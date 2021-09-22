@@ -21,17 +21,16 @@
 require 'casclient'
 
 class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
-
   def self.sti_name
     'cas'.freeze
   end
 
   def self.recognized_params
-    super + [ :auth_base, :log_in_url, :jit_provisioning ].freeze
+    super + [:auth_base, :log_in_url, :jit_provisioning].freeze
   end
 
   def self.deprecated_params
-    [ :unknown_user_url ].freeze
+    [:unknown_user_url].freeze
   end
 
   def self.recognized_federated_attributes
@@ -49,10 +48,10 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
 
   def self.debugging_keys
     [{
-       debugging: -> { t("Testing state") },
-       ticket_received: -> { t("Received CAS Ticket") },
-       validate_service_ticket: -> { t("Validated Service Ticket") },
-     }]
+      debugging: -> { t("Testing state") },
+      ticket_received: -> { t("Received CAS Ticket") },
+      validate_service_ticket: -> { t("Validated Service Ticket") },
+    }]
   end
 
   def auth_provider_filter

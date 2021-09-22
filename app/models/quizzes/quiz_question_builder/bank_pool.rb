@@ -35,6 +35,7 @@ class Quizzes::QuizQuestionBuilder
         remaining_picks = count - questions.count
         duplicated = @bank.select_for_submission(quiz_id, quiz_group_id, remaining_picks, [], duplicate_index)
         break if duplicated.empty?
+
         duplicate_index += 1
         @mark_picked.call(duplicated)
         questions.concat(duplicated)

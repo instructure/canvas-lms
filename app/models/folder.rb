@@ -58,11 +58,11 @@ class Folder < ActiveRecord::Base
   validate :protect_root_folder_name, :if => :name_changed?
   validate :reject_recursive_folder_structures, on: :update
   validate :restrict_submission_folder_context
-  after_commit :clear_permissions_cache, if: ->{[:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? {|k| saved_changes.key?(k)}}
+  after_commit :clear_permissions_cache, if: -> { [:workflow_state, :parent_folder_id, :locked, :lock_at, :unlock_at].any? { |k| saved_changes.key?(k) } }
 
   def file_attachments_visible_to(user)
     if self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS) ||
-        self.grants_right?(user, :read_as_admin)
+       self.grants_right?(user, :read_as_admin)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
@@ -94,6 +94,7 @@ class Folder < ActiveRecord::Base
 
   def reject_recursive_folder_structures
     return true if !self.parent_folder_id_changed?
+
     seen_folders = Set.new([self])
     folder = self
     while folder.parent_folder
@@ -124,16 +125,18 @@ class Folder < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
-    self.active_file_attachments.each{|a| a.destroy }
-    self.active_sub_folders.each{|s| s.destroy }
+    self.active_file_attachments.each { |a| a.destroy }
+    self.active_sub_folders.each { |s| s.destroy }
     self.deleted_at = Time.now.utc
     self.save
   end
 
   scope :active, -> { where("folders.workflow_state<>'deleted'") }
   scope :not_hidden, -> { where("folders.workflow_state<>'hidden'") }
-  scope :not_locked, -> { where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
-    (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc) }
+  scope :not_locked, -> {
+                       where("(folders.locked IS NULL OR folders.locked=?) AND ((folders.lock_at IS NULL) OR
+    (folders.lock_at>? OR (folders.unlock_at IS NOT NULL AND folders.unlock_at<?)))", false, Time.now.utc, Time.now.utc)
+                     }
   scope :by_position, -> { ordered }
   scope :by_name, -> { order(name_order_by_clause('folders')) }
 
@@ -141,12 +144,13 @@ class Folder < ActiveRecord::Base
     name
   end
 
-  def full_name(reload=false)
+  def full_name(reload = false)
     return read_attribute(:full_name) if !reload && read_attribute(:full_name)
+
     folder = self
     names = [self.name]
     while folder.parent_folder_id
-      folder = Folder.find(folder.parent_folder_id) #folder.parent_folder
+      folder = Folder.find(folder.parent_folder_id) # folder.parent_folder
       names << folder.name if folder
     end
     names.reverse.join("/")
@@ -205,7 +209,8 @@ class Folder < ActiveRecord::Base
 
   def update_sub_folders
     return unless @update_sub_folders
-    self.sub_folders.each{|f|
+
+    self.sub_folders.each { |f|
       f.reload
       f.full_name = f.full_name(true)
       f.save
@@ -218,7 +223,7 @@ class Folder < ActiveRecord::Base
     end
   end
 
-  def subcontent(opts={})
+  def subcontent(opts = {})
     res = []
     res += self.active_sub_folders
     res += self.active_file_attachments unless opts[:exclude_files]
@@ -227,11 +232,13 @@ class Folder < ActiveRecord::Base
 
   def visible?
     return @visible if defined?(@visible)
+
     @visible = (self.workflow_state == "visible") && (!self.parent_folder || self.parent_folder.visible?)
   end
 
   def hidden?
     return @hidden if defined?(@hidden)
+
     @hidden = self.workflow_state == 'hidden' || (self.parent_folder && self.parent_folder.hidden?)
   end
 
@@ -249,6 +256,7 @@ class Folder < ActiveRecord::Base
 
   def public?
     return @public if defined?(@public)
+
     @public = self.workflow_state == 'public' || (self.parent_folder && self.parent_folder.public?)
   end
 
@@ -262,7 +270,8 @@ class Folder < ActiveRecord::Base
   end
 
   attr_accessor :clone_updated
-  def clone_for(context, dup=nil, options={})
+
+  def clone_for(context, dup = nil, options = {})
     if !self.cloned_item && !self.new_record?
       self.cloned_item ||= ClonedItem.create(:original_item => self)
       self.save!
@@ -270,9 +279,10 @@ class Folder < ActiveRecord::Base
     existing = context.folders.active.where(id: self).first
     existing ||= context.folders.active.where(cloned_item_id: self.cloned_item_id || 0).first
     return existing if existing && !options[:overwrite] && !options[:force_copy]
+
     dup ||= Folder.new
     dup = existing if existing && options[:overwrite]
-    self.attributes.delete_if{|k,v| [:id, :full_name, :parent_folder_id].include?(k.to_sym) }.each do |key, val|
+    self.attributes.delete_if { |k, v| [:id, :full_name, :parent_folder_id].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
     end
     if self.unique_type && context.folders.active.where(:unique_type => self.unique_type).exists?
@@ -324,7 +334,7 @@ class Folder < ActiveRecord::Base
     context.shard.activate do
       Folder.unique_constraint_retry do
         root_folder = context.folders.active.where(parent_folder_id: nil, name: name).first
-        root_folder ||= GuardRail.activate(:primary) {context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible")}
+        root_folder ||= GuardRail.activate(:primary) { context.folders.create!(:name => name, :full_name => name, :workflow_state => "visible") }
         root_folders = [root_folder]
       end
     end
@@ -347,12 +357,12 @@ class Folder < ActiveRecord::Base
   end
 
   def self.buttons_and_icons_folder(context)
-    unique_folder(context, BUTTONS_AND_ICONS_UNIQUE_TYPE, ->{ t("Buttons and Icons") })
+    unique_folder(context, BUTTONS_AND_ICONS_UNIQUE_TYPE, -> { t("Buttons and Icons") })
   end
 
   MEDIA_TYPE = "media"
   def self.media_folder(context)
-    unique_folder(context, MEDIA_TYPE, ->{ t("Uploaded Media") })
+    unique_folder(context, MEDIA_TYPE, -> { t("Uploaded Media") })
   end
 
   def self.is_locked?(folder_id)
@@ -372,7 +382,8 @@ class Folder < ActiveRecord::Base
     @@path_lookups ||= {}
     key = [context.global_asset_string, path].join('//')
     return @@path_lookups[key] if @@path_lookups[key]
-    folders = path.split('/').select{|f| !f.empty? }
+
+    folders = path.split('/').select { |f| !f.empty? }
     @@root_folders ||= {}
     current_folder = (@@root_folders[context.global_asset_string] ||= Folder.root_folders(context).first)
     if folders[0] == current_folder.name
@@ -424,7 +435,7 @@ class Folder < ActiveRecord::Base
     if components.empty?
       # find the attachment
       atts = visible_file_attachments.to_a
-      return atts.detect {|a| Attachment.matches_name?(a.display_name, component) } || atts.detect {|a| Attachment.matches_name?(a.filename, component) }
+      return atts.detect { |a| Attachment.matches_name?(a.display_name, component) } || atts.detect { |a| Attachment.matches_name?(a.filename, component) }
     else
       # find a subfolder and recurse (yes, we can have multiple sub-folders w/ the same name)
       active_sub_folders.where(name: component).each do |folder|
@@ -472,9 +483,9 @@ class Folder < ActiveRecord::Base
     return @locked if defined?(@locked)
 
     @locked = self.locked ||
-      (self.lock_at && Time.zone.now > self.lock_at) ||
-      (self.unlock_at && Time.zone.now < self.unlock_at) ||
-      self.parent_folder&.locked?
+              (self.lock_at && Time.zone.now > self.lock_at) ||
+              (self.unlock_at && Time.zone.now < self.unlock_at) ||
+              self.parent_folder&.locked?
   end
 
   def for_student_annotation_documents?
@@ -551,6 +562,7 @@ class Folder < ActiveRecord::Base
     visible_ids.concat dir_contents
     dir_contents.each do |child_folder_id|
       next unless folder_tree[child_folder_id].present?
+
       find_visible_folders(visible_ids, folder_tree, folder_tree[child_folder_id])
     end
     nil
@@ -573,6 +585,6 @@ class Folder < ActiveRecord::Base
   end
 
   def next_lock_change
-    [lock_at, unlock_at].compact.select {|t| t > Time.zone.now}.min
+    [lock_at, unlock_at].compact.select { |t| t > Time.zone.now }.min
   end
 end

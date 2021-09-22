@@ -38,6 +38,7 @@ class Quizzes::QuizEligibility
     return true if quiz.grants_right?(user, session, :manage)
     return false unless course
     return false if inactive_student_with_private_course?
+
     !locked? && !user_restrictions_apply?
   end
 
@@ -52,6 +53,7 @@ class Quizzes::QuizEligibility
 
   def locked?
     return false unless quiz_locked?
+
     !quiz.grants_right?(user, session, :update)
   end
 
@@ -67,6 +69,7 @@ class Quizzes::QuizEligibility
   def restricted?(section)
     #  Restrictions aren't applicable if date boundries are not set
     return false unless section.start_at && section.end_at
+
     case section
     when Course
       !!section.restrict_enrollments_to_course_dates
@@ -108,6 +111,7 @@ class Quizzes::QuizEligibility
 
   def inactive_non_admin?
     return false if user.new_record?
+
     inactive_enrollment? && user_cannot_not_read_as_admin?
   end
 

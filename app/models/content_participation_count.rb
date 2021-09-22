@@ -26,7 +26,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   before_create :set_root_account_id
 
-  def self.create_or_update(opts={})
+  def self.create_or_update(opts = {})
     opts = opts.with_indifferent_access
     context = opts.delete(:context)
     user = opts.delete(:user)
@@ -39,10 +39,10 @@ class ContentParticipationCount < ActiveRecord::Base
         participant = context.content_participation_counts.where(:user_id => user, :content_type => type).lock.first
         if participant.blank?
           participant ||= context.content_participation_counts.build({
-            :user => user,
-            :content_type => type,
-            :unread_count => unread_count_for(type, context, user),
-          })
+                                                                       :user => user,
+                                                                       :content_type => type,
+                                                                       :unread_count => unread_count_for(type, context, user),
+                                                                     })
         end
         participant.attributes = opts.slice(*ACCESSIBLE_ATTRIBUTES)
 
@@ -58,6 +58,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def self.unread_count_for(type, context, user)
     return 0 unless user.present? && context.present?
+
     case type
     when "Submission"
       self.unread_submission_count_for(context, user)
@@ -68,9 +69,10 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def self.unread_submission_count_for(context, user)
     return 0 unless context.is_a?(Course) && context.user_is_student?(user)
+
     GuardRail.activate(:secondary) do
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
-          batch_object: user, batched_keys: :submissions) do
+                                                          batch_object: user, batched_keys: :submissions) do
         submission_conditions = sanitize_sql_for_conditions([<<~SQL, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
@@ -79,20 +81,20 @@ class ContentParticipationCount < ActiveRecord::Base
           assignments.submission_types != 'not_graded' AND
           (assignments.muted IS NULL OR NOT assignments.muted)
         SQL
-        subs_with_grades = Submission.active.graded.
-            joins(:assignment).
-            where(submission_conditions).
-            where("submissions.score IS NOT NULL").
-            pluck(:id)
-        subs_with_comments = Submission.active.
-            joins(:assignment, :submission_comments).
-            where(submission_conditions).
-            where(<<~SQL, user).pluck(:id)
-              (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
-              AND NOT submission_comments.draft
-              AND submission_comments.provisional_grade_id IS NULL
-              AND submission_comments.author_id <> ?
-            SQL
+        subs_with_grades = Submission.active.graded
+                                     .joins(:assignment)
+                                     .where(submission_conditions)
+                                     .where("submissions.score IS NOT NULL")
+                                     .pluck(:id)
+        subs_with_comments = Submission.active
+                                       .joins(:assignment, :submission_comments)
+                                       .where(submission_conditions)
+                                       .where(<<~SQL, user).pluck(:id)
+                                         (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
+                                         AND NOT submission_comments.draft
+                                         AND submission_comments.provisional_grade_id IS NULL
+                                         AND submission_comments.author_id <> ?
+                                       SQL
         (subs_with_grades + subs_with_comments).uniq
       end
       already_read_count = potential_ids.any? ? ContentParticipation.where(
@@ -112,7 +114,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def refresh_unread_count
     self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-    GuardRail.activate(:primary) {self.save} if self.changed?
+    GuardRail.activate(:primary) { self.save } if self.changed?
   end
 
   def set_root_account_id

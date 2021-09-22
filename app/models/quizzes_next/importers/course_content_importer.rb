@@ -27,8 +27,9 @@ module QuizzesNext::Importers
     def import_content(params)
       context = @migration.context
       return unless context.instance_of?(Course)
-      ::Importers::CourseContentImporter.
-        import_content(context, @data, params, @migration)
+
+      ::Importers::CourseContentImporter
+        .import_content(context, @data, params, @migration)
 
       migration_lti!
       mark_completion!
@@ -41,6 +42,7 @@ module QuizzesNext::Importers
       @migration.imported_migration_items_by_class(Quizzes::Quiz).each do |quiz|
         assignment = quiz_assignment(quiz)
         next unless assignment
+
         lti_assignment_quiz_set << [assignment.global_id, quiz.global_id]
         assignment.workflow_state = 'importing'
         assignment.importing_started_at = Time.zone.now
@@ -63,12 +65,14 @@ module QuizzesNext::Importers
 
     def assignment_quiz_assignment(quiz)
       return unless quiz.assignment?
+
       quiz.build_assignment unless quiz.assignment
       quiz.assignment
     end
 
     def practice_quiz_assignment(quiz)
       return unless quiz.quiz_type == 'practice_quiz'
+
       assignment = quiz.assignment
       unless assignment
         assignment = quiz.context.assignments.build(

@@ -24,7 +24,7 @@ class Account::HelpLinks
     @account = account
   end
 
-  def default_links(filter=true)
+  def default_links(filter = true)
     defaults = [
       {
         :available_to => ['student'],
@@ -47,7 +47,7 @@ class Account::HelpLinks
         :is_featured => true,
         :is_new => false,
         :feature_headline => -> { I18n.t('Little lost? Try here first!') }
-        }.freeze,
+      }.freeze,
       {
         :available_to => ['user', 'student', 'teacher', 'admin', 'observer', 'unenrolled'],
         :text => -> { I18n.t('#help_dialog.report_problem', 'Report a Problem') },
@@ -97,7 +97,7 @@ class Account::HelpLinks
       link = link.except(:is_featured, :is_new, :feature_headline) unless Account.site_admin.feature_enabled?(:featured_help_links)
       link
     end
-    featured, not_featured = instantiated.partition {|link| link[:is_featured]}
+    featured, not_featured = instantiated.partition { |link| link[:is_featured] }
     featured + not_featured
   end
 
@@ -145,11 +145,11 @@ class Account::HelpLinks
 
   def self.validate_links(links)
     errors = []
-    if links.count {|link| link[:is_featured]} > 1
+    if links.count { |link| link[:is_featured] } > 1
       errors << 'at most one featured link is permitted'
-    elsif links.count {|link| link[:is_new]} > 1
+    elsif links.count { |link| link[:is_new] } > 1
       errors << 'at most one new link is permitted'
-    elsif links.any? {|link| link[:is_new] && link[:is_featured]}
+    elsif links.any? { |link| link[:is_new] && link[:is_featured] }
       errors << 'a link cannot be featured and new'
     end
     errors

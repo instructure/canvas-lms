@@ -44,35 +44,35 @@ class AssessmentQuestionBank < ActiveRecord::Base
     given do |user, session|
       !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :read_question_banks) &&
-          self.context.grants_right?(user, session, :manage_assignments)
+        self.context.grants_right?(user, session, :manage_assignments)
     end
     can :read and can :create and can :update and can :delete and can :manage
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :read_question_banks) &&
-          self.context.grants_right?(user, session, :manage_assignments_add)
+        self.context.grants_right?(user, session, :manage_assignments_add)
     end
     can :read and can :create
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :read_question_banks) &&
-          self.context.grants_right?(user, session, :manage_assignments_edit)
+        self.context.grants_right?(user, session, :manage_assignments_edit)
     end
     can :read and can :update and can :manage
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :read_question_banks) &&
-          self.context.grants_right?(user, session, :manage_assignments_delete)
+        self.context.grants_right?(user, session, :manage_assignments_delete)
     end
     can :read and can :delete
 
-    given{|user, session| self.context.grants_right?(user, session, :read_question_banks) }
+    given { |user, session| self.context.grants_right?(user, session, :read_question_banks) }
     can :read
 
-    given{|user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
+    given { |user| user && self.assessment_question_bank_users.where(:user_id => user).exists? }
     can :read
   end
 
@@ -118,16 +118,17 @@ class AssessmentQuestionBank < ActiveRecord::Base
     if outcomes.empty?
       learning_outcome_alignments.update_all(:workflow_state => 'deleted')
     else
-      learning_outcome_alignments.
-        where("learning_outcome_id NOT IN (?)", outcomes).
-        update_all(:workflow_state => 'deleted')
+      learning_outcome_alignments
+        .where("learning_outcome_id NOT IN (?)", outcomes)
+        .update_all(:workflow_state => 'deleted')
     end
 
     # add/update current alignments
     unless outcomes.empty?
       alignments.each do |outcome_id, mastery_score|
-        matching_outcome = outcomes.detect{ |outcome| outcome.id == outcome_id.to_i }
+        matching_outcome = outcomes.detect { |outcome| outcome.id == outcome_id.to_i }
         next unless matching_outcome
+
         matching_outcome.align(self, context, :mastery_score => mastery_score)
       end
     end
@@ -135,10 +136,11 @@ class AssessmentQuestionBank < ActiveRecord::Base
 
   def update_alignments
     return unless saved_change_to_workflow_state? && deleted?
+
     LearningOutcome.update_alignments(self, context, [])
   end
 
-  def bookmark_for(user, do_bookmark=true)
+  def bookmark_for(user, do_bookmark = true)
     if do_bookmark
       question_bank_user = self.assessment_question_bank_users.where(user_id: user).first
       question_bank_user ||= self.assessment_question_bank_users.create(:user => user)
@@ -151,7 +153,7 @@ class AssessmentQuestionBank < ActiveRecord::Base
     user && self.assessment_question_bank_users.where(user_id: user).exists?
   end
 
-  def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids=[], duplicate_index = 0)
+  def select_for_submission(quiz_id, quiz_group_id, count, exclude_ids = [], duplicate_index = 0)
     # 1. select a random set of questions from the DB
     questions = assessment_questions.active
     questions = questions.where.not(id: exclude_ids) unless exclude_ids.empty?

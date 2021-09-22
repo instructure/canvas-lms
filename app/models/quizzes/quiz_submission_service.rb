@@ -235,7 +235,7 @@ class Quizzes::QuizSubmissionService
   #   - #ensure_latest_attempt!
   #
   # @return [Hash] the recently-adjusted submission_data set
-  def update_question(question_record, quiz_submission, attempt, snapshot=true)
+  def update_question(question_record, quiz_submission, attempt, snapshot = true)
     unless quiz_submission.grants_right?(participant.user, :update)
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
@@ -253,9 +253,9 @@ class Quizzes::QuizSubmissionService
     ensure_latest_attempt! quiz_submission, attempt
 
     quiz_submission.backup_submission_data question_record.merge({
-      validation_token: participant.validation_token,
-      cnt: snapshot ? 5 : 1 # force generation of snapshot
-    })
+                                                                   validation_token: participant.validation_token,
+                                                                   cnt: snapshot ? 5 : 1 # force generation of snapshot
+                                                                 })
   end
 
   protected
@@ -301,7 +301,6 @@ class Quizzes::QuizSubmissionService
                                             user: participant.user,
                                             remote_ip: participant.ip_address,
                                             access_code: participant.access_code)
-
 
     unless can_take.eligible?
       reason = can_take.declined_reason_renders

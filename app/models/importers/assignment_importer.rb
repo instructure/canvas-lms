@@ -27,18 +27,18 @@ module Importers
     self.item_class = Assignment
 
     def self.process_migration(data, migration)
-      assignments = data['assignments'] ? data['assignments']: []
+      assignments = data['assignments'] ? data['assignments'] : []
       to_import = migration.to_import 'assignments'
 
       create_assignments(assignments, migration)
 
-      migration_ids = assignments.map{|m| m['assignment_id'] }.compact
+      migration_ids = assignments.map { |m| m['assignment_id'] }.compact
       conn = Assignment.connection
       cases = []
       max = migration.context.assignments.pluck(:position).compact.max || 0
-      assignments.each_with_index{|m, idx| cases << " WHEN migration_id=#{conn.quote(m['assignment_id'])} THEN #{max + idx + 1} " if m['assignment_id'] }
+      assignments.each_with_index { |m, idx| cases << " WHEN migration_id=#{conn.quote(m['assignment_id'])} THEN #{max + idx + 1} " if m['assignment_id'] }
       unless cases.empty?
-        conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map{|id| conn.quote(id)}.join(',')})")
+        conn.execute("UPDATE #{Assignment.quoted_table_name} SET position=CASE #{cases.join(' ')} ELSE NULL END WHERE context_id=#{migration.context.id} AND context_type=#{conn.quote(migration.context.class.to_s)} AND migration_id IN (#{migration_ids.map { |id| conn.quote(id) }.join(',')})")
       end
     end
 
@@ -61,8 +61,8 @@ module Importers
       end
 
       if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
-        context.assignments.active.where.not(:migration_id => nil).
-          where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
+        context.assignments.active.where.not(:migration_id => nil)
+               .where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
           if group = context.assignment_group_no_drop_assignments[item.migration_id]
             AssignmentGroup.add_never_drop_assignment(group, item)
           end
@@ -106,16 +106,17 @@ module Importers
       )
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil, quiz=nil)
+    def self.import_from_migration(hash, context, migration, item = nil, quiz = nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignments_to_import] && !hash[:assignments_to_import][hash[:migration_id]]
+
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Assignment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
-      item ||= context.assignments.temp_record #new(:context => context)
+      item ||= context.assignments.temp_record # new(:context => context)
 
       item.saved_by = :migration
       item.mark_as_importing!(migration)
-      master_migration = migration&.for_master_course_import?  # propagate null dates only for blueprint syncs
+      master_migration = migration&.for_master_course_import? # propagate null dates only for blueprint syncs
       new_record = item.new_record?
 
       item.title = hash[:title]
@@ -152,7 +153,7 @@ module Importers
         item.submission_types = hash[:submission_types]
       elsif ['discussion_topic'].include?(hash[:submission_format])
         item.submission_types = "discussion_topic"
-      elsif ['online_upload','textwithattachments'].include?(hash[:submission_format])
+      elsif ['online_upload', 'textwithattachments'].include?(hash[:submission_format])
         item.submission_types = "online_upload,online_text_entry"
       elsif ['online_text_entry'].include?(hash[:submission_format])
         item.submission_types = "online_text_entry"
@@ -239,8 +240,9 @@ module Importers
         added_overrides = false
         hash[:assignment_overrides].each do |o|
           next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
-            o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
-            !context.feature_enabled?(:conditional_release)
+                  o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
+                  !context.feature_enabled?(:conditional_release)
+
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
@@ -248,12 +250,13 @@ module Importers
           override.set_id = o[:set_id]
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.key?(field)
+
             override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
           added_overrides = true
           migration.add_imported_item(override,
-            key: [item.migration_id, override.set_type, override.set_id].join('/'))
+                                      key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
         can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
         if hash.has_key?(:only_visible_to_overrides) && can_restrict
@@ -292,7 +295,7 @@ module Importers
       hash[:due_at] ||= hash[:due_date] if hash.has_key?(:due_date)
       [:due_at, :lock_at, :unlock_at, :peer_reviews_due_at].each do |key|
         if hash.has_key?(key) && (master_migration || hash[key].present?)
-          item.send"#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
+          item.send "#{key}=", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(hash[key])
         end
       end
 
@@ -315,20 +318,20 @@ module Importers
        :omit_from_final_grade, :intra_group_peer_reviews,
        :grader_count, :grader_comments_visible_to_graders,
        :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
-       :anonymous_instructor_annotations
-      ].each do |prop|
+       :anonymous_instructor_annotations].each do |prop|
         item.send("#{prop}=", hash[prop]) unless hash[prop].nil?
       end
 
       # Only set post_to_sis if this is a new assignment or if the content is locked
       if new_record || item.editing_restricted?(:any)
         if hash[:post_to_sis] && item.grading_type != 'not_graded' && AssignmentUtil.due_date_required_for_account?(context) &&
-          (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
+           (item.due_at.nil? || (migration.date_shift_options && Canvas::Plugin.value_to_boolean(migration.date_shift_options[:remove_dates])))
           # check if it's going to fail the weird post_to_sis validation requiring due dates
           # either because the date is already nil or we're going to remove it later
           migration.add_warning(
             t("The Sync to SIS setting could not be enabled for the assignment \"%{assignment_name}\" without a due date.",
-              :assignment_name => item.title))
+              :assignment_name => item.title)
+          )
         elsif !hash[:post_to_sis].nil?
           item.post_to_sis = hash[:post_to_sis]
         end
@@ -393,12 +396,11 @@ module Importers
           context: context, vendor_code: vendor_code, product_code: product_code
         )
 
-
         if active_proxies.blank?
           migration.add_warning(I18n.t(
-            "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
-            vendor_code: vendor_code, product_code: product_code)
-          )
+                                  "We were unable to find a tool profile match for vendor_code: \"%{vendor_code}\" product_code: \"%{product_code}\".",
+                                  vendor_code: vendor_code, product_code: product_code
+                                ))
         else
           item.lti_context_id ||= SecureRandom.uuid
           create_tool_settings(hash['tool_setting'], active_proxies.first, item)
@@ -426,9 +428,9 @@ module Importers
       if item.submission_types == 'external_tool' && (hash[:external_tool_url] || hash[:external_tool_id] || hash[:external_tool_migration_id])
         current_tag = item.external_tool_tag
         needs_new_tag = !current_tag ||
-          (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
-          (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id].to_i) ||
-          (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
+                        (hash[:external_tool_url] && current_tag.url != hash[:external_tool_url]) ||
+                        (hash[:external_tool_id] && current_tag.content_id != hash[:external_tool_id].to_i) ||
+                        (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
 
         if needs_new_tag
           tag = current_tag || item.build_external_tool_tag
@@ -462,8 +464,8 @@ module Importers
           if !tag.save
             if tag.errors["url"]
               migration.add_warning(t('errors.import.external_tool_url',
-                "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
-                :assignment_name => item.title))
+                                      "The url for the external tool assignment \"%{assignment_name}\" wasn't valid.",
+                                      :assignment_name => item.title))
             end
             item.association(:external_tool_tag).target = nil # otherwise it will trigger destroy on the tag
           end
@@ -476,7 +478,7 @@ module Importers
       end
 
       if hash[:line_items].present?
-        any_coupled_line_items = hash["line_items"].any?{|li| li["coupled"]}
+        any_coupled_line_items = hash["line_items"].any? { |li| li["coupled"] }
 
         hash[:line_items].each do |li|
           params = {
@@ -490,7 +492,7 @@ module Importers
           # Do not create a line item if an equivalent one already existed
           # before this import. Prevents re-imports from creating duplicate
           # line items on existing assignments.
-          equivalency_field_values = LINE_ITEMS_EQUIVALENCY_FIELDS.map{|f| params[f]}
+          equivalency_field_values = LINE_ITEMS_EQUIVALENCY_FIELDS.map { |f| params[f] }
           next if previously_existing_line_items.include?(equivalency_field_values)
 
           params[:client_id] = li[:client_id] unless tool

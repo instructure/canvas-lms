@@ -34,10 +34,10 @@ class Lti::ResourceLink < ApplicationRecord
   alias_method :original_context_external_tool, :context_external_tool
 
   has_many :line_items,
-            inverse_of: :resource_link,
-            class_name: 'Lti::LineItem',
-            dependent: :destroy,
-            foreign_key: :lti_resource_link_id
+           inverse_of: :resource_link,
+           class_name: 'Lti::LineItem',
+           dependent: :destroy,
+           foreign_key: :lti_resource_link_id
 
   before_validation :generate_resource_link_uuid, on: :create
   before_validation :generate_lookup_uuid, on: :create

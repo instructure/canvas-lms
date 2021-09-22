@@ -30,7 +30,7 @@ class Profile < ActiveRecord::Base
   validates_format_of :path, :with => /\A[a-z0-9-]+\z/
   validates_uniqueness_of :path, :scope => :root_account_id
   validates_uniqueness_of :context_id, :scope => :context_type
-  validates_inclusion_of :visibility, :in => %w{ public unlisted private }
+  validates_inclusion_of :visibility, :in => %w{public unlisted private}
 
   def title=(title)
     write_attribute(:title, title)
@@ -40,10 +40,12 @@ class Profile < ActiveRecord::Base
 
   def infer_path
     return nil unless title
+
     path = base_path = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A\-+|\-+\z/, '')
     count = 0
     while profile = Profile.where(root_account_id: root_account_id, path: path).first
       break if profile.id == id
+
       path = "#{base_path}-#{count += 1}"
     end
     path
@@ -73,11 +75,12 @@ class Profile < ActiveRecord::Base
 
   def sanitize_data(value, options)
     return nil unless value.present?
+
     case options[:type]
-      when :decimal,
-           :float;   value.to_f
-      when :int;     value.to_i
-      else           value
+    when :decimal,
+           :float; value.to_f
+    when :int; value.to_i
+    else value
     end
   end
 

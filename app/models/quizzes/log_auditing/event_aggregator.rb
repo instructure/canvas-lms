@@ -56,20 +56,21 @@ module Quizzes::LogAuditing
         AND created_at <= :time
       SQL
       events = Quizzes::QuizSubmissionEvent.where(sql_string, {
-        qs_id: quiz_submission_id,
-        attempt: attempt,
-        filter: [
-          Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,
-          Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
-        ],
-        time: timestamp
-      }).order("created_at ASC")
+                                                    qs_id: quiz_submission_id,
+                                                    attempt: attempt,
+                                                    filter: [
+                                                      Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED,
+                                                      Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED
+                                                    ],
+                                                    time: timestamp
+                                                  }).order("created_at ASC")
       filtered_events, final_answers = pick_latest_distinct_events_and_answers(events)
       submission_data_hash = build_submission_data_from_events(filtered_events)
       submission_data_hash.merge build_submission_data_from_answers(final_answers)
     end
 
     private
+
     # constructs submission data from events, including the parsing of flagged
     # to indicate that they are 'marked' or 'flagged'
     def build_submission_data_from_events(events)

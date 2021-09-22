@@ -34,6 +34,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   def push_json(json)
     return false unless endpoint_exists? && own_endpoint? && endpoint_enabled? && !token_changed?
+
     sns_client.publish(target_arn: self.arn, message: json, message_structure: 'json')
   end
 
@@ -86,13 +87,14 @@ class NotificationEndpoint < ActiveRecord::Base
       # parse already existing with different access_token from the response message
       Canvas::Errors.capture_exception(:push_notifications, e, :info)
       raise unless DIFFERENT_ATTRIBUTES_ERROR_REGEX.match(e.message)
+
       self.arn = $1
       # steal the endpoint by setting the access token
       endpoint_updated = false
       begin
         sns_client.set_endpoint_attributes(
           endpoint_arn: self.arn,
-          attributes: {'CustomUserData' => access_token.global_id.to_s}
+          attributes: { 'CustomUserData' => access_token.global_id.to_s }
         )
         endpoint_updated = true
       rescue Aws::SNS::Errors::NotFound => ex
@@ -106,6 +108,7 @@ class NotificationEndpoint < ActiveRecord::Base
         if retried
           raise FailedSnsInteraction, "Unable to create or reassign SNS endpoint for access_token #{access_token.global_id.to_s}"
         end
+
         retried = true
         Canvas::Errors.capture_exception(:push_notifications, ex, :info)
       end
@@ -115,6 +118,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   def delete_platform_endpoint
     return unless endpoint_exists? && own_endpoint?
+
     sns_client.delete_endpoint(endpoint_arn: self.arn)
   end
 end

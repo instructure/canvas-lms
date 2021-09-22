@@ -19,7 +19,6 @@
 
 module Quizzes::QuizQuestion::AnswerSerializers
   class Quizzes::QuizQuestion::AnswerSerializers::SerializedAnswer
-
     # @property [Hash] answer
     #
     # The output of the serializer which is compatible for merging with
@@ -58,7 +57,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     ERROR_CODES = {
       invalid_type: lambda { |param_name, expected_type|
-        '%s must be of type %s' % [ param_name, expected_type.to_s ]
+        '%s must be of type %s' % [param_name, expected_type.to_s]
       },
       unknown_answer: lambda { |id| "Unknown answer '#{id}'" },
       unknown_match: lambda { |id| "Unknown match '#{id}'" },

@@ -42,16 +42,16 @@ class Alert < ActiveRecord::Base
     admin_role_ids = []
     self.recipients.try(:each) do |recipient|
       case
-        when recipient == :student
-          include_student = true
-        when recipient == :teachers
-          include_teachers = true
-        when recipient.is_a?(String)
-          admin_role_ids << find_role_by_name(recipient).id
-        when recipient.is_a?(Hash)
-          admin_role_ids << recipient[:role_id]
-        else
-          raise "Unsupported recipient type!"
+      when recipient == :student
+        include_student = true
+      when recipient == :teachers
+        include_teachers = true
+      when recipient.is_a?(String)
+        admin_role_ids << find_role_by_name(recipient).id
+      when recipient.is_a?(Hash)
+        admin_role_ids << recipient[:role_id]
+      else
+        raise "Unsupported recipient type!"
       end
     end
 
@@ -90,7 +90,7 @@ class Alert < ActiveRecord::Base
   def criteria=(values)
     if values[0].is_a? Hash
       values = values.map do |params|
-        if(params[:id].present?)
+        if (params[:id].present?)
           id = params.delete(:id).to_i
           criterion = self.criteria.to_ary.find { |c| c.id == id }
           criterion.attributes = params

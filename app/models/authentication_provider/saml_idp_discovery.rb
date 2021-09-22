@@ -25,7 +25,7 @@ class AuthenticationProvider::SamlIdpDiscovery < AuthenticationProvider::Delegat
     end
 
     def recognized_params
-      [ :discovery_service_url ].freeze
+      [:discovery_service_url].freeze
     end
 
     def display_name

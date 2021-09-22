@@ -52,9 +52,9 @@ class MediaObject < ActiveRecord::Base
     unless Rails.env.production?
       raise "Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content."
     end
+
     super
   end
-
 
   set_policy do
     given { |user| (self.user && self.user == user) || (self.context && self.context.grants_right?(user, :manage_content)) }
@@ -73,8 +73,8 @@ class MediaObject < ActiveRecord::Base
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadCsv(csv)
     if !res[:ready]
-      MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY).
-        refresh_media_files(res[:id], [], root_account_id)
+      MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY)
+                 .refresh_media_files(res[:id], [], root_account_id)
     else
       build_media_objects(res, root_account_id)
     end
@@ -128,15 +128,15 @@ class MediaObject < ActiveRecord::Base
     end
   end
 
-  def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt=0)
+  def self.refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt = 0)
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     res = client.bulkUploadGet(bulk_upload_id)
     if !res[:ready]
       if attempt < Setting.get('media_object_bulk_refresh_max_attempts', '5').to_i
         wait_period = Setting.get('media_object_bulk_refresh_wait_period', '30').to_i
-        MediaObject.delay(run_at: wait_period.minutes.from_now, priority: Delayed::LOW_PRIORITY).
-          refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
+        MediaObject.delay(run_at: wait_period.minutes.from_now, priority: Delayed::LOW_PRIORITY)
+                   .refresh_media_files(bulk_upload_id, attachment_ids, root_account_id, attempt + 1)
       else
         # if it fails, then the attachment should no longer consider itself kalturable
         Attachment.where("id IN (?) OR root_attachment_id IN (?)", attachment_ids, attachment_ids).update_all(:media_entry_id => nil) unless attachment_ids.empty?
@@ -186,16 +186,16 @@ class MediaObject < ActiveRecord::Base
     CanvasKaltura::ClientV3.new.media_sources(self.media_id)
   end
 
-  def retrieve_details_ensure_codecs(attempt=0)
+  def retrieve_details_ensure_codecs(attempt = 0)
     retrieve_details
     if !transcoded_details && self.created_at > 6.hours.ago
       if attempt < 10
         delay(run_at: (5 * attempt).minutes.from_now).retrieve_details_ensure_codecs(attempt + 1)
       else
         Canvas::Errors.capture(:media_object_failure, {
-          message: "Kaltura flavor retrieval failed",
-          object: self.inspect.to_s,
-        }, :warn)
+                                 message: "Kaltura flavor retrieval failed",
+                                 object: self.inspect.to_s,
+                               }, :warn)
       end
     end
   end
@@ -216,18 +216,18 @@ class MediaObject < ActiveRecord::Base
       self.data[:plays] = entry[:plays].to_i
       self.data[:download_url] = entry[:downloadUrl]
       tags = (entry[:tags] || "").split(/,/).map(&:strip)
-      old_id = tags.detect{|t| t.match(/old_id_/) }
+      old_id = tags.detect { |t| t.match(/old_id_/) }
       self.old_media_id = old_id.sub(/old_id_/, '') if old_id
     end
     self.data[:extensions] ||= {}
     assets.each do |asset|
       asset[:fileExt] = "none" if asset[:fileExt].blank?
-      self.data[:extensions][asset[:fileExt].to_sym] = asset #.slice(:width, :height, :id, :entryId, :status, :containerFormat, :fileExt, :size
+      self.data[:extensions][asset[:fileExt].to_sym] = asset # .slice(:width, :height, :id, :entryId, :status, :containerFormat, :fileExt, :size
       if asset[:size]
         self.max_size = [self.max_size || 0, asset[:size].to_i].max
       end
     end
-    self.total_size = [self.max_size || 0, assets.map{|a| (a[:size] || 0).to_i }.sum].max
+    self.total_size = [self.max_size || 0, assets.map { |a| (a[:size] || 0).to_i }.sum].max
     self.save
     ensure_attachment
     self.data
@@ -235,6 +235,7 @@ class MediaObject < ActiveRecord::Base
 
   def retrieve_details
     return unless self.media_id
+
     # From Kaltura, retrieve the title (if it's not already set)
     # and the list of valid flavors along with their id's.
     # Might as well confirm the media type while you're at it.
@@ -308,14 +309,14 @@ class MediaObject < ActiveRecord::Base
     return unless sources.present?
 
     attachment = build_attachment({
-      "context" => context,
-      "display_name" => self.title,
-      "filename" => self.title,
-      "content_type" => self.media_type,
-      "media_entry_id" => self.media_id,
-      "workflow_state" => "processed",
-      "folder_id" => Folder.media_folder(context).id
-    })
+                                    "context" => context,
+                                    "display_name" => self.title,
+                                    "filename" => self.title,
+                                    "content_type" => self.media_type,
+                                    "media_entry_id" => self.media_id,
+                                    "workflow_state" => "processed",
+                                    "folder_id" => Folder.media_folder(context).id
+                                  })
 
     url = self.data.dig(:download_url)
     url = sources.select { |s| s[:isOriginal] == '1' }.first&.dig(:url) if url.blank?

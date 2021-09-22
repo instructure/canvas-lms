@@ -26,7 +26,7 @@ module QuizzesNext
       def begin_export(course, opts)
         selected_assignment_ids = nil
         if opts[:selective]
-          selected_assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/)) && match[1]}.compact
+          selected_assignment_ids = opts[:exported_assets].map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }.compact
           return unless selected_assignment_ids.any?
         end
         assignments = QuizzesNext::Service.active_lti_assignments_for_course(course, selected_assignment_ids: selected_assignment_ids)

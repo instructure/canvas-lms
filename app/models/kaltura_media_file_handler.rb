@@ -21,18 +21,19 @@
 class KalturaMediaFileHandler
   def add_media_files(attachments, wait_for_completion)
     return unless CanvasKaltura::ClientV3.config
+
     attachments = Array(attachments)
     client = CanvasKaltura::ClientV3.new
     client.startSession(CanvasKaltura::SessionType::ADMIN)
     files = []
-    root_account_id = attachments.map{|a| a.root_account_id }.compact.first
-    attachments.select{|a| !a.media_object }.each do |attachment|
+    root_account_id = attachments.map { |a| a.root_account_id }.compact.first
+    attachments.select { |a| !a.media_object }.each do |attachment|
       files << {
-                  :name       => attachment.display_name,
-                  :url        => attachment.public_download_url,
-                  :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
-                  :partner_data  => build_partner_data(attachment)
-               }
+        :name => attachment.display_name,
+        :url => attachment.public_download_url,
+        :media_type => (attachment.content_type || "").match(/\Avideo/) ? 'video' : 'audio',
+        :partner_data => build_partner_data(attachment)
+      }
     end
     return nil if files.empty?
 
@@ -59,10 +60,10 @@ class KalturaMediaFileHandler
     end
 
     partner_data.merge!({
-      attachment_id: attachment.id.to_s,
-      context_source: "file_upload",
-      root_account_id: Shard.global_id_for(attachment.root_account_id).to_s,
-    })
+                          attachment_id: attachment.id.to_s,
+                          context_source: "file_upload",
+                          root_account_id: Shard.global_id_for(attachment.root_account_id).to_s,
+                        })
     Rack::Utils.build_nested_query(partner_data)
   end
 
@@ -94,8 +95,8 @@ class KalturaMediaFileHandler
   end
 
   def refresh_later(bulk_upload_id, attachments, root_account_id)
-    MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY).
-      refresh_media_files(bulk_upload_id, attachments.map(&:id), root_account_id)
+    MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY)
+               .refresh_media_files(bulk_upload_id, attachments.map(&:id), root_account_id)
   end
 
   def send_sis_data_to_kaltura?

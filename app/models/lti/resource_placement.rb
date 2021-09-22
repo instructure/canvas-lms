@@ -20,7 +20,6 @@
 
 module Lti
   class ResourcePlacement < ActiveRecord::Base
-
     ACCOUNT_NAVIGATION = 'account_navigation'
     ASSIGNMENT_EDIT = 'assignment_edit'
     ASSIGNMENT_SELECTION = 'assignment_selection'
@@ -98,7 +97,7 @@ module Lti
     end
 
     def self.update_tabs_and_return_item_banks_tab(tabs, new_label = nil)
-      item_banks_tab = tabs.find {|t| t[:label] == 'Item Banks'}
+      item_banks_tab = tabs.find { |t| t[:label] == 'Item Banks' }
       if item_banks_tab
         item_banks_tab[:label] = new_label || t('#tabs.item_banks', 'Item Banks')
       end

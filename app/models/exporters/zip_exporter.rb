@@ -20,7 +20,7 @@
 
 module Exporters
   class ZipExporter
-    def self.create_zip_export(content_export, opts={})
+    def self.create_zip_export(content_export, opts = {})
       exporter = ZipExporter.new(content_export)
       exporter.export
     end
@@ -103,11 +103,12 @@ module Exporters
     end
 
     def mock_session
-      @user && {:user_id => @user.id} # used for public_to_auth_users courses
+      @user && { :user_id => @user.id } # used for public_to_auth_users courses
     end
 
     def process_folder(folder)
       return unless folder.grants_right?(@user, mock_session, :read_contents)
+
       @folder_list << folder unless folder.root_folder?
       folder.sub_folders.active.each do |sub_folder|
         process_folder(sub_folder)

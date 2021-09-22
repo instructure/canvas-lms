@@ -31,6 +31,7 @@ module ConditionalRelease
     end
 
     private
+
     def lower_bound_less_than_upper_bound
       if lower_bound.is_a?(Numeric) && upper_bound.is_a?(Numeric) && lower_bound > upper_bound
         errors.add(:base, 'lower bound must be less than upper bound')

@@ -19,7 +19,6 @@
 #
 
 class Announcement < DiscussionTopic
-
   belongs_to :context, polymorphic: [:course, :group]
 
   has_a_broadcast_policy
@@ -37,7 +36,7 @@ class Announcement < DiscussionTopic
 
   acts_as_list scope: { context: self, type: 'Announcement' }
 
-  scope :between , lambda { |start_date, end_date|
+  scope :between, lambda { |start_date, end_date|
     where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', start_date, end_date)
   }
 
@@ -61,8 +60,8 @@ class Announcement < DiscussionTopic
 
   def respect_context_lock_rules
     self.locked = true if !locked? &&
-            context.is_a?(Course) &&
-            context.lock_all_announcements?
+                          context.is_a?(Course) &&
+                          context.lock_all_announcements?
   end
   protected :respect_context_lock_rules
 
@@ -105,24 +104,24 @@ class Announcement < DiscussionTopic
 
     given do |user|
       self.grants_right?(user, :read) &&
-       (self.context.is_a?(Group) ||
-        (user &&
-         (self.context.grants_right?(user, :read_as_admin) ||
-          (self.context.is_a?(Course) &&
-           self.context.includes_user?(user)))))
+        (self.context.is_a?(Group) ||
+         (user &&
+          (self.context.grants_right?(user, :read_as_admin) ||
+           (self.context.is_a?(Course) &&
+            self.context.includes_user?(user)))))
     end
     can :read_replies
 
     given { |user, session| self.context.grants_right?(user, session, :read_announcements) && self.visible_for?(user) }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked?}
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.locked? }
     can :reply
 
     given { |user, session| self.context.is_a?(Group) && self.context.grants_right?(user, session, :create_forum) }
     can :create
 
-    given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } #admins.include?(user) }
+    given { |user, session| self.context.grants_all_rights?(user, session, :read_announcements, :moderate_forum) } # admins.include?(user) }
     can :update and can :read_as_admin and can :delete and can :reply and can :create and can :read and can :attach
 
     given do |user, session|
@@ -147,7 +146,7 @@ class Announcement < DiscussionTopic
     :topic_is_announcement
   end
 
-  def can_unpublish?(opts=nil)
+  def can_unpublish?(opts = nil)
     false
   end
 
@@ -173,9 +172,9 @@ class Announcement < DiscussionTopic
       ObserverAlert.create!(observer: observer, student: student, observer_alert_threshold: threshold,
                             context: self, alert_type: 'course_announcement', action_date: self.updated_at,
                             title: I18n.t("Course announcement: \"%{title}\" in %{course_code}", {
-                              title: self.title,
-                              course_code: self.course.course_code
-                            }))
+                                            title: self.title,
+                                            course_code: self.course.course_code
+                                          }))
     end
   end
 end

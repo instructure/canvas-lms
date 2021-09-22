@@ -41,6 +41,7 @@ class Attachments::S3Storage
     # note that GC of the S3 bucket isn't yet implemented,
     # so there's a bit of a cost here
     return if attachment.instfs_hosted?
+
     if !exists?
       if !attachment.size
         attachment.size = bucket.object(old_full_filename).content_length
@@ -56,15 +57,15 @@ class Attachments::S3Storage
 
   def initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
     {
-        :upload_url => bucket.url,
-        :file_param => 'file',
-        :success_url => s3_success_url,
-        :upload_params => cred_params(options[:datetime])
+      :upload_url => bucket.url,
+      :file_param => 'file',
+      :success_url => s3_success_url,
+      :upload_params => cred_params(options[:datetime])
     }
   end
 
   def amend_policy_conditions(policy, datetime:)
-    policy['conditions'].unshift({'bucket' => bucket.name})
+    policy['conditions'].unshift({ 'bucket' => bucket.name })
     cred_params(datetime).each do |k, v|
       policy['conditions'] << { k => v }
     end
@@ -73,7 +74,7 @@ class Attachments::S3Storage
 
   def cred_params(datetime)
     access_key = bucket.client.config.access_key_id
-    day_string = datetime[0,8]
+    day_string = datetime[0, 8]
     region = bucket.client.config.region
     credential = "#{access_key}/#{day_string}/#{region}/s3/aws4_request"
     {
@@ -86,7 +87,7 @@ class Attachments::S3Storage
   def shared_secret(datetime)
     config = bucket.client.config
     sha256 = OpenSSL::Digest::SHA256.new
-    date_key = OpenSSL::HMAC.digest(sha256, "AWS4#{config.secret_access_key}", datetime[0,8])
+    date_key = OpenSSL::HMAC.digest(sha256, "AWS4#{config.secret_access_key}", datetime[0, 8])
     date_region_key = OpenSSL::HMAC.digest(sha256, date_key, config.region)
     date_region_service_key = OpenSSL::HMAC.digest(sha256, date_region_key, "s3")
     OpenSSL::HMAC.digest(sha256, date_region_service_key, "aws4_request")

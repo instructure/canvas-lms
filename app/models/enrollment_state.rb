@@ -39,6 +39,7 @@ class EnrollmentState < ActiveRecord::Base
   belongs_to :enrollment, inverse_of: :enrollment_state
 
   attr_accessor :skip_touch_user, :user_needs_touch, :is_direct_recalculation
+
   validates_presence_of :enrollment_id
 
   resolves_root_account through: :enrollment
@@ -150,7 +151,7 @@ class EnrollmentState < ActiveRecord::Base
     now = Time.now
 
     # start_at <= now <= end_at, allowing for open ranges on either end
-    if range = ranges.detect{|start_at, end_at| (start_at || now) <= now && now <= (end_at || now) }
+    if range = ranges.detect { |start_at, end_at| (start_at || now) <= now && now <= (end_at || now) }
       # we're in the middle of the start-end so the state is just the same as the workflow state
       self.state = wf_state
       start_at, end_at = range
@@ -209,18 +210,18 @@ class EnrollmentState < ActiveRecord::Base
   # ********************
   # The rest of these class-level methods keep the database state up to date when dates and access settings are changed elsewhere
 
-  def self.enrollments_needing_calculation(scope=Enrollment.all)
-    scope.joins(:enrollment_state).
-      where("enrollment_states.state_is_current = ? OR enrollment_states.access_is_current = ?", false, false)
+  def self.enrollments_needing_calculation(scope = Enrollment.all)
+    scope.joins(:enrollment_state)
+         .where("enrollment_states.state_is_current = ? OR enrollment_states.access_is_current = ?", false, false)
   end
 
-  def self.process_states_in_ranges(start_at, end_at, enrollment_scope=Enrollment.all)
+  def self.process_states_in_ranges(start_at, end_at, enrollment_scope = Enrollment.all)
     Enrollment.find_ids_in_ranges(:start_at => start_at, :end_at => end_at, :batch_size => 250) do |min_id, max_id|
       process_states_for(enrollments_needing_calculation(enrollment_scope).where(:id => min_id..max_id))
     end
   end
 
-  def self.process_term_states_in_ranges(start_at, end_at, term, enrollment_type=nil)
+  def self.process_term_states_in_ranges(start_at, end_at, term, enrollment_type = nil)
     scope = term.enrollments
     scope = scope.where(:type => enrollment_type) if enrollment_type
     process_states_in_ranges(start_at, end_at, scope)
@@ -243,7 +244,7 @@ class EnrollmentState < ActiveRecord::Base
       update_enrollment(enrollment)
     end
 
-    user_ids_to_touch = enrollments.select{|e| e.enrollment_state.user_needs_touch}.map(&:user_id)
+    user_ids_to_touch = enrollments.select { |e| e.enrollment_state.user_needs_touch }.map(&:user_id)
     if user_ids_to_touch.any?
       User.touch_and_clear_cache_keys(user_ids_to_touch, :enrollments)
     end
@@ -255,44 +256,44 @@ class EnrollmentState < ActiveRecord::Base
 
   INVALIDATEABLE_STATES = %w{pending_invited pending_active invited active completed inactive}.freeze # don't worry about creation_pending or rejected, etc
   def self.invalidate_states(enrollment_scope)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES).
-      update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES)
+                   .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
   end
 
   def self.invalidate_states_and_access(enrollment_scope)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES).
-      update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?, access_is_current = ?", false, false])
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => INVALIDATEABLE_STATES)
+                   .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?, access_is_current = ?", false, false])
   end
 
   def self.force_recalculation(enrollment_ids, strand: nil)
     if enrollment_ids.any?
-      EnrollmentState.where(:enrollment_id => enrollment_ids).
-        update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
-      args = strand ? {n_strand: strand} : {}
+      EnrollmentState.where(:enrollment_id => enrollment_ids)
+                     .update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
+      args = strand ? { n_strand: strand } : {}
       EnrollmentState.delay_if_production(**args).process_states_for_ids(enrollment_ids)
     end
   end
 
   def self.invalidate_access(enrollment_scope, states_to_update)
-    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => states_to_update).
-      update_all(["lock_version = COALESCE(lock_version, 0) + 1, access_is_current = ?", false])
+    EnrollmentState.where(:enrollment_id => enrollment_scope, :state => states_to_update)
+                   .update_all(["lock_version = COALESCE(lock_version, 0) + 1, access_is_current = ?", false])
   end
 
   def self.enrollments_for_account_ids(account_ids)
-    Enrollment.joins(:course).where(:courses => {:account_id => account_ids}).where(:type => %w{StudentEnrollment ObserverEnrollment})
+    Enrollment.joins(:course).where(:courses => { :account_id => account_ids }).where(:type => %w{StudentEnrollment ObserverEnrollment})
   end
 
   ENROLLMENT_BATCH_SIZE = 1_000
 
-  def self.invalidate_states_for_term(term, enrollment_type=nil)
+  def self.invalidate_states_for_term(term, enrollment_type = nil)
     # invalidate and re-queue individual jobs for reprocessing because it might be too big to do all at once
     scope = term.enrollments
     scope = scope.where(:type => enrollment_type) if enrollment_type
     scope.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       if invalidate_states(scope.where(:id => min_id..max_id)) > 0
         EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ['invalidate_states_for_term', term.global_root_account_id]).
-          process_term_states_in_ranges(min_id, max_id, term, enrollment_type)
+                                            n_strand: ['invalidate_states_for_term', term.global_root_account_id])
+                       .process_term_states_in_ranges(min_id, max_id, term, enrollment_type)
       end
     end
   end
@@ -318,8 +319,8 @@ class EnrollmentState < ActiveRecord::Base
       scope = enrollments_for_account_ids(account_ids).where(:id => min_id..max_id)
       if invalidate_access(scope, states_to_update) > 0
         EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ['invalidate_access_for_accounts', Shard.current.id]).
-          process_account_states_in_ranges(min_id, max_id, account_ids)
+                                            n_strand: ['invalidate_access_for_accounts', Shard.current.id])
+                       .process_account_states_in_ranges(min_id, max_id, account_ids)
       end
     end
   end

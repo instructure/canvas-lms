@@ -30,7 +30,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :user
   belongs_to :assessor, :class_name => 'User'
   belongs_to :artifact, touch: true,
-             polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
+                        polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
   has_many :assessment_requests, :dependent => :destroy
   has_many :learning_outcome_results, as: :artifact, :dependent => :destroy
   serialize :data
@@ -46,23 +46,23 @@ class RubricAssessment < ActiveRecord::Base
   after_save :track_outcomes
 
   def track_outcomes
-    outcome_ids = (self.data || []).map{|r| r[:learning_outcome_id] }.compact.uniq
+    outcome_ids = (self.data || []).map { |r| r[:learning_outcome_id] }.compact.uniq
     peer_review = self.assessment_type == "peer_review"
     provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
     delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
 
-  def update_outcomes_for_assessment(outcome_ids=[])
+  def update_outcomes_for_assessment(outcome_ids = [])
     return if outcome_ids.empty?
 
     alignments = if active_rubric_association?
-      self.rubric_association.association_object.learning_outcome_alignments.where({
-        learning_outcome_id: outcome_ids
-      })
-    else
-      []
-    end
+                   self.rubric_association.association_object.learning_outcome_alignments.where({
+                                                                                                  learning_outcome_id: outcome_ids
+                                                                                                })
+                 else
+                   []
+                 end
 
     (self.data || []).each do |rating|
       if rating[:learning_outcome_id]
@@ -78,10 +78,10 @@ class RubricAssessment < ActiveRecord::Base
   def create_outcome_result(alignment)
     # find or create the user's unique LearningOutcomeResult for this alignment
     # of the assessment's associated object.
-    result = alignment.learning_outcome_results.
-      for_association(rubric_association).
-      where(user_id: user.id).
-      first_or_initialize
+    result = alignment.learning_outcome_results
+                      .for_association(rubric_association)
+                      .where(user_id: user.id)
+                      .first_or_initialize
 
     result.workflow_state = :active
     result.user_uuid = user.uuid
@@ -91,8 +91,8 @@ class RubricAssessment < ActiveRecord::Base
     result.context = alignment.context
 
     # mastery
-    criterion = rubric_association.rubric.data.find{|c| c[:learning_outcome_id] == alignment.learning_outcome_id }
-    criterion_result = self.data.find{|c| c[:criterion_id] == criterion[:id] }
+    criterion = rubric_association.rubric.data.find { |c| c[:learning_outcome_id] == alignment.learning_outcome_id }
+    criterion_result = self.data.find { |c| c[:criterion_id] == criterion[:id] }
     if criterion
       result.possible = criterion[:points]
       result.score = criterion_result && criterion_result[:points]
@@ -114,7 +114,7 @@ class RubricAssessment < ActiveRecord::Base
     # title
     result.title = CanvasTextHelper.truncate_text(
       "#{user.name}, #{rubric_association.title}",
-      {max_length: 250}
+      { max_length: 250 }
     )
 
     # non-scoring rubrics
@@ -147,13 +147,13 @@ class RubricAssessment < ActiveRecord::Base
     requests = self.assessment_requests
     if active_rubric_association?
       requests += self.rubric_association.assessment_requests.where({
-        assessor_id: self.assessor_id,
-        asset_id: self.artifact_id,
-        asset_type: self.artifact_type
-      })
+                                                                      assessor_id: self.assessor_id,
+                                                                      asset_id: self.artifact_id,
+                                                                      asset_type: self.artifact_type
+                                                                    })
     end
     requests.each { |a|
-      a.attributes = {:rubric_assessment => self, :assessor => self.assessor}
+      a.attributes = { :rubric_assessment => self, :assessor => self.assessor }
       a.complete
     }
   end
@@ -190,48 +190,47 @@ class RubricAssessment < ActiveRecord::Base
   protected :update_artifact
 
   set_policy do
-    given {|user| user && self.assessor_id == user.id }
+    given { |user| user && self.assessor_id == user.id }
     can :create and can :read and can :update
 
-    given {|user| user && self.user_id == user.id }
+    given { |user| user && self.user_id == user.id }
     can :read
 
     given { |user|
       user &&
-      self.user &&
-      self.rubric_association &&
-      self.rubric_association.context.is_a?(Course) &&
-      self.rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
+        self.user &&
+        self.rubric_association &&
+        self.rubric_association.context.is_a?(Course) &&
+        self.rubric_association.context.observer_enrollments.where(user_id: user, associated_user: self.user, workflow_state: 'active').exists?
     }
     can :read
 
-    given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :manage) }
     can :create and can :read and can :delete
 
-    given {|user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
+    given { |user, session| self.rubric_association && self.rubric_association.grants_right?(user, session, :view_rubric_assessments) }
     can :read
 
-    given {|user, session|
+    given { |user, session|
       self.rubric_association &&
-      self.rubric_association.grants_right?(user, session, :manage) &&
-      (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
+        self.rubric_association.grants_right?(user, session, :manage) &&
+        (self.rubric_association.association_object.context.grants_right?(self.assessor, :manage_rubrics) rescue false)
     }
     can :update
 
-    given {|user, session|
+    given { |user, session|
       self.can_read_assessor_name?(user, session)
     }
     can :read_assessor
-
   end
 
   scope :of_type, lambda { |type| where(:assessment_type => type.to_s) }
 
-  scope :for_submissions, -> { where(:artifact_type => "Submission")}
-  scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade")}
+  scope :for_submissions, -> { where(:artifact_type => "Submission") }
+  scope :for_provisional_grades, -> { where(:artifact_type => "ModeratedGrading::ProvisionalGrade") }
 
   scope :for_course_context, lambda { |course_id|
-    joins(:rubric_association).where(rubric_associations: {context_id: course_id, context_type: "Course"})
+    joins(:rubric_association).where(rubric_associations: { context_id: course_id, context_type: "Course" })
   }
 
   def methods_for_serialization(*methods)
@@ -256,18 +255,18 @@ class RubricAssessment < ActiveRecord::Base
 
   def can_read_assessor_name?(user, session)
     self.assessment_type == 'grading' ||
-    !self.considered_anonymous? ||
-    self.assessor_id == user.id ||
-    self.rubric_association.association_object.context.grants_right?(
-      user, session, :view_all_grades
-    )
+      !self.considered_anonymous? ||
+      self.assessor_id == user.id ||
+      self.rubric_association.association_object.context.grants_right?(
+        user, session, :view_all_grades
+      )
   end
 
   def considered_anonymous?
     return false unless active_rubric_association?
 
     self.rubric_association.association_type == 'Assignment' &&
-    self.rubric_association.association_object.anonymous_peer_reviews?
+      self.rubric_association.association_object.anonymous_peer_reviews?
   end
 
   def ratings
@@ -279,10 +278,10 @@ class RubricAssessment < ActiveRecord::Base
       students = self.rubric_association.association_object.group_students(self.user).last
       submissions = students.map do |student|
         submission = self.rubric_association.association_object.find_asset_for_assessment(self.rubric_association, student).first
-        {submission: submission,
-         rubric_assessments: submission.rubric_assessments
-           .where.not(rubric_association: nil)
-           .map{|ra| ra.as_json(methods: :assessor_name)}}
+        { submission: submission,
+          rubric_assessments: submission.rubric_assessments
+                                        .where.not(rubric_association: nil)
+                                        .map { |ra| ra.as_json(methods: :assessor_name) } }
       end
     else
       []

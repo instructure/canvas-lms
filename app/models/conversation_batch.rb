@@ -36,6 +36,7 @@ class ConversationBatch < ActiveRecord::Base
   attr_accessor :mode
 
   attr_reader :conversations
+
   def deliver(update_progress = true)
     self.shard.activate do
       chunk_size = 25
@@ -43,18 +44,17 @@ class ConversationBatch < ActiveRecord::Base
       @conversations = []
       self.user = user_map[user_id]
       existing_conversations = Conversation.find_all_private_conversations(self.user, recipient_ids.map { |id| user_map[id] },
-        context_type: self.context_type, context_id: self.context_id)
+                                                                           context_type: self.context_type, context_id: self.context_id)
       update_attribute :workflow_state, 'sending'
 
-      ModelCache.with_cache(:conversations => existing_conversations, :users => {:id => user_map}) do
-
+      ModelCache.with_cache(:conversations => existing_conversations, :users => { :id => user_map }) do
         should_cc_author = true
 
         recipient_ids.each_slice(chunk_size) do |ids|
           ids.each do |id|
             is_group = self.group?
             conversation = user.initiate_conversation([user_map[id]], !is_group,
-              subject: subject, context_type: context_type, context_id: context_id)
+                                                      subject: subject, context_type: context_type, context_id: context_id)
             @conversations << conversation
             message = root_conversation_message.clone
             message.generate_user_note = self.generate_user_note
@@ -82,23 +82,24 @@ class ConversationBatch < ActiveRecord::Base
     job_start_factor = 20.0 / (recipient_ids.size + 20)
 
     case workflow_state
-      when 'sent'
-        1
-      when 'created'
-        # the first part of the progress bar is while we wait for the job
-        # to start. ideally this will just take a couple seconds. if jobs
-        # are backed up, we still want to make it seem like we are making
-        # headway. every minute we will advance half of the remainder of
-        # job_start_factor.
-        minutes = (Time.zone.now - created_at).to_i / 60.0
-        job_start_factor * (1 - (1 / 2**minutes))
-      else
-        # the rest of the progress bar is nice and linear
-        job_start_factor + ((1 - job_start_factor) * conversation_message_ids.size / recipient_ids.size)
+    when 'sent'
+      1
+    when 'created'
+      # the first part of the progress bar is while we wait for the job
+      # to start. ideally this will just take a couple seconds. if jobs
+      # are backed up, we still want to make it seem like we are making
+      # headway. every minute we will advance half of the remainder of
+      # job_start_factor.
+      minutes = (Time.zone.now - created_at).to_i / 60.0
+      job_start_factor * (1 - (1 / 2**minutes))
+    else
+      # the rest of the progress bar is nice and linear
+      job_start_factor + ((1 - job_start_factor) * conversation_message_ids.size / recipient_ids.size)
     end
   end
 
   attr_writer :user_map
+
   def user_map
     @user_map ||= self.shard.activate { User.where(id: recipient_ids + [user_id]).index_by(&:id) }
   end

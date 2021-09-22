@@ -26,7 +26,7 @@ class ExternalIntegrationKey < ActiveRecord::Base
   validates_presence_of :key_type
   validates_presence_of :key_value
   validates_inclusion_of :key_type, in: proc { self.key_types }
-  validates_uniqueness_of :key_type, scope: [ :context_type, :context_id ]
+  validates_uniqueness_of :key_type, scope: [:context_type, :context_id]
 
   def key_type
     attributes['key_type'].try(:to_sym)
@@ -58,6 +58,7 @@ class ExternalIntegrationKey < ActiveRecord::Base
     keys = context.external_integration_keys.index_by(&:key_type)
     key_types.each do |key_type|
       next if keys.key?(key_type)
+
       keys[key_type] = ExternalIntegrationKey.new
       keys[key_type].context = context
       keys[key_type].key_type = key_type

@@ -122,9 +122,9 @@ class DiscussionEntry < ActiveRecord::Base
       # If the topic has been going for more than two weeks, only show
       # people who have been participating in the topic
       if self.created_at > self.discussion_topic.created_at + 2.weeks
-        participants.map(&:id) & DiscussionEntry.active.
-          where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago).
-          distinct.pluck(:user_id)
+        participants.map(&:id) & DiscussionEntry.active
+                                                .where('discussion_topic_id=? AND created_at > ?', self.discussion_topic_id, 2.weeks.ago)
+                                                .distinct.pluck(:user_id)
       else
         participants
       end
@@ -140,7 +140,7 @@ class DiscussionEntry < ActiveRecord::Base
 
   def self.rating_sums(entry_ids)
     sums = self.where(:id => entry_ids).where('COALESCE(rating_sum, 0) != 0')
-    Hash[sums.map{|x| [x.id, x.rating_sum]}]
+    Hash[sums.map { |x| [x.id, x.rating_sum] }]
   end
 
   def set_depth
@@ -166,6 +166,7 @@ class DiscussionEntry < ActiveRecord::Base
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
     raise IncomingMail::Errors::ReplyToDeletedDiscussion if self.discussion_topic.deleted?
+
     user = opts[:user]
     if opts[:html]
       message = opts[:html].strip
@@ -195,15 +196,15 @@ class DiscussionEntry < ActiveRecord::Base
     self.message = format_message(val).first
   end
 
-  def truncated_message(length=nil)
+  def truncated_message(length = nil)
     plaintext_message(length)
   end
 
-  def summary(length=150)
+  def summary(length = 150)
     HtmlTextHelper.strip_and_truncate(message, :max_length => length)
   end
 
-  def plaintext_message(length=250)
+  def plaintext_message(length = 250)
     truncate_html(self.message, :max_length => length)
   end
 
@@ -234,6 +235,7 @@ class DiscussionEntry < ActiveRecord::Base
       entries = self.discussion_topic.discussion_entries.where(:user_id => self.user_id, :workflow_state => 'active')
       submission = self.discussion_topic.assignment.submissions.where(:user_id => self.user_id).take
       return unless submission
+
       if entries.any?
         submission_date = entries.order(:created_at).limit(1).pluck(:created_at).first
         if submission_date > self.created_at
@@ -253,12 +255,12 @@ class DiscussionEntry < ActiveRecord::Base
     # decrement unread_entry_count for every participant that has not read the
     transaction do
       # get a list of users who have not read the entry yet
-      users = discussion_topic.discussion_topic_participants.
-          where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
+      users = discussion_topic.discussion_topic_participants
+                              .where(['user_id NOT IN (?)', discussion_entry_participants.read.pluck(:user_id)]).pluck(:user_id)
       # decrement unread_entry_count for topic participants
       if users.present?
-        DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users).
-            update_all('unread_entry_count = unread_entry_count - 1')
+        DiscussionTopicParticipant.where(:discussion_topic_id => self.discussion_topic_id, :user_id => users)
+                                  .update_all('unread_entry_count = unread_entry_count - 1')
       end
     end
   end
@@ -327,7 +329,7 @@ class DiscussionEntry < ActiveRecord::Base
     given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && !self.discussion_topic.locked_for?(user) && self.discussion_topic.visible_for?(user) }
     can :reply and can :create and can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.discussion_topic.visible_for?(user)}
+    given { |user, session| self.context.grants_right?(user, session, :post_to_forum) && self.discussion_topic.visible_for?(user) }
     can :read
 
     given { |user, session| context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments && context.grants_right?(user, session, :post_to_forum) && discussion_topic.available_for?(user) }
@@ -365,7 +367,7 @@ class DiscussionEntry < ActiveRecord::Base
       AND discussion_entry_participants.user_id = ?", current_user.id])
   end
 
-  def to_atom(opts={})
+  def to_atom(opts = {})
     author_name = self.user.present? ? self.user.name : t('atom_no_author', "No Author")
     Atom::Entry.new do |entry|
       subject = [self.discussion_topic.title]
@@ -375,13 +377,13 @@ class DiscussionEntry < ActiveRecord::Base
       else
         entry.title = subject.to_sentence
       end
-      entry.authors  << Atom::Person.new(:name => author_name)
+      entry.authors << Atom::Person.new(:name => author_name)
       entry.updated   = self.updated_at
       entry.published = self.created_at
       entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/discussion_entries/#{self.feed_code}"
-      entry.links    << Atom::Link.new(:rel => 'alternate',
+      entry.links << Atom::Link.new(:rel => 'alternate',
                                     :href => "http://#{HostUrl.context_host(self.discussion_topic.context)}/#{self.discussion_topic.context_prefix}/discussion_topics/#{self.discussion_topic_id}")
-      entry.content   = Atom::Content::Html.new(self.message)
+      entry.content = Atom::Content::Html.new(self.message)
     end
   end
 
@@ -421,7 +423,7 @@ class DiscussionEntry < ActiveRecord::Base
       if self.discussion_topic.root_topic?
         group_ids = self.discussion_topic.group_category.groups.active.pluck(:id)
         scope = scope.where("NOT EXISTS (?)",
-          GroupMembership.where("group_memberships.workflow_state <> 'deleted' AND
+                            GroupMembership.where("group_memberships.workflow_state <> 'deleted' AND
             group_memberships.user_id=discussion_topic_participants.user_id AND
             group_memberships.group_id IN (?)", group_ids))
       end
@@ -465,15 +467,18 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   attr_accessor :current_user
+
   def read_state(current_user = nil)
     current_user ||= self.current_user
     return "read" unless current_user # default for logged out users
+
     find_existing_participant(current_user).workflow_state
   end
 
   def rating(current_user = nil)
     current_user ||= self.current_user
     return nil unless current_user # default for logged out users
+
     find_existing_participant(current_user).rating
   end
 
@@ -549,12 +554,12 @@ class DiscussionEntry < ActiveRecord::Base
     count_delta = (new_rating.nil? ? 0 : 1) - (old_rating.nil? ? 0 : 1)
     sum_delta = new_rating.to_i - old_rating.to_i
 
-    DiscussionEntry.where(id: id). update_all([
-      'rating_count = COALESCE(rating_count, 0) + ?,
+    DiscussionEntry.where(id: id).update_all([
+                                               'rating_count = COALESCE(rating_count, 0) + ?,
         rating_sum = COALESCE(rating_sum, 0) + ?',
-      count_delta,
-      sum_delta
-    ])
+                                               count_delta,
+                                               sum_delta
+                                             ])
     self.discussion_topic.update_materialized_view
   end
 
@@ -569,7 +574,7 @@ class DiscussionEntry < ActiveRecord::Base
   #        :forced       - The new forced_read_state for the participant.
   #
   # Returns id or nil if no current_user is specified.
-  def update_or_create_participant(opts={})
+  def update_or_create_participant(opts = {})
     current_user = opts[:current_user] || self.current_user
     return nil unless current_user
 
@@ -594,14 +599,14 @@ class DiscussionEntry < ActiveRecord::Base
   def find_existing_participant(user)
     user_id = user.is_a?(User) ? user.id : user
     participant = discussion_entry_participants.loaded? ?
-      discussion_entry_participants.detect{|dep| dep.user_id == user_id} :
+      discussion_entry_participants.detect { |dep| dep.user_id == user_id } :
       discussion_entry_participants.where(:user_id => user_id).first
     unless participant
       # return a temporary record with default values
       participant = DiscussionEntryParticipant.new({
-        :workflow_state => "unread",
-        :forced_read_state => false,
-        })
+                                                     :workflow_state => "unread",
+                                                     :forced_read_state => false,
+                                                   })
       participant.discussion_entry = self
       participant.user_id = user_id
     end

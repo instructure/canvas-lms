@@ -27,16 +27,16 @@ class BigBlueButtonConference < WebConference
   after_destroy :delete_all_recordings
 
   user_setting_field :record, {
-    name: ->{ t('recording_setting', 'Recording') },
-    description: ->{ t('recording_setting_enabled_description', 'Enable recording for this conference') },
+    name: -> { t('recording_setting', 'Recording') },
+    description: -> { t('recording_setting_enabled_description', 'Enable recording for this conference') },
     type: :boolean,
     default: false,
-    visible: ->{ WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
+    visible: -> { WebConference.config(class_name: BigBlueButtonConference.to_s)[:recording_enabled] },
   }
 
   user_setting_field :scheduled_date, {
-    name: ->{ t('Scheduled Date') },
-    description: ->{ t('Enable recording for this conference') },
+    name: -> { t('Scheduled Date') },
+    description: -> { t('Enable recording for this conference') },
     type: :date,
     default: false,
     visible: false
@@ -44,6 +44,7 @@ class BigBlueButtonConference < WebConference
 
   def initiate_conference
     return conference_key if conference_key && !retouch?
+
     unless self.conference_key
       self.conference_key = "instructure_#{self.feed_code}".gsub(/[^a-zA-Z0-9_]/, "_")
       chars = ('a'..'z').to_a + ('0'..'9').to_a
@@ -51,24 +52,24 @@ class BigBlueButtonConference < WebConference
       # the admin passwords in the ui in case moderators need them for any
       # admin-specific functionality within the BBB ui (or we could provide
       # ui for them to specify the password/key)
-      settings[:user_key] = 8.times.map{ chars[chars.size * rand] }.join
-      settings[:admin_key] = 8.times.map{ chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
+      settings[:user_key] = 8.times.map { chars[chars.size * rand] }.join
+      settings[:admin_key] = 8.times.map { chars[chars.size * rand] }.join until settings[:admin_key] && settings[:admin_key] != settings[:user_key]
     end
     settings[:record] &&= config[:recording_enabled]
     settings[:domain] ||= config[:domain] # save the domain
     current_host = URI(settings[:default_return_url] || "http://www.instructure.com").host
     send_request(:create, {
-      :meetingID => conference_key,
-      :name => title,
-      :voiceBridge => format("%020d", self.global_id),
-      :attendeePW => settings[:user_key],
-      :moderatorPW => settings[:admin_key],
-      :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
-      :record => settings[:record] ? "true" : "false",
-      :welcome => settings[:record] ? t("This conference may be recorded.") : "",
-      "meta_canvas-recording-ready-user" => recording_ready_user,
-      "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
-    }) or return nil
+                   :meetingID => conference_key,
+                   :name => title,
+                   :voiceBridge => format("%020d", self.global_id),
+                   :attendeePW => settings[:user_key],
+                   :moderatorPW => settings[:admin_key],
+                   :logoutURL => (settings[:default_return_url] || "http://www.instructure.com"),
+                   :record => settings[:record] ? "true" : "false",
+                   :welcome => settings[:record] ? t("This conference may be recorded.") : "",
+                   "meta_canvas-recording-ready-user" => recording_ready_user,
+                   "meta_canvas-recording-ready-url" => recording_ready_url(current_host)
+                 }) or return nil
     @conference_active = true
     save
     conference_key
@@ -111,7 +112,7 @@ class BigBlueButtonConference < WebConference
 
   def recording(recording_id = nil)
     unless recording_id.nil?
-      recording = fetch_recordings.find{ |r| r[:recordID]==recording_id }
+      recording = fetch_recordings.find { |r| r[:recordID] == recording_id }
       recording_formats(recording) if recording
     end
   end
@@ -122,17 +123,18 @@ class BigBlueButtonConference < WebConference
       format.merge(:show_to_students => show_to_students)
     end
     {
-      recording_id:     recording[:recordID],
-      title:            recording[:name],
+      recording_id: recording[:recordID],
+      title: recording[:name],
       duration_minutes: filter_duration(recording_formats),
-      playback_url:     nil,
+      playback_url: nil,
       playback_formats: recording_formats,
-      created_at:       recording[:startTime].to_i,
+      created_at: recording[:startTime].to_i,
     }
   end
 
   def delete_recording(recording_id)
     return { deleted: false } if recording_id.nil?
+
     response = send_request(:deleteRecordings, recordID: recording_id)
     { deleted: response.present? && response[:deleted].casecmp('true') == 0 }
   end
@@ -149,13 +151,14 @@ class BigBlueButtonConference < WebConference
   end
 
   attr_writer :loaded_recordings
+
   # we can use the same API method with multiple meeting ids to load all the recordings up in one go
   # instead of making a bunch of individual calls
   def self.preload_recordings(conferences)
-    filtered_conferences = conferences.select{|c| c.conference_key && c.settings[:record]}
+    filtered_conferences = conferences.select { |c| c.conference_key && c.settings[:record] }
     return unless filtered_conferences.any?
 
-    fallback_conferences, current_conferences = filtered_conferences.partition{|c| c.use_fallback_config?}
+    fallback_conferences, current_conferences = filtered_conferences.partition { |c| c.use_fallback_config? }
     fetch_and_preload_recordings(fallback_conferences, use_fallback_config: true) if fallback_conferences.any?
     fetch_and_preload_recordings(current_conferences, use_fallback_config: false) if current_conferences.any?
   end
@@ -166,11 +169,11 @@ class BigBlueButtonConference < WebConference
     conferences.each_slice(limit) do |sliced_conferences|
       meeting_ids = sliced_conferences.map(&:conference_key).join(",")
       response = send_request(:getRecordings,
-        {:meetingID => meeting_ids},
-        use_fallback_config: use_fallback_config)
+                              { :meetingID => meeting_ids },
+                              use_fallback_config: use_fallback_config)
       result = response[:recordings] if response
       result = [] if result.is_a?(String)
-      grouped_result = Array(result).group_by{|r| r[:meetingID]}
+      grouped_result = Array(result).group_by { |r| r[:meetingID] }
       sliced_conferences.each do |c|
         c.loaded_recordings = grouped_result[c.conference_key] || []
       end
@@ -201,17 +204,17 @@ class BigBlueButtonConference < WebConference
 
   def join_url(user, type = :user)
     generate_request :join,
-      :fullName => user.short_name,
-      :meetingID => conference_key,
-      :password => settings[(type == :user ? :user_key : :admin_key)],
-      :userID => user.id
+                     :fullName => user.short_name,
+                     :meetingID => conference_key,
+                     :password => settings[(type == :user ? :user_key : :admin_key)],
+                     :userID => user.id
   end
 
   def end_meeting
     response = send_request(:end, {
-      :meetingID => conference_key,
-      :password => settings[(type == :user ? :user_key : :admin_key)],
-      })
+                              :meetingID => conference_key,
+                              :password => settings[(type == :user ? :user_key : :admin_key)],
+                            })
     response[:ended] if response
   end
 
@@ -219,8 +222,8 @@ class BigBlueButtonConference < WebConference
     @loaded_recordings ||= begin
       if conference_key && settings[:record]
         response = send_request(:getRecordings, {
-          :meetingID => conference_key,
-          })
+                                  :meetingID => conference_key,
+                                })
         result = response[:recordings] if response
         result = [] if result.is_a?(String)
         Array(result)
@@ -259,14 +262,14 @@ class BigBlueButtonConference < WebConference
 
     case http_response
     when Net::HTTPSuccess
-        response = xml_to_hash(http_response.body)
-        if response[:returncode] == 'SUCCESS'
-          return response
-        else
-          logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
-        end
+      response = xml_to_hash(http_response.body)
+      if response[:returncode] == 'SUCCESS'
+        return response
       else
-        logger.error "big blue button http error #{http_response}"
+        logger.error "big blue button api error #{response[:message]} (#{response[:messageKey]})"
+      end
+    else
+      logger.error "big blue button http error #{http_response}"
     end
     nil
   rescue
@@ -299,7 +302,6 @@ class BigBlueButtonConference < WebConference
     else
       child_elements.each_with_object({}) do |child, hash|
         hash[child.name.to_sym] = xml_to_value(child)
-
       end
     end
   end

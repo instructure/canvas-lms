@@ -27,7 +27,7 @@ class CommunicationChannel
     attr_reader :account, :after, :before, :order, :pattern, :path_type
 
     def initialize(account:, after: nil, before: nil, order: nil, pattern: nil, path_type: nil, with_invalid_paths: false)
-      @account, @pattern, @path_type, @with_invalid_paths= account, pattern, path_type, with_invalid_paths
+      @account, @pattern, @path_type, @with_invalid_paths = account, pattern, path_type, with_invalid_paths
       @after = Time.zone.parse(after) if after
       @before = Time.zone.parse(before) if before
       @order = order&.downcase == 'desc' ? :desc : :asc
@@ -116,10 +116,9 @@ class CommunicationChannel
         ccs
       end
 
-
       def perform!
         delay.reset_bounce_counts!
-        {scheduled_reset_approximate_count: count}
+        { scheduled_reset_approximate_count: count }
       end
 
       def reset_bounce_counts!
@@ -146,7 +145,7 @@ class CommunicationChannel
       end
 
       def perform!
-        {confirmed_count: matching_channels.update_all(workflow_state: 'active')}
+        { confirmed_count: matching_channels.update_all(workflow_state: 'active') }
       end
     end
   end

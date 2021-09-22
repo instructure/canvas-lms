@@ -57,7 +57,7 @@ class UserNote < ActiveRecord::Base
     save!
   end
 
-  def formatted_note(truncate=nil)
+  def formatted_note(truncate = nil)
     self.extend TextHelper
     res = self.note
     res = truncate_html(self.note, :max_length => truncate, :words => true) if truncate
@@ -72,5 +72,4 @@ class UserNote < ActiveRecord::Base
     self.user.update_last_user_note
     self.user.save
   end
-
 end

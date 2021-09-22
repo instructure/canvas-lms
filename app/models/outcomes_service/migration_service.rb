@@ -28,6 +28,7 @@ module OutcomesService
       def begin_export(course, opts)
         artifacts = export_artifacts(course, opts)
         return nil if artifacts.empty?
+
         data = {
           context_type: 'course',
           context_id: course.id.to_s,
@@ -122,14 +123,13 @@ module OutcomesService
         if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           json['missing_alignments']&.each do |missing_alignment|
-
             page = lookup_artifact(missing_alignment["artifact_type"], missing_alignment["artifact_id"],
                                    import_data[:course])
             if page.nil?
               import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to a page'))
             else
               import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to "%{title}"',
-               { title: page.title}))
+                                                                 { title: page.title }))
             end
           end
           case json['state']
@@ -173,11 +173,12 @@ module OutcomesService
 
       def export_artifacts(course, opts)
         page_ids = if opts[:selective]
-          opts[:exported_assets].map{|asset| (match = asset.match(/wiki_page_(\d+)/)) && match[1]}.compact
-        else
-          course.wiki_pages.pluck(:id)
-        end
+                     opts[:exported_assets].map { |asset| (match = asset.match(/wiki_page_(\d+)/)) && match[1] }.compact
+                   else
+                     course.wiki_pages.pluck(:id)
+                   end
         return [] unless page_ids.any?
+
         [{
           external_type: 'canvas.page',
           external_id: page_ids

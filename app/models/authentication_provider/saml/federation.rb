@@ -34,8 +34,8 @@ class AuthenticationProvider::SAML::Federation < AuthenticationProvider::SAML::M
     end
 
     def refresh_providers(shard_scope: Shard.in_current_region, providers: nil)
-      providers ||= AuthenticationProvider::SAML.active.
-        where(metadata_uri: self::URN).shard(shard_scope)
+      providers ||= AuthenticationProvider::SAML.active
+                                                .where(metadata_uri: self::URN).shard(shard_scope)
 
       # don't even bother checking the federation if no one is using it
       # (but a multi-shard environment probably is, and it's expensive

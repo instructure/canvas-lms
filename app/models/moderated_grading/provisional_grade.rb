@@ -31,8 +31,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   has_many :rubric_assessments, as: :artifact
   has_one :selection,
-    class_name: 'ModeratedGrading::Selection',
-    foreign_key: :selected_provisional_grade_id
+          class_name: 'ModeratedGrading::Selection',
+          foreign_key: :selected_provisional_grade_id
 
   belongs_to :source_provisional_grade, :class_name => 'ModeratedGrading::ProvisionalGrade'
 
@@ -40,7 +40,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   validates :submission, presence: true
 
   before_create :must_be_final_or_student_in_need_of_provisional_grade,
-    :must_have_non_final_provisional_grade_to_create_final
+                :must_have_non_final_provisional_grade_to_create_final
 
   after_create :touch_graders # to update grading counts
   after_save :touch_submission, :remove_moderation_ignores
@@ -51,8 +51,8 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   scope :scored_by, ->(scorer) { where(scorer_id: scorer) }
-  scope :final, -> { where(:final => true)}
-  scope :not_final, -> { where(:final => false)}
+  scope :final, -> { where(:final => true) }
+  scope :not_final, -> { where(:final => false) }
 
   def must_be_final_or_student_in_need_of_provisional_grade
     if final.blank? && !submission.assignment_can_be_moderated_grader?(scorer)
@@ -108,7 +108,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
 
   def submission_comments
     if submission.all_submission_comments.loaded?
-      submission.all_submission_comments.select { |c| c.provisional_grade_id == id || c.provisional_grade_id.nil?}
+      submission.all_submission_comments.select { |c| c.provisional_grade_id == id || c.provisional_grade_id.nil? }
     else
       submission.all_submission_comments.where("provisional_grade_id = ? OR provisional_grade_id IS NULL", self.id)
     end
@@ -148,9 +148,9 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     {
       :attachment_id => attachment.id,
       :crocodoc_url => attachment.crocodoc_available? &&
-                       attachment.crocodoc_url(user, url_opts),
+        attachment.crocodoc_url(user, url_opts),
       :canvadoc_url => attachment.canvadoc_available? &&
-                       attachment.canvadoc_url(user, url_opts)
+        attachment.canvadoc_url(user, url_opts)
     }
   end
 
@@ -195,7 +195,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
       }
 
       unless rubric_association.assessments_unique_per_asset?(provisional_assessment.assessment_type)
-        params = params.merge({assessor_id: provisional_assessment.assessor})
+        params = params.merge({ assessor_id: provisional_assessment.assessor })
       end
 
       rubric_assessment = rubric_association.rubric_assessments.find_by(params)
@@ -230,7 +230,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
   end
 
   def create_provisional_grade_updated_event
-    create_audit_event(event_type: :provisional_grade_updated, payload: saved_auditable_changes.merge({id: id}))
+    create_audit_event(event_type: :provisional_grade_updated, payload: saved_auditable_changes.merge({ id: id }))
   end
 
   def create_audit_event(event_type:, payload:)
