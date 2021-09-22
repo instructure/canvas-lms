@@ -148,7 +148,6 @@ describe AssetUserAccess do
     it "can load by user context" do
       expect(AssetUserAccess.for_context(@user)).to eq [@asset]
     end
-
   end
 
   describe '#log_action' do
@@ -308,7 +307,7 @@ describe AssetUserAccess do
     before { allow(access).to receive :save }
 
     describe 'attribute values directly from hash' do
-      def it_sets_if_nil( attribute, hash_key = nil)
+      def it_sets_if_nil(attribute, hash_key = nil)
         hash_key ||= attribute
         access.log(context, { hash_key => 'value' })
         expect(access.send(attribute)).to eq 'value'
@@ -317,9 +316,9 @@ describe AssetUserAccess do
         expect(access.send(attribute)).to eq 'other'
       end
 
-      specify { it_sets_if_nil( :asset_category, :category ) }
-      specify { it_sets_if_nil( :asset_group_code, :group_code ) }
-      specify { it_sets_if_nil( :membership_type ) }
+      specify { it_sets_if_nil(:asset_category, :category) }
+      specify { it_sets_if_nil(:asset_group_code, :group_code) }
+      specify { it_sets_if_nil(:membership_type) }
     end
 
     describe 'interally set or calculated attribute values' do
@@ -381,7 +380,6 @@ describe AssetUserAccess do
         expect(AssetUserAccess.last.root_account_id).to eq(0)
       end
     end
-
   end
 
   describe '#corrected_view_score' do
@@ -417,7 +415,7 @@ describe AssetUserAccess do
     it "reads plugin setting for override" do
       ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs")
       ps.inheritance_scope = "shard"
-      ps.settings = { max_log_ids: [0,0,0,0,0,0,0], write_path: 'log' }
+      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: 'log' }
       ps.save!
       expect(AssetUserAccess.view_counting_method).to eq("log")
     end

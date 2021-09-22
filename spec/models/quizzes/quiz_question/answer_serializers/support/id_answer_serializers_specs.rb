@@ -37,7 +37,7 @@ shared_examples_for 'Id Answer Serializers' do
   end
 
   it '[auto] should reject a bad answer ID' do
-    [ nil, [], {} ].each do |bad_input|
+    [nil, [], {}].each do |bad_input|
       bad_input = format(bad_input) if respond_to?(:format)
 
       rc = subject.serialize(bad_input)

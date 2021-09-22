@@ -22,9 +22,11 @@ require_relative '../../spec_helper'
 describe Csp::Domain do
   describe '::domains_for_tool' do
     describe 'when the tool has a domain' do
-      let(:tool) { double('ContextExternalTool',
-                          domain: 'puppyhoff.me',
-                          url: 'http://mac.puppyhoff.me/launch') }
+      let(:tool) {
+        double('ContextExternalTool',
+               domain: 'puppyhoff.me',
+               url: 'http://mac.puppyhoff.me/launch')
+      }
 
       it 'returns that domain and a wildcard for its subdomains' do
         expect(Csp::Domain.domains_for_tool(tool)).to eq [
@@ -34,9 +36,11 @@ describe Csp::Domain do
     end
 
     describe 'when the tool has a domain property that is actually a URL' do
-      let(:tool) { double('ContextExternalTool',
-                          domain: 'http://puppyhoff.me',
-                          url: 'http://mac.puppyhoff.me/launch') }
+      let(:tool) {
+        double('ContextExternalTool',
+               domain: 'http://puppyhoff.me',
+               url: 'http://mac.puppyhoff.me/launch')
+      }
 
       it 'extracts a domain from the domain property' do
         expect(Csp::Domain.domains_for_tool(tool)).to eq [
@@ -46,9 +50,11 @@ describe Csp::Domain do
     end
 
     describe 'when the tool has a url property but no domain' do
-      let(:tool) { double('ContextExternalTool',
-                          domain: nil,
-                          url: 'http://mac.puppyhoff.me/launch') }
+      let(:tool) {
+        double('ContextExternalTool',
+               domain: nil,
+               url: 'http://mac.puppyhoff.me/launch')
+      }
 
       it 'extracts a domain from the URL' do
         expect(Csp::Domain.domains_for_tool(tool)).to eq [

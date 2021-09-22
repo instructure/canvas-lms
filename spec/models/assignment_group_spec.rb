@@ -39,7 +39,7 @@ describe AssignmentGroup do
 
   it "should convert NaN group weight values to 0 on save" do
     ag = @course.assignment_groups.create!(@valid_attributes)
-    ag.group_weight = 0/0.0
+    ag.group_weight = 0 / 0.0
     ag.save!
     expect(ag.group_weight).to eq 0
   end
@@ -153,13 +153,13 @@ describe AssignmentGroup do
 
       it "sends a notification when the grade weight changes" do
         @ag.update_attribute(:group_weight, 0.2)
-        expect(@ag.context.messages_sent['Grade Weight Changed'].any?{|m| m.user_id == @student.id}).to be_truthy
+        expect(@ag.context.messages_sent['Grade Weight Changed'].any? { |m| m.user_id == @student.id }).to be_truthy
       end
 
       it "sends a notification to observers when the grade weight changes" do
         course_with_observer(course: @course, associated_user_id: @student.id, active_all: true)
         @ag.reload.update_attribute(:group_weight, 0.2)
-        expect(@ag.context.messages_sent['Grade Weight Changed'].any?{|m| m.user_id == @observer.id}).to be_truthy
+        expect(@ag.context.messages_sent['Grade Weight Changed'].any? { |m| m.user_id == @observer.id }).to be_truthy
       end
     end
   end
@@ -170,7 +170,7 @@ describe AssignmentGroup do
   end
 
   it "should return never_drop list as ints" do
-    expected = [ 9, 22, 16, 4 ]
+    expected = [9, 22, 16, 4]
     rules = "drop_lowest:2\n"
     expected.each do |val|
       rules += "never_drop:#{val}\n"
@@ -181,14 +181,14 @@ describe AssignmentGroup do
   end
 
   it "should return never_drop list as strings if `stringify_json_ids` is true" do
-    expected = [ '9', '22', '16', '4' ]
+    expected = ['9', '22', '16', '4']
     rules = "drop_highest:25\n"
     expected.each do |val|
       rules += "never_drop:#{val}\n"
     end
 
     assignment_group_model :rules => rules
-    result = @ag.rules_hash({stringify_json_ids: true})
+    result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result['never_drop']).to eql(expected)
   end
 
@@ -202,7 +202,7 @@ describe AssignmentGroup do
   it "should return rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model :rules => rules
-    result = @ag.rules_hash({stringify_json_ids: true})
+    result = @ag.rules_hash({ stringify_json_ids: true })
     expect(result['drop_lowest']).to eql(2)
   end
 
@@ -230,17 +230,17 @@ describe AssignmentGroup do
       @assignment_group.reload
 
       @grading_period_group.grading_periods.create!({
-        title: "Example Grading Period",
-        start_date: 5.weeks.ago,
-        end_date: 3.weeks.ago,
-        close_date: 1.week.ago
-      })
+                                                      title: "Example Grading Period",
+                                                      start_date: 5.weeks.ago,
+                                                      end_date: 3.weeks.ago,
+                                                      close_date: 1.week.ago
+                                                    })
       @grading_period_group.grading_periods.create!({
-        title: "Example Grading Period",
-        start_date: 3.weeks.ago,
-        end_date: 1.week.ago,
-        close_date: 1.week.from_now
-      })
+                                                      title: "Example Grading Period",
+                                                      start_date: 3.weeks.ago,
+                                                      end_date: 1.week.ago,
+                                                      close_date: 1.week.from_now
+                                                    })
     end
 
     context "to delete" do
@@ -586,6 +586,6 @@ describe AssignmentGroup do
   end
 end
 
-def assignment_group_model(opts={})
+def assignment_group_model(opts = {})
   @ag = @course.assignment_groups.create!(@valid_attributes.merge(opts))
 end

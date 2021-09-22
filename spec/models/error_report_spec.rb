@@ -24,22 +24,22 @@ describe ErrorReport do
   describe ".log_exception_from_canvas_errors" do
     it "should not fail with invalid UTF-8" do
       message = "he" +
-        255.chr +
-        "llo"
+                255.chr +
+                "llo"
       data = { extra: { message: message } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }.
-        to_not raise_error
+      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+        .to_not raise_error
     end
 
     it "uses an empty hash as a default for errors with no extra data" do
       data = { tags: { a: "b" } }
-      expect { described_class.log_exception_from_canvas_errors('my error', data) }.
-        to_not raise_error
+      expect { described_class.log_exception_from_canvas_errors('my error', data) }
+        .to_not raise_error
     end
 
     it "should use class name for category" do
       e = Exception.new("error")
-      report = described_class.log_exception_from_canvas_errors(e, {extra:{}})
+      report = described_class.log_exception_from_canvas_errors(e, { extra: {} })
       expect(report.category).to eq(e.class.name)
     end
 
@@ -58,8 +58,8 @@ describe ErrorReport do
 
     it "should plug together with Canvas::Errors::Info to log the user" do
       req = instance_double("request", request_method_symbol: "GET", format: "html")
-      allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request).
-        and_return({})
+      allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request)
+        .and_return({})
       allow(Canvas::Errors::Info).to receive(:useful_http_headers).and_return({})
       user = instance_double("User", global_id: 5)
       err = Exception.new("error")
@@ -90,8 +90,8 @@ describe ErrorReport do
   it "should filter params" do
     mock_attrs = {
       :env => {
-          "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
-          "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
+        "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
+        "REQUEST_URI" => "https://www.instructure.example.com?access_token=abcdef&pseudonym[password]=zzz",
       },
       :remote_ip => "",
       :path_parameters => { :api_key => "1" },

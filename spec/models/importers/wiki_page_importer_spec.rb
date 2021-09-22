@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing wikis" do
-
   SYSTEMS.each do |system|
     if import_data_exists? system, 'wiki'
       it "should import for #{system}" do

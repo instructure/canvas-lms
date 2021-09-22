@@ -29,7 +29,7 @@ describe Polling::Poll do
   context "creating a poll" do
     it "requires an associated user" do
       expect { Polling::Poll.create!(question: 'A Test Poll') }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                        /User can't be blank/)
+                                                                               /User can't be blank/)
     end
 
     it "requires a question" do
@@ -45,7 +45,7 @@ describe Polling::Poll do
 
   describe "#closed_and_viewable_for?" do
     it "returns false if the latest poll session available to the user is opened" do
-      student = student_in_course(active_user:true).user
+      student = student_in_course(active_user: true).user
       poll = @teacher.polls.create!(question: 'A Test Poll')
       session = poll.poll_sessions.create(course: @course)
       session.publish!
@@ -55,7 +55,7 @@ describe Polling::Poll do
 
     context "the latest poll session available to the user is closed" do
       before(:each) do
-        @student = student_in_course(active_user:true).user
+        @student = student_in_course(active_user: true).user
         @poll = @teacher.polls.create!(question: 'A Test Poll')
         @choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
         @session = @poll.poll_sessions.create(course: @course)
@@ -83,7 +83,7 @@ describe Polling::Poll do
 
   describe "#total_results" do
     def create_submission(session, choice)
-      student = student_in_course(active_user:true).user
+      student = student_in_course(active_user: true).user
 
       session.poll_submissions.create!(
         poll: @poll,
@@ -123,10 +123,10 @@ describe Polling::Poll do
       @poll.reload
 
       expect(@poll.total_results).to eq({
-        @choice1.id => 3,
-        @choice2.id => 1,
-        @choice3.id => 2
-      })
+                                          @choice1.id => 3,
+                                          @choice2.id => 1,
+                                          @choice3.id => 2
+                                        })
     end
   end
 end

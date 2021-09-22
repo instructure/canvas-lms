@@ -64,11 +64,11 @@ describe MediaObject do
       @a3 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a4 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       data = {
-          :entries => [
-              { :entryId => "test2", :originalId => "#{@a1.id}" },
-              { :entryId => "test3", :originalId => @a3.id },
-              { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
-          ],
+        :entries => [
+          { :entryId => "test2", :originalId => "#{@a1.id}" },
+          { :entryId => "test3", :originalId => @a3.id },
+          { :entryId => "test4", :originalId => "attachment_id=#{@a4.id}" }
+        ],
       }
       MediaObject.create!(:context => user_factory, :media_id => "test")
       MediaObject.create!(:context => user_factory, :media_id => "test2")
@@ -198,7 +198,7 @@ describe MediaObject do
       kaltura_media_file_handler = double('KalturaMediaFileHandler')
       expect(KalturaMediaFileHandler).to receive(:new).and_return(kaltura_media_file_handler)
 
-      attachments = [ Attachment.new ]
+      attachments = [Attachment.new]
       wait_for_completion = true
 
       expect(kaltura_media_file_handler).to receive(:add_media_files).with(attachments, wait_for_completion).and_return(:retval)
@@ -231,8 +231,8 @@ describe MediaObject do
       mock_kaltura = double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
       allow(mock_kaltura).to receive(:media_sources).and_return(
-        [{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
-          :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}]
+        [{ :height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+           :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size => "204", :fileExt => "mp4" }]
       )
     end
 
@@ -241,8 +241,8 @@ describe MediaObject do
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(@mock_kaltura)
       allow(@mock_kaltura).to receive(:startSession).and_return(nil)
       allow(@mock_kaltura).to receive(:media_sources).and_return(
-        [{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
-          :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}]
+        [{ :height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+           :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size => "204", :fileExt => "mp4" }]
       )
       allow(@mock_kaltura).to receive(:mediaGet).and_return(media_object)
       allow(@mock_kaltura).to receive(:mediaTypeToSymbol).and_return("video")
@@ -250,21 +250,21 @@ describe MediaObject do
     end
 
     it "keeps the current title if already set" do
-        mo = @media_object
-        mo.title = "Canvas Title"
-        mo.save!
+      mo = @media_object
+      mo.title = "Canvas Title"
+      mo.save!
 
-        mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-        expect(mo.title).to eq "Canvas Title"
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(mo.title).to eq "Canvas Title"
     end
 
     it "uses the kaltura title if no current title" do
-        mo = @media_object
-        mo.title = ""
-        mo.save!
+      mo = @media_object
+      mo.title = ""
+      mo.save!
 
-        mo.process_retrieved_details(@mock_entry, @media_type, @assets)
-        expect(mo.title).to eq "Kaltura Title"
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(mo.title).to eq "Kaltura Title"
     end
 
     it "ensures retrieve_details adds '/' to media_type " do

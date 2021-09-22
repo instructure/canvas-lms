@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
-
   include_examples 'Answer Serializers'
 
   let :input do
@@ -68,7 +67,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
 
   context 'validations' do
     it 'should reject a bad pairing set' do
-      [ nil, 'asdf' ].each do |bad_input|
+      [nil, 'asdf'].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
         expect(rc.error).to match(/of type array/i)
@@ -76,26 +75,26 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
     end
 
     it 'should reject a bad pairing entry' do
-      rc = subject.serialize([ 'asdf' ])
+      rc = subject.serialize(['asdf'])
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/of type hash/i)
     end
 
     it 'should reject a pairing entry missing a required parameter' do
-      rc = subject.serialize([ match_id: 123 ])
+      rc = subject.serialize([match_id: 123])
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/missing parameter "answer_id"/i)
 
-      rc = subject.serialize([ answer_id: 123 ])
+      rc = subject.serialize([answer_id: 123])
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/missing parameter "match_id"/i)
     end
 
     it 'should reject a match for an unknown answer' do
       rc = subject.serialize([{
-        answer_id: 123,
-        match_id: 6061
-      }])
+                               answer_id: 123,
+                               match_id: 6061
+                             }])
 
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/unknown answer/i)
@@ -103,9 +102,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
 
     it 'should reject an unknown match' do
       rc = subject.serialize([{
-        answer_id: 7396,
-        match_id: 123456
-      }])
+                               answer_id: 7396,
+                               match_id: 123456
+                             }])
 
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/unknown match/i)
@@ -113,9 +112,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
 
     it 'should reject a bad match' do
       rc = subject.serialize([{
-        answer_id: 7396,
-        match_id: 'adooken'
-      }])
+                               answer_id: 7396,
+                               match_id: 'adooken'
+                             }])
 
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/must be of type integer/i)
@@ -123,9 +122,9 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Matching do
 
     it 'should reject a bad answer' do
       rc = subject.serialize([{
-        answer_id: 'ping',
-        match_id: 6061
-      }])
+                               answer_id: 'ping',
+                               match_id: 6061
+                             }])
 
       expect(rc.error).not_to be_nil
       expect(rc.error).to match(/must be of type integer/i)

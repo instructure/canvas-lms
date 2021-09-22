@@ -38,31 +38,31 @@ describe IncomingMail::MessageHandler do
   end
   let_once(:user) do
     user_model
-    communication_channel(@user, {username: 'lucy@example.com', active_cc: true})
+    communication_channel(@user, { username: 'lucy@example.com', active_cc: true })
     @user
   end
   let(:context) { double("context", reply_from: nil) }
 
   let(:original_message_attributes) {
     {
-        :notification_id => 1,
-        :shard => shard,
-        :context => context,
-        :user => user,
-        :global_id => 1,
-        :to => "lucy@example.com"
+      :notification_id => 1,
+      :shard => shard,
+      :context => context,
+      :user => user,
+      :global_id => 1,
+      :to => "lucy@example.com"
     }
   }
 
   let(:incoming_message_attributes) {
     {
-        subject: "some subject",
-        header: {
-            :subject => double("subject", :charset => "utf8")
-        },
-        from: ["lucy@example.com"],
-        reply_to: ["lucy@example.com"],
-        message_id: 1,
+      subject: "some subject",
+      header: {
+        :subject => double("subject", :charset => "utf8")
+      },
+      from: ["lucy@example.com"],
+      reply_to: ["lucy@example.com"],
+      message_id: 1,
     }
   }
 
@@ -163,7 +163,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "bounces the message on invalid context" do
-          message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
+          message = double("original message with invalid context", original_message_attributes.merge({ context: double("context") }))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
@@ -172,7 +172,7 @@ describe IncomingMail::MessageHandler do
         end
 
         it "saves and delivers the message with proper input" do
-          message = double("original message with invalid context", original_message_attributes.merge({context: double("context")}))
+          message = double("original message with invalid context", original_message_attributes.merge({ context: double("context") }))
           allow(subject).to receive(:get_original_message).with(original_message_id, timestamp).and_return(message)
           expect_any_instance_of(Message).to receive(:save)
           expect_any_instance_of(Message).to receive(:deliver)
@@ -202,14 +202,14 @@ describe IncomingMail::MessageHandler do
             BODY
 
             message_attributes = {
-                :to => "lucy@example.com",
-                :from => "no-reply@example.com",
-                :subject => email_subject,
-                :body => body,
-                :delay_for => 0,
-                :context => nil,
-                :path_type => "email",
-                :from_name => "Instructure",
+              :to => "lucy@example.com",
+              :from => "no-reply@example.com",
+              :subject => email_subject,
+              :body => body,
+              :delay_for => 0,
+              :context => nil,
+              :path_type => "email",
+              :from_name => "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -233,14 +233,14 @@ describe IncomingMail::MessageHandler do
             BODY
 
             message_attributes = {
-                :to => "lucy@example.com",
-                :from => "no-reply@example.com",
-                :subject => email_subject,
-                :body => body,
-                :delay_for => 0,
-                :context => nil,
-                :path_type => "email",
-                :from_name => "Instructure",
+              :to => "lucy@example.com",
+              :from => "no-reply@example.com",
+              :subject => email_subject,
+              :body => body,
+              :delay_for => 0,
+              :context => nil,
+              :path_type => "email",
+              :from_name => "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -264,14 +264,14 @@ describe IncomingMail::MessageHandler do
             BODY
 
             message_attributes = {
-                :to => "lucy@example.com",
-                :from => "no-reply@example.com",
-                :subject => email_subject,
-                :body => body,
-                :delay_for => 0,
-                :context => nil,
-                :path_type => "email",
-                :from_name => "Instructure",
+              :to => "lucy@example.com",
+              :from => "no-reply@example.com",
+              :subject => email_subject,
+              :body => body,
+              :delay_for => 0,
+              :context => nil,
+              :path_type => "email",
+              :from_name => "Instructure",
             }
             expected_bounce_message = Message.new(message_attributes)
             expect(Message).to receive(:new).with(message_attributes).and_return(expected_bounce_message)
@@ -289,8 +289,8 @@ describe IncomingMail::MessageHandler do
             expect(Mailer).to receive(:create_message)
 
             message = double("incoming message with bad from",
-                           incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
-                                                             :reply_to => ['also_not_lucy@example.com']))
+                             incoming_message_attributes.merge(:from => ['not_lucy@example.com'],
+                                                               :reply_to => ['also_not_lucy@example.com']))
             subject.handle(outgoing_from_address, body, html_body, message, tag)
           end
         end

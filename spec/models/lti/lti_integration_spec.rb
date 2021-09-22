@@ -30,19 +30,19 @@ describe "LTI integration tests" do
       canvas_tool.shared_secret = 'secret'
       canvas_tool.privacy_level = 'public'
       canvas_tool.settings[:custom_fields] = {
-          'custom_variable_canvas_api_domain' => '$Canvas.api.domain',
-          'custom_variable_canvas_assignment_id' => '$Canvas.assignment.id',
-          'custom_variable_canvas_assignment_points_possible' => '$Canvas.assignment.pointsPossible',
-          'custom_variable_canvas_assignment_title' => '$Canvas.assignment.title',
-          'custom_variable_canvas_course_id' => '$Canvas.course.id',
-          'custom_variable_canvas_enrollment_enrollment_state' => '$Canvas.enrollment.enrollmentState',
-          'custom_variable_canvas_membership_concluded_roles' => '$Canvas.membership.concludedRoles',
-          'custom_variable_canvas_user_id' => '$Canvas.user.id',
-          'custom_variable_canvas_user_login_id' => '$Canvas.user.loginId',
-          'custom_variable_person_address_timezone' => '$Person.address.timezone',
-          'custom_variable_person_name_family' => '$Person.name.family',
-          'custom_variable_person_name_full' => '$Person.name.full',
-          'custom_variable_person_name_given' => '$Person.name.given',
+        'custom_variable_canvas_api_domain' => '$Canvas.api.domain',
+        'custom_variable_canvas_assignment_id' => '$Canvas.assignment.id',
+        'custom_variable_canvas_assignment_points_possible' => '$Canvas.assignment.pointsPossible',
+        'custom_variable_canvas_assignment_title' => '$Canvas.assignment.title',
+        'custom_variable_canvas_course_id' => '$Canvas.course.id',
+        'custom_variable_canvas_enrollment_enrollment_state' => '$Canvas.enrollment.enrollmentState',
+        'custom_variable_canvas_membership_concluded_roles' => '$Canvas.membership.concludedRoles',
+        'custom_variable_canvas_user_id' => '$Canvas.user.id',
+        'custom_variable_canvas_user_login_id' => '$Canvas.user.loginId',
+        'custom_variable_person_address_timezone' => '$Person.address.timezone',
+        'custom_variable_person_name_family' => '$Person.name.family',
+        'custom_variable_person_name_full' => '$Person.name.full',
+        'custom_variable_person_name_given' => '$Person.name.given',
       }
     end
   }
@@ -90,8 +90,9 @@ describe "LTI integration tests" do
     adapter = Lti::LtiOutboundAdapter.new(canvas_tool, canvas_user, canvas_course)
 
     variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller, {
-                                                                  current_user: canvas_user,
-                                                                  current_pseudonym: pseudonym})
+                                                    current_user: canvas_user,
+                                                    current_pseudonym: pseudonym
+                                                  })
 
     adapter.prepare_tool_launch(return_url, variable_expander)
     post_payload = adapter.generate_post_payload
@@ -171,7 +172,7 @@ describe "LTI integration tests" do
       @course.save!
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
-      variable_expander = Lti::VariableExpander.new(@account, @course, controller, {current_user: @user})
+      variable_expander = Lti::VariableExpander.new(@account, @course, controller, { current_user: @user })
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
       expect(hash['lti_message_type']).to eq 'basic-lti-launch-request'
@@ -275,14 +276,14 @@ describe "LTI integration tests" do
 
     it "should include custom fields" do
       course_with_teacher(:active_all => true)
-      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => {'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123}, :name => 'tool')
+      @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => { 'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123 }, :name => 'tool')
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.yahoo.com', variable_expander, launch_url: 'http://www.yahoo.com', link_code: '123456')
       hash = adapter.generate_post_payload
 
-      expect(hash.keys.select{|k| k.match(/^custom_/) }.sort).to eq ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
+      expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
       expect(hash['custom_bob']).to eql('bob')
       expect(hash['custom_fred']).to eql('fred')
       expect(hash['custom_john']).to eql('john')
@@ -388,11 +389,11 @@ describe "LTI integration tests" do
 
   context "outcome launch" do
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     end
 
-    def tool_setup(for_student=true)
+    def tool_setup(for_student = true)
       if for_student
         course_with_student(:active_all => true)
       else

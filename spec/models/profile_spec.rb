@@ -71,9 +71,9 @@ describe Profile do
         profile = FooProfile.new
         expect(profile.data).to eq({})
         expect(profile.bar).to eq []
-        expect(profile.data).to eq({:bar => []})
+        expect(profile.data).to eq({ :bar => [] })
         profile.bar = ["lol"]
-        expect(profile.data).to eq({:bar => ["lol"]})
+        expect(profile.data).to eq({ :bar => ["lol"] })
       end
     end
   end

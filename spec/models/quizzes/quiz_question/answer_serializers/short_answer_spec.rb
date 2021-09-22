@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
-
   include_examples 'Answer Serializers'
 
   let :input do

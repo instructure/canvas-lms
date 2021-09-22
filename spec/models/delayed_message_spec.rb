@@ -174,9 +174,9 @@ describe DelayedMessage do
       @true_now = Time.zone.now
 
       # time zones of interest
-      @mountain = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == 'Mountain Time (US & Canada)' }
-      @central = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == 'Central Time (US & Canada)' }
-      @eastern = ActiveSupport::TimeZone.us_zones.find{ |zone| zone.name == 'Eastern Time (US & Canada)' }
+      @mountain = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Mountain Time (US & Canada)' }
+      @central = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Central Time (US & Canada)' }
+      @eastern = ActiveSupport::TimeZone.us_zones.find { |zone| zone.name == 'Eastern Time (US & Canada)' }
 
       # set up user in central time (different than the specific time zones
       # referenced in set_send_at)

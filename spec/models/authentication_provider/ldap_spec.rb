@@ -83,7 +83,7 @@ describe AuthenticationProvider::LDAP do
         expect(InstStatsd::Statsd).to have_received(:increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_success",
           short_stat: "ldap_success",
-          tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id}
+          tags: { account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id }
         )
       end
 
@@ -93,7 +93,7 @@ describe AuthenticationProvider::LDAP do
         expect(InstStatsd::Statsd).to have_received(:increment).with(
           "#{@aac.send(:statsd_prefix)}.ldap_failure",
           short_stat: "ldap_failure",
-          tags: {account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id}
+          tags: { account_id: Shard.global_id_for(@aac.account_id), auth_provider_id: @aac.global_id }
         )
       end
 

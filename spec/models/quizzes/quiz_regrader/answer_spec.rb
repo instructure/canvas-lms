@@ -21,23 +21,22 @@ require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::Answer do
-
   let(:points) { 15 }
 
   let(:question) do
-    double(:id => 1, :question_data => {:id => 1,
-                                      :regrade_option => 'full_credit',
-                                      :points_possible => points},
-                   :quiz_group => nil)
+    double(:id => 1, :question_data => { :id => 1,
+                                         :regrade_option => 'full_credit',
+                                         :points_possible => points },
+           :quiz_group => nil)
   end
 
   let(:question_regrade) do
-    double(:quiz_question  => question,
-         :regrade_option => "full_credit")
+    double(:quiz_question => question,
+           :regrade_option => "full_credit")
   end
 
   let(:answer) do
-    { :question_id => 1, :points => points, :text => ""}
+    { :question_id => 1, :points => points, :text => "" }
   end
 
   let(:wrapper) do
@@ -46,16 +45,16 @@ describe Quizzes::QuizRegrader::Answer do
 
   def mark_original_answer_as!(correct)
     answer[:correct] = case correct
-      when :correct then true
-      when :wrong   then false
-      when :partial then "partial"
-    end
+                       when :correct then true
+                       when :wrong   then false
+                       when :partial then "partial"
+                       end
 
     answer[:points] = case correct
-      when :correct then 15
-      when :wrong   then 0
-      when :partial then 5
-    end
+                      when :correct then 15
+                      when :wrong   then 0
+                      when :partial then 5
+                      end
   end
 
   def assert_answer_has_regrade_option!(regrade_option)
@@ -64,23 +63,24 @@ describe Quizzes::QuizRegrader::Answer do
 
   def score_question_as!(correct)
     correct = case correct
-      when :correct then true
-      when :wrong   then false
-      when :partial then "partial"
-    end
+              when :correct then true
+              when :wrong   then false
+              when :partial then "partial"
+              end
 
     points = case correct
-      when true      then 15
-      when false     then 0
-      when "partial" then 10
-    end
+             when true      then 15
+             when false     then 0
+             when "partial" then 10
+             end
 
     sent_params = {}
     expect(Quizzes::SubmissionGrader).to receive(:score_question).at_least(:once) do |*args|
       sent_params, sent_answer_data = args
       if question.question_data[:question_type] == 'multiple_answers_question'
-        answer.each do |k,v|
+        answer.each do |k, v|
           next unless /answer/ =~ k
+
           key = "question_#{question.id}_#{k}"
           expect(sent_answer_data[key]).to eq v
         end
@@ -93,7 +93,6 @@ describe Quizzes::QuizRegrader::Answer do
   end
 
   describe "#initialize" do
-
     it 'saves a reference to the passed answer hash' do
       expect(wrapper.answer).to eq answer
     end
@@ -103,15 +102,15 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     it 'raises an error if the question has an unrecognized regrade_option' do
-      question_regrade = double(:quiz_question  => question,
-                              :regrade_option => "be_a_jerk")
+      question_regrade = double(:quiz_question => question,
+                                :regrade_option => "be_a_jerk")
 
       expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to raise_error("Regrade option not valid!")
     end
 
     it 'does not raise an error if question has recognized regrade_option' do
-      question_regrade = double(:quiz_question  => question,
-                              :regrade_option => "current_correct_only")
+      question_regrade = double(:quiz_question => question,
+                                :regrade_option => "current_correct_only")
 
       Quizzes::QuizRegrader::Answer::REGRADE_OPTIONS.each do |regrade_option|
         expect { Quizzes::QuizRegrader::Answer.new(answer, question_regrade) }.to_not raise_error
@@ -120,9 +119,7 @@ describe Quizzes::QuizRegrader::Answer do
   end
 
   describe '#regrade!' do
-
     context 'full_credit regrade option' do
-
       it 'returns the points possible for the question if the answer was not correct before' do
         mark_original_answer_as!(:wrong)
         score_question_as!(:correct)
@@ -140,7 +137,6 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     context 'current_and_previous_correct regrade option' do
-
       before { wrapper.regrade_option = 'current_and_previous_correct' }
 
       it 'returns 0 if previously correct' do
@@ -175,7 +171,6 @@ describe Quizzes::QuizRegrader::Answer do
     end
 
     context 'current_correct_only regrade option' do
-
       before { wrapper.regrade_option = 'current_correct_only' }
 
       it 'returns points_possible - points if previously wrong but now correct' do
@@ -234,5 +229,4 @@ describe Quizzes::QuizRegrader::Answer do
       end
     end
   end
-
 end

@@ -123,7 +123,7 @@ describe ConversationParticipant do
 
   context "tagged scope" do
     def conversation_for(*tags_or_users)
-      users, tags = tags_or_users.partition{ |u| u.is_a?(User) }
+      users, tags = tags_or_users.partition { |u| u.is_a?(User) }
       users << user_factory if users.empty?
       c = @me.initiate_conversation(users)
       c.add_message("test")
@@ -259,6 +259,7 @@ describe ConversationParticipant do
       users = @convo.reload.participants
       users.each do |user|
         next if user == @me
+
         expect(@me.address_book.cached?(user)).to be_falsey
       end
     end
@@ -279,7 +280,7 @@ describe ConversationParticipant do
         if [@me.id, @u3.id].include? user.id
           expect(common_courses).to eq({})
         else
-          expect(common_courses).to eq({@course.id => ["StudentEnrollment"]})
+          expect(common_courses).to eq({ @course.id => ["StudentEnrollment"] })
         end
       end
     end
@@ -343,7 +344,7 @@ describe ConversationParticipant do
 
       c.move_to_user @user2
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       rconvo.reload
       expect(rconvo.participants.size).to eql 3
@@ -380,8 +381,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -403,7 +404,7 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
       rconvo.reload
       expect(rconvo.participants.size).to eql 1
       expect(rconvo.private_hash).not_to eql old_hash
@@ -421,8 +422,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -442,8 +443,8 @@ describe ConversationParticipant do
 
       c.reload.move_to_user @user2
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -467,8 +468,8 @@ describe ConversationParticipant do
         c.move_to_user @user2
       end
 
-      expect{ c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
-      expect{ Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { c.reload }.to raise_error(ActiveRecord::RecordNotFound) # deleted
+      expect { Conversation.find(c.conversation_id) }.to raise_error(ActiveRecord::RecordNotFound) # deleted
 
       expect(c2.reload.messages.size).to eql 2
       expect(c2.messages.map(&:author_id)).to eql [@user2.id, @user2.id]
@@ -513,7 +514,7 @@ describe ConversationParticipant do
           expect(convos.size).to eql 1
           expect(convos.sort_by(&:id)).to eql [@c1]
 
-          @cross_shard_admin =  @shard1.activate { user_factory }
+          @cross_shard_admin = @shard1.activate { user_factory }
           @a1.account_users.create!(user: @cross_shard_admin)
           convos = @target_user.conversations.for_masquerading_user(@cross_shard_admin, @target_user)
           expect(convos.size).to eql 1

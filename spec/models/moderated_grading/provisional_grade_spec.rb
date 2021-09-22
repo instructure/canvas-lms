@@ -26,8 +26,8 @@ describe ModeratedGrading::ProvisionalGrade do
   let(:course) { account.courses.create! }
   let(:assignment) { course.assignments.create!(submission_types: 'online_text_entry', moderated_grading: true, grader_count: 2) }
   let(:submission) { assignment.submissions.find_by!(user: student) }
-  let(:scorer) { user_factory(active_user: true).tap {|u| course.enroll_teacher(u, enrollment_state: 'active') } }
-  let(:student) { user_factory(active_user: true).tap {|u| course.enroll_student(u, enrollment_state: 'active') } }
+  let(:scorer) { user_factory(active_user: true).tap { |u| course.enroll_teacher(u, enrollment_state: 'active') } }
+  let(:student) { user_factory(active_user: true).tap { |u| course.enroll_student(u, enrollment_state: 'active') } }
 
   before(:once) do
     @graded_at = @now = Time.zone.now.change(usec: 0)
@@ -38,9 +38,9 @@ describe ModeratedGrading::ProvisionalGrade do
   it { is_expected.to be_valid }
 
   it do
-    is_expected.to have_one(:selection).
-      with_foreign_key(:selected_provisional_grade_id).
-      class_name('ModeratedGrading::Selection')
+    is_expected.to have_one(:selection)
+      .with_foreign_key(:selected_provisional_grade_id)
+      .class_name('ModeratedGrading::Selection')
   end
 
   it { is_expected.to belong_to(:submission).required }
@@ -236,17 +236,17 @@ describe ModeratedGrading::ProvisionalGrade do
     it "returns the proper format" do
       json = provisional_grade.grade_attributes
       expect(json).to eq({
-        'provisional_grade_id' => provisional_grade.id,
-        'grade' => 'A',
-        'score' => 100.0,
-        'graded_at' => nil,
-        'scorer_id' => provisional_grade.scorer_id,
-        'graded_anonymously' => nil,
-        'entered_grade' => 'A',
-        'entered_score' => 100.0,
-        'final' => false,
-        'grade_matches_current_submission' => true
-      })
+                           'provisional_grade_id' => provisional_grade.id,
+                           'grade' => 'A',
+                           'score' => 100.0,
+                           'graded_at' => nil,
+                           'scorer_id' => provisional_grade.scorer_id,
+                           'graded_anonymously' => nil,
+                           'entered_grade' => 'A',
+                           'entered_score' => 100.0,
+                           'final' => false,
+                           'grade_matches_current_submission' => true
+                         })
     end
   end
 
@@ -454,7 +454,7 @@ describe ModeratedGrading::ProvisionalGrade do
         )
       end.to change { LearningOutcomeResult.count }.by(0)
 
-      expect { provisional_grade.publish!}.to change { LearningOutcomeResult.count }.by(1)
+      expect { provisional_grade.publish! }.to change { LearningOutcomeResult.count }.by(1)
     end
 
     it "sets grade_posting_in_progress on the rubric_assessment's submission" do
@@ -569,8 +569,8 @@ describe ModeratedGrading::ProvisionalGrade do
       submission.add_comment(comment: 'provisional comment', provisional: true, author: scorer)
 
       expect { provisional_grade.publish!(skip_grade_calc: true) }.not_to change {
-        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission).
-          submission_comment_created.count
+        AnonymousOrModerationEvent.where(assignment: assignment, submission: submission)
+                                  .submission_comment_created.count
       }
     end
   end

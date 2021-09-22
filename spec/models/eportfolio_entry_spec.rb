@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe EportfolioEntry do
-
   describe 'validation' do
     before(:once) do
       eportfolio_model
@@ -57,7 +56,7 @@ describe EportfolioEntry do
     it "should accept valid attachments" do
       eportfolio_model
       attachment_model(:context => @user)
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment', :attachment_id => @attachment.id}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment', :attachment_id => @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql('attachment')
@@ -66,12 +65,12 @@ describe EportfolioEntry do
 
     it "should not accept invalid attachments" do
       attachment_model(:context => User.create)
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment', :attachment_id => @attachment.id}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment', :attachment_id => @attachment.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'attachment'}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'attachment' } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
@@ -79,7 +78,7 @@ describe EportfolioEntry do
 
     it "should accept valid submissions" do
       submission_model(:user => @user)
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission', :submission_id => @submission.id}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission', :submission_id => @submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql('submission')
@@ -91,19 +90,19 @@ describe EportfolioEntry do
       @bad_submission = @submission
       eportfolio_model
       submission_model(:user => @user)
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission', :submission_id => @bad_submission.id}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission', :submission_id => @bad_submission.id } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
 
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'submission'}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'submission' } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "should accept valid html content" do
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'html', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql('html')
@@ -114,14 +113,14 @@ describe EportfolioEntry do
     end
 
     it "should not accept invalid html content" do
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'html'}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'html' } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
     end
 
     it "should accept valid rich content" do
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>"}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "<a onclick='javascript: alert(5);' href='#bob;'>link</a>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0][:section_type]).to eql('rich_text')
@@ -132,7 +131,7 @@ describe EportfolioEntry do
     end
 
     it "should not accept invalid rich content" do
-      @eportfolio_entry.parse_content({:section_count => 1, :section_1 => {:section_type => 'rich_text', :content => "<blink/>"}})
+      @eportfolio_entry.parse_content({ :section_count => 1, :section_1 => { :section_type => 'rich_text', :content => "<blink/>" } })
       expect(@eportfolio_entry.content).not_to be_nil
       expect(@eportfolio_entry.content.length).to eql(1)
       expect(@eportfolio_entry.content[0]).to eql("No Content Added Yet")
@@ -140,13 +139,13 @@ describe EportfolioEntry do
   end
 
   it "Should update eportfolio date" do
-      eportfolio_model
-      old_time = 1.day.ago
-      @eportfolio.update_attribute(:updated_at, old_time)
-      @eportfolio_entry.name = "update test"
-      @eportfolio_entry.save!
-      expect(@eportfolio.updated_at.to_i).not_to eq(old_time.to_i)
-    end
+    eportfolio_model
+    old_time = 1.day.ago
+    @eportfolio.update_attribute(:updated_at, old_time)
+    @eportfolio_entry.name = "update test"
+    @eportfolio_entry.save!
+    expect(@eportfolio.updated_at.to_i).not_to eq(old_time.to_i)
+  end
 
   describe "callbacks" do
     before(:once) do

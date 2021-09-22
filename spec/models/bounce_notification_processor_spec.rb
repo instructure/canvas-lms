@@ -24,8 +24,8 @@ describe BounceNotificationProcessor do
   before(:once) do
     bounce_queue_log = File.read(File.dirname(__FILE__) + '/../fixtures/bounces.json')
     @all_bounce_messages_json = JSON.parse(bounce_queue_log)
-    @soft_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Transient')}
-    @hard_bounce_messages_json = @all_bounce_messages_json.select {|m| m['Message'].include?('Permanent')}
+    @soft_bounce_messages_json = @all_bounce_messages_json.select { |m| m['Message'].include?('Transient') }
+    @hard_bounce_messages_json = @all_bounce_messages_json.select { |m| m['Message'].include?('Permanent') }
     @bounce_count = @all_bounce_messages_json.count do |notification|
       JSON.parse(notification['Message'])['notificationType'] == 'Bounce'
     end
@@ -45,7 +45,8 @@ describe BounceNotificationProcessor do
           region: 'us-east-1',
           access_key: 'key',
           secret_access_key: 'secret'
-        })
+        }
+      )
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each { |m| expectation.and_yield(mock_message(m)) }
@@ -62,7 +63,8 @@ describe BounceNotificationProcessor do
           region: 'us-east-1',
           access_key: 'key',
           secret_access_key: 'secret'
-        })
+        }
+      )
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|
@@ -77,9 +79,9 @@ describe BounceNotificationProcessor do
     it "flags addresses with hard bounces" do
       bnp = BounceNotificationProcessor.new
       allow(BounceNotificationProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+                                                                          access_key: 'key',
+                                                                          secret_access_key: 'secret'
+                                                                        })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|
@@ -88,24 +90,24 @@ describe BounceNotificationProcessor do
       expect(queue).to expectation
       allow(bnp).to receive(:bounce_queue).and_return(queue)
 
-      expect(CommunicationChannel).to receive(:bounce_for_path).
-        with(include(path: 'hard@example.edu',
-                     timestamp: '2014-08-22T12:25:46.786Z',
-                     permanent_bounce: true,
-                     suppression_bounce: false)).
-        exactly(4).times
-      expect(CommunicationChannel).to receive(:bounce_for_path).
-        with(include(path: 'suppressed@example.edu',
-                     timestamp: '2014-08-22T12:18:58.044Z',
-                     permanent_bounce: true,
-                     suppression_bounce: true)).
-        exactly(3).times
-      expect(CommunicationChannel).to receive(:bounce_for_path).
-        with(include(path: 'soft@example.edu',
-                     timestamp: '2014-08-22T13:24:31.000Z',
-                     permanent_bounce: false,
-                     suppression_bounce: false)).
-        exactly(:once)
+      expect(CommunicationChannel).to receive(:bounce_for_path)
+        .with(include(path: 'hard@example.edu',
+                      timestamp: '2014-08-22T12:25:46.786Z',
+                      permanent_bounce: true,
+                      suppression_bounce: false))
+        .exactly(4).times
+      expect(CommunicationChannel).to receive(:bounce_for_path)
+        .with(include(path: 'suppressed@example.edu',
+                      timestamp: '2014-08-22T12:18:58.044Z',
+                      permanent_bounce: true,
+                      suppression_bounce: true))
+        .exactly(3).times
+      expect(CommunicationChannel).to receive(:bounce_for_path)
+        .with(include(path: 'soft@example.edu',
+                      timestamp: '2014-08-22T13:24:31.000Z',
+                      permanent_bounce: false,
+                      suppression_bounce: false))
+        .exactly(:once)
 
       bnp.process
     end
@@ -113,9 +115,9 @@ describe BounceNotificationProcessor do
     it 'pings statsd' do
       bnp = BounceNotificationProcessor.new
       allow(BounceNotificationProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+                                                                          access_key: 'key',
+                                                                          secret_access_key: 'secret'
+                                                                        })
       queue = double
       expectation = receive(:poll)
       @all_bounce_messages_json.each do |m|

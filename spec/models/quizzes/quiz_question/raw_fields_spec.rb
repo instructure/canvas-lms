@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::RawFields do
-
   describe "#fetch_any" do
     let(:fields) { Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment", comments: "another answer comment") }
     it "fetches a specified key" do
@@ -40,7 +39,6 @@ describe Quizzes::QuizQuestion::RawFields do
   end
 
   describe "#fetch_with_enforced_length" do
-
     it "has no problem with short data" do
       fields = Quizzes::QuizQuestion::RawFields.new(answer_comment: "an answer comment")
       expect(fields.fetch_with_enforced_length(:answer_comment)).to eq "an answer comment"
@@ -59,5 +57,4 @@ describe Quizzes::QuizQuestion::RawFields do
       }.to raise_error(Quizzes::QuizQuestion::RawFields::FieldTooLongError)
     end
   end
-
 end

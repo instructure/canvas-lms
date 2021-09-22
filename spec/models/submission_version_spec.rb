@@ -34,7 +34,7 @@ describe SubmissionVersion do
 
   describe "index_version" do
     it "should create a new record" do
-      expect{
+      expect {
         SubmissionVersion.index_version(@version)
       }.to change(SubmissionVersion, :count)
     end
@@ -70,11 +70,11 @@ describe SubmissionVersion do
     it "should create a new record for each version" do
       n = 5
 
-      submissions = n.times.map{ unversioned_submission }
-      contexts = submissions.map{ |submission| submission.assignment.context }
-      versions = submissions.map{ |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
+      submissions = n.times.map { unversioned_submission }
+      contexts = submissions.map { |submission| submission.assignment.context }
+      versions = submissions.map { |submission| Version.create(:versionable => submission, :yaml => submission.attributes.to_yaml) }
 
-      expect{
+      expect {
         SubmissionVersion.index_versions(versions)
       }.to change(SubmissionVersion, :count).by(n)
     end
@@ -85,13 +85,13 @@ describe SubmissionVersion do
       end
 
       it "should error on invalid yaml by default" do
-        expect{
+        expect {
           SubmissionVersion.index_versions([@version])
         }.to raise_error(Psych::SyntaxError)
       end
 
       it "should allow ignoring invalid yaml errors" do
-        expect{
+        expect {
           SubmissionVersion.index_versions([@version], ignore_errors: true)
         }.not_to raise_error
       end
@@ -102,14 +102,14 @@ describe SubmissionVersion do
     attrs = YAML.load(@version.yaml)
     attrs.delete('assignment_id')
     @version.update_attribute(:yaml, attrs.to_yaml)
-    expect{
+    expect {
       SubmissionVersion.index_version(@version)
       SubmissionVersion.index_versions([@version])
     }.not_to change(SubmissionVersion, :count)
   end
 
   it "should not create a SubmissionVersion when the Version doesn't save" do
-    version = @submission.versions.build(yaml: {"assignment_id" => @submission.assignment_id}.to_yaml)
+    version = @submission.versions.build(yaml: { "assignment_id" => @submission.assignment_id }.to_yaml)
     expect(@submission.versions).to receive(:create).and_return(version)
     expect do
       @submission.with_versioning(explicit: true) do
@@ -126,7 +126,7 @@ describe SubmissionVersion do
 
     Version.preload_version_number([sub1, sub2])
 
-    [sub1, sub2].each{|s| expect(s).to receive(:versions).never}
+    [sub1, sub2].each { |s| expect(s).to receive(:versions).never }
 
     expect(sub1.version_number).to eq 3
     expect(sub2.version_number).to eq 2

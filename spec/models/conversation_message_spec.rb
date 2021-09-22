@@ -28,13 +28,13 @@ describe ConversationMessage do
 
       course_with_teacher(:active_all => true)
       @students = []
-      3.times{ @students << student_in_course(:active_all => true).user }
+      3.times { @students << student_in_course(:active_all => true).user }
       @first_student = @students.first
       @initial_students = @students.first(2)
       @last_student = @students.last
 
       [@teacher, *@students].each do |user|
-        communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
+        communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
       end
 
       @conversation = @teacher.initiate_conversation(@initial_students)
@@ -123,8 +123,8 @@ describe ConversationMessage do
 
       expect(message.context).to eq conversation_message
       message.context.reply_from(:user => message.user, :purpose => 'general',
-        :subject => message.subject,
-        :text => "Reply to notification")
+                                 :subject => message.subject,
+                                 :text => "Reply to notification")
       # The initial message, the one the sent the notification,
       # and the response to the notification
       expect(@conversation.messages.size).to eq 3
@@ -193,7 +193,7 @@ describe ConversationMessage do
       @submission = @assignment.submit_homework(@user, :body => 'some message')
       @submission.add_comment(:author => @user, :comment => "hello")
 
-      expect(StreamItem.all.select{ |i| i.asset_string =~ /conversation_/ }).to be_empty
+      expect(StreamItem.all.select { |i| i.asset_string =~ /conversation_/ }).to be_empty
     end
 
     it "should not create additional stream_items for additional messages in the same conversation" do
@@ -309,30 +309,32 @@ describe ConversationMessage do
       Account.default.destroy
       cm.reload
 
-      expect { cm.reply_from({
-        :purpose => 'general',
-        :user => @teacher,
-        :subject => "an email reply",
-        :html => "body",
-        :text => "body"
-      }) }.to raise_error(IncomingMail::Errors::UnknownAddress)
+      expect {
+        cm.reply_from({
+                        :purpose => 'general',
+                        :user => @teacher,
+                        :subject => "an email reply",
+                        :html => "body",
+                        :text => "body"
+                      })
+      }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
     it "should reply only to the message author on conversations2 conversations" do
-      users = 3.times.map{ course_with_student(course: @course).user }
+      users = 3.times.map { course_with_student(course: @course).user }
       conversation = Conversation.initiate(users, false, :context_type => 'Course', :context_id => @course.id)
       cm1 = conversation.add_message(users[0], "initial message", :root_account_id => Account.default.id)
       cm2 = conversation.add_message(users[1], "subsequent message", :root_account_id => Account.default.id)
       expect(cm2.conversation_message_participants.size).to eq 3
       cm3 = cm2.reply_from({
-        :purpose => 'general',
-        :user => users[2],
-        :subject => "an email reply",
-        :html => "body",
-        :text => "body"
-      })
+                             :purpose => 'general',
+                             :user => users[2],
+                             :subject => "an email reply",
+                             :html => "body",
+                             :text => "body"
+                           })
       expect(cm3.conversation_message_participants.size).to eq 2
-      expect(cm3.conversation_message_participants.map{|x| x.user_id}.sort).to eq [users[1].id, users[2].id].sort
+      expect(cm3.conversation_message_participants.map { |x| x.user_id }.sort).to eq [users[1].id, users[2].id].sort
     end
 
     it "should mark conversations as read for the replying author" do
@@ -343,12 +345,12 @@ describe ConversationMessage do
       cp2 = cp.conversation.conversation_participants.where(user_id: @user).first
       expect(cp2.workflow_state).to eq 'unread'
       cm.reply_from({
-        :purpose => 'general',
-        :user => @user,
-        :subject => "an email reply",
-        :html => "body",
-        :text => "body"
-      })
+                      :purpose => 'general',
+                      :user => @user,
+                      :subject => "an email reply",
+                      :html => "body",
+                      :text => "body"
+                    })
       cp2.reload
       expect(cp2.workflow_state).to eq 'read'
     end

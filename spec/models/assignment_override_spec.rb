@@ -45,7 +45,7 @@ describe AssignmentOverride do
     AssignmentOverride.where(id: override).update_all(set_type: 'potato')
     expect(override.reload).to be_invalid
     override.destroy
-    expect{ override.destroy }.not_to raise_error
+    expect { override.destroy }.not_to raise_error
   end
 
   it "should default set_type to adhoc" do
@@ -107,7 +107,7 @@ describe AssignmentOverride do
     expect(@override_student2).to be_valid
     expect(@override2).to be_valid
 
-    expect{ @override_student2.save! }.not_to raise_error
+    expect { @override_student2.save! }.not_to raise_error
     @override2.reload
     expect(@override2.set).to eq [@student]
   end
@@ -115,9 +115,9 @@ describe AssignmentOverride do
   context '#mastery_paths?' do
     let(:override) do
       described_class.new({
-        set_type: AssignmentOverride::SET_TYPE_NOOP,
-        set_id: AssignmentOverride::NOOP_MASTERY_PATHS
-      })
+                            set_type: AssignmentOverride::SET_TYPE_NOOP,
+                            set_id: AssignmentOverride::NOOP_MASTERY_PATHS
+                          })
     end
 
     it "returns true when it is a mastery_paths override" do
@@ -170,7 +170,7 @@ describe AssignmentOverride do
 
   describe "active scope" do
     before :once do
-      @overrides = 5.times.map{ assignment_override_model }
+      @overrides = 5.times.map { assignment_override_model }
     end
 
     it "should include active overrides" do
@@ -370,7 +370,7 @@ describe AssignmentOverride do
     it "should set ADHOC's name to reflect students (with many)" do
       @override.title = nil
       @override.set_type = "ADHOC"
-      ["A Student","B Student","C Student","D Student"].each do |student_name|
+      ["A Student", "B Student", "C Student", "D Student"].each do |student_name|
         override_student = @override.assignment_override_students.build
         override_student.user = student_in_course(course: @override.assignment.context, name: student_name).user
         override_student.save!
@@ -438,7 +438,7 @@ describe AssignmentOverride do
   describe_override("lock_at", 10.minutes.from_now, 12.minutes.from_now)
 
   describe "#due_at=" do
-    def fancy_midnight(opts={})
+    def fancy_midnight(opts = {})
       zone = opts[:zone] || Time.zone
       Time.use_zone(zone) do
         time = opts[:time] || Time.zone.now
@@ -523,7 +523,7 @@ describe AssignmentOverride do
     end
 
     it "should preserve non-all-day date when only changing time zone" do
-      Timecop.freeze(Time.utc(2013,3,10,0,0)) do
+      Timecop.freeze(Time.utc(2013, 3, 10, 0, 0)) do
         @override.due_at = Date.today.in_time_zone('Alaska') - 11.hours # 13:00:00 AKDT -08:00 previous day
         @override.due_at = @override.due_at.in_time_zone('Baghdad') # 00:00:00 AST +03:00 today
         expect(@override.all_day_date).to eq Date.today - 1.day
@@ -559,7 +559,6 @@ describe AssignmentOverride do
       @override.lock_at = nil
       expect(@override.lock_at).to be_nil
     end
-
   end
 
   describe '#availability_expired?' do
@@ -793,9 +792,9 @@ describe AssignmentOverride do
   end
 
   describe "as_hash" do
-    let(:due_at) { Time.utc(2013,1,10,12,30) }
-    let(:unlock_at) { Time.utc(2013,1,9,12,30) }
-    let(:lock_at) { Time.utc(2013,1,11,12,30) }
+    let(:due_at) { Time.utc(2013, 1, 10, 12, 30) }
+    let(:unlock_at) { Time.utc(2013, 1, 9, 12, 30) }
+    let(:lock_at) { Time.utc(2013, 1, 11, 12, 30) }
     let(:id) { 1 }
     let(:title) { "My Wonderful VDD" }
     let(:override) do
@@ -855,7 +854,7 @@ describe AssignmentOverride do
 
     it "does nothing if the set is not empty" do
       allow(@override).to receive(:set_type).and_return "ADHOC"
-      allow(@override).to receive(:set).and_return [1,2,3]
+      allow(@override).to receive(:set).and_return [1, 2, 3]
       expect(@override).to receive(:destroy).never
 
       @override.destroy_if_empty_set
@@ -902,7 +901,7 @@ describe AssignmentOverride do
 
       expect(@override.applies_to_students).to eq []
 
-      @course.enroll_student(@student,:enrollment_state => 'active', :section => @override.set)
+      @course.enroll_student(@student, :enrollment_state => 'active', :section => @override.set)
 
       expect(@override.applies_to_students).to eq [@student]
     end

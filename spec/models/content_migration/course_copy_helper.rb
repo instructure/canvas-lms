@@ -32,13 +32,13 @@ shared_examples_for "course copy" do
       :user => @user,
       :source_course => @copy_from,
       :migration_type => 'course_copy_importer',
-      :copy_options => {:everything => "1"}
+      :copy_options => { :everything => "1" }
     )
     @cm.migration_settings[:import_immediately] = true
     @cm.save!
   end
 
-  def run_course_copy(warnings=[])
+  def run_course_copy(warnings = [])
     @cm.set_default_settings
     worker = Canvas::Migration::Worker::CourseCopyWorker.new
     worker.perform(@cm)
@@ -90,11 +90,11 @@ shared_examples_for "course copy" do
     CC::CCHelper.create_key(obj, global: true)
   end
 
-  def create_outcome(context, group=nil)
+  def create_outcome(context, group = nil)
     lo = LearningOutcome.new
     lo.context = context
     lo.short_description = "haha_#{rand(10_000)}"
-    lo.data = {:rubric_criterion=>{:mastery_points=>3, :ratings=>[{:description=>"Exceeds Expectations", :points=>5}], :description=>"First outcome", :points_possible=>5}}
+    lo.data = { :rubric_criterion => { :mastery_points => 3, :ratings => [{ :description => "Exceeds Expectations", :points => 5 }], :description => "First outcome", :points_possible => 5 } }
     lo.save!
     if group
       group.add_outcome(lo)
@@ -109,7 +109,7 @@ shared_examples_for "course copy" do
     rubric_context ||= @copy_from
     @rubric = rubric_context.rubrics.new
     @rubric.title = "Rubric"
-    @rubric.data = [{:ratings=>[{:criterion_id=>"309_6312", :points=>5.5, :description=>"Full Marks", :id=>"blank", :long_description=>""}, {:criterion_id=>"309_6312", :points=>0, :description=>"No Marks", :id=>"blank_2", :long_description=>""}], :points=>5.5, :description=>"Description of criterion", :id=>"309_6312", :long_description=>""}]
+    @rubric.data = [{ :ratings => [{ :criterion_id => "309_6312", :points => 5.5, :description => "Full Marks", :id => "blank", :long_description => "" }, { :criterion_id => "309_6312", :points => 0, :description => "No Marks", :id => "blank_2", :long_description => "" }], :points => 5.5, :description => "Description of criterion", :id => "309_6312", :long_description => "" }]
     @rubric.save!
 
     @assignment = @copy_from.assignments.create!(:title => "some assignment", :points_possible => 12)

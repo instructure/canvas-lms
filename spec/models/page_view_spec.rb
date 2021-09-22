@@ -29,14 +29,14 @@ describe PageView do
   end
 
   describe "sharding" do
-      specs_require_sharding
+    specs_require_sharding
 
-      it "should not assign the default shard" do
-        expect(PageView.new.shard).to eq Shard.default
-        @shard1.activate do
-          expect(PageView.new.shard).to eq @shard1
-        end
+    it "should not assign the default shard" do
+      expect(PageView.new.shard).to eq Shard.default
+      @shard1.activate do
+        expect(PageView.new.shard).to eq @shard1
       end
+    end
   end
 
   describe "token" do
@@ -67,7 +67,7 @@ describe PageView do
     end
 
     it "logs on error without blowing up" do
-      expect{ PageView::EventStream.on_error[0].call("write", {user: @user}, StandardError.new) }.to_not raise_error
+      expect { PageView::EventStream.on_error[0].call("write", { user: @user }, StandardError.new) }.to_not raise_error
     end
 
     describe "sharding" do
@@ -125,11 +125,11 @@ describe PageView do
       expect(full.next_page).to be_nil
 
       half = pager.paginate(:per_page => 2)
-      expect(half).to eq full[0,2]
+      expect(half).to eq full[0, 2]
       expect(half.next_page).to be_present
 
       second_half = pager.paginate(:per_page => 2, :page => half.next_page)
-      expect(second_half).to eq full[2,2]
+      expect(second_half).to eq full[2, 2]
       expect(second_half.next_page).to be_nil
     end
 
@@ -166,7 +166,6 @@ describe PageView do
         expect(user.page_views(viewer: viewer3).paginate(per_page: 2)).to eq [@page_view]
         expect(user.page_views(viewer: viewer4).paginate(per_page: 2)).to eq []
       end
-
     end
 
     describe "db migrator" do
@@ -303,13 +302,13 @@ describe PageView do
   end
 
   describe '.generate' do
-    let(:params) { {:action => 'path', :controller => 'some'} }
-    let(:session) { {:id => '42'} }
+    let(:params) { { :action => 'path', :controller => 'some' } }
+    let(:session) { { :id => '42' } }
     let(:request) { double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0', :request_method => 'GET') }
     let(:user) { User.new }
-    let(:attributes) { {:real_user => user, :user => user } }
+    let(:attributes) { { :real_user => user, :user => user } }
 
-    before { allow(RequestContextGenerator).to receive_messages( :request_id => 'xyz' ) }
+    before { allow(RequestContextGenerator).to receive_messages(:request_id => 'xyz') }
 
     subject { PageView.generate(request, attributes) }
 
@@ -376,7 +375,7 @@ describe PageView do
     it "should filter sensitive url params" do
       @url = 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET'
       pv = PageView.generate(request, attributes)
-      expect(pv.url).to eq  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
+      expect(pv.url).to eq 'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
 
     it "should filter sensitive url params on the way out" do
@@ -388,7 +387,7 @@ describe PageView do
 
     it "should force encoding on string fields" do
       request = double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
-      pv = PageView.generate(request,attributes)
+      pv = PageView.generate(request, attributes)
 
       expect(pv.remote_ip.encoding).to eq Encoding::UTF_8
     end
@@ -458,7 +457,7 @@ describe PageView do
     end
   end
 
-   describe ".find_one" do
+  describe ".find_one" do
     context "db-backed" do
       before :once do
         Setting.set('enable_page_views', 'db')
@@ -545,8 +544,8 @@ describe PageView do
       it "should interpret ids relative to the current shard" do
         user_id = 1
         attributes = @attributes.merge('user_id' => user_id)
-        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
-        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        page_view1 = @shard1.activate { PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate { PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
             expect(page_view1.user_id).to eq Shard.relative_id_for(user_id, @shard1, Shard.current)
@@ -562,8 +561,8 @@ describe PageView do
       it "should interpret ids relative to the default shard" do
         user_id = 1
         attributes = @attributes.merge('user_id' => user_id)
-        page_view1 = @shard1.activate{ PageView.from_attributes(attributes) }
-        page_view2 = @shard2.activate{ PageView.from_attributes(attributes) }
+        page_view1 = @shard1.activate { PageView.from_attributes(attributes) }
+        page_view2 = @shard2.activate { PageView.from_attributes(attributes) }
         [@shard1, @shard2].each do |shard|
           shard.activate do
             expect(page_view1.user_id).to eq Shard.relative_id_for(user_id, Shard.default, Shard.current)

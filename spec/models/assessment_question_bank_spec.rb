@@ -24,7 +24,7 @@ describe AssessmentQuestionBank do
   before :once do
     course_factory
     assessment_question_bank_model
-    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
   end
 
   describe "#select_for_submission" do

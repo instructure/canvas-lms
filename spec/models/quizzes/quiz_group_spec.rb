@@ -21,13 +21,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizGroup do
-
   describe "saving a group" do
     it "should mark its quiz as having unpublished changes when updated" do
       course_factory
       quiz = @course.quizzes.create!(:title => "some quiz")
       group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 1, :question_points => 5.0)
-      group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
+      group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
       quiz.published_at = Time.now
       quiz.publish!
       expect(quiz.unpublished_changes?).to be_falsey
@@ -45,8 +44,8 @@ describe Quizzes::QuizGroup do
         course_factory
         quiz = @course.quizzes.create!(:title => "some quiz")
         group = quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
-        group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
-        group.quiz_questions.create!(:quiz=>quiz, :question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+        group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+        group.quiz_questions.create!(:quiz => quiz, :question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
         expect(group.quiz_questions.active.size).to eq 2
 
         expect(group.pick_count).to eq 3
@@ -57,9 +56,9 @@ describe Quizzes::QuizGroup do
     context "with a question bank" do
       before(:once) do
         course_factory
-        @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
-        @bank.assessment_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
-        @bank.assessment_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+        @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
         @quiz = @course.quizzes.create!(:title => "some quiz")
         @group = @quiz.quiz_groups.create!(:name => "question group", :pick_count => 3, :question_points => 5.0)
         @group.assessment_question_bank = @bank
@@ -71,7 +70,7 @@ describe Quizzes::QuizGroup do
         expect(@group.pick_count).to eq 3
         expect(@group.actual_pick_count).to eq 2
 
-        @bank.assessment_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 3}, {'id' => 4}]})
+        @bank.assessment_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
         @group.reload
         expect(@group.actual_pick_count).to eq 3
       end
@@ -90,8 +89,8 @@ describe Quizzes::QuizGroup do
       course_factory
       quiz = @course.quizzes.create!(:title => "some quiz")
       g = quiz.quiz_groups.create(:name => "question group", :pick_count => 2, :question_points => 5.0)
-      g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question', 'answers' => [{'id' => 1}, {'id' => 2}]})
-      g.quiz_questions << quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}]})
+      g.quiz_questions << quiz.quiz_questions.create!(:question_data => { 'name' => 'test question', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
+      g.quiz_questions << quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }] })
       expect(g.name).to eql("question group")
       expect(g.pick_count).to eql(2)
       expect(g.question_points).to eql(5.0)
@@ -111,7 +110,7 @@ describe Quizzes::QuizGroup do
 
   describe ".update_all_positions!" do
     def group_positions(quiz)
-      quiz.quiz_groups.sort_by{|g| g.position }.map {|g| g.id }
+      quiz.quiz_groups.sort_by { |g| g.position }.map { |g| g.id }
     end
 
     before :once do

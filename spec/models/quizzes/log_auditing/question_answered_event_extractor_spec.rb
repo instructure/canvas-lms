@@ -83,7 +83,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
   end
 
   def quiz_data
-    [ multiple_choice_question_data, true_false_question_data ]
+    [multiple_choice_question_data, true_false_question_data]
   end
 
   describe '#build_event' do
@@ -92,9 +92,9 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
       quiz_submission.quiz_data = quiz_data
 
       event = subject.build_event({
-        "attempt" => 1,
-        "question_1" => "11" # choose the answer "A" in MC question
-      }, quiz_submission)
+                                    "attempt" => 1,
+                                    "question_1" => "11" # choose the answer "A" in MC question
+                                  }, quiz_submission)
 
       expect(event.attempt).to eq 1
       expect(event.event_type).to be_present
@@ -146,16 +146,16 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
     describe 'optimizing' do
       it 'should optimize against all previous events' do
         event1 = subject({
-          "attempt" => 1,
-          "question_1" => "11",
-          "question_2" => "21"
-        })
+                           "attempt" => 1,
+                           "question_1" => "11",
+                           "question_2" => "21"
+                         })
 
         event2 = subject({
-          "attempt" => 1,
-          "question_1" => "11",
-          "question_2" => "22"
-        })
+                           "attempt" => 1,
+                           "question_1" => "11",
+                           "question_2" => "22"
+                         })
 
         expect(event1.answers.length).to equal 2
         expect(event2.answers.length).to equal 1
@@ -163,14 +163,14 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
 
       it 'should not save redundant events' do
         event1 = subject({
-          "attempt" => 1,
-          "question_1" => "11"
-        })
+                           "attempt" => 1,
+                           "question_1" => "11"
+                         })
 
         event2 = subject({
-          "attempt" => 1,
-          "question_1" => "11"
-        })
+                           "attempt" => 1,
+                           "question_1" => "11"
+                         })
 
         expect(event1).to be_truthy
         expect(event2).to be_nil
@@ -180,9 +180,9 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
         # This can happen on a failed QTI import
         @quiz_submission.quiz_data[0]["question_type"] = "Error"
         event1 = subject({
-          "attempt" => 1,
-          "question_1" => ""
-        })
+                           "attempt" => 1,
+                           "question_1" => ""
+                         })
         expect(event1).to be_truthy
       end
 
@@ -197,23 +197,23 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventExtractor do
 
         it 'should track only the things i did just now' do
           one = answer_and_generate_event({
-            question_1: 11
-          }, Time.now)
+                                            question_1: 11
+                                          }, Time.now)
 
           two = answer_and_generate_event({
-            question_1: 11,
-            question_2: 21
-          }, 1.second.from_now)
+                                            question_1: 11,
+                                            question_2: 21
+                                          }, 1.second.from_now)
 
           three = answer_and_generate_event({
-            question_1: 12,
-            question_2: 21
-          }, 2.seconds.from_now)
+                                              question_1: 12,
+                                              question_2: 21
+                                            }, 2.seconds.from_now)
 
           four = answer_and_generate_event({
-            question_1: 12,
-            question_2: 21
-          }, 3.seconds.from_now)
+                                             question_1: 12,
+                                             question_2: 21
+                                           }, 3.seconds.from_now)
 
           # first save, it keeps everything:
           expect(one.answers.as_json).to eq [{

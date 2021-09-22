@@ -24,7 +24,7 @@ describe BookmarkService do
   before :once do
     bookmark_service_model
   end
-  
+
   it "should include Delicious" do
     expect(BookmarkService.included_modules).to be_include(Delicious)
   end
@@ -35,58 +35,60 @@ describe BookmarkService do
       allow(@bookmark_service).to receive(:delicious_post_bookmark).and_return(true)
       allow(@bookmark_service).to receive(:diigo_post_bookmark).and_return(true)
     end
-    
+
     it "should be able to post a bookmark for diigo" do
       expect(@bookmark_service.service).to eql('diigo')
-      
+
       expect(Diigo::Connection).to receive(:diigo_post_bookmark).with(
-        @bookmark_service, 
-        'google.com', 
-        'some title', 
-        'some comments', 
+        @bookmark_service,
+        'google.com',
+        'some title',
+        'some comments',
         ['some', 'tags']
       ).and_return(true)
-      
+
       @bookmark_service.post_bookmark(
-        :title => 'some title', 
-        :url => 'google.com', 
-        :comments => 'some comments', 
+        :title => 'some title',
+        :url => 'google.com',
+        :comments => 'some comments',
         :tags => %w(some tags)
       )
     end
-    
+
     it "should be able to post a bookmark for delicious" do
       bookmark_service_model(:service => 'delicious')
 
       expect(@bookmark_service.service).to eql('delicious')
-      
+
       expect(@bookmark_service).to receive(:delicious_post_bookmark).with(
-        @bookmark_service, 
-        'google.com', 
-        'some title', 
-        'some comments', 
+        @bookmark_service,
+        'google.com',
+        'some title',
+        'some comments',
         ['some', 'tags']
       ).and_return(true)
-      
+
       @bookmark_service.post_bookmark(
-        :title => 'some title', 
-        :url => 'google.com', 
-        :comments => 'some comments', 
+        :title => 'some title',
+        :url => 'google.com',
+        :comments => 'some comments',
         :tags => %w(some tags)
       )
     end
-    
+
     it "should rescue silently if something happens during the process" do
       def @bookmark_service.diigo_post_bookmark(*args)
         raise ArgumentError
       end
-      
-      expect{@bookmark_service.post_bookmark(
-        :title => 'some title', 
-        :url => 'google.com', 
-        :comments => 'some comments', 
-        :tags => %w(some tags)
-      )}.not_to raise_error
+
+      expect {
+        @bookmark_service.post_bookmark(
+          :title => 'some title',
+          :url => 'google.com',
+          :comments => 'some comments',
+          :tags => %w(some tags)
+        )
+      }.not_to raise_error
     end
   end
 end

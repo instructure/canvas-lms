@@ -45,7 +45,7 @@ describe OutcomesService::MigrationService do
         domain: 'canvas.test',
         consumer_key: 'blah',
         jwt_secret: 'woo'
-      }}
+      } }
       root_account.save!
     end
 
@@ -82,29 +82,29 @@ describe OutcomesService::MigrationService do
 
         def stub_post_content_export(external_ids = [course.wiki_pages.first.id])
           stub_request(:post, 'http://canvas.test/api/content_exports').with({
-            body: {
-              context_type: 'course',
-              context_id: course.id.to_s,
-              export_settings: {
-                format: 'canvas',
-                artifacts: [{
-                  external_type: 'canvas.page',
-                  external_id: external_ids
-                }]
-              }
-            },
-            headers: {
-              Authorization: /.+/
-            }
-          })
+                                                                               body: {
+                                                                                 context_type: 'course',
+                                                                                 context_id: course.id.to_s,
+                                                                                 export_settings: {
+                                                                                   format: 'canvas',
+                                                                                   artifacts: [{
+                                                                                     external_type: 'canvas.page',
+                                                                                     external_id: external_ids
+                                                                                   }]
+                                                                                 }
+                                                                               },
+                                                                               headers: {
+                                                                                 Authorization: /.+/
+                                                                               }
+                                                                             })
         end
 
         it 'should request course wiki page' do
           stub_post_content_export.to_return(status: 200, body: '{"id":123}')
           expect(described_class.begin_export(course, {})).to eq({
-            export_id: 123,
-            course: course
-          })
+                                                                   export_id: 123,
+                                                                   course: course
+                                                                 })
         end
 
         it 'should raise error on non 2xx response' do
@@ -115,19 +115,19 @@ describe OutcomesService::MigrationService do
         it 'should request selective course wiki page' do
           stub_post_content_export(['2']).to_return(status: 200, body: '{"id":123}')
           expect(described_class.begin_export(course, {
-            selective: true,
-            exported_assets: ['wiki_page_2']
-          })).to eq({
-            export_id: 123,
-            course: course
-          })
+                                                selective: true,
+                                                exported_assets: ['wiki_page_2']
+                                              })).to eq({
+                                                          export_id: 123,
+                                                          course: course
+                                                        })
         end
 
         it 'should return no export if no artifacts requested' do
           expect(described_class.begin_export(course, {
-            selective: true,
-            exported_assets: []
-          })).to eq nil
+                                                selective: true,
+                                                exported_assets: []
+                                              })).to eq nil
         end
       end
 
@@ -141,10 +141,10 @@ describe OutcomesService::MigrationService do
 
         def stub_get_content_export
           stub_request(:get, 'http://canvas.test/api/content_exports/1').with({
-            headers: {
-              Authorization: /\+*/
-            }
-          })
+                                                                                headers: {
+                                                                                  Authorization: /\+*/
+                                                                                }
+                                                                              })
         end
 
         it 'returns true on completed' do
@@ -182,10 +182,10 @@ describe OutcomesService::MigrationService do
 
         def stub_get_content_export
           stub_request(:get, 'http://canvas.test/api/content_exports/1').with({
-            headers: {
-              Authorization: /\+*/
-            }
-          })
+                                                                                headers: {
+                                                                                  Authorization: /\+*/
+                                                                                }
+                                                                              })
         end
 
         it 'returns export data when complete' do
@@ -226,11 +226,11 @@ describe OutcomesService::MigrationService do
 
         it 'returns import id on import creation' do
           stub_post_content_import.to_return(status: 200, body: '{"id":123}')
-          expect(described_class.send_imported_content(course, content_migration, imported_content)). to eq({
-            import_id: 123,
-            course: course,
-            content_migration: content_migration
-          })
+          expect(described_class.send_imported_content(course, content_migration, imported_content)).to eq({
+                                                                                                             import_id: 123,
+                                                                                                             course: course,
+                                                                                                             content_migration: content_migration
+                                                                                                           })
         end
 
         it 'raises error on non 2xx response' do
@@ -252,15 +252,15 @@ describe OutcomesService::MigrationService do
         end
 
         let!(:wiki_page) do
-          wiki_page_model({course: course})
+          wiki_page_model({ course: course })
         end
 
         def stub_get_content_import
           stub_request(:get, 'http://canvas.test/api/content_imports/1').with({
-            headers: {
-              Authorization: /\+*/
-            }
-          })
+                                                                                headers: {
+                                                                                  Authorization: /\+*/
+                                                                                }
+                                                                              })
         end
 
         it 'returns true on completed' do
@@ -300,7 +300,7 @@ describe OutcomesService::MigrationService do
           failure_desc = 'Content Import for Outcomes Service failed'
           stub_get_content_import.to_return(status: 200, body: '{"state":"failed"}')
           expect { described_class.import_completed?(import_data) }.to raise_error(RuntimeError,
-            "#{failure_desc}: {\"state\"=>\"failed\"}")
+                                                                                   "#{failure_desc}: {\"state\"=>\"failed\"}")
           expect(content_migration.warnings).to include('Content Import for Outcomes Service failed')
         end
 

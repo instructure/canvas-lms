@@ -116,6 +116,7 @@ describe ContentParticipationCount do
         allowed = false
         expect(cpc).to receive(:refresh_unread_count).and_wrap_original do |original|
           raise "not allowed" unless allowed
+
           original.call
         end
         expect(cpc.unread_count).to eq 0

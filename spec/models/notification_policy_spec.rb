@@ -32,40 +32,40 @@ describe NotificationPolicy do
       @student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
       e = @course.enroll_student(@student)
       e.accept!
-      Notification.all.each{|n| n.destroy }
+      Notification.all.each { |n| n.destroy }
       Notification.reset_cache!
       @notif = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'TestNever')
     end
 
     it "should cause message dispatch to specified channel on triggered policies" do
-      communication_channel(@student, {username: 'default@example.com', active_cc: true})
-      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
+      communication_channel(@student, { username: 'default@example.com', active_cc: true })
+      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "immediately")
       @assignment = @course.assignments.create!(:title => "test assignment")
       expect(@assignment.messages_sent).to be_include("Assignment Created")
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "secondary@example.com" }
       expect(m).not_to be_nil
     end
 
     it "should prevent message dispatches if set to 'never' on triggered policies" do
-      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
+      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
       @policy = NotificationPolicy.create(:notification => @notif, :communication_channel => @cc, :frequency => "never")
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "secondary@example.com" }
       expect(m).to be_nil
     end
 
     it "should prevent message dispatches if no policy setting exists" do
-      communication_channel(@student, {username: 'secondary@example.com', active_cc: true})
+      communication_channel(@student, { username: 'secondary@example.com', active_cc: true })
       NotificationPolicy.where(:notification_id => @notif, :communication_channel_id => @cc).delete_all
       @assignment = @course.assignments.create!(:title => "test assignment")
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "default@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "default@example.com" }
       expect(m).to be_nil
-      m = @assignment.messages_sent["Assignment Created"].find{|message| message.to == "secondary@example.com"}
+      m = @assignment.messages_sent["Assignment Created"].find { |message| message.to == "secondary@example.com" }
       expect(m).to be_nil
     end
   end
@@ -92,7 +92,7 @@ describe NotificationPolicy do
           u
         }
         whenever { true }
-        data { {course_id: 'this is a real course_id', root_account_id: Account.default.id} }
+        data { { course_id: 'this is a real course_id', root_account_id: Account.default.id } }
       end
       def root_account
         Account.default
@@ -183,7 +183,6 @@ describe NotificationPolicy do
       policies = NotificationPolicy.for(@notification).for(@user).for(@communication_channel).by_frequency([:daily, :weekly])
       expect(policies).to eq [n1]
     end
-
   end
 
   describe "setup_for" do
@@ -228,9 +227,9 @@ describe NotificationPolicy do
         :communication_channel => @communication_channel,
         :frequency => Notification::FREQ_NEVER
       }
-      n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1) )
-      n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2) )
-      params = {:category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY}
+      n1 = notification_policy_model(trifecta_opts.merge(:notification => notify1))
+      n2 = notification_policy_model(trifecta_opts.merge(:notification => notify2))
+      params = { :category => 'multi_category', :channel_id => @communication_channel.id, :frequency => Notification::FREQ_IMMEDIATELY }
       NotificationPolicy.setup_for(@user, params)
       n1.reload; n2.reload
       expect(n1.frequency).to eq Notification::FREQ_IMMEDIATELY
@@ -266,7 +265,7 @@ describe NotificationPolicy do
   describe "setup_with_default_policies" do
     before :once do
       @user = User.create!
-      @communication_channel = communication_channel(@user, {username: 'email@example.com'})
+      @communication_channel = communication_channel(@user, { username: 'email@example.com' })
       @announcement = notification_model(:name => 'Setting 1', :category => 'Announcement')
     end
 
@@ -286,9 +285,9 @@ describe NotificationPolicy do
     it "should not overwrite an existing setting with a default" do
       # Create an existing policy entry
       NotificationPolicy.delete_all
-      n1 = notification_policy_model({:communication_channel => @communication_channel,
-                                      :notification => @announcement,
-                                      :frequency => Notification::FREQ_NEVER})
+      n1 = notification_policy_model({ :communication_channel => @communication_channel,
+                                       :notification => @announcement,
+                                       :frequency => Notification::FREQ_NEVER })
 
       expect(@announcement.default_frequency).not_to eq Notification::FREQ_NEVER # verify that it differs from the default
       policies = NotificationPolicy.setup_with_default_policies(@user, [@announcement])
@@ -326,7 +325,7 @@ describe NotificationPolicy do
     it "should not error if no channel exists" do
       NotificationPolicy.delete_all
       CommunicationChannel.delete_all
-      expect { NotificationPolicy.setup_with_default_policies(@user, [@announcement])}.not_to raise_error
+      expect { NotificationPolicy.setup_with_default_policies(@user, [@announcement]) }.not_to raise_error
     end
 
     context "across shards" do
@@ -348,7 +347,7 @@ describe NotificationPolicy do
   context 'find_all_for' do
     it 'should only return course type notification policies if provided a course context type' do
       student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
-      channel = communication_channel(student, {username: 'default@example.com', active_cc: true})
+      channel = communication_channel(student, { username: 'default@example.com', active_cc: true })
 
       course_type_notification = Notification.create!(:name => "Course Type", :subject => "Test", :category => 'Due Date')
       notification = Notification.create!(:name => "Panda Express", :subject => "Test", :category => 'Whatever')

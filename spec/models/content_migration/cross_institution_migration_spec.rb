@@ -29,13 +29,13 @@ describe ContentMigration do
 
       # account external tool in module item, course navigation, and assignment submission
       @tool = @account.context_external_tools.build name: 'blah', url: 'https://blah.example.com',
-        shared_secret: '123', consumer_key: '456'
+                                                    shared_secret: '123', consumer_key: '456'
       @tool.course_navigation = { enabled: 'true' }
       @tool.homework_submission = { url: 'https://blah.example.com/sub' }
       @tool.save!
       mod = @copy_from.context_modules.create!
       @item = mod.add_item(type: 'external_tool', url: 'https://blah.example.com/what', id: @tool.id, title: 'what')
-      @copy_from.tab_configuration = [ {"id" =>0 }, {"id" => "context_external_tool_#{@tool.id}"} ]
+      @copy_from.tab_configuration = [{ "id" => 0 }, { "id" => "context_external_tool_#{@tool.id}" }]
       @copy_from.save!
 
       # account outcome in course group
@@ -60,7 +60,7 @@ describe ContentMigration do
       # account question bank in course quiz
       @bank = @account.assessment_question_banks.create!(:title => "account bank")
       aq = @bank.assessment_questions.create!(:question_data =>
-        {'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah'})
+        { 'question_name' => 'test question 1', 'question_type' => 'essay_question', 'question_text' => 'blah' })
       @quiz = @copy_from.quizzes.create!
       @quiz.quiz_groups.create! pick_count: 1, assessment_question_bank_id: @bank.id
 
@@ -73,7 +73,7 @@ describe ContentMigration do
       run_import(@export.attachment_id)
 
       expect(@copy_to.context_module_tags.first.content).to eq @tool
-      expect(@copy_to.tab_configuration).to eq [ {"id" =>0 }, {"id" => "context_external_tool_#{@tool.id}"} ]
+      expect(@copy_to.tab_configuration).to eq [{ "id" => 0 }, { "id" => "context_external_tool_#{@tool.id}" }]
       expect(@copy_to.learning_outcome_links.first.content).to eq @outcome
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric).to eq @rubric
@@ -91,7 +91,7 @@ describe ContentMigration do
 
       expect(@copy_to.context_module_tags.first.url).to eq 'https://blah.example.com/what'
       expect(@copy_to.context_module_tags.first.content).to be_nil
-      expect(@copy_to.tab_configuration).to eq [{'id'=>0}]
+      expect(@copy_to.tab_configuration).to eq [{ 'id' => 0 }]
       expect(@copy_to.learning_outcome_links.first.content.context).to eq @copy_to
       to_assignment = @copy_to.assignments.where(migration_id: mig_id(@assignment)).first
       expect(to_assignment.rubric.context).to eq @copy_to

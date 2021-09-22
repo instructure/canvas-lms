@@ -24,14 +24,14 @@ describe ContentMigration do
     include_examples "course copy"
 
     before :once do
-      @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => {'a' => '1', 'b' => '2'}, :url => "http://www.example.com")
-      @tool_from.settings[:course_navigation] = {:url => "http://www.example.com", :text => "Example URL"}
+      @tool_from = @copy_from.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :custom_fields => { 'a' => '1', 'b' => '2' }, :url => "http://www.example.com")
+      @tool_from.settings[:course_navigation] = { :url => "http://www.example.com", :text => "Example URL" }
       @tool_from.save!
     end
 
     it "should copy external tools" do
       @copy_from.tab_configuration = [
-        {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        { "id" => 0 }, { "id" => "context_external_tool_#{@tool_from.id}" }, { "id" => 14 }
       ]
       @copy_from.save!
 
@@ -41,7 +41,7 @@ describe ContentMigration do
       tool_to = @copy_to.context_external_tools.first
 
       expect(@copy_to.tab_configuration).to eq [
-          {"id" =>0 }, {"id" => "context_external_tool_#{tool_to.id}"}, {"id" => 14}
+        { "id" => 0 }, { "id" => "context_external_tool_#{tool_to.id}" }, { "id" => 14 }
       ]
 
       expect(tool_to.name).to eq @tool_from.name
@@ -53,10 +53,10 @@ describe ContentMigration do
 
     it "should not duplicate external tools used in modules" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
-      tag = mod1.add_item({:type => 'context_external_tool',
-                           :title => 'Example URL',
-                           :url => "http://www.example.com",
-                           :new_tab => true})
+      tag = mod1.add_item({ :type => 'context_external_tool',
+                            :title => 'Example URL',
+                            :url => "http://www.example.com",
+                            :new_tab => true })
       tag.save
 
       run_course_copy
@@ -107,21 +107,21 @@ describe ContentMigration do
     end
 
     it "should copy vendor extensions" do
-      @tool_from.settings[:vendor_extensions] = [{:platform=>"my.lms.com", :custom_fields=>{"key"=>"value"}}]
+      @tool_from.settings[:vendor_extensions] = [{ :platform => "my.lms.com", :custom_fields => { "key" => "value" } }]
       @tool_from.save!
 
       run_course_copy
 
       tool = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
-      expect(tool.settings[:vendor_extensions]).to eq [{'platform'=>"my.lms.com", 'custom_fields'=>{"key"=>"value"}}]
+      expect(tool.settings[:vendor_extensions]).to eq [{ 'platform' => "my.lms.com", 'custom_fields' => { "key" => "value" } }]
     end
 
     it "should copy canvas extensions" do
-      @tool_from.user_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
-      @tool_from.course_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields=>{"key"=>"value"}}
-      @tool_from.account_navigation = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
-      @tool_from.resource_selection = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :extra => 'extra', :custom_fields=>{"key"=>"value"}}
-      @tool_from.editor_button = {:url => "http://www.example.com", :text => "hello", :labels => {'en' => 'hello', 'es' => 'hola'}, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra', :custom_fields=>{"key"=>"value"}}
+      @tool_from.user_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :extra => 'extra', :custom_fields => { "key" => "value" } }
+      @tool_from.course_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields => { "key" => "value" } }
+      @tool_from.account_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :extra => 'extra', :custom_fields => { "key" => "value" } }
+      @tool_from.resource_selection = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :selection_width => 100, :selection_height => 50, :extra => 'extra', :custom_fields => { "key" => "value" } }
+      @tool_from.editor_button = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :selection_width => 100, :selection_height => 50, :icon_url => "http://www.example.com", :extra => 'extra', :custom_fields => { "key" => "value" } }
       @tool_from.save!
 
       run_course_copy
@@ -142,7 +142,7 @@ describe ContentMigration do
     it "should keep reference to ContextExternalTool by id for courses" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       tag = mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
-                    :url => "https://www.example.com/launch"
+                          :url => "https://www.example.com/launch"
       run_course_copy
 
       tool_copy = @copy_to.context_external_tools.where(migration_id: mig_id(@tool_from)).first
@@ -171,14 +171,14 @@ describe ContentMigration do
       @tool_from.save!
 
       @copy_from.tab_configuration = [
-          {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        { "id" => 0 }, { "id" => "context_external_tool_#{@tool_from.id}" }, { "id" => 14 }
       ]
       @copy_from.save!
 
       run_course_copy
 
       expect(@copy_to.tab_configuration).to eq [
-          {"id" =>0 }, {"id" => "context_external_tool_#{@tool_from.id}"}, {"id" => 14}
+        { "id" => 0 }, { "id" => "context_external_tool_#{@tool_from.id}" }, { "id" => 14 }
       ]
     end
 
@@ -193,8 +193,8 @@ describe ContentMigration do
     end
 
     it "should copy message_type (and other fields)" do
-      @tool_from.course_settings_sub_navigation = {:url => "http://www.example.com", :text => "hello",
-                                    :message_type => "ContentItemSelectionResponse"}
+      @tool_from.course_settings_sub_navigation = { :url => "http://www.example.com", :text => "hello",
+                                                    :message_type => "ContentItemSelectionResponse" }
       @tool_from.settings[:selection_width] = 5000
       @tool_from.save!
 

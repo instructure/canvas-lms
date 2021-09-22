@@ -42,8 +42,8 @@ describe Ignore do
       ignore2 = Ignore.create!(asset: assignment2, user: @student, purpose: 'submitting')
       assignment2.destroy_permanently!
       Ignore.cleanup
-      expect {@ignore_assign.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {ignore2.reload}.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_assign.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { ignore2.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should delete ignores for deleted quizzes' do
@@ -52,14 +52,14 @@ describe Ignore do
       ignore2 = Ignore.create!(asset: quiz2, user: @student, purpose: 'submitting')
       quiz2.destroy_permanently!
       Ignore.cleanup
-      expect {@ignore_quiz.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {ignore2.reload}.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_quiz.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { ignore2.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should delete ignores for deleted assessment requests' do
       @ar.delete
       Ignore.cleanup
-      expect {@ignore_ar.reload}.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_ar.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should not delete ignores for recently deleted (and recoverable) assets' do
@@ -73,9 +73,9 @@ describe Ignore do
     it 'should delete ignores for users with deleted enrollments' do
       @enrollment.update!(workflow_state: 'deleted', updated_at: 2.months.ago)
       Ignore.cleanup
-      expect {@ignore_assign.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {@ignore_quiz.reload}.to raise_error ActiveRecord::RecordNotFound
-      expect {@ignore_ar.reload}.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_assign.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_quiz.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect { @ignore_ar.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should not delete ignores for users with recently deleted (and recoverable) enrollments' do

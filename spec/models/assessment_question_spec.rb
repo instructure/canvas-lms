@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe AssessmentQuestion do
   before :once do
     course_factory
-    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
   end
 
   def attachment_in_course(course)
@@ -54,7 +54,7 @@ describe AssessmentQuestion do
 
   it "should translate links to be readable when creating the assessment question" do
     @attachment = attachment_in_course(@course)
-    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
     @question = @bank.assessment_questions.create!(:question_data => data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
@@ -64,7 +64,7 @@ describe AssessmentQuestion do
 
   it "should translate links relative path url" do
     @attachment = attachment_in_course(@course)
-    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
     @question = @bank.assessment_questions.create!(:question_data => data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
@@ -74,9 +74,9 @@ describe AssessmentQuestion do
 
   it "should handle existing query string parameters" do
     @attachment = attachment_in_course(@course)
-    data = {'name' => "Hi",
-            'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
-            'answers' => [{'id' => 1}, {'id' => 2}]}
+    data = { 'name' => "Hi",
+             'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg?wrap=1'>",
+             'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
     @question = @bank.assessment_questions.create!(:question_data => data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
@@ -87,7 +87,7 @@ describe AssessmentQuestion do
   it "should translate multiple links in same body" do
     @attachment = attachment_in_course(@course)
 
-    data = {'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{'id' => 1}, {'id' => 2}]}
+    data = { 'name' => "Hi", 'question_text' => "Translate this: <img src='/courses/#{@course.id}/files/#{@attachment.id}/download'> and this: <img src='/courses/#{@course.id}/file_contents/course%20files/unfiled/test.jpg'>", 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] }
     @question = @bank.assessment_questions.create!(:question_data => data)
 
     @clone = @question.attachments.where(root_attachment: @attachment).first
@@ -97,7 +97,7 @@ describe AssessmentQuestion do
 
   it "should translate links to be readable w/ verifier" do
     @attachments = {}
-    attachment_tag = lambda {|key|
+    attachment_tag = lambda { |key|
       @attachments[key] ||= []
       a = @course.attachments.build(:filename => "foo-#{key}.gif")
       a.content_type = 'image/gif'
@@ -127,7 +127,7 @@ describe AssessmentQuestion do
 
     @question = @bank.assessment_questions.create!(:question_data => data)
 
-    @attachment_clones = Hash[@attachments.map{|k, ary| [k, ary.map {|a| @question.attachments.where(root_attachment_id: a).first}]}]
+    @attachment_clones = Hash[@attachments.map { |k, ary| [k, ary.map { |a| @question.attachments.where(root_attachment_id: a).first }] }]
 
     @attachment_clones.each do |key, ary|
       string = eval "@question.question_data#{key}"
@@ -145,22 +145,21 @@ describe AssessmentQuestion do
   end
 
   it "should not modify the question_data hash in place when translating links" do
-
   end
 
   it "should not drop non-string/array/hash data types when translate links" do
-    bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+    bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
     data = {
-            :name => 'mc question',
-            :question_type => 'multiple_choice_question',
-            :question_text => "text text text",
-            :points_possible => "10",
-            :correct_comments => "",
-            :incorrect_comments => "",
-            :answers => {
-                    "answer_0" => {:answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there"}
-            }
+      :name => 'mc question',
+      :question_type => 'multiple_choice_question',
+      :question_text => "text text text",
+      :points_possible => "10",
+      :correct_comments => "",
+      :incorrect_comments => "",
+      :answers => {
+        "answer_0" => { :answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there" }
+      }
     }
 
     question = bank.assessment_questions.create!(:question_data => data)
@@ -177,13 +176,13 @@ describe AssessmentQuestion do
 
   it "should always return a HashWithIndifferentAccess and allow editing" do
     data = {
-            :name => 'mc question',
-            :question_type => 'multiple_choice_question',
-            :question_text => "text text text",
-            :points_possible => "10",
-            :answers => {
-                    "answer_0" => {:answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there"}
-            }
+      :name => 'mc question',
+      :question_type => 'multiple_choice_question',
+      :question_text => "text text text",
+      :points_possible => "10",
+      :answers => {
+        "answer_0" => { :answer_weight => 100, :answer_text => "1", :id => "0", :answer_comments => "hi there" }
+      }
     }
 
     question = @bank.assessment_questions.create!(:question_data => data)
@@ -200,13 +199,13 @@ describe AssessmentQuestion do
   end
 
   describe '.find_or_create_quiz_questions' do
-    let(:assessment_question){assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))}
-    let(:quiz){quiz_model}
+    let(:assessment_question) { assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!)) }
+    let(:quiz) { quiz_model }
 
     it 'should create a quiz_question when one does not exist' do
       expect do
         AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil)
-      end.to change{Quizzes::QuizQuestion.count}.by(1)
+      end.to change { Quizzes::QuizQuestion.count }.by(1)
     end
 
     it 'should find an existing quiz_question' do
@@ -215,7 +214,7 @@ describe AssessmentQuestion do
       expect do
         qq2 = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
         expect(qq2.id).to eql(qq.id)
-      end.to_not change{AssessmentQuestion.count}
+      end.to_not change { AssessmentQuestion.count }
     end
 
     it 'should find and update an out of date quiz_question' do

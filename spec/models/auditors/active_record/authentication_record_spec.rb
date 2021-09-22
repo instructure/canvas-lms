@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 describe Auditors::ActiveRecord::AuthenticationRecord do
-  let(:request_id){ 'abcde-12345'}
+  let(:request_id) { 'abcde-12345' }
 
   before(:each) do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
@@ -33,9 +33,9 @@ describe Auditors::ActiveRecord::AuthenticationRecord do
   end
 
   describe "mapping from event stream record" do
-    let(:user_record){ user_with_pseudonym }
-    let(:pseudonym_record){ user_record.pseudonym }
-    let(:es_record){ Auditors::Authentication::Record.generate(pseudonym_record, 'login') }
+    let(:user_record) { user_with_pseudonym }
+    let(:pseudonym_record) { user_record.pseudonym }
+    let(:es_record) { Auditors::Authentication::Record.generate(pseudonym_record, 'login') }
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::AuthenticationRecord.create_from_event_stream!(es_record)
@@ -61,5 +61,4 @@ describe Auditors::ActiveRecord::AuthenticationRecord do
       end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
-
 end

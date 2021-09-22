@@ -30,7 +30,7 @@ describe Quizzes::LogAuditing::EventAggregator do
     @qs = @quiz.generate_submission(student_in_course.user)
   end
 
-  def build_an_event(event_type, event_data, time_step=0)
+  def build_an_event(event_type, event_data, time_step = 0)
     Quizzes::QuizSubmissionEvent.create do |event|
       event.quiz_submission_id = @qs.id
       event.event_type = event_type
@@ -50,22 +50,22 @@ describe Quizzes::LogAuditing::EventAggregator do
     event_data_examples = {
       'page_blurred' => [nil, nil, nil, nil],
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_FLAGGED => [
-        {"quiz_question_id" => @questions[0].id, 'flagged' => true},
-        {"quiz_question_id" => @questions[0].id, 'flagged' => false},
-        {"quiz_question_id" => @questions[1].id, 'flagged' => true},
-        {"quiz_question_id" => @questions[1].id, 'flagged' => false},
+        { "quiz_question_id" => @questions[0].id, 'flagged' => true },
+        { "quiz_question_id" => @questions[0].id, 'flagged' => false },
+        { "quiz_question_id" => @questions[1].id, 'flagged' => true },
+        { "quiz_question_id" => @questions[1].id, 'flagged' => false },
       ],
       Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED => [
-        [{'quiz_question_id'=> @questions[0].id, "answer"=> "hello"}],
-        [{'quiz_question_id'=> @questions[0].id, 'answer'=> "goodbye"}],
-        [{'quiz_question_id'=> @questions[1].id, "answer"=> "hello"}],
-        [{'quiz_question_id'=> @questions[1].id, "answer"=> "goodbye"}],
+        [{ 'quiz_question_id' => @questions[0].id, "answer" => "hello" }],
+        [{ 'quiz_question_id' => @questions[0].id, 'answer' => "goodbye" }],
+        [{ 'quiz_question_id' => @questions[1].id, "answer" => "hello" }],
+        [{ 'quiz_question_id' => @questions[1].id, "answer" => "goodbye" }],
       ]
     }
     # Build out each event in pairs to test that we are aggregating correctly
-    event_types.each.with_index do |event_type,i|
-      build_an_event(event_type, event_data_examples[event_type][0], i*2-1)
-      build_an_event(event_type, event_data_examples[event_type][1], i*2)
+    event_types.each.with_index do |event_type, i|
+      build_an_event(event_type, event_data_examples[event_type][0], i * 2 - 1)
+      build_an_event(event_type, event_data_examples[event_type][1], i * 2)
     end
     @events = Quizzes::QuizSubmissionEvent.all
   end
@@ -82,7 +82,7 @@ describe Quizzes::LogAuditing::EventAggregator do
     end
   end
   context "with set of events" do
-    let(:latest_submission_data) { {"question_#{@questions[0].id}"=>"goodbye", "question_#{@questions[0].id}_marked"=>false} }
+    let(:latest_submission_data) { { "question_#{@questions[0].id}" => "goodbye", "question_#{@questions[0].id}_marked" => false } }
     before :once do
       build_course_quiz_qs
       build_out_database_events
@@ -94,11 +94,11 @@ describe Quizzes::LogAuditing::EventAggregator do
     end
     it "builds submission_data up to the specified timestamp, inclusive" do
       submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[0].created_at)
-      expect(submission_data).to eq({"question_#{@questions[0].id}"=>"hello"})
+      expect(submission_data).to eq({ "question_#{@questions[0].id}" => "hello" })
     end
     it "replaces previous content in submission_data build" do
       submission_data = @aggregator.run(@qs.id, @qs.attempt, @events[3].created_at)
-      expect(submission_data).to eq({"question_#{@questions[0].id}"=>"goodbye", "question_#{@questions[0].id}_marked"=>true})
+      expect(submission_data).to eq({ "question_#{@questions[0].id}" => "goodbye", "question_#{@questions[0].id}_marked" => true })
     end
   end
 end

@@ -52,22 +52,22 @@ describe NotificationFailureProcessor do
       messages.each(&:save!) # generate a message id
 
       failure_queue = mock_queue([
-        {
-          global_id: messages[0].notification_service_id,
-          error_context: nil,
-          error: 'Error from mail system'
-        },
-        {
-          global_id: messages[1].notification_service_id,
-          error_context: nil,
-          error: 'Error from SNS system'
-        }
-      ])
+                                   {
+                                     global_id: messages[0].notification_service_id,
+                                     error_context: nil,
+                                     error: 'Error from mail system'
+                                   },
+                                   {
+                                     global_id: messages[1].notification_service_id,
+                                     error_context: nil,
+                                     error: 'Error from SNS system'
+                                   }
+                                 ])
       nfp = NotificationFailureProcessor.new
       allow(NotificationFailureProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+                                                                           access_key: 'key',
+                                                                           secret_access_key: 'secret'
+                                                                         })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
       nfp.process
 
@@ -85,8 +85,8 @@ describe NotificationFailureProcessor do
       @at = AccessToken.create!(:user => @user, :developer_key => DeveloperKey.default)
 
       sns_client = double()
-      expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s}))
-      expect(sns_client).to receive(:create_platform_endpoint).twice.and_return({endpoint_arn: bad_arn}, {endpoint_arn: good_arn})
+      expect(sns_client).to receive(:get_endpoint_attributes).at_least(:once).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s }))
+      expect(sns_client).to receive(:create_platform_endpoint).twice.and_return({ endpoint_arn: bad_arn }, { endpoint_arn: good_arn })
       bad_ne = @at.notification_endpoints.new(token: 'token1') # order matters
       good_ne = @at.notification_endpoints.new(token: 'token2')
       allow(bad_ne).to receive(:sns_client).and_return(sns_client)
@@ -100,17 +100,17 @@ describe NotificationFailureProcessor do
       @message.save! # generate a message id
 
       failure_queue = mock_queue([
-        {
-          global_id: @message.notification_service_id,
-          error_context: bad_arn,
-          error: 'EndpointDisabled: Endpoint is disabled'
-        },
-      ])
+                                   {
+                                     global_id: @message.notification_service_id,
+                                     error_context: bad_arn,
+                                     error: 'EndpointDisabled: Endpoint is disabled'
+                                   },
+                                 ])
       nfp = NotificationFailureProcessor.new
       allow(NotificationFailureProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+                                                                           access_key: 'key',
+                                                                           secret_access_key: 'secret'
+                                                                         })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
       expect(sns_client).to receive(:delete_endpoint).with(endpoint_arn: bad_arn)
@@ -124,21 +124,21 @@ describe NotificationFailureProcessor do
       nonexistent_id = 123456789
 
       failure_queue = mock_queue([
-        {
-          global_id: nonexistent_id,
-          error_context: nil,
-          error: 'error'
-        },
-      ])
+                                   {
+                                     global_id: nonexistent_id,
+                                     error_context: nil,
+                                     error: 'error'
+                                   },
+                                 ])
       nfp = NotificationFailureProcessor.new
       allow(NotificationFailureProcessor).to receive(:config).and_return({
-        access_key: 'key',
-        secret_access_key: 'secret'
-      })
+                                                                           access_key: 'key',
+                                                                           secret_access_key: 'secret'
+                                                                         })
       allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
 
-      expect{ Message.find(nonexistent_id) }.to raise_error(ActiveRecord::RecordNotFound)
-      expect{ nfp.process }.not_to raise_error
+      expect { Message.find(nonexistent_id) }.to raise_error(ActiveRecord::RecordNotFound)
+      expect { nfp.process }.not_to raise_error
     end
 
     it "breaks out early when exceeding its timeline" do
@@ -175,17 +175,17 @@ describe NotificationFailureProcessor do
         message = generate_message(:account_user_notification, :email, @au, user: @user)
         message.save!
         failure_queue = mock_queue([
-          {
-            global_id: message.notification_service_id,
-            error_context: nil,
-            error: 'Error from mail system'
-          }
-        ])
+                                     {
+                                       global_id: message.notification_service_id,
+                                       error_context: nil,
+                                       error: 'Error from mail system'
+                                     }
+                                   ])
         nfp = NotificationFailureProcessor.new
         allow(NotificationFailureProcessor).to receive(:config).and_return({
-          access_key: 'key',
-          secret_access_key: 'secret'
-        })
+                                                                             access_key: 'key',
+                                                                             secret_access_key: 'secret'
+                                                                           })
         allow(nfp).to receive(:notification_failure_queue).and_return(failure_queue)
         @shard1.activate do
           nfp.process

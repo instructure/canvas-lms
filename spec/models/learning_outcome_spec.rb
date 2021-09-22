@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcome do
-
   def outcome_errors(prop)
     @outcome.errors[prop].map(&:to_s)
   end
@@ -55,7 +54,7 @@ describe LearningOutcome do
       @outcome = @course.created_learning_outcomes.create!(:title => 'outcome')
     end
 
-    def assess_with(outcome=@outcome)
+    def assess_with(outcome = @outcome)
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -86,30 +85,30 @@ describe LearningOutcome do
       @assignment.reload
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 2,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 2,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       @result = @outcome.learning_outcome_results.first
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 3,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 3,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       @result.reload
       @rubric.reload
     end
@@ -317,17 +316,17 @@ describe LearningOutcome do
       expect(@assignment.rubric_association).not_to be_nil
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 2,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 2,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       expect(@outcome.learning_outcome_results).not_to be_empty
       @result = @outcome.learning_outcome_results.first
       expect(@result.user_id).to eql(@user.id)
@@ -339,17 +338,17 @@ describe LearningOutcome do
       expect(@result.versions.length).to eql(1)
       n = @result.version_number
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 3,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 3,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       @result.reload
       expect(@result.versions.length).to eql(2)
       expect(@result.version_number).to be > n
@@ -406,21 +405,21 @@ describe LearningOutcome do
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       expect(@outcome.learning_outcome_results).to be_empty
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 2,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 2,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       @outcome.reload
       expect(@outcome.learning_outcome_results).not_to be_empty
       expect(@outcome.learning_outcome_results.length).to eql(1)
-      @result = @outcome.learning_outcome_results.find{|r| r.artifact_type == 'RubricAssessment'}
+      @result = @outcome.learning_outcome_results.find { |r| r.artifact_type == 'RubricAssessment' }
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
       expect(@result.score).to eql(2.0)
@@ -472,20 +471,20 @@ describe LearningOutcome do
       @assignment.reload
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher).first
       @assessment = @a.assess({
-        :user => @user,
-        :assessor => @user,
-        :artifact => @submission,
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_1 => {
-            :points => 2,
-            :comments => "cool, yo"
-          }
-        }
-      })
+                                :user => @user,
+                                :assessor => @user,
+                                :artifact => @submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 2,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
       expect(@outcome.learning_outcome_results).not_to be_empty
       expect(@outcome.learning_outcome_results.length).to eql(1)
-      @result = @outcome.learning_outcome_results.find{|r| r.artifact_type == 'RubricAssessment'}
+      @result = @outcome.learning_outcome_results.find { |r| r.artifact_type == 'RubricAssessment' }
       expect(@result).not_to be_nil
       expect(@result.user_id).to eql(@user.id)
       expect(@result.score).to eql(2.0)
@@ -568,10 +567,10 @@ describe LearningOutcome do
 
     it "should destroy provided alignment" do
       @alignment = ContentTag.create({
-        content: @outcome,
-        context: @outcome.context,
-        tag_type: 'learning_outcome'
-      })
+                                       content: @outcome,
+                                       context: @outcome.context,
+                                       tag_type: 'learning_outcome'
+                                     })
       @outcome.alignments << @alignment
 
       expect {
@@ -607,7 +606,7 @@ describe LearningOutcome do
       expect(@outcome.rubric_criterion).to eq(@outcome.data[:rubric_criterion])
       expect {
         @outcome.rubric_criterion = @outcome.rubric_criterion.merge(mpoints)
-      }.to change{@outcome.rubric_criterion}.to(@outcome.rubric_criterion.merge(mpoints))
+      }.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
     end
 
     it "should update aligned rubrics after save" do
@@ -640,11 +639,11 @@ describe LearningOutcome do
       @outcome.save!
 
       rubric.reload
-      expect(rubric.data.first[:ratings].map {|r| r[:description]}).to match_array([
-        "Exceeds Expectations",
-        "Meets Expectations",
-        "Does Not Meet Expectations"
-      ])
+      expect(rubric.data.first[:ratings].map { |r| r[:description] }).to match_array([
+                                                                                       "Exceeds Expectations",
+                                                                                       "Meets Expectations",
+                                                                                       "Does Not Meet Expectations"
+                                                                                     ])
     end
   end
 
@@ -960,18 +959,18 @@ describe LearningOutcome do
 
     context 'sets root account ids on save' do
       it 'when context is account' do
-        outcome = LearningOutcome.create! title:'outcome', context: subaccount
+        outcome = LearningOutcome.create! title: 'outcome', context: subaccount
         expect(outcome.root_account_ids).to eq [root_account.id]
       end
 
       it 'when context is course' do
-        outcome = LearningOutcome.create! title:'outcome', context: course
+        outcome = LearningOutcome.create! title: 'outcome', context: course
         expect(outcome.root_account_ids).to eq [root_account.id]
       end
     end
 
     it 'sets empty root account ids when context is nil' do
-      outcome = LearningOutcome.create! title:'outcome', context: nil
+      outcome = LearningOutcome.create! title: 'outcome', context: nil
       expect(outcome.root_account_ids).to eq []
     end
 
@@ -1029,7 +1028,7 @@ describe LearningOutcome do
       ->(*courses) { courses.each { |c| student_in_course(course: c) } }
     end
 
-    let(:account) { ->{ Account.all.find{|a| !a.site_admin? && a.root_account?} } }
+    let(:account) { -> { Account.all.find { |a| !a.site_admin? && a.root_account? } } }
 
     let(:create_rubric) do
       ->(outcome) do
@@ -1089,30 +1088,30 @@ describe LearningOutcome do
         assignment.reload
         submission = assignment.grade_student(user, grade: "10", grader: teacher).first
         a.assess({
-          :user => user,
-          :assessor => user,
-          :artifact => submission,
-          :assessment => {
-            :assessment_type => 'grading',
-            :criterion_1 => {
-              :points => 2,
-              :comments => "cool, yo"
-            }
-          }
-        })
+                   :user => user,
+                   :assessor => user,
+                   :artifact => submission,
+                   :assessment => {
+                     :assessment_type => 'grading',
+                     :criterion_1 => {
+                       :points => 2,
+                       :comments => "cool, yo"
+                     }
+                   }
+                 })
         result = outcome.learning_outcome_results.first
         assessment = a.assess({
-          :user => user,
-          :assessor => user,
-          :artifact => submission,
-          :assessment => {
-            :assessment_type => 'grading',
-            :criterion_1 => {
-              :points => 3,
-              :comments => "cool, yo"
-            }
-          }
-        })
+                                :user => user,
+                                :assessor => user,
+                                :artifact => submission,
+                                :assessment => {
+                                  :assessment_type => 'grading',
+                                  :criterion_1 => {
+                                    :points => 3,
+                                    :comments => "cool, yo"
+                                  }
+                                }
+                              })
         result.reload
         rubric.reload
         { assignment: assignment, assessment: assessment, rubric: rubric, result: result }
@@ -1163,7 +1162,7 @@ describe LearningOutcome do
       account = Account.default
       course_factory
       lo = LearningOutcome.create!(context: @course, title: "outcome",
-        calculation_method: 'highest', workflow_state: 'active')
+                                   calculation_method: 'highest', workflow_state: 'active')
       3.times do |i|
         group = @course.learning_outcome_groups.create!(:title => "groupage_#{i}")
         group.add_outcome(lo)
@@ -1231,16 +1230,16 @@ describe LearningOutcome do
       outcome_with_rubric mastery_points: 4.0
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
       @assessment = @association.assess({
-        :user => @student,
-        :assessor => @teacher,
-        :artifact => @assignment.find_or_create_submission(@student),
-        :assessment => {
-          :assessment_type => 'grading',
-          :criterion_crit1 => {
-            :points => 5
-          }
-        }
-      })
+                                          :user => @student,
+                                          :assessor => @teacher,
+                                          :artifact => @assignment.find_or_create_submission(@student),
+                                          :assessment => {
+                                            :assessment_type => 'grading',
+                                            :criterion_crit1 => {
+                                              :points => 5
+                                            }
+                                          }
+                                        })
       @outcome.rubric_criterion = { mastery_points: 3.0 }
       @outcome.save!
       expect(@rubric.reload.criteria[0][:mastery_points]).to be 4.0
@@ -1285,16 +1284,16 @@ describe LearningOutcome do
         a1 = assignment_model
         association = @rubric.associate_with(a1, @course, :purpose => 'grading', :use_for_grading => true)
         association.assess({
-          :user => @student,
-          :assessor => @teacher,
-          :artifact => a1.find_or_create_submission(@student),
-          :assessment => {
-            :assessment_type => 'grading',
-            :criterion_crit1 => {
-              :points => 5
-            }
-          }
-        })
+                             :user => @student,
+                             :assessor => @teacher,
+                             :artifact => a1.find_or_create_submission(@student),
+                             :assessment => {
+                               :assessment_type => 'grading',
+                               :criterion_crit1 => {
+                                 :points => 5
+                               }
+                             }
+                           })
       end
 
       it 'does not return assessed rubric' do

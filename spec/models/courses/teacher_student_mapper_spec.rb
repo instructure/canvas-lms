@@ -49,7 +49,6 @@ module Courses
       ]
     }
 
-
     describe "#teachers_for_student" do
       it 'returns teacher ids for a given student id' do
         teacher_student_mapper = TeacherStudentMapper.new(mock_student_enrollments, mock_teacher_enrollments)
@@ -64,6 +63,5 @@ module Courses
         expect(teacher_student_mapper.teachers_for_student(student_id)).to match_array [teacher_id]
       end
     end
-
   end
 end

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Group do
-
   before :once do
     course_model
     group_model(:context => @course)
@@ -138,10 +137,10 @@ describe Group do
       context = course_model
       group_category = context.group_categories.create(:name => "worldCup")
       other_category = context.group_categories.create(:name => "other category")
-      group1 = Group.create!(:name=>"group1", :group_category => group_category, :context => context)
-      group2 = Group.create!(:name=>"group2", :group_category => group_category, :context => context)
-      group3 = Group.create!(:name=>"group3", :group_category => group_category, :context => context)
-      group4 = Group.create!(:name=>"group4", :group_category => other_category, :context => context)
+      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
+      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
+      group3 = Group.create!(:name => "group3", :group_category => group_category, :context => context)
+      group4 = Group.create!(:name => "group4", :group_category => other_category, :context => context)
       expect(group1.peer_groups.length).to eq 2
       expect(group1.peer_groups).to be_include(group2)
       expect(group1.peer_groups).to be_include(group3)
@@ -152,8 +151,8 @@ describe Group do
     it "should not find peer groups for student organized groups" do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
-      group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
-      group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
+      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
+      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
       expect(group1.peer_groups).to be_empty
     end
   end
@@ -193,8 +192,8 @@ describe Group do
     it "should remove that user from peer groups" do
       context = course_model
       group_category = context.group_categories.create!(:name => "worldCup")
-      group1 = Group.create!(:name=>"group1", :group_category=>group_category, :context => context)
-      group2 = Group.create!(:name=>"group2", :group_category=>group_category, :context => context)
+      group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
+      group2 = Group.create!(:name => "group2", :group_category => group_category, :context => context)
       user_model
       pseudonym_model(:user_id => @user.id)
       group1.add_user(@user)
@@ -210,8 +209,8 @@ describe Group do
       @communities = GroupCategory.communities_for(Account.default)
       user_model
       {
-        'invitation_only'          => 'invited',
-        'parent_context_request'   => 'requested',
+        'invitation_only' => 'invited',
+        'parent_context_request' => 'requested',
         'parent_context_auto_join' => 'accepted'
       }.each do |join_level, workflow_state|
         group = group_model(:join_level => join_level, :group_category => @communities)
@@ -226,7 +225,7 @@ describe Group do
       @group.save!
       user_model
 
-      [ 'invited', 'requested', 'accepted' ].each do |workflow_state|
+      ['invited', 'requested', 'accepted'].each do |workflow_state|
         @group.add_user(@user, workflow_state)
         expect(@group.group_memberships.where(:workflow_state => workflow_state, :user_id => @user).first).not_to be_nil
       end
@@ -377,7 +376,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map{|g| g.auto_accept?}).to eq [true, false, false]
+      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [true, false, false]
     end
 
     it "should be false unless the group is student organized or a community" do
@@ -388,7 +387,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map{|g| g.auto_accept?}).to eq [false, true, true]
+      expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [false, true, true]
     end
   end
 
@@ -400,7 +399,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_auto_join')
       group2 = @course.groups.create(:group_category => group_category, :join_level => 'parent_context_request')
       group3 = @course.groups.create(:group_category => group_category, :join_level => 'invitation_only')
-      expect([group1, group2, group3].map{|g| g.allow_join_request?}).to eq [true, true, false]
+      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [true, true, false]
     end
 
     it "should be false unless the group is student organized or a community" do
@@ -411,7 +410,7 @@ describe Group do
       group1 = @course.groups.create(:group_category => @course.group_categories.create(:name => "random category"), :join_level => jl)
       group2 = @course.groups.create(:group_category => GroupCategory.student_organized_for(@course), :join_level => jl)
       group3 = @account.groups.create(:group_category => GroupCategory.communities_for(@account), :join_level => jl)
-      expect([group1, group2, group3].map{|g| g.allow_join_request?}).to eq [false, true, true]
+      expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [false, true, true]
     end
   end
 
@@ -439,7 +438,7 @@ describe Group do
     it "should correctly handle restricted course sections" do
       course_with_student
       @other_section = @course.course_sections.create!(:name => "Other Section")
-      @other_student = @course.enroll_student(user_model, {:section => @other_section}).user
+      @other_student = @course.enroll_student(user_model, { :section => @other_section }).user
 
       group_category = GroupCategory.student_organized_for(@course)
       group_category.configure_self_signup(true, true)
@@ -537,14 +536,14 @@ describe Group do
     it "returns true if the context is an account" do
       account = Account.default
       group = account.groups.create
-      expect( group.user_can_manage_own_discussion_posts?(nil) ).to be_truthy
+      expect(group.user_can_manage_own_discussion_posts?(nil)).to be_truthy
     end
 
     it "defers to the context if that context is a course" do
       course_with_student
       group = @course.groups.create
       allow(group.context).to receive(:user_can_manage_own_discussion_posts?).and_return(false)
-      expect( group.user_can_manage_own_discussion_posts?(nil) ).to be_falsey
+      expect(group.user_can_manage_own_discussion_posts?(nil)).to be_falsey
     end
   end
 
@@ -703,29 +702,29 @@ describe Group do
         before do
           allow(WebConference).to receive(:plugins).and_return(
             [
-              web_conference_plugin_mock("big_blue_button", {:domain => "bbb.instructure.com", :secret_dec => "secret"}),
-              web_conference_plugin_mock("wimba", {:domain => "wimba.test"}),
-              web_conference_plugin_mock("broken_plugin", {:foor => :bar})
+              web_conference_plugin_mock("big_blue_button", { :domain => "bbb.instructure.com", :secret_dec => "secret" }),
+              web_conference_plugin_mock("wimba", { :domain => "wimba.test" }),
+              web_conference_plugin_mock("broken_plugin", { :foor => :bar })
             ]
           )
         end
 
         it 'returns the plugin names' do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Conferences)")
+          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Big blue button Wimba (Conferences)")
         end
       end
 
       context 'when WebConferences are not enabled' do
         it "returns Conferences" do
           tabs = @group.tabs_available(@user)
-          expect(tabs.select{ |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
+          expect(tabs.select { |t| t[:css_class] == 'conferences' }[0][:label]).to eq("Conferences")
         end
       end
     end
 
     it "should let members see everything" do
-      expect(@group.tabs_available(@student).map{|t|t[:id]}).to eql [
+      expect(@group.tabs_available(@student).map { |t| t[:id] }).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -739,7 +738,7 @@ describe Group do
     end
 
     it "should let admins see everything" do
-      expect(@group.tabs_available(@teacher).map{|t|t[:id]}).to eql [
+      expect(@group.tabs_available(@teacher).map { |t| t[:id] }).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
         Group::TAB_PAGES,
@@ -753,7 +752,7 @@ describe Group do
     end
 
     it "should not let nobodies see conferences" do
-      expect(@group.tabs_available(nil).map{|t|t[:id]}).not_to include Group::TAB_CONFERENCES
+      expect(@group.tabs_available(nil).map { |t| t[:id] }).not_to include Group::TAB_CONFERENCES
     end
   end
 
@@ -860,8 +859,8 @@ describe Group do
   describe '#favorite_for_user?' do
     before :each do
       context = course_model
-      @group_fave = Group.create!(:name=>"group1", :context=>context)
-      @group_not_fave = Group.create!(:name=>"group2", :context=>context)
+      @group_fave = Group.create!(:name => "group1", :context => context)
+      @group_not_fave = Group.create!(:name => "group2", :context => context)
       @group_fave.add_user(@user)
       @group_not_fave.add_user(@user)
       @user.favorites.build(:context => @group_fave)
@@ -921,9 +920,9 @@ describe Group do
 
     it 'returns true on account group' do
       account = account_model
-      account.settings = {'usage_rights_required' => {
+      account.settings = { 'usage_rights_required' => {
         'value' => true
-      }}
+      } }
       group = group_model(context: account)
       expect(group.usage_rights_required?).to be true
     end

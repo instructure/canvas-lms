@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionAttempt do
-
   describe "#initialize" do
     it "should assign number" do
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1)

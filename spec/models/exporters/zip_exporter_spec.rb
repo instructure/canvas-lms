@@ -43,7 +43,7 @@ describe "Exporters::ZipExporter" do
         content_export = course.content_exports.create!(
           user: user,
           workflow_state: "created",
-          selected_content: {attachments: {"attachment_#{attachment.id}": "1"}}
+          selected_content: { attachments: { "attachment_#{attachment.id}": "1" } }
         )
 
         Exporters::ZipExporter.new(content_export)
@@ -201,7 +201,7 @@ describe "Exporters::ZipExporter" do
         content_export = course.content_exports.create!(
           user: user,
           workflow_state: "created",
-          selected_content: {folders: {"folder_#{folder.id}": "1"}}
+          selected_content: { folders: { "folder_#{folder.id}": "1" } }
         )
 
         Exporters::ZipExporter.new(content_export)

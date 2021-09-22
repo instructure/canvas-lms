@@ -20,11 +20,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizExtension do
-
   describe "#quiz_submission" do
     it "should be initialized" do
       qs = Quizzes::QuizSubmission.new
-      params = {user_id: 1, extra_attempts: 2}
+      params = { user_id: 1, extra_attempts: 2 }
       extension = Quizzes::QuizExtension.new(qs, params)
 
       expect(extension.quiz_submission).to eq qs
@@ -34,7 +33,7 @@ describe Quizzes::QuizExtension do
   describe "#ext_params" do
     it "should be initialized" do
       qs = Quizzes::QuizSubmission.new
-      params = {user_id: 1, extra_attempts: 2}
+      params = { user_id: 1, extra_attempts: 2 }
       extension = Quizzes::QuizExtension.new(qs, params)
 
       expect(extension.ext_params).to eq params
@@ -76,8 +75,8 @@ describe Quizzes::QuizExtension do
     it "should build a list of extensions from given hash" do
       students = @course.students
       params = [
-        {user_id: @user1.id, extra_attempts: 2},
-        {user_id: @user2.id, extra_time: 20}
+        { user_id: @user1.id, extra_attempts: 2 },
+        { user_id: @user2.id, extra_time: 20 }
       ]
 
       yielded = []
@@ -155,7 +154,7 @@ describe Quizzes::QuizExtension do
 
     it "should have reasonable limits on extendable attributes" do
       extension = Quizzes::QuizExtension.new(@qs,
-        extra_attempts: 99999999, extra_time: 99999999)
+                                             extra_attempts: 99999999, extra_time: 99999999)
 
       extension.extend_submission!
       expect(extension.extra_attempts).to eq 1000
@@ -164,9 +163,9 @@ describe Quizzes::QuizExtension do
 
     it "should only allow numbers or bool for input" do
       extension = Quizzes::QuizExtension.new(@qs,
-        extra_attempts: "abc",
-        extra_time: "abc",
-        manually_unlocked: "abc")
+                                             extra_attempts: "abc",
+                                             extra_time: "abc",
+                                             manually_unlocked: "abc")
 
       extension.extend_submission!
 

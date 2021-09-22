@@ -32,30 +32,30 @@ RSpec.describe Lti::ContentMigrationService do
       @root_account.ensure_defaults
       @root_account.save!
       @tool = @course.context_external_tools.build({
-        name:          'a',
-        domain:        'lti.example.com',
-        consumer_key:  '12345',
-        shared_secret: 'secret',
-      })
+                                                     name: 'a',
+                                                     domain: 'lti.example.com',
+                                                     consumer_key: '12345',
+                                                     shared_secret: 'secret',
+                                                   })
       @tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
-        settings: {
-          'custom_fields' => {
-            'course_id'=>'$Canvas.course.id',
-          },
-          'content_migration' => {
-            'export_start_url'=>'https://lti.example.com/begin_export',
-            'import_start_url'=>'https://lti.example.com/begin_import'
-          },
-        }
-      })
+                                                                                     settings: {
+                                                                                       'custom_fields' => {
+                                                                                         'course_id' => '$Canvas.course.id',
+                                                                                       },
+                                                                                       'content_migration' => {
+                                                                                         'export_start_url' => 'https://lti.example.com/begin_export',
+                                                                                         'import_start_url' => 'https://lti.example.com/begin_import'
+                                                                                       },
+                                                                                     }
+                                                                                   })
       @tool.save!
 
       response_body = {
         status_url: 'https://lti.example.com/export/42/status',
         fetch_url: 'https://lti.example.com/export/42',
       }.to_json
-      stub_request(:post, 'https://lti.example.com/begin_export').
-        to_return(:status => 200, :body => response_body, :headers => {})
+      stub_request(:post, 'https://lti.example.com/begin_export')
+        .to_return(:status => 200, :body => response_body, :headers => {})
       @return_value = Lti::ContentMigrationService.begin_exports(@course)
     end
 

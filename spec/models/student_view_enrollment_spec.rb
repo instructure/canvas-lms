@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe StudentViewEnrollment do
-
   before(:each) do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")

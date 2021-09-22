@@ -202,49 +202,49 @@ describe EnrollmentTerm do
         name: :active,
         criteria: {}
       },
-      {
-        name: :not_default,
-        criteria: {}
-      },
-      {
-        name: :ended,
-        criteria: {
-          end_at: 10.days.ago
-        }
-      },
-      {
-        name: :started_1,
-        criteria: {
-          start_at: 10.days.ago
-        }
-      },
-      {
-        name: :started_2,
-        criteria: {
-          start_at: nil
-        }
-      },
-      {
-        name: :not_ended_1,
-        criteria: {
-          end_at: 10.days.from_now
-        }
-      },
-      {
-        name: :not_ended_2,
-        criteria: {
-          end_at: nil
-        }
-      },
-      {
-        name: :not_started,
-        criteria: {
-          start_at: 10.days.from_now
-        }
-      }]
+                {
+                  name: :not_default,
+                  criteria: {}
+                },
+                {
+                  name: :ended,
+                  criteria: {
+                    end_at: 10.days.ago
+                  }
+                },
+                {
+                  name: :started_1,
+                  criteria: {
+                    start_at: 10.days.ago
+                  }
+                },
+                {
+                  name: :started_2,
+                  criteria: {
+                    start_at: nil
+                  }
+                },
+                {
+                  name: :not_ended_1,
+                  criteria: {
+                    end_at: 10.days.from_now
+                  }
+                },
+                {
+                  name: :not_ended_2,
+                  criteria: {
+                    end_at: nil
+                  }
+                },
+                {
+                  name: :not_started,
+                  criteria: {
+                    start_at: 10.days.from_now
+                  }
+                }]
 
       scopes.each do |scope|
-        @terms[scope[:name]] = @root_account.enrollment_terms.create!({name: scope[:name].to_s}.merge(scope[:criteria]))
+        @terms[scope[:name]] = @root_account.enrollment_terms.create!({ name: scope[:name].to_s }.merge(scope[:criteria]))
         course_with_teacher(active_course: true, active_enrollment: true)
         @course.enrollment_term_id = @terms[scope[:name]].id
         @course.save!
@@ -252,10 +252,10 @@ describe EnrollmentTerm do
     end
 
     def term_ids_for_scope(scope)
-      Array.wrap(@root_account.
-        enrollment_terms.
-        send(scope).
-        pluck(:id)).sort
+      Array.wrap(@root_account
+        .enrollment_terms
+        .send(scope)
+        .pluck(:id)).sort
     end
 
     def validate_scope(scope, expected_scopes = nil, include_default: false)
@@ -392,8 +392,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.to change {
@@ -408,8 +408,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.not_to change {
@@ -422,8 +422,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.to change {
@@ -438,8 +438,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.not_to change {

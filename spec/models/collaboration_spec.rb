@@ -22,9 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Collaboration do
   context "collaboration_class" do
-
     describe ".any_collaborations_configured?" do
-      let(:context) {course_factory}
+      let(:context) { course_factory }
       it "should by default not have any collaborations" do
         expect(Collaboration.any_collaborations_configured?(context)).to be_falsey
         expect(Collaboration.collaboration_types).to eq []
@@ -32,17 +31,18 @@ describe Collaboration do
 
       it "returns true if an external tool with a collaboration placment exists" do
         tool = context.context_external_tools.new(
-            name: "bob",
-            consumer_key: "bob",
-            shared_secret: "bob",
-            tool_id: 'some_tool',
-            privacy_level: 'public'
+          name: "bob",
+          consumer_key: "bob",
+          shared_secret: "bob",
+          tool_id: 'some_tool',
+          privacy_level: 'public'
         )
         tool.url = "http://www.example.com/basic_lti"
         tool.collaboration = {
-            :url => "http://#{HostUrl.default_host}/selection_test",
-            :selection_width => 400,
-            :selection_height => 400}
+          :url => "http://#{HostUrl.default_host}/selection_test",
+          :selection_width => 400,
+          :selection_height => 400
+        }
         tool.save!
         expect(Collaboration.any_collaborations_configured?(context)).to eq true
       end
@@ -92,13 +92,13 @@ describe Collaboration do
     before :once do
       PluginSetting.create!(:name => "etherpad", :settings => {})
       @other_user = user_with_pseudonym(:active_all => true)
-      @users  = (1..4).map { user_with_pseudonym(:active_all => true) }
+      @users = (1..4).map { user_with_pseudonym(:active_all => true) }
       course_factory(:active_all => true)
       @users.each { |u| @course.enroll_student(u) }
       @groups = [group_model(:context => @course)]
       @groups.first.add_user(@users.last, 'active')
       @collaboration = @course.collaborations.new(:title => 'Test collaboration',
-                                                  :user  => @users.first)
+                                                  :user => @users.first)
       @collaboration.type = 'EtherpadCollaboration'
       @collaboration.save!
     end
@@ -140,7 +140,7 @@ describe Collaboration do
     end
 
     it "allows course admins (and group members) to be added to a group collaboration" do
-      @users.each{|u| u.student_enrollments.first.accept!}
+      @users.each { |u| u.student_enrollments.first.accept! }
       gc = @groups.first.collaborations.create! :title => 'derp', :user => @teacher
       gc.update_members([@teacher, @users.first, @users.last])
       users = gc.reload.collaborators.pluck(:user_id)

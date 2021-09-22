@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeGroup do
-
   before :each do
     course_factory
     @root = @course.root_outcome_group
@@ -29,7 +28,7 @@ describe LearningOutcomeGroup do
 
   def long_text(max = 65535)
     text = +''
-    (0...max+1).each do |num|
+    (0...max + 1).each do |num|
       text.concat(num.to_s)
     end
     text
@@ -85,20 +84,20 @@ describe LearningOutcomeGroup do
     end
 
     it 'validates presense of title' do
-      expect{ @course.learning_outcome_groups.create! }.to raise_error(
+      expect { @course.learning_outcome_groups.create! }.to raise_error(
         ActiveRecord::RecordInvalid, "Validation failed: Title can't be blank"
       )
     end
 
     it 'validates length of title' do
-      expect{ @course.learning_outcome_groups.create!(title: long_text(255)) }.to raise_error(
+      expect { @course.learning_outcome_groups.create!(title: long_text(255)) }.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Title is too long (maximum is 255 characters)"
       )
     end
 
     it 'validates length of description' do
-      expect{ @course.learning_outcome_groups.create!(title: 'foobar', description: long_text) }.to raise_error(
+      expect { @course.learning_outcome_groups.create!(title: 'foobar', description: long_text) }.to raise_error(
         ActiveRecord::RecordInvalid,
         "Validation failed: Description is too long (maximum is 65,535 characters)"
       )
@@ -204,8 +203,8 @@ describe LearningOutcomeGroup do
 
       expect(outcome_link.associated_asset).to eq(group1)
 
-      expect{ group1.adopt_outcome_link(outcome_link) }.
-        not_to change{ outcome_link.associated_asset }
+      expect { group1.adopt_outcome_link(outcome_link) }
+        .not_to change { outcome_link.associated_asset }
     end
 
     it "doesn't touch parent group if skip_parent_group_touch is true" do
@@ -237,8 +236,8 @@ describe LearningOutcomeGroup do
     it 'no-ops if group is already parent' do
       group1 = @course.learning_outcome_groups.create!(:title => 'group1')
 
-      expect{ group1.adopt_outcome_group(group1) }.
-        not_to change{ group1.learning_outcome_group_id }
+      expect { group1.adopt_outcome_group(group1) }
+        .not_to change { group1.learning_outcome_group_id }
     end
   end
 
@@ -287,7 +286,7 @@ describe LearningOutcomeGroup do
       group2.add_outcome(outcome2)
       group1.add_outcome_group(group2)
 
-      active_child_outcomes = group1.child_outcome_links.select{|ol| ol.workflow_state == "active"}
+      active_child_outcomes = group1.child_outcome_links.select { |ol| ol.workflow_state == "active" }
       active_child_groups = group1.child_outcome_groups.active
       expect(active_child_outcomes).not_to be_empty
       expect(active_child_groups).not_to be_empty
@@ -295,7 +294,7 @@ describe LearningOutcomeGroup do
       group1.destroy
       group1.reload
 
-      active_child_outcomes = group1.child_outcome_links.select{|ol| ol.workflow_state == "active"}
+      active_child_outcomes = group1.child_outcome_links.select { |ol| ol.workflow_state == "active" }
       active_child_groups = group1.child_outcome_groups.active
       expect(group1.workflow_state).to eq('deleted')
       expect(active_child_outcomes).to be_empty
@@ -323,7 +322,7 @@ describe LearningOutcomeGroup do
   context "sync_source_group" do
     def assert_tree_exists(groups, db_parent_group)
       group_titles = db_parent_group.child_outcome_groups.active.pluck(:title)
-      expect(group_titles.sort).to eql(groups.map {|g| g[:title]}.sort)
+      expect(group_titles.sort).to eql(groups.map { |g| g[:title] }.sort)
 
       groups.each do |group|
         outcome_titles = group[:outcomes] || []
@@ -342,20 +341,20 @@ describe LearningOutcomeGroup do
 
     before do
       make_group_structure({
-        title: "Group A",
-        outcomes: 1,
-        groups: [{
-          title: "Group C",
-          outcomes: 1,
-          groups: [{
-            title: "Group D",
-            outcomes: 1
-          }, {
-            title: "Group E",
-            outcomes: 1
-          }]
-        }]
-      }, Account.default)
+                             title: "Group A",
+                             outcomes: 1,
+                             groups: [{
+                               title: "Group C",
+                               outcomes: 1,
+                               groups: [{
+                                 title: "Group D",
+                                 outcomes: 1
+                               }, {
+                                 title: "Group E",
+                                 outcomes: 1
+                               }]
+                             }]
+                           }, Account.default)
 
       group_a = LearningOutcomeGroup.find_by(title: "Group A")
       @course_group_a = LearningOutcomeGroup.create!(
@@ -366,27 +365,27 @@ describe LearningOutcomeGroup do
 
     it "sync all groups and outcomes from source" do
       assert_tree_exists([{
-        title: "Group A",
-        outcomes: []
-      }], @root)
+                           title: "Group A",
+                           outcomes: []
+                         }], @root)
 
       @course_group_a.sync_source_group
 
       assert_tree_exists([{
-        title: "Group A",
-        outcomes: ["0 Group A outcome"],
-        groups: [{
-          title: "Group C",
-          outcomes: ["0 Group C outcome"],
-          groups: [{
-            title: "Group D",
-            outcomes: ["0 Group D outcome"]
-          }, {
-            title: "Group E",
-            outcomes: ["0 Group E outcome"]
-          }]
-        }]
-      }], @root)
+                           title: "Group A",
+                           outcomes: ["0 Group A outcome"],
+                           groups: [{
+                             title: "Group C",
+                             outcomes: ["0 Group C outcome"],
+                             groups: [{
+                               title: "Group D",
+                               outcomes: ["0 Group D outcome"]
+                             }, {
+                               title: "Group E",
+                               outcomes: ["0 Group E outcome"]
+                             }]
+                           }]
+                         }], @root)
     end
 
     it "restore previous deleted group" do

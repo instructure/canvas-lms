@@ -27,7 +27,7 @@ describe 'Notification Policy Override' do
     before(:once) do
       @shard1.activate do
         @teacher = User.create!(name: 'Mr Feeny', workflow_state: 'registered')
-        @channel = communication_channel(@teacher, {username: 'feeny@instructure.com', active_cc: true})
+        @channel = communication_channel(@teacher, { username: 'feeny@instructure.com', active_cc: true })
         @notification = Notification.create!(name: 'Assignment Created', subject: 'Test', category: 'Due Date', shard: @shard1)
       end
 

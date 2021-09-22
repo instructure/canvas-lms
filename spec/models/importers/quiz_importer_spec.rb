@@ -57,7 +57,6 @@ describe "Importers::QuizImporter" do
     end
   end
 
-
   it "should complete a quiz question reference" do
     context = course_model
     question_data = import_example_questions context
@@ -110,7 +109,7 @@ describe "Importers::QuizImporter" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    data = {'assessments' => {'assessments' => [quiz_hash]}}
+    data = { 'assessments' => { 'assessments' => [quiz_hash] } }
     migration = context.content_migrations.create!
     allow(migration).to receive(:canvas_import?).and_return(true)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
@@ -127,7 +126,7 @@ describe "Importers::QuizImporter" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    data = {'assessments' => {'assessments' => [quiz_hash]}}
+    data = { 'assessments' => { 'assessments' => [quiz_hash] } }
     migration = context.content_migrations.create!
     allow(migration).to receive(:canvas_import?).and_return(false)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
@@ -147,7 +146,7 @@ describe "Importers::QuizImporter" do
     assignment_hash = get_import_data 'vista', 'assignment'
     quiz_hash['assignment_migration_id'] = assignment_hash['migration_id']
 
-    data = {'assessments' => {'assessments' => [quiz_hash]}, 'assignments' => [assignment_hash]}
+    data = { 'assessments' => { 'assessments' => [quiz_hash] }, 'assignments' => [assignment_hash] }
 
     migration = context.content_migrations.create!
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)

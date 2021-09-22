@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe AccountUser do
-
   before :once do
     @role1 = custom_account_role('role1', :account => Account.default)
     @role2 = custom_account_role('role2', :account => Account.default)
@@ -77,8 +76,8 @@ describe AccountUser do
   describe "all_permissions_for" do
     it "should include granted permissions from multiple roles" do
       user = User.create!
-      manage_wiki_permissions = {:manage_wiki_create => true, :manage_wiki_update => true, :manage_wiki_delete => true}
-      account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => {:manage_sis => true})
+      manage_wiki_permissions = { :manage_wiki_create => true, :manage_wiki_update => true, :manage_wiki_delete => true }
+      account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => { :manage_sis => true })
       account_admin_user_with_role_changes(:user => user, :role => @role2, :role_changes => manage_wiki_permissions)
 
       permissions = AccountUser.all_permissions_for(user, Account.default)

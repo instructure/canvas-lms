@@ -23,8 +23,8 @@ require 'spec_helper'
 describe 'ScheduledSmartAlert' do
   context 'due_date_reminder alert' do
     before(:once) do
-      assignment_model({due_at: 3.days.from_now})
-      @override = create_section_override_for_assignment(@a, {due_at: 1.day.from_now})
+      assignment_model({ due_at: 3.days.from_now })
+      @override = create_section_override_for_assignment(@a, { due_at: 1.day.from_now })
     end
 
     it 'correctly calculates the runnable scope' do

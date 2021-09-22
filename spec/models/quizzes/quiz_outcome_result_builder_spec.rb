@@ -58,14 +58,14 @@ describe Quizzes::QuizOutcomeResultBuilder do
 
     context 'with long quiz titles' do
       before :once do
-       @user.update!(name: 'a'*255)
-       @sub.update_scores({
-        'context_id' => @course.id,
-        'override_scores' => true,
-        'context_type' => 'Course',
-        'submission_version_number' => '1',
-        "question_score_#{@q2.id}" => '0'
-      })
+        @user.update!(name: 'a' * 255)
+        @sub.update_scores({
+                             'context_id' => @course.id,
+                             'override_scores' => true,
+                             'context_type' => 'Course',
+                             'submission_version_number' => '1',
+                             "question_score_#{@q2.id}" => '0'
+                           })
       end
 
       it "truncates result.title and question_result.title to 250 characters" do
@@ -120,12 +120,12 @@ describe Quizzes::QuizOutcomeResultBuilder do
         expect(@bank2.assessment_question_count).to eql(2)
       end
       it "should create two learning outcome results" do
-        expect(@question_results.map(&:size)).to eql([2,2])
+        expect(@question_results.map(&:size)).to eql([2, 2])
         expect(@quiz_results.size).to eql(2)
       end
       it 'should consider scores in aggregate' do
-        expect(@quiz_results.map(&:possible)).to eql([2.0,2.0])
-        expect(@quiz_results.map(&:score)).to eql([1.0,1.0])
+        expect(@quiz_results.map(&:possible)).to eql([2.0, 2.0])
+        expect(@quiz_results.map(&:score)).to eql([1.0, 1.0])
       end
       it "should declare mastery when equal" do
         expect(@quiz_results.map(&:mastery)).to eql([false, true])
@@ -185,8 +185,8 @@ describe Quizzes::QuizOutcomeResultBuilder do
       build_course_quiz_questions_and_a_bank
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
-      @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
-      @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
+      @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
       @quiz.generate_quiz_data(:persist => true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
@@ -206,7 +206,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
     end
 
     it "should update learning outcome results when aligned to assessment questions and kept score will update" do
-      build_course_quiz_questions_and_a_bank({}, {scoring_policy: "keep_latest"})
+      build_course_quiz_questions_and_a_bank({}, { scoring_policy: "keep_latest" })
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
       @quiz.generate_quiz_data(:persist => true)
@@ -283,7 +283,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
 
   describe "quizzes with a mix of auto-gradeable and non-auto-gradeable questions" do
     before :once do
-      build_course_quiz_questions_and_a_bank(q2: {'question_type' => 'essay_question', 'answers' => []})
+      build_course_quiz_questions_and_a_bank(q2: { 'question_type' => 'essay_question', 'answers' => [] })
       @quiz.generate_quiz_data(:persist => true)
       @quiz.save!
       @sub = @quiz.generate_submission(@user)
@@ -297,19 +297,19 @@ describe Quizzes::QuizOutcomeResultBuilder do
     it "creates an outcome result even if the total score doesn't increase after grading an essay question" do
       expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 0
       @sub.update_scores({
-        'context_id' => @course.id,
-        'override_scores' => true,
-        'context_type' => 'Course',
-        'submission_version_number' => '1',
-        "question_score_#{@q2.id}" => "0"
-      })
+                           'context_id' => @course.id,
+                           'override_scores' => true,
+                           'context_type' => 'Course',
+                           'submission_version_number' => '1',
+                           "question_score_#{@q2.id}" => "0"
+                         })
       expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 1
     end
   end
 
   describe "quizzes that aren't graded or complete" do
     before :once do
-      build_course_quiz_questions_and_a_bank({'question_type' => 'essay_question', 'answers' => []})
+      build_course_quiz_questions_and_a_bank({ 'question_type' => 'essay_question', 'answers' => [] })
       @quiz.generate_quiz_data(:persist => true)
       @sub = @quiz.generate_submission(@user)
       @sub.submission_data = {}
@@ -322,30 +322,30 @@ describe Quizzes::QuizOutcomeResultBuilder do
     it "creates and updates an outcome result once fully manually graded" do
       # update_scores is the method fired when manually grading a quiz in speedgrader.
       @sub.update_scores({
-        'context_id' => @course.id,
-        'override_scores' => true,
-        'context_type' => 'Course',
-        'submission_version_number' => '1',
-        "question_score_#{@q1.id}" => "1",
-      })
+                           'context_id' => @course.id,
+                           'override_scores' => true,
+                           'context_type' => 'Course',
+                           'submission_version_number' => '1',
+                           "question_score_#{@q1.id}" => "1",
+                         })
       expect(@outcome.learning_outcome_results.active.where(user_id: @user).count).to equal 0
       @sub.update_scores({
-        'context_id' => @course.id,
-        'override_scores' => true,
-        'context_type' => 'Course',
-        'submission_version_number' => '1',
-        "question_score_#{@q2.id}" => "1"
-      })
+                           'context_id' => @course.id,
+                           'override_scores' => true,
+                           'context_type' => 'Course',
+                           'submission_version_number' => '1',
+                           "question_score_#{@q2.id}" => "1"
+                         })
       results = @outcome.learning_outcome_results.active.where(user_id: @user)
       expect(results.count).to equal 1
       expect(results[0].score).to equal 2.0
       @sub.update_scores({
-        'context_id' => @course.id,
-        'override_scores' => true,
-        'context_type' => 'Course',
-        'submission_version_number' => '1',
-        "question_score_#{@q1.id}" => "2"
-      })
+                           'context_id' => @course.id,
+                           'override_scores' => true,
+                           'context_type' => 'Course',
+                           'submission_version_number' => '1',
+                           "question_score_#{@q1.id}" => "2"
+                         })
       results[0].reload
       expect(results[0].score).to equal 3.0
     end
@@ -385,9 +385,9 @@ describe Quizzes::QuizOutcomeResultBuilder do
 
   describe "quiz questions with no points possible" do
     before :once do
-      build_course_quiz_questions_and_a_bank({}, {scoring_policy: "keep_latest"})
-      @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
-      @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      build_course_quiz_questions_and_a_bank({}, { scoring_policy: "keep_latest" })
+      @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
+      @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
     end
 
     it "does not generate a learning outcome question result for 0 point questions" do
@@ -434,8 +434,8 @@ describe Quizzes::QuizOutcomeResultBuilder do
   describe "quizzes with no points possible" do
     before :once do
       build_course_quiz_questions_and_a_bank
-      @q1.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
-      @q2.question_data[:answers].detect{|a| a[:weight] == 100 }[:id]
+      @q1.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
+      @q2.question_data[:answers].detect { |a| a[:weight] == 100 }[:id]
     end
     it "does not generate a learning outcome result" do
       q1_data = @q1.question_data

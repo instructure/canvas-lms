@@ -21,10 +21,10 @@ require_relative '../spec_helper'
 
 describe GradebookUpload do
   describe ".queue_from" do
-    let(:teacher_enrollment){ teacher_in_course }
-    let(:teacher){ teacher_enrollment.user }
-    let(:gradebook_course){ teacher_enrollment.course }
-    let(:attachment_data){ {dummy: "data"} }
+    let(:teacher_enrollment) { teacher_in_course }
+    let(:teacher) { teacher_enrollment.user }
+    let(:gradebook_course) { teacher_enrollment.course }
+    let(:attachment_data) { { dummy: "data" } }
 
     before(:each) do
       # actual attachment integration covered in gradebook_uploads_controller_spec;

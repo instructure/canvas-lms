@@ -22,10 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AccessToken do
-
   context "Authenticate" do
     shared_examples "#authenticate" do
-
       it "new access tokens shouldnt have an expiration" do
         at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
         expect(at.permanent_expires_at).to eq nil
@@ -67,7 +65,6 @@ describe AccessToken do
       end
 
       it "shouldn't have auto expire tokens" do
-
         expect(DeveloperKey.default.auto_expire_tokens).to be false
       end
 
@@ -178,10 +175,10 @@ describe AccessToken do
     it "only displays integrations from non-internal developer keys" do
       user = User.create!
       trustedkey = DeveloperKey.create!(internal_service: true)
-      trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
+      trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
 
       untrustedkey = DeveloperKey.create!()
-      third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
+      third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
 
       expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
       expect(AccessToken.visible_tokens(user.access_tokens).first.id).to eq third_party_access_token.id
@@ -198,8 +195,8 @@ describe AccessToken do
 
       @shard2.activate do
         user = User.create!
-        trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
-        third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
+        trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
+        third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
         user.save!
 
         expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
@@ -233,7 +230,7 @@ describe AccessToken do
     end
 
     it "does not validate scopes if the workflow state is deleted" do
-      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id",  "url:GET|/api/v1/accounts/:account_id/admins"]
+      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id", "url:GET|/api/v1/accounts/:account_id/admins"]
       dk = DeveloperKey.create!(scopes: dk_scopes, require_scopes: true)
       token = AccessToken.new(developer_key: dk, scopes: dk_scopes)
       dk.update!(scopes: [])
@@ -280,7 +277,6 @@ describe AccessToken do
   end
 
   describe "account scoped access" do
-
     before :once do
       @ac = account_model
       @sub_ac = @ac.sub_accounts.create!
@@ -418,7 +414,7 @@ describe AccessToken do
     end
 
     describe 'adding scopes' do
-      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0,10)}
+      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0, 10) }
       let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes: scopes) }
       let(:scopes) { [TokenScopes.all_scopes[12]] }
 

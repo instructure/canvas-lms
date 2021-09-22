@@ -28,20 +28,20 @@ describe EpubExport do
 
   describe "after_create" do
     it "should create one job progress" do
-      expect{@course.epub_exports.create(user: @student)}.to change{Progress.count}.from(0).to(1)
+      expect { @course.epub_exports.create(user: @student) }.to change { Progress.count }.from(0).to(1)
     end
   end
 
   describe "#export" do
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student
-      })
+                                    user: @student
+                                  })
     end
 
     context "method is successful" do
       it "should create one content_export" do
-        expect{epub_export.export(synchronous: true)}.to change{ContentExport.count}.from(0).to(1)
+        expect { epub_export.export(synchronous: true) }.to change { ContentExport.count }.from(0).to(1)
       end
 
       it "should set state to 'exporting'" do
@@ -63,21 +63,21 @@ describe EpubExport do
 
     let_once(:content_export) do
       @course.content_exports.create({
-        user: @student
-      }).tap do |content_export|
+                                       user: @student
+                                     }).tap do |content_export|
         content_export.create_attachment({
-          context: @course,
-          filename: File.basename(cartridge_path),
-          uploaded_data: File.open(cartridge_path)
-        })
+                                           context: @course,
+                                           filename: File.basename(cartridge_path),
+                                           uploaded_data: File.open(cartridge_path)
+                                         })
       end
     end
 
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student,
-        content_export: content_export
-      })
+                                    user: @student,
+                                    content_export: content_export
+                                  })
     end
 
     it "should be stored in instfs if instfs is enabled" do
@@ -89,18 +89,17 @@ describe EpubExport do
     end
   end
 
-
   describe "mark_exported" do
     let_once(:content_export) do
       @course.content_exports.create({
-        user: @student
-      })
+                                       user: @student
+                                     })
     end
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student,
-        content_export: content_export
-      })
+                                    user: @student,
+                                    content_export: content_export
+                                  })
     end
 
     context "when content export is successful" do
@@ -130,8 +129,8 @@ describe EpubExport do
   describe "#generate" do
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student
-      }).tap do |epub_export|
+                                    user: @student
+                                  }).tap do |epub_export|
         epub_export.update_attribute(:workflow_state, 'exported')
       end
     end
@@ -154,28 +153,28 @@ describe EpubExport do
 
     let_once(:content_export) do
       @course.content_exports.create({
-        user: @student
-      }).tap do |content_export|
+                                       user: @student
+                                     }).tap do |content_export|
         content_export.create_attachment({
-          context: @course,
-          filename: File.basename(cartridge_path),
-          uploaded_data: File.open(cartridge_path)
-        })
+                                           context: @course,
+                                           filename: File.basename(cartridge_path),
+                                           uploaded_data: File.open(cartridge_path)
+                                         })
       end
     end
 
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student,
-        content_export: content_export
-      })
+                                    user: @student,
+                                    content_export: content_export
+                                  })
     end
 
     it 'should create and associate an attachment' do
       expect(epub_export.epub_attachment).to be_nil, 'precondition'
       expect(epub_export.zip_attachment).to be_nil, 'precondition'
 
-      expect{epub_export.convert_to_epub(synchronous: true)}.to change{Attachment.count}.by(2)
+      expect { epub_export.convert_to_epub(synchronous: true) }.to change { Attachment.count }.by(2)
 
       epub_export.reload
       expect(epub_export.epub_attachment).not_to be_nil
@@ -213,7 +212,7 @@ describe EpubExport do
         @course.epub_exports.create(user: @student)
       end
 
-      [ "generated", "failed" ].each do |state|
+      ["generated", "failed"].each do |state|
         context "when state is #{state}" do
           it "should allow regeneration" do
             epub_export.update_attribute(:workflow_state, state)
@@ -227,8 +226,8 @@ describe EpubExport do
   describe "scopes" do
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student
-      })
+                                    user: @student
+                                  })
     end
 
     context "running" do
@@ -264,26 +263,26 @@ describe EpubExport do
     end
     let_once(:content_export) do
       @course.content_exports.create({
-        user: @student
-      }).tap do |content_export|
+                                       user: @student
+                                     }).tap do |content_export|
         content_export.create_attachment({
-          context: @course,
-          filename: File.basename(cartridge_path),
-          uploaded_data: File.open(cartridge_path)
-        })
+                                           context: @course,
+                                           filename: File.basename(cartridge_path),
+                                           uploaded_data: File.open(cartridge_path)
+                                         })
       end
     end
     let_once(:epub_export) do
       @course.epub_exports.create({
-        user: @student,
-        content_export: content_export
-      })
+                                    user: @student,
+                                    content_export: content_export
+                                  })
     end
 
     it 'is called during export and resets locale after' do
       expect(epub_export).to receive(:infer_locale).once
-        .with(context: @course, user: @student, root_account: @course.root_account)
-        .and_return(:ru)
+                                                   .with(context: @course, user: @student, root_account: @course.root_account)
+                                                   .and_return(:ru)
       epub_export.convert_to_epub(synchronous: true)
       expect(I18n.locale).to be :en
     end
@@ -344,9 +343,9 @@ describe EpubExport do
   it "should escape html characters in titles" do
     course_with_student(active_all: true)
     assignment = @course.assignments.create!({
-      title: 'here you go </html> lol',
-      description: "beep beep"
-    })
+                                               title: 'here you go </html> lol',
+                                               description: "beep beep"
+                                             })
 
     EpubExports::CreateService.new(@course, @student, :epub_export).save
     run_jobs
@@ -355,7 +354,7 @@ describe EpubExport do
     expect(epub_export).to be_generated
     path = epub_export.epub_attachment.open(:need_local_file => true).path
     zip_file = Zip::File.open(path)
-    html = zip_file.read(zip_file.entries.map(&:name).detect{|n| n.include?("assignments")})
+    html = zip_file.read(zip_file.entries.map(&:name).detect { |n| n.include?("assignments") })
     expect(html).to include("here you go &lt;/html&gt; lol")
   end
 end

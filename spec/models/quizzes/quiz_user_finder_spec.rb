@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizUserFinder do
-
   before :once do
     course_with_teacher(course: @course, active_all: true)
     course_quiz(true)
@@ -35,7 +34,7 @@ describe Quizzes::QuizUserFinder do
   end
 
   def students
-    [ @unsubmitted_student, @submitted_student ]
+    [@unsubmitted_student, @submitted_student]
   end
 
   it "(#all_students) finds all students" do
@@ -43,15 +42,15 @@ describe Quizzes::QuizUserFinder do
   end
 
   it "(#unsubmitted_students) finds unsubmitted students" do
-    expect(@finder.unsubmitted_students).to eq [ @unsubmitted_student ]
+    expect(@finder.unsubmitted_students).to eq [@unsubmitted_student]
   end
 
   it "(#submitted_student) finds submitted students" do
-    expect(@finder.submitted_students).to eq [ @submitted_student ]
+    expect(@finder.submitted_students).to eq [@submitted_student]
   end
 
   it "doesn't find submissions from teachers for preview submissions" do
-    sub = @quiz.generate_submission(@teacher, preview=true)
+    sub = @quiz.generate_submission(@teacher, preview = true)
     Quizzes::SubmissionGrader.new(sub).grade_submission
     sub.save!
     expect(@finder.submitted_students).not_to include @teacher
@@ -67,12 +66,11 @@ describe Quizzes::QuizUserFinder do
   end
 
   context "differentiated_assignments" do
-    before{@quiz.only_visible_to_overrides = true;@quiz.save!}
+    before { @quiz.only_visible_to_overrides = true; @quiz.save! }
     it "(#all_students_with_visibility) filters students if DA is on" do
       expect(@finder.unsubmitted_students).not_to include(@unsubmitted_student)
-      create_section_override_for_quiz(@quiz, {course_section: @unsubmitted_student.enrollments.current.first.course_section})
+      create_section_override_for_quiz(@quiz, { course_section: @unsubmitted_student.enrollments.current.first.course_section })
       expect(@finder.unsubmitted_students).to include(@unsubmitted_student)
     end
   end
-
 end

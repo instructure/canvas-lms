@@ -21,8 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe AuthenticationProvider do
-
-  let(:account){ Account.default }
+  let(:account) { Account.default }
 
   context "password" do
     it "should decrypt the password to the original value" do
@@ -35,7 +34,6 @@ describe AuthenticationProvider do
   end
 
   describe "enable_canvas_authentication" do
-
     before do
       account.authentication_providers.destroy_all
       account.settings[:canvas_authentication] = false
@@ -53,7 +51,6 @@ describe AuthenticationProvider do
       account.authentication_providers.destroy_all
       expect(account.reload.canvas_authentication?).to eq true
     end
-
   end
 
   it "should disable open registration when created" do
@@ -64,7 +61,7 @@ describe AuthenticationProvider do
   end
 
   describe "FindByType module" do
-    let!(:aac){ account.authentication_providers.create!(auth_type: 'facebook') }
+    let!(:aac) { account.authentication_providers.create!(auth_type: 'facebook') }
 
     it "still reloads ok" do
       expect { aac.reload }.not_to raise_error
@@ -158,43 +155,43 @@ describe AuthenticationProvider do
     context "validation" do
       it "normalizes short form" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'integration_id' => 'internal_id'})
+                                                           federated_attributes: { 'integration_id' => 'internal_id' })
         expect(aac).to be_valid
         expect(aac.federated_attributes).to eq({ 'integration_id' => { 'attribute' => 'internal_id',
-                                                                       'provisioning_only' => false}})
+                                                                       'provisioning_only' => false } })
       end
 
       it "defaults provisioning_only to false" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' }})
+                                                           federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' } })
         expect(aac).to be_valid
         expect(aac.federated_attributes).to eq({ 'integration_id' => { 'attribute' => 'internal_id',
-                                                                       'provisioning_only' => false}})
+                                                                       'provisioning_only' => false } })
       end
 
       it "doesn't allow invalid Canvas attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'sis_id' => 'internal_id'})
+                                                           federated_attributes: { 'sis_id' => 'internal_id' })
         expect(aac).not_to be_valid
       end
 
       it "allows valid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'integration_id' => 'internal_id'})
+                                                           federated_attributes: { 'integration_id' => 'internal_id' })
         allow(AuthenticationProvider::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).to be_valid
       end
 
       it "doesn't allow invalid provider attributes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'integration_id' => 'garbage'})
+                                                           federated_attributes: { 'integration_id' => 'garbage' })
         allow(AuthenticationProvider::SAML).to receive(:recognized_federated_attributes).and_return(['internal_id'])
         expect(aac).not_to be_valid
       end
 
       it "rejects unknown keys for attriutes" do
         aac = Account.default.authentication_providers.new(auth_type: 'saml',
-            federated_attributes: { 'integration_id' => { 'garbage' => 'internal_id' }})
+                                                           federated_attributes: { 'integration_id' => { 'garbage' => 'internal_id' } })
         expect(aac).not_to be_valid
       end
     end
@@ -203,19 +200,19 @@ describe AuthenticationProvider do
   describe "apply_federated_attributes" do
     let(:aac) do
       Account.default.authentication_providers.new(auth_type: 'saml',
-        federated_attributes: {
-          'admin_roles' => 'admin_roles',
-          'display_name' => 'display_name',
-          'email' => 'email',
-          'given_name' => 'given_name',
-          'integration_id' => { 'attribute' => 'internal_id', 'provisioning_only' => true },
-          'locale' => 'locale',
-          'name' => 'name',
-          'sis_user_id' => { 'attribute' => 'sis_id', 'provisioning_only' => true },
-          'sortable_name' => 'sortable_name',
-          'surname' => 'surname',
-          'time_zone' => 'timezone'
-        })
+                                                   federated_attributes: {
+                                                     'admin_roles' => 'admin_roles',
+                                                     'display_name' => 'display_name',
+                                                     'email' => 'email',
+                                                     'given_name' => 'given_name',
+                                                     'integration_id' => { 'attribute' => 'internal_id', 'provisioning_only' => true },
+                                                     'locale' => 'locale',
+                                                     'name' => 'name',
+                                                     'sis_user_id' => { 'attribute' => 'sis_id', 'provisioning_only' => true },
+                                                     'sortable_name' => 'sortable_name',
+                                                     'surname' => 'surname',
+                                                     'time_zone' => 'timezone'
+                                                   })
     end
 
     before do
@@ -226,16 +223,16 @@ describe AuthenticationProvider do
 
     it 'handles most attributes' do
       aac.apply_federated_attributes(@pseudonym,
-        {
-          'display_name' => 'Mr. Cutler',
-          'email' => 'cody@school.edu',
-          'internal_id' => 'abc123',
-          'locale' => 'es',
-          'name' => 'Cody Cutrer',
-          'sis_id' => '28',
-          'sortable_name' => 'Cutrer, Cody',
-          'timezone' => 'America/New_York'
-        }, purpose: :provisioning)
+                                     {
+                                       'display_name' => 'Mr. Cutler',
+                                       'email' => 'cody@school.edu',
+                                       'internal_id' => 'abc123',
+                                       'locale' => 'es',
+                                       'name' => 'Cody Cutrer',
+                                       'sis_id' => '28',
+                                       'sortable_name' => 'Cutrer, Cody',
+                                       'timezone' => 'America/New_York'
+                                     }, purpose: :provisioning)
       @user.reload
       expect(@user.short_name).to eq 'Mr. Cutler'
       expect(@user.communication_channels.email.active.pluck(:path)).to be_include('cody@school.edu')
@@ -249,8 +246,8 @@ describe AuthenticationProvider do
 
     it 'handles separate names' do
       aac.apply_federated_attributes(@pseudonym,
-        { 'given_name' => 'Cody',
-          'surname' => 'Cutrer' })
+                                     { 'given_name' => 'Cody',
+                                       'surname' => 'Cutrer' })
       @user.reload
       expect(@user.short_name).to eq 'Cody Cutrer'
       expect(@user.name).to eq 'Cody Cutrer'
@@ -259,15 +256,15 @@ describe AuthenticationProvider do
 
     it 'ignores attributes that are for provisioning only when not provisioning' do
       aac.apply_federated_attributes(@pseudonym,
-         {
-           'email' => 'cody@school.edu',
-           'internal_id' => 'abc123',
-           'locale' => 'es',
-           'name' => 'Cody Cutrer',
-           'sis_id' => '28',
-           'sortable_name' => 'Cutrer, Cody',
-           'timezone' => 'America/New_York'
-         })
+                                     {
+                                       'email' => 'cody@school.edu',
+                                       'internal_id' => 'abc123',
+                                       'locale' => 'es',
+                                       'name' => 'Cody Cutrer',
+                                       'sis_id' => '28',
+                                       'sortable_name' => 'Cutrer, Cody',
+                                       'timezone' => 'America/New_York'
+                                     })
       @user.reload
       expect(@user.communication_channels.email.active.pluck(:path)).to be_include('cody@school.edu')
       expect(@pseudonym.integration_id).not_to eq 'abc123'

@@ -75,8 +75,8 @@ describe Announcement do
     it "should unlock the attachment when the job runs" do
       course_factory(:active_all => true)
       att = attachment_model(context: @course)
-      announcement = @course.announcements.create!(valid_announcement_attributes.
-        merge(:delayed_post_at => Time.now + 1.week, :workflow_state => 'post_delayed', :attachment => att))
+      announcement = @course.announcements.create!(valid_announcement_attributes
+        .merge(:delayed_post_at => Time.now + 1.week, :workflow_state => 'post_delayed', :attachment => att))
       att.reload
       expect(att).to be_locked
 
@@ -202,7 +202,7 @@ describe Announcement do
       n = Notification.create(:name => notification_name, :category => "TestImmediately")
       n2 = Notification.create(:name => "Announcement Created By You", :category => "TestImmediately")
 
-      channel = communication_channel(@teacher, {username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true})
+      channel = communication_channel(@teacher, { username: "test_channel_email_#{@teacher.id}@test.com", active_cc: true })
 
       NotificationPolicy.create(:notification => n, :communication_channel => @student.communication_channel, :frequency => "immediately")
       NotificationPolicy.create(:notification => n, :communication_channel => @observer.communication_channel, :frequency => "immediately")

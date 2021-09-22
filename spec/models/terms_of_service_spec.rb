@@ -27,7 +27,6 @@ describe TermsOfService do
   end
 
   describe "::terms_of_service_workflow_state" do
-
     it "returns 'deleted' for deleted terms of service" do
       @terms_of_service.destroy!
       expect(@terms_of_service.workflow_state).to eq 'deleted'
@@ -41,8 +40,8 @@ describe TermsOfService do
   it "creates a Terms of Service defaulting passive to true" do
     ac2 = account_model
     tos = TermsOfService.create!(terms_type: "default",
-                                               terms_of_service_content: @terms_of_service_content,
-                                               account: ac2)
+                                 terms_of_service_content: @terms_of_service_content,
+                                 account: ac2)
     expect(tos.passive).to eq true
   end
 

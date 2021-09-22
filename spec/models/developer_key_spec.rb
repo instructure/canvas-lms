@@ -26,10 +26,10 @@ describe DeveloperKey do
 
   let(:developer_key_saved) do
     DeveloperKey.create(
-      name:         'test',
-      email:        'test@test.com',
+      name: 'test',
+      email: 'test@test.com',
       redirect_uri: 'http://test.com',
-      account_id:    account.id
+      account_id: account.id
     )
   end
 
@@ -37,8 +37,8 @@ describe DeveloperKey do
   # save an account and a developer_key to the db
   let(:developer_key_not_saved) do
     DeveloperKey.new(
-      name:         'test',
-      email:        'test@test.com',
+      name: 'test',
+      email: 'test@test.com',
       redirect_uri: 'http://test.com',
     )
   end
@@ -398,10 +398,10 @@ describe DeveloperKey do
 
     it "is false for site admin generated keys" do
       key = DeveloperKey.create!(
-        name:         'test',
-        email:        'test@test.com',
+        name: 'test',
+        email: 'test@test.com',
         redirect_uri: 'http://test.com',
-        account_id:   nil
+        account_id: nil
       )
 
       expect(key.visible).to eq(false)
@@ -409,10 +409,10 @@ describe DeveloperKey do
 
     it "is true for non site admin generated keys" do
       key = DeveloperKey.create!(
-        name:         'test',
-        email:        'test@test.com',
+        name: 'test',
+        email: 'test@test.com',
         redirect_uri: 'http://test.com',
-        account_id:   account.id
+        account_id: account.id
       )
 
       expect(key.visible).to eq(true)
@@ -440,7 +440,7 @@ describe DeveloperKey do
       end
 
       context 'when required claims are missing' do
-        before { developer_key_saved.update public_jwk: {foo: 'bar'} }
+        before { developer_key_saved.update public_jwk: { foo: 'bar' } }
 
         it { is_expected.to eq false }
       end
@@ -457,7 +457,7 @@ describe DeveloperKey do
     context 'when api token scoping FF is enabled' do
       let(:valid_scopes) do
         %w(url:POST|/api/v1/courses/:course_id/quizzes/:id/validate_access_code
-          url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
+           url:GET|/api/v1/audit/grade_change/courses/:course_id/assignments/:assignment_id/graders/:grader_id)
       end
 
       describe 'before_save' do
@@ -664,7 +664,7 @@ describe DeveloperKey do
     describe 'after_save' do
       describe 'set_root_account' do
         context 'when account is not root account' do
-          let(:account) {account_model(root_account: Account.create!) }
+          let(:account) { account_model(root_account: Account.create!) }
 
           it 'sets root account equal to account\'s root account' do
             expect(developer_key_not_saved.root_account).to be_nil
@@ -1088,7 +1088,6 @@ describe DeveloperKey do
       # set up assymetric key
       allow(Canvas::Oauth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
     }
-
 
     it "defaults to internal symmetric encryption with no audience set" do
       expect(subject.client_credentials_audience).to be_nil

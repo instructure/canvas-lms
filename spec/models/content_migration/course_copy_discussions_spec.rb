@@ -25,8 +25,8 @@ describe ContentMigration do
 
     it "should copy discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
-        :pinned => true, :discussion_type => "threaded",
-        :require_initial_post => true, :locked => true)
+                                                   :pinned => true, :discussion_type => "threaded",
+                                                   :require_initial_post => true, :locked => true)
       todo_date = 1.day.from_now
       topic.todo_date = todo_date
       topic.posted_at = 2.days.ago
@@ -107,8 +107,8 @@ describe ContentMigration do
       @copy_to.groups.create!(:name => 'some random group of people')
 
       @cm.copy_options = {
-              :assignments => {mig_id(@assignment) => "1"},
-              :discussion_topics => {mig_id(@topic) => "0"},
+        :assignments => { mig_id(@assignment) => "1" },
+        :discussion_topics => { mig_id(@topic) => "0" },
       }
       @cm.save!
 
@@ -124,7 +124,7 @@ describe ContentMigration do
       from_ann.workflow_state = "post_delayed"
       from_ann.save!
 
-      @cm.copy_options = { :announcements => {mig_id(from_ann) => "1"}}
+      @cm.copy_options = { :announcements => { mig_id(from_ann) => "1" } }
       @cm.save!
 
       run_course_copy
@@ -148,7 +148,7 @@ describe ContentMigration do
     end
 
     it "should properly copy selected delayed announcements even if they've already posted and locked" do
-      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago )
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago)
       from_ann.save!
       run_jobs
       from_ann.reload
@@ -189,7 +189,7 @@ describe ContentMigration do
       ann = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
 
       @cm.copy_options = {
-          :all_discussion_topics => "1", :all_announcements => "0"
+        :all_discussion_topics => "1", :all_announcements => "0"
       }
       @cm.save!
 
@@ -200,12 +200,12 @@ describe ContentMigration do
 
     it "should implicitly copy files attached to topics" do
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'),
-        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+                               :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       topic = @copy_from.discussion_topics.new(:message => "howdy", :title => "title")
       topic.attachment = att
       topic.save!
 
-      @cm.copy_options = {:all_discussion_topics => "1"}
+      @cm.copy_options = { :all_discussion_topics => "1" }
       @cm.save!
 
       run_course_copy

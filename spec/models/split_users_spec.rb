@@ -234,24 +234,24 @@ describe SplitUsers do
       end
 
       it 'should handle conversations' do
-          sender = restored_user
-          recipient = user3
-          convo = sender.initiate_conversation([recipient])
-          UserMerge.from(restored_user).into(source_user)
-          expect(convo.reload.user_id).to eq source_user.id
-          SplitUsers.split_db_users(source_user)
-          expect(convo.reload.user_id).to eq restored_user.id
+        sender = restored_user
+        recipient = user3
+        convo = sender.initiate_conversation([recipient])
+        UserMerge.from(restored_user).into(source_user)
+        expect(convo.reload.user_id).to eq source_user.id
+        SplitUsers.split_db_users(source_user)
+        expect(convo.reload.user_id).to eq restored_user.id
       end
 
       it 'should handle attachments' do
         attachment1 = Attachment.create!(user: restored_user,
-          context: restored_user,
-          filename: "test.txt",
-          uploaded_data: StringIO.new("first"))
+                                         context: restored_user,
+                                         filename: "test.txt",
+                                         uploaded_data: StringIO.new("first"))
         attachment2 = Attachment.create!(user: source_user,
-          context: source_user,
-          filename: "test2.txt",
-          uploaded_data: StringIO.new("second"))
+                                         context: source_user,
+                                         filename: "test2.txt",
+                                         uploaded_data: StringIO.new("second"))
 
         UserMerge.from(restored_user).into(source_user)
         run_jobs
@@ -273,7 +273,6 @@ describe SplitUsers do
         expect(restored_user.reload.as_observer_observation_links.to_a).to eq [link]
         expect(source_user.reload.as_student_observation_links.to_a).to eq [link]
       end
-
 
       it 'should handle as_observer_observation_links' do
         observee1 = user_model
@@ -336,51 +335,51 @@ describe SplitUsers do
       it "should move ccs to the new user (but only if they don't already exist)" do
         notification = Notification.where(name: "Report Generated").first_or_create
         # unconfirmed: active conflict
-        communication_channel(restored_user, {username: 'a@instructure.com'})
-        communication_channel(source_user, {username: 'A@instructure.com', active_cc: true})
+        communication_channel(restored_user, { username: 'a@instructure.com' })
+        communication_channel(source_user, { username: 'A@instructure.com', active_cc: true })
         # active: unconfirmed conflict
-        communication_channel(restored_user, {username: 'b@instructure.com', active_cc: true})
-        cc1 = communication_channel(source_user, {username: 'B@instructure.com'})
+        communication_channel(restored_user, { username: 'b@instructure.com', active_cc: true })
+        cc1 = communication_channel(source_user, { username: 'B@instructure.com' })
         # active: active conflict + notification policy copy
-        np_cc = communication_channel(restored_user, {username: 'c@instructure.com', active_cc: true})
+        np_cc = communication_channel(restored_user, { username: 'c@instructure.com', active_cc: true })
         np_cc.notification_policies.create!(notification_id: notification.id, frequency: 'weekly')
-        needs_np = communication_channel(source_user, {username: 'C@instructure.com', active_cc: true})
+        needs_np = communication_channel(source_user, { username: 'C@instructure.com', active_cc: true })
         # unconfirmed: unconfirmed conflict
-        communication_channel(restored_user, {username: 'd@instructure.com'})
-        communication_channel(source_user, {username: 'D@instructure.com'})
+        communication_channel(restored_user, { username: 'd@instructure.com' })
+        communication_channel(source_user, { username: 'D@instructure.com' })
         # retired: unconfirmed conflict
-        communication_channel(restored_user, {username: 'e@instructure.com', cc_state: 'retired'})
-        communication_channel(source_user, {username: 'E@instructure.com'})
+        communication_channel(restored_user, { username: 'e@instructure.com', cc_state: 'retired' })
+        communication_channel(source_user, { username: 'E@instructure.com' })
         # unconfirmed: retired conflict
-        communication_channel(restored_user, {username: 'f@instructure.com'})
-        communication_channel(source_user, {username: 'F@instructure.com', cc_state: 'retired'})
+        communication_channel(restored_user, { username: 'f@instructure.com' })
+        communication_channel(source_user, { username: 'F@instructure.com', cc_state: 'retired' })
         # retired: active conflict
-        communication_channel(restored_user, {username: 'g@instructure.com', cc_state: 'retired'})
-        communication_channel(source_user, {username: 'G@instructure.com', active_cc: true})
+        communication_channel(restored_user, { username: 'g@instructure.com', cc_state: 'retired' })
+        communication_channel(source_user, { username: 'G@instructure.com', active_cc: true })
         # active: retired conflict
-        communication_channel(restored_user, {username: 'h@instructure.com', active_cc: true})
-        communication_channel(source_user, {username: 'H@instructure.com', cc_state: 'retired'})
+        communication_channel(restored_user, { username: 'h@instructure.com', active_cc: true })
+        communication_channel(source_user, { username: 'H@instructure.com', cc_state: 'retired' })
         # retired: retired conflict
-        communication_channel(restored_user, {username: 'i@instructure.com', cc_state: 'retired'})
-        communication_channel(source_user, {username: 'I@instructure.com', cc_state: 'retired'})
+        communication_channel(restored_user, { username: 'i@instructure.com', cc_state: 'retired' })
+        communication_channel(source_user, { username: 'I@instructure.com', cc_state: 'retired' })
         # <nothing>: active
-        communication_channel(source_user, {username: 'J@instructure.com', active_cc: true})
+        communication_channel(source_user, { username: 'J@instructure.com', active_cc: true })
         # active: <nothing>
-        communication_channel(restored_user, {username: 'k@instructure.com', active_cc: true})
+        communication_channel(restored_user, { username: 'k@instructure.com', active_cc: true })
         # <nothing>: unconfirmed
-        communication_channel(source_user, {username: 'L@instructure.com'})
+        communication_channel(source_user, { username: 'L@instructure.com' })
         # unconfirmed: <nothing>
-        communication_channel(restored_user, {username: 'm@instructure.com'})
+        communication_channel(restored_user, { username: 'm@instructure.com' })
         # <nothing>: retired
-        communication_channel(source_user, {username: 'N@instructure.com', cc_state: 'retired'})
+        communication_channel(source_user, { username: 'N@instructure.com', cc_state: 'retired' })
         # retired: <nothing>
-        communication_channel(restored_user, {username: 'o@instructure.com', cc_state: 'retired'})
+        communication_channel(restored_user, { username: 'o@instructure.com', cc_state: 'retired' })
 
-        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort
+        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired')
+                                         .map { |cc| [cc.path, cc.workflow_state] }.sort
         # cc will not be restored because it conflicted on merge and it was unconfirmed and it is frd deleted
-        source_user_ccs = source_user.communication_channels.where.not(id: cc1).where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort
+        source_user_ccs = source_user.communication_channels.where.not(id: cc1).where.not(workflow_state: 'retired')
+                                     .map { |cc| [cc.path, cc.workflow_state] }.sort
 
         UserMerge.from(restored_user).into(source_user)
         expect(needs_np.notification_policies.take.frequency).to eq 'weekly'
@@ -388,28 +387,28 @@ describe SplitUsers do
         restored_user.reload
         source_user.reload
 
-        expect(restored_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
-        expect(source_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
+        expect(restored_user.communication_channels.where.not(workflow_state: 'retired')
+          .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
+        expect(source_user.communication_channels.where.not(workflow_state: 'retired')
+          .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
 
       it "deconflicts duplicated paths where it can" do
         notification = Notification.where(name: "Report Generated").first_or_create
-        communication_channel(restored_user, {username: 'test@instructure.com'})
-        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort
-        source_user_ccs = source_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort
+        communication_channel(restored_user, { username: 'test@instructure.com' })
+        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired')
+                                         .map { |cc| [cc.path, cc.workflow_state] }.sort
+        source_user_ccs = source_user.communication_channels.where.not(workflow_state: 'retired')
+                                     .map { |cc| [cc.path, cc.workflow_state] }.sort
         UserMerge.from(restored_user).into(source_user)
-        communication_channel(restored_user, {username: 'test@instructure.com', cc_state: 'retired'})
+        communication_channel(restored_user, { username: 'test@instructure.com', cc_state: 'retired' })
         SplitUsers.split_db_users(source_user)
         restored_user.reload
         source_user.reload
-        expect(restored_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
-        expect(source_user.communication_channels.where.not(workflow_state: 'retired').
-          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
+        expect(restored_user.communication_channels.where.not(workflow_state: 'retired')
+          .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
+        expect(source_user.communication_channels.where.not(workflow_state: 'retired')
+          .map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
     end
 
@@ -626,7 +625,7 @@ describe SplitUsers do
       end
 
       it "should split a user across shards with ccs" do
-        communication_channel(restored_user, {username: 'a@example.com', active_cc: true})
+        communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
         restored_user_ccs = restored_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
         source_user_ccs = shard1_source_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
 
@@ -667,7 +666,7 @@ describe SplitUsers do
       end
 
       it "should copy notification policies" do
-        og_cc = communication_channel(restored_user, {username: 'a@example.com', active_cc: true})
+        og_cc = communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
 
         n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
         NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
@@ -683,12 +682,12 @@ describe SplitUsers do
       end
 
       it "should copy notification policies on conflict" do
-        og_cc = communication_channel(restored_user, {username: 'a@example.com', active_cc: true})
+        og_cc = communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
 
         n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
         NotificationPolicy.create!(notification: n, communication_channel: og_cc, frequency: 'immediately')
         # conflict_cc
-        cc = communication_channel(shard1_source_user, {username: 'a@example.com', active_cc: true})
+        cc = communication_channel(shard1_source_user, { username: 'a@example.com', active_cc: true })
 
         UserMerge.from(restored_user).into(shard1_source_user)
         expect(cc.notification_policies.count).to eq 1
@@ -696,7 +695,6 @@ describe SplitUsers do
         SplitUsers.split_db_users(shard1_source_user)
         expect(shard1_source_user.communication_channels.count).to eq 1
       end
-
     end
   end
 end

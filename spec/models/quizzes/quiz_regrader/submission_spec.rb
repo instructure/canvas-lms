@@ -21,9 +21,8 @@ require 'active_support'
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizRegrader::Submission do
-
   let(:regrade_options) do
-    {1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
+    { 1 => 'no_regrade', 2 => 'full_credit', 3 => 'current_correct_only' }
   end
 
   let(:question_group) do
@@ -32,9 +31,9 @@ describe Quizzes::QuizRegrader::Submission do
 
   let(:question_regrades) do
     1.upto(3).each_with_object({}) do |i, hash|
-      hash[i] = double(:quiz_question  => double(:id => i, :question_data => {:id => i}, :quiz_group => question_group),
-                     :question_data  => {:id => i},
-                     :regrade_option => regrade_options[i])
+      hash[i] = double(:quiz_question => double(:id => i, :question_data => { :id => i }, :quiz_group => question_group),
+                       :question_data => { :id => i },
+                       :regrade_option => regrade_options[i])
     end
   end
 
@@ -45,21 +44,21 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:submission_data) do
-    1.upto(3).map {|i| {:question_id => i} }
+    1.upto(3).map { |i| { :question_id => i } }
   end
 
   let(:submission) do
-    double(:score                 => 0,
-         :score_before_regrade  => 1,
-         :questions             => questions,
-         :score=                => nil,
-         :score_before_regrade= => nil,
-         :submission_data       => submission_data,
-         :write_attribute       => {})
+    double(:score => 0,
+           :score_before_regrade => 1,
+           :questions => questions,
+           :score= => nil,
+           :score_before_regrade= => nil,
+           :submission_data => submission_data,
+           :write_attribute => {})
   end
 
   let(:wrapper) do
-    Quizzes::QuizRegrader::Submission.new(:submission        => submission,
+    Quizzes::QuizRegrader::Submission.new(:submission => submission,
                                           :question_regrades => question_regrades)
   end
 
@@ -71,7 +70,7 @@ describe Quizzes::QuizRegrader::Submission do
   end
 
   let(:multiple_attempts_submission_data) do
-    4.upto(6).map {|i| {:question_id => i} }
+    4.upto(6).map { |i| { :question_id => i } }
   end
 
   let(:multiple_attempts_submission) do
@@ -94,7 +93,6 @@ describe Quizzes::QuizRegrader::Submission do
     )
   end
 
-
   describe "#initialize" do
     it "saves a reference to the passed submission" do
       expect(wrapper.submission).to eq submission
@@ -114,7 +112,7 @@ describe Quizzes::QuizRegrader::Submission do
       end
 
       # submission data isn't called if not included in question_regrades
-      submission_data << {:question_id => 4}
+      submission_data << { :question_id => 4 }
       expect(Quizzes::QuizRegrader::Answer).to receive(:new).with(submission_data.last, nil).never
 
       # submission updates and saves correct data
@@ -156,15 +154,15 @@ describe Quizzes::QuizRegrader::Submission do
     let(:regraded_quiz_data) do
       question_regrades.map do |key, _|
         Quizzes::QuizQuestionBuilder.decorate_question_for_submission({
-          id: key,
-          points_possible: question_group.question_points
-        }, key)
+                                                                        id: key,
+                                                                        points_possible: question_group.question_points
+                                                                      }, key)
       end
     end
 
     let(:regrade_submission) do
       Quizzes::QuizRegrader::Submission.new(
-        :submission        => submission,
+        :submission => submission,
         :question_regrades => question_regrades
       )
     end

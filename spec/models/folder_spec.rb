@@ -336,7 +336,7 @@ describe Folder do
 
     context "with files tab hidden to students" do
       before :once do
-        @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+        @course.tab_configuration = [{ "id" => Course::TAB_FILES, "hidden" => true }]
         @course.save!
         @root_folder.reload
       end
@@ -367,7 +367,7 @@ describe Folder do
       account_model
       folder_model(context: @account)
       expect(Folder.root_folders(@course).first).not_to eq(@folder),
-        'precondition'
+                                                        'precondition'
       expect(Folder.from_context_or_id(nil, @folder.id)).to eq(@folder)
     end
 

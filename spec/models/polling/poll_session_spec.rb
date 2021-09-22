@@ -33,12 +33,12 @@ describe Polling::PollSession do
   context "creating a poll session" do
     it "requires an associated poll" do
       expect { Polling::PollSession.create!(course: @course, course_section: @section) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                                            /Poll can't be blank/)
+                                                                                                        /Poll can't be blank/)
     end
 
     it "requires an associated course" do
       expect { Polling::PollSession.create!(poll: @poll, course_section: @section) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                                        /Course can't be blank/)
+                                                                                                    /Course can't be blank/)
     end
 
     it "insures that the given course section belongs to the given course" do
@@ -47,7 +47,7 @@ describe Polling::PollSession do
 
       section = new_course.course_sections.create!(name: "Alien Section")
       expect { Polling::PollSession.create!(poll: @poll, course: old_course, course_section: section) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                                                           /That course section does not belong to the existing course/)
+                                                                                                                       /That course section does not belong to the existing course/)
     end
 
     it "allows a session to be created without a section" do
@@ -82,25 +82,25 @@ describe Polling::PollSession do
       @poll2 = Polling::Poll.create!(user: @teacher2, question: 'Another Test Poll')
     end
 
-      it "returns the poll sessions available for a user" do
-        student1_sessions = []
-        student2_sessions = []
+    it "returns the poll sessions available for a user" do
+      student1_sessions = []
+      student2_sessions = []
 
-        3.times do |n|
-          student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
-        end
+      3.times do |n|
+        student1_sessions << Polling::PollSession.create(poll: @poll1, course: @course1)
+      end
 
-        expect(Polling::PollSession.available_for(@student1).size).to eq 3
-        expect(Polling::PollSession.available_for(@student2).size).to eq 0
-        expect(Polling::PollSession.available_for(@student1)).to match_array student1_sessions
+      expect(Polling::PollSession.available_for(@student1).size).to eq 3
+      expect(Polling::PollSession.available_for(@student2).size).to eq 0
+      expect(Polling::PollSession.available_for(@student1)).to match_array student1_sessions
 
-        2.times do |n|
-          student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
-        end
+      2.times do |n|
+        student2_sessions << Polling::PollSession.create(poll: @poll2, course: @course2)
+      end
 
-        expect(Polling::PollSession.available_for(@student1).size).to eq 3
-        expect(Polling::PollSession.available_for(@student2).size).to eq 2
-        expect(Polling::PollSession.available_for(@student2)).to match_array student2_sessions
+      expect(Polling::PollSession.available_for(@student1).size).to eq 3
+      expect(Polling::PollSession.available_for(@student2).size).to eq 2
+      expect(Polling::PollSession.available_for(@student2)).to match_array student2_sessions
     end
   end
 
