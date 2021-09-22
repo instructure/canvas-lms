@@ -345,6 +345,7 @@ export const DiscussionThreadContainer = props => {
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
+                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
                       !props.discussionEntry.deleted ? (

@@ -16,19 +16,34 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
+import {CREATE_DISCUSSION_ENTRY_DRAFT} from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
+import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React from 'react'
+import React, {useContext} from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import {User} from '../../../graphql/User'
+import {useMutation} from 'react-apollo'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
+  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+
+  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    onCompleted: () => {
+      setOnSuccess('Draft message saved.')
+    },
+    onError: () => {
+      setOnFailure(I18n.t('Unable to save draft message.'))
+    }
+  })
+
   if (props.deleted) {
     return (
       <DeletedPostMessage
@@ -129,6 +144,15 @@ export const DiscussionEntryContainer = props => {
               onSave={props.onSave}
               onCancel={props.onCancel}
               isIsolatedView={props.isIsolatedView}
+              onCreateDiscussionEntryDraft={newDraftMessage =>
+                createDiscussionEntryDraft({
+                  variables: {
+                    discussionTopicId: ENV.discussion_topic_id,
+                    message: newDraftMessage,
+                    discussionEntryId: props.isEditing ? props.discussionEntry._id : null
+                  }
+                })
+              }
             >
               {props.children}
             </PostMessage>
@@ -145,6 +169,7 @@ DiscussionEntryContainer.propTypes = {
   author: User.shape,
   children: PropTypes.node,
   title: PropTypes.string,
+  discussionEntry: PropTypes.object,
   message: PropTypes.string,
   isEditing: PropTypes.bool,
   onSave: PropTypes.func,

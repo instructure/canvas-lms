@@ -294,6 +294,7 @@ const IsolatedThreadContainer = props => {
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
+                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
                       <ThreadActions

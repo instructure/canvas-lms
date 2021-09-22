@@ -70,6 +70,9 @@ export function PostMessage({...props}) {
                 value={props.message}
                 onSubmit={props.onSave}
                 isEdit
+                updateDraft={newDraftMessage => {
+                  props.onCreateDiscussionEntryDraft(newDraftMessage)
+                }}
               />
             </View>
           ) : (
@@ -124,7 +127,8 @@ PostMessage.propTypes = {
    * Callback for when Editor Cancel button is pressed
    */
   onCancel: PropTypes.func,
-  isIsolatedView: PropTypes.bool
+  isIsolatedView: PropTypes.bool,
+  onCreateDiscussionEntryDraft: PropTypes.func
 }
 
 PostMessage.defaultProps = {
