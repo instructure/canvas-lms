@@ -44,8 +44,8 @@ describe LtiApiController, type: :request do
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
     req.body = JSON.generate(opts['body']) if opts['body']
     post "https://www.example.com#{req.path}",
-      params: req.body,
-      headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         params: req.body,
+         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   context 'xAPI' do
@@ -62,25 +62,25 @@ describe LtiApiController, type: :request do
     def xapi_body
       # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
       {
-              id: "12345678-1234-5678-1234-567812345678",
-              actor: {
-                      account: {
-                              homePage: "http://www.instructure.com/",
-                              name: '123somemagicguid'
-                      }
-              },
-              verb: {
-                      id: "http://adlnet.gov/expapi/verbs/interacted",
-                      display: {
-                              "en-US" => "interacted"
-                      }
-              },
-              object: {
-                      id: "http://example.com/"
-              },
-              result: {
-                      duration: "PT10M0S"
-              }
+        id: "12345678-1234-5678-1234-567812345678",
+        actor: {
+          account: {
+            homePage: "http://www.instructure.com/",
+            name: '123somemagicguid'
+          }
+        },
+        verb: {
+          id: "http://adlnet.gov/expapi/verbs/interacted",
+          display: {
+            "en-US" => "interacted"
+          }
+        },
+        object: {
+          id: "http://example.com/"
+        },
+        result: {
+          duration: "PT10M0S"
+        }
       }
     end
 
@@ -130,7 +130,6 @@ describe LtiApiController, type: :request do
   end
 
   context 'caliper' do
-
     it "should require the correct shared secret" do
       make_call('secret' => 'bad secret is bad', 'path' => "/api/lti/v1/caliper/#{@token}")
       assert_status(401)
@@ -138,27 +137,27 @@ describe LtiApiController, type: :request do
 
     def caliper_body
       {
-              "@context" => "http://purl.imsglobal.org/ctx/caliper/v1/ViewEvent",
-              "@type" => "http://purl.imsglobal.org/caliper/v1/ViewEvent",
-              "action" => "viewed",
-              "startedAtTime" => Time.now.utc.to_i,
-              "duration" => "PT10M0S",
-              "actor" => {
-                      "@id" => '123somemagicguid',
-                      "@type" => "http://purl.imsglobal.org/caliper/v1/lis/Person"
-              },
-              "object" => {
-                      "@id" => "http://www.instructure.com/",
-                      "@type" => "http://www.idpf.org/epub/vocab/structure/#volume",
-                      "name" => "Test LTI Tool"
-              },
-              "edApp" => {
-                      "@id" => "http://www.instructure.com/",
-                      "@type" => "http://purl.imsglobal.org/caliper/v1/SoftwareApplication",
-                      "name" => "LTI Tool of All Things",
-                      "properties" => {},
-                      "lastModifiedTime" => Time.now.utc.to_i
-              }
+        "@context" => "http://purl.imsglobal.org/ctx/caliper/v1/ViewEvent",
+        "@type" => "http://purl.imsglobal.org/caliper/v1/ViewEvent",
+        "action" => "viewed",
+        "startedAtTime" => Time.now.utc.to_i,
+        "duration" => "PT10M0S",
+        "actor" => {
+          "@id" => '123somemagicguid',
+          "@type" => "http://purl.imsglobal.org/caliper/v1/lis/Person"
+        },
+        "object" => {
+          "@id" => "http://www.instructure.com/",
+          "@type" => "http://www.idpf.org/epub/vocab/structure/#volume",
+          "name" => "Test LTI Tool"
+        },
+        "edApp" => {
+          "@id" => "http://www.instructure.com/",
+          "@type" => "http://purl.imsglobal.org/caliper/v1/SoftwareApplication",
+          "name" => "LTI Tool of All Things",
+          "properties" => {},
+          "lastModifiedTime" => Time.now.utc.to_i
+        }
       }
     end
 
@@ -218,5 +217,4 @@ describe LtiApiController, type: :request do
       expect(response).to be_successful
     end
   end
-
 end

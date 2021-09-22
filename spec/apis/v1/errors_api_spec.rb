@@ -22,7 +22,7 @@ require_relative "../api_spec_helper"
 
 describe ErrorsController, type: :request do
   describe "reporting an error" do
-    let(:path){ "/api/v1/error_reports" }
+    let(:path) { "/api/v1/error_reports" }
 
     let(:api_options) do
       {

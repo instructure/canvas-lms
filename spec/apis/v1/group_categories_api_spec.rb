@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe "Group Categories API", type: :request do
-  def category_json(category, user=@user)
+  def category_json(category, user = @user)
     json = {
       'id' => category.id,
       'name' => category.name,
@@ -46,7 +46,7 @@ describe "Group Categories API", type: :request do
 
   before :once do
     @account = Account.default
-    @category_path_options = {:controller => "group_categories", :format => "json"}
+    @category_path_options = { :controller => "group_categories", :format => "json" }
   end
 
   describe "course group categories" do
@@ -69,7 +69,7 @@ describe "Group Categories API", type: :request do
       before :once do
         5.times do |n|
           @course.enroll_user(user_with_pseudonym(sis_user_id: "user_#{n}", username: "login_#{n}"), "StudentEnrollment", enrollment_state: 'active')
-          @course.enroll_user(user_factory,'TeacherEnrollment',:enrollment_state => :active)
+          @course.enroll_user(user_factory, 'TeacherEnrollment', :enrollment_state => :active)
         end
       end
 
@@ -137,6 +137,7 @@ describe "Group Categories API", type: :request do
         5.times do
           p = Pseudonym.by_unique_id(csv.first[3]).take
           next unless p.unique_id == 'login_0'
+
           expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, 'g2', g2.id.to_s, 'g2sis'])
         end
       end
@@ -162,22 +163,21 @@ describe "Group Categories API", type: :request do
       let(:api_url) { "/api/v1/group_categories/#{@category2.id}/users.json" }
       let(:api_route) do
         {
-            :controller => 'group_categories',
-            :action => 'users',
-            :group_category_id => @category2.to_param,
-            :format => 'json'
+          :controller => 'group_categories',
+          :action => 'users',
+          :group_category_id => @category2.to_param,
+          :format => 'json'
         }
       end
 
       before :once do
         @user = user_factory(:name => "joe mcCool")
-        @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
+        @course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => :active)
 
         @user_waldo = user_factory(:name => "waldo")
-        @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
+        @course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => :active)
 
-
-        6.times { course_with_student({:course => @course}) }
+        6.times { course_with_student({ :course => @course }) }
 
         @user = @course.teacher_enrollments.first.user
       end
@@ -189,12 +189,12 @@ describe "Group Categories API", type: :request do
                         { 'name' => 'category', 'split_group_count' => 3 })
 
         @user_antisocial = user_factory(:name => "antisocial")
-        @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
+        @course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => :active)
 
         @category2 = GroupCategory.find(json["id"])
 
-        @category_users = @category2.groups.inject([]){|result, group| result.concat(group.users)} << @user
-        @category_assigned_users = @category2.groups.active.inject([]){|result, group| result.concat(group.users)}
+        @category_users = @category2.groups.inject([]) { |result, group| result.concat(group.users) } << @user
+        @category_assigned_users = @category2.groups.active.inject([]) { |result, group| result.concat(group.users) }
         @category_unassigned_users = @category_users - @category_assigned_users
       end
 
@@ -209,13 +209,13 @@ describe "Group Categories API", type: :request do
       end
 
       it "should return 401 for users outside the group_category" do
-        user_factory  # ?
+        user_factory # ?
         raw_api_call(:get, api_url, api_route)
         expect(response.code).to eq '401'
       end
 
       it "returns an error when search_term is fewer than 2 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => 'a'}, {}, :expected_status => 400)
+        json = api_call(:get, api_url, api_route, { :search_term => 'a' }, {}, :expected_status => 400)
         error = json["errors"].first
         verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
@@ -223,7 +223,7 @@ describe "Group Categories API", type: :request do
       it "returns a list of users" do
         expected_keys = %w{id name sortable_name short_name}
 
-        json = api_call(:get, api_url, api_route, {:search_term => 'waldo'})
+        json = api_call(:get, api_url, api_route, { :search_term => 'waldo' })
 
         expect(json.count).to eq 1
         json.each do |user|
@@ -235,7 +235,7 @@ describe "Group Categories API", type: :request do
       it "returns a list of unassigned users" do
         expected_keys = %w{id name sortable_name short_name}
 
-        json = api_call(:get, api_url, api_route, {:search_term => 'antisocial', :unassigned => 'true'})
+        json = api_call(:get, api_url, api_route, { :search_term => 'antisocial', :unassigned => 'true' })
 
         expect(json.count).to eq 1
         json.each do |user|
@@ -250,7 +250,7 @@ describe "Group Categories API", type: :request do
         role = custom_student_role('CustomStudent', :account => @course.account)
         @course.enroll_user(custom_student, 'StudentEnrollment', role: role)
         json = api_call_as_user(teacher, :get, api_url, api_route)
-        expect(json.map{|u|u['id']}).to be_include custom_student.id
+        expect(json.map { |u| u['id'] }).to be_include custom_student.id
       end
     end
 
@@ -258,14 +258,14 @@ describe "Group Categories API", type: :request do
       before :once do
         @name = 'some group name'
         @user = user_factory(:name => "joe mcCool")
-        @course.enroll_user(@user,'TeacherEnrollment',:enrollment_state => :active)
+        @course.enroll_user(@user, 'TeacherEnrollment', :enrollment_state => :active)
       end
 
       it "should allow a teacher to update a category that creates groups" do
         json = api_call :put, "/api/v1/group_categories/#{@category.id}",
                         @category_path_options.merge(:action => 'update',
                                                      :group_category_id => @category.to_param),
-                        { :name => @name, :self_signup => 'enabled','create_group_count' => 3 }
+                        { :name => @name, :self_signup => 'enabled', 'create_group_count' => 3 }
         category = GroupCategory.find(json["id"])
         expect(category.self_signup).to eq "enabled"
         groups = @category.groups.active
@@ -278,8 +278,8 @@ describe "Group Categories API", type: :request do
         category2 = GroupCategory.student_organized_for(course)
         json = api_call(:put, "/api/v1/group_categories/#{category2.id}",
                         @category_path_options.merge(action: 'update', group_category_id: category2.to_param),
-                        { name: @name, self_signup: 'enabled', 'create_group_count' => 3, course_id: og_course.id},
-                        {}, {expected_status: 401})
+                        { name: @name, self_signup: 'enabled', 'create_group_count' => 3, course_id: og_course.id },
+                        {}, { expected_status: 401 })
         expect(json['status']).to eq 'unauthorized'
         expect(category2.reload.name).to_not eq @name
       end
@@ -331,8 +331,7 @@ describe "Group Categories API", type: :request do
                           'name' => @name,
                           'self_signup' => 'restricted',
                           'create_group_count' => 3
-                        }
-        )
+                        })
         category = GroupCategory.find(json["id"])
         expect(category.self_signup).to eq "restricted"
         groups = category.groups.active
@@ -347,8 +346,7 @@ describe "Group Categories API", type: :request do
                           'name' => @name,
                           'enable_self_signup' => '1',
                           'split_group_count' => 3
-                        }
-        )
+                        })
         category = GroupCategory.find(json["id"])
         expect(category.self_signup).to eq "enabled"
         expect(category.groups.active).to be_empty
@@ -362,8 +360,7 @@ describe "Group Categories API", type: :request do
                           'name' => @name,
                           'create_group_count' => 3,
                           'split_group_count' => 2
-                        }
-        )
+                        })
         category = GroupCategory.find(json["id"])
         expect(category.groups.active.size).to eq 2
       end
@@ -400,7 +397,7 @@ describe "Group Categories API", type: :request do
           api_call :put, "/api/v1/group_categories/#{@category.id}",
                    @category_path_options.merge(:action => 'update',
                                                 :group_category_id => @category.to_param),
-                   {:name => @name}
+                   { :name => @name }
           category = GroupCategory.find(@category.id)
           expect(category.name).to eq @name
         end
@@ -457,7 +454,7 @@ describe "Group Categories API", type: :request do
           api_call :delete, "/api/v1/group_categories/#{project_groups.id}",
                    @category_path_options.merge(:action => 'destroy',
                                                 :group_category_id => project_groups.to_param),
-                   {}, {}, {expected_status: 401}
+                   {}, {}, { expected_status: 401 }
           expect(GroupCategory.find(project_groups.id).deleted_at).to be_nil
         end
 
@@ -465,7 +462,7 @@ describe "Group Categories API", type: :request do
           json = api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                           @category_path_options.merge(:action => 'create',
                                                        :course_id => @course.to_param),
-                          {'name' => @name})
+                          { 'name' => @name })
           category = GroupCategory.find(json["id"])
           expect(json["context_type"]).to eq "Course"
           expect(category.name).to eq @name
@@ -477,7 +474,7 @@ describe "Group Categories API", type: :request do
     describe "student actions" do
       before :once do
         @user = user_factory(:name => "derrik hans")
-        @course.enroll_user(@user,'StudentEnrollment',:enrollment_state => :active)
+        @course.enroll_user(@user, 'StudentEnrollment', :enrollment_state => :active)
       end
 
       it "should not allow listing of a course's group categories for students" do
@@ -498,7 +495,7 @@ describe "Group Categories API", type: :request do
         raw_api_call(:post, "/api/v1/courses/#{@course.id}/group_categories",
                      @category_path_options.merge(:action => 'create',
                                                   :course_id => @course.to_param),
-                     {'name' => name})
+                     { 'name' => name })
         expect(response.code).to eq '401'
       end
 
@@ -525,7 +522,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :put, "/api/v1/group_categories/#{@category.id}",
                      @category_path_options.merge(:action => 'update',
                                                   :group_category_id => @category.to_param),
-                     {:name => 'name'}
+                     { :name => 'name' }
         expect(response.code).to eq '401'
       end
     end
@@ -539,7 +536,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
-                     {'sync' => true}
+                     { 'sync' => true }
         assert_status(401)
       end
 
@@ -550,7 +547,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :post, "/api/v1/group_categories/#{category.id + 1}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => (category.id + 1).to_param),
-                     {'sync' => true}
+                     { 'sync' => true }
         assert_status(404)
       end
 
@@ -561,7 +558,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
-                     {'sync' => true}
+                     { 'sync' => true }
         assert_status(400)
       end
 
@@ -574,7 +571,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
-                     {'sync' => true}
+                     { 'sync' => true }
         assert_status(400)
 
         category.configure_self_signup(true, false)
@@ -583,7 +580,7 @@ describe "Group Categories API", type: :request do
         raw_api_call :post, "/api/v1/group_categories/#{category.id}/assign_unassigned_members",
                      @category_path_options.merge(:action => 'assign_unassigned_members',
                                                   :group_category_id => category.to_param),
-                     {'sync' => true}
+                     { 'sync' => true }
         expect(response).to be_successful
       end
 
@@ -650,10 +647,9 @@ describe "Group Categories API", type: :request do
                         @category_path_options.merge(:action => 'create',
                                                      :account_id => @account.to_param),
                         {
-                            'name' => 'category',
-                            'split_group_count' => 3
-                        }
-        )
+                          'name' => 'category',
+                          'split_group_count' => 3
+                        })
         category = GroupCategory.find(json["id"])
         expect(category.groups.active).to be_empty
       end
@@ -686,7 +682,7 @@ describe "Group Categories API", type: :request do
                         @category_path_options.merge(:action => 'create',
                                                      :sis_group_category_id => 'gc101',
                                                      :account_id => @account.to_param),
-                        {'name' => 'name'})
+                        { 'name' => 'name' })
         category = GroupCategory.find(json["id"])
         expect(json["context_type"]).to eq "Account"
         expect(category.name).to eq 'name'
@@ -699,7 +695,7 @@ describe "Group Categories API", type: :request do
                  @category_path_options.merge(:action => 'update',
                                               :sis_group_category_id => 'gc101',
                                               :group_category_id => @communities.to_param),
-                 {:name => 'name'}
+                 { :name => 'name' }
         category = GroupCategory.find(@communities.id)
         expect(category.name).to eq 'name'
         expect(category.sis_source_id).to eq 'gc101'
@@ -722,15 +718,16 @@ describe "Group Categories API", type: :request do
                        'name' => 'name',
                        'enable_self_signup' => '1',
                        'create_group_count' => 3
-                     }
-        )
+                     })
         expect(response.code).to eq '400'
       end
 
       describe "sis permissions" do
-        let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
-                              @category_path_options.merge(action:'index',
-                                                           account_id: @account.to_param)) }
+        let(:json) {
+          api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
+                   @category_path_options.merge(action: 'index',
+                                                account_id: @account.to_param))
+        }
         let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
         before :each do
@@ -791,7 +788,7 @@ describe "Group Categories API", type: :request do
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/group_categories",
                    @category_path_options.merge(:action => 'create',
                                                 :account_id => @account.to_param),
-                   {'name' => 'name'})
+                   { 'name' => 'name' })
       expect(response.code).to eq '401'
     end
 
@@ -799,7 +796,7 @@ describe "Group Categories API", type: :request do
       raw_api_call :put, "/api/v1/group_categories/#{@communities.id}",
                    @category_path_options.merge(:action => 'update',
                                                 :group_category_id => @communities.to_param),
-                   {:name => 'name'}
+                   { :name => 'name' }
       expect(response.code).to eq '401'
     end
   end

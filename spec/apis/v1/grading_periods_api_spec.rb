@@ -59,7 +59,7 @@ describe GradingPeriodsController, type: :request do
         expect(period['weight']).to eq(@grading_period.weight)
         expect(period['title']).to eq(@grading_period.title)
         expect(period['permissions']).to include(
-          "read"   => true,
+          "read" => true,
           "create" => false,
           "delete" => true,
           "update" => true
@@ -74,7 +74,7 @@ describe GradingPeriodsController, type: :request do
     end
 
     describe 'PUT update' do
-      def put_update(params, raw=false)
+      def put_update(params, raw = false)
         helper = method(raw ? :raw_api_call : :api_call)
 
         helper.call(
@@ -99,7 +99,7 @@ describe GradingPeriodsController, type: :request do
 
       it "doesn't update deleted grading periods" do
         @grading_period.destroy
-        put_update({weight: 80}, true)
+        put_update({ weight: 80 }, true)
         expect(response.status).to eq 404
       end
     end

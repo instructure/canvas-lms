@@ -26,30 +26,30 @@ describe "AuthenticationProviders API", type: :request do
     user_with_pseudonym(:active_all => true, :account => @account)
     @account.authentication_providers.scope.delete_all
     @account.account_users.create!(user: @user)
-    @cas_hash = {"auth_type" => "cas",
-                 "auth_base" => "127.0.0.1",
-                 "jit_provisioning" => false}
-    @saml_hash = {'auth_type' => 'saml',
-                  'idp_entity_id' => 'http://example.com/saml1',
-                  'log_in_url' => 'http://example.com/saml1/sli',
-                  'log_out_url' => 'http://example.com/saml1/slo',
-                  'certificate_fingerprint' => '111222',
-                  'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
-                  'federated_attributes' => {},
-                  'jit_provisioning' => false}
-    @ldap_hash = {'auth_type' => 'ldap',
-                  'auth_host' => '127.0.0.1',
-                  'auth_filter' => 'filter1',
-                  'auth_username' => 'username1',
-                  'auth_password' => 'password1',
-                  'jit_provisioning' => false}
+    @cas_hash = { "auth_type" => "cas",
+                  "auth_base" => "127.0.0.1",
+                  "jit_provisioning" => false }
+    @saml_hash = { 'auth_type' => 'saml',
+                   'idp_entity_id' => 'http://example.com/saml1',
+                   'log_in_url' => 'http://example.com/saml1/sli',
+                   'log_out_url' => 'http://example.com/saml1/slo',
+                   'certificate_fingerprint' => '111222',
+                   'identifier_format' => 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
+                   'federated_attributes' => {},
+                   'jit_provisioning' => false }
+    @ldap_hash = { 'auth_type' => 'ldap',
+                   'auth_host' => '127.0.0.1',
+                   'auth_filter' => 'filter1',
+                   'auth_username' => 'username1',
+                   'auth_password' => 'password1',
+                   'jit_provisioning' => false }
   end
 
   context "/index" do
-    def call_index(status=200)
+    def call_index(status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers",
-             { :controller => 'authentication_providers', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
-             {}, {}, :expected_status => status)
+               { :controller => 'authentication_providers', :action => 'index', :account_id => @account.id.to_s, :format => 'json' },
+               {}, {}, :expected_status => status)
     end
 
     it "should return all aacs in position order" do
@@ -61,7 +61,7 @@ describe "AuthenticationProviders API", type: :request do
 
       res = call_index
 
-      expect(res.map{|c|c['idp_entity_id']}.join).to eq 'rad'
+      expect(res.map { |c| c['idp_entity_id'] }.join).to eq 'rad'
     end
 
     it "should return unauthorized error" do
@@ -75,8 +75,8 @@ describe "AuthenticationProviders API", type: :request do
 
     def call_create(params, status = 200)
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/authentication_providers",
-             { :controller => 'authentication_providers', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
-             params, {}, :expected_status => status)
+                      { :controller => 'authentication_providers', :action => 'create', :account_id => @account.id.to_s, :format => 'json' },
+                      params, {}, :expected_status => status)
       @account.reload
       json
     end
@@ -110,7 +110,7 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "should work with rails form style params" do
-      call_create({:authentication_provider => @saml_hash})
+      call_create({ :authentication_provider => @saml_hash })
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
@@ -230,22 +230,22 @@ describe "AuthenticationProviders API", type: :request do
 
     it "should allow updating without auth type" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
-                      {controller: 'authentication_providers',
-                       action: 'update',
-                       account_id: @account.id.to_s,
-                       id: @aac.to_param,
-                       format: 'json'},
+                      { controller: 'authentication_providers',
+                        action: 'update',
+                        account_id: @account.id.to_s,
+                        id: @aac.to_param,
+                        format: 'json' },
                       { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in' } })
       expect(json['log_in_url']).to eq 'http://example.com/updated_cool_log_in'
     end
 
     it "should error when changing the type" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
-                      {controller: 'authentication_providers',
-                       action: 'update',
-                       account_id: @account.id.to_s,
-                       id: @aac.to_param,
-                       format: 'json'},
+                      { controller: 'authentication_providers',
+                        action: 'update',
+                        account_id: @account.id.to_s,
+                        id: @aac.to_param,
+                        format: 'json' },
                       { authentication_provider: { log_in_url: 'http://example.com/updated_cool_log_in', auth_type: 'facebook' } },
                       {},
                       expected_status: 400)
@@ -256,8 +256,8 @@ describe "AuthenticationProviders API", type: :request do
   context "/show" do
     def call_show(id, status = 200)
       api_call(:get, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-             {}, {}, :expected_status => status)
+               { :controller => 'authentication_providers', :action => 'show', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+               {}, {}, :expected_status => status)
     end
 
     it "should return saml aac" do
@@ -326,8 +326,8 @@ describe "AuthenticationProviders API", type: :request do
   context "/update" do
     def call_update(id, params, status = 200)
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'authentication_providers', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-             params, {}, :expected_status => status)
+                      { :controller => 'authentication_providers', :action => 'update', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+                      params, {}, :expected_status => status)
       @account.reload
       json
     end
@@ -341,7 +341,6 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
-
     it "should return error when it fails to update" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['metadata_uri'] = 'hahahaha_super_invalid'
@@ -352,7 +351,7 @@ describe "AuthenticationProviders API", type: :request do
     it "updates federated attributes" do
       aac = @account.authentication_providers.create!(@saml_hash)
       json = call_update(aac.id, 'auth_type' => 'saml',
-                         'federated_attributes' => { 'integration_id' => 'internal_id' })
+                                 'federated_attributes' => { 'integration_id' => 'internal_id' })
       # jit provisioning off; short form output
       expect(json['federated_attributes']).to eq('integration_id' => 'internal_id')
       aac.reload
@@ -363,7 +362,7 @@ describe "AuthenticationProviders API", type: :request do
     it "should work with rails form style params" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
-      call_update(aac.id, {:authentication_provider => @saml_hash})
+      call_update(aac.id, { :authentication_provider => @saml_hash })
 
       aac.reload
       expect(aac.idp_entity_id).to eq 'hahahaha'
@@ -429,8 +428,8 @@ describe "AuthenticationProviders API", type: :request do
   context "/destroy" do
     def call_destroy(id, status = 200)
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/authentication_providers/#{id}",
-             { :controller => 'authentication_providers', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
-             {}, {}, :expected_status => status)
+                      { :controller => 'authentication_providers', :action => 'destroy', :account_id => @account.id.to_s, :id => id.to_param, :format => 'json' },
+                      {}, {}, :expected_status => status)
       @account.reload
       json
     end
@@ -554,11 +553,11 @@ describe "AuthenticationProviders API", type: :request do
                               action: "show_sso_settings",
                               account_id: @account.id.to_s,
                               format: 'json'
-                            },{},{},
+                            }, {}, {},
                             expected_status: 200)
 
-        expect(response['sso_settings']['login_handle_name']).
-          to eq("LoginHandleSet")
+        expect(response['sso_settings']['login_handle_name'])
+          .to eq("LoginHandleSet")
       end
     end
   end
@@ -569,7 +568,7 @@ describe "AuthenticationProviders API", type: :request do
         aac = AuthenticationProvider::SAML.new(
           federated_attributes: { 'integration_id' => { 'attribute' => 'internal_id' },
                                   'sis_user_id' => { 'attribute' => 'external_id',
-                                                     'provisioning_only' => true }}
+                                                     'provisioning_only' => true } }
         )
         expect(aac.federated_attributes_for_api).to eq('integration_id' => 'internal_id')
       end
@@ -578,9 +577,9 @@ describe "AuthenticationProviders API", type: :request do
         federated_attributes = { 'integration_id' => { 'attribute' => 'internal_id',
                                                        'provisioning_only' => false },
                                  'sis_user_id' => { 'attribute' => 'external_id',
-                                                    'provisioning_only' => true }}
+                                                    'provisioning_only' => true } }
         aac = AuthenticationProvider::SAML.new(federated_attributes: federated_attributes,
-                                                   jit_provisioning: true)
+                                               jit_provisioning: true)
         expect(aac.federated_attributes_for_api).to eq(federated_attributes)
       end
     end

@@ -33,7 +33,7 @@ describe 'Provisional Grades API', type: :request do
     let_once(:teacher) { teacher_in_course(active_all: true, course: course).user }
     let_once(:ta_1) { ta_in_course(active_all: true, course: course).user }
     let_once(:ta_2) { ta_in_course(active_all: true, course: course).user }
-    let_once(:students) { 3.times.map {|n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
+    let_once(:students) { 3.times.map { |n| student_in_course(active_all: true, course: course, name: "Student #{n}").user } }
 
     let_once(:assignment) do
       course.assignments.create!(
@@ -44,7 +44,7 @@ describe 'Provisional Grades API', type: :request do
       )
     end
 
-    let_once(:submissions) { students.map {|student| student.submissions.first} }
+    let_once(:submissions) { students.map { |student| student.submissions.first } }
     let_once(:grades) do
       [
         grade_student(assignment, students[0], ta_1, 5),
@@ -99,7 +99,7 @@ describe 'Provisional Grades API', type: :request do
 
     it "returns json including the id of each selected provisional grade" do
       json = bulk_select(grades[0..1])
-      ids = json.map {|grade| grade['selected_provisional_grade_id']}
+      ids = json.map { |grade| grade['selected_provisional_grade_id'] }
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 
@@ -119,7 +119,7 @@ describe 'Provisional Grades API', type: :request do
     it "includes the anonymous ids for submissions when the user cannot view student identities" do
       assignment.update!(anonymous_grading: true)
       json = bulk_select(grades[0..1])
-      ids = json.map {|grade| grade["anonymous_id"]}
+      ids = json.map { |grade| grade["anonymous_id"] }
       expect(ids).to match_array(submissions[0..1].map(&:anonymous_id))
     end
 
@@ -138,7 +138,7 @@ describe 'Provisional Grades API', type: :request do
 
       it "excludes the already-selected provisional grade from the returned json" do
         json = bulk_select(grades[0..1])
-        ids = json.map {|grade| grade['selected_provisional_grade_id']}
+        ids = json.map { |grade| grade['selected_provisional_grade_id'] }
         expect(ids).to match_array([grades[1].id])
       end
 
@@ -165,7 +165,7 @@ describe 'Provisional Grades API', type: :request do
 
       it "excludes the unrelated provisional grade from the returned json" do
         json = bulk_select(grades[0..1] + [other_grade])
-        ids = json.map {|grade| grade['selected_provisional_grade_id']}
+        ids = json.map { |grade| grade['selected_provisional_grade_id'] }
         expect(ids).to match_array(grades[0..1].map(&:id))
       end
     end
@@ -174,7 +174,7 @@ describe 'Provisional Grades API', type: :request do
       invalid_id = ModeratedGrading::ProvisionalGrade.maximum(:id).next # ensure the id is not used
       invalid_grade = ModeratedGrading::ProvisionalGrade.new(id: invalid_id)
       json = bulk_select(grades[0..1] + [invalid_grade])
-      ids = json.map {|grade| grade['selected_provisional_grade_id']}
+      ids = json.map { |grade| grade['selected_provisional_grade_id'] }
       expect(ids).to match_array(grades[0..1].map(&:id))
     end
 

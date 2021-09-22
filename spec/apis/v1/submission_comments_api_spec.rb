@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper')
 
 describe 'Submissions Comment API', type: :request do
-
   def submission_with_comment
     course_with_student(:active_all => true)
     teacher_in_course(:course => @course, :active_all => true)
@@ -45,7 +44,7 @@ describe 'Submissions Comment API', type: :request do
       teacher_in_course active_all: true
       student_in_course active_all: true
       @assignment = @course.assignments.create! name: "blah",
-        submission_types: "online_upload"
+                                                submission_types: "online_upload"
     end
 
     include_examples "file uploads api"
@@ -53,11 +52,11 @@ describe 'Submissions Comment API', type: :request do
 
     def preflight(preflight_params)
       api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-      {controller: "submission_comments_api", action: "create_file",
-       format: "json", course_id: @course.to_param,
-       assignment_id: @assignment.to_param, user_id: @student.to_param},
-       preflight_params
+               "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
+               { controller: "submission_comments_api", action: "create_file",
+                 format: "json", course_id: @course.to_param,
+                 assignment_id: @assignment.to_param, user_id: @student.to_param },
+               preflight_params
     end
 
     it "checks permissions" do
@@ -65,11 +64,11 @@ describe 'Submissions Comment API', type: :request do
       course_with_student active_all: true
       @course = orig_course
       raw_api_call :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
-      {controller: "submission_comments_api", action: "create_file",
-       format: "json", course_id: @course.to_param,
-       assignment_id: @assignment.to_param, user_id: @student.to_param},
-      name: "whatever"
+                   "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/files",
+                   { controller: "submission_comments_api", action: "create_file",
+                     format: "json", course_id: @course.to_param,
+                     assignment_id: @assignment.to_param, user_id: @student.to_param },
+                   name: "whatever"
       expect(response).not_to be_successful
     end
 
@@ -128,10 +127,10 @@ describe 'Submissions Comment API', type: :request do
     def annotation_notification_call(author_id: @student.to_param, assignment_id: auto_post_assignment.to_param)
       raw_api_call(:post,
                    "/api/v1/courses/#{@course.id}/assignments/#{assignment_id}/submissions/#{@student.to_param}/annotation_notification",
-                   {controller: "submission_comments_api", action: "annotation_notification",
-                    format: "json", course_id: @course.to_param,
-                    assignment_id: assignment_id, user_id: @student.to_param},
-                   {author_id: author_id})
+                   { controller: "submission_comments_api", action: "annotation_notification",
+                     format: "json", course_id: @course.to_param,
+                     assignment_id: assignment_id, user_id: @student.to_param },
+                   { author_id: author_id })
     end
 
     it 'sends notification to teacher for student annotation' do
@@ -233,7 +232,7 @@ describe 'Submissions Comment API', type: :request do
                    :comment => "Goodbye world!"
                  },
                  {},
-                 {:expected_status => 401})
+                 { :expected_status => 401 })
         expect(@comment.reload.comment).to eq("Hello world!")
       end
     end
@@ -255,7 +254,7 @@ describe 'Submissions Comment API', type: :request do
                    :comment => "Goodbye world!"
                  },
                  {},
-                 {:expected_status => 200})
+                 { :expected_status => 200 })
         expect(@comment.reload.comment).to eq("Goodbye world!")
       end
     end
@@ -282,7 +281,7 @@ describe 'Submissions Comment API', type: :request do
                  },
                  {},
                  {},
-                 {:expected_status => 401})
+                 { :expected_status => 401 })
         expect(@submission.reload.submission_comments.length).to eq(1)
       end
     end
@@ -302,7 +301,7 @@ describe 'Submissions Comment API', type: :request do
                  },
                  {},
                  {},
-                 {:expected_status => 200})
+                 { :expected_status => 200 })
         expect(@submission.reload.submission_comments).to be_empty
       end
     end

@@ -28,8 +28,8 @@ describe ObserverPairingCodesApiController, type: :request do
       @student = student_in_course(active_all: true).user
       @course.account.enable_self_registration
       @path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
-      @params = {user_id: @student.to_param,
-        controller: 'observer_pairing_codes_api', action: 'create', format: 'json'}
+      @params = { user_id: @student.to_param,
+                  controller: 'observer_pairing_codes_api', action: 'create', format: 'json' }
     end
 
     it "does not permit pairing code generation if self-registration is disabled" do
@@ -105,8 +105,8 @@ describe ObserverPairingCodesApiController, type: :request do
         @student = course_with_student(account: @sub_account, active_all: true).user
         @sub_admin = account_admin_user(account: @sub_account)
         @path = "/api/v1/users/#{@student.id}/observer_pairing_codes"
-        @params = {user_id: @student.to_param,
-          controller: 'observer_pairing_codes_api', action: 'create', format: 'json'}
+        @params = { user_id: @student.to_param,
+                    controller: 'observer_pairing_codes_api', action: 'create', format: 'json' }
       end
 
       it 'sub_account admin can generate code' do
@@ -119,8 +119,8 @@ describe ObserverPairingCodesApiController, type: :request do
         other_sub_account = Account.create! root_account: Account.default
         other_student = course_with_student(account: other_sub_account, active_all: true).user
         path = "/api/v1/users/#{other_student.id}/observer_pairing_codes"
-        params = {user_id: other_student.to_param,
-          controller: 'observer_pairing_codes_api', action: 'create', format: 'json'}
+        params = { user_id: other_student.to_param,
+                   controller: 'observer_pairing_codes_api', action: 'create', format: 'json' }
         api_call_as_user(@sub_admin, :post, path, params)
         expect(response.code).to eq "401"
       end

@@ -46,7 +46,7 @@ describe Api::Html::Content, type: :request do
       end
 
       it "handles error gracefully" do
-        expect{ Api::Html::Content.apply_mathml(@node) }.not_to raise_error
+        expect { Api::Html::Content.apply_mathml(@node) }.not_to raise_error
       end
 
       it "retains the alt attribute" do

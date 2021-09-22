@@ -29,42 +29,42 @@ describe "Rubrics API", type: :request do
     @account = Account.default
   end
 
-  def create_rubric(context, opts={})
+  def create_rubric(context, opts = {})
     @rubric = Rubric.new(:context => context)
     @rubric.data = [rubric_data_hash(opts)]
     @rubric.save!
-    @rubric.update_with_association(nil, {}, context, {association_object: context})
+    @rubric.update_with_association(nil, {}, context, { association_object: context })
   end
 
   def rubric_association_params_for_assignment(assign)
     HashWithIndifferentAccess.new({
-      hide_score_total: "0",
-      purpose: "grading",
-      skip_updating_points_possible: false,
-      update_if_existing: true,
-      use_for_grading: "1",
-      association_object: assign
-    })
+                                    hide_score_total: "0",
+                                    purpose: "grading",
+                                    skip_updating_points_possible: false,
+                                    update_if_existing: true,
+                                    use_for_grading: "1",
+                                    association_object: assign
+                                  })
   end
 
-  def create_rubric_assessment(opts={})
+  def create_rubric_assessment(opts = {})
     assessment_type = opts[:type] || "grading"
     assignment1 = assignment_model(context: @course)
     submission = assignment1.find_or_create_submission(@student)
     ra_params = rubric_association_params_for_assignment(submission.assignment)
     rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
     rubric_assessment = RubricAssessment.create!({
-      artifact: submission,
-      assessment_type: assessment_type,
-      assessor: @teacher,
-      rubric: @rubric,
-      user: submission.user,
-      rubric_association: rubric_assoc,
-      data: [{points: 3.0, description: "hello", comments: opts[:comments]}]
-    })
+                                                   artifact: submission,
+                                                   assessment_type: assessment_type,
+                                                   assessor: @teacher,
+                                                   rubric: @rubric,
+                                                   user: submission.user,
+                                                   rubric_association: rubric_assoc,
+                                                   data: [{ points: 3.0, description: "hello", comments: opts[:comments] }]
+                                                 })
   end
 
-  def rubric_data_hash(opts={})
+  def rubric_data_hash(opts = {})
     hash = {
       points: 3,
       description: "Criteria row",
@@ -87,7 +87,7 @@ describe "Rubrics API", type: :request do
     hash
   end
 
-  def rubrics_api_call(context, params={}, type='course')
+  def rubrics_api_call(context, params = {}, type = 'course')
     api_call(
       :get, "/api/v1/#{type}s/#{context.id}/rubrics", {
         controller: 'rubrics_api',
@@ -98,7 +98,7 @@ describe "Rubrics API", type: :request do
     )
   end
 
-  def rubric_api_call(context, params={}, type='course')
+  def rubric_api_call(context, params = {}, type = 'course')
     api_call(
       :get, "/api/v1/#{type}s/#{context.id}/rubrics/#{@rubric.id}", {
         controller: 'rubrics_api',
@@ -110,7 +110,7 @@ describe "Rubrics API", type: :request do
     )
   end
 
-  def create_rubric_api_call(context, params={}, type='course')
+  def create_rubric_api_call(context, params = {}, type = 'course')
     api_call(
       :post, "/api/v1/#{type}s/#{context.id}/rubrics", {
         controller: 'rubrics',
@@ -121,7 +121,7 @@ describe "Rubrics API", type: :request do
     )
   end
 
-  def update_rubric_api_call(context, params={}, type='course')
+  def update_rubric_api_call(context, params = {}, type = 'course')
     api_call(
       :put, "/api/v1/#{type}s/#{context.id}/rubrics/#{@rubric.id}", {
         controller: 'rubrics',
@@ -133,7 +133,7 @@ describe "Rubrics API", type: :request do
     )
   end
 
-  def raw_rubric_call(context, params={}, type='course')
+  def raw_rubric_call(context, params = {}, type = 'course')
     raw_api_call(
       :get, "/api/v1/#{type}s/#{context.id}/rubrics/#{@rubric.id}", {
         controller: 'rubrics_api',
@@ -148,24 +148,24 @@ describe "Rubrics API", type: :request do
   def paginate_call(context, type)
     @user = account_admin_user
     7.times { create_rubric(context) }
-    json = rubrics_api_call(context, {:per_page => '3'}, type)
+    json = rubrics_api_call(context, { :per_page => '3' }, type)
 
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="next"/)}).to match(/page=2/)
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
+    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
 
     # get the last page
-    json = rubrics_api_call(context, {:per_page => '3', :page => '3'}, type)
+    json = rubrics_api_call(context, { :per_page => '3', :page => '3' }, type)
 
     expect(json.length).to eq 2
     links = response.headers['Link'].split(",")
-    expect(links.all?{ |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
-    expect(links.find{ |l| l.match(/rel="prev"/)}).to match(/page=2/)
-    expect(links.find{ |l| l.match(/rel="first"/)}).to match(/page=1/)
-    expect(links.find{ |l| l.match(/rel="last"/)}).to match(/page=3/)
+    expect(links.all? { |l| l =~ /api\/v1\/#{type}s\/#{context.id}\/rubrics/ }).to be_truthy
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3/)
   end
 
   describe "course level rubrics" do
@@ -254,7 +254,7 @@ describe "Rubrics API", type: :request do
           create_rubric(@course)
           RubricAssociation.generate(@teacher, @rubric, @course, association_object: @account)
           ['grading', 'peer_review'].each.with_index do |type, index|
-            create_rubric_assessment({type: type, comments: "comment #{index}"})
+            create_rubric_assessment({ type: type, comments: "comment #{index}" })
           end
         end
 
@@ -264,19 +264,19 @@ describe "Rubrics API", type: :request do
         end
 
         it "returns rubric assessments when passed 'assessments'" do
-          response = rubric_api_call(@course, {include: "assessments"})
+          response = rubric_api_call(@course, { include: "assessments" })
           expect(response).to have_key "assessments"
           expect(response["assessments"].length).to eq 2
         end
 
         it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
-          response = rubric_api_call(@course, {include: "graded_assessments"})
+          response = rubric_api_call(@course, { include: "graded_assessments" })
           expect(response["assessments"][0]["assessment_type"]).to eq "grading"
           expect(response["assessments"].length).to eq 1
         end
 
         it "returns any peer review assessments when passed 'peer_assessments'" do
-          response = rubric_api_call(@course, {include: "peer_assessments"})
+          response = rubric_api_call(@course, { include: "peer_assessments" })
           expect(response["assessments"][0]["assessment_type"]).to eq "peer_review"
           expect(response["assessments"].length).to eq 1
         end
@@ -287,31 +287,31 @@ describe "Rubrics API", type: :request do
         end
 
         it "returns rubric associations when passed 'associations'" do
-          response = rubric_api_call(@course, {include: "associations"})
+          response = rubric_api_call(@course, { include: "associations" })
           expect(response).to have_key "associations"
           expect(response["associations"].length).to eq 4
         end
 
         it "returns any course associations used for grading when passed 'course_associations'" do
-          response = rubric_api_call(@course, {include: "course_associations"})
+          response = rubric_api_call(@course, { include: "course_associations" })
           expect(response["associations"][0]["association_type"]).to eq "Course"
           expect(response["associations"].length).to eq 1
         end
 
         it "returns any account associations when passed 'account_associations'" do
-          response = rubric_api_call(@course, {include: "account_associations"})
+          response = rubric_api_call(@course, { include: "account_associations" })
           expect(response["associations"][0]["association_type"]).to eq "Account"
           expect(response["associations"].length).to eq 1
         end
 
         it "returns assignment associations when passed 'assignment_associations'" do
-          response = rubric_api_call(@course, {include: "assignment_associations"})
+          response = rubric_api_call(@course, { include: "assignment_associations" })
           expect(response["associations"][0]["association_type"]).to eq "Assignment"
           expect(response["associations"].length).to eq 2
         end
 
         it "returns an error if passed an invalid argument" do
-          raw_rubric_call(@course, {include: "cheez"})
+          raw_rubric_call(@course, { include: "cheez" })
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
@@ -319,13 +319,13 @@ describe "Rubrics API", type: :request do
         end
 
         it "returns an error if passed mutually-exclusive include options" do
-          raw_rubric_call(@course, {include: ["assessments", "peer_assessments"]})
+          raw_rubric_call(@course, { include: ["assessments", "peer_assessments"] })
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
 
-          raw_rubric_call(@course, {include: ["associations", "assignment_associations"]})
+          raw_rubric_call(@course, { include: ["associations", "assignment_associations"] })
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
@@ -334,17 +334,17 @@ describe "Rubrics API", type: :request do
 
         context "style argument" do
           it "returns all data when passed 'full'" do
-            response = rubric_api_call(@course, {include: "assessments", style: "full"})
+            response = rubric_api_call(@course, { include: "assessments", style: "full" })
             expect(response["assessments"][0]).to have_key 'data'
           end
 
           it "returns only comments when passed 'comments_only'" do
-            response = rubric_api_call(@course, {include: "assessments", style: "comments_only"})
+            response = rubric_api_call(@course, { include: "assessments", style: "comments_only" })
             expect(response["assessments"][0]).to have_key 'comments'
           end
 
           it "returns an error if passed an invalid argument" do
-            raw_rubric_call(@course, {include: "assessments", style: "BigMcLargeHuge"})
+            raw_rubric_call(@course, { include: "assessments", style: "BigMcLargeHuge" })
 
             expect(response).not_to be_successful
             json = JSON.parse response.body
@@ -352,7 +352,7 @@ describe "Rubrics API", type: :request do
           end
 
           it "returns an error if passed a style parameter without assessments" do
-            raw_rubric_call(@course, {style: "full"})
+            raw_rubric_call(@course, { style: "full" })
 
             expect(response).not_to be_successful
             json = JSON.parse response.body
@@ -375,7 +375,7 @@ describe "Rubrics API", type: :request do
 
       it "creats a rubric with an association" do
         assignment = @course.assignments.create
-        response = create_rubric_api_call(@course, {rubric: {title: 'new title'}, rubric_association: {association_id: assignment.id, association_type: 'Assignment'}})
+        response = create_rubric_api_call(@course, { rubric: { title: 'new title' }, rubric_association: { association_id: assignment.id, association_type: 'Assignment' } })
         expect(response['rubric_association']['association_id']).to eq assignment.id
       end
     end
@@ -391,12 +391,12 @@ describe "Rubrics API", type: :request do
         new_title = "some new title"
         awesome = 'Awesome'
         ratings = {
-          '0': {points: 9000, description: awesome},
-          '1': {points: 100, description: 'not good'}
+          '0': { points: 9000, description: awesome },
+          '1': { points: 100, description: 'not good' }
         }
         above = 'above 9000'
-        criteria = {'0': {id: 1, points: points, description: above, long_description: "he's above 9000!", ratings: ratings}}
-        response = update_rubric_api_call(@course, {rubric: {title: new_title, criteria: criteria}})
+        criteria = { '0': { id: 1, points: points, description: above, long_description: "he's above 9000!", ratings: ratings } }
+        response = update_rubric_api_call(@course, { rubric: { title: new_title, criteria: criteria } })
         rubric = response['rubric']
         expect(rubric['title']).to eq new_title
         expect(rubric['points_possible']).to eq points
@@ -411,23 +411,23 @@ describe "Rubrics API", type: :request do
         points2 = 2001.0
         total_points = points0 + points1 + points2
         criteria1ratings = {
-          '0': {points: points0, description: 'awesome'},
-          '1': {points: 100, description: 'not good'}
+          '0': { points: points0, description: 'awesome' },
+          '1': { points: 100, description: 'not good' }
         }
         criteria2ratings = {
-          '0': {points: points1, description: 'awesome'},
-          '1': {points: 100, description: 'not good'}
+          '0': { points: points1, description: 'awesome' },
+          '1': { points: 100, description: 'not good' }
         }
         criteria3ratings = {
-          '0': {points: points2, description: 'awesome'},
-          '1': {points: 100, description: 'not good'}
+          '0': { points: points2, description: 'awesome' },
+          '1': { points: 100, description: 'not good' }
         }
         criteria = {
-          '0': {id: 1, points: points0, description: 'description', long_description: "long description", ratings: criteria1ratings},
-          '1': {id: 2, points: points1, description: 'description', long_description: "long description", ratings: criteria2ratings},
-          '2': {id: 3, points: points2, description: 'description', long_description: "long description", ratings: criteria3ratings},
+          '0': { id: 1, points: points0, description: 'description', long_description: "long description", ratings: criteria1ratings },
+          '1': { id: 2, points: points1, description: 'description', long_description: "long description", ratings: criteria2ratings },
+          '2': { id: 3, points: points2, description: 'description', long_description: "long description", ratings: criteria3ratings },
         }
-        response = update_rubric_api_call(@course, {rubric: {criteria: criteria}})
+        response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
         rubric = response['rubric']
         expect(rubric['points_possible']).to eq total_points
         expect(rubric['criteria'][0]['ratings'][0]['points']).to eq points0
@@ -443,14 +443,14 @@ describe "Rubrics API", type: :request do
           :vendor_guid => "vendorguid9000"
         )
         rating = {
-          '0': {points: 9000, description: 'awesome'},
-          '1': {points: 1000, description: 'meh'},
-          '2': {points: 100, description: 'not good'}
+          '0': { points: 9000, description: 'awesome' },
+          '1': { points: 1000, description: 'meh' },
+          '2': { points: 100, description: 'not good' }
         }
         criteria = {
-          '0': {id: 1, points: 9000, learning_outcome_id: outcome.id, description: 'description', long_description: "long description", ratings: rating},
+          '0': { id: 1, points: 9000, learning_outcome_id: outcome.id, description: 'description', long_description: "long description", ratings: rating },
         }
-        response = update_rubric_api_call(@course, {rubric: {criteria: criteria}})
+        response = update_rubric_api_call(@course, { rubric: { criteria: criteria } })
         expect(response['rubric']['criteria'][0]['learning_outcome_id']).to eq outcome.id
       end
 
@@ -460,7 +460,7 @@ describe "Rubrics API", type: :request do
         use_for_grading = true
         hide_score_total = true
         association_type = 'Assignment'
-        response = update_rubric_api_call(@course, {rubric: {title: 'new title'}, rubric_association: {use_for_grading: use_for_grading, purpose: purpose, hide_score_total: hide_score_total, association_id: assignment.id, association_type: association_type}})
+        response = update_rubric_api_call(@course, { rubric: { title: 'new title' }, rubric_association: { use_for_grading: use_for_grading, purpose: purpose, hide_score_total: hide_score_total, association_id: assignment.id, association_type: association_type } })
         expect(response['rubric_association']['association_id']).to eq assignment.id
         expect(response['rubric_association']['association_type']).to eq association_type
         expect(response['rubric_association']['purpose']).to eq purpose
@@ -536,7 +536,7 @@ describe "Rubrics API", type: :request do
           course_with_teacher active_all: true
           create_rubric(@account)
           ['grading', 'peer_review'].each.with_index do |type, index|
-            create_rubric_assessment({type: type, comments: "comment #{index}"})
+            create_rubric_assessment({ type: type, comments: "comment #{index}" })
           end
           @user = account_admin_user
         end
@@ -547,25 +547,25 @@ describe "Rubrics API", type: :request do
         end
 
         it "returns rubric assessments when passed 'assessments'" do
-          response = rubric_api_call(@account, {include: "assessments"}, 'account')
+          response = rubric_api_call(@account, { include: "assessments" }, 'account')
           expect(response).to have_key "assessments"
           expect(response["assessments"].length).to eq 2
         end
 
         it "returns any rubric assessments used for grading when passed 'graded_assessments'" do
-          response = rubric_api_call(@account, {include: "graded_assessments"}, 'account')
+          response = rubric_api_call(@account, { include: "graded_assessments" }, 'account')
           expect(response["assessments"][0]["assessment_type"]).to eq "grading"
           expect(response["assessments"].length).to eq 1
         end
 
         it "returns any peer review assessments when passed 'peer_assessments'" do
-          response = rubric_api_call(@account, {include: "peer_assessments"}, 'account')
+          response = rubric_api_call(@account, { include: "peer_assessments" }, 'account')
           expect(response["assessments"][0]["assessment_type"]).to eq "peer_review"
           expect(response["assessments"].length).to eq 1
         end
 
         it "returns an error if passed an invalid argument" do
-          raw_rubric_call(@account, {include: "cheez"}, 'account')
+          raw_rubric_call(@account, { include: "cheez" }, 'account')
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
@@ -573,13 +573,13 @@ describe "Rubrics API", type: :request do
         end
 
         it "returns an error if passed mutually-exclusive include options" do
-          raw_rubric_call(@account, {include: ["assessments", "peer_assessments"]}, 'account')
+          raw_rubric_call(@account, { include: ["assessments", "peer_assessments"] }, 'account')
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
           expect(json["errors"]["include"].first["message"]).to start_with "cannot list multiple assessment includes."
 
-          raw_rubric_call(@account, {include: ["associations", "assignment_associations"]}, 'account')
+          raw_rubric_call(@account, { include: ["associations", "assignment_associations"] }, 'account')
 
           expect(response).not_to be_successful
           json = JSON.parse response.body
@@ -592,17 +592,17 @@ describe "Rubrics API", type: :request do
           end
 
           it "returns all data when passed 'full'" do
-            response = rubric_api_call(@account, {include: "assessments", style: "full"}, 'account')
+            response = rubric_api_call(@account, { include: "assessments", style: "full" }, 'account')
             expect(response["assessments"][0]).to have_key 'data'
           end
 
           it "returns only comments when passed 'comments_only'" do
-            response = rubric_api_call(@account, {include: "assessments", style: "comments_only"}, 'account')
+            response = rubric_api_call(@account, { include: "assessments", style: "comments_only" }, 'account')
             expect(response["assessments"][0]).to have_key 'comments'
           end
 
           it "returns an error if passed an invalid argument" do
-            raw_rubric_call(@account, {include: "assessments", style: "BigMcLargeHuge"}, 'account')
+            raw_rubric_call(@account, { include: "assessments", style: "BigMcLargeHuge" }, 'account')
 
             expect(response).not_to be_successful
             json = JSON.parse response.body
@@ -610,7 +610,7 @@ describe "Rubrics API", type: :request do
           end
 
           it "returns an error if passed a style parameter without assessments" do
-            raw_rubric_call(@account, {style: "full"}, 'account')
+            raw_rubric_call(@account, { style: "full" }, 'account')
 
             expect(response).not_to be_successful
             json = JSON.parse response.body

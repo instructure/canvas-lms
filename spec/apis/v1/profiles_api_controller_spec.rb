@@ -21,11 +21,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 def call_setting(opts)
-  status_assertion = opts[:assert_unauthorized] ? {:expected_status => 401} : {}
+  status_assertion = opts[:assert_unauthorized] ? { :expected_status => 401 } : {}
   api_call_as_user(opts[:as_user], :get,
-    "/api/v1/users/#{opts[:for_user].id}/profile.json",
-    { :controller => 'profile', :action => 'settings',
-      :format => 'json', :user_id => opts[:for_user].id },{},{}, status_assertion)
+                   "/api/v1/users/#{opts[:for_user].id}/profile.json",
+                   { :controller => 'profile', :action => 'settings',
+                     :format => 'json', :user_id => opts[:for_user].id }, {}, {}, status_assertion)
 end
 
 describe 'ProfileController', type: :request do

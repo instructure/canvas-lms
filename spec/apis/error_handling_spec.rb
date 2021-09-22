@@ -40,7 +40,7 @@ describe "API Error Handling", type: :request do
       parsed = JSON.parse(errors)['errors']
       expect(parsed.size).to be > 0
       expect(errors).not_to match(/blah blah/)
-      parsed.each { |k,v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
+      parsed.each { |k, v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
     end
   end
 
@@ -48,6 +48,6 @@ describe "API Error Handling", type: :request do
     get "/api/v1/courses/54321", headers: { 'Authorization' => "Bearer #{@token.full_token}" }
     expect(response.response_code).to eq 404
     json = JSON.parse(response.body)
-    expect(json['errors']).to eq [{'message' => 'The specified resource does not exist.'}]
+    expect(json['errors']).to eq [{ 'message' => 'The specified resource does not exist.' }]
   end
 end

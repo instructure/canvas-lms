@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
   describe "GET /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [index]" do
-    def api_index(options={}, data={})
+    def api_index(options = {}, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions"
       params =  { controller: "quizzes/outstanding_quiz_submissions",
                   action: "index",
@@ -49,7 +49,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
     end
 
     it 'denies unprivileged access' do
-      json = api_index( raw: true )
+      json = api_index(raw: true)
       assert_status(401)
     end
 
@@ -71,7 +71,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
   end
 
   describe "POST /courses/:course_id/quizzes/:quiz_id/outstanding_quiz_submissions [grade]" do
-    def api_grade(options={}, data={})
+    def api_grade(options = {}, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/outstanding_quiz_submissions"
       params = { controller: "quizzes/outstanding_quiz_submissions",
                  action: "grade",
@@ -98,7 +98,7 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
 
     it 'denies unprivileged access' do
       student_in_course
-      json = api_grade({raw: true}, {quiz_submission_ids: [@submission.id]})
+      json = api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
       assert_status 401
     end
 
@@ -113,14 +113,14 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
       end
 
       it "should grade all outstanding quiz submissions" do
-        api_grade({raw: true},{quiz_submission_ids: [@submission.id]})
+        api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
         assert_status 204
       end
 
       it 'should continue w/o error when given already graded ids' do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         expect(@submission.needs_grading?).to eq false
-        api_grade({raw: true},{quiz_submission_ids: [@submission.id, @submission2.id]})
+        api_grade({ raw: true }, { quiz_submission_ids: [@submission.id, @submission2.id] })
         @submission2.reload
         expect(@submission2.needs_grading?).to eq false
         expect(Quizzes::OutstandingQuizSubmissionManager.new(@quiz).find_by_quiz.size).to eq 0

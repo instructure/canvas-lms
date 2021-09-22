@@ -28,19 +28,19 @@ describe UserObserveesController, type: :request do
   let_once(:student2)           { student2_pseudonym.user }
   let_once(:student2_pseudonym) { user_with_pseudonym(name: 'Another Smith', active_all: true); @pseudonym }
   let_once(:allowed_admin) do
-    a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
+    a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: true })
     pseudonym(a)
     a
   end
   let_once(:multi_admin) do
-    a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
+    a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: true })
     pseudonym(a)
-    account_admin_user_with_role_changes(active_all: true, user: a, account: external_account, role_changes: {manage_user_observers: true})
+    account_admin_user_with_role_changes(active_all: true, user: a, account: external_account, role_changes: { manage_user_observers: true })
     pseudonym(a, account: external_account)
     a
   end
   let(:disallowed_admin) do
-    a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: false})
+    a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: false })
     pseudonym(a)
     a
   end
@@ -50,12 +50,12 @@ describe UserObserveesController, type: :request do
   let_once(:external_student)           { external_student_pseudonym.user }
   let_once(:external_student_pseudonym) { user_with_pseudonym(name: 'Child External', active_all: true, account: external_account); @pseudonym }
   let_once(:external_allowed_admin) do
-    a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: true})
+    a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: true })
     pseudonym(a, account: external_account)
     a
   end
   let(:external_disallowed_admin) do
-    a = account_admin_user_with_role_changes(active_all: true, role_changes: {manage_user_observers: false})
+    a = account_admin_user_with_role_changes(active_all: true, role_changes: { manage_user_observers: false })
     pseudonym(a, account: external_account)
     a
   end
@@ -73,39 +73,43 @@ describe UserObserveesController, type: :request do
 
   let(:params) { { controller: 'user_observees', format: 'json' } }
 
-  def index_call(opts={})
+  def index_call(opts = {})
     json = raw_index_call(opts)
     return nil if opts[:expected_status]
-    json.map{|o| o['id'] }.sort
+
+    json.map { |o| o['id'] }.sort
   end
-  def raw_index_call(opts={})
+
+  def raw_index_call(opts = {})
     params[:user_id] = opts[:user_id] || parent.id
     if opts[:page]
       params.merge!(per_page: 1, page: opts[:page])
       page = "?per_page=1&page=#{opts[:page]}"
     end
 
-    if(opts[:avatars])
+    if (opts[:avatars])
       params.merge!(include: ["avatar_url"])
     end
     json = api_call_as_user(
-        opts[:api_user] || allowed_admin,
-        :get,
-        "/api/v1/users/#{params[:user_id]}/observees#{page}",
-        params.merge(action: 'index'),
-        {},
-        {},
-        { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
+      opts[:api_user] || allowed_admin,
+      :get,
+      "/api/v1/users/#{params[:user_id]}/observees#{page}",
+      params.merge(action: 'index'),
+      {},
+      {},
+      { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
     json
   end
 
-  def observers_call(opts={})
+  def observers_call(opts = {})
     json = raw_observers_call(opts)
     return nil if opts[:expected_status]
-    json.map{|o| o['id'] }.sort
+
+    json.map { |o| o['id'] }.sort
   end
-  def raw_observers_call(opts={})
+
+  def raw_observers_call(opts = {})
     params[:user_id] = opts[:user_id] || student.id
     json = api_call_as_user(
       opts[:api_user] || allowed_admin,
@@ -115,11 +119,11 @@ describe UserObserveesController, type: :request do
       {},
       {},
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
-      )
+    )
     json
   end
 
-  def create_call(data, opts={})
+  def create_call(data, opts = {})
     params[:user_id] = opts[:user_id] || parent.id
 
     json = api_call_as_user(
@@ -132,10 +136,11 @@ describe UserObserveesController, type: :request do
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
     return nil if opts[:expected_status]
+
     json['id']
   end
 
-  def show_call(opts={})
+  def show_call(opts = {})
     params[:user_id] = opts[:user_id] || parent.id
     params[:observee_id] = opts[:observee_id] || student.id
 
@@ -149,10 +154,11 @@ describe UserObserveesController, type: :request do
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
     return nil if opts[:expected_status]
+
     json['id']
   end
 
-  def show_observer_call(opts={})
+  def show_observer_call(opts = {})
     params[:user_id] = opts[:user_id] || student.id
     params[:observer_id] = opts[:observer_id] || parent.id
 
@@ -164,12 +170,13 @@ describe UserObserveesController, type: :request do
       {},
       {},
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
-      )
+    )
     return nil if opts[:expected_status]
+
     json['id']
   end
 
-  def update_call(opts={})
+  def update_call(opts = {})
     params[:user_id] = opts[:user_id] || parent.id
     params[:observee_id] = opts[:observee_id] || student.id
 
@@ -183,10 +190,11 @@ describe UserObserveesController, type: :request do
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
     return nil if opts[:expected_status]
+
     json['id']
   end
 
-  def delete_call(opts={})
+  def delete_call(opts = {})
     params[:user_id] = opts[:user_id] || parent.id
     params[:observee_id] = opts[:observee_id] || student.id
     json = api_call_as_user(
@@ -199,6 +207,7 @@ describe UserObserveesController, type: :request do
       { expected_status: opts[:expected_status] || 200, domain_root_account: opts[:domain_root_account] || Account.default },
     )
     return nil if opts[:expected_status]
+
     json['id']
   end
 
@@ -298,15 +307,15 @@ describe UserObserveesController, type: :request do
       student.avatar_image_url = "/relative/canvas/path"
       student.save!
       add_linked_observer(student, parent)
-      opts = {:avatars=>true}
-      json = raw_index_call(opts )
-      expect(json.map{|o| o['id'] }).to eq [student.id]
-      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
+      opts = { :avatars => true }
+      json = raw_index_call(opts)
+      expect(json.map { |o| o['id'] }).to eq [student.id]
+      expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
     end
 
     it 'should return avatar if avatar service enabled on account when called from shard with avatars disabled' do
       @shard2.activate do
-        student= User.create
+        student = User.create
         student.account.set_service_availability(:avatars, true)
         student.account.save!
         student.save!
@@ -316,10 +325,10 @@ describe UserObserveesController, type: :request do
       student.save!
       add_linked_observer(student, parent)
       parent.account.set_service_availability(:avatars, false)
-      opts = {:avatars=>true}
-      json = raw_index_call(opts )
-      expect(json.map{|o| o['id'] }).to eq [student.id]
-      expect(json.map{|o| o["avatar_url"]}).to eq ["http://www.example.com/relative/canvas/path"]
+      opts = { :avatars => true }
+      json = raw_index_call(opts)
+      expect(json.map { |o| o['id'] }).to eq [student.id]
+      expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
     end
 
     it "should only return linked root accounts the admin has rights for" do
@@ -339,7 +348,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      expect(create_call({observee: observee})).to eq student.id
+      expect(create_call({ observee: observee })).to eq student.id
 
       expect(parent.reload.linked_students).to eq [student]
     end
@@ -349,7 +358,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      expect(create_call({observee: observee}, api_user: parent)).to eq student.id
+      expect(create_call({ observee: observee }, api_user: parent)).to eq student.id
 
       expect(parent.reload.linked_students).to eq [student]
     end
@@ -359,7 +368,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      json = create_call({observee: observee}, user_id: external_parent.id, api_user: multi_admin, domain_root_account: external_account)
+      json = create_call({ observee: observee }, user_id: external_parent.id, api_user: multi_admin, domain_root_account: external_account)
       expect(json).to eq external_student.id
 
       expect(external_parent.reload.linked_students).to eq [external_student]
@@ -370,7 +379,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password + 'bad credentials',
       }
-      create_call({observee: observee}, expected_status: 401)
+      create_call({ observee: observee }, expected_status: 401)
 
       expect(parent.reload.linked_students).to eq []
     end
@@ -380,7 +389,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      create_call({observee: observee, root_account_id: 'all'}, domain_root_account: external_account, expected_status: 422)
+      create_call({ observee: observee, root_account_id: 'all' }, domain_root_account: external_account, expected_status: 422)
 
       expect(parent.reload.linked_students).to eq []
     end
@@ -390,7 +399,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      create_call({observee: observee}, user_id: 0, expected_status: 404)
+      create_call({ observee: observee }, user_id: 0, expected_status: 404)
     end
 
     it 'should not allow admins from and external account' do
@@ -398,7 +407,7 @@ describe UserObserveesController, type: :request do
         unique_id: external_student_pseudonym.unique_id,
         password: external_student_pseudonym.password,
       }
-      create_call({observee: observee}, user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
+      create_call({ observee: observee }, user_id: external_parent.id, domain_root_account: external_account, expected_status: 401)
     end
 
     it 'should not allow unauthorized admins' do
@@ -406,7 +415,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      create_call({observee: observee}, api_user: disallowed_admin, expected_status: 401)
+      create_call({ observee: observee }, api_user: disallowed_admin, expected_status: 401)
 
       expect(parent.reload.linked_students).to eq []
     end
@@ -416,7 +425,7 @@ describe UserObserveesController, type: :request do
         unique_id: student_pseudonym.unique_id,
         password: student_pseudonym.password,
       }
-      create_call({observee: observee}, api_user: student, expected_status: 401)
+      create_call({ observee: observee }, api_user: student, expected_status: 401)
 
       expect(student.reload.linked_students).to eq []
     end
@@ -629,35 +638,34 @@ describe UserObserveesController, type: :request do
     end
   end
 
-    context "Add observer by token" do
-      shared_examples "handle_observees_by_auth_token" do
-        it 'should add an observee, given a valid access token' do
-          expect(create_call({access_token: access_token_for_user(@token_student)})).to eq @token_student.id
-          expect(parent.reload.linked_students).to eq [@token_student]
-        end
-
-        it 'should not add an observee, given an invalid access token' do
-          create_call({access_token: "Not A Valid Token"}, expected_status: 422)
-          expect(parent.reload.linked_students).to eq []
-        end
+  context "Add observer by token" do
+    shared_examples "handle_observees_by_auth_token" do
+      it 'should add an observee, given a valid access token' do
+        expect(create_call({ access_token: access_token_for_user(@token_student) })).to eq @token_student.id
+        expect(parent.reload.linked_students).to eq [@token_student]
       end
 
-      context "with sharding" do
-        specs_require_sharding
-        before :each do
-          @shard2.activate do
-            @token_student = user_with_pseudonym(name: "Sharded Student", active_all: true)
-          end
-        end
-        include_examples "handle_observees_by_auth_token"
-      end
-
-      context "without sharding" do
-        before :once do
-          @token_student = user_with_pseudonym(name: "Sameshard Student", active_all: true)
-        end
-        include_examples "handle_observees_by_auth_token"
+      it 'should not add an observee, given an invalid access token' do
+        create_call({ access_token: "Not A Valid Token" }, expected_status: 422)
+        expect(parent.reload.linked_students).to eq []
       end
     end
 
+    context "with sharding" do
+      specs_require_sharding
+      before :each do
+        @shard2.activate do
+          @token_student = user_with_pseudonym(name: "Sharded Student", active_all: true)
+        end
+      end
+      include_examples "handle_observees_by_auth_token"
+    end
+
+    context "without sharding" do
+      before :once do
+        @token_student = user_with_pseudonym(name: "Sameshard Student", active_all: true)
+      end
+      include_examples "handle_observees_by_auth_token"
+    end
+  end
 end

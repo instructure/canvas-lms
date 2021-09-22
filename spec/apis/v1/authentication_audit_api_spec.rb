@@ -42,7 +42,7 @@ describe "AuthenticationAudit API", type: :request do
     before do
       Setting.set('enable_page_views', 'cassandra')
       @request_id = SecureRandom.uuid
-      allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+      allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
       @viewing_user = site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
       @account = Account.default
@@ -61,7 +61,7 @@ describe "AuthenticationAudit API", type: :request do
       @event = Auditors::Authentication.record(@pseudonym, 'login')
     end
 
-    def fetch_for_context(context, options={})
+    def fetch_for_context(context, options = {})
       type = context.class.to_s.downcase unless type = options.delete(:type)
       id = context.id.to_s
 
@@ -88,19 +88,19 @@ describe "AuthenticationAudit API", type: :request do
       api_call_as_user(@viewing_user, :get, path, arguments, {}, {}, options.slice(:expected_status))
     end
 
-    def expect_event_for_context(context, event, options={})
+    def expect_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .to include([event.id, event.event_type])
       json
     end
 
-    def forbid_event_for_context(context, event, options={})
+    def forbid_event_for_context(context, event, options = {})
       json = options.delete(:json)
       json ||= fetch_for_context(context, options)
-      expect(json['events'].map{ |e| [e['id'], e['event_type']] })
-                    .not_to include([event.id, event.event_type])
+      expect(json['events'].map { |e| [e['id'], e['event_type']] })
+        .not_to include([event.id, event.event_type])
       json
     end
 
@@ -204,9 +204,9 @@ describe "AuthenticationAudit API", type: :request do
             "name" => @user.name,
             "sortable_name" => @user.sortable_name,
             "short_name" => @user.short_name,
-            "sis_user_id"=>nil,
-            "integration_id"=>nil,
-            "sis_import_id"=>nil,
+            "sis_user_id" => nil,
+            "integration_id" => nil,
+            "sis_import_id" => nil,
             "login_id" => @pseudonym.unique_id
           }]
         end
@@ -281,7 +281,8 @@ describe "AuthenticationAudit API", type: :request do
             'id' => SecureRandom.uuid,
             'created_at' => 1.day.ago,
             'pseudonym' => @pseudonym,
-            'event_type' => 'logout')
+            'event_type' => 'logout'
+          )
           Auditors::Authentication::Stream.insert(record)
         end
       end
@@ -370,7 +371,8 @@ describe "AuthenticationAudit API", type: :request do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
             :role => @custom_role,
-            :role_changes => {:view_statistics => true})
+            :role_changes => { :view_statistics => true }
+          )
         end
 
         it "should authorize the login endpoint" do
@@ -391,7 +393,8 @@ describe "AuthenticationAudit API", type: :request do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
             :role => @custom_role,
-            :role_changes => {:manage_user_logins => true})
+            :role_changes => { :manage_user_logins => true }
+          )
         end
 
         it "should authorize the login endpoint" do
@@ -412,7 +415,8 @@ describe "AuthenticationAudit API", type: :request do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
             :role => @custom_sa_role,
-            :role_changes => {:view_statistics => true})
+            :role_changes => { :view_statistics => true }
+          )
         end
 
         it "should authorize the login endpoint" do
@@ -433,7 +437,8 @@ describe "AuthenticationAudit API", type: :request do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => Account.site_admin, :user => @viewing_user,
             :role => @custom_sa_role,
-            :role_changes => {:manage_user_logins => true})
+            :role_changes => { :manage_user_logins => true }
+          )
         end
 
         it "should authorize the login endpoint" do
@@ -457,7 +462,8 @@ describe "AuthenticationAudit API", type: :request do
           @user, _ = @user, account_admin_user_with_role_changes(
             :account => @account, :user => @viewing_user,
             :role => custom_role,
-            :role_changes => {:manage_user_logins => true})
+            :role_changes => { :manage_user_logins => true }
+          )
         end
 
         context "without permission on the second account" do
@@ -471,7 +477,8 @@ describe "AuthenticationAudit API", type: :request do
             @user, _ = @user, account_admin_user_with_role_changes(
               :account => Account.site_admin, :user => @viewing_user,
               :role => @custom_sa_role,
-              :role_changes => {:manage_user_logins => true})
+              :role_changes => { :manage_user_logins => true }
+            )
           end
 
           it "should include cross-account events at user endpoint" do
@@ -509,13 +516,14 @@ describe "AuthenticationAudit API", type: :request do
 
       context "with permission on only a subset of accounts" do
         before do
-          @user, @viewing_user = @user, @shard2.activate{ user_model }
+          @user, @viewing_user = @user, @shard2.activate { user_model }
           @user, _ = @user, @shard2.activate do
             custom_role = custom_account_role("CustomAdmin", :account => @account)
             account_admin_user_with_role_changes(
               :account => @account, :user => @viewing_user,
               :role => custom_role,
-              :role_changes => {:manage_user_logins => true})
+              :role_changes => { :manage_user_logins => true }
+            )
           end
         end
 
