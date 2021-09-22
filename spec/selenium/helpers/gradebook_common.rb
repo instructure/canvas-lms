@@ -126,11 +126,11 @@ module GradebookCommon
     cells[4].find_element(:css, '.percentage').text.strip
   end
 
-  def switch_to_section(section=nil)
+  def switch_to_section(section = nil)
     ::Gradebook.select_section(section)
   end
 
-  def gradebook_data_setup(opts={})
+  def gradebook_data_setup(opts = {})
     assignment_setup_defaults
     assignment_setup(opts)
   end
@@ -154,8 +154,8 @@ module GradebookCommon
     @default_password = "qwertyuiop"
   end
 
-  def assignment_setup(opts={})
-    course_with_teacher({active_all: true}.merge(opts))
+  def assignment_setup(opts = {})
+    course_with_teacher({ active_all: true }.merge(opts))
     @course.grading_standard_enabled = true
     @course.save!
     @course.reload
@@ -323,7 +323,7 @@ module GradebookCommon
         @a3.submit_homework(@course.students.first, body: 'submitting my homework')
       end
     end
-    
+
     def grade_assignments
       # as a teacher grade the assignments
       @a1.grade_student(@course.students.first, grade: 90, grader: @teacher)

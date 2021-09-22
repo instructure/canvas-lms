@@ -94,18 +94,18 @@ describe 'Global Navigation' do
     describe 'LTI Tools' do
       it 'should show a custom logo/link for LTI tools' do
         @tool = Account.default.context_external_tools.new({
-          :name => "Commons",
-          :domain => "canvaslms.com",
-          :consumer_key => '12345',
-          :shared_secret => 'secret'
-        })
+                                                             :name => "Commons",
+                                                             :domain => "canvaslms.com",
+                                                             :consumer_key => '12345',
+                                                             :shared_secret => 'secret'
+                                                           })
         @tool.set_extension_setting(:global_navigation, {
-          :url => "canvaslms.com",
-          :visibility => "admins",
-          :display_type => "full_width",
-          :text => "Commons",
-          :icon_svg_path_64 => 'M100,37L70.1,10.5v17.6H38.6c-4.9,0-8.8,3.9-8.8,8.8s3.9,8.8,8.8,8.8h31.5v17.6L100,37z'
-        })
+                                      :url => "canvaslms.com",
+                                      :visibility => "admins",
+                                      :display_type => "full_width",
+                                      :text => "Commons",
+                                      :icon_svg_path_64 => 'M100,37L70.1,10.5v17.6H38.6c-4.9,0-8.8,3.9-8.8,8.8s3.9,8.8,8.8,8.8h31.5v17.6L100,37z'
+                                    })
         @tool.save!
         get "/"
         expect(f('.ic-icon-svg--lti')).to be_displayed

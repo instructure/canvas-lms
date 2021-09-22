@@ -106,7 +106,8 @@ describe "assignments" do
         :title => "some assignment",
         :submission_types => "online_url,online_upload,online_text_entry",
         :group_category => GroupCategory.create!(:name => "groups", :context => @course),
-        :grade_group_students_individually => false)
+        :grade_group_students_individually => false
+      )
       group = assignment.group_category.groups.create!(:name => 'g1', :context => @course)
       group.users << u1
       group.users << @user
@@ -163,7 +164,6 @@ describe "assignments" do
       expect(f(".student-assignment-overview")).to be_displayed
     end
 
-
     it "should still not show assignment data if locked by unlock date" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
@@ -190,7 +190,7 @@ describe "assignments" do
       it "should allow submission when within override locks" do
         @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
-        @override.unlock_at = Time.now.utc - 1.days   # available now
+        @override.unlock_at = Time.now.utc - 1.days # available now
         @override.save!
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -211,7 +211,7 @@ describe "assignments" do
       end
     end
 
-    context "click_away_accept_alert" do #this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
+    context "click_away_accept_alert" do # this context exits to handle the click_away_accept_alert method call after each spec that needs it even if it fails early to prevent other specs from failing
       after(:each) do
         click_away_accept_alert
       end
@@ -418,7 +418,7 @@ describe "assignments" do
 
     it "should correctly categorize assignments by date" do
       # assuming two undated and two future assignments created above
-      undated, upcoming = @course.assignments.partition{ |a| a.due_date.nil? }
+      undated, upcoming = @course.assignments.partition { |a| a.due_date.nil? }
 
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }

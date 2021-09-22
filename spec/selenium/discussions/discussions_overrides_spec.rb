@@ -30,14 +30,14 @@ describe "discussions overrides" do
     @new_section = @course.course_sections.create!(name: 'New Section')
     @assignment = @course.assignments.create!(name: 'assignment', assignment_group: @assignment_group)
     @discussion_topic = @course.discussion_topics.create!(user: @teacher,
-                                                         title: 'Discussion 1',
-                                                         message: 'Discussion with multiple due dates',
-                                                         assignment: @assignment)
+                                                          title: 'Discussion 1',
+                                                          message: 'Discussion with multiple due dates',
+                                                          assignment: @assignment)
   end
 
   it "should add multiple due dates", priority: "2", test_id: 58763 do
     get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-    expect_new_page_load{f('.edit-btn').click}
+    expect_new_page_load { f('.edit-btn').click }
     expect(f('.ic-token-label')).to include_text('Everyone')
     assign_dates_for_first_override_section
     f('#add_due_date').click
@@ -50,12 +50,12 @@ describe "discussions overrides" do
 
   describe "set overrides" do
     around do |example|
-      Timecop.freeze(Time.zone.local(2016,12,15,10,0,0), &example)
+      Timecop.freeze(Time.zone.local(2016, 12, 15, 10, 0, 0), &example)
     end
 
     before do
-      default_due_at = Time.zone.now.advance(days:1).round
-      override_due_at = Time.zone.now.advance(days:2).round
+      default_due_at = Time.zone.now.advance(days: 1).round
+      override_due_at = Time.zone.now.advance(days: 2).round
       @assignment.due_at = default_due_at
       add_user_specific_due_date_override(@assignment, due_at: override_due_at, section: @new_section)
       @discussion_topic.save!
@@ -84,8 +84,8 @@ describe "discussions overrides" do
       expect(f('.discussion-topic-due-dates')).to be_present
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(1)').text).to include(@default_due_at_time)
       expect(f('.discussion-topic-due-dates tbody tr td:nth-of-type(2)').text).to include('Everyone else')
-      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(1)').text).
-                                                                                     to include(@override_due_at_time)
+      expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(1)').text)
+        .to include(@override_due_at_time)
       expect(f('.discussion-topic-due-dates tbody tr:nth-of-type(2) td:nth-of-type(2)').text).to include('New Section')
       f('.toggle_due_dates').click
       wait_for_ajaximations
@@ -96,7 +96,7 @@ describe "discussions overrides" do
       skip('Example skipped due to an issue in the assignment add button for due dates')
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       @new_section_1 = @course.course_sections.create!(name: 'Additional Section')
-      expect_new_page_load{f('.edit-btn').click}
+      expect_new_page_load { f('.edit-btn').click }
       f('#add_due_date').click
       wait_for_ajaximations
       select_last_override_section(@new_section_1.name)
@@ -106,13 +106,13 @@ describe "discussions overrides" do
 
     it "should allow to not set due dates for everyone", priority: "2", test_id: 114320 do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
-      expect_new_page_load{f('.edit-btn').click}
+      expect_new_page_load { f('.edit-btn').click }
       f('#bordered-wrapper .Container__DueDateRow-item:nth-of-type(2) button[title = "Remove These Dates"]').click
       f('.form-actions button[type=submit]').click
       wait_for_ajaximations
       expect(fj('.ui-dialog:contains("Warning")')).to be_present
       expect(fj('.ui-dialog:contains("Warning")').text).to include('Not all sections will be assigned this item')
-      wait_for_new_page_load{f('.ui-dialog .ui-dialog-buttonset .btn-primary').click}
+      wait_for_new_page_load { f('.ui-dialog .ui-dialog-buttonset .btn-primary').click }
       f('.toggle_due_dates').click
       wait_for_ajaximations
       # The toggle dates does not show the due date for everyone else
@@ -123,8 +123,8 @@ describe "discussions overrides" do
 
     context "outside discussions page" do
       before do
-        @default_due = format_date_for_view(Time.zone.now.advance(days:1))
-        @override_due = format_date_for_view(Time.zone.now.advance(days:2))
+        @default_due = format_date_for_view(Time.zone.now.advance(days: 1))
+        @override_due = format_date_for_view(Time.zone.now.advance(days: 2))
       end
 
       it "should show due dates in mouse hover in the assignments index page", priority: "2", test_id: 114318 do

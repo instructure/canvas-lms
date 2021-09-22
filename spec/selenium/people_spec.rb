@@ -110,7 +110,6 @@ describe "people" do
   end
 
   context "people as a teacher" do
-
     before :once do
       course_with_teacher active_user: true, active_course: true, active_enrollment: true, name: 'Mrs. Commanderson'
       # add first student
@@ -189,7 +188,7 @@ describe "people" do
       expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
-    it "should not display Student Interaction button for a student", priority: "1", test_id: 244450  do
+    it "should not display Student Interaction button for a student", priority: "1", test_id: 244450 do
       user_session(@student_1)
       get "/courses/#{@course.id}/users"
       expect(f("#content")).not_to contain_link("Student Interactions Report")
@@ -333,7 +332,7 @@ describe "people" do
       end
 
       2.times do |i|
-        student_in_course(:name => "Student #{i+2}")
+        student_in_course(:name => "Student #{i + 2}")
         @students << @student
       end
 
@@ -459,7 +458,6 @@ describe "people" do
   end
 
   context "people as a student" do
-
     before :once do
       course_with_student(:active_all => true)
     end
@@ -475,7 +473,6 @@ describe "people" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(f('.avatar')['href']).not_to be_present
     end
-
   end
 
   context "course with multiple sections", priority: "2" do
@@ -495,7 +492,7 @@ describe "people" do
       wait_for_ajaximations
 
       expect(f(".addpeople")).to be_displayed
-      replace_content(f(".addpeople__peoplesearch textarea"),'student@example.com')
+      replace_content(f(".addpeople__peoplesearch textarea"), 'student@example.com')
       click_INSTUI_Select_option('#peoplesearch_select_role', ta_role.id.to_s, :value)
       click_INSTUI_Select_option('#peoplesearch_select_section', 'Unnamed Course', :text)
       f('#addpeople_next').click
@@ -834,7 +831,8 @@ describe "people" do
           @tool.student_context_card = {
             :url => "http://www.example.com",
             :text => "See data for this student or whatever",
-            :required_permissions => "view_all_grades,manage_grades"}
+            :required_permissions => "view_all_grades,manage_grades"
+          }
           @tool.save!
         end
 

@@ -22,7 +22,6 @@ require_relative '../helpers/gradebook_common'
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
 
-
 describe 'Canvadoc' do
   include_context "in-process server selenium tests"
   include GradebookCommon
@@ -31,10 +30,10 @@ describe 'Canvadoc' do
 
   before :once do
     PluginSetting.create! :name => 'canvadocs',
-      :settings => {"api_key" => "blahblahblahblahblah",
-                    "base_url" => "http://example.com",
-                    "annotations_supported" => "1",
-                    "account" => "Account.default"}
+                          :settings => { "api_key" => "blahblahblahblahblah",
+                                         "base_url" => "http://example.com",
+                                         "annotations_supported" => "1",
+                                         "account" => "Account.default" }
   end
 
   def turn_on_plugin_settings

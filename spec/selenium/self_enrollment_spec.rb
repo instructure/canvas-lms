@@ -183,9 +183,9 @@ describe "self enrollment" do
   end
 
   context "in a published course" do
-    let(:active_course){ true }
-    let(:set_up_course){ }
-    let(:primary_action){ "Go to the Course" }
+    let(:active_course) { true }
+    let(:set_up_course) {}
+    let(:primary_action) { "Go to the Course" }
     let(:assert_valid_dashboard) {
       expect(f('#global_nav_courses_link')).to include_text("Courses")
     }
@@ -199,13 +199,13 @@ describe "self enrollment" do
   end
 
   context "in a not-yet-started course" do
-    let(:active_course){ true }
+    let(:active_course) { true }
     let(:set_up_course) {
       @course.start_at = 1.week.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
     }
-    let(:primary_action){ "Go to your Dashboard" }
+    let(:primary_action) { "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
       expect(f('#global_nav_courses_link')).to include_text("Courses") # show for future course
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
@@ -219,9 +219,9 @@ describe "self enrollment" do
   end
 
   context "in an unpublished course" do
-    let(:active_course){ false }
-    let(:set_up_course){ }
-    let(:primary_action){ "Go to your Dashboard" }
+    let(:active_course) { false }
+    let(:set_up_course) {}
+    let(:primary_action) { "Go to your Dashboard" }
     let(:assert_valid_dashboard) {
       expect(f('#global_nav_courses_link')).to include_text("Courses")
       expect(f('#dashboard')).to include_text("You've enrolled in one or more courses that have not started yet")
@@ -233,5 +233,4 @@ describe "self enrollment" do
       include_examples "closed registration"
     end
   end
-
 end

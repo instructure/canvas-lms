@@ -130,8 +130,8 @@ describe "manage groups" do
       expect(f("#content")).not_to contain_css(group1_users_selector)
       expect(f("#content")).not_to contain_css(group2_users_selector)
 
-      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
-      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
+      drag_and_drop_element(fj(first_unassigned_user), fj(group1_selector))
+      drag_and_drop_element(fj(first_unassigned_user), fj(group1_selector))
       # assert there are 3 students in unassigned
       # assert there is 2 student in group 0
       # assert there is still 0 students in group 1
@@ -139,8 +139,8 @@ describe "manage groups" do
       expect(ff(group1_users_selector).size).to eq 2
       expect(f("#content")).not_to contain_css(group2_users_selector)
 
-      drag_and_drop_element( fj(first_group1_user), fj(unassigned_group_selector) )
-      drag_and_drop_element( fj(first_group1_user), fj(group2_selector) )
+      drag_and_drop_element(fj(first_group1_user), fj(unassigned_group_selector))
+      drag_and_drop_element(fj(first_group1_user), fj(group2_selector))
       # assert there are 4 students in unassigned
       # assert there are 0 students in group 0
       # assert there is 1 student in group 1
@@ -177,7 +177,7 @@ describe "manage groups" do
       skip('KNO-190')
       students = groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
-      groups = add_groups_in_category(group_categories[0],2)
+      groups = add_groups_in_category(group_categories[0], 2)
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 

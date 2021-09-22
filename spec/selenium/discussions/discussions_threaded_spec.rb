@@ -114,11 +114,13 @@ describe "threaded discussions" do
 
     it "should allow edits to discussion with replies", priority: "1", test_id: 150513 do
       reply_depth = 3
-      reply_depth.times { |i| @topic.discussion_entries.create!(user: @student,
-                                                                message: "new threaded reply #{i} from student",
-                                                                parent_entry: DiscussionEntry.last) }
+      reply_depth.times { |i|
+        @topic.discussion_entries.create!(user: @student,
+                                          message: "new threaded reply #{i} from student",
+                                          parent_entry: DiscussionEntry.last)
+      }
       Discussion.visit(@course, @topic)
-      expect_new_page_load{ f('.edit-btn').click }
+      expect_new_page_load { f('.edit-btn').click }
       edit_topic('edited title', 'edited message')
       expect(get_all_replies.count).to eq 3
     end
@@ -210,7 +212,7 @@ describe "threaded discussions" do
       expect(f("#entry-#{entry.id} #entry-#{subentry.id}")).to be_truthy
     end
 
-    it "should display editor name and timestamp after delete", priority: "2", test_id: 222525  do
+    it "should display editor name and timestamp after delete", priority: "2", test_id: 222525 do
       entry_text = 'new entry'
       Discussion.visit(@course, @topic)
 
@@ -277,7 +279,7 @@ describe "threaded discussions" do
       f("button[data-testid='thread-actions-menu']").click
       fj("li:contains('Edit')").click
       wait_for_ajaximations
-      type_in_tiny('textarea',edit_text)
+      type_in_tiny('textarea', edit_text)
       fj("button:contains('Save')").click
       wait_for_ajax_requests
       expect(entry.reload.message).to match(edit_text)

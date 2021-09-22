@@ -48,13 +48,13 @@ describe "analytics in Canvas" do
       # Analytics1.0 is disabled
       @admin.account.update(allowed_services: "")
       visit_admin_settings_tab(@admin.account.id)
-      
+
       expect(admin_left_nav_menu.text).not_to include('Analytics')
     end
   end
 
   context "Analytics 2.0 LTI installed" do
-    before :once do 
+    before :once do
       @admin = account_admin_user(:active_all => true)
       # Analytics1.0 is enabled for all tests by default
       @admin.account.update(allowed_services: "+analytics")
@@ -63,14 +63,14 @@ describe "analytics in Canvas" do
       @tool_id = @admin.account.context_external_tools.first.id
       # create a course, @teacher and student in course
       @course = course_with_teacher(
-        :account => @admin.account, 
-        :course_name => "A New Course", 
-        name: 'Teacher1', 
+        :account => @admin.account,
+        :course_name => "A New Course",
+        name: 'Teacher1',
         :active_all => true
       ).course
       @student = student_in_course(
-        :course => @course, 
-        :name => "First Student", 
+        :course => @course,
+        :name => "First Student",
         :active_all => true
       ).user
     end
@@ -102,8 +102,8 @@ describe "analytics in Canvas" do
           manage_user_link(@student.name).click
 
           expect(manage_user_options_list.text).to include('Analytics 2')
-          expect(manage_user_analytics_2_link.attribute('href')).
-            to include("/courses/#{@course.id}/external_tools/#{@tool_id}?launch_type=student_context_card&student_id=#{@student.id}")
+          expect(manage_user_analytics_2_link.attribute('href'))
+            .to include("/courses/#{@course.id}/external_tools/#{@tool_id}?launch_type=student_context_card&student_id=#{@student.id}")
         end
       end
 
@@ -134,8 +134,8 @@ describe "analytics in Canvas" do
 
     #   it "with FF enabled, displays Analytics 2 link on course nav" do
     #     visit_course_home_page(@course.id)
-             
-    #     expect(course_nav_menu.text).to include('Analytics 2')       
+
+    #     expect(course_nav_menu.text).to include('Analytics 2')
     #   end
 
     #   it "with FF enabled, displays Analytics 2 link on self profile page" do
@@ -152,7 +152,7 @@ describe "analytics in Canvas" do
       # view_all_grades permission is required in analytics 2 for student tray and user analytics
       context "with A2 FF enabled" do
         before :each do
-          @course.root_account.enable_feature!(:analytics_2)   
+          @course.root_account.enable_feature!(:analytics_2)
           @course.account.role_overrides.create!(permission: :view_all_grades, role: teacher_role, enabled: false)
           user_session(@teacher)
         end

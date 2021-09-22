@@ -36,6 +36,7 @@ module SharedExamplesCommon
       if opts.empty? || !opts.key?(context)
         raise("Error: Invalid context for test id")
       end
+
       opts[context]
     end
 
@@ -50,10 +51,11 @@ module SharedExamplesCommon
     #                                    admin: "592119", ta: "592130"),
     #     priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
     #
-    def pick_priority(context, opts ={})
+    def pick_priority(context, opts = {})
       if opts.empty? || !opts.key?(context)
         raise("Error: Invalid context for test id")
       end
+
       opts[context]
     end
   end

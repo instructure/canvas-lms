@@ -108,7 +108,7 @@ describe 'creating a quiz' do
 
       expect(f('#quiz-draft-state')).to be_displayed
 
-      expect_new_page_load {f('.save_and_publish').click}
+      expect_new_page_load { f('.save_and_publish').click }
       expect(f('#quiz-publish-link.btn-published')).to be_displayed
 
       # Check that the list of quizzes is also updated
@@ -130,7 +130,7 @@ describe 'creating a quiz' do
       it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
         expect do
           create_new_quiz
-        end.to change{ Quizzes::Quiz.count }.by(1)
+        end.to change { Quizzes::Quiz.count }.by(1)
       end
 
       it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
@@ -168,7 +168,7 @@ describe 'creating a quiz' do
     end
 
     it "should default to post grades if account setting is enabled", custom_timeout: 30 do
-      @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+      @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
       @account.save!
 
       get "/courses/#{@course.id}/quizzes"
@@ -221,7 +221,7 @@ describe 'creating a quiz' do
 
       before do
         turn_on_sis_settings(@account)
-        @account.settings[:sis_require_assignment_due_date] = { value: true}
+        @account.settings[:sis_require_assignment_due_date] = { value: true }
         @account.save!
       end
 

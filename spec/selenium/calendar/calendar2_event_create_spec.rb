@@ -32,7 +32,7 @@ describe "calendar2" do
 
   before(:each) do
     Account.default.tap do |a|
-      a.settings[:show_scheduler]   = true
+      a.settings[:show_scheduler] = true
       a.save!
     end
   end
@@ -71,7 +71,7 @@ describe "calendar2" do
         expect(title).to be_displayed
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
-        expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/  # passed in ISO format, not localized
+        expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/ # passed in ISO format, not localized
         expect(f('.title')).to have_value event_title
         expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)
@@ -189,15 +189,15 @@ describe "calendar2" do
         replace_content(f("input[type=number][name='duplicate_count']"), 1)
 
         form = f('#editCalendarEventFull')
-        expect_new_page_load{form.submit}
+        expect_new_page_load { form.submit }
 
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
-        s1_events = CalendarEvent.where(:context_code => section1.asset_string).
-          where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s1_events = CalendarEvent.where(:context_code => section1.asset_string)
+                                 .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
         expect(s1_events[1].start_at.to_date).to eq (s1_events[0].start_at.to_date + 1.week)
 
-        s2_events = CalendarEvent.where(:context_code => section2.asset_string).
-          where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
+        s2_events = CalendarEvent.where(:context_code => section2.asset_string)
+                                 .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
         expect(s2_events[1].start_at.to_date).to eq (s2_events[0].start_at.to_date + 1.week)
       end
 
@@ -259,8 +259,8 @@ describe "calendar2" do
         get "/calendar2"
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
-        expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_time_for_view(@todo_date, :short)
+        expect(event_content.find_element(:css, '.event-details-timestring').text)
+          .to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link('Student 1')
       end
     end
@@ -281,8 +281,8 @@ describe "calendar2" do
         get "/calendar2"
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
-        expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_time_for_view(@todo_date, :short)
+        expect(event_content.find_element(:css, '.event-details-timestring').text)
+          .to eq format_time_for_view(@todo_date, :short)
         expect(event_content).to contain_link('Course 1')
       end
     end
@@ -294,7 +294,6 @@ describe "calendar2" do
       end
 
       it "respects the calendars checkboxes" do
-
         get "/calendar2"
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
 
@@ -304,7 +303,6 @@ describe "calendar2" do
         # turn it back on
         f("span.group_user_#{@student1.id}").click
         expect(ff('.fc-view-container .fc-content .fc-title').length).to equal(1)
-
 
         # click to edit
         f(".fc-event-container a.group_user_#{@student1.id}").click
@@ -335,17 +333,17 @@ describe "calendar2" do
         replace_content(f('input[name=title]'), 'new to-do edited')
         datetime = @todo_date
         datetime = if datetime.to_date().mday() == '15'
-                      datetime.change({day: 20})
+                     datetime.change({ day: 20 })
                    else
-                      datetime.change({day: 15})
+                     datetime.change({ day: 15 })
                    end
         replace_content(f('input[name=date]'), format_date_for_view(datetime, :short))
         f('.validated-form-view').submit
         refresh_page
         f('.fc-content .fc-title').click
         event_content = fj('.event-details-content:visible')
-        expect(event_content.find_element(:css, '.event-details-timestring').text).
-          to eq format_time_for_view(datetime, :short)
+        expect(event_content.find_element(:css, '.event-details-timestring').text)
+          .to eq format_time_for_view(datetime, :short)
         @to_do.reload
         expect(format_time_for_view(@to_do.todo_date, :short)).to eq(format_time_for_view(datetime, :short))
       end

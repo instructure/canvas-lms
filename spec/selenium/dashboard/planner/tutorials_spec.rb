@@ -18,7 +18,6 @@
 require_relative '../../common'
 
 describe "Tutorials" do
-
   include_context "in-process server selenium tests"
 
   context "In Teacher Settings" do
@@ -35,7 +34,6 @@ describe "Tutorials" do
   end
 
   context "In Course Pages" do
-
     before(:once) do
       Account.default.enable_feature!(:new_user_tutorial)
       course_with_teacher(active_all: true, new_user: true)
@@ -116,7 +114,7 @@ describe "Tutorials" do
       expect(element).to include_text("Distribute files to students from your course folder")
     end
 
-    it "the tutorial tray appears on the syllabus page", priority:"1", test_id: 3165150 do
+    it "the tutorial tray appears on the syllabus page", priority: "1", test_id: 3165150 do
       get "/courses/#{@course.id}/assignments/syllabus"
       element = f('.NewUserTutorialTray')
       expect(element).to include_text("Syllabus")

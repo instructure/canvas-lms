@@ -33,7 +33,6 @@ describe 'quizzes' do
   end
 
   context 'with a student' do
-
     it 'can\'t see unpublished quizzes', priority: "1", test_id: 140651 do
       # create course with an unpublished quiz
       assignment_quiz([], course: @course)
@@ -53,7 +52,6 @@ describe 'quizzes' do
     end
 
     context 'with a quiz started' do
-
       before(:once) do
         @qsub = quiz_with_submission(false)
       end
@@ -108,7 +106,6 @@ describe 'quizzes' do
       end
 
       context 'when logged out while taking a quiz' do
-
         it 'is notified and able to relogin', priority: "1", test_id: 209413 do
           # setup a quiz and start taking it
           quiz_with_new_questions(!:goto_edit)
@@ -123,9 +120,9 @@ describe 'quizzes' do
           # now kill our session (like logging out)
           destroy_session
           sleep 1 # updateSubmission throttles itself at 1 sec (quite
-                  # unintelligently, cuz it ignores calls in that second,
-                  # so you'd have to wait 15-30 sec for the periodic
-                  # update to hit)
+          # unintelligently, cuz it ignores calls in that second,
+          # so you'd have to wait 15-30 sec for the periodic
+          # update to hit)
 
           # and try answering another question
           ff('.answers .answer_input input')[1].click
@@ -140,7 +137,6 @@ describe 'quizzes' do
   end
 
   context 'with multiple fill in the blanks' do
-
     it 'displays MFITB responses in their respective boxes on submission view page', priority: "2", test_id: 209414 do
       # create new multiple fill in the blank quiz and question
       @quiz = quiz_model({ course: @course, time_limit: 5 })
@@ -194,7 +190,7 @@ describe 'quizzes' do
     before(:each) do
       quiz_with_submission
       @quiz.update(:show_correct_answers => true,
-        :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
+                   :show_correct_answers_last_attempt => true, :allowed_attempts => 2)
       @quiz.save!
     end
 
@@ -211,7 +207,6 @@ describe 'quizzes' do
   end
 
   context 'when the \'show correct answers\' setting is off' do
-
     before(:once) do
       quiz_with_submission
       @quiz.update(show_correct_answers: false)

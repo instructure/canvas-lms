@@ -34,7 +34,6 @@ describe "account" do
   end
 
   describe "term create/update" do
-
     it "should be able to add a term" do
       get "/accounts/#{Account.default.id}/terms"
       f(".add_term_link").click
@@ -66,11 +65,11 @@ describe "account" do
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["Jul 1", "Jul 31"],
-          :student_enrollment => ["term start", "term end"],
-          :teacher_enrollment => ["whenever", "term end"],
-          :ta_enrollment => ["whenever", "term end"]
-      })
+                                    :general => ["Jul 1", "Jul 31"],
+                                    :student_enrollment => ["term start", "term end"],
+                                    :teacher_enrollment => ["whenever", "term end"],
+                                    :ta_enrollment => ["whenever", "term end"]
+                                  })
     end
 
     it 'student enrollment dates', priority: 1, test_id: 1621632 do
@@ -82,11 +81,11 @@ describe "account" do
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["whenever", "whenever"],
-          :student_enrollment => ["Jul 2", "Jul 30"],
-          :teacher_enrollment => ["whenever", "term end"],
-          :ta_enrollment => ["whenever", "term end"]
-      })
+                                    :general => ["whenever", "whenever"],
+                                    :student_enrollment => ["Jul 2", "Jul 30"],
+                                    :teacher_enrollment => ["whenever", "term end"],
+                                    :ta_enrollment => ["whenever", "term end"]
+                                  })
     end
 
     it 'teacher enrollment dates', priority: 1, test_id: 1621633 do
@@ -98,11 +97,11 @@ describe "account" do
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["whenever", "whenever"],
-          :student_enrollment => ["term start", "term end"],
-          :teacher_enrollment => ["Jul 3", "Jul 29"],
-          :ta_enrollment => ["whenever", "term end"]
-      })
+                                    :general => ["whenever", "whenever"],
+                                    :student_enrollment => ["term start", "term end"],
+                                    :teacher_enrollment => ["Jul 3", "Jul 29"],
+                                    :ta_enrollment => ["whenever", "term end"]
+                                  })
     end
 
     it 'ta enrollment dates', priority: 1, test_id: 1621934 do
@@ -114,11 +113,11 @@ describe "account" do
       f(".submit_button").click
       expect(term).not_to have_class("editing_term")
       verify_displayed_term_dates(term, {
-          :general => ["whenever", "whenever"],
-          :student_enrollment => ["term start", "term end"],
-          :teacher_enrollment => ["whenever", "term end"],
-          :ta_enrollment => ["Jul 4", "Jul 28"]
-      })
+                                    :general => ["whenever", "whenever"],
+                                    :student_enrollment => ["term start", "term end"],
+                                    :teacher_enrollment => ["whenever", "term end"],
+                                    :ta_enrollment => ["Jul 4", "Jul 28"]
+                                  })
     end
   end
 

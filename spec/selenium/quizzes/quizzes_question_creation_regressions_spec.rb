@@ -96,7 +96,7 @@ describe 'quizzes question creation' do
 
       # check to make sure extra answers were not generated
       expect(quiz.quiz_questions.first.question_data['answers'].count).to eq 2
-      expect(quiz.quiz_questions.first.question_data['answers'].detect{|a| a['text'] == ''}).to be_nil
+      expect(quiz.quiz_questions.first.question_data['answers'].detect { |a| a['text'] == '' }).to be_nil
     end
 
     it 'respects character limits on short answer questions', priority: "2", test_id: 197493 do
@@ -113,7 +113,6 @@ describe 'quizzes question creation' do
         expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
       end
     end
-
 
     it 'respects character limits on short answer questions- MFIB', priority: "2", test_id: 1160451 do
       skip('Skipping this as there is already an existing bug CNVS-27665 for this')
@@ -145,7 +144,6 @@ describe 'quizzes question creation' do
     #  This is a function written to capture common code used
     #  in MFIB and FIB case for checking number of characters are <80 in answers
     def trigger_max_characters_alert(web_element)
-
       short_answer_field = lambda do
         replace_content(web_element, 'a' * 100)
         web_element.send_keys(:tab)

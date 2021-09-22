@@ -54,11 +54,11 @@ module DifferentiatedAssignments
     @da_quiz = @course.quizzes.create!(:title => 'DA Quiz', :allowed_attempts => '2', :only_visible_to_overrides => true)
     @da_quiz.publish!
     assignment_data = {
-        :title => 'DA assignment',
-        :points_possible => 10,
-        :due_at => Time.zone.now + 2.days,
-        :submission_types => 'online_text_entry',
-        :only_visible_to_overrides => true
+      :title => 'DA assignment',
+      :points_possible => 10,
+      :due_at => Time.zone.now + 2.days,
+      :submission_types => 'online_text_entry',
+      :only_visible_to_overrides => true
     }
     @da_assignment = @course.assignments.create!(assignment_data)
     @da_d_assignment = @course.assignments.create!(assignment_data)
@@ -84,9 +84,9 @@ module DifferentiatedAssignments
 
   def create_da_quiz
     @da_quiz = @course.quizzes.create!({
-                                        :title => 'DA Quiz',
-                                        :allowed_attempts => '2',
-                                        :only_visible_to_overrides => true
+                                         :title => 'DA Quiz',
+                                         :allowed_attempts => '2',
+                                         :only_visible_to_overrides => true
                                        })
     @da_quiz.publish!
     @da_quiz

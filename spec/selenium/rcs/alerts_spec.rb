@@ -182,7 +182,7 @@ describe "Alerts" do
     end
 
     it "should not show the add link when all recipients are already there" do
-      alert = @alerts.create!(:recipients => [:student, :teachers, {:role_id => admin_role.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+      alert = @alerts.create!(:recipients => [:student, :teachers, { :role_id => admin_role.id }], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click
@@ -214,7 +214,7 @@ describe "Alerts" do
       role1 = custom_account_role('these rolls are delicious', :account => @context)
       role2 = custom_account_role('your just jelly', :account => @context)
 
-      alert = @alerts.create!(:recipients => [{:role_id => role1.id}], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+      alert = @alerts.create!(:recipients => [{ :role_id => role1.id }], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click
@@ -235,7 +235,7 @@ describe "Alerts" do
       wait_for_ajaximations
 
       alert.reload
-      expect(alert.recipients.map{|r| r[:role_id]}.sort).to eq [role1.id, role2.id].sort
+      expect(alert.recipients.map { |r| r[:role_id] }.sort).to eq [role1.id, role2.id].sort
     end
   end
 end

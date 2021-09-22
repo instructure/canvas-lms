@@ -36,7 +36,7 @@ describe "context modules" do
       override_for_student(@student, @due_at)
 
       course_module
-      @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.add_item({ :id => @assignment.id, :type => 'assignment' })
 
       user_session(@observer)
     end

@@ -63,7 +63,6 @@ describe "teacher k5 course dashboard" do
     it 'saves tab information for refresh' do
       get "/courses/#{@subject_course.id}#home"
 
-
       select_schedule_tab
       refresh_page
       wait_for_ajaximations

@@ -95,7 +95,6 @@ describe "site admin jobs ui" do
   end
 
   context "search" do
-
     it "should only action the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
       get "/jobs?flavor=id&q=#{job.id}"

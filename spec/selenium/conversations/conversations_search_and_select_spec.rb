@@ -40,8 +40,8 @@ describe "conversations index page" do
 
     describe "search" do
       before do
-        @conv1 = conversation(@teacher, @s1,body:"adrian")
-        @conv2 = conversation(@teacher, @s2,body:"roberto")
+        @conv1 = conversation(@teacher, @s1, body: "adrian")
+        @conv2 = conversation(@teacher, @s2, body: "roberto")
       end
 
       it "should allow finding messages by recipient", priority: "1", test_id: 197540 do
@@ -70,9 +70,9 @@ describe "conversations index page" do
         conversations
         f('#content').click # Ensures focus is in the window and not on the address bar
         driver.action.key_down(modifier)
-          .send_keys('a')
-          .key_up(modifier)
-          .perform
+              .send_keys('a')
+              .key_up(modifier)
+              .perform
         expect(ff('.messages li.active').count).to eq 3
       end
 

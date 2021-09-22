@@ -34,7 +34,6 @@ describe "account admin grading schemes" do
   end
 
   describe "grading schemes" do
-
     it "should add a grading scheme", priority: "1", test_id: 163992 do
       should_add_a_grading_scheme
     end
@@ -50,7 +49,6 @@ describe "account admin grading schemes" do
   end
 
   describe "grading scheme items" do
-
     before do
       create_simple_standard_and_edit(account, url)
     end

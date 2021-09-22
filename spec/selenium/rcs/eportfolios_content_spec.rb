@@ -30,7 +30,7 @@ describe "add content box" do
     @assignment = @course.assignments.create(:name => 'new assignment')
     @assignment.submit_homework(@student)
     attachment_model(:context => @student)
-    eportfolio_model({:user => @user, :name => "student content"})
+    eportfolio_model({ :user => @user, :name => "student content" })
     get "/eportfolios/#{@eportfolio.id}?view=preview"
     f("#right-side .edit_content_link").click
     wait_for_ajaximations
@@ -55,7 +55,7 @@ describe "add content box" do
     type_in_tiny "textarea", "hello student"
     submit_form(".form_content")
     wait_for_ajax_requests
-    entry_verifier({:section_type => "rich_text", :content => "hello student"})
+    entry_verifier({ :section_type => "rich_text", :content => "hello student" })
     expect(f("#page_content .section_content")).to include_text("hello student")
   end
 
@@ -84,7 +84,7 @@ describe "add content box" do
 
   context "adding html content" do
     before(:each) do
-      @html_content="<strong>student</strong>"
+      @html_content = "<strong>student</strong>"
       f(".add_html_link").click
       wait_for_ajaximations
       f("#edit_page_section_0").send_keys(@html_content)
@@ -98,13 +98,13 @@ describe "add content box" do
       allow_comments = "#eportfolio_entry_allow_comments"
       f(allow_comments).click
       expect(is_checked(allow_comments)).to be_truthy
-      comment_public="#eportfolio_entry_show_comments"
+      comment_public = "#eportfolio_entry_show_comments"
       f(comment_public).click
       expect(is_checked(comment_public)).to be_truthy
       submit_form(".form_content")
       wait_for_ajaximations
       expect(f(".section_content strong").text).to eq "student"
-      entry_verifier({:section_type => "html", :content => @html_content})
+      entry_verifier({ :section_type => "html", :content => @html_content })
       refresh_page
       f("#page_comment_message").send_keys("hi student")
       submit_form("#add_page_comment_form")
@@ -116,7 +116,7 @@ describe "add content box" do
     it "should verify that the html is there" do
       add_html
       expect(f(".section_content strong").text).to eq "student"
-      entry_verifier({:section_type => "html", :content => @html_content})
+      entry_verifier({ :section_type => "html", :content => @html_content })
     end
 
     it "should put comment in html" do
@@ -125,7 +125,7 @@ describe "add content box" do
 
     it "should delete the html content" do
       add_html
-      entry_verifier({:section_type => "html", :content => @html_content})
+      entry_verifier({ :section_type => "html", :content => @html_content })
       f("#right-side .edit_content_link").click
       hover_and_click("#page_section_0 .delete_page_section_link")
       accept_alert

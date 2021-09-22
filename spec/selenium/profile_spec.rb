@@ -55,7 +55,7 @@ describe "profile" do
   end
 
   def log_in_to_settings
-    user_with_pseudonym({active_user: true})
+    user_with_pseudonym({ active_user: true })
     create_session(@pseudonym)
     get '/profile/settings'
   end
@@ -100,7 +100,6 @@ describe "profile" do
   end
 
   context "non password tests" do
-
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -137,7 +136,7 @@ describe "profile" do
 
     it "should change default email address" do
       @user.communication_channel.confirm!
-      channel = communication_channel(@user, {username: 'walter_white@example.com', active_cc: true})
+      channel = communication_channel(@user, { username: 'walter_white@example.com', active_cc: true })
 
       get '/profile/settings'
       row = f("#channel_#{channel.id}")

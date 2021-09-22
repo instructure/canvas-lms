@@ -19,7 +19,6 @@
 require_relative '../../common'
 
 module CourseHomePage
-
   # ---------------------- Elements ----------------------
 
   def course_header
@@ -37,7 +36,7 @@ module CourseHomePage
   def course_options_analytics1_link
     fj(".course-options a:contains('View Course Analytics')")
   end
-  
+
   def course_nav_menu
     f('#section-tabs')
   end

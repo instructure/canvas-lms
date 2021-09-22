@@ -33,10 +33,10 @@ describe "teacher planner" do
   context "teacher interaction with ToDoSidebar" do
     before :each do
       @assignment1 = @course.assignments.create({
-                                                 name: "Teacher Assignment",
-                                                 due_at: Time.zone.now-1.days,
-                                                 submission_types: 'online_text_entry'
-                                               })
+                                                  name: "Teacher Assignment",
+                                                  due_at: Time.zone.now - 1.days,
+                                                  submission_types: 'online_text_entry'
+                                                })
       @submission = @assignment1.submit_homework(@student1, body: "here is my submission")
       user_session(@teacher)
     end

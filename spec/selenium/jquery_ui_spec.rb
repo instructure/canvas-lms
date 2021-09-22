@@ -27,9 +27,9 @@ describe "jquery ui" do
 
   def shift_tab
     driver.action.key_down(:shift)
-      .send_keys(:tab)
-      .key_up(:shift)
-      .perform
+          .send_keys(:tab)
+          .key_up(:shift)
+          .perform
   end
 
   def create_simple_modal
@@ -112,7 +112,6 @@ describe "jquery ui" do
   end
 
   context "dialog titles" do
-
     # jquery ui doesn't escape dialog titles by default (even when inferred from
     # title attributes!). our modified ui.dialog does (and hopefully jquery.ui
     # will too in 1.9). to pass in an html title that you don't want escaped,

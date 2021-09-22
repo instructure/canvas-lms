@@ -29,7 +29,7 @@ describe "course people" do
     Account.default.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
-  def add_user(email, type, section_name=nil)
+  def add_user(email, type, section_name = nil)
     get "/courses/#{@course.id}/users"
     add_button = f('#addUsers')
     expect(add_button).to be_displayed
@@ -70,10 +70,10 @@ describe "course people" do
     def kyle_menu_css(user, role = nil)
       if role
         role_name = if role.respond_to?(:name)
-          role.name
-        else
-          role
-        end
+                      role.name
+                    else
+                      role
+                    end
         "#user_#{user.id}.#{role_name} .admin-links"
       else
         "#user_#{user.id} .admin-links"
@@ -129,8 +129,8 @@ describe "course people" do
       expect(f("#user_#{@student.id}")).to include_text(section_name)
       expect(ff("#user_#{@student.id} .section").length).to eq 2
       @student.reload
-      @student.enrollments.each{|e| expect(e.role_id).to eq role.id}
-      @student.enrollments.each{|e| expect(e.workflow_state).to eq enrollment_state}
+      @student.enrollments.each { |e| expect(e.role_id).to eq role.id }
+      @student.enrollments.each { |e| expect(e.workflow_state).to eq enrollment_state }
     end
 
     it "should add a user without custom role to another section" do
@@ -180,7 +180,7 @@ describe "course people" do
       open_kyle_menu(@student)
       # when
       links = ff(".admin-links li a")
-      link = links.detect{|link| link.text.include?("User Details")}
+      link = links.detect { |link| link.text.include?("User Details") }
       href = link['href']
       link.click
       wait_for_ajaximations
@@ -376,7 +376,7 @@ describe "course people" do
         end
 
         @observer.reload
-        @observer.enrollments.each{|e| expect(e.role_id).to eq role.id}
+        @observer.enrollments.each { |e| expect(e.role_id).to eq role.id }
       end
 
       it "should create new enrollments as custom type when adding sections" do
@@ -424,5 +424,4 @@ describe "course people" do
       expect(teacher_row).to_not have_class("Mentor")
     end
   end
-
 end

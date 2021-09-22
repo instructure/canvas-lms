@@ -58,7 +58,7 @@ describe "student view toggle" do
   end
 
   it "should not be visible from pages that have been disabled by instructor" do
-    @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_QUIZZES, 'hidden'=>true}])
+    @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_QUIZZES, 'hidden' => true }])
     get "/courses/#{@course.id}/quizzes"
     expect(page_header).not_to contain_css("#easy_student_view")
   end

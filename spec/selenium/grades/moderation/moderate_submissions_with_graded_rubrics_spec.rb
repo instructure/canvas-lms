@@ -47,7 +47,7 @@ describe 'Moderated Marking' do
       moderated_grading: true,
       points_possible: 10,
       submission_types: :online_text_entry,
-      title:'Moderated Assignment',
+      title: 'Moderated Assignment',
     )
   end
 

@@ -35,7 +35,7 @@ describe "Filter" do
       course_with_teacher(active_all: true)
       @modules = Array.new(2) { |i| @course.context_modules.create! name: "Mod#{i}" }
       group = @course.assignment_groups.create! name: 'assignments'
-      @assignments = Array.new(2) { |i| @course.assignments.create! assignment_group: group, title: "Assign#{i}"}
+      @assignments = Array.new(2) { |i| @course.assignments.create! assignment_group: group, title: "Assign#{i}" }
       2.times { |i| @modules[i].add_item type: 'assignment', id: @assignments[i].id }
     end
 

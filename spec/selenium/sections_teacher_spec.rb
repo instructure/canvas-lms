@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # coding: utf-8
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -24,7 +25,6 @@ describe "sections" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-
     it "should only show users enrolled in the section on the section page" do
       course_with_teacher_logged_in(:active_course => true, :active_user => true)
       @section = @course.course_sections.create!

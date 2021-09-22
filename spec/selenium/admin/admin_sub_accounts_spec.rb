@@ -134,7 +134,7 @@ describe "admin sub accounts" do
     added_courses_count = 3
     get "/accounts/#{default_account_id}/sub_accounts"
 
-    validate_course_count(default_account_id, '1 Course') #make sure default account was setup correctly
+    validate_course_count(default_account_id, '1 Course') # make sure default account was setup correctly
     sub_account = create_sub_account('add courses to me')
     added_courses_count.times { Course.create!(:account => sub_account) }
     refresh_page # to make new account with courses show up

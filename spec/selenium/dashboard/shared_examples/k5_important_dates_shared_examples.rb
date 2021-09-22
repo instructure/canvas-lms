@@ -58,7 +58,7 @@ shared_examples_for 'k5 important dates' do
     expect(important_date_subject).to include_text(@subject_course.name)
     expect(important_date_icon_exists?('IconAssignment')).to be_truthy
     expect(important_date_link).to include_text(assignment_title)
-    expect(element_value_for_attr(important_date_link,'href')).to include("/courses/#{@subject_course.id}/assignments/#{assignment.id}")
+    expect(element_value_for_attr(important_date_link, 'href')).to include("/courses/#{@subject_course.id}/assignments/#{assignment.id}")
   end
 
   it 'only shows no dates panda when important dates is not set for assignment' do
@@ -83,11 +83,10 @@ shared_examples_for 'k5 important dates' do
 
     get "/"
 
-
     expect(important_date_subject).to include_text(@subject_course.name)
     expect(important_date_icon_exists?('IconQuiz')).to be_truthy
     expect(important_date_link).to include_text(quiz_title)
-    expect(element_value_for_attr(important_date_link,'href')).to include("/courses/#{@subject_course.id}/assignments/#{quiz_assignment.id}")
+    expect(element_value_for_attr(important_date_link, 'href')).to include("/courses/#{@subject_course.id}/assignments/#{quiz_assignment.id}")
   end
 
   it 'shows an important date for a graded discussion' do
@@ -102,7 +101,7 @@ shared_examples_for 'k5 important dates' do
     expect(important_date_subject).to include_text(@subject_course.name)
     expect(important_date_icon_exists?('IconDiscussion')).to be_truthy
     expect(important_date_link).to include_text(discussion_title)
-    expect(element_value_for_attr(important_date_link,'href')).to include("/courses/#{@subject_course.id}/assignments/#{discussion_assignment.id}")
+    expect(element_value_for_attr(important_date_link, 'href')).to include("/courses/#{@subject_course.id}/assignments/#{discussion_assignment.id}")
   end
 
   it 'does not show an important date assignment in the past' do
@@ -125,7 +124,7 @@ shared_examples_for 'k5 important dates' do
     expect(important_date_subject).to include_text(@subject_course.name)
     expect(important_date_icon_exists?('IconCalendarMonth')).to be_truthy
     expect(important_date_link).to include_text(calendar_event_title)
-    expect(element_value_for_attr(important_date_link,'href')).to include("/calendar?event_id=#{calendar_event.id}&include_contexts=course_#{@subject_course.id}")
+    expect(element_value_for_attr(important_date_link, 'href')).to include("/calendar?event_id=#{calendar_event.id}&include_contexts=course_#{@subject_course.id}")
   end
 
   it 'does not show an important date for a calendar event' do
@@ -328,7 +327,5 @@ shared_examples_for 'k5 important dates calendar picker' do |context|
       expect(subject_list[0]).to include_text(@subject_course.name)
       expect(subject_list[1]).to include_text(@new_course_list[0].name)
     end
-
   end
-
 end

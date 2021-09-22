@@ -26,12 +26,12 @@ def visit_page
   get "/courses/#{@course.id}/content_migrations"
 end
 
-def select_migration_type(type=nil)
+def select_migration_type(type = nil)
   type ||= @type
   click_option('#chooseMigrationConverter', type, :value)
 end
 
-def select_migration_file(opts={})
+def select_migration_file(opts = {})
   filename = opts[:filename] || @filename
 
   new_filename, fullpath, data = get_file(filename, opts[:data])
@@ -39,7 +39,7 @@ def select_migration_file(opts={})
   return new_filename
 end
 
-def fill_migration_form(opts={})
+def fill_migration_form(opts = {})
   select_migration_type('none') unless opts[:type] == 'none'
   select_migration_type(opts[:type])
   select_migration_file(opts)
@@ -56,7 +56,7 @@ def submit
   end
 end
 
-def run_migration(cm=nil)
+def run_migration(cm = nil)
   cm ||= @course.content_migrations.last
   cm.reload
   cm.skip_job_progress = false
@@ -65,14 +65,14 @@ def run_migration(cm=nil)
   worker_class.new(cm.id).perform
 end
 
-def import(cm=nil)
+def import(cm = nil)
   cm ||= @course.content_migrations.last
   cm.reload
   cm.set_default_settings
   cm.import_content
 end
 
-def test_selective_content(source_course=nil)
+def test_selective_content(source_course = nil)
   visit_page
 
   # Open selective dialog
@@ -86,7 +86,6 @@ def test_selective_content(source_course=nil)
   f(".selectContentDialog input[type=submit]").click
   wait_for_ajaximations
 
-
   source_course ? run_migration : import
 
   visit_page
@@ -98,7 +97,7 @@ end
 describe "content migrations", :non_parallel do
   include_context "in-process server selenium tests"
 
-  def test_selective_outcome(source_course=nil)
+  def test_selective_outcome(source_course = nil)
     visit_page
 
     # Open selective dialog
@@ -131,8 +130,8 @@ describe "content migrations", :non_parallel do
     expect(@course.created_learning_outcomes.count).to eq 2
     outcome_links = subgroup1.child_outcome_links
     expect(outcome_links.map(&:learning_outcome_content).map(&:short_description)).to match_array([
-      'non-root2', 'non-root3'
-    ])
+                                                                                                    'non-root2', 'non-root3'
+                                                                                                  ])
   end
 
   context "canvas cartridge importing" do
@@ -250,7 +249,7 @@ describe "content migrations", :non_parallel do
       submit
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       expect(opts["shift_dates"]).to eq '1'
-      expect(opts["day_substitutions"]).to eq({"1" => "2", "5" => "4"})
+      expect(opts["day_substitutions"]).to eq({ "1" => "2", "5" => "4" })
       expect(Date.parse(opts["old_start_date"])).to eq Date.new(2014, 7, 1)
       expect(Date.parse(opts["old_end_date"])).to eq Date.new(2014, 7, 11)
       expect(Date.parse(opts["new_start_date"])).to eq Date.new(2014, 8, 5)
@@ -274,7 +273,7 @@ describe "content migrations", :non_parallel do
 
   context "course copy" do
     before do
-      #the "true" param is important, it forces the cache clear
+      # the "true" param is important, it forces the cache clear
       #  without it this spec group fails if
       #  you run it with the whole suite
       #  because of a cached default account
@@ -285,8 +284,8 @@ describe "content migrations", :non_parallel do
       data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test_smaller.zip')
 
       cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-      cm.migration_settings = {:import_immediately => true,
-                               :migration_ids_to_import => {:copy => {:everything => true}}}
+      cm.migration_settings = { :import_immediately => true,
+                                :migration_ids_to_import => { :copy => { :everything => true } } }
       cm.skip_job_progress = true
       cm.save!
 
@@ -424,8 +423,8 @@ describe "content migrations", :non_parallel do
         data = File.read(File.dirname(__FILE__) + '/../../fixtures/migration/cc_full_test.zip')
 
         cm = ContentMigration.new(:context => @copy_from, :migration_type => "common_cartridge_importer")
-        cm.migration_settings = {:import_immediately => true,
-                                 :migration_ids_to_import => {:copy => {:everything => true}}}
+        cm.migration_settings = { :import_immediately => true,
+                                  :migration_ids_to_import => { :copy => { :everything => true } } }
         cm.skip_job_progress = true
         cm.save!
 
@@ -541,10 +540,10 @@ describe "content migrations", :non_parallel do
 
       opts = @course.content_migrations.last.migration_settings["date_shift_options"]
       expect(opts["shift_dates"]).to eq '1'
-      expect(opts["day_substitutions"]).to eq({"1" => "2", "2" => "3"})
+      expect(opts["day_substitutions"]).to eq({ "1" => "2", "2" => "3" })
       expected = {
-          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -573,8 +572,8 @@ describe "content migrations", :non_parallel do
       expect(opts["shift_dates"]).to eq '1'
       expect(opts["day_substitutions"]).to eq({})
       expected = {
-          "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
-          "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
+        "old_start_date" => "Jul 1, 2012", "old_end_date" => "Jul 11, 2012",
+        "new_start_date" => "Aug 5, 2012", "new_end_date" => "Aug 15, 2012"
       }
       expected.each do |k, v|
         expect(Date.parse(opts[k].to_s)).to eq Date.parse(v)
@@ -645,34 +644,34 @@ describe "content migrations", :non_parallel do
     }
     let(:import_tool) do
       tool = import_course.context_external_tools.new({
-                                                          name: "test lti import tool",
-                                                          consumer_key: "key",
-                                                          shared_secret: "secret",
-                                                          url: "http://www.example.com/ims/lti",
+                                                        name: "test lti import tool",
+                                                        consumer_key: "key",
+                                                        shared_secret: "secret",
+                                                        url: "http://www.example.com/ims/lti",
                                                       })
       tool.migration_selection = {
-          url: "http://#{HostUrl.default_host}/selection_test",
-          text: "LTI migration text",
-          selection_width: 500,
-          selection_height: 500,
-          icon_url: "/images/add.png",
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "LTI migration text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
       }
       tool.save!
       tool
     end
     let(:other_tool) do
       tool = import_course.context_external_tools.new({
-                                                          name: "other lti tool",
-                                                          consumer_key: "key",
-                                                          shared_secret: "secret",
-                                                          url: "http://www.example.com/ims/lti",
+                                                        name: "other lti tool",
+                                                        consumer_key: "key",
+                                                        shared_secret: "secret",
+                                                        url: "http://www.example.com/ims/lti",
                                                       })
       tool.resource_selection = {
-          url: "http://#{HostUrl.default_host}/selection_test",
-          text: "other resource text",
-          selection_width: 500,
-          selection_height: 500,
-          icon_url: "/images/add.png",
+        url: "http://#{HostUrl.default_host}/selection_test",
+        text: "other resource text",
+        selection_width: 500,
+        selection_height: 500,
+        icon_url: "/images/add.png",
       }
       tool.save!
       tool

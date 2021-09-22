@@ -53,12 +53,11 @@ describe 'BigBlueButton conferences' do
 
   after { close_extra_windows }
   context 'when a conference is open' do
-
     context 'and the conference has no recordings' do
       before(:once) do
-        stub_request(:get, /getRecordings/).
-          with(query: bbb_fixtures[:get_recordings]).
-          to_return(:body => big_blue_button_mock_response('get_recordings', 'none'))
+        stub_request(:get, /getRecordings/)
+          .with(query: bbb_fixtures[:get_recordings])
+          .to_return(:body => big_blue_button_mock_response('get_recordings', 'none'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -69,9 +68,9 @@ describe 'BigBlueButton conferences' do
 
     context 'and the conference has recordings' do
       before(:once) do
-        stub_request(:get, /getRecordings/).
-          with(query: bbb_fixtures[:get_recordings]).
-          to_return(:body => big_blue_button_mock_response('get_recordings', 'two'))
+        stub_request(:get, /getRecordings/)
+          .with(query: bbb_fixtures[:get_recordings])
+          .to_return(:body => big_blue_button_mock_response('get_recordings', 'two'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -82,12 +81,12 @@ describe 'BigBlueButton conferences' do
 
     context 'and the conference has one recording and it is deleted' do
       before(:once) do
-        stub_request(:get, /deleteRecordings/).
-          with(query: bbb_fixtures[:delete_recordings]).
-          to_return(:body => big_blue_button_mock_response('delete_recordings'))
-        stub_request(:get, /getRecordings/).
-          with(query: bbb_fixtures[:get_recordings]).
-          to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+        stub_request(:get, /deleteRecordings/)
+          .with(query: bbb_fixtures[:delete_recordings])
+          .to_return(:body => big_blue_button_mock_response('delete_recordings'))
+        stub_request(:get, /getRecordings/)
+          .with(query: bbb_fixtures[:get_recordings])
+          .to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
@@ -100,9 +99,9 @@ describe 'BigBlueButton conferences' do
 
     context 'and the conference has one recording with statistics' do
       before(:once) do
-        stub_request(:get, /getRecordings/).
-          with(query: bbb_fixtures[:get_recordings]).
-          to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
+        stub_request(:get, /getRecordings/)
+          .with(query: bbb_fixtures[:get_recordings])
+          .to_return(:body => big_blue_button_mock_response('get_recordings', 'one'))
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
     end
@@ -123,6 +122,5 @@ describe 'BigBlueButton conferences' do
         verify_conference_does_not_include_recordings_with_statistics
       end
     end
-
   end
 end

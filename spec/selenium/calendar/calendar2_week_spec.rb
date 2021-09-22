@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # coding: utf-8
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -42,7 +43,6 @@ describe "calendar2" do
     end
 
     context "week view" do
-
       it "should navigate to week view when week button is clicked", :xbrowser, priority: "2", test_id: 766945 do
         load_week_view
         expect(fj('.fc-agendaWeek-view:visible')).to be_present
@@ -172,7 +172,7 @@ describe "calendar2" do
 
       # Click non all-day event
       fj('.fc-agendaWeek-view .fc-time-grid .fc-slats .fc-widget-content:not(.fc-axis):first').click
-      event_from_modal(title,false,false)
+      event_from_modal(title, false, false)
       expect(f('.fc-title')).to include_text title
     end
 
@@ -182,7 +182,7 @@ describe "calendar2" do
 
       # click all day event
       f('.fc-agendaWeek-view .fc-week .fc-wed').click
-      event_from_modal(title,false,false)
+      event_from_modal(title, false, false)
       expect(f('.fc-title')).to include_text title
     end
 
@@ -280,7 +280,6 @@ describe "calendar2" do
     end
 
     context "drag and drop" do
-
       before(:each) do
         @saturday = 8
         @initial_time = Time.zone.parse('2015-1-1').beginning_of_day + 9.hours

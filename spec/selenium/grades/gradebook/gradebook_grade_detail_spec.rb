@@ -64,7 +64,7 @@ describe 'Grade Detail Tray:' do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
       Gradebook::GradeDetailTray.change_status_to('Excused')
 
-      excuse_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).excused
+      excuse_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).excused
 
       expect(excuse_status).to be true
     end
@@ -73,7 +73,7 @@ describe 'Grade Detail Tray:' do
       Gradebook::Cells.open_tray(@course.students.first, @a2)
       Gradebook::GradeDetailTray.change_status_to('None')
 
-      late_policy_status = @course.students.first.submissions.find_by(assignment_id:@a2.id).late_policy_status
+      late_policy_status = @course.students.first.submissions.find_by(assignment_id: @a2.id).late_policy_status
 
       expect(late_policy_status).to eq 'none'
     end
@@ -98,28 +98,28 @@ describe 'Grade Detail Tray:' do
     end
 
     it 'late submission has late-by days/hours', test_id: 3337209, priority: '1' do
-      late_by_days_value = (@course.students.first.submissions.find_by(assignment_id:@a1.id).
-        seconds_late/86400.to_f).round(2)
+      late_by_days_value = (@course.students.first.submissions.find_by(assignment_id: @a1.id)
+        .seconds_late / 86400.to_f).round(2)
 
       expect(Gradebook::GradeDetailTray.fetch_late_by_value.to_f).to eq late_by_days_value
     end
 
     it 'late submission has late penalty', test_id: 3337210, priority: '1' do
-      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id: @a1.id).points_deducted.to_s
 
       # the data from rails and data from ui are not in the same format
       expect(Gradebook::GradeDetailTray.late_penalty_text.to_f.to_s).to eq late_penalty_value
     end
 
     it 'late submission has final grade', test_id: 3415931, priority: '2' do
-      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
 
       expect(Gradebook::GradeDetailTray.final_grade_text).to eq final_grade_value
     end
 
     it 'updates score when late_by value changes', test_id: 3337212, priority: '1' do
       Gradebook::GradeDetailTray.edit_late_by_input(3)
-      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
       expect(final_grade_value).to eq "60"
       expect(Gradebook::GradeDetailTray.final_grade_text).to eq "60"
       expect(Gradebook::GradeDetailTray.late_penalty_text).to eq "-30"
@@ -173,15 +173,15 @@ describe 'Grade Detail Tray:' do
       it 'left arrow button is not present when leftmost assignment is selected', test_id: 3337219, priority: '2' do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
 
-        expect(Gradebook::GradeDetailTray.submission_tray_full_content).
-          not_to contain_css('#assignment-carousel .left-arrow-button-container button')
+        expect(Gradebook::GradeDetailTray.submission_tray_full_content)
+          .not_to contain_css('#assignment-carousel .left-arrow-button-container button')
       end
 
       it 'right arrow button is not present when rightmost assignment is selected', test_id: 3337218, priority: '2' do
         Gradebook::Cells.open_tray(@course.students.first, @a4)
 
-        expect(Gradebook::GradeDetailTray.submission_tray_full_content).
-          not_to contain_css('#assignment-carousel .right-arrow-button-container button')
+        expect(Gradebook::GradeDetailTray.submission_tray_full_content)
+          .not_to contain_css('#assignment-carousel .right-arrow-button-container button')
       end
 
       it 'student right arrow navigates to next student', test_id: 3337223, priority: '1' do
@@ -202,8 +202,8 @@ describe 'Grade Detail Tray:' do
       it 'first student does not have left arrow', test_id: 3337226, priority: '1' do
         Gradebook::Cells.open_tray(@course.students.first, @a1)
 
-        expect(Gradebook::GradeDetailTray.submission_tray_full_content).
-          not_to contain_css(Gradebook::GradeDetailTray.navigate_to_previous_student_selector)
+        expect(Gradebook::GradeDetailTray.submission_tray_full_content)
+          .not_to contain_css(Gradebook::GradeDetailTray.navigate_to_previous_student_selector)
       end
 
       it 'student name link navigates to student grades page', test_id: 3355448, priority: '2' do
@@ -217,16 +217,16 @@ describe 'Grade Detail Tray:' do
     context 'when the rightmost column is an assignment column' do
       before(:each) do
         @teacher.set_preference(:gradebook_column_order, @course.global_id, {
-          sortType: 'custom',
-          customOrder: [
-            "assignment_#{@a1.id}",
-            "assignment_#{@a2.id}",
-            "assignment_group_#{@a1.assignment_group_id}",
-            "assignment_#{@a3.id}",
-            'total_grade',
-            "assignment_#{@a4.id}"
-          ]
-        })
+                                  sortType: 'custom',
+                                  customOrder: [
+                                    "assignment_#{@a1.id}",
+                                    "assignment_#{@a2.id}",
+                                    "assignment_group_#{@a1.assignment_group_id}",
+                                    "assignment_#{@a3.id}",
+                                    'total_grade',
+                                    "assignment_#{@a4.id}"
+                                  ]
+                                })
         Gradebook.visit(@course)
       end
 
@@ -235,7 +235,6 @@ describe 'Grade Detail Tray:' do
         button = Gradebook::GradeDetailTray.previous_assignment_button
         keep_trying_until { button.click; true } # have to wait for instUI Tray animation
 
-
         expect(Gradebook::GradeDetailTray.assignment_link(@a3.name)).to be_displayed
       end
     end
@@ -243,14 +242,14 @@ describe 'Grade Detail Tray:' do
 
   context "comments" do
     let(:comment_1) { "You are late1" }
-    let(:comment_2) {"You are also late2"}
+    let(:comment_2) { "You are also late2" }
 
     before(:each) do
       user_session(@teacher)
 
-      submission_comment_model({author: @teacher,
-                                submission: @a1.find_or_create_submission(@course.students.first),
-                                comment: comment_1})
+      submission_comment_model({ author: @teacher,
+                                 submission: @a1.find_or_create_submission(@course.students.first),
+                                 comment: comment_1 })
       Gradebook.visit(@course)
     end
 

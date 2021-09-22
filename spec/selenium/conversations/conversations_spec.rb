@@ -190,17 +190,17 @@ describe "conversations new" do
         click_message(0)
 
         # Tests forwarding messages via the top level More Options gear menu
-        click_more_options(admin:true)
+        click_more_options(admin: true)
         forward_message(@s[2])
         expect(ffj('.message-item-view').length).to eq message_count += 1
 
         # Tests forwarding messages via the conversation level More Options gear menu
-        click_more_options(convo:true)
+        click_more_options(convo: true)
         forward_message(@s[0])
         expect(ffj('.message-item-view').length).to eq message_count += 1
 
         # Tests forwarding messages via the message level More Options gear menu
-        click_more_options({message:true}, 0)
+        click_more_options({ message: true }, 0)
         forward_message(@s[1])
         expect(ffj('.message-item-view').length).to eq message_count + 1
       end
@@ -247,7 +247,7 @@ describe "conversations new" do
 
         click_message(0)
         # Clicks the title-level more options gear menu
-        click_more_options(convo:true)
+        click_more_options(convo: true)
         f('.delete-btn.ui-corner-all').click
         driver.switch_to.alert.accept
         expect_flash_message :success, "Message Deleted!"
@@ -271,7 +271,7 @@ describe "conversations new" do
 
         click_message(0)
         # Clicks the title-level more options gear menu
-        click_more_options(convo:true)
+        click_more_options(convo: true)
         click_archive_menu_item
         # Archiving messages requires jobs to run to complete
         run_progress_job
@@ -293,7 +293,7 @@ describe "conversations new" do
         select_view('sent')
         click_message(0)
         # Clicks the title-level more options gear menu
-        click_more_options(convo:true)
+        click_more_options(convo: true)
         expect(f("#content")).not_to contain_css('.archive-btn.ui-corner-all')
       end
 
@@ -318,7 +318,7 @@ describe "conversations new" do
         it "should unarchive a message via the cog dropdown", priority: "1", test_id: 201497 do
           skip_if_safari(:alert)
           # Clicks the title-level more options gear menu
-          click_more_options(convo:true)
+          click_more_options(convo: true)
           click_archive_menu_item
           # Unarchiving messages requires jobs to run to complete
           run_progress_job
@@ -446,7 +446,7 @@ describe "conversations new" do
         expect(star_btn).to be_present
         expect(unstarred_elt).not_to contain_css('.active')
 
-        click_star_icon(unstarred_elt,star_btn)
+        click_star_icon(unstarred_elt, star_btn)
         expect(f('.active', unstarred_elt)).to be_present
         expect(@conv_unstarred.reload.starred).to be_truthy
       end

@@ -69,35 +69,35 @@ describe "discussions index" do
       [course, discussion]
     end
 
-    it "discussions can be filtered", test_id:3481189, priority: "1" do
+    it "discussions can be filtered", test_id: 3481189, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.select_filter("Unread")
 
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
-      expect(DiscussionsIndex.discussion_group("Closed for Comments")).
-        not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
+      expect(DiscussionsIndex.discussion_group("Closed for Comments"))
+        .not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
-    it "search by title works correctly", test_id:3481190, priority: "1" do
+    it "search by title works correctly", test_id: 3481190, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.enter_search(discussion1_title)
 
       # Attempt to make this test less brittle. It's doing client side filtering
       # with a debounce function, so we need to give it time to perform the filtering
       expect(DiscussionsIndex.discussion(discussion1_title)).to be_displayed
-      expect(DiscussionsIndex.discussion_group("Closed for Comments")).
-        not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
+      expect(DiscussionsIndex.discussion_group("Closed for Comments"))
+        .not_to contain_jqcss(DiscussionsIndex.discussion_title_css(discussion2_title))
     end
 
-    it 'clicking the Add Discussion button redirects to new discussion page', test_id:3481193, priority: "1" do
+    it 'clicking the Add Discussion button redirects to new discussion page', test_id: 3481193, priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect_new_page_load { DiscussionsIndex.click_add_discussion }
       expect(driver.current_url).to include(DiscussionsIndex.new_discussion_url)
     end
 
-    it 'clicking the publish button changes the published status', test_id:3481203, priority: "1" do
+    it 'clicking the publish button changes the published status', test_id: 3481203, priority: "1" do
       # Cannot use @discussion[12] here because unpublish requires there to be no posts
       course, discussion = create_course_and_discussion(
         title: 'foo',
@@ -111,7 +111,7 @@ describe "discussions index" do
       expect(discussion.published?).to be false
     end
 
-    it 'clicking the subscribe button changes the subscribed status', test_id:3481204, priority: "1" do
+    it 'clicking the subscribe button changes the subscribed status', test_id: 3481204, priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect(@discussion1.subscribed?(@teacher)).to be true
       DiscussionsIndex.click_subscribe_button(discussion1_title)
@@ -119,7 +119,7 @@ describe "discussions index" do
       expect(@discussion1.subscribed?(@teacher)).to be false
     end
 
-    it 'discussion can be moved between groups using Pin menu item', test_id:3481207, priority: "1" do
+    it 'discussion can be moved between groups using Pin menu item', test_id: 3481207, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_pin_menu_option(discussion1_title)
       group = DiscussionsIndex.discussion_group("Pinned Discussions")
@@ -158,7 +158,7 @@ describe "discussions index" do
       expect(discussion.pinned).to be false
     end
 
-    it 'discussion can be moved to Closed For Comments group using menu item', test_id:3481191, priority: "1" do
+    it 'discussion can be moved to Closed For Comments group using menu item', test_id: 3481191, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_close_for_comments_menu_option(discussion1_title)
       group = DiscussionsIndex.discussion_group("Closed for Comments")
@@ -191,13 +191,13 @@ describe "discussions index" do
       expect(@discussion2.locked).to be false
     end
 
-    it 'clicking the discussion goes to the discussion page', test_id:3481194, priority: "1" do
+    it 'clicking the discussion goes to the discussion page', test_id: 3481194, priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect_new_page_load { DiscussionsIndex.click_on_discussion(discussion1_title) }
       expect(driver.current_url).to include(DiscussionsIndex.individual_discussion_url(@discussion1))
     end
 
-    it 'a discussion can be deleted by using Delete menu item and modal', test_id:3481192, priority: "1" do
+    it 'a discussion can be deleted by using Delete menu item and modal', test_id: 3481192, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_delete_menu_option(discussion1_title)
       DiscussionsIndex.click_delete_modal_confirm
@@ -205,13 +205,13 @@ describe "discussions index" do
       expect(DiscussionTopic.where(title: discussion1_title).first.workflow_state).to eq 'deleted'
     end
 
-    it 'a discussion can be duplicated by using Duplicate menu item', test_id:3481202, priority: "1" do
+    it 'a discussion can be duplicated by using Duplicate menu item', test_id: 3481202, priority: "1" do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_duplicate_menu_option(discussion1_title)
       expect(DiscussionsIndex.discussion(discussion1_title + " Copy")).to be_displayed
     end
 
-    it 'pill on announcement displays correct number of unread replies', test_id:3481195, priority: "1" do
+    it 'pill on announcement displays correct number of unread replies', test_id: 3481195, priority: "1" do
       login_and_visit_course(@teacher, @course)
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
     end

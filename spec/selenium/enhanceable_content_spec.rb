@@ -80,7 +80,6 @@ describe "enhanceable_content" do
     expect(ul).to be_displayed
     expect(ul).to have_class('ui-sortable')
 
-
     tabs = f(".enhanceable_content.tabs")
     expect(tabs).to have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
@@ -138,4 +137,3 @@ describe "enhanceable_content" do
     end
   end
 end
-

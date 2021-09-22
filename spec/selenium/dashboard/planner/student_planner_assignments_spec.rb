@@ -45,21 +45,21 @@ describe "student planner" do
 
     it "shows and navigates to assignments page from student planner", priority: "1", test_id: 3259300 do
       go_to_list_view
-      validate_object_displayed(@course_name,'Assignment')
+      validate_object_displayed(@course_name, 'Assignment')
       validate_link_to_url(@assignment, 'assignments')
     end
 
     it "navigates to the assignment submissions page when they are submitted." do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry",
-                                  body: "Assignment submitted")
+                                             body: "Assignment submitted")
       go_to_list_view
       fj("button:contains('Show 1 completed item')").click
-      validate_link_to_submissions(@assignment, @student1,'assignments')
+      validate_link_to_submissions(@assignment, @student1, 'assignments')
     end
 
     it "enables the checkbox when an assignment is completed", priority: "1", test_id: 3306201 do
       @assignment.submit_homework(@student1, submission_type: "online_text_entry",
-                                  body: "Assignment submitted")
+                                             body: "Assignment submitted")
       go_to_list_view
       expect(planner_app_div).to contain_jqcss('span:contains("Show 1 completed item")')
     end
@@ -81,7 +81,7 @@ describe "student planner" do
     end
 
     it "shows new feedback tag for assignments that has feedback", priority: "1", test_id: 3263154 do
-      @assignment.update_submission(@student1, {comment: 'Good', author: @teacher})
+      @assignment.update_submission(@student1, { comment: 'Good', author: @teacher })
       go_to_list_view
       validate_pill('Feedback')
     end
@@ -95,7 +95,7 @@ describe "student planner" do
       refresh_page
 
       # the users time zone is not converted to UTC and to balance it we subtract 6 hours from the due time
-      time = calendar_time_string(@assignment.due_at+9.hours).chop
+      time = calendar_time_string(@assignment.due_at + 9.hours).chop
       expect(course_assignment_by_due_at(time)).to be_displayed
     end
 
@@ -103,10 +103,10 @@ describe "student planner" do
       @assignment.due_at = Time.zone.now - 2.weeks
       @assignment.save!
       @course.assignments.create({
-        name: 'Assignment 2',
-        due_at: Time.zone.now + 1.day,
-        submission_types: 'online_text_entry'
-      })
+                                   name: 'Assignment 2',
+                                   due_at: Time.zone.now + 1.day,
+                                   submission_types: 'online_text_entry'
+                                 })
 
       go_to_list_view
       force_click(load_prior_button_selector)

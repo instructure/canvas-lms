@@ -56,7 +56,7 @@ shared_examples 'home_page' do |context|
   it "should display recent activity feed on the group home page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273605, teacher: 319912) do
     DiscussionTopic.create!(context: @testgroup.first, user: @teacher,
                             title: 'Discussion Topic', message: 'test')
-    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
 
     get url
     expect(f('.recent-activity-header')).to be_displayed
@@ -67,7 +67,7 @@ shared_examples 'home_page' do |context|
   end
 
   it "should display announcements on the group home page feed", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273609, teacher: 319913) do
-    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Test Announcement', message: 'Message', user: @teacher)
     get url
     expect(f('.title')).to include_text('1 Announcement')
     f('.toggle-details').click
@@ -91,7 +91,7 @@ shared_examples 'announcements_page' do |context|
     # Create 5 announcements in the group
     announcements = []
     5.times do |n|
-      announcements << @testgroup.first.announcements.create!(title: "Announcement #{n+1}", message: "Message #{n+1}",user: @teacher)
+      announcements << @testgroup.first.announcements.create!(title: "Announcement #{n + 1}", message: "Message #{n + 1}", user: @teacher)
     end
 
     get announcements_page
@@ -100,8 +100,8 @@ shared_examples 'announcements_page' do |context|
 
   it "should only list in-group announcements in the content right pane", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273621, teacher: 324934) do
     # create group and course announcements
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
-    @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
+    @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
 
     get announcements_page
     expect_new_page_load { f('.btn-primary').click }
@@ -125,7 +125,7 @@ shared_examples 'announcements_page' do |context|
   end
 
   it "should have an RSS feed button on announcements", priority: "2", test_id: pick_test_id(context, student: 329630, teacher: 329631) do
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     get announcements_page
     expect(f('.btn[title="RSS feed"]')).to be_displayed
   end
@@ -151,8 +151,8 @@ shared_examples 'announcements_page_v2' do
     announcements = []
     5.times do |n|
       announcements << @testgroup.first.announcements.create!(
-        title: "Announcement #{n+1}",
-        message: "Message #{n+1}",
+        title: "Announcement #{n + 1}",
+        message: "Message #{n + 1}",
         user: @teacher
       )
     end
@@ -163,8 +163,8 @@ shared_examples 'announcements_page_v2' do
 
   it "should only list in-group announcements in the content right pane" do
     # create group and course announcements
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
-    @course.announcements.create!(title: 'Course Announcement', message: 'Course',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
+    @course.announcements.create!(title: 'Course Announcement', message: 'Course', user: @teacher)
 
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
@@ -194,7 +194,7 @@ shared_examples 'announcements_page_v2' do
   end
 
   it "should have an RSS feed button on announcements" do
-    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group',user: @teacher)
+    @testgroup.first.announcements.create!(title: 'Group Announcement', message: 'Group', user: @teacher)
     get announcements_page
     expect(f('button[id="external_feed"]')).to be_displayed
   end
@@ -219,9 +219,9 @@ shared_examples 'pages_page' do |context|
   it "should only list in-group pages in pages list", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273620, teacher: 324928) do
     # create group and course announcements
     group_page = @testgroup.first.wiki_pages.create!(user: @teacher,
-                                                          title: 'Group Page')
+                                                     title: 'Group Page')
     course_page = @course.wiki_pages.create!(user: @teacher,
-                                                  title: 'Course Page')
+                                             title: 'Course Page')
 
     get pages_page
 
@@ -248,7 +248,7 @@ shared_examples 'people_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "should allow group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323329, teacher: 324926) do
+  it "should allow group users to see group registered services page", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323329, teacher: 324926) do
     get people_page
     expect_new_page_load do
       f("#people-options .Button").click
@@ -331,7 +331,7 @@ shared_examples 'conferences_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
 
-  it "should allow group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 307624, teacher: 308534) do
+  it "should allow group users to create a conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 307624, teacher: 308534) do
     skip_if_chrome('issue with invite_all_but_one_user method')
     title = 'test conference'
     get conferences_page
@@ -339,7 +339,7 @@ shared_examples 'conferences_page' do |context|
     expect(f('#new-conference-list .ig-title').text).to include(title)
   end
 
-  it "should allow group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323557, teacher: 323558) do
+  it "should allow group users to delete an active conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323557, teacher: 323558) do
     skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     WimbaConference.create!(title: "new conference", user: @user, context: @testgroup.first)
@@ -349,7 +349,7 @@ shared_examples 'conferences_page' do |context|
     expect(f('#new-conference-list')).to include_text('There are no new conferences')
   end
 
-  it "should allow group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2"),test_id: pick_test_id(context, student: 323559, teacher: 323560) do
+  it "should allow group users to delete a concluded conference", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 323559, teacher: 323560) do
     skip_if_safari(:alert)
     skip_if_chrome('delete_conference method is fragile')
     cc = WimbaConference.create!(title: "cncluded conference", user: @user, context: @testgroup.first)

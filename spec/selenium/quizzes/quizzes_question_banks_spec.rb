@@ -25,7 +25,6 @@ describe 'quizzes question banks' do
   include QuizzesCommon
 
   context 'as a teacher' do
-
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -298,7 +297,7 @@ describe 'quizzes question banks' do
 
     it "should let teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2", test_id: 456150 do
       term = Account.default.enrollment_terms.create!
-      term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+      term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
       @course.enrollment_term = term
       @course.save!
       @bank = @course.assessment_question_banks.create!(title: 'Test Bank')
@@ -349,7 +348,7 @@ describe 'quizzes question banks' do
 
     it "should lock out teachers when :read_question_banks is disabled", priority: "2", test_id: 456163 do
       term = Account.default.enrollment_terms.create!
-      term.set_overrides(Account.default, 'TeacherEnrollment' => {:end_at => 3.days.ago})
+      term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
       @course.enrollment_term = term
       @course.save!
 
@@ -375,14 +374,13 @@ describe 'quizzes question banks' do
       @q = quiz_model
       assessment_question = []
       @quiz_question = []
-      answers = [ {'id' => 1}, {'id' => 2}, {'id' => 3} ]
+      answers = [{ 'id' => 1 }, { 'id' => 2 }, { 'id' => 3 }]
       51.times do |o|
         assessment_question[o] = source_bank.assessment_questions.create!
         @quiz_question.push(@q.quiz_questions.create!(question_data:
-                                                   {name: "question #{o}", question_type: 'multiple_choice_question',
-                                                   'answers' => answers, points_possible: 1},
+                                                   { name: "question #{o}", question_type: 'multiple_choice_question',
+                                                     'answers' => answers, points_possible: 1 },
                                                       assessment_question: assessment_question[o]))
-
       end
       get "/courses/#{@course.id}/question_banks/#{source_bank.id}"
       f('.more_questions_link').click

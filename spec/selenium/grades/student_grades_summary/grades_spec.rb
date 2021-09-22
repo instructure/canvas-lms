@@ -26,8 +26,8 @@ describe "grades" do
 
   before(:once) do
     @teacher1 = course_with_teacher(name: 'Dedicated Teacher1', active_user: true, active_enrollment: true, active_course: true).user
-    @student_1 = course_with_student(course: @course, name: "Student 1", active_all:true).user
-    @student_2 = course_with_student(course: @course, name: "Student 2", active_all:true).user
+    @student_1 = course_with_student(course: @course, name: "Student 1", active_all: true).user
+    @student_2 = course_with_student(course: @course, name: "Student 2", active_all: true).user
 
     # first assignment data
     due_date = Time.now.utc + 2.days
@@ -35,15 +35,15 @@ describe "grades" do
     @group2 = @course.assignment_groups.create!(name: 'second assignment group', group_weight: 33.3)
     @group3 = @course.assignment_groups.create!(name: 'third assignment group', group_weight: 33.3)
     @first_assignment = assignment_model({
-      course: @course,
-      title: 'first assignment',
-      due_at: due_date,
-      points_possible: 10,
-      submission_types: 'online_text_entry',
-      assignment_group: @group,
-      peer_reviews: true,
-      anonymous_peer_reviews: true
-    })
+                                           course: @course,
+                                           title: 'first assignment',
+                                           due_at: due_date,
+                                           points_possible: 10,
+                                           submission_types: 'online_text_entry',
+                                           assignment_group: @group,
+                                           peer_reviews: true,
+                                           anonymous_peer_reviews: true
+                                         })
     rubric_model
     @rubric.criteria[0][:criterion_use_range] = true
     @rubric.save!
@@ -54,62 +54,62 @@ describe "grades" do
     @submission = @first_assignment.submit_homework(@student_1, body: 'student first submission')
     @first_assignment.grade_student(@student_1, grade: 10, grader: @teacher)
     @assessment = @association.assess({
-      user: @student_1,
-      assessor: @teacher,
-      artifact: @submission,
-      assessment: {
-        assessment_type: 'grading',
-        criterion_crit1: {
-          points: 10,
-          comments: "cool, yo"
-        }
-      }
-    })
+                                        user: @student_1,
+                                        assessor: @teacher,
+                                        artifact: @submission,
+                                        assessment: {
+                                          assessment_type: 'grading',
+                                          criterion_crit1: {
+                                            points: 10,
+                                            comments: "cool, yo"
+                                          }
+                                        }
+                                      })
     @submission.reload
     @submission.score = 3
     @submission.add_comment(author: @teacher, comment: 'submission comment')
     @submission.add_comment({
-      author: @student_2,
-      comment: "Anonymous Peer Review"
-    })
+                              author: @student_2,
+                              comment: "Anonymous Peer Review"
+                            })
     @submission.save!
 
-    #second student submission
+    # second student submission
     @student_2_submission = @first_assignment.submit_homework(@student_2, body: 'second student second submission')
     @first_assignment.grade_student(@student_2, grade: 4, grader: @teacher)
     @student_2_submission.score = 3
     @submission.save!
 
-    #second assigmnent data
+    # second assigmnent data
     due_date = due_date + 1.days
     @second_assignment = assignment_model({
-      course: @course,
-      title: 'second assignment',
-      due_at: due_date,
-      points_possible: 5,
-      submission_types:'online_text_entry',
-      assignment_group: @group
-    })
+                                            course: @course,
+                                            title: 'second assignment',
+                                            due_at: due_date,
+                                            points_possible: 5,
+                                            submission_types: 'online_text_entry',
+                                            assignment_group: @group
+                                          })
 
     @second_association = @rubric.associate_with(@second_assignment, @course, purpose: 'grading')
     @second_submission = @second_assignment.submit_homework(@student_1, body: 'student second submission')
     @second_assignment.grade_student(@student_1, grade: 2, grader: @teacher)
     @second_submission.save!
     @second_assessment = @second_association.assess({
-      user: @student_1,
-      assessor: @teacher,
-      artifact: @second_submission,
-      assessment: {
-        assessment_type: 'grading',
-        criterion_crit1: {
-          points: 2
-        }
-      }
-    })
+                                                      user: @student_1,
+                                                      assessor: @teacher,
+                                                      artifact: @second_submission,
+                                                      assessment: {
+                                                        assessment_type: 'grading',
+                                                        criterion_crit1: {
+                                                          points: 2
+                                                        }
+                                                      }
+                                                    })
 
-    #third assignment data
+    # third assignment data
     due_date = due_date + 1.days
-    @third_assignment = assignment_model({title: 'third assignment', due_at: due_date, course: @course})
+    @third_assignment = assignment_model({ title: 'third assignment', due_at: due_date, course: @course })
   end
 
   context "as a teacher" do
@@ -172,7 +172,7 @@ describe "grades" do
     it "should not send PII to google analytics" do
       Setting.set('google_analytics_key', 'testing123')
       StudentGradesPage.visit_as_student(@course)
-      analytics_snippet_script = ff('script').find {|s| s.attribute('innerHTML').include? "ga('create', \"testing123\", 'auto');"}
+      analytics_snippet_script = ff('script').find { |s| s.attribute('innerHTML').include? "ga('create', \"testing123\", 'auto');" }
       expect(analytics_snippet_script.attribute('innerHTML')).to include("ga('set', 'title', \"Grades for Student\");")
     end
 
@@ -180,8 +180,8 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       expect(driver.execute_script(
-        "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-      )).to eq('hidden')
+               "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
+             )).to eq('hidden')
 
       driver.execute_script(
         'window.focus()'
@@ -192,8 +192,8 @@ describe "grades" do
       )
 
       expect(driver.execute_script(
-        "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
-      )).to eq('visible')
+               "return $('#submission_#{@submission.assignment_id} .assignment_score .grade .tooltip_wrap').css('visibility')"
+             )).to eq('visible')
     end
 
     it "should allow student to test modifying grades", priority: "1", test_id: 229660 do
@@ -202,7 +202,7 @@ describe "grades" do
 
       expect_any_instantiation_of(@first_assignment).to receive(:find_or_create_submission).and_return(@submission)
 
-      #check initial total
+      # check initial total
       expect(f('#submission_final-grade .assignment_score .grade').text).to eq '33.33%'
 
       edit_grade = lambda do |field, score|
@@ -221,7 +221,7 @@ describe "grades" do
       edit_grade.call(first_row_grade, 4)
       assert_grade.call("40%")
 
-      #using find with jquery to avoid caching issues
+      # using find with jquery to avoid caching issues
 
       # test changing unsubmitted scores
       third_grade = f("#submission_#{@third_assignment.id} .assignment_score .grade")
@@ -232,21 +232,21 @@ describe "grades" do
     end
 
     it "should display rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
-      zero_assignment = assignment_model({title: 'zero assignment', course: @course})
+      zero_assignment = assignment_model({ title: 'zero assignment', course: @course })
       zero_association = @rubric.associate_with(zero_assignment, @course, purpose: 'grading')
       zero_submission = zero_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       zero_association.assess({
-        user: @student_1,
-        assessor: @teacher,
-        artifact: zero_submission,
-        assessment: {
-          assessment_type: 'grading',
-          criterion_crit1: {
-            points: 0
-          }
-        }
-      })
+                                user: @student_1,
+                                assessor: @teacher,
+                                artifact: zero_submission,
+                                assessment: {
+                                  assessment_type: 'grading',
+                                  criterion_crit1: {
+                                    points: 0
+                                  }
+                                }
+                              })
       StudentGradesPage.visit_as_student(@course)
 
       # click first rubric
@@ -334,14 +334,14 @@ describe "grades" do
       StudentGradesPage.visit_as_student(@course)
 
       @another_assignment = assignment_model({
-        course: @course,
-        title: 'another assignment',
-        points_possible: 100,
-        submission_types: 'online_text_entry',
-        assignment_group: @group,
-        grading_type: 'letter_grade',
-        muted: true
-      })
+                                               course: @course,
+                                               title: 'another assignment',
+                                               points_possible: 100,
+                                               submission_types: 'online_text_entry',
+                                               assignment_group: @group,
+                                               grading_type: 'letter_grade',
+                                               muted: true
+                                             })
       @another_assignment.ensure_post_policy(post_manually: true)
       @another_submission = @another_assignment.submit_homework(@student_1, body: 'student second submission')
       @another_assignment.grade_student(@student_1, grade: 81, grader: @teacher)
@@ -352,7 +352,7 @@ describe "grades" do
 
     it "should display assignment statistics", priority: "1", test_id: 229664 do
       5.times do |count|
-        @s = course_with_student(course: @course, name: "Student #{count}", active_all:true).user
+        @s = course_with_student(course: @course, name: "Student #{count}", active_all: true).user
         @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
       end
 
@@ -377,7 +377,7 @@ describe "grades" do
        priority: "1", test_id: 229668 do
       # get up to a point where statistics can be shown
       5.times do |count|
-        s = course_with_student(course: @course, name: "Student_#{count}", active_all:true).user
+        s = course_with_student(course: @course, name: "Student_#{count}", active_all: true).user
         @first_assignment.grade_student(s, grade: 4, grader: @teacher)
       end
       # but then prevent them at the course levels
@@ -409,17 +409,17 @@ describe "grades" do
       @third_submission = @third_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
       @third_association.assess({
-        user: @student_1,
-        assessor: @teacher,
-        artifact: @third_submission,
-        assessment: {
-          assessment_type: 'grading',
-          criterion_crit1: {
-            points: 2,
-            comments: "not bad, not bad"
-          }
-        }
-      })
+                                  user: @student_1,
+                                  assessor: @teacher,
+                                  artifact: @third_submission,
+                                  assessment: {
+                                    assessment_type: 'grading',
+                                    criterion_crit1: {
+                                      points: 2,
+                                      comments: "not bad, not bad"
+                                    }
+                                  }
+                                })
 
       StudentGradesPage.visit_as_student(@course)
 

@@ -96,7 +96,7 @@ describe "speed grader - rubrics" do
     @association.use_for_grading = true
     @association.save!
 
-    @rubric.data.detect{ |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
+    @rubric.data.detect { |row| row[:learning_outcome_id] == @outcome.id }[:ignore_for_scoring] = true
     @rubric.save!
 
     Speedgrader.visit(@course.id, @assignment.id)
@@ -165,7 +165,7 @@ describe "speed grader - rubrics" do
         },
       ],
       learning_outcome_id: @ignored.id,
-      ignore_for_scoring:'1',
+      ignore_for_scoring: '1',
     }]
     @rubric.save!
 

@@ -37,7 +37,7 @@ describe "student planner" do
   context "Graded discussion" do
     before :once do
       @assignment_d = @course.assignments.create!(name: 'assignment',
-                                                  due_at: Time.zone.now.advance(days:2),
+                                                  due_at: Time.zone.now.advance(days: 2),
                                                   points_possible: 5)
       @discussion = @course.discussion_topics.create!(user: @teacher, title: 'Discussion 1',
                                                       message: 'Graded discussion',
@@ -46,7 +46,7 @@ describe "student planner" do
 
     it "shows and navigates to graded discussions page from student planner", priority: "1", test_id: 3259301 do
       go_to_list_view
-      validate_object_displayed(@course.name,'Discussion')
+      validate_object_displayed(@course.name, 'Discussion')
       validate_link_to_url(@discussion, 'discussion_topics')
     end
 
@@ -85,9 +85,9 @@ describe "student planner" do
                                                                todo_date: Time.zone.now + 2.days)
     end
 
-    it "shows and navigates to ungraded discussions with todo dates from student planner", priority:"1", test_id: 3259305 do
+    it "shows and navigates to ungraded discussions with todo dates from student planner", priority: "1", test_id: 3259305 do
       go_to_list_view
-      validate_object_displayed(@course.name,'Discussion')
+      validate_object_displayed(@course.name, 'Discussion')
       validate_link_to_url(@ungraded_discussion, 'discussion_topics')
     end
 

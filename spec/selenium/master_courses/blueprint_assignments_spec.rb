@@ -17,11 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 require_relative '../helpers/blueprint_common'
 
 shared_context "blueprint courses assignment context" do
-
   def assignment_options
     f('.assignment')
   end
@@ -30,8 +28,7 @@ shared_context "blueprint courses assignment context" do
     f('#edit_assignment_header')
   end
 
-  let(:delete_assignment){'a.delete_assignment'}
-
+  let(:delete_assignment) { 'a.delete_assignment' }
 end
 
 describe "blueprint courses assignments" do
@@ -110,7 +107,7 @@ describe "blueprint courses assignments" do
     end
 
     it "should not contain the delete cog-menu option on the index when locked" do
-      @tag.update(restrictions: {content: true})
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/assignments"
 
@@ -131,7 +128,7 @@ describe "blueprint courses assignments" do
     end
 
     it "should not allow the delete options on the edit page when locked" do
-      @tag.update(restrictions: {content: true})
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
@@ -149,7 +146,7 @@ describe "blueprint courses assignments" do
 
     it "should not allow editing of restricted items" do
       # restrict everything
-      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
@@ -176,7 +173,7 @@ describe "blueprint courses assignments" do
       nga_copy.migration_id = nga_tag.migration_id
       nga_copy.save!
 
-      nga_tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      nga_tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{nga_copy.id}/edit"
 
@@ -188,7 +185,7 @@ describe "blueprint courses assignments" do
 
     it "should not allow popup editing of restricted items" do
       # restrict everything
-      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments"
 
@@ -219,7 +216,7 @@ describe "blueprint courses assignments" do
 
     it "should show locked button on index page for locked assignment" do
       # restrict something
-      @tag.update(restrictions: {content: true})
+      @tag.update(restrictions: { content: true })
       get "/courses/#{@course.id}/assignments"
       expect(f('[data-view="lock-icon"] i.icon-blueprint-lock')).to be_displayed
     end

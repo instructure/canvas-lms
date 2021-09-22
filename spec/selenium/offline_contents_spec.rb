@@ -52,4 +52,3 @@ describe "offline contents" do
     it_behaves_like 'generate and download ePub', :student
   end
 end
-

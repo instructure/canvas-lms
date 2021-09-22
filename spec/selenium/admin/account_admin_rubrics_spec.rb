@@ -29,7 +29,6 @@ describe "account shared rubric specs" do
   let(:account) { Account.default }
 
   before(:each) do
-
     course_with_admin_logged_in
   end
 
@@ -49,7 +48,6 @@ describe "account shared rubric specs" do
   end
 
   it "should round to an integer when splitting" do
-
     should_round_to_an_integer_when_splitting
   end
 

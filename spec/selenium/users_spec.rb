@@ -51,7 +51,6 @@ describe "users" do
   end
 
   context "page views" do
-
     before (:each) do
       course_with_admin_logged_in
       @student = student_in_course.user

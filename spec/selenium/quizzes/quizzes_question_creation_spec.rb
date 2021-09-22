@@ -30,14 +30,12 @@ describe 'quizzes question creation' do
   end
 
   context 'when creating a new question' do
-
     before(:each) do
       course_with_teacher_logged_in
       @last_quiz = start_quiz_question
     end
 
     context 'when the \'+ New Question\' button is clicked' do
-
       it 'opens a new question form', priority: "1", test_id: 140627 do
         # setup is accomplished in before(:each)
         expect(fj('.question_form:visible')).to be_displayed
@@ -223,7 +221,6 @@ describe 'quizzes question creation' do
 
     # Matching Question
     context 'when creating a matching question' do
-
       it 'creates a basic matching question', priority: "1", test_id: 201943 do
         quiz = @last_quiz
 
@@ -312,7 +309,7 @@ describe 'quizzes question creation' do
       click_option('.question_form:visible .question_type', 'Formula Question')
 
       type_in_tiny '.question_form:visible textarea.question_content',
-        'If [x] + [y] is a whole number, then this is a formula question.'
+                   'If [x] + [y] is a whole number, then this is a formula question.'
 
       # get focus out of tinymce to allow change event to propogate
       f(".question_header").click
@@ -412,7 +409,7 @@ describe 'quizzes question creation' do
     it "should show an error when the quiz question exceeds character limit", priority: "2", test_id: 140672 do
       start_quiz_question
       chars = [*('a'..'z')]
-      value = (0..16385).map{chars.sample}.join
+      value = (0..16385).map { chars.sample }.join
       type_in_tiny '.question:visible textarea.question_content', value
       wait_for_ajaximations
       f('.submit_button').click
@@ -424,11 +421,10 @@ describe 'quizzes question creation' do
   end
 
   context 'when a quiz has more than 25 questions' do
-
     def quiz_questions_creation
       @quiz = @course.quizzes.create!(title: 'new quiz')
       26.times do
-        @quiz.quiz_questions.create!(question_data: {name: 'Quiz Questions', question_type: 'essay_question', question_text: 'qq_1', answers: [], points_possible: 1})
+        @quiz.quiz_questions.create!(question_data: { name: 'Quiz Questions', question_type: 'essay_question', question_text: 'qq_1', answers: [], points_possible: 1 })
       end
       @quiz.generate_quiz_data
       @quiz.workflow_state = 'available'
@@ -455,7 +451,6 @@ describe 'quizzes question creation' do
   end
 
   context 'when creating a new quiz question group' do
-
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -484,7 +479,7 @@ describe 'quizzes question creation' do
     end
 
     it 'edits "fill in multi blanks" question' do
-      create_quiz_question({name: 'Quiz Questions', question_type: 'fill_in_multiple_blanks_question', question_text: '[color1]', answers: [], points_possible: 1})
+      create_quiz_question({ name: 'Quiz Questions', question_type: 'fill_in_multiple_blanks_question', question_text: '[color1]', answers: [], points_possible: 1 })
       open_quiz_edit_form
       click_questions_tab
       driver.execute_script("$('.display_question').first().addClass('hover').addClass('active')")
@@ -501,7 +496,6 @@ describe 'quizzes question creation' do
   end
 
   context 'when editing a quiz question group' do
-
     before(:each) do
       course_with_teacher_logged_in
     end

@@ -45,9 +45,8 @@ describe "Notifications" do
         setup_notification(@teacher, name: 'Assignment Submitted')
         setup_notification(@teacher, name: 'Assignment Resubmitted')
         @assignment = @course.assignments.create!(name: 'assignment',
-                                                 submission_types: 'online_text_entry',
-                                                 due_at: Time.zone.now.advance(days:2),
-                                                 )
+                                                  submission_types: 'online_text_entry',
+                                                  due_at: Time.zone.now.advance(days: 2),)
         @submission = @assignment.submit_homework(@student, submission_type: 'online_text_entry', body: 'hello')
         @submission.workflow_state = 'submitted'
         @submission.save!
@@ -89,7 +88,7 @@ describe "Notifications" do
         enrollment.accept!
 
         @assignment.assign_peer_review(@student, reviewer)
-        submission_comment_model({author: reviewer, submission: @assignment.find_or_create_submission(@student)})
+        submission_comment_model({ author: reviewer, submission: @assignment.find_or_create_submission(@student) })
 
         get "/users/#{@student.id}/messages"
 
@@ -107,7 +106,7 @@ describe "Notifications" do
         before :once do
           @observer = user_with_pseudonym(username: 'observer@example.com', active_all: 1)
           @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active',
-                             associated_user_id: @student.id)
+                                                               associated_user_id: @student.id)
           setup_notification(@observer, name: 'Submission Graded')
           setup_notification(@observer, name: 'Submission Comment')
         end
@@ -120,8 +119,8 @@ describe "Notifications" do
           # Checks that the notification is there and has the correct "Notification Name" field
           fj('.ui-tabs-anchor:contains("Meta Data")').click
           expect(ff('.ic-Table--condensed.grid td').last).to include_text('Submission Graded')
-          expect(ff('.ic-Table--condensed.grid td')[3]).
-                                        to include_text("Assignment Graded: #{@assignment.name}, #{@course.name}")
+          expect(ff('.ic-Table--condensed.grid td')[3])
+            .to include_text("Assignment Graded: #{@assignment.name}, #{@course.name}")
         end
 
         it "should not send assignment graded notification to observers not linked to students", priority: "2", test_id: 1040286 do
@@ -134,21 +133,21 @@ describe "Notifications" do
         end
 
         it "should show submission comment notification to the observer", priority: "2", test_id: 1040563 do
-          submission_comment_model({author: @teacher, submission: @assignment.find_or_create_submission(@student)})
+          submission_comment_model({ author: @teacher, submission: @assignment.find_or_create_submission(@student) })
 
           get "/users/#{@observer.id}/messages"
 
           # Checks that the notification is there and has the correct "Notification Name" field
           fj('.ui-tabs-anchor:contains("Meta Data")').click
           expect(ff('.ic-Table--condensed.grid td').last).to include_text('Submission Comment')
-          expect(ff('.ic-Table--condensed.grid td')[3]).
-              to include_text("Submission Comment: #{@student.name}, #{@assignment.name}, #{@course.name}")
+          expect(ff('.ic-Table--condensed.grid td')[3])
+            .to include_text("Submission Comment: #{@student.name}, #{@assignment.name}, #{@course.name}")
         end
 
         it "should not send submission comment notification to observers not linked to students", priority: "2", test_id: 1040565 do
           @observer2 = user_with_pseudonym(username: 'observer2@example.com', active_all: 1)
           @course.enroll_user(@observer2, 'ObserverEnrollment', enrollment_state: 'active')
-          submission_comment_model({author: @teacher, submission: @assignment.find_or_create_submission(@student)})
+          submission_comment_model({ author: @teacher, submission: @assignment.find_or_create_submission(@student) })
 
           get "/users/#{@observer2.id}/messages"
           expect(f("#content")).not_to contain_css('.messages .message')
@@ -176,7 +175,7 @@ describe "Notifications" do
         before :once do
           @observer = user_with_pseudonym(username: 'observer@example.com', active_all: 1)
           @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active',
-                              associated_user_id: @student.id)
+                                                               associated_user_id: @student.id)
           setup_notification(@student, name: 'Grade Weight Changed')
         end
 
@@ -189,8 +188,8 @@ describe "Notifications" do
           # Checks that the notification is there and has the correct "Notification Name" field
           fj('.ui-tabs-anchor:contains("Meta Data")').click
           expect(ff('.ic-Table--condensed.grid td').last).to include_text('Grade Weight Changed')
-          expect(ff('.ic-Table--condensed.grid td')[3]).
-              to include_text("Grade Weight Changed: #{@course.name}")
+          expect(ff('.ic-Table--condensed.grid td')[3])
+            .to include_text("Grade Weight Changed: #{@course.name}")
         end
       end
     end
@@ -200,7 +199,7 @@ describe "Notifications" do
         before :once do
           @observer = user_with_pseudonym(username: 'observer@example.com', active_all: 1)
           @course.enroll_user(@observer, 'ObserverEnrollment', enrollment_state: 'active',
-                              associated_user_id: @student.id)
+                                                               associated_user_id: @student.id)
           setup_notification(@student, name: 'New Event Created')
           setup_notification(@student, name: 'Event Date Changed')
         end
@@ -221,8 +220,8 @@ describe "Notifications" do
 
           wait_for_ajaximations
           fj('.ui-tabs-anchor:contains("Meta Data")').click
-          expect(fj('.ic-Table--condensed.grid:first tr:contains("Notification Name")').text).
-                                                                               to include('Event Date Changed')
+          expect(fj('.ic-Table--condensed.grid:first tr:contains("Notification Name")').text)
+            .to include('Event Date Changed')
         end
       end
     end

@@ -43,20 +43,20 @@ module DifferentiatedAssignments
     end
 
     private
-      include Factories
 
-      def create_course(opts = {})
-        course_name = opts.fetch(:name, 'Selective Release Course')
-        course_factory(
-          course_name: course_name,
-          active_course: true
-        )
-      end
+    include Factories
+
+    def create_course(opts = {})
+      course_name = opts.fetch(:name, 'Selective Release Course')
+      course_factory(
+        course_name: course_name,
+        active_course: true
+      )
+    end
   end
 
   module URLs
     class << self
-
       def course_home_page
         "/courses/#{DifferentiatedAssignments.the_course.id}"
       end

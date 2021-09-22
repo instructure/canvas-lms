@@ -38,23 +38,23 @@ describe "context modules" do
       @open_item_icon = 'icon-mark-as-read'
       @no_icon = 'no-icon'
 
-      #initial module setup
+      # initial module setup
       @module_1 = create_context_module('Module One')
       @assignment_1 = @course.assignments.create!(:title => "assignment 1")
-      @tag_1 = @module_1.add_item({:id => @assignment_1.id, :type => 'assignment'})
-      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}}
+      @tag_1 = @module_1.add_item({ :id => @assignment_1.id, :type => 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' } }
 
       @module_2 = create_context_module('Module Two')
       @assignment_2 = @course.assignments.create!(:title => "assignment 2")
-      @tag_2 = @module_2.add_item({:id => @assignment_2.id, :type => 'assignment'})
-      @module_2.completion_requirements = {@tag_2.id => {:type => 'must_view'}}
+      @tag_2 = @module_2.add_item({ :id => @assignment_2.id, :type => 'assignment' })
+      @module_2.completion_requirements = { @tag_2.id => { :type => 'must_view' } }
       @module_2.prerequisites = "module_#{@module_1.id}"
 
       @module_3 = create_context_module('Module Three')
       @quiz_1 = @course.quizzes.create!(:title => "some quiz")
       @quiz_1.publish!
-      @tag_3 = @module_3.add_item({:id => @quiz_1.id, :type => 'quiz'})
-      @module_3.completion_requirements = {@tag_3.id => {:type => 'must_view'}}
+      @tag_3 = @module_3.add_item({ :id => @quiz_1.id, :type => 'quiz' })
+      @module_3.completion_requirements = { @tag_3.id => { :type => 'must_view' } }
       @module_3.prerequisites = "module_#{@module_2.id}"
 
       @module_1.save!
@@ -72,7 +72,7 @@ describe "context modules" do
       expect(f("#content")).not_to contain_css('.module_progressions_link')
 
       context_modules = ff('.context_module')
-      #initial check to make sure everything was setup correctly
+      # initial check to make sure everything was setup correctly
       validate_context_module_status_icon(@module_1.id, @no_icon)
       validate_context_module_status_icon(@module_2.id, @locked_icon)
       validate_context_module_status_icon(@module_3.id, @locked_icon)
@@ -90,7 +90,7 @@ describe "context modules" do
       # shouldn't show the teacher's "show student progression" button
       expect(f("#content")).not_to contain_css('.module_progressions_link')
 
-      #initial check to make sure everything was setup correctly
+      # initial check to make sure everything was setup correctly
       ff('.context_module .progression_container').each do |item|
         expect(item.text.strip).to be_blank
       end
@@ -116,7 +116,7 @@ describe "context modules" do
       validate_context_module_status_icon(@module_1.id, @no_icon)
       validate_context_module_status_icon(@module_2.id, @locked_icon)
 
-      #sequential normal validation
+      # sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
@@ -124,8 +124,8 @@ describe "context modules" do
 
     it "should not cache a changed module requirement" do
       other_assmt = @course.assignments.create!(:title => "assignment")
-      other_tag = @module_1.add_item({:id => other_assmt.id, :type => 'assignment'})
-      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, other_tag.id => {:type => 'must_view'}}
+      other_tag = @module_1.add_item({ :id => other_assmt.id, :type => 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' }, other_tag.id => { :type => 'must_view' } }
       @module_1.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment_1.id}"
@@ -135,7 +135,7 @@ describe "context modules" do
       validate_context_module_item_icon(@tag_1.id, @completed_icon)
 
       # change the req
-      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_submit'}, other_tag.id => {:type => 'must_view'}}
+      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_submit' }, other_tag.id => { :type => 'must_view' } }
       @module_1.save!
 
       go_to_modules
@@ -152,7 +152,7 @@ describe "context modules" do
 
     it "should validate that a student can't get to a locked context module" do
       go_to_modules
-      #sequential error validation
+      # sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       expect(f('#content')).to include_text("hasn't been unlocked yet")
       expect(f('#module_prerequisites_list')).to be_displayed
@@ -160,12 +160,12 @@ describe "context modules" do
 
     it "should validate that a student can't get to locked external items", priority: "1", test_id: 2624906 do
       external_tool = @course.context_external_tools.create!(:url => "http://example.com/ims/lti",
-          :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
+                                                             :consumer_key => "asdf", :shared_secret => "hjkl", :name => "external tool")
 
       @module_2.reload
       tag_1 = @module_2.add_item(:id => external_tool.id, :type => "external_tool", :url => external_tool.url)
       tag_2 = @module_2.add_item(:type => 'external_url', :url => 'http://example.com/lolcats',
-                                  :title => 'pls view', :indent => 1)
+                                 :title => 'pls view', :indent => 1)
 
       tag_1.publish!
       tag_2.publish!
@@ -192,13 +192,13 @@ describe "context modules" do
       @assignment_2.workflow_state = 'unpublished'
       @assignment_2.save!
 
-      module1_unpublished_tag = @module_1.add_item({:id => @assignment_2.id, :type => 'assignment'})
-      @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'}, module1_unpublished_tag.id => {:type => 'must_view'}}
+      module1_unpublished_tag = @module_1.add_item({ :id => @assignment_2.id, :type => 'assignment' })
+      @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' }, module1_unpublished_tag.id => { :type => 'must_view' } }
       @module_1.save!
-      expect(@module_1.completion_requirements.map{|h| h[:id]}).to include(@tag_1.id)
-      expect(@module_1.completion_requirements.map{|h| h[:id]}).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
+      expect(@module_1.completion_requirements.map { |h| h[:id] }).to include(@tag_1.id)
+      expect(@module_1.completion_requirements.map { |h| h[:id] }).to include(module1_unpublished_tag.id) # unpublished requirements SHOULD remain
 
-      module2_published_tag = @module_2.add_item({:id => @quiz_1.id, :type => 'quiz'})
+      module2_published_tag = @module_2.add_item({ :id => @quiz_1.id, :type => 'quiz' })
       @module_2.save!
 
       go_to_modules
@@ -235,7 +235,7 @@ describe "context modules" do
       get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
       expect(driver.current_url).not_to match %r{/courses/#{@course.id}/assignments/#{@assignment_2.id}}
 
-      create_section_override_for_assignment(@assignment_2, {course_section: @overriden_section})
+      create_section_override_for_assignment(@assignment_2, { course_section: @overriden_section })
 
       # Should redirect to the now visible assignment
       get "/courses/#{@course.id}/modules/#{@module_2.id}/items/first"
@@ -264,7 +264,7 @@ describe "context modules" do
 
       enter_student_view
 
-      #sequential error validation
+      # sequential error validation
       get "/courses/#{@course.id}/assignments/#{@assignment_2.id}"
       expect(f('#content')).to include_text("hasn't been unlocked yet")
       expect(f('#module_prerequisites_list')).to be_displayed
@@ -273,7 +273,7 @@ describe "context modules" do
       validate_context_module_status_icon(@module_1.id, @no_icon)
       validate_context_module_status_icon(@module_2.id, @locked_icon)
 
-      #sequential normal validation
+      # sequential normal validation
       navigate_to_module_item(0, @assignment_1.title)
       validate_context_module_status_icon(@module_1.id, @completed_icon)
       validate_context_module_status_icon(@module_2.id, @no_icon)
@@ -386,9 +386,9 @@ describe "context modules" do
         page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
         assmt = @course.assignments.create!(:title => "assmt")
 
-        tag1 = mod.add_item({:id => page.id, :type => 'wiki_page'})
-        tag2 = mod.add_item({:id => assmt.id, :type => 'assignment'})
-        mod.completion_requirements = {tag1.id => {:type => 'must_mark_done'}, tag2.id => {:type => 'must_mark_done'}}
+        tag1 = mod.add_item({ :id => page.id, :type => 'wiki_page' })
+        tag2 = mod.add_item({ :id => assmt.id, :type => 'assignment' })
+        mod.completion_requirements = { tag1.id => { :type => 'must_mark_done' }, tag2.id => { :type => 'must_mark_done' } }
         mod.save!
 
         get "/courses/#{@course.id}/pages/#{page.url}"
@@ -414,10 +414,10 @@ describe "context modules" do
         assmt = @course.assignments.create!(:title => "assmt")
         page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
 
-        tag1 = mod.add_item({:id => assmt.id, :type => 'assignment'})
-        tag2 = mod.add_item({:id => page.id, :type => 'wiki_page'})
+        tag1 = mod.add_item({ :id => assmt.id, :type => 'assignment' })
+        tag2 = mod.add_item({ :id => page.id, :type => 'wiki_page' })
 
-        mod.completion_requirements = {tag1.id => {:type => 'must_mark_done'}, tag2.id => {:type => 'must_mark_done'}}
+        mod.completion_requirements = { tag1.id => { :type => 'must_mark_done' }, tag2.id => { :type => 'must_mark_done' } }
         mod.require_sequential_progress = true
         mod.save!
 
@@ -429,8 +429,8 @@ describe "context modules" do
     end
 
     it "shows Mark as Done button for assignments with external tool submission", priority: "2", test_id: 3340306 do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       tool = @course.context_external_tools.create!(name: "a",
                                                     url: "example.com",
                                                     consumer_key: '12345',
@@ -438,12 +438,12 @@ describe "context modules" do
       @assignment = @course.assignments.create!
       @assignment.tool_settings_tool = tool
       @assignment.submission_types = "external_tool"
-      @assignment.external_tool_tag_attributes = {url: tool.url}
+      @assignment.external_tool_tag_attributes = { url: tool.url }
       @assignment.save!
 
       @mark_done_module = create_context_module('Mark Done Module')
-      @tag = @mark_done_module.add_item({id: @assignment.id, type: 'assignment'})
-      @mark_done_module.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+      @tag = @mark_done_module.add_item({ id: @assignment.id, type: 'assignment' })
+      @mark_done_module.completion_requirements = { @tag.id => { type: 'must_mark_done' } }
       @mark_done_module.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -491,12 +491,12 @@ describe "context modules" do
         validate_context_module_status_icon(@module_2.id, @no_icon)
       end
 
-      it "should show a locked icon when module is locked", priority:"1", test_id: 250541 do
+      it "should show a locked icon when module is locked", priority: "1", test_id: 250541 do
         go_to_modules
         validate_context_module_status_icon(@module_2.id, @locked_icon)
       end
 
-      it "should show a tooltip for locked icon when module is locked", priority:"1", test_id: 255918 do
+      it "should show a tooltip for locked icon when module is locked", priority: "1", test_id: 255918 do
         skip "flaky, LS-1297 (8/23/2020)"
         go_to_modules
         driver.action.move_to(f("#context_module_#{@module_2.id} .completion_status .icon-lock"), 0, 0).perform
@@ -518,7 +518,6 @@ describe "context modules" do
     end
 
     describe "module item icons" do
-
       it "should show a completed icon when module item is completed", priority: "1", test_id: 250546 do
         go_to_modules
         navigate_to_module_item(0, @assignment_1.title)
@@ -551,8 +550,8 @@ describe "context modules" do
         assignment.only_visible_to_overrides = true
         assignment.save!
 
-        tag = @module_1.add_item({:id => assignment.id, :type => 'assignment'})
-        @module_1.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 90}}
+        tag = @module_1.add_item({ :id => assignment.id, :type => 'assignment' })
+        @module_1.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 90 } }
         @module_1.require_sequential_progress = false
         @module_1.save!
 
@@ -635,7 +634,7 @@ describe "context modules" do
       @tag1 = @module.add_item id: @assignment.id, type: 'assignment'
       @tag2 = @module.add_item id: @assignment2.id, type: 'assignment'
 
-      @module.completion_requirements = {@tag1.id => {type: 'must_view'}, @tag2.id => {type: 'must_view'}}
+      @module.completion_requirements = { @tag1.id => { type: 'must_view' }, @tag2.id => { type: 'must_view' } }
       @module.save!
 
       get "/courses/#{@course.id}/assignments/#{@assignment2.id}"
@@ -673,12 +672,11 @@ describe "context modules" do
       quiz = @course.quizzes.create!(title: "quiz", lock_at: 3.days.ago)
       quiz.publish!
 
+      tag1 = @module.add_item({ id: asmt.id, type: 'assignment' })
+      tag2 = @module.add_item({ id: topic.id, type: 'discussion_topic' })
+      tag3 = @module.add_item({ id: quiz.id, type: 'quiz' })
 
-      tag1 = @module.add_item({id: asmt.id, type: 'assignment'})
-      tag2 = @module.add_item({id: topic.id, type: 'discussion_topic'})
-      tag3 = @module.add_item({id: quiz.id, type: 'quiz'})
-
-      @module.completion_requirements = {tag1.id => {type: 'must_view'}, tag2.id => {type: 'must_view'}, tag3.id => {type: 'must_view'}}
+      @module.completion_requirements = { tag1.id => { type: 'must_view' }, tag2.id => { type: 'must_view' }, tag3.id => { type: 'must_view' } }
       @module.save!
 
       get "/courses/#{@course.id}/assignments/#{asmt.id}"
@@ -696,7 +694,7 @@ describe "context modules" do
     it "does not show past due when due date changed for already submitted quizzes", priority: "2", test_id: 1041397 do
       quiz = @course.quizzes.create!(title: "test quiz")
       quiz.publish!
-      tag = @module.add_item({type: 'quiz', id: quiz.id})
+      tag = @module.add_item({ type: 'quiz', id: quiz.id })
       submission = quiz.generate_submission(@student)
       submission.workflow_state = 'complete'
       submission.save!
@@ -711,9 +709,9 @@ describe "context modules" do
       page = @course.wiki_pages.create!(title: "some page", body: "some body")
       page.set_as_front_page!
 
-      tag = @module.add_item({id: page.id, type: 'wiki_page'})
+      tag = @module.add_item({ id: page.id, type: 'wiki_page' })
       @module.require_sequential_progress = true
-      @module.completion_requirements = {tag.id => {type: 'must_view'}}
+      @module.completion_requirements = { tag.id => { type: 'must_view' } }
       @module.save!
 
       get "/courses/#{@course.id}/pages/#{page.url}"

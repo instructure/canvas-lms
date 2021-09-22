@@ -173,5 +173,3 @@ class AnnouncementIndex
     end
   end
 end
-
-

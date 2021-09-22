@@ -51,7 +51,7 @@ describe "interaction with grading periods" do
     end
 
     it "should display the correct grading period based on the GET param" do
-      future_period = @course.grading_periods.detect{|gp| gp.start_date.future?}
+      future_period = @course.grading_periods.detect { |gp| gp.start_date.future? }
       get "/courses/#{@course.id}/gradebook?grading_period_id=#{future_period.id}"
       Gradebook.select_view_dropdown
       Gradebook.select_filters
@@ -68,7 +68,7 @@ describe "interaction with grading periods" do
     end
 
     it "should display the current grading period without a GET param" do
-      current_period = @course.grading_periods.detect{|gp| gp.start_date.past? && gp.end_date.future?}
+      current_period = @course.grading_periods.detect { |gp| gp.start_date.past? && gp.end_date.future? }
       get "/courses/#{@course.id}/gradebook"
       Gradebook.select_view_dropdown
       Gradebook.select_filters

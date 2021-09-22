@@ -116,7 +116,7 @@ describe "course syllabus" do
       @user.save!
 
       # travel to April 5, 2021 4:30
-      time = Time.zone.local(2021,4,5,4,30)
+      time = Time.zone.local(2021, 4, 5, 4, 30)
       Timecop.travel(time) do
         visit_syllabus_page(@course.id)
 
@@ -141,7 +141,7 @@ describe "course syllabus" do
       @user.save!
 
       # travel to April 5, 2021 4:30
-      time = Time.zone.local(2021,4,5,4,30)
+      time = Time.zone.local(2021, 4, 5, 4, 30)
       Timecop.travel(time) do
         visit_syllabus_page(@course.id)
 

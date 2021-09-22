@@ -23,7 +23,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:default_section) { course.default_section }
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:group) do
@@ -36,11 +36,13 @@ describe "discussions" do
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:group_category) { course.group_categories.create!(name: 'group category') }
-  let(:assignment) { course.assignments.create!(
+  let(:assignment) {
+    course.assignments.create!(
       name: 'assignment',
-      #submission_types: 'discussion_topic',
+      # submission_types: 'discussion_topic',
       assignment_group: assignment_group
-  ) }
+    )
+  }
 
   before(:once) do
     Account.default.enable_feature!(:rce_enhancements)
@@ -76,7 +78,7 @@ describe "discussions" do
 
         f('input[type=checkbox][name=podcast_enabled]').click
         expect_new_page_load { submit_form('.form-actions') }
-        #get "/courses/#{course.id}/discussion_topics"
+        # get "/courses/#{course.id}/discussion_topics"
         # TODO: talk to UI, figure out what to display here
         # f('.discussion-topic .icon-rss').should be_displayed
         expect(DiscussionTopic.last.podcast_enabled).to be_truthy
@@ -149,7 +151,7 @@ describe "discussions" do
         end
 
         it "should default to post grades if account setting is enabled" do
-          @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+          @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
           @account.save!
 
           get url
@@ -181,9 +183,9 @@ describe "discussions" do
         unlock_text = format_time_for_view(target_time)
         unlock_text_index_page = format_date_for_view(target_time, :short)
         f('#delayed_post_at').send_keys(unlock_text)
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('.entry-content').text).to include("This topic is locked until #{unlock_text}")
-        expect_new_page_load{f('#section-tabs .discussions').click}
+        expect_new_page_load { f('#section-tabs .discussions').click }
         expect(f('.discussion-availability').text).to include("Not available until #{unlock_text_index_page}")
       end
 
@@ -194,7 +196,7 @@ describe "discussions" do
         replace_content(f('input[name=title]'), "Student Discussion")
         type_in_tiny('textarea[name=message]', 'This is the discussion description.')
         expect(f("#discussion-edit-view")).to_not contain_css("#has_group_category")
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('.discussion-title').text).to eq "Student Discussion"
         expect(f("#content")).not_to contain_css('#topic_publish_button')
       end
@@ -278,9 +280,9 @@ describe "discussions" do
         context "usage rights" do
           before do
             account.root_account.enable_feature!(:usage_rights_discussion_topics)
-            account.settings = {'usage_rights_required' => {
+            account.settings = { 'usage_rights_required' => {
               'value' => true
-            }}
+            } }
             account.save!
           end
 

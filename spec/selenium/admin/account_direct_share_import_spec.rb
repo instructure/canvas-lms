@@ -39,9 +39,9 @@ describe "direct share page" do
     @assignment_1 = @course_1.assignments.create!(:title => 'Assignment First', :points_possible => 10)
     assignment_model(course: @course_1, name: 'assignment to share')
 
-    @export_1 = @course_1.content_exports.create!(workflow_state: 'exported', settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
-    @export_2 = @course_1.content_exports.create!(workflow_state: 'exported', settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
-    @export_3 = @course_1.content_exports.create!(workflow_state: 'exported', settings: {"selected_content" => {"assignments" => {CC::CCHelper.create_key(@assignment_1) => '1'}}})
+    @export_1 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
+    @export_2 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
+    @export_3 = @course_1.content_exports.create!(workflow_state: 'exported', settings: { "selected_content" => { "assignments" => { CC::CCHelper.create_key(@assignment_1) => '1' } } })
     @sent_share = @teacher_1.sent_content_shares.create! name: 'a-unread share1', content_export: @export_1, read_state: 'unread'
     @unread_share1 = @teacher_2.received_content_shares.create! name: 'a-unread share1', content_export: @export_1, sender: @teacher_1, read_state: 'unread'
     @unread_share2 = @teacher_2.received_content_shares.create! name: 'b-unread share2', content_export: @export_2, sender: @teacher_1, read_state: 'unread'
@@ -109,5 +109,5 @@ describe "direct share page" do
   #   import_content_share.click
 
   #   expect(page_application_container).to contain_css("[role='dialog'][aria-label='Import...']")
-  #end
+  # end
 end

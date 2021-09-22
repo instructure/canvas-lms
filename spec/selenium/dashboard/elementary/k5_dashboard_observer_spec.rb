@@ -52,7 +52,7 @@ describe "observer k5 dashboard" do
     it 'defaults to the one observed student' do
       get "/"
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('K5Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('K5Student')
     end
 
     it 'shows the homeroom announcement and subject for the one observed student' do
@@ -138,7 +138,7 @@ describe "observer k5 dashboard" do
 
       expect(observed_student_dropdown).to be_displayed
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('K5Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('K5Student')
     end
 
     it 'selects a student from the dropdown list' do
@@ -146,7 +146,7 @@ describe "observer k5 dashboard" do
 
       click_observed_student_option('My1 Student')
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My1 Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('My1 Student')
       expect(dashboard_card_specific_subject('Art')).to be_displayed
     end
 
@@ -156,7 +156,7 @@ describe "observer k5 dashboard" do
       observed_student_dropdown.send_keys([:control, 'a'], :backspace, 'My2')
       click_observed_student_option('My2 Student')
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('My2 Student')
       expect(dashboard_card_specific_subject('Math')).to be_displayed
     end
 
@@ -169,14 +169,14 @@ describe "observer k5 dashboard" do
 
       get "/"
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('Mom')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('Mom')
       expect(dashboard_card_specific_subject('Art')).to be_displayed
     end
 
     it 'shows the dropdown picker on subject dashboard and first student on list' do
       get "/courses/#{@subject_course.id}#home"
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('K5Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('K5Student')
     end
 
     it 'selects student from list on subject drop down menu', ignore_js_errors: true do
@@ -184,7 +184,7 @@ describe "observer k5 dashboard" do
 
       click_observed_student_option('My2 Student')
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('My2 Student')
     end
 
     it 'allows for searching for a student in subject dropdown list', ignore_js_errors: true do
@@ -193,7 +193,7 @@ describe "observer k5 dashboard" do
       observed_student_dropdown.send_keys([:control, 'a'], :backspace, 'My2')
       click_observed_student_option('My2 Student')
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('My2 Student')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('My2 Student')
     end
   end
 
@@ -247,7 +247,7 @@ describe "observer k5 dashboard" do
 
       get "/courses/#{@subject_course.id}#home"
 
-      expect(element_value_for_attr(observed_student_dropdown,'value')).to eq('Mom')
+      expect(element_value_for_attr(observed_student_dropdown, 'value')).to eq('Mom')
       expect(front_page_info.text).to eq(wiki_page_data)
     end
   end

@@ -36,7 +36,7 @@ describe "Gradebook - message students who" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@third_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
       message_form = f('#message_assignment_recipients')
@@ -59,7 +59,7 @@ describe "Gradebook - message students who" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@third_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
       message_form = f('#message_assignment_recipients')
@@ -75,7 +75,7 @@ describe "Gradebook - message students who" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@second_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
     expect do
       message_form = f('#message_assignment_recipients')
@@ -123,7 +123,7 @@ describe "Gradebook - message students who" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@third_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@third_assignment.id, "message students")
 
     expect do
       message_form = f('#message_assignment_recipients')
@@ -136,7 +136,7 @@ describe "Gradebook - message students who" do
 
   it "allows the teacher to remove students from the message" do
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@second_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
     message_form = f('#message_assignment_recipients')
     click_option('#message_assignment_recipients .message_types', 'Scored more than')
@@ -160,12 +160,12 @@ describe "Gradebook - message students who" do
     submit_form(message_form)
     wait_for_ajax_requests
 
-    expect{ ConversationBatch.last.recipient_ids }.to become([@student_2.id])
+    expect { ConversationBatch.last.recipient_ids }.to become([@student_2.id])
   end
 
   it "disables the submit button if all students are filtered out" do
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@second_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
     message_form = f('#message_assignment_recipients')
     message_form.find_element(:css, '#body').send_keys('hello')
@@ -207,7 +207,7 @@ describe "Gradebook - message students who" do
 
     message_text = "This is a message"
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@second_assignment.id,"message students")
+    Gradebook.click_assignment_header_menu_element(@second_assignment.id, "message students")
 
     message_form = f('#message_assignment_recipients')
     click_option('#message_assignment_recipients .message_types', 'Scored more than')

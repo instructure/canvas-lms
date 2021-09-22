@@ -31,7 +31,6 @@ describe "calendar2" do
   before(:each) do
     # or some stuff we need to click is "below the fold"
 
-
     Account.default.tap do |a|
       a.settings[:show_scheduler] = true
       a.save!
@@ -155,7 +154,7 @@ describe "calendar2" do
 
       it "should allow deleting assignments", priority: "1", test_id: 138858 do
         title = "Maniac Mansion"
-        @assignment = @course.assignments.create!(name: title,due_at: 3.days.from_now)
+        @assignment = @course.assignments.create!(name: title, due_at: 3.days.from_now)
 
         load_agenda_view
         expect(agenda_item_title).to include_text(title)
@@ -359,7 +358,7 @@ describe "calendar2" do
 
     it "student can not delete events created by a teacher", priority: "1", test_id: 138856 do
       # create an event as the teacher
-      @course.calendar_events.create!(title: "Monkey Island", start_at: Time.zone.now.advance(days:4))
+      @course.calendar_events.create!(title: "Monkey Island", start_at: Time.zone.now.advance(days: 4))
 
       # browse to the view as a student
       load_agenda_view
