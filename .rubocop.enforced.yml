@@ -18,7 +18,7 @@ OPT_IN = {
   nil => %w[Gemfile.d].freeze,
   'Bundler' => nil,
   'Gemspec' => nil,
-  'Layout' => %w[bin build config db doc engines gems script].freeze
+  'Layout' => nil
 }.freeze
 
 # this code generates a configuration that disables all cops for all files
