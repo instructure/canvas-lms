@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {shape, string, bool} from 'prop-types'
+import {shape, string} from 'prop-types'
 import gql from 'graphql-tag'
 
 export const DiscussionEntryDraft = {
@@ -37,7 +37,7 @@ export const DiscussionEntryDraft = {
     discussionTopicId: string,
     rootEntryId: string,
     discussionEntryId: string,
-    message: string,
+    message: string
   }),
 
   mock: ({
@@ -48,7 +48,7 @@ export const DiscussionEntryDraft = {
     message = 'Howdy Partner, this is a draft message!',
     discussionTopicId = '5',
     discussionEntryId = '8',
-    rootEntryId = null,
+    rootEntryId = null
   } = {}) => ({
     id,
     _id,
@@ -71,6 +71,6 @@ export const DefaultMocks = {
     message: 'Howdy Partner, this is a draft message!',
     discussionTopicId: '5',
     discussionEntryId: '8',
-    rootEntryId: null,
+    rootEntryId: null
   })
 }
