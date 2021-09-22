@@ -210,6 +210,18 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     })
   }
 
+  const findRootEntryDraftMessage = () => {
+    let rootEntryDraftMessage = ''
+    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
+      if (!draftEntry.rootEntryId && !draftEntry.discussionEntryId) {
+        rootEntryDraftMessage = draftEntry.message
+        return false
+      }
+      return true
+    })
+    return rootEntryDraftMessage
+  }
+
   return (
     <Responsive
       match="media"
@@ -492,6 +504,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             onCancel={() => {
                               setExpandedReply(false)
                             }}
+                            value={findRootEntryDraftMessage()}
                             updateDraft={newDraftMessage => {
                               createDiscussionEntryDraft({
                                 variables: {
