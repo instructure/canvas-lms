@@ -44,6 +44,18 @@ export const DiscussionEntryContainer = props => {
     }
   })
 
+  const findDraftMessage = () => {
+    let rootEntryDraftMessage = ''
+    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
+      if (draftEntry.discussionEntryId === props.discussionEntry._id) {
+        rootEntryDraftMessage = draftEntry.message
+        return false
+      }
+      return true
+    })
+    return rootEntryDraftMessage
+  }
+
   if (props.deleted) {
     return (
       <DeletedPostMessage
@@ -144,6 +156,7 @@ export const DiscussionEntryContainer = props => {
               onSave={props.onSave}
               onCancel={props.onCancel}
               isIsolatedView={props.isIsolatedView}
+              draftMessage={findDraftMessage()}
               onCreateDiscussionEntryDraft={newDraftMessage =>
                 createDiscussionEntryDraft({
                   variables: {
@@ -170,6 +183,7 @@ DiscussionEntryContainer.propTypes = {
   children: PropTypes.node,
   title: PropTypes.string,
   discussionEntry: PropTypes.object,
+  discussionTopic: PropTypes.object,
   message: PropTypes.string,
   isEditing: PropTypes.bool,
   onSave: PropTypes.func,

@@ -67,7 +67,7 @@ export function PostMessage({...props}) {
             <View display="inline-block" margin="small none none none" width="100%">
               <DiscussionEdit
                 onCancel={props.onCancel}
-                value={props.message}
+                value={props.draftMessage || props.message}
                 onSubmit={props.onSave}
                 isEdit
                 updateDraft={newDraftMessage => {
@@ -128,7 +128,8 @@ PostMessage.propTypes = {
    */
   onCancel: PropTypes.func,
   isIsolatedView: PropTypes.bool,
-  onCreateDiscussionEntryDraft: PropTypes.func
+  onCreateDiscussionEntryDraft: PropTypes.func,
+  draftMessage: PropTypes.string
 }
 
 PostMessage.defaultProps = {

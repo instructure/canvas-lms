@@ -164,6 +164,7 @@ export const IsolatedParent = props => {
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
+                    discussionTopic={props.discussionTopic}
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
