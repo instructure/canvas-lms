@@ -59,7 +59,6 @@ const ignoredErrors = [
   /Function components cannot be given refs/,
   /Functions are not valid as a React child/,
   /invalid messageType: (notSupported|undefined)/,
-  /Invalid prop `background` of value `` supplied to `View`, expected one of/,
   /Invalid prop `children` of type `array` supplied to `Transition`/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `conversation._id` of type `number` supplied to `ComposeModalManager`/,
