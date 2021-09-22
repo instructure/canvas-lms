@@ -170,7 +170,6 @@ const ignoredErrors = [
   /The prop `text` is marked as required in `(SVGWithTextPlaceholder|TextPlaceholder)`/,
   /The prop `title` is marked as required in `ManageOutcomeItem`/,
   /The prop `trayProps.canUploadFiles` is marked as required in `RCEWrapper`/,
-  /The prop `updateDeveloperKey` is marked as required in `Scopes`/,
   /The prop `userId` is marked as required in `(CourseNotificationSettingsManager|GeneratePairingCode|NotificationPreferences)`/,
   /The prop `value` is marked as required in `CanvasSelectOption`/,
   /Unexpected keys "searchPermissions", "filterRoles", "tabChanged", "setAndOpenAddTray" found in preloadedState argument passed to createStore/,
