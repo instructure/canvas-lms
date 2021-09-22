@@ -1576,92 +1576,110 @@ describe 'Submissions API', type: :request do
     expect(json.first['integration_id']).to eq 'xyz'
   end
 
-  it "returns vericite data if present and vericite is enabled for the assignment" do
-    student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
-    @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, vericite_enabled: true)
-    a1.turnitin_settings = { :originality_report_visibility => 'after_grading' }
-    a1.save!
-    submission = submit_homework(a1, student)
-    sample_vericite_data = {
-      :last_processed_attempt => 1,
-      "attachment_504177" => {
-        :web_overlap => 73,
-        :publication_overlap => 0,
-        :error => true,
-        :student_overlap => 100,
-        :state => "failure",
-        :similarity_score => 100,
-        :object_id => "123345"
-      },
-      provider: 'vericite'
-    }
-    submission.turnitin_data = sample_vericite_data
-    submission.save!
+  context 'with plagiarism data' do
+    before :once do
+      @student = user_factory(active_all: true)
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(@student).accept!
+      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, turnitin_enabled: true)
+      @a1.update(turnitin_settings: { :originality_report_visibility => 'after_grading' })
+      @submission = submit_homework(@a1, @student)
+    end
 
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
-    expect(json).to have_key 'vericite_data'
-    sample_vericite_data.delete :last_processed_attempt
-    expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
-  end
-
-  it "returns turnitin data if present and turnitin is enabled for the assignment" do
-    student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
-    @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'letter_grade', :points_possible => 15, turnitin_enabled: true)
-    a1.turnitin_settings = { :originality_report_visibility => 'after_grading' }
-    a1.save!
-    submission = submit_homework(a1, student)
-    sample_turnitin_data = {
-      :last_processed_attempt => 1,
-      "attachment_504177" => {
-        :web_overlap => 73,
-        :publication_overlap => 0,
-        :error => true,
-        :student_overlap => 100,
-        :state => "failure",
-        :similarity_score => 100,
-        :object_id => "123345"
+    it "returns vericite data if present and vericite is enabled for the assignment" do
+      @a1.update(vericite_enabled: true, turnitin_enabled: false)
+      sample_vericite_data = {
+        :last_processed_attempt => 1,
+        "attachment_504177" => {
+          :web_overlap => 73,
+          :publication_overlap => 0,
+          :error => true,
+          :student_overlap => 100,
+          :state => "failure",
+          :similarity_score => 100,
+          :object_id => "123345"
+        },
+        provider: 'vericite'
       }
-    }
-    submission.turnitin_data = sample_turnitin_data
-    submission.save!
+      @submission.update(turnitin_data: sample_vericite_data)
 
-    # as teacher
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
-    expect(json).to have_key 'turnitin_data'
-    sample_turnitin_data.delete :last_processed_attempt
-    expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      { :controller => 'submissions_api', :action => 'show',
+                        :format => 'json', :course_id => @course.id.to_s,
+                        :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s })
+      expect(json).to have_key 'vericite_data'
+      sample_vericite_data.delete :last_processed_attempt
+      expect(json['vericite_data']).to eq sample_vericite_data.with_indifferent_access
+    end
 
-    # as student before graded
-    @user = student
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
-    expect(json).not_to have_key 'turnitin_data'
+    it "returns turnitin data if present and turnitin is enabled for the assignment" do
+      sample_turnitin_data = {
+        :last_processed_attempt => 1,
+        "attachment_504177" => {
+          :web_overlap => 73,
+          :publication_overlap => 0,
+          :error => true,
+          :student_overlap => 100,
+          :state => "failure",
+          :similarity_score => 100,
+          :object_id => "123345"
+        }
+      }
+      @submission.update(turnitin_data: sample_turnitin_data)
 
-    # as student after grading
-    a1.grade_student(student, grade: 11, grader: @teacher)
-    @user = student
-    json = api_call(:get,
-                    "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-                    { :controller => 'submissions_api', :action => 'show',
-                      :format => 'json', :course_id => @course.id.to_s,
-                      :assignment_id => a1.id.to_s, :user_id => student.id.to_s })
-    expect(json).to have_key 'turnitin_data'
-    expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
+      # as teacher
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      { :controller => 'submissions_api', :action => 'show',
+                        :format => 'json', :course_id => @course.id.to_s,
+                        :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s })
+      expect(json).to have_key 'turnitin_data'
+      sample_turnitin_data.delete :last_processed_attempt
+      expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
+
+      # as student before graded
+      @user = @student
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student.id.to_s })
+      expect(json).not_to have_key 'turnitin_data'
+
+      # as student after grading
+      @a1.grade_student(@student, grade: 11, grader: @teacher)
+      @user = @student
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      { controller: 'submissions_api', action: 'show',
+                        format: 'json', course_id: @course.id.to_s,
+                        assignment_id: @a1.id.to_s, user_id: @student.id.to_s })
+      expect(json).to have_key 'turnitin_data'
+      expect(json['turnitin_data']).to eq sample_turnitin_data.with_indifferent_access
+    end
+
+    it 'shows webhook_info with ?include[]=webhook_info' do
+      webhook_data = {
+        'product_code' => 'product_code',
+        'vendor_code' => 'vendor_code',
+        'resource_type_code' => 'code',
+        'tool_proxy_id' => 'tool_proxy_id',
+        'tool_proxy_created_at' => 'date',
+        'tool_proxy_updated_at' => 'date',
+        'tool_proxy_name' => 'tool_proxy_name',
+        'tool_proxy_context_type' => 'Account',
+        'tool_proxy_context_id' => 1,
+        'subscription_id' => '2a1cbf1c-cacb-4ebe-a418-c7463b34fca2',
+      }
+      @submission.update(turnitin_data: { webhook_info: webhook_data })
+      json = api_call(:get,
+                      "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+                      { controller: 'submissions_api', action: 'show', format: 'json',
+                        course_id: @course.id.to_s, assignment_id: @a1.id.to_s,
+                        user_id: @student.id.to_s, include: ['webhook_info'] })
+      expect(json.dig('turnitin_data', 'webhook_info')).to eq(webhook_data)
+    end
   end
 
   describe "#for_students" do

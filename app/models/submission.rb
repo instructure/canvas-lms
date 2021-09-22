@@ -795,9 +795,7 @@ class Submission < ActiveRecord::Base
         error_message: originality_report.error_message
       }
     end
-    ret_val = turnitin_data.merge(data)
-    ret_val.delete(:provider)
-    ret_val
+    turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
   end
 
   # Returns an array of the versioned originality reports in a sorted order. The ordering goes
@@ -913,8 +911,7 @@ class Submission < ActiveRecord::Base
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
     if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data
-      self.vericite_data_hash.keys.each do |asset_string|
-        data = self.vericite_data_hash[asset_string]
+      self.vericite_data_hash.each_value do |data|
         next unless data && data.is_a?(Hash) && data[:object_id]
 
         update_scores = update_scores || vericite_recheck_score(data)
@@ -978,8 +975,7 @@ class Submission < ActiveRecord::Base
     # flag to make sure that all scores are just updates and not new
     recheck_score_all = true
     data_changed = false
-    self.vericite_data_hash.keys.each do |asset_string|
-      data = self.vericite_data_hash[asset_string]
+    self.vericite_data_hash.each do |asset_string, data|
       # keep track whether the score state changed
       data_orig = data.dup
       next unless data && data.is_a?(Hash) && data[:object_id]
