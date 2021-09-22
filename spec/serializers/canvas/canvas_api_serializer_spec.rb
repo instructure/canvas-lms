@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Canvas::APISerializer do
-
   let(:controller) { ActiveModel::FakeController.new }
   let(:options) { { scope: {}, controller: controller } }
   let(:serializer) { Canvas::APISerializer.new({}, options) }
@@ -34,7 +33,6 @@ describe Canvas::APISerializer do
   end
 
   [:stringify_json_ids?, :accepts_jsonapi?, :session, :context].each do |method|
-
     it "delegates #{method} to controller" do
       expect(controller.send(method)).to eq serializer.send(method)
     end
@@ -51,7 +49,6 @@ describe Canvas::APISerializer do
 
   describe "#serializable object" do
     before do
-
       Foo = Struct.new(:id, :name) do
         def read_attribute_for_serialization(attr)
           send(attr)
@@ -71,22 +68,22 @@ describe Canvas::APISerializer do
     it "uses ActiveModel::serializer's implementation if not stringify_ids? returns false" do
       con = ActiveModel::FakeController.new(accepts_jsonapi: false, stringify_json_ids: false)
       object = Foo.new(1, 'Alice')
-      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer).to receive(:stringify_ids?).and_return false
       expect(serializer.as_json(root: nil)).to eq({
-        id: 1,
-        name: 'Alice'
-      })
+                                                    id: 1,
+                                                    name: 'Alice'
+                                                  })
     end
 
     it "stringifies ids if jsonapi or stringids requested" do
       con = ActiveModel::FakeController.new(accepts_jsonapi: true, stringify_json_ids: true)
       object = Foo.new(1, 'Alice')
-      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)).to eq({
-        id: '1',
-        name: 'Alice'
-      })
+                                                    id: '1',
+                                                    name: 'Alice'
+                                                  })
     end
 
     it "uses urls for embed: :ids, include: false" do
@@ -97,7 +94,7 @@ describe Canvas::APISerializer do
       object = Foo.new(1, 'Bob')
       expect(object).to receive(:bar).and_return double()
       url = "http://example.com/api/v1/bar/1"
-      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer).to receive(:bar_url).and_return(url)
       expect(serializer.as_json(root: nil)['links']['bar']).to eq url
     end
@@ -107,13 +104,14 @@ describe Canvas::APISerializer do
       class FooSerializer
         has_one :bar, embed: :ids, embed_in_root: true
       end
+
       class BarSerializer < Canvas::APISerializer
         attributes :id
       end
       object = Foo.new(1, 'Bob')
       expect(object).to receive(:bar).and_return Foo.new(1, 'Alice')
       url = "http://example.com/api/v1/bar/1"
-      serializer = FooSerializer.new(object, {root: nil, controller: con})
+      serializer = FooSerializer.new(object, { root: nil, controller: con })
       expect(serializer.as_json(root: nil)['links']['bar']).to eq "1"
       Object.send(:remove_const, :BarSerializer)
     end
@@ -144,16 +142,16 @@ describe Canvas::APISerializer do
 
       let :controller do
         ActiveModel::FakeController.new({
-          accepts_jsonapi: true,
-          stringify_json_ids: true
-        })
+                                          accepts_jsonapi: true,
+                                          stringify_json_ids: true
+                                        })
       end
 
       subject do
         FooSerializer.new(object, {
-          controller: controller,
-          root: nil
-        })
+                            controller: controller,
+                            root: nil
+                          })
       end
 
       it "uses objects for embed: :object, embed_in_root: true" do

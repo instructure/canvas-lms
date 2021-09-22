@@ -24,7 +24,7 @@ require_relative '../graphql_spec_helper'
 RSpec.describe Mutations::SubscribeToDiscussionTopic do
   before(:once) do
     course_with_teacher(active_all: true)
-    discussion_topic_model({context: @course})
+    discussion_topic_model({ context: @course })
   end
 
   def mutation_str(
@@ -61,7 +61,7 @@ RSpec.describe Mutations::SubscribeToDiscussionTopic do
     @topic.unsubscribe(@teacher)
     expect(@topic.subscribed?(@teacher)).to be false
 
-    result = run_mutation({id: @topic.id, subscribed: true})
+    result = run_mutation({ id: @topic.id, subscribed: true })
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'subscribeToDiscussionTopic', 'discussionTopic', 'subscribed')).to be true
     @topic.reload
@@ -72,7 +72,7 @@ RSpec.describe Mutations::SubscribeToDiscussionTopic do
     @topic.subscribe(@teacher)
     expect(@topic.subscribed?(@teacher)).to be true
 
-    result = run_mutation({id: @topic.id, subscribed: false})
+    result = run_mutation({ id: @topic.id, subscribed: false })
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'subscribeToDiscussionTopic', 'discussionTopic', 'subscribed')).to be false
     @topic.reload

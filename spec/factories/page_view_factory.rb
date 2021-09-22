@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def page_view_model(opts={})
+  def page_view_model(opts = {})
     factory_with_protected_attributes(PageView, valid_page_view_attributes.merge(opts))
   end
 
@@ -31,7 +31,7 @@ module Factories
     }
   end
 
-  def page_view_for(opts={})
+  def page_view_for(opts = {})
     @account = opts[:account] || Account.default
     @context = opts[:context] || @course || course_factory(opts)
 
@@ -40,21 +40,21 @@ module Factories
 
     @page_view = PageView.new do |p|
       p.assign_attributes({
-        :id => @request_id,
-        :url => opts[:url] || "http://test.one/",
-        :session_id => "phony",
-        :context => @context,
-        :controller => opts[:controller] || 'courses',
-        :action => opts[:action] || 'show',
-        :user_request => true,
-        :render_time => 0.01,
-        :user_agent => 'None',
-        :account_id => @account.id,
-        :request_id => @request_id,
-        :interaction_seconds => 5,
-        :user => @user,
-        :remote_ip => '192.168.0.42'
-      })
+                            :id => @request_id,
+                            :url => opts[:url] || "http://test.one/",
+                            :session_id => "phony",
+                            :context => @context,
+                            :controller => opts[:controller] || 'courses',
+                            :action => opts[:action] || 'show',
+                            :user_request => true,
+                            :render_time => 0.01,
+                            :user_agent => 'None',
+                            :account_id => @account.id,
+                            :request_id => @request_id,
+                            :interaction_seconds => 5,
+                            :user => @user,
+                            :remote_ip => '192.168.0.42'
+                          })
     end
     @page_view.assign_attributes(created_at: opts[:created_at]) if opts[:created_at]
     @page_view.real_user = opts[:real_user] if opts[:real_user]

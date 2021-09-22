@@ -20,7 +20,6 @@
 
 module Factories
   def observer_alert_model(opts = {})
-
     opts[:observer] ||= user_model
     @observer = opts[:observer]
     opts[:student] ||= course_with_student(opts).user

@@ -117,7 +117,6 @@ describe GradebooksHelper do
   end
 
   describe '#student_score_display_for(submission, can_manage_grades)' do
-
     let(:score_display) { helper.student_score_display_for(submission) }
     let(:parsed_display) { Nokogiri::HTML5(score_display) }
     let(:score_icon) { parsed_display.at_css('i') }

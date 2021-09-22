@@ -22,12 +22,12 @@ require_relative '../spec_helper'
 describe DataFixup::SplitUpUserPreferences do
   it "should work" do
     u = User.create!
-    original_prefs = {:selected_calendar_contexts => ["course_1000"], :course_nicknames => {2 => "Why am i taking this course"}, :some_other_thing => true}
+    original_prefs = { :selected_calendar_contexts => ["course_1000"], :course_nicknames => { 2 => "Why am i taking this course" }, :some_other_thing => true }
     User.where(:id => u).update_all(:preferences => original_prefs)
     DataFixup::SplitUpUserPreferences.run(nil, nil)
     u.reload
     expect(u.reload.needs_preference_migration?).to eq false
-    rows = u.user_preference_values.to_a.index_by{|v| [v.key, v.sub_key]}
+    rows = u.user_preference_values.to_a.index_by { |v| [v.key, v.sub_key] }
     expect(rows.count).to eq 2
     expect(rows[["selected_calendar_contexts", nil]].value).to eq ["course_1000"]
     expect(rows[["course_nicknames", 2]].value).to eq "Why am i taking this course"

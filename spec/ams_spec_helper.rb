@@ -38,7 +38,7 @@ module ActiveModel
 
     attr_accessor :accepts_jsonapi, :stringify_json_ids, :session, :context
 
-    def initialize(options={})
+    def initialize(options = {})
       @accepts_jsonapi = options.fetch(:accepts_jsonapi, true)
       @stringify_json_ids = options.fetch(:stringify_json_ids, true)
       @session = options[:session]
@@ -52,7 +52,6 @@ module ActiveModel
     def stringify_json_ids?
       !!stringify_json_ids
     end
-
   end
 end
 

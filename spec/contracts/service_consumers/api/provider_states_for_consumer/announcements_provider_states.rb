@@ -19,7 +19,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     # Student ID: 5 || Student Name: Student1
     # Course ID: 1
     # Announcement ID: 1

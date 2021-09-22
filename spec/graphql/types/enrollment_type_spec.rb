@@ -83,7 +83,7 @@ describe Types::EnrollmentType do
 
       expect(
         enrollment_type.resolve(
-          "grades { currentScore }" ,
+          "grades { currentScore }",
           current_user: @teacher
         )
       ).to be_nil

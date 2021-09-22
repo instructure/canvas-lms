@@ -63,7 +63,7 @@ describe StreamItemsHelper do
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
       @categorized.values.flatten.each do |presenter|
-        item = @items.detect{ |si| si.id == presenter.stream_item_id }
+        item = @items.detect { |si| si.id == presenter.stream_item_id }
         expect(item).not_to be_nil
         expect(presenter.updated_at).not_to be_nil
         expect(presenter.path).not_to be_nil
@@ -79,10 +79,10 @@ describe StreamItemsHelper do
       @group_assignment_discussion.update_attribute(:user, @teacher)
       assignment = @group_assignment_discussion.assignment
       assignment.update({
-        :due_at => 30.days.from_now,
-        :lock_at => 30.days.from_now,
-        :unlock_at => 20.days.from_now
-      })
+                          :due_at => 30.days.from_now,
+                          :lock_at => 30.days.from_now,
+                          :unlock_at => 20.days.from_now
+                        })
       expect(@student.recent_stream_items).not_to include @group_assignment_discussion
       expect(@teacher.recent_stream_items).not_to include @group_assignment_discussion
     end
@@ -110,8 +110,8 @@ describe StreamItemsHelper do
 
         items = @user2.recent_stream_items
         categorized = helper.categorize_stream_items(items, @user2)
-        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @user2) }
-        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @user2) }
+        categorized1 = @shard1.activate { helper.categorize_stream_items(items, @user2) }
+        categorized2 = @shard2.activate { helper.categorize_stream_items(items, @user2) }
         si_id = @shard1.activate { items[0].id }
         expect(categorized["DiscussionTopic"][0].stream_item_id).to eq si_id
         expect(categorized1["DiscussionTopic"][0].stream_item_id).to eq si_id
@@ -119,28 +119,28 @@ describe StreamItemsHelper do
       end
 
       it "links to stream item assets should be relative to the active shard" do
-        @shard1.activate{ course_with_teacher(account: Account.create, active_all: 1) }
-        @shard2.activate{ course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
+        @shard1.activate { course_with_teacher(account: Account.create, active_all: 1) }
+        @shard2.activate { course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
         topic = @course.discussion_topics.create!(title: 'title')
 
         items = @teacher.recent_stream_items
         categorized = helper.categorize_stream_items(items, @teacher)
-        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @teacher) }
-        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @teacher) }
+        categorized1 = @shard1.activate { helper.categorize_stream_items(items, @teacher) }
+        categorized2 = @shard2.activate { helper.categorize_stream_items(items, @teacher) }
         expect(categorized["DiscussionTopic"][0].path).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics/#{Shard.short_id_for(topic.global_id)}"
         expect(categorized1["DiscussionTopic"][0].path).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics/#{Shard.short_id_for(topic.global_id)}"
         expect(categorized2["DiscussionTopic"][0].path).to eq "/courses/#{@course.local_id}/discussion_topics/#{topic.local_id}"
       end
 
       it "links to stream item contexts should be relative to the active shard" do
-        @shard1.activate{ course_with_teacher(account: Account.create, active_all: 1) }
-        @shard2.activate{ course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
+        @shard1.activate { course_with_teacher(account: Account.create, active_all: 1) }
+        @shard2.activate { course_with_teacher(account: Account.create, active_all: 1, user: @teacher) }
         @course.discussion_topics.create!(title: 'title')
 
         items = @teacher.recent_stream_items
         categorized = helper.categorize_stream_items(items, @teacher)
-        categorized1 = @shard1.activate{ helper.categorize_stream_items(items, @teacher) }
-        categorized2 = @shard2.activate{ helper.categorize_stream_items(items, @teacher) }
+        categorized1 = @shard1.activate { helper.categorize_stream_items(items, @teacher) }
+        categorized2 = @shard2.activate { helper.categorize_stream_items(items, @teacher) }
         expect(categorized["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics"
         expect(categorized1["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{Shard.short_id_for(@course.global_id)}/discussion_topics"
         expect(categorized2["DiscussionTopic"][0].context.linked_to).to eq "/courses/#{@course.local_id}/discussion_topics"

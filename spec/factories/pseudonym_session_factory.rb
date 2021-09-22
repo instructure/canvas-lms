@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
-  def user_session(user, pseudonym=nil)
+  def user_session(user, pseudonym = nil)
     if caller.grep(/onceler\/recorder.*record!/).present?
       raise "don't stub sessions in a `before(:once)` block; do it in a `before(:each)` so the stubbing works for all examples and not just the first one"
     end
@@ -45,16 +45,17 @@ module Factories
     end
 
     session = double('PseudonymSession',
-      :record => pseudonym
-    )
+                     :record => pseudonym)
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|
       next original.call unless @session_stubbed
+
       session
     end
     allow(PseudonymSession).to receive(:find_with_validation).and_wrap_original do |original|
       next original.call unless @session_stubbed
+
       session
     end
     session

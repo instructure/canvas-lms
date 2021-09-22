@@ -45,26 +45,26 @@ RSpec.describe 'Outcomes Service - GET Content Import', :pact do
       }
     end
     let(:expected_import_get_response_body) do
-    {
-      "state": "completed"
-    }
+      {
+        "state": "completed"
+      }
     end
     let!(:course) { course_factory(active_course: true) }
     let(:import_data) { { course: course, import_id: 1 } }
 
     before do
-      outcomes.given('a provisioned outcomes service account with a completed content import').
-        upon_receiving('a request to return imported content').
-        with(
-          method: :get,
-          path: '/api/content_imports/1',
-          headers: import_get_headers
-        ).
-        will_respond_with(
-          status: 200,
-          headers: { 'Content-Type' => 'application/json; charset=utf-8' },
-          body: expected_import_get_response_body
-        )
+      outcomes.given('a provisioned outcomes service account with a completed content import')
+              .upon_receiving('a request to return imported content')
+              .with(
+                method: :get,
+                path: '/api/content_imports/1',
+                headers: import_get_headers
+              )
+              .will_respond_with(
+                status: 200,
+                headers: { 'Content-Type' => 'application/json; charset=utf-8' },
+                body: expected_import_get_response_body
+              )
     end
 
     it 'gets imported content' do

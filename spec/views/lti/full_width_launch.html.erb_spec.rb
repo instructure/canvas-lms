@@ -21,9 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-
 describe "lti full width launch view" do
-
   include_context "lti_layout_spec_helper"
 
   let(:user) { User.create! }
@@ -53,5 +51,4 @@ describe "lti full width launch view" do
       expect(ctrl.response.body).not_to have_text('no longer available')
     end
   end
-
 end

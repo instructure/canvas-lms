@@ -40,7 +40,7 @@ describe "/profile/profile" do
   end
 
   it "should not show the delete link for SIS pseudonyms without manage_sis" do
-    account_admin_user_with_role_changes(active_user: true, role_changes: {manage_sis: false})
+    account_admin_user_with_role_changes(active_user: true, role_changes: { manage_sis: false })
     view_context
 
     assign(:user, @user)
@@ -77,4 +77,3 @@ describe "/profile/profile" do
     expect(page.css("#pseudonym_#{default_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'
   end
 end
-

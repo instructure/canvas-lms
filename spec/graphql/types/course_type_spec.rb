@@ -29,7 +29,6 @@ describe Types::CourseType do
     course.enroll_teacher(user_factory, section: other_section, limit_privileges_to_course_section: true).user
   }
 
-
   it "works" do
     expect(course_type.resolve("_id")).to eq course.id.to_s
     expect(course_type.resolve("name")).to eq course.name
@@ -49,7 +48,7 @@ describe Types::CourseType do
 
       # course
       expect(
-        CanvasSchema.execute(<<~GQL, context: {current_user: @student2}).dig("data", "course")
+        CanvasSchema.execute(<<~GQL, context: { current_user: @student2 }).dig("data", "course")
           query { course(id: "#{course.id.to_s}") { id } }
         GQL
       ).to be_nil
@@ -59,11 +58,11 @@ describe Types::CourseType do
   context "sis fields" do
     let_once(:sis_course) { course.update!(sis_course_id: "SIScourseID"); course }
 
-    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
     it "returns sis_id if you have read_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: @teacher}).dig("data", "course", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: @teacher }).dig("data", "course", "sisId")
           query { course(id: "#{sis_course.id}") { sisId } }
         GQL
       ).to eq("SIScourseID")
@@ -71,7 +70,7 @@ describe Types::CourseType do
 
     it "returns sis_id if you have manage_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "course", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin }).dig("data", "course", "sisId")
           query { course(id: "#{sis_course.id}") { sisId } }
         GQL
       ).to eq("SIScourseID")
@@ -79,7 +78,7 @@ describe Types::CourseType do
 
     it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: @student}).dig("data", "course", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: @student }).dig("data", "course", "sisId")
           query { course(id: "#{sis_course.id}") { sisId } }
         GQL
       ).to be_nil
@@ -99,18 +98,18 @@ describe Types::CourseType do
     context "grading periods" do
       before(:once) do
         gpg = GradingPeriodGroup.create! title: "asdf",
-          root_account: course.root_account
+                                         root_account: course.root_account
         course.enrollment_term.update grading_period_group: gpg
         @term1 = gpg.grading_periods.create! title: "past grading period",
-        start_date: 2.weeks.ago,
-          end_date: 1.weeks.ago
+                                             start_date: 2.weeks.ago,
+                                             end_date: 1.weeks.ago
         @term2 = gpg.grading_periods.create! title: "current grading period",
-        start_date: 2.days.ago,
-          end_date: 2.days.from_now
+                                             start_date: 2.days.ago,
+                                             end_date: 2.days.from_now
         @term1_assignment1 = course.assignments.create! name: "asdf",
-          due_at: (1.5).weeks.ago
+                                                        due_at: (1.5).weeks.ago
         @term2_assignment1 = course.assignments.create! name: ";lkj",
-          due_at: Date.today
+                                                        due_at: Date.today
       end
 
       it "only returns assignments for the current grading period" do
@@ -229,13 +228,12 @@ describe Types::CourseType do
 
     it "returns submissions for specified students" do
       expect(
-        course_type.resolve(<<~GQL, current_user: @teacher
+        course_type.resolve(<<~GQL, current_user: @teacher)
           submissionsConnection(
             studentIds: ["#{@student1.id}", "#{@student2.id}"],
             orderBy: [{field: _id, direction: ascending}]
           ) { edges { node { _id } } }
-          GQL
-        )
+        GQL
       ).to eq [
         @student1a1_submission.id.to_s,
         @student1a2_submission.id.to_s,
@@ -267,7 +265,7 @@ describe Types::CourseType do
               studentIds: ["#{@student1.id}", "#{@student2.id}"],
               orderBy: [{field: gradedAt, direction: descending}]
             ) { edges { node { _id } } }
-            GQL
+          GQL
         ).to eq [
           @student1a2_submission.id.to_s,
           @student2a1_submission.id.to_s,
@@ -302,7 +300,7 @@ describe Types::CourseType do
               filter: {states: [unsubmitted]}
             ) { edges { node { _id } } }
           GQL
-        ).to eq [ ]
+        ).to eq []
       end
 
       it "submitted_since" do
@@ -315,7 +313,7 @@ describe Types::CourseType do
               filter: { submittedSince: "#{5.days.ago.iso8601}" }
             ) { nodes { _id } }
           GQL
-        ).to eq [ @student1a2_submission.id.to_s ]
+        ).to eq [@student1a2_submission.id.to_s]
       end
 
       it "graded_since" do
@@ -326,7 +324,7 @@ describe Types::CourseType do
               filter: { gradedSince: "#{1.day.from_now.iso8601}" }
             ) { nodes { _id } }
           GQL
-        ).to eq [ @student2a1_submission.id.to_s ]
+        ).to eq [@student2a1_submission.id.to_s]
       end
     end
   end

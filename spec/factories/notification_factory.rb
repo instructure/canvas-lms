@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def notification_model(opts={})
+  def notification_model(opts = {})
     @notification = Notification.create!(notification_valid_attributes.merge(opts))
   end
 

@@ -107,10 +107,10 @@ describe Types::LearningOutcomeType do
 
     it "resolves friendly description correctly" do
       course_fd = OutcomeFriendlyDescription.create!({
-        learning_outcome: @outcome,
-        context: course,
-        description: "course's description"
-      })
+                                                       learning_outcome: @outcome,
+                                                       context: course,
+                                                       description: "course's description"
+                                                     })
 
       expect(outcome_type.resolve("friendlyDescription(contextType: \"Course\", contextId: #{course.id}) { _id }"))
         .to eq course_fd.id.to_s

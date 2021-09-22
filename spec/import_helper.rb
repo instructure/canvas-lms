@@ -23,20 +23,20 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
 IMPORT_JSON_DIR = File.dirname(__FILE__) + '/fixtures/importer/'
 
 QUESTIONS = [
-        ['calculated_complex', 'calculated_question'],
-        ['calculated_simple', 'calculated_question'],
-        ['essay'],
-        ['file_upload', 'unsupported'],
-        ['fill_in_multiple_blanks'],
-        ['hot_spot', 'unsupported'],
-        ['matching'],
-        ['multiple_answers'],
-        ['multiple_choice'],
-        ['multiple_dropdowns'],
-        ['numerical'],
-        ['ordering', 'matching_question'],
-        ['short_answer'],
-        ['true_false'],
+  ['calculated_complex', 'calculated_question'],
+  ['calculated_simple', 'calculated_question'],
+  ['essay'],
+  ['file_upload', 'unsupported'],
+  ['fill_in_multiple_blanks'],
+  ['hot_spot', 'unsupported'],
+  ['matching'],
+  ['multiple_answers'],
+  ['multiple_choice'],
+  ['multiple_dropdowns'],
+  ['numerical'],
+  ['ordering', 'matching_question'],
+  ['short_answer'],
+  ['true_false'],
 ]
 SYSTEMS = ['vista', 'bb8', 'bb9', 'angel']
 
@@ -59,11 +59,11 @@ def import_example_questions(context)
       questions << q
     end
   end
-  hash = {'assessment_questions' => {'assessment_questions' => questions}}
+  hash = { 'assessment_questions' => { 'assessment_questions' => questions } }
   Importers::AssessmentQuestionImporter.process_migration(hash, @migration)
 end
 
-def get_import_context(system=nil)
+def get_import_context(system = nil)
   context = course_model
   context.import_source == :webct if system == 'vista'
 

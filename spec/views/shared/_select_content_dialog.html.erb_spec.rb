@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_select_content_dialog" do
-
   it "should indicate plural file upload" do
     course_with_teacher
     view_context
@@ -79,10 +78,10 @@ describe "shared/_select_content_dialog" do
 
     it "renders classic quizzes and new quizzes together when Quiz is selected" do
       assign(:combined_active_quizzes, [
-        [1, 'A', 'quiz'],
-        [2, 'B', 'quiz'],
-        [1, 'C', 'assignment']
-      ])
+               [1, 'A', 'quiz'],
+               [2, 'B', 'quiz'],
+               [1, 'C', 'assignment']
+             ])
       assign(:combined_active_quizzes_includes_both_types, true)
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
@@ -92,9 +91,9 @@ describe "shared/_select_content_dialog" do
 
     it "does not render the (classic) identifier when there are only classic quizzes listed" do
       assign(:combined_active_quizzes, [
-        [1, 'A', 'quiz'],
-        [2, 'B', 'quiz']
-      ])
+               [1, 'A', 'quiz'],
+               [2, 'B', 'quiz']
+             ])
       assign(:combined_active_quizzes_includes_both_types, false)
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
@@ -135,12 +134,12 @@ describe "shared/_select_content_dialog" do
       it "hides radios and honors selection for New Quizzes" do
         assign(:combined_active_quizzes, [])
         expect(@course).to receive(:settings).and_return({
-          engine_selected: {
-            user_id: {
-              newquizzes_engine_selected: 'true'
-            }
-          }
-        })
+                                                           engine_selected: {
+                                                             user_id: {
+                                                               newquizzes_engine_selected: 'true'
+                                                             }
+                                                           }
+                                                         })
         render partial: 'shared/select_content_dialog'
         page = Nokogiri(response.body)
         expect(page.css('#quizs_select .new tr').first['style']).to eq 'display: none;'
@@ -150,12 +149,12 @@ describe "shared/_select_content_dialog" do
       it "hides radios and honors selection for Classic Quizzes" do
         assign(:combined_active_quizzes, [])
         expect(@course).to receive(:settings).and_return({
-          engine_selected: {
-            user_id: {
-              newquizzes_engine_selected: 'false'
-            }
-          }
-        })
+                                                           engine_selected: {
+                                                             user_id: {
+                                                               newquizzes_engine_selected: 'false'
+                                                             }
+                                                           }
+                                                         })
         render partial: 'shared/select_content_dialog'
         page = Nokogiri(response.body)
         expect(page.css('#quizs_select .new tr').first['style']).to eq 'display: none;'
@@ -178,12 +177,12 @@ describe "shared/_select_content_dialog" do
       it "shows radios and selects new quizzes by default" do
         assign(:combined_active_quizzes, [])
         expect(@course).to receive(:settings).and_return({
-          engine_selected: {
-            user_id: {
-              newquizzes_engine_selected: 'null'
-            }
-          }
-        })
+                                                           engine_selected: {
+                                                             user_id: {
+                                                               newquizzes_engine_selected: 'null'
+                                                             }
+                                                           }
+                                                         })
         render partial: 'shared/select_content_dialog'
         page = Nokogiri(response.body)
         expect(page.css('#quizs_select .new tr').first['style']).to eq ''
@@ -295,4 +294,3 @@ describe "shared/_select_content_dialog" do
     end
   end
 end
-

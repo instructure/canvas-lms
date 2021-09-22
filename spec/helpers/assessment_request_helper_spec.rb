@@ -25,15 +25,14 @@ describe AssessmentRequestHelper do
   include ApplicationHelper
 
   describe 'submission_author_name_for' do
-
     def rubric_association_params_for_assignment(assign)
       HashWithIndifferentAccess.new({
-                                        hide_score_total: "0",
-                                        purpose: "grading",
-                                        skip_updating_points_possible: false,
-                                        update_if_existing: true,
-                                        use_for_grading: "1",
-                                        association_object: assign
+                                      hide_score_total: "0",
+                                      purpose: "grading",
+                                      skip_updating_points_possible: false,
+                                      update_if_existing: true,
+                                      use_for_grading: "1",
+                                      association_object: assign
                                     })
     end
 
@@ -48,13 +47,13 @@ describe AssessmentRequestHelper do
       ra_params = rubric_association_params_for_assignment(@assignment)
       @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
       @rubric_assessment = RubricAssessment.create!({
-        artifact: @submission,
-        assessment_type: 'peer_review',
-        assessor: @student2,
-        rubric: @rubric,
-        user: @student1,
-        rubric_association: @rubric_assoc
-        })
+                                                      artifact: @submission,
+                                                      assessment_type: 'peer_review',
+                                                      assessor: @student2,
+                                                      rubric: @rubric,
+                                                      user: @student1,
+                                                      rubric_association: @rubric_assoc
+                                                    })
       @assessment_request = AssessmentRequest.create!(rubric_assessment: @rubric_assessment, user: @student1,
                                                       asset: @submission, assessor_asset: submission2, assessor: @student2)
     end
@@ -82,6 +81,5 @@ describe AssessmentRequestHelper do
       @current_user = @student2
       expect(submission_author_name_for(@assessment_request)).to eq(I18n.t(:anonymous_user, "Anonymous User"))
     end
-
   end
 end

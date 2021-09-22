@@ -21,14 +21,13 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe SearchHelper do
-  
   include SearchHelper
 
   context "load_all_contexts" do
     it "should return requested permissions" do
       course_factory(active_all: true)
       @current_user = @teacher
-      
+
       load_all_contexts
       expect(@contexts[:courses][@course.id][:permissions]).to be_empty
 
@@ -86,8 +85,8 @@ describe SearchHelper do
       specs_require_sharding
 
       before do
-        @current_user = @shard1.activate{ user_factory(active_all: true) }
-        @shard2.activate{ course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
+        @current_user = @shard1.activate { user_factory(active_all: true) }
+        @shard2.activate { course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
       end
 
       it "should include courses from shards other than the user's native shard" do

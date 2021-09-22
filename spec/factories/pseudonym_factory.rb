@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def pseudonym_model(opts={})
+  def pseudonym_model(opts = {})
     user_model unless @user
     @pseudonym = factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes.merge(opts))
   end
@@ -43,7 +43,7 @@ module Factories
     }
   end
 
-  def pseudonym(user, opts={})
+  def pseudonym(user, opts = {})
     @spec_pseudonym_count ||= 0
     username = opts[:username] || (@spec_pseudonym_count > 0 ? "nobody+#{@spec_pseudonym_count}@example.com" : "nobody@example.com")
     opts[:username] ||= username
@@ -60,7 +60,7 @@ module Factories
     @pseudonym
   end
 
-  def managed_pseudonym(user, opts={})
+  def managed_pseudonym(user, opts = {})
     other_account = opts[:account] || account_with_saml
     if other_account.canvas_authentication?
       config = other_account.authentication_providers.build

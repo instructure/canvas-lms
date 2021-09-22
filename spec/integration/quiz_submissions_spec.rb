@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe Quizzes::QuizSubmissionsController do
-
   before do
     course_with_student_logged_in(:active_all => true)
     quiz_model(:course => @course)
@@ -59,19 +58,19 @@ describe Quizzes::QuizSubmissionsController do
 
   def record_answer_1
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
-         params: {:question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token}
+         params: { :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token }
     expect(response).to be_redirect
   end
 
   def backup_answer_1
     put  "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/backup",
-         params: {:question_1 => 'blah_overridden', :validation_token => @qs.validation_token}
+         params: { :question_1 => 'blah_overridden', :validation_token => @qs.validation_token }
     expect(response).to be_successful
   end
 
   def record_answer_2
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
-         params: {:question_2 => 'M&Ms', :last_question_id => 2, :validation_token => @qs.validation_token}
+         params: { :question_2 => 'M&Ms', :last_question_id => 2, :validation_token => @qs.validation_token }
     expect(response).to be_redirect
   end
 
@@ -91,7 +90,7 @@ describe Quizzes::QuizSubmissionsController do
 
     it "should redirect back to take quiz if the user loses connection" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
-         params: {:question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token}
+          params: { :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token }
       expect(response).to be_redirect
     end
   end
@@ -100,7 +99,7 @@ describe Quizzes::QuizSubmissionsController do
     expect(Canvas::LiveEvents).to receive(:quiz_submitted).with(@qs)
 
     post "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/",
-         params: {:question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token}
+         params: { :question_1 => 'password', :attempt => 1, :validation_token => @qs.validation_token }
     expect(response).to be_redirect
   end
 
@@ -131,5 +130,4 @@ describe Quizzes::QuizSubmissionsController do
       end
     end
   end
-
 end

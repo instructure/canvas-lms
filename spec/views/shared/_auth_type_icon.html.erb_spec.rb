@@ -21,7 +21,7 @@ require_relative '../../spec_helper'
 require_relative '../views_helper'
 
 describe "shared/_flash_notices" do
-  def local_options(overrides={})
+  def local_options(overrides = {})
     {
       with_login_text: 'Login with Facebook',
       auth_type: 'facebook',
@@ -54,5 +54,4 @@ describe "shared/_flash_notices" do
     doc = Nokogiri::HTML(response.body)
     expect(doc.css('svg.ic-icon-svg--twitter')).to be_present
   end
-
 end

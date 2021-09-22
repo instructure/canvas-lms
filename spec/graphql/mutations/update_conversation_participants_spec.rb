@@ -22,8 +22,8 @@ require 'spec_helper'
 require_relative '../graphql_spec_helper'
 
 describe Mutations::UpdateConversationParticipants do
-  let(:sender) {user_model}
-  let(:conv) {conversation(sender, user_model, user_model).conversation}
+  let(:sender) { user_model }
+  let(:conv) { conversation(sender, user_model, user_model).conversation }
 
   def execute_with_input(update_input, user_executing: sender)
     mutation_command = <<~GQL
@@ -43,7 +43,7 @@ describe Mutations::UpdateConversationParticipants do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -64,10 +64,10 @@ describe Mutations::UpdateConversationParticipants do
     expect(result.dig('data', 'updateConversationParticipants', 'errors')).to be_nil
     updated_attributes = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
     expect(updated_attributes).to include({
-      "subscribed" => false,
-      "workflowState" => 'archived',
-      "label" => 'starred'
-    })
+                                            "subscribed" => false,
+                                            "workflowState" => 'archived',
+                                            "label" => 'starred'
+                                          })
 
     participant = participant.reload
     expect(participant).not_to be_subscribed
@@ -101,7 +101,7 @@ describe Mutations::UpdateConversationParticipants do
 
   context "batching" do
     context "all ids are valid" do
-      let(:conv2) {conversation(sender, user_model).conversation}
+      let(:conv2) { conversation(sender, user_model).conversation }
 
       it "updates each view" do
         query = <<~QUERY
@@ -117,7 +117,7 @@ describe Mutations::UpdateConversationParticipants do
         expect(result.dig('errors')).to be_nil
         expect(result.dig('data', 'updateConversationParticipants', 'errors')).to be_nil
         updated_attrs = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
-        expect(updated_attrs.map{|i| i["label"]}).to match_array %w(starred starred)
+        expect(updated_attrs.map { |i| i["label"] }).to match_array %w(starred starred)
 
         participant1 = participant1.reload
         expect(participant1.starred).to be_truthy
@@ -127,13 +127,13 @@ describe Mutations::UpdateConversationParticipants do
     end
 
     context "some ids are invalid" do
-      let(:another_conv) {conversation(user_model, user_model).conversation}
-      let(:invalid_id) {Conversation.maximum(:id)&.next || 0}
+      let(:another_conv) { conversation(user_model, user_model).conversation }
+      let(:invalid_id) { Conversation.maximum(:id)&.next || 0 }
 
       def expect_error(result, id, message)
         errors = result.dig('errors') || result.dig('data', 'updateConversationParticipants', 'errors')
         expect(errors).not_to be_nil
-        error = errors.find {|i| i["attribute"] == id.to_s}
+        error = errors.find { |i| i["attribute"] == id.to_s }
         expect(error['message']).to match(/#{message}/)
       end
 
@@ -150,10 +150,10 @@ describe Mutations::UpdateConversationParticipants do
         expect_error(result, invalid_id, 'Unable to find Conversation')
         updated_attributes = result.dig('data', 'updateConversationParticipants', 'conversationParticipants')
         expect(updated_attributes).to include({
-          "subscribed" => true,
-          "workflowState" => 'read',
-          "label" => 'starred'
-        })
+                                                "subscribed" => true,
+                                                "workflowState" => 'read',
+                                                "label" => 'starred'
+                                              })
 
         participant = participant.reload
         expect(participant.starred).to be_truthy

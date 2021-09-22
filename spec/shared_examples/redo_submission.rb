@@ -29,7 +29,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_unauthorized
@@ -39,7 +39,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", due_at: 3.days.from_now)
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@student)
     put :redo_submission, params: @params
     assert_unauthorized
@@ -49,7 +49,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload", due_at: 3.days.from_now)
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
@@ -65,7 +65,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     )
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 204
@@ -81,7 +81,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     )
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@student)
     put :redo_submission, params: @params
     assert_unauthorized
@@ -96,7 +96,7 @@ RSpec.shared_examples 'a submission redo_submission action' do |controller|
     )
     @submission = @assignment.submit_homework(@user)
     @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { submission_id: @user.id }
-    @params = {course_id: @course.id, assignment_id: @assignment.id}.merge(@resource_pair)
+    @params = { course_id: @course.id, assignment_id: @assignment.id }.merge(@resource_pair)
     user_session(@teacher)
     put :redo_submission, params: @params
     assert_status 422

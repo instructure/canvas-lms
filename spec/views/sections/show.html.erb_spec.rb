@@ -53,7 +53,7 @@ describe "sections/show.html.erb" do
     end
 
     it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false})
+      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false })
       view_context(@course, admin)
       assign(:current_user, admin)
       render

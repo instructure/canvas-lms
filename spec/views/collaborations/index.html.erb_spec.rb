@@ -41,4 +41,3 @@ describe "/collaborations/index" do
     expect(response).to have_tag("label[for=collaboration_collaboration_type]", :text => "Collaborate using:")
   end
 end
-

@@ -31,8 +31,8 @@ describe "student interactions links" do
                             :password => password
     u.save!
     @e = course_with_teacher :active_course => true,
-                            :user => u,
-                            :active_enrollment => true
+                             :user => u,
+                             :active_enrollment => true
     @e.save!
     @teacher = u
 
@@ -47,7 +47,6 @@ describe "student interactions links" do
     user_model
     @ta = @user
     @course.enroll_ta(@ta).accept
-
   end
 
   context "as a user without permissions to view grades" do
@@ -109,5 +108,3 @@ describe "student interactions links" do
     end
   end
 end
-
-

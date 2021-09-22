@@ -37,19 +37,19 @@ describe Types::RubricRatingType do
     it 'description' do
       expect(
         rubric_type.resolve('criteria { ratings { description } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:description]} }
+      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:description] } }
     end
 
     it 'long_description' do
       expect(
         rubric_type.resolve('criteria { ratings { longDescription } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:long_description]} }
+      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:long_description] } }
     end
 
     it 'points' do
       expect(
         rubric_type.resolve('criteria { ratings { points } }')
-      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:points]} }
+      ).to eq rubric.criteria.map { |c| c[:ratings].map { |r| r[:points] } }
     end
   end
 end

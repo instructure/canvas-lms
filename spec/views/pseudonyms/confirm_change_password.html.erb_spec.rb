@@ -28,9 +28,8 @@ describe "/pseudonyms/confirm_change_password" do
     assign(:current_user, @user)
     assign(:pseudonym, @user.pseudonyms.create!(:unique_id => "unique@example.com", :password => "asdfaabb", :password_confirmation => "asdfaabb"))
     assign(:password_pseudonyms, @user.pseudonyms)
-    assign(:cc, communication_channel(@user, {username: 'unique@example.com'}))
+    assign(:cc, communication_channel(@user, { username: 'unique@example.com' }))
     render "pseudonyms/confirm_change_password"
     expect(response).not_to be_nil
   end
 end
-

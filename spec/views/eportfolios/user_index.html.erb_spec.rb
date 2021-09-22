@@ -30,4 +30,3 @@ describe "/eportfolios/index" do
     expect(response).not_to be_nil
   end
 end
-

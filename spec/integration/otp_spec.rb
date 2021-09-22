@@ -32,7 +32,7 @@ describe "one time passwords" do
 
   context "mid-login" do
     before do
-      post '/login/canvas', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
+      post '/login/canvas', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
     end
 
     it "should redirect" do

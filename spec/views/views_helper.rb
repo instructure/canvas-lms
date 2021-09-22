@@ -20,14 +20,14 @@
 
 require 'nokogiri'
 
-def view_context(context=@course, current_user=@user, real_current_user=nil)
+def view_context(context = @course, current_user = @user, real_current_user = nil)
   assign(:context, context)
   assign(:current_user, current_user)
   assign(:real_current_user, real_current_user)
   assign(:domain_root_account, Account.default)
 end
 
-def view_portfolio(portfolio=@portfolio, current_user=@user)
+def view_portfolio(portfolio = @portfolio, current_user = @user)
   assign(:portfolio, portfolio)
   assign(:current_user, current_user)
 end
@@ -69,15 +69,15 @@ RSpec.shared_context 'lti_layout_spec_helper' do
   module LtiLayoutSpecHelper
     def self.create_tag(tool)
       tag = ContentTag.create!({
-        title: 'Test',
-        content_id: tool.id,
-        content_type: 'ContextExternalTool',
-        tag_type: 'context_module',
-        context_type: 'Account',
-        context_id: Account.default.id,
-        root_account_id: Account.default,
-        url: 'https://example.com'
-      })
+                                 title: 'Test',
+                                 content_id: tool.id,
+                                 content_type: 'ContextExternalTool',
+                                 tag_type: 'context_module',
+                                 context_type: 'Account',
+                                 context_id: Account.default.id,
+                                 root_account_id: Account.default,
+                                 url: 'https://example.com'
+                               })
       tag
     end
 
@@ -90,14 +90,14 @@ RSpec.shared_context 'lti_layout_spec_helper' do
 
     def self.create_request
       ActionDispatch::Request.new({
-        "rack.input" => StringIO.new(""),
-        "HTTP_HOST" => 'example.com',
-        "HTTP_ACCEPT" => 'text/html',
-        "REQUEST_METHOD" => 'GET',
-        "action_dispatch.request.parameters" => {
-          "display" => "full_width"
-        }
-      })
+                                    "rack.input" => StringIO.new(""),
+                                    "HTTP_HOST" => 'example.com',
+                                    "HTTP_ACCEPT" => 'text/html',
+                                    "REQUEST_METHOD" => 'GET',
+                                    "action_dispatch.request.parameters" => {
+                                      "display" => "full_width"
+                                    }
+                                  })
     end
 
     def self.create_response
@@ -109,4 +109,3 @@ RSpec.shared_context 'lti_layout_spec_helper' do
     end
   end
 end
-

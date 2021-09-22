@@ -38,7 +38,7 @@ describe Types::ModuleExternalToolType do
 
   it "works" do
     expected = { "data" => { "moduleItem" => { "content" => { "url" => module_item.url } } } }
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher})
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
       query {
         moduleItem(id: "#{module_item.id}") {
           content {
@@ -57,12 +57,12 @@ describe Types::ModuleExternalToolType do
       "data" => {
         "moduleItem" => {
           "content" => {
-            "modules" => [{"_id" => context_module.id.to_s}]
+            "modules" => [{ "_id" => context_module.id.to_s }]
           }
         }
       }
     }
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher})
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
       query {
         moduleItem(id: "#{module_item.id}") {
           content {

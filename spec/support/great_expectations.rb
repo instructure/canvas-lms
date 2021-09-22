@@ -155,11 +155,13 @@ module GreatExpectations
 
     def assert_not_early!
       return if current_example
+
       generate_error config[:EARLY], "Don't `expect` outside of the spec itself. `before`/`after` should only be used for setup/teardown"
     end
 
     def assert_not_unchecked!
       return if unchecked_expectations.empty?
+
       generate_error config[:UNCHECKED], "This spec has unchecked expectations, i.e. you forgot to call `to` or `not_to`", current_example.location
     end
 

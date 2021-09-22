@@ -62,7 +62,7 @@ describe "users/_logins.html.erb" do
     end
 
     it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false}, :account => @account)
+      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false }, :account => @account)
       view_context(@account, admin)
       assign(:current_user, admin)
       render

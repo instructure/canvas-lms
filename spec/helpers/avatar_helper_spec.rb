@@ -25,9 +25,9 @@ describe AvatarHelper do
   include AvatarHelper
 
   context "avatars" do
-    let_once(:user) {user_model(short_name: "test user")}
-    let(:services) {{avatars: true}}
-    let(:avatar_size) {50}
+    let_once(:user) { user_model(short_name: "test user") }
+    let(:services) { { avatars: true } }
+    let(:avatar_size) { 50 }
     let(:request) { ActionDispatch::Request.new(Rack::MockRequest.env_for("http://test.host/")) }
 
     def service_enabled?(type)
@@ -50,7 +50,7 @@ describe AvatarHelper do
       end
 
       it "falls back to blank avatar when user's avatar has been reported during this session" do
-        expect(self).to receive(:session).at_least(:once).and_return({"reported_#{user.id}" => true})
+        expect(self).to receive(:session).at_least(:once).and_return({ "reported_#{user.id}" => true })
         expect(avatar_image_attrs(user)).to eq ["/images/messages/avatar-50.png", '']
       end
 
@@ -60,7 +60,7 @@ describe AvatarHelper do
     end
 
     describe ".avatar" do
-      let_once(:user) {user_model(short_name: 'Greta')}
+      let_once(:user) { user_model(short_name: 'Greta') }
 
       it "leaves off the href and creates a span if url is nil" do
         html = avatar(user, url: nil)
@@ -113,12 +113,12 @@ describe AvatarHelper do
       end
 
       it "returns null if params[no_avatar_fallback] is set" do
-        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => {:no_avatar_fallback => 1})
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => { :no_avatar_fallback => 1 })
         expect(AvatarHelper.avatar_url_for_user(user, request)).to be_nil
       end
 
       it "returns a frd avatar url if one exists" do
-        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => {:no_avatar_fallback => 1})
+        request = OpenObject.new(:host => "somedomain", :protocol => "http://", :params => { :no_avatar_fallback => 1 })
         user_with_avatar = user_model(avatar_image_url: 'http://somedomain/avatar-frd.png')
         expect(AvatarHelper.avatar_url_for_user(user_with_avatar, request, use_fallback: false)).to eq 'http://somedomain/avatar-frd.png'
       end
@@ -131,7 +131,7 @@ describe AvatarHelper do
     end
 
     context "with avatar service off" do
-      let(:services) {{avatars: false}}
+      let(:services) { { avatars: false } }
 
       it "should return full URIs for users" do
         expect(avatar_url_for_user(user)).to match(%r{\Ahttps?://})

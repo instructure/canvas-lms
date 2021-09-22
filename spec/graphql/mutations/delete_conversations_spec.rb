@@ -22,8 +22,8 @@ require "spec_helper"
 require_relative "../graphql_spec_helper"
 
 describe Mutations::DeleteConversations do
-  let(:sender) {user_model}
-  let(:conv) {conversation(sender, user_model).conversation}
+  let(:sender) { user_model }
+  let(:conv) { conversation(sender, user_model).conversation }
 
   def execute_with_input(delete_input, user_executing: sender)
     mutation_command = <<~GQL
@@ -39,7 +39,7 @@ describe Mutations::DeleteConversations do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -81,7 +81,7 @@ describe Mutations::DeleteConversations do
 
   context "batching" do
     context "all ids are valid" do
-      let(:conv2) {conversation(sender, user_model).conversation}
+      let(:conv2) { conversation(sender, user_model).conversation }
 
       it "removes messages from each view" do
         query = <<~QUERY
@@ -99,13 +99,13 @@ describe Mutations::DeleteConversations do
     end
 
     context "some ids are invalid" do
-      let(:another_conv) {conversation(user_model, user_model).conversation}
-      let(:invalid_id) {Conversation.maximum(:id)&.next || 0}
+      let(:another_conv) { conversation(user_model, user_model).conversation }
+      let(:invalid_id) { Conversation.maximum(:id)&.next || 0 }
 
       def expect_error(result, id, message)
         errors = result.dig('errors') || result.dig('data', 'deleteConversations', 'errors')
         expect(errors).not_to be_nil
-        error = errors.find {|i| i["attribute"] == id.to_s}
+        error = errors.find { |i| i["attribute"] == id.to_s }
         expect(error['message']).to match(/#{message}/)
       end
 

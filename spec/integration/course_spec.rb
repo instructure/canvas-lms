@@ -23,7 +23,6 @@ require 'spec_helper'
 require 'nokogiri'
 
 describe "course" do
-
   # normally this would be a controller test, but there is a some code in the
   # views that i need to not explode
   it "should not require authorization for public courses" do

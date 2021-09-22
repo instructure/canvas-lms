@@ -36,7 +36,6 @@ describe Types::AssignmentType do
 
   let(:assignment_type) { GraphQLTypeTester.new(assignment, current_user: student) }
 
-
   it "works" do
     expect(assignment_type.resolve("_id")).to eq assignment.id.to_s
     expect(assignment_type.resolve("name")).to eq assignment.name
@@ -63,7 +62,7 @@ describe Types::AssignmentType do
 
       # assignment
       expect(
-        CanvasSchema.execute(<<~GQL, context: {current_user: student}).dig("data", "assignment")
+        CanvasSchema.execute(<<~GQL, context: { current_user: student }).dig("data", "assignment")
           query { assignment(id: "#{assignment.id.to_s}") { id } }
         GQL
       ).to be_nil
@@ -73,11 +72,11 @@ describe Types::AssignmentType do
   context "sis field" do
     let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
 
-    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
 
     it "returns sis_id if you have read_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: teacher}).dig("data", "assignment", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: teacher }).dig("data", "assignment", "sisId")
           query { assignment(id: "#{sis_assignment.id}") { sisId } }
         GQL
       ).to eq("sisAssignment")
@@ -85,7 +84,7 @@ describe Types::AssignmentType do
 
     it "returns sis_id if you have manage_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "assignment", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin }).dig("data", "assignment", "sisId")
           query { assignment(id: "#{sis_assignment.id}") { sisId } }
         GQL
       ).to eq("sisAssignment")
@@ -93,7 +92,7 @@ describe Types::AssignmentType do
 
     it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
       expect(
-        CanvasSchema.execute(<<~GQL, context: { current_user: student}).dig("data", "assignment", "sisId")
+        CanvasSchema.execute(<<~GQL, context: { current_user: student }).dig("data", "assignment", "sisId")
           query { assignment(id: "#{sis_assignment.id}") { sisId } }
         GQL
       ).to be_nil
@@ -175,7 +174,7 @@ describe Types::AssignmentType do
   end
 
   it "returns needsGradingCount" do
-    assignment.submit_homework(student, {:body => "so cool", :submission_type => "online_text_entry"})
+    assignment.submit_homework(student, { :body => "so cool", :submission_type => "online_text_entry" })
     expect(assignment_type.resolve("needsGradingCount", current_user: teacher)).to eq 1
   end
 
@@ -191,16 +190,16 @@ describe Types::AssignmentType do
     end
 
     it "includes description when lock settings allow" do
-      expect_any_instance_of(Assignment).
-        to receive(:low_level_locked_for?).
-        and_return(can_view: true)
+      expect_any_instance_of(Assignment)
+        .to receive(:low_level_locked_for?)
+        .and_return(can_view: true)
       expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to include "Content"
     end
 
     it "returns null when not allowed" do
-      expect_any_instance_of(Assignment).
-        to receive(:low_level_locked_for?).
-        and_return(can_view: false)
+      expect_any_instance_of(Assignment)
+        .to receive(:low_level_locked_for?)
+        .and_return(can_view: false)
       expect(assignment_type.resolve("description", request: ActionDispatch::TestRequest.create)).to be_nil
     end
 
@@ -263,23 +262,23 @@ describe Types::AssignmentType do
         ) { nodes { _id } }
       GQL
       expect(SubmissionSearch).to have_received(:new).with(assignment, teacher, nil, {
-        states: ["submitted"],
-        section_ids: ["42"],
-        enrollment_types: ["StudentEnrollment"],
-        user_search: 'foo',
-        scored_less_than: 3.0,
-        scored_more_than: 1.0,
-        grading_status: :needs_grading,
-        order_by: [{
-          field: "username",
-          direction: "descending"
-        }]
-      })
+                                                             states: ["submitted"],
+                                                             section_ids: ["42"],
+                                                             enrollment_types: ["StudentEnrollment"],
+                                                             user_search: 'foo',
+                                                             scored_less_than: 3.0,
+                                                             scored_more_than: 1.0,
+                                                             grading_status: :needs_grading,
+                                                             order_by: [{
+                                                               field: "username",
+                                                               direction: "descending"
+                                                             }]
+                                                           })
     end
 
     it "returns 'real' submissions from with permissions" do
-      submission1 = assignment.submit_homework(student, {:body => "sub1", :submission_type => "online_text_entry"})
-      submission2 = assignment.submit_homework(other_student, {:body => "sub1", :submission_type => "online_text_entry"})
+      submission1 = assignment.submit_homework(student, { :body => "sub1", :submission_type => "online_text_entry" })
+      submission2 = assignment.submit_homework(other_student, { :body => "sub1", :submission_type => "online_text_entry" })
 
       expect(
         assignment_type.resolve(
@@ -353,9 +352,9 @@ describe Types::AssignmentType do
 
       it "respects visibility for limited teachers" do
         teacher.enrollments.first.update! course_section: section2,
-          limit_privileges_to_course_section: true
+                                          limit_privileges_to_course_section: true
 
-        submissions =  assignment_type.resolve(<<~GQL, current_user: teacher)
+        submissions = assignment_type.resolve(<<~GQL, current_user: teacher)
           submissionsConnection { nodes { _id } }
         GQL
 
@@ -400,15 +399,15 @@ describe Types::AssignmentType do
         ) { nodes { _id } }
       GQL
       expect(SubmissionSearch).to have_received(:new).with(@assignment, @teacher, nil, {
-        states: ["submitted"],
-        section_ids: ["42"],
-        enrollment_types: ["StudentEnrollment"],
-        user_search: 'foo',
-        scored_less_than: 3.0,
-        scored_more_than: 1.0,
-        grading_status: :needs_grading,
-        order_by: []
-      })
+                                                             states: ["submitted"],
+                                                             section_ids: ["42"],
+                                                             enrollment_types: ["StudentEnrollment"],
+                                                             user_search: 'foo',
+                                                             scored_less_than: 3.0,
+                                                             scored_more_than: 1.0,
+                                                             grading_status: :needs_grading,
+                                                             order_by: []
+                                                           })
     end
 
     it "returns nil if not a group assignment" do
@@ -437,7 +436,7 @@ describe Types::AssignmentType do
   end
 
   xit "validate assignment 404 return correctly with override instrumenter (ADMIN-2407)" do
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher})
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher })
       query {
         assignment(id: "987654321") {
           _id dueAt lockAt unlockAt

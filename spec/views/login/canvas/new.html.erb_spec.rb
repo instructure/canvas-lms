@@ -50,8 +50,8 @@ describe "login/canvas/new.html.erb" do
   end
 
   context "with external mechanism specified" do
-    let(:account){ Account.default }
-    let(:config){ account.authentication_providers.build }
+    let(:account) { Account.default }
+    let(:config) { account.authentication_providers.build }
 
     before do
       config.auth_type = 'ldap'
@@ -64,8 +64,8 @@ describe "login/canvas/new.html.erb" do
     it "should use external forgot password mechanism" do
       render
       page = Nokogiri(response.body)
-      expect(page.css("#login_forgot_password")[0]['href']).
-        to eq(account.change_password_url)
+      expect(page.css("#login_forgot_password")[0]['href'])
+        .to eq(account.change_password_url)
     end
   end
 end

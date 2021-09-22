@@ -88,12 +88,12 @@ describe Mutations::DeleteDiscussionEntry do
 
     it 'if the user does not have read access to the discussion entry' do
       user = user_model
-      result = run_mutation({id: @discussion_entry.id}, user)
+      result = run_mutation({ id: @discussion_entry.id }, user)
       expect(result.dig('errors', 0, 'message')).to eq 'not found'
     end
 
     it 'if the user does not have delete permissions' do
-      result = run_mutation({id: @discussion_entry.id}, @student)
+      result = run_mutation({ id: @discussion_entry.id }, @student)
       expect(result.dig('errors')).to be_nil
       expect(result.dig('data', 'deleteDiscussionEntry', 'errors', 0, 'message')).to eq 'Insufficient permissions'
     end

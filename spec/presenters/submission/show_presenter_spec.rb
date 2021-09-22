@@ -106,8 +106,8 @@ describe Submission::ShowPresenter do
     end
 
     it "returns any additional parameters as part of the URL" do
-      expect(presenter_for_reviewer.submission_data_url(another_param: 'z')).to match_path(anonymous_submission_path).
-        and_query({'another_param' => 'z'})
+      expect(presenter_for_reviewer.submission_data_url(another_param: 'z')).to match_path(anonymous_submission_path)
+        .and_query({ 'another_param' => 'z' })
     end
   end
 
@@ -177,16 +177,16 @@ describe Submission::ShowPresenter do
       )
       submission_comment = reviewee_submission.add_comment(author: reviewer, comment: 'ok I guess')
 
-      expect(presenter_for_reviewer).to receive(:submission_data_url).
-        with(hash_including(comment_id: submission_comment.id, download: attachment.id))
+      expect(presenter_for_reviewer).to receive(:submission_data_url)
+        .with(hash_including(comment_id: submission_comment.id, download: attachment.id))
       presenter_for_reviewer.comment_attachment_download_url(submission_comment: submission_comment, attachment: attachment)
     end
   end
 
   describe "#comment_attachment_template_url" do
     it "calls submission_data_url with template-style parameters" do
-      expect(presenter_for_reviewer).to receive(:submission_data_url).
-        with(hash_including(comment_id: "{{ comment_id }}", download: "{{ id }}"))
+      expect(presenter_for_reviewer).to receive(:submission_data_url)
+        .with(hash_including(comment_id: "{{ comment_id }}", download: "{{ id }}"))
 
       presenter_for_reviewer.comment_attachment_template_url
     end

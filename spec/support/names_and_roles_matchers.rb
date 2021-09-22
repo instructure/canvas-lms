@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti::Ims::NamesAndRolesMatchers
-
   def expected_lti_id(entity)
     entity.is_a?(User) ? entity.lti_id : Lti::Asset.opaque_identifier_for(entity)
   end
@@ -41,16 +40,16 @@ module Lti::Ims::NamesAndRolesMatchers
   def map_course_enrollment_role(enrollment)
     case enrollment.role.base_role_type
     when 'TeacherEnrollment'
-      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ]
+      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor']
     when 'TaEnrollment'
-      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
-        'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor' ]
+      ['http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant',
+       'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor']
     when 'DesignerEnrollment'
-      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper' ]
+      ['http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper']
     when 'StudentEnrollment'
-      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner' ]
+      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Learner']
     when 'ObserverEnrollment'
-      [ 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor' ]
+      ['http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor']
     else
       []
     end
@@ -77,11 +76,12 @@ module Lti::Ims::NamesAndRolesMatchers
   end
 
   def expected_course_membership_context(context)
-    expected_base_membership_context(context).merge!({'label' => context.course_code}).compact
+    expected_base_membership_context(context).merge!({ 'label' => context.course_code }).compact
   end
 
   def expected_sourced_id(user)
     return user.sourced_id if user.respond_to?(:sourced_id)
+
     SisPseudonym.for(user, Account.default, type: :trusted, require_sis: false)&.sis_user_id
   end
 
@@ -124,10 +124,10 @@ module Lti::Ims::NamesAndRolesMatchers
   end
 
   def expected_context_membership(user, roles_matcher, opts)
-    expected_base_membership(user, opts).
-      merge!('roles' => roles_matcher.call).
-      merge('message' => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil).
-      compact
+    expected_base_membership(user, opts)
+      .merge!('roles' => roles_matcher.call)
+      .merge('message' => opts[:message_matcher] ? match_array(expected_message_array(user, opts)) : nil)
+      .compact
   end
 
   def expected_course_membership(opts)

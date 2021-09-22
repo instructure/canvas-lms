@@ -96,12 +96,12 @@ describe ContextModulesHelper do
 
     it 'returns New Quiz for lti-quiz type' do
       tool = t_course.context_external_tools.create!(
-          :name => 'Quizzes.Next',
-          :consumer_key => 'test_key',
-          :shared_secret => 'test_secret',
-          :tool_id => 'Quizzes 2',
-          :url => 'http://example.com/launch'
-        )
+        :name => 'Quizzes.Next',
+        :consumer_key => 'test_key',
+        :shared_secret => 'test_secret',
+        :tool_id => 'Quizzes 2',
+        :url => 'http://example.com/launch'
+      )
       assignment = t_course.assignments.create(
         submission_types: 'external_tool',
         external_tool_tag_attributes: {
@@ -120,14 +120,14 @@ describe ContextModulesHelper do
         :tool_id => 'Quizzes 2',
         :url => 'http://example.com/launch'
       )
-    assignment = t_course.assignments.create(
-      submission_types: 'external_tool',
-      external_tool_tag_attributes: {
-        content: tool
-      }
-    )
-    item = t_module.add_item(type: 'assignment', id: assignment.id)
-    expect(module_item_translated_content_type(item, true)).to eq 'Quiz'
+      assignment = t_course.assignments.create(
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: {
+          content: tool
+        }
+      )
+      item = t_module.add_item(type: 'assignment', id: assignment.id)
+      expect(module_item_translated_content_type(item, true)).to eq 'Quiz'
     end
 
     it 'returns a string for a recognized content type' do
@@ -149,12 +149,12 @@ describe ContextModulesHelper do
     before do
       @context = t_course
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-        {
-          trigger_assignment: assg.id,
-          locked: false,
-          assignment_sets: [{}, {}],
-        }
-      ])
+                                                                             {
+                                                                               trigger_assignment: assg.id,
+                                                                               locked: false,
+                                                                               assignment_sets: [{}, {}],
+                                                                             }
+                                                                           ])
     end
 
     it "should not set mastery_paths if cyoe is disabled" do
@@ -185,12 +185,12 @@ describe ContextModulesHelper do
 
       it "should be true if no set has been selected and the rule is locked" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-          {
-            trigger_assignment: assg.id,
-            locked: true,
-            assignment_sets: [],
-          }
-        ])
+                                                                               {
+                                                                                 trigger_assignment: assg.id,
+                                                                                 locked: true,
+                                                                                 assignment_sets: [],
+                                                                               }
+                                                                             ])
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to eq true
@@ -204,13 +204,13 @@ describe ContextModulesHelper do
 
       it "should be true if still processing results" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-          {
-            trigger_assignment: assg.id,
-            locked: false,
-            assignment_sets: [],
-            still_processing: true
-          }
-        ])
+                                                                               {
+                                                                                 trigger_assignment: assg.id,
+                                                                                 locked: false,
+                                                                                 assignment_sets: [],
+                                                                                 still_processing: true
+                                                                               }
+                                                                             ])
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to eq false
@@ -218,27 +218,26 @@ describe ContextModulesHelper do
 
       it "should be false if no set has been selected and no sets are available" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-          {
-            trigger_assignment: assg.id,
-            locked: false,
-            assignment_sets: [],
-          }
-        ])
+                                                                               {
+                                                                                 trigger_assignment: assg.id,
+                                                                                 locked: false,
+                                                                                 assignment_sets: [],
+                                                                               }
+                                                                             ])
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to eq false
-
       end
 
       it "should be false if set has been selected for a cyoe trigger assignment module item" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
-          {
-            selected_set_id: 1,
-            trigger_assignment: assg.id,
-            locked: false,
-            assignment_sets: [{}, {}],
-          }
-        ])
+                                                                               {
+                                                                                 selected_set_id: 1,
+                                                                                 trigger_assignment: assg.id,
+                                                                                 locked: false,
+                                                                                 assignment_sets: [{}, {}],
+                                                                               }
+                                                                             ])
 
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]

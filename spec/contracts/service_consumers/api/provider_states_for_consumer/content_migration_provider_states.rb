@@ -22,7 +22,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     provider_state 'content migration data' do
       set_up do
         course = Pact::Canvas.base_state.course
@@ -31,7 +30,7 @@ PactConfig::Consumers::ALL.each do |consumer|
           workflow_state: 'imported',
           migration_settings: {
             imported_assets: {
-              lti_assignment_quiz_set: [[ 11, 111]]
+              lti_assignment_quiz_set: [[11, 111]]
             },
             import_quizzes_next: true,
             import_immediately: true,

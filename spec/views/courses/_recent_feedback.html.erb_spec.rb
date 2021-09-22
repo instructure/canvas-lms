@@ -31,7 +31,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 7, grader: @teacher)
     @submission.reload
 
-    render partial: "courses/recent_feedback", object: @submission, locals: {is_hidden: false, show_context: true}
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false, show_context: true }
 
     expect(response.body).to include(@course.short_name)
   end
@@ -40,7 +40,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 7, grader: @teacher)
     @submission.reload
 
-    render partial: "courses/recent_feedback", contexts: [@course], object: @submission, locals: {is_hidden: false}
+    render partial: "courses/recent_feedback", contexts: [@course], object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to_not include(@course.name)
   end
@@ -49,7 +49,7 @@ describe "/courses/_recent_feedback" do
     @assignment.update_submission(@user, comment: 'bunch of random stuff', commenter: @teacher)
     @submission.reload
 
-    render partial: "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    render partial: "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to include('bunch of random stuff')
   end
@@ -59,7 +59,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 5782394, grader: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to include("5,782,394 out of 5,782,394")
   end
@@ -70,7 +70,7 @@ describe "/courses/_recent_feedback" do
     @assignment.update_submission(@user, comment: 'something different', commenter: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
 
     expect(response.body).to include("25,734 out of 25,734")
     expect(response.body).to include('something different')
@@ -82,7 +82,7 @@ describe "/courses/_recent_feedback" do
     @assignment.grade_student(@user, grade: 25734, grader: @teacher)
     @submission.reload
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
+    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
     url = context_url(@assignment.context, :context_assignment_url, id: @assignment.id)
     expect(response.body).to include("\"#{url}\"")
   end
@@ -94,8 +94,8 @@ describe "/courses/_recent_feedback" do
 
     assign(:current_user, @user)
 
-    render :partial => "courses/recent_feedback", object: @submission, locals: {is_hidden: false}
-    url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id:@user.id)
+    render :partial => "courses/recent_feedback", object: @submission, locals: { is_hidden: false }
+    url = context_url(@assignment.context, :context_assignment_submission_url, assignment_id: @assignment.id, id: @user.id)
     expect(response.body).to include("\"#{url}\"")
   end
 end

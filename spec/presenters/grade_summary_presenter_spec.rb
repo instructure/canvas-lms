@@ -200,7 +200,7 @@ describe GradeSummaryPresenter do
     it 'filters out test students and inactive enrollments' do
       s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -248,7 +248,7 @@ describe GradeSummaryPresenter do
       teacher_in_course
       s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -305,9 +305,7 @@ describe GradeSummaryPresenter do
       expect(@presenter.observed_students).to include(@student => [@student_enrollment])
       expect(@presenter.observed_students).to include(@student2 => [@student_enrollment2])
     end
-
   end
-
 
   describe '#submissions' do
     before(:once) do
@@ -601,11 +599,11 @@ describe GradeSummaryPresenter do
     end
 
     let(:teacher) do
-      teacher_in_course({course: gspcourse}).user
+      teacher_in_course({ course: gspcourse }).user
     end
 
     let(:inactive_student_enrollment) do
-      enrollment = course_with_user('StudentEnrollment', {course: gspcourse})
+      enrollment = course_with_user('StudentEnrollment', { course: gspcourse })
       enrollment.workflow_state = 'inactive'
       enrollment.save!
       enrollment
@@ -616,7 +614,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:other_student_enrollment) do
-      course_with_user('StudentEnrollment', {course: gspcourse})
+      course_with_user('StudentEnrollment', { course: gspcourse })
     end
 
     let(:other_student) do

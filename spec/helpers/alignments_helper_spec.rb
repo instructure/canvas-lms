@@ -44,16 +44,18 @@ describe AlignmentsHelper do
     tag = ContentTag.create(
       content: outcome,
       context: outcome.context,
-      tag_type: 'learning_outcome')
+      tag_type: 'learning_outcome'
+    )
     outcome.alignments << tag
     tag
   }
 
   let_once(:graded_alignment) {
     tag = ContentTag.create(
-        content: @assignment,
-        context: outcome.context,
-        tag_type: 'learning_outcome')
+      content: @assignment,
+      context: outcome.context,
+      tag_type: 'learning_outcome'
+    )
     outcome.alignments << tag
     tag
   }
@@ -163,8 +165,8 @@ describe AlignmentsHelper do
     context "with a rubric association" do
       before(:once) {
         rubric_association_model({
-          purpose: "grading"
-        })
+                                   purpose: "grading"
+                                 })
       }
       let(:string) { outcome_alignment_tag(@course, outcome, graded_alignment) {} }
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }

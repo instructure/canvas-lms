@@ -24,7 +24,7 @@ require_relative '../graphql_spec_helper'
 RSpec.describe Mutations::UpdateDiscussionReadState do
   before(:once) do
     course_with_teacher(active_all: true)
-    topic_with_nested_replies({context: @course})
+    topic_with_nested_replies({ context: @course })
   end
 
   def mutation_str(
@@ -64,12 +64,11 @@ RSpec.describe Mutations::UpdateDiscussionReadState do
 
   it 'updates read state' do
     @topic.change_all_read_state(:read, @teacher)
-    result = run_mutation({id: @topic.id, read: false})
+    result = run_mutation({ id: @topic.id, read: false })
     expect(result.dig('errors')).to be nil
     expect(result.dig('data', 'updateDiscussionReadState', 'discussionTopic', 'title')).to eq @topic.title
     scope = @topic.discussion_entry_participants.where(user: @teacher)
-      .where.not(discussion_entries: { workflow_state: 'deleted' })
+                  .where.not(discussion_entries: { workflow_state: 'deleted' })
     expect(scope.pluck(:workflow_state)).not_to include('read')
   end
-
 end

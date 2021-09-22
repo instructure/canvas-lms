@@ -100,29 +100,29 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
 
       expect(ContextExternalToolPlacement.count).to eq 4
 
-      expect{
+      expect {
         DataFixup::CreateQuizLtiNavigationPlacements.run
-      }.to not_change{ContextExternalToolPlacement.count}
+      }.to not_change { ContextExternalToolPlacement.count }
     end
 
     it 'should not create navigation placements for tools that are not Quiz LTI' do
       some_tool = ContextExternalTool.find_by(tool_id: 'Some tool')
 
       expect(some_tool.quiz_lti?).to eq false
-      expect{
+      expect {
         DataFixup::CreateQuizLtiNavigationPlacements.run
         some_tool.reload
-      }.to not_change{some_tool.context_external_tool_placements.count}
+      }.to not_change { some_tool.context_external_tool_placements.count }
     end
 
     it 'should not create navigation placements for Quiz LTI tools where context_type is not Account' do
       quiz_tool = ContextExternalTool.quiz_lti.last
       quiz_tool.update!(context_type: 'Course')
 
-      expect{
+      expect {
         DataFixup::CreateQuizLtiNavigationPlacements.run
         quiz_tool.reload
-      }.to not_change{quiz_tool.context_external_tool_placements.count}
+      }.to not_change { quiz_tool.context_external_tool_placements.count }
     end
   end
 end

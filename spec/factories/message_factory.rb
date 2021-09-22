@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def message_model(opts={})
+  def message_model(opts = {})
     @message = factory_with_protected_attributes(Message, message_valid_attributes.merge(opts))
   end
 
@@ -33,6 +33,7 @@ module Factories
 
   def generate_message(notification_name, path_type, asset, options = {})
     raise "options must be a hash!" unless options.is_a? Hash
+
     @notification = Notification.where(name: notification_name.to_s).first_or_create!
     user = options[:user]
     data = options[:data] || {}

@@ -29,7 +29,7 @@ describe "/discussion_topics/_entry" do
     @topic.context
     assign(:entries, [])
     assign(:topic, @topic)
-    render :partial => "discussion_topics/entry", :object => nil, :locals => {:topic => @topic}
+    render :partial => "discussion_topics/entry", :object => nil, :locals => { :topic => @topic }
   end
 
   it "should render with data" do
@@ -42,6 +42,6 @@ describe "/discussion_topics/_entry" do
     assign(:entries, [@entry])
     assign(:grouped_entries, [@entry].group_by(&:parent_id))
     assign(:topic, @topic)
-    render :partial => "discussion_topics/entry", :object => @entry, :locals => {:topic => @topic}
+    render :partial => "discussion_topics/entry", :object => @entry, :locals => { :topic => @topic }
   end
 end
