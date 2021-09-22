@@ -178,7 +178,6 @@ const ignoredWarnings = [
   /Exactly one focusable child is required/,
   /Found @client directives in a query but no ApolloClient resolvers were specified/,
   /is deprecated and will be removed/,
-  /Missing field __typename in/,
   /Missing field errors in/,
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
