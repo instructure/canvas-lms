@@ -26,26 +26,24 @@
 #
 module Canvas::Plugins
   module TicketingSystem
-
     # can use this constant as the "tag" for other connectors
     PLUGIN_ID = 'ticketing_system'
 
     class << self
-
       # public, but not for you to use.  this method wraps the registration
       # that "default_plugins.rb" does, so since there's a little behavior
       # this plugin needs anyway, may as well let it manage it's own
       # registration
       def register!
         Canvas::Plugin.register(PLUGIN_ID, nil, {
-          name: ->{ I18n.t 'Ticketing System' },
-          description: ->{ I18n.t 'Ticketing system configurations' },
-          author: 'Instructure',
-          author_website: 'http://www.instructure.com',
-          version: '1.0.0',
-          settings_partial: 'plugins/ticketing_system_settings',
-          validator: 'TicketingSystemValidator'
-        })
+                                  name: -> { I18n.t 'Ticketing System' },
+                                  description: -> { I18n.t 'Ticketing system configurations' },
+                                  author: 'Instructure',
+                                  author_website: 'http://www.instructure.com',
+                                  version: '1.0.0',
+                                  settings_partial: 'plugins/ticketing_system_settings',
+                                  validator: 'TicketingSystemValidator'
+                                })
         TicketingSystem::EmailPlugin.new(self).register!
         TicketingSystem::WebPostPlugin.new(self).register!
       end
@@ -92,6 +90,7 @@ module Canvas::Plugins
       def is_selected?(plugin_id, setting_registry = PluginSetting)
         setting = setting_registry.settings_for_plugin(PLUGIN_ID)
         return false if setting.nil?
+
         plugin_id.to_s == setting[:type].to_s
       end
 
@@ -105,7 +104,6 @@ module Canvas::Plugins
       def registered_extensions
         Canvas::Plugin.all_for_tag(PLUGIN_ID)
       end
-
     end
   end
 end

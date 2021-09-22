@@ -24,9 +24,10 @@ module AddressBook
       @ignore_result = ignore_result
     end
 
-    def known_users(users, options={})
+    def known_users(users, options = {})
       return [] if users.empty?
-      user_ids = users.map{ |user| Shard.global_id_for(user) }
+
+      user_ids = users.map { |user| Shard.global_id_for(user) }
 
       if admin_context?(options[:context])
         # users any admin over the specified context knows
@@ -40,7 +41,7 @@ module AddressBook
       end
 
       # whitelist just those users I know
-      whitelist, unknown = user_ids.partition{ |id| common_contexts.key?(id) }
+      whitelist, unknown = user_ids.partition { |id| common_contexts.key?(id) }
       if unknown.present? && options[:conversation_id].present?
         conversation_shard = Shard.shard_for(options[:conversation_id])
         participants = ConversationParticipant.shard(conversation_shard).where(
@@ -49,12 +50,12 @@ module AddressBook
         ).pluck(:user_id)
         if participants.include?(@sender.id)
           # add conversation participants to whitelist
-          whitelist |= participants.map{ |id| Shard.global_id_for(id) }
+          whitelist |= participants.map { |id| Shard.global_id_for(id) }
         end
       end
 
       # apply whitelist to provided user objects/ids, to restore order
-      users.select!{ |user| whitelist.include?(Shard.global_id_for(user)) }
+      users.select! { |user| whitelist.include?(Shard.global_id_for(user)) }
 
       # if we didn't start with objects, hydrate
       users = hydrate(users) unless users.first.is_a?(User)
@@ -100,7 +101,7 @@ module AddressBook
       end
     end
 
-    def search_users(options={})
+    def search_users(options = {})
       # if we're querying a specific context and that context is a valid admin
       # context for the sender, then we want the sender-agnostic search results
       # (i.e. the results any admin would see). otherwise, include the sender
@@ -116,8 +117,8 @@ module AddressBook
             # than here. handling it is just complaining in an error report,
             # and then ignoring
             Canvas::Errors.capture(RuntimeError.new(
-              "AddressBook::Service#search_users should not be paged with include_bookmark: true"
-            ), {}, :warn)
+                                     "AddressBook::Service#search_users should not be paged with include_bookmark: true"
+                                   ), {}, :warn)
           end
           service_options[:cursor] = pager.current_bookmark
         end
@@ -152,10 +153,10 @@ module AddressBook
     # takes a list of user ids and returns a corresponding list of objects,
     # order preserved.
     def hydrate(ids)
-      ids = ids.map{ |id| Shard.global_id_for(id) }
+      ids = ids.map { |id| Shard.global_id_for(id) }
       hydrated = User.select(::MessageableUser::SELECT).where(id: ids)
       reverse_lookup = hydrated.index_by(&:global_id)
-      ids.map{ |id| reverse_lookup[id] }.compact
+      ids.map { |id| reverse_lookup[id] }.compact
     end
 
     # caches with common contexts for each user in the list, pulling the

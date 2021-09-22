@@ -43,29 +43,30 @@ module Submittable
   module ClassMethods
     def visible_ids_by_user(opts)
       # pluck id, assignment_id, and user_id from items joined with the SQL view
-      plucked_visibilities = pluck_visibilities(opts).group_by{|_, _, user_id| user_id}
+      plucked_visibilities = pluck_visibilities(opts).group_by { |_, _, user_id| user_id }
       # Assignment-less items are *normally* visible to all -- the exception is
       # section-specific discussions, so here get the ones visible to everyone in the
       # course, and below get the ones that are visible to the right section.
       ids_visible_to_all = if opts[:item_type] == :discussion
-        self.without_assignment_in_course(opts[:course_id]).where(:is_section_specific => false).pluck(:id)
-      else
-        self.without_assignment_in_course(opts[:course_id]).pluck(:id)
-      end
+                             self.without_assignment_in_course(opts[:course_id]).where(:is_section_specific => false).pluck(:id)
+                           else
+                             self.without_assignment_in_course(opts[:course_id]).pluck(:id)
+                           end
 
       # Now get the section-specific discussions that are in the proper sections.
       ids_visible_to_sections = if opts[:item_type] == :discussion
-        user_sections = Enrollment.active.where(
-          :course_id => opts[:course_id], :user_id => opts[:user_id]).pluck(:course_section_id)
-        DiscussionTopicSectionVisibility.active.where(:course_section_id => user_sections).pluck(:discussion_topic_id).uniq
-      else
-        []
-      end
+                                  user_sections = Enrollment.active.where(
+                                    :course_id => opts[:course_id], :user_id => opts[:user_id]
+                                  ).pluck(:course_section_id)
+                                  DiscussionTopicSectionVisibility.active.where(:course_section_id => user_sections).pluck(:discussion_topic_id).uniq
+                                else
+                                  []
+                                end
 
       # build map of user_ids to array of item ids {1 => [2,3,4], 2 => [2,4]}
       opts[:user_id].reduce({}) do |vis_hash, student_id|
         vis_hash[student_id] = begin
-          ids_from_pluck = (plucked_visibilities[student_id] || []).map{|id, _ ,_| id}
+          ids_from_pluck = (plucked_visibilities[student_id] || []).map { |id, _, _| id }
           ids_from_pluck.concat(ids_visible_to_all).concat(ids_visible_to_sections)
         end
         vis_hash
@@ -74,8 +75,8 @@ module Submittable
 
     def pluck_visibilities(opts)
       name = self.name.underscore.pluralize
-      self.joins_assignment_student_visibilities(opts[:user_id],opts[:course_id]).
-        pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
+      self.joins_assignment_student_visibilities(opts[:user_id], opts[:course_id])
+          .pluck("#{name}.id", "#{name}.assignment_id", "assignment_student_visibilities.user_id")
     end
   end
 
@@ -94,7 +95,7 @@ module Submittable
     self.assignment && self.assignment.submission_types =~ /#{name}/
   end
 
-  def restore(from=nil)
+  def restore(from = nil)
     self.workflow_state = 'unpublished'
     self.save
 
@@ -112,6 +113,7 @@ module Submittable
 
   def restore_old_assignment
     return nil unless self.old_assignment && self.old_assignment.deleted?
+
     self.old_assignment.workflow_state = 'published'
     name = self.class.name.underscore
     self.old_assignment.saved_by = name.to_sym
@@ -153,8 +155,8 @@ module Submittable
     end
     if self.assignment_id
       self.assignment_id = nil unless self.assignment &&
-        self.assignment.context == self.context ||
-        self.try(:root_topic).try(:assignment_id) == self.assignment_id
+                                      self.assignment.context == self.context ||
+                                      self.try(:root_topic).try(:assignment_id) == self.assignment_id
       self.old_assignment_id = self.assignment_id if self.assignment_id
     end
   end

@@ -20,12 +20,11 @@
 
 class ExternalStatuses
   ALL_POSSIBLE_EXTERNAL_STATUSES = [:active]
-  
+
   # before changing this, be sure to consider the database schema defaults
   DEFAULT_EXTERNAL_STATUS = :active
-  
-  class <<self
 
+  class << self
     def possible_external_statuses
       if Setting.get("support_multiple_account_types", "true") == "true"
         ALL_POSSIBLE_EXTERNAL_STATUSES
@@ -33,11 +32,7 @@ class ExternalStatuses
         [DEFAULT_EXTERNAL_STATUS]
       end
     end
-    
+
     def default_external_status; DEFAULT_EXTERNAL_STATUS; end
-  
   end
-
 end
-
-

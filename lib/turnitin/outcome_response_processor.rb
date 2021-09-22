@@ -19,9 +19,8 @@
 
 module Turnitin
   class OutcomeResponseProcessor
-
     # this one goes to 14 (so that the last attempt is ~24hr after the first)
-    MAX_ATTEMPTS=14
+    MAX_ATTEMPTS = 14
 
     def self.max_attempts
       MAX_ATTEMPTS
@@ -74,10 +73,10 @@ module Turnitin
         turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
         stash_turnitin_client do
           turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-            priority: Delayed::LOW_PRIORITY,
-            attempts: attempt_number,
-            run_at: Time.now.utc + (attempt_number ** 4) + 5).
-            new_submission
+                                   priority: Delayed::LOW_PRIORITY,
+                                   attempts: attempt_number,
+                                   run_at: Time.now.utc + (attempt_number**4) + 5)
+                            .new_submission
         end
       end
     rescue StandardError
@@ -161,6 +160,5 @@ module Turnitin
     def submit_homework(attachment)
       @assignment.submit_homework(@user, attachments: [attachment], submission_type: 'online_upload', submitted_at: turnitin_client.uploaded_at)
     end
-
   end
 end

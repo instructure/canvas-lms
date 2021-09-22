@@ -30,10 +30,10 @@ module DataFixup
 
       # We're only fixing notification policies that were created by default,
       # as we don't want to accidentally stomp on any user set policies.
-      policy_scope = NotificationPolicy.
-        where(notification: posted_notifs).
-        where(frequency: "immediately").
-        where("updated_at = created_at")
+      policy_scope = NotificationPolicy
+                     .where(notification: posted_notifs)
+                     .where(frequency: "immediately")
+                     .where("updated_at = created_at")
 
       CommunicationChannel.find_ids_in_batches do |cc_ids|
         communication_channels = CommunicationChannel.where(id: cc_ids).preload(:notification_policies)

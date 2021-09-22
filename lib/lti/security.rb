@@ -23,8 +23,7 @@
 
 module Lti
   module Security
-
-    def self.signed_post_params(params, url, key, secret, disable_lti_post_only=false)
+    def self.signed_post_params(params, url, key, secret, disable_lti_post_only = false)
       if disable_lti_post_only
         signed_post_params_frd(params, url, key, secret)
       else
@@ -35,7 +34,7 @@ module Lti
     # This is the correct way to sign the params, but in the name of not breaking things, we are using the
     # #generate_params_deprecated method by default
     def self.signed_post_params_frd(params, url, key, secret)
-      message = IMS::LTI::Models::Messages::Message.generate(params.merge({oauth_consumer_key: key}))
+      message = IMS::LTI::Models::Messages::Message.generate(params.merge({ oauth_consumer_key: key }))
       message.launch_url = url
       signed_parameters = message.signed_post_params(secret).stringify_keys
 
@@ -62,9 +61,9 @@ module Lti
       end
 
       consumer = OAuth::Consumer.new(key, secret, {
-        :site => "#{uri.scheme}://#{host}",
-        :signature_method => 'HMAC-SHA1'
-      })
+                                       :site => "#{uri.scheme}://#{host}",
+                                       :signature_method => 'HMAC-SHA1'
+                                     })
 
       path = uri.path
       path = '/' if path.empty?
@@ -75,7 +74,7 @@ module Lti
           end
         end
       end
-      options = {:scheme => 'body'}
+      options = { :scheme => 'body' }
 
       request = consumer.create_signed_request(:post, path, nil, options, params.stringify_keys)
       # the request is made by a html form in the user's browser, so we
@@ -127,6 +126,7 @@ module Lti
 
     def self.decoded_lti_assignment_id(secure_params)
       return if secure_params.blank?
+
       secure_params = Canvas::Security.decode_jwt(secure_params)
       secure_params[:lti_assignment_id]
     rescue Canvas::Security::InvalidToken

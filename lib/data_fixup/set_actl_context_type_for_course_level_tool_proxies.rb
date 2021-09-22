@@ -52,7 +52,8 @@ module DataFixup::SetACTLContextTypeForCourseLevelToolProxies
       course_ids_with_tool.each do |course_id|
         course = Course.find_by(id: course_id)
         next unless course
-        next if course.account_chain_ids.any?{|a| account_ids_with_tool.include?(a)}
+        next if course.account_chain_ids.any? { |a| account_ids_with_tool.include?(a) }
+
         change_all_actls_for_course(course_id)
       end
     end

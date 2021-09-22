@@ -31,6 +31,7 @@ module SupportHelpers
       def fix
         tool_proxies.find_each do |tp|
           next if tp.raw_data.dig('security_contract', 'tool_service').blank?
+
           tp.raw_data['security_contract']['tool_service'] << ims_service(@service, @actions)
           tp.save!
         end

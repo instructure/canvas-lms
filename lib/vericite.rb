@@ -28,13 +28,14 @@ module VeriCite
     return 'acceptable' if similarity_score < 25
     return 'warning' if similarity_score < 50
     return 'problem' if similarity_score < 75
+
     'failure'
   end
 
   class Client
     attr_accessor :account_id, :shared_secret, :host, :testing, :show_preliminary_score
 
-    def initialize(testing=false)
+    def initialize(testing = false)
       @host = Canvas::Plugin.find(:vericite).settings[:host] || "api.vericite.com"
       account_id = Canvas::Plugin.find(:vericite).settings[:account_id]
       shared_secret = Canvas::Plugin.find(:vericite).settings[:shared_secret]
@@ -67,7 +68,7 @@ module VeriCite
     def self.default_assignment_vericite_settings
       {
         :originality_report_visibility => Canvas::Plugin.find(:vericite).settings[:release_to_students] || 'immediate',
-        :exclude_quoted =>  Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
+        :exclude_quoted => Canvas::Plugin.find(:vericite).settings[:exclude_quotes],
         :exclude_self_plag => Canvas::Plugin.find(:vericite).settings[:exclude_self_plag],
         :store_in_index => Canvas::Plugin.find(:vericite).settings[:store_in_index],
         :vericite => true
@@ -96,22 +97,22 @@ module VeriCite
       settings = VeriCite::Client.normalize_assignment_vericite_settings(settings)
 
       response = sendRequest(:create_assignment, settings.merge!({
-        :user => course,
-        :course => course,
-        :assignment => assignment,
-        :utp => '2',
-        :dtstart => "#{today.strftime} 00:00:00",
-        :dtdue => "#{today.strftime} 00:00:00",
-        :dtpost => "#{today.strftime} 00:00:00",
-        :late_accept_flag => '1',
-        :post => true
-      }))
+                                                                   :user => course,
+                                                                   :course => course,
+                                                                   :assignment => assignment,
+                                                                   :utp => '2',
+                                                                   :dtstart => "#{today.strftime} 00:00:00",
+                                                                   :dtdue => "#{today.strftime} 00:00:00",
+                                                                   :dtpost => "#{today.strftime} 00:00:00",
+                                                                   :late_accept_flag => '1',
+                                                                   :post => true
+                                                                 }))
 
       is_response_success?(response) ? { assignment_id: response[:assignment_id] } : response_error_hash(response)
     end
 
     # if asset_string is passed in, only submit that attachment
-    def submitPaper(submission, asset_string=nil)
+    def submitPaper(submission, asset_string = nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
@@ -126,7 +127,7 @@ module VeriCite
       }
       responses = {}
       if submission.submission_type == 'online_upload'
-        attachments = submission.attachments.select{ |a| a.vericiteable? && (asset_string.nil? || a.asset_string == asset_string) }
+        attachments = submission.attachments.select { |a| a.vericiteable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
           # do not resubmit if the score already exists
           if submission.vericite_data_hash[a.asset_string][:similarity_score].blank?
@@ -149,14 +150,14 @@ module VeriCite
         paper_type = "text/html"
         paper_size = plain_text.bytesize
 
-        responses[submission.asset_string] = sendRequest(:submit_paper, {:pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text }.merge!(opts))
+        responses[submission.asset_string] = sendRequest(:submit_paper, { :pid => paper_id, :ptl => paper_title, :pext => paper_ext, :ptype => paper_type, :psize => paper_size, :pdata => plain_text }.merge!(opts))
       else
         raise "Unsupported submission type for VeriCite integration: #{submission.submission_type}"
       end
 
       responses.keys.each do |asset_string|
         res = responses[asset_string]
-        responses[asset_string] = is_response_success?(res) ? {object_id: res[:returned_object_id]} : response_error_hash(res)
+        responses[asset_string] = is_response_success?(res) ? { object_id: res[:returned_object_id] } : response_error_hash(res)
       end
 
       responses
@@ -274,7 +275,7 @@ module VeriCite
             fail "Failed to submit paper: #{external_content_data.external_content_id}"
           end
           data.each do |externalContentUploadInfo|
-            #API will return an upload URL to store the submission (throws an exception if it fails)
+            # API will return an upload URL to store the submission (throws an exception if it fails)
             api_client.uploadfile(externalContentUploadInfo.url_post, args[:pdata], externalContentUploadInfo.headers)
           end
           # this is a flag to signal success
@@ -283,29 +284,29 @@ module VeriCite
           context_id = course.id
           assignment_id = assignment.id
           user_id = user.id
-          user_score_cache_key_prefix =  "vericite_scores/#{consumer}/#{context_id}/#{assignment_id}/"
+          user_score_cache_key_prefix = "vericite_scores/#{consumer}/#{context_id}/#{assignment_id}/"
           users_score_map = {}
           # first check if the cache already has the user's score and if we haven't looked up this assignment lately:
           users_score_map["#{user_id}"] = Rails.cache.read("#{user_score_cache_key_prefix}#{user_id}")
           if users_score_map["#{user_id}"].nil? && Rails.cache.read(user_score_cache_key_prefix) == nil
-            #we already looked up this user in Redis, don't bother again (by setting {})
+            # we already looked up this user in Redis, don't bother again (by setting {})
             users_score_map["#{user_id}"] ||= {}
             # we need to look up the user scores in VeriCite for this course
             # @return [Array<ReportScoreReponse>]
-            data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, {:assignment_id => assignment_id})
-            #keep track of the assignment lookup api call
+            data, status_code, _headers = vericite_client.reports_scores_context_id_get(context_id, consumer, consumer_secret, { :assignment_id => assignment_id })
+            # keep track of the assignment lookup api call
             Rails.cache.write(user_score_cache_key_prefix, true, :expires_in => 5.minutes)
             # check status code
             response[:return_code] = status_code
             if !is_response_success?(response)
-             response[:return_message] = "An error has occurred while getting scores from VeriCite."
-             response[:public_error_message] = response[:return_message]
-             fail "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
+              response[:return_message] = "An error has occurred while getting scores from VeriCite."
+              response[:public_error_message] = response[:return_message]
+              fail "Failed to get scores for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}"
             end
             # create the user scores map and cache it
             data.each do |reportScoreReponse|
               if reportScoreReponse.score.is_a?(Integer) && reportScoreReponse.score >= 0 &&
-                (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
+                 (@show_preliminary_score || reportScoreReponse.preliminary.nil? || !reportScoreReponse.preliminary)
                 # keep track of this user's report scores
                 users_score_map[reportScoreReponse.user] ||= {}
                 users_score_map[reportScoreReponse.user][reportScoreReponse.external_content_id] = Float(reportScoreReponse.score)
@@ -336,11 +337,11 @@ module VeriCite
           token_user = current_user.id
           token_user_role = 'Learner'
           if args[:utp] == '2'
-            #instructor
+            # instructor
             token_user_role = 'Instructor'
           end
           # @return [Array<ReportURLLinkReponse>]
-          data, status_code, headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, {:'user_id_filter' => user_id, :'external_content_id_filter' => args[:oid]})
+          data, status_code, headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { :'user_id_filter' => user_id, :'external_content_id_filter' => args[:oid] })
           # check status code
           response[:return_code] = status_code
           if !is_response_success?(response)
@@ -349,8 +350,8 @@ module VeriCite
             fail "Failed to get the report url for site: #{context_id}, assignment: #{assignment_id}, user: #{user_id},  exId: #{args[:oid]}, token_user: #{token_user}, token_user_role: #{token_user_role}"
           end
           data.each do |reportURLLinkReponse|
-            #should only be 1 url
-            if reportURLLinkReponse.external_content_id ==  args[:oid]
+            # should only be 1 url
+            if reportURLLinkReponse.external_content_id == args[:oid]
               # setting response URL is a signal for success
               response[:report_url] = reportURLLinkReponse.url
             end
@@ -367,7 +368,7 @@ module VeriCite
           response[:return_message] = "VeriCite error during #{command} command, error: #{e}"
           response[:public_error_message] = response[:return_message]
         end
-      end #begin
+      end # begin
 
       return nil if @testing
 
@@ -387,12 +388,12 @@ module VeriCite
 
     def response_error_hash(response)
       return {} unless !is_response_success?(response)
+
       {
         error_code: response[:return_code],
         error_message: response[:return_message],
         public_error_message: response[:public_error_message],
       }
     end
-
   end
 end

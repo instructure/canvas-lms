@@ -113,11 +113,11 @@ module Services
 
       def tool_proxy_jwt_body(tool_proxy, options = {})
         options.merge({
-          sub: "ltiToolProxy:#{tool_proxy.guid}",
-          DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
-          RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s,
-          RootAccountUUID: tool_proxy.context.root_account.uuid
-        })
+                        sub: "ltiToolProxy:#{tool_proxy.guid}",
+                        DeveloperKey: tool_proxy.product_family.developer_key.global_id.to_s,
+                        RootAccountId: (tool_proxy.context.global_root_account_id || tool_proxy.context.global_id).to_s,
+                        RootAccountUUID: tool_proxy.context.root_account.uuid
+                      })
       end
     end
   end

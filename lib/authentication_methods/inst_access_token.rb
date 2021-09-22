@@ -23,7 +23,6 @@ module AuthenticationMethods
   # defined in the canvas_security gem and the
   # canvas domain itself (users, pseudonyms, accounts, etc)
   module InstAccessToken
-
     # given a POTENTIAL token string, this will validate
     # it as being an InstAccess token and return
     # the token ruby object.
@@ -41,7 +40,7 @@ module AuthenticationMethods
         token = InstAccess::Token.from_token_string(token_string)
         return token
       rescue InstAccess::InvalidToken, # token didn't pass signature verification
-            InstAccess::TokenExpired # token passed signature verification, but is expired
+             InstAccess::TokenExpired # token passed signature verification, but is expired
         raise AccessTokenError
       rescue InstAccess::ConfigError => exception
         # InstAccess isn't configured. A human should fix that, but this method
@@ -75,6 +74,7 @@ module AuthenticationMethods
         Shard.lookup(token.masquerading_user_shard_id).activate do
           real_user = find_user_by_uuid_prefer_local(token.masquerading_user_uuid)
           raise AccessTokenError, "masquerading user not found" unless real_user
+
           auth_context[:real_current_user] = real_user
           auth_context[:real_current_pseudonym] = SisPseudonym.for(
             real_user, domain_root_account, type: :implicit, require_sis: false

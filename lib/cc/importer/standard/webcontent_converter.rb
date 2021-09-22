@@ -31,13 +31,13 @@ module CC::Importer::Standard
           if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
             case res[:intended_use]
             when "assignment"
-              new_assignments << {:migration_id => res[:migration_id], :description => File.read(path)}
+              new_assignments << { :migration_id => res[:migration_id], :description => File.read(path) }
             when "syllabus"
               @course[:course] ||= {}
               @course[:course][:syllabus_body] = File.read(path)
             else
               if @convert_html_to_pages
-                new_pages << {:migration_id => res[:migration_id], :text => File.read(path)}
+                new_pages << { :migration_id => res[:migration_id], :text => File.read(path) }
               end
             end
           end
@@ -53,6 +53,7 @@ module CC::Importer::Standard
         # add any extra files in this resource
         res[:files].each do |file_ref|
           next unless file_ref[:href]
+
           if !main_file[:path_name]
             # if the resource didn't have an href use the first file
             main_file[:path_name] = file_ref[:href]
@@ -92,6 +93,7 @@ module CC::Importer::Standard
       make_export_dir
 
       return if file_map.empty?
+
       Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
         file_map.each_value do |val|
           next if zipfile.entries.include?(val[:path_name])

@@ -31,7 +31,6 @@ module Canvas
   # wants to do with errors can be hooked into this path with the
   # .register! method.
   class Errors
-
     # normally we would alias Errors to be CanvasErrors
     # as the shim, but we have several other classes actually inside
     # lib/canvas/errors/*.rb that need the existing module structure,

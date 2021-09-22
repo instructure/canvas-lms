@@ -19,12 +19,11 @@
 
 module Api::V1
   class CourseJson
-
     BASE_ATTRIBUTES = %w(id name course_code account_id created_at start_at default_view enrollment_term_id is_public
                          grading_standard_id root_account_id uuid license grade_passback_setting).freeze
 
-    INCLUDE_CHECKERS = {grading: 'needs_grading_count', syllabus: 'syllabus_body',
-                        url: 'html_url', description: 'public_description', permissions: 'permissions'}.freeze
+    INCLUDE_CHECKERS = { grading: 'needs_grading_count', syllabus: 'syllabus_body',
+                         url: 'html_url', description: 'public_description', permissions: 'permissions' }.freeze
 
     OPTIONAL_FIELDS = %w(needs_grading_count public_description enrollments).freeze
 
@@ -33,7 +32,7 @@ module Api::V1
     def initialize(course, user, includes, enrollments, precalculated_permissions: nil)
       @course = course
       @user = user
-      @includes = includes.map{ |include_key| include_key.to_sym }
+      @includes = includes.map { |include_key| include_key.to_sym }
       @enrollments = enrollments
       @precalculated_permissions = precalculated_permissions
       if block_given?
@@ -81,7 +80,7 @@ module Api::V1
     end
 
     def clear_unneeded_fields(hash)
-      hash.reject{|k, v| (OPTIONAL_FIELDS.include?(k) && v.nil?) }
+      hash.reject { |k, v| (OPTIONAL_FIELDS.include?(k) && v.nil?) }
     end
 
     def description(course)
@@ -116,16 +115,17 @@ module Api::V1
     def needs_grading_count(enrollments, course)
       if include_grading && enrollments && enrollments.any? { |e| e.participating_instructor? }
         proxy = Assignments::NeedsGradingCountQuery::CourseProxy.new(course, user)
-        course.assignments.active.to_a.sum{|a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
+        course.assignments.active.to_a.sum { |a| Assignments::NeedsGradingCountQuery.new(a, user, proxy).count }
       end
     end
 
     def permissions_to_include
-      [ :create_discussion_topic, :create_announcement ] if include_permissions
+      [:create_discussion_topic, :create_announcement] if include_permissions
     end
 
     def extract_enrollments(enrollments)
       return unless enrollments
+
       if include_total_scores?
         ActiveRecord::Associations::Preloader.new.preload(enrollments, :scores)
       end
@@ -140,6 +140,7 @@ module Api::V1
 
     def include_total_scores?
       return @include_total_scores unless @include_total_scores.nil?
+
       @include_total_scores = @includes.include?(:total_scores) && !@course.hide_final_grades?
     end
 
@@ -245,10 +246,10 @@ module Api::V1
       return nil unless current_grading_period
 
       prefix = if @course.grants_any_right?(@user, :manage_grades, :view_all_grades)
-        unposted ? "unposted" : "computed"
-      else
-        "effective"
-      end
+                 unposted ? "unposted" : "computed"
+               else
+                 "effective"
+               end
 
       enrollment.send(
         "#{prefix}_#{current_or_final}_#{score_or_grade}",
@@ -265,12 +266,14 @@ module Api::V1
 
     def include_current_grading_period_scores?
       return @include_current_grading_period_scores unless @include_current_grading_period_scores.nil?
+
       @include_current_grading_period_scores =
         include_total_scores? && @includes.include?(:current_grading_period_scores)
     end
 
     def include_grading_period_info?
       return @include_grading_period_info unless @include_grading_period_info.nil?
+
       @include_grading_period_info =
         @includes.include?(:current_grading_period_scores) && @includes.include?(:total_scores)
     end

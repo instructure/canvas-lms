@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class UserImporter < CSVBaseImporter
-
       def self.user_csv?(row)
         login_csv = (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}.freeze).empty?
         row.include?('user_id') && row.include?('login_id') && login_csv
@@ -33,7 +32,7 @@ module SIS
 
       # expected columns:
       # user_id,login_id,first_name,last_name,email,status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         messages = []
         count = SIS::UserImporter.new(@root_account, importer_opts).process(messages) do |importer|
           csv_rows(csv, index, count) do |row|
@@ -50,6 +49,7 @@ module SIS
       end
 
       private
+
       def create_user(row, csv)
         SIS::Models::User.new(
           user_id: row['user_id'],

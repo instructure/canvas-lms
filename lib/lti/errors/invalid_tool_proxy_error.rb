@@ -20,7 +20,6 @@
 
 module Lti::Errors
   class InvalidToolProxyError < RuntimeError
-
     def initialize(message = nil, json = {})
       super(message)
       @message = message
@@ -31,6 +30,5 @@ module Lti::Errors
       @json['error'] = @message if @message
       @json
     end
-
   end
 end

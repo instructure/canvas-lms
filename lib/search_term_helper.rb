@@ -27,7 +27,7 @@ module SearchTermHelper
         if scope.respond_to?(:where)
           scope = scope.where(wildcard("#{self.table_name}.#{attr}", search_term))
         else
-          scope = scope.select{|item| item.matches_attribute?(attr, search_term)}
+          scope = scope.select { |item| item.matches_attribute?(attr, search_term) }
         end
       end
       scope
@@ -39,7 +39,6 @@ module SearchTermHelper
   end
 
   class SearchTermTooShortError < ArgumentError
-
     def response_status
       :bad_request
     end

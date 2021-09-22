@@ -32,12 +32,11 @@ module Api::V1::ExternalFeeds
 
   def external_feed_api_json(external_feed, context, user, session)
     options = { :only => API_EXPOSED_EXTERNAL_FEED_PARAMS,
-                :methods => [:display_name]}
+                :methods => [:display_name] }
 
     api_json(external_feed, user, session, options).tap do |json|
       json.merge! :external_feed_entries_count => external_feed.external_feed_entries.size
     end
-
   end
 
   def create_api_external_feed(context, feed_params, user)
@@ -45,5 +44,4 @@ module Api::V1::ExternalFeeds
     feed.user = user
     feed
   end
-
 end

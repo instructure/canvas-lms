@@ -23,7 +23,7 @@ class SummaryMessageConsolidator
     SummaryMessageConsolidator.new.process
   end
 
-  def initialize(n=nil)
+  def initialize(n = nil)
     @logger = Rails.logger
   end
 
@@ -40,12 +40,13 @@ class SummaryMessageConsolidator
       update_sql = DelayedMessage.send(:sanitize_sql_array, ["UPDATE #{DelayedMessage.quoted_table_name}
                     SET workflow_state='sent', updated_at=?, batched_at=?
                     WHERE workflow_state='pending' AND id IN (?) RETURNING id", Time.now.utc, Time.now.utc, ids_to_update])
-      updated_ids = Shard.current.database_server.unguard{ DelayedMessage.connection.select_values(update_sql)}
+      updated_ids = Shard.current.database_server.unguard { DelayedMessage.connection.select_values(update_sql) }
 
       Delayed::Batch.serial_batch do
         batches.each do |dm_ids|
           dm_ids = dm_ids & updated_ids
           next unless dm_ids.any?
+
           DelayedMessage.delay(priority: Delayed::LOWER_PRIORITY).summarize(dm_ids)
         end
       end
@@ -56,17 +57,17 @@ class SummaryMessageConsolidator
   def delayed_message_batch_ids
     GuardRail.activate(:secondary) do
       DelayedMessage.connection.select_all(
-        DelayedMessage.select('communication_channel_id').select('root_account_id').distinct.
-          where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).
-          to_sql)
+        DelayedMessage.select('communication_channel_id').select('root_account_id').distinct
+          .where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db))
+          .to_sql
+      )
     end
   end
 
   def delayed_message_ids_for_batch(batch)
-    DelayedMessage.
-      where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db)).
-      where(batch). # hash condition will properly handle the case where root_account_id is null
-      pluck(:id)
+    DelayedMessage
+      .where("workflow_state = ? AND send_at <= ?", 'pending', Time.now.to_s(:db))
+      .where(batch) # hash condition will properly handle the case where root_account_id is null
+      .pluck(:id)
   end
-
 end

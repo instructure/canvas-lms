@@ -27,7 +27,7 @@ module Api::V1::Attachment
   include Api::V1::User
   include Api::V1::UsageRights
 
-  def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
+  def can_view_hidden_files?(context = @context, user = @current_user, session = nil)
     context.grants_any_right?(
       user,
       session,
@@ -100,8 +100,8 @@ module Api::V1::Attachment
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
-       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
-       if !thumbnail_url && attachment.content_type == 'image/svg+xml' && attachment.size < 16_384 #16k
+      # and svg can stand in as its own thumbnail, but let's be reasonable about their size
+      if !thumbnail_url && attachment.content_type == 'image/svg+xml' && attachment.size < 16_384 # 16k
         thumbnail_url = url
       end
     else
@@ -187,7 +187,7 @@ module Api::V1::Attachment
   # The `File.mime_types[mime_type]` returns the last extesion recorded in the
   # mime_types.yml.
   def infer_file_extension(params)
-    filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
+    filenames_with_extension = filenames(params).select { |item| item.include?('.') }
 
     extension = filenames_with_extension&.first&.split('.')&.last&.downcase
 
@@ -313,30 +313,30 @@ module Api::V1::Attachment
 
     folder ||= opts[:folder]
     progress_context = if opts[:assignment].present?
-      opts[:assignment]
-    elsif params[:assignment_id].present?
-      Assignment.find_by(id: params[:assignment_id])
-    else
-      current_user
-    end
+                         opts[:assignment]
+                       elsif params[:assignment_id].present?
+                         Assignment.find_by(id: params[:assignment_id])
+                       else
+                         current_user
+                       end
 
     if InstFS.enabled?
       additional_capture_params = {}
       progress_json_result = if params[:url]
-        progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
-        progress.start
-        progress.save!
+                               progress = ::Progress.new(context: progress_context, user: current_user, tag: :upload_via_url)
+                               progress.start
+                               progress.save!
 
-        if progress_context.is_a? Assignment
-          additional_capture_params = {
-            eula_agreement_timestamp: params[:eula_agreement_timestamp],
-            comment: params[:comment],
-            submit_assignment: opts[:submit_assignment]
-          }
-        end
+                               if progress_context.is_a? Assignment
+                                 additional_capture_params = {
+                                   eula_agreement_timestamp: params[:eula_agreement_timestamp],
+                                   comment: params[:comment],
+                                   submit_assignment: opts[:submit_assignment]
+                                 }
+                               end
 
-        progress_json(progress, current_user, session)
-      end
+                               progress_json(progress, current_user, session)
+                             end
 
       json = InstFS.upload_preflight_json(
         context: context,
@@ -390,16 +390,19 @@ module Api::V1::Attachment
           api_v1_files_create_url(
             on_duplicate: on_duplicate,
             quota_exemption: quota_exemption,
-            success_include: params[:success_include]),
+            success_include: params[:success_include]
+          ),
           api_v1_files_create_success_url(
             @attachment,
             uuid: @attachment.uuid,
             on_duplicate: on_duplicate,
             quota_exemption: quota_exemption,
-            include: params[:success_include]),
+            include: params[:success_include]
+          ),
           ssl: request.ssl?,
           file_param: opts[:file_param],
-          no_redirect: params[:no_redirect])
+          no_redirect: params[:no_redirect]
+        )
         json = json.slice(:upload_url, :upload_params, :file_param)
       end
     end
@@ -411,9 +414,9 @@ module Api::V1::Attachment
     end
   end
 
-  def api_attachment_preflight_json(context, request, opts={})
+  def api_attachment_preflight_json(context, request, opts = {})
     opts[:return_json] = true
-    {:attachments => [api_attachment_preflight(context, request, opts)]}
+    { :attachments => [api_attachment_preflight(context, request, opts)] }
   end
 
   def check_quota_after_attachment

@@ -34,7 +34,7 @@ module CC::Importer
         res[:href] = r_node['href']
         res[:files] = []
         r_node.css('file').each do |file_node|
-          res[:files] << {:href => file_node[:href]}
+          res[:files] << { :href => file_node[:href] }
         end
 
         blti_resources << res
@@ -111,6 +111,7 @@ module CC::Importer
       if !doc.namespaces.to_s.downcase.include? 'imsglobal'
         raise CCImportError.new(I18n.t("Invalid XML Configuration"))
       end
+
       begin
         tool = convert_blti_link(doc)
         check_for_unescaped_url_properties(tool) if tool
@@ -123,12 +124,12 @@ module CC::Importer
     def check_for_unescaped_url_properties(obj)
       # Recursively look for properties named 'url'
       if obj.is_a?(Hash)
-        obj.select{|k, v| k.to_s == 'url' && v.is_a?(String)}.each do |k, v|
+        obj.select { |k, v| k.to_s == 'url' && v.is_a?(String) }.each do |k, v|
           check_for_unescaped_url(v)
         end
-        obj.each{|k, v| check_for_unescaped_url_properties(v)}
+        obj.each { |k, v| check_for_unescaped_url_properties(v) }
       elsif obj.is_a?(Array)
-        obj.each{|o| check_for_unescaped_url_properties(o)}
+        obj.each { |o| check_for_unescaped_url_properties(o) }
       end
     end
 
@@ -152,6 +153,7 @@ module CC::Importer
       props = {}
       node.children.each do |property|
         next if property.name == 'text'
+
         if property.name == 'property'
           props[property['name']] = property.text.strip
         elsif property.name == 'options'
@@ -166,7 +168,7 @@ module CC::Importer
     def get_blti_namespace(doc)
       doc.namespaces.each_pair do |key, val|
         if val == BLTI_NAMESPACE
-          return key.gsub('xmlns:','')
+          return key.gsub('xmlns:', '')
         end
       end
       "blti"
@@ -177,7 +179,7 @@ module CC::Importer
 
       lti_tools.each do |tool|
         if tool[:assignment_points_possible]
-          asmnt = {:migration_id => tool[:migration_id]}
+          asmnt = { :migration_id => tool[:migration_id] }
           asmnt[:title] = tool[:title]
           asmnt[:description] = tool[:description]
           asmnt[:submission_format] = "external_tool"

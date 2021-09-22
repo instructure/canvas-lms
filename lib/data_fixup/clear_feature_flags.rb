@@ -21,7 +21,7 @@ module DataFixup
   module ClearFeatureFlags
     def self.run_async(feature_flag)
       DataFixup::ClearFeatureFlags.delay_if_production(priority: Delayed::LOWER_PRIORITY,
-        n_strand: "DataFixup::ClearFeatureFlags:#{feature_flag}:#{Shard.current.database_server.id}").run(feature_flag)
+                                                       n_strand: "DataFixup::ClearFeatureFlags:#{feature_flag}:#{Shard.current.database_server.id}").run(feature_flag)
     end
 
     def self.run(feature_flag)

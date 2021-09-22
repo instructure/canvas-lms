@@ -20,17 +20,16 @@
 require_relative '../errors'
 module Canvas
   class Errors
-
     # This is a class for taking the common context
     # found in the request/response cycle for an exception
     # and turning it into a pleasent hash for Canvas::Errors
     # to make use of.
     class Info
-
       attr_reader :req, :account, :user, :rci, :type
+
       MAX_DATA_SIZE = 65535
 
-      def initialize(request, root_account, user, opts={})
+      def initialize(request, root_account, user, opts = {})
         @req = request
         @account = root_account
         @user = user
@@ -54,9 +53,9 @@ module Canvas
             request_context_id: @rci,
             request_method: @req.request_method_symbol,
             format: @req.format,
-          }.merge(self.class.useful_http_env_stuff_from_request(@req)).
-            merge(self.class.useful_http_headers(@req)).
-            merge(@canvas_error_info)
+          }.merge(self.class.useful_http_env_stuff_from_request(@req))
+            .merge(self.class.useful_http_headers(@req))
+            .merge(@canvas_error_info)
         }
       end
 
@@ -108,7 +107,7 @@ module Canvas
           'REQUEST_URI' => f.filter_uri(req.url),
           'path_parameters' => f.filter_params(req.path_parameters.dup).inspect,
           'query_parameters' => f.filter_params(req.query_parameters.dup).inspect,
-          'request_parameters' => f.filter_params(req.request_parameters.dup).inspect[0,MAX_DATA_SIZE],
+          'request_parameters' => f.filter_params(req.request_parameters.dup).inspect[0, MAX_DATA_SIZE],
         }
       end
       private_class_method :filtered_request_params

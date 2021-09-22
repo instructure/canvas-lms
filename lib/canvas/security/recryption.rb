@@ -35,7 +35,7 @@ module Canvas::Security
   class Recryption
     def self.execute(encryption_key)
       {
-        Account =>  {
+        Account => {
           :encrypted_column => :turnitin_crypted_secret,
           :salt_column => :turnitin_salt,
           :key => 'instructure_turnitin_secret_shared'
@@ -56,17 +56,17 @@ module Canvas::Security
           :key => 'otp_secret_key'
         }
       }.each do |(model, definition)|
-        model.where("#{definition[:encrypted_column]} IS NOT NULL").
-          select([:id, definition[:encrypted_column], definition[:salt_column]]).
-          find_each do |instance|
+        model.where("#{definition[:encrypted_column]} IS NOT NULL")
+             .select([:id, definition[:encrypted_column], definition[:salt_column]])
+             .find_each do |instance|
           cleartext = Canvas::Security.decrypt_password(instance.read_attribute(definition[:encrypted_column]),
                                                         instance.read_attribute(definition[:salt_column]),
                                                         definition[:key],
                                                         encryption_key)
           new_crypted_data, new_salt = Canvas::Security.encrypt_password(cleartext, definition[:key])
-          model.where(:id => instance).
-              update_all(definition[:encrypted_column] => new_crypted_data,
-                        definition[:salt_column] => new_salt)
+          model.where(:id => instance)
+               .update_all(definition[:encrypted_column] => new_crypted_data,
+                           definition[:salt_column] => new_salt)
         end
       end
 

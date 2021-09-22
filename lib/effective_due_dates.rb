@@ -87,9 +87,9 @@ class EffectiveDueDates
     return @any_in_closed_grading_period unless @any_in_closed_grading_period.nil?
 
     @any_in_closed_grading_period = @context.grading_periods? &&
-        to_hash.any? do |_, assignment_due_dates|
-          any_student_in_closed_grading_period?(assignment_due_dates)
-        end
+                                    to_hash.any? do |_, assignment_due_dates|
+                                      any_student_in_closed_grading_period?(assignment_due_dates)
+                                    end
   end
 
   # This iterates through a single assignment's EffectiveDueDate hash to see
@@ -134,6 +134,7 @@ class EffectiveDueDates
 
   def any_student_in_closed_grading_period?(assignment_due_dates)
     return false unless assignment_due_dates
+
     assignment_due_dates.any? { |_, student| student[:in_closed_grading_period] }
   end
 
@@ -170,14 +171,14 @@ class EffectiveDueDates
       assignment_collection = @assignments.empty? ? [@context.active_assignments] : @assignments
 
       if assignment_collection.length == 1 &&
-        assignment_collection.first.respond_to?(:to_sql) &&
-        !assignment_collection.first.loaded?
+         assignment_collection.first.respond_to?(:to_sql) &&
+         !assignment_collection.first.loaded?
         # it's a relation, let's not load it unnecessarily out here
         assignment_collection = assignment_collection.first.except(:order).select(:id).to_sql
       else
         # otherwise, map through the array as necessary to get id's
         assignment_collection.flatten!
-        assignment_collection.map!{ |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
+        assignment_collection.map! { |assignment| assignment.try(:id) } if assignment_collection.first.is_a?(Assignment)
         assignment_collection.compact!
         assignment_collection = assignment_collection.join(',')
       end

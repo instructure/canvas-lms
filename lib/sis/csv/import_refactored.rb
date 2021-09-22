@@ -24,9 +24,8 @@ require 'zip'
 module SIS
   module CSV
     class ImportRefactored
-
       attr_accessor :root_account, :batch, :finished, :counts,
-        :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
+                    :override_sis_stickiness, :add_sis_stickiness, :clear_sis_stickiness, :logger
 
       IGNORE_FILES = /__macosx|desktop d[bf]|\A\..*/i
 
@@ -98,7 +97,8 @@ module SIS
               CanvasUnzip::extract_archive(file, tmp_dir)
               Dir[File.join(tmp_dir, "**/**")].each do |fn|
                 next if File.directory?(fn) || !!(fn =~ IGNORE_FILES)
-                file_name = fn[tmp_dir.size+1 .. -1]
+
+                file_name = fn[tmp_dir.size + 1..-1]
                 att = create_batch_attachment(File.join(tmp_dir, file_name))
                 process_file(tmp_dir, file_name, att)
               end
@@ -190,7 +190,7 @@ module SIS
         if @run_immediately
           run_all_importers
         else
-          @parallel_importers = Hash[@parallel_importers.map{|k, v| [k, v.map(&:id)]}] # save as ids in handler
+          @parallel_importers = Hash[@parallel_importers.map { |k, v| [k, v.map(&:id)] }] # save as ids in handler
           remove_instance_variable(:@csvs) # don't need anymore
           queue_next_importer_set
         end
@@ -207,7 +207,7 @@ module SIS
       end
 
       def calculate_progress
-        [(((@current_row.to_f/@total_rows) * @progress_multiplier) + @progress_offset) * 100, 99].min
+        [(((@current_row.to_f / @total_rows) * @progress_multiplier) + @progress_offset) * 100, 99].min
       end
 
       def update_progress
@@ -219,13 +219,13 @@ module SIS
       def run_parallel_importer(id, csv: nil, attempt: 0)
         ensure_later = false
         parallel_importer = id.is_a?(ParallelImporter) ? id : ParallelImporter.find(id)
-        in_retry =  parallel_importer.workflow_state == 'retry'
+        in_retry = parallel_importer.workflow_state == 'retry'
 
         if should_stop_import?
           parallel_importer.abort
           return
         end
-        InstStatsd::Statsd.increment("sis_parallel_worker", tags: { attempt: attempt, retry: in_retry})
+        InstStatsd::Statsd.increment("sis_parallel_worker", tags: { attempt: attempt, retry: in_retry })
 
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
@@ -260,7 +260,7 @@ module SIS
           att = parallel_importer.attachment
           file = att.open
           parallel_importer.start
-          {:fullpath => file.path, :file => att.display_name}
+          { :fullpath => file.path, :file => att.display_name }
         end
         count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
         parallel_importer.complete(rows_processed: count)
@@ -278,6 +278,7 @@ module SIS
         # pulling it from the importer attachment, then re-parsing
         # won't help because we won't redownload, so we might as well go ahead and raise
         raise if input_csv.present? || malformed_retries >= 1
+
         file&.close
         malformed_retries += 1
         retry
@@ -287,13 +288,14 @@ module SIS
 
       def fail_with_error!(e, csv: nil)
         return @batch if @batch.workflow_state == 'aborted'
+
         message = "Importing CSV for account: "\
             "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
         err_id = Canvas::Errors.capture(e, {
-          type: :sis_import,
-          message: message,
-          during_tests: false
-        })[:error_report]
+                                          type: :sis_import,
+                                          message: message,
+                                          during_tests: false
+                                        })[:error_report]
         error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
         @batch.shard.activate do
@@ -312,8 +314,9 @@ module SIS
         IMPORTERS.each do |importer_type|
           importers = @parallel_importers[importer_type]
           next unless importers
+
           importers.each do |pi|
-            run_parallel_importer(pi, csv: @csvs[importer_type].detect{|csv| csv[:attachment] == pi.attachment})
+            run_parallel_importer(pi, csv: @csvs[importer_type].detect { |csv| csv[:attachment] == pi.attachment })
             @batch.data[:completed_importers] << importer_type
             return false if should_stop_import?
           end
@@ -341,17 +344,18 @@ module SIS
       end
 
       def queue_next_importer_set
-        next_importer_type = IMPORTERS.detect{|i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present?}
+        next_importer_type = IMPORTERS.detect { |i| !@batch.data[:completed_importers].include?(i) && @parallel_importers[i].present? }
         return finish unless next_importer_type
 
         enqueue_args = job_args(next_importer_type)
 
         importers_to_queue = @parallel_importers[next_importer_type]
-        updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending").
-          update_all(:workflow_state => "queued")
+        updated_count = @batch.parallel_importers.where(:id => importers_to_queue, :workflow_state => "pending")
+                              .update_all(:workflow_state => "queued")
         if updated_count != importers_to_queue.count
           raise "state mismatch error queuing parallel import jobs"
         end
+
         importers_to_queue.each do |pi|
           delay(**enqueue_args).run_parallel_importer(pi)
         end
@@ -387,7 +391,7 @@ module SIS
       end
 
       def process_file(base, file, att)
-        csv = {base: base, file: file, fullpath: File.join(base, file), attachment: att}
+        csv = { base: base, file: file, fullpath: File.join(base, file), attachment: att }
         if File.file?(csv[:fullpath]) && File.extname(csv[:fullpath]).downcase == '.csv'
           unless Attachment.valid_utf8?(File.open(csv[:fullpath]))
             SisBatch.add_error(csv, I18n.t("Invalid UTF-8"), sis_batch: @batch, failure: true)
@@ -395,7 +399,7 @@ module SIS
           end
           begin
             ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
-              row.each {|header| header&.downcase!}
+              row.each { |header| header&.downcase! }
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
                   unless @previous_diff_import

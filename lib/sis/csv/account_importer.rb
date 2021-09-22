@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class AccountImporter < CSVBaseImporter
-
       def self.account_csv?(row)
         row.include?('account_id') && row.include?('parent_account_id')
       end
@@ -32,7 +31,7 @@ module SIS
 
       # expected columns
       # account_id,parent_account_id
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::AccountImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             begin

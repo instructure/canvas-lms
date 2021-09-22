@@ -19,19 +19,18 @@
 
 module Turnitin
   class AttachmentManager
-
     def self.update_attachment(submission, attachment)
       assignment = submission.assignment
       user = submission.user
       tool = assignment.external_tool_tag.content
       tool ||= ContextExternalTool.find_external_tool(assignment.external_tool_tag.url, assignment.context)
-        tii_client = TiiClient.new(
+      tii_client = TiiClient.new(
         user,
         assignment,
         tool,
         submission.turnitin_data[attachment.asset_string][:outcome_response]
       )
-      save_attachment( tii_client, user, attachment)
+      save_attachment(tii_client, user, attachment)
     end
 
     def self.create_attachment(user, assignment, tool, outcomes_response_json)
@@ -47,7 +46,7 @@ module Turnitin
           fail Errors::ScoreStillPendingError if content_disposition.nil?
 
           filename = content_disposition.match(/filename=(\"?)(.+)\1/)[2]
-          filename.tr!('/','-')
+          filename.tr!('/', '-')
           path = File.join(dirname, filename)
           File.open(path, 'wb') do |f|
             f.write(response.body)
@@ -61,6 +60,5 @@ module Turnitin
       end
     end
     private_class_method :save_attachment
-
   end
 end

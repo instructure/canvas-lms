@@ -94,7 +94,7 @@ module Canvas::Migration
     rescue
       # Not a valid archive file
       raise Canvas::Migration::Error, I18n.t(:package_error,
-          "Error identifying package type: %{error}", :error => $!.message), $!.backtrace
+                                             "Error identifying package type: %{error}", :error => $!.message), $!.backtrace
     end
 
     private
@@ -104,7 +104,7 @@ module Canvas::Migration
     def check_flat_xml_file
       doc = create_xml_doc(File.read(@archive.file))
       if get_node_val(doc, 'metadata schema') =~ COMMON_CARTRIDGE_REGEX &&
-              get_node_val(doc, 'metadata schemaversion') == "1.3.0"
+         get_node_val(doc, 'metadata schemaversion') == "1.3.0"
         :common_cartridge_1_3
       else
         :unknown
@@ -112,11 +112,11 @@ module Canvas::Migration
     end
 
     def has_namespace(node, namespace)
-      node.namespaces.values.any?{|ns|ns =~ /#{namespace}/i}
+      node.namespaces.values.any? { |ns| ns =~ /#{namespace}/i }
     end
 
     def find_converter
-      if plugin = Canvas::Plugin.all_for_tag(:export_system).find{|p|p.settings[:provides] && p.settings[:provides][@type]}
+      if plugin = Canvas::Plugin.all_for_tag(:export_system).find { |p| p.settings[:provides] && p.settings[:provides][@type] }
         return plugin.settings[:provides][@type]
       end
 

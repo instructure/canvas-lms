@@ -19,9 +19,9 @@
 #
 
 # A small wrapper around the CutyCapt binary.
-# 
+#
 # Requires a config in dynamic settings private/canvas/cutycapt.yml that looks like this:
-# 
+#
 # production:
 #   path: /usr/bin/cutycapt
 #   delay: 3000
@@ -42,13 +42,12 @@ require 'resolv'
 require 'ipaddr'
 
 class CutyCapt
-
   CUTYCAPT_DEFAULTS = {
     :delay => 3000,
     :timeout => 60000,
-    :ip_blacklist => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8' ],
-    :domain_blacklist => [ ],
-    :allowed_schemes => [ 'http', 'https' ],
+    :ip_blacklist => ['10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8'],
+    :domain_blacklist => [],
+    :allowed_schemes => ['http', 'https'],
     :lang => 'en,*;q=0.9'
   }
 
@@ -56,6 +55,7 @@ class CutyCapt
 
   def self.config
     return @@config if defined?(@@config) && @@config
+
     setting = begin
       consul_config = Canvas::DynamicSettings.find(tree: :private)['cutycapt.yml']
       (consul_config && YAML.load(consul_config).with_indifferent_access) || ConfigFile.load('cutycapt') || {}
@@ -70,13 +70,14 @@ class CutyCapt
   def self.screencap_service
     return @@screencap_service if defined?(@@screencap_service) && @@screencap_service
     return nil unless @@config[:screencap_service]
+
     @@screencap_service = Services::ScreencapService.new(@@config[:screencap_service])
     @@screencap_service
   end
 
   def self.process_config
-    @@config[:ip_blacklist] = @@config[:ip_blacklist].map {|ip| IPAddr.new(ip) } if @@config[:ip_blacklist]
-    @@config[:domain_blacklist] = @@config[:domain_blacklist].map {|domain| Resolv::DNS::Name.create(domain) } if @@config[:domain_blacklist]
+    @@config[:ip_blacklist] = @@config[:ip_blacklist].map { |ip| IPAddr.new(ip) } if @@config[:ip_blacklist]
+    @@config[:domain_blacklist] = @@config[:domain_blacklist].map { |domain| Resolv::DNS::Name.create(domain) } if @@config[:domain_blacklist]
   end
 
   def self.logger
@@ -97,14 +98,15 @@ class CutyCapt
     end
 
     dns_host = Resolv::DNS::Name.create(uri.host)
-    if config[:domain_blacklist] && config[:domain_blacklist].any? {|bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
+    if config[:domain_blacklist] && config[:domain_blacklist].any? { |bl_host| dns_host == bl_host || dns_host.subdomain_of?(bl_host) }
       logger.warn("Skipping url because of blacklisted domain: #{url}")
       return false
     end
 
     addresses = Resolv.getaddresses(uri.host)
     return false if addresses.blank?
-    if config[:ip_blacklist] && addresses.any? {|address| config[:ip_blacklist].any? {|cidr| cidr.include?(address) rescue false } }
+
+    if config[:ip_blacklist] && addresses.any? { |address| config[:ip_blacklist].any? { |cidr| cidr.include?(address) rescue false } }
       logger.warn("Skipping url because of blacklisted IP address: #{url}")
       return false
     end
@@ -113,7 +115,7 @@ class CutyCapt
   end
 
   def self.cuty_arguments(path, url, img_file, format, delay, timeout, lang)
-    [ path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}", "--header=Accept-Language:#{lang}" ]
+    [path, "--url=#{url}", "--out=#{img_file}", "--out-format=#{format}", "--delay=#{delay}", "--max-wait=#{timeout}", "--header=Accept-Language:#{lang}"]
   end
 
   def self.snapshot_url(url, &block)

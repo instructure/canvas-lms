@@ -170,6 +170,7 @@ module UserContent
 
     def initialize(context, user, contextless_types: [])
       raise(ArgumentError, "context required") unless context
+
       @context = context
       @user = user
       @contextless_types = contextless_types
@@ -210,7 +211,7 @@ module UserContent
     def translate_content(html)
       return html if html.blank?
 
-      asset_types = AssetTypes.reject { |k,v| !@allowed_types.include?(k) }
+      asset_types = AssetTypes.reject { |k, v| !@allowed_types.include?(k) }
 
       html.gsub(@toplevel_regex) do |url|
         _absolute_part, prefix, type, obj_id, rest = [$1, $2, $3, $4, $5]
@@ -247,10 +248,12 @@ module UserContent
     def user_can_view_content?(content = nil, &get_content)
       return false if user.blank? && content.respond_to?(:locked?) && content.locked?
       return true unless user
+
       # if user given, check that the user is allowed to manage all
       # context content, or read that specific item (and it's not locked)
       @read_as_admin = context.grants_right?(user, :read_as_admin) if @read_as_admin.nil?
       return true if @read_as_admin
+
       content ||= get_content.call
       allow = true if content.respond_to?(:grants_right?) && content.grants_right?(user, :read)
       allow = false if allow && content.respond_to?(:locked_for?) && content.locked_for?(user)

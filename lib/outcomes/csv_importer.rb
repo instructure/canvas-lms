@@ -124,7 +124,7 @@ module Outcomes
     end
 
     def file_line_count
-      count = @file.each.inject(0) { |c, _line| c + 1}
+      count = @file.each.inject(0) { |c, _line| c + 1 }
       @file.rewind
       count
     end
@@ -133,6 +133,7 @@ module Outcomes
       encoded = str&.force_encoding('utf-8')
       valid = (encoded || '').valid_encoding?
       raise ParseError, I18n.t('Not a valid utf-8 string: %{string}', string: str.inspect) unless valid
+
       encoded
     end
 
@@ -169,6 +170,7 @@ module Outcomes
       prior = nil
       drop_trailing_nils(ratings).each_slice(2).to_a.map.with_index(1) do |(points, description), index|
         raise InvalidDataError, I18n.t("Points for rating tier %{index} not present", index: index) if points.nil? || points.blank?
+
         points = strict_parse_float(points, I18n.t('rating tier %{index} threshold', index: index))
 
         if prior.present? && prior < points
@@ -185,6 +187,7 @@ module Outcomes
 
     def normalize_i18n(string)
       raise ArgumentError if string.blank?
+
       separator = I18n.t(:separator, :scope => :'number.format')
       delimiter = I18n.t(:delimiter, :scope => :'number.format')
       string.gsub(delimiter, '').gsub(separator, '.')

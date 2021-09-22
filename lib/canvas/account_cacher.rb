@@ -24,15 +24,16 @@ module Canvas
       def find_target
         key = ["account2", owner._read_attribute(reflection.foreign_key)].cache_key
         return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
-      end  
+      end
     end
 
     class CacheAccountOnPolymorphicAssociation < ActiveRecord::Associations::BelongsToPolymorphicAssociation
       def find_target
         return super unless klass == Account
+
         key = ["account", owner._read_attribute(reflection.foreign_key)].cache_key
         return RequestCache.cache([Switchman::Shard.current.id, key].cache_key) { Rails.cache.fetch(key) { super } }
-      end  
+      end
     end
 
     module ExtendAccountReflection
@@ -47,7 +48,6 @@ module Canvas
       end
     end
 
-
     def self.apply_to_reflections(klass)
       klass.reflections.each do |(name, r)|
         next unless r.macro == :belongs_to
@@ -60,8 +60,8 @@ module Canvas
         end
 
         next if [Canvas::RootAccountCacher::ExtendRootAccountReflection,
-          ExtendAccountReflection,
-          ExtendPolymorphicAccountReflection].include?(r.association_class)
+                 ExtendAccountReflection,
+                 ExtendPolymorphicAccountReflection].include?(r.association_class)
 
         r.extend(r.options[:polymorphic] ? ExtendPolymorphicAccountReflection : ExtendAccountReflection)
 

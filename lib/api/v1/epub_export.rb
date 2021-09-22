@@ -23,8 +23,8 @@ module Api::V1::EpubExport
 
   def course_epub_export_json(course)
     api_json(course, @current_user, session, {
-      only: [ :name, :id ]
-    }).tap do |hash|
+               only: [:name, :id]
+             }).tap do |hash|
       if course.latest_epub_export.present?
         hash['epub_export'] = epub_export_json(course.latest_epub_export)
       end
@@ -33,17 +33,17 @@ module Api::V1::EpubExport
 
   def epub_export_json(epub_export)
     api_json(epub_export, @current_user, session, {}, [
-      :download, :regenerate
-    ]).tap do |hash|
+               :download, :regenerate
+             ]).tap do |hash|
       hash['progress_id'] = epub_export.job_progress.id
       hash['progress_url'] = polymorphic_url([:api_v1, epub_export.job_progress])
 
-      [ :epub_attachment, :zip_attachment ].each do |attachment_type|
+      [:epub_attachment, :zip_attachment].each do |attachment_type|
         next if (type = epub_export.send(attachment_type)).blank?
 
         hash[attachment_type.to_s] = attachment_json(type, @current_user, {}, {
-          can_view_hidden_files: true
-        })
+                                                       can_view_hidden_files: true
+                                                     })
       end
     end
   end

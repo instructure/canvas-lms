@@ -21,13 +21,13 @@ module SimpleTags
   module ReaderInstanceMethods
     def tags
       @tag_array ||= if tags = read_attribute(:tags)
-        tags.split(',')
-      else
-        []
-      end
+                       tags.split(',')
+                     else
+                       []
+                     end
     end
 
-    def serialized_tags(tags=self.tags)
+    def serialized_tags(tags = self.tags)
       SimpleTags.normalize_tags(tags).join(',')
     end
 
@@ -41,9 +41,9 @@ module SimpleTags
       options = tags.last.is_a?(Hash) ? tags.pop : {}
       options[:mode] ||= :or
       conditions = handle_tags(tags, options) +
-        tags.map{ |tag|
-          wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
-        }
+                   tags.map { |tag|
+                     wildcard(quoted_table_name + '.tags', tag, :delimiter => ',')
+                   }
       conditions.empty? ?
           none :
           where(conditions.join(options[:mode] == :or ? " OR " : " AND "))
@@ -55,8 +55,10 @@ module SimpleTags
     end
 
     protected
+
     def handle_tags(tags, options)
       return [] unless @tagged_scope_handlers
+
       @tagged_scope_handlers.inject([]) do |result, (pattern, handler)|
         handler_tags = []
         tags.delete_if do |tag|
@@ -79,6 +81,7 @@ module SimpleTags
     end
 
     protected
+
     def serialize_tags
       if @tag_array
         write_attribute(:tags, serialized_tags)
@@ -98,7 +101,7 @@ module SimpleTags
       elsif tag =~ /\Asection_(\d+).*/
         section = CourseSection.where(id: $1).first
         ary << section.course.asset_string if section
-      # TODO: allow user-defined tags, e.g. #foo
+        # TODO: allow user-defined tags, e.g. #foo
       end
       ary
     }.uniq

@@ -50,12 +50,12 @@ module VisibilityPluckingHelper
 
     def empty_id_hash(ids)
       # [1,2,3] => {1:[],2:[],3:[]}
-      Hash[ids.zip(ids.map{[]})]
+      Hash[ids.zip(ids.map { [] })]
     end
 
     def check_args(opts, key)
       # throw error if the the right args aren't given
-      [:course_id, key].each{ |k| opts.fetch(k) }
+      [:course_id, key].each { |k| opts.fetch(k) }
     end
 
     def pluck_own_and_user_ids(column_to_pluck, opts)

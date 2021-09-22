@@ -47,15 +47,15 @@ class ApiRouteSet
   end
 
   def self.routes_for(prefix)
-    CanvasRails::Application.routes.set.select{|r| r.path.spec.to_s.start_with?(prefix)}
+    CanvasRails::Application.routes.set.select { |r| r.path.spec.to_s.start_with?(prefix) }
   end
 
   def self.segments_match(seg1, seg2)
-    seg1.size == seg2.size && seg1.each_with_index { |s,i| return false unless s.respond_to?(:value) && s.value == seg2[i].value }
+    seg1.size == seg2.size && seg1.each_with_index { |s, i| return false unless s.respond_to?(:value) && s.value == seg2[i].value }
   end
 
   def self.api_methods_for_controller_and_action(controller, action)
-    @routes ||= self.prefixes.map{|pfx| self.routes_for(pfx)}.flatten
+    @routes ||= self.prefixes.map { |pfx| self.routes_for(pfx) }.flatten
     @routes.find_all { |r| matches_controller_and_action?(r, controller, action) }
   end
 
@@ -100,7 +100,7 @@ class ApiRouteSet
 
     get("#{path}", opts.merge(:action => :index, :as => "#{name_prefix}#{resource_name}")) if maybe_action[:index]
     get("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :show, :as => "#{name_prefix}#{resource_name.singularize}")) if maybe_action[:show]
-    post( "#{path}", opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
+    post("#{path}", opts.merge(:action => :create, :as => (maybe_action[:index] ? nil : "#{name_prefix}#{resource_name}"))) if maybe_action[:create]
     put("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :update)) if maybe_action[:update]
     delete("#{path}/:#{resource_name.singularize}_id", opts.merge(:action => :destroy)) if maybe_action[:destroy]
   end

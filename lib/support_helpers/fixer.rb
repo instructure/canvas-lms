@@ -52,6 +52,7 @@ module SupportHelpers
 
     def elapsed_time
       return 0 unless @start_time
+
       (Time.now - @start_time).to_i
     end
 

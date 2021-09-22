@@ -34,7 +34,6 @@ module Api::V1::StreamItem
   def stream_item_json(stream_item_instance, stream_item, current_user, session)
     data = stream_item.data(current_user.id)
     {}.tap do |hash|
-
       # generic attributes common to all stream item types
       hash['created_at'] = stream_item.created_at
       hash['updated_at'] = stream_item.updated_at
@@ -60,7 +59,7 @@ module Api::V1::StreamItem
         hash['total_root_discussion_entries'] = data.total_root_discussion_entries
         hash['require_initial_post'] = data.require_initial_post
         hash['user_has_posted'] = data.respond_to?(:user_has_posted) ? data.user_has_posted : nil
-        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0,StreamItem::LATEST_ENTRY_LIMIT].map do |entry|
+        hash['root_discussion_entries'] = (data.root_discussion_entries || [])[0, StreamItem::LATEST_ENTRY_LIMIT].map do |entry|
           {
             'user' => {
               'user_id' => entry.user_id,
@@ -97,7 +96,7 @@ module Api::V1::StreamItem
         # backwards compat from before using submission_json
         hash['assignment']['title'] = hash['assignment']['name']
         hash['title'] = hash['assignment']['name']
-        hash['submission_comments'].each {|c| c['body'] = c['comment']}
+        hash['submission_comments'].each { |c| c['body'] = c['comment'] }
       when /Conference/
         hash['web_conference_id'] = stream_item.asset_id
         hash['type'] = 'WebConference'
@@ -125,8 +124,8 @@ module Api::V1::StreamItem
     items = @current_user.shard.activate do
       scope = @current_user.visible_stream_item_instances(opts).preload(:stream_item)
       if opts.has_key?(:asset_type)
-        is_cross_shard = @current_user.visible_stream_item_instances(opts).
-          where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
+        is_cross_shard = @current_user.visible_stream_item_instances(opts)
+                                      .where("stream_item_id > ?", Shard::IDS_PER_SHARD).exists?
         if is_cross_shard
           # the old join doesn't work for cross-shard stream items, so we basically have to pre-calculate everything
           scope = scope.where(:stream_item_id => filtered_stream_item_ids(opts))
@@ -146,7 +145,7 @@ module Api::V1::StreamItem
     items.select!(&:stream_item)
     stream_item_preloads(items.map(&:stream_item))
     json = items.map { |i| stream_item_json(i, i.stream_item, @current_user, session) }
-    json.select! {|hash| hash['submission_comments'].present?} if opts[:asset_type] == 'Submission'
+    json.select! { |hash| hash['submission_comments'].present? } if opts[:asset_type] == 'Submission'
     render :json => json
   end
 
@@ -162,7 +161,7 @@ module Api::V1::StreamItem
         # we still need to filter after the pagination :(
         si_scope = si_scope.where("submissions.workflow_state <> 'deleted' AND submissions.submission_comments_count>0")
         si_scope = si_scope.where("submissions.user_id=?", opts[:submission_user_id]) if opts.has_key?(:submission_user_id)
-        filtered_ids += si_scope.pluck(:id).map{|id| Shard.relative_id_for(id, Shard.current, @current_user.shard)}
+        filtered_ids += si_scope.pluck(:id).map { |id| Shard.relative_id_for(id, Shard.current, @current_user.shard) }
       end
     end
     filtered_ids
@@ -176,13 +175,13 @@ module Api::V1::StreamItem
         base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
 
         full_counts = base_scope.except(:order).group('stream_items.asset_type', 'stream_items.notification_category',
-          'stream_item_instances.workflow_state').count
-          # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
-         # oh wait, except for Announcements -_-
-        if full_counts.keys.any?{|k| k[0] == 'DiscussionTopic'}
-          ann_counts = base_scope.where(:stream_items => {:asset_type => "DiscussionTopic"}).
-            joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id").
-            where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
+                                                      'stream_item_instances.workflow_state').count
+        # as far as I can tell, the 'type' column previously extracted by stream_item_json is identical to asset_type
+        # oh wait, except for Announcements -_-
+        if full_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
+          ann_counts = base_scope.where(:stream_items => { :asset_type => "DiscussionTopic" })
+                                 .joins("INNER JOIN #{DiscussionTopic.quoted_table_name} ON discussion_topics.id=stream_items.asset_id")
+                                 .where("discussion_topics.type = ?", "Announcement").except(:order).group('stream_item_instances.workflow_state').count
 
           ann_counts.each do |wf_state, ann_count|
             full_counts[['Announcement', nil, wf_state]] = ann_count
@@ -214,10 +213,10 @@ module Api::V1::StreamItem
 
         total_counts.each do |key, count|
           type, category = key
-          items << {:type => type, :notification_category => category,
-            :count => count, :unread_count => unread_counts[key] || 0}
+          items << { :type => type, :notification_category => category,
+                     :count => count, :unread_count => unread_counts[key] || 0 }
         end
-        items.sort_by!{|i| i[:type]}
+        items.sort_by! { |i| i[:type] }
       end
     end
     render :json => items
@@ -227,22 +226,22 @@ module Api::V1::StreamItem
     total_counts = {}
     unread_counts = {}
     # handle cross-shard stream items -________-
-    stream_item_ids = @current_user.visible_stream_item_instances(:contexts => contexts).
-      where("stream_item_id > ?", Shard::IDS_PER_SHARD).pluck(:stream_item_id)
+    stream_item_ids = @current_user.visible_stream_item_instances(:contexts => contexts)
+                                   .where("stream_item_id > ?", Shard::IDS_PER_SHARD).pluck(:stream_item_id)
     if stream_item_ids.any?
-      unread_stream_item_ids = @current_user.visible_stream_item_instances(:contexts => contexts).
-        where("stream_item_id > ?", Shard::IDS_PER_SHARD).
-        where(:workflow_state => "unread").pluck(:stream_item_id)
+      unread_stream_item_ids = @current_user.visible_stream_item_instances(:contexts => contexts)
+                                            .where("stream_item_id > ?", Shard::IDS_PER_SHARD)
+                                            .where(:workflow_state => "unread").pluck(:stream_item_id)
 
       total_counts = StreamItem.where(:id => stream_item_ids).except(:order).group(:asset_type, :notification_category).count
       if unread_stream_item_ids.any?
         unread_counts = StreamItem.where(:id => unread_stream_item_ids).except(:order).group(:asset_type, :notification_category).count
       end
 
-      if total_counts.keys.any?{|k| k[0] == 'DiscussionTopic'}
-        ann_scope = StreamItem.where(:stream_items => {:asset_type => "DiscussionTopic"}).
-          joins(:discussion_topic).
-          where("discussion_topics.type = ?", "Announcement")
+      if total_counts.keys.any? { |k| k[0] == 'DiscussionTopic' }
+        ann_scope = StreamItem.where(:stream_items => { :asset_type => "DiscussionTopic" })
+                              .joins(:discussion_topic)
+                              .where("discussion_topics.type = ?", "Announcement")
         ann_total = ann_scope.where(:id => stream_item_ids).count
 
         if ann_total > 0

@@ -62,7 +62,7 @@ module CC
           :href => syl_rel_path,
           :intendeduse => "syllabus"
         ) do |res|
-          res.file(:href=>syl_rel_path)
+          res.file(:href => syl_rel_path)
         end
       end
 
@@ -74,14 +74,12 @@ module CC
         "type" => Manifest::LOR,
         :href => canvas_export_path
       ) do |res|
-
         resources.each do |resource|
-          res.file(:href=>resource) if resource
+          res.file(:href => resource) if resource
         end
 
         res.file(:href => canvas_export_path)
       end
-
     end
 
     # Method Summary
@@ -94,14 +92,14 @@ module CC
       canvas_export_file = File.open(path, 'w')
 
       # Fun panda joke!
-      canvas_export_file << <<-JOKE
-Q: What did the panda say when he was forced out of his natural habitat?
-A: This is un-BEAR-able
-JOKE
+      canvas_export_file << <<~JOKE
+        Q: What did the panda say when he was forced out of his natural habitat?
+        A: This is un-BEAR-able
+      JOKE
       canvas_export_file.close
     end
 
-    def create_syllabus(io_object=nil)
+    def create_syllabus(io_object = nil)
       syl_rel_path = nil
 
       unless io_object
@@ -115,22 +113,21 @@ JOKE
       syl_rel_path
     end
 
-    def create_course_settings(migration_id, document=nil)
+    def create_course_settings(migration_id, document = nil)
       if document
         course_file = nil
         rel_path = nil
       else
         course_file = File.new(File.join(@canvas_resource_dir, CCHelper::COURSE_SETTINGS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::COURSE_SETTINGS)
-        document = Builder::XmlMarkup.new(:target=>course_file, :indent=>2)
+        document = Builder::XmlMarkup.new(:target => course_file, :indent => 2)
       end
 
       document.instruct!
       document.course("identifier" => migration_id,
                       "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                      "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                      "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-      ) do |c|
+                      "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                      "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}") do |c|
         c.title @course.name
         c.course_code @course.course_code
         c.start_at ims_datetime(@course.start_at, nil)

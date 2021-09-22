@@ -33,6 +33,7 @@ module MicrosoftSync
     GROUP_USERS_BATCH_SIZE = 20
 
     attr_reader :http
+
     delegate :request, :expand_options, :get_paginated_list, :run_batch, :quote_value, to: :http
 
     def initialize(tenant, extra_statsd_tags)
@@ -44,7 +45,7 @@ module MicrosoftSync
     # === Education Classes: ===
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
-    def list_education_classes(options={}, &blk)
+    def list_education_classes(options = {}, &blk)
       check_for_expected_errors = lambda do |resp|
         if resp.code == 400 && resp.body =~ /Education_ObjectType.*does not exist as.*property/
           Errors::NotEducationTenant.new
@@ -53,8 +54,8 @@ module MicrosoftSync
 
       get_paginated_list(
         'education/classes', quota: [1, 0],
-        expected_error_block: check_for_expected_errors,
-        **options, &blk
+                             expected_error_block: check_for_expected_errors,
+                             **options, &blk
       )
     end
 
@@ -70,17 +71,17 @@ module MicrosoftSync
 
     # Used for debugging. Example:
     # get_group('id', select: %w[microsoft_EducationClassLmsExt microsoft_EducationClassSisExt])
-    def get_group(group_id, options={})
+    def get_group(group_id, options = {})
       request(:get, "groups/#{group_id}", quota: [1, 0], query: expand_options(**options))
     end
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
-    def list_group_members(group_id, options={}, &blk)
+    def list_group_members(group_id, options = {}, &blk)
       get_paginated_list("groups/#{group_id}/members", quota: [3, 0], **options, &blk)
     end
 
     # Yields (results, next_link) for each page, or returns first page of results if no block given.
-    def list_group_owners(group_id, options={}, &blk)
+    def list_group_owners(group_id, options = {}, &blk)
       get_paginated_list("groups/#{group_id}/owners", quota: [2, 0], **options, &blk)
     end
 
@@ -118,6 +119,7 @@ module MicrosoftSync
       end
 
       raise Errors::MissingOwners if expected_error == :missing_owners
+
       split_request_ids_to_hash(failed_req_ids)
     end
 
@@ -140,10 +142,10 @@ module MicrosoftSync
 
       body = {}
       unless members.empty?
-        body['members@odata.bind'] = members.map{|m| DIRECTORY_OBJECT_PREFIX + m}
+        body['members@odata.bind'] = members.map { |m| DIRECTORY_OBJECT_PREFIX + m }
       end
       unless owners.empty?
-        body['owners@odata.bind'] = owners.map{|o| DIRECTORY_OBJECT_PREFIX + o}
+        body['owners@odata.bind'] = owners.map { |o| DIRECTORY_OBJECT_PREFIX + o }
       end
 
       # Irregular write cost of adding members, about users_added/3, according to Microsoft.
@@ -163,8 +165,8 @@ module MicrosoftSync
       return nil if req_ids.blank?
 
       req_ids
-        .group_by{|id| id.split("_").first.to_sym}
-        .transform_values{|ids| ids.map{|id| id.split("_").last}}
+        .group_by { |id| id.split("_").first.to_sym }
+        .transform_values { |ids| ids.map { |id| id.split("_").last } }
     end
 
     # === Teams ===
@@ -192,7 +194,7 @@ module MicrosoftSync
 
     # === Users ===
 
-    def list_users(options={}, &blk)
+    def list_users(options = {}, &blk)
       get_paginated_list('users', quota: [2, 0], **options, &blk)
     end
 

@@ -20,7 +20,6 @@
 require 'turnitin_api'
 module Turnitin
   class TiiClient < TurnitinApi::OutcomesResponseTransformer
-
     def initialize(user, assignment, tool, outcomes_response_json)
       lti_params = {
         'user_id' => Lti::Asset.opaque_identifier_for(user),
@@ -48,6 +47,5 @@ module Turnitin
         status: "scored"
       }
     end
-
   end
 end

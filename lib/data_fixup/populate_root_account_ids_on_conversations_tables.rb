@@ -20,17 +20,17 @@
 module DataFixup::PopulateRootAccountIdsOnConversationsTables
   def self.run(min, max)
     Conversation.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
-      ConversationParticipant.joins(:conversation).
-        where(conversation: batch_min..batch_max).
-        update_all("root_account_ids=conversations.root_account_ids")
+      ConversationParticipant.joins(:conversation)
+                             .where(conversation: batch_min..batch_max)
+                             .update_all("root_account_ids=conversations.root_account_ids")
 
       messages = ConversationMessage.joins(:conversation).where(conversation: batch_min..batch_max)
       messages.update_all("root_account_ids=conversations.root_account_ids")
 
       # only has FK to ConversationMessage and ConversationParticipant, not Conversation
-      ConversationMessageParticipant.joins(:conversation_message).
-        where(conversation_message: messages).
-        update_all("root_account_ids=conversation_messages.root_account_ids")
+      ConversationMessageParticipant.joins(:conversation_message)
+                                    .where(conversation_message: messages)
+                                    .update_all("root_account_ids=conversation_messages.root_account_ids")
     end
   end
 end

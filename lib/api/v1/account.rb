@@ -38,7 +38,7 @@ module Api::V1::Account
     @@extensions.delete(extension)
   end
 
-  def account_json(account, user, session, includes, read_only=false)
+  def account_json(account, user, session, includes, read_only = false)
     attributes = %w(id name parent_account_id root_account_id workflow_state uuid)
     if read_only
       return api_json(account, user, session, :only => attributes).tap do |hash|
@@ -69,7 +69,7 @@ module Api::V1::Account
         end
       end
       if includes.include?('services') && account.grants_right?(user, session, :manage_account_settings)
-        hash['services'] = Hash[Account.services_exposed_to_ui_hash(nil, user, account).keys.map{|k| [k, account.service_enabled?(k)]}]
+        hash['services'] = Hash[Account.services_exposed_to_ui_hash(nil, user, account).keys.map { |k| [k, account.service_enabled?(k)] }]
       end
 
       @@extensions.each do |extension|
@@ -79,6 +79,6 @@ module Api::V1::Account
   end
 
   def accounts_json(accounts, user, session, includes)
-    accounts.map{ |account| account_json(account, user, session, includes) }
+    accounts.map { |account| account_json(account, user, session, includes) }
   end
 end

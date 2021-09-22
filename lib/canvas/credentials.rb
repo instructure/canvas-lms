@@ -37,6 +37,7 @@ module Canvas
     end
 
     private
+
     def options
       @options ||= ActiveSupport::InheritableOptions.new(config)
     end

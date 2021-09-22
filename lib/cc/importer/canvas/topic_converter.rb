@@ -48,7 +48,7 @@ module CC::Importer::Canvas
       [topics, announcements]
     end
 
-    def convert_topic(cc_doc, meta_doc, mig_id=nil)
+    def convert_topic(cc_doc, meta_doc, mig_id = nil)
       topic = {}
       topic['description'] = get_node_val(cc_doc, 'text')
       topic['title'] = get_node_val(cc_doc, 'title')
@@ -80,6 +80,5 @@ module CC::Importer::Canvas
 
       topic
     end
-
   end
 end

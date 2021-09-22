@@ -19,8 +19,8 @@
 
 module Canvas::Migration::ExternalContent
   class Translator
-
     attr_reader :content_migration, :content_export
+
     def initialize(content_migration: nil, content_export: nil)
       @content_migration = content_migration
       @content_export = content_export
@@ -37,7 +37,7 @@ module Canvas::Migration::ExternalContent
     def translate_data(data, translate_type)
       case data
       when Array
-        data.each{|item| translate_data(item, translate_type)}
+        data.each { |item| translate_data(item, translate_type) }
       when Hash
         data.each do |key, item|
           if item.is_a?(Hash) || item.is_a?(Array)
@@ -106,13 +106,15 @@ module Canvas::Migration::ExternalContent
       if (item = content_migration.find_imported_migration_item(obj_class, migration_id))
         return item.id
       end
+
       # most of the time, the new canvas object have been imported with the current import
       # but it may have been imported earlier as a selective import
       # so we can search for it in the course just to be sure
-      obj_type = TYPES_TO_CLASSES.detect{|_k, v| v == obj_class}.first
+      obj_type = TYPES_TO_CLASSES.detect { |_k, v| v == obj_class }.first
       if (item = content_migration.context.send(obj_type.pluralize).where(:migration_id => migration_id).first)
         return item.id
       end
+
       NOT_FOUND
     end
   end

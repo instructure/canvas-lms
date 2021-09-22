@@ -19,7 +19,7 @@
 #
 module CC
   module Rubrics
-    def create_rubrics(document=nil)
+    def create_rubrics(document = nil)
       return nil unless @course.rubric_associations.count > 0
 
       # There can be multiple rubric associations to the same rubric, only export each rubric once
@@ -31,23 +31,24 @@ module CC
       else
         rubrics_file = File.new(File.join(@canvas_resource_dir, CCHelper::RUBRICS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::RUBRICS)
-        document = Builder::XmlMarkup.new(:target=>rubrics_file, :indent=>2)
+        document = Builder::XmlMarkup.new(:target => rubrics_file, :indent => 2)
       end
 
       document.instruct!
       document.rubrics(
-          "xmlns" => CCHelper::CANVAS_NAMESPACE,
-          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |rubrics_node|
         @course.rubric_associations.each do |assoc|
           rubric = assoc.rubric
           next if rubric.nil? || !rubric.active? || imported_rubrics[rubric.id]
+
           if !export_object?(rubric)
             next if assoc.association_type != "Assignment"
 
             assignment = assoc.association_object
-            next unless [assignment, assignment.quiz, assignment.discussion_topic, assignment.wiki_page].compact.any?{|o| export_object?(o)}
+            next unless [assignment, assignment.quiz, assignment.discussion_topic, assignment.wiki_page].compact.any? { |o| export_object?(o) }
           end
           imported_rubrics[rubric.id] = true
           rubric.learning_outcome_alignments.each do |align|
@@ -57,7 +58,7 @@ module CC
           add_exported_asset(rubric)
 
           migration_id = create_key(rubric)
-          rubrics_node.rubric(:identifier=>migration_id) do |r_node|
+          rubrics_node.rubric(:identifier => migration_id) do |r_node|
             atts = [:read_only, :title, :reusable, :public, :points_possible,
                     :hide_score_total, :free_form_criterion_comments]
             if rubric.context != @course
@@ -75,7 +76,6 @@ module CC
                 end
               end
             end
-
           end
         end
       end
@@ -116,9 +116,7 @@ module CC
             end
           end
         end
-
       end
     end
-
   end
 end

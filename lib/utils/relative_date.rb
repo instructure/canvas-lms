@@ -20,7 +20,7 @@ module Utils
   class RelativeDate
     attr_reader :date, :zone
 
-    def initialize(date, zone=nil)
+    def initialize(date, zone = nil)
       @date = date
       @zone = zone || Time.zone
     end
@@ -46,6 +46,7 @@ module Utils
     end
 
     private
+
     def today
       zone.today
     end

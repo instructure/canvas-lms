@@ -57,12 +57,14 @@ module Canvas::Security
     def aud
       return if errors?
       return if (Array(@jwt.aud) & Array(@expected_aud)).present?
+
       errors.add(:base, "the 'aud' is invalid")
     end
 
     def exp
       errors.add(:base, "the 'exp' must be a number") if @jwt.exp.present? && !@jwt.exp.is_a?(Numeric)
       return if errors?
+
       exp_time = Time.zone.at(@jwt.exp)
       errors.add(:base, "the JWT has expired") if exp_time < Time.zone.now
     end
@@ -70,6 +72,7 @@ module Canvas::Security
     def iat
       errors.add(:base, "the 'iat' must be a number") if @jwt.iat.present? && !@jwt.iat.is_a?(Numeric)
       return if errors?
+
       iat_time = Time.zone.at(@jwt.iat)
       iat_future_buffer = Setting.get("oauth2_jwt_iat_future_buffer", 30.seconds.to_s).to_i.seconds
       errors.add(:base, "the 'iat' must be less than #{@max_iat_age} seconds old") if iat_time < @max_iat_age.ago
@@ -78,6 +81,7 @@ module Canvas::Security
 
     def jti
       return if errors? || @skip_jti_check
+
       nonce_duration = (@jwt.exp.to_i - @jwt.iat.to_i).seconds
       nonce_key = "nonce:#{@jwt.sub}:#{@jwt.jti}"
       unless Lti::Security.check_and_store_nonce(nonce_key, @jwt.iat, nonce_duration)

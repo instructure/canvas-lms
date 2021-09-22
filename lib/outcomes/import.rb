@@ -20,6 +20,7 @@
 module Outcomes
   module Import
     class InvalidDataError < RuntimeError; end
+
     class DataFormatError < RuntimeError; end
 
     OBJECT_ONLY_FIELDS = %i[calculation_method calculation_int ratings].freeze
@@ -28,6 +29,7 @@ module Outcomes
     def check_object(object)
       %i[vendor_guid title].each do |field|
         next if object[field].present?
+
         raise InvalidDataError, I18n.t(
           'The "%{field}" field is required', field: field
         )
@@ -78,6 +80,7 @@ module Outcomes
 
       parents = find_parents(group)
       raise InvalidDataError, I18n.t("An outcome group can only have one parent") if parents.length > 1
+
       parent = parents.first
 
       model = find_prior_group(group)
@@ -200,6 +203,7 @@ module Outcomes
         vendor_guid = outcome[:vendor_guid]
         prior = LearningOutcome.where(vendor_guid: vendor_guid).active_first.first
         return prior if prior
+
         LearningOutcome.new(vendor_guid: vendor_guid)
       end
     end
@@ -242,21 +246,22 @@ module Outcomes
       return [root_parent] if object[:parent_guids].nil? || object[:parent_guids].blank?
 
       guids = object[:parent_guids].strip.split
-      LearningOutcomeGroup.where(context: context, outcome_import_id: outcome_import_id).
-        where(vendor_guid: guids).
-        tap do |parents|
-          if parents.length < guids.length
-            missing = guids - parents.map(&:vendor_guid)
-            raise InvalidDataError, I18n.t(
-              'Parent references not found prior to this row: %{missing}',
-              missing: missing.inspect,
-            )
-          end
+      LearningOutcomeGroup.where(context: context, outcome_import_id: outcome_import_id)
+                          .where(vendor_guid: guids)
+                          .tap do |parents|
+        if parents.length < guids.length
+          missing = guids - parents.map(&:vendor_guid)
+          raise InvalidDataError, I18n.t(
+            'Parent references not found prior to this row: %{missing}',
+            missing: missing.inspect,
+          )
         end
+      end
     end
 
     def context_visible?(other_context)
       return true if other_context.nil?
+
       other_context == context || context.account_chain.include?(other_context)
     end
 
@@ -264,10 +269,10 @@ module Outcomes
       existing_links = ContentTag.learning_outcome_links.where(context: context, content: outcome)
 
       next_parent_ids = parents.map(&:id)
-      resurrect = existing_links.
-        where(associated_asset_id: next_parent_ids).
-        where(associated_asset_type: 'LearningOutcomeGroup').
-        where(workflow_state: 'deleted')
+      resurrect = existing_links
+                  .where(associated_asset_id: next_parent_ids)
+                  .where(associated_asset_type: 'LearningOutcomeGroup')
+                  .where(workflow_state: 'deleted')
       resurrect.update_all(workflow_state: 'active')
 
       # add new parents before removing old to avoid deleting last link
@@ -276,10 +281,10 @@ module Outcomes
       new_parents = parents.reject { |p| existing_parent_ids.include?(p.id) }
       new_parents.each { |p| p.add_outcome(outcome) }
 
-      kill = existing_links.
-        where.not(associated_asset_id: next_parent_ids).
-        where(associated_asset_type: 'LearningOutcomeGroup').
-        where(workflow_state: 'active')
+      kill = existing_links
+             .where.not(associated_asset_id: next_parent_ids)
+             .where(associated_asset_type: 'LearningOutcomeGroup')
+             .where(workflow_state: 'active')
       kill.destroy_all
     end
 

@@ -25,13 +25,11 @@ module Canvas
   Redis = CanvasCache::Redis
 end
 
-
 # TODO: the connection management being delegated here
 # isn't necessarily part of the canvas_cache gem.
 # Once callsites have been updated to use the RedisConnections module
 # instead, we can drop this module re-openning.
 class << Canvas::Redis
-
   # technically this is just disconnect_redis, because new connections are created lazily,
   # but we didn't want to rename it when there are several uses of it
   def reconnect_redis

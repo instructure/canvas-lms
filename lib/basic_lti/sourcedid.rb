@@ -57,14 +57,15 @@ module BasicLTI
 
       tag = assignment.external_tool_tag
       raise Errors::InvalidSourceId, 'Assignment is no longer associated with this tool' unless tag &&
-        (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
-        tool.workflow_state != 'deleted'
+                                                                                                (tool.matches_url?(tag.url, false) || tool.matches_tool_domain?(tag.url)) &&
+                                                                                                tool.workflow_state != 'deleted'
     end
 
     def self.load!(sourcedid_string)
       raise Errors::InvalidSourceId, 'Invalid sourcedid' if sourcedid_string.blank?
+
       token = load_from_legacy_sourcedid!(sourcedid_string) ||
-        token_from_sourcedid!(sourcedid_string)
+              token_from_sourcedid!(sourcedid_string)
 
       tool = ContextExternalTool.find_by(id: token[:tool_id])
       course = Course.active.find_by(id: token[:course_id])
@@ -84,9 +85,11 @@ module BasicLTI
       if md
         tool = ContextExternalTool.find_by(id: md[1])
         raise Errors::InvalidSourceId, 'Tool is invalid' unless tool
+
         new_encoding = [md[1], md[2], md[3], md[4]].join('-')
-        raise Errors::InvalidSourceId, 'Invalid signature' unless Canvas::Security.
-            verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+        raise Errors::InvalidSourceId, 'Invalid signature' unless Canvas::Security
+                                                                  .verify_hmac_sha1(md[5], new_encoding, key: tool.shard.settings[:encryption_key])
+
         token = { tool_id: md[1].to_i, course_id: md[2], assignment_id: md[3], user_id: md[4] }
       end
       token

@@ -20,7 +20,6 @@
 require 'lti_advantage'
 
 module Lti::Messages
-
   # Base class for all LTI Message "factory" classes.
   #
   # This class, and it's child classes, are responsible
@@ -56,6 +55,7 @@ module Lti::Messages
 
     def generate_post_payload_message(validate_launch: true)
       raise 'Class can only be used once.' if @used
+
       @used = true
 
       add_security_claims! if include_claims?(:security)
@@ -103,8 +103,8 @@ module Lti::Messages
 
     def target_link_uri
       @opts[:target_link_uri] ||
-      @tool.extension_setting(@opts[:resource_type], :target_link_uri) ||
-      @tool.url
+        @tool.extension_setting(@opts[:resource_type], :target_link_uri) ||
+        @tool.url
     end
 
     def add_context_claims!
@@ -192,7 +192,7 @@ module Lti::Messages
     end
 
     def expand_variable(variable)
-      @expander.expand_variables!({value: variable})[:value]
+      @expander.expand_variables!({ value: variable })[:value]
     end
 
     def current_observee_list
@@ -200,10 +200,10 @@ module Lti::Messages
       return nil if @user.blank?
 
       @_current_observee_list ||= begin
-        @user.observer_enrollments.current.
-          where(course_id: @context.id).
-          preload(:associated_user).
-          map { |e| e.try(:associated_user).try(:lti_id) }.compact
+        @user.observer_enrollments.current
+             .where(course_id: @context.id)
+             .preload(:associated_user)
+             .map { |e| e.try(:associated_user).try(:lti_id) }.compact
       end
     end
 
@@ -231,6 +231,7 @@ module Lti::Messages
 
     def add_extension(key, value)
       return unless include_extension?(key.to_sym)
+
       @message.extensions["#{JwtMessage::EXTENSION_PREFIX}#{key}"] = value
     end
   end

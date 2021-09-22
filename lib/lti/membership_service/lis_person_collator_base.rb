@@ -23,7 +23,7 @@ module Lti
     class LisPersonCollatorBase < CollatorBase
       attr_reader :user
 
-      def initialize(context, user, opts={})
+      def initialize(context, user, opts = {})
         super(context, opts)
         @user = user
       end

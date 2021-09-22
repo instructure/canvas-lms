@@ -37,10 +37,10 @@ module Lti
         elsif asset.lti_context_id?
           lti_context_id = (old_id = old_id_for_user_in_context(asset, context)) ? old_id : asset.lti_context_id
         else
-          GuardRail.activate(:primary) {asset.reload}
+          GuardRail.activate(:primary) { asset.reload }
           unless asset.lti_context_id
             asset.lti_context_id = global_context_id
-            GuardRail.activate(:primary) {asset.save!}
+            GuardRail.activate(:primary) { asset.save! }
           end
           lti_context_id = asset.lti_context_id
         end
@@ -66,12 +66,14 @@ module Lti
       shard ||= asset.shard
       str = asset.asset_string.to_s
       raise "Empty value" if str.blank?
+
       Canvas::Security.hmac_sha1(str, shard.settings[:encryption_key])
     end
 
     def self.global_context_id_for(asset)
       str = asset.global_asset_string.to_s
       raise "Empty value" if str.blank?
+
       Canvas::Security.hmac_sha1(str, asset.shard.settings[:encryption_key])
     end
   end

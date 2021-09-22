@@ -46,12 +46,13 @@ module DataFixup::Lti::UpdateCustomParams
 
       search(domains, subdomain_matching, validate_domain) do |tool|
         tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
-          settings: tool.settings.deep_merge({
-            "custom_fields" => custom_fields
-          })
-        })
+                                                                                      settings: tool.settings.deep_merge({
+                                                                                                                           "custom_fields" => custom_fields
+                                                                                                                         })
+                                                                                    })
 
         return failures << tool unless tool.save
+
         logger "Successfully migrated tool @ #{tool.url} !"
       end
 
@@ -81,7 +82,7 @@ module DataFixup::Lti::UpdateCustomParams
       subdomain_match = subdomain_matching ? '(\\w*\\.)?' : ''
 
       tools = ContextExternalTool.active.where(
-        '"context_external_tools".url ~ ANY (array[?])', domains.map {|d| "^https?://#{subdomain_match}#{d}/" }
+        '"context_external_tools".url ~ ANY (array[?])', domains.map { |d| "^https?://#{subdomain_match}#{d}/" }
       )
       tools
     end

@@ -44,6 +44,7 @@ module Canvas
 
           def instrument(job)
             return yield job unless tracer&.enabled
+
             job_name = job.name
             tracer.trace("inst_jobs", service: "canvas_jobs", resource: job_name) do |span|
               span.set_tag("inst_jobs.id", job.id)
@@ -66,6 +67,7 @@ module Canvas
 
           def tracer
             return @tracer if @tracer.present?
+
             Datadog.tracer
           end
         end

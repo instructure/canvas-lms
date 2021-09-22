@@ -20,7 +20,6 @@
 
 # Public: Delete old (> 90 days) records from delayed_messages table.
 class DelayedMessageScrubber < MessageScrubber
-
   protected
 
   def filter_attribute

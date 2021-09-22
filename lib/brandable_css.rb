@@ -156,14 +156,16 @@ module BrandableCSS
 
     def handle_urls(value, config, css_urls)
       return value unless config['type'] == 'image' && css_urls
+
       "url('#{value}')" if value.present?
     end
 
     # gets the *effective* value for a brandable variable
-    def brand_variable_value(variable_name, active_brand_config=nil, config_map=variables_map, css_urls=false)
+    def brand_variable_value(variable_name, active_brand_config = nil, config_map = variables_map, css_urls = false)
       config = config_map[variable_name]
       explicit_value = active_brand_config && active_brand_config.get_value(variable_name).presence
       return handle_urls(explicit_value, config, css_urls) if explicit_value
+
       default = config['default']
       if default && default.starts_with?('$')
         if css_urls
@@ -179,7 +181,7 @@ module BrandableCSS
       handle_urls(default, config, css_urls)
     end
 
-    def computed_variables(active_brand_config=nil)
+    def computed_variables(active_brand_config = nil)
       [
         ['ic-brand-primary', 'darken', 5],
         ['ic-brand-primary', 'darken', 10],
@@ -197,28 +199,28 @@ module BrandableCSS
         ['ic-link-color', 'lighten', 10],
       ].each_with_object({}) do |(variable_name, darken_or_lighten, percent), memo|
         color = brand_variable_value(variable_name, active_brand_config, variables_map_with_image_urls)
-        computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent/100.0)
+        computed_color = CanvasColor::Color.new(color).send(darken_or_lighten, percent / 100.0)
         memo["#{variable_name}-#{darken_or_lighten}ed-#{percent}"] = computed_color.to_s
       end
     end
 
-    def all_brand_variable_values(active_brand_config=nil, css_urls=false)
+    def all_brand_variable_values(active_brand_config = nil, css_urls = false)
       variables_map.each_with_object(computed_variables(active_brand_config)) do |(key, _), memo|
         memo[key] = brand_variable_value(key, active_brand_config, variables_map_with_image_urls, css_urls)
       end
     end
 
-    def all_brand_variable_values_as_json(active_brand_config=nil)
+    def all_brand_variable_values_as_json(active_brand_config = nil)
       all_brand_variable_values(active_brand_config).to_json
     end
 
-    def all_brand_variable_values_as_js(active_brand_config=nil)
+    def all_brand_variable_values_as_js(active_brand_config = nil)
       "CANVAS_ACTIVE_BRAND_VARIABLES = #{all_brand_variable_values_as_json(active_brand_config)};"
     end
 
-    def all_brand_variable_values_as_css(active_brand_config=nil)
+    def all_brand_variable_values_as_css(active_brand_config = nil)
       ":root {
-        #{all_brand_variable_values(active_brand_config, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
+        #{all_brand_variable_values(active_brand_config, true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
       }"
     end
 
@@ -230,24 +232,24 @@ module BrandableCSS
       public_brandable_css_folder.join('default')
     end
 
-    def default_brand_file(type, high_contrast=false)
+    def default_brand_file(type, high_contrast = false)
       default_brand_folder.join("variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}")
     end
 
     def high_contrast_overrides
       Class.new do
         def get_value(variable_name)
-          {"ic-brand-primary" => "#0770A3", "ic-link-color" => "#0073A7"}[variable_name]
+          { "ic-brand-primary" => "#0770A3", "ic-link-color" => "#0073A7" }[variable_name]
         end
       end.new
     end
 
-    def default(type, high_contrast=false)
+    def default(type, high_contrast = false)
       bc = high_contrast ? high_contrast_overrides : nil
       send("all_brand_variable_values_as_#{type}", bc)
     end
 
-    def save_default!(type, high_contrast=false)
+    def save_default!(type, high_contrast = false)
       default_brand_folder.mkpath
       default_brand_file(type, high_contrast).write(default(type, high_contrast))
       move_default_to_s3_if_enabled!(type, high_contrast)
@@ -259,8 +261,9 @@ module BrandableCSS
       end
     end
 
-    def move_default_to_s3_if_enabled!(type, high_contrast=false)
+    def move_default_to_s3_if_enabled!(type, high_contrast = false)
       return unless defined?(Canvas) && Canvas::Cdn.enabled?
+
       s3_uploader.upload_file(public_default_path(type, high_contrast))
       begin
         File.delete(default_brand_file(type, high_contrast))
@@ -272,7 +275,7 @@ module BrandableCSS
       @s3_uploaderer ||= Canvas::Cdn::S3Uploader.new
     end
 
-    def public_default_path(type, high_contrast=false)
+    def public_default_path(type, high_contrast = false)
       "dist/brandable_css/default/variables#{high_contrast ? '-high_contrast' : ''}-#{default_variables_md5}.#{type}"
     end
 
@@ -281,13 +284,14 @@ module BrandableCSS
     end
 
     def brandable_variants
-      @brandable_variants ||= CONFIG['variants'].select{|_, v| v['brandable']}.map{ |k,_| k }.freeze
+      @brandable_variants ||= CONFIG['variants'].select { |_, v| v['brandable'] }.map { |k, _| k }.freeze
     end
 
     def combined_checksums
       if defined?(ActionController) && ActionController::Base.perform_caching && defined?(@combined_checksums)
         return @combined_checksums
       end
+
       file = APP_ROOT.join(CONFIG['paths']['bundles_with_deps'])
       if file.exist?
         @combined_checksums = JSON.parse(file.read).each_with_object({}) do |(k, v), memo|
@@ -300,7 +304,7 @@ module BrandableCSS
         # if you haven't ran `brandable_css` and the manifest file doesn't exist yet.
         # eg: you want to test a controller action and you don't care that it links
         # to a css file that hasn't been created yet.
-        default_value = {:combinedChecksum => "Error: unknown css checksum. you need to run brandable_css"}.freeze
+        default_value = { :combinedChecksum => "Error: unknown css checksum. you need to run brandable_css" }.freeze
         @combined_checksums = Hash.new(default_value).freeze
       end
     end
@@ -326,6 +330,7 @@ module BrandableCSS
       key = ["#{bundle_path}.scss", variant].join(CONFIG['manifest_key_seperator'])
       fingerprint = combined_checksums[key]
       raise "Fingerprint not found. #{bundle_path} #{variant}" unless fingerprint
+
       fingerprint
     end
 
@@ -370,12 +375,12 @@ module BrandableCSS
 
   class BrandConfigWithOutCompileAssets < RuntimeError
     def initialize
-      super <<-END
+      super <<~END
 
-It looks like you are running a migration before running `rake canvas:compile_assets`
-compile_assets needs to complete before running db:migrate if brand_configs have not run
+        It looks like you are running a migration before running `rake canvas:compile_assets`
+        compile_assets needs to complete before running db:migrate if brand_configs have not run
 
-run `rake canvas:compile_assets` and then try migrations again.
+        run `rake canvas:compile_assets` and then try migrations again.
 
       END
     end
@@ -383,32 +388,32 @@ run `rake canvas:compile_assets` and then try migrations again.
 
   class DefaultMD5NotUpToDateError < RuntimeError
     def initialize
-      super <<-END
+      super <<~END
 
-Something has changed about the default variables or images used in the Theme Editor.
-If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json
-or one of the images it references, it probably meeans your local setup is out of date.
+        Something has changed about the default variables or images used in the Theme Editor.
+        If you are seeing this and _you_ did not make changes to either app/stylesheets/brandable_variables.json
+        or one of the images it references, it probably meeans your local setup is out of date.
 
-First, make sure you run `rake db:migrate`
-and then run `./script/nuke_node.sh`
+        First, make sure you run `rake db:migrate`
+        and then run `./script/nuke_node.sh`
 
-If that does not resolve the issue, it probably means you _did_ update one of those json variables
-in app/stylesheets/brandable_variables.json or one of the images it references so you need to rename
-the db migrations that makes sure when this change is deployed or checked out by anyone else
-makes a new .css file for the css variables for each brand based on these new defaults.
-To do that, run this command and then restart your rails process. (for local dev, if you want the
-changes to show up in the ui, make sure you also run `rake db:migrate` afterwards).
+        If that does not resolve the issue, it probably means you _did_ update one of those json variables
+        in app/stylesheets/brandable_variables.json or one of the images it references so you need to rename
+        the db migrations that makes sure when this change is deployed or checked out by anyone else
+        makes a new .css file for the css variables for each brand based on these new defaults.
+        To do that, run this command and then restart your rails process. (for local dev, if you want the
+        changes to show up in the ui, make sure you also run `rake db:migrate` afterwards).
 
-ONLY DO THIS IF YOU REALLY DID MEAN TO MAKE A CHANGE TO THE DEFAULT BRANDING STUFF:
+        ONLY DO THIS IF YOU REALLY DID MEAN TO MAKE A CHANGE TO THE DEFAULT BRANDING STUFF:
 
-mv db/migrate/*_#{MIGRATION_NAME.underscore}_predeploy.rb \\
-   db/migrate/#{BrandableCSS.migration_version}_#{MIGRATION_NAME.underscore}_predeploy.rb \\
-&& \\
-mv db/migrate/*_#{MIGRATION_NAME.underscore}_postdeploy.rb \\
-   db/migrate/#{BrandableCSS.migration_version + 1}_#{MIGRATION_NAME.underscore}_postdeploy.rb
+        mv db/migrate/*_#{MIGRATION_NAME.underscore}_predeploy.rb \\
+           db/migrate/#{BrandableCSS.migration_version}_#{MIGRATION_NAME.underscore}_predeploy.rb \\
+        && \\
+        mv db/migrate/*_#{MIGRATION_NAME.underscore}_postdeploy.rb \\
+           db/migrate/#{BrandableCSS.migration_version + 1}_#{MIGRATION_NAME.underscore}_postdeploy.rb
 
-FYI, current variables are: #{BrandableCSS.things_that_go_into_defaults_md5}
-END
+        FYI, current variables are: #{BrandableCSS.things_that_go_into_defaults_md5}
+      END
     end
   end
 end

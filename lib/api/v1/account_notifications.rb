@@ -22,7 +22,7 @@ module Api::V1::AccountNotifications
   include Api::V1::Json
 
   def account_notifications_json(account_notifications, user, session)
-    account_notifications.map {|n| account_notification_json(n, user, session) }
+    account_notifications.map { |n| account_notification_json(n, user, session) }
   end
 
   def account_notification_json(account_notification, user, session)
@@ -31,6 +31,4 @@ module Api::V1::AccountNotifications
     json['roles'] = account_notification.account_notification_roles.map(&:role_name)
     json
   end
-
 end
-
