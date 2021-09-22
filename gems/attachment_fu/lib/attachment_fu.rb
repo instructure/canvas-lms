@@ -74,7 +74,8 @@ module AttachmentFu # :nodoc:
     # *  <tt>:path_prefix</tt> - path to store the uploaded files.  Uses public/#{table_name} by default for the filesystem, and just #{table_name}
     #      for the S3 backend.  Setting this sets the :storage to :file_system.
     # *  <tt>:storage</tt> - Use :file_system to specify the attachment data is stored with the file system.  Defaults to :db_system.
-
+    #
+    # *  <tt>:use_sha512_digests</tt> - Use the SHA512 digest for files. Default is to use MD5.
     # *  <tt>:keep_profile</tt> By default image EXIF data will be stripped to minimize image size. For small thumbnails this proivides important savings. Picture quality is not affected. Set to false if you want to keep the image profile as is. ImageScience will allways keep EXIF data.
     #
     # Examples:
@@ -87,7 +88,7 @@ module AttachmentFu # :nodoc:
     #   has_attachment :thumbnails => { :thumb => [50, 50], :geometry => 'x50' }
     #   has_attachment :storage => :file_system, :path_prefix => 'public/files'
     #   has_attachment :storage => :file_system, :path_prefix => 'public/files',
-    #     :content_type => :image, :resize_to => [50,50]
+    #     :content_type => :image, :resize_to => [50,50], :use_sha512_digests => true
     #   has_attachment :storage => :file_system, :path_prefix => 'public/files',
     #     :thumbnails => { :thumb => [50, 50], :geometry => 'x50' }
     #   has_attachment :storage => :s3
@@ -217,6 +218,15 @@ module AttachmentFu # :nodoc:
         tmp.close
       end
     end
+
+    def digest_class
+      if attachment_options[:use_sha512_digests]
+        Digest::SHA512
+      else
+        Digest::MD5
+      end
+    end
+
   end
 
   module InstanceMethods
@@ -364,7 +374,7 @@ module AttachmentFu # :nodoc:
         end
         unless attachment_options[:skip_sis]
           read_bytes = false
-          digest = Digest::MD5.new
+          digest = self.class.digest_class.new
           begin
             io = file_data
             if file_from_path
