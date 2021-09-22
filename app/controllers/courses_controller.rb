@@ -2256,7 +2256,7 @@ class CoursesController < ApplicationController
               read_announcements: @context.grants_right?(@current_user, session, :read_announcements)
             },
             STUDENT_PLANNER_ENABLED: planner_enabled?,
-            TABS: @context.tabs_available(@current_user, course_subject_tabs: true),
+            TABS: @context.tabs_available(@current_user, course_subject_tabs: true, session: session),
             OBSERVER_LIST: observed_users(@current_user, session, @context.id)
           )
 
