@@ -220,7 +220,11 @@ export const IsolatedViewContainer = props => {
   const findDraftMessage = rootId => {
     let rootEntryDraftMessage = ''
     props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (draftEntry.rootEntryId === rootId && !draftEntry.discussionEntryId) {
+      if (
+        draftEntry.rootEntryId &&
+        draftEntry.rootEntryId === rootId &&
+        !draftEntry.discussionEntryId
+      ) {
         rootEntryDraftMessage = draftEntry.message
         return false
       }
@@ -400,7 +404,10 @@ export const IsolatedViewContainer = props => {
                     .nodes,
                   props.replyFromId
                 )}
-                value={findDraftMessage(props.replyFromId)}
+                value={findDraftMessage(
+                  isolatedEntryOlderDirection.data.legacyNode.root_entry_id ||
+                    isolatedEntryOlderDirection.data.legacyNode._id
+                )}
                 updateDraft={newDraftMessage => {
                   createDiscussionEntryDraft({
                     variables: {
