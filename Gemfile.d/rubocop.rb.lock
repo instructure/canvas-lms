@@ -65,9 +65,8 @@ GEM
       rubocop (>= 1.7.0, < 2.0)
     rubocop-rake (0.6.0)
       rubocop (~> 1.0)
-    rubocop-rspec (2.4.0)
-      rubocop (~> 1.0)
-      rubocop-ast (>= 1.1.0)
+    rubocop-rspec (2.5.0)
+      rubocop (~> 1.19)
     ruby-progressbar (1.10.1)
     sqlite3 (1.4.2)
     thread_safe (0.3.6)
@@ -88,7 +87,7 @@ DEPENDENCIES
   rubocop-performance (= 1.11.5)
   rubocop-rails (= 2.11.3)
   rubocop-rake (= 0.6.0)
-  rubocop-rspec (= 2.4.0)
+  rubocop-rspec (= 2.5.0)
   unicode-display_width (= 2.1.0)
 
 BUNDLED WITH
