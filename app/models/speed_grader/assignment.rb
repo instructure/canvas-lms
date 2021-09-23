@@ -168,9 +168,11 @@ module SpeedGrader
       end
 
       res[:submissions] = submissions.map do |sub|
+        submission_methods = %i(submission_history late external_tool_url entered_score entered_grade seconds_late missing)
+        submission_methods << :word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
         json = sub.as_json(
           include_root: false,
-          methods: %i(submission_history late external_tool_url entered_score entered_grade seconds_late missing),
+          methods: submission_methods,
           only: submission_json_fields
         ).merge("from_enrollment_type" => enrollment_types_by_id[sub.user_id])
 
@@ -219,8 +221,9 @@ module SpeedGrader
           json['submission_history'] = json['submission_history'].map do |version|
             # to avoid a call to the DB in Submission#missing?
             version.assignment = sub.assignment
-            version.as_json(only: submission_json_fields,
-                            methods: %i[versioned_attachments late missing external_tool_url]).tap do |version_json|
+            version_methods = %i[versioned_attachments late missing external_tool_url]
+            version_methods << :word_count if assignment.root_account.feature_enabled?(:word_count_in_speed_grader)
+            version.as_json(only: submission_json_fields, methods: version_methods).tap do |version_json|
               version_json['submission']['has_originality_report'] = version.has_originality_report?
               version_json['submission']['has_plagiarism_tool'] = version.assignment.assignment_configuration_tool_lookup_ids.present?
               version_json['submission']['has_originality_score'] = version.originality_reports_for_display.any? { |o| o.originality_score.present? }

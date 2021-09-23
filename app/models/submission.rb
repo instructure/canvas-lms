@@ -2406,6 +2406,7 @@ class Submission < ActiveRecord::Base
   def self.json_serialization_full_parameters(additional_parameters = {})
     includes = { :quiz_submission => {} }
     methods = [:submission_history, :attachments, :entered_score, :entered_grade]
+    methods << :word_count if Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
@@ -2797,6 +2798,13 @@ class Submission < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def word_count
+    return nil unless body
+
+    tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
+    @word_count ||= ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
   end
 
   private

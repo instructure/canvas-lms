@@ -7707,6 +7707,32 @@ describe Submission do
     end
   end
 
+  describe "word_count" do
+    it "returns the word count" do
+      submission.update(body: 'test submission')
+      expect(submission.word_count).to eq 2
+    end
+
+    it "returns nil if there is no body" do
+      expect(submission.body).to eq nil
+      expect(submission.word_count).to eq nil
+    end
+
+    it "returns 0 if the body is empty" do
+      submission.update(body: '')
+      expect(submission.word_count).to eq 0
+    end
+
+    it "ignores HTML tags" do
+      submission.update(body: '<span>test <div></div>submission</span> <p></p>')
+      expect(submission.word_count).to eq 2
+      submission.instance_variable_set :@word_count, nil
+      submission.update(body: '<p>This is my submission, which has&nbsp;<strong>some bold&nbsp;<em>italic text</em> in</strong> it.</p>
+        <p>A couple paragraphs, and maybe super<sup>script</sup>.&nbsp;</p>')
+      expect(submission.word_count).to eq 18
+    end
+  end
+
   context "Assignment Cache" do
     specs_require_cache(:redis_cache_store)
 
