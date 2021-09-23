@@ -15,7 +15,7 @@ linter_options = {
   campsite_mode: false,
   append_files_to_command: true,
   severe_levels: [],
-  boyscout_mode: false,
+  boyscout_mode: false
 }
 no_fail = false
 optional = false
@@ -36,6 +36,22 @@ OptionParser.new do |opts|
           TEXT
             no_fail = true
           end
+  opts.on("--all", "Run RuboCop against all files, not just changed files") do
+    linter_options[:heavy_mode] = true
+    linter_options[:append_files_to_command] = false
+  end
+  opts.on("--summary", "Print a summary of offense counts by cop, instead of individual offenses") do
+    linter_options[:comment_post_processing] = proc do |comments|
+      grouped_comments = comments.group_by do |comment|
+        comment[:message] =~ %r{^\[rubocop\]( \[Corrected\])?( \[Correctable\])? ([A-Za-z/]+)}
+        $3
+      end
+
+      require 'pp'
+      pp grouped_comments.transform_values(&:length).to_a.sort_by(&:last).reverse.to_h
+      exit 0
+    end
+  end
   opts.on("-a", "--auto-correct") do |_v|
     linter_options[:auto_correct] = true
     linter_options[:command] << " -a"
@@ -57,9 +73,7 @@ end.parse!
 # without optional, we only run against the "enforced" config. this makes it so
 # that jenkins will warn about a larger config, but the pre-commit hook can
 # auto-correct against a much smaller config.
-unless optional
-  linter_options[:command] << " -c .rubocop.enforced.yml"
-end
+linter_options[:command] << " -c .rubocop.enforced.yml" unless optional
 
 rlint = Linter.new(linter_options)
 exit 1 if !rlint.run && !no_fail
