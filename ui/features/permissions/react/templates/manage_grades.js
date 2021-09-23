@@ -78,9 +78,7 @@ export const template = generateActionTemplates(
     },
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t(
-        'To edit course grading schemes, Courses - manage / update must also be enabled.'
-      )
+      description: I18n.t('To edit course grading schemes, Courses - manage must also be enabled.')
     },
     {
       title: I18n.t('Gradebook, SpeedGrader'),

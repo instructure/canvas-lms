@@ -58,7 +58,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings on the Discussions index page, Courses - manage / update and Discussions - view must also be enabled.'
+        'To edit lock settings on the Discussions index page, Courses - manage and Discussions - view must also be enabled.'
       )
     },
     {

@@ -121,7 +121,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Modules'),
       description: I18n.t(
-        'To publish and unpublish module content, Courses - manage / update and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
+        'To publish and unpublish module content, Courses - manage and Course Content - view must also be enabled. Module items cannot be unpublished if there are student submissions.'
       )
     }
   ],

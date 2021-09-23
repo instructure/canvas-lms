@@ -19,7 +19,11 @@
 import I18n from 'i18n!permissions_templates_8'
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
-  manage_courses: () => I18n.t('conclude / delete / publish / reset'),
+  manage_courses: contextType => {
+    return contextType === 'Course'
+      ? I18n.t('conclude / delete / publish / reset')
+      : I18n.t('add / manage / conclude / delete / publish / reset')
+  },
   manage_groups: () => I18n.t('add / delete / manage'),
   manage_files: () => I18n.t('add / delete / edit'),
   manage_sections: () => I18n.t('add / delete / edit'),

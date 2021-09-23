@@ -52,7 +52,7 @@ export const template = generateActionTemplates(
   [
     {
       title: I18n.t('Course Settings'),
-      description: I18n.t('To edit course settings, Courses - manage / update must be enabled.')
+      description: I18n.t('To edit course settings, Courses - manage must be enabled.')
     },
     {
       title: I18n.t('People (Account)'),

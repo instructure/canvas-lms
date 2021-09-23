@@ -47,7 +47,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Cross-Listing'),
       description: I18n.t(
-        'To cross-list sections, Course Sections - edit and Courses - manage / update must also be enabled.'
+        'To cross-list sections, Course Sections - edit and Courses - manage must also be enabled.'
       )
     }
   ],

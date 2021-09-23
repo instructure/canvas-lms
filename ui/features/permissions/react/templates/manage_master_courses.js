@@ -51,17 +51,17 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on files, Courses - manage / update and Course Files - edit must also be enabled.'
+        'To edit lock settings on files, Courses - manage and Course Files - edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - manage / edit must also be enabled.'
+        'To edit lock settings on quizzes, Courses - manage and Assignments and Quizzes - manage / edit must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'To manage lock settings for object types, Courses - manage / update must also be enabled.'
+        'To manage lock settings for object types, Courses - manage must also be enabled.'
       )
     }
   ],
