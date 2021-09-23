@@ -59,6 +59,7 @@
 #       }
 #     }
 class Quizzes::CourseQuizExtensionsController < ApplicationController
+
   before_action :require_user, :require_context
 
   # @API Set extensions for student quiz submissions
@@ -129,8 +130,8 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
 
     # check permissions on all extensions before performing on submissions
     quiz_extensions = Quizzes::QuizExtension.build_extensions(
-      students, quizzes, params[:quiz_extensions]
-    ) do |extension|
+      students, quizzes, params[:quiz_extensions]) do |extension|
+
       unless extension.quiz_submission.grants_right?(participant.user, :add_attempts)
         reject! 'you are not allowed to change extension settings for these submissions', 403
       end
@@ -142,16 +143,17 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
     render json: serialize_jsonapi(quiz_extensions)
   end
 
+
   private
 
   def serialize_jsonapi(quiz_extensions)
     serialized_set = Canvas::APIArraySerializer.new(quiz_extensions, {
-                                                      each_serializer: Quizzes::QuizExtensionSerializer,
-                                                      controller: self,
-                                                      scope: @current_user,
-                                                      root: false,
-                                                      include_root: false
-                                                    }).as_json
+      each_serializer: Quizzes::QuizExtensionSerializer,
+      controller: self,
+      scope: @current_user,
+      root: false,
+      include_root: false
+    }).as_json
 
     { quiz_extensions: serialized_set }
   end
@@ -163,8 +165,9 @@ class Quizzes::CourseQuizExtensionsController < ApplicationController
   def students
     @context.students
   end
-
+  
   def quizzes
     @context.quizzes
   end
+
 end

@@ -20,6 +20,7 @@
 require_relative '../common'
 
 shared_context "blueprint course settings context" do
+
   def blueprint_settings_options
     f('.blueprint_setting_options')
   end
@@ -39,6 +40,7 @@ shared_context "blueprint course settings context" do
   def availability_dates_checkbox_state
     is_checked('input[name="course[blueprint_restrictions][availability_dates]"][type=checkbox]')
   end
+
 end
 
 describe "course settings/blueprint" do
@@ -131,10 +133,10 @@ describe "course settings/blueprint" do
       template.reload
       expect(template.use_default_restrictions_by_type).to be_truthy
       expect(template.default_restrictions_by_type["Assignment"]).to eq({
-                                                                          content: true, points: true, due_dates: false, availability_dates: false
+        content: true, points: true, due_dates: false, availability_dates: false
                                                                         })
       expect(template.default_restrictions_by_type["Quizzes::Quiz"]).to eq({
-                                                                             content: false, points: false, due_dates: true, availability_dates: false
+        content: false, points: false, due_dates: true, availability_dates: false
                                                                            })
     end
   end
@@ -154,5 +156,6 @@ describe "course settings/blueprint" do
       get "/courses/#{@course.id}/settings"
       expect(f('#course_blueprint')).to include_text 'Yes'
     end
+
   end
 end

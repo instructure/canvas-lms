@@ -20,6 +20,7 @@
 require_relative '../../common'
 
 module PlannerPageObject
+
   #------------------------- Selectors --------------------------
 
   def todo_sidebar_modal_selector(title = nil)
@@ -165,7 +166,7 @@ module PlannerPageObject
     fxpath("//span[contains(text(),'#{course_name}')]", scope)
   end
 
-  def course_assignment_by_due_at(time = nil)
+  def course_assignment_by_due_at(time=nil)
     fxpath("//div[contains(@class, 'PlannerApp')]//span[contains(text(),'Due: #{time}')]")
   end
 
@@ -434,9 +435,9 @@ module PlannerPageObject
 
   def new_activities_in_the_past
     old = graded_discussion_in_the_past
-    older = graded_discussion_in_the_past(Time.zone.now - 4.days, 'older')
-    oldest = graded_discussion_in_the_past(Time.zone.now - 6.days, 'oldest')
-    ancient = graded_discussion_in_the_past(Time.zone.now - 8.days, 'ancient')
+    older = graded_discussion_in_the_past(Time.zone.now-4.days, 'older')
+    oldest = graded_discussion_in_the_past(Time.zone.now-6.days, 'oldest')
+    ancient = graded_discussion_in_the_past(Time.zone.now-8.days, 'ancient')
     [old, older, oldest, ancient]
   end
 

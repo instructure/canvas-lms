@@ -20,6 +20,7 @@
 require 'spec_helper'
 
 describe GroupLeadership do
+
   describe "member_changed_event" do
     before(:once) do
       course_factory
@@ -88,7 +89,7 @@ describe GroupLeadership do
           expect(@group.leader).not_to be_nil
           @membership.destroy_permanently!
           expect(@group.reload.leader).not_to be_nil
-        end
+       end
 
         it "should not revoke when group is changed" do
           expect(@group.leader).not_to be_nil
@@ -97,6 +98,7 @@ describe GroupLeadership do
           expect(@group.reload.leader).not_to be_nil
         end
       end
+
     end
   end
 end

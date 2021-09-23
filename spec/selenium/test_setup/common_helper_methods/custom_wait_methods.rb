@@ -125,7 +125,6 @@ module CustomWaitMethods
       }
     JS
     raise "ajax requests not completed" if result == -2
-
     result
   end
 

@@ -19,6 +19,7 @@
 require_relative '../../common'
 
 module MasqueradePage
+
   # ---------------------- Controls ----------------------
 
   def act_as_label

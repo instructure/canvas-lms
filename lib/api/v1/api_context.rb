@@ -36,10 +36,9 @@ module Api::V1
     end
 
     private
-
     def pagination_options
       if @per_page
-        { :page => @page, :per_page => @per_page }
+        { :page => @page , :per_page => @per_page}
       else
         { :page => @page }
       end

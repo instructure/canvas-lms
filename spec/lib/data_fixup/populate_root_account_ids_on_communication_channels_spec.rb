@@ -36,4 +36,5 @@ describe DataFixup::PopulateRootAccountIdsOnCommunicationChannels do
       end
     end
   end
+
 end

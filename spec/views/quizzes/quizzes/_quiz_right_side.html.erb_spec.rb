@@ -59,3 +59,4 @@ describe "/quizzes/quizzes/_quiz_right_side" do
     end
   end
 end
+

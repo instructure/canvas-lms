@@ -20,8 +20,9 @@
 require_relative '../common'
 
 module CopyToTrayPage
-  # ------------------------------ Selectors -----------------------------
 
+  # ------------------------------ Selectors -----------------------------
+  
   def copy_to_dialog_css_selector
     "[role='dialog'][aria-label='Copy To...']"
   end
@@ -101,6 +102,7 @@ module CopyToTrayPage
   # the course dropdown triggers a fetch that needs to then fetch the modules
 
   def wait_for_module_search_dropdown
-    wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2 }
+    wait_for(method: nil, timeout: 1) { dropdowns_in_tray.count == 2}
   end
+
 end

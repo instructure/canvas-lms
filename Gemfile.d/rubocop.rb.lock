@@ -63,8 +63,6 @@ GEM
       activesupport (>= 4.2.0)
       rack (>= 1.1)
       rubocop (>= 1.7.0, < 2.0)
-    rubocop-rake (0.6.0)
-      rubocop (~> 1.0)
     rubocop-rspec (2.4.0)
       rubocop (~> 1.0)
       rubocop-ast (>= 1.1.0)
@@ -73,7 +71,7 @@ GEM
     thread_safe (0.3.6)
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
-    unicode-display_width (2.1.0)
+    unicode-display_width (2.0.0)
     zeitwerk (2.4.2)
 
 PLATFORMS
@@ -87,9 +85,7 @@ DEPENDENCIES
   rubocop-canvas!
   rubocop-performance (= 1.11.5)
   rubocop-rails (= 2.11.3)
-  rubocop-rake (= 0.6.0)
   rubocop-rspec (= 2.4.0)
-  unicode-display_width (= 2.1.0)
 
 BUNDLED WITH
    2.2.24

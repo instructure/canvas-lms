@@ -25,11 +25,11 @@ class Discussion
     # ---------------------- Selectors ---------------------
 
     # ---------------------- Elements ----------------------
-
+    
     def discussion_page_body
       f('body')
     end
-
+    
     def create_reply_button
       f('.discussion-reply-box')
     end
@@ -77,3 +77,4 @@ class Discussion
     end
   end
 end
+

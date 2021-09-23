@@ -19,6 +19,7 @@
 #
 
 module Api::V1::Context
+
   def context_data(obj, use_effective_code: false)
     if obj.respond_to?(:context_type) && obj.context_type.present?
       context_type = obj.context_type
@@ -39,4 +40,6 @@ module Api::V1::Context
       "#{context_type.underscore}_id" => id.to_i,
     }
   end
+
 end
+

@@ -23,6 +23,7 @@ require 'spec_helper'
 require 'nokogiri'
 
 describe AccountsController do
+
   context "SAML meta data" do
     before(:each) do
       skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?

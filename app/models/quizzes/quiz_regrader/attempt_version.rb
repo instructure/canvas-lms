@@ -19,6 +19,7 @@
 #
 
 class Quizzes::QuizRegrader::AttemptVersion
+
   attr_reader :version, :question_regrades
 
   def initialize(hash)
@@ -29,8 +30,8 @@ class Quizzes::QuizRegrader::AttemptVersion
   def regrade!
     version.model = Quizzes::QuizRegrader::Submission.new(
       :submission => version.model,
-      :question_regrades => question_regrades
-    ).rescored_submission
-    version.save!
+      :question_regrades => question_regrades).rescored_submission
+      version.save!
   end
+
 end

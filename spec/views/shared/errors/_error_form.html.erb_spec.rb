@@ -30,3 +30,4 @@ describe "shared/errors/_error_form" do
     expect(response).to include("error[user_roles]")
   end
 end
+

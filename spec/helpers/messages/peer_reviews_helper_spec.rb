@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Messages::PeerReviewsHelper do
+
   describe 'assessment requests' do
     before :once do
       assessment_request_model
@@ -56,7 +57,9 @@ describe Messages::PeerReviewsHelper do
   end
 
   describe 'submission comments' do
+
     context 'anonymous peer reviews disabled' do
+
       it 'should return author name' do
         submission_model
         comment = @submission.add_comment(:comment => "new comment")
@@ -71,9 +74,11 @@ describe Messages::PeerReviewsHelper do
         comment.reload
         expect(submission_comment_author(comment, @user)).to eq(I18n.t(:anonymous_user, 'Anonymous User'))
       end
+
     end
 
     context 'anonymous peer reviews enabled' do
+
       it 'should return submittor' do
         submission_model
         comment = @submission.add_comment(:comment => "new comment")
@@ -88,6 +93,8 @@ describe Messages::PeerReviewsHelper do
         comment.reload
         expect(submission_comment_submittor(comment, @user2)).to eq(I18n.t(:anonymous_user, 'Anonymous User'))
       end
+
     end
   end
+
 end

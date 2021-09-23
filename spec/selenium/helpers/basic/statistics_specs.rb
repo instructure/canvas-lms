@@ -29,6 +29,7 @@ shared_examples_for "statistics basic tests" do
   end
 
   context "with admin initially logged in" do
+
     before (:each) do
       @course = Course.create!(:name => 'stats', :account => account)
       @course.offer!

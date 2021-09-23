@@ -34,3 +34,4 @@ describe "shared/errors/500_message" do
     expect(response).not_to be_nil
   end
 end
+

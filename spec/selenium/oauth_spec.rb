@@ -19,6 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
+
 describe "oauth2 flow" do
   include_context "in-process server selenium tests"
 
@@ -52,6 +53,7 @@ describe "oauth2 flow" do
         code = driver.current_url.match(%r{code=([^\?&]+)})[1]
         expect(code).to be_present
       end
+
     end
 
     describe "a non-logged-in user" do

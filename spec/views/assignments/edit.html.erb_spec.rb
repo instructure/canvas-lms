@@ -48,3 +48,4 @@ describe "/assignments/edit" do
     expect(response).to render_template(partial: '_rubrics_component')
   end
 end
+

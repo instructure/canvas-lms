@@ -27,6 +27,7 @@ describe 'new ui' do
   include RCENextPage
 
   context 'as teacher' do
+
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -149,6 +150,7 @@ describe 'new ui' do
   end
 
   context 'as student' do
+
     it 'should still have courses icon when only course is unpublished', priority: "1", test_id: 288860 do
       course_with_student_logged_in(active_course: false)
       get "/"

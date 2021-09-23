@@ -1237,9 +1237,7 @@ export const updateOutcomeMocks = ({
     result: {
       data: {
         updateLearningOutcome: {
-          __typename: 'UpdateLearningOutcomePayload',
           learningOutcome: {
-            __typename: 'LearningOutcome',
             _id: '1',
             title,
             displayName,

@@ -41,6 +41,7 @@ shared_examples 'profile_settings_page' do |context|
   end
 end
 
+
 shared_examples 'profile_user_about_page' do |context|
   include SharedExamplesCommon
 

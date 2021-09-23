@@ -48,7 +48,6 @@ module Types
     field :thumbnail_url, Types::UrlType, null: true
     def thumbnail_url
       return if object.locked_for?(current_user, check_policies: true)
-
       authenticated_thumbnail_url(object)
     end
 
@@ -85,7 +84,6 @@ module Types
           load_submission_history_associations(submission) do |course, assignment|
             attachment_ids = submission.submission_history.map(&:attachment_ids_for_version).flatten
             next unless attachment_ids.include?(object.id)
-
             get_canvadoc_url(course, assignment, submission)
           end
         end

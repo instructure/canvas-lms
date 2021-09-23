@@ -20,6 +20,7 @@
 
 class PageView
   class CsvReport
+
     attr_reader :user, :limit
 
     def initialize(user, viewer = nil, options = {})
@@ -46,7 +47,6 @@ class PageView
         while accum.length < limit
           accum.concat(batch)
           break unless batch.next_page
-
           batch = page_views(batch.next_page)
         end
         accum.take(limit)

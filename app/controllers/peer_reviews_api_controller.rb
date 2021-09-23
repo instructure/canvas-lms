@@ -110,9 +110,8 @@ class PeerReviewsApiController < ApplicationController
   # @returns PeerReview
   def create
     if @reviewer == @student
-      return render :json => { :errors => { :base => t("Create failed") } }, :status => :bad_request
+      return render :json => {:errors => {:base => t("Create failed")}}, :status => :bad_request
     end
-
     if authorized_action(@assignment, @current_user, :grade)
       assessment_request = @assignment.assign_peer_review(@reviewer, @student)
       includes = Set.new(Array(params[:include]))
@@ -129,17 +128,18 @@ class PeerReviewsApiController < ApplicationController
   # @returns PeerReview
   def destroy
     if authorized_action(@assignment, @current_user, :grade)
-      assessment_request = AssessmentRequest.for_asset(@submission)
-                                            .for_assessor(@reviewer)
-                                            .for_assessee(@student).first
+      assessment_request = AssessmentRequest.for_asset(@submission).
+                                             for_assessor(@reviewer).
+                                             for_assessee(@student).first
       if assessment_request
         assessment_request.destroy
         render :json => assessment_request_json(assessment_request, @current_user, session, [])
       else
-        render :json => { :errors => { :base => t('errors.delete_reminder_failed', "Delete failed") } },
+        render :json => {:errors => {:base => t('errors.delete_reminder_failed', "Delete failed")}},
                :status => :bad_request
       end
     end
+
   end
 
   private
@@ -154,4 +154,5 @@ class PeerReviewsApiController < ApplicationController
     @reviewer = @context.students_visible_to(@current_user).find params[:user_id]
     @student = @context.students_visible_to(@current_user).find  @submission.user.id
   end
+
 end

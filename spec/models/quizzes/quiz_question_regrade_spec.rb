@@ -20,7 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestionRegrade do
+
   describe "relationships" do
+
     it "belongs to a quiz_question" do
       expect(Quizzes::QuizQuestionRegrade.new).to respond_to :quiz_question
     end
@@ -31,6 +33,7 @@ describe Quizzes::QuizQuestionRegrade do
   end
 
   describe "validations" do
+
     it "validates the presence of quiz_question_id & quiz_regrade_id" do
       expect(Quizzes::QuizQuestionRegrade.new).not_to be_valid
       expect(Quizzes::QuizQuestionRegrade.new(quiz_question_id: 1, quiz_regrade_id: 1)).to be_valid

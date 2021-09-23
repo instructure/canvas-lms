@@ -115,14 +115,16 @@ const OutcomeEditModal = ({outcome, isOpen, onCloseHandler}) => {
         await Promise.all(promises)
 
         showFlashAlert({
-          message: I18n.t('"%{title}" was successfully updated.', {
-            title
-          }),
+          message: I18n.t('This outcome was successfully updated.'),
           type: 'success'
         })
       } catch (err) {
         showFlashAlert({
-          message: I18n.t('An error occurred while editing this outcome. Please try again.'),
+          message: err.message
+            ? I18n.t('An error occurred while updating this outcome: %{message}.', {
+                message: err.message
+              })
+            : I18n.t('An error occurred while updating this outcome.'),
           type: 'error'
         })
       }

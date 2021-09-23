@@ -604,10 +604,7 @@ export class PlannerItem extends Component {
 
   renderOnlineMeeting() {
     // simplifiedControls is a surrogate for k5Mode (see PlannerApp/index.js)
-    if (
-      (this.props.simplifiedControls || window.ENV?.FEATURES.conferencing_in_planner) &&
-      this.props.onlineMeetingURL
-    ) {
+    if (this.props.simplifiedControls && this.props.onlineMeetingURL) {
       const now = moment()
       const enabled =
         (this.props.allDay && now.isSame(this.props.date, 'day')) || // an all day event today

@@ -27,3 +27,5 @@ describe "/gradebooks/blank_submission" do
     expect(response).not_to be_nil
   end
 end
+
+

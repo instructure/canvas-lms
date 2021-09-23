@@ -122,3 +122,4 @@ describe "default plugins" do
     end
   end
 end
+

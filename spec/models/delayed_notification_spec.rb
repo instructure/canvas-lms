@@ -40,5 +40,8 @@ describe DelayedNotification do
 
       expect(messages.size).to eq 10
     end
+
   end
+
 end
+

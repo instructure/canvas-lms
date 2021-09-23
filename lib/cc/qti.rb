@@ -23,3 +23,4 @@ module Canvas::CC
 end
 
 require_dependency 'cc/qti/qti_generator'
+

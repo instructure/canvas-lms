@@ -20,6 +20,7 @@
 require 'spec_helper'
 
 describe CanvasQuizStatistics::Analyzers::Matching do
+
   let(:question_data) { QuestionHelpers.fixture('matching_question') }
   let :correct_answer do
     {
@@ -65,23 +66,23 @@ describe CanvasQuizStatistics::Analyzers::Matching do
   describe '[:answered]' do
     it 'should count students who matched everything' do
       expect(subject.run([
-                           correct_answer
-                         ])[:answered]).to eq(1)
+        correct_answer
+      ])[:answered]).to eq(1)
     end
 
     it 'should count students who matched everything even if incorrectly' do
       expect(subject.run([
-                           partially_correct_answer
-                         ])[:answered]).to eq(1)
+        partially_correct_answer
+      ])[:answered]).to eq(1)
     end
 
     it "should not count students who skipped at least one matching" do
       expect(subject.run([
-                           {
-                             answer_8796: "1525",
-                             answer_6666: "4393",
-                           }
-                         ])[:answered]).to eq(0)
+        {
+          answer_8796: "1525",
+          answer_6666: "4393",
+        }
+      ])[:answered]).to eq(0)
     end
   end
 
@@ -99,8 +100,8 @@ describe CanvasQuizStatistics::Analyzers::Matching do
     describe '[][:answers][:responses]' do
       it 'should count all students who attempted to match the blank' do
         stats = subject.run([
-                              { answer_8796: '1525' }
-                            ])
+          { answer_8796: '1525' }
+        ])
 
         stats[:answer_sets].detect { |set| set[:id] == '8796' }.tap do |set|
           set[:answers].detect { |lhs| lhs[:id] == '1525' }.tap do |lhs|
@@ -112,8 +113,8 @@ describe CanvasQuizStatistics::Analyzers::Matching do
 
     it 'should generate a NoAnswer for those who didnt make any match' do
       stats = subject.run([
-                            {}
-                          ])
+        {}
+      ])
 
       set = stats[:answer_sets].detect { |set| set[:id] == '8796' }
       lhs = set[:answers].detect { |lhs| lhs[:id] == 'none' }

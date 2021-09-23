@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::AccountImporter do
+
   before { account_model }
 
   it 'should skip bad content' do
@@ -31,8 +32,7 @@ describe SIS::CSV::AccountImporter do
       ",,Humanities 3,active",
       "A002,A000,English,active",
       "A003,,English,inactive",
-      "A004,,,active"
-    )
+      "A004,,,active")
     expect(Account.where.not(:sis_source_id => nil).count).to eq before_count + 1
 
     errors = importer.errors.map { |r| r.last }
@@ -108,18 +108,17 @@ describe SIS::CSV::AccountImporter do
 
     expect(Account.where(sis_source_id: 'A002').first.workflow_state).to eq "deleted"
     expect(Account.where(sis_source_id: 'A003').first.name).to eq "English Literature"
+
   end
 
   it 'should not allow deleting accounts with content' do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
-      "A002,A001,Sub Humanities,active"
-    )
+      "A002,A001,Sub Humanities,active")
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
-      "A001,,Humanities,deleted"
-    )
+      "A001,,Humanities,deleted")
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
@@ -153,7 +152,7 @@ describe SIS::CSV::AccountImporter do
       "A001,,Math,active",
       "A002,,Humanities,active",
       "S001,A001,Submath,active",
-      { :add_sis_stickiness => true }
+      {:add_sis_stickiness => true}
     )
     sub = Account.where(sis_source_id: 'S001').first
     expect(sub.reload.parent_account.sis_source_id).to eq "A001"
@@ -168,7 +167,7 @@ describe SIS::CSV::AccountImporter do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "S001,A002,Submath,active",
-      { :add_sis_stickiness => true }
+      {:add_sis_stickiness => true}
     )
     expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
   end
@@ -224,7 +223,7 @@ describe SIS::CSV::AccountImporter do
       "Account_ID,Parent_Account_ID,Name,Status",
       "A1,,math,active",
       "A2,A1,special,active",
-      batch: batch1
+    batch: batch1
     )
     batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(

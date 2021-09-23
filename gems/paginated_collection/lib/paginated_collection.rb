@@ -59,7 +59,6 @@ module PaginatedCollection
 
   def self.build(&block)
     raise(ArgumentError, "block required") unless block
-
     PaginatedCollection::Proxy.new(block)
   end
 end

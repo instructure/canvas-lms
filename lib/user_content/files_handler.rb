@@ -49,7 +49,6 @@ module UserContent
       end
 
       private
-
       attr_reader :match, :attachment, :is_public, :in_app
 
       # Returns either:
@@ -60,7 +59,7 @@ module UserContent
       #
       # [ attachment.context_id, attachment.id, url_options ]
       def args
-        [attachment.id, options].tap do |a|
+        [ attachment.id, options ].tap do |a|
           if Attachment.relative_context?(attachment.context_type)
             a.unshift(attachment.context_id)
           end
@@ -123,7 +122,6 @@ module UserContent
     end
 
     private
-
     attr_reader :match, :context, :user, :preloaded_attachments, :is_public, :in_app
 
     def attachment

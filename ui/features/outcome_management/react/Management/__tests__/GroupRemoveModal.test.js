@@ -39,7 +39,6 @@ describe('GroupRemoveModal', () => {
   let onSuccessMock
   const defaultProps = (props = {}) => ({
     groupId: '123',
-    groupTitle: 'Fancy group',
     isOpen: true,
     onCloseHandler: onCloseHandlerMock,
     onSuccess: onSuccessMock,
@@ -112,7 +111,7 @@ describe('GroupRemoveModal', () => {
     ).toBeInTheDocument()
   })
 
-  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds', async () => {
+  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds in Account context', async () => {
     const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
     removeOutcomeGroup.mockReturnValue(
       Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
@@ -123,7 +122,26 @@ describe('GroupRemoveModal', () => {
     await waitFor(() => {
       expect(onSuccessMock).toHaveBeenCalled()
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'This group was successfully removed.',
+        message: 'This group was successfully removed from this account.',
+        type: 'success'
+      })
+    })
+  })
+
+  it('displays flash confirmation with proper message and calls onSuccess if delete request succeeds in Course context', async () => {
+    const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
+    removeOutcomeGroup.mockReturnValue(
+      Promise.resolve({status: 200, data: {id: 2, parent_outcome_group: {id: 1}}})
+    )
+    const {getByText} = render(<GroupRemoveModal {...defaultProps()} />, {
+      contextType: 'Course'
+    })
+    fireEvent.click(getByText('Remove Group'))
+    expect(removeOutcomeGroup).toHaveBeenCalledWith('Course', '1', '123')
+    await waitFor(() => {
+      expect(onSuccessMock).toHaveBeenCalled()
+      expect(showFlashAlertSpy).toHaveBeenCalledWith({
+        message: 'This group was successfully removed from this course.',
         type: 'success'
       })
     })
@@ -137,7 +155,7 @@ describe('GroupRemoveModal', () => {
     expect(removeOutcomeGroup).toHaveBeenCalledWith('Account', '1', '123')
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while removing this group. Please try again.',
+        message: 'An error occurred while removing this group: Network error.',
         type: 'error'
       })
     })
@@ -154,7 +172,7 @@ describe('GroupRemoveModal', () => {
     await waitFor(() => {
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
         message:
-          'An error occurred while removing this group: "Fancy group" contains one or more Outcomes that are currently aligned to content.',
+          'An error occurred while removing this group: Outcome Group contains one or more Outcomes that are currently aligned to content.',
         type: 'error'
       })
     })

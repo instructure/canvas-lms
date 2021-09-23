@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::LoginImporter do
+
   before :once do
     account_model
     process_csv_data_cleanly(

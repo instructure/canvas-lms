@@ -29,3 +29,4 @@ describe "shared/_javascript_init" do
     expect(response).not_to be_nil
   end
 end
+

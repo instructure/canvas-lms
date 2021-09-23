@@ -23,3 +23,4 @@ module MicrosoftSync
     'microsoft_sync_'
   end
 end
+

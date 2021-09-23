@@ -23,7 +23,9 @@ require File.expand_path('../configurable_timeout', __FILE__)
 require 'zlib'
 
 module IncomingMailProcessor
+  
   class DirectoryMailbox
+
     include ConfigurableTimeout
 
     attr_accessor :folder
@@ -32,7 +34,7 @@ module IncomingMailProcessor
       @folder = options.fetch(:folder, "")
       @options = options
       wrap_with_timeout(self,
-                        [:folder_exists?, :files_in_folder, :read_file, :file?, :delete_file, :move_file, :create_folder])
+        [:folder_exists?, :files_in_folder, :read_file, :file?, :delete_file, :move_file, :create_folder])
     end
 
     def connect
@@ -40,12 +42,12 @@ module IncomingMailProcessor
     end
 
     def disconnect
-      # nothing to do
+      # nothing to do    
     end
 
-    def each_message(opts = {})
+    def each_message(opts={})
       filenames = files_in_folder(folder)
-      filenames = filenames.select { |filename| Zlib.crc32(filename) % opts[:stride] == opts[:offset] } if opts[:stride] && opts[:offset]
+      filenames = filenames.select{|filename| Zlib.crc32(filename) % opts[:stride] == opts[:offset]} if opts[:stride] && opts[:offset]
       filenames.each do |filename|
         if file?(folder, filename)
           body = read_file(folder, filename)
@@ -70,8 +72,7 @@ module IncomingMailProcessor
       nil
     end
 
-    private
-
+  private
     def folder_exists?(folder, subfolder = nil)
       to_check = subfolder ? File.join(folder, subfolder) : folder
       File.directory?(to_check)
@@ -101,5 +102,7 @@ module IncomingMailProcessor
     def create_folder(folder, subfolder)
       Dir.mkdir(File.join(folder, subfolder))
     end
+
   end
+
 end

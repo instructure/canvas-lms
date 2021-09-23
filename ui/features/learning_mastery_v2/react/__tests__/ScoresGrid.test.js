@@ -40,24 +40,13 @@ describe('ScoresGrid', () => {
       ],
       students: [
         {
-          id: '1',
-          name: 'Student Name',
-          display_name: 'Student Name'
+          id: '1'
         }
       ],
       outcomes: [
         {
           id: '1',
-          title: 'Outcome Title',
-          mastery_points: 3,
-          ratings: [
-            {
-              points: 5,
-              color: 'green',
-              description: 'Description',
-              mastery: true
-            }
-          ]
+          mastery_points: 3
         }
       ],
       ...props

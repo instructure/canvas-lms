@@ -24,7 +24,6 @@ module Api
   module Html
     class Link
       attr_reader :link
-
       def initialize(link_string, host: nil, port: nil)
         @link, @host, @port = link_string, host, port
       end
@@ -32,7 +31,6 @@ module Api
       def to_corrected_s
         local_link = strip_host(link)
         return local_link if is_not_actually_a_file_link? || should_skip_correction?
-
         strip_verifier_params(scope_link_to_context(local_link))
       end
 
@@ -45,7 +43,6 @@ module Api
 
       def strip_host(link)
         return link if @host.nil?
-
         begin
           uri = URI.parse(link)
           if uri.host == @host && (uri.port.nil? || uri.port == @port)
@@ -87,16 +84,15 @@ module Api
 
       def attachment
         return @_attachment unless @_attachment.nil?
-
         @_attachment = Attachment.where(id: attachment_id).first
       end
 
       def attachment_id
         match = link.match(FILE_LINK_REGEX)
         return nil unless match
-
         match.captures[0]
       end
+
     end
   end
 end

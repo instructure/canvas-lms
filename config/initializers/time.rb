@@ -20,7 +20,6 @@
 module JsonTimeInUTC
   def as_json(options = {})
     return super if utc?
-
     utc.as_json(options)
   end
 end

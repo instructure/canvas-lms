@@ -47,7 +47,6 @@ module CC::Exporter::Epub::Converters
       end
 
       private
-
       def flv_filename
         File.basename(flv_path)
       end
@@ -66,9 +65,9 @@ module CC::Exporter::Epub::Converters
 
       def mp4_url
         @_mp4_url ||= media_source_fetcher.fetch_preferred_source_url({
-                                                                        media_id: media_id,
-                                                                        file_extension: 'mp4'
-                                                                      })
+          media_id: media_id,
+          file_extension: 'mp4'
+        })
       end
     end
 
@@ -94,7 +93,6 @@ module CC::Exporter::Epub::Converters
       end
 
       private
-
       def flv?
         File.extname(original_path) == '.flv'
       end

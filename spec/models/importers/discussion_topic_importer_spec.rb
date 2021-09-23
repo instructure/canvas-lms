@@ -23,6 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 require 'nokogiri'
 
 describe Importers::DiscussionTopicImporter do
+
   SYSTEMS.each do |system|
     if import_data_exists? system, 'discussion_topic'
       it "should import topics for #{system}" do
@@ -53,12 +54,12 @@ describe Importers::DiscussionTopicImporter do
           expect(topic.assignment.points_possible).to eq data[:grading][:points_possible].to_f
           expect(topic.assignment.submission_types).to eq 'discussion_topic'
         end
+
       end
     end
   end
 
-  describe "Importing announcements" do # rubocop:disable RSpec/EmptyExampleGroup
-    # RuboCop can't detect the examples that are dynamically defined
+  describe "Importing announcements" do
     SYSTEMS.each do |system|
       if import_data_exists? system, 'announcements'
         it "should import assignments for #{system}" do
@@ -90,7 +91,7 @@ describe Importers::DiscussionTopicImporter do
     data[:attachment_migration_id] = nil
     attachment_model(:context => context) # create a file with no migration id
 
-    data[:topics_to_import] = { data[:migration_id] => true }
+    data[:topics_to_import] = {data[:migration_id] => true}
     Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
 
     topic = DiscussionTopic.where(migration_id: data[:migration_id]).first

@@ -52,6 +52,7 @@ require 'atom'
 #       }
 #     }
 class ObserverPairingCodesApiController < ApplicationController
+
   before_action :require_user
 
   # @API Create observer pairing code

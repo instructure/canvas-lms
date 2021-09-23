@@ -34,7 +34,6 @@ module LtiAdvantage::Messages
     ].freeze
 
     attr_accessor(*(REQUIRED_PARAMETERS + OPTIONAL_PARAMETERS))
-
     validates_presence_of(*REQUIRED_PARAMETERS)
   end
 end

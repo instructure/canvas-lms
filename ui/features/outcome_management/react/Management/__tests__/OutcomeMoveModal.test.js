@@ -164,54 +164,7 @@ describe('OutcomeMoveModal', () => {
     expect(getByText('Move').closest('button')).toBeEnabled()
   })
 
-  it('single move: displays flash confirmation and calls onSuccess if move outcomes request succeeds for', async () => {
-    const onSuccess = jest.fn()
-    const {getByText} = render(<OutcomeMoveModal {...defaultProps({onSuccess})} />, {
-      mocks: [
-        ...defaultMocks,
-        ...smallOutcomeTree('Account'),
-        moveOutcomeMock({outcomeLinkIds: ['1']})
-      ]
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Account folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: '"Outcome 101" has been moved to "Account folder 1".',
-      type: 'success'
-    })
-    expect(onSuccess).toHaveBeenCalledWith({
-      movedOutcomeLinkIds: ['1'],
-      groupId: '101',
-      targetAncestorsIds: ['101', '1']
-    })
-  })
-
-  it('single move: displays flash error if move outcomes request fails', async () => {
-    const {getByText} = render(<OutcomeMoveModal {...defaultProps()} />, {
-      mocks: [
-        ...defaultMocks,
-        ...smallOutcomeTree('Account'),
-        moveOutcomeMock({
-          failResponse: true,
-          outcomeLinkIds: ['1']
-        })
-      ]
-    })
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Account folder 1'))
-    await act(async () => jest.runOnlyPendingTimers())
-    fireEvent.click(getByText('Move'))
-    await act(async () => jest.runOnlyPendingTimers())
-    expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while moving this outcome. Please try again.',
-      type: 'error'
-    })
-  })
-
-  it('bulk move: displays flash confirmation and calls onSuccess if move outcomes request succeeds', async () => {
+  it('displays flash confirmation and calls onSuccess if move outcomes request succeeds', async () => {
     const onSuccess = jest.fn()
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({onSuccess, outcomes: generateOutcomes(2)})} />,
@@ -235,7 +188,7 @@ describe('OutcomeMoveModal', () => {
     })
   })
 
-  it('bulk move: displays flash error if move outcomes request fails', async () => {
+  it('displays flash error if move outcomes request fails', async () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
@@ -254,12 +207,13 @@ describe('OutcomeMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while moving these outcomes. Please try again.',
+      message:
+        'An error occurred moving these outcomes: GraphQL error: Could not find associated outcome in this context.',
       type: 'error'
     })
   })
 
-  it('bulk move: displays flash error if move outcomes mutation fails', async () => {
+  it('displays flash error if move outcomes mutation fails', async () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
@@ -278,12 +232,12 @@ describe('OutcomeMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while moving these outcomes. Please try again.',
+      message: 'An error occurred moving these outcomes: Mutation failed.',
       type: 'error'
     })
   })
 
-  it('bulk move: displays flash default error if move outcomes mutation fails and error message is empty', async () => {
+  it('displays flash default error if move outcomes mutation fails and error message is empty', async () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
@@ -302,12 +256,12 @@ describe('OutcomeMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while moving these outcomes. Please try again.',
+      message: 'An error occurred moving these outcomes.',
       type: 'error'
     })
   })
 
-  it('bulk move: displays flash generic error if move outcomes mutation partially succeeds', async () => {
+  it('displays flash generic error if move outcomes mutation partially succeeds', async () => {
     const {getByText} = render(
       <OutcomeMoveModal {...defaultProps({outcomes: generateOutcomes(2)})} />,
       {
@@ -326,7 +280,7 @@ describe('OutcomeMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred while moving these outcomes. Please try again.',
+      message: 'An error occurred moving these outcomes.',
       type: 'error'
     })
   })

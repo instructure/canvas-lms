@@ -22,6 +22,7 @@
 # Includes helpers for integration with SIS systems.
 #
 class DisablePostToSisApiController < ApplicationController
+
   before_action :require_authorized_user
   before_action :require_valid_grading_period, :if => :grading_period_exists?
 

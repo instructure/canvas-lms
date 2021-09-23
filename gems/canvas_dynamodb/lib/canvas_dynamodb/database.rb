@@ -18,7 +18,9 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module CanvasDynamoDB
+
   class Database
+
     DEFAULT_MIN_CAPACITY = 5
     DEFAULT_MAX_CAPACITY = 10000
 
@@ -77,5 +79,6 @@ module CanvasDynamoDB
       logger.debug("  #{"DDB (%.2fms)" % [ms]}  #{method}(#{params.inspect}) [#{fingerprint}]")
       result
     end
+
   end
 end

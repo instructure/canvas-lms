@@ -100,6 +100,7 @@ describe 'Gradebook Controls' do
   end
 
   context 'using Actions dropdown' do
+
     it 'navigates to upload page', test_id: 3265129, priority: '1' do
       Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
@@ -111,6 +112,7 @@ describe 'Gradebook Controls' do
   end
 
   context 'using enhanced filter actions' do
+
     it 'navigates to upload page', test_id: 3265130, priority: '1' do
       Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
       Gradebook.visit(@course)
@@ -120,3 +122,6 @@ describe 'Gradebook Controls' do
     end
   end
 end
+
+
+

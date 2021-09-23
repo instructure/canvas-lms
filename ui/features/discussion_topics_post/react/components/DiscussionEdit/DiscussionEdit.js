@@ -38,8 +38,6 @@ export const DiscussionEdit = props => {
     !!props.quotedEntry?.previewMessage
   )
   const textAreaId = useRef(`message-body-${nanoid()}`)
-  const [lastSaved, setLastSaved] = useState('')
-  const [draftTimeout, setDraftTimeout] = useState(null)
 
   const rceMentionsIsEnabled = () => {
     return !!ENV.rce_mentions_in_discussions
@@ -62,27 +60,6 @@ export const DiscussionEdit = props => {
   useEffect(() => {
     setRceContent(props.value)
   }, [props.value, setRceContent])
-
-  const handleDraftResponse = nextDraft => {
-    if (!nextDraft) return
-
-    if (draftTimeout) {
-      clearTimeout(draftTimeout)
-      setDraftTimeout(
-        setTimeout(() => {
-          props.updateDraft(nextDraft)
-          setLastSaved(new Date().toLocaleString())
-        }, 1000)
-      )
-    } else {
-      setDraftTimeout(
-        setTimeout(() => {
-          props.updateDraft(nextDraft)
-          setLastSaved(new Date().toLocaleString())
-        }, 1000)
-      )
-    }
-  }
 
   return (
     <div
@@ -123,7 +100,6 @@ export const DiscussionEdit = props => {
             ref={rceRef}
             onContentChange={content => {
               setRceContent(content)
-              handleDraftResponse(content)
             }}
             editorOptions={{
               focus: true,
@@ -200,9 +176,6 @@ export const DiscussionEdit = props => {
               </View>
             ) : (
               <Flex key="nonMobileButtons">
-                <Flex.Item shouldGrow textAlign="start">
-                  <Text>{lastSaved ? I18n.t('Saved at %{lastSaved}', {lastSaved}) : ''}</Text>
-                </Flex.Item>
                 <Flex.Item shouldGrow textAlign="end">
                   {rceButtons}
                 </Flex.Item>
@@ -221,16 +194,14 @@ DiscussionEdit.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isEdit: PropTypes.bool,
-  quotedEntry: PropTypes.object,
-  updateDraft: PropTypes.func
+  quotedEntry: PropTypes.object
 }
 
 DiscussionEdit.defaultProps = {
   show: true,
   isEdit: false,
   quotedEntry: null,
-  value: '',
-  updateDraft: () => {}
+  value: ''
 }
 
 export default DiscussionEdit

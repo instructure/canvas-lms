@@ -70,5 +70,6 @@ module CC::Importer::Canvas
 
       rubrics
     end
+
   end
 end

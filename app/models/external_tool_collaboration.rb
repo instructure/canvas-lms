@@ -24,4 +24,5 @@ class ExternalToolCollaboration < Collaboration
   def update_url
     data['updateUrl']
   end
+
 end

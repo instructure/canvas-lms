@@ -49,9 +49,8 @@ class Mutations::CreateDiscussionEntry < Mutations::BaseMutation
     end
 
     entry.save!
-    entry.delete_draft
 
-    { discussion_entry: entry }
+    {discussion_entry: entry}
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue InsufficientPermissionsError

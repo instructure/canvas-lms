@@ -87,15 +87,13 @@ describe('LearningMastery', () => {
     }
   }
 
-  let oldEnv
   beforeEach(() => {
     useRollups.mockReturnValue({isLoading: false, students: users, outcomes, rollups})
-    oldEnv = {...window.ENV}
     window.ENV = {GRADEBOOK_OPTIONS: {outcome_proficiency: {ratings}}}
   })
 
-  afterEach(() => {
-    window.ENV = oldEnv
+  afterAll(() => {
+    window.ENV = {}
   })
 
   it('renders each proficiency rating description specified in window.ENV', async () => {

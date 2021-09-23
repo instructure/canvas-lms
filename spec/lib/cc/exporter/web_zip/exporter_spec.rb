@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # coding: utf-8
-
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -30,10 +29,11 @@ describe "Exporter" do
     end
 
     @attachment = Attachment.create({
-                                      context: course_factory,
-                                      filename: 'exportable-test-file',
-                                      uploaded_data: File.open(cartridge_path)
-                                    })
+      context: course_factory,
+      filename: 'exportable-test-file',
+      uploaded_data: File.open(cartridge_path)
+    })
+
   end
 
   context "create web zip package default settings" do

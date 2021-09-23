@@ -30,3 +30,4 @@ describe "/gradebooks/_grading_box" do
     expect(response).not_to be_nil
   end
 end
+

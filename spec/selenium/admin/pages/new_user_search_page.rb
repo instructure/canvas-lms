@@ -19,6 +19,7 @@
 require_relative '../../common'
 
 module NewUserSearchPage
+
   # ---------------------- Page ----------------------
   def visit_users(account)
     get("/accounts/#{account.id}/users")

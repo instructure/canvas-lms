@@ -77,6 +77,7 @@ describe "collaborations" do
       end
     end
 
+
     context "a students's etherpad collaboration" do
       before(:each) do
         course_with_teacher(:active_all => true, :name => 'teacher@example.com')

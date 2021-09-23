@@ -81,15 +81,30 @@ const OutcomeMoveModal = ({
         })
       } catch (err) {
         showFlashAlert({
-          message: I18n.t(
-            {
-              one: 'An error occurred while moving this outcome. Please try again.',
-              other: 'An error occurred while moving these outcomes. Please try again.'
-            },
-            {
-              count
-            }
-          ),
+          message: err.message
+            ? I18n.t(
+                {
+                  one: 'An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}": %{errorMessage}.',
+                  other: 'An error occurred moving these outcomes: %{errorMessage}.'
+                },
+                {
+                  newGroupTitle: targetGroup.name,
+                  errorMessage: err.message,
+                  outcomeTitle,
+                  count
+                }
+              )
+            : I18n.t(
+                {
+                  one: 'An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}".',
+                  other: 'An error occurred moving these outcomes.'
+                },
+                {
+                  newGroupTitle: targetGroup.name,
+                  outcomeTitle,
+                  count
+                }
+              ),
           type: 'error'
         })
       }

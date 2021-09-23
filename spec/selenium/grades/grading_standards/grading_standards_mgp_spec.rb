@@ -140,3 +140,4 @@ describe "grading periods account page" do
     end
   end
 end
+

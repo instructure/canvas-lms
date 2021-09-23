@@ -31,6 +31,7 @@ describe "submissions" do
   include K5Common
 
   context 'as a student' do
+
     before(:once) do
       @due_date = Time.now.utc + 2.days
       course_with_student(active_all: true)
@@ -68,7 +69,7 @@ describe "submissions" do
 
     it "should not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
       stub_kaltura
-      # pending("failing because it is dependant on an external kaltura system")
+      #pending("failing because it is dependant on an external kaltura system")
 
       create_assignment_and_go_to_page('media_recording')
 
@@ -97,7 +98,7 @@ describe "submissions" do
     it "should not allow blank media submission", priority: "1", test_id: 237021 do
       skip_if_safari(:alert)
       stub_kaltura
-      # pending("failing because it is dependant on an external kaltura system")
+      #pending("failing because it is dependant on an external kaltura system")
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
@@ -173,6 +174,7 @@ describe "submissions" do
       driver.switch_to.alert.accept
       driver.switch_to.default_content
     end
+
 
     it "should not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
       skip('flaky, will be fixed in ADMIN-3015')
@@ -327,16 +329,16 @@ describe "submissions" do
 
       asset = @submission.turnitin_assets.first.asset_string
       @submission.turnitin_data = {
-        "#{asset}" => {
-          :object_id => "123456",
-          :publication_overlap => 5,
-          :similarity_score => 100,
-          :state => "failure",
-          :status => "scored",
-          :student_overlap => 44,
-          :web_overlap => 100
-        },
-        :last_processed_attempt => 1
+          "#{asset}" => {
+              :object_id => "123456",
+              :publication_overlap => 5,
+              :similarity_score => 100,
+              :state => "failure",
+              :status => "scored",
+              :student_overlap => 44,
+              :web_overlap => 100
+          },
+          :last_processed_attempt => 1
       }
       @submission.turnitin_data_changed!
       @submission.save!
@@ -347,14 +349,15 @@ describe "submissions" do
       end
     end
 
+
     it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029
 
     context 'with Canvadocs enabled' do
       before(:once) do
         PluginSetting.create! name: 'canvadocs',
-                              settings: { "api_key" => "blahblahblahblahblah",
-                                          "base_url" => "http://example.com",
-                                          "disabled" => false }
+                              settings: {"api_key" => "blahblahblahblahblah",
+                                            "base_url" => "http://example.com",
+                                            "disabled" => false}
       end
 
       it "should show preview link after submitting a canvadocable file type", priority: "1", test_id: 587302 do
@@ -432,7 +435,7 @@ describe "submissions" do
 
         # traverse the tree
         f('li[aria-label="My files"] button').click
-        f('li[aria-label="' + FILENAME + '"] button').click
+        f('li[aria-label="'+FILENAME+'"] button').click
 
         f('#submit_file_button').click
 
@@ -513,7 +516,7 @@ describe "submissions" do
       end
 
       it 'indicates as excused on the submission details page', priority: "1", test_id: 201937 do
-        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+         get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
         expect(f("#content .submission_details .entered_grade")).to include_text 'Excused'
       end
     end
@@ -524,7 +527,7 @@ describe "submissions" do
       end
 
       before(:once) do
-        assignment.submit_homework(@student, { submission_type: 'online_text_entry' })
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 
@@ -537,7 +540,7 @@ describe "submissions" do
       end
 
       before(:once) do
-        assignment.submit_homework(@student, { submission_type: 'online_text_entry' })
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 

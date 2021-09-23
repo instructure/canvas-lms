@@ -78,9 +78,9 @@ describe RoleOverride do
     c2.enroll_student(u2, :role => role)
 
     ro = RoleOverride.create!(:context => a1, :permission => 'moderate_forum',
-                              :role => role, :enabled => true)
+      :role => role, :enabled => true)
     RoleOverride.create!(:context => a2, :permission => 'moderate_forum',
-                         :role => role, :enabled => false)
+      :role => role, :enabled => false)
 
     expect(c1.grants_right?(u1, :moderate_forum)).to be_truthy
     expect(c2.grants_right?(u2, :moderate_forum)).to be_falsey
@@ -97,7 +97,7 @@ describe RoleOverride do
   it "should not fail when a context's associated accounts are missing" do
     group_model
     allow(@group).to receive(:account).and_return(nil)
-    expect {
+    expect{
       RoleOverride.permission_for(@group, :read_course_content, teacher_role)
     }.to_not raise_error
   end
@@ -130,7 +130,7 @@ describe RoleOverride do
         permission: 'moderate_forum',
         role: @role,
         enabled: false
-      )
+        )
 
       expect(override.root_account_id).to eq(@account.root_account_id)
     end
@@ -141,7 +141,7 @@ describe RoleOverride do
         permission: 'moderate_forum',
         role: @role,
         enabled: false
-      )
+        )
       altered_id = Account.create!.id
       override.root_account_id = altered_id
 
@@ -182,8 +182,7 @@ describe RoleOverride do
       before :once do
         @existing_override = @account.role_overrides.build(
           :permission => @permission,
-          :role => @role
-        )
+          :role => @role)
         @existing_override.enabled = true
         @existing_override.locked = false
         @existing_override.save!
@@ -284,7 +283,7 @@ describe RoleOverride do
 
     def create_override(role, enabled)
       RoleOverride.create!(:context => @account, :permission => @permission.to_s,
-                           :role => role, :enabled => enabled)
+                         :role => role, :enabled => enabled)
     end
 
     it "should not mark a permission as explicit in a sub account when it's explicit in the root" do
@@ -391,7 +390,7 @@ describe RoleOverride do
           it "should use permission for role in parent account" do
             @course = @sub.courses.create!
 
-            # create permission in parent
+            #create permission in parent
             create_override(@role, !@default_perm)
 
             # check based on sub account
@@ -404,7 +403,7 @@ describe RoleOverride do
             @course.id = Account.site_admin.id
             @course.save!
 
-            # create permission in parent
+            #create permission in parent
             create_override(@role, !@default_perm)
 
             # check based on sub account
@@ -551,7 +550,7 @@ describe RoleOverride do
       end
 
       it "should allow with account_allows on" do
-        Account.default.tap { |a| a.enable_user_notes = true; a.save! }
+        Account.default.tap{|a| a.enable_user_notes = true; a.save!}
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, admin_role)).to_not eq []
         expect(RoleOverride.enabled_for?(Account.default, :manage_user_notes, @role)).to_not eq []
       end
@@ -569,8 +568,7 @@ describe RoleOverride do
 
     it "should not show a permission if the specified plugin is not enabled" do
       p = Canvas::Plugin.register(:assignment_freezer, :assignment_freezer, {
-                                    :settings => { :foo => true }
-                                  })
+        :settings => {:foo => true}})
       s = PluginSetting.new(:name => p.id, :settings => p.default_settings)
       s.disabled = true
       s.save!
@@ -579,8 +577,7 @@ describe RoleOverride do
 
     it "should include show a permission if the specified plugin is enabled" do
       p = Canvas::Plugin.register(:assignment_freezer, :assignment_freezer, {
-                                    :settings => { :foo => true }
-                                  })
+        :settings => {:foo => true}})
       s = PluginSetting.new(:name => p.id, :settings => p.default_settings)
       s.disabled = false
       s.save!

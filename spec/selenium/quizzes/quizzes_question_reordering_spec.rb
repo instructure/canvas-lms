@@ -56,6 +56,7 @@ describe 'drag and drop reordering' do
   end
 
   it 'should remove questions from a group', priority: "1", test_id: 201951 do
+
     # drag it out
     click_questions_tab
     drag_question_to_top @quest1.id
@@ -65,6 +66,7 @@ describe 'drag and drop reordering' do
   end
 
   it 'should reorder questions within a group', priority: "1", test_id: 201952 do
+
     create_question_group
     drag_question_into_group @quest1.id, @group.id
     drag_question_into_group @quest2.id, @group.id

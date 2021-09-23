@@ -19,6 +19,7 @@
 #
 
 module ShardedBookmarkedCollection
+
   # Given an association (+HasManyAssociation+ or +HasManyThroughAssociation+),
   # automatically creates bookmarked collections for the shard-restricted
   # versions of that association (using wrap) and then merges those

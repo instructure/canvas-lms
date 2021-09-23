@@ -32,7 +32,6 @@ module Twitter
 
     def deliver
       return unless @twitter_service
-
       twitter = Twitter::Connection.from_service_token(
         @twitter_service.token,
         @twitter_service.secret

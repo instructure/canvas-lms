@@ -44,7 +44,7 @@ describe AssessmentRequest do
 
   describe 'peer review invitations' do
     before :once do
-      communication_channel(@student, { username: 'test@example.com', active_cc: true })
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       @notification_name = "Peer Review Invitation"
       notification = Notification.create!(:name => @notification_name, :category => 'Invitation')
       NotificationPolicy.create!(:notification => notification, :communication_channel => @student.communication_channel, :frequency => 'immediately')
@@ -77,13 +77,14 @@ describe AssessmentRequest do
   end
 
   describe "notifications" do
+
     let(:notification_name) { 'Rubric Assessment Submission Reminder' }
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
     it "should send submission reminders" do
-      communication_channel(@student, { username: 'test@example.com', active_cc: true })
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => notification,
-                                 :communication_channel => @student.communication_channel, :frequency => 'immediately')
+        :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
@@ -100,9 +101,9 @@ describe AssessmentRequest do
     end
 
     it "should send to the correct url if anonymous" do
-      communication_channel(@student, { username: 'test@example.com', active_cc: true })
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => notification,
-                                 :communication_channel => @student.communication_channel, :frequency => 'immediately')
+        :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
@@ -119,6 +120,7 @@ describe AssessmentRequest do
   end
 
   describe 'policies' do
+
     before :once do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
@@ -150,12 +152,12 @@ describe AssessmentRequest do
 
     it 'should delete ignores if the request is completed' do
       @request.complete!
-      expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should delete ignores if the request is deleted' do
       @request.destroy!
-      expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
+      expect {@ignore.reload}.to raise_error ActiveRecord::RecordNotFound
     end
 
     it 'should not delete ignores if the request is updated, but not completed or deleted' do

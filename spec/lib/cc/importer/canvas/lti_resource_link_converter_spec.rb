@@ -75,5 +75,8 @@ describe CC::Importer::Canvas::LtiResourceLinkConverter do
         )
       end
     end
+
+    context 'with no launch URL' do
+    end
   end
 end

@@ -59,8 +59,7 @@ describe "SummaryMessageConsolidator" do
         dms << delayed_message_model(
           :cc => u.communication_channels.first,
           :root_account_id => rai,
-          :send_at => 1.day.ago
-        )
+          :send_at => 1.day.ago)
       end
     end
 

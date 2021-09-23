@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class ApiScopeMappingWriter
+
   attr_reader :resource_lookup
 
   def initialize(resources)
@@ -31,7 +32,7 @@ class ApiScopeMappingWriter
   def generate_scope_mapper
     mapping = generate_scopes_mapping(@resources)
     out = ERB.new(@template, nil, '-').result(binding)
-    File.open(@output_file, 'w') { |file| file.write(out) }
+    File.open(@output_file, 'w') {|file| file.write(out)}
   end
 
   private
@@ -53,7 +54,6 @@ class ApiScopeMappingWriter
   def process_children(children, name)
     children.each_with_object({}) do |child, hash|
       next unless api_method?(child)
-
       resource = name.parameterize.underscore.to_sym
       hash[child.name] = resource
       add_resource_lookup(resource, name)
@@ -65,6 +65,7 @@ class ApiScopeMappingWriter
   end
 
   def api_method?(child)
-    child.tags.any? { |t| t.tag_name == "API" } && child.tags.none? { |t| t.tag_name.casecmp?("internal") }
+    child.tags.any? {|t| t.tag_name == "API"} && child.tags.none? {|t| t.tag_name.casecmp?("internal")}
   end
+
 end

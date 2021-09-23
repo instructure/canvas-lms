@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe "Quizzes2 Exporter" do
+
   context "assignment creation" do
     before :once do
       @course = Account.default.courses.create!

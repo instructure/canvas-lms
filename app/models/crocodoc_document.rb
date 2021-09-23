@@ -86,7 +86,6 @@ class CrocodocDocument < ActiveRecord::Base
 
   def session_url(opts = {})
     return canvadocs_session_url opts.merge(canvadoc_options) if should_migrate_to_canvadocs?
-
     defaults = {
       :annotations => true,
       :downloadable => true,
@@ -101,7 +100,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:user] = user.crocodoc_user
     end
 
-    crocodoc_ids = opts[:moderated_grading_allow_list]&.map { |h| h["crocodoc_id"] }
+    crocodoc_ids = opts[:moderated_grading_allow_list]&.map {|h| h["crocodoc_id"] }
     opts.merge! permissions_for_user(user, crocodoc_ids)
 
     unless annotations_on
@@ -149,9 +148,9 @@ class CrocodocDocument < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions
-        .preload(submission: :assignment)
-        .map(&:submission)
+    self.canvadocs_submissions.
+      preload(submission: :assignment).
+      map(&:submission)
   end
 
   def apply_allow_list(user, opts, allow_list)
@@ -170,10 +169,10 @@ class CrocodocDocument < ActiveRecord::Base
     end
 
     opts[:filter] = if allowed_users.empty?
-                      'none'
-                    else
-                      allowed_users.join(',')
-                    end
+      'none'
+    else
+      allowed_users.join(',')
+    end
   end
 
   def available?
@@ -182,7 +181,6 @@ class CrocodocDocument < ActiveRecord::Base
 
   def crocodoc_api
     raise "Crocodoc isn't configured" unless Canvas::Crocodoc.config
-
     @api ||= CrocodocDocument.crocodoc_api
   end
   private :crocodoc_api
@@ -217,9 +215,9 @@ class CrocodocDocument < ActiveRecord::Base
           end
 
           bulk_updates.each do |status, uuids|
-            CrocodocDocument
-              .where(:uuid => uuids)
-              .update_all(:process_state => status)
+            CrocodocDocument.
+                where(:uuid => uuids).
+                update_all(:process_state => status)
           end
 
           if error_uuids.present?

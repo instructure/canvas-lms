@@ -25,7 +25,8 @@ describe "/calendars/_event" do
   it "should render" do
     course_with_student
     view_context(@course, @user)
-    render :partial => 'calendars/event', :object => @course.calendar_events.create!(:title => "some event")
+    render :partial => 'calendars/event', :object => @course.calendar_events.create!(:title => "some event") 
     expect(response).not_to be_nil
   end
 end
+

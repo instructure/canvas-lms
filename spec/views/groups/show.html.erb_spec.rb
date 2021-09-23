@@ -35,3 +35,4 @@ describe "/groups/show" do
     expect(response).not_to be_nil
   end
 end
+

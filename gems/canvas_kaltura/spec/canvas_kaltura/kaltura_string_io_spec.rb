@@ -25,4 +25,5 @@ describe CanvasKaltura::KalturaStringIO do
     io = CanvasKaltura::KalturaStringIO.new("hey there", "custom_path.csv")
     expect(io.path).to eq("custom_path.csv")
   end
+
 end

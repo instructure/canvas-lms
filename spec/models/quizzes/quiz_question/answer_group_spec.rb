@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerGroup do
+
   let(:question_data_params) do
     {
       answers: [
@@ -83,6 +84,7 @@ describe Quizzes::QuizQuestion::AnswerGroup do
     it "returns the correct answer" do
       expect(question_data.answers.correct_answer[:text]).to eq "A"
     end
+
   end
 end
 

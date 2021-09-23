@@ -21,8 +21,9 @@
 module SIS
   module CSV
     class TermImporter < CSVBaseImporter
+
       def self.term_csv?(row)
-        # This matcher works because a course has long_name/short_name
+        #This matcher works because a course has long_name/short_name
         row.include?('term_id') && row.include?('name')
       end
 
@@ -32,7 +33,7 @@ module SIS
 
       # expected columns
       # account_id,parent_account_id,name,status
-      def process(csv, index = nil, count = nil)
+      def process(csv, index=nil, count=nil)
         count = SIS::TermImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             start_date = nil
