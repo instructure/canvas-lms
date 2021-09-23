@@ -28,7 +28,11 @@ class Loaders::DiscussionEntryDraftLoader < GraphQL::Batch::Loader
     Shard.partition_by_shard(all_objects) do |objects|
       scope = @current_user.discussion_entry_drafts.where(discussion_topic_id: objects)
       drafts = scope.group_by(&:discussion_topic_id)
-      objects.each { |object| fulfill(object, drafts[object.id]) }
+      objects.each do |object|
+        topic_drafts = drafts[object.id]
+        topic_drafts ||= DiscussionEntryDraft.none
+        fulfill(object, topic_drafts)
+      end
     end
   end
 end
