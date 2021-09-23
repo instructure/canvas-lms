@@ -122,10 +122,13 @@ class SubmissionCommentsApiController < ApplicationController
     GuardRail.activate(:secondary) do
       if authorized_action?(Account.site_admin, @current_user, :send_messages)
         assignment = api_find(@context.assignments.active, params[:assignment_id])
-        author = api_find(@context.all_current_users, params[:author_id])
+        author = assignment.shard.activate { api_find(User.active, params[:author_id]) }
         user = api_find(@context.all_current_users, params[:user_id])
         submission = assignment.submissions.where(user_id: user).take
-        return render json: { error: "Couldn't find Submission for user with API id #{params[:user_id]}" }, status: :bad_request unless submission
+        unless submission
+          return render json: { error: "Couldn't find Submission for user with API id #{params[:user_id]}" },
+                        status: :bad_request
+        end
 
         user.mark_submission_annotations_unread!(submission) unless user == author
 
@@ -140,7 +143,7 @@ class SubmissionCommentsApiController < ApplicationController
           if assignment.post_manually? && !submission.posted?
             return render json: {}, status: 200
           end
-        else # author is a student
+        else # author is a student or admin
           # always notify instructor
           broadcast_annotation_notification(submission: submission, to_list: instructors, data: broadcast_data(author))
         end
