@@ -128,17 +128,17 @@ describe('CreateCourseModal', () => {
     const accountsPage1 = []
     for (let i = 0; i < 50; i++) {
       accountsPage1.push({
-        id: i,
+        id: String(i),
         name: String(i)
       })
     }
     const accountsPage2 = [
       {
-        id: 51,
+        id: '51',
         name: '51'
       },
       {
-        id: 52,
+        id: '52',
         name: '52'
       }
     ]

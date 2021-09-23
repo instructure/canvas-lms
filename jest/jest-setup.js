@@ -70,7 +70,6 @@ const ignoredErrors = [
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invalid prop `headingAs` of value `h4` supplied to `Billboard`/,
   /Invalid prop `id` of type `number` supplied to `Option`/,
-  /Invalid prop `open` of type `number` supplied to `(Modal|ModalSpinner)`/,
   /Invalid prop `outcomesGroup.contextId` of type `number` supplied to `FindOutcomesView`, expected `string`/,
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
@@ -80,7 +79,6 @@ const ignoredErrors = [
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
   /modalProps.onDismiss is not a function/,
-  /Must provide id for each option via `getOptionProps`/,
   /Prop `children` should be supplied unless/,
   /props.setRCEOpen is not a function/,
   /React does not recognize the `%s` prop on a DOM element/,
@@ -183,14 +181,12 @@ const ignoredWarnings = [
   /is deprecated and will be removed/,
   /Missing field __typename in/,
   /Missing field errors in/,
-  /Missing field id in/,
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
   /The `renderSortLabel` prop should be provided when Table is sortable/,
   /toBeEmpty has been deprecated/,
   /Translation for .* is missing/,
-  /Unmatched (GET|POST) to \/api\/v1/,
   /value provided is not in a recognized RFC2822 or ISO format/
 ]
 global.console = {
