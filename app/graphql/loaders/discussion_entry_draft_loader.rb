@@ -24,9 +24,8 @@ class Loaders::DiscussionEntryDraftLoader < GraphQL::Batch::Loader
     super()
   end
 
-  def perform(objects)
-    # objects is an array of DiscussionTopics.
-    objects.first.shard.activate do
+  def perform(all_objects)
+    Shard.partition_by_shard(all_objects) do |objects|
       scope = @current_user.discussion_entry_drafts.where(discussion_topic_id: objects)
       drafts = scope.group_by(&:discussion_topic_id)
       objects.each { |object| fulfill(object, drafts[object.id]) }
