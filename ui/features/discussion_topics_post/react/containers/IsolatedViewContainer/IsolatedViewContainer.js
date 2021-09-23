@@ -455,6 +455,7 @@ export const IsolatedViewContainer = props => {
               }
               fetchingMoreOlderReplies={fetchingMoreOlderReplies}
               fetchingMoreNewerReplies={fetchingMoreNewerReplies}
+              updateDraftCache={props.updateDraftCache}
             />
           </View>
         )}
@@ -523,9 +524,9 @@ IsolatedViewContainer.propTypes = {
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   replyFromId: PropTypes.string,
-  updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
-  relativeEntryId: PropTypes.string
+  relativeEntryId: PropTypes.string,
+  updateDraftCache: PropTypes.func
 }
 
 export default IsolatedViewContainer

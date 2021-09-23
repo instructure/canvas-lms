@@ -214,6 +214,7 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
+          updateDraftCache={updateDraftCache}
           onOpenIsolatedView={(
             discussionEntryId,
             isolatedEntryId,

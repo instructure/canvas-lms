@@ -226,6 +226,7 @@ export const IsolatedParent = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    updateDraftCache={props.updateDraftCache}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
@@ -259,5 +260,6 @@ IsolatedParent.propTypes = {
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  goToTopic: PropTypes.func
+  goToTopic: PropTypes.func,
+  updateDraftCache: PropTypes.func
 }

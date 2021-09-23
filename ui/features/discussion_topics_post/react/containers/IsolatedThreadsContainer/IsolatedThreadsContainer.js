@@ -132,6 +132,7 @@ export const IsolatedThreadsContainer = props => {
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
+          updateDraftCache={props.updateDraftCache}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -170,7 +171,8 @@ IsolatedThreadsContainer.propTypes = {
   hasMoreOlderReplies: PropTypes.bool,
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
-  fetchingMoreNewerReplies: PropTypes.bool
+  fetchingMoreNewerReplies: PropTypes.bool,
+  updateDraftCache: PropTypes.func
 }
 
 export default IsolatedThreadsContainer
@@ -353,6 +355,7 @@ const IsolatedThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     <View as="div" padding="x-small none none">
@@ -381,5 +384,6 @@ IsolatedThreadContainer.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  isHighlighted: PropTypes.bool
+  isHighlighted: PropTypes.bool,
+  updateDraftCache: PropTypes.func
 }
