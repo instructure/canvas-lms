@@ -67,11 +67,11 @@ describe "master courses - course picker" do
     user_session(@admin)
   end
 
-  let(:course_search_input) {'.bca-course-filter input[type="search"]'}
-  let(:filter_output) {'.bca-course-details__wrapper'}
-  let(:loading) {'.bca-course-picker__loading'}
-  let(:term_filter) {'#termsFilter'}
-  let(:sub_account_filter) {'#subAccountsFilter'}
+  let(:course_search_input) { '.bca-course-filter input[type="search"]' }
+  let(:filter_output) { '.bca-course-details__wrapper' }
+  let(:loading) { '.bca-course-picker__loading' }
+  let(:term_filter) { '#termsFilter' }
+  let(:sub_account_filter) { '#subAccountsFilter' }
 
   def wait_for_spinner
     wait_for_transient_element(loading) { yield }

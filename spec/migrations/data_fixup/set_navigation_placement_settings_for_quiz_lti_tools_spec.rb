@@ -62,7 +62,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
       expect(quiz_tool.extension_setting(:account_navigation, :display_type)).to eq "full_width"
       expect(quiz_tool.extension_setting(:account_navigation, :text)).to eq "Item Banks"
       expect(quiz_tool.extension_setting(:account_navigation, :default)).to eq "enabled"
-      expect(quiz_tool.extension_setting(:account_navigation, :custom_fields)).to eq({"item_banks"=>"account"})
+      expect(quiz_tool.extension_setting(:account_navigation, :custom_fields)).to eq({ "item_banks" => "account" })
     end
 
     ContextExternalTool.quiz_lti.find_by(workflow_state: 'deleted')
@@ -80,7 +80,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
       expect(quiz_tool.extension_setting(:course_navigation, :display_type)).to eq "full_width"
       expect(quiz_tool.extension_setting(:course_navigation, :text)).to eq "Item Banks"
       expect(quiz_tool.extension_setting(:course_navigation, :default)).to eq "enabled"
-      expect(quiz_tool.extension_setting(:course_navigation, :custom_fields)).to eq({"item_banks"=>"course"})
+      expect(quiz_tool.extension_setting(:course_navigation, :custom_fields)).to eq({ "item_banks" => "course" })
     end
   end
 
@@ -108,19 +108,19 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     some_tool = ContextExternalTool.find_by(tool_id: 'Some tool')
 
     expect(some_tool.quiz_lti?).to eq false
-    expect{
+    expect {
       DataFixup::SetNavigationPlacementSettingsForQuizLtiTools.run
       some_tool.reload
-    }.to not_change{some_tool.settings}
+    }.to not_change { some_tool.settings }
   end
 
   it 'should not set navigation placement settings for Quiz LTI tools where context_type is not Account' do
     quiz_tool = ContextExternalTool.quiz_lti.last
     quiz_tool.update!(context_type: 'Course')
 
-    expect{
+    expect {
       DataFixup::SetNavigationPlacementSettingsForQuizLtiTools.run
       quiz_tool.reload
-    }.to not_change{quiz_tool.settings}
+    }.to not_change { quiz_tool.settings }
   end
 end

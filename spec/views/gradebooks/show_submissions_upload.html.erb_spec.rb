@@ -55,54 +55,54 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     before :each do
       progress.workflow_state = "completed"
       progress.set_results({
-        comments: [
-          {
-            attachments: [
-              {filename: "egg.png", display_name: "egg.png", id: "9901"}
-            ],
+                             comments: [
+                               {
+                                 attachments: [
+                                   { filename: "egg.png", display_name: "egg.png", id: "9901" }
+                                 ],
 
-            id: "9801",
+                                 id: "9801",
 
-            submission: {
-              user_id: "1101",
-              user_name: "Adam Jones"
-            }
-          },
+                                 submission: {
+                                   user_id: "1101",
+                                   user_name: "Adam Jones"
+                                 }
+                               },
 
-          {
-            attachments: [
-              {filename: "mydog.png", display_name: "My Dog", id: "9902"}
-            ],
+                               {
+                                 attachments: [
+                                   { filename: "mydog.png", display_name: "My Dog", id: "9902" }
+                                 ],
 
-            id: "9802",
+                                 id: "9802",
 
-            submission: {
-              user_id: "1102",
-              user_name: "Betty Ford"
-            }
-          },
+                                 submission: {
+                                   user_id: "1102",
+                                   user_name: "Betty Ford"
+                                 }
+                               },
 
-          {
-            attachments: [
-              {filename: "bacon.png", display_name: "Delicious Bacon", id: "9903"},
-              {filename: "toast.png", display_name: "toast.png", id: "9904"},
-              {filename: "coffee.png", display_name: "coffee.png", id: "9905"}
-            ],
+                               {
+                                 attachments: [
+                                   { filename: "bacon.png", display_name: "Delicious Bacon", id: "9903" },
+                                   { filename: "toast.png", display_name: "toast.png", id: "9904" },
+                                   { filename: "coffee.png", display_name: "coffee.png", id: "9905" }
+                                 ],
 
-            id: "9803",
+                                 id: "9803",
 
-            submission: {
-              user_id: "1103",
-              user_name: "Albert Breakfast"
-            }
-          }
-        ],
+                                 submission: {
+                                   user_id: "1103",
+                                   user_name: "Albert Breakfast"
+                                 }
+                               }
+                             ],
 
-        ignored_files: [
-          "/tmp/pfKn/fartingkangaroo.mp4",
-          "/tmp/pfKn/naughtymuppets.jpeg"
-        ]
-      })
+                             ignored_files: [
+                               "/tmp/pfKn/fartingkangaroo.mp4",
+                               "/tmp/pfKn/naughtymuppets.jpeg"
+                             ]
+                           })
     end
 
     it "displays a message indicating successful upload" do

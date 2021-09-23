@@ -83,17 +83,17 @@ describe Switchman::Shard do
 
       expect(window[0].wday).to eq(Date::DAYNAMES.index('Tuesday'))
     end
-    
+
     context 'with a positive timezone' do
       before do
         @old_zone = ::Time.zone
-        ::Time.zone = ActiveSupport::TimeZone['Melbourne']  
+        ::Time.zone = ActiveSupport::TimeZone['Melbourne']
       end
 
       after do
         ::Time.zone = @old_zone
       end
-      
+
       it 'Returns a window on the correct day' do
         allow(Setting).to receive(:get).with("maintenance_window_start_hour", anything).and_return('0')
         allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return('Tuesday')
@@ -109,14 +109,14 @@ describe Switchman::Shard do
       allow(Setting).to receive(:get).with("maintenance_window_weekday", anything).and_return('Tuesday')
       allow(Setting).to receive(:get).with("maintenance_window_weeks_of_month", anything).and_return('2,4')
 
-      Timecop.freeze(Time.utc(2021,3,1,12,0)) do
+      Timecop.freeze(Time.utc(2021, 3, 1, 12, 0)) do
         window = DatabaseServer.all.first.next_maintenance_window
 
         # The 9th was the second tuesday of that month
         expect(window[0].day).to eq(9)
       end
 
-      Timecop.freeze(Time.utc(2021,3,10,12,0)) do
+      Timecop.freeze(Time.utc(2021, 3, 10, 12, 0)) do
         window = DatabaseServer.all.first.next_maintenance_window
 
         # The 23rd was the fourth tuesday of that month

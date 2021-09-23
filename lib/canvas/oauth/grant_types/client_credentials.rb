@@ -33,6 +33,7 @@ module Canvas::Oauth
           if @provider.key&.client_credentials_audience != "external"
             raise Canvas::Oauth::InvalidRequestError, 'assertion method not supported for this grant_type'
           end
+
           @secret = opts.fetch(:client_secret)
         end
       end

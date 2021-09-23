@@ -27,8 +27,8 @@ class WikiPages::ScopedToUser < ScopeFilter
       if wiki_context.is_a?(Course) && wiki_context.feature_enabled?(:conditional_release)
         return DifferentiableAssignment.scope_filter(@relation, user, wiki_context)
       end
+
       @relation
     end
   end
 end
-

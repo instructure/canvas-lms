@@ -22,7 +22,7 @@ module Lti::Ims::Concerns
     extend ActiveSupport::Concern
 
     UNIVERSAL_GRANT_HOST = Canvas::Security.config['lti_grant_host'] ||
-      'canvas.instructure.com'.freeze
+                           'canvas.instructure.com'.freeze
 
     class AccessToken
       def initialize(raw_jwt_str)
@@ -84,19 +84,19 @@ module Lti::Ims::Concerns
     # factories for array matchers typically returned by #scopes_matcher
     class_methods do
       def all_of(*items)
-        -> (match_in) { items.present? && (items - match_in).blank? }
+        ->(match_in) { items.present? && (items - match_in).blank? }
       end
 
       def any_of(*items)
-        -> (match_in) { items.present? && (items & match_in).present? }
+        ->(match_in) { items.present? && (items & match_in).present? }
       end
 
       def any
-        -> (_) { true }
+        ->(_) { true }
       end
 
       def none
-        -> (_) { false }
+        ->(_) { false }
       end
     end
 

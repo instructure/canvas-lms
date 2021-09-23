@@ -29,19 +29,19 @@ describe AppointmentGroup do
     it "should ensure the course section matches the course" do
       other_section = Course.create!.default_section
       expect(AppointmentGroup.new(
-        :title => "test",
-        :contexts => [@course],
-        :sub_context_codes => [other_section.asset_string]
-      )).not_to be_valid
+               :title => "test",
+               :contexts => [@course],
+               :sub_context_codes => [other_section.asset_string]
+             )).not_to be_valid
     end
 
     it "should ensure the group category matches the course" do
       other_course = Course.create!(name: 'Other')
       expect(AppointmentGroup.new(
-        :title => "test",
-        :contexts => [@course],
-        :sub_context_codes => [GroupCategory.create(name: "foo", course: other_course).asset_string]
-      )).not_to be_valid
+               :title => "test",
+               :contexts => [@course],
+               :sub_context_codes => [GroupCategory.create(name: "foo", course: other_course).asset_string]
+             )).not_to be_valid
     end
 
     it "should include all section if only course is specified" do
@@ -84,7 +84,7 @@ describe AppointmentGroup do
       group.contexts = [@course]
       group.save!
 
-      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+      expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
     end
 
     it 'should include all course_ids' do
@@ -94,7 +94,7 @@ describe AppointmentGroup do
       group.contexts = [@course, course2]
       group.save!
 
-      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+      expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
     end
 
     it 'should include course_id if the context is a section' do
@@ -103,7 +103,7 @@ describe AppointmentGroup do
       group.contexts = [@course.default_section]
       group.save!
 
-      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+      expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
     end
 
     it 'should include mixed contexts course_ids' do
@@ -113,7 +113,7 @@ describe AppointmentGroup do
       group.contexts = [@course.default_section, course2]
       group.save!
 
-      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+      expect(group.broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
     end
   end
 
@@ -223,9 +223,9 @@ describe AppointmentGroup do
       expect(@ag.end_at).to eql @ag.appointments.map(&:end_at).max
 
       expect(@ag.update(:new_appointments => [
-        ['2012-01-01 17:00:00', '2012-01-01 18:00:00'],
-        ['2012-01-01 07:00:00', '2012-01-01 08:00:00']
-      ])).to be_truthy
+                          ['2012-01-01 17:00:00', '2012-01-01 18:00:00'],
+                          ['2012-01-01 07:00:00', '2012-01-01 08:00:00']
+                        ])).to be_truthy
 
       expect(@ag.appointments.size).to eql 3
       expect(@ag.start_at).to eql @ag.appointments.map(&:start_at).min
@@ -237,11 +237,11 @@ describe AppointmentGroup do
     before :each do
       course_with_teacher_logged_in(:active_all => true)
       @ag = AppointmentGroup.create!(
-          :title => "test",
-          :description => "hello",
-          :contexts => [@course],
-          :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'],
-                                ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
+        :title => "test",
+        :description => "hello",
+        :contexts => [@course],
+        :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'],
+                              ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
     end
 
@@ -315,7 +315,7 @@ describe AppointmentGroup do
       # teacher can't reserve anything for himself
       visible_groups = AppointmentGroup.reservable_by(@teacher).sort_by(&:id)
       expect(visible_groups).to eql []
-      @groups.each{ |g|
+      @groups.each { |g|
         expect(g.grants_right?(@teacher, :reserve)).to be_falsey
         expect(g.eligible_participant?(@teacher)).to be_falsey
       }
@@ -323,7 +323,7 @@ describe AppointmentGroup do
       # nor can the ta
       visible_groups = AppointmentGroup.reservable_by(@ta).sort_by(&:id)
       expect(visible_groups).to eql []
-      @groups.each{ |g|
+      @groups.each { |g|
         expect(g.grants_right?(@ta, :reserve)).to be_falsey
         expect(g.eligible_participant?(@ta)).to be_falsey
       }
@@ -364,7 +364,6 @@ describe AppointmentGroup do
       expect(@g9.grants_right?(@student_in_course3_section2, :reserve)).to be_truthy
     end
 
-
     it "should return only appointment groups that are manageable by the user" do
       # teacher can manage everything in the course
       visible_groups = AppointmentGroup.manageable_by(@teacher).sort_by(&:id)
@@ -391,7 +390,7 @@ describe AppointmentGroup do
       # student can't manage anything
       visible_groups = AppointmentGroup.manageable_by(@student).sort_by(&:id)
       expect(visible_groups).to eql []
-      @groups.each{ |g| expect(g.grants_right?(@student, :manage)).to be_falsey }
+      @groups.each { |g| expect(g.grants_right?(@student, :manage)).to be_falsey }
 
       # multiple contexts
       expect(@g8.grants_right?(@teacher, :manage)).to be_falsey  # not in any courses
@@ -437,7 +436,7 @@ describe AppointmentGroup do
       course_with_observer(active_all: true, active_cc: true, course: @course, associated_user_id: @student)
 
       [@teacher, @student].each do |user|
-        communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
+        communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
       end
 
       @ag = AppointmentGroup.create!(:title => "test", :contexts => [@course], :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
@@ -476,8 +475,8 @@ describe AppointmentGroup do
       @unpublished_course.enroll_user(@observer, 'ObserverEnrollment')
 
       @ag = AppointmentGroup.create!(:title => "test",
-                                       :contexts => [@unpublished_course],
-                                       :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
+                                     :contexts => [@unpublished_course],
+                                     :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       @ag.publish!
       expect(@ag.messages_sent).to be_empty
 
@@ -720,5 +719,4 @@ describe AppointmentGroup do
       expect(@ag.users_with_reservations_through_group).not_to include @not_group_user.id
     end
   end
-
 end

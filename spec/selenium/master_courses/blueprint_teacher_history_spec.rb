@@ -44,7 +44,7 @@ describe "master courses - child courses - sync history for teacher" do
 
   it "should show import history to a teacher", priority: "1", test_id: 3208649 do
     assmt = @copy_from.assignments.create!(title: "assmt", due_at: 2.days.from_now)
-    @template.create_content_tag_for!(assmt, {restrictions: {content: true}})
+    @template.create_content_tag_for!(assmt, { restrictions: { content: true } })
     topic = @copy_from.discussion_topics.create!(title: "something")
     run_master_migration # run the full export initially
 
@@ -60,16 +60,16 @@ describe "master courses - child courses - sync history for teacher" do
     wait_for_ajaximations
 
     rows = ff(".bcs__history-item__change-log-row")
-    assmt_row = rows.detect{|r| r.text.include?(assmt.title)}
+    assmt_row = rows.detect { |r| r.text.include?(assmt.title) }
     expect(assmt_row).to contain_css("svg[name=IconBlueprintLock]")
     expect(assmt_row).to include_text("Updated")
     expect(assmt_row).to include_text("Yes") # change applied
 
-    topic_row = rows.detect{|r| r.text.include?(topic_to.title)}
+    topic_row = rows.detect { |r| r.text.include?(topic_to.title) }
     expect(topic_row).to contain_css("svg[name=IconBlueprint]")
     expect(topic_row).to include_text("No") # change not applied
 
-    page_row = rows.detect{|r| r.text.include?(page.title)}
+    page_row = rows.detect { |r| r.text.include?(page.title) }
     expect(page_row).to include_text("Created")
   end
 end

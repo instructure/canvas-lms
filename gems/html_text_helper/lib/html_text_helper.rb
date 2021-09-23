@@ -56,6 +56,7 @@ module HtmlTextHelper
   # tweak and improve it as time goes on.
   def html_to_text(html_str, opts = {})
     return '' if html_str.blank?
+
     doc = Nokogiri::HTML.fragment(html_str)
     text = html_node_to_text(doc, opts)
     text.squeeze!(' ')
@@ -69,7 +70,7 @@ module HtmlTextHelper
   end
 
   # turns a nokogiri element, node, or fragment into text (recursively!)
-  def html_node_to_text(node, opts={})
+  def html_node_to_text(node, opts = {})
     if node.text?
       text = node.text
       text.gsub!(/\s+/, ' ') unless opts[:pre]
@@ -80,7 +81,7 @@ module HtmlTextHelper
            when 'link', 'script'
              ''
            when 'pre'
-             node.children.map{|c| html_node_to_text(c, opts.merge(pre: true))}.join
+             node.children.map { |c| html_node_to_text(c, opts.merge(pre: true)) }.join
            when 'img'
              src = node['src']
              if src
@@ -100,7 +101,7 @@ module HtmlTextHelper
            when 'br'
              "\n"
            else
-             subtext = node.children.map{|c| html_node_to_text(c, opts)}.join
+             subtext = node.children.map { |c| html_node_to_text(c, opts) }.join
              case node.name
              when 'a'
                href = node['href']
@@ -131,6 +132,7 @@ module HtmlTextHelper
              end
            end
     return "\n\n#{text}\n\n" if node.description.try(:block?)
+
     text
   end
 
@@ -138,11 +140,11 @@ module HtmlTextHelper
   # *******
   # like so
   # *******
-  def banner(text, opts={})
+  def banner(text, opts = {})
     return text if text.empty?
 
     char = opts.fetch(:char, '*')
-    text_width = text.lines.map{|l| l.strip.length}.max
+    text_width = text.lines.map { |l| l.strip.length }.max
     text_width = [text_width, opts[:line_width]].min if opts[:line_width]
     line = char * text_width
 
@@ -170,6 +172,7 @@ module HtmlTextHelper
   # Returns an HTML string.
   def html_to_simple_html(html, options = {})
     return '' if html.blank?
+
     base_url = options.fetch(:base_url, '')
     config = Sanitize::Config::BASIC
     if options[:tags] || options[:attributes]
@@ -228,7 +231,7 @@ module HtmlTextHelper
       (?:
         https?://                                # http or https protocol
         |                                        # or
-        www\d{0,3}[.]                            # "www.", "www1.", "www2." … "www999."
+        www\d{0,3}[.]                            # "www.", "www1.", "www2." ... "www999."
         |                                        # or
         [a-z0-9.\-]+[.][a-z]{2,4}/               # looks like domain name followed by a slash
       )
@@ -249,8 +252,9 @@ module HtmlTextHelper
   }xi
 
   # Converts a plaintext message to html, with newlinification, quotification, and linkification
-  def format_message(message, opts={:url => nil, :notification_id => nil})
+  def format_message(message, opts = { :url => nil, :notification_id => nil })
     return '' unless message
+
     # insert placeholders for the links we're going to generate, before we go and escape all the html
     links = []
     placeholder_blocks = []
@@ -319,7 +323,7 @@ module HtmlTextHelper
     CGI::unescapeHTML text
   end
 
-  def self.strip_and_truncate(text, options={})
+  def self.strip_and_truncate(text, options = {})
     CanvasTextHelper::truncate_text(strip_tags(text), options)
   end
 end

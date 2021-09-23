@@ -25,7 +25,7 @@ describe "/profile/_sms_select" do
   it "should render" do
     course_with_student
     view_context
-    cc = communication_channel(@user, {username: 'user@example.com'})
+    cc = communication_channel(@user, { username: 'user@example.com' })
     assign(:other_channels, [cc])
     assign(:sms_channels, [])
 
@@ -33,4 +33,3 @@ describe "/profile/_sms_select" do
     expect(response).not_to be_nil
   end
 end
-

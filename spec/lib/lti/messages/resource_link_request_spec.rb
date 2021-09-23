@@ -28,7 +28,7 @@ describe Lti::Messages::ResourceLinkRequest do
   # rubocop:enable RSpec/ScatteredLet
 
   shared_examples 'disabled rlid claim group check' do
-    let(:opts) { super().merge({claim_group_blacklist: [:rlid]}) }
+    let(:opts) { super().merge({ claim_group_blacklist: [:rlid] }) }
 
     it 'does not set the resource link id' do
       expect(jws).not_to include('https://purl.imsglobal.org/spec/lti/claim/resource_link')
@@ -232,9 +232,9 @@ describe Lti::Messages::ResourceLinkRequest do
         context 'but the tool is associated with the assignment (i.e. an upgrade or reinstallation occured)' do
           before do
             assignment.line_items
-              .find(&:assignment_line_item?)
-              .resource_link
-              .update!(context_external_tool: duplicate_tool)
+                      .find(&:assignment_line_item?)
+                      .resource_link
+                      .update!(context_external_tool: duplicate_tool)
           end
 
           it 'allows the LTI launch to occur' do

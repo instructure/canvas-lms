@@ -20,6 +20,7 @@ import getCookie from 'get-cookie'
 import gql from 'graphql-tag'
 import {ApolloClient} from 'apollo-client'
 import {InMemoryCache, IntrospectionFragmentMatcher} from 'apollo-cache-inmemory'
+import {persistCache} from 'apollo-cache-persist'
 import {HttpLink} from 'apollo-link-http'
 import {onError} from 'apollo-link-error'
 import {ApolloLink} from 'apollo-link'
@@ -81,8 +82,17 @@ function createCache() {
   })
 }
 
-function createClient(opts = {}) {
+async function createPersistentCache() {
   const cache = createCache()
+  await persistCache({
+    cache,
+    storage: window.localStorage
+  })
+  return cache
+}
+
+function createClient(opts = {}) {
+  const cache = opts.cache || createCache()
   const defaults = opts.defaults || {}
   const resolvers = opts.resolvers || {}
   const stateLink = withClientState({
@@ -138,4 +148,4 @@ function createClient(opts = {}) {
   return client
 }
 
-export {createClient, gql, ApolloProvider, Query, createCache}
+export {createClient, gql, ApolloProvider, Query, createCache, createPersistentCache}

@@ -38,4 +38,3 @@ describe "TimedCache" do
     end
   end
 end
-

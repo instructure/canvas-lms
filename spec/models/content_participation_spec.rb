@@ -32,28 +32,28 @@ describe ContentParticipation do
     it "should create if it doesn't exist" do
       expect {
         ContentParticipation.create_or_update({
-          :content => @content,
-          :user => @student,
-          :workflow_state => "read",
-        })
+                                                :content => @content,
+                                                :user => @student,
+                                                :workflow_state => "read",
+                                              })
       }.to change(ContentParticipation, :count).by 1
     end
 
     it "should update existing if one already exists" do
       expect {
         ContentParticipation.create_or_update({
-          :content => @content,
-          :user => @student,
-          :workflow_state => "read",
-        })
+                                                :content => @content,
+                                                :user => @student,
+                                                :workflow_state => "read",
+                                              })
       }.to change(ContentParticipation, :count).by 1
 
       expect {
         ContentParticipation.create_or_update({
-          :content => @content,
-          :user => @student,
-          :workflow_state => "unread",
-        })
+                                                :content => @content,
+                                                :user => @student,
+                                                :workflow_state => "unread",
+                                              })
       }.to change(ContentParticipation, :count).by 0
 
       cp = ContentParticipation.where(:user_id => @student).first
@@ -65,17 +65,17 @@ describe ContentParticipation do
     it "should update the participation count automatically when the workflow state changes" do
       expect {
         ContentParticipation.create_or_update({
-          :content => @content,
-          :user => @student,
-          :workflow_state => "read",
-        })
+                                                :content => @content,
+                                                :user => @student,
+                                                :workflow_state => "read",
+                                              })
       }.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
-        :content => @content,
-        :user => @student,
-        :workflow_state => "unread",
-      })
+                                              :content => @content,
+                                              :user => @student,
+                                              :workflow_state => "unread",
+                                            })
       cpc = ContentParticipationCount.where(:user_id => @student).first
       expect(cpc.unread_count).to eq 1
     end
@@ -83,17 +83,17 @@ describe ContentParticipation do
     it "should not update participation count if workflow_state doesn't change" do
       expect {
         ContentParticipation.create_or_update({
-          :content => @content,
-          :user => @student,
-          :workflow_state => "read",
-        })
+                                                :content => @content,
+                                                :user => @student,
+                                                :workflow_state => "read",
+                                              })
       }.to change(ContentParticipationCount, :count).by 1
 
       ContentParticipation.create_or_update({
-        :content => @content,
-        :user => @student,
-        :workflow_state => "read",
-      })
+                                              :content => @content,
+                                              :user => @student,
+                                              :workflow_state => "read",
+                                            })
       cpc = ContentParticipationCount.where(:user_id => @student).first
       expect(cpc.unread_count).to eq 0
     end
@@ -102,10 +102,10 @@ describe ContentParticipation do
   describe 'create' do
     it 'should set the root_account_id from the submissions assignment' do
       participant = ContentParticipation.create_or_update({
-        :content => @content,
-        :user => @student,
-        :workflow_state => "unread",
-      })
+                                                            :content => @content,
+                                                            :user => @student,
+                                                            :workflow_state => "unread",
+                                                          })
       expect(participant.root_account_id).to eq(@assignment.root_account_id)
     end
   end

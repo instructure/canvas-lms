@@ -30,6 +30,6 @@ class AddCustomClaimColumnsToLtiResourceLinks < ActiveRecord::Migration[5.2]
               algorithm: :concurrently, if_not_exists: true,
               name: "index_lti_resource_links_by_context_id_context_type"
     add_index :lti_resource_links, :lookup_id, algorithm: :concurrently,
-              unique: true, if_not_exists: true
+                                               unique: true, if_not_exists: true
   end
 end

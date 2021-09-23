@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::Base
-  def perform(cm=nil)
+  def perform(cm = nil)
     cm ||= ContentMigration.find migration_id
 
     cm.workflow_state = :pre_processing
@@ -48,7 +48,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         if ce.workflow_state == 'exported_for_course_copy'
           # use the exported attachment as the import archive
           cm.attachment = ce.attachment
-          cm.migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
+          cm.migration_settings[:migration_ids_to_import] ||= { :copy => {} }
           cm.migration_settings[:migration_ids_to_import][:copy][:everything] = true
           # set any attachments referenced in html to be copied
           ce.selected_content['attachments'] ||= {}

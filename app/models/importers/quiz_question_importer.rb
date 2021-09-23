@@ -21,10 +21,9 @@ require_dependency 'importers'
 
 module Importers
   class QuizQuestionImporter < Importer
-
     self.item_class = Quizzes::QuizQuestion
 
-    def self.import_from_migration(aq_hash, qq_hash, position, qq_ids, context, migration, quiz=nil, quiz_group=nil)
+    def self.import_from_migration(aq_hash, qq_hash, position, qq_ids, context, migration, quiz = nil, quiz_group = nil)
       unless aq_hash[:prepped_for_import]
         Importers::AssessmentQuestionImporter.prep_for_import(aq_hash, migration, :quiz_question)
       end
@@ -37,10 +36,10 @@ module Importers
       mig_id = qq_hash['quiz_question_migration_id'] || qq_hash['migration_id']
 
       if id = qq_ids[mig_id]
-        data = {quiz_group_id: quiz_group&.id,
-          assessment_question_id: hash['assessment_question_id'], question_data: hash,
-          created_at: Time.now.utc, updated_at: Time.now.utc, migration_id: mig_id,
-          position: position}
+        data = { quiz_group_id: quiz_group&.id,
+                 assessment_question_id: hash['assessment_question_id'], question_data: hash,
+                 created_at: Time.now.utc, updated_at: Time.now.utc, migration_id: mig_id,
+                 position: position }
         data.delete(:assessment_question_id) if hash['assessment_question_id'].nil? && migration.for_master_course_import? # don't undo an existing association
         Quizzes::QuizQuestion.where(id: id).update_all(data)
       else
@@ -55,7 +54,7 @@ module Importers
         SQL
         GuardRail.activate(:primary) do
           qq_ids[mig_id] = self.item_class.connection.insert(query, "#{self.item_class.name} Create",
-            self.item_class.primary_key, nil, self.item_class.sequence_name)
+                                                             self.item_class.primary_key, nil, self.item_class.sequence_name)
         end
       end
       hash

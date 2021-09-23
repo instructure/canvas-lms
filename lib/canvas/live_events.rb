@@ -35,33 +35,34 @@ module Canvas::LiveEvents
   def self.amended_context(canvas_context)
     ctx = LiveEvents.get_context || {}
     return ctx unless canvas_context
+
     ctx = ctx.merge({
-      context_type: canvas_context.class.to_s,
-      context_id: canvas_context.global_id
-    })
+                      context_type: canvas_context.class.to_s,
+                      context_id: canvas_context.global_id
+                    })
     if canvas_context.respond_to?(:root_account)
       ctx.merge!({
-        root_account_id: canvas_context.root_account.try(:global_id),
-        root_account_uuid: canvas_context.root_account.try(:uuid),
-        root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
-      })
+                   root_account_id: canvas_context.root_account.try(:global_id),
+                   root_account_uuid: canvas_context.root_account.try(:uuid),
+                   root_account_lti_guid: canvas_context.root_account.try(:lti_guid),
+                 })
     end
     ctx
   end
 
   def self.conversation_created(conversation)
     post_event_stringified('conversation_created', {
-      conversation_id: conversation.id,
-      updated_at: conversation.updated_at
-    })
+                             conversation_id: conversation.id,
+                             updated_at: conversation.updated_at
+                           })
   end
 
   def self.conversation_forwarded(conversation)
     post_event_stringified('conversation_forwarded', {
-      conversation_id: conversation.id,
-      updated_at: conversation.updated_at
-      },
-      amended_context(nil))
+                             conversation_id: conversation.id,
+                             updated_at: conversation.updated_at
+                           },
+                           amended_context(nil))
   end
 
   def self.get_course_data(course)
@@ -86,19 +87,19 @@ module Canvas::LiveEvents
 
   def self.course_syllabus_updated(course, old_syllabus_body)
     post_event_stringified('syllabus_updated', {
-      course_id: course.global_id,
-      syllabus_body: LiveEvents.truncate(course.syllabus_body),
-      old_syllabus_body: LiveEvents.truncate(old_syllabus_body)
-    })
+                             course_id: course.global_id,
+                             syllabus_body: LiveEvents.truncate(course.syllabus_body),
+                             old_syllabus_body: LiveEvents.truncate(old_syllabus_body)
+                           })
   end
 
   def self.conversation_message_created(conversation_message)
     post_event_stringified('conversation_message_created', {
-      author_id: conversation_message.author_id,
-      conversation_id: conversation_message.conversation_id,
-      created_at: conversation_message.created_at,
-      message_id: conversation_message.id
-    })
+                             author_id: conversation_message.author_id,
+                             conversation_id: conversation_message.conversation_id,
+                             created_at: conversation_message.created_at,
+                             message_id: conversation_message.id
+                           })
   end
 
   def self.discussion_entry_created(entry)
@@ -114,7 +115,7 @@ module Canvas::LiveEvents
 
   def self.get_discussion_entry_data(entry)
     payload = {
-      user_id:  entry.user_id,
+      user_id: entry.user_id,
       created_at: entry.created_at,
       discussion_entry_id: entry.id,
       discussion_topic_id: entry.discussion_topic_id,
@@ -150,13 +151,13 @@ module Canvas::LiveEvents
 
   def self.account_notification_created(notification)
     post_event_stringified('account_notification_created', {
-      account_notification_id: notification.global_id,
-      subject: LiveEvents.truncate(notification.subject),
-      message: LiveEvents.truncate(notification.message),
-      icon: notification.icon,
-      start_at: notification.start_at,
-      end_at: notification.end_at,
-    })
+                             account_notification_id: notification.global_id,
+                             subject: LiveEvents.truncate(notification.subject),
+                             message: LiveEvents.truncate(notification.message),
+                             icon: notification.icon,
+                             start_at: notification.start_at,
+                             end_at: notification.end_at,
+                           })
   end
 
   def self.get_group_membership_data(membership)
@@ -292,7 +293,7 @@ module Canvas::LiveEvents
   end
 
   def self.assignments_bulk_updated(assignment_ids)
-    Assignment.where(:id => assignment_ids).each{|a| assignment_updated(a)}
+    Assignment.where(:id => assignment_ids).each { |a| assignment_updated(a) }
   end
 
   def self.submissions_bulk_updated(submissions)
@@ -484,13 +485,13 @@ module Canvas::LiveEvents
 
   def self.user_account_association_created(assoc)
     post_event_stringified('user_account_association_created', {
-      user_id: assoc.global_user_id,
-      account_id: assoc.global_account_id,
-      account_uuid: assoc.account.uuid,
-      created_at: assoc.created_at,
-      updated_at: assoc.updated_at,
-      is_admin: !(assoc.account.root_account.cached_all_account_users_for(assoc.user).empty?),
-    })
+                             user_id: assoc.global_user_id,
+                             account_id: assoc.global_account_id,
+                             account_uuid: assoc.account.uuid,
+                             created_at: assoc.created_at,
+                             updated_at: assoc.updated_at,
+                             is_admin: !(assoc.account.root_account.cached_all_account_users_for(assoc.user).empty?),
+                           })
   end
 
   def self.logged_in(session, user, pseudonym)
@@ -501,8 +502,8 @@ module Canvas::LiveEvents
     ctx[:user_sis_id] = pseudonym.sis_user_id
     ctx[:session_id] = session[:session_id] if session[:session_id]
     post_event_stringified('logged_in', {
-      redirect_url: session[:return_to]
-    }, ctx)
+                             redirect_url: session[:return_to]
+                           }, ctx)
   end
 
   def self.logged_out
@@ -512,17 +513,17 @@ module Canvas::LiveEvents
   def self.quiz_submitted(submission)
     # TODO: include score, for automatically graded portions?
     post_event_stringified('quiz_submitted', {
-      submission_id: submission.global_id,
-      quiz_id: submission.global_quiz_id
-    })
+                             submission_id: submission.global_id,
+                             quiz_id: submission.global_quiz_id
+                           })
   end
 
   def self.wiki_page_created(page)
     post_event_stringified('wiki_page_created', {
-      wiki_page_id: page.global_id,
-      title: LiveEvents.truncate(page.title),
-      body: LiveEvents.truncate(page.body)
-    })
+                             wiki_page_id: page.global_id,
+                             title: LiveEvents.truncate(page.title),
+                             body: LiveEvents.truncate(page.body)
+                           })
   end
 
   def self.wiki_page_updated(page, old_title, old_body)
@@ -545,9 +546,9 @@ module Canvas::LiveEvents
 
   def self.wiki_page_deleted(page)
     post_event_stringified('wiki_page_deleted', {
-      wiki_page_id: page.global_id,
-      title: LiveEvents.truncate(page.title)
-    })
+                             wiki_page_id: page.global_id,
+                             title: LiveEvents.truncate(page.title)
+                           })
   end
 
   def self.attachment_created(attachment)
@@ -567,7 +568,7 @@ module Canvas::LiveEvents
     post_event_stringified('attachment_deleted', get_attachment_data(attachment))
   end
 
-  def self.grade_changed(submission, old_submission=nil, old_assignment=submission.assignment)
+  def self.grade_changed(submission, old_submission = nil, old_assignment = submission.assignment)
     grader_id = nil
     if submission.grader_id && !submission.autograded?
       grader_id = submission.global_grader_id
@@ -578,22 +579,22 @@ module Canvas::LiveEvents
     end
 
     post_event_stringified('grade_change', {
-      submission_id: submission.global_id,
-      assignment_id: submission.global_assignment_id,
-      assignment_name: submission.assignment.name,
-      grade: submission.grade,
-      old_grade: old_submission.try(:grade),
-      score: submission.score,
-      old_score: old_submission.try(:score),
-      points_possible: submission.assignment.points_possible,
-      old_points_possible: old_assignment.points_possible,
-      grader_id: grader_id,
-      student_id: submission.global_user_id,
-      student_sis_id: sis_pseudonym&.sis_user_id,
-      user_id: submission.global_user_id,
-      grading_complete: submission.graded?,
-      muted: !submission.posted?
-    }, amended_context(submission.assignment.context))
+                             submission_id: submission.global_id,
+                             assignment_id: submission.global_assignment_id,
+                             assignment_name: submission.assignment.name,
+                             grade: submission.grade,
+                             old_grade: old_submission.try(:grade),
+                             score: submission.score,
+                             old_score: old_submission.try(:score),
+                             points_possible: submission.assignment.points_possible,
+                             old_points_possible: old_assignment.points_possible,
+                             grader_id: grader_id,
+                             student_id: submission.global_user_id,
+                             student_sis_id: sis_pseudonym&.sis_user_id,
+                             user_id: submission.global_user_id,
+                             grading_complete: submission.graded?,
+                             muted: !submission.posted?
+                           }, amended_context(submission.assignment.context))
   end
 
   def self.asset_access(asset, category, role, level, context: nil, context_membership: nil)
@@ -738,10 +739,10 @@ module Canvas::LiveEvents
 
   def self.course_completed(context_module_progression)
     post_event_stringified('course_completed',
-      get_course_completed_data(
-        context_module_progression.context_module.course,
-        context_module_progression.user
-      ))
+                           get_course_completed_data(
+                             context_module_progression.context_module.course,
+                             context_module_progression.user
+                           ))
   end
 
   def self.course_progress(context_module_progression)
@@ -849,6 +850,7 @@ module Canvas::LiveEvents
 
   def self.grade_override(score, old_score, enrollment, course)
     return unless score.course_score && score.override_score != old_score
+
     data = {
       score_id: score.id,
       enrollment_id: score.enrollment_id,

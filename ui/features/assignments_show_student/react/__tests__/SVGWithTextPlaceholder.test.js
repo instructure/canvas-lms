@@ -57,7 +57,7 @@ describe('SVGWithTextPlaceholder', () => {
 
   it('renders with null in img prop', () => {
     ReactDOM.render(
-      <SVGWithTextPlaceholder text="coolest test ever" />,
+      <SVGWithTextPlaceholder text="coolest test ever" url="" />,
       document.getElementById('fixtures')
     )
     const textContainer = $('#fixtures:contains("coolest test ever")')
@@ -66,7 +66,7 @@ describe('SVGWithTextPlaceholder', () => {
 
   it('renders when no props provided', () => {
     ReactDOM.render(
-      <SVGWithTextPlaceholder text="coolest test ever" />,
+      <SVGWithTextPlaceholder text="coolest test ever" url="" />,
       document.getElementById('fixtures')
     )
     const imgContainer = $('img')

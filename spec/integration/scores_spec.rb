@@ -98,7 +98,7 @@ module Lti::Ims
 
       context 'when line_item is an assignment and instfs is enabled' do
         let(:folder) { Folder.create!(name: "test", context: user) }
-        let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url)}
+        let(:progress) { Progress.create!(context: assignment, user: user, tag: :upload_via_url) }
 
         before :each do
           allow(InstFS).to receive(:enabled?).and_return(true)
@@ -107,7 +107,7 @@ module Lti::Ims
         end
 
         it 'creates a new submission' do
-          submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+          submission_body = { submitted_at: 1.hour.ago, submission_type: 'external_tool' }
           attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
           expect(result.submission.attachments.count).to eq 0
 
@@ -136,7 +136,7 @@ module Lti::Ims
           run_jobs
           expect(result.reload.submission.attachments.count).to eq 1
 
-          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = {submission_type: 'external_tool'}
+          line_item_params[Lti::Result::AGS_EXT_SUBMISSION] = { submission_type: 'external_tool' }
           post("/api/lti/courses/#{context.id}/line_items/#{line_item_id}/scores", params: line_item_params.to_json, headers: headers)
           run_jobs
           expect(result.reload.submission.attachments.count).to eq 0

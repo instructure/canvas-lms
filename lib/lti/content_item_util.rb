@@ -39,6 +39,5 @@ module Lti
     def callback(method)
       CanvasHttp.delay(priority: Delayed::LOW_PRIORITY, max_attempts: 3).__send__(method, @callback_url) if @callback_url
     end
-
   end
 end

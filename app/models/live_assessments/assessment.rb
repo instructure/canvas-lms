@@ -58,12 +58,14 @@ module LiveAssessments
     def generate_submissions_for(users)
       # if we aren't aligned, we don't need submissions
       return unless learning_outcome_alignments.any?
+
       Assessment.transaction do
         users.each do |user|
           submission = submissions.where(user_id: user.id).first_or_initialize
 
           user_results = results.for_user(user).to_a
           next unless user_results.any?
+
           submission.possible = user_results.count
           submission.score = user_results.count(&:passed)
           submission.assessed_at = user_results.map(&:assessed_at).max

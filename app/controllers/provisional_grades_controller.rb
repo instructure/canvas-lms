@@ -88,18 +88,18 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     render_unauthorized_action and return unless @assignment.permits_moderation?(@current_user)
 
     provisional_grade_ids = params[:provisional_grade_ids]
-    provisional_grades_by_id = @assignment.provisional_grades.
-      where(id: provisional_grade_ids).
-      preload(:submission).
-      index_by(&:id)
+    provisional_grades_by_id = @assignment.provisional_grades
+                                          .where(id: provisional_grade_ids)
+                                          .preload(:submission)
+                                          .index_by(&:id)
 
     submissions_by_student_id = provisional_grades_by_id.values.each_with_object({}) do |grade, map|
       map[grade.submission.user_id] = grade.submission
     end
 
-    selections_by_student_id = @assignment.moderated_grading_selections.
-      where(student_id: submissions_by_student_id.keys).
-      index_by(&:student_id)
+    selections_by_student_id = @assignment.moderated_grading_selections
+                                          .where(student_id: submissions_by_student_id.keys)
+                                          .index_by(&:student_id)
 
     all_by_student_id = provisional_grade_ids.each_with_object({}) do |grade_id, map|
       provisional_grade = provisional_grades_by_id[grade_id.to_i]
@@ -186,6 +186,7 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     submission = pg.submission
     selection = @assignment.moderated_grading_selections.where(student_id: submission.user_id).first
     return render :json => { :message => 'student not in moderation set' }, :status => :bad_request unless selection
+
     selection.provisional_grade = pg
     selection.save!
     selection.create_moderation_event(@current_user)
@@ -245,15 +246,15 @@ class ProvisionalGradesController < ProvisionalGradesBaseController
     grades_to_publish = graded_submissions.map do |submission|
       if (selection = selections[submission.user_id])
         # student in moderation: choose the selected provisional grade
-        selected_provisional_grade = submission.provisional_grades.
-          detect { |pg| pg.id == selection.selected_provisional_grade_id }
+        selected_provisional_grade = submission.provisional_grades
+                                               .detect { |pg| pg.id == selection.selected_provisional_grade_id }
       end
 
       # either the student is not in moderation, or not all provisional grades were entered
       # choose the first one with a grade (there should only be one)
       unless selected_provisional_grade
-        provisional_grades = submission.provisional_grades.
-          select { |pg| pg.graded_at.present? }
+        provisional_grades = submission.provisional_grades
+                                       .select { |pg| pg.graded_at.present? }
         selected_provisional_grade = provisional_grades.first if provisional_grades.count == 1
       end
 

@@ -31,8 +31,8 @@ module Lti
       def show
         dev_key = oauth2_request? ? developer_key : nil
         tcp_uuid = params[:tool_consumer_profile_id] ||
-          dev_key&.tool_consumer_profile&.uuid ||
-          Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
+                   dev_key&.tool_consumer_profile&.uuid ||
+                   Lti::ToolConsumerProfile::DEFAULT_TCP_UUID
         tcp_url = polymorphic_url([@context, :tool_consumer_profile], tool_consumer_profile_id: tcp_uuid)
         profile = Lti::ToolConsumerProfileCreator.new(
           @context,
@@ -46,7 +46,6 @@ module Lti
       def lti2_service_name
         TOOL_CONSUMER_PROFILE_SERVICE
       end
-
     end
   end
 end

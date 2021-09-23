@@ -58,6 +58,7 @@ module Lti
 
       def retrieve_export
         return nil if @export_status == FAILED_STATUS
+
         response = Canvas.retriable(on: Timeout::Error) do
           CanvasHttp.get(@fetch_url, base_request_headers)
         end
@@ -115,13 +116,13 @@ module Lti
       end
 
       def start_export_post_body
-        base_post_body.
-          merge(expanded_variables).
-          merge(selected_assets)
+        base_post_body
+          .merge(expanded_variables)
+          .merge(selected_assets)
       end
 
       def selected_assets
-        (@options[:selective] ? {custom_exported_assets: @options[:exported_assets]} : {})
+        (@options[:selective] ? { custom_exported_assets: @options[:exported_assets] } : {})
       end
     end
   end

@@ -31,8 +31,8 @@ module RuboCop
 
         BAD_CONST = "Selenium::WebDriver::Wait".freeze
         BAD_CONST_MATCHER = BAD_CONST.split("::")
-          .map { |name| ":#{name})" }
-          .join(" ")
+                                     .map { |name| ":#{name})" }
+                                     .join(" ")
 
         # (const
         #   (const
@@ -45,6 +45,7 @@ module RuboCop
 
         def on_const(node)
           return unless bad_const?(node)
+
           add_offense node, message: MSG, severity: :warning
         end
       end

@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe "syllabus" do
-  def anonymous_syllabus_access_allowed(property, value=true)
+  def anonymous_syllabus_access_allowed(property, value = true)
     course_with_teacher(:course => @course, :active_all => true)
     @course.send("#{property}=", value)
     @course.save!
@@ -148,7 +148,6 @@ describe "syllabus" do
     course_factory.save
     user_factory(active_user: true)
     user_session(@user)
-
   end
 
   it "should display syllabus description on syllabus course home pages" do

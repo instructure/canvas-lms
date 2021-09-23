@@ -161,7 +161,7 @@ class PageViewsController < ApplicationController
   include Api::V1::PageView
 
   def update
-    render :json => {:ok => true}
+    render :json => { :ok => true }
     # page view update happens in log_page_view after_action
   end
 
@@ -182,7 +182,7 @@ class PageViewsController < ApplicationController
     return unless authorized_action(@user, @current_user, :view_statistics)
 
     date_options = {}
-    url_options = {user_id: @user}
+    url_options = { user_id: @user }
     if start_time = CanvasTime.try_parse(params[:start_time])
       date_options[:oldest] = start_time
       url_options[:start_time] = params[:start_time]
@@ -215,7 +215,7 @@ class PageViewsController < ApplicationController
         options = {
           type: 'text/csv',
           filename: t(:download_filename, 'Pageviews For %{user}',
-          user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
+                      user: @user.name.to_s.gsub(/ /, '_')) + '.csv', disposition: 'attachment'
         }
         send_data(csv, options)
       end

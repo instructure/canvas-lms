@@ -34,7 +34,7 @@ describe "gradebook - logged in as a student" do
 
   describe 'total point displays' do
     before(:once) do
-      course_with_student({active_course: true, active_enrollment: true})
+      course_with_student({ active_course: true, active_enrollment: true })
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
       assignment = @course.assignments.build(points_possible: 20)
@@ -61,8 +61,8 @@ describe "gradebook - logged in as a student" do
 
   context 'when testing grading periods' do
     before(:once) do
-      account_admin_user({:active_user => true})
-      course_with_teacher({user: @user, active_course: true, active_enrollment: true})
+      account_admin_user({ :active_user => true })
+      course_with_teacher({ user: @user, active_course: true, active_enrollment: true })
       student_in_course
     end
 

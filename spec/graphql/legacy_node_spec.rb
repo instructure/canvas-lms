@@ -28,7 +28,7 @@ describe "legacyNode" do
   end
 
   def run_query(query, user)
-    CanvasSchema.execute(query, context: {current_user: user})
+    CanvasSchema.execute(query, context: { current_user: user })
   end
 
   context "OutcomeCalculationMethod" do

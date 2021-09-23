@@ -35,7 +35,6 @@ describe ErrorsController do
   end
 
   describe "POST create" do
-
     def assert_recorded_error(msg = "Thanks for your help!  We'll get right on this")
       expect(flash[:notice]).to eql(msg)
       expect(response).to be_redirect
@@ -68,25 +67,25 @@ describe ErrorsController do
     end
 
     it "is successful with limited data" do
-      post 'create', params: {error: {title: 'ugly', message: 'bacon', fried_ham: 'stupid'}}
+      post 'create', params: { error: { title: 'ugly', message: 'bacon', fried_ham: 'stupid' } }
       assert_recorded_error
     end
 
     it "should not choke on non-integer ids" do
-      post 'create', params: {error: {id: 'garbage'}}
+      post 'create', params: { error: { id: 'garbage' } }
       assert_recorded_error
       expect(ErrorReport.last.message).not_to eq "Error Report Creation failed"
     end
 
     it "should not return nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: {error: {id: 1}}, format: 'json'
+      post 'create', params: { error: { id: 1 } }, format: 'json'
       expect(JSON.parse(response.body)).to eq({ 'logged' => true, 'id' => nil })
     end
 
     it "should not record the user as nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: {error: { id: 1 }}
+      post 'create', params: { error: { id: 1 } }
       expect(ErrorReport.last.user_id).to be_nil
     end
 
@@ -94,7 +93,7 @@ describe ErrorsController do
       user = User.create!
       user_session(user)
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
-      post 'create', params: {error: { id: 1 }}
+      post 'create', params: { error: { id: 1 } }
       expect(ErrorReport.last.user_id).to eq user.id
     end
 
@@ -102,7 +101,7 @@ describe ErrorsController do
       authenticate_user!
       svs = course_factory.student_view_student
       session[:become_user_id] = svs.id
-      post 'create', params: {error: {message: 'test message'}}
+      post 'create', params: { error: { message: 'test message' } }
       expect(ErrorReport.order(:id).last.user_id).to eq @user.id
     end
 
@@ -110,9 +109,8 @@ describe ErrorsController do
       other_user = user_with_pseudonym(name: 'other', active_all: true)
       authenticate_user! # reassigns @user
       session[:become_user_id] = other_user.id
-      post 'create', params: {eerror: {message: 'test message'}}
+      post 'create', params: { eerror: { message: 'test message' } }
       expect(ErrorReport.order(:id).last.user_id).to eq other_user.id
     end
-
   end
 end

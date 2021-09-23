@@ -21,7 +21,7 @@
 module Api::V1::AssignmentOverride
   include Api::V1::Json
 
-  def assignment_override_json(override, visible_users=nil)
+  def assignment_override_json(override, visible_users = nil)
     fields = [:id, :assignment_id, :title]
     fields.concat([:due_at, :all_day, :all_day_date]) if override.due_at_overridden
     fields << :unlock_at if override.unlock_at_overridden
@@ -33,10 +33,10 @@ module Api::V1::AssignmentOverride
           json[:student_ids] = override.preloaded_student_ids
         else
           json[:student_ids] = if visible_users.present?
-                       override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
-                     else
-                       override.assignment_override_students.pluck(:user_id)
-                     end
+                                 override.assignment_override_students.where(user_id: visible_users).pluck(:user_id)
+                               else
+                                 override.assignment_override_students.pluck(:user_id)
+                               end
         end
       when 'Group'
         json[:group_id] = override.set_id
@@ -51,13 +51,13 @@ module Api::V1::AssignmentOverride
   def assignment_overrides_json(overrides, user = nil)
     visible_users_ids = ::AssignmentOverride.visible_enrollments_for(overrides.compact, user).select(:user_id)
     # we most likely already have the student_ids preloaded here because of overridden_for, but just in case
-    if overrides.any?{|ov| ov.present? && ov.set_type == 'ADHOC' && !ov.preloaded_student_ids}
-      AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select{|ov| ov.set_type == 'ADHOC'}, visible_users_ids)
+    if overrides.any? { |ov| ov.present? && ov.set_type == 'ADHOC' && !ov.preloaded_student_ids }
+      AssignmentOverrideApplicator.preload_student_ids_for_adhoc_overrides(overrides.select { |ov| ov.set_type == 'ADHOC' }, visible_users_ids)
     end
-    overrides.map{ |override| assignment_override_json(override, visible_users_ids) if override }
+    overrides.map { |override| assignment_override_json(override, visible_users_ids) if override }
   end
 
-  def assignment_override_collection(assignment, include_students=false)
+  def assignment_override_collection(assignment, include_students = false)
     overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(assignment, @current_user)
     if include_students
       ActiveRecord::Associations::Preloader.new.preload(overrides, :assignment_override_students)
@@ -78,18 +78,19 @@ module Api::V1::AssignmentOverride
 
   def filter_assignment_overrides(overrides, set_or_id)
     return nil if overrides.empty? || set_or_id.nil?
+
     case set_or_id
     when CourseSection, Group
       overrides.detect do |o|
         o.set_type == set_or_id.class.to_s &&
-        o.set_id == set_or_id.id # maybe FIXME
+          o.set_id == set_or_id.id # maybe FIXME
       end
     else
       overrides.detect { |o| o.id == set_or_id.to_i }
     end
   end
 
-  def find_group(assignment, group_id, group_category_id=nil)
+  def find_group(assignment, group_id, group_category_id = nil)
     scope = Group.active.where(:context_type => 'Course').where("group_category_id IS NOT NULL")
     if assignment
       scope = scope.where(
@@ -99,6 +100,7 @@ module Api::V1::AssignmentOverride
     end
     group = scope.find(group_id)
     raise ActiveRecord::RecordNotFound unless group.grants_right?(@current_user, session, :read)
+
     group
   end
 
@@ -107,10 +109,11 @@ module Api::V1::AssignmentOverride
     scope = scope.where(:course_id => context) if context
     section = api_find(scope, section_id)
     raise ActiveRecord::RecordNotFound unless section.grants_right?(@current_user, session, :read)
+
     section
   end
 
-  def interpret_assignment_override_data(assignment, data, set_type=nil)
+  def interpret_assignment_override_data(assignment, data, set_type = nil)
     data ||= {}
     return {}, ["invalid override data"] unless data.is_a?(Hash) || data.is_a?(ActionController::Parameters)
 
@@ -137,14 +140,16 @@ module Api::V1::AssignmentOverride
         students = students.uniq if students.is_a?(Array)
 
         # make sure they were all valid
-        found_ids = students.map{ |s| [
-          s.id.to_s,
-          s.global_id.to_s,
-          ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
-          ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack('H*')}" if s.pseudonym),
-          ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
-          ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack('H*')}" if s.pseudonym && s.pseudonym.sis_user_id)
-        ]}.flatten.compact
+        found_ids = students.map { |s|
+          [
+            s.id.to_s,
+            s.global_id.to_s,
+            ("sis_login_id:#{s.pseudonym.unique_id}" if s.pseudonym),
+            ("hex:sis_login_id:#{s.pseudonym.unique_id.to_s.unpack('H*')}" if s.pseudonym),
+            ("sis_user_id:#{s.pseudonym.sis_user_id}" if s.pseudonym && s.pseudonym.sis_user_id),
+            ("hex:sis_user_id:#{s.pseudonym.sis_user_id.to_s.unpack('H*')}" if s.pseudonym && s.pseudonym.sis_user_id)
+          ]
+        }.flatten.compact
         bad_ids = student_ids.map(&:to_s) - found_ids
         errors << "unknown student ids: #{bad_ids.inspect}" unless bad_ids.empty?
       end
@@ -238,21 +243,21 @@ module Api::V1::AssignmentOverride
     end
     return nil, all_errors unless all_errors.compact.blank?
 
-    grouped = assignment_overrides_data.group_by {|o| o['assignment_id']}
+    grouped = assignment_overrides_data.group_by { |o| o['assignment_id'] }
     assignments = course.active_assignments.where(id: grouped.keys).preload(:assignment_overrides)
     overrides = grouped.map do |assignment_id, overrides_data|
-      assignment = assignments.find {|a| a.id.to_s == assignment_id.to_s}
-      find_assignment_overrides(assignment, overrides_data.map{|o| o['id']}) if assignment
+      assignment = assignments.find { |a| a.id.to_s == assignment_id.to_s }
+      find_assignment_overrides(assignment, overrides_data.map { |o| o['id'] }) if assignment
     end.flatten.compact if for_update
 
     interpreted = assignment_overrides_data.each_with_index.map do |override_data, i|
-      assignment = assignments.find {|a| a.id.to_s == override_data['assignment_id'].to_s}
+      assignment = assignments.find { |a| a.id.to_s == override_data['assignment_id'].to_s }
       unless assignment.present?
         all_errors[i] = ['assignment not found']
         next
       end
       if for_update
-        override = overrides.find {|o| o.id.to_s == override_data['id'].to_s}
+        override = overrides.find { |o| o.id.to_s == override_data['id'].to_s }
         unless override.present?
           all_errors[i] = ['override not found']
           next
@@ -306,10 +311,10 @@ module Api::V1::AssignmentOverride
 
       unless defunct_student_ids.empty?
         override.changed_student_ids.merge(defunct_student_ids)
-        override.assignment_override_students.
-          where(:user_id => defunct_student_ids.to_a).
-          in_batches.
-          delete_all
+        override.assignment_override_students
+                .where(:user_id => defunct_student_ids.to_a)
+                .in_batches
+                .delete_all
       end
     end
 
@@ -323,8 +328,8 @@ module Api::V1::AssignmentOverride
 
     if override.set_type == 'ADHOC'
       override.title = override_data[:title] ||
-                         (override_data[:students] && override.title_from_students(override_data[:students])) ||
-                         override.title
+                       (override_data[:students] && override.title_from_students(override_data[:students])) ||
+                       override.title
     end
 
     [:due_at, :unlock_at, :lock_at].each do |field|
@@ -384,15 +389,16 @@ module Api::V1::AssignmentOverride
     # get the student overrides the user can't see and ensure those overrides are included
     visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
     invisible_user_ids = context.enrollments.where.not(:user_id => visible_user_ids).distinct.pluck(:user_id)
-    invisible_override_ids = existing_overrides.select{ |ov|
+    invisible_override_ids = existing_overrides.select { |ov|
       ov.set_type == 'ADHOC' &&
-      !ov.visible_student_overrides(visible_user_ids)
+        !ov.visible_student_overrides(visible_user_ids)
     }.map(&:id)
     return invisible_user_ids, invisible_override_ids
   end
 
   def update_override_with_invisible_data(override_params, override, invisible_override_ids, invisible_user_ids)
     return override_params = override if invisible_override_ids.include?(override.id)
+
     # add back in the invisible students for this override if any found
     hidden_ids = override.assignment_override_students.where(user_id: invisible_user_ids).pluck(:user_id)
     unless hidden_ids.empty?
@@ -408,7 +414,7 @@ module Api::V1::AssignmentOverride
       assignment.context, user, existing_overrides
     )
 
-    override_param_ids = invisible_override_ids + overrides_params.map {|ov| ov[:id].to_i}
+    override_param_ids = invisible_override_ids + overrides_params.map { |ov| ov[:id].to_i }
     split_overrides = existing_overrides.group_by do |override|
       override_param_ids.include?(override.id) ? :keep : :delete
     end
@@ -459,7 +465,7 @@ module Api::V1::AssignmentOverride
     prepared_overrides[:overrides_to_update].each(&:save!)
 
     @overrides_affected = prepared_overrides[:overrides_to_delete].size +
-      prepared_overrides[:overrides_to_create].size + prepared_overrides[:overrides_to_update].size
+                          prepared_overrides[:overrides_to_create].size + prepared_overrides[:overrides_to_update].size
 
     assignment.touch # invalidate cached list of overrides for the assignment
     assignment.assignment_overrides.reset # unload the obsolete association
@@ -472,7 +478,7 @@ module Api::V1::AssignmentOverride
   end
 
   def get_override_from_params(override_params, assignment, potential_overrides)
-    override = potential_overrides.detect {|ov| ov.id == override_params[:id].to_i}
+    override = potential_overrides.detect { |ov| ov.id == override_params[:id].to_i }
     return override if override
 
     case assignment
@@ -486,10 +492,12 @@ module Api::V1::AssignmentOverride
 
   def deserialize_overrides(overrides)
     if overrides.is_a?(Hash) || overrides.is_a?(ActionController::Parameters)
-      return unless overrides.keys.all?{ |k| k.to_i.to_s == k.to_s }
+      return unless overrides.keys.all? { |k| k.to_i.to_s == k.to_s }
+
       indices = overrides.keys.sort_by(&:to_i)
       return unless indices.map(&:to_i) == (0...indices.size).to_a
-      overrides = indices.map{ |index| overrides[index] }
+
+      overrides = indices.map { |index| overrides[index] }
     else
       overrides
     end

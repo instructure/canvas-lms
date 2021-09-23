@@ -20,7 +20,6 @@
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
-
 describe "master courses - add and remove course associations" do
   include_context "in-process server selenium tests"
   include BlueprintCourseCommon

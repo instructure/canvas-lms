@@ -55,7 +55,7 @@ describe MasterCourses::MasterTemplate do
       expect(template.workflow_state).to eq "active"
       expect(template.active?).to eq true
 
-      expect{MasterCourses::MasterTemplate.remove_as_master_course(@course)}.to change{template.reload.workflow_state}.from("active").to("deleted")
+      expect { MasterCourses::MasterTemplate.remove_as_master_course(@course) }.to change { template.reload.workflow_state }.from("active").to("deleted")
       expect(MasterCourses::MasterTemplate.full_template_for(@course)).to be_nil
       expect(sub.reload).to be_deleted
     end
@@ -143,7 +143,7 @@ describe MasterCourses::MasterTemplate do
       other_assmt = @course.assignments.create!
 
       objects = [topic_assmt, normal_topic, @assignment]
-      objects.each {|o| @template.content_tag_for(o)}
+      objects.each { |o| @template.content_tag_for(o) }
       @template.load_tags!(objects)
       objects.each do |o|
         expect(@template.cached_content_tag_for(o)).to be_present
@@ -163,7 +163,7 @@ describe MasterCourses::MasterTemplate do
       tag2 = @template.create_content_tag_for!(@course.discussion_topics.create!, :use_default_restrictions => false)
       old_default = tag2.restrictions
 
-      new_default = {:content => true, :points => true}
+      new_default = { :content => true, :points => true }
       @template.update_attribute(:default_restrictions, new_default)
       expect(tag1.reload.restrictions).to eq new_default
       expect(tag2.reload.restrictions).to eq old_default
@@ -175,10 +175,10 @@ describe MasterCourses::MasterTemplate do
       assmt_tag1 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => true)
       assmt_tag2 = @template.create_content_tag_for!(@course.assignments.create!, :use_default_restrictions => false)
 
-      assmt_restricts = {:content => true, :points => true}
-      topic_restricts = {:content => true}
+      assmt_restricts = { :content => true, :points => true }
+      topic_restricts = { :content => true }
       @template.update_attribute(:default_restrictions_by_type,
-        {'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts})
+                                 { 'Assignment' => assmt_restricts, 'DiscussionTopic' => topic_restricts })
 
       expect(topic_tag1.reload.restrictions).to be_blank # shouldn't have updated yet because it's not configured to use per-object defaults
       expect(assmt_tag1.reload.restrictions).to be_blank
@@ -198,7 +198,7 @@ describe MasterCourses::MasterTemplate do
     end
 
     it "should touch content when tightening default_restrictions" do
-      @template.update_attribute(:default_restrictions, {:content => true, :points => true})
+      @template.update_attribute(:default_restrictions, { :content => true, :points => true })
       old_time = 1.minute.ago
       Timecop.freeze(old_time) do
         @quiz1 = @course.quizzes.create!
@@ -206,11 +206,11 @@ describe MasterCourses::MasterTemplate do
         @template.create_content_tag_for!(@quiz1, :use_default_restrictions => true)
         @template.create_content_tag_for!(@quiz2, :use_default_restrictions => false)
       end
-      @template.update_attribute(:default_restrictions, {:content => true})
+      @template.update_attribute(:default_restrictions, { :content => true })
       # shouldn't need to update
       expect(@quiz1.reload.updated_at.to_i).to eq old_time.to_i
 
-      @template.update_attribute(:default_restrictions, {:content => true, :due_dates => true})
+      @template.update_attribute(:default_restrictions, { :content => true, :due_dates => true })
       # now should update
       expect(@quiz1.reload.updated_at.to_i).to_not eq old_time.to_i
       expect(@quiz2.reload.updated_at.to_i).to eq old_time.to_i # has custom restrictions
@@ -218,11 +218,11 @@ describe MasterCourses::MasterTemplate do
 
     it "should touch content when tightening default_restrictions_by_type" do
       @template.update(:use_default_restrictions_by_type => true,
-        :default_restrictions_by_type => {
-          'Assignment' => {:content => true, :points => true},
-          'DiscussionTopic' => {:content => true},
-          'Quizzes::Quiz' => {:content => true}
-        })
+                       :default_restrictions_by_type => {
+                         'Assignment' => { :content => true, :points => true },
+                         'DiscussionTopic' => { :content => true },
+                         'Quizzes::Quiz' => { :content => true }
+                       })
 
       old_time = 1.minute.ago
       Timecop.freeze(old_time) do
@@ -234,10 +234,10 @@ describe MasterCourses::MasterTemplate do
         end
       end
       @template.update(:default_restrictions_by_type => {
-        'Assignment' => {:content => true}, # lessened restrictions
-        'DiscussionTopic' => {:content => true, :points => true},
-        'Quizzes::Quiz' => {:content => true, :due_dates => true}
-      })
+                         'Assignment' => { :content => true }, # lessened restrictions
+                         'DiscussionTopic' => { :content => true, :points => true },
+                         'Quizzes::Quiz' => { :content => true, :due_dates => true }
+                       })
       expect(@assmt.reload.updated_at.to_i).to eq old_time.to_i
       expect(@topic.reload.updated_at.to_i).to_not eq old_time.to_i
       expect(@quiz.reload.updated_at.to_i).to_not eq old_time.to_i

@@ -23,14 +23,12 @@ require_dependency "assignments/needs_grading_count_query"
 
 module Assignments
   describe NeedsGradingCountQuery do
-
     before :once do
       course_with_teacher(active_all: true)
       student_in_course(active_all: true, user_name: "some user")
     end
 
     describe "#count" do
-
       it "should only count submissions in the user's visible section(s)" do
         @section = @course.course_sections.create!(:name => 'section 2')
         @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
@@ -65,7 +63,7 @@ module Assignments
 
         # test limited enrollment in multiple sections
         @course.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section,
-                            :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+                                                 :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
         @assignment.reload
         expect(NeedsGradingCountQuery.new(@assignment, @ta).count).to eql(1)
       end
@@ -87,9 +85,9 @@ module Assignments
         expect(sections_grading_counts).to be_a(Array)
         @course.course_sections.each do |section|
           expect(sections_grading_counts).to include({
-            section_id: section.id,
-            needs_grading_count: 1
-          })
+                                                       section_id: section.id,
+                                                       needs_grading_count: 1
+                                                     })
         end
       end
 

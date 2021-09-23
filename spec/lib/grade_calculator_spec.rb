@@ -114,7 +114,7 @@ describe GradeCalculator do
       stale_score.reload.undestroy
       expect {
         GradeCalculator.recompute_final_score(@user.id, @course.id)
-      }.to change{stale_score.reload.workflow_state}.from('active').to('deleted')
+      }.to change { stale_score.reload.workflow_state }.from('active').to('deleted')
     end
 
     it "gracefully handles missing submissions" do
@@ -216,7 +216,7 @@ describe GradeCalculator do
 
         expect {
           GradeCalculator.recompute_final_score(@user.id, @course.id)
-        }.to change{@stale_score.reload.workflow_state}.from('active').to('deleted')
+        }.to change { @stale_score.reload.workflow_state }.from('active').to('deleted')
       end
 
       it "should update cross-shard scores" do
@@ -353,9 +353,9 @@ describe GradeCalculator do
       ag1 = @course.assignment_groups.create! name: "Group 1", group_weight: 80
       ag2 = @course.assignment_groups.create! name: "Group 2", group_weight: 20
       a1 = ag1.assignments.create! points_possible: 10, name: "Assignment 1",
-             context: @course
+                                   context: @course
       a2 = ag2.assignments.create! points_possible: 10, name: "Assignment 2",
-             context: @course
+                                   context: @course
 
       a1.grade_student(@student, grade: 0, grader: @teacher)
       a2.grade_student(@student, grade: 10, grader: @teacher)
@@ -370,7 +370,7 @@ describe GradeCalculator do
 
     it "recomputes during #run_if_overrides_changed!" do
       a = @course.assignments.create! name: "Foo", points_possible: 10,
-            context: @assignment
+                                      context: @assignment
       a.grade_student(@student, grade: 10, grader: @teacher)
 
       e = @student.enrollments.first
@@ -831,7 +831,7 @@ describe GradeCalculator do
 
     it "should convert NaN to NULL" do
       calc = GradeCalculator.new [@user.id], @course.id
-      score = 0/0.0
+      score = 0 / 0.0
       expect(calc.send(:number_or_null, score)).to eql('NULL::float')
     end
 
@@ -876,64 +876,64 @@ describe GradeCalculator do
 
   describe 'GradeCalculator.recompute_final_score' do
     it 'accepts a course' do
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, Hash).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, Hash)
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it 'accepts a course id' do
-      expect(GradeCalculator).to receive(:new).with([@student.id], Course, Hash).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      expect(GradeCalculator).to receive(:new).with([@student.id], Course, Hash)
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course.id)
     end
 
     it 'fetches assignments for GradeCalculator' do
-      expect(@course).to receive_message_chain(:assignments, :published, :gradeable, :to_a => [5,6])
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      expect(@course).to receive_message_chain(:assignments, :published, :gradeable, :to_a => [5, 6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it 'does not fetch assignments if they are already passed' do
       expect(@course).not_to receive(:assignments)
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
-      GradeCalculator.recompute_final_score(@student.id, @course, assignments: [5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(assignments: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, assignments: [5, 6])
     end
 
     it 'fetches groups for GradeCalculator' do
-      expect(@course).to receive_message_chain(:assignment_groups, :active, :to_a => [5,6])
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      expect(@course).to receive_message_chain(:assignment_groups, :active, :to_a => [5, 6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it 'does not fetch groups if they are already passed' do
       expect(@course).not_to receive(:assignment_groups)
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
-      GradeCalculator.recompute_final_score(@student.id, @course, groups: [5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(groups: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, groups: [5, 6])
     end
 
     it 'fetches periods for GradeCalculator' do
-      expect(GradingPeriod).to receive(:for).with(@course).and_return([5,6])
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      expect(GradingPeriod).to receive(:for).with(@course).and_return([5, 6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
       GradeCalculator.recompute_final_score(@student.id, @course)
     end
 
     it 'does not fetch periods if they are already passed' do
       expect(GradingPeriod).not_to receive(:for)
-      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5,6])).
-        and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
-      GradeCalculator.recompute_final_score(@student.id, @course, periods: [5,6])
+      expect(GradeCalculator).to receive(:new).with([@student.id], @course, hash_including(periods: [5, 6]))
+                                              .and_return(double('GradeCalculator', compute_and_save_scores: 'hi'))
+      GradeCalculator.recompute_final_score(@student.id, @course, periods: [5, 6])
     end
   end
 
   describe '#compute_and_save_scores' do
     before :each do
       @now = Time.zone.now
-      @grading_period_options = { count: 2, weights: [30, 70], start_dates: [1, 2].map { |n| @now + n.months }}
+      @grading_period_options = { count: 2, weights: [30, 70], start_dates: [1, 2].map { |n| @now + n.months } }
 
       assignment_group_weights = [45.0, 55.0]
       @assignment_groups = []
@@ -1844,7 +1844,7 @@ describe GradeCalculator do
         (1..2).each do |i|
           section = @course.course_sections.create!(name: "section #{i}")
           @course.enroll_user(@student, 'StudentEnrollment', section: section,
-                              enrollment_state: 'active', allow_multiple_enrollments: true)
+                                                             enrollment_state: 'active', allow_multiple_enrollments: true)
         end
         GradeCalculator.new(@student.id, @course).compute_and_save_scores
         scored_enrollment_ids = Score.where(assignment_group_id: @group1.id).map(&:enrollment_id)
@@ -1924,7 +1924,7 @@ describe GradeCalculator do
     a.grade_student @student, grade: 25, grader: @teacher
     calc = GradeCalculator.new([@student.id], @course)
     grade_info = calc.compute_scores.first[:current]
-    expect(grade_info).to eq({grade: 50, total: 25, possible: 50, dropped: []})
+    expect(grade_info).to eq({ grade: 50, total: 25, possible: 50, dropped: [] })
   end
 
   context "error trapping" do

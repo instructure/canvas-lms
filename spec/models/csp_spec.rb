@@ -21,7 +21,7 @@ require_relative '../spec_helper'
 
 describe Csp do
   def create_tool(context, attrs)
-    context.context_external_tools.create!({:name => "a", :consumer_key => '12345', :shared_secret => 'secret'}.merge(attrs))
+    context.context_external_tools.create!({ :name => "a", :consumer_key => '12345', :shared_secret => 'secret' }.merge(attrs))
   end
 
   describe "account setting inheritance" do
@@ -33,7 +33,7 @@ describe Csp do
     end
 
     it "should not be enabled by default" do
-      @accounts.each{|a| expect(a.csp_enabled?).to eq false }
+      @accounts.each { |a| expect(a.csp_enabled?).to eq false }
     end
 
     it "should inherit settings" do
@@ -222,17 +222,17 @@ describe Csp do
       sub2_tool = create_tool(@sub2, domain: 'example2.com')
 
       expect(@sub1.csp_tools_grouped_by_domain).to eq({
-        'example1.com' => [root_tool],
-        '*.example1.com' => [root_tool],
-        'example2.com' => [sub1_tool],
-        '*.example2.com' => [sub1_tool]
-      })
+                                                        'example1.com' => [root_tool],
+                                                        '*.example1.com' => [root_tool],
+                                                        'example2.com' => [sub1_tool],
+                                                        '*.example2.com' => [sub1_tool]
+                                                      })
       expect(@sub2.csp_tools_grouped_by_domain).to eq({
-        'example1.com' => [root_tool],
-        '*.example1.com' => [root_tool],
-        'example2.com' => [sub1_tool, sub2_tool],
-        '*.example2.com' => [sub1_tool, sub2_tool]
-      })
+                                                        'example1.com' => [root_tool],
+                                                        '*.example1.com' => [root_tool],
+                                                        'example2.com' => [sub1_tool, sub2_tool],
+                                                        '*.example2.com' => [sub1_tool, sub2_tool]
+                                                      })
     end
   end
 

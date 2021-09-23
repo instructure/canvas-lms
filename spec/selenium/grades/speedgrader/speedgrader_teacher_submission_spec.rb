@@ -36,7 +36,7 @@ describe "speed grader submissions" do
     it "should display submission of first student and then second student", priority: "1", test_id: 283276 do
       student_submission
 
-      #create initial data for second student
+      # create initial data for second student
       @student_2 = User.create!(name: 'student 2')
       @student_2.register
       @student_2.pseudonyms.create!(unique_id: 'student2@example.com', password: 'qwertyuiop', password_confirmation: 'qwertyuiop')
@@ -51,14 +51,14 @@ describe "speed grader submissions" do
       # check for assignment text in speed grader iframe
       check_first_student = -> do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student.name)
-        in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+        in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission.body)
         end
       end
 
       check_second_student = -> do
         expect(f('#combo_box_container .ui-selectmenu-item-header')).to include_text(@student_2.name)
-        in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+        in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
           expect(f('#main')).to include_text(@submission_2.body)
         end
       end
@@ -88,12 +88,12 @@ describe "speed grader submissions" do
       @student_2 = User.create!(name: 'student 2')
       @student_2.register
       @student_2.pseudonyms.create!(unique_id: 'student2@example.com', password: 'qwertyuiop', password_confirmation: 'qwertyuiop')
-      @course.enroll_user(@student_2, "StudentEnrollment", enrollment_state:'active')
+      @course.enroll_user(@student_2, "StudentEnrollment", enrollment_state: 'active')
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       wait_for_ajax_requests
 
-      #add comment
+      # add comment
       f('#add_a_comment textarea').send_keys('grader comment')
       submit_form('#add_a_comment')
       expect(f('#comments > .comment')).to be_displayed
@@ -138,7 +138,7 @@ describe "speed grader submissions" do
 
     it "should handle versions correctly", priority: "2", test_id: 283500 do
       submission1 = student_submission(username: "student1@example.com", body: 'first student, first version')
-      submission2 = student_submission(username: "student2@example.com", body:'second student')
+      submission2 = student_submission(username: "student2@example.com", body: 'second student')
       student_3
 
       update_submission(submission1, 'first student, second version')
@@ -150,14 +150,14 @@ describe "speed grader submissions" do
       # was carried through to other students, ones with only 1 version.
       expect(f('#submission_to_view').find_elements(:css, 'option').length).to eq 2
 
-      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         expect(f('#content')).to include_text('first student, second version')
       end
 
       click_option('#submission_to_view', '0', :value)
       wait_for_ajaximations
 
-      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations
         expect(f('#content')).to include_text('first student, first version')
       end
@@ -172,7 +172,7 @@ describe "speed grader submissions" do
       f('#grade_container').find_element(:css, 'input').send_keys("5\n")
       wait_for_ajaximations
 
-      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         expect(f('#content')).to include_text('second student')
       end
 
@@ -194,7 +194,7 @@ describe "speed grader submissions" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{submission1.user.id}&attempt=1"
       wait_for_ajaximations
 
-      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations
         expect(f('#content')).to include_text('first student, first version')
       end
@@ -202,7 +202,7 @@ describe "speed grader submissions" do
 
       f(%Q{#students_selectmenu option[value="#{submission2.user.id}"]}).click
 
-      in_frame 'speedgrader_iframe','.is-inside-submission-frame' do
+      in_frame 'speedgrader_iframe', '.is-inside-submission-frame' do
         wait_for_ajaximations
         expect(f('#content')).to include_text('second student, second version')
       end
@@ -245,12 +245,12 @@ describe "speed grader submissions" do
     end
 
     it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
-       test_id: 283502
+                                                                                                test_id: 283502
 
     it "should display image submission in browser", priority: "1", test_id: 283503 do
       filename, fullpath, _data = get_file("graded.png")
       create_and_enroll_students(1)
-      @assignment.submission_types ='online_upload'
+      @assignment.submission_types = 'online_upload'
       @assignment.save!
 
       add_attachment_student_assignment(filename, @students[0], fullpath)
@@ -296,7 +296,7 @@ describe "speed grader submissions" do
 
       it "should display a pending icon if submission status is pending", priority: "1", test_id: 283504 do
         student_submission
-        set_turnitin_asset(@submission, {status: 'pending'})
+        set_turnitin_asset(@submission, { status: 'pending' })
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
@@ -310,7 +310,7 @@ describe "speed grader submissions" do
 
       it "should display a score if submission has a similarity score", priority: "1", test_id: 283505 do
         student_submission
-        set_turnitin_asset(@submission, {similarity_score: 96, state: 'failure', status: 'scored'})
+        set_turnitin_asset(@submission, { similarity_score: 96, state: 'failure', status: 'scored' })
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
@@ -320,7 +320,7 @@ describe "speed grader submissions" do
 
       it "should display an error icon if submission status is error", priority: "2", test_id: 283506 do
         student_submission
-        set_turnitin_asset(@submission, {status: 'error'})
+        set_turnitin_asset(@submission, { status: 'error' })
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
@@ -334,7 +334,7 @@ describe "speed grader submissions" do
       end
 
       it "should show turnitin score for attached files", priority: "1", test_id: 283507 do
-        @user = user_with_pseudonym({active_user: true, username: 'student@example.com', password: 'qwertyuiop'})
+        @user = user_with_pseudonym({ active_user: true, username: 'student@example.com', password: 'qwertyuiop' })
         attachment1 = @user.attachments.new filename: "homework1.doc"
         attachment1.content_type = "application/msword"
         attachment1.size = 10093
@@ -345,9 +345,9 @@ describe "speed grader submissions" do
         attachment2.save!
 
         create_enrollments @course, [@user]
-        student_submission({user: @user, submission_type: 'online_upload', attachments: [attachment1, attachment2], course: @course})
-        set_turnitin_asset(attachment1, {similarity_score: 96, state: 'failure', status: 'scored'})
-        set_turnitin_asset(attachment2, {status: 'pending'})
+        student_submission({ user: @user, submission_type: 'online_upload', attachments: [attachment1, attachment2], course: @course })
+        set_turnitin_asset(attachment1, { similarity_score: 96, state: 'failure', status: 'scored' })
+        set_turnitin_asset(attachment2, { status: 'pending' })
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
@@ -359,18 +359,18 @@ describe "speed grader submissions" do
       it "should successfully schedule resubmit when button is clicked", priority: "1", test_id: 283508 do
         account = @assignment.context.account
         account.update(turnitin_account_id: 'test_account',
-                                  turnitin_shared_secret: 'skeret',
-                                  settings: account.settings.merge(enable_turnitin: true))
+                       turnitin_shared_secret: 'skeret',
+                       settings: account.settings.merge(enable_turnitin: true))
 
         student_submission
-        set_turnitin_asset(@submission, {status: 'error'})
+        set_turnitin_asset(@submission, { status: 'error' })
 
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
 
         f('#grade_container .submission_error').click
         wait_for_ajaximations
-        expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click}
+        expect_new_page_load { f('#grade_container .turnitin_resubmit_button').click }
         wait_for_ajaximations
         expect(Delayed::Job.find_by_tag('Submission#submit_to_turnitin')).not_to be_nil
         expect(f('#grade_container .submission_pending')).not_to be_nil

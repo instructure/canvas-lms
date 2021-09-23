@@ -28,13 +28,13 @@ module Lti
     def as_json
       key = @tool_configuration.developer_key
       @tool_configuration.as_json.merge({
-        developer_key: developer_key_json(
-          key,
-          nil,
-          nil,
-          key.owner_account
-        )
-      })
+                                          developer_key: developer_key_json(
+                                            key,
+                                            nil,
+                                            nil,
+                                            key.owner_account
+                                          )
+                                        })
     end
   end
 end

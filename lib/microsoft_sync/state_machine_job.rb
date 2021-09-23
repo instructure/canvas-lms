@@ -57,6 +57,7 @@
 module MicrosoftSync
   class StateMachineJob
     class InternalError < ArgumentError; end
+
     class RetriesExhaustedError < StandardError
       attr_reader :cause
 
@@ -111,7 +112,8 @@ module MicrosoftSync
     # memory_state is passed into the next step.
     class NextStep
       attr_reader :step, :memory_state
-      def initialize(step, memory_state=nil)
+
+      def initialize(step, memory_state = nil)
         @step = step or raise InternalError
         @memory_state = memory_state
       end
@@ -119,7 +121,8 @@ module MicrosoftSync
 
     class DelayedNextStep
       attr_reader :step, :delay_amount, :job_state_data
-      def initialize(step, delay_amount, job_state_data=nil)
+
+      def initialize(step, delay_amount, job_state_data = nil)
         @step = step or raise InternalError
         @delay_amount = delay_amount
         @job_state_data = job_state_data
@@ -148,6 +151,7 @@ module MicrosoftSync
     #
     class Retry
       attr_reader :error, :delay_amount, :job_state_data, :step, :stash_block
+
       def initialize(error:, delay_amount: nil, job_state_data: nil, step: nil, &stash_block)
         @error = error
         @delay_amount = delay_amount
@@ -169,20 +173,20 @@ module MicrosoftSync
     INITIAL_STEP = :step_initial
 
     # Mostly used for debugging. May use sleep!
-    def run_synchronously(initial_mem_state=nil)
+    def run_synchronously(initial_mem_state = nil)
       run_with_delay(initial_mem_state: initial_mem_state, synchronous: true)
     rescue IRB::Abort => e
       update_state_record_to_errored_and_cleanup(e)
       raise
     end
 
-    def run_later(initial_mem_state=nil)
+    def run_later(initial_mem_state = nil)
       run_with_delay(initial_mem_state: initial_mem_state)
     end
 
     private
 
-    def run(step, initial_mem_state, synchronous=false)
+    def run(step, initial_mem_state, synchronous = false)
       job_state = job_state_record.job_state
 
       # Record has been deleted since we were enqueued:
@@ -243,7 +247,7 @@ module MicrosoftSync
         end
 
         self.delay(strand: strand, run_at: currently_retrying_job.run_at + 1)
-          .run(nil, initial_mem_state)
+            .run(nil, initial_mem_state)
       end
     end
 
@@ -295,8 +299,8 @@ module MicrosoftSync
       end
     end
 
-    def statsd_increment(bucket, step, error=nil)
-      tags = {category: error&.class&.name&.tr(':', '_'), microsoft_sync_step: step.to_s}.compact
+    def statsd_increment(bucket, step, error = nil)
+      tags = { category: error&.class&.name&.tr(':', '_'), microsoft_sync_step: step.to_s }.compact
       InstStatsd::Statsd.increment("#{STATSD_PREFIX}.#{bucket}", tags: tags)
     end
 
@@ -319,7 +323,7 @@ module MicrosoftSync
       end
 
       self.delay(strand: strand, run_at: delay_amount&.seconds&.from_now)
-        .run(step, initial_mem_state)
+          .run(step, initial_mem_state)
     end
 
     def update_state_record_to_errored_and_cleanup(error, capture: nil)
@@ -340,7 +344,7 @@ module MicrosoftSync
     end
 
     def capture_exception(err)
-      Canvas::Errors.capture(err, {tags: {type: 'microsoft_sync_smj'}}, :error)
+      Canvas::Errors.capture(err, { tags: { type: 'microsoft_sync_smj' } }, :error)
     end
 
     def handle_delayed_next_step(delayed_next_step, synchronous)

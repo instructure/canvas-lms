@@ -37,7 +37,6 @@ class NonexistentMockSiteError < StandardError
 end
 
 class MockStaticSite
-
   attr_accessor :mock_site, :index_file, :root_dir_path
 
   def initialize(url, mock_site)
@@ -52,16 +51,16 @@ class MockStaticSite
       raise NonexistentMockSiteError,
             "There is no directory for #{mock_site}; create one at #{root_dir_path}"
     end
- 
+
     index = root_dir.index { |file_name| file_name.start_with?('index.') }
     @index_file = index ? root_dir[index] : nil
 
     WebMock.enable!
     set_stub
   end
-  
+
   private
-  
+
   def set_stub
     WebMock.stub_request(:get, /#{Regexp.quote(@url)}/).to_return do |request|
       file_name = get_requested_file_name(request.uri.path)

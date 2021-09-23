@@ -37,7 +37,7 @@ module EventStream::IndexStrategy
       for_ar_scope(args, options.merge(just_ids: true))
     end
 
-    def for_ar_scope(args, options={})
+    def for_ar_scope(args, options = {})
       ar_type = index.event_stream.active_record_type
       index_scope = index.ar_scope_proc.call(*args)
       self.class.for_ar_scope(ar_type, index_scope, options)

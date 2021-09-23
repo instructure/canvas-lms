@@ -32,7 +32,7 @@ module DataFixup::MoveMasterImportResults
             :import_type => res[:import_type]
           }
           if res[:skipped].present?
-            attrs[:results] = {:skipped => res[:skipped]}
+            attrs[:results] = { :skipped => res[:skipped] }
           end
           mig.migration_results.create!(attrs)
         end

@@ -21,13 +21,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 
 describe "Outcomes Import API", type: :request do
-
   let(:guid) { "A833C528-901A-11DF-A622-0C319DFF4B22" }
 
   def filename_to_hash(file)
     JSON.parse(File.read(
-      "#{File.dirname(File.expand_path(__FILE__))}/fixtures/#{file}"
-    ))
+                 "#{File.dirname(File.expand_path(__FILE__))}/fixtures/#{file}"
+               ))
   end
 
   def stub_ab_config_with(return_value)
@@ -36,69 +35,65 @@ describe "Outcomes Import API", type: :request do
 
   def available_json(expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/available",
-      {
-        controller: 'outcomes_academic_benchmark_import_api',
-        action: 'available',
-        account_id: @account.id.to_s,
-        format: 'json',
-      },
-      { },
-      { },
-      {
-        expected_status: expected_status
-      }
-    )
+             {
+               controller: 'outcomes_academic_benchmark_import_api',
+               action: 'available',
+               account_id: @account.id.to_s,
+               format: 'json',
+             },
+             {},
+             {},
+             {
+               expected_status: expected_status
+             })
   end
 
   def create_json(guid:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
-      {
-        controller: 'outcomes_academic_benchmark_import_api',
-        action: 'create',
-        account_id: @account.id.to_s,
-        format: 'json',
-      },
-      {
-        guid: guid
-      },
-      { },
-      {
-        expected_status: expected_status
-      }
-    )
+             {
+               controller: 'outcomes_academic_benchmark_import_api',
+               action: 'create',
+               account_id: @account.id.to_s,
+               format: 'json',
+             },
+             {
+               guid: guid
+             },
+             {},
+             {
+               expected_status: expected_status
+             })
   end
 
   def create_full_json(json:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
-      {
-        controller: 'outcomes_academic_benchmark_import_api',
-        action: 'create',
-        account_id: @account.id.to_s,
-        format: 'json',
-      },
-      json,
-      { },
-      {
-        expected_status: expected_status
-      }
-            )
+             {
+               controller: 'outcomes_academic_benchmark_import_api',
+               action: 'create',
+               account_id: @account.id.to_s,
+               format: 'json',
+             },
+             json,
+             {},
+             {
+               expected_status: expected_status
+             })
   end
 
   def status_json(migration_id:, expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
-      {
-        controller: 'outcomes_academic_benchmark_import_api',
-        action: 'migration_status',
-        account_id: @account.id.to_s,
-        format: 'json',
-        migration_id: migration_id
-      },
-      { },
-      { },
-      {
-        expected_status: expected_status
-      }
-    )
+             {
+               controller: 'outcomes_academic_benchmark_import_api',
+               action: 'migration_status',
+               account_id: @account.id.to_s,
+               format: 'json',
+               migration_id: migration_id
+             },
+             {},
+             {},
+             {
+               expected_status: expected_status
+             })
   end
 
   def revoke_permission(account_user, permission)
@@ -111,7 +106,7 @@ describe "Outcomes Import API", type: :request do
   end
 
   def create_request(json)
-    {guid: "9426DCAE-734C-40D5-ABF6-FB748CD8BE65"}.merge(json)
+    { guid: "9426DCAE-734C-40D5-ABF6-FB748CD8BE65" }.merge(json)
   end
 
   before :once do
@@ -144,9 +139,9 @@ describe "Outcomes Import API", type: :request do
         end
         it "rejects a partner key that is the empty string" do
           stub_ab_config_with({
-            partner_id: "instructure",
-            partner_key: ""
-          })
+                                partner_id: "instructure",
+                                partner_key: ""
+                              })
           expect(request.call(type: request_type)["error"]).to match(/needs partner_key/i)
         end
       end
@@ -184,20 +179,20 @@ describe "Outcomes Import API", type: :request do
         end
 
         it "includes the United Kingdom" do
-          expect(available_json).to be_any {|j| j["title"] == "UK Department for Education"}
+          expect(available_json).to be_any { |j| j["title"] == "UK Department for Education" }
         end
 
         it "includes the common core standards" do
-          expect(available_json.any?{|j| j["title"] =~ /common core/i}).to be_truthy
+          expect(available_json.any? { |j| j["title"] =~ /common core/i }).to be_truthy
         end
 
         it "includes the NGSS standards" do
-          expect(available_json.any?{|j| j["title"] =~ /ngss/i}).to be_truthy
+          expect(available_json.any? { |j| j["title"] =~ /ngss/i }).to be_truthy
         end
 
         %w[Administrators Teachers Students].each do |group|
           it "includes the ISTE standards for #{group}" do
-            expect(available_json.any?{|j| j["title"] == "NETS for #{group}"}).to be_truthy
+            expect(available_json.any? { |j| j["title"] == "NETS for #{group}" }).to be_truthy
           end
         end
 
@@ -250,7 +245,8 @@ describe "Outcomes Import API", type: :request do
             100
           ].each do |mastery_points|
             expect(create_full_json(json: create_request({
-              mastery_points: mastery_points}))).not_to have_key("error")
+                                                           mastery_points: mastery_points
+                                                         }))).not_to have_key("error")
           end
         end
 
@@ -261,7 +257,8 @@ describe "Outcomes Import API", type: :request do
             1a
           ].each do |mastery_points|
             expect(create_full_json(json: create_request({
-              mastery_points: mastery_points}))).to have_key("error")
+                                                           mastery_points: mastery_points
+                                                         }))).to have_key("error")
           end
         end
 
@@ -272,7 +269,8 @@ describe "Outcomes Import API", type: :request do
             100
           ].each do |points_possible|
             expect(create_full_json(json: create_request({
-              points_possible: points_possible}))).not_to have_key("error")
+                                                           points_possible: points_possible
+                                                         }))).not_to have_key("error")
           end
         end
 
@@ -283,78 +281,101 @@ describe "Outcomes Import API", type: :request do
             1a
           ].each do |points_possible|
             expect(create_full_json(json: create_request({
-              points_possible: points_possible}))).to have_key("error")
+                                                           points_possible: points_possible
+                                                         }))).to have_key("error")
           end
         end
 
         it "accepts valid ratings" do
           expect(create_full_json(json: create_request({
-            ratings: [{description: "Perfect", points: 10}]}))).not_to have_key("error")
+                                                         ratings: [{ description: "Perfect", points: 10 }]
+                                                       }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-            ratings: [{description: "Perfect", points: 10},
-                      {description: "Failure", points: 0}]}))).not_to have_key("error")
+                                                         ratings: [{ description: "Perfect", points: 10 },
+                                                                   { description: "Failure", points: 0 }]
+                                                       }))).not_to have_key("error")
         end
 
         it "rejects malformed ratings" do
           expect(create_full_json(json: create_request({
-            ratings: "1"}))).to have_key("error")
+                                                         ratings: "1"
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            'ratings[][description]' => nil}))).to have_key("error")
+                                                         'ratings[][description]' => nil
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            'ratings[][description]' => "stuff"}))).to have_key("error")
+                                                         'ratings[][description]' => "stuff"
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            'ratings[][description]' => "stuff",
-            'ratings[][points]' => nil}))).to have_key("error")
+                                                         'ratings[][description]' => "stuff",
+                                                         'ratings[][points]' => nil
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            'ratings[][description]' => "stuff",
-            'ratings[][points]' => ""}))).to have_key("error")
+                                                         'ratings[][description]' => "stuff",
+                                                         'ratings[][points]' => ""
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            'ratings[][description]' => "stuff",
-            'ratings[][points]' => "0.1"}))).to have_key("error")
+                                                         'ratings[][description]' => "stuff",
+                                                         'ratings[][points]' => "0.1"
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            ratings: [{description: ["stuff", "more stuff"], points: 10},
-                      {description: "Failure"}]}))).to have_key("error")
+                                                         ratings: [{ description: ["stuff", "more stuff"], points: 10 },
+                                                                   { description: "Failure" }]
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            ratings: [{description: "Perfect", points: 10},
-                      {description: "Failure"}]}))).to have_key("error")
+                                                         ratings: [{ description: "Perfect", points: 10 },
+                                                                   { description: "Failure" }]
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            ratings: [{description: "Perfect", points: 10},
-                      {points: 0}]}))).to have_key("error")
+                                                         ratings: [{ description: "Perfect", points: 10 },
+                                                                   { points: 0 }]
+                                                       }))).to have_key("error")
         end
 
         it "accepts valid calculation methods" do
           expect(create_full_json(json: create_request({
-            calculation_method: 'decaying_average',
-            calculation_int: 60}))).not_to have_key("error")
+                                                         calculation_method: 'decaying_average',
+                                                         calculation_int: 60
+                                                       }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'n_mastery',
-            calculation_int: 3}))).not_to have_key("error")
+                                                         calculation_method: 'n_mastery',
+                                                         calculation_int: 3
+                                                       }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'highest'}))).not_to have_key("error")
+                                                         calculation_method: 'highest'
+                                                       }))).not_to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'latest'}))).not_to have_key("error")
+                                                         calculation_method: 'latest'
+                                                       }))).not_to have_key("error")
         end
 
         it "rejects malformed calculation methods" do
           expect(create_full_json(json: create_request({
-            calculation_method: 'invalid calculation method',
-            calculation_int: 60}))).to have_key("error")
+                                                         calculation_method: 'invalid calculation method',
+                                                         calculation_int: 60
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'decaying_average'}))).to have_key("error")
+                                                         calculation_method: 'decaying_average'
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'decaying_average',
-            calculation_int: 200}))).to have_key("error")
+                                                         calculation_method: 'decaying_average',
+                                                         calculation_int: 200
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'n_mastery'}))).to have_key("error")
+                                                         calculation_method: 'n_mastery'
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'n_mastery',
-            calculation_int: 100}))).to have_key("error")
+                                                         calculation_method: 'n_mastery',
+                                                         calculation_int: 100
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'highest',
-            calculation_int: 1}))).to have_key("error")
+                                                         calculation_method: 'highest',
+                                                         calculation_int: 1
+                                                       }))).to have_key("error")
           expect(create_full_json(json: create_request({
-            calculation_method: 'latest',
-            calculation_int: 1}))).to have_key("error")
+                                                         calculation_method: 'latest',
+                                                         calculation_int: 1
+                                                       }))).to have_key("error")
         end
       end
 
@@ -364,14 +385,14 @@ describe "Outcomes Import API", type: :request do
         end
         it "check valid migration id" do
           cm_mock = double("content_migration", {
-            id: 2,
-            context_id: 1,
-            created_at: Time.zone.now,
-            attachment: nil,
-            for_course_copy?: false,
-            job_progress: nil,
-            migration_type: nil
-            })
+                             id: 2,
+                             context_id: 1,
+                             created_at: Time.zone.now,
+                             attachment: nil,
+                             for_course_copy?: false,
+                             job_progress: nil,
+                             migration_type: nil
+                           })
           allow(cm_mock).to receive(:migration_issues).and_return([])
           allow(ContentMigration).to receive(:find).with('2').and_return(cm_mock)
           expect(status_json(migration_id: 2)["migration_issues_count"]).to eq 0
@@ -389,29 +410,29 @@ describe "Outcomes Import API", type: :request do
     let(:json_file) { "available_return_val.json" }
     def stub_ab_api
       standards_mock = double("standards")
-      allow(standards_mock).to receive(:authorities).
-        and_return(filename_to_hash("available_authorities.json").
-                map{ |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
-      allow(standards_mock).to receive(:authority_publications).
-        with(not_eq('CC').and(not_eq('Achieve'))).
-        and_return(filename_to_hash("iste_authority_pubs.json").
-                map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-      allow(standards_mock).to receive(:authority_publications).
-        with('Achieve').
-        and_return(filename_to_hash("achieve_authority_pubs.json").
-                map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-      allow(standards_mock).to receive(:authority_publications).
-        with('CC').
-        and_return(filename_to_hash("common_core_authority_pubs.json").
-               map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(standards_mock).to receive(:authorities)
+        .and_return(filename_to_hash("available_authorities.json")
+                .map { |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
+      allow(standards_mock).to receive(:authority_publications)
+        .with(not_eq('CC').and(not_eq('Achieve')))
+        .and_return(filename_to_hash("iste_authority_pubs.json")
+                .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(standards_mock).to receive(:authority_publications)
+        .with('Achieve')
+        .and_return(filename_to_hash("achieve_authority_pubs.json")
+                .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
+      allow(standards_mock).to receive(:authority_publications)
+        .with('CC')
+        .and_return(filename_to_hash("common_core_authority_pubs.json")
+               .map { |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
       allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     end
 
     def stub_ab_config
       stub_ab_config_with({
-        partner_key: "<secret-key>",
-        partner_id: "instructure"
-      })
+                            partner_key: "<secret-key>",
+                            partner_id: "instructure"
+                          })
     end
   end
 end

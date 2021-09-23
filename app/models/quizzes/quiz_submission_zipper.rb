@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Quizzes::QuizSubmissionZipper < ContentZipper
-
   attr_reader :submissions, :attachments, :zip_attachment, :quiz, :filename
 
   def initialize(hash)
@@ -50,15 +49,17 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
 
   def attachments_with_filenames
     return @attachments_with_filenames if @attachments_with_filenames
+
     @attachments_with_filenames = []
     submissions.each do |submission|
       user = submission.user
       submission.submission_data.each do |sub_hash|
         next unless sub_hash[:attachment_ids].present?
+
         sub_hash[:attachment_ids].each do |id|
           attachment = attachments[id.to_i]
           @attachments_with_filenames <<
-          question_attachment_filename(sub_hash, attachment, user)
+            question_attachment_filename(sub_hash, attachment, user)
         end
       end
     end
@@ -66,6 +67,7 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
   end
 
   private
+
   def question_attachment_filename(question, attach, user)
     name = user.last_name_first.gsub(/_(\d+)_/, '-\1-')
     name = name + user.id.to_s
@@ -100,5 +102,4 @@ class Quizzes::QuizSubmissionZipper < ContentZipper
   def quiz_zip_filename(quiz)
     "#{quiz.context.short_name_slug}-#{quiz.title} submissions"
   end
-
 end

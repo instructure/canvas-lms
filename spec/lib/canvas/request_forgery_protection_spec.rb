@@ -27,17 +27,17 @@ describe Canvas::RequestForgeryProtection do
     headers = ActionDispatch::Http::Headers.new(raw_headers)
     cookies = ActionDispatch::Cookies::CookieJar.new(nil)
     request = double("request",
-      host_with_port: "example.com:80",
-      headers: headers,
-      get?: false,
-      head?: false)
+                     host_with_port: "example.com:80",
+                     headers: headers,
+                     get?: false,
+                     head?: false)
     @controller = double("controller",
-      request: request,
-      cookies: cookies,
-      protect_against_forgery?: true,
-      api_request?: false,
-      in_app?: true,
-      form_authenticity_param: "bogus")
+                         request: request,
+                         cookies: cookies,
+                         protect_against_forgery?: true,
+                         api_request?: false,
+                         in_app?: true,
+                         form_authenticity_param: "bogus")
     @controller.extend(Canvas::RequestForgeryProtection)
   end
 

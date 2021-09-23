@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe UserService do
-
   before :once do
     user_service_model
   end
@@ -137,7 +136,7 @@ describe UserService do
       params[:user_name] = 'some username'
       params[:password] = 'password'
 
-      expect{UserService.register_from_params(user_model, params)}.to raise_error("Unknown Service Type")
+      expect { UserService.register_from_params(user_model, params) }.to raise_error("Unknown Service Type")
     end
   end
 

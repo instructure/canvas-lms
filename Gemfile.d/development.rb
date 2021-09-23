@@ -25,4 +25,6 @@ group :development do
   gem 'spring-commands-rubocop', '0.2.0'
 
   gem 'byebug', '11.1.3', platform: :mri
+  gem 'debase', '0.2.4.1', require: false
+  gem 'ruby-debug-ide', '0.7.2', require: false
 end

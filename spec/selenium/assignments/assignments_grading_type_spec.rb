@@ -25,9 +25,9 @@ describe "assignments" do
   include_context "in-process server selenium tests"
 
   before(:once) do
-    @user = user_with_pseudonym({:active_user => true})
+    @user = user_with_pseudonym({ :active_user => true })
     @pseudonym = @user.pseudonym
-    @course = course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}).course
+    @course = course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }).course
   end
 
   before :each do
@@ -57,7 +57,7 @@ describe "assignments" do
       end
     end
 
-    it "should validate points for letter grading (!= '')", priority: '2', test_id:209985 do
+    it "should validate points for letter grading (!= '')", priority: '2', test_id: 209985 do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Letter Grade'
         AssignmentCreateEditPage.enter_points_possible ''
@@ -136,7 +136,7 @@ describe "assignments" do
     yield if block_given?
     AssignmentCreateEditPage.assignment_save_button.click
     wait_for_ajaximations
-    expect(f('.errorBox:not(#error_box_template)')).
-      to include_text('Points possible must be 0 or more for selected grading type')
+    expect(f('.errorBox:not(#error_box_template)'))
+      .to include_text('Points possible must be 0 or more for selected grading type')
   end
 end

@@ -29,7 +29,6 @@ describe IncomingMailProcessor::ConfigurableTimeout do
     def foo(arg)
       arg
     end
-
   end
 
   before do
@@ -72,8 +71,7 @@ describe IncomingMailProcessor::ConfigurableTimeout do
     @tester.set_timeout_method { raise ArgumentError }
     expect { @tester.foo(42) }.to raise_error(ArgumentError)
     expect(@tester.untimed_foo(42)).to equal 42
-    @tester.set_timeout_method {|&block| block.call }
+    @tester.set_timeout_method { |&block| block.call }
     expect(@tester.foo(42)).to equal 42
   end
-
 end

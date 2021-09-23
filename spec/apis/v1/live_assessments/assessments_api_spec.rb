@@ -31,11 +31,11 @@ describe LiveAssessments::AssessmentsController, type: :request do
     assessment_course.reload
     outcome
   end
-  let_once(:unrelated_outcome) {course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome')}
-  let(:assessment_hash) {{key: '2014-05-28-Outcome-52', title: 'a test assessment'}}
+  let_once(:unrelated_outcome) { course_with_teacher.course.created_learning_outcomes.create!(description: 'this outcome is in a different course', short_description: 'unrelated outcome') }
+  let(:assessment_hash) { { key: '2014-05-28-Outcome-52', title: 'a test assessment' } }
 
   describe 'POST create' do
-    def create_assessments(params, opts={})
+    def create_assessments(params, opts = {})
       api_call_as_user(opts[:user] || teacher,
                        :post,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments",
@@ -53,7 +53,7 @@ describe LiveAssessments::AssessmentsController, type: :request do
       end
 
       it "aligns an assessment when given an outcome" do
-        create_assessments([assessment_hash.merge(links: {outcome: outcome.id})])
+        create_assessments([assessment_hash.merge(links: { outcome: outcome.id })])
         data = json_parse
         assessment = LiveAssessments::Assessment.find(data['assessments'][0]['id'])
         expect(assessment.learning_outcome_alignments.count).to eq 1
@@ -61,7 +61,7 @@ describe LiveAssessments::AssessmentsController, type: :request do
       end
 
       it "won't align an unrelated outcome" do
-        create_assessments([assessment_hash.merge(links: {outcome: unrelated_outcome.id})], expected_status: 400)
+        create_assessments([assessment_hash.merge(links: { outcome: unrelated_outcome.id })], expected_status: 400)
       end
 
       it 'returns an existing assessment with the same key' do
@@ -81,7 +81,7 @@ describe LiveAssessments::AssessmentsController, type: :request do
   end
 
   describe 'GET index' do
-    def index_assessments(opts={})
+    def index_assessments(opts = {})
       api_call_as_user(opts[:user] || teacher,
                        :get,
                        "/api/v1/courses/#{assessment_course.id}/live_assessments",

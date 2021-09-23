@@ -28,7 +28,7 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::Oauth2
   end
 
   def self.recognized_params
-    super + [ :login_attribute, :jit_provisioning ].freeze
+    super + [:login_attribute, :jit_provisioning].freeze
   end
 
   def self.login_attributes
@@ -75,15 +75,15 @@ class AuthenticationProvider::GitHub < AuthenticationProvider::Oauth2
   def authorize_options
     res = {}
     res[:scope] = 'user:email' if login_attribute == 'email' ||
-        federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
+                                  federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
     res
   end
 
   def client_options
     {
-        site: domain.present? ? "https://#{domain}/api/v3" : 'https://api.github.com'.freeze,
-        authorize_url: "https://#{inferred_domain}/login/oauth/authorize",
-        token_url: "https://#{inferred_domain}/login/oauth/access_token"
+      site: domain.present? ? "https://#{domain}/api/v3" : 'https://api.github.com'.freeze,
+      authorize_url: "https://#{inferred_domain}/login/oauth/authorize",
+      token_url: "https://#{inferred_domain}/login/oauth/access_token"
     }
   end
 

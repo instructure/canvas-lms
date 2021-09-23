@@ -21,14 +21,13 @@
 module SIS
   module CSV
     class GradePublishingResultsImporter < CSVBaseImporter
-
       def self.grade_publishing_results_csv?(row)
         row.include?('enrollment_id') && row.include?('grade_publishing_status')
       end
 
       # expected columns
       # enrollment_id,grade_publishing_status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::GradePublishingResultsImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             begin

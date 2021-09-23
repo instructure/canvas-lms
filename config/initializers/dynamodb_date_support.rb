@@ -23,7 +23,7 @@
 module DynamoDBDateSupport
   def format(obj)
     if obj.respond_to?(:iso8601)
-      {s: obj.iso8601}
+      { s: obj.iso8601 }
     else
       super(obj)
     end
@@ -31,4 +31,3 @@ module DynamoDBDateSupport
 end
 
 Aws::DynamoDB::AttributeValue::Marshaler.prepend(DynamoDBDateSupport)
-

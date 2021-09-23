@@ -65,7 +65,7 @@ describe "conversations new" do
 
       it "should allow admins with read_roster permission to send a message without picking a context", priority: "1", test_id: 138677 do
         user = account_admin_user
-        user_logged_in({:user => user})
+        user_logged_in({ :user => user })
         conversations
         compose to: [@s1], subject: 'context-free', body: 'hallo!'
         c = @s1.conversations.last.conversation
@@ -76,7 +76,7 @@ describe "conversations new" do
       it "should not allow admins without read_roster permission to send a message without picking a context", priority: "1" do
         user = account_admin_user
         RoleOverride.manage_role_override(Account.default, admin_role, 'read_roster', override: false, locked: false)
-        user_logged_in({:user => user})
+        user_logged_in({ :user => user })
         conversations
         f('#compose-btn').click
         wait_for_animations
@@ -95,7 +95,7 @@ describe "conversations new" do
         @group.add_user(@s1)
         @group.add_user(@s2)
         @group.save
-        user_logged_in({:user => @s1})
+        user_logged_in({ :user => @s1 })
         conversations
         f('#compose-btn').click
         wait_for_ajaximations
@@ -114,7 +114,7 @@ describe "conversations new" do
         @group.add_user(@s1)
         @group.add_user(@s2)
         @group.save
-        user_logged_in({:user => @s1})
+        user_logged_in({ :user => @s1 })
         conversations
         f('#compose-btn').click
         wait_for_ajaximations
@@ -131,7 +131,7 @@ describe "conversations new" do
 
       it "should allow admins to message users from their profiles", priority: "2", test_id: 201940 do
         user = account_admin_user
-        user_logged_in({:user => user})
+        user_logged_in({ :user => user })
         get "/accounts/#{Account.default.id}/users"
         fj('[data-automation="users list"] tr a:has([name="IconMessage"])').click
         wait_for_ajaximations

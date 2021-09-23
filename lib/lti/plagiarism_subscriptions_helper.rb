@@ -42,6 +42,7 @@ module Lti
         subscription = plagiarism_subscription(tool_proxy, product_family)
         result = Services::LiveEventsSubscriptionService.create_tool_proxy_subscription(tool_proxy, subscription)
         raise PlagiarismSubscriptionError, error_message unless result.ok?
+
         result.parsed_response['Id']
       else
         raise PlagiarismSubscriptionError, I18n.t('Live events subscriptions service is not configured')
@@ -95,7 +96,7 @@ module Lti
     end
 
     def transport_metadata
-      {'Url': submission_event_service&.endpoint}
+      { 'Url': submission_event_service&.endpoint }
     end
   end
 end

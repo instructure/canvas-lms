@@ -32,17 +32,17 @@ describe SupportHelpers::Crocodoc::CrocodocFixer do
   end
   let!(:submission) do
     assignment.submit_homework(student, submission_type: 'online_upload',
-                               attachments: [shardattachment])
+                                        attachments: [shardattachment])
   end
 
   let!(:submission2) do
     assignment.submit_homework(student, submission_type: 'online_upload',
-                               attachments: [shardattachment2])
+                                        attachments: [shardattachment2])
   end
 
   let!(:submission3) do
     assignment2.submit_homework(student, submission_type: 'online_upload',
-                               attachments: [shardattachment3])
+                                         attachments: [shardattachment3])
   end
 
   let(:shardattachment) do

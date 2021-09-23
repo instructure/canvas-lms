@@ -61,7 +61,7 @@ module Outcomes
       @context = context
     end
 
-    def total_outcomes(learning_outcome_group_id, args={})
+    def total_outcomes(learning_outcome_group_id, args = {})
       if args == {} && improved_outcomes_management?
         cache_key = total_outcomes_cache_key(learning_outcome_group_id)
         Rails.cache.fetch(cache_key) do
@@ -72,12 +72,12 @@ module Outcomes
       end
     end
 
-    def suboutcomes_by_group_id(learning_outcome_group_id, args={})
+    def suboutcomes_by_group_id(learning_outcome_group_id, args = {})
       learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
       relation = ContentTag.active.learning_outcome_links
-        .where(associated_asset_id: learning_outcome_groups_ids)
-        .joins(:learning_outcome_content)
-        .joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
+                           .where(associated_asset_id: learning_outcome_groups_ids)
+                           .joins(:learning_outcome_content)
+                           .joins("INNER JOIN #{LearningOutcomeGroup.quoted_table_name} AS logs
               ON logs.id = content_tags.associated_asset_id")
 
       if args[:search_query]
@@ -99,16 +99,16 @@ module Outcomes
       # cache this in the class since this won't change so much
       @supported_languages ||= ContentTag.connection.execute(
         'SELECT cfgname FROM pg_ts_config'
-      ).to_a.map {|r| r['cfgname']}
+      ).to_a.map { |r| r['cfgname'] }
     end
 
     private
 
-    def total_outcomes_for(learning_outcome_group_id, args={})
+    def total_outcomes_for(learning_outcome_group_id, args = {})
       learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
 
       relation = ContentTag.active.learning_outcome_links
-        .where(associated_asset_id: learning_outcome_groups_ids)
+                           .where(associated_asset_id: learning_outcome_groups_ids)
 
       if args[:search_query]
         relation = relation.joins(:learning_outcome_content)
@@ -124,16 +124,16 @@ module Outcomes
       # parse to_tsvector with the not supported lang, and it'll throw an error
 
       sql = if self.class.supported_languages.include?(lang)
-        ContentTag.sanitize_sql_array([<<~SQL.squish, lang, search_query])
-          SELECT unnest(tsvector_to_array(to_tsvector(?, ?))) as token
-        SQL
-      else
-        ContentTag.sanitize_sql_array([<<~SQL.squish, search_query])
-          SELECT unnest(tsvector_to_array(to_tsvector(?))) as token
-        SQL
-      end
+              ContentTag.sanitize_sql_array([<<~SQL.squish, lang, search_query])
+                SELECT unnest(tsvector_to_array(to_tsvector(?, ?))) as token
+              SQL
+            else
+              ContentTag.sanitize_sql_array([<<~SQL.squish, search_query])
+                SELECT unnest(tsvector_to_array(to_tsvector(?))) as token
+              SQL
+            end
 
-      search_query_tokens = ContentTag.connection.execute(sql).to_a.map {|r| r['token']}.uniq
+      search_query_tokens = ContentTag.connection.execute(sql).to_a.map { |r| r['token'] }.uniq
 
       short_description_query = ContentTag.sanitize_sql_array(["#{SHORT_DESCRIPTION} ~* ANY(array[?])",
                                                                search_query_tokens])
@@ -169,7 +169,7 @@ module Outcomes
         SELECT id FROM levels
       SQL
 
-      LearningOutcomeGroup.connection.execute(sql).as_json.map {|r| r["id"]}
+      LearningOutcomeGroup.connection.execute(sql).as_json.map { |r| r["id"] }
     end
 
     def context_timestamp_cache
@@ -190,15 +190,15 @@ module Outcomes
     end
 
     def context_asset_string
-     @context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
+      @context_asset_string ||= (context || LearningOutcomeGroup.global_root_outcome_group).global_asset_string
     end
 
     def improved_outcomes_management?
       @improved_outcomes_management ||= if context
-        context.root_account.feature_enabled?(:improved_outcomes_management)
-      else
-        LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
-      end
+                                          context.root_account.feature_enabled?(:improved_outcomes_management)
+                                        else
+                                          LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
+                                        end
     end
 
     def lang

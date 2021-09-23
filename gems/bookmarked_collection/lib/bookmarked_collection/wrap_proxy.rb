@@ -20,7 +20,7 @@
 
 class BookmarkedCollection::WrapProxy < BookmarkedCollection::Proxy
   def initialize(bookmarker, base_scope)
-    super bookmarker, lambda{ |pager|
+    super bookmarker, lambda { |pager|
       scope = base_scope
       scope = bookmarker.restrict_scope(scope, pager)
       scope = yield scope if block_given?

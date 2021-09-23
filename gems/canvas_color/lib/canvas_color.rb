@@ -37,12 +37,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
-
 # Implements a color (r,g,b + a) with conversion to/from web format (eg #aabbcc), and
 # with a number of utilities to lighten, darken and blend values.
 module CanvasColor
   class Color
-
     attr_reader :r, :g, :b, :a
 
     # Table for conversion to hex
@@ -209,7 +207,7 @@ module CanvasColor
       @b = 255
       @a = 255
 
-      if args.size.between?(3,4)
+      if args.size.between?(3, 4)
         self.r = args[0]
         self.g = args[1]
         self.b = args[2]
@@ -235,6 +233,7 @@ module CanvasColor
     def ==(val)
       val = Color.parse(val)
       return false if val.nil?
+
       return r == val.r && g == val.g && b == val.b && a == val.a
     end
 
@@ -274,15 +273,15 @@ module CanvasColor
         case str.size
         when 3, 4 then
           r, g, b, a = str.scan(/[0-9A-F]/)
-        when 6,8 then
+        when 6, 8 then
           r, g, b, a = str.scan(/[0-9A-F]{2}/)
         else
           return nil
         end
 
-        return Color.new(r,g,b,a || 255)
+        return Color.new(r, g, b, a || 255)
 
-      when 3,4 then
+      when 3, 4 then
         return Color.new(*args)
 
       end
@@ -321,10 +320,11 @@ module CanvasColor
     def lighten(amt = BRIGHTNESS_DEFAULT)
       return self if amt <= 0
       return WHITE if amt >= 1.0
+
       val = Color.new(self)
-      val.r += ((255-val.r) * amt).to_i
-      val.g += ((255-val.g) * amt).to_i
-      val.b += ((255-val.b) * amt).to_i
+      val.r += ((255 - val.r) * amt).to_i
+      val.g += ((255 - val.g) * amt).to_i
+      val.b += ((255 - val.b) * amt).to_i
       val
     end
 
@@ -338,6 +338,7 @@ module CanvasColor
     def darken(amt = BRIGHTNESS_DEFAULT)
       return self if amt <= 0
       return BLACK if amt >= 1.0
+
       val = Color.new(self)
       val.r -= (val.r * amt).to_i
       val.g -= (val.g * amt).to_i
@@ -370,10 +371,11 @@ module CanvasColor
       other = Color.parse(other)
       return Color.new(self) if amt <= 0 || other.nil?
       return Color.new(other) if amt >= 1.0
+
       val = Color.new(self)
-      val.r += ((other.r - val.r)*amt).to_i
-      val.g += ((other.g - val.g)*amt).to_i
-      val.b += ((other.b - val.b)*amt).to_i
+      val.r += ((other.r - val.r) * amt).to_i
+      val.g += ((other.g - val.g) * amt).to_i
+      val.b += ((other.b - val.b) * amt).to_i
       val
     end
 
@@ -414,9 +416,8 @@ module CanvasColor
     public
 
     # Some constants for general use
-    WHITE = Color.new(255,255,255).freeze
-    BLACK = Color.new(0,0,0).freeze
-
+    WHITE = Color.new(255, 255, 255).freeze
+    BLACK = Color.new(0, 0, 0).freeze
   end
 
   # "Global" method for creating Color objects, eg:

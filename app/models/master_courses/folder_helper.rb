@@ -30,12 +30,12 @@ class MasterCourses::FolderHelper
   def self.locked_folder_ids_for_course(child_course)
     child_course.shard.activate do
       Rails.cache.fetch(cache_key(child_course)) do
-        folder_id_restriction_pairs = child_course.attachments.not_deleted.
-          where("#{Attachment.table_name}.migration_id IS NOT NULL AND
-            #{Attachment.table_name}.migration_id LIKE ?", "#{MasterCourses::MIGRATION_ID_PREFIX}%").
-          joins("INNER JOIN #{MasterCourses::MasterContentTag.quoted_table_name} ON
-            #{Attachment.table_name}.migration_id=#{MasterCourses::MasterContentTag.table_name}.migration_id").
-          distinct.pluck(:folder_id, :restrictions)
+        folder_id_restriction_pairs = child_course.attachments.not_deleted
+                                                  .where("#{Attachment.table_name}.migration_id IS NOT NULL AND
+            #{Attachment.table_name}.migration_id LIKE ?", "#{MasterCourses::MIGRATION_ID_PREFIX}%")
+                                                  .joins("INNER JOIN #{MasterCourses::MasterContentTag.quoted_table_name} ON
+            #{Attachment.table_name}.migration_id=#{MasterCourses::MasterContentTag.table_name}.migration_id")
+                                                  .distinct.pluck(:folder_id, :restrictions)
 
         locked_folder_ids = Set.new
         folder_id_restriction_pairs.each do |folder_id, restrictions|
@@ -68,7 +68,7 @@ class MasterCourses::FolderHelper
     updated_folders.each do |source_folder|
       dest_folder = child_course.folders.active.where(cloned_item_id: source_folder.cloned_item_id).take
       sync_folder_location(child_course, dest_folder, source_folder) if dest_folder
-      if dest_folder && [:name, :workflow_state, :locked, :lock_at, :unlock_at].any?{|attr| dest_folder.send(attr) != source_folder.send(attr)}
+      if dest_folder && [:name, :workflow_state, :locked, :lock_at, :unlock_at].any? { |attr| dest_folder.send(attr) != source_folder.send(attr) }
         [:name, :workflow_state, :locked, :lock_at, :unlock_at].each do |attr|
           dest_folder.send("#{attr}=", source_folder.send(attr))
         end
@@ -80,8 +80,10 @@ class MasterCourses::FolderHelper
   def self.sync_folder_location(dest_course, dest_folder, source_folder)
     return unless dest_folder.cloned_item_id == source_folder.cloned_item_id
     return unless dest_folder.parent_folder && source_folder.parent_folder
+
     source_parent_folder = source_folder.parent_folder
     return unless source_parent_folder.cloned_item_id.present?
+
     if dest_folder.parent_folder.cloned_item_id != source_parent_folder.cloned_item_id
       new_parent = dest_course.folders.where(cloned_item_id: source_parent_folder.cloned_item_id).take
       dest_folder.parent_folder = new_parent if new_parent

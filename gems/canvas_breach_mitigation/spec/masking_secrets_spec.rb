@@ -40,7 +40,7 @@ describe CanvasBreachMitigation::MaskingSecrets do
 
   describe ".valid_authenticity_token?" do
     let(:unmasked_token) { SecureRandom.base64(32) }
-    let(:cookies) { {'_csrf_token' => masking_secrets.masked_token(unmasked_token)} }
+    let(:cookies) { { '_csrf_token' => masking_secrets.masked_token(unmasked_token) } }
 
     it "returns true for a valid masked token" do
       valid_masked = masking_secrets.masked_token(unmasked_token)
@@ -100,7 +100,7 @@ describe CanvasBreachMitigation::MaskingSecrets do
       token = masking_secrets.masked_authenticity_token(cookies)
       expect(token).not_to eq original_token
       expect(cookies['_csrf_token'][:value]).to eq token
-      expect(masking_secrets.valid_authenticity_token?({'_csrf_token' => token}, original_token)).to be true
+      expect(masking_secrets.valid_authenticity_token?({ '_csrf_token' => token }, original_token)).to be true
     end
   end
 end

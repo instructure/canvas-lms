@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/new" do
-  def course_quiz(active=false)
+  def course_quiz(active = false)
     @quiz = @course.quizzes.create
     @quiz.workflow_state = "available" if active
     @quiz.save!
@@ -37,7 +37,7 @@ describe "/quizzes/quizzes/new" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
-    assign(:js_env, {quiz_max_combination_count: 200})
+    assign(:js_env, { quiz_max_combination_count: 200 })
     render "quizzes/quizzes/new"
     expect(response).not_to be_nil
   end
@@ -47,7 +47,7 @@ describe "/quizzes/quizzes/new" do
       course_with_teacher(:active_all => true)
       @quiz = course_quiz
       assign(:quiz, @quiz)
-      assign(:js_env, {quiz_max_combination_count: 200})
+      assign(:js_env, { quiz_max_combination_count: 200 })
       view_context
     end
     it "should not display 'NOTE:' message when questions within limit" do
@@ -57,7 +57,7 @@ describe "/quizzes/quizzes/new" do
     end
 
     it "should explain why 'Show Question Details' is disabled" do
-      (Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT+1).times { quiz_question }
+      (Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT + 1).times { quiz_question }
       render 'quizzes/quizzes/new'
       expect(response.inspect).to include('NOTE: Question details not available when more than')
     end
@@ -75,6 +75,4 @@ describe "/quizzes/quizzes/new" do
       expect(response.inspect).to include("Not Published")
     end
   end
-
 end
-

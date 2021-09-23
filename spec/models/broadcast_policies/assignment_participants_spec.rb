@@ -44,9 +44,9 @@ describe BroadcastPolicies::AssignmentParticipants do
     context 'with students whose enrollments have not yet started' do
       before :once do
         student_in_course({
-          course: @course,
-          start_at: 1.month.from_now
-        })
+                            course: @course,
+                            start_at: 1.month.from_now
+                          })
       end
 
       it 'excludes said students' do

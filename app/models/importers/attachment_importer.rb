@@ -22,12 +22,11 @@ require_dependency 'importers'
 
 module Importers
   class AttachmentImporter < Importer
-
     self.item_class = Attachment
 
     def self.process_migration(data, migration)
       created_usage_rights_map = {}
-      attachments = data['file_map'] ? data['file_map']: {}
+      attachments = data['file_map'] ? data['file_map'] : {}
       attachments = attachments.with_indifferent_access
       attachments.values.each do |att|
         if !att['is_folder'] && (migration.import_object?("attachments", att['migration_id']) || migration.import_object?("files", att['migration_id']))
@@ -40,13 +39,13 @@ module Importers
       end
 
       if data[:locked_folders]
-         data[:locked_folders].each do |path|
-           # TODO i18n
-           if f = migration.context.active_folders.where(full_name: "course files/#{path}").first
-             f.locked = true
-             f.save
-           end
-         end
+        data[:locked_folders].each do |path|
+          # TODO i18n
+          if f = migration.context.active_folders.where(full_name: "course files/#{path}").first
+            f.locked = true
+            f.save
+          end
+        end
       end
 
       if data[:hidden_folders]
@@ -62,8 +61,9 @@ module Importers
 
     private
 
-    def self.import_from_migration(hash, context, migration, item=nil, created_usage_rights_map={})
+    def self.import_from_migration(hash, context, migration, item = nil, created_usage_rights_map = {})
       return nil if hash[:files_to_import] && !hash[:files_to_import][hash[:migration_id]]
+
       item ||= Attachment.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= Attachment.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first # if hash[:migration_id]
       item ||= Attachment.find_from_path(hash[:path_name], context)
@@ -94,6 +94,5 @@ module Importers
       usage_rights = context.usage_rights.create!(attrs)
       created_usage_rights_map[key] = usage_rights.id
     end
-
   end
 end

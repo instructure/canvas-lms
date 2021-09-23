@@ -29,7 +29,7 @@ describe KalturaMediaFileHandler do
     let(:attachment_context) { uploading_user }
     let(:attachment) { attachment_obj_with_context(attachment_context, user: uploading_user) }
     let(:wait_for_completion) { false }
-    let(:bulk_upload_add_response) {{ id: "someBulkUploadId", ready: false }}
+    let(:bulk_upload_add_response) { { id: "someBulkUploadId", ready: false } }
 
     before do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return(kaltura_config)
@@ -73,7 +73,7 @@ describe KalturaMediaFileHandler do
 
           expect(media_file_handler).to receive(:sleep).with(60).twice
           expect(kaltura_client).to receive(:bulkUploadGet).with("someBulkUploadId").twice
-            .and_return(unfinished_bulk_upload_get, successful_bulk_upload_get)
+                                                           .and_return(unfinished_bulk_upload_get, successful_bulk_upload_get)
 
           expect(MediaObject).to receive(:build_media_objects).with(successful_bulk_upload_get, attachment.root_account_id)
 
@@ -100,14 +100,14 @@ describe KalturaMediaFileHandler do
 
           partner_data = Rack::Utils.parse_nested_query(files_sent_to_kaltura.first[:partner_data])
           expect(partner_data).to eq({
-            "attachment_id" => attachment.id.to_s,
-            "context_source" => "file_upload",
-            "root_account_id" => Shard.global_id_for(attachment.root_account_id).to_s,
-          })
+                                       "attachment_id" => attachment.id.to_s,
+                                       "context_source" => "file_upload",
+                                       "root_account_id" => Shard.global_id_for(attachment.root_account_id).to_s,
+                                     })
         end
 
         context "when the kaltura settings for the account include 'Write SIS data to Kaltura'" do
-          let(:kaltura_config) { { 'kaltura_sis' => '1' }}
+          let(:kaltura_config) { { 'kaltura_sis' => '1' } }
 
           it "adds a context_code to the partner_data" do
             KalturaMediaFileHandler.new.add_media_files([attachment], wait_for_completion)

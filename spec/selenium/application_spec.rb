@@ -42,7 +42,7 @@ describe "Authenticity Tokens" do
     token2 = driver.execute_script "return $.cookie('_csrf_token')"
     expect(token).not_to eq token2
     expect(CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token)).not_to eq(
-        CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token2)
+      CanvasBreachMitigation::MaskingSecrets.send(:unmasked_token, token2)
     )
   end
 end

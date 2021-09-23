@@ -63,7 +63,7 @@ describe "Gradebook view menu" do
     end
 
     it "sorts assignments by grade - Low to High", priority: "1", test_id: 3253345 do
-      Gradebook.click_assignment_group_header_options(@group.name,'Grade - Low to High')
+      Gradebook.click_assignment_group_header_options(@group.name, 'Grade - Low to High')
       gradebook_student_names = Gradebook.fetch_student_names
 
       expect(gradebook_student_names[0]).to eq(@student_name_2)
@@ -72,7 +72,7 @@ describe "Gradebook view menu" do
     end
 
     it "sorts assignments by grade - High to Low", priority: "1", test_id: 3253346 do
-      Gradebook.click_assignment_group_header_options(@group.name,'Grade - High to Low')
+      Gradebook.click_assignment_group_header_options(@group.name, 'Grade - High to Low')
       gradebook_student_names = Gradebook.fetch_student_names
 
       expect(gradebook_student_names[0]).to eq(@student_name_1)

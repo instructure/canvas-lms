@@ -42,12 +42,12 @@ describe Quizzes::QuizQuestionBuilder do
 
     it 'should use a local question' do
       questions = quiz_question_builder.build_submission_questions(1, [
-        {
-          id: 1,
-          name: 'some question',
-          question_type: 'essay_question'
-        }
-      ])
+                                                                     {
+                                                                       id: 1,
+                                                                       name: 'some question',
+                                                                       question_type: 'essay_question'
+                                                                     }
+                                                                   ])
 
       expect(questions.count).to eq(1)
       expect(questions[0][:id]).to eq(1)
@@ -55,24 +55,24 @@ describe Quizzes::QuizQuestionBuilder do
 
     it 'strips ascii escape characters from multiple dropdown questions' do
       questions = quiz_question_builder.build_submission_questions(1, [
-        {
-          id: 1,
-          name: 'some question',
-          question_type: ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
-          question_text: 'Hello in Chinese is [blank]',
-          answers: [{
-            id: rand(1..999),
-            blank_id: 'blank',
-            text: "\b你好"
-          }]
-        }
-      ])
+                                                                     {
+                                                                       id: 1,
+                                                                       name: 'some question',
+                                                                       question_type: ::Quizzes::QuizQuestion::Q_MULTIPLE_DROPDOWNS,
+                                                                       question_text: 'Hello in Chinese is [blank]',
+                                                                       answers: [{
+                                                                         id: rand(1..999),
+                                                                         blank_id: 'blank',
+                                                                         text: "\b你好"
+                                                                       }]
+                                                                     }
+                                                                   ])
       expect(questions[0][:question_text]).not_to include('\\b')
     end
 
     context 'with a question bank entry' do
       before(:once) do
-        @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+        @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
         @quiz = @course.quizzes.create!
       end
 
@@ -84,11 +84,11 @@ describe Quizzes::QuizQuestionBuilder do
         ]
 
         @group = @quiz.quiz_groups.create!({
-          name: "question group a",
-          pick_count: 2,
-          question_points: 5.0,
-          assessment_question_bank_id: @bank.id
-        })
+                                             name: "question group a",
+                                             pick_count: 2,
+                                             question_points: 5.0,
+                                             assessment_question_bank_id: @bank.id
+                                           })
 
         # it should pick 2 questions from that bank
         expect(questions.count).to eq(2)
@@ -101,18 +101,18 @@ describe Quizzes::QuizQuestionBuilder do
         # it generates quiz questions for every AQ it pulls out of the bank:
         expect(@quiz.quiz_questions.count).to eq(2)
         expect(@quiz.quiz_questions.generated.count).to eq(2)
-        expect(@quiz.quiz_questions.pluck(:id).sort).
-          to eq(questions.map { |q| q[:id] }.sort)
+        expect(@quiz.quiz_questions.pluck(:id).sort)
+          .to eq(questions.map { |q| q[:id] }.sort)
       end
 
       it 'should duplicate questions to fill the group' do
         aq = assessment_question_model(bank: @bank, name: 'Group Question 1')
 
         @group = @quiz.quiz_groups.create!({
-                                               name: "question group a",
-                                               pick_count: 5,
-                                               question_points: 5.0,
-                                               assessment_question_bank_id: @bank.id
+                                             name: "question group a",
+                                             pick_count: 5,
+                                             question_points: 5.0,
+                                             assessment_question_bank_id: @bank.id
                                            })
 
         # it should pick 2 questions from that bank
@@ -124,8 +124,8 @@ describe Quizzes::QuizQuestionBuilder do
         # it generates quiz questions for every AQ it pulls out of the bank:
         expect(@quiz.quiz_questions.count).to eq(5)
         expect(@quiz.quiz_questions.generated.count).to eq(5)
-        expect(@quiz.quiz_questions.pluck(:id).sort).
-            to eq(questions.map { |q| q[:id] }.sort)
+        expect(@quiz.quiz_questions.pluck(:id).sort)
+          .to eq(questions.map { |q| q[:id] }.sort)
       end
 
       it "should duplicate questions from a bank" do
@@ -133,22 +133,22 @@ describe Quizzes::QuizQuestionBuilder do
 
         # both groups pull from the same bank
         @quiz.quiz_groups.create!({
-          name: "question group a",
-          pick_count: 1,
-          question_points: 5.0,
-          assessment_question_bank_id: @bank.id
-        })
+                                    name: "question group a",
+                                    pick_count: 1,
+                                    question_points: 5.0,
+                                    assessment_question_bank_id: @bank.id
+                                  })
 
         @quiz.quiz_groups.create!({
-          name: "question group b",
-          pick_count: 1,
-          question_points: 5.0,
-          assessment_question_bank_id: @bank.id
-        })
+                                    name: "question group b",
+                                    pick_count: 1,
+                                    question_points: 5.0,
+                                    assessment_question_bank_id: @bank.id
+                                  })
 
         expect(questions.count).to eq 2
         expect(questions[0][:id]).not_to eq(questions[1][:id]),
-          "a duplicated question is still created as a separate QuizQuestion entity"
+                                         "a duplicated question is still created as a separate QuizQuestion entity"
       end
     end
 
@@ -156,20 +156,20 @@ describe Quizzes::QuizQuestionBuilder do
       before(:once) do
         @quiz = @course.quizzes.create!
         @group = @quiz.quiz_groups.create!({
-          name: 'Quiz Group 1',
-          pick_count: 1,
-          question_points: 2.5
-        })
+                                             name: 'Quiz Group 1',
+                                             pick_count: 1,
+                                             question_points: 2.5
+                                           })
       end
 
       it 'should use a question defined locally in a group' do
         @qq = @quiz.quiz_questions.create!({
-          quiz_group_id: @group.id,
-          question_data: {
-            question_type: 'essay_question',
-            question_text: 'qq1'
-          }
-        })
+                                             quiz_group_id: @group.id,
+                                             question_data: {
+                                               question_type: 'essay_question',
+                                               question_text: 'qq1'
+                                             }
+                                           })
 
         expect(questions.count).to eq(1)
         expect(questions[0][:id]).to eq(@qq.id)
@@ -177,7 +177,7 @@ describe Quizzes::QuizQuestionBuilder do
 
       context 'linked to a question bank' do
         before(:once) do
-          @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
+          @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
 
           @group.update_attribute(:assessment_question_bank_id, @bank.id)
         end
@@ -200,29 +200,29 @@ describe Quizzes::QuizQuestionBuilder do
           it 'should duplicate as many questions as needed' do
             aqs = [
               @bank.assessment_questions.create!({
-                question_data: {
-                  question_text: 'bq1',
-                  question_type: 'essay_question'
-                }
-              }),
+                                                   question_data: {
+                                                     question_text: 'bq1',
+                                                     question_type: 'essay_question'
+                                                   }
+                                                 }),
 
               @bank.assessment_questions.create!({
-                question_data: {
-                  question_text: 'bq2',
-                  question_type: 'essay_question'
-                }
-              })
+                                                   question_data: {
+                                                     question_text: 'bq2',
+                                                     question_type: 'essay_question'
+                                                   }
+                                                 })
             ]
 
             @group.update_attribute(:pick_count, 3)
 
             expect(questions.count).to eq(3)
             expect(questions.map { |q| q[:question_text] }.sort.uniq).to eq([
-              'bq1', 'bq2'
-            ])
+                                                                              'bq1', 'bq2'
+                                                                            ])
 
             expect(questions.map { |q| q[:id] }.uniq.count).to eq(3),
-              "it links to 3 distinct QuizQuestion objects"
+                                                               "it links to 3 distinct QuizQuestion objects"
 
             expect(@quiz.quiz_questions.generated.count).to eq(3)
           end
@@ -237,47 +237,47 @@ describe Quizzes::QuizQuestionBuilder do
         quiz_question_builder.options[:shuffle_questions] = false
 
         aq1 = @bank.assessment_questions.create!({
-          question_data: {
-            question_text: 'bank question 1',
-            question_type: 'essay_question'
-          }
-        })
+                                                   question_data: {
+                                                     question_text: 'bank question 1',
+                                                     question_type: 'essay_question'
+                                                   }
+                                                 })
 
         aq2 = @bank.assessment_questions.create!({
-          question_data: {
-            question_text: 'bank question 2',
-            question_type: 'essay_question'
-          }
-        })
+                                                   question_data: {
+                                                     question_text: 'bank question 2',
+                                                     question_type: 'essay_question'
+                                                   }
+                                                 })
 
         group1 = @quiz.quiz_groups.create!({
-          name: "linked group",
-          pick_count: 2,
-          question_points: 1,
-          assessment_question_bank_id: @bank.id
-        })
+                                             name: "linked group",
+                                             pick_count: 2,
+                                             question_points: 1,
+                                             assessment_question_bank_id: @bank.id
+                                           })
 
         group2 = @quiz.quiz_groups.create!({
-          name: "standalone group",
-          pick_count: 2,
-          question_points: 1
-        })
+                                             name: "standalone group",
+                                             pick_count: 2,
+                                             question_points: 1
+                                           })
 
-        @quiz.add_assessment_questions([ aq1 ], group2)
+        @quiz.add_assessment_questions([aq1], group2)
         @quiz.quiz_questions.create!({
-          quiz_group: group2,
-          question_data: {
-            question_type: 'essay_question',
-            question_text: 'group question'
-          }
-        })
+                                       quiz_group: group2,
+                                       question_data: {
+                                         question_type: 'essay_question',
+                                         question_text: 'group question'
+                                       }
+                                     })
 
         expect(questions.count).to eq(4)
         expect(@quiz.quiz_questions.generated.count).to eq(2)
         expect([
-          [ 'bank question 1', 'bank question 1', 'bank question 2', 'group question' ],
-          [ 'bank question 1', 'bank question 2', 'group question', 'group question' ],
-        ]).to include(questions.map { |q| q[:question_text] }.sort)
+                 ['bank question 1', 'bank question 1', 'bank question 2', 'group question'],
+                 ['bank question 1', 'bank question 2', 'group question', 'group question'],
+               ]).to include(questions.map { |q| q[:question_text] }.sort)
       end
     end
   end

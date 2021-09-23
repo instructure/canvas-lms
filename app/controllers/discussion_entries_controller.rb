@@ -25,15 +25,15 @@ class DiscussionEntriesController < ApplicationController
   before_action :require_context_and_read_access, :except => :public_feed
 
   def show
-    @entry = @context.discussion_entries.find(params[:id]).tap{|e| e.current_user = @current_user}
+    @entry = @context.discussion_entries.find(params[:id]).tap { |e| e.current_user = @current_user }
     if @entry.deleted?
       flash[:notice] = t :deleted_entry_notice, "That entry has been deleted"
       redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)
     end
     if authorized_action(@entry, @current_user, :read)
       respond_to do |format|
-        format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id)}
-        format.json  { render :json => @entry.as_json(:methods => :read_state) }
+        format.html { redirect_to named_context_url(@context, :context_discussion_topic_url, @entry.discussion_topic_id) }
+        format.json { render :json => @entry.as_json(:methods => :read_state) }
       end
     end
   end
@@ -68,7 +68,8 @@ class DiscussionEntriesController < ApplicationController
                                   methods: [:user_name, :read_state],
                                   permissions: {
                                     user: @current_user,
-                                    session: session })
+                                    session: session
+                                  })
             render(json: json, status: :created)
           }
         else
@@ -102,12 +103,14 @@ class DiscussionEntriesController < ApplicationController
 
     @entry = (@topic || @context).discussion_entries.find(params[:id])
     raise(ActiveRecord::RecordNotFound) if @entry.deleted?
+
     @topic ||= @entry.discussion_topic
     @entry.current_user = @current_user
     @entry.attachment_id = nil if @remove_attachment == '1' || params[:attachment].nil?
 
     if authorized_action(@entry, @current_user, :update)
       return if context_file_quota_exceeded?
+
       @entry.editor = @current_user
       respond_to do |format|
         if @entry.update(entry_params)
@@ -152,6 +155,7 @@ class DiscussionEntriesController < ApplicationController
 
   def public_feed
     return unless get_feed_context
+
     @topic = @context.discussion_topics.active.find(params[:discussion_topic_id])
     if !@topic.podcast_enabled && request.format == :rss
       @problem = t :disabled_podcasts_notice, "Podcasts have not been enabled for this topic."
@@ -169,7 +173,7 @@ class DiscussionEntriesController < ApplicationController
             f.id = polymorphic_url([@context, @topic])
           end
           feed.entries << @topic.to_atom
-          @discussion_entries.sort_by{|e| e.updated_at}.each do |e|
+          @discussion_entries.sort_by { |e| e.updated_at }.each do |e|
             feed.entries << e.to_atom
           end
           render :plain => feed.to_xml
@@ -214,8 +218,8 @@ class DiscussionEntriesController < ApplicationController
   def save_attachment
     return unless can_attach?
 
-    attachment_params = params.require(:attachment).
-      permit(Attachment.permitted_attributes)
+    attachment_params = params.require(:attachment)
+                              .permit(Attachment.permitted_attributes)
     @attachment = @context.attachments.create(attachment_params)
     @entry.attachment = @attachment
     @entry.save
@@ -227,7 +231,6 @@ class DiscussionEntriesController < ApplicationController
   def context_file_quota_exceeded?
     can_attach?(1.kilobyte) && quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
   end
-
 
   # Internal: Respond to a bad request by redirecting or returning error JSON.
   #

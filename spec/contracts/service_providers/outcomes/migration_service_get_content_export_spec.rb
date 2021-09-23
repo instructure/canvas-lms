@@ -44,56 +44,56 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
       }
     end
     let(:expected_export_get_response_body) do
-    {
-      "id": Pact.like(5),
-      "context_type": "course",
-      "context_id": Pact.like("100"),
-      "state": "completed",
-      "export_settings": {
-        "format": "canvas",
-        "artifacts": [
-          {
-            "external_id": Pact.each_like(1),
-            "external_type": "canvas.page"
-          }
-        ]
-      },
-      "data": {
-        "format": "canvas",
-        "alignments": Pact.each_like({
-          "artifact": Pact.like({
-            "$canvas_wiki_page_id": "1"
-          }),
-          "outcomes": Pact.each_like({
-            "$canvas_learning_outcome_id": "external-id-1"
-          })
-        })
+      {
+        "id": Pact.like(5),
+        "context_type": "course",
+        "context_id": Pact.like("100"),
+        "state": "completed",
+        "export_settings": {
+          "format": "canvas",
+          "artifacts": [
+            {
+              "external_id": Pact.each_like(1),
+              "external_type": "canvas.page"
+            }
+          ]
+        },
+        "data": {
+          "format": "canvas",
+          "alignments": Pact.each_like({
+                                         "artifact": Pact.like({
+                                                                 "$canvas_wiki_page_id": "1"
+                                                               }),
+                                         "outcomes": Pact.each_like({
+                                                                      "$canvas_learning_outcome_id": "external-id-1"
+                                                                    })
+                                       })
+        }
       }
-    }
     end
     let(:export_data) { { "export_id": "1" } }
 
     before do
-      outcomes.given('artifacts and an export to retrieve').
-        upon_receiving('a request to return exported content').
-        with(
-          method: :get,
-          path: '/api/content_exports/1',
-          headers: export_get_headers
-        ).
-        will_respond_with(
-          status: 200,
-          headers: { 'Content-Type' => 'application/json; charset=utf-8' },
-          body: expected_export_get_response_body
-        )
+      outcomes.given('artifacts and an export to retrieve')
+              .upon_receiving('a request to return exported content')
+              .with(
+                method: :get,
+                path: '/api/content_exports/1',
+                headers: export_get_headers
+              )
+              .will_respond_with(
+                status: 200,
+                headers: { 'Content-Type' => 'application/json; charset=utf-8' },
+                body: expected_export_get_response_body
+              )
     end
 
     it 'gets exported content' do
       # CanvasHttp performs several validations that don't make sense to stub before making
       #  the actual call to the desired service, so it's easier to just stub the whole method
       http_double = class_double(CanvasHttp).as_stubbed_const
-      allow(http_double).to receive(:get).
-        and_return(
+      allow(http_double).to receive(:get)
+        .and_return(
           HTTParty.get(
             "http://#{outcomes_host}/api/content_exports/1",
             headers: export_get_headers

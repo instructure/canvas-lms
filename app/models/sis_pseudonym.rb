@@ -61,7 +61,7 @@ class SisPseudonym
     results << find_in_home_account
     results << find_in_other_accounts
     results = results.flatten.compact.uniq
-    results.reject! {|result| exclude_deleted?(result)}
+    results.reject! { |result| exclude_deleted?(result) }
     if results.present?
       results.each do |result|
         result.account = root_account if result.account_id == root_account.id
@@ -145,7 +145,7 @@ class SisPseudonym
   def find_in_home_account
     if use_loaded_collection?(root_account.shard)
       if user.pseudonyms.loaded?
-        pick_user_pseudonym(user.pseudonyms,[root_account.id])
+        pick_user_pseudonym(user.pseudonyms, [root_account.id])
       else
         pick_user_pseudonym(include_deleted ? user.all_pseudonyms : user.all_active_pseudonyms,
                             [root_account.id])
@@ -168,7 +168,7 @@ class SisPseudonym
       raise "could not resolve root account" unless account.is_a?(Account)
 
       account
-     end
+    end
   end
 
   def pick_pseudonym(account_ids)
@@ -206,7 +206,7 @@ class SisPseudonym
         true
       end
     else
-      collection.sort_by {|p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
+      collection.sort_by { |p| [p.workflow_state, p.sis_user_id ? 0 : 1, Canvas::ICU.collation_key(p.unique_id)] }.detect do |p|
         next if account_ids && !account_ids.include?(p.account_id)
         next if !account_ids && !p.works_for_account?(root_account, type == :implicit)
         next if require_sis && !p.sis_user_id

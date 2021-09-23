@@ -37,7 +37,7 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
 
   describe '[:answers]' do
     it 'generates the "none" answer when a student skips the question' do
-      stats = subject.run([ { text: '' } ])
+      stats = subject.run([{ text: '' }])
       stats[:answers].last.tap do |no_answer|
         expect(no_answer[:id]).to eq('none')
         expect(no_answer[:responses]).to eq(1)
@@ -72,7 +72,7 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
       it 'should read 1.50 for an exact answer with margin' do
         expect(subject.run([])[:answers][3][:text]).to eq('1.50')
       end
-      
+
       it 'should read "1.1 (with precision: 2)" for a precision answer' do
         expect(subject.run([])[:answers][4][:text]).to eq("1.1 (with precision: 1)")
       end
@@ -80,7 +80,7 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
 
     describe '[:responses]' do
       it 'should count the number of students who got it right' do
-        stats = subject.run([{answer_id: 4343}])
+        stats = subject.run([{ answer_id: 4343 }])
         answer = stats[:answers].detect { |answer| answer[:id] == '4343' }
         expect(answer[:responses]).to eq(1)
       end

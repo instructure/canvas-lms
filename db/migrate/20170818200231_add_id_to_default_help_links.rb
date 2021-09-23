@@ -29,12 +29,15 @@ class AddIdToDefaultHelpLinks < ActiveRecord::Migration[5.0]
       found_link = false
       new_links = a.settings[:custom_help_links].map do |link|
         next link unless link[:type] == 'default'
+
         default_link = default_links.find { |l| l[:url] == link[:url] }
         next link unless default_link
+
         found_link = true
         default_link
       end
       next unless found_link
+
       a.settings[:custom_help_links] = a.help_links_builder.instantiate_links(new_links)
       a.save!
     end

@@ -45,18 +45,18 @@ describe "Gradebook - uploads" do
     expect(f("#content")).not_to contain_css('.right-highlight')
   end
 
-  it "should correctly update grades for assignments with GPA Scale grading type",priority: "1", test_id: 209969 do
+  it "should correctly update grades for assignments with GPA Scale grading type", priority: "1", test_id: 209969 do
     assignment = @course.assignments.create!(title: "GPA Scale Assignment",
-      grading_type: "gpa_scale", points_possible: 5)
+                                             grading_type: "gpa_scale", points_possible: 5)
     assignment.grade_student(@student, grade: "D", grader: @teacher)
     _filename, fullpath, _data = gradebook_file("gradebook0.csv",
-      "Student Name,ID,Section,GPA Scale Assignment",
-      "User,#{@student.id},,B-")
+                                                "Student Name,ID,Section,GPA Scale Assignment",
+                                                "User,#{@student.id},,B-")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
-    wait_for_new_page_load(true){ submit_form('#gradebook_grid_form') }
+    wait_for_new_page_load(true) { submit_form('#gradebook_grid_form') }
     run_jobs
     expect(assignment.submissions.last.grade).to eq "B-"
   end
@@ -66,10 +66,10 @@ describe "Gradebook - uploads" do
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook1.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,10")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "User,#{@student.id},,10")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -83,10 +83,10 @@ describe "Gradebook - uploads" do
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 1,Assignment 2",
-          "User,#{@student.id},,10,9")
+                                                "Student Name,ID,Section,Assignment 1,Assignment 2",
+                                                "User,#{@student.id},,10,9")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -99,10 +99,10 @@ describe "Gradebook - uploads" do
 
   it "should show a new assignment", priority: "1", test_id: 209975 do
     _filename, fullpath, _data = gradebook_file("gradebook3.csv",
-      "Student Name,ID,Section,New Assignment",
-      "User,#{@student.id},,0")
+                                                "Student Name,ID,Section,New Assignment",
+                                                "User,#{@student.id},,0")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -127,7 +127,6 @@ describe "Gradebook - uploads" do
     assignment = @course.assignments.order(:created_at).last
     submission = assignment.submissions.last
     expect(submission.score).to eq 0
-
   end
 
   it "should create an assignment with no grades", priority: "1", test_id: 209971 do
@@ -135,10 +134,10 @@ describe "Gradebook - uploads" do
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 2,Assignment 1",
-          "User,#{@student.id},,,10")
+                                                "Student Name,ID,Section,Assignment 2,Assignment 1",
+                                                "User,#{@student.id},,,10")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -156,7 +155,7 @@ describe "Gradebook - uploads" do
     expect(ff('.slick-header-column.assignment').length).to eq 1
 
     assignment_count = @course.assignments.count
-    wait_for_new_page_load{ submit_form('#gradebook_grid_form') }
+    wait_for_new_page_load { submit_form('#gradebook_grid_form') }
     run_jobs
     expect(@course.assignments.count).to eql (assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
@@ -170,10 +169,10 @@ describe "Gradebook - uploads" do
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook4.csv",
-          "Student Name,ID,Section,Assignment 2",
-          "User,#{@student.id},,10")
+                                                "Student Name,ID,Section,Assignment 2",
+                                                "User,#{@student.id},,10")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -196,10 +195,10 @@ describe "Gradebook - uploads" do
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook5.csv",
-          "Student Name,ID,Section,Assignment 1,Assignment 3",
-          "User,#{@student.id},,10,9")
+                                                "Student Name,ID,Section,Assignment 1,Assignment 3",
+                                                "User,#{@student.id},,10,9")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -218,15 +217,15 @@ describe "Gradebook - uploads" do
     expect(f('#assignments_without_changes_alert')).to be_displayed
   end
 
-  it "should say no changes after matching student", priority: "1", test_id: 209978  do
+  it "should say no changes after matching student", priority: "1", test_id: 209978 do
     assignment = @course.assignments.create!(title: "Assignment 1")
     assignment.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook6.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "Student,,,10")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "Student,,,10")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -249,10 +248,10 @@ describe "Gradebook - uploads" do
     assignment2.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook7.csv",
-          "Student Name,ID,Section,Assignment 1,Assignment 2",
-          "Student,,,10,9")
+                                                "Student Name,ID,Section,Assignment 1,Assignment 2",
+                                                "Student,,,10,9")
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -276,11 +275,11 @@ describe "Gradebook - uploads" do
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,9")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "User,#{@student.id},,9")
 
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -292,11 +291,11 @@ describe "Gradebook - uploads" do
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "User,#{@student.id},,")
 
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -308,11 +307,11 @@ describe "Gradebook - uploads" do
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,100")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "User,#{@student.id},,100")
 
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -324,11 +323,11 @@ describe "Gradebook - uploads" do
     assignment1.grade_student(@student, grade: 10, grader: @teacher)
 
     _filename, fullpath, _data = gradebook_file("gradebook.csv",
-          "Student Name,ID,Section,Assignment 1",
-          "User,#{@student.id},,EX")
+                                                "Student Name,ID,Section,Assignment 1",
+                                                "User,#{@student.id},,EX")
 
     Gradebook.grades_uploaded_data.send_keys(fullpath)
-    wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+    wait_for_new_page_load { Gradebook.grades_new_upload.submit }
     run_jobs
     Gradebook.wait_for_spinner
 
@@ -355,11 +354,11 @@ describe "Gradebook - uploads" do
       Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
 
       _filename, fullpath, _data = gradebook_file("gradebook.csv",
-            "Student Name,ID,Section,Assignment 1,Override Score",
-            "User,#{@student.id},,10,100")
+                                                  "Student Name,ID,Section,Assignment 1,Override Score",
+                                                  "User,#{@student.id},,10,100")
 
       Gradebook.grades_uploaded_data.send_keys(fullpath)
-      wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+      wait_for_new_page_load { Gradebook.grades_new_upload.submit }
       run_jobs
       Gradebook.wait_for_spinner
 
@@ -374,11 +373,11 @@ describe "Gradebook - uploads" do
       Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
 
       _filename, fullpath, _data = gradebook_file("gradebook.csv",
-            "Student Name,ID,Section,Assignment 1,Override Score",
-            "User,#{@student.id},,10,100")
+                                                  "Student Name,ID,Section,Assignment 1,Override Score",
+                                                  "User,#{@student.id},,10,100")
 
       Gradebook.grades_uploaded_data.send_keys(fullpath)
-      wait_for_new_page_load{ Gradebook.grades_new_upload.submit }
+      wait_for_new_page_load { Gradebook.grades_new_upload.submit }
       run_jobs
       Gradebook.wait_for_spinner
 

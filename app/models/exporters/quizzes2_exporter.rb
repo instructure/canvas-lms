@@ -21,10 +21,10 @@ require 'English'
 
 module Exporters
   class Quizzes2Exporter
-
     GROUP_NAME = 'Migrated Quizzes'.freeze
 
     attr_accessor :course, :quiz
+
     delegate :add_error, :to => :@content_export, :allow_nil => true
 
     def initialize(content_export)

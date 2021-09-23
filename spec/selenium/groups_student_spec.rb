@@ -24,11 +24,10 @@ describe "student groups" do
   include_context "in-process server selenium tests"
   include GroupsCommon
 
-  let(:group_name){ 'Windfury' }
-  let(:group_category_name){ 'cat1' }
+  let(:group_name) { 'Windfury' }
+  let(:group_category_name) { 'cat1' }
 
   describe "as a student" do
-
     before(:each) do
       course_with_student_logged_in(:active_all => true)
     end
@@ -47,7 +46,7 @@ describe "student groups" do
 
       f('#edit_group').click
       set_value f('#group_name'), "new group name"
-      expect_new_page_load {submit_form("span[aria-label='Edit Group']")}
+      expect_new_page_load { submit_form("span[aria-label='Edit Group']") }
       expect(g1.reload.name).to include("new group name")
     end
 
@@ -59,8 +58,8 @@ describe "student groups" do
     end
 
     it "should restrict students from accessing groups in unpublished course", priority: "1", test_id: 246620 do
-      group_test_setup(1,1,1)
-      add_user_to_group(@students.first,@testgroup[0])
+      group_test_setup(1, 1, 1)
+      add_user_to_group(@students.first, @testgroup[0])
       @course.workflow_state = 'unpublished'
       @course.save!
       user_session(@students.first)
@@ -76,7 +75,7 @@ describe "student groups" do
         wait_for_ajaximations
       end
 
-      it "should have dropdown with two options", priority:"2", test_id: 180681 do
+      it "should have dropdown with two options", priority: "2", test_id: 180681 do
         expect(ff("#joinLevelSelect option").length).to eq 2
         expect(ff("#joinLevelSelect option")[0]).to include_text("Course members are free to join")
         expect(ff("#joinLevelSelect option")[1]).to include_text("Membership by invitation only")
@@ -118,15 +117,15 @@ describe "student groups" do
         fj(".student-group-title").click
         wait_for_ajaximations
 
-        expected_student_list = ["nobody@example.com","Test Student 1","Test Student 2",
-                                 "Test Student 3","Test Student 4","Test Student 5"]
+        expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2",
+                                 "Test Student 3", "Test Student 4", "Test Student 5"]
         student_list = ff("[role=listitem]")
 
         # first item in the student_list array is the group name
         # I skip the group name and then do an index-1 to account for skipping index 0
         student_list.each_with_index do |student, index|
           if (index != 0)
-            expect(student).to include_text(expected_student_list[index-1].to_s)
+            expect(student).to include_text(expected_student_list[index - 1].to_s)
           end
         end
       end
@@ -135,12 +134,12 @@ describe "student groups" do
     describe "new self sign-up groups" do
       it "should allow a student to leave a group and not change the group leader", priority: "1", test_id: 96027 do
         # Creating two groups, using one, and ensuring the second group remains empty
-        group_test_setup(4,1,2)
-        @group_category.first.configure_self_signup(true,false)
+        group_test_setup(4, 1, 2)
+        @group_category.first.configure_self_signup(true, false)
         3.times do |n|
-          add_user_to_group(@students[n], @testgroup.first,false)
+          add_user_to_group(@students[n], @testgroup.first, false)
         end
-        add_user_to_group(@students[3], @testgroup.first,true)
+        add_user_to_group(@students[3], @testgroup.first, true)
 
         user_session(@students[0])
         get "/courses/#{@course.id}/groups"
@@ -174,7 +173,7 @@ describe "student groups" do
 
     describe "student group index page" do
       before(:each) do
-       create_group(group_name:group_name)
+        create_group(group_name: group_name)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -219,7 +218,7 @@ describe "student groups" do
 
     describe "student who is not in the group", priority: "2", test_id: 184465 do
       it "should allow the student to join a student group they did not create" do
-        create_group(group_name:group_name,enroll_student_count:0,add_self_to_group:false)
+        create_group(group_name: group_name, enroll_student_count: 0, add_self_to_group: false)
         get "/courses/#{@course.id}/groups"
 
         # join group
@@ -230,7 +229,7 @@ describe "student groups" do
 
     describe "Manage Student Group Page" do
       before(:each) do
-        create_group(group_name:group_name, enroll_student_count:2)
+        create_group(group_name: group_name, enroll_student_count: 2)
         get "/courses/#{@course.id}/groups"
       end
 
@@ -241,7 +240,7 @@ describe "student groups" do
         expect(f("#group_name")).to have_attribute(:value, group_name.to_s)
       end
 
-      it "should change group name", priority:"2", test_id: 180714 do
+      it "should change group name", priority: "2", test_id: 180714 do
         fln('Manage').click
         wait_for_ajaximations
 
@@ -276,14 +275,14 @@ describe "student groups" do
         fj('button.confirm-dialog-confirm-btn').click
         wait_for_ajaximations
 
-        expected_student_list = ["nobody@example.com","Test Student 1", "Test Student 2"]
+        expected_student_list = ["nobody@example.com", "Test Student 1", "Test Student 2"]
         student_list = ff("[role=listitem]")
 
         # first item in the student_list array is the group name
         # I skip the group name and then do an index-1 to account for skipping index 0
         student_list.each_with_index do |student, index|
           if (index != 0)
-            expect(student).to include_text(expected_student_list[index-1].to_s)
+            expect(student).to include_text(expected_student_list[index - 1].to_s)
           end
         end
       end

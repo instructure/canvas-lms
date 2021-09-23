@@ -34,7 +34,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   belongs_to :context, polymorphic: [:account, :course]
 
   before_save :infer_defaults
-  resolves_root_account through: -> (group) { group.context_id ? group.context.resolved_root_account_id : 0 }
+  resolves_root_account through: ->(group) { group.context_id ? group.context.resolved_root_account_id : 0 }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates_length_of :description, :maximum => maximum_text_length, :allow_nil => true, :allow_blank => true
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
@@ -59,6 +59,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   def touch_parent_group
     return if self.skip_parent_group_touch
+
     self.touch
     self.learning_outcome_group.touch_parent_group if self.learning_outcome_group
   end
@@ -120,7 +121,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
   # TODO: this is certainly not the behavior we want, but it matches existing
   # behavior, and I'm not getting into a full refactor of copy course in this
   # commit!
-  def add_outcome_group(original, opts={})
+  def add_outcome_group(original, opts = {})
     # copy group into this group
     transaction do
       copy = child_outcome_groups.build
@@ -135,11 +136,13 @@ class LearningOutcomeGroup < ActiveRecord::Base
       copy_opts = opts.reverse_merge(skip_touch: true)
       original.child_outcome_groups.active.each do |group|
         next if opts[:only] && opts[:only][group.asset_string] != "1"
+
         copy.add_outcome_group(group, copy_opts)
       end
 
       original.child_outcome_links.active.each do |link|
         next if opts[:only] && opts[:only][link.asset_string] != "1"
+
         copy.add_outcome(link.content, skip_touch: true)
       end
 
@@ -153,7 +156,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   # moves an existing outcome link from the same context to be under this
   # group.
-  def adopt_outcome_link(outcome_link, opts={})
+  def adopt_outcome_link(outcome_link, opts = {})
     return if self.context && self.context != outcome_link.context
     # no-op if the group is global and the link isn't
     return if self.context.nil? && outcome_link.context_type != 'LearningOutcomeGroup'
@@ -172,7 +175,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
 
   # moves an existing outcome group from the same context to be under this
   # group. cannot move an ancestor of the group.
-  def adopt_outcome_group(group, opts={})
+  def adopt_outcome_group(group, opts = {})
     # can only move within context, and no cycles!
     return unless group.context == self.context
     return if is_ancestor?(group.id)
@@ -238,7 +241,7 @@ class LearningOutcomeGroup < ActiveRecord::Base
     end
   end
 
-  def self.global_root_outcome_group(force=true)
+  def self.global_root_outcome_group(force = true)
     find_or_create_root(nil, force)
   end
 

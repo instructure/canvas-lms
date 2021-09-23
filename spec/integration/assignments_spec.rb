@@ -122,7 +122,6 @@ describe "assignments" do
 end
 
 describe "download submissions link" do
-
   before do
     course_with_teacher_logged_in(:active_all => true)
     assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
@@ -215,11 +214,9 @@ describe "download submissions link" do
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
-
 end
 
 describe "ratio of submissions graded" do
-
   before do
     course_with_teacher_logged_in(:active_all => true)
     assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
@@ -238,7 +235,6 @@ describe "ratio of submissions graded" do
   end
 
   it "should not show ratio of submissions graded with no submissions" do
-
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
@@ -464,7 +460,7 @@ describe "assignments_2 feature flag and parameter" do
     end
 
     let(:description) { <<~HTML }
-        <a href="#{attachment_model.public_download_url}">link</a>
+      <a href="#{attachment_model.public_download_url}">link</a>
     HTML
 
     it "excludes verifiers if course is not public" do

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CourseLinkValidator do
-
   it "should validate all the links" do
     allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
@@ -45,8 +44,8 @@ describe CourseLinkValidator do
     @course.save!
 
     bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
+                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
     event = @course.calendar_events.create!(:title => "event", :description => html)
@@ -65,15 +64,15 @@ describe CourseLinkValidator do
     issues.each do |issue|
       if issue[:type] == :course_card_image
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/settings"
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :image => true})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :image => true })
       elsif issue[:type] == :module
         expect(issue[:content_url]).to eq "/courses/#{@course.id}/modules#module_#{mod.id}"
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :link_text => 'pls view', :url => bad_url})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :link_text => 'pls view', :url => bad_url })
       else
-        expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link'})
-        expect(issue[:invalid_links]).to include({:reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing"})
-        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_url2, :image => true})
-        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_media_object_url})
+        expect(issue[:invalid_links]).to include({ :reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link' })
+        expect(issue[:invalid_links]).to include({ :reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing" })
+        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_url2, :image => true })
+        expect(issue[:invalid_links]).to include({ :reason => :missing_item, :url => bad_media_object_url })
       end
     end
 
@@ -90,8 +89,8 @@ describe CourseLinkValidator do
       :wiki_page => page.title
     }
     type_names.each do |type, name|
-      expect(issues.select{|issue| issue[:type] == type}.count).to eq(1)
-      expect(issues.detect{|issue| issue[:type] == type}[:name]).to eq(name)
+      expect(issues.select { |issue| issue[:type] == type }.count).to eq(1)
+      expect(issues.detect { |issue| issue[:type] == type }[:name]).to eq(name)
     end
   end
 
@@ -101,8 +100,8 @@ describe CourseLinkValidator do
 
     course_factory
     bank = @course.assessment_question_banks.create!(:title => 'bank')
-    aq = bank.assessment_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    aq = bank.assessment_questions.create!(:question_data => { 'name' => 'test question',
+                                                               'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
@@ -125,8 +124,8 @@ describe CourseLinkValidator do
 
     course_factory
     quiz = @course.quizzes.create!(:title => 'quiz1', :description => "desc")
-    qq = quiz.quiz_questions.create!(:question_data => {'name' => 'test question',
-      'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+    qq = quiz.quiz_questions.create!(:question_data => { 'name' => 'test question',
+                                                         'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
     qq.destroy!
 
     CourseLinkValidator.queue_course(@course)
@@ -191,14 +190,14 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
   it "should work more betterer with external_tools/retrieve" do
     course_factory
     tool = @course.context_external_tools.create!(name: 'blah',
-      url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
+                                                  url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456')
 
     active_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(tool.url)}"
     nonsense_link = "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape("https://lolwut.beep")}"
@@ -212,7 +211,7 @@ describe CourseLinkValidator do
 
     CourseLinkValidator.queue_course(@course)
     run_jobs
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to eq([nonsense_link])
   end
 
@@ -230,7 +229,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [deleted_link]
   end
 
@@ -278,7 +277,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [unpublished_link, deleted_link]
   end
 
@@ -319,7 +318,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [invalid_link1, invalid_link2]
   end
 
@@ -351,7 +350,7 @@ describe CourseLinkValidator do
     CourseLinkValidator.queue_course(@course)
     run_jobs
 
-    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map{|l| l[:url]}
+    links = CourseLinkValidator.current_progress(@course).results[:issues].first[:invalid_links].map { |l| l[:url] }
     expect(links).to match_array [link]
   end
 

@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe StudentEnrollment do
-
   before(:each) do
     @student = User.create(:name => "some student")
     @course = Course.create(:name => "some course")
@@ -79,7 +78,7 @@ describe StudentEnrollment do
 
     it "sets the score for the specific grading period if one is passed in" do
       enrollment.update_override_score(override_score: 80.0, grading_period_id: grading_period.id, updating_user: teacher)
-      expect(enrollment.override_score({grading_period_id: grading_period.id})).to eq 80.0
+      expect(enrollment.override_score({ grading_period_id: grading_period.id })).to eq 80.0
     end
 
     it "sets the course score if grading period is nil" do
@@ -88,7 +87,7 @@ describe StudentEnrollment do
     end
 
     it "emits a grade_override live event" do
-      updated_score = enrollment.find_score({grading_period_id: grading_period.id})
+      updated_score = enrollment.find_score({ grading_period_id: grading_period.id })
 
       expect(Canvas::LiveEvents).to receive(:grade_override).with(updated_score, nil, enrollment, course).once
       enrollment.update_override_score(override_score: 70.0, grading_period_id: grading_period.id, updating_user: teacher)
@@ -96,7 +95,7 @@ describe StudentEnrollment do
 
     it "returns the affected score object" do
       score = enrollment.update_override_score(override_score: 80.0, grading_period_id: grading_period.id, updating_user: teacher)
-      expect(score).to eq enrollment.find_score({grading_period_id: grading_period.id})
+      expect(score).to eq enrollment.find_score({ grading_period_id: grading_period.id })
     end
 
     it "raises a RecordNotFound error if the score object cannot be found" do

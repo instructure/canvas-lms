@@ -31,9 +31,9 @@ describe "context modules" do
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
       @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-        :submission_types => 'online_text_entry',
-        :due_at => 2.days.from_now,
-        :points_possible => 10)
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
       @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
 
       @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
@@ -56,8 +56,8 @@ describe "context modules" do
       prereq_select = f('.criterion select')
       option = first_selected_option(prereq_select)
       expect(option.text).to eq @module1.name.to_s
-      expect(ff('.prerequisites_list .criteria_list .delete_criterion_link').map{|link|link.attribute('aria-label')}).
-          to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
+      expect(ff('.prerequisites_list .criteria_list .delete_criterion_link').map { |link| link.attribute('aria-label') })
+        .to eq(['Delete prerequisite First module', 'Delete prerequisite Second module'])
     end
 
     it "updates the name of edited prerequisite modules" do
@@ -121,7 +121,7 @@ describe "context modules" do
     end
 
     it "should prompt relock when adding an unlock_at date" do
-      lock_until=format_date_for_view(Time.zone.today + 2.days)
+      lock_until = format_date_for_view(Time.zone.today + 2.days)
       @course.context_modules.create!(name: "name")
       get "/courses/#{@course.id}/modules"
       f(".ig-header-admin .al-trigger").click
@@ -257,8 +257,8 @@ describe "context modules" do
     context "edit dialog" do
       before :once do
         @mod = create_modules(2, true)
-        @mod[0].add_item({id: @assignment.id, type: 'assignment'})
-        @mod[0].add_item({id: @assignment2.id, type: 'assignment'})
+        @mod[0].add_item({ id: @assignment.id, type: 'assignment' })
+        @mod[0].add_item({ id: @assignment2.id, type: 'assignment' })
       end
 
       before :each do

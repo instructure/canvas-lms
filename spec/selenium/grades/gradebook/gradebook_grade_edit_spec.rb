@@ -205,7 +205,7 @@ describe "Gradebook editing grades" do
     curved_grade_text = "8"
 
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
+    Gradebook.click_assignment_header_menu_element(@first_assignment.id, "curve grades")
     curve_form = GradingCurvePage.new
     curve_form.edit_grade_curve(curved_grade_text)
     curve_form.curve_grade_submit
@@ -218,7 +218,7 @@ describe "Gradebook editing grades" do
     skip_if_safari(:alert)
     @first_assignment.grade_student(@student_2, grade: '', grader: @teacher)
     Gradebook.visit(@course)
-    Gradebook.click_assignment_header_menu_element(@first_assignment.id,"curve grades")
+    Gradebook.click_assignment_header_menu_element(@first_assignment.id, "curve grades")
 
     f('#assign_blanks').click
     fj('.ui-dialog-buttonpane button:visible').click

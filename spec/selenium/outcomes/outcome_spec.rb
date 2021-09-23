@@ -43,7 +43,6 @@ describe "outcomes" do
     end
 
     context "create/edit/delete outcomes" do
-
       it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250533 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end

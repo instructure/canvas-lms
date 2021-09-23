@@ -57,9 +57,9 @@ describe AttachmentSerializer do
 
   subject do
     AttachmentSerializer.new(attachment, {
-      controller: controller,
-      scope: User.new
-    })
+                               controller: controller,
+                               scope: User.new
+                             })
   end
 
   let :json do

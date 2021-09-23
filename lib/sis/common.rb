@@ -19,7 +19,5 @@
 #
 
 module SIS
-
   class ImportError < StandardError; end
-
 end

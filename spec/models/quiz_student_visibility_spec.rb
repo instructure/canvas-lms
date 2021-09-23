@@ -27,28 +27,28 @@ describe "differentiated_assignments" do
     @course.save!
   end
 
-  def make_quiz(opts={})
+  def make_quiz(opts = {})
     @quiz = Quizzes::Quiz.create!({
-      context: @course,
-      description: 'descript foo',
-      only_visible_to_overrides: opts[:ovto],
-      points_possible: rand(1000),
-      title: "I am a quiz"
-    })
+                                    context: @course,
+                                    description: 'descript foo',
+                                    only_visible_to_overrides: opts[:ovto],
+                                    points_possible: rand(1000),
+                                    title: "I am a quiz"
+                                  })
     @quiz.publish
     @quiz.save!
     @assignment = @quiz.assignment
   end
 
   def quiz_with_true_only_visible_to_overrides
-    make_quiz({date: nil, ovto: true})
+    make_quiz({ date: nil, ovto: true })
   end
 
   def quiz_with_false_only_visible_to_overrides
-    make_quiz({date: Time.now, ovto: false})
+    make_quiz({ date: Time.now, ovto: false })
   end
 
-  def student_in_course_with_adhoc_override(quiz, opts={})
+  def student_in_course_with_adhoc_override(quiz, opts = {})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course)
     ao = AssignmentOverride.new()
@@ -64,7 +64,7 @@ describe "differentiated_assignments" do
     @user
   end
 
-  def enroller_user_in_section(section, opts={})
+  def enroller_user_in_section(section, opts = {})
     @user = opts[:user] || user_model
     StudentEnrollment.create!(:user => @user, :course => @course, :course_section => section)
   end
@@ -127,21 +127,20 @@ describe "differentiated_assignments" do
 
     it "doesnt allow updates" do
       @visibility_object.user_id = @visibility_object.user_id + 1
-      expect {@visibility_object.save!}.to raise_error(ActiveRecord::ReadOnlyRecord)
+      expect { @visibility_object.save! }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow new records" do
       expect {
         Quizzes::QuizStudentVisibility.create!(user_id: @user.id,
-                                            quiz_id: @quiz_id,
-                                            course_id: @course.id)
-        }.to raise_error(ActiveRecord::ReadOnlyRecord)
+                                               quiz_id: @quiz_id,
+                                               course_id: @course.id)
+      }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
 
     it "doesnt allow deletion" do
-      expect {@visibility_object.destroy}.to raise_error(ActiveRecord::ReadOnlyRecord)
+      expect { @visibility_object.destroy }.to raise_error(ActiveRecord::ReadOnlyRecord)
     end
-
   end
 
   context "course_with_differentiated_assignments_enabled" do
@@ -193,7 +192,7 @@ describe "differentiated_assignments" do
           @quiz.assignment.grade_student(@student, grade: 10, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @student})
+          enroller_user_in_section(@section_bar, { user: @student })
           ensure_user_does_not_see_quiz
         end
 
@@ -203,7 +202,7 @@ describe "differentiated_assignments" do
           @quiz.assignment.submissions.last.update_attribute("grade", 10)
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @student})
+          enroller_user_in_section(@section_bar, { user: @student })
           ensure_user_does_not_see_quiz
         end
 
@@ -211,7 +210,7 @@ describe "differentiated_assignments" do
           @quiz.assignment.grade_student(@student, grade: 0, grader: @teacher)
           Score.where(enrollment_id: @student.enrollments).each(&:destroy_permanently!)
           @student.enrollments.each(&:destroy_permanently!)
-          enroller_user_in_section(@section_bar, {user: @student})
+          enroller_user_in_section(@section_bar, { user: @student })
           ensure_user_does_not_see_quiz
         end
       end
@@ -222,7 +221,7 @@ describe "differentiated_assignments" do
         end
       end
       context "user in section with override" do
-        before{enroller_user_in_section(@section_foo)}
+        before { enroller_user_in_section(@section_foo) }
         it "should show the quiz to the user" do
           ensure_user_sees_quiz
         end
@@ -240,7 +239,7 @@ describe "differentiated_assignments" do
         end
       end
       context "user in section with no override" do
-        before{enroller_user_in_section(@section_bar)}
+        before { enroller_user_in_section(@section_bar) }
         it "should hide the quiz from the user" do
           ensure_user_does_not_see_quiz
         end
@@ -265,13 +264,13 @@ describe "differentiated_assignments" do
         end
       end
       context "user in section with override" do
-        before{enroller_user_in_section(@section_foo)}
+        before { enroller_user_in_section(@section_foo) }
         it "should show the quiz to the user" do
           ensure_user_sees_quiz
         end
       end
       context "user in section with no override" do
-        before{enroller_user_in_section(@section_bar)}
+        before { enroller_user_in_section(@section_bar) }
         it "should show the quiz to the user" do
           ensure_user_sees_quiz
         end

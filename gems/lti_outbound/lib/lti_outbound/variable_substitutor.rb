@@ -55,6 +55,5 @@ module LtiOutbound
       end
       value
     end
-
   end
 end

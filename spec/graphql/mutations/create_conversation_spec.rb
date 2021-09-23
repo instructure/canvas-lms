@@ -30,7 +30,7 @@ RSpec.describe Mutations::CreateConversation do
   def conversation(opts = {})
     num_other_users = opts[:num_other_users] || 1
     course = opts[:course] || @course
-    user_data = num_other_users.times.map { {name: 'User'} }
+    user_data = num_other_users.times.map { { name: 'User' } }
     users = create_users_in_course(course, user_data, account_associations: true, return_type: :record)
     @conversation = @user.initiate_conversation(users)
     @conversation.add_message(opts[:message] || 'test')
@@ -153,7 +153,7 @@ RSpec.describe Mutations::CreateConversation do
     teacher2 = teacher_in_course(active_all: true).user
     @course.update!(workflow_state: 'claimed')
 
-    result = run_mutation({recipients: [teacher2.id.to_s], body: 'yo', context_code: @course.asset_string}, @teacher)
+    result = run_mutation({ recipients: [teacher2.id.to_s], body: 'yo', context_code: @course.asset_string }, @teacher)
     expect(
       result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationMessagesConnection', 'nodes', 0, 'body')
     ).to eq 'yo'
@@ -185,7 +185,7 @@ RSpec.describe Mutations::CreateConversation do
     observer = user_with_pseudonym
     add_linked_observer(@student, observer, root_account: @course.root_account)
 
-    result = run_mutation({recipients: [@student.id.to_s], body: 'Hello there', context_code: @course.asset_string}, observer)
+    result = run_mutation({ recipients: [@student.id.to_s], body: 'Hello there', context_code: @course.asset_string }, observer)
     expect(
       result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationMessagesConnection', 'nodes', 0, 'body')
     ).to eq 'Hello there'
@@ -259,9 +259,9 @@ RSpec.describe Mutations::CreateConversation do
       result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: 'yo', group_conversation: true)
 
       expect(
-        result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationParticipantsConnection', 'nodes').
-          pluck('user').
-          pluck('_id').sort
+        result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationParticipantsConnection', 'nodes')
+          .pluck('user')
+          .pluck('_id').sort
       ).to eql [@student.id.to_s, @new_user1.id.to_s, @new_user2.id.to_s].sort
       expect(Conversation.count).to eql(@old_count + 1)
     end
@@ -278,8 +278,8 @@ RSpec.describe Mutations::CreateConversation do
     it 'sets the root account id to the participants for group conversations' do
       result = run_mutation(recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: 'yo', group_conversation: true)
 
-      participant_ids = result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationParticipantsConnection', 'nodes').
-        pluck('_id')
+      participant_ids = result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationParticipantsConnection', 'nodes')
+                              .pluck('_id')
       participant_ids.each do |participant_id|
         cp = ConversationParticipant.find(participant_id)
         expect(cp.root_account_ids).to eq [@account_id]
@@ -304,12 +304,12 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it 'creates user notes' do
-      run_mutation({recipients: @students.map(&:id).map(&:to_s), body: 'yo', subject: 'greetings', user_note: true}, @teacher)
-      @students.each{|x| expect(x.user_notes.size).to be(1)}
+      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: 'yo', subject: 'greetings', user_note: true }, @teacher)
+      @students.each { |x| expect(x.user_notes.size).to be(1) }
     end
 
     it 'includes the domain root account in the user note' do
-      run_mutation({recipients: @students.map(&:id).map(&:to_s), body: 'hi there', subject: 'hi there', user_note: true}, @teacher)
+      run_mutation({ recipients: @students.map(&:id).map(&:to_s), body: 'hi there', subject: 'hi there', user_note: true }, @teacher)
       note = UserNote.last
       expect(note.root_account_id).to eql Account.default.id
     end
@@ -326,7 +326,7 @@ RSpec.describe Mutations::CreateConversation do
     end
 
     it 'should succeed for siteadmins with send_messages grants' do
-      result = run_mutation({recipients: [User.create.id.to_s], body: 'foo'}, site_admin_user)
+      result = run_mutation({ recipients: [User.create.id.to_s], body: 'foo' }, site_admin_user)
 
       expect(
         result.dig('data', 'createConversation', 'conversations', 0, 'conversation', 'conversationMessagesConnection', 'nodes', 0, 'body')

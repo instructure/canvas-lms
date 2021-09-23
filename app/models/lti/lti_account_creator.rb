@@ -32,12 +32,12 @@ module Lti
 
     def convert
       case @canvas_context
-        when Account
-          create_account(@canvas_context)
-        when Course, Group
-          create_account(@canvas_context.account)
-        when User
-          create_account(@root_account)
+      when Account
+        create_account(@canvas_context)
+      when Course, Group
+        create_account(@canvas_context.account)
+      when User
+        create_account(@root_account)
       end
     end
 
@@ -50,6 +50,5 @@ module Lti
         lti_account.name = canvas_account.name
       end
     end
-
   end
 end

@@ -148,77 +148,77 @@ describe LatePolicyApplicator do
       @late_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[0])
       # Update using update_all to prevent any callbacks that already apply late policies
       # rubocop:disable Rails/SkipsModelValidations
-      Submission.where(id: @late_submission1.id).
-        update_all(
-          submitted_at: @now - 3.months + 1.hour,
-          cached_due_date: @now - 3.months,
-          score: 20,
-          grade: 20,
-          submission_type: 'online_text_entry'
-        )
+      Submission.where(id: @late_submission1.id)
+                .update_all(
+                  submitted_at: @now - 3.months + 1.hour,
+                  cached_due_date: @now - 3.months,
+                  score: 20,
+                  grade: 20,
+                  submission_type: 'online_text_entry'
+                )
 
       @timely_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[1])
-      Submission.where(id: @timely_submission1).
-        update_all(
-          submitted_at: @now,
-          cached_due_date: @now + 1.hour,
-          score: 20,
-          grade: 20,
-          submission_type: 'online_text_entry'
-        )
+      Submission.where(id: @timely_submission1)
+                .update_all(
+                  submitted_at: @now,
+                  cached_due_date: @now + 1.hour,
+                  score: 20,
+                  grade: 20,
+                  submission_type: 'online_text_entry'
+                )
 
       @missing_submission1 = @assignment_in_closed_gp.submissions.find_by(user: @students[2])
-      Submission.where(id: @missing_submission1).
-        update_all(
-          submitted_at: nil,
-          cached_due_date: 1.month.ago(@now),
-          score: nil,
-          grade: nil
-        )
+      Submission.where(id: @missing_submission1)
+                .update_all(
+                  submitted_at: nil,
+                  cached_due_date: 1.month.ago(@now),
+                  score: nil,
+                  grade: nil
+                )
 
       @assignment_in_open_gp = @course.assignments.create!(
         points_possible: 20, due_at: @now - 1.month, submission_types: 'online_text_entry'
       )
 
       @late_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[0])
-      Submission.where(id: @late_submission2.id).
-        update_all(
-          submitted_at: @now - 1.month + 1.hour,
-          cached_due_date: @now - 1.month,
-          score: 20,
-          grade: 20,
-          submission_type: 'online_text_entry'
-        )
+      Submission.where(id: @late_submission2.id)
+                .update_all(
+                  submitted_at: @now - 1.month + 1.hour,
+                  cached_due_date: @now - 1.month,
+                  score: 20,
+                  grade: 20,
+                  submission_type: 'online_text_entry'
+                )
 
       @timely_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[1])
-      Submission.where(id: @timely_submission2).
-        update_all(
-          submitted_at: @now,
-          cached_due_date: @now + 1.hour,
-          score: 20,
-          grade: 20,
-          submission_type: 'online_text_entry'
-        )
+      Submission.where(id: @timely_submission2)
+                .update_all(
+                  submitted_at: @now,
+                  cached_due_date: @now + 1.hour,
+                  score: 20,
+                  grade: 20,
+                  submission_type: 'online_text_entry'
+                )
 
       @missing_submission2 = @assignment_in_open_gp.submissions.find_by(user: @students[2])
-      Submission.where(id: @missing_submission2).
-        update_all(
-          submitted_at: nil,
-          cached_due_date: @now - 1.month,
-          score: nil,
-          grade: nil
-        )
+      Submission.where(id: @missing_submission2)
+                .update_all(
+                  submitted_at: nil,
+                  cached_due_date: @now - 1.month,
+                  score: nil,
+                  grade: nil
+                )
 
       @previously_late_submission = @assignment_in_open_gp.submissions.find_by(user: @students[3])
-      Submission.where(id: @previously_late_submission).
-        update_all(
-          submitted_at: @now,
-          cached_due_date: @now + 1.hour,
-          score: 10,
-          grade: 10,
-          points_deducted: 10,
-          submission_type: 'online_text_entry'
-        )
+      Submission.where(id: @previously_late_submission)
+                .update_all(
+                  submitted_at: @now,
+                  cached_due_date: @now + 1.hour,
+                  score: 10,
+                  grade: 10,
+                  points_deducted: 10,
+                  submission_type: 'online_text_entry'
+                )
       # rubocop:enable Rails/SkipsModelValidations
     end
 
@@ -324,11 +324,11 @@ describe LatePolicyApplicator do
 
       it 'calls re-calculates grades in bulk after processing all submissions' do
         @late_policy_applicator = LatePolicyApplicator.new(@course)
-        student_ids = [0,2,3].map { |i| @students[i].id }
+        student_ids = [0, 2, 3].map { |i| @students[i].id }
 
-        expect(@course).to receive(:recompute_student_scores).
-          with(array_including(student_ids)).
-          with(Array.new(3, kind_of(Integer)))
+        expect(@course).to receive(:recompute_student_scores)
+          .with(array_including(student_ids))
+          .with(Array.new(3, kind_of(Integer)))
 
         @late_policy_applicator.process
       end

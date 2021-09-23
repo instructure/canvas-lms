@@ -32,8 +32,8 @@ module Submissions
         end
         format.json do
           error = @assignment ?
-            t("The specified user (%{id}) is not a student in this course", {id: params[:id]}) :
-            t("The specified assignment (%{id}) could not be found", {id: params[:assignment_id]})
+            t("The specified user (%{id}) is not a student in this course", { id: params[:id] }) :
+            t("The specified assignment (%{id}) could not be found", { id: params[:assignment_id] })
           render json: {
             errors: error
           }

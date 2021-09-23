@@ -32,8 +32,8 @@ class ExternalFeed < ActiveRecord::Base
   validates :url, :context_id, :context_type, presence: true
   validates_as_url :url
   validates :url,
-    uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
-    length: { maximum: maximum_string_length }
+            uniqueness: { scope: [:context_id, :context_type, :verbosity, :header_match] },
+            length: { maximum: maximum_string_length }
 
   VERBOSITIES = %w(full link_only truncate).freeze
   validates_inclusion_of :verbosity, :in => VERBOSITIES, :allow_nil => true
@@ -48,10 +48,9 @@ class ExternalFeed < ActiveRecord::Base
   end
   protected :infer_defaults
 
-  def display_name(short=true)
-    short_url = (self.url || "").split("/")[0,3].join("/")
-    res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url )
-
+  def display_name(short = true)
+    short_url = (self.url || "").split("/")[0, 3].join("/")
+    res = self.title || (short ? t(:short_feed_title, "%{short_url} feed", :short_url => short_url) : self.url)
   end
 
   def header_match=(str)
@@ -72,14 +71,14 @@ class ExternalFeed < ActiveRecord::Base
   end
 
   def add_rss_entries(rss)
-    items = rss.items.map{|item| add_entry(item, rss, :rss) }.compact
+    items = rss.items.map { |item| add_entry(item, rss, :rss) }.compact
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
   end
 
   def add_atom_entries(atom)
     items = []
-    atom.each_entry{|item| items << add_entry(item, atom, :atom) }
+    atom.each_entry { |item| items << add_entry(item, atom, :atom) }
     items.compact!
     self.context.add_aggregate_entries(items, self) if self.context && self.context.respond_to?(:add_aggregate_entries)
     items
@@ -123,6 +122,7 @@ class ExternalFeed < ActiveRecord::Base
       date = (item.respond_to?(:date) && item.date) || Time.zone.today
       return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
       return nil if (date && self.created_at > date rescue false)
+
       description = "<a href='#{ERB::Util.h(item.link)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.description || item.title)
       entry = self.external_feed_entries.new(
@@ -159,6 +159,7 @@ class ExternalFeed < ActiveRecord::Base
       end
       return nil if self.header_match && !item.title.downcase.include?(self.header_match.downcase)
       return nil if (item.published && self.created_at > item.published rescue false)
+
       description = "<a href='#{ERB::Util.h(item.links.alternate.to_s)}'>#{ERB::Util.h(t(:original_article, "Original article"))}</a><br/><br/>"
       description += format_description(item.content || item.title)
       entry = self.external_feed_entries.new(

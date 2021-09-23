@@ -43,7 +43,7 @@ describe DataFixup::SetACTLContextTypeForCourseLevelToolProxies do
 
   let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
   let(:test_id) { SecureRandom.uuid }
-  let(:stub_response) { double(code: 200, parsed_response: {'Id' => test_id}, ok?: true) }
+  let(:stub_response) { double(code: 200, parsed_response: { 'Id' => test_id }, ok?: true) }
 
   before(:each) do
     allow(subscription_service).to receive_messages(available?: true)

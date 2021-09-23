@@ -100,7 +100,7 @@ describe LtiOutbound::ToolLaunch do
 
   let(:variable_expander) do
     m = double('variable_expander')
-    allow(m).to receive(:expand_variables!){ |hash| hash }
+    allow(m).to receive(:expand_variables!) { |hash| hash }
     m
   end
 
@@ -152,7 +152,7 @@ describe LtiOutbound::ToolLaunch do
         'tool_consumer_info_product_family_code' => "canvas",
         'tool_consumer_info_version' => "cloud",
         'oauth_callback' => "about:blank"
-     }
+      }
     end
 
     it 'generates correct parameters' do
@@ -196,7 +196,6 @@ describe LtiOutbound::ToolLaunch do
         hash = tool_launch.generate
 
         expect(hash.keys).to_not include('text')
-
       end
     end
 
@@ -223,7 +222,6 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'adds account and user info in launch data for user profile launch' do
-
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => tool,
                                          :user => user,
@@ -236,7 +234,7 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['custom_canvas_account_sis_id']).to eq '$Canvas.account.sisSourceId'
       expect(hash['lis_person_sourcedid']).to eq '$Person.sourcedId'
       expect(hash['custom_canvas_user_id']).to eq '$Canvas.user.id'
-      expect(hash['tool_consumer_instance_guid']).to eq 'root_account_lti_guid' #was hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
+      expect(hash['tool_consumer_instance_guid']).to eq 'root_account_lti_guid' # was hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
     it 'does not allow overwriting other parameters from the URI query string' do
@@ -254,14 +252,16 @@ describe LtiOutbound::ToolLaunch do
 
     it 'includes custom fields' do
       tool.privacy_level = LtiOutbound::LTITool::PRIVACY_LEVEL_ANONYMOUS
-      tool.settings = {:custom_fields => {
-          'custom_bob' => 'bob',
-          'custom_fred' => 'fred',
-          'john' => 'john',
-          '@$TAA$#$#' => 123}}
+      tool.settings = { :custom_fields => {
+        'custom_bob' => 'bob',
+        'custom_fred' => 'fred',
+        'john' => 'john',
+        '@$TAA$#$#' => 123
+      } }
       hash = tool_launch.generate
       expect(hash.keys.select { |k| k.match(/^custom_/) }.sort).to eq(
-                                                                       ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john'])
+        ['custom___taa____', 'custom_bob', 'custom_canvas_enrollment_state', 'custom_fred', 'custom_john']
+      )
       expect(hash['custom_bob']).to eql('bob')
       expect(hash['custom_fred']).to eql('fred')
       expect(hash['custom_john']).to eql('john')
@@ -276,7 +276,7 @@ describe LtiOutbound::ToolLaunch do
           custom: {
             'custom_param' => 123
           },
-          ext:{
+          ext: {
             'ext_param' => 123,
           }
         }
@@ -299,14 +299,13 @@ describe LtiOutbound::ToolLaunch do
 
       it 'includes custom fields from link_params' do
         hash = tool_launch.generate
-        expect(hash).to include({'custom_param' => 123})
+        expect(hash).to include({ 'custom_param' => 123 })
       end
 
       it 'includes ext fields from link_params' do
         hash = tool_launch.generate
-        expect(hash).to include({'ext_param' => 123})
+        expect(hash).to include({ 'ext_param' => 123 })
       end
-
     end
 
     it 'does not include name and email if anonymous' do
@@ -354,7 +353,7 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'gets the correct width and height based on resource type' do
-      tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
+      tool.settings = { editor_button: { :selection_width => 1000, :selection_height => 300, :icon_url => 'www.example.com/icon', :url => 'www.example.com' } }
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.yahoo.com',
                                          :tool => tool,
                                          :user => user,
@@ -369,8 +368,8 @@ describe LtiOutbound::ToolLaunch do
     end
 
     it 'does not copy query params to POST body if disable_lti_post_only feature flag is set' do
-      tool.settings = {editor_button: {:selection_width => 1000, :selection_height => 300,
-                       :icon_url => 'www.example.com/icon', :url => 'www.example.com'}}
+      tool.settings = { editor_button: { :selection_width => 1000, :selection_height => 300,
+                                         :icon_url => 'www.example.com/icon', :url => 'www.example.com' } }
       hash = LtiOutbound::ToolLaunch.new(:url => 'http://www.instructure.com?first=weston&last=dransfield',
                                          :tool => tool,
                                          :user => user,
@@ -449,5 +448,4 @@ describe LtiOutbound::ToolLaunch do
       expect(hash['ext_content_file_extensions']).to eq nil
     end
   end
-
 end

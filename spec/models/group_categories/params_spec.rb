@@ -22,11 +22,8 @@ require_relative '../../support/boolean_translator'
 require_dependency "group_categories/params"
 
 module GroupCategories
-
-
   describe Params do
-
-    let(:param_options){
+    let(:param_options) {
       { boolean_translator: BooleanTranslator }
     }
 
@@ -81,7 +78,7 @@ module GroupCategories
       end
 
       it 'is nil with auto_leading disabled from form submission of an existing record' do
-        raw_args = {auto_leader: "first", enable_auto_leader: "0"}
+        raw_args = { auto_leader: "first", enable_auto_leader: "0" }
         params = build_params(raw_args)
         expect(params.auto_leader).to be(nil)
       end
@@ -98,7 +95,7 @@ module GroupCategories
 
       it 'errors on a bad assignment' do
         params = build_params(enable_auto_leader: true, auto_leader_type: "nonsense")
-        expect{ params.auto_leader }.to raise_error(ArgumentError)
+        expect { params.auto_leader }.to raise_error(ArgumentError)
       end
 
       it 'is random if random is passed in raw' do
@@ -112,8 +109,7 @@ module GroupCategories
       end
 
       describe "when there's a collision between raw and formbased" do
-
-        #because this would indicate it's not actively trying to be deleted
+        # because this would indicate it's not actively trying to be deleted
         it 'uses the raw value if form value not from a checkbox form' do
           params = build_params(auto_leader_type: "FIRST", auto_leader: "random")
           expect(params.auto_leader).to eq("random")
@@ -134,7 +130,7 @@ module GroupCategories
     describe '#create_group_count' do
       it 'passes through the count param when self signup is enabled' do
         params = build_params(enable_self_signup: true,
-          restrict_self_signup: false, create_group_count: "3")
+                              restrict_self_signup: false, create_group_count: "3")
         expect(params.create_group_count).to eq 3
       end
 
@@ -175,7 +171,6 @@ module GroupCategories
         params = build_params(split_groups: '2', create_group_member_count: '5')
         expect(params.create_group_member_count).to eq 5
       end
-
     end
 
     describe '#assign_unassigned_members' do
@@ -191,16 +186,15 @@ module GroupCategories
 
       it 'is false if create_group_count is empty' do
         params = build_params(enable_self_signup: false,
-          split_groups: '1', create_group_count: nil, split_group_count: nil)
+                              split_groups: '1', create_group_count: nil, split_group_count: nil)
         expect(params.assign_unassigned_members).to be(false)
       end
 
       it 'is true without self signup and with a split count' do
         params = build_params(enable_self_signup: false,
-          split_groups: '1', create_group_count: nil, split_group_count: '3')
+                              split_groups: '1', create_group_count: nil, split_group_count: '3')
         expect(params.assign_unassigned_members).to be(true)
       end
     end
-
   end
 end

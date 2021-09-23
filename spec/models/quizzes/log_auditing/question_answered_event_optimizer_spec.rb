@@ -41,7 +41,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
       event2 = build_event [{ quiz_question_id: '2', answer: '21' }]
 
-      expect(run(event2, [ event1 ])).to eq false
+      expect(run(event2, [event1])).to eq false
       expect(event2.answers.length).to eq 1
     end
 
@@ -49,7 +49,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
       event2 = build_event [{ quiz_question_id: '1', answer: '12' }]
 
-      expect(run(event2, [ event1 ])).to eq false
+      expect(run(event2, [event1])).to eq false
       expect(event2.answers.length).to eq 1
     end
 
@@ -66,7 +66,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
 
       expect(event2.answers.length).to eq 2
 
-      expect(run(event2, [ event1 ])).to eq true
+      expect(run(event2, [event1])).to eq true
 
       expect(event2.answers.length).to eq 0
     end

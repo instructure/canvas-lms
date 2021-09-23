@@ -44,28 +44,28 @@ module Calendar2Common
     end
   end
 
-  def create_appointment_group(params={})
+  def create_appointment_group(params = {})
     tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
-        :title => "new appointment group",
-        :contexts => [@course],
-        :new_appointments => [
-            [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
-        ]
+      :title => "new appointment group",
+      :contexts => [@course],
+      :new_appointments => [
+        [tomorrow + ' 12:00:00', tomorrow + ' 13:00:00'],
+      ]
     }
     ag = AppointmentGroup.create!(default_params.merge(params))
     ag.publish!
     ag.title
   end
 
-  def create_appointment_group_early(params={})
+  def create_appointment_group_early(params = {})
     tomorrow = (Time.now.utc.to_date + 1.day).to_s
     default_params = {
-        :title => "new appointment group",
-        :contexts => [@course],
-        :new_appointments => [
-            [tomorrow + ' 7:00', tomorrow + ' 11:00:00'],
-        ]
+      :title => "new appointment group",
+      :contexts => [@course],
+      :new_appointments => [
+        [tomorrow + ' 7:00', tomorrow + ' 11:00:00'],
+      ]
     }
     ag = AppointmentGroup.create!(default_params.merge(params))
     ag.publish!
@@ -81,9 +81,9 @@ module Calendar2Common
 
   def make_event(params = {})
     opts = {
-        :context => @user,
-        :start => Time.zone.now,
-        :description => "Test event"
+      :context => @user,
+      :start => Time.zone.now,
+      :description => "Test event"
     }.with_indifferent_access.merge(params)
     c = CalendarEvent.new :description => opts[:description],
                           :start_at => opts[:start],
@@ -99,8 +99,8 @@ module Calendar2Common
 
   def create_quiz
     due_at = 5.minutes.from_now
-    unlock_at = Time.zone.now.advance(days:-2)
-    lock_at = Time.zone.now.advance(days:4)
+    unlock_at = Time.zone.now.advance(days: -2)
+    lock_at = Time.zone.now.advance(days: 4)
     title = 'Test Quiz'
     @context = @course
     @quiz = quiz_model
@@ -212,7 +212,6 @@ module Calendar2Common
     end
   end
 
-
   # Creates event from the 'edit event' modal
   def event_from_modal(event_title, should_add_date = false, should_add_location = false)
     edit_event_dialog = f('#edit_event_tabs')
@@ -273,7 +272,7 @@ module Calendar2Common
     expect(f('.event-details-timestring')).to include_text(format_date_for_view(due_at))
   end
 
-  def assert_title(title,agenda_view)
+  def assert_title(title, agenda_view)
     if agenda_view
       expect(f('.agenda-event__title')).to include_text(title)
     else
@@ -282,28 +281,28 @@ module Calendar2Common
   end
 
   # The following methods verify that created events of all kinds are present in each view and have correct dates
-  def assert_agenda_view(title,due)
+  def assert_agenda_view(title, due)
     load_agenda_view
-    assert_title(title,true)
+    assert_title(title, true)
     expect(f('.navigation_title')).to include_text(format_date_for_view(due))
   end
 
-  def assert_week_view(title,due)
+  def assert_week_view(title, due)
     load_week_view
-    assert_title(title,false)
+    assert_title(title, false)
     assert_edit_modal_date(due)
   end
 
-  def assert_month_view(title,due)
+  def assert_month_view(title, due)
     load_month_view
-    assert_title(title,false)
+    assert_title(title, false)
     assert_edit_modal_date(due)
   end
 
-  def assert_views(title,due)
-    assert_agenda_view(title,due)
-    assert_week_view(title,due)
-    assert_month_view(title,due)
+  def assert_views(title, due)
+    assert_agenda_view(title, due)
+    assert_week_view(title, due)
+    assert_month_view(title, due)
   end
 
   def agenda_item

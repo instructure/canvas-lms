@@ -25,6 +25,7 @@ require_relative '../../helpers/k5_common'
 class TestUserApi
   include Api::V1::UserProfile
   attr_accessor :services_enabled, :context, :current_user
+
   def service_enabled?(service); @services_enabled.include? service; end
 
   def avatar_image_url(user_id); "avatar_image_url(#{user_id})"; end
@@ -55,7 +56,7 @@ describe "User Profile API", type: :request do
   it "should return another user's avatars, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                     :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
-    expect(json.map{ |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
+    expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
   it "should return user info for users with no pseudonym" do
@@ -65,48 +66,48 @@ describe "User Profile API", type: :request do
     @course.enroll_user(new_user, 'ObserverEnrollment')
     Account.site_admin.account_users.create!(user: @user)
     json = api_call(:get, "/api/v1/users/#{new_user.id}/profile",
-             :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
+                    :controller => "profile", :action => "settings", :user_id => new_user.to_param, :format => 'json')
     expect(json).to eq({
-      'id' => new_user.id,
-      'name' => 'new guy',
-      'sortable_name' => 'guy, new',
-      'short_name' => 'new guy',
-      'sis_user_id' => nil,
-      'login_id' => nil,
-      'integration_id' => nil,
-      'primary_email' => nil,
-      'title' => nil,
-      'bio' => nil,
-      'avatar_url' => default_avatar_url,
-      'time_zone' => 'Etc/UTC',
-      'locale' => nil
-    })
+                         'id' => new_user.id,
+                         'name' => 'new guy',
+                         'sortable_name' => 'guy, new',
+                         'short_name' => 'new guy',
+                         'sis_user_id' => nil,
+                         'login_id' => nil,
+                         'integration_id' => nil,
+                         'primary_email' => nil,
+                         'title' => nil,
+                         'bio' => nil,
+                         'avatar_url' => default_avatar_url,
+                         'time_zone' => 'Etc/UTC',
+                         'locale' => nil
+                       })
 
     get("/courses/#{@course.id}/students")
   end
 
   it "should return this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
-             :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json')
+                    :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json')
     expect(json).to eq({
-      'id' => @admin.id,
-      'name' => 'User',
-      'sortable_name' => 'User',
-      'short_name' => 'User',
-      'sis_user_id' => nil,
-      'integration_id' => nil,
-      'primary_email' => 'nobody@example.com',
-      'login_id' => 'nobody@example.com',
-      'avatar_url' => default_avatar_url,
-      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
-      'lti_user_id' => @admin_lti_user_id,
-      'title' => nil,
-      'bio' => nil,
-      'time_zone' => 'Etc/UTC',
-      'locale' => nil,
-      'effective_locale' => 'en',
-      'k5_user' => false
-    })
+                         'id' => @admin.id,
+                         'name' => 'User',
+                         'sortable_name' => 'User',
+                         'short_name' => 'User',
+                         'sis_user_id' => nil,
+                         'integration_id' => nil,
+                         'primary_email' => 'nobody@example.com',
+                         'login_id' => 'nobody@example.com',
+                         'avatar_url' => default_avatar_url,
+                         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@admin.uuid}.ics" },
+                         'lti_user_id' => @admin_lti_user_id,
+                         'title' => nil,
+                         'bio' => nil,
+                         'time_zone' => 'Etc/UTC',
+                         'locale' => nil,
+                         'effective_locale' => 'en',
+                         'k5_user' => false
+                       })
   end
 
   it 'should return the correct locale if not using the system default' do
@@ -114,56 +115,56 @@ describe "User Profile API", type: :request do
     @student.locale = 'es'
     @student.save!
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     expect(json).to eq({
-      'id' => @student.id,
-      'name' => 'Student',
-      'sortable_name' => 'Student',
-      'short_name' => 'Student',
-      'integration_id' => nil,
-      'primary_email' => 'pvuser@example.com',
-      'login_id' => 'pvuser@example.com',
-      'avatar_url' => default_avatar_url,
-      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-      'lti_user_id' => @student.lti_context_id,
-      'title' => nil,
-      'bio' => nil,
-      'time_zone' => 'Etc/UTC',
-      'locale' => 'es',
-      'effective_locale' => 'es',
-      'k5_user' => false
-    })
+                         'id' => @student.id,
+                         'name' => 'Student',
+                         'sortable_name' => 'Student',
+                         'short_name' => 'Student',
+                         'integration_id' => nil,
+                         'primary_email' => 'pvuser@example.com',
+                         'login_id' => 'pvuser@example.com',
+                         'avatar_url' => default_avatar_url,
+                         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+                         'lti_user_id' => @student.lti_context_id,
+                         'title' => nil,
+                         'bio' => nil,
+                         'time_zone' => 'Etc/UTC',
+                         'locale' => 'es',
+                         'effective_locale' => 'es',
+                         'k5_user' => false
+                       })
   end
 
   it "should return this user's profile (non-admin)" do
     @user = @student
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     expect(json).to eq({
-      'id' => @student.id,
-      'name' => 'Student',
-      'sortable_name' => 'Student',
-      'short_name' => 'Student',
-      'integration_id' => nil,
-      'primary_email' => 'pvuser@example.com',
-      'login_id' => 'pvuser@example.com',
-      'avatar_url' => default_avatar_url,
-      'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
-      'lti_user_id' => @student.lti_context_id,
-      'title' => nil,
-      'bio' => nil,
-      'time_zone' => 'Etc/UTC',
-      'locale' => nil,
-      'effective_locale' => 'en',
-      'k5_user' => false
-    })
+                         'id' => @student.id,
+                         'name' => 'Student',
+                         'sortable_name' => 'Student',
+                         'short_name' => 'Student',
+                         'integration_id' => nil,
+                         'primary_email' => 'pvuser@example.com',
+                         'login_id' => 'pvuser@example.com',
+                         'avatar_url' => default_avatar_url,
+                         'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/user_#{@student.uuid}.ics" },
+                         'lti_user_id' => @student.lti_context_id,
+                         'title' => nil,
+                         'bio' => nil,
+                         'time_zone' => 'Etc/UTC',
+                         'locale' => nil,
+                         'effective_locale' => 'en',
+                         'k5_user' => false
+                       })
   end
 
   it "respects :read_email_addresses permission" do
     RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
                          :role => admin_role, :enabled => false)
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
-             :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
+                    :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     expect(json['id']).to eq @student.id
     expect(json['primary_email']).to be_nil
   end
@@ -173,13 +174,13 @@ describe "User Profile API", type: :request do
     @student.register
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                     :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
-    expect(json.map{ |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
+    expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
   it "shouldn't return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
-             :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
+                 :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
     assert_status(401)
   end
 
@@ -191,7 +192,7 @@ describe "User Profile API", type: :request do
     end
 
     before :each do
-      allow(Twitter::Connection).to receive(:config).and_return({:some_hash => "fullofstuff"})
+      allow(Twitter::Connection).to receive(:config).and_return({ :some_hash => "fullofstuff" })
     end
 
     it "should return user_services, if requested" do
@@ -201,8 +202,8 @@ describe "User Profile API", type: :request do
                       :user_id => @student.to_param, :format => "json",
                       :include => ["user_services"])
       expect(json["user_services"]).to eq [
-        {"service" => "skype", "visible" => false, "service_user_link" => "skype:user?add"},
-        {"service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user"}
+        { "service" => "skype", "visible" => false, "service_user_link" => "skype:user?add" },
+        { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" }
       ]
     end
 
@@ -213,7 +214,7 @@ describe "User Profile API", type: :request do
                       :user_id => @student.to_param, :format => "json",
                       :include => %w(user_services))
       expect(json["user_services"]).to eq [
-        {"service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user"},
+        { "service" => "twitter", "visible" => true, "service_user_link" => "http://www.twitter.com/user" },
       ]
     end
 
@@ -227,7 +228,7 @@ describe "User Profile API", type: :request do
                       :user_id => @student.to_param, :format => "json",
                       :include => %w(links))
       expect(json["links"]).to eq [
-        {"url" => "http://instructure.com", "title" => "Instructure"}
+        { "url" => "http://instructure.com", "title" => "Instructure" }
       ]
     end
   end

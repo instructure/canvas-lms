@@ -46,29 +46,29 @@ class Login::SamlController < ApplicationController
 
     issuer = response.issuer&.id || response.assertions.first&.issuer&.id
 
-    aac = @domain_root_account.authentication_providers.active.
-      where(auth_type: 'saml').
-      where(idp_entity_id: issuer).
-      first
+    aac = @domain_root_account.authentication_providers.active
+                              .where(auth_type: 'saml')
+                              .where(idp_entity_id: issuer)
+                              .first
     if aac.nil?
       logger.error "Attempted SAML login for #{issuer} on account without that IdP"
       flash[:delegated_message] = if @domain_root_account.auth_discovery_url
-        t("Canvas did not recognize your identity provider")
-      elsif response.issuer
-        t("Canvas is not configured to receive logins from %{issuer}.", issuer: issuer)
-      else
-        t("The institution you logged in from is not configured on this account.")
-      end
+                                    t("Canvas did not recognize your identity provider")
+                                  elsif response.issuer
+                                    t("Canvas is not configured to receive logins from %{issuer}.", issuer: issuer)
+                                  else
+                                    t("The institution you logged in from is not configured on this account.")
+                                  end
       return redirect_to login_url
     end
 
     debugging = if aac.debugging? && response.is_a?(SAML2::Response)
-      if response.in_response_to
-        aac.debug_get(:request_id) == response.in_response_to
-      else
-        aac.debug_set(:request_id, t("IdP Initiated"), overwrite: false)
-      end
-    end
+                  if response.in_response_to
+                    aac.debug_get(:request_id) == response.in_response_to
+                  else
+                    aac.debug_set(:request_id, t("IdP Initiated"), overwrite: false)
+                  end
+                end
     encrypted_xml = response.to_s if debugging
 
     aac.sp_metadata(request.host_with_port).valid_response?(response,
@@ -90,10 +90,10 @@ class Login::SamlController < ApplicationController
     provider_attributes = assertion&.attribute_statements&.first&.to_h || {} rescue {}
     subject_name_id = assertion&.subject&.name_id
     unique_id = if aac.login_attribute == 'NameID'
-      subject_name_id&.id
-    else
-      provider_attributes[aac.login_attribute]
-    end
+                  subject_name_id&.id
+                else
+                  provider_attributes[aac.login_attribute]
+                end
     if unique_id && aac.strip_domain_from_login_attribute?
       unique_id = unique_id.split('@', 2)[0]
     end
@@ -152,15 +152,15 @@ class Login::SamlController < ApplicationController
       session[:login_aac] = aac.id
 
       if relay_state.present? &&
-        (uri = URI.parse(relay_state) rescue nil) &&
-        uri.path &&
-        (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
+         (uri = URI.parse(relay_state) rescue nil) &&
+         uri.path &&
+         (!uri.scheme || request.scheme == uri.scheme || uri.scheme == "https")
         if uri.host
           # allow relay_state's to other (trusted) domains, by tacking on a session token
           target_account = Account.find_by_domain(uri.host)
           if target_account &&
-            target_account != @domain_root_account &&
-            pseudonym.works_for_account?(target_account, true)
+             target_account != @domain_root_account &&
+             pseudonym.works_for_account?(target_account, true)
             token = SessionToken.new(pseudonym.global_id,
                                      current_user_id: pseudonym.global_user_id).to_s
             uri.query.concat('&') if uri.query
@@ -215,6 +215,7 @@ class Login::SamlController < ApplicationController
       # only require signatures for LogoutRequests, and only if the provider has a certificate on file
       if message.is_a?(SAML2::LogoutRequest) && (certificates = aac.signing_certificates)
         raise SAML2::UnsignedMessage unless message.signed?
+
         unless (signature_errors = message.validate_signature(cert: certificates)).empty?
           logger.debug("Failed to validate signature: #{signature_errors}")
           raise SAML2::InvalidSignature
@@ -229,6 +230,7 @@ class Login::SamlController < ApplicationController
         # only require signatures for LogoutRequests, and only if the provider has a certificate on file
         next unless message.is_a?(SAML2::LogoutRequest)
         next if (certificates = aac.signing_certificates).blank?
+
         certificates.map do |cert_base64|
           certificate = OpenSSL::X509::Certificate.new(Base64.decode64(cert_base64))
           key = certificate.public_key
@@ -308,6 +310,7 @@ class Login::SamlController < ApplicationController
       if sso_idp.single_logout_services.empty?
         return render status: :bad_request, plain: "IDP Metadata contains no destination to send a logout response"
       end
+
       logout_response = SAML2::LogoutResponse.respond_to(message,
                                                          aac.idp_metadata.identity_providers.first,
                                                          SAML2::NameID.new(aac.entity_id))
@@ -348,8 +351,8 @@ class Login::SamlController < ApplicationController
 
   def observee_validation
     redirect_to
-      @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                  parent_registration: session[:parent_registration])
+    @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                parent_registration: session[:parent_registration])
   end
 
   protected
@@ -359,6 +362,7 @@ class Login::SamlController < ApplicationController
       scope = @domain_root_account.authentication_providers.active.where(auth_type: 'saml')
       id = params[:id] || params[:entityID]
       return scope.first! unless id
+
       if id.to_i == 0
         scope.find_by!(idp_entity_id: id)
       else

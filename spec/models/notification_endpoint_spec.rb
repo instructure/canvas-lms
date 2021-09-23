@@ -40,7 +40,7 @@ describe NotificationEndpoint do
     it "resets the user data on an existing, conflicting sns endpoint" do
       # i.e. it steals ownership of the sns endpoint from other NotificationEndpoints
       expect(@sns_client).to receive(:create_platform_endpoint).and_raise(Aws::SNS::Errors::InvalidParameter.new(nil, "Invalid parameter: Token Reason: Endpoint existing_arn already exists with the same Token, but different attributes."))
-      expect(@sns_client).to receive(:set_endpoint_attributes).with(endpoint_arn: 'existing_arn', attributes: {'CustomUserData' => @at.global_id.to_s})
+      expect(@sns_client).to receive(:set_endpoint_attributes).with(endpoint_arn: 'existing_arn', attributes: { 'CustomUserData' => @at.global_id.to_s })
       ne = @at.notification_endpoints.create!(token: 'token')
       expect(ne.arn).to eq 'existing_arn'
     end
@@ -55,7 +55,7 @@ describe NotificationEndpoint do
         { endpoint_arn: 'new-arn' }
       end
       expect(@sns_client).to receive(:set_endpoint_attributes)
-        .with(endpoint_arn: 'existing_arn', attributes: {'CustomUserData' => @at.global_id.to_s})
+        .with(endpoint_arn: 'existing_arn', attributes: { 'CustomUserData' => @at.global_id.to_s })
         .and_raise(Aws::SNS::Errors::NotFound.new(nil, "deleted"))
       ne = @at.notification_endpoints.create!(token: 'token')
       expect(ne.arn).to eq 'new-arn'
@@ -64,19 +64,19 @@ describe NotificationEndpoint do
 
   describe "#push_json" do
     it "returns false when the endpoint is disabled" do
-      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: {'Enabled' => 'false', 'CustomUserData' => @at.global_id.to_s}))
+      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'false', 'CustomUserData' => @at.global_id.to_s }))
       ne = @at.notification_endpoints.new(token: 'token')
       expect(ne.push_json('json')).to be_falsey
     end
 
     it "returns false when the endpoint isn't owned" do
-      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => 'not my id'}))
+      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => 'not my id' }))
       ne = @at.notification_endpoints.new(token: 'token')
       expect(ne.push_json('json')).to be_falsey
     end
 
     it "returns false if the token has changed" do
-      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s, 'Token' => 'token2'}))
+      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s, 'Token' => 'token2' }))
       ne = @at.notification_endpoints.new(token: 'token')
       expect(ne.push_json('json')).to be_falsey
     end
@@ -87,7 +87,7 @@ describe NotificationEndpoint do
       allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
       ne = @at.notification_endpoints.create!(token: 'token')
 
-      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s}))
+      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => @at.global_id.to_s }))
       expect(@sns_client).to receive(:delete_endpoint)
       ne.destroy
     end
@@ -96,7 +96,7 @@ describe NotificationEndpoint do
       allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
       ne = @at.notification_endpoints.create!(token: 'token')
 
-      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: {'Enabled' => 'true', 'CustomUserData' => 'not my id'}))
+      expect(@sns_client).to receive(:get_endpoint_attributes).and_return(double(attributes: { 'Enabled' => 'true', 'CustomUserData' => 'not my id' }))
       expect(@sns_client).to receive(:delete_endpoint).never
       ne.destroy
     end

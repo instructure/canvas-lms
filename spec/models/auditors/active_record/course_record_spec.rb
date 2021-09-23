@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 describe Auditors::ActiveRecord::CourseRecord do
-  let(:request_id){ 'abcde-12345'}
+  let(:request_id) { 'abcde-12345' }
 
   before(:once) do
     Auditors::ActiveRecord::Partitioner.process
@@ -32,11 +32,11 @@ describe Auditors::ActiveRecord::CourseRecord do
   end
 
   describe "mapping from event stream record" do
-    let(:course_enrollment){ course_with_student }
-    let(:course_record){ course_enrollment.course }
-    let(:user_record){ course_enrollment.user }
-    let(:event_data){ {"data-key" => "data-val"} }
-    let(:es_record){ Auditors::Course::Record.generate(course_record, user_record, 'unconcluded', event_data) }
+    let(:course_enrollment) { course_with_student }
+    let(:course_record) { course_enrollment.course }
+    let(:user_record) { course_enrollment.user }
+    let(:event_data) { { "data-key" => "data-val" } }
+    let(:es_record) { Auditors::Course::Record.generate(course_record, user_record, 'unconcluded', event_data) }
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::CourseRecord.create_from_event_stream!(es_record)
@@ -46,7 +46,7 @@ describe Auditors::ActiveRecord::CourseRecord do
       expect(ar_rec.user_id).to eq(user_record.id)
       expect(ar_rec.event_source).to eq("manual")
       expect(ar_rec.event_type).to eq("unconcluded")
-      expect(ar_rec.event_data).to eq({"data-key" => "data-val"})
+      expect(ar_rec.event_data).to eq({ "data-key" => "data-val" })
       expect(ar_rec.sis_batch_id).to be_nil
       expect(ar_rec.created_at).to_not be_nil
     end

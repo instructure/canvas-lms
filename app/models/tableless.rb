@@ -58,9 +58,14 @@ class Tableless < ActiveRecord::Base
   end
 
   def self.find_by_sql(*args); []; end
+
   def self.count_by_sql(*args); 0; end
+
   def self.delete_all(*args); end
+
   def self.update_all(*args); end
+
   def self.execute_simple_calculation(*args); end
+
   def self.execute_grouped_calculation(*args); end
 end

@@ -60,6 +60,7 @@ module AttachmentFu # :nodoc:
   mattr_writer :tempfile_path
 
   class ThumbnailError < StandardError;  end
+
   class AttachmentError < StandardError; end
 
   module ActMethods
@@ -120,7 +121,7 @@ module AttachmentFu # :nodoc:
       if attachment_options[:path_prefix].nil?
         attachment_options[:path_prefix] = attachment_options[:storage] == :s3 ? table_name : File.join("public", table_name)
       end
-      attachment_options[:path_prefix]   = attachment_options[:path_prefix][1..-1] if options[:path_prefix].first == '/'
+      attachment_options[:path_prefix] = attachment_options[:path_prefix][1..-1] if options[:path_prefix].first == '/'
 
       with_options :foreign_key => 'parent_id' do |m|
         m.has_many   :thumbnails, :class_name => "::#{attachment_options[:thumbnail_class]}"
@@ -157,7 +158,7 @@ module AttachmentFu # :nodoc:
       end unless parent_options[:processor] # Don't let child override processor
     end
 
-    def load_related_exception?(e) #:nodoc: implementation specific
+    def load_related_exception?(e) # :nodoc: implementation specific
       case
       when e.kind_of?(LoadError), e.kind_of?(MissingSourceFile), $!.class.name == "CompilationError"
         # We can't rescue CompilationError directly, as it is part of the RubyInline library.
@@ -203,7 +204,7 @@ module AttachmentFu # :nodoc:
 
     # Copies the given file path to a new tempfile, returning the closed tempfile.
     def copy_to_temp_file(file, temp_base_name)
-      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['', temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.close
         FileUtils.cp file, tmp.path
       end
@@ -211,7 +212,7 @@ module AttachmentFu # :nodoc:
 
     # Writes the given data to a new tempfile, returning the closed tempfile.
     def write_to_temp_file(data, temp_base_name)
-      Tempfile.new(['',temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
+      Tempfile.new(['', temp_base_name], AttachmentFu.tempfile_path).tap do |tmp|
         tmp.binmode
         tmp.write data
         tmp.close
@@ -248,6 +249,7 @@ module AttachmentFu # :nodoc:
     # Gets the thumbnail name for a filename.  'foo.jpg' becomes 'foo_thumbnail.jpg'
     def thumbnail_name_for(thumbnail = nil)
       return filename if thumbnail.blank?
+
       ext = nil
       basename = filename.gsub /\.\w+$/ do |s|
         ext = s; ''
@@ -266,9 +268,9 @@ module AttachmentFu # :nodoc:
       thumbnailable? || raise(ThumbnailError.new("Can't create a thumbnail if the content type is not an image or there is no parent_id column"))
       find_or_initialize_thumbnail(file_name_suffix).tap do |thumb|
         thumb.attributes = {
-          :content_type             => content_type,
-          :filename                 => thumbnail_name_for(file_name_suffix),
-          :temp_path                => temp_file,
+          :content_type => content_type,
+          :filename => thumbnail_name_for(file_name_suffix),
+          :temp_path => temp_file,
           :thumbnail_resize_options => size
         }
         if thumb.valid?
@@ -281,6 +283,7 @@ module AttachmentFu # :nodoc:
     def create_thumbnail_size(target_size)
       actual_size = self.attachment_options[:thumbnails][target_size]
       raise "this class doesn't have a thubnail size for #{target_size}" if actual_size.nil?
+
       begin
         tmp = self.create_temp_file
         res = self.create_or_update_thumbnail(tmp, target_size.to_s, actual_size)
@@ -316,6 +319,7 @@ module AttachmentFu # :nodoc:
         if self.root_attachment_id && self.new_record?
           return false
         end
+
         self.filename && File.file?(temp_path.to_s)
       else
         File.file?(temp_path.to_s)
@@ -339,6 +343,7 @@ module AttachmentFu # :nodoc:
     def uploaded_data=(file_data)
       if self.is_a?(Attachment)
         return nil if file_data.nil? || (file_data.respond_to?(:size) && file_data.size == 0)
+
         # glean information from the file handle
         self.content_type = detect_mimetype(file_data)
         self.filename     = file_data.original_filename if respond_to?(:filename) && file_data.respond_to?(:original_filename)
@@ -390,6 +395,7 @@ module AttachmentFu # :nodoc:
         file_data
       else
         return nil if file_data.nil? || file_data.size == 0
+
         self.content_type = file_data.content_type
         self.filename     = file_data.original_filename if respond_to?(:filename)
         unless file_data.respond_to?(:path)
@@ -486,103 +492,104 @@ module AttachmentFu # :nodoc:
     end
 
     protected
-      # Generates a unique filename for a Tempfile.
-      def random_tempfile_filename
-        "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
+
+    # Generates a unique filename for a Tempfile.
+    def random_tempfile_filename
+      "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
+    end
+
+    def sanitize_filename(filename)
+      filename.strip.tap do |name|
+        # NOTE: File.basename doesn't work right with Windows paths on Unix
+        # get only the filename, not the whole path
+        name.gsub! /^.*(\\|\/)/, ''
+
+        # Finally, replace all non alphanumeric, underscore or periods with underscore
+        name.gsub! /[^\w\.\-]/, '_'
       end
+    end
 
-      def sanitize_filename(filename)
-        filename.strip.tap do |name|
-          # NOTE: File.basename doesn't work right with Windows paths on Unix
-          # get only the filename, not the whole path
-          name.gsub! /^.*(\\|\/)/, ''
+    # before_validation callback.
+    def set_size_from_temp_path
+      self.size = File.size(temp_path) if save_attachment?
+    end
 
-          # Finally, replace all non alphanumeric, underscore or periods with underscore
-          name.gsub! /[^\w\.\-]/, '_'
-        end
+    # validates the size and content_type attributes according to the current model's options
+    def attachment_attributes_valid?
+      [:size, :content_type].each do |attr_name|
+        enum = attachment_options[attr_name]
+        errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
       end
+    end
 
-      # before_validation callback.
-      def set_size_from_temp_path
-        self.size = File.size(temp_path) if save_attachment?
-      end
+    # Initializes a new thumbnail with the given suffix.
+    def find_or_initialize_thumbnail(file_name_suffix)
+      scope = thumbnail_class.where(thumbnail: file_name_suffix.to_s)
+      scope = scope.where(parent_id: id) if respond_to?(:parent_id)
+      scope.first_or_initialize
+    end
 
-      # validates the size and content_type attributes according to the current model's options
-      def attachment_attributes_valid?
-        [:size, :content_type].each do |attr_name|
-          enum = attachment_options[attr_name]
-          errors.add attr_name, ActiveRecord::Errors.default_error_messages[:inclusion] unless enum.nil? || enum.include?(send(attr_name))
-        end
-      end
+    # Stub for a #process_attachment method in a processor
+    def process_attachment
+      @saved_attachment = save_attachment?
+      run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
+      @saved_attachment
+    end
 
-      # Initializes a new thumbnail with the given suffix.
-      def find_or_initialize_thumbnail(file_name_suffix)
-        scope = thumbnail_class.where(thumbnail: file_name_suffix.to_s)
-        scope = scope.where(parent_id: id) if respond_to?(:parent_id)
-        scope.first_or_initialize
-      end
+    # Cleans up after processing.  Thumbnails are created, the attachment is stored to the backend, and the temp_paths are cleared.
+    def after_process_attachment
+      if @saved_attachment
+        # # INSTRUCTURE I (ryan shaw) commented these next lines out so that the thumbnailing does not happen syncronisly as part of the request.
+        # # we are going to do the same thing as delayed_jobs
+        # if respond_to?(:process_attachment) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
+        #   temp_file = temp_path || create_temp_file
+        #   attachment_options[:thumbnails].each { |suffix, size| create_or_update_thumbnail(temp_file, suffix, *size) }
+        # end
 
-      # Stub for a #process_attachment method in a processor
-      def process_attachment
-        @saved_attachment = save_attachment?
-        run_before_attachment_saved if @saved_attachment && self.respond_to?(:run_before_attachment_saved)
-        @saved_attachment
-      end
-
-      # Cleans up after processing.  Thumbnails are created, the attachment is stored to the backend, and the temp_paths are cleared.
-      def after_process_attachment
-        if @saved_attachment
-          # # INSTRUCTURE I (ryan shaw) commented these next lines out so that the thumbnailing does not happen syncronisly as part of the request.
-          # # we are going to do the same thing as delayed_jobs
-          # if respond_to?(:process_attachment) && thumbnailable? && !attachment_options[:thumbnails].blank? && parent_id.nil?
-          #   temp_file = temp_path || create_temp_file
-          #   attachment_options[:thumbnails].each { |suffix, size| create_or_update_thumbnail(temp_file, suffix, *size) }
-          # end
-
-          # In normal attachment upload usage, the only transaction we should
-          # be inside is the AR#save transaction. If that's the case, defer
-          # the upload and callbacks until after the transaction commits. If
-          # the upload fails, that will leave this attachment in an
-          # unattached state, but that's already the case in other error
-          # situations as well.
-          #
-          # If there is no transaction, or more than one transaction, then
-          # just upload immediately. This can happen if
-          # after_process_attachment is called directly, or if we're inside
-          # an rspec test run (which is wrapped in an outer transaction).
-          # It can also happen if somebody explicitly uploads file data
-          # inside a .transaction block, which we normally shouldn't do.
-          save_and_callbacks = proc do
-            save_to_storage
-            @temp_paths.clear
-            @saved_attachment = nil
-            run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
-            run_callbacks(:save_and_attachment_processing)
-          end
-
-          if Rails.env.test?
-            save_and_callbacks.call()
-          else
-            self.class.connection.after_transaction_commit(&save_and_callbacks)
-          end
-        else
+        # In normal attachment upload usage, the only transaction we should
+        # be inside is the AR#save transaction. If that's the case, defer
+        # the upload and callbacks until after the transaction commits. If
+        # the upload fails, that will leave this attachment in an
+        # unattached state, but that's already the case in other error
+        # situations as well.
+        #
+        # If there is no transaction, or more than one transaction, then
+        # just upload immediately. This can happen if
+        # after_process_attachment is called directly, or if we're inside
+        # an rspec test run (which is wrapped in an outer transaction).
+        # It can also happen if somebody explicitly uploads file data
+        # inside a .transaction block, which we normally shouldn't do.
+        save_and_callbacks = proc do
+          save_to_storage
+          @temp_paths.clear
+          @saved_attachment = nil
+          run_after_attachment_saved if self.respond_to?(:run_after_attachment_saved)
           run_callbacks(:save_and_attachment_processing)
         end
-      end
 
-      # Resizes the given processed img object with either the attachment resize options or the thumbnail resize options.
-      def resize_image_or_thumbnail!(img)
-        if (!respond_to?(:parent_id) || parent_id.nil?) && attachment_options[:resize_to] # parent image
-          resize_image(img, attachment_options[:resize_to])
-        elsif thumbnail_resize_options # thumbnail
-          resize_image(img, thumbnail_resize_options)
+        if Rails.env.test?
+          save_and_callbacks.call()
+        else
+          self.class.connection.after_transaction_commit(&save_and_callbacks)
         end
+      else
+        run_callbacks(:save_and_attachment_processing)
       end
+    end
 
-      # Removes the thumbnails for the attachment, if it has any
-      def destroy_thumbnails
-        self.thumbnails.each { |thumbnail| thumbnail.destroy } if thumbnailable?
+    # Resizes the given processed img object with either the attachment resize options or the thumbnail resize options.
+    def resize_image_or_thumbnail!(img)
+      if (!respond_to?(:parent_id) || parent_id.nil?) && attachment_options[:resize_to] # parent image
+        resize_image(img, attachment_options[:resize_to])
+      elsif thumbnail_resize_options # thumbnail
+        resize_image(img, thumbnail_resize_options)
       end
+    end
+
+    # Removes the thumbnails for the attachment, if it has any
+    def destroy_thumbnails
+      self.thumbnails.each { |thumbnail| thumbnail.destroy } if thumbnailable?
+    end
   end
 end
 

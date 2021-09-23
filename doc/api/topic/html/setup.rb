@@ -20,7 +20,7 @@
 
 def init
   if options[:all_resources]
-    options[:controllers] = options[:resources].map { |r,c| c }.flatten
+    options[:controllers] = options[:resources].map { |r, c| c }.flatten
     sections :header, :method_details_list, [T('method_details')]
   else
     sections :header, [:topic_doc, :method_details_list, [T('method_details')]]
@@ -43,10 +43,10 @@ def topic_doc
   erb(:topic_doc)
 end
 
-def word_wrap(text, col_width=80)
-   text.gsub!( /(\S{#{col_width}})(?=\S)/, '\1 ' )
-   text.gsub!( /(.{1,#{col_width}})(?:\s+|$)/, "\\1\n" )
-   text
+def word_wrap(text, col_width = 80)
+  text.gsub!(/(\S{#{col_width}})(?=\S)/, '\1 ')
+  text.gsub!(/(.{1,#{col_width}})(?:\s+|$)/, "\\1\n")
+  text
 end
 
 def indent(str, amount = 2, char = ' ')

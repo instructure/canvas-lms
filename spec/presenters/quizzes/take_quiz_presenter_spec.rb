@@ -21,13 +21,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Quizzes::TakeQuizPresenter do
-
   let(:quiz) { Quizzes::Quiz.new }
   let(:submission) { Quizzes::QuizSubmission.new }
   let(:params) { {} }
-  let(:question1) { {:id => 1, :name => "Question 1"} }
-  let(:question2) { {:id => 2, :name => "Question 2"} }
-  let(:question3) { {:id => 3, :name => "Question 3"} }
+  let(:question1) { { :id => 1, :name => "Question 1" } }
+  let(:question2) { { :id => 2, :name => "Question 2" } }
+  let(:question3) { { :id => 3, :name => "Question 3" } }
   let(:all_questions) { [question1, question2, question3] }
 
   let(:presenter) { Quizzes::TakeQuizPresenter.new(quiz, submission, params) }
@@ -114,14 +113,13 @@ describe Quizzes::TakeQuizPresenter do
   end
 
   describe "previous_question_viewable?" do
-
     it "returns false if no previous_question" do
       expect(presenter).to receive(:previous_question).and_return false
       expect(presenter.previous_question_viewable?).to eq false
     end
 
-    it "returns true if there is a previous question and quiz allows "+
-      "user to go back" do
+    it "returns true if there is a previous question and quiz allows " +
+       "user to go back" do
       expect(presenter).to receive(:previous_question).and_return true
       expect(presenter).to receive(:cant_go_back?).and_return false
       expect(presenter.previous_question_viewable?).to eq true
@@ -148,9 +146,9 @@ describe Quizzes::TakeQuizPresenter do
   describe "answered_icon" do
     before do
       allow(submission).to receive(:submission_data).and_return({
-        "question_#{question1[:id]}" => true,
-        "question_#{question2[:id]}" => nil
-      })
+                                                                  "question_#{question1[:id]}" => true,
+                                                                  "question_#{question2[:id]}" => nil
+                                                                })
     end
 
     it 'returns icon-check for answered questions' do
@@ -165,9 +163,9 @@ describe Quizzes::TakeQuizPresenter do
   describe "answered_text" do
     before do
       allow(submission).to receive(:submission_data).and_return({
-        "question_#{question1[:id]}" => true,
-        "question_#{question2[:id]}" => nil
-      })
+                                                                  "question_#{question1[:id]}" => true,
+                                                                  "question_#{question2[:id]}" => nil
+                                                                })
     end
 
     it 'returns icon-check for answered questions' do
@@ -250,7 +248,7 @@ describe Quizzes::TakeQuizPresenter do
         "_question_#{question3[:id]}_read" => true
       )
       allow(quiz).to receive(:cant_go_back?).and_return(true)
-      expect{ presenter.question_seen?(question1) }.not_to raise_error
+      expect { presenter.question_seen?(question1) }.not_to raise_error
       expect(presenter.question_seen?(question3)).to be_truthy
     end
   end
@@ -301,7 +299,6 @@ describe Quizzes::TakeQuizPresenter do
     it "adds 'seen' if the question was seen" do
       expect(presenter.question_class(question1)).to match /seen/
       expect(presenter.question_class(question2)).not_to match /seen/
-
     end
 
     it "adds 'text_only' if the question is a text only question" do
@@ -316,9 +313,9 @@ describe Quizzes::TakeQuizPresenter do
   describe 'building the answer set' do
     it 'should discard irrelevant entries' do
       allow(submission).to receive(:submission_data).and_return({
-        'foo' => 'bar',
-        "question_#{question1[:id]}_marked" => true
-      })
+                                                                  'foo' => 'bar',
+                                                                  "question_#{question1[:id]}_marked" => true
+                                                                })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
       expect(p.answers.empty?).to be_truthy
@@ -326,9 +323,9 @@ describe Quizzes::TakeQuizPresenter do
 
     it 'marks a question as answered' do
       allow(submission).to receive(:submission_data).and_return({
-        "question_#{question1[:id]}" => '123',
-        "question_#{question2[:id]}" => true
-      })
+                                                                  "question_#{question1[:id]}" => '123',
+                                                                  "question_#{question2[:id]}" => true
+                                                                })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
 
@@ -339,12 +336,11 @@ describe Quizzes::TakeQuizPresenter do
 
     it 'rejects zeroes for an answer' do
       allow(submission).to receive(:submission_data).and_return({
-        "question_#{question1[:id]}" => '0'
-      })
+                                                                  "question_#{question1[:id]}" => '0'
+                                                                })
 
       p = Quizzes::TakeQuizPresenter.new(quiz, submission, params)
       expect(p.answers.has_key?(question1[:id])).to be_falsey
     end
   end
-
 end

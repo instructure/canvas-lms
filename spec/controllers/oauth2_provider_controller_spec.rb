@@ -36,7 +36,7 @@ describe Oauth2ProviderController do
     end
 
     it 'renders 400 on a bad redirect_uri' do
-      get :auth, params: {:client_id => key.id}
+      get :auth, params: { :client_id => key.id }
       assert_status(400)
       expect(response.body).to match /redirect_uri does not match/
     end
@@ -68,40 +68,40 @@ describe Oauth2ProviderController do
 
     it 'redirects back with an error for invalid response_type' do
       get :auth,
-          params: {client_id: key.id,
-          redirect_uri: 'https://example.com/oauth/callback'}
+          params: { client_id: key.id,
+                    redirect_uri: 'https://example.com/oauth/callback' }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback\?error=unsupported_response_type})
     end
 
     it 'redirects to the login url' do
       get :auth,
-          params: {client_id: key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          response_type: 'code'}
+          params: { client_id: key.id,
+                    redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                    response_type: 'code' }
       expect(response).to redirect_to(login_url)
     end
 
     it 'passes on canvas_login if provided' do
-      get :auth, params: {client_id: key.id,
-          redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          canvas_login: 1,
-          response_type: 'code'}
+      get :auth, params: { client_id: key.id,
+                           redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                           canvas_login: 1,
+                           response_type: 'code' }
       expect(response).to redirect_to(login_url(:canvas_login => 1))
     end
 
     it 'should pass pseudonym_session[unique_id] to login to populate username textbox' do
-      get :auth, params: {:client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-          "unique_id"=>"test", force_login: true, response_type: 'code'}
-      expect(response).to redirect_to(login_url+'?force_login=true&pseudonym_session%5Bunique_id%5D=test')
+      get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                           "unique_id" => "test", force_login: true, response_type: 'code' }
+      expect(response).to redirect_to(login_url + '?force_login=true&pseudonym_session%5Bunique_id%5D=test')
     end
 
     it 'redirects with "login_required" if prompt=none' do
       get :auth,
-          params: {client_id: key.id,
-          redirect_uri: 'https://example.com/oauth/callback',
-          prompt: 'none',
-          response_type: 'code'}
+          params: { client_id: key.id,
+                    redirect_uri: 'https://example.com/oauth/callback',
+                    prompt: 'none',
+                    response_type: 'code' }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback})
       redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
@@ -110,10 +110,10 @@ describe Oauth2ProviderController do
 
     it 'redirects with "unsupported_prompt_type" if prompt is not recognized' do
       get :auth,
-          params: {client_id: key.id,
-          redirect_uri: 'https://example.com/oauth/callback',
-          prompt: 'yesplz',
-          response_type: 'code'}
+          params: { client_id: key.id,
+                    redirect_uri: 'https://example.com/oauth/callback',
+                    prompt: 'yesplz',
+                    response_type: 'code' }
       expect(response).to be_redirect
       expect(response.location).to match(%r{^https://example.com/oauth/callback})
       redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
@@ -135,18 +135,18 @@ describe Oauth2ProviderController do
 
       it 'should redirect to the confirm url if the user has no token' do
         get :auth,
-            params: {client_id: key.id,
-            redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-            response_type: 'code'}
+            params: { client_id: key.id,
+                      redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                      response_type: 'code' }
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
       it 'redirects to login_url with ?force_login=1' do
         get :auth,
-            params: {client_id: key.id,
-            redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
-            response_type: 'code',
-            force_login: 1}
+            params: { client_id: key.id,
+                      redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
+                      response_type: 'code',
+                      force_login: 1 }
         expect(response).to redirect_to(login_url(:force_login => 1))
       end
 
@@ -157,57 +157,59 @@ describe Oauth2ProviderController do
       end
 
       it 'should redirect to the redirect uri if the user already has remember-me token' do
-        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth,
-            params: {client_id: key.id,
-            redirect_uri: 'https://example.com',
-            response_type: 'code',
-            scope: '/auth/userinfo'}
+            params: { client_id: key.id,
+                      redirect_uri: 'https://example.com',
+                      response_type: 'code',
+                      scope: '/auth/userinfo' }
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
       it 'it accepts the deprecated name of scopes for scope param' do
-        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth,
-            params: {client_id: key.id,
-            redirect_uri: 'https://example.com',
-            response_type: 'code',
-            scope: '/auth/userinfo'}
+            params: { client_id: key.id,
+                      redirect_uri: 'https://example.com',
+                      response_type: 'code',
+                      scope: '/auth/userinfo' }
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
       it 'should not reuse userinfo tokens for other scopes' do
-        @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
-        get :auth, params: {client_id: key.id,
-            redirect_uri: 'https://example.com',
-            response_type: 'code'}
+        @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
+        get :auth, params: { client_id: key.id,
+                             redirect_uri: 'https://example.com',
+                             response_type: 'code' }
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
       it 'should redirect to the redirect uri if the developer key is trusted' do
         key.trusted = true
         key.save!
-        get :auth, params: {client_id: key.id,
-            redirect_uri: 'https://example.com',
-            response_type: 'code',
-            scope: '/auth/userinfo'}
+        get :auth, params: { client_id: key.id,
+                             redirect_uri: 'https://example.com',
+                             response_type: 'code',
+                             scope: '/auth/userinfo' }
         expect(response).to be_redirect
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
       context 'when "prompt=none"' do
-        let(:params) { {
-          client_id: key.id,
+        let(:params) {
+          {
+            client_id: key.id,
             redirect_uri: 'https://example.com',
             response_type: 'code',
             scope: '/auth/userinfo',
             prompt: 'none'
-        } }
+          }
+        }
 
         it 'should redirect to the redirect uri if the user already has remember-me token' do
-          @user.access_tokens.create!({:developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil})
+          @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
           get :auth, params: params
           expect(response).to be_redirect
           expect(response.location).to match(/https:\/\/example.com/)
@@ -469,8 +471,8 @@ describe Oauth2ProviderController do
 
     context 'authorization_code' do
       let(:grant_type) { 'authorization_code' }
-      let(:valid_code) {"thecode"}
-      let(:valid_code_redis_key) {"#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}"}
+      let(:valid_code) { "thecode" }
+      let(:valid_code_redis_key) { "#{Canvas::Oauth::Token::REDIS_PREFIX}#{valid_code}" }
       let(:redis) do
         redis = double('Redis')
         allow(redis).to receive(:get)
@@ -534,7 +536,7 @@ describe Oauth2ProviderController do
       let(:refresh_token) { old_token.plaintext_refresh_token }
 
       it_behaves_like 'common oauth2 token checks' do
-        let(:success_params) { {refresh_token: refresh_token} }
+        let(:success_params) { { refresh_token: refresh_token } }
         let(:success_token_keys) { %w(access_token user expires_in token_type) }
       end
 
@@ -608,7 +610,7 @@ describe Oauth2ProviderController do
 
       describe 'additional client_credentials checks' do
         subject do
-          parameters = {grant_type: 'client_credentials' }.merge(client_credentials_params)
+          parameters = { grant_type: 'client_credentials' }.merge(client_credentials_params)
           post :token, params: parameters
           response
         end
@@ -692,7 +694,7 @@ describe Oauth2ProviderController do
               expect(subject).to have_http_status 200
               Setting.set('oauth.allowed_timestamp_future_skew', 0.seconds)
 
-              parameters = {grant_type: 'client_credentials' }.merge(client_credentials_params)
+              parameters = { grant_type: 'client_credentials' }.merge(client_credentials_params)
               post :token, params: parameters
               expect(response).to have_http_status 200
             end
@@ -729,13 +731,13 @@ describe Oauth2ProviderController do
   describe 'POST accept' do
     let_once(:user) { User.create! }
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI  } } }
+    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI } } }
     let(:oauth_accept) { post :accept, session: session_hash }
 
     before { user_session user }
 
     it 'uses the global id of the user for generating the code' do
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, {:scopes => nil, :remember_access => nil, :purpose => nil}).and_return('code')
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => nil, :purpose => nil }).and_return('code')
       oauth_accept
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code'))
     end
@@ -743,13 +745,13 @@ describe Oauth2ProviderController do
     it 'saves the requested scopes with the code' do
       scopes = 'userinfo'
       session_hash[:oauth2][:scopes] = scopes
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, {:scopes => scopes, :remember_access => nil, :purpose => nil}).and_return('code')
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => scopes, :remember_access => nil, :purpose => nil }).and_return('code')
       oauth_accept
     end
 
     it 'remembers the users access preference with the code' do
-      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, {:scopes => nil, :remember_access => '1', :purpose => nil}).and_return('code')
-      post :accept, params: {:remember_access => '1'}, session: session_hash
+      expect(Canvas::Oauth::Token).to receive(:generate_code_for).with(user.global_id, user.global_id, key.id, { :scopes => nil, :remember_access => '1', :purpose => nil }).and_return('code')
+      post :accept, params: { :remember_access => '1' }, session: session_hash
     end
 
     it 'removes oauth session info after code generation' do
@@ -773,7 +775,7 @@ describe Oauth2ProviderController do
 
   describe 'GET deny' do
     let_once(:key) { DeveloperKey.create! }
-    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI  } } }
+    let(:session_hash) { { :oauth2 => { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI } } }
 
     it 'forwards the oauth state if it was provided' do
       session_hash[:oauth2][:state] = '1234567890'
@@ -804,7 +806,7 @@ describe Oauth2ProviderController do
     let(:token) { user.access_tokens.create!(developer_key: key) }
 
     it "deletes the token" do
-      delete :destroy, params: {access_token: token.full_token}
+      delete :destroy, params: { access_token: token.full_token }
       expect(JSON.parse(response.body)).to eq({})
       expect(AccessToken.not_deleted.exists?(token.id)).to be(false)
     end
@@ -812,7 +814,7 @@ describe Oauth2ProviderController do
     it "doesn't need a scope to delete the token" do
       key.require_scopes = true
       key.save!
-      delete :destroy, params: {access_token: token.full_token}
+      delete :destroy, params: { access_token: token.full_token }
       expect(AccessToken.not_deleted.exists?(token.id)).to be(false)
     end
 
@@ -826,7 +828,7 @@ describe Oauth2ProviderController do
       let(:session) { { login_aac: ap.global_id } }
 
       it "includes forward URL when possible" do
-        delete :destroy, params: {access_token: token.full_token, expire_sessions: true}, session: session
+        delete :destroy, params: { access_token: token.full_token, expire_sessions: true }, session: session
         expect(JSON.parse(response.body)).to eq({ "forward_url" => "somewhere" })
       end
 
@@ -840,10 +842,10 @@ describe Oauth2ProviderController do
   describe 'GET jwks' do
     before :each do
       allow(Canvas::Oauth::KeyStorage).to receive(:retrieve_keys).and_return({
-        Canvas::Security::KeyStorage::PAST => Canvas::Security::RSAKeyPair.new.to_jwk,
-        Canvas::Security::KeyStorage::PRESENT => Canvas::Security::RSAKeyPair.new.to_jwk,
-        Canvas::Security::KeyStorage::FUTURE => Canvas::Security::RSAKeyPair.new.to_jwk
-      })
+                                                                               Canvas::Security::KeyStorage::PAST => Canvas::Security::RSAKeyPair.new.to_jwk,
+                                                                               Canvas::Security::KeyStorage::PRESENT => Canvas::Security::RSAKeyPair.new.to_jwk,
+                                                                               Canvas::Security::KeyStorage::FUTURE => Canvas::Security::RSAKeyPair.new.to_jwk
+                                                                             })
       get 'jwks'
     end
 

@@ -22,18 +22,18 @@ require 'aws-sdk-sqs'
 
 module Services
   class NotificationService
-    def self.process(global_id, body, type, to, priority=false)
+    def self.process(global_id, body, type, to, priority = false)
       queue_url = choose_queue_url(priority)
       return unless queue_url.present?
 
       notification_sqs.send_message(message_body: {
-          global_id: global_id,
-          type: type,
-          message: body,
-          target: to,
-          request_id: RequestContextGenerator.request_id
-        }.to_json,
-        queue_url: queue_url)
+        global_id: global_id,
+        type: type,
+        message: body,
+        target: to,
+        request_id: RequestContextGenerator.request_id
+      }.to_json,
+                                    queue_url: queue_url)
     end
 
     class << self
@@ -54,6 +54,7 @@ module Services
           QUEUE_NAME_KEYS.each do |key, queue_name_key|
             queue_name = conf[queue_name_key]
             next unless queue_name.present?
+
             @queue_urls[key] = sqs.get_queue_url(queue_name: queue_name).queue_url
           end
           sqs
@@ -62,6 +63,7 @@ module Services
 
       def choose_queue_url(priority)
         return nil unless notification_sqs.present?
+
         url = @queue_urls[:priority] if priority
         url || @queue_urls[:default]
       end

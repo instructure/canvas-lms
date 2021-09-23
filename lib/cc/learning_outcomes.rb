@@ -21,10 +21,12 @@ module CC
   module LearningOutcomes
     include Outcomes::OutcomeFriendlyDescriptionResolver
 
-    def create_learning_outcomes(document=nil)
+    def create_learning_outcomes(document = nil)
       return nil unless @course.has_outcomes?
+
       root_group = @course.root_outcome_group(false)
       return nil unless root_group
+
       @selectable_outcomes = @course.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
 
       if document
@@ -33,14 +35,14 @@ module CC
       else
         outcomes_file = File.new(File.join(@canvas_resource_dir, CCHelper::LEARNING_OUTCOMES), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::LEARNING_OUTCOMES)
-        document = Builder::XmlMarkup.new(:target=>outcomes_file, :indent=>2)
+        document = Builder::XmlMarkup.new(:target => outcomes_file, :indent => 2)
       end
 
       document.instruct!
       document.learningOutcomes(
-          "xmlns" => CCHelper::CANVAS_NAMESPACE,
-          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |outs_node|
         @exported_outcome_ids = []
 
@@ -62,7 +64,7 @@ module CC
 
     def process_outcome_group(node, group, force_export = false)
       migration_id = create_key(group)
-      node.learningOutcomeGroup(:identifier=>migration_id) do |group_node|
+      node.learningOutcomeGroup(:identifier => migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
         group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
@@ -88,6 +90,7 @@ module CC
       group.child_outcome_links.active.each do |item|
         item = item.content
         next unless force_export || export_object?(item, 'learning_outcomes')
+
         process_learning_outcome(node, item)
       end
     end
@@ -98,7 +101,7 @@ module CC
       add_exported_asset(item)
 
       migration_id = create_key(item)
-      node.learningOutcome(:identifier=>migration_id) do |out_node|
+      node.learningOutcome(:identifier => migration_id) do |out_node|
         out_node.title item.short_description if item.short_description.present?
         out_node.description @html_exporter.html_content(item.description) if item.description.present?
         out_node.calculation_method item.calculation_method if item.calculation_method.present?

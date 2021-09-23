@@ -28,6 +28,7 @@ require "active_support/core_ext/module/aliasing"
 
 module I18nliner
   class HtmlTagsInDefaultTranslationError < ExtractionError; end
+
   class AmbiguousTranslationKeyError < ExtractionError; end
 end
 
@@ -46,11 +47,12 @@ module I18nExtraction::Extensions
 
     def validate_key
       if @scope.root? &&
-        !@meta[:explicit_receiver] &&
-        !@options[:i18nliner_inferred_key] &&
-        key !~ I18nliner::Scope::ABSOLUTE_KEY
+         !@meta[:explicit_receiver] &&
+         !@options[:i18nliner_inferred_key] &&
+         key !~ I18nliner::Scope::ABSOLUTE_KEY
         raise I18nliner::AmbiguousTranslationKeyError.new(@line, @key)
       end
+
       super
     end
   end
@@ -68,7 +70,7 @@ module I18nExtraction::Extensions
       # needs to run RubyParser on the source
       def pattern
         @pattern ||= begin
-          calls = (I18nliner::Extractors::RubyExtractor::TRANSLATE_CALLS + LABEL_CALLS).map{ |c| Regexp.escape(c.to_s) }
+          calls = (I18nliner::Extractors::RubyExtractor::TRANSLATE_CALLS + LABEL_CALLS).map { |c| Regexp.escape(c.to_s) }
           /(^|\W)(#{calls.join('|')})(\W|$)/
         end
       end
@@ -83,7 +85,7 @@ module I18nExtraction::Extensions
       # automagically scope our plugin `-> { t ... }` stuff
       call_scope = @scope
       if exp[1] && exp[1].last == :Plugin && exp[2] == :register &&
-        exp[3] && [:lit, :str].include?(exp[3].sexp_type)
+         exp[3] && [:lit, :str].include?(exp[3].sexp_type)
         call_scope = I18nliner::Scope.new("plugins.#{exp[3].last}")
       end
 
@@ -106,6 +108,7 @@ module I18nExtraction::Extensions
     def extractable_call?(receiver, method)
       return false unless ALL_CALLS.include?(method)
       return false if ALL_CALLS.include?(current_defn)
+
       (receiver.nil? || receiver == :I18n || LABEL_CALLS.include?(method))
     end
 
@@ -165,9 +168,9 @@ module I18nExtraction::Extensions
   # config/initializers/i18n.rb for runtime counterparts
 
   module RubyProcessor
-    STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`.
-      split("\n") - ['OpenStruct', 'Tableless']).
-      map(&:underscore).freeze
+    STI_SUPERCLASSES = (`grep '^class.*<' ./app/models/*rb|grep -v '::'|sed 's~.*< ~~'|sort|uniq`
+      .split("\n") - ['OpenStruct', 'Tableless'])
+                       .map(&:underscore).freeze
 
     def scope_for(filename)
       scope = case filename

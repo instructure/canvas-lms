@@ -31,4 +31,3 @@ describe "/assignments/text_entry_page" do
     expect(response).not_to be_nil
   end
 end
-

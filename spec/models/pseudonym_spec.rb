@@ -21,10 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Pseudonym do
-
   it "should create a new instance given valid attributes" do
     user_model
-    expect{factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes)}.to change(Pseudonym, :count).by(1)
+    expect { factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
   end
 
   it "should allow single character usernames" do
@@ -164,13 +163,13 @@ describe Pseudonym do
       require 'net/ldap'
       user_with_pseudonym(:active_all => true)
       @aac = @pseudonym.account.authentication_providers.create!(
-        :auth_type      => 'ldap',
-        :auth_base      => "ou=people,dc=example,dc=com",
-        :auth_host      => "ldap.example.com",
-        :auth_username  => "cn=query,dc=example,dc=com",
-        :auth_port      => 636,
-        :auth_filter    => "(uid={{login}})",
-        :auth_over_tls  => true
+        :auth_type => 'ldap',
+        :auth_base => "ou=people,dc=example,dc=com",
+        :auth_host => "ldap.example.com",
+        :auth_username => "cn=query,dc=example,dc=com",
+        :auth_port => 636,
+        :auth_filter => "(uid={{login}})",
+        :auth_over_tls => true
       )
     end
 
@@ -181,7 +180,7 @@ describe Pseudonym do
         expect(data[:account]).to eq(@pseudonym.account)
         expect(level).to eq(:warn)
       end.and_call_original
-      expect{ @pseudonym.ldap_bind_result('blech') }.not_to raise_error
+      expect { @pseudonym.ldap_bind_result('blech') }.not_to raise_error
     end
 
     it "passes a success result through" do
@@ -292,7 +291,7 @@ describe Pseudonym do
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
+      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
 
       pseudonym.add_ldap_channel
       u.reload
@@ -321,7 +320,7 @@ describe Pseudonym do
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
+      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
 
       pseudonym.infer_auth_provider(ap)
       pseudonym.add_ldap_channel
@@ -410,13 +409,11 @@ describe Pseudonym do
   end
 
   describe '#verify_unique_sis_user_id' do
-
     it 'is true if there is no sis_user_id' do
       expect(Pseudonym.new.verify_unique_sis_user_id).to be_truthy
     end
 
     describe 'when a pseudonym already exists' do
-
       let(:sis_user_id) { "1234554321" }
 
       before :once do
@@ -436,7 +433,6 @@ describe Pseudonym do
         new_pseudonym.sis_user_id = sis_user_id.to_i
         expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end
-
     end
   end
 
@@ -449,21 +445,29 @@ describe Pseudonym do
     }
     let(:account2) { Account.create! }
 
-    let(:sally) { account_admin_user(
-      user: student_in_course(account: account2).user,
-      account: account1) }
+    let(:sally) {
+      account_admin_user(
+        user: student_in_course(account: account2).user,
+        account: account1
+      )
+    }
 
-    let(:bob) { student_in_course(
-      user: student_in_course(account: account2).user,
-      course: course_factory(account: account1)).user }
+    let(:bob) {
+      student_in_course(
+        user: student_in_course(account: account2).user,
+        course: course_factory(account: account1)
+      ).user
+    }
 
     let(:charlie) { student_in_course(account: account2).user }
 
     let(:alice) {
       account_admin_user_with_role_changes(
-      account: account1,
-      role: custom_account_role('StrongerAdmin', account: account1),
-      role_changes: { view_notifications: true }) }
+        account: account1,
+        role: custom_account_role('StrongerAdmin', account: account1),
+        role_changes: { view_notifications: true }
+      )
+    }
 
     describe ":create" do
       it "should grant admins :create for themselves on the account" do
@@ -669,11 +673,11 @@ describe Pseudonym do
   end
 
   describe ".for_auth_configuration" do
-    let!(:bob){ user_model }
+    let!(:bob) { user_model }
     let!(:new_pseud) { Account.default.pseudonyms.create!(user: bob, unique_id: "BobbyRicky") }
 
     context "with legacy auth types" do
-      let!(:aac){ Account.default.authentication_providers.create!(auth_type: 'ldap') }
+      let!(:aac) { Account.default.authentication_providers.create!(auth_type: 'ldap') }
 
       it "filters down by unique ID" do
         pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
@@ -688,8 +692,7 @@ describe Pseudonym do
     end
 
     context "with contemporary auth types" do
-
-      let!(:aac){ Account.default.authentication_providers.create!(auth_type: 'facebook') }
+      let!(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
 
       before do
         new_pseud.authentication_provider_id = aac.id
@@ -706,7 +709,6 @@ describe Pseudonym do
         expect(pseud).to be_nil
       end
     end
-
   end
 
   it "allows duplicate unique_ids, in different providers" do
@@ -746,7 +748,7 @@ describe Pseudonym do
       wat = " " * 3000
       unique_id = "asdf#{wat}asdf"
       creds = { unique_id: unique_id, password: 'foobar' }
-      expect{ Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
+      expect { Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
     end
 
     it "doesn't find deleted pseudonyms" do

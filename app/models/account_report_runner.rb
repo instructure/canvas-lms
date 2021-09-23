@@ -42,6 +42,7 @@ class AccountReportRunner < ActiveRecord::Base
   def write_rows
     return unless rows
     return if rows.empty?
+
     GuardRail.activate(:primary) do
       self.class.bulk_insert_objects(rows)
       @rows = []
@@ -66,9 +67,9 @@ class AccountReportRunner < ActiveRecord::Base
     self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 
-  scope :in_progress, -> {where(workflow_state: %w(running))}
-  scope :completed, -> {where(workflow_state: %w(completed))}
-  scope :incomplete, -> {where(workflow_state: %w(created running))}
+  scope :in_progress, -> { where(workflow_state: %w(running)) }
+  scope :completed, -> { where(workflow_state: %w(completed)) }
+  scope :incomplete, -> { where(workflow_state: %w(created running)) }
 
   def delete_account_report_rows
     cleanup = self.account_report_rows.limit(10_000)

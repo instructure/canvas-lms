@@ -93,7 +93,6 @@ module Lti::Ims
       render json: Lti::Ims::ResultsSerializer.new(result, line_item_url).as_json, content_type: MIME_TYPE
     end
 
-
     private
 
     def scopes_matcher

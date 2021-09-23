@@ -25,9 +25,9 @@ describe Types::GroupSetType do
   before(:once) do
     course_with_student(active_all: true)
     @group_set = @course.group_categories.create! name: "asdf",
-      self_signup: "restricted",
-      auto_leader: "random",
-      sis_source_id: "sisSet"
+                                                  self_signup: "restricted",
+                                                  auto_leader: "random",
+                                                  sis_source_id: "sisSet"
     @group = @group_set.groups.create! name: "group 1", context: @course
     @membership = @group.add_user(@student)
   end
@@ -63,8 +63,8 @@ describe Types::GroupSetType do
   end
 
   context "sis field" do
-    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
-    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false }) }
 
     it "returns sis_id if you have read_sis permissions" do
       tester = GraphQLTypeTester.new(@group_set, current_user: read_admin)

@@ -37,7 +37,7 @@ RSpec.describe CourseScoreStatistic, type: :model do
     let(:course_score_statistic) { CourseScoreStatistic.new(course_id: 123, average: 12.23.to_d, score_count: 2) }
 
     it "returns the data in the grades presenter expected shape and keys" do
-      expect(course_score_statistic.grades_presenter_hash).to eq({ score: 12.23.to_d, students: 2})
+      expect(course_score_statistic.grades_presenter_hash).to eq({ score: 12.23.to_d, students: 2 })
     end
   end
 end

@@ -64,6 +64,7 @@ module CC::Exporter::Epub::Converters
 
     def update_syllabus(content)
       return unless content[:identifier]
+
       @course[:syllabus] << {
         title: content[:title],
         identifier: content[:identifier],
@@ -74,12 +75,12 @@ module CC::Exporter::Epub::Converters
 
     def organize_syllabus
       due_anytime, has_due_date = @course[:syllabus].partition { |item| item[:due_at].nil? }
-      @course[:syllabus] = has_due_date.sort_by{|item| item[:due_at]} + due_anytime
+      @course[:syllabus] = has_due_date.sort_by { |item| item[:due_at] } + due_anytime
     end
 
-    def include_item?(meta_node, workflow_state='published')
+    def include_item?(meta_node, workflow_state = 'published')
       get_node_val(meta_node, 'workflow_state') == workflow_state &&
-      !get_bool_val(meta_node, 'module_locked')
+        !get_bool_val(meta_node, 'module_locked')
     end
 
     # exports the package into the intermediary json

@@ -56,7 +56,7 @@ describe QuizzesNext::ExportService do
     end
 
     it "filters to selected assignments with selective exports" do
-      export_opts = {:selective => true, :exported_assets => ['assignment_42', 'wiki_page_84']}
+      export_opts = { :selective => true, :exported_assets => ['assignment_42', 'wiki_page_84'] }
       expect(QuizzesNext::Service).to receive(:active_lti_assignments_for_course).with(course, selected_assignment_ids: ["42"]).and_return([])
       ExportService.begin_export(course, export_opts)
     end
@@ -80,8 +80,8 @@ describe QuizzesNext::ExportService do
         {
           "original_course_uuid": 1234,
           "assignments": [
-            {"original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0, "original_assignment_id": 0},
-            {"original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1, "original_assignment_id": 1}
+            { "original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0, "original_assignment_id": 0 },
+            { "original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1, "original_assignment_id": 1 }
           ]
         }
       )

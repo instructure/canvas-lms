@@ -54,7 +54,7 @@ describe Canvas::Migration::MigratorHelper do
       it 'returns nothing if there are no tool_profiles' do
         helper = subject.new
         helper.course = {}
-        helper.settings = {content_migration: content_migration}
+        helper.settings = { content_migration: content_migration }
         helper.overview()
         expect(helper.overview[:tool_profiles]).to be_nil
       end
@@ -62,7 +62,7 @@ describe Canvas::Migration::MigratorHelper do
       it 'returns a tool profile overview if there is a tool_profile' do
         helper = subject.new
         helper.course = course
-        helper.settings = {content_migration: content_migration}
+        helper.settings = { content_migration: content_migration }
         helper.overview()
         expect(helper.overview[:tool_profiles]).to match_array [
           {
@@ -76,7 +76,7 @@ describe Canvas::Migration::MigratorHelper do
         helper = subject.new
         course[:tool_profiles].first['tool_profile']['product_instance'] = {}
         helper.course = course
-        helper.settings = {content_migration: content_migration}
+        helper.settings = { content_migration: content_migration }
         helper.overview()
         expect(helper.overview[:tool_profiles]).to match_array []
       end
@@ -107,7 +107,7 @@ describe Canvas::Migration::MigratorHelper do
         it 'does not generate learning_outcome_groups overview section' do
           helper = subject.new
           helper.course = course
-          helper.settings = {content_migration: content_migration}
+          helper.settings = { content_migration: content_migration }
           overview = helper.overview
           expect(overview).not_to have_key(:learning_outcome_groups)
         end
@@ -121,7 +121,7 @@ describe Canvas::Migration::MigratorHelper do
         it 'generates learning_outcome_groups overview section' do
           helper = subject.new
           helper.course = course
-          helper.settings = {content_migration: content_migration}
+          helper.settings = { content_migration: content_migration }
           overview = helper.overview
           groups = overview[:learning_outcome_groups]
           outcomes = overview[:learning_outcomes]

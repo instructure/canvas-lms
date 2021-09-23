@@ -55,10 +55,10 @@ describe ImmersiveReaderController do
     get 'authenticate'
     expect(WebMock).to have_requested(:post, 'https://login.windows.net/faketenantid/oauth2/token')
       .with(
-      body:
-        'grant_type=client_credentials&client_id=fakeclientid&client_secret=fakesecret&resource=https%3A%2F%2Fcognitiveservices.azure.com%2F',
-      headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
-    )
+        body:
+          'grant_type=client_credentials&client_id=fakeclientid&client_secret=fakesecret&resource=https%3A%2F%2Fcognitiveservices.azure.com%2F',
+        headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
+      )
       .once
   end
 end

@@ -28,7 +28,7 @@ class Group < ActiveRecord::Base
   validates :context_id, :context_type, :account_id, :root_account_id, :workflow_state, :uuid, presence: true
   validates_allowed_transitions :is_public, false => true
 
-  validates :sis_source_id, uniqueness: {scope: :root_account}, allow_nil: true
+  validates :sis_source_id, uniqueness: { scope: :root_account }, allow_nil: true
 
   # use to skip queries in can_participate?, called by policy block
   attr_accessor :can_participate
@@ -55,7 +55,7 @@ class Group < ActiveRecord::Base
   has_many :all_attachments, :as => 'context', :class_name => 'Attachment'
   has_many :folders, -> { order('folders.name') }, as: :context, inverse_of: :context, dependent: :destroy
   has_many :active_folders, -> { where("folders.workflow_state<>'deleted'").order('folders.name') }, class_name: 'Folder', as: :context, inverse_of: :context
-  has_many :submissions_folders, -> { where.not(:folders => {:submission_context_code => nil}) }, as: :context, inverse_of: :context, class_name: 'Folder'
+  has_many :submissions_folders, -> { where.not(:folders => { :submission_context_code => nil }) }, as: :context, inverse_of: :context, class_name: 'Folder'
   has_many :collaborators
   has_many :external_feeds, :as => :context, :inverse_of => :context, :dependent => :destroy
   has_many :messages, :as => :context, :inverse_of => :context, :dependent => :destroy
@@ -95,6 +95,7 @@ class Group < ActiveRecord::Base
 
   validates_each :max_membership do |record, attr, value|
     next if value.nil?
+
     record.errors.add attr, t(:greater_than_1, "Must be greater than 1") unless value.to_i > 1
   end
 
@@ -104,8 +105,9 @@ class Group < ActiveRecord::Base
     end
   end
 
-  def includes_user?(user, membership_scope=group_memberships)
+  def includes_user?(user, membership_scope = group_memberships)
     return false if user.nil? || user.new_record?
+
     membership_scope.where(user_id: user).exists?
   end
 
@@ -113,7 +115,7 @@ class Group < ActiveRecord::Base
 
   def participating_users(user_ids = nil)
     user_ids ?
-      participating_users_association.where(:id =>user_ids) :
+      participating_users_association.where(:id => user_ids) :
       participating_users_association
   end
 
@@ -121,40 +123,44 @@ class Group < ActiveRecord::Base
     users = participating_users(user_ids)
     users = users.order_by_sortable_name if sort
     return users unless !include_inactive_users && (self.context.is_a? Course)
+
     context.participating_users(users.pluck(:id))
   end
 
   def all_real_students
     return self.context.all_real_students.where(users: { id: group_memberships.select(:user_id) }) if self.context.respond_to? "all_real_students"
+
     self.users
   end
 
   def all_real_student_enrollments
     return self.context.all_real_student_enrollments.where(user_id: group_memberships.select(:user_id)) if self.context.respond_to? "all_real_student_enrollments"
+
     self.group_memberships
   end
 
   def wiki
     return super if wiki_id
+
     Wiki.wiki_for_context(self)
   end
 
   def auto_accept?
     self.group_category &&
-    self.group_category.allows_multiple_memberships? &&
-    self.join_level == 'parent_context_auto_join'
+      self.group_category.allows_multiple_memberships? &&
+      self.join_level == 'parent_context_auto_join'
   end
 
   def allow_join_request?
     self.group_category &&
-    self.group_category.allows_multiple_memberships? &&
-    ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
+      self.group_category.allows_multiple_memberships? &&
+      ['parent_context_auto_join', 'parent_context_request'].include?(self.join_level)
   end
 
   def allow_self_signup?(user)
     self.group_category &&
-    (self.group_category.unrestricted_self_signup? ||
-      (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
+      (self.group_category.unrestricted_self_signup? ||
+        (self.group_category.restricted_self_signup? && self.has_common_section_with_user?(user)))
   end
 
   def full?
@@ -189,7 +195,7 @@ class Group < ActiveRecord::Base
     context.respond_to?(:allow_student_forum_attachments) && context.allow_student_forum_attachments
   end
 
-  def participants(opts={})
+  def participants(opts = {})
     users = participating_users.distinct.all
     if opts[:include_observers] && self.context.is_a?(Course)
       (users + User.observing_students_in_course(users, self.context)).flatten.uniq
@@ -208,6 +214,7 @@ class Group < ActiveRecord::Base
 
   def context_available?
     return false unless self.context
+
     case self.context
     when Course
       self.context.available? && (!self.context.respond_to?(:concluded?) || !self.context.concluded?)
@@ -217,7 +224,7 @@ class Group < ActiveRecord::Base
   end
 
   def appointment_context_codes
-    {:primary => [context_string], :secondary => [group_category.asset_string]}
+    { :primary => [context_string], :secondary => [group_category.asset_string] }
   end
 
   def membership_for_user(user)
@@ -238,6 +245,7 @@ class Group < ActiveRecord::Base
     if self.group_memberships.loaded?
       return self.group_memberships.to_a.find { |gm| gm.accepted? && gm.user_id == user.id && gm.moderator }
     end
+
     self.participating_group_memberships.moderators.where(user_id: user).first
   end
 
@@ -259,12 +267,13 @@ class Group < ActiveRecord::Base
   end
 
   def self.find_all_by_context_code(codes)
-    ids = codes.map{|c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }.compact
+    ids = codes.map { |c| c.match(/\Agroup_(\d+)\z/)[1] rescue nil }.compact
     Group.find(ids)
   end
 
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
+
     sanitize_sql([<<~SQL, groups])
       NOT EXISTS (SELECT * FROM #{GroupMembership.quoted_table_name} gm
       WHERE gm.user_id = users.id AND
@@ -320,20 +329,21 @@ class Group < ActiveRecord::Base
       entry.title     = self.name
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate',
+      entry.links << Atom::Link.new(:rel => 'alternate',
                                     :href => "/groups/#{self.id}")
     end
   end
 
   # this method is idempotent
-  def add_user(user, new_record_state=nil, moderator=nil)
+  def add_user(user, new_record_state = nil, moderator = nil)
     return nil if !user
+
     attrs = { :user => user, :moderator => !!moderator }
     new_record_state ||= case self.join_level
-      when 'invitation_only'          then 'invited'
-      when 'parent_context_request'   then 'requested'
-      when 'parent_context_auto_join' then 'accepted'
-      end
+                         when 'invitation_only'          then 'invited'
+                         when 'parent_context_request'   then 'requested'
+                         when 'parent_context_auto_join' then 'accepted'
+                         end
     attrs[:workflow_state] = new_record_state if new_record_state
 
     member = nil
@@ -374,6 +384,7 @@ class Group < ActiveRecord::Base
 
   def bulk_add_users_to_group(users, options = {})
     return if users.empty?
+
     user_ids = users.map(&:id)
     old_group_memberships = self.group_memberships.where("user_id IN (?)", user_ids).to_a
     bulk_insert_group_memberships(users, options)
@@ -382,20 +393,21 @@ class Group < ActiveRecord::Base
     new_group_memberships.sort_by!(&:user_id)
     users.sort_by!(&:id)
     User.clear_cache_keys(user_ids, :groups)
-    users.each {|user| clear_permissions_cache(user) }
+    users.each { |user| clear_permissions_cache(user) }
 
     if self.context_available?
       notification_name = options[:notification_name] || "New Context Group Membership"
       notification = BroadcastPolicy.notification_finder.by_name(notification_name)
 
       users.each_with_index do |user, index|
-        BroadcastPolicy.notifier.delay(priority: Delayed::LOW_PRIORITY).
-          send_notification(
-            new_group_memberships[index],
-            notification_name.parameterize.underscore.to_sym,
-            notification,
-            [user],
-            broadcast_data)
+        BroadcastPolicy.notifier.delay(priority: Delayed::LOW_PRIORITY)
+                       .send_notification(
+                         new_group_memberships[index],
+                         notification_name.parameterize.underscore.to_sym,
+                         notification,
+                         [user],
+                         broadcast_data
+                       )
       end
     end
     new_group_memberships
@@ -404,15 +416,15 @@ class Group < ActiveRecord::Base
   def bulk_insert_group_memberships(users, options = {})
     current_time = Time.now
     options = {
-        :group_id => self.id,
-        :workflow_state => 'accepted',
-        :moderator => false,
-        :created_at => current_time,
-        :updated_at => current_time,
-        :root_account_id => self.root_account_id
+      :group_id => self.id,
+      :workflow_state => 'accepted',
+      :moderator => false,
+      :created_at => current_time,
+      :updated_at => current_time,
+      :root_account_id => self.root_account_id
     }.merge(options)
-    GroupMembership.bulk_insert(users.map{ |user|
-      options.merge({:user_id => user.id, :uuid => CanvasSlug.generate_securish_uuid})
+    GroupMembership.bulk_insert(users.map { |user|
+      options.merge({ :user_id => user.id, :uuid => CanvasSlug.generate_securish_uuid })
     })
   end
 
@@ -433,16 +445,18 @@ class Group < ActiveRecord::Base
         invitees << User.where(id: key.to_i).first if val != '0'
       end
     end
-    invitees.compact.map{|i| self.invite_user(i) }.compact
+    invitees.compact.map { |i| self.invite_user(i) }.compact
   end
 
   def peer_groups
     return [] if !self.context || !self.group_category || self.group_category.allows_multiple_memberships?
+
     self.group_category.groups.where("id<>?", self).to_a
   end
 
   attr_accessor :merge_mappings
   attr_accessor :merge_results
+
   def merge_mapped_id(*args)
     nil
   end
@@ -497,21 +511,20 @@ class Group < ActiveRecord::Base
   # if you modify this set_policy block, note that we've denormalized this
   # permission check for efficiency -- see User#cached_contexts
   set_policy do
-
     # Participate means the user is connected to the group somehow and can be
     given { |user| user && can_participate?(user) && self.has_member?(user) }
     can :participate and
-    can :manage_calendar and
-    can :manage_content and
-    can :manage_files_add and
-    can :manage_files_edit and
-    can :manage_files_delete and
-    can :manage_wiki_create and
-    can :manage_wiki_delete and
-    can :manage_wiki_update and
-    can :post_to_forum and
-    can :create_collaborations and
-    can :create_forum
+      can :manage_calendar and
+      can :manage_content and
+      can :manage_files_add and
+      can :manage_files_edit and
+      can :manage_files_delete and
+      can :manage_wiki_create and
+      can :manage_wiki_delete and
+      can :manage_wiki_update and
+      can :post_to_forum and
+      can :create_collaborations and
+      can :create_forum
 
     # Course-level groups don't grant any permissions besides :participate (because for a teacher to add a student to a
     # group, the student must be able to :participate, and the teacher should be able to add students while the course
@@ -522,13 +535,15 @@ class Group < ActiveRecord::Base
     use_additional_policy do
       given { |user| user && self.has_member?(user) }
       can :read_forum and
-      can :read and
-      can :read_announcements and
-      can :read_roster and
-      can :view_unpublished_items
+        can :read and
+        can :read_announcements and
+        can :read_roster and
+        can :view_unpublished_items
 
-      given { |user, session| user && self.has_member?(user) &&
-        (!self.context || self.context.is_a?(Account) || self.context.grants_any_right?(user, session, :send_messages, :send_messages_all)) }
+      given { |user, session|
+        user && self.has_member?(user) &&
+          (!self.context || self.context.is_a?(Account) || self.context.grants_any_right?(user, session, :send_messages, :send_messages_all))
+      }
       can :send_messages and can :send_messages_all
 
       # if I am a member of this group and I can moderate_forum in the group's context
@@ -538,12 +553,12 @@ class Group < ActiveRecord::Base
 
       given { |user| user && self.has_moderator?(user) }
       can :delete and
-      can :manage and
-      can :manage_admin_users and
-      can :allow_course_admin_actions and
-      can :manage_students and
-      can :moderate_forum and
-      can :update
+        can :manage and
+        can :manage_admin_users and
+        can :allow_course_admin_actions and
+        can :manage_students and
+        can :moderate_forum and
+        can :update
 
       given { |user| user && self.leader == user }
       can :update
@@ -566,7 +581,7 @@ class Group < ActiveRecord::Base
       can :create and can :create_collaborations and can :delete and can :manage and
         can :manage_admin_users and can :allow_course_admin_actions and can :manage_calendar and
         can :manage_content and can :manage_files_add and can :manage_files_edit and
-        can :manage_files_delete and can :manage_students and can :manage_wiki_create and 
+        can :manage_files_delete and can :manage_students and can :manage_wiki_create and
         can :manage_wiki_delete and can :manage_wiki_update and can :moderate_forum and
         can :post_to_forum and can :create_forum and can :read and can :read_forum and
         can :read_announcements and can :read_roster and can :send_messages and
@@ -610,30 +625,30 @@ class Group < ActiveRecord::Base
       can :read and can :read_forum and can :read_announcements and can :read_roster
 
       # Join is participate + the group being in a state that allows joining directly (free_association)
-      given { |user| user && can_participate?(user) && free_association?(user)}
+      given { |user| user && can_participate?(user) && free_association?(user) }
       can :join and can :read_roster
 
       given { |user| user && (self.group_category.try(:allows_multiple_memberships?) || allow_self_signup?(user)) }
       can :leave
 
-      given {|user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences)}
+      given { |user, session| self.grants_right?(user, session, :manage_content) && self.context && self.context.grants_right?(user, session, :create_conferences) }
       can :create_conferences
 
-      given {|user, session| self.context && self.context.grants_right?(user, session, :read_as_admin)}
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_as_admin) }
       can :read_as_admin
 
-      given {|user, session| self.context && self.context.grants_right?(user, session, :read_sis)}
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_sis) }
       can :read_sis
 
-      given {|user, session| self.context && self.context.grants_right?(user, session, :view_user_logins)}
+      given { |user, session| self.context && self.context.grants_right?(user, session, :view_user_logins) }
       can :view_user_logins
 
-      given {|user, session| self.context && self.context.grants_right?(user, session, :read_email_addresses)}
+      given { |user, session| self.context && self.context.grants_right?(user, session, :read_email_addresses) }
       can :read_email_addresses
     end
   end
 
-  def users_visible_to(user, opts={})
+  def users_visible_to(user, opts = {})
     return users.none unless grants_right?(user, :read)
 
     opts[:include_inactive] ? users : participating_users_in_context
@@ -649,6 +664,7 @@ class Group < ActiveRecord::Base
     elsif self.context.is_a?(Account)
       return self.context.root_account.user_account_associations.where(:user_id => user.id).exists?
     end
+
     return false
   end
 
@@ -662,6 +678,7 @@ class Group < ActiveRecord::Base
 
   def user_can_manage_own_discussion_posts?(user)
     return true unless self.context.is_a?(Course)
+
     context.user_can_manage_own_discussion_posts?(user)
   end
 
@@ -671,7 +688,7 @@ class Group < ActiveRecord::Base
 
   def members_json_cached
     Rails.cache.fetch(['group_members_json', self].cache_key) do
-      self.users.map{ |u| u.group_member_json(self.context) }
+      self.users.map { |u| u.group_member_json(self.context) }
     end
   end
 
@@ -704,7 +721,7 @@ class Group < ActiveRecord::Base
   TAB_HOME, TAB_PAGES, TAB_PEOPLE, TAB_DISCUSSIONS, TAB_FILES,
     TAB_CONFERENCES, TAB_ANNOUNCEMENTS, TAB_PROFILE, TAB_SETTINGS, TAB_COLLABORATIONS,
     TAB_COLLABORATIONS_NEW = *1..20
-  def tabs_available(user=nil, opts={})
+  def tabs_available(user = nil, opts = {})
     available_tabs = [
       { :id => TAB_HOME,          :label => t("#group.tabs.home", "Home"), :css_class => 'home', :href => :group_path },
       { :id => TAB_ANNOUNCEMENTS, :label => t('#tabs.announcements', "Announcements"), :css_class => 'announcements', :href => :group_announcements_path },
@@ -741,7 +758,7 @@ class Group < ActiveRecord::Base
     self.write_attribute(:category, self.group_category && self.group_category.name)
   end
 
-  def as_json(options=nil)
+  def as_json(options = nil)
     json = super(options)
     if json && json['group']
       # remove anything coming automatically from deprecated db column
@@ -756,13 +773,14 @@ class Group < ActiveRecord::Base
 
   def has_common_section?
     self.context && self.context.is_a?(Course) &&
-    self.context.course_sections.active.any?{ |section| section.common_to_users?(self.users) }
+      self.context.course_sections.active.any? { |section| section.common_to_users?(self.users) }
   end
 
   def has_common_section_with_user?(user)
     return false unless self.context && self.context.is_a?(Course)
+
     users = self.users.where(id: self.context.enrollments.active_or_pending.select(:user_id)) + [user]
-    self.context.course_sections.active.any?{ |section| section.common_to_users?(users) }
+    self.context.course_sections.active.any? { |section| section.common_to_users?(users) }
   end
 
   def self.join_levels
@@ -783,6 +801,7 @@ class Group < ActiveRecord::Base
   def feature_enabled?(feature)
     # shouldn't matter, but most specs create anonymous (contextless) groups :(
     return false if context.nil?
+
     context.feature_enabled?(feature)
   end
 
@@ -811,6 +830,7 @@ class Group < ActiveRecord::Base
   def sortable_name
     name
   end
+
   ##
   # Returns a boolean describing if the user passed in has marked this group
   # as a favorite.
@@ -820,9 +840,10 @@ class Group < ActiveRecord::Base
 
   def submissions_folder(_course = nil)
     return @submissions_folder if @submissions_folder
+
     Folder.unique_constraint_retry do
       @submissions_folder = self.folders.where(parent_folder_id: Folder.root_folders(self).first, submission_context_code: 'root')
-        .first_or_create!(name: I18n.t('Submissions'))
+                                .first_or_create!(name: I18n.t('Submissions'))
     end
   end
 

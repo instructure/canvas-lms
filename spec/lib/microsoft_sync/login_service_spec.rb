@@ -53,9 +53,9 @@ describe MicrosoftSync::LoginService do
         before do
           allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
           allow(Canvas::DynamicSettings).to receive(:find).with('microsoft-sync').and_return({
-            'client-id' => 'theclientid',
-            'client-secret' => 'thesecret'
-          })
+                                                                                               'client-id' => 'theclientid',
+                                                                                               'client-secret' => 'thesecret'
+                                                                                             })
 
           WebMock.stub_request(
             :post, 'https://login.microsoftonline.com/mytenant/oauth2/v2.0/token'
@@ -69,7 +69,7 @@ describe MicrosoftSync::LoginService do
           ).and_return(
             status: response_status,
             body: response_body.to_json,
-            headers: {'Content-type' => 'application/json'},
+            headers: { 'Content-type' => 'application/json' },
           )
         end
 
@@ -85,7 +85,7 @@ describe MicrosoftSync::LoginService do
             subject
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.login_service',
-              tags: {status_code: '200'}
+              tags: { status_code: '200' }
             )
           end
         end
@@ -101,7 +101,7 @@ describe MicrosoftSync::LoginService do
             )
             expect(InstStatsd::Statsd).to have_received(:increment).with(
               'microsoft_sync.login_service',
-              tags: {status_code: '401'}
+              tags: { status_code: '401' }
             )
           end
         end
@@ -110,12 +110,12 @@ describe MicrosoftSync::LoginService do
           let(:response_status) { 400 }
           let(:response_body) do
             {
-              "error"=>"invalid_request",
-               "error_description"=>
+              "error" => "invalid_request",
+              "error_description" =>
                  "AADSTS90002: Tenant 'a.b.c' not found. This may happen if there are no active subscriptions for the tenant. Check to make sure you have the correct tenant ID. Check with your subscription administrator.\r\nTrace ID: etc.",
-               "error_codes"=>[90002],
-               "timestamp"=>"2021-04-28 23:20:12Z",
-               "error_uri"=>"https://login.microsoftonline.com/error?code=90002"
+              "error_codes" => [90002],
+              "timestamp" => "2021-04-28 23:20:12Z",
+              "error_uri" => "https://login.microsoftonline.com/error?code=90002"
             }
           end
 
@@ -129,7 +129,7 @@ describe MicrosoftSync::LoginService do
         context '(400 status code, Tenant not valid domain)' do
           let(:response_status) { 400 }
           let(:response_body) do
-            {"error_description"=>"AADSTS900023: Specified tenant identifier '---' is neither a valid DNS name, nor a valid external domain.\r\nTrace ID: etc", "error_codes"=>[900023], "timestamp"=>"2021-04-28 23:20:23Z", "error_uri"=>"https://login.microsoftonline.com/error?code=900023"}
+            { "error_description" => "AADSTS900023: Specified tenant identifier '---' is neither a valid DNS name, nor a valid external domain.\r\nTrace ID: etc", "error_codes" => [900023], "timestamp" => "2021-04-28 23:20:23Z", "error_uri" => "https://login.microsoftonline.com/error?code=900023" }
           end
 
           it 'raises a TenantDoesNotExist (graceful cancel error)' do
@@ -141,7 +141,7 @@ describe MicrosoftSync::LoginService do
 
         context '(400 status code, other error message)' do
           let(:response_status) { 400 }
-          let(:response_body) { {"error_description" => "foo"} }
+          let(:response_body) { { "error_description" => "foo" } }
 
           it 'raises an HTTPInvalidStatus' do
             expect { subject }.to raise_error(
@@ -159,7 +159,7 @@ describe MicrosoftSync::LoginService do
           expect { subject }.to raise_error(error)
           expect(InstStatsd::Statsd).to have_received(:increment).with(
             'microsoft_sync.login_service',
-            tags: {status_code: 'error'}
+            tags: { status_code: 'error' }
           )
         end
       end
@@ -171,8 +171,8 @@ describe MicrosoftSync::LoginService do
       it 'caches the token until the expiry specified by Microsoft, minus a buffer time' do
         enable_cache do
           expect(described_class).to receive(:new_token).once.with('some_tenant').and_return({
-            'expires_in' => specified_expiry, 'access_token' => 'firsttoken'
-          })
+                                                                                               'expires_in' => specified_expiry, 'access_token' => 'firsttoken'
+                                                                                             })
 
           expect(described_class.token('some_tenant')).to eq('firsttoken')
           Timecop.freeze((specified_expiry - 16).seconds.from_now) do
@@ -180,8 +180,8 @@ describe MicrosoftSync::LoginService do
           end
 
           expect(described_class).to receive(:new_token).once.with('some_tenant').and_return({
-            'expires_in' => specified_expiry, 'access_token' => 'secondtoken'
-          })
+                                                                                               'expires_in' => specified_expiry, 'access_token' => 'secondtoken'
+                                                                                             })
 
           Timecop.freeze((specified_expiry - 1).seconds.from_now) do
             expect(described_class.token('some_tenant')).to eq('secondtoken')
@@ -205,11 +205,11 @@ describe MicrosoftSync::LoginService do
     it 'caches per tenant' do
       enable_cache do
         expect(described_class).to receive(:new_token).once.with('some_tenant').and_return({
-          'expires_in' => 123, 'access_token' => 'firsttoken'
-        })
+                                                                                             'expires_in' => 123, 'access_token' => 'firsttoken'
+                                                                                           })
         expect(described_class).to receive(:new_token).once.with('another_tenant').and_return({
-          'expires_in' => 123, 'access_token' => 'secondtoken'
-        })
+                                                                                                'expires_in' => 123, 'access_token' => 'secondtoken'
+                                                                                              })
         expect(described_class.token('some_tenant')).to eq('firsttoken')
         expect(described_class.token('some_tenant')).to eq('firsttoken')
         expect(described_class.token('another_tenant')).to eq('secondtoken')

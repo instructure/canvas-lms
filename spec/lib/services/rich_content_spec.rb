@@ -34,7 +34,6 @@ module Services
     end
 
     describe ".env_for" do
-
       it "fills out host values when enabled" do
         env = described_class.env_for
         expect(env[:RICH_CONTENT_APP_HOST]).to eq("rce-app")
@@ -46,9 +45,8 @@ module Services
         ctx = double("ctx", grants_right?: true)
         jwt = double("jwt")
         allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(domain, user,
-          include(workflows: [:rich_content, :ui],
-            context: ctx)
-        ).and_return(jwt)
+                                                                        include(workflows: [:rich_content, :ui],
+                                                                                context: ctx)).and_return(jwt)
         env = described_class.env_for(user: user, domain: domain, context: ctx)
         expect(env[:JWT]).to eql(jwt)
       end

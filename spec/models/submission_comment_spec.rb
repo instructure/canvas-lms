@@ -34,7 +34,7 @@ RSpec.describe SubmissionComment do
     @submission = @assignment.submit_homework(@user)
   end
 
-  let(:valid_attributes) {{ comment: "some comment" }}
+  let(:valid_attributes) { { comment: "some comment" } }
 
   it "creates a new instance given valid attributes" do
     expect(@submission.submission_comments.create!(valid_attributes)).to be_persisted
@@ -296,14 +296,14 @@ This text has a http://www.google.com link in it...
       before(:once) do
         @assignment.update_attribute(:anonymous_peer_reviews, true)
         @reviewer_comment = @submission.add_comment({
-          author: @student2,
-          comment: "My peer review comment."
-        })
+                                                      author: @student2,
+                                                      comment: "My peer review comment."
+                                                    })
 
         @teacher_comment = @submission.add_comment({
-          author: @teacher,
-          comment: "My teacher review comment."
-        })
+                                                     author: @teacher,
+                                                     comment: "My teacher review comment."
+                                                   })
       end
 
       it "should mark submission comment as anonymous" do
@@ -364,13 +364,12 @@ This text has a http://www.google.com link in it...
         submission.reload.posted?
       }.from(false).to(true)
     end
-
   end
 
   describe "read/unread state" do
     it "should be unread after submission is commented on by teacher" do
       expect {
-        @comment = @submission.submission_comments.create!(valid_attributes.merge({author: @teacher}))
+        @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
       }.to change(ContentParticipation, :count).by(1)
       expect(ContentParticipation.where(user_id: @student).first).to be_unread
       expect(@submission.unread?(@student)).to be_truthy
@@ -378,7 +377,7 @@ This text has a http://www.google.com link in it...
 
     it "should be read after submission is commented on by self" do
       expect {
-        @comment = @submission.submission_comments.create!(valid_attributes.merge({author: @student}))
+        @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
       }.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to be_truthy
     end
@@ -529,8 +528,8 @@ This text has a http://www.google.com link in it...
 
   describe 'scope: published' do
     before(:once) do
-      @published_comment = @submission.submission_comments.create!(valid_attributes.merge({draft: false}))
-      @draft_comment = @submission.submission_comments.create!(valid_attributes.merge({draft: true}))
+      @published_comment = @submission.submission_comments.create!(valid_attributes.merge({ draft: false }))
+      @draft_comment = @submission.submission_comments.create!(valid_attributes.merge({ draft: true }))
     end
 
     it 'does not return the draft comment' do
@@ -549,9 +548,9 @@ This text has a http://www.google.com link in it...
         @second_teacher = @user
 
         @submission_comment = @submission.submission_comments.create!(valid_attributes.merge({
-          draft: true,
-          author: @teacher
-        }))
+                                                                                               draft: true,
+                                                                                               author: @teacher
+                                                                                             }))
       end
 
       it 'can be updated by the teacher who created it' do
@@ -618,9 +617,9 @@ This text has a http://www.google.com link in it...
       before(:once) do
         @submission.submission_comments.create!(valid_attributes)
         @submission_comment = @submission.submission_comments.create!(valid_attributes.merge({
-          draft: true,
-          author: @teacher
-        }))
+                                                                                               draft: true,
+                                                                                               author: @teacher
+                                                                                             }))
       end
 
       it "is not reflected in the submission's submission_comments_count" do
@@ -631,8 +630,8 @@ This text has a http://www.google.com link in it...
         @submission_comment.draft = false
 
         expect { @submission_comment.save }.to(
-          change { @submission_comment.submission.reload.submission_comments_count }.
-            from(1).to(2)
+          change { @submission_comment.submission.reload.submission_comments_count }
+            .from(1).to(2)
         )
       end
     end
@@ -701,8 +700,8 @@ This text has a http://www.google.com link in it...
   describe 'audit event logging' do
     before(:once) { @assignment.update!(anonymous_grading: true, grader_count: 2) }
     it 'creates exactly one AnonymousOrModerationEvent on creation' do
-      expect { @submission.submission_comments.create!(author: @student, anonymous: false) }.
-        to change { AnonymousOrModerationEvent.count }.by(1)
+      expect { @submission.submission_comments.create!(author: @student, anonymous: false) }
+        .to change { AnonymousOrModerationEvent.count }.by(1)
     end
 
     it 'on creation of the comment, the payload of the event includes boolean values that were set to false' do
@@ -719,7 +718,7 @@ This text has a http://www.google.com link in it...
 
     it "does not create an event when no updating_user present" do
       comment = @submission.submission_comments.create!(author: @student)
-      expect{ comment.update!(comment: "changing the comment!") }.not_to change{ AnonymousOrModerationEvent.count }
+      expect { comment.update!(comment: "changing the comment!") }.not_to change { AnonymousOrModerationEvent.count }
     end
   end
 
@@ -785,8 +784,8 @@ This text has a http://www.google.com link in it...
     end
 
     it "updates participation for an automatically posted assignment" do
-      expect(ContentParticipation).to receive(:create_or_update).
-        with({content: @submission, user: @submission.user, workflow_state: "unread"})
+      expect(ContentParticipation).to receive(:create_or_update)
+        .with({ content: @submission, user: @submission.user, workflow_state: "unread" })
       @comment = @submission.add_comment(author: @teacher, comment: "some comment")
     end
   end

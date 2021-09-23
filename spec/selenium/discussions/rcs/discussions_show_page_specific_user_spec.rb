@@ -23,17 +23,19 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:student_topic) { course.discussion_topics.create!(user: student, title: 'student topic title', message: 'student topic message') }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
-  let(:assignment) { course.assignments.create!(
+  let(:assignment) {
+    course.assignments.create!(
       name: 'assignment',
-      #submission_types: 'discussion_topic',
+      # submission_types: 'discussion_topic',
       assignment_group: assignment_group
-  ) }
+    )
+  }
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: 'assignment topic title',
@@ -146,21 +148,20 @@ describe "discussions" do
       let(:topic) { teacher_topic }
 
       before(:each) do
-
         user_session(teacher)
       end
 
       it "should create a group discussion", priority: "1", test_id: 150473 do
         group
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#add_discussion').click}
+        expect_new_page_load { f('#add_discussion').click }
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         f('#has_group_category').click
         drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
         expect(drop_down).to include('category 1')
         click_option('#assignment_group_category_id', @category1.name)
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
                                                   " each group has its own conversation for this topic."\
                                                   " Here are the ones you have access to:\nsome group")
@@ -169,7 +170,7 @@ describe "discussions" do
       it "should create a graded discussion", priority: "1", test_id: 150477 do
         assignment_group
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#add_discussion').click}
+        expect_new_page_load { f('#add_discussion').click }
         f('#discussion-title').send_keys('New Discussion')
         type_in_tiny 'textarea[name=message]', 'Discussion topic message'
         expect(f('#availability_options')).to be_displayed
@@ -179,7 +180,7 @@ describe "discussions" do
         f('#discussion_topic_assignment_points_possible').send_keys('10')
         wait_for_ajaximations
         click_option('#assignment_group_id', assignment_group.name)
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
       end
 
@@ -200,7 +201,7 @@ describe "discussions" do
         drop_down = get_options('#assignment_group_category_id').map(&:text).map(&:strip)
         expect(drop_down).to include('category 1')
         click_option('#assignment_group_category_id', @category1.name)
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
         expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
         " each group has its own conversation for this topic."\
@@ -210,12 +211,12 @@ describe "discussions" do
 
       it "should show attachment", priority: "1", test_id: 150478 do
         get "/courses/#{course.id}/discussion_topics"
-        expect_new_page_load{f('#add_discussion').click}
+        expect_new_page_load { f('#add_discussion').click }
         filename, fullpath, _data = get_file("graded.png")
         f('#discussion-title').send_keys('New Discussion')
         f('input[name=attachment]').send_keys(fullpath)
         type_in_tiny('textarea[name=message]', 'file attachment discussion')
-        expect_new_page_load {submit_form('.form-actions')}
+        expect_new_page_load { submit_form('.form-actions') }
         expect(f('.image').text).to include(filename)
       end
 
@@ -227,7 +228,7 @@ describe "discussions" do
       end
 
       context "in student view" do
-        it "should allow student view student to read/post", priority:"2", test_id: 344545 do
+        it "should allow student view student to read/post", priority: "2", test_id: 344545 do
           skip_if_chrome('Can not get to student view in Chrome')
           enter_student_view
           get url

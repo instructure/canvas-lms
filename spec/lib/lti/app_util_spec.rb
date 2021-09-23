@@ -21,9 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Lti::AppUtil do
-
   describe ".custom_params" do
-
     let(:raw_post) {
       'external_tool%5Bname%5D=IMS+Cert+Tool&external_tool%5Bprivacy_level%5D=name_only'\
         '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
@@ -38,18 +36,17 @@ describe Lti::AppUtil do
 
     it "parses a raw post and returns custom params in key/value pairs" do
       expect(Lti::AppUtil.custom_params(raw_post)).to eq({
-                                                     "simple_key" => "custom_simple_value",
-                                                     "cert_userid" => "$User.id",
-                                                     "Complex!@#$^*(){}[]KEY" => "Complex!@#$^*;(){}[]½Value",
-                                                     "cert_username" => "$User.username",
-                                                     "tc_profile_url" => "$ToolConsumerProfile.url"
-                                                   })
+                                                           "simple_key" => "custom_simple_value",
+                                                           "cert_userid" => "$User.id",
+                                                           "Complex!@#$^*(){}[]KEY" => "Complex!@#$^*;(){}[]½Value",
+                                                           "cert_username" => "$User.username",
+                                                           "tc_profile_url" => "$ToolConsumerProfile.url"
+                                                         })
     end
 
     it "parses complex key/values correctly" do
       expect(Lti::AppUtil.custom_params(raw_post)["Complex!@#$^*(){}[]KEY"]).to eq "Complex!@#$^*;(){}[]½Value"
     end
-
   end
 
   describe ".display_template" do
@@ -108,11 +105,11 @@ describe Lti::AppUtil do
     end
 
     it 'allows candidate if present in multi-valued whitelist and not present in multi-valued blacklist' do
-      expect(Lti::AppUtil).to be_allowed('foo', ['bar', 'foo', 'baz'], ['bap','bam','ban'])
+      expect(Lti::AppUtil).to be_allowed('foo', ['bar', 'foo', 'baz'], ['bap', 'bam', 'ban'])
     end
 
     it 'disallows candidate if present in multi-valued blacklist and not present in multi-valued whitelist' do
-      expect(Lti::AppUtil).to_not be_allowed('foo', ['bap','bam','ban'], ['bar', 'foo', 'baz'])
+      expect(Lti::AppUtil).to_not be_allowed('foo', ['bap', 'bam', 'ban'], ['bar', 'foo', 'baz'])
     end
   end
 end

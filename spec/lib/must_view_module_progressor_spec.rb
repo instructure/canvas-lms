@@ -48,7 +48,7 @@ describe "MustViewModuleProgressor" do
 
   def add_module_item(mod, item, requirement_type = 'must_view')
     item_tag = mod.add_item(id: item.id, type: item_type_of(item))
-    mod.completion_requirements = mod.completion_requirements + [{id: item_tag.id, type: requirement_type.to_s}]
+    mod.completion_requirements = mod.completion_requirements + [{ id: item_tag.id, type: requirement_type.to_s }]
     mod.save!
     item_tag
   end
@@ -73,17 +73,17 @@ describe "MustViewModuleProgressor" do
     final_page = @course.wiki_pages.create!(title: "some page")
     final_page_tag = mod.add_item(id: final_page.id, type: 'page')
     mod.completion_requirements = {
-      initial_page_tag.id => {type: 'must_view'},
-      assignment_tag.id => {type: assignment_requirement_type},
-      final_page_tag.id => {type: 'must_view'},
+      initial_page_tag.id => { type: 'must_view' },
+      assignment_tag.id => { type: assignment_requirement_type },
+      final_page_tag.id => { type: 'must_view' },
     }
     mod.require_sequential_progress = true
     mod.save!
     {
       mod: mod,
-      initial_page: {item: initial_page, tag: initial_page_tag},
-      assignment: {item: assignment, tag: assignment_tag},
-      final_page: {item: final_page, tag: final_page_tag},
+      initial_page: { item: initial_page, tag: initial_page_tag },
+      assignment: { item: assignment, tag: assignment_tag },
+      final_page: { item: final_page, tag: final_page_tag },
     }
   end
 
@@ -114,8 +114,8 @@ describe "MustViewModuleProgressor" do
 
       actual = progression.requirements_met.sort_by { |req| req[:id] }
       expected = [
-        {id: first_page_tag.id, type: 'must_view'},
-        {id: second_page_tag.id, type: 'must_view'},
+        { id: first_page_tag.id, type: 'must_view' },
+        { id: second_page_tag.id, type: 'must_view' },
       ].sort_by { |ex| ex[:id] }
       expect(actual).to eq(expected)
     end
@@ -126,7 +126,7 @@ describe "MustViewModuleProgressor" do
         module_with_item(:page),
       ]
 
-      mods[1].prerequisites = [{id: mods[0].id, name: mods[0].name, type: 'context_module'}]
+      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: 'context_module' }]
       mods[1].save!
 
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -135,7 +135,7 @@ describe "MustViewModuleProgressor" do
       @course.context_modules.each do |mod|
         progression = mod.find_or_create_progression(@student)
         tag = mod.content_tags.first
-        expect(progression.requirements_met).to eq([{id: tag.id, type: 'must_view'}])
+        expect(progression.requirements_met).to eq([{ id: tag.id, type: 'must_view' }])
       end
     end
 
@@ -146,7 +146,7 @@ describe "MustViewModuleProgressor" do
       add_module_item(mods[0], create_item(:assignment), 'must_submit')
       add_module_item(mods[1], create_item(:page))
 
-      mods[1].prerequisites = [{id: mods[0].id, name: mods[0].name, type: 'context_module'}]
+      mods[1].prerequisites = [{ id: mods[0].id, name: mods[0].name, type: 'context_module' }]
       mods[1].save!
 
       progressor = MustViewModuleProgressor.new(@student, @course)
@@ -166,8 +166,8 @@ describe "MustViewModuleProgressor" do
 
       progression = mod.reload.find_or_create_progression(@student)
       expect(progression.requirements_met).to eq([
-        {id: sequence[:initial_page][:tag].id, type: 'must_view'}
-      ])
+                                                   { id: sequence[:initial_page][:tag].id, type: 'must_view' }
+                                                 ])
     end
 
     it "can follow sequential progress" do
@@ -262,8 +262,8 @@ describe "MustViewModuleProgressor" do
       progression = mod.reload.find_or_create_progression(@student)
       reqs = progression.requirements_met.sort_by { |req| req[:id] }
       expected = [
-        {id: sequence[:initial_page][:tag].id, type: 'must_view'},
-        {id: sequence[:final_page][:tag].id, type: 'must_view'},
+        { id: sequence[:initial_page][:tag].id, type: 'must_view' },
+        { id: sequence[:final_page][:tag].id, type: 'must_view' },
       ].sort_by { |ex| ex[:id] }
       expect(reqs).to eq expected
     end
@@ -291,7 +291,7 @@ describe "MustViewModuleProgressor" do
       first_page_tag = add_module_item(first_mod, first_page)
 
       second_mod, _, second_page_tag = module_with_item_return_all(:page)
-      second_mod.prerequisites = [{id: first_mod.id, name: first_mod.name, type: 'context_module'}]
+      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: 'context_module' }]
       second_mod.save!
 
       assignment.unpublish!
@@ -301,10 +301,10 @@ describe "MustViewModuleProgressor" do
       progressor.make_progress
 
       first_progression = first_mod.find_or_create_progression(@student)
-      expect(first_progression.requirements_met).to eq([{id: first_page_tag.id, type: 'must_view'}])
+      expect(first_progression.requirements_met).to eq([{ id: first_page_tag.id, type: 'must_view' }])
 
       second_progression = second_mod.find_or_create_progression(@student)
-      expect(second_progression.requirements_met).to eq([{id: second_page_tag.id, type: 'must_view'}])
+      expect(second_progression.requirements_met).to eq([{ id: second_page_tag.id, type: 'must_view' }])
     end
 
     it "triggers completion events" do
@@ -354,7 +354,7 @@ describe "MustViewModuleProgressor" do
     it "does not progress items in locked modules" do
       first_mod = module_with_item(:page)
       second_mod = module_with_item(:page)
-      second_mod.prerequisites = [{id: first_mod.id, name: first_mod.name, type: 'context_module'}]
+      second_mod.prerequisites = [{ id: first_mod.id, name: first_mod.name, type: 'context_module' }]
       second_mod.save!
 
       first_mod.unlock_at = Time.now.utc + 2.days

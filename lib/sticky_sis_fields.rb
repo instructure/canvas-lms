@@ -19,9 +19,7 @@
 #
 
 module StickySisFields
-
   module InstanceMethods
-
     # this method is set as a before_update callback
     def set_sis_stickiness
       self.class.sis_stickiness_options ||= {}
@@ -94,7 +92,6 @@ module StickySisFields
   end
 
   module ClassMethods
-
     # specify which fields are able to be stuck
     def are_sis_sticky(*fields)
       self.sticky_sis_fields = fields.map(&:to_sym).to_set
@@ -114,7 +111,7 @@ module StickySisFields
     #   clear_sis_stickiness: default false,
     #       if true, the set_sis_stickiness callback is enabled and configured
     #       to write out an empty stickiness list on every save.
-    def process_as_sis(opts={})
+    def process_as_sis(opts = {})
       self.sis_stickiness_options ||= {}
       old_options = self.sis_stickiness_options.clone
       self.sis_stickiness_options = opts
@@ -130,7 +127,6 @@ module StickySisFields
         self.sis_stickiness_options = old_options
       end
     end
-
   end
 
   def self.included(klass)
@@ -142,5 +138,4 @@ module StickySisFields
       klass.before_save :set_sis_stickiness
     end
   end
-
 end

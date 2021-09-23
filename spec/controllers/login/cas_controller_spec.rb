@@ -54,7 +54,7 @@ describe Login::CasController do
     session[:cas_session] = cas_ticket
     session[:login_aac] = Account.default.authentication_providers.first.id
 
-    post :destroy, params: {logoutRequest: request_text}
+    post :destroy, params: { logoutRequest: request_text }
     expect(response.status).to eq 200
   end
 
@@ -74,11 +74,11 @@ describe Login::CasController do
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
     cas_client.instance_variable_set(:@stub_response, response_text)
-    def cas_client.request_cas_response(_uri, type, _options={})
+    def cas_client.request_cas_response(_uri, type, _options = {})
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: {:ticket => 'ST-abcd'}
+    get 'new', params: { :ticket => 'ST-abcd' }
     expect(response).to redirect_to(login_url)
   end
 
@@ -98,11 +98,11 @@ describe Login::CasController do
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
     cas_client.instance_variable_set(:@stub_response, response_text)
-    def cas_client.request_cas_response(_uri, type, _options={})
+    def cas_client.request_cas_response(_uri, type, _options = {})
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: {:ticket => 'ST-abcd'}
+    get 'new', params: { :ticket => 'ST-abcd' }
     expect(response).to redirect_to(login_url)
   end
 
@@ -127,11 +127,11 @@ describe Login::CasController do
     controller.instance_variable_set(:@domain_root_account, Account.default)
     cas_client = controller.client
     cas_client.instance_variable_set(:@stub_response, response_text)
-    def cas_client.request_cas_response(_uri, type, _options={})
+    def cas_client.request_cas_response(_uri, type, _options = {})
       type.new(@stub_response, @conf_options)
     end
 
-    get 'new', params: {:ticket => 'ST-abcd'}
+    get 'new', params: { :ticket => 'ST-abcd' }
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:cas_session]).to eq 'ST-abcd'
     # the auth provider got set on the pseudonym
@@ -142,19 +142,19 @@ describe Login::CasController do
     unique_id = 'foo@example.com'
 
     account1 = account_with_cas
-    user1 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    user1 = user_with_pseudonym({ :active_all => true, :username => unique_id })
     @pseudonym.account = account1
     @pseudonym.save!
 
     account2 = account_with_cas
-    user2 = user_with_pseudonym({:active_all => true, :username => unique_id})
+    user2 = user_with_pseudonym({ :active_all => true, :username => unique_id })
     @pseudonym.account = account2
     @pseudonym.save!
 
     stubby("yes\n#{unique_id}\n")
 
     controller.request.env['canvas.domain_root_account'] = account1
-    get 'new', params: {:ticket => 'ST-abcd'}
+    get 'new', params: { :ticket => 'ST-abcd' }
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:cas_session]).to eq 'ST-abcd'
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user1.pseudonyms.first
@@ -167,7 +167,7 @@ describe Login::CasController do
     stubby("yes\n#{unique_id}\n")
 
     controller.request.env['canvas.domain_root_account'] = account2
-    get 'new', params: {:ticket => 'ST-efgh'}
+    get 'new', params: { :ticket => 'ST-efgh' }
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:cas_session]).to eq 'ST-efgh'
     expect(Pseudonym.find(session['pseudonym_credentials_id'])).to eq user2.pseudonyms.first
@@ -186,7 +186,7 @@ describe Login::CasController do
 
       # Default to Login url with a nil value
       session[:sentinel] = true
-      get 'new', params: {:ticket => 'ST-abcd'}
+      get 'new', params: { :ticket => 'ST-abcd' }
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -198,7 +198,7 @@ describe Login::CasController do
       account.unknown_user_url = ''
       account.save!
 
-      get 'new', params: {:ticket => 'ST-abcd'}
+      get 'new', params: { :ticket => 'ST-abcd' }
       expect(response).to redirect_to(login_url)
       expect(session[:cas_session]).to be_nil
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
@@ -208,7 +208,7 @@ describe Login::CasController do
       unknown_user_url = "https://example.com/unknown_user"
       account.unknown_user_url = unknown_user_url
       account.save!
-      get 'new', params: {:ticket => 'ST-abcd'}
+      get 'new', params: { :ticket => 'ST-abcd' }
       expect(response).to redirect_to(unknown_user_url)
       expect(session[:cas_session]).to be_nil
     end
@@ -219,7 +219,7 @@ describe Login::CasController do
       unique_id = 'foo@example.com'
 
       expect(account.pseudonyms.active.by_unique_id(unique_id)).to_not be_exists
-      get 'new', params: {:ticket => 'ST-abcd'}
+      get 'new', params: { :ticket => 'ST-abcd' }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:cas_session]).to eq 'ST-abcd'
       p = account.pseudonyms.active.by_unique_id(unique_id).first!
@@ -236,7 +236,7 @@ describe Login::CasController do
     start = Time.now.utc
     expect(cas_client).to receive(:validate_service_ticket) { sleep 5 }
     session[:sentinel] = true
-    get 'new', params: {:ticket => 'ST-abcd'}
+    get 'new', params: { :ticket => 'ST-abcd' }
     expect(response).to redirect_to(login_url)
     expect(flash[:delegated_message]).to_not be_blank
     expect(Time.now.utc - start).to be < 1
@@ -249,7 +249,7 @@ describe Login::CasController do
     account_with_cas(account: Account.site_admin)
 
     controller.request.env['canvas.domain_root_account'] = Account.site_admin
-    get 'new', params: {:ticket => 'ST-efgh'}
+    get 'new', params: { :ticket => 'ST-efgh' }
     expect(response).to redirect_to(dashboard_url(:login_success => 1))
     expect(session[:cas_session]).to eq 'ST-efgh'
     expect(cookies['canvas_sa_delegated']).to eq '1'
@@ -279,7 +279,7 @@ describe Login::CasController do
 
     stubby("yes\nuser\n")
 
-    get 'new', params: {:ticket => 'ST-efgh'}
+    get 'new', params: { :ticket => 'ST-efgh' }
     expect(response).to redirect_to(otp_login_url)
     expect(session[:cas_session]).to eq 'ST-efgh'
     expect(session[:pending_otp_secret_key]).to be_nil

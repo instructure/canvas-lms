@@ -29,7 +29,6 @@ include Helpers::ModuleHelper
 include Helpers::FilterHelper
 
 module YARD::Templates::Helpers::BaseHelper
-
   def linkify_with_api(*args)
     # References to controller actions
     #
@@ -98,14 +97,14 @@ module YARD::Templates::Helpers::BaseHelper
 
   def lookup_topic(controller_path)
     controller = nil
-    topic = options[:resources].find { |r,cs|
+    topic = options[:resources].find { |r, cs|
       cs.any? { |c|
         controller = c if c.path.to_s == controller_path
         !controller.nil?
       }
     }
 
-    [ topic, controller ]
+    [topic, controller]
   end
 
   def lookup_appendix(title)
@@ -160,9 +159,9 @@ end
 
 def init
   options[:objects] = run_verifier(options[:objects])
-  options[:resources] = options[:objects].
-    group_by { |o| o.tags('API').first.text }.
-    sort_by  { |o| o.first }
+  options[:resources] = options[:objects]
+                        .group_by { |o| o.tags('API').first.text }
+                        .sort_by  { |o| o.first }
   generate_swagger_json
   generate_data_services_markdown_pages
   scope_writer = ApiScopeMappingWriter.new(options[:resources])
@@ -263,17 +262,17 @@ end
 def serialize_redirect(filename)
   path = File.join(options[:serializer].basepath, filename)
   File.open(path, "wb") do |file|
-    file.write <<-HTML
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
-<html>
-<head>
-<title>#{options[:page_title]}</title>
-<meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
-<BODY>
-This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
-</BODY>
-</HTML>
-HTML
+    file.write <<~HTML
+      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+      <html>
+      <head>
+      <title>#{options[:page_title]}</title>
+      <meta http-equiv="REFRESH" content="0;url=file.#{filename}"></HEAD>
+      <BODY>
+      This page has moved. You will be redirected automatically, or you can <a href="file.#{filename}">click here</a> to go to the new page.
+      </BODY>
+      </HTML>
+    HTML
   end
 end
 
@@ -298,7 +297,7 @@ end
 def build_json_objects_map
   obj_map = {}
   resource_obj_list = {}
-  options[:resources].each do |r,cs|
+  options[:resources].each do |r, cs|
     cs.each do |controller|
       (controller.tags(:object) + controller.tags(:model)).each do |obj|
         name, json = obj.text.split(%r{\n+}, 2).map(&:strip)

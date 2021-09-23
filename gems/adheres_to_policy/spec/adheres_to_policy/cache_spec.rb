@@ -29,26 +29,26 @@ describe AdheresToPolicy::Cache do
     it "tries to read the key value" do
       AdheresToPolicy::Cache.write(:key, 'value')
       expect(AdheresToPolicy::Cache).to_not receive(:write)
-      value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
+      value = AdheresToPolicy::Cache.fetch(:key) { 'new_value' }
       expect(value).to eq ['value', :in_proc]
     end
 
     it "writes the key and value if it was not read" do
       expect(AdheresToPolicy::Cache).to receive(:write).with(:key, 'value', an_instance_of(Hash))
-      value = AdheresToPolicy::Cache.fetch(:key){ 'value' }
+      value = AdheresToPolicy::Cache.fetch(:key) { 'value' }
       expect(value).to eq ['value', :generated]
     end
 
     it "does not write the key if the value is 'false'" do
       AdheresToPolicy::Cache.write(:key, false)
       expect(AdheresToPolicy::Cache).to_not receive(:write)
-      value = AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
+      value = AdheresToPolicy::Cache.fetch(:key) { 'new_value' }
       expect(value).to eq [false, :in_proc]
     end
 
     it 'times generating the value and sets Thread.current[:last_cache_generate]' do
       Thread.current[:last_cache_generate] = nil
-      AdheresToPolicy::Cache.fetch(:key){ 'new_value' }
+      AdheresToPolicy::Cache.fetch(:key) { 'new_value' }
       expect(Thread.current[:last_cache_generate]).to_not be_nil
     end
 
@@ -58,7 +58,7 @@ describe AdheresToPolicy::Cache do
       expect(AdheresToPolicy::Cache).to receive(:write)
         .with(an_instance_of(String), an_instance_of(String), a_hash_including(use_rails_cache: false))
 
-      AdheresToPolicy::Cache.fetch('foobar', use_rails_cache: false){ 'new_value' }
+      AdheresToPolicy::Cache.fetch('foobar', use_rails_cache: false) { 'new_value' }
     end
   end
 

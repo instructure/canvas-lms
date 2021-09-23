@@ -60,7 +60,7 @@ describe Types::SubmissionType do
   end
 
   describe 'unread_comment_count' do
-    let(:valid_submission_comment_attributes) {{ comment: 'some comment' }}
+    let(:valid_submission_comment_attributes) { { comment: 'some comment' } }
 
     it 'returns 0 if the submission is read' do
       @submission.mark_read(@teacher)

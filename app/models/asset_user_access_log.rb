@@ -53,21 +53,27 @@ class AssetUserAccessLog
   class AuaLog0 < ActiveRecord::Base
     self.table_name = "aua_logs_0"
   end
+
   class AuaLog1 < ActiveRecord::Base
     self.table_name = "aua_logs_1"
   end
+
   class AuaLog2 < ActiveRecord::Base
     self.table_name = "aua_logs_2"
   end
+
   class AuaLog3 < ActiveRecord::Base
     self.table_name = "aua_logs_3"
   end
+
   class AuaLog4 < ActiveRecord::Base
     self.table_name = "aua_logs_4"
   end
+
   class AuaLog5 < ActiveRecord::Base
     self.table_name = "aua_logs_5"
   end
+
   class AuaLog6 < ActiveRecord::Base
     self.table_name = "aua_logs_6"
   end
@@ -76,8 +82,8 @@ class AssetUserAccessLog
     AuaLog0, AuaLog1, AuaLog2, AuaLog3, AuaLog4, AuaLog5, AuaLog6
   ].freeze
   METADATUM_KEY = "aua_logs_compaction_state"
-  PULSAR_NAMESPACE="asset_user_access_log"
-  PULSAR_SUBSCRIPTION="aua_log_compactor"
+  PULSAR_NAMESPACE = "asset_user_access_log"
+  PULSAR_SUBSCRIPTION = "aua_log_compactor"
   PULSAR_TOPIC_PREFIX = "view-increments"
 
   def self.put_view(asset_user_access, timestamp: nil)
@@ -192,7 +198,7 @@ class AssetUserAccessLog
   # metadata entry entirely and just store the message bus sequence number
   def self.metadatum_payload
     default_metadatum = {
-      max_log_ids: [0,0,0,0,0,0,0],
+      max_log_ids: [0, 0, 0, 0, 0, 0, 0],
       # in pulsar, there is no order guarantee
       # between partitions, and we're using a separate topic for each
       # root account on this shard.  WITHIN a partition,
@@ -262,10 +268,10 @@ class AssetUserAccessLog
 
     shard = ::Switchman::Shard.current
     caught_up = if self.read_from_message_bus?(shard)
-      self.message_bus_compact
-    else
-      self.postgres_compact
-    end
+                  self.message_bus_compact
+                else
+                  self.postgres_compact
+                end
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
@@ -447,7 +453,7 @@ class AssetUserAccessLog
           most_recent_id_in_this_partition = [
             new_message_bus_iterator_state[pulsar_partition_id.to_s], # might be nil if this is the first one
             pulsar_message_id.to_s
-          ].compact.map{|mids| MessageBus::MessageId.from_string(mids) }.max.to_s
+          ].compact.map { |mids| MessageBus::MessageId.from_string(mids) }.max.to_s
           new_message_bus_iterator_state[pulsar_partition_id.to_s] = most_recent_id_in_this_partition
 
           if should_process_message
@@ -510,7 +516,7 @@ class AssetUserAccessLog
         #  no problem if this fails, really, because
         # we'll skip any messages that get re-delivered
         # due to the iterator state stored in the db.
-        to_acknowledge.each{|m| consumer.acknowledge(m) }
+        to_acknowledge.each { |m| consumer.acknowledge(m) }
 
         # 12) reset data structure for a new batch
         # of messages, then repeat unless the job has timed out or
@@ -683,13 +689,13 @@ class AssetUserAccessLog
         return true
       end
 
-      state_max_log_ids = compaction_state.fetch(:max_log_ids, [0,0,0,0,0,0,0])
+      state_max_log_ids = compaction_state.fetch(:max_log_ids, [0, 0, 0, 0, 0, 0, 0])
       root_account_max_ids_map = compaction_state.fetch(:temp_root_account_max_log_ids, {})
       # if there's data in this state bucket, then we're cutting back over from
       # pulsar and we need to consider the partitioned-by-root-account state for
       # the compaction iterators for this one compaction job (afterwards.)
       use_pulsar_ripcord_iterators = !root_account_max_ids_map.empty?
-      log_id_bookmark = [(partition_lower_bound-1), state_max_log_ids[ts.wday]].max
+      log_id_bookmark = [(partition_lower_bound - 1), state_max_log_ids[ts.wday]].max
       while log_id_bookmark < partition_upper_bound
         self.log_message("processing #{log_id_bookmark} from #{partition_upper_bound}")
         # maybe we won't need this, but if we need to slow down throughput and don't want to hold
@@ -717,7 +723,7 @@ class AssetUserAccessLog
           # of all ids because we constrained the aggregation to a range of ids,
           # taking the full set of logs in that range)
           update_query = compaction_sql(log_segment_aggregation)
-          new_iterator_pos = log_segment_aggregation.map{|r| r["max_id"]}.max
+          new_iterator_pos = log_segment_aggregation.map { |r| r["max_id"] }.max
           GuardRail.activate(:primary) do
             partition_model.transaction do
               self.log_message("batch updating (sometimes these queries don't get logged)...")
@@ -749,6 +755,7 @@ class AssetUserAccessLog
             next_id = partition_model.where('id > ?', batch_upper_boundary).minimum(:id)
           end
           return false unless next_id.present? # can't find any more records for now, do not advance
+
           # make sure we actually process the next record by offsetting
           # to just under it's ID
           new_bookmark_id = next_id - 1
@@ -789,14 +796,14 @@ class AssetUserAccessLog
   # for AUA log compaction completely, this query can be removed.
   def self.aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
     <<~SQL
-    SELECT asset_user_access_id AS aua_id,
-      COUNT(asset_user_access_id) AS view_count,
-      MAX(created_at) AS max_updated_at,
-      MAX(id) AS max_id
-    FROM #{partition_model.quoted_table_name}
-      WHERE id > #{log_id_bookmark}
-        AND id <= #{batch_upper_boundary}
-      GROUP BY asset_user_access_id
+      SELECT asset_user_access_id AS aua_id,
+        COUNT(asset_user_access_id) AS view_count,
+        MAX(created_at) AS max_updated_at,
+        MAX(id) AS max_id
+      FROM #{partition_model.quoted_table_name}
+        WHERE id > #{log_id_bookmark}
+          AND id <= #{batch_upper_boundary}
+        GROUP BY asset_user_access_id
     SQL
   end
 
@@ -816,7 +823,7 @@ class AssetUserAccessLog
         ON aua_log.asset_user_access_id = aua.id
       WHERE aua_log.id > #{log_id_bookmark}
         AND aua_log.id <= #{batch_upper_boundary}
-        AND 
+        AND#{' '}
     SQL
     default_lower_bounds = [log_id_bookmark] * 7
     root_account_conditions = Account.root_accounts.active.pluck(:id).map do |root_account_id|

@@ -48,7 +48,6 @@ describe "varied due dates" do
     )
   end
 
-
   before do
     # Create a course with a student
     course_with_student(:active_all => true)
@@ -69,12 +68,11 @@ describe "varied due dates" do
     @student3 = user_with_pseudonym :user => @user
 
     @s3enrollment2 = @s3enrollment1.clone
-    @s3enrollment2.course_section = @section ; @s3enrollment2.save!
+    @s3enrollment2.course_section = @section; @s3enrollment2.save!
 
     # Create an assignment
     @course_due_date = 3.days.from_now
     @section_due_date = 5.days.from_now
-
 
     teacher = course_with_teacher(:course => @course, :active_all => true)
     @teacher = user_with_pseudonym :user => @user
@@ -85,9 +83,9 @@ describe "varied due dates" do
   def create_recent_feedback(student)
     submission = @assignment.find_or_create_submission(student)
     @assignment.update_submission(student, {
-      :comment => 'you should turn this in ...',
-      :commenter => @teacher
-    })
+                                    :comment => 'you should turn this in ...',
+                                    :commenter => @teacher
+                                  })
   end
 
   def create_teacher_todo_assignment
@@ -98,9 +96,9 @@ describe "varied due dates" do
     )
     create_override_for(@teacher_todo_assignment, @section_due_date)
     @submission = @teacher_todo_assignment.submit_homework(@student1, {
-      :submission_type => "online_text_entry",
-      :body => "canvas ate my homework"
-    })
+                                                             :submission_type => "online_text_entry",
+                                                             :body => "canvas ate my homework"
+                                                           })
     @submission.save!
   end
 

@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 require File.expand_path(File.dirname(__FILE__) + '../../../lti2_spec_helper')
 
 describe "Importing assignments" do
-
   SYSTEMS.each do |system|
     if import_data_exists? system, 'assignment'
       it "should import assignments for #{system}" do
@@ -56,7 +55,7 @@ describe "Importing assignments" do
     context = get_import_context('')
     migration = context.content_migrations.create!
 
-    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339231'}.with_indifferent_access
+    assignment_hash = file_data.find { |h| h['migration_id'] == '4469882339231' }.with_indifferent_access
 
     rubric = rubric_model(:context => context)
     rubric.migration_id = assignment_hash[:grading][:rubric_id]
@@ -73,8 +72,8 @@ describe "Importing assignments" do
     context = get_import_context('')
     migration = context.content_migrations.create!
 
-    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339231'}.with_indifferent_access
-    rubric_model({context: context, migration_id: assignment_hash[:grading][:rubric_id]})
+    assignment_hash = file_data.find { |h| h['migration_id'] == '4469882339231' }.with_indifferent_access
+    rubric_model({ context: context, migration_id: assignment_hash[:grading][:rubric_id] })
     assignment_hash[:rubric_use_for_grading] = true
     assignment_hash[:rubric_hide_points] = true
     assignment_hash[:rubric_hide_outcome_results] = true
@@ -89,7 +88,7 @@ describe "Importing assignments" do
   it "should import group category into existing group with same name when marked as a group assignment" do
     file_data = get_import_data('', 'assignment')
     context = get_import_context('')
-    assignment_hash = file_data.find{|h| h['migration_id'] == '4469882339232'}.with_indifferent_access
+    assignment_hash = file_data.find { |h| h['migration_id'] == '4469882339232' }.with_indifferent_access
     migration = context.content_migrations.create!
     context.group_categories.create! name: assignment_hash[:group_category]
 
@@ -103,23 +102,23 @@ describe "Importing assignments" do
     course_model
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
-        "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
-        "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
-        "grading_standard_migration_id" => nil,
-        "rubric_migration_id" => nil,
-        "rubric_id" => nil,
-        "quiz_migration_id" => nil,
-        "workflow_state" => "published",
-        "title" => "",
-        "grading_type" => "points",
-        "submission_types" => "none",
-        "peer_reviews" => false,
-        "automatic_peer_reviews" => false,
-        "muted" => false,
-        "due_at" => 1401947999000,
-        "peer_reviews_due_at" => 1401947999000,
-        "position" => 6,
-        "peer_review_count" => 0
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "grading_standard_migration_id" => nil,
+      "rubric_migration_id" => nil,
+      "rubric_id" => nil,
+      "quiz_migration_id" => nil,
+      "workflow_state" => "published",
+      "title" => "",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "peer_reviews" => false,
+      "automatic_peer_reviews" => false,
+      "muted" => false,
+      "due_at" => 1401947999000,
+      "peer_reviews_due_at" => 1401947999000,
+      "position" => 6,
+      "peer_review_count" => 0
     }
     Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
     assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
@@ -172,25 +171,25 @@ describe "Importing assignments" do
     expect(@course).to receive(:turnitin_enabled?).at_least(1).and_return(true)
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
-        "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
-        "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
-        "grading_standard_migration_id" => nil,
-        "rubric_migration_id" => nil,
-        "rubric_id" => nil,
-        "quiz_migration_id" => nil,
-        "workflow_state" => "published",
-        "title" => "",
-        "grading_type" => "points",
-        "submission_types" => "none",
-        "peer_reviews" => false,
-        "automatic_peer_reviews" => false,
-        "muted" => false,
-        "due_at" => 1401947999000,
-        "peer_reviews_due_at" => 1401947999000,
-        "position" => 6,
-        "peer_review_count" => 0,
-        "turnitin_enabled" => true,
-        "turnitin_settings" => "{\"originality_report_visibility\":\"after_due_date\",\"s_paper_check\":\"1\",\"internet_check\":\"0\",\"journal_check\":\"1\",\"exclude_biblio\":\"1\",\"exclude_quoted\":\"0\",\"exclude_type\":\"1\",\"exclude_value\":\"5\",\"submit_papers_to\":\"1\",\"s_view_report\":\"1\"}"
+      "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
+      "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
+      "grading_standard_migration_id" => nil,
+      "rubric_migration_id" => nil,
+      "rubric_id" => nil,
+      "quiz_migration_id" => nil,
+      "workflow_state" => "published",
+      "title" => "",
+      "grading_type" => "points",
+      "submission_types" => "none",
+      "peer_reviews" => false,
+      "automatic_peer_reviews" => false,
+      "muted" => false,
+      "due_at" => 1401947999000,
+      "peer_reviews_due_at" => 1401947999000,
+      "position" => 6,
+      "peer_review_count" => 0,
+      "turnitin_enabled" => true,
+      "turnitin_settings" => "{\"originality_report_visibility\":\"after_due_date\",\"s_paper_check\":\"1\",\"internet_check\":\"0\",\"journal_check\":\"1\",\"exclude_biblio\":\"1\",\"exclude_quoted\":\"0\",\"exclude_type\":\"1\",\"exclude_value\":\"5\",\"submit_papers_to\":\"1\",\"s_view_report\":\"1\"}"
     }
     Importers::AssignmentImporter.import_from_migration(nameless_assignment_hash, @course, migration)
     assignment = @course.assignments.where(migration_id: 'ib4834d160d180e2e91572e8b9e3b1bc6').first
@@ -432,7 +431,7 @@ describe "Importing assignments" do
           end
 
           context 'when extensions is set' do
-            let(:extra_line_item_params) { super().merge(extensions: {foo: 'bar'}.to_json) }
+            let(:extra_line_item_params) { super().merge(extensions: { foo: 'bar' }.to_json) }
 
             it 'sets extensions on the line item' do
               expect(subject.extensions).to eq('foo' => 'bar')
@@ -471,7 +470,7 @@ describe "Importing assignments" do
         describe 'a submission_type=none assignment (AGS-created) with a uncoupled line item' do
           let(:assignment_submission_types) { 'none' }
           let(:assignment_tool_url) { nil }
-          let(:extra_line_item_params) { {client_id: tool.global_developer_key_id} }
+          let(:extra_line_item_params) { { client_id: tool.global_developer_key_id } }
 
           it_behaves_like 'a single imported line item'
 
@@ -489,7 +488,6 @@ describe "Importing assignments" do
               }.to raise_error(/Client can't be blank/)
             end
           end
-
         end
 
         describe 'an external tool assignment with an uncoupled line item (AGS-created assignment)' do
@@ -511,10 +509,10 @@ describe "Importing assignments" do
 
           it 'creates all line items' do
             expect(assignment.line_items.pluck(:label, :coupled, :score_maximum).sort_by(&:first)).to eq([
-              ['abc', false, 123],
-              ['def', false, assignment_hash[:points_possible]],
-              [assignment_hash[:title], false, assignment_hash[:points_possible]],
-            ])
+                                                                                                           ['abc', false, 123],
+                                                                                                           ['def', false, assignment_hash[:points_possible]],
+                                                                                                           [assignment_hash[:title], false, assignment_hash[:points_possible]],
+                                                                                                         ])
           end
 
           it 'creates the line items with the same Lti::ResourceLink' do
@@ -564,9 +562,7 @@ describe "Importing assignments" do
             end
           end
         end
-
       end
-
     end
   end
 
@@ -659,10 +655,10 @@ describe "Importing assignments" do
     include_context 'lti2_spec_helper'
 
     let(:migration_id) { "ib4834d160d180e2e91572e8b9e3b1bc6" }
-    let(:resource_type_code) {'123'}
-    let(:vendor_code) {'abc'}
-    let(:product_code) {'qrx'}
-    let(:visibility) {'after_grading'}
+    let(:resource_type_code) { '123' }
+    let(:vendor_code) { 'abc' }
+    let(:product_code) { 'qrx' }
+    let(:visibility) { 'after_grading' }
     let(:assign_hash) do
       {
         "migration_id" => migration_id,
@@ -779,8 +775,8 @@ describe "Importing assignments" do
     end
 
     it "doesn't add a warning to the migration if there is an active tool_proxy" do
-      allow(Lti::ToolProxy).
-        to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) {[tool_proxy]}
+      allow(Lti::ToolProxy)
+        .to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) { [tool_proxy] }
       course_model
       migration = @course.content_migrations.create!
       @course.assignments.create! :title => "test", :due_at => Time.now, :unlock_at => 1.day.ago, :lock_at => 1.day.from_now, :peer_reviews_due_at => 2.days.from_now, :migration_id => migration_id
@@ -796,7 +792,7 @@ describe "Importing assignments" do
     let(:assignment_hash) do
       {
         "migration_id" => migration_id,
-        "post_policy" => {"post_manually" => false}
+        "post_policy" => { "post_manually" => false }
       }.with_indifferent_access
     end
 

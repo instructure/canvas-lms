@@ -40,7 +40,7 @@ describe Types::OutcomeFriendlyDescriptionType do
       description: description
     )
   }
-  let(:graphql_context) { {current_user: @user} }
+  let(:graphql_context) { { current_user: @user } }
   let(:outcome_friendly_description_type) { GraphQLTypeTester.new(outcome_friendly_description, graphql_context) }
 
   it 'works' do

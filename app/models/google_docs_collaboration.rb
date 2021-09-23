@@ -56,11 +56,13 @@ class GoogleDocsCollaboration < Collaboration
 
   def user_can_access_document_type?(user)
     return !!google_adapter_user_service(user) if self.user && user
+
     false
   end
 
   def authorize_user(user)
     return unless self.document_id
+
     service_user_id = google_adapter_user_service(user).service_user_id rescue nil
     collaborator = self.collaborators.where(user_id: user).first
 
@@ -117,9 +119,9 @@ class GoogleDocsCollaboration < Collaboration
 
   private
 
-  def google_user_service(user, service_domain=GOOGLE_DRIVE_SERVICE)
+  def google_user_service(user, service_domain = GOOGLE_DRIVE_SERVICE)
     google_services = user.user_services.where(service_domain: service_domain).to_a
-    google_services.find{|s| s.service_user_id}
+    google_services.find { |s| s.service_user_id }
   end
 
   def google_drive_for_user
@@ -128,6 +130,7 @@ class GoogleDocsCollaboration < Collaboration
       service && [service.token, service.secret]
     end
     raise GoogleDrive::NoTokenError unless refresh_token && access_token
+
     GoogleDrive::Connection.new(refresh_token, access_token, ApplicationController.google_drive_timeout)
   end
 

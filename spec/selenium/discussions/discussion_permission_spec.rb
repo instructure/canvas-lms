@@ -29,7 +29,6 @@ describe "discussion permissions" do
   include_context "discussions_page_shared_context"
   extend DiscussionHelpers::SetupContext
 
-
   context 'discussion created by teacher' do
     before :each do
       course_with_teacher(active_all: true, name: 'teacher1')
@@ -42,7 +41,6 @@ describe "discussion permissions" do
       )
     end
 
-
     shared_examples 'no viewing discussion title, no discussion link' do |context|
       before :each do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -52,7 +50,6 @@ describe "discussion permissions" do
         context_user.touch
         user_session(context_user)
       end
-
 
       it "disallows discussion title view", priority: pick_priority(context, student: "1", teacher: "2", ta: "2", observer: "1", designer: "2"), test_id: pick_test_id(context, student: "806797", teacher: "806798", ta: "806799", observer: "806800", designer: "806801") do
         get discussions_topic_page
@@ -86,7 +83,6 @@ describe "discussion permissions" do
       setup_designer_context
     end
 
-
     shared_examples 'no viewing discussion details' do |context|
       before :each do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -117,7 +113,6 @@ describe "discussion permissions" do
     it_behaves_like 'no viewing discussion details', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
       before :each do
@@ -151,7 +146,6 @@ describe "discussion permissions" do
     it_behaves_like 'allow viewing discussions, not edit or post', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
       before :each do
@@ -191,7 +185,6 @@ describe "discussion permissions" do
       setup_designer_context
     end
 
-
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
       before :each do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
@@ -224,7 +217,6 @@ describe "discussion permissions" do
     it_behaves_like 'allow viewing and editing discussions, not posting', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow view, edit and post to discussions' do |context|
       before :each do
@@ -265,7 +257,6 @@ describe "discussion permissions" do
     end
   end # context 'discussion created by teacher'
 
-
   context 'discussion created by student' do
     before :each do
       course_with_student(active_all: true, name: 'student1')
@@ -277,7 +268,6 @@ describe "discussion permissions" do
         nil
       )
     end
-
 
     shared_examples 'no viewing discussion title' do |context|
       before :each do
@@ -315,7 +305,6 @@ describe "discussion permissions" do
       setup_designer_context
     end
 
-
     shared_examples 'no viewing discussion details' do |context|
       before :each do
         DiscussionHelpers.disable_view_discussions(@course, context_role)
@@ -346,7 +335,6 @@ describe "discussion permissions" do
     it_behaves_like 'no viewing discussion details', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow viewing discussions, not edit or post' do |context|
       before :each do
@@ -381,7 +369,6 @@ describe "discussion permissions" do
       setup_designer_context
     end
 
-
     shared_examples 'allow viewing and posting to discussions, not edit' do |context|
       before :each do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
@@ -415,7 +402,6 @@ describe "discussion permissions" do
       setup_designer_context
     end
 
-
     shared_examples 'allow viewing and editing discussions, not posting' do |context|
       before :each do
         DiscussionHelpers.enable_view_discussions(@course, context_role)
@@ -448,7 +434,6 @@ describe "discussion permissions" do
     it_behaves_like 'allow viewing and editing discussions, not posting', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow view, edit and post to discussions' do |context|
       before :each do
@@ -492,7 +477,6 @@ describe "discussion permissions" do
     it_behaves_like 'allow view, edit and post to discussions', :designer do
       setup_designer_context
     end
-
 
     shared_examples 'allow view, edit and post to own discussions with permissions off' do
       before :each do

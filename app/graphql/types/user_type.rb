@@ -39,11 +39,11 @@ module Types
 
     field :name, String, null: true
     field :sortable_name, String,
-      "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
-      null: true
+          "The name of the user that is should be used for sorting groups of users, such as in the gradebook.",
+          null: true
     field :short_name, String,
-      "A short name the user has selected, for use in conversations or other less formal places through the site.",
-      null: true
+          "A short name the user has selected, for use in conversations or other less formal places through the site.",
+          null: true
 
     field :pronouns, String, null: true
 
@@ -62,31 +62,31 @@ module Types
 
       return object.email if object.email_cached?
 
-      Loaders::AssociationLoader.for(User, :communication_channels).
-        load(object).
-        then { object.email }
+      Loaders::AssociationLoader.for(User, :communication_channels)
+                                .load(object)
+                                .then { object.email }
     end
 
     field :sis_id, String, null: true
     def sis_id
       domain_root_account = context[:domain_root_account]
       if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
-        object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
-        Loaders::AssociationLoader.for(User, :pseudonyms).
-          load(object).
-          then do
-            pseudonym = SisPseudonym.for(object, domain_root_account, type: :implicit, require_sis: false,
-                root_account: domain_root_account, in_region: true)
-            pseudonym&.sis_user_id
-          end
+         object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+        Loaders::AssociationLoader.for(User, :pseudonyms)
+                                  .load(object)
+                                  .then do
+          pseudonym = SisPseudonym.for(object, domain_root_account, type: :implicit, require_sis: false,
+                                                                    root_account: domain_root_account, in_region: true)
+          pseudonym&.sis_user_id
+        end
       end
     end
 
     field :enrollments, [EnrollmentType], null: false do
       argument :course_id, ID,
-        "only return enrollments for this course",
-        required: false,
-        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+               "only return enrollments for this course",
+               required: false,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
 
     def enrollments(course_id: nil)
@@ -139,17 +139,17 @@ module Types
       if object == context[:current_user]
         load_association(:all_conversations).then do
           conversations_scope = case scope
-          when 'unread'
-            object.conversations.unread
-          when 'starred'
-            object.starred_conversations
-          when 'sent'
-            object.all_conversations.sent
-          when 'archived'
-            object.conversations.archived
-          else
-            object.conversations.default
-          end
+                                when 'unread'
+                                  object.conversations.unread
+                                when 'starred'
+                                  object.starred_conversations
+                                when 'sent'
+                                  object.all_conversations.sent
+                                when 'archived'
+                                  object.conversations.archived
+                                else
+                                  object.conversations.default
+                                end
 
           filter_mode = :or
           filters = Array(filter || [])
@@ -236,9 +236,9 @@ module Types
 
     field :summary_analytics, StudentSummaryAnalyticsType, null: true do
       argument :course_id, ID,
-        "returns summary analytics for this course",
-        required: true,
-        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+               "returns summary analytics for this course",
+               required: true,
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
     end
 
     def summary_analytics(course_id:)
@@ -254,9 +254,9 @@ module Types
 
       load_association(:enrollments).then do |enrollments|
         Promise.all([
-          Loaders::AssociationLoader.for(Enrollment, :course).load_many(enrollments),
-          load_association(:favorites)
-        ]).then do
+                      Loaders::AssociationLoader.for(Enrollment, :course).load_many(enrollments),
+                      load_association(:favorites)
+                    ]).then do
           object.menu_courses
         end
       end
@@ -303,7 +303,7 @@ module Types
       argument :built_in_only, Boolean, "Only return default/built_in roles", required: false
     end
     def course_roles(course_id: nil, role_types: nil, built_in_only: true)
-      # The discussion only role "Author" will be handled with a front-end check because graphql 
+      # The discussion only role "Author" will be handled with a front-end check because graphql
       # currently does not support type inheritance. If graphql starts supporting type inheritance
       # this field can be replaced by a discussionAuthor type that inherits from User type and
       # contains a discussionRoles field
@@ -317,9 +317,9 @@ end
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
     def initialize(course_ids:)
-      scope = Enrollment.joins(:course).
-        where.not(enrollments: {workflow_state: "deleted"}).
-        where.not(courses: {workflow_state: "deleted"})
+      scope = Enrollment.joins(:course)
+                        .where.not(enrollments: { workflow_state: "deleted" })
+                        .where.not(courses: { workflow_state: "deleted" })
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
 

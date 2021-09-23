@@ -36,8 +36,8 @@ shared_examples_for "submittable" do
       @section = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "second test section")
       student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
-      create_section_override_for_assignment(@assignment3, {course_section: @section2})
+      create_section_override_for_assignment(@assignment, { course_section: @section })
+      create_section_override_for_assignment(@assignment3, { course_section: @section2 })
       @course.reload
       @vis_hash = submittable_class.visible_ids_by_user(course_id: @course.id, user_id: [@student1, @student2, @student3].map(&:id))
     end

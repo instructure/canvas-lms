@@ -30,13 +30,13 @@ module BroadcastPolicies
     }
     let(:assignment) do
       double(:context => context,
-           :published? => true, :muted? => false, :created_at => 4.hours.ago,
-           :changed_in_state => true, :due_at => Time.zone.now,
-           :points_possible => 100, :assignment_changed => false,
-           :just_created => false, :workflow_state => 'published',
-           :due_at_before_last_save => 7.days.ago, :saved_change_to_points_possible? => true,
-           :saved_change_to_workflow_state? => false,
-           :workflow_state_before_last_save => 'published')
+             :published? => true, :muted? => false, :created_at => 4.hours.ago,
+             :changed_in_state => true, :due_at => Time.zone.now,
+             :points_possible => 100, :assignment_changed => false,
+             :just_created => false, :workflow_state => 'published',
+             :due_at_before_last_save => 7.days.ago, :saved_change_to_points_possible? => true,
+             :saved_change_to_workflow_state? => false,
+             :workflow_state_before_last_save => 'published')
     end
 
     let(:policy) { AssignmentPolicy.new(assignment) }
@@ -69,7 +69,7 @@ module BroadcastPolicies
           allow(assignment).to receive(:saved_change_to_workflow_state?).and_return false
         }
       }
-      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false}}
+      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
       specify { wont_send_when { allow(context).to receive(:concluded?).and_return true } }
     end
 

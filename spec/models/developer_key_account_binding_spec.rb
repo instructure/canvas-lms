@@ -136,7 +136,7 @@ RSpec.describe DeveloperKeyAccountBinding, type: :model do
     describe 'after update' do
       subject { site_admin_binding.update!(update_parameters) }
 
-      let(:update_parameters) { {workflow_state: workflow_state} }
+      let(:update_parameters) { { workflow_state: workflow_state } }
       let(:site_admin_key) { DeveloperKey.create! }
       let(:site_admin_binding) { site_admin_key.developer_key_account_bindings.find_by(account: Account.site_admin) }
 

@@ -26,7 +26,6 @@ module RuboCop
         PREDEPLOY_MSG = "`delay` cannot be used in a"\
                         " predeploy migration, since job servers won't"\
                         " have the new code yet"
-        
 
         def on_send(node)
           super
@@ -39,8 +38,8 @@ module RuboCop
         def check_send_later(node, method_name)
           if method_name.to_s !~ /if_production/
             add_offense(node,
-              message: "All `delay`s in migrations should be `delay_if_production`",
-              severity: :warning)
+                        message: "All `delay`s in migrations should be `delay_if_production`",
+                        severity: :warning)
           end
 
           if tags.include?(:predeploy)

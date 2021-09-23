@@ -41,16 +41,16 @@ describe "Sessions Timeout" do
         f("#plugin_setting_disabled").click
         f('#settings_session_timeout').clear
         f('#settings_session_timeout').send_keys('19')
-        expect_new_page_load{ f('.save_button').click }
+        expect_new_page_load { f('.save_button').click }
         assert_flash_error_message "There was an error saving the plugin settings"
       end
     end
   end
 
   it "logs the user out after the session is expired" do
-    plugin_setting = PluginSetting.new(:name => "sessions", :settings => {"session_timeout" => "1"})
+    plugin_setting = PluginSetting.new(:name => "sessions", :settings => { "session_timeout" => "1" })
     plugin_setting.save!
-    user_with_pseudonym({:active_user => true})
+    user_with_pseudonym({ :active_user => true })
     login_as
     expect(f('[aria-label="Profile tray"] h2').text).to eq @user.primary_pseudonym.unique_id
 

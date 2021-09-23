@@ -36,7 +36,6 @@ describe "scheduler" do
 
     before :each do
       user_session(@student1)
-
     end
 
     it 'shows the find appointment button with feature flag turned on', priority: "1", test_id: 2908326 do
@@ -110,7 +109,7 @@ describe "scheduler" do
       expect(f('.fc-time')).to include_text expected_time
     end
 
-    it 'unreserves appointment slot', priority:"1", test_id: 2936791 do
+    it 'unreserves appointment slot', priority: "1", test_id: 2936791 do
       reserve_appointment_for(@student1, @student1, @app1)
       expect(@app1.appointments.first.workflow_state).to eq('locked')
       get "/calendar2"

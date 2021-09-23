@@ -123,12 +123,12 @@ describe Canvadocs do
 
       describe 'user filter' do
         let(:peer_reviewer) { User.create!(name: 'Percy the Peer Reviewer') }
-        let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer'} }
+        let(:peer_reviewer_real_data) { { type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: 'Percy the Peer Reviewer' } }
         let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
-        let(:peer_reviewer2_real_data) { {type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer'} }
-        let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
+        let(:peer_reviewer2_real_data) { { type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer' } }
+        let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student' } }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
-        let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
+        let(:teacher_real_data) { { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' } }
 
         context "when an assignment posts manually and a submission is unposted" do
           before do
@@ -563,9 +563,9 @@ describe Canvadocs do
       end
 
       describe 'user filter' do
-        let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student'} }
+        let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: 'Sev the Student' } }
         let(:student_anonymous_data) { hash_including(type: 'anonymous', role: 'student', id: submission.anonymous_id) }
-        let(:teacher_real_data) { {type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader'} }
+        let(:teacher_real_data) { { type: 'real', role: 'teacher', id: teacher.global_id.to_s, name: 'Gise the Grader' } }
         let(:ta) { User.create!(name: 'Tory the TA', short_name: 'Tory') }
         let(:ta_real_data) { { type: 'real', role: 'ta', id: ta.global_id.to_s, name: 'Tory the TA' } }
         let(:ta_anonymous_data) { hash_including(type: 'anonymous', role: 'ta', id: 'tttt') }
@@ -836,10 +836,10 @@ describe Canvadocs do
 
           context 'when a peer reviewer is viewing' do
             let(:peer_reviewer) { course.enroll_student(User.create!(name: "Percy the Peer Reviewer")).user }
-            let(:peer_reviewer_real_data) { {type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer"} }
+            let(:peer_reviewer_real_data) { { type: 'real', role: 'student', id: peer_reviewer.global_id.to_s, name: "Percy the Peer Reviewer" } }
             let(:peer_reviewer2) { User.create!(name: 'Penny the Peer Reviewer') }
-            let(:peer_reviewer2_real_data) { {type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer'} }
-            let(:student_real_data) { {type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student"} }
+            let(:peer_reviewer2_real_data) { { type: 'real', role: 'student', id: peer_reviewer2.global_id.to_s, name: 'Penny the Peer Reviewer' } }
+            let(:student_real_data) { { type: 'real', role: 'student', id: student.global_id.to_s, name: "Sev the Student" } }
 
             before(:each) do
               assignment.update!(peer_reviews: true)

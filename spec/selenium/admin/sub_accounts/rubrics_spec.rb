@@ -29,7 +29,6 @@ describe "sub account shared rubric specs" do
   let(:who_to_login) { 'admin' }
 
   before(:each) do
-
     course_with_admin_logged_in
   end
 
@@ -44,13 +43,11 @@ describe "sub account shared rubric specs" do
     should_allow_fractional_points
   end
 
-
   it "should round to 2 decimal places" do
     should_round_to_2_decimal_places
   end
 
   it "should round to an integer when splitting" do
-
     should_round_to_an_integer_when_splitting
   end
 

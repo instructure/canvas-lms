@@ -72,9 +72,9 @@ shared_examples_for "file uploads api" do
 
     unless options[:no_doc_preview]
       json.merge!({
-        'canvadoc_session_url' => nil,
-        'crocodoc_session_url' => nil
-      })
+                    'canvadoc_session_url' => nil,
+                    'crocodoc_session_url' => nil
+                  })
     end
 
     json
@@ -95,7 +95,7 @@ shared_examples_for "file uploads api" do
     tmpfile = Tempfile.new(["test", File.extname(filename)])
     tmpfile.write(content)
     tmpfile.rewind
-    post_params = json["upload_params"].merge({"file" => tmpfile})
+    post_params = json["upload_params"].merge({ "file" => tmpfile })
     send_multipart(json["upload_url"], post_params)
 
     attachment = Attachment.order(:id).last
@@ -109,29 +109,29 @@ shared_examples_for "file uploads api" do
     attachment.reload
     json = json_parse(response.body)
     expected_json = {
-        'id' => attachment.id,
-        'uuid' => attachment.uuid,
-        'folder_id' => attachment.folder_id,
-        'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
-        'content-type' => attachment.content_type,
-        'display_name' => attachment.display_name,
-        'filename' => attachment.filename,
-        'size' => tmpfile.size,
-        'unlock_at' => nil,
-        'locked' => false,
-        'hidden' => false,
-        'lock_at' => nil,
-        'locked_for_user' => false,
-        'hidden_for_user' => false,
-        'created_at' => attachment.created_at.as_json,
-        'updated_at' => attachment.updated_at.as_json,
-        'upload_status' => "success",
-        'thumbnail_url' => attachment.has_thumbnail? ? thumbnail_image_url(attachment, attachment.uuid, host: 'www.example.com') : nil,
-        'modified_at' => attachment.modified_at.as_json,
-        'mime_class' => attachment.mime_class,
-        'media_entry_id' => attachment.media_entry_id,
-        'canvadoc_session_url' => nil,
-        'crocodoc_session_url' => nil
+      'id' => attachment.id,
+      'uuid' => attachment.uuid,
+      'folder_id' => attachment.folder_id,
+      'url' => file_download_url(attachment, :verifier => attachment.uuid, :download => '1', :download_frd => '1'),
+      'content-type' => attachment.content_type,
+      'display_name' => attachment.display_name,
+      'filename' => attachment.filename,
+      'size' => tmpfile.size,
+      'unlock_at' => nil,
+      'locked' => false,
+      'hidden' => false,
+      'lock_at' => nil,
+      'locked_for_user' => false,
+      'hidden_for_user' => false,
+      'created_at' => attachment.created_at.as_json,
+      'updated_at' => attachment.updated_at.as_json,
+      'upload_status' => "success",
+      'thumbnail_url' => attachment.has_thumbnail? ? thumbnail_image_url(attachment, attachment.uuid, host: 'www.example.com') : nil,
+      'modified_at' => attachment.modified_at.as_json,
+      'mime_class' => attachment.mime_class,
+      'media_entry_id' => attachment.media_entry_id,
+      'canvadoc_session_url' => nil,
+      'crocodoc_session_url' => nil
     }
 
     if attachment.context.is_a?(User) || attachment.context.is_a?(Course) || attachment.context.is_a?(Group)
@@ -164,9 +164,9 @@ shared_examples_for "file uploads api" do
     # step 2, upload
     # we skip the actual call and double this out, since we can't hit s3 during specs
     expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
-      :content_type => 'application/msword',
-      :content_length => 1234,
-    })
+                                                                           :content_type => 'application/msword',
+                                                                           :content_length => 1234,
+                                                                         })
 
     # step 3, confirmation
     post redir, headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
@@ -195,13 +195,13 @@ shared_examples_for "file uploads api" do
     expect(progress_url).to be_present
 
     # step 2, download
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'queued'
 
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/images/delete.png").and_yield(FakeHttpResponse.new(200, "asdf"))
     run_download_job
 
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
 
     expect(json['workflow_state']).to eq('completed')
     expect(json['results']).to be_present
@@ -226,7 +226,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, download
     run_download_job
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "Could not parse the URL: \#@$YA#Y#AGWREG"
     expect(attachment.reload.file_state).to eq 'errored'
@@ -245,7 +245,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, download
     run_download_job
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "No host provided for the URL: /images/delete.png"
     expect(attachment.reload.file_state).to eq 'errored'
@@ -266,9 +266,9 @@ shared_examples_for "file uploads api" do
 
     # step 2, download
     run_download_job
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
-    expect(json['message']).to include  "Invalid response code, expected 200 got 404"
+    expect(json['message']).to include "Invalid response code, expected 200 got 404"
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
@@ -287,7 +287,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, download
     run_download_job
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "The request timed out: http://www.example.com/images/delete.png"
     expect(attachment.reload.file_state).to eq 'errored'
@@ -309,7 +309,7 @@ shared_examples_for "file uploads api" do
 
     # step 2, download
     run_download_job
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to include "Too many redirects"
     expect(attachment.reload.file_state).to eq 'errored'
@@ -362,7 +362,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile = Tempfile.new(["test", ".txt"])
     tmpfile.write("second")
     tmpfile.rewind
-    post_params = json["upload_params"].merge({"file" => tmpfile})
+    post_params = json["upload_params"].merge({ "file" => tmpfile })
     send_multipart(json["upload_url"], post_params)
     post response['Location'], headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_successful
@@ -399,7 +399,7 @@ shared_examples_for "file uploads api with folders" do
     tmpfile = Tempfile.new(["test", ".txt"])
     tmpfile.write("second")
     tmpfile.rewind
-    post_params = json["upload_params"].merge({"file" => tmpfile})
+    post_params = json["upload_params"].merge({ "file" => tmpfile })
     send_multipart(json["upload_url"], post_params)
     post response['Location'], headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_successful
@@ -436,9 +436,9 @@ shared_examples_for "file uploads api with folders" do
     redir = json['upload_params']['success_action_redirect']
     attachment = Attachment.order(:id).last
     expect_any_instance_of(Aws::S3::Object).to receive(:data).and_return({
-                                      :content_type => 'application/msword',
-                                      :content_length => 1234,
-                                    })
+                                                                           :content_type => 'application/msword',
+                                                                           :content_length => 1234,
+                                                                         })
 
     post redir, headers: { 'Authorization' => "Bearer #{access_token_for_user @user}" }
     expect(response).to be_successful
@@ -478,7 +478,7 @@ shared_examples_for "file uploads api with quotas" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     json = preflight({ :name => "test.txt", :size => 10.megabytes, :url => "http://www.example.com/test" },
-      expected_status: 400)
+                     expected_status: 400)
     expect(json['message']).to eq "file size exceeds quota"
   end
 
@@ -492,7 +492,7 @@ shared_examples_for "file uploads api with quotas" do
     attachment.content_type = 'text/plain'
     attachment.size = 4.megabytes
     attachment.save!
-    json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success", {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'}, {:uuid => attachment.uuid})
+    json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success", { :id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json' }, { :uuid => attachment.uuid })
     expect(json['id']).to eq attachment.id
     attachment.reload
     expect(attachment.file_state).to eq 'available'
@@ -509,8 +509,8 @@ shared_examples_for "file uploads api with quotas" do
     attachment.size = 6.megabytes
     attachment.save!
     json = api_call(:get, "/api/v1/files/#{attachment.id}/create_success",
-                    {:id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json'},
-                    {:uuid => attachment.uuid},
+                    { :id => attachment.id.to_s, :controller => 'files', :action => 'api_create_success', :format => 'json' },
+                    { :uuid => attachment.uuid },
                     {},
                     expected_status: 400)
     expect(json['message']).to eq 'file size exceeds quota limits'
@@ -528,7 +528,7 @@ shared_examples_for "file uploads api with quotas" do
     expect(CanvasHttp).to receive(:get).with("http://www.example.com/test").and_yield(FakeHttpResponse.new(200, (" " * 2.megabytes)))
     run_jobs
 
-    json = api_call(:get, progress_url, {:id => progress_id, :controller => 'progress', :action => 'show', :format => 'json'})
+    json = api_call(:get, progress_url, { :id => progress_id, :controller => 'progress', :action => 'show', :format => 'json' })
     expect(json['workflow_state']).to eq 'failed'
     expect(json['message']).to eq "file size exceeds quota limits: #{ActiveSupport::NumberHelper.number_to_delimited(2.megabytes)} bytes"
     expect(attachment.file_state).to eq 'deleted'

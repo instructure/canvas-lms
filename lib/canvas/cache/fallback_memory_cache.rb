@@ -26,8 +26,8 @@ module Canvas
       end
 
       def write_set(hash, ttl: nil)
-        opts = {expires_in: ttl}
-        hash.each{|k, v| write(k, v, opts) }
+        opts = { expires_in: ttl }
+        hash.each { |k, v| write(k, v, opts) }
       end
 
       # lock is unique to this implementation, it's not a standard part of
@@ -41,6 +41,7 @@ module Canvas
         lock_timeout = options.fetch(:lock_timeout, 5).to_i
         existing_value = read(key)
         return false if existing_value
+
         write(key, nonce, expires_in: lock_timeout.seconds)
         true
       end
@@ -53,6 +54,7 @@ module Canvas
       # so that we can use locking on any local cache implementation.
       def unlock(key, nonce)
         raise ArgumentError("nonce can't be nil") unless nonce
+
         existing_value = read(key)
         delete(key) if nonce == existing_value
       end

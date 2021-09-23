@@ -40,7 +40,8 @@ module BasicLTI
       grade, score = @assignment.compute_grade_and_score(grade, nil)
       # if score is not changed, stop creating a new version
       return true if attempt.present? &&
-        score_equal?(score, grade, launch_url)
+                     score_equal?(score, grade, launch_url)
+
       save_submission!(launch_url, grade, score, grader_id)
       true
     end
@@ -57,6 +58,7 @@ module BasicLTI
 
     def grade_history
       return @_grade_history unless @_grade_history.nil?
+
       # attempt submitted time should be submitted_at from the first version
       attempts = attempts_history.map do |attempt|
         last = attempt.last
@@ -101,6 +103,7 @@ module BasicLTI
 
     def initialize_version
       return if submission.versions.present?
+
       # create a padding unsubmitted version for reopen request
       save_with_versioning
     end
@@ -168,6 +171,7 @@ module BasicLTI
           h = YAML.safe_load(v.yaml).with_indifferent_access
           url = v.model.url
           next if url.blank? # exclude invalid versions (url is actual attempt identifier)
+
           h[:url] = url
           (a[url] = (a[url] || [])) << h.slice(*JSON_FIELDS)
         end
@@ -176,6 +180,7 @@ module BasicLTI
         sorted_list = attempts.keys.sort_by do |k|
           matches = k.match(/\?.*=(\d+)\&/)
           next 0 if matches.blank?
+
           matches.captures.first.to_i # ordered by the first lti parameter
         end
         sorted_list.each_with_object({}) { |k, a| a[k] = attempts[k] }

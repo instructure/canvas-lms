@@ -20,13 +20,12 @@
 
 require_relative '../api_spec_helper'
 
-
 describe UsersController, type: :request do
   include Api
   include Api::V1::Assignment
   def update_assignment_json
-    @a1_json['assignment'] = controller.assignment_json(@a1,@user,session,:include_all_dates => true).as_json
-    @a2_json['assignment'] = controller.assignment_json(@a2,@user,session,:include_all_dates => true).as_json
+    @a1_json['assignment'] = controller.assignment_json(@a1, @user, session, :include_all_dates => true).as_json
+    @a2_json['assignment'] = controller.assignment_json(@a2, @user, session, :include_all_dates => true).as_json
   end
 
   def strip_secure_params(json)
@@ -95,7 +94,7 @@ describe UsersController, type: :request do
 
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     raw_api_call(:get, "/api/v1/courses/#{@course.id}/todo",
-                :controller => "courses", :action => "todo_items", :format => "json", :course_id => @course.to_param)
+                 :controller => "courses", :action => "todo_items", :format => "json", :course_id => @course.to_param)
     assert_status(401)
   end
 
@@ -112,7 +111,7 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @student_course.to_param)
-                    .first
+           .first
 
     update_assignment_json
     expect(strip_secure_params(json)).to eq strip_secure_params(@a1_json)
@@ -122,7 +121,7 @@ describe UsersController, type: :request do
     json = api_call(:get, "/api/v1/courses/#{@teacher_course.id}/todo",
                     :controller => "courses", :action => "todo_items",
                     :format => "json", :course_id => @teacher_course.to_param)
-                    .first
+           .first
     update_assignment_json
     expect(strip_secure_params(json)).to eq strip_secure_params(@a2_json)
   end
@@ -200,8 +199,8 @@ describe UsersController, type: :request do
     @a1.grade_student(@me, excuse: true, grader: @teacher)
 
     json = api_call(:get, "/api/v1/courses/#{@student_course.id}/todo",
-      :controller => "courses", :action => "todo_items",
-      :format => "json", :course_id => @student_course.to_param)
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @student_course.to_param)
 
     expect(json).to eq []
   end
@@ -210,28 +209,28 @@ describe UsersController, type: :request do
     past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
     ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     due_overridden = @student_course.assignments.create! workflow_state: 'published', submission_types: 'not_graded'
-    create_adhoc_override_for_assignment(due_overridden, @user, {due_at: 2.days.from_now})
+    create_adhoc_override_for_assignment(due_overridden, @user, { due_at: 2.days.from_now })
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses", :action => "todo_items",
-        :format => "json", :course_id => @student_course.to_param
-    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id, due_overridden.id
-    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
+                                                                        :format => "json", :course_id => @student_course.to_param
+    expect(json.map { |e| e['assignment']['id'] }).to include ungraded.id, due_overridden.id
+    expect(json.map { |e| e['assignment']['id'] }).not_to include past_ungraded.id
   end
 
   it "should include future assignments that don't expect an online submission (users endpoint)" do
     past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
     ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     due_overridden = @student_course.assignments.create! workflow_state: 'published', submission_types: 'not_graded'
-    create_adhoc_override_for_assignment(due_overridden, @user, {due_at: 2.days.from_now})
+    create_adhoc_override_for_assignment(due_overridden, @user, { due_at: 2.days.from_now })
     json = api_call :get, "/api/v1/users/self/todo", :controller => "users", :action => "todo_items", :format => "json"
-    expect(json.map {|e| e['assignment']['id']}).to include ungraded.id, due_overridden.id
-    expect(json.map {|e| e['assignment']['id']}).not_to include past_ungraded.id
+    expect(json.map { |e| e['assignment']['id'] }).to include ungraded.id, due_overridden.id
+    expect(json.map { |e| e['assignment']['id'] }).not_to include past_ungraded.id
   end
 
   it "should respect grading permissions (users endpoint)" do
     course_with_ta(course: @teacher_course, active_all: true)
     @ta = @user
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
-    expect(json.map {|e| e['assignment']['id']}).to include @a2.id
+    expect(json.map { |e| e['assignment']['id'] }).to include @a2.id
 
     RoleOverride.create!(context: @course.account,
                          permission: 'manage_grades',
@@ -245,7 +244,7 @@ describe UsersController, type: :request do
   it "should not include items from courses concluded by terms dates if the user is also an admin" do
     account_admin_user(account: @teacher_course.root_account, user: @user)
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
-    expect(json.map {|e| e['assignment']['id']}).to include @a2.id
+    expect(json.map { |e| e['assignment']['id'] }).to include @a2.id
 
     et = @teacher_course.enrollment_term
     et.end_at = 1.day.ago
@@ -263,7 +262,7 @@ describe UsersController, type: :request do
 
     # course endpoint
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo", :controller => "courses",
-                    :action => "todo_items", :format => "json", :course_id => @student_course.to_param
+                                                                        :action => "todo_items", :format => "json", :course_id => @student_course.to_param
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
@@ -276,7 +275,7 @@ describe UsersController, type: :request do
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-                    :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
   end
 
@@ -291,7 +290,7 @@ describe UsersController, type: :request do
     survey2.assignment_overrides.create!(:set => section)
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-      :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([survey.id])
   end
 
@@ -309,12 +308,12 @@ describe UsersController, type: :request do
     past_survey.publish!
 
     json = api_call :get, "/api/v1/users/self/todo?include[]=ungraded_quizzes", :controller => "users",
-      :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
+                                                                                :action => "todo_items", :format => "json", :include => %w(ungraded_quizzes)
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
 
     json = api_call :get, "/api/v1/courses/#{@student_course.id}/todo?include[]=ungraded_quizzes",
-      :controller => "courses", :action => "todo_items",
-      :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
+                    :controller => "courses", :action => "todo_items",
+                    :format => "json", :course_id => @student_course.to_param, :include => %w(ungraded_quizzes)
     expect(json.map { |el| el['quiz'] && el['quiz']['id'] }.compact).to eql([])
   end
 
@@ -338,7 +337,6 @@ describe UsersController, type: :request do
       so.save!
       survey.publish!
     end
-
 
     it "includes assignments/quizzes with no due_at (users controller)" do
       json = api_call(:get, "/api/v1/users/self/todo?include[]=ungraded_quizzes",
@@ -431,11 +429,11 @@ describe UsersController, type: :request do
       response_ids = json.map { |todo| todo['assignment']['id'] }
 
       json_next = follow_pagination_link('next', {
-        controller: 'users',
-        action: 'todo_items',
-        format: 'json',
-        per_page: 10
-      })
+                                           controller: 'users',
+                                           action: 'todo_items',
+                                           format: 'json',
+                                           per_page: 10
+                                         })
       response_ids += json_next.map { |todo| todo['assignment']['id'] }
 
       expect(response_ids).to eq((@teacher_assignments + @student_assignments).sort_by(&:due_at).map(&:id))
@@ -448,12 +446,12 @@ describe UsersController, type: :request do
                       :course_id => @student_course.to_param)
       response_ids = json.map { |todo| todo['assignment']['id'] }
       json_next = follow_pagination_link('next', {
-        controller: 'courses',
-        action: 'todo_items',
-        format: 'json',
-        per_page: 5,
-        :course_id => @student_course.to_param
-      })
+                                           controller: 'courses',
+                                           action: 'todo_items',
+                                           format: 'json',
+                                           per_page: 5,
+                                           :course_id => @student_course.to_param
+                                         })
       response_ids += json_next.map { |todo| todo['assignment']['id'] }
 
       expect(response_ids).to eq(@student_assignments.sort_by(&:due_at).map(&:id))
@@ -531,28 +529,28 @@ describe UsersController, type: :request do
 
     it "returns the correct count" do
       json = api_call(:get, "/api/v1/users/self/todo_item_count",
-                :controller => "users", :action => "todo_item_count", :format => "json")
+                      :controller => "users", :action => "todo_item_count", :format => "json")
       expect(json['needs_grading_count']).to eq 1
       expect(json['assignments_needing_submitting']).to eq 16
     end
 
     it "doesn't count assignments that don't need grading" do
       a = Assignment.create!(:context => @teacher_course,
-                         :due_at => 1.day.from_now,
-                         :title => 'no grading',
-                         :submission_types => 'on_paper',
-                         :points_possible => 15)
+                             :due_at => 1.day.from_now,
+                             :title => 'no grading',
+                             :submission_types => 'on_paper',
+                             :points_possible => 15)
       a.submit_homework(@student, :submission_type => 'on_paper')
 
       json = api_call(:get, "/api/v1/users/self/todo_item_count",
-                :controller => "users", :action => "todo_item_count", :format => "json")
+                      :controller => "users", :action => "todo_item_count", :format => "json")
       expect(json['needs_grading_count']).to eq 1
     end
 
     it "doesn't count submissions on deleted assignments" do
       @teacher_course.assignments.last.destroy
       json = api_call(:get, "/api/v1/users/self/todo_item_count",
-                :controller => "users", :action => "todo_item_count", :format => "json")
+                      :controller => "users", :action => "todo_item_count", :format => "json")
       expect(json['needs_grading_count']).to eq 0
     end
   end

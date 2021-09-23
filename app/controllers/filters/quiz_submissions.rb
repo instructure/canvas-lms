@@ -29,10 +29,10 @@ module Filters::QuizSubmissions
     query = {}
     scope = @quiz ? @quiz.quiz_submissions : Quizzes::QuizSubmission
     id = if params.has_key?(:quiz_submission_id)
-      params[:quiz_submission_id]
-    else
-      params[:id]
-    end
+           params[:quiz_submission_id]
+         else
+           params[:id]
+         end
 
     if active
       scope = scope.not_settings_only

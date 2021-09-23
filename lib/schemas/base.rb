@@ -28,6 +28,7 @@ module Schemas
       if error['data_pointer'].present?
         return "#{error['data']} #{error['data_pointer']}. Schema: #{error['schema']}"
       end
+
       "The following fields are required: #{error.dig('schema', 'required').join(', ')}"
     end
 

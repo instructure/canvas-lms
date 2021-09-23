@@ -243,7 +243,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_2.name, @student_3.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students)
 
             f('button[data-component="lmgb-student-filter-trigger"]').click
@@ -251,7 +251,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_1.name, @student_2.name, @student_3.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students)
           end
 
@@ -263,7 +263,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_2.name, @student_3.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students)
 
             f('button[data-component="lmgb-student-filter-trigger"]').click
@@ -271,7 +271,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_1.name, @student_2.name, @student_3.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students)
           end
 
@@ -285,7 +285,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_1.name, @student_2.name, @student_3.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students)
 
             f('button[data-component="lmgb-student-filter-trigger"]').click
@@ -293,7 +293,7 @@ describe "outcome gradebook" do
             wait_for_ajax_requests
 
             active_students = [@student_1.name, @student_2.name, @student_3.name, student_4.name]
-            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            student_names = ff('.outcome-student-cell-content').map { |cell| cell.text.split("\n")[0] }
             expect(student_names.sort).to eq(active_students.sort)
           end
 
@@ -333,97 +333,95 @@ describe "outcome gradebook" do
             result(@student_3, align3, 2)
           end
 
-        it "Displays the mastery scales and proficiency calculations once enabled" do
-          get "/courses/#{@course.id}/gradebook"
-          select_learning_mastery
-          wait_for_ajax_requests
+          it "Displays the mastery scales and proficiency calculations once enabled" do
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
 
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("1.58", "2.33")
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("1.58", "2.33")
 
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("1.7", "2")
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("1.7", "2")
 
-          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
-          # refresh page
-          refresh_page
+            Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+            # refresh page
+            refresh_page
 
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("3.33", "7.78")
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("3.33", "7.78")
 
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("3.33", "6.67")
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("3.33", "6.67")
+          end
+
+          it "Displays changes to the mastery scales and proficiency calculations" do
+            Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("3.33", "7.78")
+
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("3.33", "6.67")
+
+            # Update the ratings points, and use the highest calculation method so averages will be over 100
+            @rating1.points = 100
+            @rating2.points = 10
+            @calculation_method.calculation_method = 'highest'
+            @calculation_method.save!
+            @proficiency.save!
+
+            # refresh page
+            refresh_page
+
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("111.11", "77.78")
+
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("100", "66.67")
+          end
+
+          it "Displays the course level outcome values when FF is turned off" do
+            Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("3.33", "7.78")
+
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("3.33", "6.67")
+
+            Account.default.set_feature_flag!('account_level_mastery_scales', 'off')
+
+            # refresh page
+            refresh_page
+
+            # mean
+            averages = selected_values
+            expect(averages).to contain_exactly("1.58", "2.33")
+
+            # median
+            medians = median_values
+            expect(medians).to contain_exactly("1.7", "2")
+          end
         end
-
-        it "Displays changes to the mastery scales and proficiency calculations" do
-
-          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
-
-          get "/courses/#{@course.id}/gradebook"
-          select_learning_mastery
-          wait_for_ajax_requests
-
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("3.33", "7.78")
-
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("3.33", "6.67")
-
-          # Update the ratings points, and use the highest calculation method so averages will be over 100
-          @rating1.points = 100
-          @rating2.points = 10
-          @calculation_method.calculation_method = 'highest'
-          @calculation_method.save!
-          @proficiency.save!
-
-          # refresh page
-          refresh_page
-
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("111.11", "77.78")
-
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("100", "66.67")
-        end
-
-        it "Displays the course level outcome values when FF is turned off" do
-
-          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
-
-          get "/courses/#{@course.id}/gradebook"
-          select_learning_mastery
-          wait_for_ajax_requests
-
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("3.33", "7.78")
-
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("3.33", "6.67")
-
-          Account.default.set_feature_flag!('account_level_mastery_scales', 'off')
-
-          # refresh page
-          refresh_page
-
-          # mean
-          averages = selected_values
-          expect(averages).to contain_exactly("1.58", "2.33")
-
-          # median
-          medians = median_values
-          expect(medians).to contain_exactly("1.7", "2")
-        end
-       end
       end
 
       context 'with non-scoring results' do

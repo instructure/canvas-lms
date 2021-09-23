@@ -36,7 +36,7 @@ describe DuplicatingObjects do
       end
 
       def get_potentially_conflicting_titles(_title_base)
-        [ 'Foo', 'assignment Copy', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5' ].to_set
+        ['Foo', 'assignment Copy', 'Foo Copy', 'Foo Copy 1', 'Foo Copy 2', 'Foo Copy 5'].to_set
       end
 
       attr_accessor :title

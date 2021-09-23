@@ -23,6 +23,7 @@ class OauthProxyController < ApplicationController
 
   def redirect_proxy
     reject! t("The state parameter is required") and return unless params[:state]
+
     begin
       json = Canvas::Security.decode_jwt(params[:state])
       url = URI.parse(json['redirect_uri'])
@@ -33,5 +34,4 @@ class OauthProxyController < ApplicationController
       reject! t("Invalid state parameter") and return
     end
   end
-
 end

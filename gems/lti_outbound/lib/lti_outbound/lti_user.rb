@@ -38,9 +38,9 @@ module LtiOutbound
 
     def enrollment_state
       {
-          true => LtiOutbound::LTIUser::ACTIVE_STATE,
-          false => LtiOutbound::LTIUser::INACTIVE_STATE,
-          nil => nil
+        true => LtiOutbound::LTIUser::ACTIVE_STATE,
+        false => LtiOutbound::LTIUser::INACTIVE_STATE,
+        nil => nil
       }[currently_active_in_course]
     end
 
@@ -50,8 +50,11 @@ module LtiOutbound
 
     def observer?
       return false unless current_roles
-      current_roles.any? { |e| LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').include?(e) ||
-                               LtiOutbound::LTIRoles::Context::OBSERVER.split(',').include?(e) }
+
+      current_roles.any? { |e|
+        LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER.split(',').include?(e) ||
+          LtiOutbound::LTIRoles::Context::OBSERVER.split(',').include?(e)
+      }
     end
   end
 end

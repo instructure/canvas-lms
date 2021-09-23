@@ -36,8 +36,8 @@ describe "Admins API", type: :request do
 
     it "should flag the user as an admin for the account" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-        { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id })
+                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                      { :user_id => @new_user.id })
       @new_user.reload
       expect(@new_user.account_users.size).to eq 1
       admin = @new_user.account_users.first
@@ -46,8 +46,8 @@ describe "Admins API", type: :request do
 
     it "should default the role of the admin association to AccountAdmin" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-        { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id })
+                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                      { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(admin.role).to eq admin_role
@@ -56,8 +56,8 @@ describe "Admins API", type: :request do
     it "should respect the provided role, if any" do
       role = custom_account_role('CustomAccountUser', :account => @admin.account)
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-        { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
-        { :user_id => @new_user.id, :role_id => role.id })
+                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                      { :user_id => @new_user.id, :role_id => role.id })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(admin.role).to eq role
@@ -75,8 +75,8 @@ describe "Admins API", type: :request do
 
     it "should return json of the new admin association" do
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      {:controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s},
-                      {:user_id => @new_user.id})
+                      { :controller => 'admins', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
+                      { :user_id => @new_user.id })
       @new_user.reload
       admin = @new_user.account_users.first
       expect(json).to eq({
@@ -103,9 +103,9 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-               {:controller => 'admins', :action => 'create', :format => 'json',
-                :account_id => @admin.account.to_param },
-               {:user_id => @new_user.to_param, :send_confirmation => '0'})
+               { :controller => 'admins', :action => 'create', :format => 'json',
+                 :account_id => @admin.account.to_param },
+               { :user_id => @new_user.to_param, :send_confirmation => '0' })
 
       # Both of the expectations above should pass.
     end
@@ -115,9 +115,9 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).never
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      {:controller => 'admins', :action => 'create', :format => 'json',
-                       :account_id => @admin.account.to_param },
-                      {:user_id => @new_user.to_param, :send_confirmation => 'false'})
+                      { :controller => 'admins', :action => 'create', :format => 'json',
+                        :account_id => @admin.account.to_param },
+                      { :user_id => @new_user.to_param, :send_confirmation => 'false' })
 
       # Both of the expectations above should pass.
     end
@@ -126,9 +126,9 @@ describe "Admins API", type: :request do
       expect_any_instance_of(AccountUser).to receive(:account_user_registration!).once
 
       json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/admins",
-                      {:controller => 'admins', :action => 'create', :format => 'json',
-                       :account_id => @admin.account.to_param },
-                      {:user_id => @new_user.to_param})
+                      { :controller => 'admins', :action => 'create', :format => 'json',
+                        :account_id => @admin.account.to_param },
+                      { :user_id => @new_user.to_param })
 
       # Expectation above should pass.
     end
@@ -280,69 +280,69 @@ describe "Admins API", type: :request do
 
       it "should return the correct format" do
         json = api_call(:get, @path, @path_opts)
-        expect(json).to be_include({"id" => @admin.account_users.first.id,
-                                    "role" => "AccountAdmin",
-                                    "role_id" => admin_role.id,
-                                    "user" =>
-                                      {"id" => @admin.id,
-                                       "created_at" => @admin.created_at.iso8601,
-                                       "name" => @admin.name,
-                                       "sortable_name" => @admin.sortable_name,
-                                       "short_name" => @admin.short_name,
-                                       "sis_user_id" => nil,
-                                       "integration_id" => nil,
-                                       "sis_import_id" => nil,
-                                       "login_id" => @admin.pseudonym.unique_id},
-                                    "workflow_state" => 'active'})
+        expect(json).to be_include({ "id" => @admin.account_users.first.id,
+                                     "role" => "AccountAdmin",
+                                     "role_id" => admin_role.id,
+                                     "user" =>
+                                      { "id" => @admin.id,
+                                        "created_at" => @admin.created_at.iso8601,
+                                        "name" => @admin.name,
+                                        "sortable_name" => @admin.sortable_name,
+                                        "short_name" => @admin.short_name,
+                                        "sis_user_id" => nil,
+                                        "integration_id" => nil,
+                                        "sis_import_id" => nil,
+                                        "login_id" => @admin.pseudonym.unique_id },
+                                     "workflow_state" => 'active' })
       end
 
       it "should scope the results to the user_id if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: @admin.id))
-        expect(json).to eq [{"id" => @admin.account_users.first.id,
-                             "role" => "AccountAdmin",
-                             "role_id" => admin_role.id,
-                             "user" =>
-                               {"id" => @admin.id,
-                                "created_at" => @admin.created_at.iso8601,
-                                "name" => @admin.name,
-                                "sortable_name" => @admin.sortable_name,
-                                "short_name" => @admin.short_name,
-                                "sis_user_id" => nil,
-                                "integration_id" => nil,
-                                "sis_import_id" => nil,
-                                "login_id" => @admin.pseudonym.unique_id},
-                             "workflow_state" => 'active'}]
+        expect(json).to eq [{ "id" => @admin.account_users.first.id,
+                              "role" => "AccountAdmin",
+                              "role_id" => admin_role.id,
+                              "user" =>
+                               { "id" => @admin.id,
+                                 "created_at" => @admin.created_at.iso8601,
+                                 "name" => @admin.name,
+                                 "sortable_name" => @admin.sortable_name,
+                                 "short_name" => @admin.short_name,
+                                 "sis_user_id" => nil,
+                                 "integration_id" => nil,
+                                 "sis_import_id" => nil,
+                                 "login_id" => @admin.pseudonym.unique_id },
+                              "workflow_state" => 'active' }]
       end
 
       it "should scope the results to the array of user_ids if given" do
         json = api_call(:get, @path, @path_opts.merge(user_id: [@admin.id, @another_admin.id]))
-        expect(json).to eq [{"id" => @admin.account_users.first.id,
-                             "role" => "AccountAdmin",
-                             "role_id" => admin_role.id,
-                             "user" =>
-                               {"id" => @admin.id,
-                                "created_at" => @admin.created_at.iso8601,
-                                "name" => @admin.name,
-                                "sortable_name" => @admin.sortable_name,
-                                "short_name" => @admin.short_name,
-                                "sis_user_id" => nil,
-                                "integration_id" => nil,
-                                "sis_import_id" => nil,
-                                "login_id" => @admin.pseudonym.unique_id},
-                             "workflow_state" => 'active'},
-                            {"id" => @another_admin.account_users.first.id,
-                             "role" => "MT 1",
-                             "role_id" => @roles[1].id,
-                             "user" =>
-                               {"id" => @another_admin.id,
-                                "created_at" => @another_admin.created_at.iso8601,
-                                "name" => @another_admin.name,
-                                "sortable_name" => @another_admin.sortable_name,
-                                "sis_user_id" => nil,
-                                "integration_id" => nil,
-                                "sis_import_id" => nil,
-                                "short_name" => @another_admin.short_name},
-                             "workflow_state" => 'active'}]
+        expect(json).to eq [{ "id" => @admin.account_users.first.id,
+                              "role" => "AccountAdmin",
+                              "role_id" => admin_role.id,
+                              "user" =>
+                               { "id" => @admin.id,
+                                 "created_at" => @admin.created_at.iso8601,
+                                 "name" => @admin.name,
+                                 "sortable_name" => @admin.sortable_name,
+                                 "short_name" => @admin.short_name,
+                                 "sis_user_id" => nil,
+                                 "integration_id" => nil,
+                                 "sis_import_id" => nil,
+                                 "login_id" => @admin.pseudonym.unique_id },
+                              "workflow_state" => 'active' },
+                            { "id" => @another_admin.account_users.first.id,
+                              "role" => "MT 1",
+                              "role_id" => @roles[1].id,
+                              "user" =>
+                               { "id" => @another_admin.id,
+                                 "created_at" => @another_admin.created_at.iso8601,
+                                 "name" => @another_admin.name,
+                                 "sortable_name" => @another_admin.sortable_name,
+                                 "sis_user_id" => nil,
+                                 "integration_id" => nil,
+                                 "sis_import_id" => nil,
+                                 "short_name" => @another_admin.short_name },
+                              "workflow_state" => 'active' }]
       end
 
       context 'sharding' do
@@ -362,14 +362,14 @@ describe "Admins API", type: :request do
       it "should paginate" do
         json = api_call(:get, @path + "?per_page=2", @path_opts.merge(:per_page => '2'))
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
-            { :user => @admin.name, :role => 'AccountAdmin', :role_id => admin_role.id },
-            { :user => "User 0", :role => "MT 0", :role_id => @roles[0].id },
+        expect(json.map { |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
+          { :user => @admin.name, :role => 'AccountAdmin', :role_id => admin_role.id },
+          { :user => "User 0", :role => "MT 0", :role_id => @roles[0].id },
         ]
         json = api_call(:get, @path + "?per_page=2&page=2", @path_opts.merge(:per_page => '2', :page => '2'))
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/admins\?.*page=2.*>; rel="last"})
-        expect(json.map{ |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
-            { :user => "User 1", :role => "MT 1", :role_id => @roles[1].id }
+        expect(json.map { |au| { :user => au['user']['name'], :role => au['role'], :role_id => au['role_id'] } }).to eq [
+          { :user => "User 1", :role => "MT 1", :role_id => @roles[1].id }
         ]
       end
     end

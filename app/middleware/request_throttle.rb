@@ -60,11 +60,11 @@ class RequestThrottle
     pre_judged = (approved?(request) || blocked?(request))
     cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
       status, headers, response = if !allowed?(request, bucket)
-        throttled = true
-        rate_limit_exceeded
-      else
-        @app.call(env)
-      end
+                                    throttled = true
+                                    rate_limit_exceeded
+                                  else
+                                    @app.call(env)
+                                  end
 
       ending_cpu = Process.times()
       ending_mem = Canvas.sample_memory()
@@ -143,6 +143,7 @@ class RequestThrottle
 
   def tag_identifier(tag, identifier)
     return unless identifier
+
     "#{tag}:#{identifier}"
   end
 
@@ -150,22 +151,25 @@ class RequestThrottle
   # object won't be caught.
   def client_identifiers(request)
     request.env['canvas.request_throttle.user_id'] ||= [
-        (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
-        tag_identifier("user", AuthenticationMethods.user_id(request).presence),
-        tag_identifier("session", session_id(request).presence),
-        tag_identifier("tool", tool_id(request)),
-        tag_identifier("ip", request.ip)
-      ].compact
+      (token_string = AuthenticationMethods.access_token(request, :GET).presence) && "token:#{AccessToken.hashed_token(token_string)}",
+      tag_identifier("user", AuthenticationMethods.user_id(request).presence),
+      tag_identifier("session", session_id(request).presence),
+      tag_identifier("tool", tool_id(request)),
+      tag_identifier("ip", request.ip)
+    ].compact
   end
 
   def tool_id(request)
     return unless (request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback})
+
     tool_id = $1
     return unless tool_id =~ Api::ID_REGEX
+
     # yes, a db lookup, but we're only loading it for these two actions,
     # and only if another identifier couldn't be found
     tool = ContextExternalTool.find_by(id: tool_id)
     return unless tool
+
     tool.domain
   end
 
@@ -200,9 +204,8 @@ class RequestThrottle
 
   def rate_limit_exceeded
     [403,
-     {'Content-Type' => 'text/plain; charset=utf-8', 'X-Rate-Limit-Remaining' => '0.0'},
-     ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]
-    ]
+     { 'Content-Type' => 'text/plain; charset=utf-8', 'X-Rate-Limit-Remaining' => '0.0' },
+     ["403 #{Rack::Utils::HTTP_STATUS_CODES[403]} (Rate Limit Exceeded)\n"]]
   end
 
   def report_on_stats(db_runtime, account, starting_mem, ending_mem, user_cpu, system_cpu)
@@ -215,10 +218,10 @@ class RequestThrottle
     if account&.shard&.database_server
       InstStatsd::Statsd.timing("requests_system_cpu.cluster_#{account.shard.database_server.id}", system_cpu,
                                 short_stat: 'requests_system_cpu',
-                                tags: {cluster: account.shard.database_server.id})
+                                tags: { cluster: account.shard.database_server.id })
       InstStatsd::Statsd.timing("requests_user_cpu.cluster_#{account.shard.database_server.id}", user_cpu,
                                 short_stat: 'requests_user_cpu',
-                                tags: {cluster: account.shard.database_server.id})
+                                tags: { cluster: account.shard.database_server.id })
     end
 
     mem_stat = if starting_mem == 0 || ending_mem == 0
@@ -286,7 +289,7 @@ class RequestThrottle
       @up_front_cost_regex_map ||=
         begin
           hash = RequestThrottle.dynamic_settings['up_front_cost_by_path_regex'] || {}
-          hash.keys.select{|k| k.is_a?(String)}.map{|k| hash[Regexp.new(k)] = hash.delete(k)} #regexify strings
+          hash.keys.select { |k| k.is_a?(String) }.map { |k| hash[Regexp.new(k)] = hash.delete(k) } # regexify strings
           hash.each do |k, v|
             unless k.is_a?(Regexp) && v.is_a?(Numeric)
               ::Rails.logger.error("ERROR in request_throttle.yml: up_front_cost_by_path_regex must use Regex => Numeric key-value pairs")

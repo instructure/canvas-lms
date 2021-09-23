@@ -37,7 +37,7 @@ module CanvasQuizStatistics::Analyzers
 
     inherit :responses, :full_credit, from: :essay
     inherit :correct, :incorrect, from: :fill_in_multiple_blanks
-    
+
     RANGE_ANSWER = 'range_answer'.freeze
     PRECISION_ANSWER = 'precision_answer'.freeze
 
@@ -109,12 +109,12 @@ module CanvasQuizStatistics::Analyzers
         text = generate_text_for_answer(answer, answer_type)
 
         answer_stats.merge!({
-          text: text,
-          value: bounds,
-          responses: 0,
-          margin: answer[:margin].to_f,
-          is_range: answer_type == RANGE_ANSWER
-        })
+                              text: text,
+                              value: bounds,
+                              responses: 0,
+                              margin: answer[:margin].to_f,
+                              is_range: answer_type == RANGE_ANSWER
+                            })
       end
 
       answers.tap { calculate_responses(responses, answers) }
@@ -136,7 +136,7 @@ module CanvasQuizStatistics::Analyzers
 
       case answer_type
       when RANGE_ANSWER
-        range = [ answer[:start], answer[:end] ].map(&format).join('..')
+        range = [answer[:start], answer[:end]].map(&format).join('..')
         "[#{range}]"
       when PRECISION_ANSWER
         "#{answer[:approximate]} (with precision: #{answer[:precision]})"
@@ -153,12 +153,12 @@ module CanvasQuizStatistics::Analyzers
       case answer_type
       when RANGE_ANSWER
         # there's no margin in range answers
-        [ answer[:start].to_f, answer[:end].to_f ]
+        [answer[:start].to_f, answer[:end].to_f]
       when PRECISION_ANSWER
-        [ answer[:approximate] - answer[:precision], answer[:approximate] + answer[:precision] ]
+        [answer[:approximate] - answer[:precision], answer[:approximate] + answer[:precision]]
       else
         margin = answer[:margin].to_f
-        [ answer[:exact] - margin, answer[:exact] + margin ]
+        [answer[:exact] - margin, answer[:exact] + margin]
       end
     end
 

@@ -21,11 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe ApiScopeMapperLoader do
-
-  let(:resource) {"users"}
+  let(:resource) { "users" }
 
   describe ".load" do
-
     it "loads the ApiScopeMapper file if present" do
       fallback_class = ApiScopeMapperLoader.api_scope_mapper_fallback
       Object.const_set("ApiScopeMapper", fallback_class)
@@ -38,11 +36,9 @@ describe ApiScopeMapperLoader do
       api_scope_mapper = ApiScopeMapperLoader.load
       expect(api_scope_mapper.name_for_resource(resource)).to eq resource
     end
-
   end
 
   describe ".api_scope_mapper_fallback" do
-
     it "creates a ApiScopeMapper Class with a lookup_resource method" do
       api_scope_mapper_fallback = ApiScopeMapperLoader.api_scope_mapper_fallback
       expect(api_scope_mapper_fallback.lookup_resource(resource, "not_used")).to eq(resource)
@@ -52,6 +48,5 @@ describe ApiScopeMapperLoader do
       api_scope_mapper_fallback = ApiScopeMapperLoader.api_scope_mapper_fallback
       expect(api_scope_mapper_fallback.name_for_resource(resource)).to eq(resource)
     end
-
   end
 end

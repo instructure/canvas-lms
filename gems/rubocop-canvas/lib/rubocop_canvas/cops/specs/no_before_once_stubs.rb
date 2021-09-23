@@ -48,12 +48,13 @@ module RuboCop
           return unless node.ancestors.find do |ancestor|
             child = ancestor.children && ancestor.children[0]
             child &&
-              child.is_a?(::RuboCop::AST::Node) &&
-              child.to_a[1] == BLOCK_METHOD &&
-              child.to_a[2] &&
-              child.to_a[2].is_a?(::RuboCop::AST::Node) &&
-              child.to_a[2].children[0] == BLOCK_ARG
+            child.is_a?(::RuboCop::AST::Node) &&
+            child.to_a[1] == BLOCK_METHOD &&
+            child.to_a[2] &&
+            child.to_a[2].is_a?(::RuboCop::AST::Node) &&
+            child.to_a[2].children[0] == BLOCK_ARG
           end
+
           add_offense node, message: MSG, severity: :warning
         end
       end

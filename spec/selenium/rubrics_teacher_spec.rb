@@ -27,7 +27,6 @@ describe "teacher shared rubric specs" do
   let(:who_to_login) { 'teacher' }
 
   before(:each) do
-
     course_with_teacher_logged_in
   end
 
@@ -48,7 +47,6 @@ describe "teacher shared rubric specs" do
   end
 
   it "should round to an integer when splitting" do
-
     should_round_to_an_integer_when_splitting
   end
 
@@ -63,7 +61,6 @@ describe "course rubrics" do
   include RubricsCommon
 
   context "as a teacher" do
-
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -89,7 +86,7 @@ describe "course rubrics" do
 
       # check again after reload
       refresh_page
-      expect(fj('.rubric_total')).to include_text "10" #avoid selenium caching
+      expect(fj('.rubric_total')).to include_text "10" # avoid selenium caching
     end
 
     it "should calculate ratings based on initial rating values" do
@@ -201,7 +198,7 @@ describe "course rubrics" do
         get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
         wait_for_ajaximations
         import_outcome
-        points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s}
+        points = proficiency.outcome_proficiency_ratings.map { |rating| round_if_whole(rating.points).to_s }
         expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq points
       end
 
@@ -226,7 +223,7 @@ describe "course rubrics" do
         get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
         wait_for_ajaximations
         import_outcome
-        current_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        current_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f }
         # checks if they are equal after adding outcome
         expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq current_points
         submit_form("#edit_rubric_form")
@@ -242,7 +239,7 @@ describe "course rubrics" do
 
         refresh_page
         wait_for_ajaximations
-        updated_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        updated_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f }
         # checks if they are equal after update
         expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq updated_points
       end
@@ -257,16 +254,16 @@ describe "course rubrics" do
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     comment = "Hi, please see www.example.com"
     @assessment = @association.assess({
-                                          :user => @student,
-                                          :assessor => @teacher,
-                                          :artifact => @assignment.find_or_create_submission(@student),
-                                          :assessment => {
-                                              :assessment_type => 'grading',
-                                              :criterion_crit1 => {
-                                                  :points => nil,
-                                                  :comments => comment,
-                                              }
+                                        :user => @student,
+                                        :assessor => @teacher,
+                                        :artifact => @assignment.find_or_create_submission(@student),
+                                        :assessment => {
+                                          :assessment_type => 'grading',
+                                          :criterion_crit1 => {
+                                            :points => nil,
+                                            :comments => comment,
                                           }
+                                        }
                                       })
     user_logged_in(:user => @student)
 
@@ -287,15 +284,15 @@ describe "course rubrics" do
     course_with_student(:course => @course, :active_all => true)
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     @assessment = @association.assess({
-                                          :user => @student,
-                                          :assessor => @teacher,
-                                          :artifact => @assignment.find_or_create_submission(@student),
-                                          :assessment => {
-                                              :assessment_type => 'grading',
-                                              :criterion_crit1 => {
-                                                  :points => 0
-                                              }
+                                        :user => @student,
+                                        :assessor => @teacher,
+                                        :artifact => @assignment.find_or_create_submission(@student),
+                                        :assessment => {
+                                          :assessment_type => 'grading',
+                                          :criterion_crit1 => {
+                                            :points => 0
                                           }
+                                        }
                                       })
     user_logged_in(:user => @student)
 
@@ -311,15 +308,15 @@ describe "course rubrics" do
     course_with_student(:course => @course, :active_all => true)
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
     @assessment = @association.assess({
-                                          :user => @student,
-                                          :assessor => @teacher,
-                                          :artifact => @assignment.find_or_create_submission(@student),
-                                          :assessment => {
-                                              :assessment_type => 'grading',
-                                              :criterion_crit1 => {
-                                                  :points => nil
-                                              }
+                                        :user => @student,
+                                        :assessor => @teacher,
+                                        :artifact => @assignment.find_or_create_submission(@student),
+                                        :assessment => {
+                                          :assessment_type => 'grading',
+                                          :criterion_crit1 => {
+                                            :points => nil
                                           }
+                                        }
                                       })
     user_logged_in(:user => @student)
 

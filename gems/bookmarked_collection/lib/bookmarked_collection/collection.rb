@@ -29,6 +29,7 @@ class BookmarkedCollection::Collection < Array
 
   def shift_with_bookmark
     return if empty?
+
     bookmark = bookmark_for(first)
     [shift, bookmark]
   end

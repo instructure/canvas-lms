@@ -109,7 +109,7 @@ module AccountReports
           }
         },
         'outcome_export_csv' => {
-          title: proc { I18n.t('Outcome Export')},
+          title: proc { I18n.t('Outcome Export') },
           parameters_partial: false,
           description_partial: true,
           parameters: {}

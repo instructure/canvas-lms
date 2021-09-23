@@ -27,7 +27,6 @@ describe "submissions" do
   include SubmissionsCommon
 
   context 'as a teacher' do
-
     before(:each) do
       course_with_teacher_logged_in
     end
@@ -58,7 +57,6 @@ describe "submissions" do
   end
 
   context "student view" do
-
     before(:each) do
       Account.default.enable_feature!(:rce_enhancements)
       course_with_teacher_logged_in
@@ -66,10 +64,11 @@ describe "submissions" do
 
     it "should allow a student view student to view/submit assignments", priority: "1", test_id: 237034 do
       @assignment = @course.assignments.create(
-          :title => 'Cool Assignment',
-          :points_possible => 10,
-          :submission_types => "online_text_entry",
-          :due_at => Time.now.utc + 2.days)
+        :title => 'Cool Assignment',
+        :points_possible => 10,
+        :submission_types => "online_text_entry",
+        :due_at => Time.now.utc + 2.days
+      )
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -90,10 +89,11 @@ describe "submissions" do
 
     it "should allow a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
       @assignment = @course.assignments.create(
-          :title => 'Cool Assignment',
-          :points_possible => 10,
-          :submission_types => "online_upload",
-          :due_at => Time.now.utc + 2.days)
+        :title => 'Cool Assignment',
+        :points_possible => 10,
+        :submission_types => "online_upload",
+        :due_at => Time.now.utc + 2.days
+      )
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

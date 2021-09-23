@@ -34,6 +34,7 @@ class MigrateSamlLoginAttributes < ActiveRecord::Migration[5.1]
     AuthenticationProvider::SAML.where(login_attribute: 'NameID').update_all(login_attribute: 'nameid')
     AuthenticationProvider::SAML.where(login_attribute: 'eduPersonPrincipalName').each do |ap|
       next unless ap.strip_domain_from_login_attribute?
+
       ap.login_attribute = 'eduPersonPrincipalName_stripped'
       ap.save!
     end

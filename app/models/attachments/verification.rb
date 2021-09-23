@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Attachments::Verification
-
   # Attachment verifiers are tokens that can be added to attachment URLs that give
   # the holder of the URL the ability to read an attachment without having an
   # authenticated session. Verifiers capture in them the user id of the current user,
@@ -125,6 +124,7 @@ class Attachments::Verification
     if !body[:user_id] && !body[:pm]
       return true
     end
+
     user = body[:user_id] && User.find(body[:user_id])
 
     if body[:ctx] && body[:pm]
@@ -146,4 +146,3 @@ class Attachments::Verification
     context.grants_right?(user, session, permission_map[permission])
   end
 end
-

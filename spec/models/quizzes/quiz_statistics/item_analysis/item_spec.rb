@@ -21,15 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/common.rb')
 
 describe Quizzes::QuizStatistics::ItemAnalysis::Item do
-
   describe ".from" do
     it "should create an item for a supported question type" do
-      qq = {:question_type => "true_false_question", :answers => []}
+      qq = { :question_type => "true_false_question", :answers => [] }
       expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).not_to be_nil
     end
 
     it "should not create an item for an unsupported question type" do
-      qq = {:question_type => "essay_question"}
+      qq = { :question_type => "essay_question" }
       expect(Quizzes::QuizStatistics::ItemAnalysis::Item.from(nil, qq)).to be_nil
     end
   end

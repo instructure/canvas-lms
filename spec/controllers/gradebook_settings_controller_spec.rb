@@ -87,9 +87,9 @@ RSpec.describe GradebookSettingsController, type: :controller do
         before { put :update, params: valid_params }
 
         it { expect(response).to be_ok }
-        it { is_expected.to include 'enter_grades_as' => {'2301' => 'points'} }
-        it { is_expected.to include 'filter_columns_by' => {'grading_period_id' => '1401', 'assignment_group_id' => '888'} }
-        it { is_expected.to include 'filter_rows_by' => {'section_id' => nil, 'student_group_id' => nil} }
+        it { is_expected.to include 'enter_grades_as' => { '2301' => 'points' } }
+        it { is_expected.to include 'filter_columns_by' => { 'grading_period_id' => '1401', 'assignment_group_id' => '888' } }
+        it { is_expected.to include 'filter_rows_by' => { 'section_id' => nil, 'student_group_id' => nil } }
         it { is_expected.to include 'selected_view_options_filters' => ['assignmentGroups'] }
         it { is_expected.to include 'show_inactive_enrollments' => 'true' }
         it { is_expected.to include 'show_concluded_enrollments' => 'false' }
@@ -109,12 +109,12 @@ RSpec.describe GradebookSettingsController, type: :controller do
           it { is_expected.to have(5).items } # ensure we add specs for new additions
           it do
             is_expected.to include({
-              'late' => '#000000',
-              'missing' => '#000001',
-              'resubmitted' => '#000002',
-              'dropped' => '#000003',
-              'excused' => '#000004'
-            })
+                                     'late' => '#000000',
+                                     'missing' => '#000001',
+                                     'resubmitted' => '#000002',
+                                     'dropped' => '#000003',
+                                     'excused' => '#000004'
+                                   })
           end
         end
       end
@@ -122,9 +122,9 @@ RSpec.describe GradebookSettingsController, type: :controller do
       it "transforms 'null' string values to nil" do
         put :update, params: valid_params
 
-        section_id = teacher.get_preference(:gradebook_settings, @course.global_id).
-          fetch('filter_rows_by').
-          fetch('section_id')
+        section_id = teacher.get_preference(:gradebook_settings, @course.global_id)
+                            .fetch('filter_rows_by')
+                            .fetch('section_id')
 
         expect(section_id).to be_nil
       end
@@ -132,11 +132,11 @@ RSpec.describe GradebookSettingsController, type: :controller do
       it "allows saving gradebook settings for multiple courses" do
         previous_course = Course.create!(name: 'Previous Course')
         teacher.update!(preferences: {
-          gradebook_settings: {
-            previous_course.id => gradebook_settings_massaged.except("colors"),
-            colors: gradebook_settings_massaged.fetch("colors")
-          }
-        })
+                          gradebook_settings: {
+                            previous_course.id => gradebook_settings_massaged.except("colors"),
+                            colors: gradebook_settings_massaged.fetch("colors")
+                          }
+                        })
         put :update, params: valid_params
 
         expect(json_parse.fetch('gradebook_settings')).to eql expected_settings
@@ -197,7 +197,7 @@ RSpec.describe GradebookSettingsController, type: :controller do
       it { is_expected.to have_http_status :bad_request }
 
       it "gives an error message" do
-        expect(json_parse).to include "errors" => [{"message" => "gradebook_settings is missing"}]
+        expect(json_parse).to include "errors" => [{ "message" => "gradebook_settings is missing" }]
       end
     end
   end

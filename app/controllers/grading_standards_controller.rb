@@ -116,6 +116,7 @@ class GradingStandardsController < ApplicationController
 
   def grading_standard_params
     return {} unless params[:grading_standard]
+
     params[:grading_standard].permit(:title, :standard_data => strong_anything, :data => strong_anything)
   end
 end

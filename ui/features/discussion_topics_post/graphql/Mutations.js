@@ -17,6 +17,7 @@
  */
 
 import {DiscussionEntry} from './DiscussionEntry'
+import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import {Discussion} from './Discussion'
 import {Error} from '../../../shared/graphql/Error'
 import gql from 'graphql-tag'
@@ -235,4 +236,29 @@ export const UPDATE_ISOLATED_VIEW_DEEPLY_NESTED_ALERT = gql`
     }
   }
   ${User.fragment}
+`
+
+export const CREATE_DISCUSSION_ENTRY_DRAFT = gql`
+  mutation CreateDiscussionEntryDraft(
+    $discussionTopicId: ID!
+    $message: String!
+    $discussionEntryId: ID
+    $parentId: ID
+    $fileId: ID
+  ) {
+    createDiscussionEntryDraft(
+      input: {
+        discussionTopicId: $discussionTopicId
+        discussionEntryId: $discussionEntryId
+        message: $message
+        parentId: $parentId
+        fileId: $fileId
+      }
+    ) {
+      discussionEntryDraft {
+        ...DiscussionEntryDraft
+      }
+    }
+  }
+  ${DiscussionEntryDraft.fragment}
 `

@@ -27,7 +27,6 @@ describe CyoeHelper do
   FakeTag = Struct.new(:id, :assignment).freeze
 
   describe 'cyoeable item' do
-
     it 'should return false if an item is not a quiz or assignment' do
       topic = FakeItem.new(1, 'DiscussionTopic', false)
       expect(helper.cyoe_able?(topic)).to eq false
@@ -73,7 +72,7 @@ describe CyoeHelper do
 
     describe 'path data for student' do
       it 'should return url data for the mastery path if assignment set action is created' do
-        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: @student })
         expect(mastery_path[:still_processing]).to be false
         expect(mastery_path[:modules_url]).to eq("/courses/#{@context.id}/modules")
       end
@@ -83,7 +82,7 @@ describe CyoeHelper do
         unpublised_assmt = @course.assignments.create!(:only_visible_to_overrides => true, :workflow_state => "unpublished")
         set1.assignment_set_associations.create!(:assignment => unpublised_assmt)
 
-        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: @student })
         expect(mastery_path[:still_processing]).to be false # old code would have blown up because the unpublished assmt isn't visible
         expect(mastery_path[:modules_url]).to eq("/courses/#{@context.id}/modules")
       end
@@ -94,18 +93,17 @@ describe CyoeHelper do
         expect(ConditionalRelease::OverrideHandler).to receive(:handle_grade_change).and_return(nil) # and do nothing
         @trigger_assmt.grade_student(student2, grade: 9, grader: @teacher)
 
-        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: student2})
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: student2 })
         expect(mastery_path[:still_processing]).to be true
       end
 
       it 'should set awaiting_choice to true if sets exist but none are selected' do
         @trigger_assmt.grade_student(@student, grade: 3, grader: @teacher)
 
-        mastery_path = helper.conditional_release_rule_for_module_item(@tag, {is_student: true, context: @course, user: @student})
+        mastery_path = helper.conditional_release_rule_for_module_item(@tag, { is_student: true, context: @course, user: @student })
         expect(mastery_path[:choose_url]).to eq("/courses/#{@context.id}/modules/items/#{@tag.id}/choose")
         expect(mastery_path[:awaiting_choice]).to be true
       end
     end
-
   end
 end

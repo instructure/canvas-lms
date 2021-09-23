@@ -173,9 +173,8 @@ class ErrorsController < ApplicationController
     respond_to do |format|
       flash[:notice] = t('notices.error_reported', "Thanks for your help!  We'll get right on this")
       format.html { redirect_to root_url }
-      format.json { render json: {logged: true, id: report.try(:id) } }
+      format.json { render json: { logged: true, id: report.try(:id) } }
     end
-
   end
 
   def error_search_enabled?

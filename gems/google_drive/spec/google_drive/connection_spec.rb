@@ -21,7 +21,6 @@
 require 'spec_helper'
 
 describe GoogleDrive::Connection do
-
   let(:connection) { GoogleDrive::Connection.new(token, secret, retries: 1) }
   let(:token) { "token" }
   let(:secret) { "secret" }
@@ -97,11 +96,11 @@ describe GoogleDrive::Connection do
 
   describe "API interaction" do
     before do
-      stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/drive/v2/rest").
-        to_return(
+      stub_request(:get, "https://www.googleapis.com/discovery/v1/apis/drive/v2/rest")
+        .to_return(
           :status => 200,
           :body => load_fixture('discovered_api.json'),
-          :headers => {'Content-Type' => 'application/json'}
+          :headers => { 'Content-Type' => 'application/json' }
         )
     end
 
@@ -110,11 +109,11 @@ describe GoogleDrive::Connection do
       let(:body) { load_fixture('list.json') }
       let(:url) { 'https://www.googleapis.com/drive/v2/files?maxResults=0&q=trashed=false' }
       let(:request) do
-        stub_request(:get, url).
-          to_return(
+        stub_request(:get, url)
+          .to_return(
             status: http_status,
             body: body,
-            headers: {'Content-Type' => 'application/json'}
+            headers: { 'Content-Type' => 'application/json' }
           )
       end
 
@@ -175,7 +174,7 @@ describe GoogleDrive::Connection do
         stub_request(:get, files_url).to_return(
           :status => http_status,
           body: load_fixture('file_data.json'),
-          headers: {'Content-Type' => 'application/json'}
+          headers: { 'Content-Type' => 'application/json' }
         )
 
         stub_request(:get, export_url).to_return(
@@ -195,7 +194,7 @@ describe GoogleDrive::Connection do
 
       it "wraps a timeout in a drive connection exception" do
         allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
-        expect{ connection.download("42", nil) }.to(
+        expect { connection.download("42", nil) }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
             expect(e.message).to eq("Google Drive connection timed out")
           end
@@ -206,9 +205,9 @@ describe GoogleDrive::Connection do
         stub_request(:get, files_url).to_return(
           :status => http_status,
           body: load_fixture('bad_file_data.json'),
-          headers: {'Content-Type' => 'application/json'}
+          headers: { 'Content-Type' => 'application/json' }
         )
-        expect{ connection.download("42", nil) }.to raise_error(GoogleDrive::WorkflowError)
+        expect { connection.download("42", nil) }.to raise_error(GoogleDrive::WorkflowError)
       end
 
       context 'with 307 temporary redirect response' do
@@ -225,7 +224,7 @@ describe GoogleDrive::Connection do
         it 'will follow redirect response' do
           stub_request(:get, export_url).to_return(
             status: 307,
-            headers: {'Content-Type' => 'application/json', 'Location' => redirect_url}
+            headers: { 'Content-Type' => 'application/json', 'Location' => redirect_url }
           ).times(1)
           connection.download("42", nil)
           output = connection.download("42", nil)
@@ -236,7 +235,7 @@ describe GoogleDrive::Connection do
         it 'will retry on redirect response' do
           stub_request(:get, export_url).to_return(
             status: 307,
-            headers: {'Content-Type' => 'application/json', 'Location' => redirect_url}
+            headers: { 'Content-Type' => 'application/json', 'Location' => redirect_url }
           )
           stub_request(:get, redirect_url).to_return(
             status: 307,
@@ -277,9 +276,8 @@ describe GoogleDrive::Connection do
 
     describe "#create_doc" do
       it "wraps a timeout in a drive connection exception" do
-
         allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
-        expect{ connection.create_doc("Docname") }.to(
+        expect { connection.create_doc("Docname") }.to(
           raise_error(GoogleDrive::ConnectionException) do |e|
             expect(e.message).to eq("Google Drive connection timed out")
           end
@@ -302,10 +300,9 @@ describe GoogleDrive::Connection do
         expect(my_connection.authorized?).to be false
       end
 
-      it "returns false when there NoTokenError" do
-
-        stub_request(:get, "https://www.googleapis.com/drive/v2/about").
-          to_return(:status => 200, :body => "", :headers => {})
+      it "returns true when response is 200" do
+        stub_request(:get, "https://www.googleapis.com/drive/v2/about")
+          .to_return(:status => 200, :body => "", :headers => {})
 
         expect(connection.authorized?).to be true
       end

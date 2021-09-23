@@ -53,6 +53,7 @@ class NotificationFailureProcessor
 
   def process
     return nil unless self.class.enabled?
+
     start_time = Time.now
     notification_failure_queue.before_request do |_stats|
       throw :stop_polling if Time.now - start_time > config[:iteration_high_water]
@@ -97,6 +98,7 @@ class NotificationFailureProcessor
 
   def notification_failure_queue
     return @notification_failure_queue if defined?(@notification_failure_queue)
+
     conf = Canvas::AWS.validate_v2_config(config, 'notification_failures.yml').dup
     conf.except!(*POLL_PARAMS)
     conf.delete(:iteration_high_water)

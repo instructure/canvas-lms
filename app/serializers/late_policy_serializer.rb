@@ -22,11 +22,11 @@ class LatePolicySerializer < Canvas::APISerializer
   root :late_policy
 
   attributes :id,
-    :missing_submission_deduction_enabled,
-    :missing_submission_deduction,
-    :late_submission_deduction_enabled,
-    :late_submission_deduction,
-    :late_submission_interval,
-    :late_submission_minimum_percent_enabled,
-    :late_submission_minimum_percent
+             :missing_submission_deduction_enabled,
+             :missing_submission_deduction,
+             :late_submission_deduction_enabled,
+             :late_submission_deduction,
+             :late_submission_interval,
+             :late_submission_minimum_percent_enabled,
+             :late_submission_minimum_percent
 end

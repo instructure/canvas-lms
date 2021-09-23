@@ -160,14 +160,14 @@ describe Types::SubmissionCommentType do
     context 'with no media object' do
       it 'returns nil' do
         expect(submission_type.resolve(
-          'commentsConnection(filter: {allComments: true}) {
+                 'commentsConnection(filter: {allComments: true}) {
             nodes {
               mediaObject {
                 title
               }
             }
           }'
-        )).to eq([nil, nil, nil])
+               )).to eq([nil, nil, nil])
       end
     end
 
@@ -184,14 +184,14 @@ describe Types::SubmissionCommentType do
 
       it 'returns the media object for the comment' do
         expect(submission_type.resolve(
-          'commentsConnection(filter: {allComments: true}) {
+                 'commentsConnection(filter: {allComments: true}) {
             nodes {
               mediaObject {
                 title
               }
             }
           }'
-        )).to eq([@media_title, nil, nil])
+               )).to eq([@media_title, nil, nil])
       end
     end
   end

@@ -105,14 +105,14 @@ class ReleaseNotesController < ApplicationController
     js_bundle :release_notes_edit
     set_active_tab 'release_notes'
     js_env({
-      release_notes_langs: allowed_langs,
-      release_notes_envs: allowed_envs,
-    })
+             release_notes_langs: allowed_langs,
+             release_notes_envs: allowed_envs,
+           })
     render :html => "".html_safe, :layout => true
   end
 
   private
-  
+
   def release_notes_for_user
     return [] unless ReleaseNote.enabled?
 
@@ -126,7 +126,7 @@ class ReleaseNotesController < ApplicationController
       MultiCache.fetch("latest_release_notes/#{role}/#{release_note_lang}", expires_in: 300) do
         notes = ReleaseNote.latest(env: release_note_env, role: role, limit: latest_limit)
         # Ensure we have loaded the locales *before* caching
-        notes.each { |note| note[release_note_lang] || note['en']}
+        notes.each { |note| note[release_note_lang] || note['en'] }
         notes
       end
     end
@@ -148,7 +148,7 @@ class ReleaseNotesController < ApplicationController
   end
 
   def upsert_params
-    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.map { |l| [l, ['title', 'description', 'url']]}.to_h, show_ats: allowed_envs).to_h
+    @upsert_params ||= params.permit(:published, target_roles: [], langs: allowed_langs.map { |l| [l, ['title', 'description', 'url']] }.to_h, show_ats: allowed_envs).to_h
   end
 
   def allowed_langs
@@ -170,7 +170,7 @@ class ReleaseNotesController < ApplicationController
   # For specs only
   def clear_ivars
     self.instance_variables.each do |ivar|
-      self.instance_variable_set(ivar, nil)      
+      self.instance_variable_set(ivar, nil)
     end
   end
 end

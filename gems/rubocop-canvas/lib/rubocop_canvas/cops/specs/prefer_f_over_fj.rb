@@ -32,6 +32,7 @@ module RuboCop
           _receiver, method_name, *args = *node
           return unless SUSPECT_METHOD_NAMES.keys.include?(method_name)
           return if jquery_necessary?(args.to_a.first.children.first)
+
           add_offense node, message: error_msg(method_name), severity: :warning
         end
 
@@ -40,6 +41,7 @@ module RuboCop
         def jquery_necessary?(selector)
           # TODO: inspect the value of the variable
           return true unless selector.is_a?(String)
+
           selector =~ JQUERY_SELECTORS_REGEX
         end
 

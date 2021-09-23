@@ -25,13 +25,13 @@ describe MigrationIssuesController, type: :request do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     @migration = @course.content_migrations.create!
     @issue_url = "/api/v1/courses/#{@course.id}/content_migrations/#{@migration.id}/migration_issues"
-    @params = { :controller => 'migration_issues', :format => 'json', :course_id => @course.id.to_param, :content_migration_id => @migration.id.to_param}
+    @params = { :controller => 'migration_issues', :format => 'json', :course_id => @course.id.to_param, :content_migration_id => @migration.id.to_param }
     @issue = @migration.add_warning("fail", :fix_issue_html_url => "https://example.com", :error_message => "secret error", :error_report_id => 0)
   end
 
   describe 'index' do
     before do
-      @params = @params.merge( :action => 'index')
+      @params = @params.merge(:action => 'index')
     end
 
     it "should return the list" do
@@ -42,10 +42,10 @@ describe MigrationIssuesController, type: :request do
 
     it "should paginate" do
       issue = @migration.add_warning("hey")
-      json = api_call(:get, @issue_url + "?per_page=1", @params.merge({:per_page=>'1'}))
+      json = api_call(:get, @issue_url + "?per_page=1", @params.merge({ :per_page => '1' }))
       expect(json.length).to eq 1
       expect(json.first['id']).to eq @issue.id
-      json = api_call(:get, @issue_url + "?per_page=1&page=2", @params.merge({:per_page => '1', :page => '2'}))
+      json = api_call(:get, @issue_url + "?per_page=1&page=2", @params.merge({ :per_page => '1', :page => '2' }))
       expect(json.length).to eq 1
       expect(json.first['id']).to eq issue.id
     end
@@ -59,7 +59,7 @@ describe MigrationIssuesController, type: :request do
   describe 'show' do
     before do
       @issue_url = @issue_url + "/#{@issue.id}"
-      @params = @params.merge( :action => 'show', :id => @issue.id.to_param )
+      @params = @params.merge(:action => 'show', :id => @issue.id.to_param)
     end
 
     it "should return migration" do
@@ -85,7 +85,7 @@ describe MigrationIssuesController, type: :request do
     end
 
     it "should 404" do
-      api_call(:get, @issue_url + "000", @params.merge({:id => @issue.id.to_param + "000"}), {}, {}, :expected_status => 404)
+      api_call(:get, @issue_url + "000", @params.merge({ :id => @issue.id.to_param + "000" }), {}, {}, :expected_status => 404)
     end
 
     it "should 401" do
@@ -97,8 +97,8 @@ describe MigrationIssuesController, type: :request do
   describe 'update' do
     before do
       @issue_url = @issue_url + "/#{@issue.id}"
-      @params = @params.merge( :action => 'update', :id => @issue.id.to_param )
-      @body_params = {:workflow_state => 'resolved'}
+      @params = @params.merge(:action => 'update', :id => @issue.id.to_param)
+      @body_params = { :workflow_state => 'resolved' }
     end
 
     it "should update state" do
@@ -109,14 +109,14 @@ describe MigrationIssuesController, type: :request do
     end
 
     it "should reject invalid state" do
-      api_call(:put, @issue_url, @params, {:workflow_state => 'deleted'}, {}, :expected_status => 403)
+      api_call(:put, @issue_url, @params, { :workflow_state => 'deleted' }, {}, :expected_status => 403)
 
       @issue.reload
       expect(@issue.workflow_state).to eq 'active'
     end
 
     it "should 404" do
-      api_call(:put, @issue_url + "000", @params.merge({:id => @issue.id.to_param + "000"}), @body_params, {}, :expected_status => 404)
+      api_call(:put, @issue_url + "000", @params.merge({ :id => @issue.id.to_param + "000" }), @body_params, {}, :expected_status => 404)
     end
 
     it "should 401" do
@@ -126,5 +126,4 @@ describe MigrationIssuesController, type: :request do
       expect(@issue.workflow_state).to eq 'active'
     end
   end
-
 end

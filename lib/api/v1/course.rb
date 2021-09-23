@@ -62,7 +62,7 @@ module Api::V1::Course
   end
 
   def courses_json(courses, user, session, includes, enrollments)
-    courses.map{ |course| course_json(course, user, session, includes, enrollments) }
+    courses.map { |course| course_json(course, user, session, includes, enrollments) }
   end
 
   # Public: Returns a course hash to serialize for a json api request.
@@ -96,16 +96,16 @@ module Api::V1::Course
   #
   def course_json(course, user, session, includes, enrollments, subject_user = user, preloaded_progressions: nil, precalculated_permissions: nil, prefer_friendly_name: true)
     if includes.include?('access_restricted_by_date') && enrollments&.all?(&:inactive?) && !course.grants_right?(user, :read_as_admin)
-      return {'id' => course.id, 'access_restricted_by_date' => true}
+      return { 'id' => course.id, 'access_restricted_by_date' => true }
     end
 
     Api::V1::CourseJson.to_hash(course, user, includes, enrollments,
-        precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
+                                precalculated_permissions: precalculated_permissions) do |builder, allowed_attributes, methods, permissions_to_include|
       hash = api_json(course, user, session, { :only => allowed_attributes, :methods => methods }, permissions_to_include)
       hash['term'] = enrollment_term_json(course.enrollment_term, user, session, enrollments, []) if includes.include?('term')
       if includes.include?('grading_periods')
         hash['grading_periods'] = course.enrollment_term&.grading_period_group&.grading_periods&.map do |gp|
-           api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
+          api_json(gp, user, session, :only => %w(id title start_date end_date workflow_state))
         end
       end
       if includes.include?('course_progress')
@@ -116,10 +116,10 @@ module Api::V1::Course
       hash['apply_assignment_group_weights'] = course.apply_group_weights?
       if includes.include?('sections')
         hash['sections'] = if enrollments.any?
-          section_enrollments_json(enrollments)
-        else
-          course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
-        end
+                             section_enrollments_json(enrollments)
+                           else
+                             course.course_sections.map { |section| section.attributes.slice(*%w(id name start_at end_at)) }
+                           end
       end
       hash['total_students'] = course.student_count || course.student_enrollments.not_fake.distinct.count(:user_id) if includes.include?('total_students')
       hash['passback_status'] = post_grades_status_json(course) if includes.include?('passback_status')
@@ -154,7 +154,7 @@ module Api::V1::Course
       if course.root_account.feature_enabled?(:course_templates)
         hash['template'] = course.template?
         if course.template? && includes.include?('templated_accounts')
-          hash['templated_accounts'] = course.templated_accounts.map { |a| {id: a.id, name: a.name} }
+          hash['templated_accounts'] = course.templated_accounts.map { |a| { id: a.id, name: a.name } }
         end
       end
 
@@ -219,6 +219,7 @@ module Api::V1::Course
       to_preload = []
       courses.each do |course|
         next unless count = teacher_counts[course.id]
+
         if count > threshold
           course.teacher_count = count
         else

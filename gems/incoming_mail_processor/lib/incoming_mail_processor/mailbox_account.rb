@@ -26,7 +26,6 @@ module IncomingMailProcessor
       attr_accessor :default_outgoing_email, :reply_to_enabled
     end
 
-
     def initialize(options = {})
       self.protocol     = options[:protocol]
       self.config       = options[:config] || {}

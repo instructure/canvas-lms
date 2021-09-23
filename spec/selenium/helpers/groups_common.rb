@@ -24,14 +24,14 @@ module GroupsCommon
 
   module ClassMethods
     def setup_group_page_urls
-      let(:url) {"/groups/#{@testgroup.first.id}"}
-      let(:announcements_page) {url + '/announcements'}
-      let(:people_page) {url + '/users'}
-      let(:discussions_page) {url + '/discussion_topics'}
-      let(:pages_page) {url + '/pages'}
-      let(:files_page) {url + '/files'}
-      let(:conferences_page) {url + '/conferences'}
-      let(:collaborations_page) {url + '/collaborations'}
+      let(:url) { "/groups/#{@testgroup.first.id}" }
+      let(:announcements_page) { url + '/announcements' }
+      let(:people_page) { url + '/users' }
+      let(:discussions_page) { url + '/discussion_topics' }
+      let(:pages_page) { url + '/pages' }
+      let(:files_page) { url + '/files' }
+      let(:conferences_page) { url + '/conferences' }
+      let(:collaborations_page) { url + '/collaborations' }
     end
   end
 
@@ -44,10 +44,10 @@ module GroupsCommon
     @group_category = []
     @testgroup = []
     groupset_count.times do |n|
-      @group_category << @course.group_categories.create!(:name => "Test Group Set #{n+1}")
+      @group_category << @course.group_categories.create!(:name => "Test Group Set #{n + 1}")
 
       groups_per_set.times do |i|
-        @testgroup << @course.groups.create!(:name => "Test Group #{i+1}", :group_category => @group_category[n])
+        @testgroup << @course.groups.create!(:name => "Test Group #{i + 1}", :group_category => @group_category[n])
       end
     end
   end
@@ -58,7 +58,7 @@ module GroupsCommon
     seed_groups(groupset_count, groups_per_set)
   end
 
-  def add_user_to_group(user,group,is_leader = false)
+  def add_user_to_group(user, group, is_leader = false)
     group.add_user user
     group.leader = user if is_leader
     group.save!
@@ -87,39 +87,39 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def create_category(params={})
+  def create_category(params = {})
     default_params = {
-      category_name:'category1',
-      has_max_membership:false,
-      member_limit:0,
+      category_name: 'category1',
+      has_max_membership: false,
+      member_limit: 0,
     }
     params = default_params.merge(params)
 
     category1 = @course.group_categories.create!(name: params[:category_name])
     category1.configure_self_signup(true, false)
     if params[:has_max_membership]
-      category1.update_attribute(:group_limit,params[:member_limit])
+      category1.update_attribute(:group_limit, params[:member_limit])
     end
 
     category1
   end
 
-  def create_group(params={})
+  def create_group(params = {})
     default_params = {
-        group_name:'Windfury',
-        enroll_student_count:0,
-        add_self_to_group:true,
-        category_name:'category1',
-        is_leader:'true',
-        has_max_membership:false,
-        member_limit: 0,
-        group_category: nil,
-        add_students_to_group: false
+      group_name: 'Windfury',
+      enroll_student_count: 0,
+      add_self_to_group: true,
+      category_name: 'category1',
+      is_leader: 'true',
+      has_max_membership: false,
+      member_limit: 0,
+      group_category: nil,
+      add_students_to_group: false
     }
     params = default_params.merge(params)
 
     # Sets up a group category for the group if one isn't passed in
-    params[:group_category] = create_category(category_name:params[:category_name]) if params[:group_category].nil?
+    params[:group_category] = create_category(category_name: params[:category_name]) if params[:group_category].nil?
 
     group = @course.groups.create!(
       name: params[:group_name],
@@ -127,7 +127,7 @@ module GroupsCommon
     )
 
     if params[:has_max_membership]
-      group.update_attribute(:max_membership,params[:member_limit])
+      group.update_attribute(:max_membership, params[:member_limit])
     end
 
     if params[:add_self_to_group] == true
@@ -152,7 +152,7 @@ module GroupsCommon
     add_user_to_group(@student, group, false)
 
     enroll_student_count.times do |n|
-      @student = User.create!(:name => "Test Student #{n+2}")
+      @student = User.create!(:name => "Test Student #{n + 2}")
       @course.enroll_student(@student).accept!
 
       add_user_to_group(@student, group, false)
@@ -161,11 +161,11 @@ module GroupsCommon
     group
   end
 
-  def manually_create_group(params={})
+  def manually_create_group(params = {})
     default_params = {
-      group_name:'Test Group',
-      has_max_membership:false,
-      member_limit:0,
+      group_name: 'Test Group',
+      has_max_membership: false,
+      member_limit: 0,
     }
     params = default_params.merge(params)
 
@@ -188,11 +188,11 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def manually_fill_limited_group(member_limit ="2",student_count = 0)
+  def manually_fill_limited_group(member_limit = "2", student_count = 0)
     student_count.times do |n|
       f('.assign-to-group').click
       f('.set-group').click
-      expect(f('.group-summary')).to include_text("#{n+1} / #{member_limit} students")
+      expect(f('.group-summary')).to include_text("#{n + 1} / #{member_limit} students")
       # make sure the popover is gone; it takes 100ms, and its on('close') -> focus can mess up the next click
       expect(f('body')).not_to contain_css('.set-group')
     end
@@ -216,10 +216,10 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def set_cloned_groupset_name(groupset_name="Test Group Set Clone",page_reload=false)
+  def set_cloned_groupset_name(groupset_name = "Test Group Set Clone", page_reload = false)
     replace_content(f('#cloned_category_name'), groupset_name)
     if page_reload
-      expect_new_page_load {f('#clone_category_submit_button').click}
+      expect_new_page_load { f('#clone_category_submit_button').click }
     else
       f('#clone_category_submit_button').click
       wait_for_ajaximations
@@ -241,7 +241,7 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def move_unassigned_student_to_group(group=0)
+  def move_unassigned_student_to_group(group = 0)
     f('.assign-to-group').click
     wait_for_ajaximations
     ff('.set-group')[group].click
@@ -249,7 +249,7 @@ module GroupsCommon
   end
 
   # Moves student from one group to another group. Assumes student can be seen by toggling group's collapse arrow.
-  def move_student_to_group(group_destination, student=0)
+  def move_student_to_group(group_destination, student = 0)
     ff('.group-user-actions')[student].click
     wait_for(method: nil, timeout: 1) { f(".ui-menu-item .edit-group-assignment").displayed? }
     ff('.edit-group-assignment')[student].click
@@ -262,7 +262,7 @@ module GroupsCommon
   end
 
   # Assumes student can be seen by toggling group's collapse arrow
-  def remove_student_from_group(student=0)
+  def remove_student_from_group(student = 0)
     ff('.group-user-actions')[student].click
     wait_for_ajaximations
     ff('.remove-from-group')[student].click
@@ -307,17 +307,17 @@ module GroupsCommon
   def create_and_submit_assignment_from_group(student)
     category = @group_category[0]
     assignment = @course.assignments.create({
-      :name => "test assignment",
-      :group_category => category
-    })
+                                              :name => "test assignment",
+                                              :group_category => category
+                                            })
     a = Attachment.create! context: student,
-      filename: "homework.pdf",
-      uploaded_data: StringIO.new("blah blah blah")
+                           filename: "homework.pdf",
+                           uploaded_data: StringIO.new("blah blah blah")
     assignment.submit_homework(student, attachments: [a],
-    submission_type: "online_upload")
+                                        submission_type: "online_upload")
   end
 
-  def create_group_announcement_manually(title,text)
+  def create_group_announcement_manually(title, text)
     get announcements_page
     expect_new_page_load { f('.btn-primary').click }
     replace_content(f('input[name=title]'), title)
@@ -355,7 +355,7 @@ module GroupsCommon
     wait_for_ajaximations
   end
 
-  def move_file_to_folder(file_name,destination_name)
+  def move_file_to_folder(file_name, destination_name)
     move(file_name, 1, :toolbar_menu)
     wait_for_ajaximations
     expect(f('#flash_message_holder').text).to eq "#{file_name} moved to #{destination_name}"
@@ -396,6 +396,6 @@ module GroupsCommon
     expect_new_page_load { ff('li.discussion-topic').first.click }
     click_edit_btn
     # edit also verifies it has been edited
-    edit('I edited it','My test message')
+    edit('I edited it', 'My test message')
   end
 end

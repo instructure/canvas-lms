@@ -35,7 +35,7 @@ module AdminSettingsPage
   def profile_tray
     f("div[role='dialog'][aria-label='Profile tray']")
   end
-  
+
   def profile_tray_menu_items
     f("div[role='dialog'][aria-label='Profile tray'] ul")
   end
@@ -43,19 +43,19 @@ module AdminSettingsPage
   def profile_tray_content_share_link
     fj("a:contains('Shared Content')")
   end
-  
+
   def profile_tray_spinner
     fj("li title:contains('Loading')")
   end
 
   # ---------------------- Actions -----------------------
-  
+
   def visit_admin_settings_tab(account_id)
     get "/accounts/#{account_id}/settings"
   end
 
   # ---------------------- Methods -----------------------
-  
+
   def wait_for_profile_tray_spinner
     begin
       spinner = profile_tray_spinner
@@ -65,5 +65,4 @@ module AdminSettingsPage
     end
     wait_for_ajaximations
   end
-  
 end

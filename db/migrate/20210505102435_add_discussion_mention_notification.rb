@@ -22,10 +22,10 @@ class AddDiscussionMentionNotification < ActiveRecord::Migration[5.2]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-        name: 'Discussion Mention',
-        delay_for: 120,
-        category: 'DiscussionMention'
-      })
+                                                  name: 'Discussion Mention',
+                                                  delay_for: 120,
+                                                  category: 'DiscussionMention'
+                                                })
     end
   end
 

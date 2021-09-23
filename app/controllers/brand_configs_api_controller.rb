@@ -19,7 +19,6 @@
 
 # @API Brand Configs
 class BrandConfigsApiController < ApplicationController
-
   # @API Get the brand config variables that should be used for this domain
   #
   # Will redirect to a static json file that has all of the brand

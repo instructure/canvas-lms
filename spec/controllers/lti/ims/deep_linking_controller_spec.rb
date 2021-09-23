@@ -28,7 +28,7 @@ module Lti
       describe '#deep_linking_response' do
         subject { post :deep_linking_response, params: params }
 
-        let(:params) { {JWT: deep_linking_jwt, account_id: account.id } }
+        let(:params) { { JWT: deep_linking_jwt, account_id: account.id } }
 
         it { is_expected.to be_ok }
 
@@ -50,18 +50,18 @@ module Lti
         end
 
         context 'when the messages/logs passed in are not strings' do
-          let(:message) { {html: 'some message'} }
-          let(:error_message) { {html: 'some error message'} }
-          let(:log) { {html: 'some log'} }
-          let(:error_log) { {html: 'some error log'} }
+          let(:message) { { html: 'some message' } }
+          let(:error_message) { { html: 'some error message' } }
+          let(:log) { { html: 'some log' } }
+          let(:error_log) { { html: 'some error log' } }
 
           it 'turns them into strings before calling js_env to prevent HTML injection' do
             expect(controller).to receive(:js_env).with(hash_including(
-              message: '{"html"=>"some message"}',
-              log: '{"html"=>"some log"}',
-              error_message: '{"html"=>"some error message"}',
-              error_log: '{"html"=>"some error log"}'
-            ))
+                                                          message: '{"html"=>"some message"}',
+                                                          log: '{"html"=>"some log"}',
+                                                          error_message: '{"html"=>"some error message"}',
+                                                          error_log: '{"html"=>"some error log"}'
+                                                        ))
             subject
           end
         end
@@ -180,7 +180,7 @@ module Lti
 
           context 'when there is no public jwk' do
             before do
-              public_jwk_url_response = { keys: [ public_jwk ] }
+              public_jwk_url_response = { keys: [public_jwk] }
               developer_key.update!(public_jwk: nil, public_jwk_url: url)
             end
 
@@ -288,7 +288,7 @@ module Lti
 
         context 'when module item content items are received' do
           let(:course) { course_model }
-          let(:context_module) { course.context_modules.create!(:name => 'Test Module')}
+          let(:context_module) { course.context_modules.create!(:name => 'Test Module') }
           let(:developer_key) do
             key = DeveloperKey.create!(account: course.account)
             key.generate_rsa_keypair!
@@ -307,11 +307,11 @@ module Lti
               shared_secret: 'secret',
               consumer_key: 'key',
               developer_key: developer_key,
-              settings: {use_1_3: true}
+              settings: { use_1_3: true }
             )
           }
 
-          let(:params) { super().merge({course_id: course.id, context_module_id: context_module.id})}
+          let(:params) { super().merge({ course_id: course.id, context_module_id: context_module.id }) }
           let(:launch_url) { 'http://tool.url/launch' }
 
           before do
@@ -322,7 +322,7 @@ module Lti
 
           context 'single item' do
             let(:content_items) do
-              [ { type: 'ltiResourceLink', url: launch_url, title: 'Item 1', custom_params: {"a" => "b"} } ]
+              [{ type: 'ltiResourceLink', url: launch_url, title: 'Item 1', custom_params: { "a" => "b" } }]
             end
 
             it "doesn't create a resource link" do
@@ -339,7 +339,7 @@ module Lti
             let(:content_items) {
               [
                 { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
-                { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: {'mycustom': '123'} },
+                { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: { 'mycustom': '123' } },
                 { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
               ]
             }
@@ -383,9 +383,9 @@ module Lti
             context 'when content items have iframe property' do
               let(:content_items) {
                 [
-                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 1'},
-                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 2'},
-                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 3'}
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 1' },
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 2' },
+                  { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 3' }
                 ]
               }
 

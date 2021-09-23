@@ -31,7 +31,6 @@ class AddIncludeReplyPreviewToDiscussionEntry < ActiveRecord::Migration[6.0]
       DataFixup::BackfillNulls.run(DiscussionEntry, [:include_reply_preview], default_value: false)
       change_column_null :discussion_entries, :include_reply_preview, false
     end
-
   end
 
   def down

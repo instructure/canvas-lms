@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EquationImagesController < ApplicationController
-
   # Facade to codecogs API for gif generation or microservice MathMan for svg
   def show
     @latex = params[:id]
@@ -37,6 +36,7 @@ class EquationImagesController < ApplicationController
   end
 
   private
+
   def url
     if MathMan.use_for_svg?
       MathMan.url_for(latex: @latex, target: :svg)

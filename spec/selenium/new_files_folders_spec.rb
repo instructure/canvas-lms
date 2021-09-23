@@ -63,8 +63,8 @@ describe "better_file_browsing, folders" do
     end
 
     it "should validate xss on folder text", priority: "1", test_id: 133113 do
-     add_folder('<script>alert("Hi");</script>')
-     expect(ff('.ef-name-col__text')[0].text).to eq '<script>alert("Hi");<_script>'
+      add_folder('<script>alert("Hi");</script>')
+      expect(ff('.ef-name-col__text')[0].text).to eq '<script>alert("Hi");<_script>'
     end
 
     it "should move a folder", priority: "1", test_id: 133125 do
@@ -124,53 +124,53 @@ describe "better_file_browsing, folders" do
   end
 
   context "Folder Tree" do
-     before(:each) do
-       course_with_teacher_logged_in
-       get "/courses/#{@course.id}/files"
-     end
+    before(:each) do
+      course_with_teacher_logged_in
+      get "/courses/#{@course.id}/files"
+    end
 
-     it "should create a new folder", priority: "2", test_id: 133121 do
-       new_folder = create_new_folder
-       expect(all_files_folders.count).to eq 1
-       expect(new_folder.text).to match(/New Folder/)
-     end
+    it "should create a new folder", priority: "2", test_id: 133121 do
+      new_folder = create_new_folder
+      expect(all_files_folders.count).to eq 1
+      expect(new_folder.text).to match(/New Folder/)
+    end
 
-     it "should handle duplicate folder names", priority: "1", test_id: 133130 do
-       create_new_folder
-       add_folder("New Folder")
-       expect(all_files_folders.last.text).to match(/New Folder 2/)
-     end
+    it "should handle duplicate folder names", priority: "1", test_id: 133130 do
+      create_new_folder
+      add_folder("New Folder")
+      expect(all_files_folders.last.text).to match(/New Folder 2/)
+    end
 
-     it "should display folders in tree view", priority: "1", test_id: 133099 do
-       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
+    it "should display folders in tree view", priority: "1", test_id: 133099 do
+      add_file(fixture_file_upload('files/example.pdf', 'application/pdf'),
                @course, "example.pdf")
-       get "/courses/#{@course.id}/files"
-       create_new_folder
-       add_folder("New Folder")
-       ff('.ef-name-col__text')[1].click
-       wait_for_ajaximations
-       add_folder("New Folder 1.1")
-       ff(".icon-folder")[1].click
-       expect(ff('.ef-name-col__text')[0].text).to eq "New Folder 1.1"
-       get "/courses/#{@course.id}/files"
-       expect(ff('.ef-name-col__text')[0].text).to eq "example.pdf"
-       expect(f('.ef-folder-content')).to be_displayed
-     end
+      get "/courses/#{@course.id}/files"
+      create_new_folder
+      add_folder("New Folder")
+      ff('.ef-name-col__text')[1].click
+      wait_for_ajaximations
+      add_folder("New Folder 1.1")
+      ff(".icon-folder")[1].click
+      expect(ff('.ef-name-col__text')[0].text).to eq "New Folder 1.1"
+      get "/courses/#{@course.id}/files"
+      expect(ff('.ef-name-col__text')[0].text).to eq "example.pdf"
+      expect(f('.ef-folder-content')).to be_displayed
+    end
 
-     it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
-       create_new_folder
-       f('.ef-name-col > a.ef-name-col__link').click
-       wait_for_ajaximations
-       1.upto(15) do |number_of_folders|
+    it "should create 15 new child folders and show them in the FolderTree when expanded", priority: "2", test_id: 121886 do
+      create_new_folder
+      f('.ef-name-col > a.ef-name-col__link').click
+      wait_for_ajaximations
+      1.upto(15) do |number_of_folders|
         folder_regex = number_of_folders > 1 ? Regexp.new("New Folder\\s#{number_of_folders}") : "New Folder"
         create_new_folder
         expect(all_files_folders.count).to eq number_of_folders
         expect(all_files_folders.last.text).to match folder_regex
-       end
-       get "/courses/#{@course.id}/files"
-       f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
-       wait_for_ajaximations
-       expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
-     end
+      end
+      get "/courses/#{@course.id}/files"
+      f('ul.collectionViewItems > li > a > i.icon-mini-arrow-right').click
+      wait_for_ajaximations
+      expect(ff('ul.collectionViewItems > li > ul.treeContents > li.subtrees > ul.collectionViewItems li')).to have_size(15)
+    end
   end
 end

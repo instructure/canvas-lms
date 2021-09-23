@@ -35,7 +35,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
 
   def mock_net_pop
     @pop_mock = Object.new
-    class <<@pop_mock
+    class << @pop_mock
       IncomingMailProcessor::Pop3Mailbox::UsedPopMethods.each do |method_name|
         define_method(method_name) { |*args, &block| }
       end
@@ -47,12 +47,12 @@ describe IncomingMailProcessor::Pop3Mailbox do
   describe "#initialize" do
     it "should accept existing mailman pop3 configuration" do
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new({
-        :server => "pop3.server.com",
-        :port => 1234,
-        :ssl => "truthy-value",
-        :username => "user@server.com",
-        :password => "secret-user-password",
-      })
+                                                          :server => "pop3.server.com",
+                                                          :port => 1234,
+                                                          :ssl => "truthy-value",
+                                                          :username => "user@server.com",
+                                                          :password => "secret-user-password",
+                                                        })
 
       expect(@mailbox.server).to eql "pop3.server.com"
       expect(@mailbox.port).to eql 1234
@@ -168,5 +168,4 @@ describe IncomingMailProcessor::Pop3Mailbox do
       end
     end
   end
-
 end

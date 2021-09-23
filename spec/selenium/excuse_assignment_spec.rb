@@ -160,14 +160,14 @@ describe 'Excuse an Assignment' do
         course_with_teacher_logged_in
         group_test_setup 4, 1, 1
 
-        @students.each {|student| @testgroup[0].add_user student}
+        @students.each { |student| @testgroup[0].add_user student }
         @testgroup[0].save!
 
         assignment = @course.assignments.create!(
-            title: 'Group Assignment',
-            group_category_id: @group_category[0].id,
-            grade_group_students_individually: false,
-            points_possible: 20
+          title: 'Group Assignment',
+          group_category_id: @group_category[0].id,
+          grade_group_students_individually: false,
+          points_possible: 20
         )
 
         assignment.grade_student @students[1], excuse: true, grader: @teacher
@@ -197,14 +197,14 @@ describe 'Excuse an Assignment' do
         course_with_teacher_logged_in
         group_test_setup 2, 1, 1
 
-        @students.each {|student| @testgroup[0].add_user student}
+        @students.each { |student| @testgroup[0].add_user student }
         @testgroup[0].save!
 
         a1 = @course.assignments.create!(
-            title: 'Group Assignment',
-            group_category_id: @group_category[0].id,
-            grade_group_students_individually: false,
-            points_possible: 10
+          title: 'Group Assignment',
+          group_category_id: @group_category[0].id,
+          grade_group_students_individually: false,
+          points_possible: 10
         )
         a2 = @course.assignments.create! title: 'Assignment', points_possible: 20
 
@@ -317,7 +317,6 @@ describe 'Excuse an Assignment' do
         expect(ff('.ic-flash-error').length).to be i + 1
         expect(f('.ic-flash-error').text).to include 'Default grade cannot be set to EX'
       end
-
     end
 
     ['EX', 'ex', 'Ex', 'eX'].each do |ex|

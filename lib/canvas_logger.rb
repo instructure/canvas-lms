@@ -31,8 +31,9 @@ class CanvasLogger < ActiveSupport::Logger
     @skip_thread_context = options[:skip_thread_context]
   end
 
-  def add(severity, message=nil, progname=nil, &block)
+  def add(severity, message = nil, progname = nil, &block)
     return if level > severity
+
     message = (message || (block && block.call) || progname).to_s
     # If a newline is necessary then create a new message ending with a newline.
     # Ensures that the original message is not mutated.
@@ -89,8 +90,9 @@ class CanvasLogger < ActiveSupport::Logger
       captured_messages
     end
 
-    def add(severity, message=nil, progname=nil, &block)
+    def add(severity, message = nil, progname = nil, &block)
       return if level > severity
+
       message = (message || (block && block.call) || progname).to_s
       captured_message = "[#{Time.now.to_s}] #{message}"
       captured_message_stack.each do |messages|

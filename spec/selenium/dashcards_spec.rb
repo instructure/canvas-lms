@@ -30,7 +30,6 @@ describe 'dashcards' do
   include FilesCommon
 
   context 'as a student' do
-
     before do
       @course = course_factory(active_all: true)
       course_with_student_logged_in(active_all: true)
@@ -121,7 +120,7 @@ describe 'dashcards' do
 
     it "should not show hidden tab icons on dashcard", priority: "1", test_id: 3907593 do
       # setup
-      @course.tab_configuration = [{"id" => Course::TAB_DISCUSSIONS, "hidden" => true}]
+      @course.tab_configuration = [{ "id" => Course::TAB_DISCUSSIONS, "hidden" => true }]
       @course.save!
       get '/'
       # need not check for announcements, assignments and files as we have not created any
@@ -218,7 +217,7 @@ describe 'dashcards' do
 
         new_displayed_color = f("[role='checkbox'].group_course_#{@course1.id}").style('color')
 
-        expect('#'+rgba_to_hex(new_displayed_color)).to eq(new_color_code)
+        expect('#' + rgba_to_hex(new_displayed_color)).to eq(new_color_code)
         expect(f("#group_course_#{@course1.id}_checkbox_label")).to include_text(@course1.name)
       end
     end
@@ -301,6 +300,7 @@ describe 'dashcards' do
   def select_color_palette_from_calendar_page
     get '/calendar'
     fail 'Not the right course' unless f('#context-list li:nth-of-type(2)').text.include? @course1.name
+
     f('#context-list li:nth-of-type(2) .ContextList__MoreBtn').click
     wait_for_ajaximations
     expect(f('.ColorPicker__Container')).to be_displayed

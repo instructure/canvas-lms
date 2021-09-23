@@ -20,7 +20,7 @@
 module DataFixup::CreateQuizLtiNavigationPlacements
   def self.run
     quiz_lti_tools = ContextExternalTool.quiz_lti
-      .where(context_type: 'Account').where.not(workflow_state: 'deleted')
+                                        .where(context_type: 'Account').where.not(workflow_state: 'deleted')
 
     quiz_lti_tools.preload(:context_external_tool_placements).find_each do |quiz_tool|
       placements = quiz_tool.context_external_tool_placements

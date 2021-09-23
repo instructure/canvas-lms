@@ -39,7 +39,6 @@ module Canvas::Security
   #   ...
   # }
   module LoginRegistry
-
     ##
     # this is the expected interface for the rest of the application.
     # When a pseudonym tries to login, it should be run through this method.
@@ -66,6 +65,7 @@ module Canvas::Security
 
     def self.allow_login_attempt?(pseudonym, ip)
       return true unless Canvas.redis_enabled? && pseudonym
+
       ip.present? || ip = 'no_ip'
       total_allowed = Setting.get('login_attempts_total', '20').to_i
       ip_allowed = Setting.get('login_attempts_per_ip', '10').to_i
@@ -76,6 +76,7 @@ module Canvas::Security
     # log a successful login, resetting the failed login attempts counter
     def self.successful_login!(pseudonym, ip)
       return unless Canvas.redis_enabled? && pseudonym
+
       Canvas.redis.del(login_attempts_key(pseudonym))
       nil
     end
@@ -83,6 +84,7 @@ module Canvas::Security
     # log a failed login attempt
     def self.failed_login!(pseudonym, ip)
       return unless Canvas.redis_enabled? && pseudonym
+
       key = login_attempts_key(pseudonym)
       exptime = Setting.get('login_attempts_ttl', 5.minutes.to_s).to_i
       redis = Canvas.redis

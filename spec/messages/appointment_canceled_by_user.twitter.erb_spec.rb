@@ -29,8 +29,8 @@ describe 'appointment_canceled_by_user.twitter' do
     appointment_participant_model(:participant => user)
 
     generate_message(:appointment_canceled_by_user, :twitter, @event,
-                     :data => {:updating_user_name => user.name,
-                               :cancel_reason => "just because"})
+                     :data => { :updating_user_name => user.name,
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)
@@ -45,8 +45,8 @@ describe 'appointment_canceled_by_user.twitter' do
     appointment_participant_model(:participant => @group, :course => @course)
 
     generate_message(:appointment_canceled_by_user, :twitter, @event,
-                     :data => {:updating_user_name => user.name,
-                               :cancel_reason => "just because"})
+                     :data => { :updating_user_name => user.name,
+                                :cancel_reason => "just because" })
 
     expect(@message.body).to include('some title')
     expect(@message.body).to include(user.name)

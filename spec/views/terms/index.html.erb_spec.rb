@@ -26,7 +26,7 @@ describe "/terms/index" do
     assign(:context, assign(:root_account, Account.default))
     term = Account.default.enrollment_terms.create!
     term.courses.create! { |c| c.workflow_state = 'deleted' }
-    terms = assign(:terms, Account.default.enrollment_terms.active.sort_by{|t| t.start_at || t.created_at }.reverse)
+    terms = assign(:terms, Account.default.enrollment_terms.active.sort_by { |t| t.start_at || t.created_at }.reverse)
     assign(:course_counts_by_term, EnrollmentTerm.course_counts(terms))
     render "terms/index"
     page = Nokogiri('<document>' + response.body + '</document>')

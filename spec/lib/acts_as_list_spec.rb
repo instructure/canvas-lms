@@ -49,19 +49,19 @@ describe "acts_as_list" do
       expect(@modules.map(&:position)).to eq [1, 2, 3]
 
       expect(@module_1.insert_at(3)).to eq true
-      @modules.each{|m| m.reload}
+      @modules.each { |m| m.reload }
       expect(@modules.map(&:position)).to eq [3, 1, 2]
 
       expect(@module_2.insert_at(2)).to eq true
-      @modules.each{|m| m.reload}
+      @modules.each { |m| m.reload }
       expect(@modules.map(&:position)).to eq [3, 2, 1]
 
       expect(@module_3.insert_at(3)).to eq true
-      @modules.each{|m| m.reload}
+      @modules.each { |m| m.reload }
       expect(@modules.map(&:position)).to eq [2, 1, 3]
 
       expect(@module_1.insert_at(1)).to eq true
-      @modules.each{|m| m.reload}
+      @modules.each { |m| m.reload }
       expect(@modules.map(&:position)).to eq [1, 2, 3]
     end
   end
@@ -75,7 +75,7 @@ describe "acts_as_list" do
       module_2.position = 1
       module_2.save!
       module_1.fix_position_conflicts
-      expect(@course.context_modules.map{|m| [m.id, m.position]}).to eql [[module_2.id, 1], [module_1.id, 2]]
+      expect(@course.context_modules.map { |m| [m.id, m.position] }).to eql [[module_2.id, 1], [module_1.id, 2]]
     end
 
     it "should break ties by object id" do
@@ -87,7 +87,7 @@ describe "acts_as_list" do
       module_2.position = 1
       module_2.save!
       module_1.fix_position_conflicts
-      expect(@course.context_modules.map{|m| [m.id, m.position]}).to eql [[module_1.id, 1], [module_2.id, 2]]
+      expect(@course.context_modules.map { |m| [m.id, m.position] }).to eql [[module_1.id, 1], [module_2.id, 2]]
     end
 
     it "should consolidate gaps" do
@@ -99,7 +99,7 @@ describe "acts_as_list" do
       module_2.position = 3
       module_2.save!
       module_1.fix_position_conflicts
-      expect(@course.context_modules.map{|m| [m.id, m.position]}).to eql [[module_1.id, 1], [module_2.id, 2]]
+      expect(@course.context_modules.map { |m| [m.id, m.position] }).to eql [[module_1.id, 1], [module_2.id, 2]]
     end
   end
 

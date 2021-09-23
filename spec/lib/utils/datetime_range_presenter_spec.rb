@@ -119,7 +119,7 @@ module Utils
         begin
           pre_zone = Time.zone
           Time.zone = "Alaska"
-          Timecop.freeze(Time.utc(2014,10,1,7,30)) do
+          Timecop.freeze(Time.utc(2014, 10, 1, 7, 30)) do
             datetime = Time.now
 
             alaskan_presenter = DatetimeRangePresenter.new(datetime)
@@ -131,7 +131,6 @@ module Utils
           Time.zone = pre_zone
         end
       end
-
     end
   end
 end

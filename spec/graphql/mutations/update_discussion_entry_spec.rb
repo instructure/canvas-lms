@@ -25,7 +25,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    discussion_topic_model({context: @course})
+    discussion_topic_model({ context: @course })
     @attachment = attachment_with_context(@student)
     @entry = @topic.discussion_entries.create!(message: 'Howdy', user: @student, attachment: @attachment)
     @topic.update!(discussion_type: 'threaded')
@@ -80,6 +80,19 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
     expect(result.dig('data', 'updateDiscussionEntry', 'errors')).to be nil
     expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry', 'message')).to eq 'New message'
     expect(@entry.reload.message).to eq 'New message'
+  end
+
+  it 'deletes discussion_entry_drafts for an edit' do
+    delete_me = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: 'Howdy Hey', entry: @entry)
+    run_mutation(discussion_entry_id: @entry.id, message: 'New message')
+    expect(DiscussionEntryDraft.where(id: delete_me)).to eq []
+  end
+
+  it 'deletes discussion_entry_drafts for an edit for a non author' do
+    delete_me = DiscussionEntryDraft.upsert_draft(user: @teacher, topic: @topic, message: 'talk to me', entry: @entry)
+    keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: 'Howdy Hey', entry: @entry)
+    run_mutation({ discussion_entry_id: @entry.id, message: 'New message' }, @teacher)
+    expect(DiscussionEntryDraft.where(id: [delete_me, keeper].flatten).pluck(:id)).to eq keeper
   end
 
   it 'removes a discussion entry attachment' do
@@ -147,14 +160,14 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
 
     it 'if the user does not have permission to read' do
       user = user_model
-      result = run_mutation({discussion_entry_id: @entry.id, message: 'should fail'}, user)
+      result = run_mutation({ discussion_entry_id: @entry.id, message: 'should fail' }, user)
       expect(result.dig('data', 'updateDiscussionEntry')).to be nil
       expect(result.dig('errors', 0, 'message')).to eq 'not found'
     end
 
     it 'if the user does not have permission to update' do
       entry = @topic.discussion_entries.create!(message: 'teacher message', user: @teacher)
-      result = run_mutation({discussion_entry_id: entry.id, message: 'should fail'}, @student)
+      result = run_mutation({ discussion_entry_id: entry.id, message: 'should fail' }, @student)
       expect(result.dig('data', 'updateDiscussionEntry', 'discussionEntry')).to be nil
       expect(result.dig('data', 'updateDiscussionEntry', 'errors', 0, 'message')).to eq 'Insufficient Permissions'
     end

@@ -33,7 +33,7 @@ describe ContentMigration do
     end
 
     before :each do
-      allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({'test_service' => TestExternalContentService})
+      allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => TestExternalContentService })
     end
 
     it "should skip everything if #applies_to_course? returns false" do
@@ -49,7 +49,7 @@ describe ContentMigration do
     it "should send the data from begin_export back later to retrieve_export" do
       expect(TestExternalContentService).to receive(:applies_to_course?).with(@copy_from).and_return(true)
 
-      test_data = {:sometestdata => "something"}
+      test_data = { :sometestdata => "something" }
       expect(TestExternalContentService).to receive(:begin_export).with(@copy_from, {}).and_return(test_data)
       expect(TestExternalContentService).to receive(:export_completed?).with(test_data).and_return(true)
       expect(TestExternalContentService).to receive(:retrieve_export).with(test_data).and_return(nil)
@@ -119,9 +119,10 @@ describe ContentMigration do
       allow(TestExternalContentService).to receive(:begin_export).and_return(true)
       allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
       allow(TestExternalContentService).to receive(:retrieve_export).and_return(
-        {'$canvas_assignment_id' => assmt.id, '$canvas_discussion_topic_id' => topic.id})
+        { '$canvas_assignment_id' => assmt.id, '$canvas_discussion_topic_id' => topic.id }
+      )
 
-      @cm.copy_options = {'all_discussion_topics' => '1'}
+      @cm.copy_options = { 'all_discussion_topics' => '1' }
       @cm.save!
 
       run_course_copy
@@ -150,12 +151,12 @@ describe ContentMigration do
       allow(TestExternalContentService).to receive(:export_completed?).and_return(true)
       allow(TestExternalContentService).to receive(:retrieve_export).and_return({})
 
-      @cm.copy_options = {:context_modules => {mig_id(cm) => "1"}}
+      @cm.copy_options = { :context_modules => { mig_id(cm) => "1" } }
       @cm.save!
 
       expect(TestExternalContentService).to receive(:begin_export).with(@copy_from,
-        {:selective => true, :exported_assets =>
-          ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"]})
+                                                                        { :selective => true, :exported_assets =>
+                                                                          ["context_module_#{cm.id}", "assignment_#{assmt.id}", "quiz_#{graded_quiz.id}", "assignment_#{graded_quiz.assignment.id}"] })
 
       run_course_copy
     end
@@ -167,7 +168,7 @@ describe ContentMigration do
       expect(TestExternalContentService).to receive(:export_completed?).exactly(6).times.and_return(false) # retries 5 times
 
       expect(Canvas::Errors).to receive(:capture_exception).with(:external_content_migration,
-        "External content migrations timed out for test_service", :warn)
+                                                                 "External content migrations timed out for test_service", :warn)
 
       run_course_copy
     end

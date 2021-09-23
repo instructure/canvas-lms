@@ -40,7 +40,6 @@ describe CourseDateRange do
   end
 
   describe "with restrict enrollments to course dates active" do
-
     it "should set the range based on the course" do
       @course.update(start_at: Time.now - 5.days, conclude_at: Time.now + 5.days, restrict_enrollments_to_course_dates: true)
       range = CourseDateRange.new(@course)

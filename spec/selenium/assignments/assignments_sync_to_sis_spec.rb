@@ -34,10 +34,9 @@ describe "assignments sync to sis" do
   # note: due date testing can be found in assignments_overrides_spec
 
   context "as a teacher" do
-
     before(:once) do
       @teacher = user_with_pseudonym
-      course_with_teacher({:user => @teacher, :active_course => true, :active_enrollment => true})
+      course_with_teacher({ :user => @teacher, :active_course => true, :active_enrollment => true })
       @course.start_at = nil
       @course.save!
       @course.require_assignment_group
@@ -51,7 +50,7 @@ describe "assignments sync to sis" do
     end
 
     let(:name_length_limit) { 10 }
-    let(:invalid_name) { "Name Assignment Too Long"}
+    let(:invalid_name) { "Name Assignment Too Long" }
     let(:valid_name) { "Name" }
     let(:points) { "10" }
     let(:differentiate) { false }
@@ -99,9 +98,9 @@ describe "assignments sync to sis" do
       ff('.DueDateInput')
     end
 
-    def check_due_date_table(section, due_date="-")
+    def check_due_date_table(section, due_date = "-")
       row_elements = f('.assignment_dates').find_elements(:tag_name, 'tr')
-      section_row = row_elements.detect{ |i| i.text.include?(section)}
+      section_row = row_elements.detect { |i| i.text.include?(section) }
       expect(section_row).not_to be_nil
       expect(section_row.text.split("\n").first).to eq due_date
     end
@@ -126,7 +125,7 @@ describe "assignments sync to sis" do
 
       def length_settings
         {
-          :sis_assignment_name_length       => { :value=> true },
+          :sis_assignment_name_length => { :value => true },
           :sis_assignment_name_length_input => { :value => name_length_limit.to_s }
         }
       end
@@ -147,7 +146,7 @@ describe "assignments sync to sis" do
 
     context 'due date required' do
       let(:error) { "Please add a due date" }
-      let(:settings_enable) { {:sis_require_assignment_due_date => {:value=> true} } }
+      let(:settings_enable) { { :sis_require_assignment_due_date => { :value => true } } }
 
       it 'validates due date while sis is on' do
         submit_blocked_with_errors
@@ -178,7 +177,7 @@ describe "assignments sync to sis" do
 
         it 'checks each due date when on' do
           submit_blocked_with_errors
-          due_date_input_fields.each{ |h| set_value(h, due_date_valid) }
+          due_date_input_fields.each { |h| set_value(h, due_date_valid) }
           f('#edit_assignment_form .btn-primary[type=submit]').click
           check_due_date_table(section_to_set, short_date)
         end
@@ -193,7 +192,7 @@ describe "assignments sync to sis" do
     end
 
     context 'when on index page' do
-      let(:assignment_name) { "Test Assignment"}
+      let(:assignment_name) { "Test Assignment" }
       let(:settings_enable) { { :sis_require_assignment_due_date => { value: true } } }
       let(:expected_date) { format_date_for_view(Time.zone.now - 1.month) }
       let(:assignment_id) { @assignment.id }
@@ -203,8 +202,8 @@ describe "assignments sync to sis" do
       let(:sis_state_text) { f('.icon-post-to-sis', post_to_sis_button).attribute(:alt) }
       let(:due_date_display) { true }
       let(:sis_state) { due_date_display ? "disabled" : "enabled" }
-      let(:set_date) { due_date_display ? nil : 1.day.ago}
-      let(:params) { { name: assignment_name} }
+      let(:set_date) { due_date_display ? nil : 1.day.ago }
+      let(:params) { { name: assignment_name } }
       let(:type) { @course.assignments }
 
       before(:each) do

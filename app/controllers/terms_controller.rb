@@ -26,9 +26,9 @@ class TermsController < ApplicationController
   def index
     @root_account = @context.root_account
     @context.default_enrollment_term
-    @terms = @context.enrollment_terms.active.
-      preload(:enrollment_dates_overrides).
-      order(Arel.sql("COALESCE(start_at, created_at) DESC")).to_a
+    @terms = @context.enrollment_terms.active
+                     .preload(:enrollment_dates_overrides)
+                     .order(Arel.sql("COALESCE(start_at, created_at) DESC")).to_a
     @course_counts_by_term = EnrollmentTerm.course_counts(@terms)
   end
 
@@ -120,18 +120,20 @@ class TermsController < ApplicationController
   end
 
   private
+
   def save_and_render_response
     params.require(:enrollment_term)
     overrides = params[:enrollment_term][:overrides]&.to_unsafe_h
     if overrides.present?
       unless (overrides.keys.map(&:classify) - %w(StudentEnrollment TeacherEnrollment TaEnrollment DesignerEnrollment)).empty?
-        return render :json => {:message => 'Invalid enrollment type in overrides'}, :status => :bad_request
+        return render :json => { :message => 'Invalid enrollment type in overrides' }, :status => :bad_request
       end
     end
     sis_id = params[:enrollment_term][:sis_source_id] || params[:enrollment_term][:sis_term_id]
     if sis_id && !(sis_id.is_a?(String) || sis_id.is_a?(Numeric))
-      return render :json => {:message => "Invalid SIS ID"}, :status => :bad_request
+      return render :json => { :message => "Invalid SIS ID" }, :status => :bad_request
     end
+
     handle_sis_id_param(sis_id)
 
     term_params = params.require(:enrollment_term).permit(:name, :start_at, :end_at)
@@ -159,8 +161,8 @@ class TermsController < ApplicationController
 
   def handle_sis_id_param(sis_id)
     if !sis_id.nil? &&
-        sis_id != @account.sis_source_id &&
-        @context.root_account.grants_right?(@current_user, session, :manage_sis)
+       sis_id != @account.sis_source_id &&
+       @context.root_account.grants_right?(@current_user, session, :manage_sis)
       @term.sis_source_id = sis_id.presence
       if @term.sis_source_id && @term.sis_source_id_changed?
         scope = @term.root_account.enrollment_terms.where(sis_source_id: @term.sis_source_id)

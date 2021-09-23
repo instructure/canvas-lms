@@ -26,12 +26,13 @@ module Api
   def api_find(collection, id, account: nil)
     result = api_find_all(collection, [id], account: account).first
     raise(ActiveRecord::RecordNotFound, "Couldn't find #{collection.name} with API id '#{id}'") unless result
+
     result
   end
 
   def api_find_all(collection, ids, account: nil)
     if collection.table_name == User.table_name && @current_user
-      ids = ids.map{|id| id == 'self' ? @current_user.id : id }
+      ids = ids.map { |id| id == 'self' ? @current_user.id : id }
     end
     if collection.table_name == Account.table_name
       ids = ids.map do |id|
@@ -55,12 +56,12 @@ module Api
           @domain_root_account.default_enrollment_term
         when 'current'
           if !current_term
-            current_terms = @domain_root_account.
-              enrollment_terms.
-              active.
-              where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc).
-              limit(2).
-              to_a
+            current_terms = @domain_root_account
+                            .enrollment_terms
+                            .active
+                            .where("(start_at<=? OR start_at IS NULL) AND (end_at >=? OR end_at IS NULL) AND NOT (start_at IS NULL AND end_at IS NULL)", Time.now.utc, Time.now.utc)
+                            .limit(2)
+                            .to_a
             current_term = current_terms.length == 1 ? current_terms.first : :nil
           end
           current_term == :nil ? nil : current_term
@@ -109,8 +110,8 @@ module Api
     'users' =>
       { :lookups => { 'sis_user_id' => 'pseudonyms.sis_user_id',
                       'sis_login_id' => {
-                          column: 'LOWER(pseudonyms.unique_id)',
-                          transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
+                        column: 'LOWER(pseudonyms.unique_id)',
+                        transform: ->(id) { QuotedValue.new("LOWER(#{Pseudonym.connection.quote(id)})") }
                       },
                       'id' => 'users.id',
                       'sis_integration_id' => 'pseudonyms.integration_id',
@@ -164,6 +165,7 @@ module Api
                         root_account: nil)
     # returns column_name, column_value
     return lookups['id'], id if id.is_a?(Numeric) || id.is_a?(ActiveRecord::Base)
+
     id = id.to_s.strip
     if id =~ %r{\Ahex:(lti_[\w_]+|sis_[\w_]+):(([0-9A-Fa-f]{2})+)\z}
       sis_column = $1
@@ -181,6 +183,7 @@ module Api
 
     column = lookups[sis_column]
     return nil, nil unless column
+
     if column.is_a?(Hash)
       sis_id = column[:transform].call(sis_id)
       column = column[:column]
@@ -196,6 +199,7 @@ module Api
                                     current_user,
                                     root_account: root_account)
       next unless column && sis_id
+
       columns[column] ||= []
       columns[column] << sis_id
     end
@@ -207,14 +211,14 @@ module Api
   # return in integer format if possible
   # (note that ID_REGEX may be redefined by a plugin!)
   def self.map_non_sis_ids(ids)
-    ids.map{ |id| id.to_s.strip }.select{ |id| id =~ ID_REGEX }.map do |id|
+    ids.map { |id| id.to_s.strip }.select { |id| id =~ ID_REGEX }.map do |id|
       id =~ /\A\d+\z/ ? id.to_i : id
     end
   end
 
   def self.sis_find_sis_mapping_for_collection(collection)
     SIS_MAPPINGS[collection.table_name] or
-        raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
+      raise(ArgumentError, "need to add support for table name: #{collection.table_name}")
   end
 
   def self.sis_relation_for_collection(collection, ids, sis_root_account, current_user = nil)
@@ -238,6 +242,7 @@ module Api
   def self.relation_for_sis_mapping_and_columns(relation, columns, sis_mapping, sis_root_account)
     raise ArgumentError, "sis_root_account required for lookups" unless sis_root_account.is_a?(Account)
     return relation.none if columns.empty?
+
     relation = relation.all unless relation.is_a?(ActiveRecord::Relation)
 
     not_scoped_to_account = sis_mapping[:is_not_scoped_to_account] || []
@@ -252,6 +257,7 @@ module Api
           args << columns[column]
         else
           raise ArgumentError, "missing scope for collection" unless sis_mapping[:scope]
+
           ids = columns[column]
           if ids.any? { |id| id.is_a?(Array) }
             ids_hash = {}
@@ -277,6 +283,7 @@ module Api
               args.concat(sub_args)
             else
               raise "cross-shard non-ID Api lookups are only supported for users" unless relation.klass == User
+
               sub_args.unshift(sub_query.join(" OR "))
               users = relation.klass.joins(sis_mapping[:joins]).where(*sub_args).select(:id, :updated_at).to_a
               User.preload_shard_associations(users)
@@ -306,7 +313,7 @@ module Api
     result || Setting.get('api_per_page', '10').to_i
   end
 
-  def self.per_page_for(controller, options={})
+  def self.per_page_for(controller, options = {})
     action = "#{controller.params[:controller]}##{controller.params[:action]}"
     per_page_requested = controller.params[:per_page] || options[:default] || per_page(action)
     max = options[:max] || max_per_page(action)
@@ -323,7 +330,7 @@ module Api
     links = build_links_from_hash(hash)
     controller.response.headers["Link"] = links.join(',') if links.length > 0
     if response_args[:enhanced_return]
-      {hash: hash, collection: collection}
+      { hash: hash, collection: collection }
     else
       collection
     end
@@ -393,8 +400,9 @@ module Api
     pagination_args.reverse_merge!(
       page: controller.params[:page],
       per_page: per_page_for(controller,
-        default: pagination_args.delete(:default_per_page),
-        max: pagination_args.delete(:max_per_page)))
+                             default: pagination_args.delete(:default_per_page),
+                             max: pagination_args.delete(:max_per_page))
+    )
   end
 
   def self.meta_for_pagination(controller, collection)
@@ -412,7 +420,7 @@ module Api
   PAGINATION_PARAMS = [:current, :next, :prev, :first, :last].freeze
   LINK_PRIORITY = [:next, :last, :prev, :current, :first].freeze
   EXCLUDE_IN_PAGINATION_LINKS = %w(page per_page access_token api_key)
-  def self.build_links(base_url, opts={})
+  def self.build_links(base_url, opts = {})
     links = build_links_hash(base_url, opts)
     build_links_from_hash(links)
   end
@@ -425,8 +433,8 @@ module Api
     end
   end
 
-  def self.build_links_hash(base_url, opts={})
-    base_url += (base_url =~ /\?/ ? '&': '?')
+  def self.build_links_hash(base_url, opts = {})
+    base_url += (base_url =~ /\?/ ? '&' : '?')
     qp = opts[:query_parameters] || {}
     qp = qp.with_indifferent_access.except(*EXCLUDE_IN_PAGINATION_LINKS)
     base_url += "#{qp.to_query}&" if qp.present?
@@ -439,6 +447,7 @@ module Api
       if opts[param].present?
         link = "#{base_url}page=#{opts[param]}&per_page=#{opts[:per_page]}"
         return obj if link_headers_size + link.size > max_link_headers_size
+
         link_headers_size += link.size
         obj[param] = link
       end
@@ -459,6 +468,7 @@ module Api
       url, rel = link.match(%r{^<([^>]+)>; rel="([^"]+)"}).captures
       uri = URI.parse(url)
       raise(ArgumentError, "pagination url is not an absolute uri: #{url}") unless uri.is_a?(URI::HTTP)
+
       Rack::Utils.parse_nested_query(uri.query).merge(:uri => uri, :rel => rel)
     end
   end
@@ -477,9 +487,7 @@ module Api
     }
   end
 
-
   def self.api_bulk_load_user_content_attachments(htmls, context = nil)
-
     regex = context ? %r{/#{context.class.name.tableize}/#{context.id}/files/(\d+)} : %r{/files/(\d+)}
 
     attachment_ids = []
@@ -510,14 +518,14 @@ module Api
   PLACEHOLDER_HOST = 'placeholder.invalid'
 
   def get_host_and_protocol_from_request
-    [ request.host_with_port, request.ssl? ? 'https' : 'http' ]
+    [request.host_with_port, request.ssl? ? 'https' : 'http']
   end
 
   def resolve_placeholders(content)
     host, protocol = get_host_and_protocol_from_request
     # content is a json-encoded string; slashes are escaped (at least in Rails 4.0)
-    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}").
-            gsub("#{PLACEHOLDER_PROTOCOL}://#{PLACEHOLDER_HOST}", "#{protocol}://#{host}")
+    content.gsub("#{PLACEHOLDER_PROTOCOL}:\\/\\/#{PLACEHOLDER_HOST}", "#{protocol}:\\/\\/#{host}")
+           .gsub("#{PLACEHOLDER_PROTOCOL}://#{PLACEHOLDER_HOST}", "#{protocol}://#{host}")
   end
 
   def user_can_download_attachment?(attachment, context, user)
@@ -530,7 +538,7 @@ module Api
   end
 
   def api_user_content(html, context = @context, user = @current_user,
-    preloaded_attachments = {}, options = {}, is_public=false)
+                       preloaded_attachments = {}, options = {}, is_public = false)
     return html if html.blank?
 
     # use the host of the request if available;
@@ -572,7 +580,8 @@ module Api
     Html::Content.rewrite_outgoing(
       html, account, url_helper,
       include_mobile: include_mobile,
-      rewrite_api_urls: options[:rewrite_api_urls])
+      rewrite_api_urls: options[:rewrite_api_urls]
+    )
   end
 
   # This removes the verifier parameters that are added to attachment links by api_user_content
@@ -638,6 +647,7 @@ module Api
       @inverse_map = m
     end
     return nil unless api_type
+
     @inverse_map[api_type.downcase]
   end
 

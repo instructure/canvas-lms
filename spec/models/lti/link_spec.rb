@@ -73,8 +73,8 @@ module Lti
         resource_handler.save!
 
         lti_link.update(resource_type_code: resource_handler.resource_type_code,
-                                   product_code: product_family.product_code,
-                                   vendor_code: product_family.vendor_code)
+                        product_code: product_family.product_code,
+                        vendor_code: product_family.vendor_code)
       end
 
       it 'looks up the message handler identified by the codes' do

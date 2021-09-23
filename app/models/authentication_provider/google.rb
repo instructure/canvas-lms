@@ -28,7 +28,7 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   end
 
   def self.recognized_params
-    super - open_id_connect_params + [ :login_attribute, :jit_provisioning, :hosted_domain ].freeze
+    super - open_id_connect_params + [:login_attribute, :jit_provisioning, :hosted_domain].freeze
   end
 
   # Rename db field
@@ -92,8 +92,8 @@ class AuthenticationProvider::Google < AuthenticationProvider::OpenIDConnect
   def scope
     scopes = []
     scopes << 'email' if login_attribute == 'email'.freeze ||
-        hosted_domain ||
-        federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
+                         hosted_domain ||
+                         federated_attributes.any? { |(_k, v)| v['attribute'] == 'email' }
     scopes << 'profile' if federated_attributes.any? { |(_k, v)| v['attribute'] == 'name' }
     scopes.join(' ')
   end

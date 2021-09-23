@@ -73,7 +73,7 @@ describe Mutations::SetOverrideScore do
   end
 
   context "when executed by a user with permission to set override scores" do
-    let(:context) { {current_user: teacher} }
+    let(:context) { { current_user: teacher } }
 
     describe "returned values" do
       it "returns the ID of the grading period in the gradingPeriodId field if the score has a grading period" do
@@ -182,12 +182,12 @@ describe Mutations::SetOverrideScore do
 
   context "when the caller does not have the manage_grades permission" do
     it "returns an error" do
-      result = CanvasSchema.execute(mutation_str, context: {current_user: student_enrollment.user})
+      result = CanvasSchema.execute(mutation_str, context: { current_user: student_enrollment.user })
       expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
     it "does not return data pertaining to the score in question" do
-      result = CanvasSchema.execute(mutation_str, context: {current_user: student_enrollment.user})
+      result = CanvasSchema.execute(mutation_str, context: { current_user: student_enrollment.user })
       expect(result.dig("data", "setOverrideScore")).to be nil
     end
   end

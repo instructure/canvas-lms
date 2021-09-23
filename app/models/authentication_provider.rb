@@ -23,7 +23,7 @@ require 'net_ldap_extensions'
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
-  validates :auth_filter, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
+  validates :auth_filter, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
 
   workflow do
     state :active
@@ -42,6 +42,7 @@ class AuthenticationProvider < ActiveRecord::Base
   # so we shim it
   def self.find_sti_class(type_name)
     return self if type_name.blank? # super no longer does this in Rails 4
+
     case type_name
     when 'cas', 'ldap', 'saml'
       const_get(type_name.upcase)
@@ -102,7 +103,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
   end
 
-  scope :active, ->{ where("workflow_state <> 'deleted'") }
+  scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
   include Canvas::RootAccountCacher
   has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
@@ -160,11 +161,13 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def auth_password=(password)
     return if password.blank?
+
     self.auth_crypted_password, self.auth_password_salt = ::Canvas::Security.encrypt_password(password, 'instructure_auth')
   end
 
   def auth_decrypted_password
     return nil unless self.auth_password_salt && self.auth_crypted_password
+
     ::Canvas::Security.decrypt_password(self.auth_crypted_password, self.auth_password_salt, 'instructure_auth')
   end
 
@@ -271,10 +274,10 @@ class AuthenticationProvider < ActiveRecord::Base
     if given_name || surname
       user.name = "#{given_name} #{surname}"
       user.sortable_name = if given_name.present? && surname.present?
-        "#{surname}, #{given_name}"
-      else
-        "#{given_name}#{surname}"
-      end
+                             "#{surname}, #{given_name}"
+                           else
+                             "#{given_name}#{surname}"
+                           end
     end
 
     canvas_attributes.each do |(attribute, value)|
@@ -312,6 +315,7 @@ class AuthenticationProvider < ActiveRecord::Base
         lowercase_locales = I18n.available_locales.map(&:to_s).map(&:downcase)
         while value.include?('-')
           break if lowercase_locales.include?(value.downcase)
+
           value = value.sub(/(?:x-)?-[^-]*$/, '')
         end
         if (i = lowercase_locales.index(value.downcase))
@@ -335,6 +339,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def debugging?
     return false unless self.class.debugging_enabled?
+
     unless instance_variable_defined?(:@debugging)
       @debugging = !!debug_get(:debugging)
     end
@@ -394,6 +399,7 @@ class AuthenticationProvider < ActiveRecord::Base
     end
 
     return if self.class.recognized_federated_attributes.nil?
+
     bad_values = federated_attributes.values.map { |v| v['attribute'] } - self.class.recognized_federated_attributes
     unless bad_values.empty?
       errors.add(:federated_attributes, "#{bad_values.join(', ')} is not a valid attribute")
@@ -404,6 +410,7 @@ class AuthenticationProvider < ActiveRecord::Base
     result = {}
     federated_attributes.each do |(canvas_attribute_name, provider_attribute_config)|
       next if purpose != :provisioning && provider_attribute_config['provisioning_only']
+
       provider_attribute_name = provider_attribute_config['attribute']
 
       if provider_attributes.key?(provider_attribute_name)
@@ -419,6 +426,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   def enable_canvas_authentication
     return if account.non_canvas_auth_configured?
+
     account.enable_canvas_authentication
   end
 
@@ -429,7 +437,6 @@ class AuthenticationProvider < ActiveRecord::Base
   def debug_expire
     Setting.get('auth_provider_debug_expire_minutes', 30).to_i.minutes
   end
-
 end
 
 # so it doesn't get mixed up with ::CAS, ::LinkedIn and ::Twitter

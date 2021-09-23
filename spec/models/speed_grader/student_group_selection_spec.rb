@@ -59,7 +59,7 @@ describe SpeedGrader::StudentGroupSelection do
 
     context "when a group containing the student was previously selected" do
       it "returns the currently-selected group" do
-        @teacher.preferences[:gradebook_settings] = {@course.global_id => {'filter_rows_by' => {'student_group_id' => group1.id.to_s}}}
+        @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => group1.id.to_s } } }
         @teacher.save!
 
         selection = group_selector.select_group(student_id: group1_student.id)
@@ -69,7 +69,7 @@ describe SpeedGrader::StudentGroupSelection do
 
     context "when a group that does not contain the student was previously selected" do
       before(:each) do
-        @teacher.preferences[:gradebook_settings] = {@course.global_id => {'filter_rows_by' => {'student_group_id' => group1.id.to_s}}}
+        @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => group1.id.to_s } } }
         @teacher.save!
       end
 
@@ -114,7 +114,7 @@ describe SpeedGrader::StudentGroupSelection do
 
     context "when a non-empty group is already selected" do
       before(:each) do
-        @teacher.preferences[:gradebook_settings] = {@course.global_id => {'filter_rows_by' => {'student_group_id' => group2.id.to_s}}}
+        @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => group2.id.to_s } } }
         @teacher.save!
       end
 
@@ -125,7 +125,7 @@ describe SpeedGrader::StudentGroupSelection do
         nil_moderator_group.group_memberships.update_all(moderator: nil)
 
         @teacher.preferences[:gradebook_settings] = {
-          @course.global_id => {'filter_rows_by' => {'student_group_id' => nil_moderator_group.id.to_s}}
+          @course.global_id => { 'filter_rows_by' => { 'student_group_id' => nil_moderator_group.id.to_s } }
         }
         @teacher.save!
 
@@ -141,7 +141,7 @@ describe SpeedGrader::StudentGroupSelection do
 
     context "when an empty group is already selected" do
       before(:each) do
-        @teacher.preferences[:gradebook_settings] = {@course.global_id => {'filter_rows_by' => {'student_group_id' => empty_group.id.to_s}}}
+        @teacher.preferences[:gradebook_settings] = { @course.global_id => { 'filter_rows_by' => { 'student_group_id' => empty_group.id.to_s } } }
         @teacher.save!
       end
 

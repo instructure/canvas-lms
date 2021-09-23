@@ -35,7 +35,7 @@ describe Turnitin::Client do
 
   FakeHTTPResponse = Struct.new(:body)
   def stub_net_http_to_return(partial_body, return_code = 1)
-    body = "<returndata>#{ partial_body }<rcode>#{return_code}</rcode></returndata>"
+    body = "<returndata>#{partial_body}<rcode>#{return_code}</rcode></returndata>"
     fake_response = FakeHTTPResponse.new(body)
     expect_any_instance_of(Net::HTTP).to receive(:start).and_return(fake_response)
   end
@@ -97,16 +97,17 @@ describe Turnitin::Client do
       @default_settings[:exclude_value] = '50'
       normalized_settings = Turnitin::Client.normalize_assignment_turnitin_settings(@default_settings)
       expect(normalized_settings).to eq({
-        :originality_report_visibility=>"never",
-        :s_paper_check=>"1",
-        :internet_check=>"1",
-        :journal_check=>"1",
-        :exclude_biblio=>"1",
-        :exclude_quoted=>"1",
-        :exclude_type=>"1",
-        :exclude_value=>"50",
-        :submit_papers_to=>"1",
-        :s_view_report=>"0" })
+                                          :originality_report_visibility => "never",
+                                          :s_paper_check => "1",
+                                          :internet_check => "1",
+                                          :journal_check => "1",
+                                          :exclude_biblio => "1",
+                                          :exclude_quoted => "1",
+                                          :exclude_type => "1",
+                                          :exclude_value => "50",
+                                          :submit_papers_to => "1",
+                                          :s_view_report => "0"
+                                        })
     end
 
     it 'determines student visibility' do
@@ -142,7 +143,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0'})
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
     end
 
     it "stores error code and message on failure" do
@@ -152,14 +153,14 @@ describe Turnitin::Client do
 
       expect(status).to be_falsey
       expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({
-        :s_view_report => "1",
-        :submit_papers_to => '0',
-        :error => {
-          :error_code => 123,
-          :error_message => 'You cannot create this assignment right now',
-          :public_error_message => 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
-        }
-      })
+                                                                                            :s_view_report => "1",
+                                                                                            :submit_papers_to => '0',
+                                                                                            :error => {
+                                                                                              :error_code => 123,
+                                                                                              :error_message => 'You cannot create this assignment right now',
+                                                                                              :public_error_message => 'There was an error submitting to the similarity detection service. Please try resubmitting the file before contacting support.'
+                                                                                            }
+                                                                                          })
     end
 
     it "does not make api call if assignment is marked current" do
@@ -168,7 +169,7 @@ describe Turnitin::Client do
       status = @assignment.create_in_turnitin
 
       expect(status).to be_truthy
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0'})
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => "1", :submit_papers_to => '0' })
     end
 
     it "sets s_view_report to 0 if originality_report_visibility is 'never'" do
@@ -177,7 +178,7 @@ describe Turnitin::Client do
       stub_net_http_to_return('<assignmentid>12345</assignmentid>')
       @assignment.create_in_turnitin
 
-      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0'})
+      expect(@assignment.reload.turnitin_settings).to eql @sample_turnitin_settings.merge({ :created => true, :current => true, :s_view_report => '0', :submit_papers_to => '0' })
     end
   end
 
@@ -238,7 +239,6 @@ describe Turnitin::Client do
     end
 
     context "when submitting a paper" do
-
       let(:teacher_email_arg) { turnitin_submit_args[:tem] }
       let(:paper_title_arg) { turnitin_submit_args[:ptl] }
 
@@ -250,7 +250,6 @@ describe Turnitin::Client do
       let(:processed_md5) { processed_params[:md5] }
 
       context "when escaping parameters" do
-
         it "escapes '%' signs" do
           @attachment.display_name = "Awkward%20Name.txt"
           expect(paper_title_arg).to include("%") # sanity check
@@ -285,7 +284,6 @@ describe Turnitin::Client do
     end
 
     context "when creating a user" do
-
       let(:processed_params) { @turnitin_api.prepare_params(:create_user, '2', turnitin_submit_args) }
 
       let(:processed_user_first_name) { processed_params[:ufn] }
@@ -306,7 +304,6 @@ describe Turnitin::Client do
         expect(processed_user_first_name).to eq "User"
         expect(processed_user_last_name).not_to be_empty
       end
-
     end
 
     it "ensures turnitin recieves unique assignment names even if the assignments have the same name" do
@@ -346,7 +343,7 @@ describe Turnitin::Client do
       doc_sample_params = {
         :gmtime => "200310311",
         :fid => "1",
-        :fcmd  => "1",
+        :fcmd => "1",
         :encrypt => "0",
         :aid => doc_sample_account_id,
         :diagnostic => "0",

@@ -22,7 +22,7 @@ require_relative '../common'
 
 describe "add_people" do
   include_context "in-process server selenium tests"
-  let(:enrollee_count){0}
+  let(:enrollee_count) { 0 }
 
   context "as a teacher" do
     before(:each) do
@@ -81,34 +81,34 @@ describe "add_people" do
     end
 
     it "should tell our user when not adding any users to the course" do
-        get "/courses/#{@course.id}/users"
+      get "/courses/#{@course.id}/users"
 
-        # open the dialog
-        f('a#addUsers').click
-        expect(f(".addpeople")).to be_displayed
+      # open the dialog
+      f('a#addUsers').click
+      expect(f(".addpeople")).to be_displayed
 
-        # search for some gibberish
-        replace_content(f(".addpeople__peoplesearch textarea"), "jibberish@example.com")
+      # search for some gibberish
+      replace_content(f(".addpeople__peoplesearch textarea"), "jibberish@example.com")
 
-        # click next button
-        f("#addpeople_next").click
+      # click next button
+      f("#addpeople_next").click
 
-        # the validation issues panel is displayed
-        expect(f(".addpeople__peoplevalidationissues")).to be_displayed
+      # the validation issues panel is displayed
+      expect(f(".addpeople__peoplevalidationissues")).to be_displayed
 
-        # click the next button
-        f("#addpeople_next").click
+      # click the next button
+      f("#addpeople_next").click
 
-        # the people ready panel is displayed
-        people_ready_panel = f('.addpeople__peoplereadylist')
-        expect(people_ready_panel).to be_displayed
+      # the people ready panel is displayed
+      people_ready_panel = f('.addpeople__peoplereadylist')
+      expect(people_ready_panel).to be_displayed
 
-        # no table
-        expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
+      # no table
+      expect(f('body')).not_to contain_css('.addpeople__peoplereadylist table')
 
-        # the message_user_path
-        msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
-        expect(msg).to be_displayed
+      # the message_user_path
+      msg = fj(".addpeople__peoplereadylist:contains('No users were selected to add to the course')")
+      expect(msg).to be_displayed
     end
 
     it "should include only manageable roles (non-granular)" do
@@ -155,7 +155,6 @@ describe "add_people" do
       # check the checkbox again
       f('label[for="limit_privileges_to_course_section"]').click
       expect(f('#limit_privileges_to_course_section')).to be_selected
-
     end
 
     # tests that INSTUI fixed a bug in Select that would close the Modal
@@ -179,7 +178,6 @@ describe "add_people" do
 
       expect(f(".addpeople")).to be_displayed # still
     end
-
   end
 
   context('as an admin') do

@@ -57,7 +57,6 @@ describe SectionTabPresenter do
     it 'returns false if the tab target is nil' do
       expect(SectionTabPresenter.new(tab.merge(target: nil), course).target?).to eq false
     end
-
   end
 
   describe '#hide?' do
@@ -88,7 +87,7 @@ describe SectionTabPresenter do
     end
 
     it 'should return path associated with course and tab when given args as a hash' do
-      assignments_tab[:args] = {message_handler_id: 1, :resource_link_fragment => :nav, course_id: 1 }
+      assignments_tab[:args] = { message_handler_id: 1, :resource_link_fragment => :nav, course_id: 1 }
       path = SectionTabPresenter.new(assignments_tab, course).path
       expect(path).to eq "/courses/1/assignments?message_handler_id=1&resource_link_fragment=nav"
     end
@@ -102,7 +101,7 @@ describe SectionTabPresenter do
       end
 
       context 'with keys as symbols' do
-        let(:args) { {message_handler_id: 5, resource_link_fragment: "nav", course_id: 1} }
+        let(:args) { { message_handler_id: 5, resource_link_fragment: "nav", course_id: 1 } }
 
         it 'handles the tab correctly' do
           expect(SectionTabPresenter.new(tab, course).path).to eq(
@@ -112,7 +111,7 @@ describe SectionTabPresenter do
       end
 
       context 'with keys as strings' do
-        let(:args) { {"message_handler_id"=>5, "resource_link_fragment"=>"nav", "course_id"=>1}.with_indifferent_access }
+        let(:args) { { "message_handler_id" => 5, "resource_link_fragment" => "nav", "course_id" => 1 }.with_indifferent_access }
 
         it 'handles the tab correctly' do
           expect(SectionTabPresenter.new(tab, course).path).to eq(
@@ -122,7 +121,7 @@ describe SectionTabPresenter do
       end
 
       context 'with indifferent access hash' do
-        let(:args) { {"message_handler_id"=>5, "resource_link_fragment"=>"nav", "course_id"=>1} }
+        let(:args) { { "message_handler_id" => 5, "resource_link_fragment" => "nav", "course_id" => 1 } }
 
         it 'handles the tab correctly' do
           expect(SectionTabPresenter.new(tab, course).path).to eq(
@@ -137,15 +136,15 @@ describe SectionTabPresenter do
     it 'should return tab args if present' do
       string_arg = 'blah'
       path_args = SectionTabPresenter.new(assignments_tab.merge({
-        args: string_arg
-      }), course).path_args
+                                                                  args: string_arg
+                                                                }), course).path_args
       expect(path_args).to eq string_arg
     end
 
     it 'should return empty array if tab no_args is present' do
       path_args = SectionTabPresenter.new(assignments_tab.merge({
-        no_args: true
-      }), course).path_args
+                                                                  no_args: true
+                                                                }), course).path_args
       expect(path_args).to be_a Array
       expect(path_args).to be_empty
     end
@@ -158,8 +157,8 @@ describe SectionTabPresenter do
   describe '#to_h' do
     it 'should include icon, path & label' do
       h = SectionTabPresenter.new(tab.merge({
-        icon: 'icon-home'
-      }), course).to_h
+                                              icon: 'icon-home'
+                                            }), course).to_h
       expect(h.keys).to include(:icon, :hidden, :path, :label)
     end
   end

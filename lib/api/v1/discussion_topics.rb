@@ -29,7 +29,7 @@ module Api::V1::DiscussionTopics
   include HtmlTextHelper
 
   # Public: DiscussionTopic fields to serialize.
-  ALLOWED_TOPIC_FIELDS  = %w{
+  ALLOWED_TOPIC_FIELDS = %w{
     id title assignment_id delayed_post_at lock_at created_at
     last_reply_at posted_at root_topic_id podcast_has_student_posts
     discussion_type position allow_rating only_graders_can_rate sort_by_rating
@@ -47,6 +47,7 @@ module Api::V1::DiscussionTopics
   def get_root_topic_data(topics, fields)
     root_topic_ids = topics.pluck(:root_topic_id).reject(&:blank?).uniq
     return {} unless root_topic_ids && root_topic_ids.length > 0
+
     fields_with_id = fields.unshift(:id)
     root_topics_array = DiscussionTopic.select(fields_with_id).find(root_topic_ids)
     root_topics_array.map { |root_topic| [root_topic.id, root_topic] }.to_h
@@ -60,7 +61,7 @@ module Api::V1::DiscussionTopics
   # session - The current session.
   # opts - see discussion_topic_api_json in this file for what the options are
   # Returns an array of hashes
-  def discussion_topics_api_json(topics, context, user, session, opts={})
+  def discussion_topics_api_json(topics, context, user, session, opts = {})
     DiscussionTopic.preload_can_unpublish(context, topics) if context
     root_topics = {}
     if opts[:root_topic_fields]&.length
@@ -119,9 +120,9 @@ module Api::V1::DiscussionTopics
     if opts[:include_assignment] && topic.assignment
       excludes = opts[:exclude_assignment_description] ? ['description'] : []
       json[:assignment] = assignment_json(topic.assignment, user, session,
-        {include_discussion_topic: false, override_dates: opts[:override_dates],
-        include_all_dates: opts[:include_all_dates],
-        exclude_response_fields: excludes, include_overrides: opts[:include_overrides]}.merge(opts[:assignment_opts]))
+                                          { include_discussion_topic: false, override_dates: opts[:override_dates],
+                                            include_all_dates: opts[:include_all_dates],
+                                            exclude_response_fields: excludes, include_overrides: opts[:include_overrides] }.merge(opts[:assignment_opts]))
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
@@ -160,7 +161,7 @@ module Api::V1::DiscussionTopics
   # user - Requesting user.
   #
   # Returns a hash.
-  def serialize_additional_topic_fields(topic, context, user, opts={})
+  def serialize_additional_topic_fields(topic, context, user, opts = {})
     attachment_opts = {}
     attachment_opts[:include] = ['usage_rights'] if opts[:include_usage_rights]
     attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
@@ -174,21 +175,21 @@ module Api::V1::DiscussionTopics
                   end
 
     fields = { require_initial_post: topic.require_initial_post?,
-      user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
-      read_state: topic.read_state(user), unread_count: topic.unread_count(user, opts: opts),
-      subscribed: topic.subscribed?(user, opts: opts),
-      attachments: attachments, published: topic.published?,
-      can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
-      locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
-      author: user_display_json(topic.user, topic.context),
-      html_url: html_url, url: html_url, pinned: !!topic.pinned,
-      group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
+               user_can_see_posts: topic.user_can_see_posts?(user), podcast_url: url,
+               read_state: topic.read_state(user), unread_count: topic.unread_count(user, opts: opts),
+               subscribed: topic.subscribed?(user, opts: opts),
+               attachments: attachments, published: topic.published?,
+               can_unpublish: opts[:user_can_moderate] ? topic.can_unpublish?(opts) : false,
+               locked: topic.locked?, can_lock: topic.can_lock?, comments_disabled: topic.comments_disabled?,
+               author: user_display_json(topic.user, topic.context),
+               html_url: html_url, url: html_url, pinned: !!topic.pinned,
+               group_category_id: topic.group_category_id, can_group: topic.can_group?(opts) }
 
     child_topic_data = topic.root_topic? ? topic.child_topics.active.pluck(:id, :context_id) : []
     fields[:topic_children] = child_topic_data.map(&:first)
-    fields[:group_topic_children] = child_topic_data.map{|id, group_id| {id: id, group_id: group_id}}
+    fields[:group_topic_children] = child_topic_data.map { |id, group_id| { id: id, group_id: group_id } }
 
-    fields.merge!({context_code: topic.context_code}) if opts[:include_context_code]
+    fields.merge!({ context_code: topic.context_code }) if opts[:include_context_code]
 
     locked_json(fields, topic, user, 'topic', check_policies: true, deep_check_if_needed: true)
     can_view = !fields[:lock_info].is_a?(Hash) || fields[:lock_info][:can_view]
@@ -273,9 +274,10 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_attachment(entry, user, context)
     return {} unless entry.attachment
+
     url_options = {}
     url_options.merge!(host: Api::PLACEHOLDER_HOST, protocol: Api::PLACEHOLDER_PROTOCOL) if respond_to?(:use_placeholder_host?) && use_placeholder_host? unless respond_to?(:request)
-    json = {attachment: attachment_json(entry.attachment, user, url_options)}
+    json = { attachment: attachment_json(entry.attachment, user, url_options) }
     json[:attachments] = [json[:attachment]]
 
     json
@@ -289,6 +291,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_read_state(entry, user)
     return {} unless user
+
     participant = entry.find_existing_participant(user)
 
     { read_state: participant.workflow_state,
@@ -306,6 +309,7 @@ module Api::V1::DiscussionTopics
   # Returns a hash.
   def discussion_entry_subentries(entry, user, context, session, includes)
     return {} unless includes.include?(:subentries) && entry.root_entry_id.nil?
+
     replies = entry.flattened_discussion_subentries.active.newest_first.limit(11).to_a
 
     if replies.empty?

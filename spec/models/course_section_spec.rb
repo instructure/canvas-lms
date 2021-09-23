@@ -174,7 +174,7 @@ describe CourseSection, "moving to new course" do
     e = course1.enroll_user(u, 'StudentEnrollment', :section => cs)
     e.workflow_state = 'active'
     e.save!
-    #should also move deleted enrollments
+    # should also move deleted enrollments
     e.destroy
     course1.reload
     course2.reload
@@ -264,7 +264,7 @@ describe CourseSection, "moving to new course" do
     section = course.course_sections.create!
     course.save!
     announcement1 = Announcement.create!(:title => "some topic", :message => "blah",
-      :context => course, :is_section_specific => true, :course_sections => [section])
+                                         :context => course, :is_section_specific => true, :course_sections => [section])
     visibility = announcement1.reload.discussion_topic_section_visibilities.first
 
     course2 = course_factory
@@ -331,8 +331,8 @@ describe CourseSection, "moving to new course" do
     e.save!
     course1.reload
 
-    expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([u.id], course2, nil, update_grades: true, executing_user: nil)
+    expect(DueDateCacher).to receive(:recompute_users_for_course)
+      .with([u.id], course2, nil, update_grades: true, executing_user: nil)
     cs.move_to_course(course2)
   end
 
@@ -346,17 +346,17 @@ describe CourseSection, "moving to new course" do
     it "should validate the length of attributes" do
       @section.name = @long_string
       @section.sis_source_id = @long_string
-      expect(lambda {@section.save!}).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
+      expect(lambda { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
     end
 
     it "should validate the length of sis_source_id" do
       @section.sis_source_id = @long_string
-      expect(lambda {@section.save!}).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
+      expect(lambda { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
     end
 
     it "should validate the length of section name" do
       @section.name = @long_string
-      expect(lambda {@section.save!}).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
+      expect(lambda { @section.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
   end
 
@@ -364,7 +364,7 @@ describe CourseSection, "moving to new course" do
     before :once do
       course_with_teacher
       @course.assignments.build
-      @assignment = @course.assignments.build("title"=>"test")
+      @assignment = @course.assignments.build("title" => "test")
       @assignment.save!
       @section = @course.course_sections.create!
     end
@@ -380,7 +380,7 @@ describe CourseSection, "moving to new course" do
     end
 
     it 'should soft destroy enrollments when destroyed' do
-      @enrollment = @course.enroll_student(User.create, {section: @section})
+      @enrollment = @course.enroll_student(User.create, { section: @section })
       expect(@enrollment.workflow_state).to eq("creation_pending")
       @section.destroy
       @enrollment.reload
@@ -459,11 +459,11 @@ describe CourseSection, "moving to new course" do
     context ":read and section_visibilities" do
       before do
         RoleOverride.create!({
-          :context => Account.default,
-          :permission => 'manage_students',
-          :role => ta_role,
-          :enabled => false
-        })
+                               :context => Account.default,
+                               :permission => 'manage_students',
+                               :role => ta_role,
+                               :enabled => false
+                             })
         course_with_ta(:active_all => true)
         @other_section = @course.course_sections.create!(:name => "Other Section")
       end
@@ -528,7 +528,7 @@ describe CourseSection, "moving to new course" do
 
     it "should invalidate access if section is cross-listed" do
       @course.update(:workflow_state => "available", :restrict_student_future_view => true,
-        :restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
+                     :restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true
 
       other_course = course_factory(active_all: true)

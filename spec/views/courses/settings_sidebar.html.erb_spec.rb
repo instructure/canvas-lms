@@ -85,14 +85,14 @@ describe "courses/_settings_sidebar.html.erb" do
 
     describe "external tools" do
       def create_course_settings_sub_navigation_tool(options = {})
-          defaults = {
-            name: options[:name] || "external tool",
-            consumer_key: 'test',
-            shared_secret: 'asdf',
-            url: 'http://example.com/ims/lti',
-            course_settings_sub_navigation: { icon_url: '/images/delete.png' },
-          }
-          @course.context_external_tools.create!(defaults.merge(options))
+        defaults = {
+          name: options[:name] || "external tool",
+          consumer_key: 'test',
+          shared_secret: 'asdf',
+          url: 'http://example.com/ims/lti',
+          course_settings_sub_navigation: { icon_url: '/images/delete.png' },
+        }
+        @course.context_external_tools.create!(defaults.merge(options))
       end
 
       it "should display all configured tools" do

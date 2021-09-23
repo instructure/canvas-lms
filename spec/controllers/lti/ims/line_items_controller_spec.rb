@@ -32,13 +32,13 @@ module Lti
       let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
       let(:resource_link) do
         if tool.present? && tool.use_1_3?
-          resource_link_model(overrides: {resource_link_uuid: assignment.lti_context_id})
+          resource_link_model(overrides: { resource_link_uuid: assignment.lti_context_id })
         else
           resource_link_model
         end
       end
       let(:assignment) do
-        opts = {course: course}
+        opts = { course: course }
         if tool.present?
           opts[:submission_types] = 'external_tool'
           opts[:external_tool_tag_attributes] = {
@@ -214,13 +214,13 @@ module Lti
             assignment
             expect do
               send_request
-            end.to change {Assignment.count}.by(1)
+            end.to change { Assignment.count }.by(1)
           end
 
           it 'does not create a resource_link record' do
             expect do
               send_request
-            end.to change {Lti::ResourceLink.count}.by(0)
+            end.to change { Lti::ResourceLink.count }.by(0)
           end
 
           context 'when a new assignment is created' do
@@ -255,9 +255,9 @@ module Lti
 
               let(:params_overrides) {
                 super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
-                  type: "external_tool",
-                  external_tool_url: "http://www.google.com"
-                })
+                                type: "external_tool",
+                                external_tool_url: "http://www.google.com"
+                              })
               }
 
               it 'sets the assignment submission type to external tool' do
@@ -276,9 +276,9 @@ module Lti
             context 'when submission type is invalid' do
               let(:params_overrides) {
                 super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
-                  type: "a_bad_submission_type",
-                  external_tool_url: "http://www.google.com"
-                })
+                                type: "a_bad_submission_type",
+                                external_tool_url: "http://www.google.com"
+                              })
               }
 
               it 'returns a 400 error response code' do
@@ -290,9 +290,9 @@ module Lti
           context 'when submission type is external tool and and tool URL matches a tool' do
             let(:params_overrides) {
               super().merge(LineItem::AGS_EXT_SUBMISSION_TYPE => {
-                type: "external_tool",
-                external_tool_url: tool.url
-              })
+                              type: "external_tool",
+                              external_tool_url: tool.url
+                            })
             }
 
             it_behaves_like 'the line item create endpoint'
@@ -300,8 +300,8 @@ module Lti
             it 'creates exactly one assignment and resource link' do
               expect do
                 send_request
-              end.to change(Assignment, :count).by(1).
-                and change(Lti::ResourceLink, :count).by(1)
+              end.to change(Assignment, :count).by(1)
+                                               .and change(Lti::ResourceLink, :count).by(1)
             end
 
             it 'creates a line item with resource link, tag, and extensions' do
@@ -622,11 +622,11 @@ module Lti
         it 'includes all associated line items in the course' do
           send_request
           expect(line_item_list).to match_array([
-            line_item,
-            line_item_with_tag,
-            line_item_with_resource_id,
-            line_item_with_resource_link_id
-          ])
+                                                  line_item,
+                                                  line_item_with_tag,
+                                                  line_item_with_resource_id,
+                                                  line_item_with_resource_link_id
+                                                ])
         end
 
         context do
@@ -635,8 +635,8 @@ module Lti
           it 'correctly queries by tag' do
             send_request
             expect(line_item_list).to match_array([
-              line_item_with_tag
-            ])
+                                                    line_item_with_tag
+                                                  ])
           end
         end
 
@@ -646,8 +646,8 @@ module Lti
           it 'correctly queries by resource_id' do
             send_request
             expect(line_item_list).to match_array([
-              line_item_with_resource_id
-            ])
+                                                    line_item_with_resource_id
+                                                  ])
           end
         end
 
@@ -664,9 +664,9 @@ module Lti
           it 'correctly queries by resource_link_id' do
             send_request
             expect(line_item_list).to match_array([
-              line_item_new_lti_link.assignment.line_items.first,
-              line_item_new_lti_link
-            ])
+                                                    line_item_new_lti_link.assignment.line_items.first,
+                                                    line_item_new_lti_link
+                                                  ])
           end
         end
 
@@ -681,8 +681,8 @@ module Lti
             )
             send_request
             expect(line_item_list).to match_array([
-              tag_and_resource
-            ])
+                                                    tag_and_resource
+                                                  ])
           end
         end
 

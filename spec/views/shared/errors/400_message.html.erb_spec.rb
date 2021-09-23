@@ -34,4 +34,3 @@ describe "shared/errors/400_message" do
     expect(response).not_to be_nil
   end
 end
-

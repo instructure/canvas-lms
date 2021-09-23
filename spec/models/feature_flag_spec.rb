@@ -27,13 +27,13 @@ describe FeatureFlag do
 
   before do
     allow(Feature).to receive(:definitions).and_return({
-      'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount'),
-      'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
-      'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),
-      'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User'),
-      'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course'),
-      'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course', root_opt_in: true)
-    })
+                                                         'root_account_feature' => Feature.new(feature: 'root_account_feature', applies_to: 'RootAccount'),
+                                                         'account_feature' => Feature.new(feature: 'account_feature', applies_to: 'Account'),
+                                                         'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course'),
+                                                         'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User'),
+                                                         'hidden_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course'),
+                                                         'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', state: 'hidden', applies_to: 'Course', root_opt_in: true)
+                                                       })
   end
 
   context "validation" do
@@ -45,7 +45,7 @@ describe FeatureFlag do
     it "should validate the feature exists" do
       flag = t_root_account.feature_flags.build(feature: 'xyzzy')
       expect(flag).not_to be_valid
-      expect(flag.errors.to_h).to eq({feature: "does not exist"})
+      expect(flag.errors.to_h).to eq({ feature: "does not exist" })
     end
 
     it "should allow 'allowed' state only in accounts" do
@@ -62,7 +62,7 @@ describe FeatureFlag do
 
       flag = t_sub_account.feature_flags.build(feature: 'root_account_feature')
       expect(flag).not_to be_valid
-      expect(flag.errors.to_h).to eq({feature: "does not apply to context"})
+      expect(flag.errors.to_h).to eq({ feature: "does not apply to context" })
     end
   end
 
@@ -124,7 +124,7 @@ describe FeatureFlag do
     let_once(:acting_user) { user_model }
 
     before(:each) do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     end
 
     it "logs account feature creation" do
@@ -166,7 +166,7 @@ describe FeatureFlag do
       flag.state = 'off'
       flag.save!
       logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
-      log = logs.detect{|l| l.state_after == 'off' }
+      log = logs.detect { |l| l.state_after == 'off' }
       expect(log.feature_flag_id).to eq(flag.id)
       expect(log.state_before).to eq("allowed")
       expect(log.state_after).to eq('off')
@@ -180,7 +180,7 @@ describe FeatureFlag do
       flag.save!
       flag.destroy
       logs = Auditors::FeatureFlag.for_feature_flag(flag).paginate(per_page: 3).to_a
-      log = logs.detect{|l| l.state_after == 'allowed' }
+      log = logs.detect { |l| l.state_after == 'allowed' }
       expect(log.feature_flag_id).to eq(flag.id)
       expect(log.state_after).to eq("allowed")
       expect(log.state_before).to eq("on")

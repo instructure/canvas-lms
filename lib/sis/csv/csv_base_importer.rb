@@ -49,7 +49,7 @@ module SIS
 
       # This will skip rows unless they are bigger than or equal to the index
       # passed. It will return if the current row is bigger than the index+count
-      def csv_rows(csv, index=nil, count=nil)
+      def csv_rows(csv, index = nil, count = nil)
         # csv foreach does not track the line number, and we want increase the
         # counter first thing because we skip if the line number is out of the
         # range. We have to start at -1 to have a 0 index work.
@@ -59,6 +59,7 @@ module SIS
           next if index && lineno < index
           break if index && lineno >= index + count
           next if row.to_hash.values.all?(&:nil?)
+
           # this does not really need index to be present, but we only trust the
           # lineno on the refactored importer for parallel imports.
           #
@@ -71,12 +72,12 @@ module SIS
       end
 
       def importer_opts
-        {batch: @batch,
-         batch_user: @batch.try(:user),
-         logger: @sis.logger,
-         override_sis_stickiness: @sis.override_sis_stickiness,
-         add_sis_stickiness: @sis.add_sis_stickiness,
-         clear_sis_stickiness: @sis.clear_sis_stickiness}
+        { batch: @batch,
+          batch_user: @batch.try(:user),
+          logger: @sis.logger,
+          override_sis_stickiness: @sis.override_sis_stickiness,
+          add_sis_stickiness: @sis.add_sis_stickiness,
+          clear_sis_stickiness: @sis.clear_sis_stickiness }
       end
     end
   end

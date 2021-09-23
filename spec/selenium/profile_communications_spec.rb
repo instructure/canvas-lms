@@ -30,7 +30,7 @@ describe "profile communication settings" do
     @sub_comment = Notification.create(:name => "Submission Comment1", :category => "Submission Comment")
   end
 
-  let(:sns_response) { double(data: {endpointarn: 'endpointarn'}) }
+  let(:sns_response) { double(data: { endpointarn: 'endpointarn' }) }
   let(:sns_client) { double(create_platform_endpoint: sns_response) }
   let(:sns_developer_key_sns_field) { sns_client }
 
@@ -43,7 +43,7 @@ describe "profile communication settings" do
   end
 
   let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
-  let(:sns_channel) { communication_channel(@user, {username: 'push', path_type: CommunicationChannel::TYPE_PUSH}) }
+  let(:sns_channel) { communication_channel(@user, { username: 'push', path_type: CommunicationChannel::TYPE_PUSH }) }
 
   context "as teacher" do
     before :each do
@@ -75,7 +75,7 @@ describe "profile communication settings" do
     end
 
     it "shouldn't display a SMS number as channel" do
-      communication_channel(@user, {username: '8011235555@vtext.com', path_type: 'sms', active_cc: true})
+      communication_channel(@user, { username: '8011235555@vtext.com', path_type: 'sms', active_cc: true })
 
       get "/profile/communication"
       expect(f("thead")).not_to contain_jqcss("span:contains('sms')")
@@ -110,7 +110,7 @@ describe "profile communication settings" do
     end
 
     it "should load an existing frequency setting and save a change" do
-      channel = communication_channel(@user, {username: '8011235555@vtext.com', active_cc: true})
+      channel = communication_channel(@user, { username: '8011235555@vtext.com', active_cc: true })
       # Create a notification policy entry as an existing setting.
       policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
       policy.frequency = Notification::FREQ_DAILY

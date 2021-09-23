@@ -19,8 +19,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "activesupport", ">= 3.2"
 
   spec.add_dependency "i18n", ">= 0.7", "< 2"
-  spec.add_dependency "ruby_parser", "~> 3.7"
   spec.add_dependency "i18n_extraction"
+  spec.add_dependency "ruby_parser", "~> 3.7"
   spec.add_dependency "utf8_cleaner"
 
   spec.add_development_dependency "bundler", "~> 2.2"

@@ -22,9 +22,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 describe AddressBook::Service do
   before do
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-    allow(Canvas::DynamicSettings).to receive(:find).
-      with("address-book", anything).
-      and_return({'app-host' => 'http://test.host'})
+    allow(Canvas::DynamicSettings).to receive(:find)
+      .with("address-book", anything)
+      .and_return({ 'app-host' => 'http://test.host' })
 
     @sender = user_model
     @address_book = AddressBook::Service.new(@sender)
@@ -37,7 +37,7 @@ describe AddressBook::Service do
 
   def expand_common_contexts(returns)
     common_contexts = {}
-    returns.each do |user,result|
+    returns.each do |user, result|
       common_contexts[user.global_id] =
         case result
         when :student
@@ -61,13 +61,13 @@ describe AddressBook::Service do
     returns
   end
 
-  def stub_common_contexts(args, returns={})
+  def stub_common_contexts(args, returns = {})
     args << false # ignore_result
     returns = expand_common_contexts(returns)
     allow(Services::AddressBook).to receive(:common_contexts).with(*args).and_return(returns)
   end
 
-  def stub_known_in_context(args, compact_returns={})
+  def stub_known_in_context(args, compact_returns = {})
     args << nil if args.length < 3 # user_ids
     args << false if args.length < 4 # ignore_result
     user_ids = expand_user_ids(compact_returns)
@@ -122,7 +122,7 @@ describe AddressBook::Service do
     end
 
     describe "with optional :context" do
-      def stub_roles_in_context(args, returns={})
+      def stub_roles_in_context(args, returns = {})
         args << false # ignore_result
         returns = expand_common_contexts(returns)
         allow(Services::AddressBook).to receive(:roles_in_context).with(*args).and_return(returns)
@@ -142,12 +142,12 @@ describe AddressBook::Service do
         stub_known_in_context([@sender, @course2, [@recipient.global_id]], { @recipient => @course2 })
         stub_known_in_context([@sender, @course3, [@recipient.global_id]], {})
         stub_common_contexts([@sender, [@recipient.global_id]], { @recipient => {
-          courses: {
-            @course1.global_id => ['StudentEnrollment'],
-            @course2.global_id => ['StudentEnrollment']
-          },
-          groups: {}
-        }})
+                               courses: {
+                                 @course1.global_id => ['StudentEnrollment'],
+                                 @course2.global_id => ['StudentEnrollment']
+                               },
+                               groups: {}
+                             } })
       end
 
       it "includes all known contexts when absent" do
@@ -221,7 +221,7 @@ describe AddressBook::Service do
     describe "sharding" do
       specs_require_sharding
 
-      let(:xshard_recipient) { @shard2.activate{ user_model } }
+      let(:xshard_recipient) { @shard2.activate { user_model } }
 
       before do
         stub_common_contexts(
@@ -236,7 +236,7 @@ describe AddressBook::Service do
       end
 
       it "works when given local ids" do
-        known_users = @shard2.activate{ @address_book.known_users([xshard_recipient.id]) }
+        known_users = @shard2.activate { @address_book.known_users([xshard_recipient.id]) }
         expect(known_users).to include(xshard_recipient)
       end
     end
@@ -317,8 +317,8 @@ describe AddressBook::Service do
       specs_require_sharding
 
       before do
-        @xshard_recipient = @shard2.activate{ user_model }
-        @xshard_course = @shard2.activate{ course_model(account: Account.create) }
+        @xshard_recipient = @shard2.activate { user_model }
+        @xshard_course = @shard2.activate { course_model(account: Account.create) }
         stub_known_in_context([@sender, @course.global_asset_string], { @xshard_recipient => @course })
         stub_known_in_context([@sender, @xshard_course.global_asset_string], { @xshard_recipient => @xshard_course })
       end
@@ -336,7 +336,7 @@ describe AddressBook::Service do
   end
 
   describe "search_users" do
-    def stub_search_users(args, compact_returns={})
+    def stub_search_users(args, compact_returns = {})
       args << false # ignore_result
       user_ids = expand_user_ids(compact_returns)
       common_contexts = expand_common_contexts(compact_returns)

@@ -112,7 +112,6 @@ module ConditionalRelease
         expect(@rule.scoring_ranges.for_score(20).count).to eq 1
         expect(@rule.scoring_ranges.for_score(1000).count).to eq 1
       end
-
     end
 
     describe 'contains_score' do

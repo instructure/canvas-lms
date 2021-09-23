@@ -55,7 +55,6 @@ RSpec.shared_examples 'ungraded student grade' do
   end
 end
 
-
 RSpec.shared_examples 'displayable student grade' do
   it 'publishes grade and comments to student', priority: '1' do
     user_session(student)

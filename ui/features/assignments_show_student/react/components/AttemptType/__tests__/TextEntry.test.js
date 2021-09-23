@@ -114,6 +114,8 @@ describe('TextEntry', () => {
         it('uses the submission body if the submission is graded', async () => {
           const props = await makeProps({
             submission: {
+              id: '1',
+              _id: '1',
               body: 'I am graded!',
               state: 'graded'
             }
@@ -127,6 +129,8 @@ describe('TextEntry', () => {
         it('uses the submission body if the submission is submitted', async () => {
           const props = await makeProps({
             submission: {
+              id: '1',
+              _id: '1',
               body: 'I am not graded!',
               state: 'submitted'
             }
@@ -140,6 +144,8 @@ describe('TextEntry', () => {
         it('uses the contents of the draft if not graded or submitted and a draft is present', async () => {
           const props = await makeProps({
             submission: {
+              id: '1',
+              _id: '1',
               submissionDraft: {body: 'just a draft'}
             }
           })
@@ -152,6 +158,8 @@ describe('TextEntry', () => {
         it('is empty if not graded or submitted and no draft is present', async () => {
           const props = await makeProps({
             submission: {
+              id: '1',
+              _id: '1',
               body: 'this should be ignored',
               state: 'unsubmitted'
             }
@@ -166,6 +174,8 @@ describe('TextEntry', () => {
 
   describe('receiving updated props', () => {
     const initialSubmission = {
+      id: '1',
+      _id: '1',
       attempt: 1,
       state: 'unsubmitted',
       submissionDraft: {body: 'hello'}
@@ -214,6 +224,8 @@ describe('TextEntry', () => {
 
       const newProps = await makeProps({
         submission: {
+          id: '1',
+          _id: '1',
           attempt: 2,
           state: 'unsubmitted',
           submissionDraft: {body: 'hello, again'}
@@ -359,6 +371,8 @@ describe('TextEntry', () => {
 
       const newProps = await makeProps({
         submission: {
+          id: '1',
+          _id: '1',
           attempt: 2,
           state: 'unsubmitted'
         }

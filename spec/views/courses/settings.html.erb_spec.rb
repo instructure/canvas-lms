@@ -74,7 +74,7 @@ describe "courses/settings.html.erb" do
 
     it "should not show to non-sis admin" do
       role = custom_account_role('NoSissy', :account => @course.root_account)
-      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => {'manage_sis' => false}, :role => role)
+      admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false }, :role => role)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -83,7 +83,7 @@ describe "courses/settings.html.erb" do
 
     it "should not show to subaccount admin" do
       role = custom_account_role('CustomAdmin', :account => @course.root_account)
-      admin = account_admin_user_with_role_changes(:account => @subaccount, :role_changes => {'manage_sis' => true, 'manage_courses' => true}, :role => role)
+      admin = account_admin_user_with_role_changes(:account => @subaccount, :role_changes => { 'manage_sis' => true, 'manage_courses' => true }, :role => role)
       view_context(@course, admin)
       assign(:current_user, admin)
       render
@@ -195,9 +195,9 @@ describe "courses/settings.html.erb" do
       doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
-      #select.children.count.should == 3
+      # select.children.count.should == 3
 
-      option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i rescue c.to_s}
+      option_ids = select.search("option").map { |c| c.attributes["value"].value.to_i rescue c.to_s }
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
@@ -214,14 +214,14 @@ describe "courses/settings.html.erb" do
 
       option_ids =
         select
-          .search('option')
-          .map do |c|
-            begin
-              c.attributes['value'].value.to_i
-            rescue StandardError
-              c.to_s
-            end
+        .search('option')
+        .map do |c|
+          begin
+            c.attributes['value'].value.to_i
+          rescue StandardError
+            c.to_s
           end
+        end
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
@@ -235,7 +235,7 @@ describe "courses/settings.html.erb" do
       expect(select).not_to be_nil
       all_accounts = [Account.default] + Account.default.all_accounts
 
-      option_ids = select.search("option").map{|c| c.attributes["value"].value.to_i}
+      option_ids = select.search("option").map { |c| c.attributes["value"].value.to_i }
       expect(option_ids.sort).to eq all_accounts.map(&:id).sort
     end
   end

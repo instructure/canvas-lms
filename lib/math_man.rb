@@ -47,6 +47,7 @@ module MathMan
       url = dynamic_settings[:base_url]
       # if we get here, we should have already checked one of the booleans above
       raise InvalidConfigurationError unless url
+
       Addressable::URI.parse(url).tap do |uri|
         uri.path << '/' unless uri.path.end_with?('/')
       end

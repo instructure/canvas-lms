@@ -27,21 +27,21 @@ describe GradingStandardsController do
     end
 
     let(:default_grading_standard) do
-      [ ["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84],
-        ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7],
-        ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0] ]
+      [["A", 0.94], ["A-", 0.9], ["B+", 0.87], ["B", 0.84],
+       ["B-", 0.8], ["C+", 0.77], ["C", 0.74], ["C-", 0.7],
+       ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
     end
 
     let!(:teacher_session) { user_session(@teacher) }
     let(:json_response) { json_parse['grading_standard']['data'] }
 
     it "responds with a 200 with a valid user, course id, and json format" do
-      post 'create', params: {course_id: @course.id}, format: 'json'
+      post 'create', params: { course_id: @course.id }, format: 'json'
       expect(response).to be_ok
     end
 
     it "uses the default grading standard if no standard data is provided" do
-      post 'create', params: {course_id: @course.id}, format: 'json'
+      post 'create', params: { course_id: @course.id }, format: 'json'
       expect(json_response).to eq(default_grading_standard)
     end
 
@@ -52,7 +52,7 @@ describe GradingStandardsController do
       }
       # send the request as JSON, so that the nested arrays are preserved
       request.content_type = 'application/json'
-      post 'create', params: {course_id: @course.id, grading_standard: standard}, format: 'json'
+      post 'create', params: { course_id: @course.id, grading_standard: standard }, format: 'json'
       expect(json_response).to eq(standard[:data])
     end
 
@@ -60,11 +60,11 @@ describe GradingStandardsController do
       standard = {
         title: 'New Grading Standard!',
         standard_data: {
-          scheme_1: {name: 'A',value: 61},
-          scheme_2: {name: 'F',value: 0}
+          scheme_1: { name: 'A', value: 61 },
+          scheme_2: { name: 'F', value: 0 }
         }
       }
-      post 'create', params: {course_id: @course.id, grading_standard: standard}, format: 'json'
+      post 'create', params: { course_id: @course.id, grading_standard: standard }, format: 'json'
       expected_response_data = [['A', 0.61], ['F', 0.00]]
       expect(json_response).to eq(expected_response_data)
     end
@@ -146,7 +146,7 @@ describe GradingStandardsController do
         @admin = account_admin_user(account: @account)
       end
 
-      subject { get :index, params: {account_id: @account.id} }
+      subject { get :index, params: { account_id: @account.id } }
 
       it "returns a 200 for a valid request" do
         user_session(@admin)
@@ -164,7 +164,7 @@ describe GradingStandardsController do
         course_with_teacher(active_all: true)
       end
 
-      subject { get :index, params: {course_id: @course.id} }
+      subject { get :index, params: { course_id: @course.id } }
 
       it "returns a 200 for a valid request" do
         user_session(@teacher)

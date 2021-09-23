@@ -20,10 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe "Enrollment::BatchStateUpdater" do
-
   it 'should fail with more than 1000 enrollments' do
-    expect { Enrollment::BatchStateUpdater.destroy_batch(1..1001) }.
-      to raise_error(ArgumentError, 'Cannot call with more than 1000 enrollments')
+    expect { Enrollment::BatchStateUpdater.destroy_batch(1..1001) }
+      .to raise_error(ArgumentError, 'Cannot call with more than 1000 enrollments')
   end
 
   it 'should not fail with more than empty batch' do
@@ -78,7 +77,7 @@ describe "Enrollment::BatchStateUpdater" do
       enable_cache do
         user = User.create!
         user.update_attribute(:workflow_state, 'creation_pending')
-        communication_channel(user, {username: 'panda@instructure.com'})
+        communication_channel(user, { username: 'panda@instructure.com' })
         enrollment = @course.enroll_user(user)
         expect(Enrollment.cached_temporary_invitations('panda@instructure.com').length).to eq 1
         Enrollment::BatchStateUpdater.mark_enrollments_as_deleted([enrollment])
@@ -117,7 +116,7 @@ describe "Enrollment::BatchStateUpdater" do
       @override.assignment_override_students.create!(user: @user)
     end
 
-    let(:override_student) {@override.assignment_override_students.unscope(:where).find_by(user_id: @user)}
+    let(:override_student) { @override.assignment_override_students.unscope(:where).find_by(user_id: @user) }
 
     it 'destroys assignment override students on the user if no other enrollments for the user exist in the course' do
       Enrollment::BatchStateUpdater.update_assignment_overrides([@enrollment.id], [@course], [@user.id])
@@ -217,6 +216,6 @@ describe "Enrollment::BatchStateUpdater" do
       update_linked_enrollments
       update_user_account_associations_if_necessary
     )
-    expect(Enrollment._save_callbacks.collect(&:filter).select {|k| k.is_a? Symbol} - accounted_for_callbacks).to eq []
+    expect(Enrollment._save_callbacks.collect(&:filter).select { |k| k.is_a? Symbol } - accounted_for_callbacks).to eq []
   end
 end

@@ -55,19 +55,19 @@ class LearningOutcome < ActiveRecord::Base
 
   set_policy do
     # managing a contextual outcome requires manage_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.context.grants_right?(user, session, :manage_outcomes) }
+    given { |user, session| self.context_id && self.context.grants_right?(user, session, :manage_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a contextual outcome is also allowed by read_outcomes on the outcome's context
-    given {|user, session| self.context_id && self.context.grants_right?(user, session, :read_outcomes) }
+    given { |user, session| self.context_id && self.context.grants_right?(user, session, :read_outcomes) }
     can :read
 
     # managing a global outcome requires manage_global_outcomes on the site_admin
-    given {|user, session| self.context_id.nil? && Account.site_admin.grants_right?(user, session, :manage_global_outcomes) }
+    given { |user, session| self.context_id.nil? && Account.site_admin.grants_right?(user, session, :manage_global_outcomes) }
     can :create and can :read and can :update and can :delete
 
     # reading a global outcome is also allowed by just being logged in
-    given {|user| self.context_id.nil? && user }
+    given { |user| self.context_id.nil? && user }
     can :read
   end
 
@@ -91,10 +91,10 @@ class LearningOutcome < ActiveRecord::Base
     # find linked contexts
     links = self.new_record? ? [] :
             ContentTag.learning_outcome_links
-              .preload(:context)
-              .where(content_id: self, context_type: ['Account', 'Course'])
-              .select(:context_type, :context_id)
-              .distinct
+                      .preload(:context)
+                      .where(content_id: self, context_type: ['Account', 'Course'])
+                      .select(:context_type, :context_id)
+                      .distinct
     link_root_account_ids = links.map { |link| link.context.resolved_root_account_id }
 
     self.root_account_ids = ([context_root_account_id] + link_root_account_ids).uniq.compact
@@ -117,15 +117,15 @@ class LearningOutcome < ActiveRecord::Base
       valid_ints = self.class.valid_calculation_ints(self.calculation_method)
       if valid_ints.to_a.empty?
         errors.add(:calculation_int, t(
-          "A calculation value is not used with this calculation method"
-        ))
+                                       "A calculation value is not used with this calculation method"
+                                     ))
       else
         errors.add(:calculation_int, t(
-          "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
-          :calculation_int => calculation_int,
-          :valid_calculation_ints_min => valid_ints.min,
-          :valid_calculation_ints_max => valid_ints.max
-        ))
+                                       "'%{calculation_int}' is not a valid value for this calculation method. The value must be between '%{valid_calculation_ints_min}' and '%{valid_calculation_ints_max}'",
+                                       :calculation_int => calculation_int,
+                                       :valid_calculation_ints_min => valid_ints.min,
+                                       :valid_calculation_ints_max => valid_ints.max
+                                     ))
       end
     end
   end
@@ -167,7 +167,7 @@ class LearningOutcome < ActiveRecord::Base
     "decaying_average"
   end
 
-  def default_calculation_int(method=self.calculation_method)
+  def default_calculation_int(method = self.calculation_method)
     case method
     when 'decaying_average' then 65
     when 'n_mastery' then 5
@@ -175,7 +175,7 @@ class LearningOutcome < ActiveRecord::Base
     end
   end
 
-  def align(asset, context, opts={})
+  def align(asset, context, opts = {})
     tag = find_or_create_tag(asset, context)
     tag.tag = determine_tag_type(opts[:mastery_type])
     tag.mastery_score = opts[:mastery_score] if opts[:mastery_score]
@@ -194,25 +194,25 @@ class LearningOutcome < ActiveRecord::Base
 
   def remove_alignment(alignment_id, context)
     tag = self.alignments.where({
-      context_id: context,
-      context_type: context.class_name,
-      id: alignment_id
-    }).first
+                                  context_id: context,
+                                  context_type: context.class_name,
+                                  id: alignment_id
+                                }).first
     tag.destroy if tag
     tag
   end
 
   def self.update_alignments(asset, context, new_outcome_ids)
-    old_outcome_ids = asset.learning_outcome_alignments.
-      where("learning_outcome_id IS NOT NULL").
-      pluck(:learning_outcome_id).
-      uniq
+    old_outcome_ids = asset.learning_outcome_alignments
+                           .where("learning_outcome_id IS NOT NULL")
+                           .pluck(:learning_outcome_id)
+                           .uniq
 
     defunct_outcome_ids = old_outcome_ids - new_outcome_ids
     unless defunct_outcome_ids.empty?
-      asset.learning_outcome_alignments.
-        where(:learning_outcome_id => defunct_outcome_ids).
-        update_all(:workflow_state => 'deleted')
+      asset.learning_outcome_alignments
+           .where(:learning_outcome_id => defunct_outcome_ids)
+           .update_all(:workflow_state => 'deleted')
     end
 
     missing_outcome_ids = new_outcome_ids - old_outcome_ids
@@ -284,7 +284,7 @@ class LearningOutcome < ActiveRecord::Base
           :points => rating[:points].to_f || 0
         }
       end
-      criterion[:ratings] = criterion[:ratings].sort_by{|r| r[:points] }.reverse
+      criterion[:ratings] = criterion[:ratings].sort_by { |r| r[:points] }.reverse
       criterion[:mastery_points] = (hash[:mastery_points] || criterion[:ratings][0][:points]).to_f
       criterion[:points_possible] = criterion[:ratings][0][:points] rescue 0
     else
@@ -342,6 +342,7 @@ class LearningOutcome < ActiveRecord::Base
 
   def mastery_percent
     return unless mastery_points && points_possible
+
     (mastery_points / points_possible).round(2)
   end
 
@@ -361,31 +362,31 @@ class LearningOutcome < ActiveRecord::Base
     tags = ContentTag.active.where(content_id: ids, content_type: 'LearningOutcome').to_a
     to_delete = []
     ids.each do |id|
-      to_delete << id unless tags.any?{|t| t.content_id == id }
+      to_delete << id unless tags.any? { |t| t.content_id == id }
     end
     LearningOutcome.where(:id => to_delete).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
   end
 
   def self.ensure_presence_in_context(outcome_ids, context)
     return unless outcome_ids && context
+
     missing_outcomes = LearningOutcome.where(id: outcome_ids)
-                        .where.not(id: context.linked_learning_outcomes.select(:id))
-                        .active
-    missing_outcomes.each{ |o| context.root_outcome_group.add_outcome(o) }
+                                      .where.not(id: context.linked_learning_outcomes.select(:id))
+                                      .active
+    missing_outcomes.each { |o| context.root_outcome_group.add_outcome(o) }
   end
 
   scope(:for_context_codes, ->(codes) { where(:context_code => codes) })
   scope(:active, -> { where("learning_outcomes.workflow_state<>'deleted'") })
   scope(:active_first, -> { order(Arel.sql("CASE WHEN workflow_state = 'active' THEN 0 ELSE 1 END")) })
   scope(:has_result_for_user,
-    lambda do |user|
-      joins(:learning_outcome_results)
-        .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
-               "AND learning_outcome_results.workflow_state <> 'deleted' " \
-               "AND learning_outcome_results.user_id=?", user)
-        .order(best_unicode_collation_key('short_description'))
-    end
-  )
+        lambda do |user|
+          joins(:learning_outcome_results)
+            .where("learning_outcomes.id=learning_outcome_results.learning_outcome_id " \
+                   "AND learning_outcome_results.workflow_state <> 'deleted' " \
+                   "AND learning_outcome_results.user_id=?", user)
+            .order(best_unicode_collation_key('short_description'))
+        end)
 
   scope :global, -> { where(:context_id => nil) }
 
@@ -393,8 +394,8 @@ class LearningOutcome < ActiveRecord::Base
     # exclude new outcomes
     return if self.saved_change_to_id?
     return if !self.saved_change_to_data? &&
-      !self.saved_change_to_short_description? &&
-      !self.saved_change_to_description?
+              !self.saved_change_to_short_description? &&
+              !self.saved_change_to_description?
 
     delay_if_production.update_associated_rubrics
   end
@@ -413,12 +414,12 @@ class LearningOutcome < ActiveRecord::Base
     conds = { learning_outcome_id: self.id, content_type: 'Rubric', workflow_state: 'active' }
     # Find all unassessed, active rubrics aligned to this outcome, referenced by no more than one assignment
     Rubric.where(
-      id: Rubric.
-        active.
-        joins(:learning_outcome_alignments).
-        where(content_tags: conds).
-        with_at_most_one_association.
-        select('rubrics.id')
+      id: Rubric
+        .active
+        .joins(:learning_outcome_alignments)
+        .where(content_tags: conds)
+        .with_at_most_one_association
+        .select('rubrics.id')
     ).unassessed
   end
 
@@ -461,15 +462,15 @@ class LearningOutcome < ActiveRecord::Base
   def clear_total_outcomes_cache
     return unless improved_outcomes_management?
 
-    ContentTag.learning_outcome_links.
-      active.
-      distinct.
-      where(content_id: id).
-      select(<<-SQL).
+    ContentTag.learning_outcome_links
+              .active
+              .distinct
+              .where(content_id: id)
+              .select(<<-SQL).
         root_account_id,
         (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_type END) context_type,
         (CASE WHEN context_type='LearningOutcomeGroup' THEN NULL ELSE context_id END) context_id
-      SQL
+              SQL
       map do |ct|
         Outcomes::LearningOutcomeGroupChildren.new(ct.context).clear_total_outcomes_cache
       end

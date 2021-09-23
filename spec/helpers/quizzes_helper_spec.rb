@@ -66,17 +66,15 @@ describe QuizzesHelper do
   end
 
   describe "#attachment_id_for" do
-
     it "returns the attachment id if attachment exists" do
-      question = {:id => 1}
-      @attachments = { 1 => {:id => "11"} }
-      @stored_params = { "question_1" => ["1"]}
+      question = { :id => 1 }
+      @attachments = { 1 => { :id => "11" } }
+      @stored_params = { "question_1" => ["1"] }
       expect(attachment_id_for(question)).to eq "11"
     end
 
     it "returns empty string when no attachments stored" do
-
-      question = {:id => 1}
+      question = { :id => 1 }
       @stored_params = {}
       @attachments = {}
       expect(attachment_id_for(question)).to eq nil
@@ -201,7 +199,7 @@ describe QuizzesHelper do
       @answer_list = [{ blank_id: 'color', answer: 'red' }]
 
       html = fill_in_multiple_blanks_question(
-        :question => {:question_text => @question_text},
+        :question => { :question_text => @question_text },
         :answer_list => @answer_list,
         :answers => @answers
       )
@@ -216,7 +214,7 @@ describe QuizzesHelper do
       }]
 
       html = fill_in_multiple_blanks_question(
-        :question => {:question_text => @question_text},
+        :question => { :question_text => @question_text },
         :answer_list => malicious_answer_list,
         :answers => @answers
       )
@@ -227,7 +225,7 @@ describe QuizzesHelper do
 
     it 'should add an appropriate label' do
       html = fill_in_multiple_blanks_question(
-        :question => {:question_text => @question_text},
+        :question => { :question_text => @question_text },
         :answer_list => @answer_list,
         :answers => @answers
       )
@@ -238,11 +236,11 @@ describe QuizzesHelper do
     it 'should handle equation img tags in the question text' do
       broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
       @answer_list = [
-        { blank_id: 'kindof', answer: 'protein'},
-        {blank_id: 'role', answer: 'fixing'}
+        { blank_id: 'kindof', answer: 'protein' },
+        { blank_id: 'role', answer: 'fixing' }
       ]
       html = fill_in_multiple_blanks_question(
-        question: {question_text: broken_question_text},
+        question: { question_text: broken_question_text },
         answer_list: @answer_list,
         answers: @answers
       )
@@ -253,10 +251,10 @@ describe QuizzesHelper do
     it "should sanitize the answer blocks in the noisy question data" do
       broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_01731fa53c4cf2f32e893d5c3dbae9c1'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
       html = fill_in_multiple_blanks_question(
-        question: {question_text: ActiveSupport::SafeBuffer.new(broken_question_text)},
+        question: { question_text: ActiveSupport::SafeBuffer.new(broken_question_text) },
         answer_list: [
-          {:blank_id=>"color1", :answer=>"red"},
-          {:blank_id=>"color2", :answer=>"black"}
+          { :blank_id => "color1", :answer => "red" },
+          { :blank_id => "color2", :answer => "black" }
         ], answers: @answers
       )
       expect(html).not_to match "{{"
@@ -270,36 +268,36 @@ describe QuizzesHelper do
 
     it "should select the user's answer" do
       html = multiple_dropdowns_question({
-        question: {
-          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
-        },
-        answer_list: ['val'],
-        editable: true
-      })
+                                           question: {
+                                             question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+                                           },
+                                           answer_list: ['val'],
+                                           editable: true
+                                         })
       expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>' # rubocop:disable Layout/LineLength
       expect(html).to be_html_safe
     end
 
     it "should not blow up if the user's answer isn't there" do
       html = multiple_dropdowns_question({
-        question: {
-          question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
-        },
-        answer_list: ['val'],
-        editable: true
-      })
+                                           question: {
+                                             question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
+                                           },
+                                           answer_list: ['val'],
+                                           editable: true
+                                         })
       expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="other_val">val</option></select>' # rubocop:disable Layout/LineLength
       expect(html).to be_html_safe
     end
 
     it "should disable select boxes that are not editable" do
       html_string = multiple_dropdowns_question({
-        question: {
-          question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
-        },
-        answer_list: ['val'],
-        editable: false
-      })
+                                                  question: {
+                                                    question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
+                                                  },
+                                                  answer_list: ['val'],
+                                                  editable: false
+                                                })
       html = Nokogiri::HTML.fragment(html_string)
       span_html = html.css('span').first
       expect(span_html).not_to be_nil
@@ -308,7 +306,6 @@ describe QuizzesHelper do
   end
 
   describe "#quiz_edit_text" do
-
     it "returns correct string for survey" do
       quiz = double(:survey? => true)
       expect(quiz_edit_text(quiz)).to eq "Edit Survey"
@@ -321,7 +318,6 @@ describe QuizzesHelper do
   end
 
   describe "#quiz_delete_text" do
-
     it "returns correct string for survey" do
       quiz = double(:survey? => true)
       expect(quiz_delete_text(quiz)).to eq "Delete Survey"
@@ -365,7 +361,7 @@ describe QuizzesHelper do
   describe "#render_show_correct_answers" do
     context "show_correct_answers is false" do
       it 'shows No' do
-        quiz = double({show_correct_answers: false})
+        quiz = double({ show_correct_answers: false })
         expect(render_show_correct_answers(quiz)).to eq "No"
       end
     end
@@ -373,11 +369,11 @@ describe QuizzesHelper do
     context "show_correct_answers is true, but nothing else is set" do
       it 'shows Immediately' do
         quiz = double({
-          show_correct_answers: true,
-          show_correct_answers_at: nil,
-          hide_correct_answers_at: nil,
-          show_correct_answers_last_attempt: false
-        })
+                        show_correct_answers: true,
+                        show_correct_answers_at: nil,
+                        hide_correct_answers_at: nil,
+                        show_correct_answers_last_attempt: false
+                      })
         expect(render_show_correct_answers(quiz)).to eq "Immediately"
       end
     end
@@ -385,11 +381,11 @@ describe QuizzesHelper do
     context "show_correct_answers_last_attempt is true" do
       it 'shows After Last Attempt' do
         quiz = double({
-          show_correct_answers: true,
-          show_correct_answers_at: nil,
-          hide_correct_answers_at: nil,
-          show_correct_answers_last_attempt: true
-        })
+                        show_correct_answers: true,
+                        show_correct_answers_at: nil,
+                        hide_correct_answers_at: nil,
+                        show_correct_answers_last_attempt: true
+                      })
         expect(render_show_correct_answers(quiz)).to eq "After Last Attempt"
       end
     end
@@ -398,10 +394,10 @@ describe QuizzesHelper do
       it 'shows date of ' do
         time = 1.day.from_now
         quiz = double({
-          show_correct_answers: true,
-          show_correct_answers_at: time,
-          hide_correct_answers_at: nil
-        })
+                        show_correct_answers: true,
+                        show_correct_answers_at: time,
+                        hide_correct_answers_at: nil
+                      })
         expect(render_show_correct_answers(quiz)).to eq "After #{datetime_string(time)}"
       end
     end
@@ -410,10 +406,10 @@ describe QuizzesHelper do
       it 'shows date of ' do
         time = 1.day.from_now
         quiz = double({
-          show_correct_answers: true,
-          show_correct_answers_at: nil,
-          hide_correct_answers_at: time,
-        })
+                        show_correct_answers: true,
+                        show_correct_answers_at: nil,
+                        hide_correct_answers_at: time,
+                      })
         expect(render_show_correct_answers(quiz)).to eq "Until #{datetime_string(time)}"
       end
     end
@@ -424,10 +420,10 @@ describe QuizzesHelper do
         time2 = 1.week.from_now
 
         quiz = double({
-          show_correct_answers: true,
-          show_correct_answers_at: time,
-          hide_correct_answers_at: time2,
-        })
+                        show_correct_answers: true,
+                        show_correct_answers_at: time,
+                        hide_correct_answers_at: time2,
+                      })
         expect(render_show_correct_answers(quiz)).to eq "From #{datetime_string(time)} to #{datetime_string(time2)}"
       end
     end
@@ -436,8 +432,8 @@ describe QuizzesHelper do
   describe '#render_correct_answer_protection' do
     it 'should provide a useful message when "last attempt"' do
       quiz = double({
-        show_correct_answers_last_attempt: true,
-      })
+                      show_correct_answers_last_attempt: true,
+                    })
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
@@ -445,11 +441,11 @@ describe QuizzesHelper do
     end
     it 'should provide a useful message when "no"' do
       quiz = double({
-        show_correct_answers_last_attempt: nil,
-        show_correct_answers: false,
-        show_correct_answers_at: nil,
-        hide_correct_answers_at: nil
-      })
+                      show_correct_answers_last_attempt: nil,
+                      show_correct_answers: false,
+                      show_correct_answers_at: nil,
+                      hide_correct_answers_at: nil
+                    })
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
@@ -458,11 +454,11 @@ describe QuizzesHelper do
 
     it 'should provide nothing when "yes"' do
       quiz = double({
-        show_correct_answers_last_attempt: nil,
-        show_correct_answers: true,
-        show_correct_answers_at: nil,
-        hide_correct_answers_at: nil
-      })
+                      show_correct_answers_last_attempt: nil,
+                      show_correct_answers: true,
+                      show_correct_answers_at: nil,
+                      hide_correct_answers_at: nil
+                    })
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
@@ -471,11 +467,11 @@ describe QuizzesHelper do
 
     it 'should provide a useful message, and an availability date, when "show at" is set' do
       quiz = double({
-        show_correct_answers_last_attempt: nil,
-        show_correct_answers: true,
-        show_correct_answers_at: 1.day.from_now,
-        hide_correct_answers_at: nil
-      })
+                      show_correct_answers_last_attempt: nil,
+                      show_correct_answers: true,
+                      show_correct_answers_at: 1.day.from_now,
+                      hide_correct_answers_at: nil
+                    })
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
@@ -484,11 +480,11 @@ describe QuizzesHelper do
 
     it 'should provide a useful message, and a date, when "hide at" is set' do
       quiz = double({
-        show_correct_answers_last_attempt: nil,
-        show_correct_answers: true,
-        show_correct_answers_at: nil,
-        hide_correct_answers_at: 1.day.from_now
-      })
+                      show_correct_answers_last_attempt: nil,
+                      show_correct_answers: true,
+                      show_correct_answers_at: nil,
+                      hide_correct_answers_at: 1.day.from_now
+                    })
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
@@ -543,8 +539,8 @@ describe QuizzesHelper do
 
     it 'adds MathML if appropriate' do
       comment = comment_get({
-        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-      }, 'foo')
+                              foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+                            }, 'foo')
       expect(comment).to match(/MathML/)
       expect(comment).to match(/∐/)
     end
@@ -554,8 +550,8 @@ describe QuizzesHelper do
         true
       end
       comment = comment_get({
-        foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
-      }, 'foo')
+                              foo_html: '<img class="equation_image" data-equation-content="\coprod"></img>'
+                            }, 'foo')
       expect(comment).to eq('<img class="equation_image" data-equation-content="\\coprod">')
     end
   end

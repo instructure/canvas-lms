@@ -27,8 +27,8 @@ shared_examples_for "Canvas::DraftStateValidations" do
       allow(subject).to receive_messages(has_student_submissions?: true)
       allow(subject).to receive_messages(workflow_state_changed?: true)
       allow(subject).to receive_messages({
-        changes: { 'workflow_state' => [ 'published', 'unpublished' ] }
-      })
+                                           changes: { 'workflow_state' => ['published', 'unpublished'] }
+                                         })
       subject.save
 
       expect(subject.errors[:workflow_state]).to be_present

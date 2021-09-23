@@ -23,6 +23,6 @@ class PopulateCourseScoreOnScores < ActiveRecord::Migration[5.0]
 
   def up
     DataFixup::PopulateScoresCourseScore.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "populate_scores_course_score_#{Shard.current.database_server.id}").run
+                                                             strand: "populate_scores_course_score_#{Shard.current.database_server.id}").run
   end
 end

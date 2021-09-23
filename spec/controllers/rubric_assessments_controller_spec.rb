@@ -25,13 +25,13 @@ describe RubricAssessmentsController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @user.to_param}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param, :assessment_type => "no_reason" } }
       expect(response).to be_successful
     end
 
@@ -39,9 +39,9 @@ describe RubricAssessmentsController do
       course_with_teacher_logged_in(:active_all => true)
       assert_page_not_found do
         rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
-        post 'create', params: {:course_id => @course.id,
-          :rubric_association_id => @rubric_association.id,
-          :rubric_assessment => {:user_id => 'garbage', :assessment_type => "no_reason"}}
+        post 'create', params: { :course_id => @course.id,
+                                 :rubric_association_id => @rubric_association.id,
+                                 :rubric_assessment => { :user_id => 'garbage', :assessment_type => "no_reason" } }
       end
     end
   end
@@ -50,14 +50,14 @@ describe RubricAssessmentsController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
-      put 'update', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param}}
+      put 'update', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
 
     it "should assign variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
-      put 'update', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}}
+      put 'update', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => { :user_id => @user.to_param, :assessment_type => "no_reason" } }
       expect(response).to be_successful
     end
 
@@ -72,7 +72,7 @@ describe RubricAssessmentsController do
       submission = @rubric_assessment.artifact
       submission.submission_comments.create!(author: @student, comment: 'A Comment')
 
-      put 'update', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => {:user_id => @user.to_param, :assessment_type => "no_reason"}}
+      put 'update', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => { :user_id => @user.to_param, :assessment_type => "no_reason" } }
       response_json = JSON.parse(response.body)
       expect(response_json.dig('artifact', 'submission_comments').first).to have_key('anonymous_id')
       expect(response_json.dig('artifact', 'submission_comments').first).to_not have_key('author_id')
@@ -116,11 +116,11 @@ describe RubricAssessmentsController do
         submission = assignment.submissions.find_by(user: student)
         submission.find_or_create_provisional_grade!(other_teacher)
         @assessment = @rubric_association.assess({
-          user: student,
-          assessor: @teacher,
-          artifact: submission,
-          assessment: { assessment_type: 'grading', criterion_crit1: { points: 5 } }
-        })
+                                                   user: student,
+                                                   assessor: @teacher,
+                                                   artifact: submission,
+                                                   assessment: { assessment_type: 'grading', criterion_crit1: { points: 5 } }
+                                                 })
       end
 
       let(:update_params) do
@@ -198,7 +198,7 @@ describe RubricAssessmentsController do
       end
 
       let(:rubric_association) do
-        association_params = {association_object: assignment, use_for_grading: '1', purpose: 'grading'}
+        association_params = { association_object: assignment, use_for_grading: '1', purpose: 'grading' }
         RubricAssociation.generate(teacher, rubric, course, association_params)
       end
       let(:slotted_grader_ids) { assignment.moderation_graders.with_slot_taken.pluck(:user_id) }
@@ -295,7 +295,7 @@ describe RubricAssessmentsController do
       end
 
       let(:rubric_association) do
-        association_params = {association_object: course, use_for_grading: '1', purpose: 'grading'}
+        association_params = { association_object: course, use_for_grading: '1', purpose: 'grading' }
         RubricAssociation.generate(teacher, rubric, course, association_params)
       end
 
@@ -331,12 +331,12 @@ describe RubricAssessmentsController do
     end
 
     it "should require authorization" do
-      post 'remind', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id}
+      post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       assert_unauthorized
     end
     it "should send reminder" do
       user_session(@teacher)
-      post 'remind', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id}
+      post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       expect(assigns[:request]).not_to be_nil
       expect(assigns[:request]).to eql(@assessment_request)
       expect(response).to be_successful
@@ -347,14 +347,14 @@ describe RubricAssessmentsController do
     it "should require authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
-      delete 'destroy', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id}
+      delete 'destroy', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id }
       assert_unauthorized
     end
 
     it "should delete the assessment" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
-      delete 'destroy', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id}
+      delete 'destroy', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id }
       expect(response).to be_successful
       expect(assigns[:assessment]).to be_frozen
     end
@@ -372,10 +372,10 @@ describe RubricAssessmentsController do
         association_object: assignment,
         associated_asset: assignment,
         alignment: ContentTag.create!({
-          title: 'content',
-          context: @course,
-          learning_outcome: @outcome
-        })
+                                        title: 'content',
+                                        context: @course,
+                                        learning_outcome: @outcome
+                                      })
       )
       delete 'destroy', params: {
         :course_id => @course.id,
@@ -390,12 +390,12 @@ describe RubricAssessmentsController do
   describe "Assignment assessments" do
     it "should follow: actions from two teachers should only create one assessment" do
       setup_course_assessment
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "grading" } }
       expect(response).to be_successful
       @assessment = assigns[:assessment]
       expect(@assessment).not_to be_nil
       user_session(@teacher2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "grading" } }
       expect(response).to be_successful
       expect(assigns[:assessment]).to eql(@assessment)
     end
@@ -403,18 +403,18 @@ describe RubricAssessmentsController do
     it "should follow: multiple peer reviews for the same submission should work fine" do
       setup_course_assessment
       user_session(@student2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       @assessment = assigns[:assessment]
       expect(@assessment).not_to be_nil
 
       user_session(@student3)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       expect(assigns[:assessment]).not_to eql(@assessment)
 
       user_session(@teacher2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       expect(assigns[:assessment]).not_to eql(@assessment)
     end
@@ -422,24 +422,24 @@ describe RubricAssessmentsController do
     it "should follow: multiple peer reviews for the same submission should work fine, even with a teacher assessment in play" do
       setup_course_assessment
       user_session(@teacher2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "grading"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "grading" } }
       expect(response).to be_successful
       @grading_assessment = assigns[:assessment]
       expect(@grading_assessment).not_to be_nil
 
       user_session(@student2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       @assessment = assigns[:assessment]
       expect(@assessment).not_to be_nil
 
       user_session(@student3)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       expect(assigns[:assessment]).not_to eql(@assessment)
 
       user_session(@teacher2)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student1.to_param, :assessment_type => "peer_review"}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
       expect(response).to be_successful
       expect(assigns[:assessment]).not_to eql(@assessment)
       expect(assigns[:assessment]).not_to eql(@grading_assessment)
@@ -448,7 +448,7 @@ describe RubricAssessmentsController do
     it "should not allow assessing fellow students for a submission" do
       setup_course_assessment
       user_session(@student1)
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student2.to_param, :assessment_type => 'peer_review'}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student2.to_param, :assessment_type => 'peer_review' } }
       assert_unauthorized
 
       @assignment.submit_homework(@student1, :url => "http://www.google.com")
@@ -459,9 +459,9 @@ describe RubricAssessmentsController do
       expect(res).not_to be_empty
       # two of the six possible combinations have already been created
       expect(res.length).to eql(4)
-      expect(res.to_a.find{|r| r.assessor == @student1 && r.user == @student2}).not_to be_nil
+      expect(res.to_a.find { |r| r.assessor == @student1 && r.user == @student2 }).not_to be_nil
 
-      post 'create', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => {:user_id => @student2.to_param, :assessment_type => 'peer_review'}}
+      post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student2.to_param, :assessment_type => 'peer_review' } }
       expect(response).to be_successful
     end
   end
@@ -478,7 +478,7 @@ describe RubricAssessmentsController do
       it 'looks up the assessment by the passed-in ID' do
         request_params = base_request_params.merge(
           id: @rubric_assessment.id,
-          rubric_assessment: {assessment_type: 'no_reason'}
+          rubric_assessment: { assessment_type: 'no_reason' }
         )
         put 'update', params: request_params
         expect(response).to be_successful
@@ -487,13 +487,13 @@ describe RubricAssessmentsController do
 
     context 'when creating a new assessment' do
       it 'accepts user IDs in the user_id field' do
-        assessment_params = {user_id: @student1.id, assessment_type: 'no_reason'}
+        assessment_params = { user_id: @student1.id, assessment_type: 'no_reason' }
         post 'create', params: base_request_params.merge(rubric_assessment: assessment_params)
         expect(response).to be_successful
       end
 
       it 'does not accept non-numerical IDs in the user_id field' do
-        invalid_assessment_params = {user_id: 'abcde', assessment_type: 'no_reason'}
+        invalid_assessment_params = { user_id: 'abcde', assessment_type: 'no_reason' }
         post 'create', params: base_request_params.merge(rubric_assessment: invalid_assessment_params)
         expect(response).to be_not_found
       end
@@ -501,19 +501,19 @@ describe RubricAssessmentsController do
 
     context 'for anonymous IDs' do
       it 'accepts anonymous IDs matching a submission for the assignment' do
-        assessment_params = {anonymous_id: 'abcde', assessment_type: 'no reason'}
+        assessment_params = { anonymous_id: 'abcde', assessment_type: 'no reason' }
         post 'create', params: base_request_params.merge(rubric_assessment: assessment_params)
         expect(response).to be_successful
       end
 
       it 'does not recognize anonymous IDs that do not match a submission for the assignment' do
-        unknown_assessment_params = {anonymous_id: @student1.id, assessment_type: 'no reason'}
+        unknown_assessment_params = { anonymous_id: @student1.id, assessment_type: 'no reason' }
         post 'create', params: base_request_params.merge(rubric_assessment: unknown_assessment_params)
         expect(response).to be_not_found
       end
 
       it 'does not recognize user IDs in the anonymous_id field' do
-        invalid_assessment_params = {anonymous_id: @student1.id, assessment_type: 'no reason'}
+        invalid_assessment_params = { anonymous_id: @student1.id, assessment_type: 'no reason' }
         post 'create', params: base_request_params.merge(rubric_assessment: invalid_assessment_params)
         expect(response).to be_not_found
       end

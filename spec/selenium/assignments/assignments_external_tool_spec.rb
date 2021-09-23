@@ -28,10 +28,10 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  it "should allow creating through index", priority: "2", test_id: 209971  do
+  it "should allow creating through index", priority: "2", test_id: 209971 do
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
-    #create assignment
+    # create assignment
     f('.add_assignment').click
     f('.ui-datepicker-trigger').click
     f('.create_assignment_dialog input[name="name"]').send_keys('test1')
@@ -50,7 +50,7 @@ describe "external tool assignments" do
   it "should allow creating through the 'More Options' link", priority: "2", test_id: 209973 do
     get "/courses/#{@course.id}/assignments"
 
-    #create assignment
+    # create assignment
     f('.add_assignment').click
     expect_new_page_load { f('.more_options').click }
 
@@ -107,8 +107,8 @@ describe "external tool assignments" do
   end
 
   it "should show module sequence even without module_item_id param" do
-    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-    allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+    allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+    allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
@@ -128,7 +128,7 @@ describe "external tool assignments" do
   context "submission type selection placement" do
     before :each do
       [@t1, @t2].each do |tool|
-        tool.submission_type_selection = {:text => "link to #{tool.name} or whatever"}
+        tool.submission_type_selection = { :text => "link to #{tool.name} or whatever" }
         tool.save!
       end
     end
@@ -156,7 +156,7 @@ describe "external tool assignments" do
 
     it "should show the tool as selected when editing a saved configured assignment" do
       assmt = @course.assignments.create!(:title => "blah", :submission_types => "external_tool",
-        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url})
+                                          :external_tool_tag_attributes => { :content => @t1, :url => @t1.url })
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
       selected = first_selected_option(f("#assignment_submission_type"))
       expect(selected.text.strip).to eq @t1.name
@@ -178,7 +178,7 @@ describe "external tool assignments" do
         :course => @course,
         :title => "test1",
         :submission_types => 'external_tool',
-        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url, :external_data => ext_data.to_json}
+        :external_tool_tag_attributes => { :content => @t1, :url => @t1.url, :external_data => ext_data.to_json }
       )
 
       get "/courses/#{@course.id}/assignments/#{a.id}/edit"
@@ -200,7 +200,7 @@ describe "external tool assignments" do
       close_button_selector = "//span[@aria-label = 'Launch External Tool']//button[//*[text() = 'Close']]"
       close_button = fxpath(close_button_selector)
       close_button.click
-      expect(element_exists?(close_button_selector,true)).to eq(false)
+      expect(element_exists?(close_button_selector, true)).to eq(false)
     end
   end
 end

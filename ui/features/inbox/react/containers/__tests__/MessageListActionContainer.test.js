@@ -53,7 +53,7 @@ describe('MessageListActionContainer', () => {
     return render(
       <ApolloProvider client={mswClient}>
         <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-          <MessageListActionContainer {...overrideProps} />
+          <MessageListActionContainer onCompose={jest.fn()} {...overrideProps} />
         </AlertManagerContext.Provider>
       </ApolloProvider>
     )

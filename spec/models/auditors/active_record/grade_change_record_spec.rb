@@ -21,15 +21,15 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 describe Auditors::ActiveRecord::GradeChangeRecord do
-  let(:request_id){ 'abcde-12345'}
+  let(:request_id) { 'abcde-12345' }
 
   it "it appropriately connected to a table" do
     expect(Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
   end
 
   describe "mapping from event stream record" do
-    let(:submission_record){ graded_submission_model }
-    let(:es_record){ Auditors::GradeChange::Record.generate(submission_record) }
+    let(:submission_record) { graded_submission_model }
+    let(:es_record) { Auditors::GradeChange::Record.generate(submission_record) }
     let(:grading_period) do
       root_account = submission_record.assignment.context.root_account
       grading_period_group = root_account.grading_period_groups.create!

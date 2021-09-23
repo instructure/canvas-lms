@@ -29,8 +29,8 @@ describe 'appointment_canceled_by_user.email' do
     course_with_student(course: @course, active_enrollment: true)
     appointment_participant_model(:participant => user, :updating_user => @user)
     generate_message(:appointment_canceled_by_user, :email, @event,
-                     :user => @user, :data => {:updating_user_name => user.name,
-                                               :cancel_reason => "because"})
+                     :user => @user, :data => { :updating_user_name => user.name,
+                                                :cancel_reason => "because" })
 
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
@@ -51,8 +51,8 @@ describe 'appointment_canceled_by_user.email' do
     @event.cancel_reason = 'just because'
 
     generate_message(:appointment_canceled_by_user, :email, @event,
-                     :user => @user, :data => {:updating_user_name => user.name,
-                                               :cancel_reason => "just because"})
+                     :user => @user, :data => { :updating_user_name => user.name,
+                                                :cancel_reason => "just because" })
     expect(@message.subject).to include('some title')
     expect(@message.body).to include('some title')
     expect(@message.body).to include('just because')

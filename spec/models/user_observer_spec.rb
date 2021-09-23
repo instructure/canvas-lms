@@ -24,8 +24,8 @@ describe UserObservationLink do
   let_once(:student) { user_factory }
 
   it 'should fail when there is not observer or observee' do
-    expect { UserObservationLink.create_or_restore(student: nil, observer: student, root_account: Account.default) }.
-      to raise_error(ArgumentError, 'student, observer and root_account are required')
+    expect { UserObservationLink.create_or_restore(student: nil, observer: student, root_account: Account.default) }
+      .to raise_error(ArgumentError, 'student, observer and root_account are required')
   end
 
   it "should not allow a user to observe oneself" do

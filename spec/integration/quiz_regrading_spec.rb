@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe "QuizRegrading" do
-
   def create_quiz_question!(data)
     question = @quiz.quiz_questions.create!
     data.merge!(:id => question.id)
@@ -31,7 +30,7 @@ describe "QuizRegrading" do
 
   def reset_submission_data!
     @submission.submission_data = {
-      "question_#{@true_false_question.id}"=> "2",
+      "question_#{@true_false_question.id}" => "2",
       "question_#{@multiple_choice_question.id}" => "4",
       "question_#{@multiple_answers_question.id}_answer_5" => "1",
       "question_#{@multiple_answers_question.id}_answer_6" => "0",
@@ -42,7 +41,7 @@ describe "QuizRegrading" do
   end
 
   def set_regrade_option!(regrade_option)
-    [@ttf_qqr,@maq_qqr,@mcq_qqr].each do |qqr|
+    [@ttf_qqr, @maq_qqr, @mcq_qqr].each do |qqr|
       qqr.regrade_option = regrade_option
       qqr.save!
     end
@@ -55,33 +54,33 @@ describe "QuizRegrading" do
     quiz_model(course: @course)
     @regrade = @quiz.quiz_regrades.where(quiz_id: @quiz.id, quiz_version: @quiz.version_number).first_or_create(user: @student)
     @true_false_question = create_quiz_question!({
-      :points_possible => 1,
-      :question_type => 'true_false_question',
-      :question_name => 'True/False Question',
-      :answers => [
-        {:text => 'true', :id => 1, :weight => 100},
-        {:text => 'false', :id => 2, :weight => 0}
-      ]
-    })
+                                                   :points_possible => 1,
+                                                   :question_type => 'true_false_question',
+                                                   :question_name => 'True/False Question',
+                                                   :answers => [
+                                                     { :text => 'true', :id => 1, :weight => 100 },
+                                                     { :text => 'false', :id => 2, :weight => 0 }
+                                                   ]
+                                                 })
     @multiple_choice_question = create_quiz_question!({
-      :points_possible => 1,
-      :question_type => 'multiple_choice_question',
-      :question_name => 'Multiple Choice Question',
-      :answers => [
-        {:text => "correct", :id => 3, :weight => 100 },
-        {:text => "nope", :id => 4, :weight => 0}
-      ]
-    })
+                                                        :points_possible => 1,
+                                                        :question_type => 'multiple_choice_question',
+                                                        :question_name => 'Multiple Choice Question',
+                                                        :answers => [
+                                                          { :text => "correct", :id => 3, :weight => 100 },
+                                                          { :text => "nope", :id => 4, :weight => 0 }
+                                                        ]
+                                                      })
     @multiple_answers_question = create_quiz_question!({
-      :points_possible => 1,
-      :question_type => 'multiple_answers_question',
-      :question_name => 'Multiple Answers Question',
-      :answers => [
-        {:text => "correct1", :id => 5, :weight => 100},
-        {:text=> "correct2", :id => 6, :weight => 100},
-        {:text => "nope", :id=> 7, :weight => 0 }
-      ]
-    })
+                                                         :points_possible => 1,
+                                                         :question_type => 'multiple_answers_question',
+                                                         :question_name => 'Multiple Answers Question',
+                                                         :answers => [
+                                                           { :text => "correct1", :id => 5, :weight => 100 },
+                                                           { :text => "correct2", :id => 6, :weight => 100 },
+                                                           { :text => "nope", :id => 7, :weight => 0 }
+                                                         ]
+                                                       })
     @maq_qqr = @regrade.quiz_question_regrades.create!(quiz_question_id: @multiple_answers_question.id, regrade_option: 'no_regrade')
     @mcq_qqr = @regrade.quiz_question_regrades.create!(quiz_question_id: @multiple_choice_question.id, regrade_option: 'no_regrade')
     @ttf_qqr = @regrade.quiz_question_regrades.create!(quiz_question_id: @true_false_question.id, regrade_option: 'no_regrade')
@@ -100,17 +99,17 @@ describe "QuizRegrading" do
 
     set_regrade_option!('current_correct_only')
     data = @true_false_question.question_data
-    data[:answers].first[:weight]  = 0
-    data[:answers].second[:weight]  = 100
+    data[:answers].first[:weight] = 0
+    data[:answers].second[:weight] = 100
     @true_false_question.write_attribute(:question_data, data.to_hash)
     @true_false_question.save!
     data = @multiple_choice_question.question_data
     data[:answers].first[:weight] = 0
-    data[:answers].second[:weight]  = 100
+    data[:answers].second[:weight] = 100
     @multiple_choice_question.write_attribute(:question_data, data.to_hash)
     @multiple_choice_question.save!
     data = @multiple_answers_question.reload.question_data
-    data[:answers].second[:weight]  = 0
+    data[:answers].second[:weight] = 0
     @multiple_answers_question.write_attribute(:question_data, data.to_hash)
     @multiple_answers_question.save!
     @quiz.reload
@@ -143,5 +142,4 @@ describe "QuizRegrading" do
     expect(@submission.quiz_data[0][:question_name]).to eq 'Question 1'
     expect(@submission.quiz_data[1][:question_name]).to eq 'Question 2'
   end
-
 end

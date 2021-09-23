@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../locked_spec')
 
 describe Quizzes::QuizGroupsController, type: :request do
-
   before :once do
     teacher_in_course(:active_all => true)
     @quiz = @course.quizzes.create! :title => 'title'
@@ -29,12 +28,11 @@ describe Quizzes::QuizGroupsController, type: :request do
   end
 
   describe "POST /api/v1/courses/:course_id/quizzes/:quiz_id/groups (create)" do
-
-    def api_create_quiz_group(quiz_group_params, opts={})
+    def api_create_quiz_group(quiz_group_params, opts = {})
       api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups",
-              {:controller=>"quizzes/quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}"},
-              {:quiz_groups => [quiz_group_params]},
-              {'Accept' => 'application/vnd.api+json'}, opts)
+               { :controller => "quizzes/quiz_groups", :action => "create", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}" },
+               { :quiz_groups => [quiz_group_params] },
+               { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
     let (:new_quiz_group) { @quiz.reload; @quiz.quiz_groups.first }
@@ -61,7 +59,7 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
-      json = api_create_quiz_group({'name' => name}, :expected_status => 422)
+      json = api_create_quiz_group({ 'name' => name }, :expected_status => 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "name"
       expect(new_quiz_group).to be_nil
@@ -70,7 +68,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     it "renders a validation error when pick_count isn't a number" do
       name = 'A Group'
       pick_count = 'NaN'
-      json = api_create_quiz_group({name: name, pick_count: pick_count}, expected_status: 422)
+      json = api_create_quiz_group({ name: name, pick_count: pick_count }, expected_status: 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "pick_count"
       expect(new_quiz_group).to be_nil
@@ -79,7 +77,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     it "renders a validation error when question_points isn't a number" do
       name = 'A Group'
       question_points = 'NaN'
-      json = api_create_quiz_group({name: name, question_points: question_points}, expected_status: 422)
+      json = api_create_quiz_group({ name: name, question_points: question_points }, expected_status: 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "question_points"
       expect(new_quiz_group).to be_nil
@@ -87,13 +85,11 @@ describe Quizzes::QuizGroupsController, type: :request do
   end
 
   describe "PUT /api/v1/courses/:course_id/quizzes/:quiz_id/groups/:id (update)" do
-
-    def api_update_quiz_group(quiz_group_params, opts={})
-
+    def api_update_quiz_group(quiz_group_params, opts = {})
       api_call(:put, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
-              {:controller=>"quizzes/quiz_groups", :action => "update", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
-              {:quiz_groups => [quiz_group_params]},
-              {'Accept' => 'application/vnd.api+json'}, opts)
+               { :controller => "quizzes/quiz_groups", :action => "update", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+               { :quiz_groups => [quiz_group_params] },
+               { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
     before :once do
@@ -117,21 +113,21 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "renders a validation error when the name is too long" do
       name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
-      json = api_update_quiz_group({'name' => name}, :expected_status => 422)
+      json = api_update_quiz_group({ 'name' => name }, :expected_status => 422)
       expect(json).to have_key 'errors'
       expect(@group.reload.name).to eq 'Test Group'
     end
 
     it "renders a validation error when pick_count isn't a number" do
       pick_count = "NaN"
-      json = api_update_quiz_group({pick_count: pick_count}, expected_status: 422)
+      json = api_update_quiz_group({ pick_count: pick_count }, expected_status: 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "pick_count"
     end
 
     it "renders a validation error when question_points isn't a number" do
       question_points = "NaN"
-      json = api_update_quiz_group({question_points: question_points}, expected_status: 422)
+      json = api_update_quiz_group({ question_points: question_points }, expected_status: 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "question_points"
     end
@@ -144,17 +140,17 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "deletes a quiz group" do
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}",
-                  {:controller=>"quizzes/quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
-                  {}, {'Accept' => 'application/vnd.api+json'})
+                   { :controller => "quizzes/quiz_groups", :action => "destroy", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+                   {}, { 'Accept' => 'application/vnd.api+json' })
       expect(Group.exists?(@group.id)).to be_falsey
     end
   end
 
   describe "POST /courses/:course_id/quizzes/:quiz_id/groups/:id/reorder" do
     before do
-      @question1 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 1', 'answers' => [{'id' => 1}, {'id' => 2}], :position => 1})
-      @question2 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 2', 'answers' => [{'id' => 3}, {'id' => 4}], :position => 2})
-      @question3 = @quiz.quiz_questions.create!(:question_data => {'name' => 'test question 3', 'answers' => [{'id' => 5}, {'id' => 6}], :position => 3})
+      @question1 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 1', 'answers' => [{ 'id' => 1 }, { 'id' => 2 }], :position => 1 })
+      @question2 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 2', 'answers' => [{ 'id' => 3 }, { 'id' => 4 }], :position => 2 })
+      @question3 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }], :position => 3 })
 
       @group = @quiz.quiz_groups.create :name => 'Test Group'
       @group.quiz_questions = [@question1, @question2, @question3]
@@ -162,13 +158,13 @@ describe Quizzes::QuizGroupsController, type: :request do
 
     it "reorders a quiz group's questions" do
       raw_api_call(:post, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{@group.id}/reorder",
-                  {:controller=>"quizzes/quiz_groups", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}"},
-                  {:order => [{"type" => "question", "id" => @question3.id},
-                              {"type" => "question", "id" => @question1.id},
-                              {"type" => "question", "id" => @question2.id}] },
-                  {'Accept' => 'application/vnd.api+json'})
+                   { :controller => "quizzes/quiz_groups", :action => "reorder", :format => "json", :course_id => "#{@course.id}", :quiz_id => "#{@quiz.id}", :id => "#{@group.id}" },
+                   { :order => [{ "type" => "question", "id" => @question3.id },
+                                { "type" => "question", "id" => @question1.id },
+                                { "type" => "question", "id" => @question2.id }] },
+                   { 'Accept' => 'application/vnd.api+json' })
 
-      order = @group.reload.quiz_questions.active.sort_by{|q| q.position }.map {|q| q.id }
+      order = @group.reload.quiz_questions.active.sort_by { |q| q.position }.map { |q| q.id }
       expect(order).to eq [@question3.id, @question1.id, @question2.id]
     end
   end
@@ -178,12 +174,12 @@ describe Quizzes::QuizGroupsController, type: :request do
     let(:path) { "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/groups/#{group.id}" }
     let(:params) do
       {
-          :controller => "quizzes/quiz_groups",
-          :action => "show",
-          :format => "json",
-          :course_id => "#{@course.id}",
-          :quiz_id => "#{@quiz.id}",
-          :id => "#{group.id}"
+        :controller => "quizzes/quiz_groups",
+        :action => "show",
+        :format => "json",
+        :course_id => "#{@course.id}",
+        :quiz_id => "#{@quiz.id}",
+        :id => "#{group.id}"
       }
     end
 

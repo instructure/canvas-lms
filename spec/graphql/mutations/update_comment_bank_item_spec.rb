@@ -25,7 +25,7 @@ describe Mutations::UpdateCommentBankItem do
   before :once do
     course_with_student
     @admin = account_admin_user(account: @account)
-    @comment = comment_bank_item_model({course: @course, user: @admin})
+    @comment = comment_bank_item_model({ course: @course, user: @admin })
   end
 
   def execute_with_input(update_input, user_executing: @admin)
@@ -47,7 +47,7 @@ describe Mutations::UpdateCommentBankItem do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 

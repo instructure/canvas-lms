@@ -26,7 +26,7 @@ module DataFixup::MigrateMessagesToPartitions
     unless last_run_date_threshold && last_run_date_threshold >= min_date_threshold
       # remove all messages that would be inserted into a dropped partition
       Message.from("ONLY #{Message.quoted_table_name}")
-        .where("created_at < ?", min_date_threshold).in_batches.delete_all
+             .where("created_at < ?", min_date_threshold).in_batches.delete_all
     end
 
     partman = CanvasPartman::PartitionManager.create(Message)
@@ -40,6 +40,6 @@ module DataFixup::MigrateMessagesToPartitions
 
   def self.requeue(*args)
     delay_if_production(priority: Delayed::LOWER_PRIORITY,
-      strand: "partition_messages:#{Shard.current.database_server.id}").run(*args)
+                        strand: "partition_messages:#{Shard.current.database_server.id}").run(*args)
   end
 end

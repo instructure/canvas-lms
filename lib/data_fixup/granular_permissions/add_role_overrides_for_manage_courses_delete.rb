@@ -25,33 +25,33 @@ module DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
     def run(base_role_type: nil)
       roles_for_manage_courses_delete =
         Role
-          .joins(:role_overrides)
-          .where.not(workflow_state: 'deleted')
-          .where(base_role_type: base_role_type)
-          .where(
-            'role_overrides.permission = ? OR role_overrides.permission = ?',
-            'manage_courses',
-            'change_course_state'
-          )
-          .distinct
+        .joins(:role_overrides)
+        .where.not(workflow_state: 'deleted')
+        .where(base_role_type: base_role_type)
+        .where(
+          'role_overrides.permission = ? OR role_overrides.permission = ?',
+          'manage_courses',
+          'change_course_state'
+        )
+        .distinct
 
       role_overrides =
         RoleOverride
-          .where(
-            permission: %w[manage_courses change_course_state],
-            role_id: roles_for_manage_courses_delete
-          )
-          .index_by { |ro| [ro.role_id, ro.permission] }
+        .where(
+          permission: %w[manage_courses change_course_state],
+          role_id: roles_for_manage_courses_delete
+        )
+        .index_by { |ro| [ro.role_id, ro.permission] }
 
       roles_for_manage_courses_delete.each do |role|
         manage_courses_ro = role_overrides[[role.id, 'manage_courses']]
         change_course_state_ro = role_overrides[[role.id, 'change_course_state']]
 
         if base_role_type == 'AccountAdmin' &&
-             (
-               (manage_courses_ro && !manage_courses_ro.enabled) ||
-                 (change_course_state_ro && !change_course_state_ro.enabled)
-             )
+           (
+             (manage_courses_ro && !manage_courses_ro.enabled) ||
+               (change_course_state_ro && !change_course_state_ro.enabled)
+           )
           check_locked_state_and_create_ro(manage_courses_ro, change_course_state_ro)
         elsif base_role_type == 'AccountMembership' &&
               (manage_courses_ro&.enabled && change_course_state_ro&.enabled)

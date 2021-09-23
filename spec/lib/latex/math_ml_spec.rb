@@ -43,7 +43,7 @@ describe Latex::MathMl do
   end
   let(:service_url) { 'http://get.mml.com' }
   let(:request_id)  { '0c0dad8c-7857-4447-ba1f-9f33a2f1debf' }
-  let(:request_id_signature)  { CanvasSecurity.sign_hmac_sha512(request_id) }
+  let(:request_id_signature) { CanvasSecurity.sign_hmac_sha512(request_id) }
 
   subject(:math_ml) do
     Latex::MathMl.new(latex: latex)
@@ -64,12 +64,12 @@ describe Latex::MathMl do
       end
 
       it 'calls `CanvasHttp.get` with full url' do
-        expect(CanvasHttp).to receive(:get).
-          with(service_url, {
-            'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
-            'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
-          }).
-          and_return(
+        expect(CanvasHttp).to receive(:get)
+          .with(service_url, {
+                  'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
+                  'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
+                })
+          .and_return(
             OpenStruct.new(
               status: '200',
               body: mml_doc
@@ -93,12 +93,12 @@ describe Latex::MathMl do
         let(:request_id) { 5 }
 
         it "doesn't throw an error" do
-          expect(CanvasHttp).to receive(:get).
-            with(service_url, {
-              'X-Request-Context-Id' => CanvasSecurity.base64_encode('5'),
-              'X-Request-Context-Signature' => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512('5'))
-            }).
-            and_return(
+          expect(CanvasHttp).to receive(:get)
+            .with(service_url, {
+                    'X-Request-Context-Id' => CanvasSecurity.base64_encode('5'),
+                    'X-Request-Context-Signature' => CanvasSecurity.base64_encode(CanvasSecurity.sign_hmac_sha512('5'))
+                  })
+            .and_return(
               OpenStruct.new(
                 code: '200',
                 body: mml_doc

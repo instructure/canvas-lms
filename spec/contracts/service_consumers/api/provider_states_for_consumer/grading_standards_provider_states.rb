@@ -19,7 +19,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     # Account ID: 2
     provider_state 'an account with grading standards' do
       set_up do

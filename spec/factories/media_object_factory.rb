@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Factories
-  def media_object(opts={})
+  def media_object(opts = {})
     mo = MediaObject.new
     mo.context = opts[:context] || @course
     mo.media_id = opts[:media_id] || '1234'

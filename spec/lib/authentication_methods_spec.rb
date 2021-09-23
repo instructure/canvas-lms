@@ -65,6 +65,7 @@ describe AuthenticationMethods do
 
     class MockLogger
       def info(*); end
+
       def warn(*); end
     end
 
@@ -76,9 +77,9 @@ describe AuthenticationMethods do
   describe "#load_user" do
     context "with active session" do
       before do
-        @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                        :format => double(:json? => false),
-                        :host_with_port => "")
+        @request = double(:env => { 'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago },
+                          :format => double(:json? => false),
+                          :host_with_port => "")
         @controller = MockController.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
         allow(@controller).to receive(:api_request?).and_return(false)
@@ -109,7 +110,6 @@ describe AuthenticationMethods do
         expect(@controller.send(:load_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_user)).to be_nil
         expect(@controller.instance_variable_get(:@current_pseudonym)).to be_nil
-
       end
 
       it "should not destroy session if user was logged out in the future" do
@@ -266,7 +266,7 @@ describe AuthenticationMethods do
         token = AccessToken.create!(user: @user)
         controller = setup_with_token(token)
 
-        expect{controller.send(:load_user)}.to raise_error(AuthenticationMethods::AccessTokenError)
+        expect { controller.send(:load_user) }.to raise_error(AuthenticationMethods::AccessTokenError)
       end
 
       it "accepts as_user_id on a masquerading token if masquerade matches" do
@@ -335,11 +335,11 @@ describe AuthenticationMethods do
   end
 
   describe "#access_token_account" do
-    let(:account) {Account.create!}
-    let(:dev_key) {DeveloperKey.create!(account: account)}
-    let(:access_token) {AccessToken.create!(developer_key: dev_key)}
-    let(:request) {double(format: double(:json? => false), host_with_port:"")}
-    let(:controller) {MockController.new(request: request, root_account: account)}
+    let(:account) { Account.create! }
+    let(:dev_key) { DeveloperKey.create!(account: account) }
+    let(:access_token) { AccessToken.create!(developer_key: dev_key) }
+    let(:request) { double(format: double(:json? => false), host_with_port: "") }
+    let(:controller) { MockController.new(request: request, root_account: account) }
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)

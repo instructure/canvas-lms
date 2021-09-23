@@ -40,7 +40,7 @@ module LearningOutcomeContext
 
     # return the outcome but only if it's available in either the context or one
     # of the context's associated accounts.
-    def available_outcome(outcome_id, opts={})
+    def available_outcome(outcome_id, opts = {})
       if opts[:allow_global]
         outcome = LearningOutcome.global.where(id: outcome_id).first
         return outcome if outcome
@@ -73,7 +73,7 @@ module LearningOutcomeContext
       end
     end
 
-    def root_outcome_group(force=true)
+    def root_outcome_group(force = true)
       LearningOutcomeGroup.find_or_create_root(self, force)
     end
 

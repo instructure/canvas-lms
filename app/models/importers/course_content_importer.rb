@@ -21,7 +21,6 @@ require_dependency 'importers'
 
 module Importers
   class CourseContentImporter < Importer
-
     self.item_class = Course
     Importers.register_content_importer(self)
 
@@ -56,21 +55,22 @@ module Importers
           current += 1
           if (current - last) > 10
             last = current
-            migration.update_import_progress((current.to_f/total) * 18.0)
+            migration.update_import_progress((current.to_f / total) * 18.0)
           end
         end
         unzip_opts = {
-            :course => migration.context,
-            :filename => data['all_files_export']['file_path'],
-            :valid_paths => valid_paths,
-            :callback => callback,
-            :logger => logger,
-            :rename_files => migration.migration_settings[:files_import_allow_rename],
-            :migration_id_map => migration.attachment_path_id_lookup,
+          :course => migration.context,
+          :filename => data['all_files_export']['file_path'],
+          :valid_paths => valid_paths,
+          :callback => callback,
+          :logger => logger,
+          :rename_files => migration.migration_settings[:files_import_allow_rename],
+          :migration_id_map => migration.attachment_path_id_lookup,
         }
         if root_path = migration.migration_settings[:files_import_root_path]
           unzip_opts[:root_directory] = Folder.assert_path(
-              root_path, migration.context)
+            root_path, migration.context
+          )
         end
         unzipper = UnzipAttachment.new(unzip_opts)
         migration.update_import_progress(1.0)
@@ -86,7 +86,7 @@ module Importers
     end
 
     def self.import_content(course, data, params, migration)
-      params ||= {:copy=>{}}
+      params ||= { :copy => {} }
       logger.debug "starting import"
 
       Importers.disable_live_events! do
@@ -99,7 +99,7 @@ module Importers
         migration.check_cross_institution
         logger.debug "migration is cross-institution; external references will not be used" if migration.cross_institution?
 
-        (data['web_link_categories'] || []).map{|c| c['links'] }.flatten.each do |link|
+        (data['web_link_categories'] || []).map { |c| c['links'] }.flatten.each do |link|
           course.external_url_hash[link['link_id']] = link
         end
         ActiveRecord::Base.skip_touch_context
@@ -173,7 +173,7 @@ module Importers
         # be very explicit about draft state courses, but be liberal toward legacy courses
         if course.wiki.has_no_front_page
           if migration.for_course_copy? && !migration.for_master_course_import? &&
-              (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
+             (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
             mig_id = migration.content_export.create_key(source.wiki.front_page)
             if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
               course.wiki.set_front_page_url!(new_front_page.url)
@@ -207,11 +207,11 @@ module Importers
 
         adjust_dates(course, migration)
 
-        migration.progress=100
+        migration.progress = 100
         migration.migration_settings ||= {}
 
         imported_asset_hash = {}
-        migration.imported_migration_items_hash.each{|k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present?}
+        migration.imported_migration_items_hash.each { |k, assets| imported_asset_hash[k] = assets.values.map(&:id).join(',') if assets.present? }
         migration.migration_settings[:imported_assets] = imported_asset_hash
         migration.workflow_state = :imported unless post_processing?(migration)
         migration.save
@@ -219,7 +219,7 @@ module Importers
         if migration.for_master_course_import? && migration.migration_settings[:publish_after_completion]
           if course.unpublished?
             # i could just do it directly but this way preserves the audit trail
-            course.update_one({:event => 'offer'}, migration.user, :blueprint_sync)
+            course.update_one({ :event => 'offer' }, migration.user, :blueprint_sync)
           end
         end
 
@@ -268,6 +268,7 @@ module Importers
       # (the expected use case for this feature is a migration containing a single assignment anyhow)
       assignments.each do |assignment|
         next if assignment.assignment_group == ag
+
         assignment.assignment_group = ag
         assignment.position = nil
         assignment.save!
@@ -276,7 +277,7 @@ module Importers
 
     def self.adjust_dates(course, migration)
       begin
-        #Adjust dates
+        # Adjust dates
         if shift_options = migration.date_shift_options
           shift_options = self.shift_date_options(course, shift_options)
 
@@ -344,6 +345,7 @@ module Importers
               AssignmentOverride.overridden_dates.each do |field|
                 date = event.send(field)
                 next unless date
+
                 event.send("#{field}=", shift_date(date, shift_options))
               end
               event.save_without_broadcasting
@@ -365,7 +367,6 @@ module Importers
         else
           (migration.imported_migration_items_by_class(Announcement) +
             migration.imported_migration_items_by_class(DiscussionTopic)).each do |event|
-
             event.saved_by = :after_migration
             event.schedule_delayed_transitions
           end
@@ -398,6 +399,7 @@ module Importers
 
     def self.import_settings_from_migration(course, data, migration)
       return unless data[:course]
+
       settings = data[:course]
       if settings[:tab_configuration] && settings[:tab_configuration].is_a?(Array)
         tab_config = []
@@ -408,9 +410,11 @@ module Importers
             all_tools ||= migration.cross_institution? ?
                 course.context_external_tools.having_setting('course_navigation') :
                 ContextExternalTool.find_all_for(course, :course_navigation)
-            if tool = (all_tools.detect{|t| t.migration_id == tool_mig_id} ||
-                all_tools.detect{|t| CC::CCHelper.create_key(t) == tool_mig_id ||
-                  CC::CCHelper.create_key(t, global: true) == tool_mig_id})
+            if tool = (all_tools.detect { |t| t.migration_id == tool_mig_id } ||
+                all_tools.detect { |t|
+                  CC::CCHelper.create_key(t) == tool_mig_id ||
+                  CC::CCHelper.create_key(t, global: true) == tool_mig_id
+                })
               # translate the migration_id to a real id
               tab['id'] = "context_external_tool_#{tool.id}"
               tab_config << tab
@@ -431,7 +435,7 @@ module Importers
       # superhax to force new wiki front page if home view changed (or is master course sync)
       if settings['default_view'] && data[:wikis] && (migration.for_master_course_import? || (settings['default_view'] != course.default_view))
         course.wiki # ensure that it exists already
-        if page_hash = data[:wikis].detect{|h| h[:front_page]}
+        if page_hash = data[:wikis].detect { |h| h[:front_page] }
           if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
             page.set_as_front_page!
           end
@@ -463,7 +467,7 @@ module Importers
             if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
               course.grading_standard = gs
             else
-              migration.add_warning(t(:account_grading_standard_warning,"Couldn't find account grading standard for the course." ))
+              migration.add_warning(t(:account_grading_standard_warning, "Couldn't find account grading standard for the course."))
             end
           end
         elsif migration.for_master_course_import?
@@ -490,8 +494,9 @@ module Importers
       end
     end
 
-    def self.shift_date_options(course, options={})
-      return({remove_dates: true}) if Canvas::Plugin.value_to_boolean(options[:remove_dates])
+    def self.shift_date_options(course, options = {})
+      return({ remove_dates: true }) if Canvas::Plugin.value_to_boolean(options[:remove_dates])
+
       result = {}
       remove_bad_end_dates!(options)
       result[:old_start_date] = Date.parse(options[:old_start_date]) rescue course.real_start_date
@@ -521,9 +526,10 @@ module Importers
       options[:new_end_date] = nil if new_start && new_end && new_end < new_start
     end
 
-    def self.shift_date(time, options={})
+    def self.shift_date(time, options = {})
       return nil unless time
       return nil if options[:remove_dates]
+
       time_zone = options[:time_zone] || Time.zone
       Time.use_zone time_zone do
         time = ActiveSupport::TimeWithZone.new(time.utc, Time.zone)
@@ -534,6 +540,7 @@ module Importers
         new_start_date = options[:new_start_date]
         new_end_date = options[:new_end_date]
         return time unless old_start_date && old_end_date && new_start_date && new_end_date
+
         old_full_diff = old_end_date - old_start_date
         old_event_diff = old_date - old_start_date
         old_event_percent = old_full_diff > 0 ? old_event_diff.to_f / old_full_diff.to_f : 0

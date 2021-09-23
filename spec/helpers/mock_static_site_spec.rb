@@ -51,8 +51,8 @@ describe "a mock static site" do
 
     it "only blocks the specified host" do
       WebMock.enable!
-      WebMock.stub_request(:get, "http://notarealdomain-srsly.com/").
-        to_return(status: 200, body: "some other page", headers: {})
+      WebMock.stub_request(:get, "http://notarealdomain-srsly.com/")
+             .to_return(status: 200, body: "some other page", headers: {})
       MockStaticSite.new('google.com', 'sample_site')
       google_response = Net::HTTP.get('google.com', '/')
       other_response = Net::HTTP.get('notarealdomain-srsly.com', '/')

@@ -19,7 +19,6 @@
 #
 module LtiSpecHelper
   def create_tool_proxy(opts = {})
-
     default_opts = {
       shared_secret: 'shared_secret',
       guid: SecureRandom.uuid,
@@ -37,13 +36,13 @@ module LtiSpecHelper
   end
 
   def find_or_create_product_family(opts = {})
-    default_opts = {vendor_code: '123', product_code: 'abc', vendor_name: 'acme'}
+    default_opts = { vendor_code: '123', product_code: 'abc', vendor_name: 'acme' }
     default_opts[:root_account_id] = Account.create!(name: 'Test Account') unless opts.has_key?(:root_account_id)
     Lti::ProductFamily.where(default_opts.merge(opts)).first_or_create
   end
 
   def create_resource_handler(tool_proxy, opts = {})
-    default_opts = {resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy}
+    default_opts = { resource_type_code: 'code', name: (0...8).map { (65 + rand(26)).chr }.join, tool_proxy: tool_proxy }
     Lti::ResourceHandler.create(default_opts.merge(opts))
   end
 

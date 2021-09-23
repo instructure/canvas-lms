@@ -22,11 +22,11 @@ require 'spec_helper'
 
 describe JSONToken do
   it 'should encode' do
-    expect(JSONToken.encode({a: 123, b: [1, 2, '13']})).to eq "eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19"
+    expect(JSONToken.encode({ a: 123, b: [1, 2, '13'] })).to eq "eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19"
   end
 
   it 'should decode' do
-    expect(JSONToken.decode("eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19")).to eq({"a" => 123, "b" => [1, 2, "13"]})
+    expect(JSONToken.decode("eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19")).to eq({ "a" => 123, "b" => [1, 2, "13"] })
   end
 
   it 'should handle binary strings' do

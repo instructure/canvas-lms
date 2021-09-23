@@ -80,7 +80,7 @@ describe "collaborations" do
       end
 
       it 'should select from all course groups', priority: "1", test_id: 162352 do
-        select_from_all_course_groups(type,title)
+        select_from_all_course_groups(type, title)
       end
 
       it 'should deselect collaborators', priority: "1", test_id: 139054 do

@@ -20,7 +20,6 @@
 module BroadcastPolicy
   # This is where the DSL is defined.
   module SingletonMethods
-
     def self.extended(klass)
       klass.send(:class_attribute, :broadcast_policy_list) unless klass.respond_to?(:broadcast_policy_list)
     end
@@ -36,6 +35,5 @@ module BroadcastPolicy
       self.broadcast_policy_list = PolicyList.new
       self.broadcast_policy_list.populate(&block)
     end
-
   end
 end

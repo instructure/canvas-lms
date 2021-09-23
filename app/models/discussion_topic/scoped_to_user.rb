@@ -25,6 +25,7 @@ class DiscussionTopic::ScopedToUser < ScopeFilter
   end
 
   private
+
   def scope_for_differentiated_assignments(scope)
     return scope if context.is_a?(Account)
     return DifferentiableAssignment.scope_filter(scope, user, context) if context.is_a?(Course)
@@ -41,4 +42,3 @@ class DiscussionTopic::ScopedToUser < ScopeFilter
     end
   end
 end
-

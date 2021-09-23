@@ -27,7 +27,7 @@ describe 'Course Nicknames API', type: :request do
 
   it "requires a user for index" do
     api_call(:get, "/api/v1/users/self/course_nicknames", @params.merge(:action => 'index'),
-             {}, {}, {:expected_status => 401})
+             {}, {}, { :expected_status => 401 })
   end
 
   context "with user" do
@@ -93,7 +93,7 @@ describe 'Course Nicknames API', type: :request do
         @student.set_preference(:course_nicknames, @course.id, 'old_nickname')
         json = api_call(:put, "/api/v1/users/self/course_nicknames/#{@course.id}?nickname=new_nickname",
                         @params.merge(:action => 'update', :course_id => @course.to_param,
-                        :nickname => 'new_nickname'))
+                                      :nickname => 'new_nickname'))
         expect(json['nickname']).to eq('new_nickname')
         expect(@student.reload.course_nickname(@course)).to eq 'new_nickname'
       end
@@ -114,7 +114,7 @@ describe 'Course Nicknames API', type: :request do
 
       it "rejects an overly long nickname" do
         long_nickname = 'x' * 100
-        json = api_call(:put, "/api/v1/users/self/course_nicknames/#{@course.id}?nickname=#{long_nickname}" ,
+        json = api_call(:put, "/api/v1/users/self/course_nicknames/#{@course.id}?nickname=#{long_nickname}",
                         @params.merge(:action => 'update', :course_id => @course.to_param, :nickname => long_nickname),
                         {}, {}, { :expected_status => 400 })
         expect(json['message']).to include 'nickname too long'

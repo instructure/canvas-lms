@@ -24,80 +24,80 @@ describe CsvDiff::Diff do
 
   # not a let because I want a new object returned each time
   def csv1(options = { headers: true })
-    CSV.new(<<CSV, options)
-pk1,col1,pk2,col2
-a,b,c,d
-1,2,3,4
-CSV
+    CSV.new(<<~CSV, options)
+      pk1,col1,pk2,col2
+      a,b,c,d
+      1,2,3,4
+    CSV
   end
 
   def only_pk1
-    CSV.new(<<CSV, headers: true)
-pk1,col1,col2
-1,2,4
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,col2
+      1,2,4
+    CSV
   end
 
   def missing_pk
-    CSV.new(<<CSV, headers: true)
-col1,col2
-1,2
-CSV
+    CSV.new(<<~CSV, headers: true)
+      col1,col2
+      1,2
+    CSV
   end
 
   def with_new_row
-    CSV.new(<<CSV, headers: true)
-pk1,col1,pk2,col2
-a,b,c,d
-a,b,x,d
-1,2,3,4
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,pk2,col2
+      a,b,c,d
+      a,b,x,d
+      1,2,3,4
+    CSV
   end
 
   def with_new_shuffled_row
-    CSV.new(<<CSV, headers: true)
-pk1,pk2,col1,col2
-a,c,b,d
-w,y,x,z
-1,3,2,4
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,pk2,col1,col2
+      a,c,b,d
+      w,y,x,z
+      1,3,2,4
+    CSV
   end
 
   def with_changed_row
-    CSV.new(<<CSV, headers: true)
-pk1,col1,pk2,col2
-a,b,c,z
-1,2,3,4
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,pk2,col2
+      a,b,c,z
+      1,2,3,4
+    CSV
   end
 
   def with_deleted_row
-    CSV.new(<<CSV, headers: true)
-pk1,col1,pk2,col2
-1,2,3,4
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,pk2,col2
+      1,2,3,4
+    CSV
   end
 
   def only_header_row
-    CSV.new(<<CSV, headers: true)
-pk1,col1,pk2,col2
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,pk2,col2
+    CSV
   end
 
   def with_trailing_commas
-    CSV.new(<<CSV, headers: true)
-pk1,col1,pk2,col2,
-a,b,c,d,
-1,2,3,4,
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,col1,pk2,col2,
+      a,b,c,d,
+      1,2,3,4,
+    CSV
   end
 
   def with_nil_column
-    CSV.new(<<CSV, headers: true)
-pk1,,col1,pk2,col2,
-a,,b,c,d,
-1,,2,3,4,
-CSV
+    CSV.new(<<~CSV, headers: true)
+      pk1,,col1,pk2,col2,
+      a,,b,c,d,
+      1,,2,3,4,
+    CSV
   end
 
   context 'validation' do
@@ -176,22 +176,22 @@ CSV
 
   it 'handles a larger, shuffled test' do
     subject = described_class.new(%w[user_id])
-    files = File.dirname(__FILE__)+"/files"
-    previous = CSV.open(files+"/1.prev.csv", headers: true)
-    current  = CSV.open(files+"/1.curr.csv", headers: true)
+    files = File.dirname(__FILE__) + "/files"
+    previous = CSV.open(files + "/1.prev.csv", headers: true)
+    current  = CSV.open(files + "/1.curr.csv", headers: true)
     cb = ->(row) { row['state'] = 'deleted' }
     output = subject.generate(previous, current, deletes: cb)
 
     sorted_output = CSV.new(output, headers: true).read.to_a.sort
-    expected_output = CSV.open(files+"/1.out.csv", headers: true).read.to_a.sort
+    expected_output = CSV.open(files + "/1.out.csv", headers: true).read.to_a.sort
     expect(sorted_output).to eq expected_output
   end
 
   it "returns a hash with a count if requested" do
     subject = described_class.new(%w[user_id])
-    files = File.dirname(__FILE__)+"/files"
-    previous = CSV.open(files+"/1.prev.csv", headers: true)
-    current  = CSV.open(files+"/1.curr.csv", headers: true)
+    files = File.dirname(__FILE__) + "/files"
+    previous = CSV.open(files + "/1.prev.csv", headers: true)
+    current  = CSV.open(files + "/1.curr.csv", headers: true)
     cb = ->(row) { row['state'] = 'deleted' }
 
     hash = subject.generate(previous, current, deletes: cb, return_count: true)

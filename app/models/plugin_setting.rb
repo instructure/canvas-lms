@@ -48,7 +48,7 @@ class PluginSetting < ActiveRecord::Base
   def validate_posted_settings
     if @posted_settings
       plugin = Canvas::Plugin.find(name.to_s)
-      @posted_settings.transform_values! {|v| v.is_a?(String) ? v.strip : v }
+      @posted_settings.transform_values! { |v| v.is_a?(String) ? v.strip : v }
       result = plugin.validate_settings(self, @posted_settings)
       throw :abort if result == false
     end
@@ -63,6 +63,7 @@ class PluginSetting < ActiveRecord::Base
   DUMMY_STRING = "~!?3NCRYPT3D?!~"
   def initialize_plugin_setting
     return unless settings && self.plugin
+
     @valid_settings = true
     if self.plugin.encrypted_settings
       was_dirty = self.changed?
@@ -91,7 +92,7 @@ class PluginSetting < ActiveRecord::Base
         unless settings[key].blank?
           value = settings.delete(key)
           settings.delete("#{key}_dec".to_sym)
-          if value == DUMMY_STRING  # no change, use what was there previously
+          if value == DUMMY_STRING # no change, use what was there previously
             unless settings_was.nil? # we wont have setting_was if we are a new plugin
               settings["#{key}_enc".to_sym] = settings_was["#{key}_enc".to_sym]
               settings["#{key}_salt".to_sym] = settings_was["#{key}_salt".to_sym]
@@ -116,7 +117,7 @@ class PluginSetting < ActiveRecord::Base
     end
   end
 
-  def self.settings_for_plugin(name, plugin=nil)
+  def self.settings_for_plugin(name, plugin = nil)
     RequestCache.cache(settings_cache_key(name.to_s + "_settings")) do
       if (plugin_setting = cached_plugin_setting(name)) && plugin_setting.valid_settings? && plugin_setting.enabled?
         plugin_setting.plugin = plugin
@@ -124,6 +125,7 @@ class PluginSetting < ActiveRecord::Base
       else
         plugin ||= Canvas::Plugin.find(name.to_s)
         raise Canvas::NoPluginError unless plugin
+
         settings = plugin.default_settings
       end
 

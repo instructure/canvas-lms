@@ -28,7 +28,7 @@ describe "master courses - child courses - module item locking" do
       @copy_from = course_factory(active_all: true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       @original_page = @copy_from.wiki_pages.create!(title: "blah", body: "bloo")
-      @page_mc_tag = @template.create_content_tag_for!(@original_page, restrictions: {content: true})
+      @page_mc_tag = @template.create_content_tag_for!(@original_page, restrictions: { content: true })
 
       @original_topic = @copy_from.discussion_topics.create!(title: "blah", message: "bloo")
       @topic_mc_tag = @template.create_content_tag_for!(@original_topic)
@@ -39,7 +39,7 @@ describe "master courses - child courses - module item locking" do
 
       @page_copy = @copy_to.wiki_pages.create!(title: "locked page", migration_id: @page_mc_tag.migration_id)
       @topic_copy = @copy_to.discussion_topics.create!(title: "unlocked topic", migration_id: @topic_mc_tag.migration_id)
-      [@page_copy, @topic_copy].each{|obj| @sub.create_content_tag_for!(obj)}
+      [@page_copy, @topic_copy].each { |obj| @sub.create_content_tag_for!(obj) }
       @assmt = @copy_to.assignments.create!(title: "normal assignment")
 
       @mod = @copy_to.context_modules.create!(name: "modle")
@@ -82,7 +82,7 @@ describe "master courses - child courses - module item locking" do
     it "loads new restriction info as needed when adding an item" do
       title = "new quiz"
       original_quiz = @copy_from.quizzes.create!(title: title)
-      quiz_mc_tag = @template.create_content_tag_for!(original_quiz, restrictions: {content: true})
+      quiz_mc_tag = @template.create_content_tag_for!(original_quiz, restrictions: { content: true })
 
       quiz_copy = @copy_to.quizzes.create!(title: title, migration_id: quiz_mc_tag.migration_id)
       @sub.create_content_tag_for!(quiz_copy)
@@ -113,7 +113,7 @@ describe "master courses - child courses - module item locking" do
       @assmt_tag = @template.create_content_tag_for!(@assmt)
 
       @page = @course.wiki_pages.create!(title: "page blah", body: "bloo")
-      @page_tag = @template.create_content_tag_for!(@page, restrictions: {all: true})
+      @page_tag = @template.create_content_tag_for!(@page, restrictions: { all: true })
 
       @topic = @course.discussion_topics.create!(title: "topic blah", message: "bloo")
       # note the lack of a content tag

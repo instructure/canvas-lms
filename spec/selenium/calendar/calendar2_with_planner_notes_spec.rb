@@ -28,14 +28,13 @@ describe "calendar2" do
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!
-    @student1.update!(preferences: {:selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"]})
-    @teacher.update!(preferences: {:selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"]})
+    @student1.update!(preferences: { :selected_calendar_contexts => ["user_#{@student1.id}", "course_#{@course.id}"] })
+    @teacher.update!(preferences: { :selected_calendar_contexts => ["user_#{@teacher.id}", "course_#{@course.id}"] })
   end
 
   context "as the student" do
     before :each do
       # or some stuff we need to click is "below the fold"
-
 
       user_session(@student1)
     end
@@ -142,8 +141,8 @@ describe "calendar2" do
 
     it "creates a calendar event for non graded discussions with to do date" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: 30.seconds.from_now)
+                                                     message: "somebody topic message",
+                                                     todo_date: 30.seconds.from_now)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -157,7 +156,6 @@ describe "calendar2" do
   context "as the teacher" do
     before :each do
       # or some stuff we need to click is "below the fold"
-
 
       user_session(@teacher)
     end
@@ -191,8 +189,8 @@ describe "calendar2" do
 
     it "edits a todo discussion" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: Date.today)
+                                                     message: "somebody topic message",
+                                                     todo_date: Date.today)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -208,8 +206,8 @@ describe "calendar2" do
 
     it "deletes a todo discussion" do
       discussion = @course.discussion_topics.create!(user: @teacher, title: "topic 1",
-                                        message: "somebody topic message",
-                                        todo_date: Date.today)
+                                                     message: "somebody topic message",
+                                                     todo_date: Date.today)
       get '/calendar2'
       wait_for_ajax_requests
       f('.fc-content').click
@@ -229,7 +227,7 @@ describe "calendar2" do
 
     before :each do
       # or some stuff we need to click is "below the fold"
-      @user.update!(preferences: {:selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"]})
+      @user.update!(preferences: { :selected_calendar_contexts => ["user_#{@user.id}", "course_#{@course1.id}", "course_#{@course2.id}"] })
       user_session(@user)
     end
 

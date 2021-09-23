@@ -107,7 +107,6 @@ module Lti
     end
 
     describe '#all_roles' do
-
       it 'converts multiple roles' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
         allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
@@ -628,7 +627,7 @@ module Lti
         end
 
         it "should return section restricted if all enrollments are restricted" do
-          [@e1, @e2].each{|e| e.update_attribute(:limit_privileges_to_course_section, true)}
+          [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
           expect(subject.section_restricted).to eq true
         end
 
@@ -660,7 +659,7 @@ module Lti
 
       let(:user) do
         user = User.create!
-        user.email ='test@foo.com'
+        user.email = 'test@foo.com'
         user.save!
         user
       end
@@ -670,16 +669,16 @@ module Lti
           expect(substitution_helper.email).to eq user.email
         end
 
-        let(:sis_email) {'sis@example.com'}
+        let(:sis_email) { 'sis@example.com' }
 
         let(:sis_pseudonym) do
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
           pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
-          pseudonym.sis_communication_channel_id=cc.id
-          pseudonym.communication_channel_id=cc.id
-          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.sis_communication_channel_id = cc.id
+          pseudonym.communication_channel_id = cc.id
+          pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           pseudonym
         end
@@ -698,7 +697,7 @@ module Lti
           # it would return 'test@foo.com' instead of sis_email
           p.account = Account.create!
           p.save!
-          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          course.enroll_user(user, 'StudentEnrollment', { sis_pseudonym_id: p.id, enrollment_state: 'active' })
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           expect(sub_helper.email).to eq sis_email
         end
@@ -711,7 +710,7 @@ module Lti
           p.account = Account.create!
           p.workflow_state = 'deleted'
           p.save!
-          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          course.enroll_user(user, 'StudentEnrollment', { sis_pseudonym_id: p.id, enrollment_state: 'active' })
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           expect(sub_helper.email).to eq 'test@foo.com'
         end
@@ -738,21 +737,19 @@ module Lti
           it "returns the users email if there isn't a sis email" do
             expect(substitution_helper.email).to eq user.email
           end
-
         end
       end
 
       describe "#sis_email" do
-
         it "returns the sis email" do
           sis_email = 'sis@example.com'
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
           pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
-          pseudonym.sis_communication_channel_id=cc.id
-          pseudonym.communication_channel_id=cc.id
-          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.sis_communication_channel_id = cc.id
+          pseudonym.communication_channel_id = cc.id
+          pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           expect(substitution_helper.sis_email).to eq sis_email
         end
@@ -760,7 +757,6 @@ module Lti
         it "returns nil if there isn't an sis email" do
           expect(substitution_helper.sis_email).to eq nil
         end
-
       end
     end
   end

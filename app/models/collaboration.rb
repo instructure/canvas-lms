@@ -24,7 +24,7 @@ class Collaboration < ActiveRecord::Base
 
   DEEP_LINKING_EXTENSION = 'https://canvas.instructure.com/lti/collaboration'
 
-  attr_readonly   :collaboration_type
+  attr_readonly :collaboration_type
 
   belongs_to :context, polymorphic: [:course, :group]
   belongs_to :user
@@ -61,12 +61,12 @@ class Collaboration < ActiveRecord::Base
   set_policy do
     given { |user|
       user &&
-      !self.new_record? &&
+        !self.new_record? &&
         (self.user_id == user.id ||
          self.users.include?(user) ||
-         Collaborator.
-             joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id").
-             where('collaborators.group_id IS NOT NULL AND
+         Collaborator
+             .joins("INNER JOIN #{GroupMembership.quoted_table_name} ON collaborators.group_id = group_memberships.group_id")
+             .where('collaborators.group_id IS NOT NULL AND
                             group_memberships.user_id = ? AND
                             collaborators.collaboration_id = ?', user, self).exists?)
     }
@@ -80,7 +80,8 @@ class Collaboration < ActiveRecord::Base
 
     given { |user, session|
       user && self.user_id == user.id &&
-        self.context.grants_right?(user, session, :create_collaborations) }
+        self.context.grants_right?(user, session, :create_collaborations)
+    }
     can :read and can :update and can :delete
   end
 
@@ -103,9 +104,9 @@ class Collaboration < ActiveRecord::Base
 
   def authorize_user(user); end
 
-  #def remove_users_from_document(users_to_remove); end
+  # def remove_users_from_document(users_to_remove); end
 
-  #def add_users_to_document(users_to_add); end
+  # def add_users_to_document(users_to_add); end
 
   def config; raise 'Not implemented'; end
 
@@ -202,6 +203,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def include_author_as_collaborator
     return unless self.user.present?
+
     author = collaborators.where(:user_id => self.user_id).first
 
     unless author
@@ -234,6 +236,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def generate_document
     return if @generated
+
     @generated = true
     assign_uuid
     initialize_document
@@ -262,17 +265,17 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns nothing.
   def update_members(users = [], groups = [])
-    group_ids = groups.map {|g| g.try(:id) || g }
+    group_ids = groups.map { |g| g.try(:id) || g }
     save! if new_record?
     generate_document
     users << user if user.present? && !users.include?(user)
     update_user_collaborators(users)
     update_group_collaborators(group_ids)
     if respond_to?(:add_users_to_document)
-      group_users_to_add = User.
-          distinct.
-          joins(:group_memberships).
-          where('group_memberships.group_id' => group_ids).to_a
+      group_users_to_add = User
+                           .distinct
+                           .joins(:group_memberships)
+                           .where('group_memberships.group_id' => group_ids).to_a
       add_users_to_document((users + group_users_to_add).uniq)
     end
   end
@@ -311,7 +314,7 @@ class Collaboration < ActiveRecord::Base
         users_to_remove.uniq!
       end
       # make real user objects, instead of just ids, cause that's what this code expects
-      users_to_remove.reject! {|id| id == self.user.id}
+      users_to_remove.reject! { |id| id == self.user.id }
       users_to_remove = users_to_remove.map { |id| User.send(:instantiate, 'id' => id) }
       remove_users_from_document(users_to_remove)
     end
@@ -357,6 +360,7 @@ class Collaboration < ActiveRecord::Base
   # Returns nothing.
   def add_groups_to_collaborators(group_ids)
     return unless context.respond_to?(:groups)
+
     if group_ids.length > 0
       existing_groups = collaborators.where(:group_id => group_ids).select(:group_id)
       context.groups.where(:id => group_ids).where.not(:id => existing_groups).each do |g|

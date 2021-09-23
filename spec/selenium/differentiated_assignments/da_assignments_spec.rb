@@ -82,24 +82,24 @@ describe "interaction with differentiated assignments" do
       end
     end
 
-      context "Student Grades Page" do
-        it "should show assignments with an override" do
-          create_section_override_for_assignment(@da_assignment)
-          get "/courses/#{@course.id}/grades"
-          expect(f("#assignments")).to include_text(@da_assignment.title)
-        end
-        it "should show assignments with a graded submission" do
-          @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
-          get "/courses/#{@course.id}/grades"
-          expect(f("#assignments")).to include_text(@da_assignment.title)
-        end
-        it "should not show inaccessible assignments" do
-          create_section_override_for_assignment(@da_assignment, course_section: @section1)
-          get "/courses/#{@course.id}/grades"
-          expect(f("#assignments")).not_to include_text(@da_assignment.title)
-        end
+    context "Student Grades Page" do
+      it "should show assignments with an override" do
+        create_section_override_for_assignment(@da_assignment)
+        get "/courses/#{@course.id}/grades"
+        expect(f("#assignments")).to include_text(@da_assignment.title)
+      end
+      it "should show assignments with a graded submission" do
+        @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
+        get "/courses/#{@course.id}/grades"
+        expect(f("#assignments")).to include_text(@da_assignment.title)
+      end
+      it "should not show inaccessible assignments" do
+        create_section_override_for_assignment(@da_assignment, course_section: @section1)
+        get "/courses/#{@course.id}/grades"
+        expect(f("#assignments")).not_to include_text(@da_assignment.title)
       end
     end
+  end
 
   context "Observer with student" do
     before :each do

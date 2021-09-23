@@ -29,7 +29,7 @@ module CC::Exporter::WebZip
 
     def convert_to_offline_web_zip(progress_key)
       exporter = CC::Exporter::WebZip::Exporter.new(content_cartridge.open, false, :web_zip,
-        global_identifiers: self.content_export.global_identifiers?)
+                                                    global_identifiers: self.content_export.global_identifiers?)
       zip = create_zip(exporter, progress_key)
       file_path = zip.create
 

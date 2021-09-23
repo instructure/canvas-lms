@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe MarkDonePresenter do
-
   before :each do
     course_with_student(:active_all => true)
   end
@@ -51,7 +50,6 @@ describe MarkDonePresenter do
   end
 
   describe "#has_requirement?" do
-
     it "should be false when there is no mark as done requirement" do
       tag = add_wiki_page_to_module
       subject = create_presenter tag
@@ -67,7 +65,6 @@ describe MarkDonePresenter do
   end
 
   describe "#checked?" do
-
     it "should be true when the mark as done requirement is fulfilled" do
       tag = add_wiki_page_to_module
       add_mark_done_requirement tag

@@ -22,8 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::Matching do
-
- context "#parse" do
+  context "#parse" do
     let(:raw_answers) do
       [
         {
@@ -61,7 +60,6 @@ describe Quizzes::QuizQuestion::AnswerParsers::Matching do
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::Matching }
 
     include_examples "All answer parsers"
-
 
     let(:raw_dupe_answers) do
       [
@@ -102,6 +100,5 @@ describe Quizzes::QuizQuestion::AnswerParsers::Matching do
       # but 2nd & 3rd are both "California" and should have the same :match_id
       expect(@answer_data[1][:match_id]).to eql @answer_data[2][:match_id]
     end
-
   end
 end

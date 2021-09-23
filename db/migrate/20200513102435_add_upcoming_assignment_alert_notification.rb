@@ -22,10 +22,10 @@ class AddUpcomingAssignmentAlertNotification < ActiveRecord::Migration[5.2]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-        name: 'Upcoming Assignment Alert',
-        delay_for: 0,
-        category: 'Due Date'
-      })
+                                                  name: 'Upcoming Assignment Alert',
+                                                  delay_for: 0,
+                                                  category: 'Due Date'
+                                                })
     end
   end
 

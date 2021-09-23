@@ -70,11 +70,11 @@ module Lti
     def launch_params(resource_url, placement, expanded_variables, content_item_id = nil, assignment = nil)
       content_item_return_url = return_url(content_item_id)
 
-      params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user).
-        merge(message_params(content_item_return_url)).
-        merge(data: data_hash_jwt(resource_url, content_item_id)).
-        merge(placement_params(placement, assignment: assignment)).
-        merge(expanded_variables)
+      params = ContentItemSelectionRequest.default_lti_params(@context, @domain_root_account, @user)
+                                          .merge(message_params(content_item_return_url))
+                                          .merge(data: data_hash_jwt(resource_url, content_item_id))
+                                          .merge(placement_params(placement, assignment: assignment))
+                                          .merge(expanded_variables)
 
       params[:ext_lti_assignment_id] = lti_assignment_id(assignment: assignment)
 
@@ -104,7 +104,7 @@ module Lti
     end
 
     def data_hash_jwt(resource_url, content_item_id = nil)
-      data_hash = {default_launch_url: resource_url}
+      data_hash = { default_launch_url: resource_url }
       if content_item_id
         data_hash[:content_item_id] = content_item_id
         data_hash[:oauth_consumer_key] = @tool.consumer_key

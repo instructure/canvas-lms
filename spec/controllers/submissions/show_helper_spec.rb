@@ -41,7 +41,7 @@ describe 'Submissions::ShowHelper' do
 
       context 'with format html' do
         before do
-          get :show, params: {context_id: @course.id, assignment_id: @assignment.id}
+          get :show, params: { context_id: @course.id, assignment_id: @assignment.id }
         end
 
         it 'redirects to assignment url' do
@@ -55,7 +55,7 @@ describe 'Submissions::ShowHelper' do
 
       context 'with format json' do
         before do
-          get :show, params: {context_id: @course.id, assignment_id: @assignment.id}, format: :json
+          get :show, params: { context_id: @course.id, assignment_id: @assignment.id }, format: :json
         end
 
         it 'render json with errors key' do
@@ -66,13 +66,13 @@ describe 'Submissions::ShowHelper' do
 
       context 'with no assignment' do
         it 'shows a cromulent error' do
-          get :show, params: {context_id: @course.id, assignment_id: -9000}
+          get :show, params: { context_id: @course.id, assignment_id: -9000 }
           expect(response).to redirect_to(course_url(@course))
           expect(flash[:error]).to eq "The specified assignment could not be found"
         end
 
         it 'works with json too' do
-          get :show, params: {context_id: @course.id, assignment_id: -9000}, format: :json
+          get :show, params: { context_id: @course.id, assignment_id: -9000 }, format: :json
           json = JSON.parse(response.body)
           expect(json['errors']).to eq "The specified assignment (-9000) could not be found"
         end

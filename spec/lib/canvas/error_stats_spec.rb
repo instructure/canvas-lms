@@ -22,11 +22,11 @@ require_dependency "canvas/error_stats"
 
 module Canvas
   class FakeErrorStatsError < StandardError; end
+
   class OuterErrorStatsError < StandardError; end
 
   describe ErrorStats do
     describe ".capture" do
-
       def a_regrettable_method
         raise FakeErrorStatsError, "you asked for this"
       rescue FakeErrorStatsError
@@ -36,7 +36,7 @@ module Canvas
       before(:each) do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
-      let(:data){ {} }
+      let(:data) { {} }
 
       it "increments the error level by default" do
         described_class.capture("something", data)

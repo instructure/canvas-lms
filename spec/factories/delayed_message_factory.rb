@@ -19,11 +19,11 @@
 #
 
 module Factories
-  def delayed_message_model(opts={})
+  def delayed_message_model(opts = {})
     @delayed_message = factory_with_protected_attributes(DelayedMessage, delayed_message_valid_attributes(opts).merge(opts))
   end
 
-  def delayed_message_valid_attributes(opts={})
+  def delayed_message_valid_attributes(opts = {})
     opts[:notification] ||= @notification
     opts[:notification] ||= notification_model
     user = opts[:user] || @user || User.create!

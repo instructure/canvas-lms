@@ -49,7 +49,6 @@ require 'fixtures/animal'
 require 'fixtures/trail'
 require 'fixtures/week_event'
 
-
 RSpec.configure do |config|
   Zoo = CanvasPartmanTest::Zoo
   Animal = CanvasPartmanTest::Animal
@@ -73,11 +72,11 @@ RSpec.configure do |config|
   end
 
   config.before :all do
-    [ Zoo, Animal, Trail, WeekEvent ].each(&:create_schema)
+    [Zoo, Animal, Trail, WeekEvent].each(&:create_schema)
   end
 
   config.after :all do
-    [ Animal, Trail, Zoo, WeekEvent ].each(&:drop_schema)
+    [Animal, Trail, Zoo, WeekEvent].each(&:drop_schema)
   end
 
   config.after :each do

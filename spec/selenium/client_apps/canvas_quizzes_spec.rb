@@ -24,9 +24,9 @@ describe "canvas_quizzes" do
 
   before do
     quiz_with_graded_submission([
-      {:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'true_false_question'}},
-      {:question_data => {:name => 'question 2', :points_possible => 1, 'question_type' => 'true_false_question'}}
-    ])
+                                  { :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'true_false_question' } },
+                                  { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'true_false_question' } }
+                                ])
 
     course_with_teacher_logged_in(:active_all => true, :course => @course)
   end
@@ -50,5 +50,4 @@ describe "canvas_quizzes" do
       expect(f("#ic-EventStream")).to include_text('Action Log')
     end
   end
-
 end

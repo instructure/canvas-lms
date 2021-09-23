@@ -48,6 +48,7 @@ module Types
     DOC
     def real_user
       return nil unless object["real_current_user_id"]
+
       Loaders::IDLoader.for(User).load(object["real_current_user_id"])
     end
 

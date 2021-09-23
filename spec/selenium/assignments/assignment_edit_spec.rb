@@ -88,6 +88,5 @@ describe "assignment" do
 
       expect(AssignmentPage.allowed_attempts_count.text).to include "2"
     end
-
   end
 end

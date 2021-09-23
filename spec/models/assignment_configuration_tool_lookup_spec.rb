@@ -22,10 +22,10 @@ require 'lti2_spec_helper'
 describe AssignmentConfigurationToolLookup do
   include_context 'lti2_spec_helper'
 
-  let(:subscription_service){ class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
-  let(:test_id){ SecureRandom.uuid }
-  let(:stub_response){ double(code: 200, parsed_response: {'Id' => test_id}, ok?: true) }
-  let(:assignment){ assignment_model(course: course) }
+  let(:subscription_service) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
+  let(:test_id) { SecureRandom.uuid }
+  let(:stub_response) { double(code: 200, parsed_response: { 'Id' => test_id }, ok?: true) }
+  let(:assignment) { assignment_model(course: course) }
 
   before(:each) do
     message_handler.update(capabilities: ["Canvas.placements.similarityDetection"])
@@ -83,7 +83,7 @@ describe AssignmentConfigurationToolLookup do
       lookup = AssignmentConfigurationToolLookup.create(assignment: assignment, tool: tool)
       expect(lookup.resource_codes).to eq({})
     end
-  end  
+  end
 
   describe '#configured_assignments' do
     let(:assignment) do

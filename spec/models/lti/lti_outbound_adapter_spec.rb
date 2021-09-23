@@ -71,8 +71,8 @@ describe Lti::LtiOutboundAdapter do
     allow(m).to receive(:logged_in_user).and_return(@user || user)
     m
   end
-  let(:variable_expander)do
-    Lti::VariableExpander.new(account, context, controller, current_user: user )
+  let(:variable_expander) do
+    Lti::VariableExpander.new(account, context, controller, current_user: user)
   end
 
   before(:each) do
@@ -173,13 +173,12 @@ describe Lti::LtiOutboundAdapter do
   end
 
   context "link_params" do
-    let(:link_params) {{ext: {lti_assignment_id: "1234"}}}
+    let(:link_params) { { ext: { lti_assignment_id: "1234" } } }
 
     it "passes through the secure_parameters when provided" do
       expect(LtiOutbound::ToolLaunch).to receive(:new) { |options| expect(options[:link_params]).to eq link_params }
-      adapter.prepare_tool_launch(return_url, variable_expander, {link_params: link_params})
+      adapter.prepare_tool_launch(return_url, variable_expander, { link_params: link_params })
     end
-
   end
 
   describe "#launch_url" do
@@ -222,12 +221,12 @@ describe Lti::LtiOutboundAdapter do
       allow(tool_launch).to receive_messages(url: "wat;no-way")
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
       adapter.prepare_tool_launch(return_url, variable_expander)
-      expect{ adapter.generate_post_payload }.to raise_error(::Lti::Errors::InvalidLaunchUrlError)
+      expect { adapter.generate_post_payload }.to raise_error(::Lti::Errors::InvalidLaunchUrlError)
     end
 
     it "does not copy query params to the post body if oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
-      tool.settings = {oauth_compliant: true}
+      tool.settings = { oauth_compliant: true }
       adapter.prepare_tool_launch(return_url, variable_expander)
       payload = adapter.generate_post_payload
       expect(payload['firstname']).to be_nil
@@ -235,7 +234,7 @@ describe Lti::LtiOutboundAdapter do
 
     it "does not copy query params to the post body if post_only is set and  oauth_compliant tool setting is enabled" do
       allow(account).to receive(:all_account_users_for).with(user).and_return([])
-      tool.settings = {oauth_compliant: true, post_only: true}
+      tool.settings = { oauth_compliant: true, post_only: true }
       adapter.prepare_tool_launch(return_url, variable_expander)
       payload = adapter.generate_post_payload
       expect(payload['firstname']).to be_nil
@@ -282,8 +281,8 @@ describe Lti::LtiOutboundAdapter do
 
     before(:each) do
       allow(LtiOutbound::ToolLaunch).to receive(:new).and_return(tool_launch)
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     end
 
     it "includes the 'ext_lti_assignment_id' parameter" do
@@ -307,7 +306,6 @@ describe Lti::LtiOutboundAdapter do
         adapter.generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)
       }.to raise_error(RuntimeError, 'Called generate_post_payload_for_assignment before calling prepare_tool_launch')
     end
-
   end
 
   describe "#generate_post_payload_for_homework_submission" do
@@ -360,8 +358,8 @@ describe Lti::LtiOutboundAdapter do
     let(:enrollment) { StudentEnrollment.create!(user: user, course: course, workflow_state: 'active') }
 
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       assignment.update!(
         external_tool_tag: ContentTag.create!(
           context: assignment,

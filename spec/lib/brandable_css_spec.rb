@@ -40,10 +40,10 @@ describe BrandableCSS do
     describe "when called with a brand config" do
       before :once do
         parent_account = Account.default
-        parent_config = BrandConfig.create(variables: {"ic-brand-primary" => "red"})
+        parent_config = BrandConfig.create(variables: { "ic-brand-primary" => "red" })
 
         subaccount_bc = BrandConfig.for(
-          variables: {"ic-brand-global-nav-bgd" => "#123"},
+          variables: { "ic-brand-global-nav-bgd" => "#123" },
           parent_md5: parent_config.md5,
           js_overrides: nil,
           css_overrides: nil,
@@ -94,7 +94,7 @@ describe BrandableCSS do
   describe "all_brand_variable_values_as_css" do
     it "defines the right default css values in the root scope" do
       expected_css = ":root {
-        #{BrandableCSS.all_brand_variable_values(nil, true).map{ |k, v| "--#{k}: #{v};"}.join("\n")}
+        #{BrandableCSS.all_brand_variable_values(nil, true).map { |k, v| "--#{k}: #{v};" }.join("\n")}
       }"
       expect(BrandableCSS.default('css')).to eq expected_css
     end
@@ -111,7 +111,6 @@ describe BrandableCSS do
       expect(brand_variables["ic-brand-primary"]).to eq "#0770A3"
       expect(brand_variables["ic-link-color"]).to eq "#0073A7"
     end
-
   end
 
   [true, false].each do |high_contrast|

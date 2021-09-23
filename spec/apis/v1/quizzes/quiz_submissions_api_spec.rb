@@ -44,7 +44,6 @@ shared_examples_for 'Quiz Submissions API Restricted Endpoints' do
 end
 
 describe Quizzes::QuizSubmissionsApiController, type: :request do
-
   module Helpers
     def enroll_student
       last_user = @teacher = @user
@@ -378,8 +377,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
         qs_json = json['quiz_submissions'][0].with_indifferent_access
 
         output_fields = [] +
-          Api::V1::QuizSubmission::QUIZ_SUBMISSION_JSON_FIELDS +
-          Api::V1::QuizSubmission::QUIZ_SUBMISSION_JSON_FIELD_METHODS
+                        Api::V1::QuizSubmission::QUIZ_SUBMISSION_JSON_FIELDS +
+                        Api::V1::QuizSubmission::QUIZ_SUBMISSION_JSON_FIELD_METHODS
 
         output_fields.each do |field|
           expect(qs_json).to have_key field
@@ -423,8 +422,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
     context 'Links' do
       it 'should include its linked user' do
         json = qs_api_show(false, {
-          :include => [ 'user' ]
-        })
+                             :include => ['user']
+                           })
 
         expect(json.key?('users')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
@@ -434,8 +433,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'should include its linked quiz' do
         json = qs_api_show(false, {
-          :include => [ 'quiz' ]
-        })
+                             :include => ['quiz']
+                           })
 
         expect(json.key?('quizzes')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
@@ -445,8 +444,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'should include its linked submission' do
         json = qs_api_show(false, {
-          :include => [ 'submission' ]
-        })
+                             :include => ['submission']
+                           })
 
         expect(json.key?('submissions')).to be_truthy
         expect(json['quiz_submissions'].size).to eq 1
@@ -456,8 +455,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
 
       it 'should include its linked user, quiz, and submission' do
         json = qs_api_show(false, {
-          :include => [ 'user', 'quiz', 'submission' ]
-        })
+                             :include => ['user', 'quiz', 'submission']
+                           })
 
         expect(json.key?('users')).to be_truthy
         expect(json.key?('quizzes')).to be_truthy
@@ -472,11 +471,11 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       end
 
       it 'should conform to the JSON-API spec when returning linked objects' do
-        includes = [ 'user', 'quiz', 'submission' ]
+        includes = ['user', 'quiz', 'submission']
 
         json = qs_api_show(false, {
-          :include => includes
-        })
+                             :include => includes
+                           })
 
         assert_jsonapi_compliance(json, 'quiz_submissions', includes)
       end
@@ -556,13 +555,14 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                 question_type: 'multiple_choice_question',
                 'answers' =>
                   [
-                    {'answer_text' => '1', 'weight' => '100'},
-                    {'answer_text' => '2'},
-                    {'answer_text' => '3'},
-                    {'answer_text' => '4'}
+                    { 'answer_text' => '1', 'weight' => '100' },
+                    { 'answer_text' => '2' },
+                    { 'answer_text' => '3' },
+                    { 'answer_text' => '4' }
                   ]
               }
-          })
+            }
+          )
           @quiz.published_at = Time.zone.now
           @quiz.workflow_state = 'available'
           @quiz.save!
@@ -591,8 +591,8 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             quiz_id: "#{@quiz.id}"
                           },
                           {},
-                          {'Accept' => 'application/vnd.api+json'},
-                          {expected_status: 400})
+                          { 'Accept' => 'application/vnd.api+json' },
+                          { expected_status: 400 })
           expect(json['status']).to eq "bad_request"
         end
 
@@ -610,7 +610,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
                             quiz_id: "#{@quiz.id}"
                           },
                           {},
-                          {'Accept' => 'application/vnd.api+json'})
+                          { 'Accept' => 'application/vnd.api+json' })
           expect(json['quiz_submissions'][0]['user_id']).to eq @student.id
         end
       end
@@ -686,19 +686,19 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       # We're gonna test with 2 questions to make sure there are no side effects
       # when we modify a single question
       @qq1 = @quiz.quiz_questions.create!({
-        question_data: multiple_choice_question_data
-      })
+                                            question_data: multiple_choice_question_data
+                                          })
 
       @qq2 = @quiz.quiz_questions.create!({
-        question_data: true_false_question_data
-      })
+                                            question_data: true_false_question_data
+                                          })
 
       @quiz.generate_quiz_data
 
       enroll_student_and_submit({
-        "question_#{@qq1.id}" => "1658", # correct, nr points: 50
-        "question_#{@qq2.id}" => "8950"  # also correct, nr points: 45
-      })
+                                  "question_#{@qq1.id}" => "1658", # correct, nr points: 50
+                                  "question_#{@qq2.id}" => "8950" # also correct, nr points: 45
+                                })
 
       @original_score = @quiz_submission.score # should be 95
     end
@@ -773,7 +773,7 @@ describe Quizzes::QuizSubmissionsApiController, type: :request do
       json = qs_api_time(false)
       expect(json).to have_key("time_left")
       expect(json).to have_key("end_at")
-      expect(json["time_left"]).to be_within(5.0).of(60*60)
+      expect(json["time_left"]).to be_within(5.0).of(60 * 60)
     end
     it "should reject a teacher other student" do
       @user = @teacher

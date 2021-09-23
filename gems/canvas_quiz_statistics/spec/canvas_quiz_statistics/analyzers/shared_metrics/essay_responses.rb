@@ -23,7 +23,7 @@ shared_examples 'essay [:responses]' do
   end
 
   it 'should not count students who have written a blank response' do
-    expect(subject.run([{ }])[:responses]).to eq(0)
+    expect(subject.run([{}])[:responses]).to eq(0)
     expect(subject.run([{ text: nil }])[:responses]).to eq(0)
     expect(subject.run([{ text: '' }])[:responses]).to eq(0)
   end

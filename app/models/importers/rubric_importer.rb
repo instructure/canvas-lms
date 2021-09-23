@@ -24,7 +24,7 @@ module Importers
     self.item_class = Rubric
 
     def self.process_migration(data, migration)
-      rubrics = data['rubrics'] ? data['rubrics']: []
+      rubrics = data['rubrics'] ? data['rubrics'] : []
       migration.outcome_to_id_map ||= {}
       rubrics.each do |rubric|
         if migration.import_object?("rubrics", rubric['migration_id'])
@@ -37,7 +37,7 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, migration, item=nil)
+    def self.import_from_migration(hash, migration, item = nil)
       context = migration.context
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:rubrics_to_import] && !hash[:rubrics_to_import][hash[:migration_id]]

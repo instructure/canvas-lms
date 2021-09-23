@@ -29,13 +29,13 @@ describe "new user tutorials" do
   end
 
   it "should be collapsed if the page is set to collapsed on the server" do
-    @user.set_preference(:new_user_tutorial_statuses, {'home' => true})
+    @user.set_preference(:new_user_tutorial_statuses, { 'home' => true })
     get "/courses/#{@course.id}/"
     expect(f('body')).not_to contain_css('.NewUserTutorialTray')
   end
 
   it "should be expanded if the page is set to not collapsed on the server" do
-    @user.set_preference(:new_user_tutorial_statuses, {'home' => false})
+    @user.set_preference(:new_user_tutorial_statuses, { 'home' => false })
     get "/courses/#{@course.id}/"
     expect(f('body')).to contain_css('.NewUserTutorialTray')
   end

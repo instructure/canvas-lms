@@ -37,7 +37,6 @@ describe "quizzes" do
   end
 
   context "as a teacher" do
-
     before(:once) do
       course_with_teacher(active_all: true)
       course_with_student(course: @course, active_enrollment: true)
@@ -174,7 +173,7 @@ describe "quizzes" do
         expect(f(".insufficient_count_warning")).to be_displayed
 
         # save and reload
-        expect_new_page_load{ f('.save_quiz_button').click }
+        expect_new_page_load { f('.save_quiz_button').click }
         quiz = @course.quizzes.last
         get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
@@ -213,7 +212,7 @@ describe "quizzes" do
         expect(f(".insufficient_count_warning")).to be_displayed
 
         # save and reload
-        expect_new_page_load{ f('.save_quiz_button').click }
+        expect_new_page_load { f('.save_quiz_button').click }
         quiz = @course.quizzes.last
         get "/courses/#{@course.id}/quizzes/#{quiz.id}/edit"
 
@@ -231,7 +230,6 @@ describe "quizzes" do
     end
 
     describe "moderation" do
-
       before :once do
         @student = user_with_pseudonym(:active_user => true, :username => 'student@example.com', :password => 'qwertyuiop')
         @course.enroll_user(@student, "StudentEnrollment", :enrollment_state => 'active')
@@ -273,14 +271,13 @@ describe "quizzes" do
         f('.moderate_student_link').click
         expect(f('#extension_extra_time')).to have_value '13'
       end
-
     end
 
     it "should validate numerical input data", priority: "1", test_id: 210066 do
       skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
-        quiz.quiz_questions.create!(:question_data => {:name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1}, :assessment_question => aq)
+        quiz.quiz_questions.create!(:question_data => { :name => "numerical", 'question_type' => 'numerical_question', 'answers' => [], :points_possible => 1 }, :assessment_question => aq)
       end
       user_session(@student)
       take_quiz do
@@ -312,13 +309,13 @@ describe "quizzes" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
-      answers = [{id: 1, answer_text: 'A', weight: 100}, {id: 2, answer_text: 'B', weight: 0}]
+      answers = [{ id: 1, answer_text: 'A', weight: 100 }, { id: 2, answer_text: 'B', weight: 0 }]
       question = q.quiz_questions.create!(:question_data => {
-          :name => "first question",
-          'question_type' => 'multiple_choice_question',
-          'answers' => answers,
-          :points_possible => 1
-      }, :assessment_question => a)
+                                            :name => "first question",
+                                            'question_type' => 'multiple_choice_question',
+                                            'answers' => answers,
+                                            :points_possible => 1
+                                          }, :assessment_question => a)
 
       q.generate_quiz_data
       q.time_limit = 10
@@ -363,14 +360,13 @@ describe "quizzes" do
     end
 
     def file_upload_submission_data
-      @quiz.reload.quiz_submissions.first.
-          submission_data["question_#{@question.id}".to_sym]
+      @quiz.reload.quiz_submissions.first
+           .submission_data["question_#{@question.id}".to_sym]
     end
 
     def file_upload_attachment
       @quiz.reload.quiz_submissions.first.attachments.first
     end
-
 
     it "works with file upload questions", priority: "1", test_id: 210071 do
       skip_if_chrome('issue with upload_attachment_answer')
@@ -378,14 +374,14 @@ describe "quizzes" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
       a = bank.assessment_questions.create!
-      answers = {'answer_0' => {'id' => 1}, 'answer_1' => {'id' => 2}}
+      answers = { 'answer_0' => { 'id' => 1 }, 'answer_1' => { 'id' => 2 } }
       @question = q.quiz_questions.create!(:question_data => {
-          :name => "first question",
-          'question_type' => 'file_upload_question',
-          'question_text' => 'file upload question maaaan',
-          'answers' => answers,
-          :points_possible => 1
-      }, :assessment_question => a)
+                                             :name => "first question",
+                                             'question_type' => 'file_upload_question',
+                                             'question_text' => 'file upload question maaaan',
+                                             'answers' => answers,
+                                             :points_possible => 1
+                                           }, :assessment_question => a)
       q.generate_quiz_data
       q.save!
       _filename, @fullpath, _data = get_file "testfile1.txt"

@@ -22,6 +22,6 @@ class FixPointsPossibleSumsInQuizzes < ActiveRecord::Migration[4.2]
 
   def up
     DataFixup::FixPointsPossibleSumsInQuizzes.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "fix_points_possible_sums:#{Shard.current.database_server.id}").run
+                                                                  strand: "fix_points_possible_sums:#{Shard.current.database_server.id}").run
   end
 end

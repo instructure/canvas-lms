@@ -70,9 +70,11 @@ module GoogleDrive
       if @uri.nil?
         raise WorkflowError, "Fetched entry contains no url, cannot download"
       end
+
       redirect_limit = 3
       loop do
         raise(ConnectionException) if redirect_limit <= 0
+
         result = client_execute(:uri => @uri)
 
         if result.status == 200
@@ -122,7 +124,8 @@ module GoogleDrive
       force_token_update
       result = client_execute(
         :api_method => drive.files.delete,
-        :parameters => { :fileId => normalize_document_id(document_id) })
+        :parameters => { :fileId => normalize_document_id(document_id) }
+      )
       if result.error? && !result.error_message.include?('File not found')
         raise ConnectionException, result.error_message
       end
@@ -134,11 +137,14 @@ module GoogleDrive
         # google drive ids are numeric, google docs are emails. if it is a google doc email just skip it
         # this is needed for legacy purposes
         next if user_id.blank? || /@/.match(user_id)
+
         result = client_execute(
           :api_method => drive.permissions.delete,
           :parameters => {
             :fileId => normalize_document_id(document_id),
-            :permissionId => user_id })
+            :permissionId => user_id
+          }
+        )
         if result.error? && !result.error_message.starts_with?("Permission not found")
           raise ConnectionException, result.error_message
         end
@@ -158,14 +164,14 @@ module GoogleDrive
       force_token_update
       users.each do |user_id|
         new_permission = drive.permissions.insert.request_schema.new({
-           :id => user_id,
-           :type => 'user',
-           :role => 'writer'
-        })
+                                                                       :id => user_id,
+                                                                       :type => 'user',
+                                                                       :role => 'writer'
+                                                                     })
         result = client_execute(
           :api_method => drive.permissions.insert,
           :body_object => new_permission,
-          :parameters => { :fileId => normalize_document_id(document_id)}
+          :parameters => { :fileId => normalize_document_id(document_id) }
         )
         if result.error?
           raise ConnectionException, result.error_message
@@ -188,6 +194,7 @@ module GoogleDrive
       unless config.is_a?(Proc)
         raise 'Config must be a Proc'
       end
+
       @config = config
     end
 
@@ -203,7 +210,7 @@ module GoogleDrive
       yield
     rescue Google::APIClient::ClientError, Google::APIClient::ServerError
       if (attempts += 1) <= @retries
-        sleep attempts ** 2
+        sleep attempts**2
         retry
       end
 
@@ -225,10 +232,11 @@ module GoogleDrive
 
     def folderize_list(documents, extensions)
       root = GoogleDrive::Folder.new('/')
-      folders = {nil => root}
+      folders = { nil => root }
 
       documents['items'].each do |doc_entry|
         next unless doc_entry['downloadUrl'] || doc_entry['exportLinks']
+
         entry = GoogleDrive::Entry.new(doc_entry, extensions)
         if folders.key?(entry.folder)
           folder = folders[entry.folder]
@@ -258,6 +266,7 @@ module GoogleDrive
     def api_client
       raise ConnectionException, "GoogleDrive is not configured" if GoogleDrive::Connection.config.nil?
       raise NoTokenError unless @refresh_token && @access_token
+
       @api_client ||= GoogleDrive::Client.create(GoogleDrive::Connection.config, @refresh_token, @access_token)
     end
 
@@ -271,7 +280,7 @@ module GoogleDrive
       file_extension = entry.extension && !entry.extension.empty? && entry.extension || 'unknown'
 
       if headers['content-disposition'] &&
-        headers['content-disposition'].match(/filename=[\"\']?[^;\"\'\.]+\.(?<file_extension>[^;\"\']+)[\"\']?/)
+         headers['content-disposition'].match(/filename=[\"\']?[^;\"\'\.]+\.(?<file_extension>[^;\"\']+)[\"\']?/)
         file_extension = Regexp.last_match[:file_extension]
       end
 

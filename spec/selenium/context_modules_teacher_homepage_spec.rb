@@ -113,7 +113,7 @@ describe "context modules" do
         mod = @course.context_modules.first
         assignment = @course.assignments.create!(title: "assignment 1")
         assignment.unpublish!
-        tag = mod.add_item({id: assignment.id, type: 'assignment'})
+        tag = mod.add_item({ id: assignment.id, type: 'assignment' })
         refresh_page
         item = f("#context_module_item_#{tag.id}")
         expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
@@ -129,7 +129,7 @@ describe "context modules" do
       it "should add a quiz to a module", priority: "1", test_id: 126719 do
         mod = @course.context_modules.first
         quiz = @course.quizzes.create!(title: "New Quiz Title")
-        mod.add_item({id: quiz.id, type: 'quiz'})
+        mod.add_item({ id: quiz.id, type: 'quiz' })
         refresh_page
         verify_persistence('New Quiz Title')
       end
@@ -137,7 +137,7 @@ describe "context modules" do
       it "should add a content page item to a module", priority: "1", test_id: 126708 do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "New Page Title")
-        mod.add_item({id: page.id, type: 'wiki_page'})
+        mod.add_item({ id: page.id, type: 'wiki_page' })
         refresh_page
         verify_persistence('New Page Title')
       end
@@ -146,7 +146,7 @@ describe "context modules" do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "PAGE 2")
         page.unpublish!
-        tag = mod.add_item({id: page.id, type: 'wiki_page'})
+        tag = mod.add_item({ id: page.id, type: 'wiki_page' })
         refresh_page
         item = f("#context_module_item_#{tag.id}")
         expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed

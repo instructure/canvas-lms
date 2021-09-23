@@ -23,14 +23,14 @@ module PGCollkeyHelper
 
     @pg_collkey_enabled = begin
       status = if ActiveRecord::Base.connection.extension(:pg_collkey)&.schema
-        begin
-          Bundler.require 'icu'
-          true
-        rescue LoadError
-          skip 'requires pg_collkey for icu to work' # rubocop:disable Specs/NoSkipWithoutTicket
-          false
-        end
-      end
+                 begin
+                   Bundler.require 'icu'
+                   true
+                 rescue LoadError
+                   skip 'requires pg_collkey for icu to work' # rubocop:disable Specs/NoSkipWithoutTicket
+                   false
+                 end
+               end
 
       status || false
     end

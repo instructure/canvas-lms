@@ -73,7 +73,7 @@ describe 'course wizard' do
 
   it "should complete 'Add Course Assignments' checklist item" do
     skip('ADMIN-3018')
-    @course.assignments.create({name: "Test Assignment"})
+    @course.assignments.create({ name: "Test Assignment" })
     go_to_checklist
     expect(completed_checklist_item('add_assignments')).to be_displayed
   end

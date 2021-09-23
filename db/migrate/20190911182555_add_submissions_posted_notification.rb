@@ -22,15 +22,17 @@ class AddSubmissionsPostedNotification < ActiveRecord::Migration[5.2]
 
   def up
     return unless Shard.current == Shard.default
+
     Canvas::MessageHelper.create_notification({
-      name: "Submissions Posted",
-      delay_for: 0,
-      category: "Grading"
-    })
+                                                name: "Submissions Posted",
+                                                delay_for: 0,
+                                                category: "Grading"
+                                              })
   end
 
   def down
     return unless Shard.current == Shard.default
+
     Notification.where(name: "Submissions Posted").delete_all
   end
 end

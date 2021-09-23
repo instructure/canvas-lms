@@ -35,7 +35,7 @@ class Login::OtpController < ApplicationController
     # if we waiting on OTP for login, but we're not yet configured, start configuring
     # OR if we're not waiting on OTP, we're configuring
     if session[:pending_otp] && !secret_key ||
-        !session[:pending_otp] && !configuring?
+       !session[:pending_otp] && !configuring?
       session[:pending_otp_secret_key] = ROTP::Base32.random
       @first_reconfiguration = true
     end
@@ -91,10 +91,10 @@ class Login::OtpController < ApplicationController
     drift = 30
     # give them 5 minutes to enter an OTP sent via SMS
     drift = 300 if session[:pending_otp_communication_channel_id] ||
-        (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
+                   (!session[:pending_otp_secret_key] && @current_user.otp_communication_channel_id)
 
     if !force_fail && ROTP::TOTP.new(secret_key).verify(verification_code, drift_behind: drift, drift_ahead: drift) ||
-      @current_user.authenticate_one_time_password(verification_code)
+       @current_user.authenticate_one_time_password(verification_code)
       if configuring?
         @current_user.one_time_passwords.scope.delete_all
         @current_user.otp_secret_key = session.delete(:pending_otp_secret_key)
@@ -108,12 +108,12 @@ class Login::OtpController < ApplicationController
         old_cookie = cookies['canvas_otp_remember_me']
         old_cookie = nil unless @current_user.validate_otp_secret_key_remember_me_cookie(old_cookie)
         cookies['canvas_otp_remember_me'] = {
-            :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
-            :expires => now + 30.days,
-            :domain => remember_me_cookie_domain,
-            :httponly => true,
-            :secure => CanvasRails::Application.config.session_options[:secure],
-            :path => '/login'
+          :value => @current_user.otp_secret_key_remember_me_cookie(now, old_cookie, request.remote_ip),
+          :expires => now + 30.days,
+          :domain => remember_me_cookie_domain,
+          :httponly => true,
+          :secure => CanvasRails::Application.config.session_options[:secure],
+          :path => '/login'
         }
       end
       if session.delete(:pending_otp)

@@ -94,7 +94,7 @@ describe ContextModule do
       course_module
       quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
       quiz.save!
-      @module.add_item({:id => quiz.id, :type => 'quiz'})
+      @module.add_item({ :id => quiz.id, :type => 'quiz' })
       assignment = @course.assignments.create!(:title => "some assignment")
       @module.add_item({ id: assignment.id, :type => 'assignment' })
       expect(@module.can_be_duplicated?).to be_falsey
@@ -105,7 +105,7 @@ describe ContextModule do
       quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
       quiz.save!
       assignment = Assignment.find(quiz.assignment_id)
-      @module.add_item({:id => assignment.id, :type => 'assignment'})
+      @module.add_item({ :id => assignment.id, :type => 'assignment' })
       expect(@module.can_be_duplicated?).to be_falsey
     end
 
@@ -114,7 +114,7 @@ describe ContextModule do
       quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
       quiz.save!
       assignment = Assignment.find(quiz.assignment_id)
-      @module.add_item({:id => assignment.id, :type => 'assignment'})
+      @module.add_item({ :id => assignment.id, :type => 'assignment' })
       @module.content_tags[0].workflow_state = 'deleted'
       expect(@module.can_be_duplicated?).to be_truthy
     end
@@ -132,16 +132,16 @@ describe ContextModule do
     assignment1 = @course.assignments.create!(:title => "assignment")
     assignment2 = @course.assignments.create!(:title => "assignment copy")
     @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
-    @module.add_item({:id => assignment1.id, :type => 'assignment'})
+    @module.add_item({ :id => assignment1.id, :type => 'assignment' })
     @module.unlock_at = Time.zone.now # doesn't matter what, just not nil
     @module.prerequisites = @module # This is silly, but just want something not nil
     quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment")
     quiz.save!
     # It is permitted to duplicate a module with a deleted quiz tag, but the deleted
     # item should not be duplicated.
-    @module.add_item({:id => quiz.id, :type => 'quiz'})
+    @module.add_item({ :id => quiz.id, :type => 'quiz' })
     @module.content_tags[2].workflow_state = 'deleted'
-    @module.add_item({:id => assignment2.id, :type => 'assignment'})
+    @module.add_item({ :id => assignment2.id, :type => 'assignment' })
 
     @module.add_item(
       :type => 'external_url',
@@ -191,7 +191,7 @@ describe ContextModule do
       @progression = @module.find_or_create_progression(@student)
       @progression.workflow_state = :unlocked # don't save
       expect(@module.available_for?(@student)).to be_falsey
-      opts = {user_context_module_progressions: {@module.id => @progression}}
+      opts = { user_context_module_progressions: { @module.id => @progression } }
       expect(@module.available_for?(@student, opts)).to be_truthy
     end
 
@@ -201,9 +201,9 @@ describe ContextModule do
       module1.save!
       module2 = @course.context_modules.create!(:name => "some module")
       url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
-        title: 'url', url: 'https://www.google.com')
-      module2.completion_requirements = [{id: url_item.id, type: 'must_view'}]
-      module2.prerequisites = [{id: module1.id, type: 'context_module', name: 'some module'}]
+                                              title: 'url', url: 'https://www.google.com')
+      module2.completion_requirements = [{ id: url_item.id, type: 'must_view' }]
+      module2.prerequisites = [{ id: module1.id, type: 'context_module', name: 'some module' }]
       module2.save!
 
       expect(module2.available_for?(@student)).to be false
@@ -240,7 +240,7 @@ describe ContextModule do
       expect(@module2.prerequisites[0][:id]).to eql(@module.id)
 
       pres = @module2.prerequisites
-      @module2.prerequisites = pres + [{:id => -1, :type => 'asdf'}]
+      @module2.prerequisites = pres + [{ :id => -1, :type => 'asdf' }]
       expect(@module2.prerequisites).to eql(pres)
     end
 
@@ -299,8 +299,8 @@ describe ContextModule do
       @module2.update_attribute(:name, "new name 2")
 
       @module3 = ContextModule.find(@module3.id)
-      expect(@module3.prerequisites).to match_array([{:id => @module.id, :type => 'context_module', :name => 'new name 1'}, {:id => @module2.id, :type => 'context_module', :name => "new name 2"}])
-      expect(@module3.active_prerequisites).to match_array([{:id => @module.id, :type => 'context_module', :name => "new name 1"}])
+      expect(@module3.prerequisites).to match_array([{ :id => @module.id, :type => 'context_module', :name => 'new name 1' }, { :id => @module2.id, :type => 'context_module', :name => "new name 2" }])
+      expect(@module3.active_prerequisites).to match_array([{ :id => @module.id, :type => 'context_module', :name => "new name 1" }])
     end
   end
 
@@ -311,32 +311,32 @@ describe ContextModule do
 
     it "should add an assignment" do
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' }) # @assignment)
 
       expect(@tag.content).to eql(@assignment)
       expect(@module.content_tags).to be_include(@tag)
     end
 
     it "should not add an invalid assignment" do
-      @tag = @module.add_item({:id => 21, :type => 'assignment'})
+      @tag = @module.add_item({ :id => 21, :type => 'assignment' })
       expect(@tag).to be_nil
     end
 
     it "prefers the linked discussion topic when a graded topic's assignment is added" do
       topic = graded_discussion_topic(context: @course)
-      tag = @module.add_item({:id => topic.assignment.id, :type => 'assignment'})
+      tag = @module.add_item({ :id => topic.assignment.id, :type => 'assignment' })
       expect(tag.content).to eql topic
     end
 
     it "prefers the linked quiz when a quiz's assignment is added" do
       quiz = quiz_model(course: @course, quiz_type: :assignment)
-      tag = @module.add_item({:id => quiz.assignment.id, :type => 'assignment'})
+      tag = @module.add_item({ :id => quiz.assignment.id, :type => 'assignment' })
       expect(tag.content).to eql quiz
     end
 
     it "should add a wiki page" do
       @page = @course.wiki_pages.create!(:title => "some page")
-      @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
+      @tag = @module.add_item({ :id => @page.id, :type => 'wiki_page' }) # @page)
 
       expect(@tag.content).to eql(@page)
       expect(@module.content_tags).to be_include(@tag)
@@ -346,13 +346,13 @@ describe ContextModule do
       @course.wiki
       other_course = Account.default.courses.create!
       @page = other_course.wiki_pages.create!(:title => "new page")
-      @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'})
+      @tag = @module.add_item({ :id => @page.id, :type => 'wiki_page' })
       expect(@tag).to be_nil
     end
 
     it "should add an attachment" do
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
-      @tag = @module.add_item({:id => @file.id, :type => 'attachment'}) #@file)
+      @tag = @module.add_item({ :id => @file.id, :type => 'attachment' }) # @file)
 
       expect(@tag.content).to eql(@file)
       expect(@module.content_tags).to be_include(@tag)
@@ -397,7 +397,7 @@ describe ContextModule do
         @course.context_external_tools.create!(
           name: 'tool', consumer_key: '1', shared_secret: '1',
           url: 'http://example.com/', developer_key: DeveloperKey.create!,
-          settings: {use_1_3: true}
+          settings: { use_1_3: true }
         )
       }
 
@@ -414,7 +414,7 @@ describe ContextModule do
       }
 
       it 'should add an external tool with resource link and custom params' do
-        @tag = @module.add_item(args.merge(custom_params: {'foo' => 'bar'}))
+        @tag = @module.add_item(args.merge(custom_params: { 'foo' => 'bar' }))
         @module.workflow_state = 'published'
         @module.save!
 
@@ -454,7 +454,7 @@ describe ContextModule do
             expect(Lti::ResourceLink).to receive(:find_or_initialize_for_context_and_lookup_uuid)
               .with(
                 context: @course, lookup_uuid: lookup_uuid,
-                custom: {'foo' => 'bar'}, context_external_tool: tool
+                custom: { 'foo' => 'bar' }, context_external_tool: tool
               ).and_call_original
             tag = @module.add_item(
               args.merge(
@@ -487,7 +487,8 @@ describe ContextModule do
     it "appends items to the end of a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool])
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one two three attach assign page quiz topic tool))
+        %w(one two three attach assign page quiz topic tool)
+      )
     end
 
     it 'appends items to the beginning of a module' do
@@ -498,7 +499,8 @@ describe ContextModule do
     it "inserts items into a module" do
       @module.insert_items([@attach, @assign, @page, @quiz, @topic, @tool], 2)
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one attach assign page quiz topic tool two three))
+        %w(one attach assign page quiz topic tool two three)
+      )
     end
 
     it "adds things to an empty module" do
@@ -516,7 +518,8 @@ describe ContextModule do
     it "doesn't add weird things to a module" do
       @module.insert_items([@attach, user_model, 'foo', @assign])
       expect(@module.content_tags.ordered.pluck(:title)).to eq(
-        %w(one two three attach assign))
+        %w(one two three attach assign)
+      )
     end
 
     it 'adds the item in the correct position when the existing items do not start at 1' do
@@ -560,7 +563,8 @@ describe ContextModule do
       @module.insert_items([@page, @assign, @quiz])
       expect(@module.content_tags.pluck(:content_type)).to eq(
         ['ContextModuleSubHeader', 'ContextModuleSubHeader', 'ContextModuleSubHeader',
-         'Assignment', 'WikiPage', 'Quizzes::Quiz'])
+         'Assignment', 'WikiPage', 'Quizzes::Quiz']
+      )
     end
   end
 
@@ -568,9 +572,9 @@ describe ContextModule do
     it "should assign completion requirements" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' }) # @assignment)
       req = {}
-      req[@tag.id] = {:type => 'must_view'}
+      req[@tag.id] = { :type => 'must_view' }
 
       @module.completion_requirements = req
 
@@ -582,9 +586,9 @@ describe ContextModule do
     it "should remove invalid requirements" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' }) # @assignment)
       req = {}
-      req[@tag.id] = {:type => 'must_view'}
+      req[@tag.id] = { :type => 'must_view' }
 
       @module.completion_requirements = req
 
@@ -592,13 +596,13 @@ describe ContextModule do
       expect(reqs[0][:id]).to eql(@tag.id)
       expect(reqs[0][:type]).to eql('must_view')
 
-      @module.completion_requirements = reqs + [{:id => -1, :type => 'asdf'}]
+      @module.completion_requirements = reqs + [{ :id => -1, :type => 'asdf' }]
       expect(@module.completion_requirements).to eql(reqs)
     end
 
     it 'should ignore invalid requirements' do
       course_module
-      @module.completion_requirements = {"none"=>"none"} # the front-end likes to pass this in...
+      @module.completion_requirements = { "none" => "none" } # the front-end likes to pass this in...
 
       expect(@module.completion_requirements).to be_empty
     end
@@ -608,8 +612,8 @@ describe ContextModule do
       @assignment = @course.assignments.create!(title: 'some assignment')
       @assignment.workflow_state = 'unpublished'
 
-      @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
-      @module.completion_requirements = { @tag.id => {type: 'must_view'} }
+      @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
+      @module.completion_requirements = { @tag.id => { type: 'must_view' } }
 
       expect(@module.completion_requirements).to eql([id: @tag.id, type: 'must_view'])
     end
@@ -622,7 +626,7 @@ describe ContextModule do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @course.enroll_student(@user).accept!
       @tag = @module.add_item(:id => @assignment.id, :type => 'assignment')
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
 
       @progression = @module.update_for(@user, :read, @tag)
       expect(@progression.requirements_met[0][:id]).to eql(@tag.id)
@@ -633,7 +637,7 @@ describe ContextModule do
       @user = User.create!(:name => "some name")
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag = @module.add_item(:id => @assignment.id, :type => 'assignment')
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @progression = @module.update_for(@user, :read, @tag)
       expect(@progression).to be_nil
     end
@@ -643,7 +647,7 @@ describe ContextModule do
       tehmod = @course.context_modules.create! :name => "teh module"
       page = @course.wiki_pages.create! :title => "view this page"
       tag = tehmod.add_item(:id => page.id, :type => 'wiki_page')
-      tehmod.completion_requirements = { tag.id => {:type => 'must_view'} }
+      tehmod.completion_requirements = { tag.id => { :type => 'must_view' } }
       tehmod.workflow_state = 'active'
       tehmod.save!
 
@@ -670,11 +674,11 @@ describe ContextModule do
       mod.save!
 
       progression = mod.update_for(@student, :contributed, tag)
-      reqs_met = progression.requirements_met.map{ |r| { id: r[:id], type: r[:type] } }
+      reqs_met = progression.requirements_met.map { |r| { id: r[:id], type: r[:type] } }
       expect(reqs_met).to eq [{ id: tag.id, type: 'must_contribute' }]
 
       progression = mod.update_for(@student, :read, tag)
-      reqs_met = progression.requirements_met.map{ |r| { id: r[:id], type: r[:type] } }
+      reqs_met = progression.requirements_met.map { |r| { id: r[:id], type: r[:type] } }
       expect(reqs_met).to eq [{ id: tag.id, type: 'must_contribute' }]
     end
   end
@@ -698,10 +702,10 @@ describe ContextModule do
       @quiz.save!
       @assignment = @course.assignments.create!(:title => "some assignment")
 
-      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-      @tag2 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90},
-                                         @tag2.id => {:type=> 'must_view'}}
+      @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+      @tag2 = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 90 },
+                                          @tag2.id => { :type => 'must_view' } }
       @module.save!
 
       @user = User.create!(:name => "some name")
@@ -713,7 +717,6 @@ describe ContextModule do
       @module.update_for(@user, :read, @tag2)
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_completed
-
     end
 
     it "should trigger completion events" do
@@ -736,7 +739,7 @@ describe ContextModule do
       @tag = @module.add_item(:id => @assignment.id, :type => 'assignment')
       expect(@tag).not_to be_nil
       @course.enroll_student(@user).accept!
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
 
       @progression = @module.evaluate_for(@user)
       expect(@progression).to be_unlocked
@@ -745,8 +748,8 @@ describe ContextModule do
     it "should create a locked progression if there are prerequisites unmet" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.save!
 
       @user = User.create!(:name => "some name")
@@ -766,8 +769,8 @@ describe ContextModule do
     it "should create an unlocked progression if prerequisites is unpublished" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.workflow_state = 'unpublished'
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user).accept!
@@ -791,17 +794,17 @@ describe ContextModule do
         @user = User.create!(:name => "some name")
         @course.enroll_student(@user).accept!
         @a1 = @course.assignments.create!(:title => "some assignment")
-        @tag1 = @module.add_item({:id => @a1.id, :type => 'assignment'})
+        @tag1 = @module.add_item({ :id => @a1.id, :type => 'assignment' })
         @module.require_sequential_progress = true
-        @module.completion_requirements = {@tag1.id => {:type => 'must_submit'}}
+        @module.completion_requirements = { @tag1.id => { :type => 'must_submit' } }
         @module.save!
         @a2 = @course.assignments.create!(:title => "locked assignment")
         expect(@a2.locked_for?(@user)).to be_falsey
-        @tag2 = @module.add_item({:id => @a2.id, :type => 'assignment'})
+        @tag2 = @module.add_item({ :id => @a2.id, :type => 'assignment' })
         expect(@a2.reload.locked_for?(@user)).to be_truthy
 
         @mod2 = @course.context_modules.create!(:name => "mod2")
-        @tag3 = @mod2.add_item({:id => @a2.id, :type => 'assignment'})
+        @tag3 = @mod2.add_item({ :id => @a2.id, :type => 'assignment' })
         # not locked, because the second tag allows access
         expect(@a2.reload.locked_for?(@user)).to be_falsey
         @mod2.prerequisites = "module_#{@module.id}"
@@ -814,8 +817,8 @@ describe ContextModule do
     it "should not be available if previous module is incomplete" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.save!
       @user = User.create!(:name => "some name")
       @course.enroll_student(@user).accept!
@@ -823,8 +826,8 @@ describe ContextModule do
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
       @assignment2 = @course.assignments.create!(:title => 'a2')
-      @tag2 = @module2.add_item({:id => @assignment2.id, :type => 'assignment'})
-      @module2.completion_requirements = {@tag2.id => {:type => 'must_view'}}
+      @tag2 = @module2.add_item({ :id => @assignment2.id, :type => 'assignment' })
+      @module2.completion_requirements = { @tag2.id => { :type => 'must_view' } }
       @module2.save!
 
       expect(@module2.prerequisites).not_to be_empty
@@ -843,8 +846,8 @@ describe ContextModule do
     it "should be available to observers" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.save!
       @student = User.create!(:name => "some name")
       @course.enroll_student(@student).accept!
@@ -852,8 +855,8 @@ describe ContextModule do
       @module2 = @course.context_modules.create!(:name => "another module")
       @module2.prerequisites = "module_#{@module.id}"
       @assignment2 = @course.assignments.create!(:title => 'a2')
-      @tag2 = @module2.add_item({:id => @assignment2.id, :type => 'assignment'})
-      @module2.completion_requirements = {@tag2.id => {:type => 'must_view'}}
+      @tag2 = @module2.add_item({ :id => @assignment2.id, :type => 'assignment' })
+      @module2.completion_requirements = { @tag2.id => { :type => 'must_view' } }
       @module2.save!
 
       expect(@module2.prerequisites).not_to be_empty
@@ -876,7 +879,7 @@ describe ContextModule do
       @module2 = @course.context_modules.create!(:name => "another module")
       @tag = @module2.add_item(:id => @assignment.id, :type => 'assignment')
       @module2.prerequisites = "module_#{@module.id}"
-      @module2.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module2.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module2.save!
 
       @progression = @module.evaluate_for(@user)
@@ -894,7 +897,7 @@ describe ContextModule do
       @module2 = @course.context_modules.create!(:name => "another module")
       @tag = @module2.add_item(:id => @assignment.id, :type => 'assignment')
       @module2.prerequisites = "module_#{@module.id}"
-      @module2.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module2.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module2.save!
       @module2.update_for(@user, :read, @tag)
 
@@ -907,9 +910,9 @@ describe ContextModule do
 
     it "should update progression status to started if submitted for a min_score" do
       course_module
-      @assignment = @course.assignments.create!(:title => "some assignment",  :submission_types => "online_text_entry")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5.0}}
+      @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_text_entry")
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 5.0 } }
       @module.save!
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
@@ -923,7 +926,7 @@ describe ContextModule do
 
       prog = @module.evaluate_for(@user)
       expect(prog).to be_started
-      incomplete_req = prog.incomplete_requirements.detect{|r| r[:id] == @tag.id}
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
       expect(incomplete_req).to be_present
       expect(incomplete_req[:score]).to be_nil
 
@@ -931,7 +934,7 @@ describe ContextModule do
 
       prog = @module.evaluate_for(@user)
       expect(prog).to be_started
-      incomplete_req = prog.incomplete_requirements.detect{|r| r[:id] == @tag.id}
+      incomplete_req = prog.incomplete_requirements.detect { |r| r[:id] == @tag.id }
       expect(incomplete_req).to be_present
       expect(incomplete_req[:score]).to eq 4
 
@@ -942,10 +945,10 @@ describe ContextModule do
     it "should update progression status on grading and view events" do
       course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
       @assignment2 = @course.assignments.create!(:title => "another assignment")
-      @tag2 = @module.add_item({:id => @assignment2.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @tag2 = @module.add_item({ :id => @assignment2.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.save!
       @teacher = User.create!(:name => "some teacher")
       @course.enroll_teacher(@teacher)
@@ -968,7 +971,7 @@ describe ContextModule do
       expect(@module2.reload.evaluate_for(@user)).to be_completed
       expect(@module.evaluate_for(@user)).to be_completed
 
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 5 } }
       @module.save!
 
       expect(@module2.evaluate_for(@user)).to be_completed
@@ -1006,14 +1009,14 @@ describe ContextModule do
       @course.enroll_teacher(@teacher)
 
       @assign = @course.assignments.create!(title: 'title', submission_types: 'online_text_entry')
-      @tag1 = @module.add_item({id: @assign.id, type: 'assignment'})
-      @tag2 = @module.add_item({id: @assign.id, type: 'assignment'})
-      @tag3 = @module.add_item({id: @assign.id, type: 'assignment'})
+      @tag1 = @module.add_item({ id: @assign.id, type: 'assignment' })
+      @tag2 = @module.add_item({ id: @assign.id, type: 'assignment' })
+      @tag3 = @module.add_item({ id: @assign.id, type: 'assignment' })
 
       @module.completion_requirements = {
-        @tag1.id => {type: 'must_mark_done'},
-        @tag2.id => {type: 'min_score', score: 5},
-        @tag3.id => {type: 'must_view'}
+        @tag1.id => { type: 'must_mark_done' },
+        @tag2.id => { type: 'min_score', score: 5 },
+        @tag3.id => { type: 'must_view' }
       }
       @module.save!
 
@@ -1035,8 +1038,8 @@ describe ContextModule do
 
       it "should not fulfill assignment must_submit requirement on manual grade" do
         @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
-        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
-        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @tag = @module.add_item({ id: @assign.id, type: 'assignment' })
+        @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
         @module.save!
 
         expect(@module.evaluate_for(@student)).to be_unlocked
@@ -1055,8 +1058,8 @@ describe ContextModule do
         @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
         @quiz.workflow_state = 'available'
         @quiz.save!
-        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+        @module.completion_requirements = { @tag.id => { :type => 'must_submit' } }
         @module.save!
 
         @quiz.assignment.grade_student(@student, :grade => "4", :grader => @teacher)
@@ -1065,8 +1068,8 @@ describe ContextModule do
 
       it "should fulfill assignment must_submit requirement on excused submission" do
         @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
-        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
-        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @tag = @module.add_item({ id: @assign.id, type: 'assignment' })
+        @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
         @module.save!
 
         expect(@module.evaluate_for(@student)).to be_unlocked
@@ -1080,8 +1083,8 @@ describe ContextModule do
         @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
         @quiz.workflow_state = 'available'
         @quiz.save!
-        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+        @module.completion_requirements = { @tag.id => { :type => 'must_submit' } }
         @module.save!
 
         @quiz.assignment.grade_student(@student, :grader => @teacher, :excuse => true)
@@ -1092,18 +1095,18 @@ describe ContextModule do
         @quiz = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :scoring_policy => 'keep_highest')
         @quiz.workflow_state = 'available'
         @quiz.save!
-        @q1 = @quiz.quiz_questions.create!(:question_data => {:name => 'question 1', :points_possible => 1,
-            'question_type' => 'multiple_choice_question',
-            'answers' => [{'answer_text' => '1', 'answer_weight' => '100'}, {'answer_text' => '2'}]})
+        @q1 = @quiz.quiz_questions.create!(:question_data => { :name => 'question 1', :points_possible => 1,
+                                                               'question_type' => 'multiple_choice_question',
+                                                               'answers' => [{ 'answer_text' => '1', 'answer_weight' => '100' }, { 'answer_text' => '2' }] })
         @quiz.generate_quiz_data(:persist => true)
-        wrong_answer = @q1.question_data[:answers].detect{|a| a[:weight] != 100 }[:id]
+        wrong_answer = @q1.question_data[:answers].detect { |a| a[:weight] != 100 }[:id]
 
-        @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-        @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+        @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+        @module.completion_requirements = { @tag.id => { :type => 'must_submit' } }
         @module.save!
 
         @sub = @quiz.generate_submission(@student)
-        @sub.submission_data = {"question_#{@q1.data[:id]}" => wrong_answer}
+        @sub.submission_data = { "question_#{@q1.data[:id]}" => wrong_answer }
         Quizzes::SubmissionGrader.new(@sub).grade_submission
         expect(@sub.score).to eq 0
         expect(@module.evaluate_for(@student)).to be_completed
@@ -1118,8 +1121,8 @@ describe ContextModule do
       course_with_student(:active_all => true, :course => @course)
       mod = @course.context_modules.create!(:name => "some module")
 
-      tag = mod.add_item({:id => topic.id, :type => 'discussion_topic'})
-      mod.completion_requirements = {tag.id => {:type => 'min_score', :min_score => 5}}
+      tag = mod.add_item({ :id => topic.id, :type => 'discussion_topic' })
+      mod.completion_requirements = { tag.id => { :type => 'min_score', :min_score => 5 } }
       mod.save!
 
       p = mod.evaluate_for(@student)
@@ -1132,7 +1135,7 @@ describe ContextModule do
       asmnt.grade_student(@student, grader: @teacher, score: 5)
 
       p = mod.evaluate_for(@student)
-      expect(p.requirements_met).to eq [{:type=>"min_score", :min_score=>5, :id=>tag.id}]
+      expect(p.requirements_met).to eq [{ :type => "min_score", :min_score => 5, :id => tag.id }]
       expect(p).to be_completed
     end
 
@@ -1140,9 +1143,9 @@ describe ContextModule do
       course_module
       student_in_course course: @course, active_all: true
       @quiz = @course.quizzes.create!(title: "some quiz")
-      @tag = @module.add_item({id: @quiz.id, type: 'quiz'})
+      @tag = @module.add_item({ id: @quiz.id, type: 'quiz' })
       @tag.publish!
-      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
       @module.save!
 
       @submission = @quiz.generate_submission(@student)
@@ -1156,8 +1159,8 @@ describe ContextModule do
       course_module
       student_in_course course: @course, active_all: true
       @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
-      @tag = @module.add_item({id: @assign.id, type: 'assignment'})
-      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @tag = @module.add_item({ id: @assign.id, type: 'assignment' })
+      @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
       @module.save!
 
       @submission = @assign.submit_homework(@student)
@@ -1180,10 +1183,10 @@ describe ContextModule do
         @assign = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
         @assign.only_visible_to_overrides = true
         @assign.save!
-        create_section_override_for_assignment(@assign, {course_section: @overriden_section})
+        create_section_override_for_assignment(@assign, { course_section: @overriden_section })
 
-        @tag = @module.add_item({id: @assign.id, type: 'assignment'})
-        @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+        @tag = @module.add_item({ id: @assign.id, type: 'assignment' })
+        @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
         @module.save!
       end
 
@@ -1206,11 +1209,11 @@ describe ContextModule do
       @module.save!
 
       @assignment = @course.assignments.create!(:title => "some assignment")
-      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @tag = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
       @assignment2 = @course.assignments.create!(:title => "another assignment")
       @tag2 = @module.add_item(:id => @assignment2.id, :type => 'assignment')
 
-      @module.completion_requirements = {@tag.id => {:type => 'must_view'}}
+      @module.completion_requirements = { @tag.id => { :type => 'must_view' } }
       @module.save!
 
       @teacher = User.create!(:name => "some teacher")
@@ -1240,7 +1243,7 @@ describe ContextModule do
       expect(@assignment.reload.locked_for?(@user)).to be_falsey
       expect(@assignment2.reload.locked_for?(@user)).to be_falsey
 
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 5}}
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 5 } }
       @module.save
       @module2.reload
       expect(@module2.evaluate_for(@user)).to be_completed
@@ -1289,8 +1292,8 @@ describe ContextModule do
       @quiz.workflow_state = 'available'
       @quiz.save!
 
-      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       @teacher = User.create!(:name => "some teacher")
@@ -1313,9 +1316,9 @@ describe ContextModule do
       @quiz.save!
       @assignment = @course.assignments.create!(:title => "some assignment")
 
-      @tag = @module.add_item({:id => @quiz.id, :type => 'quiz'})
-      @tag2 = @module.add_item({:id => @assignment.id, :type => 'assignment'})
-      @module.completion_requirements = {@tag.id => {:type => 'min_score', :min_score => 90}}
+      @tag = @module.add_item({ :id => @quiz.id, :type => 'quiz' })
+      @tag2 = @module.add_item({ :id => @assignment.id, :type => 'assignment' })
+      @module.completion_requirements = { @tag.id => { :type => 'min_score', :min_score => 90 } }
       @module.save!
 
       @teacher = User.create!(:name => "some teacher")
@@ -1375,13 +1378,13 @@ describe ContextModule do
       @quiz = @course.quizzes.build(title: "some quiz")
       @quiz.workflow_state = 'available'
       @quiz.save!
-      @tag = @module.add_item({id: @quiz.id, type: 'quiz'})
-      @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+      @tag = @module.add_item({ id: @quiz.id, type: 'quiz' })
+      @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
       @module.save!
       @submission = @quiz.generate_submission(@student)
       @submission.workflow_state = 'complete'
       @submission.save!
-      expect(@module.evaluate_for(@student).requirements_met).to be_include({id: @tag.id, type: 'must_submit'})
+      expect(@module.evaluate_for(@student).requirements_met).to be_include({ id: @tag.id, type: 'must_submit' })
     end
 
     context 'with conditional release' do
@@ -1430,14 +1433,14 @@ describe ContextModule do
       @assignment = @course.assignments.create!(title: 'some assignment')
       @assignment.workflow_state = 'unpublished'
       @assignment.save!
-      @assignment_tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+      @assignment_tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
 
       @other_assignment = @course.assignments.create!(title: 'other assignment')
-      @other_assignment_tag = @module.add_item({id: @other_assignment.id, type: 'assignment'})
+      @other_assignment_tag = @module.add_item({ id: @other_assignment.id, type: 'assignment' })
 
       @module.completion_requirements = [
-        {id: @assignment_tag.id, type: 'min_score', min_score: 90},
-        {id: @other_assignment_tag.id, type: 'min_score', min_score: 90},
+        { id: @assignment_tag.id, type: 'min_score', min_score: 90 },
+        { id: @other_assignment_tag.id, type: 'min_score', min_score: 90 },
       ]
       @module.save!
     end
@@ -1481,9 +1484,9 @@ describe ContextModule do
       @assignment = @course.assignments.create!(title: 'how many roads must a man walk down?', submission_types: 'online_text_entry')
       @assignment.only_visible_to_overrides = true
       @assignment.save!
-      create_section_override_for_assignment(@assignment, {course_section: @overriden_section})
+      create_section_override_for_assignment(@assignment, { course_section: @overriden_section })
 
-      @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
+      @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
       @module.reload
     end
 
@@ -1520,37 +1523,37 @@ describe ContextModule do
       end
       it "should filter differentiated discussions" do
         discussion_topic_model(:user => @teacher, :context => @course)
-        @discussion_assignment = @course.assignments.create!(:title => "some discussion assignment",only_visible_to_overrides: true)
+        @discussion_assignment = @course.assignments.create!(:title => "some discussion assignment", only_visible_to_overrides: true)
         @discussion_assignment.submission_types = 'discussion_topic'
         @discussion_assignment.save!
         @topic.assignment_id = @discussion_assignment.id
         @topic.save!
-        create_section_override_for_assignment(@discussion_assignment, {course_section: @overriden_section})
-        @module.add_item({id: @topic.id, type: 'discussion_topic'})
+        create_section_override_for_assignment(@discussion_assignment, { course_section: @overriden_section })
+        @module.add_item({ id: @topic.id, type: 'discussion_topic' })
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@topic)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@topic)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@topic)).to be_falsey
       end
       it "should filter differentiated pages" do
         @page_assignment = wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
-        create_section_override_for_assignment(@page_assignment, {course_section: @overriden_section})
-        @module.add_item({id: @page.id, type: 'wiki_page'})
+        create_section_override_for_assignment(@page_assignment, { course_section: @overriden_section })
+        @module.add_item({ id: @page.id, type: 'wiki_page' })
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@page)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@page)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@page)).to be_falsey
       end
       it "should filter differentiated quizzes" do
         @quiz = Quizzes::Quiz.create!({
-          context: @course,
-          description: 'descript foo',
-          only_visible_to_overrides: true,
-          points_possible: rand(1000),
-          title: "differentiated quiz title"
-        })
+                                        context: @course,
+                                        description: 'descript foo',
+                                        only_visible_to_overrides: true,
+                                        points_possible: rand(1000),
+                                        title: "differentiated quiz title"
+                                      })
         @quiz.publish
         @quiz.save!
-        create_section_override_for_quiz(@quiz, {course_section: @overriden_section})
-        @module.add_item({id: @quiz.id, type: 'quiz'})
+        create_section_override_for_quiz(@quiz, { course_section: @overriden_section })
+        @module.add_item({ id: @quiz.id, type: 'quiz' })
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@quiz)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@quiz)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@quiz)).to be_falsey
@@ -1651,8 +1654,8 @@ describe ContextModule do
 
       quiz = @course.quizzes.create!(title: "some quiz")
       quiz.publish!
-      tag = mod.add_item({id: quiz.id, type: 'quiz'})
-      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
+      tag = mod.add_item({ id: quiz.id, type: 'quiz' })
+      mod.completion_requirements = { tag.id => { type: 'must_submit' } }
       mod.save!
 
       expect(mod.relock_warning?).to be_truthy
@@ -1721,8 +1724,8 @@ describe ContextModule do
     quiz.workflow_state = 'available'
     quiz.save!
 
-    @tag = @module.add_item({id: quiz.id, type: 'quiz'})
-    @module.completion_requirements = {@tag.id => {type: 'must_submit'}}
+    @tag = @module.add_item({ id: quiz.id, type: 'quiz' })
+    @module.completion_requirements = { @tag.id => { type: 'must_submit' } }
 
     @module.save!
 
@@ -1744,13 +1747,13 @@ describe ContextModule do
     course_factory(:active_all => true)
     student_in_course(:course => @course)
     m1 = @course.context_modules.create!(:name => "m1")
-    m2 = @course.context_modules.create!(:name => "m2", :prerequisites => [{id: m1.id, type: 'context_module', name: m1.name}])
+    m2 = @course.context_modules.create!(:name => "m2", :prerequisites => [{ id: m1.id, type: 'context_module', name: m1.name }])
 
     [m1, m2].each do |m|
       assmt = @course.assignments.create!(:title => "assmt", :submission_types => "online_text_entry")
       assmt.submit_homework(@student, :body => "bloop")
-      tag = m.add_item({:id => assmt.id, :type => 'assignment'})
-      m.update_attribute(:completion_requirements, {tag.id => {:type => "must_submit"}})
+      tag = m.add_item({ :id => assmt.id, :type => 'assignment' })
+      m.update_attribute(:completion_requirements, { tag.id => { :type => "must_submit" } })
     end
 
     expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original

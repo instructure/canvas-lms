@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def planner_override_model(opts={})
+  def planner_override_model(opts = {})
     user = opts[:user] || @user || user_model
     plannable = opts[:plannable] || assignment_model
     visibility = opts.key?(:marked_complete) ? opts[:marked_complete] : false

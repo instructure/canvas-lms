@@ -33,22 +33,22 @@ shared_examples "change combos" do |change_path, spec_path|
   context "not deletion" do
     context "no spec changes" do
       include_examples "comments",
-                       [{path: change_path, status: "added"}]
+                       [{ path: change_path, status: "added" }]
     end
     context "has spec non deletions" do
       include_examples "does not comment",
-                       [{path: change_path, status: "modified"},
-                        {path: spec_path, status: "added"}]
+                       [{ path: change_path, status: "modified" },
+                        { path: spec_path, status: "added" }]
     end
     context "has spec deletions" do
       include_examples "comments",
-                       [{path: change_path, status: "added"},
-                        {path: spec_path, status: "deleted"}]
+                       [{ path: change_path, status: "added" },
+                        { path: spec_path, status: "deleted" }]
     end
   end
   context "deletion" do
     include_examples "does not comment",
-                     [{path: change_path, status: "deleted"}]
+                     [{ path: change_path, status: "deleted" }]
   end
 end
 
@@ -56,23 +56,23 @@ shared_examples "change combos with msg key" do |change_path, spec_path, msg_key
   context "not deletion" do
     context "no spec changes" do
       include_examples "comments with msg key",
-                       [{path: change_path, status: "added"}],
+                       [{ path: change_path, status: "added" }],
                        msg_key
     end
     context "has spec non deletions" do
       include_examples "does not comment",
-                       [{path: change_path, status: "modified"},
-                        {path: spec_path, status: "added"}]
+                       [{ path: change_path, status: "modified" },
+                        { path: spec_path, status: "added" }]
     end
     context "has spec deletions" do
       include_examples "comments with msg key",
-                       [{path: change_path, status: "added"},
-                        {path: spec_path, status: "deleted"}],
+                       [{ path: change_path, status: "added" },
+                        { path: spec_path, status: "deleted" }],
                        msg_key
     end
   end
   context "deletion" do
     include_examples "does not comment",
-                     [{path: change_path, status: "deleted"}]
+                     [{ path: change_path, status: "deleted" }]
   end
 end

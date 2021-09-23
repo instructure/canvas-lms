@@ -84,7 +84,6 @@ describe 'announcement permissions' do
       setup_designer_context
     end
 
-
     shared_examples 'disallow announcement view with discussions disallowed' do |context|
       before :each do
         disable_view_announcements(@course, context_role)
@@ -113,7 +112,6 @@ describe 'announcement permissions' do
     it_behaves_like 'disallow announcement view with discussions disallowed', :observer do
       setup_observer_context
     end
-
 
     shared_examples 'disallow discussion topic view with announcements allowed' do |context|
       before :each do
@@ -157,7 +155,6 @@ describe 'announcement permissions' do
       setup_designer_context
     end
 
-
     shared_examples 'disallow discussion detail view with announcements allowed' do |context|
       before :each do
         enable_view_announcements(@course, context_role)
@@ -191,7 +188,6 @@ describe 'announcement permissions' do
     end
   end
 
-
   context 'discussion created by student' do
     before :each do
       course_with_student(active_all: true, name: 'student1')
@@ -204,7 +200,6 @@ describe 'announcement permissions' do
       )
       new_announcement(@course)
     end
-
 
     shared_examples 'disallow discussion detail view with announcements allowed' do |context|
       before :each do

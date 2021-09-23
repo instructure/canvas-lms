@@ -27,7 +27,6 @@ describe "scheduler" do
   include SchedulerCommon
 
   context "as a student" do
-
     before(:once) do
       Account.default.tap do |a|
         a.settings[:show_scheduler]   = true
@@ -39,7 +38,6 @@ describe "scheduler" do
 
     before(:each) do
       user_session(@student)
-
     end
 
     def reserve_appointment_manual(n, comment = nil)
@@ -103,7 +101,7 @@ describe "scheduler" do
           # causing fragile tests in Chrome
           participant_visibility: 'protected',
           new_appointments: [
-            [ earliest_appointment_time, 1.hour.from_now ]
+            [earliest_appointment_time, 1.hour.from_now]
           ]
         )
         AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
@@ -152,7 +150,7 @@ describe "scheduler" do
         max_appointments_per_participant: 1,
         new_appointments: [
           # this can fail if run in the first 2 seconds of the month.
-          [ 2.seconds.ago, 1.second.ago ]
+          [2.seconds.ago, 1.second.ago]
         ]
       )
       AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)

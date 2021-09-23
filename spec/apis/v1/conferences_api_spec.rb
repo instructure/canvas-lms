@@ -28,6 +28,7 @@ describe "Conferences API", type: :request do
 
   def named_context_url(context, type, conf)
     raise unless type == :context_conference_url
+
     "/#{context.class.name.downcase}s/#{context.id}/conferences/#{conf.id}"
   end
 
@@ -42,49 +43,54 @@ describe "Conferences API", type: :request do
   end
 
   describe "GET list of conferences" do
-
     it "should require authorization" do
       @user = nil
-      raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
-        merge(action: 'index', course_id: @course.to_param))
+      raw_api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
+        .merge(action: 'index', course_id: @course.to_param))
       expect(response.code).to eq '401'
     end
 
     it "should list all the conferences" do
-      @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
-                                                                      :duration => 60,
-                                                                      :user => @teacher,
-                                                                      :title => "Wimba #{i}")}
+      @conferences = (1..2).map { |i|
+        @course.web_conferences.create!(:conference_type => 'Wimba',
+                                        :duration => 60,
+                                        :user => @teacher,
+                                        :title => "Wimba #{i}")
+      }
 
-      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
-        merge(action: 'index', course_id: @course.to_param))
-      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @course, @user)
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
+        .merge(action: 'index', course_id: @course.to_param))
+      expect(json).to eq api_conferences_json(@conferences.reverse.map { |c| WebConference.find(c.id) }, @course, @user)
     end
 
     it "should not list conferences for disabled plugins" do
       plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
-      @conferences = ['AdobeConnect', 'Wimba'].map {|ct| @course.web_conferences.create!(:conference_type => ct,
-                                                                                         :duration => 60,
-                                                                                         :user => @teacher,
-                                                                                         :title => ct)}
+      @conferences = ['AdobeConnect', 'Wimba'].map { |ct|
+        @course.web_conferences.create!(:conference_type => ct,
+                                        :duration => 60,
+                                        :user => @teacher,
+                                        :title => ct)
+      }
       plugin.disabled = true
       plugin.save!
-      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
-        merge(action: 'index', course_id: @course.to_param))
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
+        .merge(action: 'index', course_id: @course.to_param))
       expect(json).to eq api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
     end
 
     it "should only list conferences the user is a participant of" do
       @user = @student
-      @conferences = (1..2).map { |i| @course.web_conferences.create!(:conference_type => 'Wimba',
-                                                                      :duration => 60,
-                                                                      :user => @teacher,
-                                                                      :title => "Wimba #{i}")}
+      @conferences = (1..2).map { |i|
+        @course.web_conferences.create!(:conference_type => 'Wimba',
+                                        :duration => 60,
+                                        :user => @teacher,
+                                        :title => "Wimba #{i}")
+      }
       @conferences[0].users << @user
       @conferences[0].save!
-      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options.
-        merge(action: 'index', course_id: @course.to_param))
+      json = api_call(:get, "/api/v1/courses/#{@course.to_param}/conferences", @category_path_options
+        .merge(action: 'index', course_id: @course.to_param))
       expect(json).to eq api_conferences_json([WebConference.find(@conferences[0].id)], @course, @user)
     end
 
@@ -92,22 +98,24 @@ describe "Conferences API", type: :request do
       @user = @student
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
-      @conferences = (1..2).map { |i| @group.web_conferences.create!(:conference_type => 'Wimba',
-                                                                      :duration => 60,
-                                                                      :user => @teacher,
-                                                                      :title => "Wimba #{i}")}
-      json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options.
-        merge(action: 'index', group_id: @group.to_param))
-      expect(json).to eq api_conferences_json(@conferences.reverse.map{|c| WebConference.find(c.id)}, @group, @student)
+      @conferences = (1..2).map { |i|
+        @group.web_conferences.create!(:conference_type => 'Wimba',
+                                       :duration => 60,
+                                       :user => @teacher,
+                                       :title => "Wimba #{i}")
+      }
+      json = api_call(:get, "/api/v1/groups/#{@group.to_param}/conferences", @category_path_options
+        .merge(action: 'index', group_id: @group.to_param))
+      expect(json).to eq api_conferences_json(@conferences.reverse.map { |c| WebConference.find(c.id) }, @group, @student)
     end
   end
 
   describe "GET conferences for a user" do
-    let(:request_params) { {controller: "conferences", action: "for_user", format: "json"} }
+    let(:request_params) { { controller: "conferences", action: "for_user", format: "json" } }
 
     it "requires a valid user" do
       @user = nil
-      raw_api_call(:get, "/api/v1/conferences.json", {controller: "conferences", action: "for_user", format: "json"})
+      raw_api_call(:get, "/api/v1/conferences.json", { controller: "conferences", action: "for_user", format: "json" })
       assert_unauthorized
     end
 
@@ -169,7 +177,7 @@ describe "Conferences API", type: :request do
       end
 
       context "with state = 'live'" do
-        let(:response_json) { api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({state: "live"})) }
+        let(:response_json) { api_call_as_user(student, :get, "/api/v1/conferences.json", request_params.merge({ state: "live" })) }
         let(:conference_json_ids) { response_json["conferences"].pluck("id") }
 
         it "includes conferences that have started and not finished yet" do
@@ -206,9 +214,9 @@ describe "Conferences API", type: :request do
           future_conference.add_user(student, "attendee")
 
           expect(conference_json_ids).to match_array([
-            live_conference_with_end_time.id,
-            live_conference_with_no_end_time.id
-          ])
+                                                       live_conference_with_end_time.id,
+                                                       live_conference_with_no_end_time.id
+                                                     ])
         end
 
         it "excludes conferences that are active but started more than a day ago" do
@@ -375,11 +383,11 @@ describe "Conferences API", type: :request do
   describe "POST 'recording_ready'" do
     before do
       allow(WebConference).to receive(:plugins).and_return([
-        web_conference_plugin_mock("big_blue_button", {
-          :domain => "bbb.instructure.com",
-          :secret_dec => "secret",
-        })
-      ])
+                                                             web_conference_plugin_mock("big_blue_button", {
+                                                                                          :domain => "bbb.instructure.com",
+                                                                                          :secret_dec => "secret",
+                                                                                        })
+                                                           ])
     end
 
     let(:conference) do
@@ -401,27 +409,27 @@ describe "Conferences API", type: :request do
     end
 
     it 'should mark the recording as ready' do
-      payload = {meeting_id: conference.conference_key}
+      payload = { meeting_id: conference.conference_key }
       jwt = Canvas::Security.create_jwt(payload, nil, conference.config[:secret_dec])
-      body_params = {signed_parameters: jwt}
+      body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 202
     end
 
     it 'should error if the secret key is wrong' do
-      payload = {meeting_id: conference.conference_key}
+      payload = { meeting_id: conference.conference_key }
       jwt = Canvas::Security.create_jwt(payload, nil, "wrong_key")
-      body_params = {signed_parameters: jwt}
+      body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 401
     end
 
     it 'should error if the conference_key is wrong' do
-      payload = {meeting_id: "wrong_conference_key"}
+      payload = { meeting_id: "wrong_conference_key" }
       jwt = Canvas::Security.create_jwt(payload, nil, conference.config[:secret_dec])
-      body_params = {signed_parameters: jwt}
+      body_params = { signed_parameters: jwt }
 
       raw_api_call(:post, path, params, body_params)
       expect(response.status).to eq 422

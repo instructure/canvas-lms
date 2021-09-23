@@ -214,7 +214,7 @@ const ComposeModalContainer = props => {
         label={I18n.t('Uploading Files')}
         message={I18n.t('Please wait while we upload attachments')}
         onExited={() => sendMessage()}
-        open={props.sendingMessage && attachmentsToUpload.length}
+        open={props.sendingMessage && !!attachmentsToUpload.length}
       />
     </>
   )

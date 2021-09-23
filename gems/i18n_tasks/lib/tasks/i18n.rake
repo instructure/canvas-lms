@@ -20,7 +20,7 @@ namespace :i18n do
     puts "\nRuby..."
     require 'i18nliner/commands/check'
 
-    options = {:only => ENV['ONLY']}
+    options = { :only => ENV['ONLY'] }
     @command = I18nliner::Commands::Check.run(options)
     @command.success? or exit 1
     @translations = @command.translations
@@ -104,7 +104,7 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('config', 'locales', '*.{rb,yml}')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
-    
+
     I18n::Backend::Simple.send(:include, I18nTasks::CsvBackend)
     I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
 
@@ -141,14 +141,14 @@ namespace :i18n do
       file = "public/javascripts/translations/#{translation_name}.js"
       content = I18nTasks::Utils.dump_js(translations)
       if !File.exist?(file) || File.read(file) != content
-        File.open(file, "w"){ |f| f.write content }
+        File.open(file, "w") { |f| f.write content }
       end
     end
 
     file_translations.each do |scope, keys|
       translations = {}
       locales.each do |locale|
-        translations.update flat_translations.slice(*keys.map{ |k| k.gsub(/\A/, "#{locale}.") })
+        translations.update flat_translations.slice(*keys.map { |k| k.gsub(/\A/, "#{locale}.") })
       end
       dump_translations.call(scope, translations.expand_keys)
     end
@@ -159,7 +159,7 @@ namespace :i18n do
       h1[locale.to_s] = all_translations[locale].slice(*I18nTasks::Utils::CORE_KEYS)
       h1
     }
-    dump_translations.call('_core_en', {'en' => core_translations.delete('en')})
+    dump_translations.call('_core_en', { 'en' => core_translations.delete('en') })
     dump_translations.call('_core', core_translations)
   end
 
@@ -237,7 +237,7 @@ namespace :i18n do
         puts "Enter path or hash of previous export base (omit to export all):"
         arg = $stdin.gets.strip
         if arg.blank?
-          last_export = {:type => :none}
+          last_export = { :type => :none }
         elsif arg =~ /\A[a-f0-9]{7,}\z/
           puts "Fetching previous export..."
           ret = `git show --name-only --oneline #{arg}`
@@ -245,7 +245,7 @@ namespace :i18n do
             if ret.include?(base_filename)
               `git checkout #{arg}`
               if previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil
-                last_export = {:type => :commit, :data => previous}
+                last_export = { :type => :commit, :data => previous }
               else
                 $stderr.puts "Unable to load en.yml file"
               end
@@ -260,7 +260,7 @@ namespace :i18n do
           puts "Loading previous export..."
           if File.exist?(arg)
             if previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil
-              last_export = {:type => :file, :data => previous}
+              last_export = { :type => :file, :data => previous }
             else
               $stderr.puts "Unable to load yml file"
             end
@@ -283,12 +283,12 @@ namespace :i18n do
       puts "Exporting #{last_export[:data] ? "new/changed" : "all"} en translations..."
       current_strings = YAML.safe_load(File.read(base_filename)).flatten_keys
       new_strings = last_export[:data] ?
-        current_strings.inject({}){ |h, (k, v)|
+        current_strings.inject({}) { |h, (k, v)|
           h[k] = v unless last_export[:data][k] == v
           h
         } :
         current_strings
-      File.open(export_filename, "w"){ |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
+      File.open(export_filename, "w") { |f| f.write new_strings.expand_keys.to_yaml(line_width: -1) }
 
       push = 'n'
       begin
@@ -354,7 +354,7 @@ namespace :i18n do
         puts " [Q] quit"
         case (command = $stdin.gets.upcase.strip)
         when 'Q' then return :abort
-        when 'D' then debugger
+        when 'D' then debugger # rubocop:disable Lint/Debugger
         when 'V' then puts error_items.join("\n")
         end
       end while command != 'C'
@@ -364,7 +364,7 @@ namespace :i18n do
     next if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
+      f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
     }
   end
 
@@ -389,7 +389,7 @@ namespace :i18n do
     process = ->(node) do
       case node
       when Hash
-        node.delete_if { |k,v| process.call(v).nil? }
+        node.delete_if { |k, v| process.call(v).nil? }
       when Proc
         nil
       else
@@ -423,11 +423,11 @@ namespace :i18n do
     raise "got no translations" if complete_translations.nil?
 
     File.open("config/locales/#{import.language}.yml", "w") { |f|
-      f.write <<-HEADER
-# This YAML file is auto-generated from a Transifex import.
-# Do not edit it by hand, your changes will be overwritten.
-HEADER
-      f.write({import.language => complete_translations}.to_yaml(line_width: -1))
+      f.write <<~HEADER
+        # This YAML file is auto-generated from a Transifex import.
+        # Do not edit it by hand, your changes will be overwritten.
+      HEADER
+      f.write({ import.language => complete_translations }.to_yaml(line_width: -1))
     }
 
     puts({
@@ -471,7 +471,7 @@ HEADER
           s3_download(args[:s3_bucket], remote_lang)
         end
       File.write("tmp/#{lang}.yml", yml)
-      new_translations = {lang => YAML.load(yml)[remote_lang]}
+      new_translations = { lang => YAML.load(yml)[remote_lang] }
 
       puts "Importing #{lang}.yml"
       autoimport(source_translations, new_translations)

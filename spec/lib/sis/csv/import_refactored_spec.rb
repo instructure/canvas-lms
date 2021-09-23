@@ -21,7 +21,6 @@
 require 'spec_helper'
 
 describe SIS::CSV::ImportRefactored do
-
   before { account_model }
 
   it "should error files with unknown headers" do
@@ -75,7 +74,7 @@ describe SIS::CSV::ImportRefactored do
   it "should error files with invalid CSV way down" do
     lines = []
     lines << "xlist_course_id,section_id,status"
-    lines.concat(["ABC2119_ccutrer_2012201_xlist,26076.20122"]*100)
+    lines.concat(["ABC2119_ccutrer_2012201_xlist,26076.20122"] * 100)
     lines << "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
     importer = process_csv_data(*lines)
     expect(importer.errors.first.last).to eq "Malformed CSV"
@@ -159,12 +158,14 @@ describe SIS::CSV::ImportRefactored do
       ",U008,student,S008S,deleted,",
       ",U009,student,S005S,deleted,"
     )
-    expect {process_csv_data_cleanly(
-      "group_id,name,account_id,status",
-      "G001,Group 1,,available",
-      "G002,Group 2,,deleted",
-      "G003,Group 3,,closed"
-    )}.not_to raise_error
+    expect {
+      process_csv_data_cleanly(
+        "group_id,name,account_id,status",
+        "G001,Group 1,,available",
+        "G002,Group 2,,deleted",
+        "G003,Group 3,,closed"
+      )
+    }.not_to raise_error
   end
 
   it 'should support sis stickiness overriding' do
@@ -210,7 +211,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Thea101,Theater,A001,T001,active",
-      {:override_sis_stickiness => true}
+      { :override_sis_stickiness => true }
     )
     expect(AbstractCourse.count).to eq before_count + 1
     AbstractCourse.last.tap do |c|
@@ -259,7 +260,7 @@ describe SIS::CSV::ImportRefactored do
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
       "C001,Phys101,Physics,A001,T001,active",
-      {:add_sis_stickiness => true}
+      { :add_sis_stickiness => true }
     )
     process_csv_data_cleanly(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -389,9 +390,9 @@ describe SIS::CSV::ImportRefactored do
 
       [0, 1, 2].each do |i|
         expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
-                                                                    tags: { attempt: i, retry: false})
+                                                                          tags: { attempt: i, retry: false })
         expect(InstStatsd::Statsd).to have_received(:increment).once.with('sis_parallel_worker',
-                                                                    tags: { attempt: i, retry: true})
+                                                                          tags: { attempt: i, retry: true })
       end
     end
 
@@ -406,6 +407,7 @@ describe SIS::CSV::ImportRefactored do
     it "will attempt re-downloading corrupted csv files from s3" do
       flakey_attachment_cls = Class.new do
         attr_reader :read_count
+
         def initialize(valid_csv_string)
           @read_count = 0
           @csv_string = valid_csv_string
@@ -429,7 +431,7 @@ describe SIS::CSV::ImportRefactored do
         end
       end
       csv_string = "term_id,name,status\n" +
-        "\"T001\",\"Winter13\",active"
+                   "\"T001\",\"Winter13\",active"
       fake_attachment = flakey_attachment_cls.new(csv_string)
       input_csv = nil
       root_account = account_model

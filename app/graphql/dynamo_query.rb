@@ -87,6 +87,7 @@ class DynamoQuery
 
   def query
     return @query if defined? @query
+
     params = {
       table_name: @table,
       key_condition_expression: @key_condition_expression,

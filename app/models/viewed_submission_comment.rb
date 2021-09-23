@@ -24,7 +24,7 @@ class ViewedSubmissionComment < ActiveRecord::Base
   before_save :set_viewed_at
 
   validates :user, presence: true
-  validates :user_id, uniqueness: { scope: :submission_comment_id}
+  validates :user_id, uniqueness: { scope: :submission_comment_id }
   validates :submission_comment, presence: true
 
   def set_viewed_at

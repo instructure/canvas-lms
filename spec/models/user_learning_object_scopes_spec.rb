@@ -34,7 +34,7 @@ describe UserLearningObjectScopes do
       @course.enroll_student(@student2, :enrollment_state => 'active')
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
+      create_section_override_for_assignment(@assignment, { course_section: @section })
       @course.reload
     end
 
@@ -57,16 +57,16 @@ describe UserLearningObjectScopes do
       before do
         @observer = User.create
         @observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2,
-          :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                                                                                    :enrollment_state => 'active', :allow_multiple_enrollments => true)
       end
       context "observer watching student with visibility" do
-        before{ @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
+        before { @observer_enrollment.update_attribute(:associated_user_id, @student1.id) }
         it "should be true" do
           expect(@observer.assignments_visible_in_course(@course)).to include @assignment
         end
       end
       context "observer watching student without visibility" do
-        before{ @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
+        before { @observer_enrollment.update_attribute(:associated_user_id, @student2.id) }
         it "should be false" do
           expect(@observer.assignments_visible_in_course(@course)).not_to include @assignment
         end
@@ -85,7 +85,7 @@ describe UserLearningObjectScopes do
       assignment_quiz([], :course => @course, :user => @user)
     end
 
-    def create_assignment_with_override(opts={})
+    def create_assignment_with_override(opts = {})
       student = opts[:student] || @student
       @course.enrollments.where(user_id: student).destroy_all # student removed from default section
       section = @course.course_sections.create!
@@ -140,8 +140,8 @@ describe UserLearningObjectScopes do
         override.due_at_overridden = true
         override.save!
         DueDateCacher.recompute(@quiz.assignment)
-        expect(@student.assignments_for_student('submitting', contexts: [@course])).
-          to include @quiz.assignment
+        expect(@student.assignments_for_student('submitting', contexts: [@course]))
+          .to include @quiz.assignment
       end
 
       it "should include assignments with no locks" do
@@ -321,7 +321,7 @@ describe UserLearningObjectScopes do
 
     context "context_codes" do
       before :once do
-        @opts = {scope_only: true}
+        @opts = { scope_only: true }
         @course1 = course_with_student(active_all: true).course
         @course2 = course_with_student(active_all: true, user: @student).course
         @assignment1 = assignment_model(context: @course1, due_at: 1.day.from_now, submission_types: "online_upload")
@@ -335,7 +335,7 @@ describe UserLearningObjectScopes do
       end
 
       it "should only include assignments from given course ids" do
-        opts = @opts.merge({course_ids: [@course1.id], group_ids: []})
+        opts = @opts.merge({ course_ids: [@course1.id], group_ids: [] })
         expect(@student.assignments_for_student('submitting', **opts).order(:id)).to eq [@assignment1]
       end
     end
@@ -449,8 +449,7 @@ describe UserLearningObjectScopes do
     end
 
     context "differentiated_assignments" do
-
-      def create_ungraded_quiz_with_override(opts={})
+      def create_ungraded_quiz_with_override(opts = {})
         student = opts[:student] || @student
         @course.enrollments.where(user_id: student).destroy_all # student removed from default section
         section = @course.course_sections.create!
@@ -460,7 +459,7 @@ describe UserLearningObjectScopes do
         @quiz.only_visible_to_overrides = true
         @quiz.publish!
         if opts[:override]
-          create_section_override_for_assignment(@quiz, {course_section: section})
+          create_section_override_for_assignment(@quiz, { course_section: section })
         end
         @quiz
       end
@@ -521,9 +520,9 @@ describe UserLearningObjectScopes do
 
       add_section("section1")
       @course.enroll_user(@reviewer, 'StudentEnrollment',
-                    :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
       @course.enroll_user(@reviewee, 'StudentEnrollment',
-                    :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
       assignment_model(course: @course, peer_reviews: true)
 
@@ -552,7 +551,7 @@ describe UserLearningObjectScopes do
       # have nothing to do.
       add_section("section2")
       @course.enroll_user(@reviewer, 'StudentEnrollment',
-                      :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                          :section => @course_section, :enrollment_state => 'active', :allow_multiple_enrollments => true)
       override = @assignment.assignment_overrides.build
       override.set = @course_section
       override.save!
@@ -597,7 +596,6 @@ describe UserLearningObjectScopes do
       Timecop.travel(1.week) do
         EnrollmentState.recalculate_expired_states # runs periodically in background
         expect(@teacher.reload.assignments_needing_grading.size).to be 0
-
       end
     end
 
@@ -649,7 +647,7 @@ describe UserLearningObjectScopes do
 
       # but if we enroll the TA in both sections of course1, it should be accessible
       @course1.enroll_user(@ta, 'TaEnrollment', :enrollment_state => 'active', :section => @section1b,
-                          :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
+                                                :allow_multiple_enrollments => true, :limit_privileges_to_course_section => true)
       @ta = User.find(@ta.id)
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading(scope_only: true).to_a.size).to be 2
@@ -901,7 +899,7 @@ describe UserLearningObjectScopes do
   end
 
   describe "discussion_topics_needing_viewing" do
-    let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+    let(:opts) { { due_after: 1.day.ago, due_before: 2.days.from_now } }
 
     context 'course discussions' do
       before(:each) do
@@ -1024,7 +1022,7 @@ describe UserLearningObjectScopes do
 
       context "context_codes" do
         before :once do
-          @opts = opts.merge({scope_only: true})
+          @opts = opts.merge({ scope_only: true })
           @course1 = course_with_student(active_all: true).course
           @course2 = course_with_student(active_all: true, user: @student).course
           group_with_user(active_all: true, user: @student)
@@ -1038,8 +1036,8 @@ describe UserLearningObjectScopes do
         end
 
         it "should only include assignments from given course/group ids" do
-          expect(@student.discussion_topics_needing_viewing(**@opts.merge({course_ids: [], group_ids: []})).order(:id)).to eq []
-          opts = @opts.merge({course_ids: [@course1.id], group_ids: [@group.id]})
+          expect(@student.discussion_topics_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+          opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
           expect(@student.discussion_topics_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
         end
       end
@@ -1134,7 +1132,7 @@ describe UserLearningObjectScopes do
       @account_page = wiki_page_model(course: @group2)
     end
 
-    let(:opts) { {due_after: 1.day.ago, due_before: 2.days.from_now} }
+    let(:opts) { { due_after: 1.day.ago, due_before: 2.days.from_now } }
 
     it 'should show for wiki pages with todo dates within the opts date range' do
       @course_page.todo_date = 1.day.from_now
@@ -1226,7 +1224,7 @@ describe UserLearningObjectScopes do
 
     context "context_codes" do
       before :once do
-        @opts = opts.merge({scope_only: true})
+        @opts = opts.merge({ scope_only: true })
         @course1 = course_with_student(active_all: true).course
         @course2 = course_with_student(active_all: true, user: @student).course
         group_with_user(active_all: true, user: @student)
@@ -1240,8 +1238,8 @@ describe UserLearningObjectScopes do
       end
 
       it "should only include assignments from given course/group ids" do
-        expect(@student.wiki_pages_needing_viewing(**@opts.merge({course_ids: [], group_ids: []})).order(:id)).to eq []
-        opts = @opts.merge({course_ids: [@course1.id], group_ids: [@group.id]})
+        expect(@student.wiki_pages_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
+        opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
         expect(@student.wiki_pages_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
       end
     end

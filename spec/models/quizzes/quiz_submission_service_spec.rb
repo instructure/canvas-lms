@@ -20,11 +20,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 shared_examples_for 'Takeable Quiz Services' do
-
   it 'should deny access to locked quizzes' do
     allow(quiz).to receive(:locked_for?).and_return(true)
-    allow(quiz).to receive(:grants_right?).
-      with(anything, anything, :manage).and_return(false)
+    allow(quiz).to receive(:grants_right?)
+      .with(anything, anything, :manage).and_return(false)
 
     expect { service_action.call }.to raise_error(RequestError, /is locked/i)
   end
@@ -119,8 +118,8 @@ describe Quizzes::QuizSubmissionService do
         end
 
         it 'should work with multiple sections' do
-          active_course_section   = CourseSection.new(start_at:Time.zone.now - 3.days, end_at:Time.zone.now + 3.days, restrict_enrollments_to_section_dates:true)
-          inactive_course_section = CourseSection.new(start_at:Time.zone.now - 6.days, end_at:Time.zone.now - 3.days, restrict_enrollments_to_section_dates:true)
+          active_course_section   = CourseSection.new(start_at: Time.zone.now - 3.days, end_at: Time.zone.now + 3.days, restrict_enrollments_to_section_dates: true)
+          inactive_course_section = CourseSection.new(start_at: Time.zone.now - 6.days, end_at: Time.zone.now - 3.days, restrict_enrollments_to_section_dates: true)
 
           quiz.context = Account.default.courses.new
 
@@ -356,7 +355,7 @@ describe Quizzes::QuizSubmissionService do
         expect do
           subject.update_scores qs, qs.attempt, {
             questions: {
-              "1" => { score: [ 'adooken' ] }
+              "1" => { score: ['adooken'] }
             }
           }
         end.to raise_error(RequestError, /must be an unsigned decimal/i)

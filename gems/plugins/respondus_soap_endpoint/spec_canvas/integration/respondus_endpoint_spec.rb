@@ -56,14 +56,14 @@ describe "Respondus SOAP API", type: :request do
 
   before(:each) do
     setting = PluginSetting.where(name: 'qti_converter').new
-    setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({:enabled => 'true'})
+    setting.settings = Canvas::Plugin.find('qti_converter').default_settings.merge({ :enabled => 'true' })
     setting.save!
     setting = PluginSetting.where(name: 'respondus_soap_endpoint').new
-    setting.settings = {:enabled => 'true'}
+    setting.settings = { :enabled => 'true' }
     setting.save!
     user_with_pseudonym :active_user => true,
-      :username => "nobody@example.com",
-      :password => "asdfasdf"
+                        :username => "nobody@example.com",
+                        :password => "asdfasdf"
     @user.save!
     @course = factory_with_protected_attributes(Course, course_valid_attributes)
     @course.enroll_teacher(@user).accept
@@ -172,29 +172,29 @@ Implemented for: Canvas LMS}
   it "should reject a session created for a different user" do
     user1 = @user
     user2 = user_with_pseudonym :active_user => true,
-      :username => "nobody2@example.com",
-      :password => "test1234"
+                                :username => "nobody2@example.com",
+                                :password => "test1234"
     user2.save!
 
     status, details, context = soap_request('ValidateAuth',
-                                 'nobody@example.com', 'asdfasdf',
-                                 '',
-                                 ['Institution', ''])
+                                            'nobody@example.com', 'asdfasdf',
+                                            '',
+                                            ['Institution', ''])
     expect(status).to eq "Success"
     status, details, context = soap_request('ValidateAuth',
-                                 'nobody@example.com', 'asdfasdf',
-                                 context,
-                                 ['Institution', ''])
+                                            'nobody@example.com', 'asdfasdf',
+                                            context,
+                                            ['Institution', ''])
     expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
-                                 'nobody2@example.com', 'test1234',
-                                 '',
-                                 ['Institution', ''])
+                                             'nobody2@example.com', 'test1234',
+                                             '',
+                                             ['Institution', ''])
     expect(status).to eq "Success"
     status, details, context2 = soap_request('ValidateAuth',
-                                 'nobody2@example.com', 'test1234',
-                                 context,
-                                 ['Institution', ''])
+                                             'nobody2@example.com', 'test1234',
+                                             context,
+                                             ['Institution', ''])
     expect(status).to eq "Invalid context"
   end
 
@@ -235,7 +235,7 @@ Implemented for: Canvas LMS}
 
     # clear boxin
     data = Marshal.load(Base64.decode64(context.split('--').first))
-    expect(data['selection_state']).to eq [ @course.to_param ]
+    expect(data['selection_state']).to eq [@course.to_param]
   end
 
   it "should queue QTI quiz uploads for processing" do
@@ -259,7 +259,8 @@ Implemented for: Canvas LMS}
     status, details, context, item_id = soap_request(
       'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
       ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
-      ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
+      ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file']
+    )
     expect(status).to eq "Success"
 
     expect(item_id).to eq "xyz"
@@ -287,7 +288,8 @@ Implemented for: Canvas LMS}
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', context,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
-        ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file'])
+        ['fileName', 'import.zip'], ['fileData', 'pretend this is a zip file']
+      )
       @token = context
     end
 
@@ -295,7 +297,8 @@ Implemented for: Canvas LMS}
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
-        ['fileName', 'import.zip'], ['fileData', "\x0"])
+        ['fileName', 'import.zip'], ['fileData', "\x0"]
+      )
       expect(status).to eq "Success"
       expect(item_id).to eq 'pending'
       expect(@token).to eq context
@@ -306,7 +309,8 @@ Implemented for: Canvas LMS}
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
-        ['fileName', 'import.zip'], ['fileData', "\x0"])
+        ['fileName', 'import.zip'], ['fileData', "\x0"]
+      )
       expect(status).to eq "Success"
       expect(item_id).to eq 'xyz'
     end
@@ -318,7 +322,8 @@ Implemented for: Canvas LMS}
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
-        ['fileName', 'import.zip'], ['fileData', "\x0"])
+        ['fileName', 'import.zip'], ['fileData', "\x0"]
+      )
       expect(status).to eq "Invalid file data"
       expect(item_id).to eq nil
     end

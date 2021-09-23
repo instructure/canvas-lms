@@ -164,7 +164,7 @@ describe GroupCategory do
     it "should not remove the database row" do
       category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
-      expect{ GroupCategory.find(category.id) }.not_to raise_error
+      expect { GroupCategory.find(category.id) }.not_to raise_error
     end
 
     it "should set deleted_at upon destroy" do
@@ -187,7 +187,6 @@ describe GroupCategory do
       expect(course.groups.count).to eq 2
     end
   end
-
 
   it "can pass through selfsignup info given (enabled, restricted)" do
     @category = GroupCategory.new
@@ -301,14 +300,14 @@ describe GroupCategory do
     it "assigns leaders according to policy" do
       category = @course.group_categories.create(:name => "Group Category")
       category.update_attribute(:auto_leader, 'first')
-      (1..3).each{|n| category.groups.create(:name => "Group #{n}", :context => @course) }
+      (1..3).each { |n| category.groups.create(:name => "Group #{n}", :context => @course) }
       create_users_in_course(@course, 6)
 
       groups = category.groups.active
-      groups.each{|group| expect(group.reload.leader).to be_nil}
+      groups.each { |group| expect(group.reload.leader).to be_nil }
       potential_members = @course.users_not_in_groups(groups)
       category.distribute_members_among_groups(potential_members, groups)
-      groups.each{|group| expect(group.reload.leader).not_to be_nil}
+      groups.each { |group| expect(group.reload.leader).not_to be_nil }
     end
 
     it "should update cached due dates for affected assignments" do
@@ -367,7 +366,6 @@ describe GroupCategory do
       group2.add_user(student1)
       group1.destroy
 
-
       # group1 now has fewer students, and would be favored if it weren't
       # destroyed. make sure the unassigned student (student2) is assigned to
       # group2 instead of group1
@@ -408,7 +406,7 @@ describe GroupCategory do
     end
 
     it "should not overassign to groups" do
-      groups = (2..4).map{ |i| @category.groups.create(name: "Group #{i}", max_membership: i, context: @course)}
+      groups = (2..4).map { |i| @category.groups.create(name: "Group #{i}", max_membership: i, context: @course) }
       students = (1..10).map { |i| @course.enroll_student(user_model).user }
       memberships = @category.assign_unassigned_members
       expect(memberships.size).to be 9
@@ -428,8 +426,8 @@ describe GroupCategory do
     it "should assign unassigned users while respecting group limits in the category" do
       initial_spread = [0, 0, 0]
       result_spread = [2, 2, 2]
-      opts = {group_limit: 2,
-              expected_leftover_count: 1}
+      opts = { group_limit: 2,
+               expected_leftover_count: 1 }
       assert_random_group_assignment(@category, @course, initial_spread, result_spread, opts)
     end
 
@@ -471,7 +469,7 @@ describe GroupCategory do
 
     it "calculates correctly for a clean split" do
       # 10 "users"
-      allow(@category).to receive(:unassigned_users) {['u','u','u','u','u','u','u','u','u','u']}
+      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership
@@ -481,7 +479,7 @@ describe GroupCategory do
 
     it "rounds up for an uneven split" do
       # 11 "users"
-      allow(@category).to receive(:unassigned_users) {['u','u','u','u','u','u','u','u','u','u','u']}
+      allow(@category).to receive(:unassigned_users) { ['u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u', 'u'] }
       # groups of 5 students
       @category.create_group_member_count = 5
       @category.calculate_group_count_by_membership
@@ -543,7 +541,7 @@ describe GroupCategory do
         calc.user_count = section_counts.sum
         calc.groups = double(:count => group_count)
         dist = calc.determine_group_distribution
-        dist.sort_by{|k, v| k}.map(&:last)
+        dist.sort_by { |k, v| k }.map(&:last)
       end
 
       it "should handle small sections" do
@@ -709,10 +707,9 @@ describe GroupCategory do
     gc = GroupCategory.create!(name: 'Test3', account: new_account, sis_source_id: 1)
     expect(gc.sis_source_id).to eq('1')
   end
-
 end
 
-def assert_random_group_assignment(category, course, initial_spread, result_spread, opts={})
+def assert_random_group_assignment(category, course, initial_spread, result_spread, opts = {})
   if (group_limit = opts[:group_limit])
     category.group_limit = group_limit
     category.save!

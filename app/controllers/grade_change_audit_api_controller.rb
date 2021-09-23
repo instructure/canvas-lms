@@ -166,6 +166,7 @@ class GradeChangeAuditApiController < AuditorApiController
       course = Course.find(params[:course_id])
     rescue ActiveRecord::RecordNotFound => not_found
       return render_unauthorized_action unless admin_authorized?
+
       raise not_found
     end
 
@@ -292,6 +293,7 @@ class GradeChangeAuditApiController < AuditorApiController
       course = Course.find(params[:course_id])
     rescue ActiveRecord::RecordNotFound => not_found
       return render_unauthorized_action unless admin_authorized?
+
       raise not_found
     end
 
@@ -308,24 +310,24 @@ class GradeChangeAuditApiController < AuditorApiController
     args[:student] = course.all_users.find(params[:student_id]) if params[:student_id]
 
     url_method = if args[:assignment] && args[:grader] && args[:student]
-      :api_v1_audit_grade_change_course_assignment_grader_student_url
-    elsif args[:assignment] && args[:grader]
-      :api_v1_audit_grade_change_course_assignment_grader_url
-    elsif args[:assignment] && args[:student]
-      :api_v1_audit_grade_change_course_assignment_student_url
-    elsif args[:assignment]
-      :api_v1_audit_grade_change_course_assignment_url
-    elsif args[:grader] && args[:student]
-      :api_v1_audit_grade_change_course_grader_student_url
-    elsif args[:grader]
-      :api_v1_audit_grade_change_course_grader_url
-    elsif args[:student]
-      :api_v1_audit_grade_change_course_student_url
-    end
+                   :api_v1_audit_grade_change_course_assignment_grader_student_url
+                 elsif args[:assignment] && args[:grader]
+                   :api_v1_audit_grade_change_course_assignment_grader_url
+                 elsif args[:assignment] && args[:student]
+                   :api_v1_audit_grade_change_course_assignment_student_url
+                 elsif args[:assignment]
+                   :api_v1_audit_grade_change_course_assignment_url
+                 elsif args[:grader] && args[:student]
+                   :api_v1_audit_grade_change_course_grader_student_url
+                 elsif args[:grader]
+                   :api_v1_audit_grade_change_course_grader_url
+                 elsif args[:student]
+                   :api_v1_audit_grade_change_course_student_url
+                 end
 
     events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
 
-    route_args = restrict_to_override_grades ? args.merge({assignment: "override"}) : args
+    route_args = restrict_to_override_grades ? args.merge({ assignment: "override" }) : args
     render_events(events, send(url_method, route_args), course: course, remove_anonymous: params[:student_id].present?)
   end
 
@@ -425,10 +427,10 @@ class GradeChangeAuditApiController < AuditorApiController
 
       current_score = current_scores[key]
       event.grade_current = if current_score&.override_grade
-        current_score.override_grade
-      elsif current_score&.override_score
-        I18n.n(current_score.override_score, percentage: true)
-      end
+                              current_score.override_grade
+                            elsif current_score&.override_score
+                              I18n.n(current_score.override_score, percentage: true)
+                            end
     end
   end
 
@@ -443,8 +445,8 @@ class GradeChangeAuditApiController < AuditorApiController
         "(#{key})"
       end.join(", ")
 
-      scopes << base_score_scope.
-        where("(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{values})")
+      scopes << base_score_scope
+                .where("(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{values})")
     end
 
     events_without_grading_period = events.reject(&:in_grading_period?)
@@ -454,9 +456,9 @@ class GradeChangeAuditApiController < AuditorApiController
         "(#{key})"
       end.join(", ")
 
-      scopes << base_score_scope.
-        where(course_score: true).
-        where("(enrollments.course_id, enrollments.user_id) IN (#{values})")
+      scopes << base_score_scope
+                .where(course_score: true)
+                .where("(enrollments.course_id, enrollments.user_id) IN (#{values})")
     end
 
     scopes.reduce { |result, scope| result.union(scope) }

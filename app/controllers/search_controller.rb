@@ -29,20 +29,20 @@ class SearchController < ApplicationController
 
   def rubrics
     contexts = begin
-                 @current_user.management_contexts
-               rescue
-                 []
-               end
+      @current_user.management_contexts
+    rescue
+      []
+    end
     res = []
     contexts.each do |context|
       res += begin
-               context.rubrics
-             rescue
-               []
-             end
+        context.rubrics
+      rescue
+        []
+      end
     end
     res += Rubric.publicly_reusable.matching(params[:q])
-    res = res.select{|r| r.title.downcase.match(params[:q].downcase) }
+    res = res.select { |r| r.title.downcase.match(params[:q].downcase) }
     render :json => res
   end
 
@@ -166,10 +166,10 @@ class SearchController < ApplicationController
   #   Only return courses that allow self enrollment. Defaults to false.
   #
   def all_courses
-    @courses = Course.where(root_account_id: @domain_root_account).
-      where(indexed: true).
-      where(workflow_state: 'available').
-      order('created_at')
+    @courses = Course.where(root_account_id: @domain_root_account)
+                     .where(indexed: true)
+                     .where(workflow_state: 'available')
+                     .order('created_at')
     @search = params[:search]
     if @search.present?
       @courses = @courses.where(@courses.wildcard('name', @search.to_s))
@@ -185,7 +185,7 @@ class SearchController < ApplicationController
     pagination_args = {}
     pagination_args[:per_page] = 12 unless request.format == :json
     base_url = api_request? ? api_v1_search_all_courses_url : '/search/all_courses/'
-    ret = Api.paginate(@courses, self, base_url, pagination_args, {enhanced_return: true})
+    ret = Api.paginate(@courses, self, base_url, pagination_args, { enhanced_return: true })
     @courses = ret[:collection]
 
     if request.format == :json

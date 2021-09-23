@@ -62,6 +62,7 @@ module Factories
 
   def lti_result_submission(li_result_overrides, user, li)
     return unless li.assignment_line_item?
+
     submission = li.assignment.submissions.find_by(user: user) ||
                  graded_submission_model({ assignment: li.assignment, user: user })
     submission.update(score: li_result_overrides[:result_score]) if li_result_overrides[:result_score]

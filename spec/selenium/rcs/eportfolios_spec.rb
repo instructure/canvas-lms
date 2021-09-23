@@ -41,7 +41,7 @@ describe "eportfolios" do
 
   context "eportfolio created with user" do
     before(:each) do
-      eportfolio_model({:user => @user, :name => "student content"})
+      eportfolio_model({ :user => @user, :name => "student content" })
     end
 
     it "should start the download of ePortfolio contents", priority: "1", test_id: 115980 do
@@ -240,7 +240,7 @@ describe "eportfolios file upload" do
     @course = course_factory :active_course => true
     @course.enroll_student(@student).accept!
     @course.reload
-    eportfolio_model({:user => @user, :name => "student content"})
+    eportfolio_model({ :user => @user, :name => "student content" })
   end
 
   def test_file_upload

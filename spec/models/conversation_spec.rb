@@ -46,7 +46,7 @@ describe Conversation do
     it "should not reuse group conversations" do
       users = create_users(2, return_type: :record)
       expect(Conversation.initiate(users, false)).not_to eq(
-      Conversation.initiate(users, false)
+        Conversation.initiate(users, false)
       )
     end
 
@@ -125,7 +125,7 @@ describe Conversation do
         @shard1.activate do
           cs_cp.process_new_message([@user1, "reply2"], [@user1, @user2], [message1.id], [])
         end
-        [cp1, cp2, cs_cp].each{|p| expect(p.reload.message_count).to eq 3}
+        [cp1, cp2, cs_cp].each { |p| expect(p.reload.message_count).to eq 3 }
       end
     end
   end
@@ -133,7 +133,7 @@ describe Conversation do
   context "adding participants" do
     it "should not add participants to private conversations" do
       root_convo = Conversation.initiate([sender, recipient], true)
-      expect{ root_convo.add_participants(sender, [user_factory]) }.to raise_error("can't add participants to a private conversation")
+      expect { root_convo.add_participants(sender, [user_factory]) }.to raise_error("can't add participants to a private conversation")
     end
 
     it "should add new participants to group conversations and give them all messages" do
@@ -141,7 +141,7 @@ describe Conversation do
       root_convo.add_message(sender, 'test')
 
       new_guy = user_factory
-      expect{ root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
+      expect { root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
       expect(root_convo.participants(true).size).to eq 3
 
       convo = new_guy.conversations.first
@@ -153,10 +153,10 @@ describe Conversation do
     it "should only add participants to messages the existing user has participants on" do
       root_convo = Conversation.initiate([sender, recipient], false)
       msgs = []
-      msgs << root_convo.add_message(sender, "first message body")  <<
-              root_convo.add_message(sender, "second message body") <<
-              root_convo.add_message(sender, "third message body")  <<
-              root_convo.add_message(sender, "fourth message body")
+      msgs << root_convo.add_message(sender, "first message body") <<
+        root_convo.add_message(sender, "second message body") <<
+        root_convo.add_message(sender, "third message body")  <<
+        root_convo.add_message(sender, "fourth message body")
       sender.conversations.first.remove_messages(msgs[0])
       sender.conversations.first.delete_messages(msgs[1])
 
@@ -166,10 +166,9 @@ describe Conversation do
       expect(new_guy.conversations.first.messages.size).to eql(msgs.size - 1 + 1)
     end
 
-
     it "should not re-add existing participants to group conversations" do
       root_convo = Conversation.initiate([sender, recipient], false)
-      expect{ root_convo.add_participants(sender, [recipient]) }.not_to raise_error
+      expect { root_convo.add_participants(sender, [recipient]) }.not_to raise_error
       expect(root_convo.participants.size).to eq 2
     end
 
@@ -448,11 +447,10 @@ describe Conversation do
     end
 
     it "should broadcast conversation created", priority: "1", test_id: 193163 do
-
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
       [sender].each do |user|
-        channel = communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
+        channel = communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
 
         NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
       end
@@ -657,8 +655,8 @@ describe Conversation do
         specs_require_sharding
 
         it "should set all tags on the other shard's participants" do
-          course1 = @shard1.activate{ course_factory(:account => Account.create!, :active_all => true) }
-          course2 = @shard2.activate{ course_factory(:account => Account.create!, :active_all => true) }
+          course1 = @shard1.activate { course_factory(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate { course_factory(:account => Account.create!, :active_all => true) }
           user1 = student_in_course(:course => course1, :active_all => true).user
           user2 = student_in_course(:course => course2, :active_all => true).user
           student_in_course(:course => course2, :user => user1, :active_all => true)
@@ -1089,11 +1087,12 @@ describe Conversation do
 
   def merge_and_check(sender, source, target, source_user, target_user)
     raise "source_user and target_user must be the same" if source_user && target_user && source_user != target_user
+
     source.add_participants(sender, [source_user]) if source_user
     target.add_participants(sender, [target_user]) if target_user
     target_user = source_user || target_user
-    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => source}).count }
-    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => target}).count }
+    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => source }).count }
+    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => target }).count }
 
     source.merge_into(target)
 

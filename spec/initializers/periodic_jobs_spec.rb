@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path('../sharding_spec_helper', File.dirname( __FILE__ ))
+require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
 
 describe 'PeriodicJobs' do
   describe ".with_each_shard_by_database_in_region" do
     class FakeJob
-      def self.some_method_to_run(arg1="other arg")
+      def self.some_method_to_run(arg1 = "other arg")
         # no-op
       end
     end
@@ -36,7 +36,7 @@ describe 'PeriodicJobs' do
 
     it "inserts jobs WITH jitter" do
       expect(Delayed::Job.count).to eq(0)
-      PeriodicJobs.with_each_shard_by_database_in_region(FakeJob, :some_method_to_run,  "SOME ARGUMENT", jitter: 2.hours)
+      PeriodicJobs.with_each_shard_by_database_in_region(FakeJob, :some_method_to_run, "SOME ARGUMENT", jitter: 2.hours)
       expect(Delayed::Job.count > 0).to eq(true)
       expect(Delayed::Job.last.run_at > Time.zone.now).to eq(true)
     end

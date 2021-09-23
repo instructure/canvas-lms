@@ -35,7 +35,7 @@ describe CanvasCache::Redis do
     end
 
     it "is true when it finds a config" do
-      allow(ConfigFile).to receive(:load).with('redis').and_return({some: :data})
+      allow(ConfigFile).to receive(:load).with('redis').and_return({ some: :data })
       expect(CanvasCache::Redis).to be_enabled
     end
 
@@ -55,7 +55,7 @@ describe CanvasCache::Redis do
       skip("redis required to test") unless CanvasCache::Redis.enabled?
     end
 
-    let(:redis_client){ CanvasCache::Redis.redis }
+    let(:redis_client) { CanvasCache::Redis.redis }
 
     it "doesn't marshall" do
       redis_client.set('test', 1)
@@ -217,7 +217,6 @@ describe CanvasCache::Redis do
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
           expect(redis_client.set('my_key', 5, nx: true)).to eq nil
         end
-
       end
     end
 
@@ -236,7 +235,7 @@ describe CanvasCache::Redis do
         expect(message["message"]).to eq("redis_request")
         expect(message["command"]).to eq("set")
         expect(message["key"]).to eq("mykey")
-        expect(message["request_size"]).to eq((key+val).size)
+        expect(message["request_size"]).to eq((key + val).size)
         expect(message["response_size"]).to eq(2) # "OK"
         expect(message["host"]).not_to be_nil
         expect(message["request_time_ms"]).to be_a(Float)
@@ -358,12 +357,12 @@ describe CanvasCache::Redis do
         expect(Rails.logger).to receive(:error) do |message|
           messages << message
         end.at_least(:once)
-        CanvasCache::Redis.handle_redis_failure({'failure'=>'val'}, 'local_fake_redis') do
+        CanvasCache::Redis.handle_redis_failure({ 'failure' => 'val' }, 'local_fake_redis') do
           raise ::Redis::InheritedError, "intentional failure"
         end
         # we don't log the second message under spring, cause reasons; we only
         # care about the primary message anyway
-        msgs = messages.select{|m| m =~ /Query failure/ }
+        msgs = messages.select { |m| m =~ /Query failure/ }
         expect(msgs.length).to eq(1)
         m = msgs.first
         expect(m).to match(/\[REDIS\] Query failure/)

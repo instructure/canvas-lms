@@ -44,12 +44,12 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
         due_at: Time.zone.now + 1000,
         points_possible: "1.5",
         submission_types: 'external_tool',
-        external_tool_tag_attributes: {url: tool.url}
+        external_tool_tag_attributes: { url: tool.url }
       }
     )
   end
 
-  let(:source_id) {gen_source_id}
+  let(:source_id) { gen_source_id }
 
   def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
     tool.shard.activate do
@@ -225,6 +225,7 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
           ).to eq(
             url_grades.map do |x|
               next if x[:url].blank?
+
               [x[:url], assignment.points_possible * x[:grade], (assignment.points_possible * x[:grade]).to_s]
             end.compact
           )

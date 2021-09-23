@@ -23,13 +23,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 
 describe Auditors::FeatureFlag do
   let(:request_id) { 42 }
-  let(:feature_name){ 'root_account_feature'}
+  let(:feature_name) { 'root_account_feature' }
 
   before(:each) do
     allow(Feature).to receive(:definitions).and_return({
-      feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
-    })
-    allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+                                                         feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
+                                                       })
+    allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
     @flag = Account.site_admin.feature_flags.build
     @flag.feature = feature_name
     @flag.state = 'on'
@@ -50,7 +50,7 @@ describe Auditors::FeatureFlag do
     include_examples "cassandra audit logs"
 
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
       @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
     end
 
@@ -60,8 +60,8 @@ describe Auditors::FeatureFlag do
       end
 
       it "should include event for feature_flag index" do
-        expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(:per_page => 10)).
-          to include(@event)
+        expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(:per_page => 10))
+          .to include(@event)
       end
 
       it "should set request_id" do
@@ -79,14 +79,14 @@ describe Auditors::FeatureFlag do
 
   describe "with dual writing enabled" do
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
       @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
     end
 
     it "writes to cassandra" do
       expect(Audits.write_to_cassandra?).to eq(true)
-      expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(per_page: 10)).
-        to include(@event)
+      expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(per_page: 10))
+        .to include(@event)
     end
 
     it "writes to postgres" do
@@ -98,7 +98,7 @@ describe Auditors::FeatureFlag do
 
   describe "with postgres backend" do
     before do
-      allow(Audits).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['active_record'], 'read_path' => 'active_record' })
       @event = Auditors::FeatureFlag.record(@flag, @user, 'off')
     end
 
@@ -109,7 +109,7 @@ describe Auditors::FeatureFlag do
     end
 
     it "does not swallow auditor write errors" do
-      test_err_class = Class.new(StandardError){ }
+      test_err_class = Class.new(StandardError) {}
       allow(Auditors::ActiveRecord::FeatureFlagRecord).to receive(:create_from_event_stream!).and_raise(test_err_class.new("DB Error"))
       expect { Auditors::FeatureFlag.record(@flag, @user, 'on') }.to raise_error(test_err_class)
     end

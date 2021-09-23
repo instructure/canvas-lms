@@ -36,7 +36,7 @@ class Auditors::FeatureFlag
     # but there would be no reason to put that on the object-that's-being-deleted.
     # the "post_state" argument here lets the caller specify an explicit state
     # if they need to.
-    def self.generate(feature_flag, user, previous_state, post_state=nil)
+    def self.generate(feature_flag, user, previous_state, post_state = nil)
       new(
         'feature_flag' => feature_flag,
         'user' => user,
@@ -107,13 +107,13 @@ class Auditors::FeatureFlag
 
     add_index :feature_flag do
       table :feature_flag_changes_by_feature_flag
-      entry_proc lambda{ |record| record.feature_flag }
-      key_proc lambda{ |feature_flag| feature_flag.global_id }
+      entry_proc lambda { |record| record.feature_flag }
+      key_proc lambda { |feature_flag| feature_flag.global_id }
       ar_scope_proc lambda { |feature_flag| auth_ar_type.where(feature_flag_id: feature_flag.id) }
     end
   end
 
-  def self.for_feature_flag(feature_flag, options={})
+  def self.for_feature_flag(feature_flag, options = {})
     feature_flag.shard.activate do
       Auditors::FeatureFlag::Stream.for_feature_flag(feature_flag, Audits.read_stream_options(options))
     end
@@ -126,8 +126,8 @@ class Auditors::FeatureFlag
     post_state ||= feature_flag.state
     feature_flag.shard.activate do
       event_record = Auditors::FeatureFlag::Record.generate(feature_flag, user, previous_state, post_state)
-      Auditors::FeatureFlag::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
-      Auditors::FeatureFlag::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
+      Auditors::FeatureFlag::Stream.insert(event_record, { backend_strategy: :cassandra }) if Audits.write_to_cassandra?
+      Auditors::FeatureFlag::Stream.insert(event_record, { backend_strategy: :active_record }) if Audits.write_to_postgres?
     end
     event_record
   end

@@ -39,7 +39,7 @@ module LoggingFilter
   end
 
   def self.filter_params(params)
-    params.each do |k,v|
+    params.each do |k, v|
       params[k] = "[FILTERED]" if all_filtered_parameters.include?(k.to_s.downcase)
       params[k] = filter_params(v) if v.is_a? Hash
     end

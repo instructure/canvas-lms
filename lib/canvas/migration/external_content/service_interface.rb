@@ -55,6 +55,7 @@ module Canvas::Migration::ExternalContent
         }
         methods.each do |method_name, arity|
           raise "external content service needs to implement #{method_name}" unless service.respond_to?(method_name)
+
           m = service.method(method_name)
           raise "method #{method_name} should accept #{arity} argument(s)" unless m.arity == arity
         end

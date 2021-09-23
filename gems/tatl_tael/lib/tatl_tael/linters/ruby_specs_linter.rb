@@ -17,6 +17,7 @@ module TatlTael
 
       def comment_msg
         return unless missing_ruby_specs?
+
         if selenium_specs?
           config[:messages][:ruby_changes_with_only_selenium]
         else

@@ -91,14 +91,14 @@ describe Api::V1::GradebookHistory do
     end
 
     it 'has a top level key for each day represented' do
-      dates = @days.map{|d| d[:date] }
+      dates = @days.map { |d| d[:date] }
       expect(dates.size).to eq 2
       expect(dates).to include(now.to_date.as_json)
       expect(dates).to include(24.hours.ago.in_time_zone.to_date.as_json)
     end
 
     it 'has a hash of graders for each day keyed by id' do
-      graders_hash = @days.find{|d| d[:date] == yesterday.to_date.as_json }[:graders]
+      graders_hash = @days.find { |d| d[:date] == yesterday.to_date.as_json }[:graders]
       grader = graders_hash.first
       expect(grader[:id]).to eq @grader2.id
       expect(grader[:name]).to eq @grader2.name
@@ -120,7 +120,6 @@ describe Api::V1::GradebookHistory do
       days = harness.days_json(course, api_context)
       expect(days.map { |d| d[:date] }.first).to eq yesterday.to_date.as_json
     end
-
   end
 
   describe '#json_for_date' do
@@ -145,33 +144,33 @@ describe Api::V1::GradebookHistory do
     end
 
     it 'includes assignment data' do
-      assignment_hash = @day_hash.find{|g| g[:id] == @grader1.id}[:assignments].first
+      assignment_hash = @day_hash.find { |g| g[:id] == @grader1.id }[:assignments].first
       expect(assignment_hash['id']).to eq @assignment.id
       expect(assignment_hash['name']).to eq @assignment.title
     end
 
     it 'returns a grader hash for that day' do
-      expect(@day_hash.map{|g| g[:id] }.sort).to eq [@grader1.id, @grader2.id].sort
+      expect(@day_hash.map { |g| g[:id] }.sort).to eq [@grader1.id, @grader2.id].sort
     end
   end
 
   describe '#versions_json' do
-      let(:grader) { User.create!(:name => 'grader') }
-      let(:student) { User.create! }
-      let(:assignment) { course.assignments.create!(:title => "some assignment") }
-      let(:versions) { [Version.create!(versionable: submission, model: submission)] }
-      let(:harness) {  GradebookHistoryHarness.new }
-      let(:submission) do
-        s = assignment.submit_homework(student)
-        s.update(graded_at: now, score: 90, grade: '90', grader: grader)
-        s
-      end
-      let(:course) do
-        c = Course.create!
-        c.enroll_student(student)
-        c.enroll_teacher(grader)
-        c
-      end
+    let(:grader) { User.create!(:name => 'grader') }
+    let(:student) { User.create! }
+    let(:assignment) { course.assignments.create!(:title => "some assignment") }
+    let(:versions) { [Version.create!(versionable: submission, model: submission)] }
+    let(:harness) {  GradebookHistoryHarness.new }
+    let(:submission) do
+      s = assignment.submit_homework(student)
+      s.update(graded_at: now, score: 90, grade: '90', grader: grader)
+      s
+    end
+    let(:course) do
+      c = Course.create!
+      c.enroll_student(student)
+      c.enroll_teacher(grader)
+      c
+    end
 
     it "does preloads originality reports" do
       submission.reload
@@ -296,12 +295,10 @@ describe Api::V1::GradebookHistory do
         expect(gradebook_history.submissions_set(course, api_context, :date => 3.days.ago.in_time_zone)).to be_empty
         expect(gradebook_history.submissions_set(course, api_context, :date => Time.now.in_time_zone)).not_to be_empty
       end
-
     end
 
     it 'does not include ungraded submissions' do
       expect(submissions).not_to include(@submission)
     end
   end
-
 end

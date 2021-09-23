@@ -190,7 +190,6 @@ module K5ScheduleTabPageObject
 
   #----------------------- Actions & Methods -------------------------
 
-
   #----------------------- Click Items -------------------------------
 
   def click_close_calendar_event_modal
@@ -231,7 +230,6 @@ module K5ScheduleTabPageObject
 
   #------------------------------Retrieve Text----------------------#
 
-
   #----------------------------Element Management---------------------#
 
   def calendar_modal_exists?
@@ -262,7 +260,7 @@ module K5ScheduleTabPageObject
   #------------------------Helper Methods------------------------#
 
   def beginning_weekday_calculation(current_date)
-      (current_date.beginning_of_week(:sunday)).strftime("%B %-d")
+    (current_date.beginning_of_week(:sunday)).strftime("%B %-d")
   end
 
   def ending_weekday_calculation(current_date)

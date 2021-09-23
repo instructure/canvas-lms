@@ -58,6 +58,7 @@ module CanvasCache
       # We're sharing redis connections between CanvasCache::Redis.redis and Rails.cache,
       # so don't call disconnect on the cache too.
       return if Rails.cache.respond_to?(:redis) && @redis == Rails.cache.redis
+
       @redis = nil
     end
 
@@ -167,7 +168,7 @@ module CanvasCache
       InstStatsd::Statsd.increment("redis.errors.all")
       InstStatsd::Statsd.increment("redis.errors.#{InstStatsd::Statsd.escape(redis_name)}",
                                    short_stat: 'redis.errors',
-                                   tags: {redis_name: InstStatsd::Statsd.escape(redis_name)})
+                                   tags: { redis_name: InstStatsd::Statsd.escape(redis_name) })
       Rails.logger.error "Failure handling redis command on #{redis_name}: #{e.inspect}"
 
       settings_store.skip_cache do
@@ -224,7 +225,7 @@ module CanvasCache
                         ["0", []]
                       when 'del'
                         0
-        end
+                      end
 
         if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
           failure_val = :failure
@@ -265,13 +266,13 @@ module CanvasCache
         }
         unless NON_KEY_COMMANDS.include?(command)
           message[:key] = if command == :mset
-            # This is an array with a single element: an array alternating key/values
-            request.first { |v| v.first }.select.with_index { |_,i| (i) % 2 == 0 }
-          elsif command == :mget
-            request
-          else
-            request.first
-          end
+                            # This is an array with a single element: an array alternating key/values
+                            request.first { |v| v.first }.select.with_index { |_, i| (i) % 2 == 0 }
+                          elsif command == :mget
+                            request
+                          else
+                            request.first
+                          end
         end
         if defined?(Marginalia)
           message[:controller] = Marginalia::Comment.controller
@@ -382,7 +383,7 @@ module CanvasCache
     end
 
     module Distributed
-      def initialize(addresses, options = { })
+      def initialize(addresses, options = {})
         options[:ring] ||= CanvasCache::HashRing.new([], options[:replicas], options[:digest])
         super
       end

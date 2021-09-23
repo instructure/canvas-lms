@@ -30,10 +30,10 @@ describe "assignments" do
       @student2 = student_in_course.user
 
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: false,
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
 
       @assignment.assign_peer_review(@student1, @student2)
       @assignment.assign_peer_review(@student2, @student1)
@@ -57,11 +57,11 @@ describe "assignments" do
       gc = GroupCategory.create(:name => "Inconceivable", :context => @course)
       @course.groups.create!(:group_category => gc)
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: true,
-        group_category_id: gc.id
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: true,
+                                       group_category_id: gc.id
+                                     })
 
       submission = @assignment.submit_homework(student)
       submission.submission_type = "online_text_entry"
@@ -80,7 +80,7 @@ describe "assignments" do
         student_in_course(:user => @student1, :active_all => true)
         @student2 = student_in_course(:active_all => true).user
 
-        @assignment = assignment_model({course: @course, peer_reviews: true, automatic_peer_reviews: false})
+        @assignment = assignment_model({ course: @course, peer_reviews: true, automatic_peer_reviews: false })
       end
 
       before :each do
@@ -127,10 +127,10 @@ describe "assignments" do
       @student = student_in_course.user
 
       @assignment = assignment_model({
-        course: @course,
-        peer_reviews: true,
-        automatic_peer_reviews: false,
-      })
+                                       course: @course,
+                                       peer_reviews: true,
+                                       automatic_peer_reviews: false,
+                                     })
       rubric_association_model(purpose: 'grading', association_object: @assignment)
       @assignment.assign_peer_review(@admin, @student)
 
@@ -154,60 +154,60 @@ describe "assignments" do
     let!(:reviewer) { student_in_course(active_all: true).user }
     let!(:assignment) {
       @assignment = assignment_model({
-        course: review_course,
-        peer_reviews: true,
-        anonymous_peer_reviews: true
-      })
+                                       course: review_course,
+                                       peer_reviews: true,
+                                       anonymous_peer_reviews: true
+                                     })
       @assignment.unmute!
       @assignment
     }
     let!(:submission) {
       submission_model({
-        assignment: assignment,
-        body: 'submission body',
-        course: review_course,
-        grade: "5",
-        score: "5",
-        submission_type: 'online_text_entry',
-        user: reviewed
-      })
+                         assignment: assignment,
+                         body: 'submission body',
+                         course: review_course,
+                         grade: "5",
+                         score: "5",
+                         submission_type: 'online_text_entry',
+                         user: reviewed
+                       })
     }
     let!(:submissionReviewer) {
       submission_model({
-        assignment: assignment,
-        body: 'submission body reviewer',
-        course: review_course,
-        grade: "5",
-        score: "5",
-        submission_type: 'online_text_entry',
-        user: reviewer
-      })
+                         assignment: assignment,
+                         body: 'submission body reviewer',
+                         course: review_course,
+                         grade: "5",
+                         score: "5",
+                         submission_type: 'online_text_entry',
+                         user: reviewer
+                       })
     }
     let!(:comment) {
       submission_comment_model({
-        author: reviewer,
-        submission: submission
-      })
+                                 author: reviewer,
+                                 submission: submission
+                               })
     }
     let!(:rubric) { rubric_model }
     let!(:association) {
       rubric.associate_with(assignment, review_course, {
-        :purpose => 'grading', :use_for_grading => true
-      })
+                              :purpose => 'grading', :use_for_grading => true
+                            })
     }
     let!(:assessment) {
       association.assess({
-        :user => reviewed,
-        :assessor => reviewer,
-        :artifact => submission,
-        :assessment => {
-          :assessment_type => 'peer_review',
-          :criterion_crit1 => {
-            :points => 5,
-            :comments => "Hey, it's a comment."
-          }
-        }
-      })
+                           :user => reviewed,
+                           :assessor => reviewer,
+                           :artifact => submission,
+                           :assessment => {
+                             :assessment_type => 'peer_review',
+                             :criterion_crit1 => {
+                               :points => 5,
+                               :comments => "Hey, it's a comment."
+                             }
+                           }
+                         })
     }
     before(:each) { assignment.assign_peer_review(reviewer, reviewed) }
 

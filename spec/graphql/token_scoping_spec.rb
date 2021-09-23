@@ -46,7 +46,7 @@ describe "GraphQL Token Scoping" do
 
   it "does not allow mutations with a scoped developer key" do
     token = AccessToken.create!(developer_key: scoped_developer_key)
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher, access_token: token})
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher, access_token: token })
       mutation {
         createAssignment(input: {courseId: "#{@course.id}", name: "asdf"}) {
           assignment { id }

@@ -65,7 +65,7 @@ end
 describe 'Course Grading Periods Inheritance' do
   include_examples 'in-process server selenium tests'
 
-  let(:title) {'hi'}
+  let(:title) { 'hi' }
   let(:start_date) { format_date_for_view(3.months.from_now) }
   let(:end_date) { format_date_for_view(4.months.from_now - 1.day) }
 

@@ -69,7 +69,7 @@ module ConditionalRelease
         end
 
         # _attributes to play nice with nested attributes
-        model_params[ "#{name}_attributes"] = collection_params
+        model_params["#{name}_attributes"] = collection_params
         model_params
       end
     end

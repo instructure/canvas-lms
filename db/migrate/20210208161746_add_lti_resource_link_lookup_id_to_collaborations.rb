@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with
 
-class AddLtiResourceLinkLookupIdToCollaborations< ActiveRecord::Migration[5.2]
+class AddLtiResourceLinkLookupIdToCollaborations < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def change

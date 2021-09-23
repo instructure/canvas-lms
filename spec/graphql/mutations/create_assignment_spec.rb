@@ -90,7 +90,7 @@ describe Mutations::CreateAssignment do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -103,10 +103,10 @@ describe Mutations::CreateAssignment do
     ["position", :position, 1, 2, 2],
     ["pointsPossible", :points_possible, nil, 100, 100],
     ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
-    ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', [ "docs", "blah" ]],
+    ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', ["docs", "blah"]],
     ["allowedAttempts", :allowed_attempts, nil, 10, 10],
     ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
-    ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', [ "discussion_topic", "not_graded" ], "discussion_topic,not_graded"],
+    ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', ["discussion_topic", "not_graded"], "discussion_topic,not_graded"],
     ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
     ["omitFromFinalGrade", :omit_from_final_grade, false, true, true],
     ["anonymousInstructorAnnotations", :anonymous_instructor_annotations, false, true, true],
@@ -262,7 +262,7 @@ describe Mutations::CreateAssignment do
 
     student_override = assignment.assignment_overrides.where(set_type: 'ADHOC').first
     expect(student_override.assignment_override_students.pluck(:user_id)).to include @student.id
-    expect(student_override.due_at). to eq due1
+    expect(student_override.due_at).to eq due1
 
     group_override = assignment.assignment_overrides.where(set_type: 'Group').first
     expect(group_override.set_id).to eq group.id
@@ -309,5 +309,4 @@ describe Mutations::CreateAssignment do
     expect(errors).to_not be_nil
     expect(errors[0]['message']).to include 'invalid course'
   end
-
 end

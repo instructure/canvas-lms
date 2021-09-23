@@ -229,7 +229,7 @@ class AccountNotificationsController < ApplicationController
         end
       end
 
-      @notification.account_notification_roles.build(roles.map{|role| {:role => role}})
+      @notification.account_notification_roles.build(roles.map { |role| { :role => role } })
     end
     respond_to do |format|
       if @notification.save
@@ -292,8 +292,8 @@ class AccountNotificationsController < ApplicationController
   def update
     account_notification = @account.announcements.find(params[:id])
     if account_notification
-      notification_params = params.require(:account_notification).
-        permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+      notification_params = params.require(:account_notification)
+                                  .permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
       account_notification.attributes = notification_params
 
       if value_to_boolean(notification_params[:send_message])
@@ -304,8 +304,8 @@ class AccountNotificationsController < ApplicationController
       requested_roles = roles_to_add(params[:account_notification_roles])
       new_roles = requested_roles - existing_roles
       remove_roles = existing_roles - requested_roles
-      remove_roles_ids = remove_roles.map {|r| r.try(:id)}
-      account_notification.account_notification_roles.create!(new_roles.map{|r| {role: r}})
+      remove_roles_ids = remove_roles.map { |r| r.try(:id) }
+      account_notification.account_notification_roles.create!(new_roles.map { |r| { role: r } })
       account_notification.account_notification_roles.where(role_id: remove_roles_ids).destroy_all if remove_roles.any?
       updated = account_notification.save
       respond_to do |format|
@@ -323,7 +323,7 @@ class AccountNotificationsController < ApplicationController
       respond_to do |format|
         flash[:error] = t("Announcement not found")
         format.html { redirect_to account_settings_path(@account, :anchor => 'tab-announcements') }
-        format.json { render :json => {:message => "announcement not found"} }
+        format.json { render :json => { :message => "announcement not found" } }
       end
     end
   end
@@ -339,6 +339,7 @@ class AccountNotificationsController < ApplicationController
   end
 
   protected
+
   def check_user_param
     raise ActiveRecord::RecordNotFound unless api_find(User, params[:user_id]) == @current_user
   end
@@ -351,6 +352,7 @@ class AccountNotificationsController < ApplicationController
   def roles_to_add(role_params)
     roles = []
     return roles unless role_params
+
     role_params.each do |role_param|
       if role_param.nil? || role_param.to_s == "NilEnrollment"
         roles << nil
@@ -364,7 +366,7 @@ class AccountNotificationsController < ApplicationController
   end
 
   def account_notification_params
-    params.require(:account_notification).
-      permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
+    params.require(:account_notification)
+          .permit(:subject, :icon, :message, :start_at, :end_at, :required_account_service, :months_in_display_cycle, :domain_specific, :send_message)
   end
 end

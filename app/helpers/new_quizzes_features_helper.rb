@@ -46,6 +46,6 @@ module NewQuizzesFeaturesHelper
   end
 
   def new_quizzes_require_migration?(context = @context)
-      context.root_account.feature_enabled?(:require_migration_to_new_quizzes)
+    context.root_account.feature_enabled?(:require_migration_to_new_quizzes)
   end
 end

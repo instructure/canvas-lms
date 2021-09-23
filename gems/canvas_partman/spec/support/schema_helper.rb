@@ -19,7 +19,7 @@
 
 module CanvasPartmanTest::SchemaHelper
   class << self
-    def create_table(table_name, opts={}, &block)
+    def create_table(table_name, opts = {}, &block)
       ActiveRecord::Migration.create_table table_name, opts, &block
     end
 
@@ -27,7 +27,7 @@ module CanvasPartmanTest::SchemaHelper
       ActiveRecord::Base.connection.table_exists?(table_name)
     end
 
-    def drop_table(table_name, opts={})
+    def drop_table(table_name, opts = {})
       if self.table_exists?(table_name)
         # `drop_table` doesn't really accept any options, so cascade must be
         # done manually.

@@ -18,12 +18,12 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "activesupport", ">= 3.2"
 
-  spec.add_dependency "mail", "~> 2.7.0"
-  spec.add_dependency "html_text_helper"
-  spec.add_dependency "utf8_cleaner"
-  spec.add_dependency "inst_statsd"
   spec.add_dependency "aws-sdk-s3"
   spec.add_dependency "aws-sdk-sqs"
+  spec.add_dependency "html_text_helper"
+  spec.add_dependency "inst_statsd"
+  spec.add_dependency "mail", "~> 2.7.0"
+  spec.add_dependency "utf8_cleaner"
 
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "byebug"

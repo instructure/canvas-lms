@@ -48,11 +48,13 @@ module DrDiff
 
     def files
       return outstanding_change_files if run_on_outstanding
+
       change_files
     end
 
     def diff
       return outstanding_change_diff if run_on_outstanding
+
       change_diff
     end
 

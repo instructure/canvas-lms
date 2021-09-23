@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::GroupMembershipImporter do
-
   before { account_model }
 
   before do
@@ -42,7 +41,8 @@ describe SIS::CSV::GroupMembershipImporter do
       "group_id,user_id,status",
       ",U001,accepted",
       "G001,,accepted",
-      "G001,U001,bogus")
+      "G001,U001,bogus"
+    )
     expect(GroupMembership.count).to eq 0
     expect(importer.errors.map(&:last)).to eq(
       ["No group_id given for a group user",
@@ -55,7 +55,8 @@ describe SIS::CSV::GroupMembershipImporter do
     process_csv_data_cleanly(
       "group_id,user_id,status",
       "G001,U001,accepted",
-      "G001,U003,deleted")
+      "G001,U003,deleted"
+    )
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
@@ -64,7 +65,8 @@ describe SIS::CSV::GroupMembershipImporter do
     process_csv_data_cleanly(
       "group_id,user_id,status",
       "G001,U001,deleted",
-      "G001,U003,deleted")
+      "G001,U003,deleted"
+    )
     ms = GroupMembership.order(:id).to_a
     expect(ms.map(&:user_id)).to eq [@user1.id, @user3.id]
     expect(ms.map(&:group_id)).to eq [@group.id, @group.id]
@@ -76,7 +78,8 @@ describe SIS::CSV::GroupMembershipImporter do
     group_model(context: course, sis_source_id: "G002")
     importer = process_csv_data(
       "group_id,user_id,status",
-      "G002,U001,accepted")
+      "G002,U001,accepted"
+    )
     expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
   end
 
@@ -86,7 +89,8 @@ describe SIS::CSV::GroupMembershipImporter do
     g.group_memberships.create!(user: @user1, workflow_state: 'deleted')
     importer = process_csv_data_cleanly(
       "group_id,user_id,status",
-      "G002,U001,accepted")
+      "G002,U001,accepted"
+    )
     expect(importer.errors).to eq []
   end
 

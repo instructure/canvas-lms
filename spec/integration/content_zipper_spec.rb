@@ -115,7 +115,7 @@ describe ContentZipper do
       end
       section = @course.course_sections.create!
       @course.enroll_user(@teacher, 'TeacherEnrollment', :section => section,
-        :enrollment_state => 'active', :allow_multiple_enrollments => true)
+                                                         :enrollment_state => 'active', :allow_multiple_enrollments => true)
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att1 = json_parse['attachment']['id']

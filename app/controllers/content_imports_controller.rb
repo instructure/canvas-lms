@@ -77,11 +77,10 @@ class ContentImportsController < ApplicationController
       raise ActiveRecord::RecordNotFound unless cm
 
       respond_to do |format|
-        format.json { render :json => copy_status_json(cm, @context, @current_user, session)}
+        format.json { render :json => copy_status_json(cm, @context, @current_user, session) }
       end
     end
   end
-
 
   # @API Copy course content
   #
@@ -112,15 +111,15 @@ class ContentImportsController < ApplicationController
     if authorized_action(@context, @current_user, :manage_content)
       if api_request?
         @source_course = api_find(Course, params[:source_course])
-        copy_params = {:everything => false}
+        copy_params = { :everything => false }
         if params[:only] && params[:except]
-          render :json => {"errors"=>t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.')}, :status => :bad_request
+          render :json => { "errors" => t('errors.no_only_and_except', 'You can not use "only" and "except" options at the same time.') }, :status => :bad_request
           return
         elsif params[:only]
-          convert_to_table_name(params[:only]).each {|o| copy_params["all_#{o}".to_sym] = true}
+          convert_to_table_name(params[:only]).each { |o| copy_params["all_#{o}".to_sym] = true }
         elsif params[:except]
-          COPY_TYPES.each {|o| copy_params["all_#{o}".to_sym] = true}
-          convert_to_table_name(params[:except]).each {|o| copy_params["all_#{o}".to_sym] = false}
+          COPY_TYPES.each { |o| copy_params["all_#{o}".to_sym] = true }
+          convert_to_table_name(params[:except]).each { |o| copy_params["all_#{o}".to_sym] = false }
         else
           copy_params[:everything] = true
         end
@@ -132,6 +131,7 @@ class ContentImportsController < ApplicationController
 
       # make sure the user can copy from the source course
       return render_unauthorized_action unless @source_course.grants_all_rights?(@current_user, :read, :read_as_admin)
+
       cm = ContentMigration.create!(:context => @context,
                                     :user => @current_user,
                                     :source_course => @source_course,
@@ -161,15 +161,14 @@ class ContentImportsController < ApplicationController
   end
 
   SELECTION_CONVERSIONS = {
-          "external_tools" => "context_external_tools",
-          "files" => "attachments",
-          "topics" => "discussion_topics",
-          "modules" => "context_modules",
-          "outcomes" => "learning_outcomes"
+    "external_tools" => "context_external_tools",
+    "files" => "attachments",
+    "topics" => "discussion_topics",
+    "modules" => "context_modules",
+    "outcomes" => "learning_outcomes"
   }.freeze
   # convert types selected in API to expected format
   def convert_to_table_name(selections)
-    selections.map{|s| SELECTION_CONVERSIONS[s] || s}
+    selections.map { |s| SELECTION_CONVERSIONS[s] || s }
   end
-
 end

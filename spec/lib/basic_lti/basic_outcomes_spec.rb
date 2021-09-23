@@ -47,17 +47,17 @@ describe BasicLTI::BasicOutcomes do
   let(:assignment) do
     @course.assignments.create!(
       {
-          title: "value for title",
-          description: "value for description",
-          due_at: Time.now,
-          points_possible: "1.5",
-          submission_types: 'external_tool',
-          external_tool_tag_attributes: {url: tool.url}
+        title: "value for title",
+        description: "value for description",
+        due_at: Time.now,
+        points_possible: "1.5",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: { url: tool.url }
       }
     )
   end
 
-  let(:source_id) {gen_source_id}
+  let(:source_id) { gen_source_id }
 
   def gen_source_id(t: tool, c: @course, a: assignment, u: @user)
     tool.shard.activate do
@@ -100,7 +100,6 @@ describe BasicLTI::BasicOutcomes do
 
   context "Exceptions" do
     it "BasicLTI::BasicOutcomes::Unauthorized should have 401 status" do
-
       begin
         raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid signature"
       rescue BasicLTI::BasicOutcomes::Unauthorized => e
@@ -109,7 +108,6 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it "BasicLTI::BasicOutcomes::InvalidRequest should have 415 status" do
-
       begin
         raise BasicLTI::BasicOutcomes::InvalidRequest, "Invalid request"
       rescue BasicLTI::BasicOutcomes::InvalidRequest => e
@@ -124,65 +122,65 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it 'throws Invalid sourcedid if sourcedid is nil' do
-      expect{described_class.decode_source_id(tool, nil)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
+      expect { described_class.decode_source_id(tool, nil) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
     end
 
     it 'throws Invalid sourcedid if sourcedid is empty' do
-      expect{described_class.decode_source_id(tool, "")}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
+      expect { described_class.decode_source_id(tool, "") }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
     end
 
     it 'throws Invalid signature if the signature is invalid' do
       bad_signature = source_id.split('-')[0..3].join('-') + '-asb9dksld9k3'
-      expect{described_class.decode_source_id(tool, bad_signature)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid signature')
+      expect { described_class.decode_source_id(tool, bad_signature) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid signature')
     end
 
     it "throws 'Tool is invalid' if the tool doesn't match" do
-      t = @course.context_external_tools.
-        create(:name => "b", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
-      expect{described_class.decode_source_id(tool, gen_source_id(t: t))}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Tool is invalid')
+      t = @course.context_external_tools
+                 .create(:name => "b", :url => "http://google.com", :consumer_key => '12345', :shared_secret => 'secret')
+      expect { described_class.decode_source_id(tool, gen_source_id(t: t)) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Tool is invalid')
     end
 
     it "throws Course is invalid if the course doesn't match" do
       @course.workflow_state = 'deleted'
       @course.save!
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Course is invalid')
     end
 
     it "throws User is no longer in course isuser enrollment is missing" do
       @user.enrollments.destroy_all
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'User is no longer in course')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'User is no longer in course')
     end
 
     it "throws Assignment is invalid if the Addignment doesn't match" do
       assignment.destroy
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is invalid')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is invalid')
     end
 
     it "throws Assignment is no longer associated with this tool if tool is deleted" do
       tool.destroy
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
     end
 
     it "throws Assignment is no longer associated with this tool if tool doesn't match the url" do
       tag = assignment.external_tool_tag
       tag.url = 'example.com'
       tag.save!
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
     end
 
     it "throws Assignment is no longer associated with this tool if tag is missing" do
       assignment.external_tool_tag.delete
-      expect{described_class.decode_source_id(tool, source_id)}.
-        to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
+      expect { described_class.decode_source_id(tool, source_id) }
+        .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Assignment is no longer associated with this tool')
     end
 
     context "jwt sourcedid" do
@@ -204,10 +202,9 @@ describe BasicLTI::BasicOutcomes do
 
       it 'throws invalid JWT if token is unrecognized' do
         missing_signature = source_id.split('-')[0..3].join('-')
-        expect{described_class.decode_source_id(tool, missing_signature)}.
-          to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
+        expect { described_class.decode_source_id(tool, missing_signature) }
+          .to raise_error(BasicLTI::Errors::InvalidSourceId, 'Invalid sourcedid')
       end
-
     end
   end
 
@@ -257,8 +254,8 @@ describe BasicLTI::BasicOutcomes do
         xml.css('resultData').remove
         xml.css('replaceResultRequest').each do |node|
           node.replace(Nokogiri::XML::DocumentFragment.parse(
-            "<deleteResultRequest>#{xml.css('replaceResultRequest').inner_html}</deleteResultRequest>"
-          ))
+                         "<deleteResultRequest>#{xml.css('replaceResultRequest').inner_html}</deleteResultRequest>"
+                       ))
         end
         request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
@@ -273,8 +270,8 @@ describe BasicLTI::BasicOutcomes do
         xml.css('resultData').remove
         xml.css('replaceResultRequest').each do |node|
           node.replace(Nokogiri::XML::DocumentFragment.parse(
-            "<readResultRequest>#{xml.css('replaceResultRequest').inner_html}</readResultRequest>"
-          ))
+                         "<readResultRequest>#{xml.css('replaceResultRequest').inner_html}</readResultRequest>"
+                       ))
         end
         request = BasicLTI::BasicOutcomes.process_request(tool, xml)
 
@@ -321,7 +318,7 @@ describe BasicLTI::BasicOutcomes do
     end
 
     it 'handles tools that have a url mismatch with the assignment' do
-      assignment.external_tool_tag_attributes = {url: 'http://example.com/foo'}
+      assignment.external_tool_tag_attributes = { url: 'http://example.com/foo' }
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
@@ -478,13 +475,13 @@ describe BasicLTI::BasicOutcomes do
       let(:assignment) do
         @course.assignments.create!(
           {
-              title: "Quizzes.next Quiz",
-              description: "value for description",
-              due_at: Time.zone.now,
-              points_possible: "1.5",
-              submission_types: 'external_tool',
-              grading_type: "letter_grade",
-              external_tool_tag_attributes: {url: tool.url}
+            title: "Quizzes.next Quiz",
+            description: "value for description",
+            due_at: Time.zone.now,
+            points_possible: "1.5",
+            submission_types: 'external_tool',
+            grading_type: "letter_grade",
+            external_tool_tag_attributes: { url: tool.url }
           }
         )
       end
@@ -505,8 +502,8 @@ describe BasicLTI::BasicOutcomes do
     context "submissions" do
       it "creates a new submissions if there isn't one" do
         xml.css('resultData').remove
-        expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
-          to change{assignment.submissions.not_placeholder.where(user_id: @user.id).count}.from(0).to(1)
+        expect { BasicLTI::BasicOutcomes.process_request(tool, xml) }
+          .to change { assignment.submissions.not_placeholder.where(user_id: @user.id).count }.from(0).to(1)
       end
 
       it 'creates a new submission of type "external_tool" when a grade is passed back without a submission' do
@@ -521,7 +518,8 @@ describe BasicLTI::BasicOutcomes do
           {
             grade: "92%",
             grader_id: -1
-          }).first
+          }
+        ).first
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq 'external_tool'
@@ -534,7 +532,8 @@ describe BasicLTI::BasicOutcomes do
             submission_type: "online_text_entry",
             body: "sample text",
             grade: "92%"
-          })
+          }
+        )
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.versions.count).to eq 2
       end
@@ -546,7 +545,8 @@ describe BasicLTI::BasicOutcomes do
             submission_type: "online_text_entry",
             body: "sample text",
             grade: "92%"
-          })
+          }
+        )
         xml.css('resultScore').remove
         xml.at_css('text').replace('<url>http://example.com/launch</url>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -560,7 +560,8 @@ describe BasicLTI::BasicOutcomes do
             submission_type: "online_text_entry",
             body: "sample text",
             grade: "92%"
-          })
+          }
+        )
         xml.css('resultScore').remove
         xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -574,7 +575,8 @@ describe BasicLTI::BasicOutcomes do
             submission_type: "online_text_entry",
             body: "sample text",
             grade: "92%"
-          })
+          }
+        )
         xml.css('resultScore').remove
         xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
         BasicLTI::BasicOutcomes.process_request(tool, xml)
@@ -594,7 +596,8 @@ describe BasicLTI::BasicOutcomes do
             submission_type: submission_type,
             body: "sample text",
             grade: "92%"
-          })
+          }
+        )
         xml.css('resultData').remove
         BasicLTI::BasicOutcomes.process_request(tool, xml)
         expect(submission.reload.submission_type).to eq submission_type
@@ -603,13 +606,13 @@ describe BasicLTI::BasicOutcomes do
 
     context 'sharding' do
       specs_require_sharding
-      let(:source_id) {gen_source_id(u: @user1)}
+      let(:source_id) { gen_source_id(u: @user1) }
 
       it 'should succeed with cross-sharded users' do
         @shard1.activate do
           @root = Account.create
           @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
-                                              username: 'other_shard@example.com', sis_user_id: 'other_shard')
+                                               username: 'other_shard@example.com', sis_user_id: 'other_shard')
         end
         @course.enroll_student(@user1)
         xml.css('resultData').remove
@@ -680,7 +683,7 @@ describe BasicLTI::BasicOutcomes do
       xml.at_css('text').replace('<documentName>face.doc</documentName><downloadUrl>http://example.com/download</downloadUrl>')
       BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(Delayed::Job.strand_size('file_download/example.com')).to be > 0
-      stub_request(:get, 'http://example.com/download').to_return({status: 500}, {status: 200, body: 'file body'})
+      stub_request(:get, 'http://example.com/download').to_return({ status: 500 }, { status: 200, body: 'file body' })
       run_jobs
       expect(Delayed::Job.strand_size('file_download/example.com/failed')).to be > 0
       Timecop.freeze(6.seconds.from_now) do
@@ -713,8 +716,8 @@ describe BasicLTI::BasicOutcomes do
 
       context "when quizzes_next_submission_history is off" do
         before do
-          allow(tool.context.root_account).to receive(:feature_enabled?).
-            with(:quizzes_next_submission_history).and_return(false)
+          allow(tool.context.root_account).to receive(:feature_enabled?)
+            .with(:quizzes_next_submission_history).and_return(false)
         end
 
         it "uses BasicLTI::BasicOutcomes::LtiResponse object" do

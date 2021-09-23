@@ -325,9 +325,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
-                    @assignment
-                  )
+            @course,
+            @assignment
+          )
         end
       end
 
@@ -363,9 +363,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-                    @course,
-                    @announcement
-                  )
+            @course,
+            @announcement
+          )
         end
       end
 
@@ -383,9 +383,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-                    @course,
-                    @discussion
-                  )
+            @course,
+            @discussion
+          )
         end
       end
 
@@ -437,9 +437,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
-                    @assignment
-                  )
+            @course,
+            @assignment
+          )
         end
       end
 
@@ -474,9 +474,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
-                    @assignment
-                  )
+            @course,
+            @assignment
+          )
         end
       end
 
@@ -495,9 +495,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
-                    @assignment
-                  )
+            @course,
+            @assignment
+          )
         end
       end
 
@@ -516,9 +516,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
-                    @assignment
-                  )
+            @course,
+            @assignment
+          )
         end
       end
 
@@ -613,9 +613,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
           in_frame rce_page_body_ifr_id do
             expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-                      @course,
-                      @discussion
-                    )
+              @course,
+              @discussion
+            )
           end
         end
       end
@@ -1521,7 +1521,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           click_questions_tab
           click_new_question_button
           create_essay_question
-          expect_new_page_load{ f('.save_quiz_button').click }
+          expect_new_page_load { f('.save_quiz_button').click }
           open_quiz_show_page
           expect_new_page_load { f('#preview_quiz_button').click }
           switch_to_html_view

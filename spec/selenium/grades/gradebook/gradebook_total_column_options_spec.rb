@@ -40,6 +40,7 @@ describe "Gradebook - total column menu options" do
     def should_show_points(*expected_points)
       ff(".slick-row .slick-cell:nth-child(5)").each do |total|
         raise Error "Total text is missing." unless total.text
+
         total.text.strip!
         expect(total.text).to include("#{expected_points.shift}") unless total.text.length < 1
       end

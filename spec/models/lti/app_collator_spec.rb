@@ -27,9 +27,9 @@ module Lti
   describe AppCollator do
     include LtiSpecHelper
 
-    subject { described_class.new(account, mock_reregistration_url_builder)}
+    subject { described_class.new(account, mock_reregistration_url_builder) }
     let(:account) { Account.create }
-    let(:mock_reregistration_url_builder) { -> (_c, _id) {"mock_url"} }
+    let(:mock_reregistration_url_builder) { ->(_c, _id) { "mock_url" } }
 
     context 'pagination' do
       it 'paginates correctly' do
@@ -50,7 +50,6 @@ module Lti
     end
 
     describe "#app_definitions" do
-
       it 'returns tool_proxy app definitions' do
         tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
@@ -72,7 +71,6 @@ module Lti
                                    reregistration_url: nil,
                                    lti_version: '2.0'
                                  })
-
       end
 
       it 'returns an external tool app definition' do
@@ -83,21 +81,21 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                    app_type: external_tool.class.name,
-                                    app_id: external_tool.id,
-                                    :context => external_tool.context_type,
-                                    :context_id => account.id,
-                                    name: external_tool.name,
-                                    description: external_tool.description,
-                                    installed_locally: true,
-                                    has_update: nil,
-                                    enabled: true,
-                                    tool_configuration: nil,
-                                    reregistration_url: nil,
-                                    lti_version: '1.1',
-                                    deployment_id: external_tool.deployment_id,
-                                    editor_button_settings: external_tool.settings[:editor_button]
-                                  })
+                                   app_type: external_tool.class.name,
+                                   app_id: external_tool.id,
+                                   :context => external_tool.context_type,
+                                   :context_id => account.id,
+                                   name: external_tool.name,
+                                   description: external_tool.description,
+                                   installed_locally: true,
+                                   has_update: nil,
+                                   enabled: true,
+                                   tool_configuration: nil,
+                                   reregistration_url: nil,
+                                   lti_version: '1.1',
+                                   deployment_id: external_tool.deployment_id,
+                                   editor_button_settings: external_tool.settings[:editor_button]
+                                 })
       end
 
       it 'returns an external tool app definition as 1.3 tool' do
@@ -110,21 +108,21 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                    app_type: external_tool.class.name,
-                                    app_id: external_tool.id,
-                                    :context => external_tool.context_type,
-                                    :context_id => account.id,
-                                    name: external_tool.name,
-                                    description: external_tool.description,
-                                    installed_locally: true,
-                                    has_update: nil,
-                                    enabled: true,
-                                    tool_configuration: nil,
-                                    reregistration_url: nil,
-                                    lti_version: '1.3',
-                                    deployment_id: external_tool.deployment_id,
-                                    editor_button_settings: external_tool.settings[:editor_button]
-                                  })
+                                   app_type: external_tool.class.name,
+                                   app_id: external_tool.id,
+                                   :context => external_tool.context_type,
+                                   :context_id => account.id,
+                                   name: external_tool.name,
+                                   description: external_tool.description,
+                                   installed_locally: true,
+                                   has_update: nil,
+                                   enabled: true,
+                                   tool_configuration: nil,
+                                   reregistration_url: nil,
+                                   lti_version: '1.3',
+                                   deployment_id: external_tool.deployment_id,
+                                   editor_button_settings: external_tool.settings[:editor_button]
+                                 })
       end
 
       it 'returns an external tool and a tool proxy' do
@@ -182,18 +180,18 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                     app_type: tool_proxy.class.name,
-                                     :context => tool_proxy.context_type,
-                                     :context_id => account.id,
-                                     app_id: tool_proxy.id,
-                                     name: tool_proxy.name,
-                                     description: tool_proxy.description,
-                                     installed_locally: true,
-                                     has_update: false,
-                                     enabled: true,
-                                     tool_configuration: nil,
-                                     reregistration_url: nil,
-                                     lti_version: '2.0'
+                                   app_type: tool_proxy.class.name,
+                                   :context => tool_proxy.context_type,
+                                   :context_id => account.id,
+                                   app_id: tool_proxy.id,
+                                   name: tool_proxy.name,
+                                   description: tool_proxy.description,
+                                   installed_locally: true,
+                                   has_update: false,
+                                   enabled: true,
+                                   tool_configuration: nil,
+                                   reregistration_url: nil,
+                                   lti_version: '2.0'
                                  })
       end
 
@@ -202,7 +200,7 @@ module Lti
 
         tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
-        tool_proxy.update_payload = {one: 2}
+        tool_proxy.update_payload = { one: 2 }
         tool_proxy.save!
 
         tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
@@ -210,18 +208,18 @@ module Lti
         expect(definitions.count).to eq 1
         definition = definitions.first
         expect(definition).to eq({
-                                     app_type: tool_proxy.class.name,
-                                     :context => tool_proxy.context_type,
-                                     :context_id => account.id,
-                                     app_id: tool_proxy.id,
-                                     name: tool_proxy.name,
-                                     description: tool_proxy.description,
-                                     installed_locally: true,
-                                     has_update: true,
-                                     enabled: true,
-                                     tool_configuration: nil,
-                                     reregistration_url: nil,
-                                     lti_version: '2.0'
+                                   app_type: tool_proxy.class.name,
+                                   :context => tool_proxy.context_type,
+                                   :context_id => account.id,
+                                   app_id: tool_proxy.id,
+                                   name: tool_proxy.name,
+                                   description: tool_proxy.description,
+                                   installed_locally: true,
+                                   has_update: true,
+                                   enabled: true,
+                                   tool_configuration: nil,
+                                   reregistration_url: nil,
+                                   lti_version: '2.0'
                                  })
       end
 
@@ -235,7 +233,6 @@ module Lti
         definition = definitions.first
         expect(definition[:reregistration_url]).to eq nil
       end
-
     end
   end
 end

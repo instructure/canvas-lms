@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
-  def perform(cm=nil)
+  def perform(cm = nil)
     cm ||= ContentMigration.find migration_id
 
     cm.workflow_state = :importing
@@ -38,7 +38,7 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
 
       folder = cm.context.folders.find(cm.migration_settings[:folder_id])
 
-      update_callback = lambda{|pct|
+      update_callback = lambda { |pct|
         percent_complete = pct * 100
 
         scaled = percent_complete
@@ -54,10 +54,10 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
       }
 
       UnzipAttachment.process(
-              :context => cm.context,
-              :root_directory => folder,
-              :filename => zipfile.path,
-              :callback => update_callback
+        :context => cm.context,
+        :root_directory => folder,
+        :filename => zipfile.path,
+        :callback => update_callback
       )
 
       zipfile.close
@@ -70,7 +70,6 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
       cm.fail_with_error!(e)
       raise e
     end
-
   end
 
   def self.enqueue(content_migration)

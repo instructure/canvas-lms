@@ -22,5 +22,5 @@ module CanvasQuizStatistics::Analyzers::Base::Constants
   UnknownAnswerText = 'Other'
   MissingAnswerKey = 'none'
   MissingAnswerText = 'No Answer'
-  FalseLike = [ 'nil', 'null', 'false', '' ]
+  FalseLike = ['nil', 'null', 'false', '']
 end

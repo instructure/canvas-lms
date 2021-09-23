@@ -37,7 +37,7 @@ class Mutations::CreateLearningOutcome < Mutations::BaseMutation
     return errors_for(record) unless record.save
 
     outcome_group.add_outcome(record)
-    {learning_outcome: record}
+    { learning_outcome: record }
   end
 
   private

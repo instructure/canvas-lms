@@ -77,7 +77,7 @@ describe('useGroupCreate', () => {
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: '"New Group" has been created.',
+      message: '"New Group" was successfully created.',
       type: 'success'
     })
   })
@@ -94,7 +94,7 @@ describe('useGroupCreate', () => {
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred adding group "New Group": GraphQL error: Network error.',
+      message: 'An error occurred while creating this group. Please try again.',
       type: 'error'
     })
   })
@@ -111,7 +111,7 @@ describe('useGroupCreate', () => {
     })
     await act(async () => jest.runAllTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred adding group "New Group".',
+      message: 'An error occurred while creating this group. Please try again.',
       type: 'error'
     })
   })

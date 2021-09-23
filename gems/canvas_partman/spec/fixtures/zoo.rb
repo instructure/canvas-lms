@@ -21,8 +21,8 @@ class CanvasPartmanTest::Zoo < ActiveRecord::Base
   self.table_name = 'partman_zoos'
 
   has_many :animals,
-    class_name: 'CanvasPartmanTest::Animal',
-    dependent: :destroy
+           class_name: 'CanvasPartmanTest::Animal',
+           dependent: :destroy
 
   has_many :trails,
            class_name: 'CanvasPartmanTest::Trail',

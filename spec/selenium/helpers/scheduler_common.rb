@@ -86,24 +86,24 @@ module SchedulerCommon
     time += 1.hour if time.hour == 23 # ensure the appointments are on the same day
     @app1 = AppointmentGroup.create!(title: "Appointment 1", contexts: [@course1],
                                      participant_visibility: 'protected',
-                                     new_appointments: [[time, time+30.minutes],
+                                     new_appointments: [[time, time + 30.minutes],
                                                         [time + 30.minutes, time + 1.hour]],
                                      participants_per_appointment: 1, max_appointments_per_participant: 1)
     @app1.publish!
     @app3 = AppointmentGroup.create!(title: "Appointment 3", contexts: [@course1, @course2],
-                                                        new_appointments: [[time+1.hour, time+1.hour + 30.minutes]])
+                                     new_appointments: [[time + 1.hour, time + 1.hour + 30.minutes]])
     @app3.publish!
   end
 
-  def appointment_params(opts={})
+  def appointment_params(opts = {})
     {
-        title: opts[:title],
-        contexts: opts[:contexts],
-        new_appointments: [
-          [opts[:start_at] || Time.zone.now + 1.hour,
-           opts[:end_at] || Time.zone.now + 3.hours],
-        ],
-        participants_per_appointment: opts[:participants] || 4
+      title: opts[:title],
+      contexts: opts[:contexts],
+      new_appointments: [
+        [opts[:start_at] || Time.zone.now + 1.hour,
+         opts[:end_at] || Time.zone.now + 3.hours],
+      ],
+      participants_per_appointment: opts[:participants] || 4
     }
   end
 
@@ -123,8 +123,8 @@ module SchedulerCommon
 
   def create_appointment_group_manual(opts = {})
     opts = {
-        :publish => true,
-        :new_appointment_text => 'new appointment group'
+      :publish => true,
+      :new_appointment_text => 'new appointment group'
     }.with_indifferent_access.merge(opts)
 
     expect {
@@ -153,7 +153,7 @@ module SchedulerCommon
     wait_for(method: nil, timeout: 15) { !f('#refresh_calendar_link').displayed? }
   end
 
-  def click_al_option(option_selector, offset=0)
+  def click_al_option(option_selector, offset = 0)
     ffj('.al-trigger')[offset].click
     options = ffj('.al-options')[offset]
     expect(options).to be_displayed

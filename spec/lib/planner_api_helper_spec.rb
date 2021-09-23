@@ -25,8 +25,8 @@ describe PlannerApiHelper do
 
   describe "#formatted_planner_date" do
     it 'should create errors for bad dates' do
-      expect {formatted_planner_date('start_date', '123-456-789')}.to raise_error(PlannerApiHelper::InvalidDates)
-      expect {formatted_planner_date('end_date', '9876-5-4321')}.to raise_error(PlannerApiHelper::InvalidDates)
+      expect { formatted_planner_date('start_date', '123-456-789') }.to raise_error(PlannerApiHelper::InvalidDates)
+      expect { formatted_planner_date('end_date', '9876-5-4321') }.to raise_error(PlannerApiHelper::InvalidDates)
     end
   end
 
@@ -50,46 +50,46 @@ describe PlannerApiHelper do
     end
 
     describe "#sync_module_requirement_done" do
-        it "sets module requirement as done when completed in planner for assignment" do
-          planner_override_model({"plannable": @assignment, "marked_complete": true})
-          sync_module_requirement_done(@assignment, @user, true)
-          progression = @module1.find_or_create_progression(@user)
-          expect(progression.finished_item?(@assignment_tag)).to eq true
-        end
+      it "sets module requirement as done when completed in planner for assignment" do
+        planner_override_model({ "plannable": @assignment, "marked_complete": true })
+        sync_module_requirement_done(@assignment, @user, true)
+        progression = @module1.find_or_create_progression(@user)
+        expect(progression.finished_item?(@assignment_tag)).to eq true
+      end
 
-        it "sets module requirement as not done when un-completed in planner for assignment" do
-          @assignment_tag.context_module_action(@user, :done)
-          planner_override_model({"plannable": @assignment, "marked_complete": false})
-          sync_module_requirement_done(@assignment, @user, false)
-          progression = @module1.find_or_create_progression(@user)
-          expect(progression.finished_item?(@assignment_tag)).to eq false
-        end
+      it "sets module requirement as not done when un-completed in planner for assignment" do
+        @assignment_tag.context_module_action(@user, :done)
+        planner_override_model({ "plannable": @assignment, "marked_complete": false })
+        sync_module_requirement_done(@assignment, @user, false)
+        progression = @module1.find_or_create_progression(@user)
+        expect(progression.finished_item?(@assignment_tag)).to eq false
+      end
 
-        it "sets module requirement as done when completed in planner for wiki page" do
-          planner_override_model({"plannable": @wiki_page, "marked_complete": true})
-          sync_module_requirement_done(@wiki_page, @user, true)
-          progression = @module1.find_or_create_progression(@user)
-          expect(progression.finished_item?(@wiki_page_tag)).to eq true
-        end
+      it "sets module requirement as done when completed in planner for wiki page" do
+        planner_override_model({ "plannable": @wiki_page, "marked_complete": true })
+        sync_module_requirement_done(@wiki_page, @user, true)
+        progression = @module1.find_or_create_progression(@user)
+        expect(progression.finished_item?(@wiki_page_tag)).to eq true
+      end
 
-        it "sets module requirement as not done when un-completed in planner for wiki page" do
-          @wiki_page_tag.context_module_action(@user, :done)
-          planner_override_model({"plannable": @wiki_page, "marked_complete": false})
-          sync_module_requirement_done(@wiki_page, @user, false)
-          progression = @module1.find_or_create_progression(@user)
-          expect(progression.finished_item?(@wiki_page_tag)).to eq false
-        end
+      it "sets module requirement as not done when un-completed in planner for wiki page" do
+        @wiki_page_tag.context_module_action(@user, :done)
+        planner_override_model({ "plannable": @wiki_page, "marked_complete": false })
+        sync_module_requirement_done(@wiki_page, @user, false)
+        progression = @module1.find_or_create_progression(@user)
+        expect(progression.finished_item?(@wiki_page_tag)).to eq false
+      end
 
-        it "catches error if tried on non-module object types" do
-          expect { sync_module_requirement_done(@user, @user, true) }.not_to raise_error
-        end
+      it "catches error if tried on non-module object types" do
+        expect { sync_module_requirement_done(@user, @user, true) }.not_to raise_error
+      end
     end
 
     describe "#sync_planner_completion" do
       it "updates existing override for assignment" do
-        planner_override_model({"plannable": @assignment,
-                                "marked_complete": false,
-                                "dismissed": false})
+        planner_override_model({ "plannable": @assignment,
+                                 "marked_complete": false,
+                                 "dismissed": false })
 
         override = sync_planner_completion(@assignment, @user, true)
         expect(override.marked_complete).to eq true
@@ -107,9 +107,9 @@ describe PlannerApiHelper do
       end
 
       it "updates existing override for wiki page" do
-        planner_override_model({"plannable": @wiki_page,
-                                "marked_complete": false,
-                                "dismissed": false})
+        planner_override_model({ "plannable": @wiki_page,
+                                 "marked_complete": false,
+                                 "dismissed": false })
 
         override = sync_planner_completion(@wiki_page, @user, true)
         expect(override.marked_complete).to eq true

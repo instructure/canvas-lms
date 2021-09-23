@@ -19,11 +19,12 @@
 
 module BroadcastPolicies
   class AssignmentParticipants
-    def initialize(assignment, excluded_ids=nil)
+    def initialize(assignment, excluded_ids = nil)
       @assignment = assignment
       @excluded_ids = excluded_ids
     end
     attr_reader :assignment, :excluded_ids
+
     delegate :context, :participants, to: :assignment
 
     def to
@@ -34,10 +35,10 @@ module BroadcastPolicies
 
     def all_participants
       @_all_participants ||= participants({
-        include_observers: true,
-        excluded_user_ids: excluded_ids,
-        by_date: true
-      })
+                                            include_observers: true,
+                                            excluded_user_ids: excluded_ids,
+                                            by_date: true
+                                          })
     end
   end
 end

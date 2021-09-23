@@ -22,7 +22,7 @@ require_relative '../spec_helper'
 describe InstAccessTokensController do
   include_context "InstAccess setup"
 
-  let_once(:user){ user_with_pseudonym }
+  let_once(:user) { user_with_pseudonym }
 
   describe "#create" do
     it "requires being logged in" do
@@ -32,7 +32,7 @@ describe InstAccessTokensController do
     end
 
     context "with valid user session" do
-      before(:each){ user_session(user) }
+      before(:each) { user_session(user) }
 
       it "generates an InstAccess token for the requeting user" do
         post 'create', format: 'json'

@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe HtmlTextHelper do
-
   class TestClassForMixins
     extend HtmlTextHelper
   end
@@ -116,61 +115,61 @@ describe HtmlTextHelper do
     end
 
     it "should format list elements" do
-      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<EOS.strip
-* Item 1
+      expect(th.html_to_text("<li>Item 1</li><li>Item 2</li>\n<li>Item 3</li> <li>Item 4\n<li>  Item 5")).to eq <<~EOS.strip
+        * Item 1
 
-* Item 2
+        * Item 2
 
-* Item 3
+        * Item 3
 
-* Item 4
+        * Item 4
 
-* Item 5
-EOS
+        * Item 5
+      EOS
     end
 
     it "should format headings" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<EOS.strip
-*********
-heading 1
-*********
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 <br> through heading 6</h3>")).to eq <<~EOS.strip
+        *********
+        heading 1
+        *********
 
------------
-heading two
-text
------------
+        -----------
+        heading two
+        text
+        -----------
 
-heading 3
-through heading 6
------------------
-EOS
+        heading 3
+        through heading 6
+        -----------------
+      EOS
     end
 
     it "should format headings in a word wrap friendly way" do
-      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<EOS.strip
-*********
-heading 1
-*********
+      expect(th.html_to_text("<h1>heading 1</h1><h2>heading two<br>text\n</h2>\n<h3>heading 3 through heading 6</h3>", line_width: 9)).to eq <<~EOS.strip
+        *********
+        heading 1
+        *********
 
----------
-heading
-two
-text
----------
+        ---------
+        heading
+        two
+        text
+        ---------
 
-heading 3
-through
-heading 6
----------
-EOS
+        heading 3
+        through
+        heading 6
+        ---------
+      EOS
     end
 
     it "should word wrap" do
-      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<EOS.strip
-text that
-is a bit
-too long
-EOS
+      expect(th.html_to_text("text that is a bit too long", line_width: 10)).to eq <<~EOS.strip
+        text that
+        is a bit
+        too long
+      EOS
     end
 
     it "should squeeze whitespace" do
@@ -226,17 +225,17 @@ EOS
 
   describe "simplify html" do
     before(:each) do
-      @body = <<-END.strip
-<p><strong>This is a bold tag</strong></p>
-<p><em>This is an em tag</em></p>
-<h1>This is an h1 tag</h1>
-<h2>This is an h2 tag</h2>
-<h3>This is an h3 tag</h3>
-<h4>This is an h4 tag</h4>
-<h5>This is an h5 tag</h5>
-<h6>This is an h6 tag</h6>
-<p><a href="http://foo.com">Link to Foo</a></p>
-<p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
+      @body = <<~END.strip
+        <p><strong>This is a bold tag</strong></p>
+        <p><em>This is an em tag</em></p>
+        <h1>This is an h1 tag</h1>
+        <h2>This is an h2 tag</h2>
+        <h3>This is an h3 tag</h3>
+        <h4>This is an h4 tag</h4>
+        <h5>This is an h5 tag</h5>
+        <h6>This is an h6 tag</h6>
+        <p><a href="http://foo.com">Link to Foo</a></p>
+        <p><img src="http://google.com/someimage.png" width="50" height="50" alt="Some Image" title="Some Image" /></p>
       END
     end
 
@@ -263,7 +262,7 @@ EOS
       original_html =
         %q{ <a href="/relative/link">Relative link</a><table border=1>foo</table><tr border=1>bar</tr></table> }
       html = th.html_to_simple_html(original_html, base_url: 'http://example.com',
-        :tags => [ 'table' ], :attributes => { 'table' => ['border'] })
+                                                   :tags => ['table'], :attributes => { 'table' => ['border'] })
       expect(html).to match(%r{http://example.com/relative/link})
       expect(html).to match(%r{table border})
       expect(html).not_to match(%r{tr border})
@@ -286,8 +285,8 @@ EOS
 
   context "#strip_and_truncate" do
     it "should strip and truncate text" do
-      allow(HtmlTextHelper).to receive(:strip_tags){"something else"}
-      allow(CanvasTextHelper).to receive(:truncate_text){true}
+      allow(HtmlTextHelper).to receive(:strip_tags) { "something else" }
+      allow(CanvasTextHelper).to receive(:truncate_text) { true }
       expect(HtmlTextHelper.strip_and_truncate("some text")).to be_truthy
       expect(HtmlTextHelper).to have_received(:strip_tags).with('some text')
       expect(CanvasTextHelper).to have_received(:truncate_text).with('something else', {})

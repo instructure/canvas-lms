@@ -27,7 +27,7 @@ Rails.env = 'test'
 # depend on as an adapter that Canvas can submit Setting itself
 # as a strategy for...anyway, use this for now for specs
 class MemorySettings
-  def initialize(data={})
+  def initialize(data = {})
     @settings = data || {}
   end
 

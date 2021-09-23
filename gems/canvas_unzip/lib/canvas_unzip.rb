@@ -31,11 +31,14 @@ end
 Gem::Package::TarHeader.singleton_class.prepend(SkipStrictOctCheck) # jeez who the heck thought it was a good idea to use rubygems code for this
 
 class CanvasUnzip
-
   class CanvasUnzipError < ::StandardError; end
+
   class UnknownArchiveType < CanvasUnzipError; end
+
   class FileLimitExceeded < CanvasUnzipError; end
+
   class SizeLimitExceeded < CanvasUnzipError; end
+
   class DestinationFileExists < CanvasUnzipError; end
 
   Limits = Struct.new(:maximum_bytes, :maximum_files)
@@ -87,6 +90,7 @@ class CanvasUnzip
         block.call(entry, index)
       else
         raise FileLimitExceeded if files_left <= 0
+
         begin
           name = entry.name
           name = name.sub(nested_dir, '') if nested_dir # pretend the dir doesn't exist
@@ -134,6 +138,7 @@ class CanvasUnzip
       begin
         Gem::Package::TarReader.new(file).each do |tar_entry|
           next if tar_entry.header.typeflag == 'x'
+
           yield(Entry.new(tar_entry), index)
           index += 1
         end
@@ -147,7 +152,7 @@ class CanvasUnzip
 
   def self.compute_uncompressed_size(archive_filename)
     total_size = 0
-    each_entry(archive_filename){|entry, index| total_size += entry.size }
+    each_entry(archive_filename) { |entry, index| total_size += entry.size }
     total_size
   end
 
@@ -162,6 +167,7 @@ class CanvasUnzip
       end
 
       raise CanvasUnzipError, "Invalid entry type" unless @type
+
       @entry = entry
     end
 
@@ -183,12 +189,12 @@ class CanvasUnzip
 
     def name
       @name ||= if type == :zip
-        # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
-        normalize_name(entry.name, 'cp437')
-      elsif type == :tar
-        # there is no standard. this seems like a reasonable fallback to me
-        normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
-      end
+                  # the standard is DOS (cp437) or UTF-8, although in practice, anything goes
+                  normalize_name(entry.name, 'cp437')
+                elsif type == :tar
+                  # there is no standard. this seems like a reasonable fallback to me
+                  normalize_name(entry.full_name.sub(/^\.\//, ''), 'iso-8859-1')
+                end
     end
 
     def size
@@ -200,7 +206,7 @@ class CanvasUnzip
     end
 
     # yields byte count
-    def extract(dest_path, overwrite=false, maximum_size=DEFAULT_BYTE_LIMIT)
+    def extract(dest_path, overwrite = false, maximum_size = DEFAULT_BYTE_LIMIT)
       dir = self.directory? ? dest_path : File.dirname(dest_path)
       FileUtils.mkdir_p(dir) unless File.exist?(dir)
       return unless self.file?

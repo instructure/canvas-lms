@@ -49,7 +49,7 @@ class Quizzes::QuizQuestion::MatchingQuestion < Quizzes::QuizQuestion::Base
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = {:multiple_answers => true}
+    stats = { :multiple_answers => true }
 
     answers = @question_data.answers
     matches = @question_data[:matches]

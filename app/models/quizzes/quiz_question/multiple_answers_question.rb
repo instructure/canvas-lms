@@ -37,6 +37,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
     @question_data[:answers].each do |answer|
       response = user_answer["answer_#{answer[:id]}"]
       next unless response
+
       total_answers += 1
       user_answer.answer_details["answer_#{answer[:id]}".to_sym] = response
 
@@ -52,6 +53,7 @@ class Quizzes::QuizQuestion::MultipleAnswersQuestion < Quizzes::QuizQuestion::Ba
       end
     end
     return nil if total_answers == 0
+
     return correct_answers
   end
 

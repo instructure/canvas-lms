@@ -47,10 +47,10 @@ module LocaleSelection
           end
           locale
         end
-         },
+      },
       -> { !ignore_browser_locale && user.try(:browser_locale) },
       -> { I18n.default_locale.to_s }
-          ]
+    ]
 
     sources.each do |source|
       locale = source.call
@@ -67,13 +67,14 @@ module LocaleSelection
 
   def infer_browser_locale(accept_language, locales_with_aliases)
     return nil unless accept_language =~ ACCEPT_LANGUAGE
+
     supported_locales = locales_with_aliases.keys
 
-    ranges = accept_language.downcase.split(SEPARATOR).map{ |range|
+    ranges = accept_language.downcase.split(SEPARATOR).map { |range|
       quality = (range =~ QUALITY_VALUE) ? $1.to_f : 1
       [range.sub(/\s*;.*/, ''), quality]
     }
-    ranges = ranges.sort_by{ |r,| r == '*' ? 1 : -r.count('-') }
+    ranges = ranges.sort_by { |r,| r == '*' ? 1 : -r.count('-') }
     # we want the longest ranges first (and * last of all), since the "quality
     # factor assigned to a [language] ... is the quality value of the longest
     # language-range ... that matches", e.g.
@@ -87,7 +88,7 @@ module LocaleSelection
         ary << [locale, best_range.last, ranges.index(best_range)] unless best_range.last == 0
       end
       ary
-    }.sort_by{ |l, q, pos| [-q, pos, l.count('-'), l]}
+    }.sort_by { |l, q, pos| [-q, pos, l.count('-'), l] }
     # wrt the sorting here, rfc2616 doesn't specify which tag is preferable
     # if there is a quality tie (due to prefix matching or otherwise).
     # technically they are equally acceptable.  we've decided to break ties
@@ -119,17 +120,18 @@ module LocaleSelection
       name = I18n.send(:t, :locales, :locale => locale)[locale]
       custom = I18n.send(:t, :custom, locale: locale) == true
       next if custom && !enabled_custom_locales.include?(locale)
+
       result[locale.to_s] = name if name
     end
     result
   end
 
   def self.custom_locales
-    @custom_locales ||= I18n.available_locales.select{ |locale| I18n.send(:t, :custom, :locale => locale) == true }.sort
+    @custom_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :custom, :locale => locale) == true }.sort
   end
 
   def crowdsourced_locales
-    @crowdsourced_locales ||= I18n.available_locales.select{ |locale| I18n.send(:t, :crowdsourced, :locale => locale) == true }
+    @crowdsourced_locales ||= I18n.available_locales.select { |locale| I18n.send(:t, :crowdsourced, :locale => locale) == true }
   end
 
   def self.locales_with_aliases

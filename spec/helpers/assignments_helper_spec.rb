@@ -92,8 +92,8 @@ describe AssignmentsHelper do
       assignment_model(course: @course)
       @assignment.turnitin_enabled = true
       @assignment.update!({
-        submission_types: ["online_url"]
-      })
+                            submission_types: ["online_url"]
+                          })
       @context = @assignment.context
       account = @context.account
       account.turnitin_account_id = 12345
@@ -108,16 +108,16 @@ describe AssignmentsHelper do
 
     it "returns false if the assignment does not require submissions" do
       @assignment.update!({
-        submission_types: ["none"]
-      })
+                            submission_types: ["none"]
+                          })
       expect(turnitin_active?).to be_falsey
     end
 
     it "returns false if turnitin is disabled on the account level" do
       @context.account.update!({
-        turnitin_account_id: nil,
-        turnitin_shared_secret: nil
-      })
+                                 turnitin_account_id: nil,
+                                 turnitin_shared_secret: nil
+                               })
       expect(turnitin_active?).to be_falsey
     end
   end

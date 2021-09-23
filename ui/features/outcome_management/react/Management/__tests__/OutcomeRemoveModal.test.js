@@ -140,28 +140,14 @@ describe('OutcomeRemoveModal', () => {
         })
       })
 
-      it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
+      it('displays flash confirmation with proper message if delete request succeeds', async () => {
         const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
           mocks: [deleteOutcomeMock()]
         })
         fireEvent.click(getByText('Remove Outcome'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome was successfully removed from this account.',
-            type: 'success'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
-        const {getByText} = render(<OutcomeRemoveModal {...defaultProps()} />, {
-          contextType: 'Course',
-          mocks: [deleteOutcomeMock()]
-        })
-        fireEvent.click(getByText('Remove Outcome'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'This outcome was successfully removed from this course.',
+            message: 'This outcome was successfully removed.',
             type: 'success'
           })
         })
@@ -174,8 +160,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcome'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message:
-              'An error occurred while removing the outcome: GraphQL error: Could not find associated outcome in this context.',
+            message: 'An error occurred while removing this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -188,8 +173,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcome'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message:
-              'An error occurred while removing the outcome: cannot be deleted because it is aligned to content.',
+            message: 'An error occurred while removing this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -202,7 +186,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcome'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing the outcome.',
+            message: 'An error occurred while removing this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -215,7 +199,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcome'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing the outcome.',
+            message: 'An error occurred while removing this outcome. Please try again.',
             type: 'error'
           })
         })
@@ -443,7 +427,7 @@ describe('OutcomeRemoveModal', () => {
         })
       })
 
-      it('displays flash confirmation with proper message if delete request succeeds for account', async () => {
+      it('displays flash confirmation with proper message if delete request succeeds', async () => {
         const {getByText} = render(
           <OutcomeRemoveModal
             {...defaultProps({
@@ -457,29 +441,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcomes'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: '2 outcomes were successfully removed from this account.',
-            type: 'success'
-          })
-        })
-      })
-
-      it('displays flash confirmation with proper message if delete request succeeds for course', async () => {
-        const {getByText} = render(
-          <OutcomeRemoveModal
-            {...defaultProps({
-              outcomes: outcomesGenerator(1, 2, true)
-            })}
-          />,
-          {
-            contextType: 'Course',
-            isCourse: true,
-            mocks: [deleteOutcomeMock({ids: ['1', '2']})]
-          }
-        )
-        fireEvent.click(getByText('Remove Outcomes'))
-        await waitFor(() => {
-          expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: '2 outcomes were successfully removed from this course.',
+            message: '2 outcomes were successfully removed.',
             type: 'success'
           })
         })
@@ -499,8 +461,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcomes'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message:
-              'An error occurred while removing 2 outcomes: GraphQL error: Could not find associated outcome in this context.',
+            message: 'An error occurred while removing these outcomes. Please try again.',
             type: 'error'
           })
         })
@@ -520,7 +481,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcomes'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing 2 outcomes.',
+            message: 'An error occurred while removing these outcomes. Please try again.',
             type: 'error'
           })
         })
@@ -540,7 +501,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcomes'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing 2 outcomes.',
+            message: 'An error occurred while removing these outcomes. Please try again.',
             type: 'error'
           })
         })
@@ -560,7 +521,7 @@ describe('OutcomeRemoveModal', () => {
         fireEvent.click(getByText('Remove Outcomes'))
         await waitFor(() => {
           expect(showFlashAlertSpy).toHaveBeenCalledWith({
-            message: 'An error occurred while removing 2 outcomes.',
+            message: 'An error occurred while removing these outcomes. Please try again.',
             type: 'error'
           })
         })

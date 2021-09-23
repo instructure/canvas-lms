@@ -52,12 +52,12 @@ describe ActiveSupport::Callbacks::Suspension do
     it "should suspend all callbacks by default" do
       expect(@instance).to receive(:validate).never
       expect(@instance).to receive(:publish).never
-      @instance.suspend_callbacks{ @instance.save }
+      @instance.suspend_callbacks { @instance.save }
     end
 
     it "should treat suspended callbacks as successful" do
       expect(@instance).to receive(:persist).once
-      @instance.suspend_callbacks{ @instance.save }
+      @instance.suspend_callbacks { @instance.save }
     end
 
     it "should only suspend given callbacks" do
@@ -105,7 +105,7 @@ describe ActiveSupport::Callbacks::Suspension do
     it "should apply suspensions from the class to instances" do
       expect(@instance).to receive(:validate).never
       expect(@instance).to receive(:publish).never
-      @class.suspend_callbacks{ @instance.save }
+      @class.suspend_callbacks { @instance.save }
     end
 
     it "should apply suspensions from a superclass to instances of a subclass" do
@@ -113,7 +113,7 @@ describe ActiveSupport::Callbacks::Suspension do
       instance = subclass.new
       expect(instance).to receive(:validate).never
       expect(instance).to receive(:publish).never
-      @class.suspend_callbacks{ instance.save }
+      @class.suspend_callbacks { instance.save }
     end
 
     it "should combine suspensions from various levels" do
@@ -147,9 +147,8 @@ describe ActiveSupport::Callbacks::Suspension do
           @instance2.save
         end.join
 
-       @instance.save
+        @instance.save
       end
     end
-
   end
 end

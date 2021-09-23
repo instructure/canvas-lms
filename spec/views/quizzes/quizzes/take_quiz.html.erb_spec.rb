@@ -28,10 +28,10 @@ describe '/quizzes/quizzes/take_quiz' do
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
     sub = assign(:submission, quiz.generate_submission(@user))
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css('#quiz-instructions').first.content.strip).to eq 'Hello'
@@ -45,10 +45,10 @@ describe '/quizzes/quizzes/take_quiz' do
     sub = assign(:submission, quiz.generate_submission(@user))
     sub.update_attribute(:workflow_state, 'preview')
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
 
     expect(response).to include 'preview of the draft version'
@@ -63,10 +63,10 @@ describe '/quizzes/quizzes/take_quiz' do
     sub = assign(:submission, quiz.generate_submission(@user))
     sub.update_attribute(:workflow_state, 'preview')
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
 
     expect(response).to include 'preview of the published version'
@@ -78,10 +78,10 @@ describe '/quizzes/quizzes/take_quiz' do
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
     sub = assign(:submission, quiz.generate_submission(@user))
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css('.timer_autosubmit_disabled').first.content.strip).not_to be_nil

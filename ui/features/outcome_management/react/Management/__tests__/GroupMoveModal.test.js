@@ -144,7 +144,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: '"Group 100 folder 0" has been moved to "Group 100 folder 1".',
+      message: '"Group 100 folder 0" was moved to "Group 100 folder 1".',
       type: 'success'
     })
   })
@@ -168,7 +168,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Group 100 folder 0": GraphQL error: Network error.',
+      message: 'An error occurred while moving this group. Please try again.',
       type: 'error'
     })
   })
@@ -193,12 +193,12 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Group 100 folder 0": Mutation failed.',
+      message: 'An error occurred while moving this group. Please try again.',
       type: 'error'
     })
   })
 
-  it('shows default error flash message when moving a group fails and error message is empty', async () => {
+  it('shows default error flash message when moving a group fails without any message', async () => {
     mocks = [
       ...mocks,
       updateOutcomeGroupMock({
@@ -218,7 +218,7 @@ describe('GroupMoveModal', () => {
     fireEvent.click(getByText('Move'))
     await act(async () => jest.runOnlyPendingTimers())
     expect(showFlashAlertSpy).toHaveBeenCalledWith({
-      message: 'An error occurred moving group "Group 100 folder 0".',
+      message: 'An error occurred while moving this group. Please try again.',
       type: 'error'
     })
   })
@@ -276,14 +276,14 @@ describe('GroupMoveModal', () => {
       fireEvent.click(getByText('Create new group'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"new group" has been created.',
+        message: '"new group" was successfully created.',
         type: 'success'
       })
       expect(getByText('Move').closest('button')).toBeEnabled()
       fireEvent.click(getByText('Move'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Group 100 folder 0" has been moved to "new group".',
+        message: '"Group 100 folder 0" was moved to "new group".',
         type: 'success'
       })
     })

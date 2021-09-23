@@ -28,12 +28,12 @@ describe 'assignments index menu tool placement' do
 
     @tool1 = Account.default.context_external_tools.new(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
     # tool1 is on index and group menus
-    @tool1.assignment_index_menu = {:url => "http://www.example.com", :text => "Import Stuff"}
-    @tool1.assignment_group_menu = {:url => "http://www.example.com", :text => "Import Stuff Here"}
+    @tool1.assignment_index_menu = { :url => "http://www.example.com", :text => "Import Stuff" }
+    @tool1.assignment_group_menu = { :url => "http://www.example.com", :text => "Import Stuff Here" }
     @tool1.save!
     @tool2 = Account.default.context_external_tools.new(:name => "b", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')
     # tool2 is on assignment menu
-    @tool2.assignment_menu = {:url => "http://www.example.com", :text => "Second Tool"}
+    @tool2.assignment_menu = { :url => "http://www.example.com", :text => "Second Tool" }
     @tool2.save!
     # assignments groups
     @agroup1 = @course.assignment_groups.create!(:name => "assignments group1")
@@ -62,8 +62,8 @@ describe 'assignments index menu tool placement' do
     expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "assignment"
     expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["assignment"]
     expect(query_params["com_instructure_course_available_canvas_resources"].values).to eq [
-      {"course_id" => @course.id.to_s, "type" => "assignment_group"}
-      ] # will replace with the groups on the variable expansion
+      { "course_id" => @course.id.to_s, "type" => "assignment_group" }
+    ] # will replace with the groups on the variable expansion
   end
 
   it "should be able to launch the group menu tool via the tray", custom_timeout: 30 do
@@ -82,7 +82,7 @@ describe 'assignments index menu tool placement' do
     expect(query_params["com_instructure_course_canvas_resource_type"]).to eq "assignment"
     expect(query_params["com_instructure_course_accept_canvas_resource_types"]).to eq ["assignment"]
 
-    group_data = [@agroup2].map{|ag| {"id" => ag.id.to_s, "name" => ag.name}} # just the selected group
+    group_data = [@agroup2].map { |ag| { "id" => ag.id.to_s, "name" => ag.name } } # just the selected group
     expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(group_data)
   end
 

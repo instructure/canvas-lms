@@ -21,9 +21,9 @@
 # This is used to take a zipped file, unzip it, add directories to a
 # context, and attach the files in the correct directories.
 class UnzipAttachment
-  THINGS_TO_IGNORE_REGEX  = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
+  THINGS_TO_IGNORE_REGEX = /^(__MACOSX|thumbs\.db|\.DS_Store)$/
 
-  def self.process(opts={})
+  def self.process(opts = {})
     @ua = new(opts)
     @ua.process
     @ua
@@ -41,7 +41,7 @@ class UnzipAttachment
     self.context_files_folder
   end
 
-  def initialize(opts={})
+  def initialize(opts = {})
     @context = opts[:course] || opts[:context]
     @filename = opts[:filename]
     # opts[:callback] is for backwards-compatibility, it's just a progress proc
@@ -60,6 +60,7 @@ class UnzipAttachment
 
   def update_progress(pct)
     return unless @progress_proc
+
     if @progress_proc.arity == 0
       # for backwards compatibility with callback procs that expect no arguments
       @progress_proc.call()
@@ -89,7 +90,6 @@ class UnzipAttachment
   # added to the root_folder/some_entry folder in the database
   # Tempfile will unlink its new file as soon as f is garbage collected.
   def process
-
     Folder.reset_path_lookups!
     with_unzip_configuration do
       zip_stats.validate_against(context)
@@ -130,7 +130,6 @@ class UnzipAttachment
             @logger.warn "Couldn't unzip archived file #{f.path}: #{e.message}" if @logger
           end
         end
-
       end
       update_attachment_positions(id_positions)
     end
@@ -156,10 +155,10 @@ class UnzipAttachment
   def attach(path, entry, folder, md5, migration_id: nil)
     begin
       FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+                                               explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
     rescue
       FileInContext.attach(self.context, path, display_name: display_name(entry.name), folder: folder,
-        explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
+                                               explicit_filename: File.split(entry.name).last, allow_rename: @rename_files, md5: md5, migration_id: migration_id)
     end
   end
 
@@ -183,8 +182,8 @@ class UnzipAttachment
 
   def should_skip?(entry)
     entry.directory? ||
-    entry.name.split('/').any?{|p| p =~ THINGS_TO_IGNORE_REGEX} ||
-    (@valid_paths && !@valid_paths.include?(entry.name))
+      entry.name.split('/').any? { |p| p =~ THINGS_TO_IGNORE_REGEX } ||
+      (@valid_paths && !@valid_paths.include?(entry.name))
   end
 
   def path_elements_for(path)
@@ -227,20 +226,20 @@ class UnzipAttachment
 
   # A cached list of folders that we know about.
   # Used by infer_folder to know whether to create a folder or not.
-  def folders(reset=false)
+  def folders(reset = false)
     @folders = nil if reset
     return @folders if @folders
+
     root_folders = Folder.root_folders(self.context)
     @folders = OpenStruct.new(:root_directory => self.context_files_folder)
   end
 end
 
-
-#this is just a helper class that wraps an archive
-#for just the duration of this operation; it doesn't
-#quite seem appropriate to move it to it's own file
-#since it's such an integral part of the unzipping
-#process
+# this is just a helper class that wraps an archive
+# for just the duration of this operation; it doesn't
+# quite seem appropriate to move it to it's own file
+# since it's such an integral part of the unzipping
+# process
 class ZipFileStats
   attr_reader :file_count, :total_size, :paths, :filename, :quota_remaining
 
@@ -266,6 +265,7 @@ class ZipFileStats
       if (quota_hash[:quota_used] + total_size) > quota_hash[:quota]
         raise Attachment::OverQuotaError, "Zip file would exceed quota limit"
       end
+
       @quota_remaining = quota_hash[:quota] - quota_hash[:quota_used]
     end
   end
@@ -277,12 +277,13 @@ class ZipFileStats
     if size > @quota_remaining
       raise Attachment::OverQuotaError, "Zip contents exceed course quota limit"
     end
+
     @quota_remaining -= size
   end
 
   def paths_with_positions(base)
     positions_hash = {}
-    paths.sort.each_with_index{|p, idx| positions_hash[p] = idx + base }
+    paths.sort.each_with_index { |p, idx| positions_hash[p] = idx + base }
     positions_hash
   end
 
@@ -291,6 +292,7 @@ class ZipFileStats
   end
 
   private
+
   def process!
     CanvasUnzip::extract_archive(filename) do |entry|
       @file_count += 1
@@ -299,5 +301,4 @@ class ZipFileStats
     end
     @file_count = 1 if @file_count == 0
   end
-
 end

@@ -67,7 +67,7 @@ describe Wiki do
 
     it "should find front_page by default url (legacy support)" do
       page = @course.wiki_pages.create!(:title => "front page")
-      page.update_attribute(:url, Wiki::DEFAULT_FRONT_PAGE_URL )
+      page.update_attribute(:url, Wiki::DEFAULT_FRONT_PAGE_URL)
       @wiki.update_attribute(:has_no_front_page, false)
 
       expect(page).to eq @wiki.front_page

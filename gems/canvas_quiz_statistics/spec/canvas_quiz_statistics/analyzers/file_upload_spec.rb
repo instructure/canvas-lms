@@ -30,11 +30,11 @@ describe CanvasQuizStatistics::Analyzers::FileUpload do
   describe '[:responses]' do
     it 'should count students who have uploaded an attachment' do
       expect(subject.run([
-        {},
-        { attachment_ids: nil },
-        { attachment_ids: [] },
-        { attachment_ids: ['1'] }
-      ])[:responses]).to eq(1)
+                           {},
+                           { attachment_ids: nil },
+                           { attachment_ids: [] },
+                           { attachment_ids: ['1'] }
+                         ])[:responses]).to eq(1)
     end
   end
 end

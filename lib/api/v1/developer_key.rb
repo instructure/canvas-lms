@@ -34,10 +34,10 @@ module Api::V1::DeveloperKey
     context ||= Account.site_admin
     account_binding = key.account_binding_for(context)
     keys_to_show = if inherited
-      INHERITED_DEVELOPER_KEY_JSON_ATTRS
-    else
-      DEVELOPER_KEY_JSON_ATTRS
-    end
+                     INHERITED_DEVELOPER_KEY_JSON_ATTRS
+                   else
+                     DEVELOPER_KEY_JSON_ATTRS
+                   end
 
     keys_to_show += ['test_cluster_only'] if DeveloperKey.test_cluster_checks_enabled?
 

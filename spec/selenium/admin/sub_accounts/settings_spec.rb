@@ -28,7 +28,7 @@ describe "sub account basic settings" do
 
   it "should disable inherited settings if locked by a parent account", priority: "1", test_id: 250007 do
     parent = Account.default
-    parent.settings[:restrict_student_future_view] = {locked: true, value: true}
+    parent.settings[:restrict_student_future_view] = { locked: true, value: true }
     parent.save!
 
     get account_settings_url

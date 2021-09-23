@@ -34,7 +34,7 @@ class NotificationMessageCreator
   # Options can include:
   #  :to_list - A list of Users, User IDs, and CommunicationChannels to send to
   #  :data - Options merged with Message options
-  def initialize(notification, asset, options={})
+  def initialize(notification, asset, options = {})
     @notification = notification
     @asset = asset
     @to_user_channels = user_channels(options[:to_list])
@@ -67,6 +67,7 @@ class NotificationMessageCreator
       # to filter users out that do not apply to the notification like when a due
       # date is different for a specific user when using variable due dates.
       next unless (asset = asset_applied_to(user))
+
       user_locale = infer_locale(user: user, context: user_asset_context(asset), ignore_browser_locale: true)
       I18n.with_locale(user_locale) do
         # the channels in this method are all the users active channels or the
@@ -126,10 +127,11 @@ class NotificationMessageCreator
     # we only send fallback when we did not send an immediate message, ie.
     # when the channel is bouncing or there have been too_many_messages
     return unless channel.bouncing? || too_many_messages_for?(user)
+
     fallback_policy = nil
     NotificationPolicy.unique_constraint_retry do
       # notification_policies are already loaded, so use find instead of generating a query
-      fallback_policy = channel.notification_policies.find{ |np| np.frequency == 'daily' && np.notification_id == nil }
+      fallback_policy = channel.notification_policies.find { |np| np.frequency == 'daily' && np.notification_id == nil }
       fallback_policy ||= channel.notification_policies.create!(frequency: 'daily')
     end
 
@@ -142,6 +144,7 @@ class NotificationMessageCreator
     # delayed_messages are only sent to email channels.
     # some types of notifications are only for immediate.
     return unless @notification.summarizable? && channel.path_type == 'email'
+
     policy = effective_policy_for(user, channel)
     # if the policy is not daily or weekly, it is either immediate which was
     # picked up before in build_immediate_message_for, or it's never.
@@ -155,18 +158,18 @@ class NotificationMessageCreator
       message = user.messages.build(message_options_for(user))
       message.parse!('summary', root_account: @account)
       delayed_message = policy.delayed_messages.build(:notification => @notification,
-                                    :frequency => policy.frequency,
-                                    # policy.communication_channel should
-                                    # already be loaded in memory as the
-                                    # inverse association of loading the
-                                    # policy from the channel. passing the
-                                    # object through here lets the delayed
-                                    # message use it without having to re-query.
-                                    :communication_channel => policy.communication_channel,
-                                    :root_account_id => message.context_root_account.try(:id),
-                                    :name_of_topic => message.subject,
-                                    :link => message.url,
-                                    :summary => message.body)
+                                                      :frequency => policy.frequency,
+                                                      # policy.communication_channel should
+                                                      # already be loaded in memory as the
+                                                      # inverse association of loading the
+                                                      # policy from the channel. passing the
+                                                      # object through here lets the delayed
+                                                      # message use it without having to re-query.
+                                                      :communication_channel => policy.communication_channel,
+                                                      :root_account_id => message.context_root_account.try(:id),
+                                                      :name_of_topic => message.subject,
+                                                      :link => message.url,
+                                                      :summary => message.body)
       delayed_message.context = @asset
       delayed_message.save! if Rails.env.test?
       delayed_message
@@ -177,6 +180,7 @@ class NotificationMessageCreator
     # if we have already created a fallback message, we don't want to make an
     # immediate message.
     return if @notification.summarizable? && too_many_messages_for?(user) && ['email', 'sms'].include?(channel.path_type)
+
     message_options = message_options_for(user)
     message = user.messages.build(message_options.merge(communication_channel: channel, to: channel.path))
     message&.parse!(root_account: @account)
@@ -204,6 +208,7 @@ class NotificationMessageCreator
     # Dashboard messages are only built if the user has finished registration,
     # if a user has never logged in, let's not spam the dashboard for no reason.
     return unless @notification.dashboard? && @notification.show_in_feed? && !user.pre_registered?
+
     message = user.messages.build(message_options_for(user).merge(:to => 'dashboard'))
     message.parse!(root_account: @account)
     message
@@ -268,7 +273,7 @@ class NotificationMessageCreator
     # are already loaded so we are using the select :active? to not do another
     # query to load them again.
     users_from_to_list(to_list).each do |user|
-      to_user_channels[user] += user.communication_channels.select{ |cc| add_channel?(user, cc) }
+      to_user_channels[user] += user.communication_channels.select { |cc| add_channel?(user, cc) }
     end
     # if the method gets communication channels, the user is loaded, and this
     # allows all the methods in this file to behave the same as if it were users.
@@ -290,8 +295,8 @@ class NotificationMessageCreator
     to_list = [to_list] unless to_list.is_a? Enumerable
 
     to_users = []
-    to_users += User.find(to_list.select{ |to| to.is_a? Numeric }.uniq)
-    to_users += to_list.select{ |to| to.is_a? User }
+    to_users += User.find(to_list.select { |to| to.is_a? Numeric }.uniq)
+    to_users += to_list.select { |to| to.is_a? User }
     to_users.uniq!
 
     to_users
@@ -299,7 +304,7 @@ class NotificationMessageCreator
 
   def communication_channels_from_to_list(to_list)
     to_list = [to_list] unless to_list.is_a? Enumerable
-    to_list.select{ |to| to.is_a? CommunicationChannel }.uniq
+    to_list.select { |to| to.is_a? CommunicationChannel }.uniq
   end
 
   def asset_applied_to(user)
@@ -356,17 +361,17 @@ class NotificationMessageCreator
     loop do
       end_time = start_time + 7.days
       end_time = final_end_time if end_time > final_end_time
-      scope = Message.
-        in_partition('created_at' => start_time).
-        where(:notification_id => @notification).
-        for(@asset).
-        by_name(@notification.name).
-        for_user(@to_user_channels.keys).
-        cancellable
+      scope = Message
+              .in_partition('created_at' => start_time)
+              .where(:notification_id => @notification)
+              .for(@asset)
+              .by_name(@notification.name)
+              .for_user(@to_user_channels.keys)
+              .cancellable
       start_partition = Message.infer_partition_table_name('created_at' => start_time)
       end_partition = Message.infer_partition_table_name('created_at' => end_time)
       if first_partition == start_partition &&
-        start_partition == end_partition
+         start_partition == end_partition
         scope = scope.where(created_at: start_time..end_time)
         break_this_loop = true
       elsif start_time == first_start_time
@@ -374,11 +379,12 @@ class NotificationMessageCreator
       elsif start_partition == end_partition
         scope = scope.where("created_at<=?", end_time)
         break_this_loop = true
-      # else <no conditions; we're addressing the entire partition>
+        # else <no conditions; we're addressing the entire partition>
       end
       scope.update_all(:workflow_state => 'cancelled') if Message.connection.table_exists?(start_partition)
 
       break if break_this_loop
+
       start_time = end_time
     end
   end

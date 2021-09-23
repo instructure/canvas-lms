@@ -45,7 +45,7 @@ module Courses
     end
 
     def index_section_ids_by_students_id(student_enrollments)
-      section_ids_indexed_by_student_id = Hash.new {|h,k| h[k]=[]}
+      section_ids_indexed_by_student_id = Hash.new { |h, k| h[k] = [] }
       student_enrollments.each do |student_enrollment|
         section_ids_indexed_by_student_id[student_enrollment.user_id] << student_enrollment.course_section_id
       end
@@ -53,7 +53,7 @@ module Courses
     end
 
     def index_teacher_ids_by_section_id(teacher_enrollments)
-      teacher_ids_indexed_by_section_id = Hash.new {|h,k| h[k]=[]}
+      teacher_ids_indexed_by_section_id = Hash.new { |h, k| h[k] = [] }
       teacher_enrollments.each do |teacher_enrollment|
         if teacher_enrollment.limit_privileges_to_course_section
           key = teacher_enrollment.course_section_id
@@ -65,6 +65,5 @@ module Courses
       end
       teacher_ids_indexed_by_section_id
     end
-
   end
 end

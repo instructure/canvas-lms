@@ -42,10 +42,10 @@ shared_examples_for 'k5 subject navigation tabs' do
   it 'has tabs rearranged in new configuration on the subject page' do
     @subject_course.update!(
       tab_configuration: [
-        {id: Course::TAB_SCHEDULE},
-        {id: Course::TAB_HOME},
-        {id: Course::TAB_GRADES},
-        {id: Course::TAB_MODULES}
+        { id: Course::TAB_SCHEDULE },
+        { id: Course::TAB_HOME },
+        { id: Course::TAB_GRADES },
+        { id: Course::TAB_MODULES }
       ]
     )
 
@@ -63,10 +63,10 @@ shared_examples_for 'k5 subject navigation tabs' do
   it 'has tabs that are hidden from the subject page' do
     @subject_course.update!(
       tab_configuration: [
-        {id: Course::TAB_SCHEDULE},
-        {id: Course::TAB_HOME, hidden: true},
-        {id: Course::TAB_GRADES},
-        {id: Course::TAB_MODULES}
+        { id: Course::TAB_SCHEDULE },
+        { id: Course::TAB_HOME, hidden: true },
+        { id: Course::TAB_GRADES },
+        { id: Course::TAB_MODULES }
       ]
     )
 
@@ -81,12 +81,12 @@ shared_examples_for 'k5 subject navigation tabs' do
   it 'has ltis that are rearranged in new order on the resources page' do
     @subject_course.update!(
       tab_configuration: [
-        {id: Course::TAB_HOME},
-        {id: Course::TAB_SCHEDULE},
-        {id: Course::TAB_GRADES},
-        {id: Course::TAB_MODULES},
-        {id: @resource_b},
-        {id: @resource_a}
+        { id: Course::TAB_HOME },
+        { id: Course::TAB_SCHEDULE },
+        { id: Course::TAB_GRADES },
+        { id: Course::TAB_MODULES },
+        { id: @resource_b },
+        { id: @resource_a }
       ]
     )
 
@@ -99,8 +99,8 @@ shared_examples_for 'k5 subject navigation tabs' do
   it 'has ltis that are hidden on the resources page' do
     @subject_course.update!(
       tab_configuration: [
-        {id: @resource_a, hidden: true},
-        {id: @resource_b}
+        { id: @resource_a, hidden: true },
+        { id: @resource_b }
       ]
     )
 

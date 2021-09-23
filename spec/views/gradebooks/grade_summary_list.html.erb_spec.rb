@@ -27,4 +27,3 @@ describe "/gradebooks/grade_summary_list" do
     expect(response).not_to be_nil
   end
 end
-

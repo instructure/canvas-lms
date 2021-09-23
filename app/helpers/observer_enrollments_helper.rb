@@ -43,6 +43,6 @@ module ObserverEnrollmentsHelper
     end
 
     @selected_observed_user = users.detect { |u| u.id.to_s == cookies[SELECTED_OBSERVED_USER_COOKIE] } || users.first
-    users.map{ |u| user_json(u, @current_user, session, ['avatar_url'], @context, nil, ['pseudonym']) }
+    users.map { |u| user_json(u, @current_user, session, ['avatar_url'], @context, nil, ['pseudonym']) }
   end
 end

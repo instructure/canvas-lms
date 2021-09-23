@@ -41,7 +41,6 @@ class ErrorReport < ActiveRecord::Base
   end
 
   class Reporter
-
     IGNORED_CATEGORIES = "404,ActionDispatch::RemoteIp::IpSpoofAttackError,Turnitin::Errors::SubmissionNotScoredError".freeze
 
     def ignored_categories
@@ -60,6 +59,7 @@ class ErrorReport < ActiveRecord::Base
     def log_error(category, opts)
       opts[:category] = category.to_s.presence || 'default'
       return if ignored_categories.include? category
+
       @opts = opts
       # sanitize invalid encodings
       @opts[:message] = Utf8Cleaner.strip_invalid_utf8(@opts[:message]) if @opts[:message]
@@ -82,6 +82,7 @@ class ErrorReport < ActiveRecord::Base
       while (exception = exception.cause)
         limit -= 1
         break if limit == 0
+
         cause = exception.to_s rescue exception.class.name
         message += " caused by #{cause}"
         new_backtrace = Array(exception.backtrace)
@@ -145,6 +146,7 @@ class ErrorReport < ActiveRecord::Base
 
   def self.log_exception_from_canvas_errors(exception, data)
     return nil if configured_to_ignore?(exception.class.to_s)
+
     tags = data.fetch(:tags, {})
     extras = data.fetch(:extra, {})
     account_id = tags[:account_id]
@@ -169,7 +171,7 @@ class ErrorReport < ActiveRecord::Base
   # otherwise goes into the general data hash
   def assign_data(data = {})
     self.data ||= {}
-    data.each do |k,v|
+    data.each do |k, v|
       if respond_to?(:"#{k}=") && !ErrorReport::PROTECTED_FIELDS.include?(k.to_sym)
         self.send(:"#{k}=", v)
       else
@@ -184,7 +186,7 @@ class ErrorReport < ActiveRecord::Base
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:backtrace, val)
     else
-      write_attribute(:backtrace, val[0,self.class.maximum_text_length])
+      write_attribute(:backtrace, val[0, self.class.maximum_text_length])
     end
   end
 
@@ -192,7 +194,7 @@ class ErrorReport < ActiveRecord::Base
     if !val || val.length < self.class.maximum_text_length
       write_attribute(:comments, val)
     else
-      write_attribute(:comments, val[0,self.class.maximum_text_length])
+      write_attribute(:comments, val[0, self.class.maximum_text_length])
     end
   end
 

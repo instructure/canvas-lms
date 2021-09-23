@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing Assignment Groups" do
-
   SYSTEMS.each do |system|
     if import_data_exists? system, 'assignment_group'
       it "should import from #{system}" do
@@ -81,5 +80,4 @@ describe "Importing Assignment Groups" do
       expect(ass.assignment_group.name).to eq data[:title]
     }.to change(AssignmentGroup, :count).by(0)
   end
-
 end

@@ -21,13 +21,13 @@ module CC::Importer::Standard
   module AssignmentConverter
     include CC::Importer
 
-    def convert_cc_assignments(asmnts=[])
+    def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
         if doc = get_node_or_open_file(res, 'assignment')
           path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
 
-          asmnt = {:migration_id => res[:migration_id]}.with_indifferent_access
+          asmnt = { :migration_id => res[:migration_id] }.with_indifferent_access
           if res[:intended_user_role] == 'Instructor'
             asmnt[:workflow_state] = 'unpublished'
           end
@@ -72,16 +72,16 @@ module CC::Importer::Standard
       if doc.css('attachment')
         asmnt[:description] += "\n<ul>"
         doc.css('attachment').each do |att_node|
-          #todo next if type is teachers
+          # todo next if type is teachers
           att_path = att_node['href']
           url = @canvas_converter ? att_path : (get_canvas_att_replacement_url(att_path, resource_dir) || att_path)
-          asmnt[:description] +="\n<li><a href=\"#{url}\">#{File.basename att_path}</a>"
+          asmnt[:description] += "\n<li><a href=\"#{url}\">#{File.basename att_path}</a>"
         end
         asmnt[:description] += "\n</ul>"
       end
     end
 
-    def parse_canvas_assignment_data(meta_doc, html_doc=nil, assignment = {})
+    def parse_canvas_assignment_data(meta_doc, html_doc = nil, assignment = {})
       if html_doc
         title, body = get_html_title_and_body(html_doc)
         assignment['description'] = body
@@ -110,7 +110,7 @@ module CC::Importer::Standard
       end
       if meta_doc.at_css("similarity_detection_tool")
         node = meta_doc.at_css("similarity_detection_tool")
-        similarity_settings = node.attributes.each_with_object({}) { |(k,v), h| h[k] = v.value }
+        similarity_settings = node.attributes.each_with_object({}) { |(k, v), h| h[k] = v.value }
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
@@ -125,9 +125,8 @@ module CC::Importer::Standard
        "rubric_hide_score_total", "has_group_category", "omit_from_final_grade",
        "intra_group_peer_reviews", "only_visible_to_overrides", "post_to_sis",
        "moderated_grading", "grader_comments_visible_to_graders",
-        "anonymous_grading", "graders_anonymous_to_graders",
-        "grader_names_visible_to_final_grader", "anonymous_instructor_annotations"
-      ].each do |bool_val|
+       "anonymous_grading", "graders_anonymous_to_graders",
+       "grader_names_visible_to_final_grader", "anonymous_instructor_annotations"].each do |bool_val|
         val = get_bool_val(meta_doc, bool_val)
         assignment[bool_val] = val unless val.nil?
       end
@@ -154,13 +153,14 @@ module CC::Importer::Standard
           }
           AssignmentOverride.overridden_dates.each do |field|
             next unless override_node.has_attribute?(field.to_s)
+
             override[field] = override_node[field.to_s]
           end
           assignment[:assignment_overrides] << override
         end
       end
       if meta_doc.at_css("post_policy")
-        assignment[:post_policy] = {post_manually: get_bool_val(meta_doc, "post_policy post_manually") || false}
+        assignment[:post_policy] = { post_manually: get_bool_val(meta_doc, "post_policy post_manually") || false }
       end
       if meta_doc.at_css("line_items")
         assignment[:line_items] = meta_doc.css("line_items line_item").map do |li_node|
@@ -182,6 +182,7 @@ module CC::Importer::Standard
     end
 
     private
+
     def get_tool_setting(meta_doc)
       tool_setting = {
         product_code: meta_doc.at_css('tool_setting tool_proxy').attribute('product_code').value,

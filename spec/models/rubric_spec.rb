@@ -21,17 +21,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Rubric do
-
   context "with outcomes" do
     before do
-      outcome_with_rubric({mastery_points: 3})
+      outcome_with_rubric({ mastery_points: 3 })
     end
 
     before :once do
       assignment_model
     end
 
-    def assessment_data(opts={})
+    def assessment_data(opts = {})
       crit_id = "criterion_#{@rubric.data[0][:id]}"
       {
         user: @user,
@@ -207,7 +206,7 @@ describe Rubric do
       @assignment.reload
       expect(@assignment.learning_outcome_alignments).not_to be_empty
       @submission = @assignment.grade_student(user, grade: "10", grader: @teacher).first
-      a.assess(assessment_data({points: 2}))
+      a.assess(assessment_data({ points: 2 }))
       expect(@outcome.learning_outcome_results).not_to be_empty
       result = @outcome.learning_outcome_results.first
       expect(result.user_id).to be(user.id)
@@ -217,7 +216,7 @@ describe Rubric do
       expect(result.original_possible).to be(3.0)
       expect(result.mastery).to be_falsey
       n = result.version_number
-      a.assess(assessment_data({points: 3}))
+      a.assess(assessment_data({ points: 3 }))
       result.reload
       expect(result.version_number).to be > n
       expect(result.score).to be(3.0)
@@ -265,7 +264,7 @@ describe Rubric do
           ]
         }
       ]
-      rubric = rubric_model({context: @course, data: data})
+      rubric = rubric_model({ context: @course, data: data })
       expect(rubric.data.first[:points]).to be(0.5)
       expect(rubric.data.first[:ratings].first[:points]).to be(0.5)
     end
@@ -294,8 +293,8 @@ describe Rubric do
         }
       }
 
-      rubric = rubric_model({context: @course})
-      rubric.update_criteria({criteria: criteria})
+      rubric = rubric_model({ context: @course })
+      rubric.update_criteria({ criteria: criteria })
       expect(rubric.points_possible).to eq 0.6667
     end
   end
@@ -303,15 +302,15 @@ describe Rubric do
   it "should be cool about duplicate titles" do
     course_with_teacher
 
-    r1 = rubric_model({context: @course, title: "rubric"})
+    r1 = rubric_model({ context: @course, title: "rubric" })
     expect(r1.title).to eql "rubric"
 
-    r2 = rubric_model({context: @course, title: "rubric"})
+    r2 = rubric_model({ context: @course, title: "rubric" })
     expect(r2.title).to eql "rubric (1)"
 
     r1.destroy
 
-    r3 = rubric_model({context: @course, title: "rubric"})
+    r3 = rubric_model({ context: @course, title: "rubric" })
     expect(r3.title).to eql "rubric"
 
     r3.title = "rubric"
@@ -331,22 +330,22 @@ describe Rubric do
       # need to run the test 2x because the code path is different for new rubrics
       2.times do
         @rubric.update_with_association(@teacher, {
-          id: @rubric.id,
-          title: @rubric.title,
-          criteria: {
-            "0" => {
-              description: "correctness",
-              points: 15,
-              ratings: {"0" => {points: 15, description: "asdf"}},
-            },
-          },
-        }, @course, {
-          association_object: @assignment,
-          update_if_existing: true,
-          use_for_grading: "1",
-          purpose: "grading",
-          skip_updating_points_possible: opts[:leave_different]
-        })
+                                          id: @rubric.id,
+                                          title: @rubric.title,
+                                          criteria: {
+                                            "0" => {
+                                              description: "correctness",
+                                              points: 15,
+                                              ratings: { "0" => { points: 15, description: "asdf" } },
+                                            },
+                                          },
+                                        }, @course, {
+                                          association_object: @assignment,
+                                          update_if_existing: true,
+                                          use_for_grading: "1",
+                                          purpose: "grading",
+                                          skip_updating_points_possible: opts[:leave_different]
+                                        })
         yield
       end
     end
@@ -367,7 +366,6 @@ describe Rubric do
   end
 
   describe "#destroy_for" do
-
     before do
       course_factory
       assignment_model
@@ -407,8 +405,8 @@ describe Rubric do
       end
 
       it 'records a rubric_deleted AnonymousOrModerationEvent for the assignment' do
-        expect { rubric.destroy_for(course, current_user: teacher) }.
-          to change { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').count }.by(1)
+        expect { rubric.destroy_for(course, current_user: teacher) }
+          .to change { AnonymousOrModerationEvent.where(event_type: 'rubric_deleted').count }.by(1)
       end
 
       it 'includes the ID of the destroyed rubric in the payload' do
@@ -505,36 +503,36 @@ describe Rubric do
   end
 
   it "normalizes criteria for comparison" do
-    criteria = [{:id => "45_392",
-      :description => "Description of criterion",
-      :long_description => "",
-      :points => 5,
-      :mastery_points => nil,
-      :ignore_for_scoring => nil,
-      :learning_outcome_migration_id => nil,
-      :title => "Description of criterion",
-      :ratings =>
-        [{:description => "Full Marks",
-          :id => "blank",
-          :criterion_id => "45_392",
-          :points => 5},
-         {:description => "No Marks",
-          :id => "blank_2",
-          :criterion_id => "45_392",
-          :points => 0}]}]
+    criteria = [{ :id => "45_392",
+                  :description => "Description of criterion",
+                  :long_description => "",
+                  :points => 5,
+                  :mastery_points => nil,
+                  :ignore_for_scoring => nil,
+                  :learning_outcome_migration_id => nil,
+                  :title => "Description of criterion",
+                  :ratings =>
+        [{ :description => "Full Marks",
+           :id => "blank",
+           :criterion_id => "45_392",
+           :points => 5 },
+         { :description => "No Marks",
+           :id => "blank_2",
+           :criterion_id => "45_392",
+           :points => 0 }] }]
     expect(Rubric.normalize(criteria)).to eq(
-      [{"description" => "Description of criterion",
-        "points" => 5.0,
-        "id" => "45_392",
-        "ratings" =>
-          [{"description" => "Full Marks",
-            "points" => 5.0,
-            "criterion_id" => "45_392",
-            "id" => "blank"},
-           {"description" => "No Marks",
-            "points" => 0.0,
-            "criterion_id" => "45_392",
-            "id" => "blank_2"}]}]
+      [{ "description" => "Description of criterion",
+         "points" => 5.0,
+         "id" => "45_392",
+         "ratings" =>
+          [{ "description" => "Full Marks",
+             "points" => 5.0,
+             "criterion_id" => "45_392",
+             "id" => "blank" },
+           { "description" => "No Marks",
+             "points" => 0.0,
+             "criterion_id" => "45_392",
+             "id" => "blank_2" }] }]
     )
   end
 
@@ -568,7 +566,7 @@ describe Rubric do
     context "updates description to be xss safe" do
       before do
         assignment_model
-        outcome_with_rubric({mastery_points: 3})
+        outcome_with_rubric({ mastery_points: 3 })
         @rubric.update_criteria(
           criteria: {
             '0' => {
@@ -681,7 +679,7 @@ describe Rubric do
 
     it 'sets the root_account_id using sub account' do
       sub_account = root_account.sub_accounts.create!
-      rubric_model({context: sub_account})
+      rubric_model({ context: sub_account })
       expect(@rubric.root_account_id).to eq sub_account.root_account_id
     end
   end
@@ -818,7 +816,6 @@ describe Rubric do
 
         expect(Rubric.aligned_to_outcomes.with_at_most_one_association).to contain_exactly(aligned_twice)
       end
-
     end
   end
 end

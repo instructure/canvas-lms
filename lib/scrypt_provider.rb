@@ -30,6 +30,7 @@ ScryptProvider = Struct.new(:cost) do
   def matches?(hash, *tokens)
     hash = new_from_hash(hash)
     return false if hash.blank?
+
     hash == join_tokens(tokens)
   end
 

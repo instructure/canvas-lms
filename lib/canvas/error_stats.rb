@@ -21,7 +21,7 @@ module Canvas
   # Simple class for shipping errors to statsd based on the format
   # propogated from callbacks on Canvas::Errors
   class ErrorStats
-    def self.capture(exception, data, level=:error)
+    def self.capture(exception, data, level = :error)
       category = exception
       cause_category = nil
       unless exception.is_a?(String) || exception.is_a?(Symbol)
@@ -44,7 +44,7 @@ module Canvas
       InstStatsd::Statsd.increment("errors.#{level}", tags: stat_tags)
       if cause_category.present?
         # if there's an inner exception, let's stat that one too.
-        cause_tags = stat_tags.merge({category: cause_category.to_s})
+        cause_tags = stat_tags.merge({ category: cause_category.to_s })
         InstStatsd::Statsd.increment("errors.#{level}", tags: cause_tags)
       end
     end

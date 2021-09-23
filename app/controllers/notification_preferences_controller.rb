@@ -89,6 +89,7 @@ class NotificationPreferencesController < ApplicationController
   # @argument notification_preferences[frequency] [Required] The desired frequency for this notification
   def update
     return render_unauthorized_action unless @user == @current_user
+
     preference = notification_preferences_param
     render json: { notification_preferences: [notification_policy_json(NotificationPolicy.find_or_update_for(@cc, params[:notification], preference[:frequency]), @current_user, session)] }
   end
@@ -99,6 +100,7 @@ class NotificationPreferencesController < ApplicationController
   # @argument notification_preferences[frequency] [Required] The desired frequency for each notification in the category
   def update_preferences_by_category
     return render_unauthorized_action unless @user == @current_user
+
     preference = notification_preferences_param
 
     # Every other category is along the lines of `Due Date`, which is processed correctly by
@@ -106,7 +108,7 @@ class NotificationPreferencesController < ApplicationController
     category = params[:category].casecmp?('discussionentry') ? 'DiscussionEntry' : params[:category].titleize
 
     policies = NotificationPolicy.find_or_update_for_category(@cc, category, preference[:frequency])
-    render json: { notification_preferences: policies.map{ |p| notification_policy_json(p, @current_user, session) } }
+    render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
   end
 
   # @API Update multiple preferences
@@ -114,17 +116,20 @@ class NotificationPreferencesController < ApplicationController
   # @argument notification_preferences[<X>][frequency] [Required] The desired frequency for <X> notification
   def update_all
     return render_unauthorized_action unless @user == @current_user
+
     policies = []
     preferences = convert_hash_to_jsonapi_array(params[:notification_preferences], :notification)
     preferences.each do |preference|
       policies << NotificationPolicy.find_or_update_for(@cc, preference[:notification], preference[:frequency])
     end
-    render json: { notification_preferences: policies.map{ |p| notification_policy_json(p, @current_user, session) } }
+    render json: { notification_preferences: policies.map { |p| notification_policy_json(p, @current_user, session) } }
   end
 
   private
+
   def convert_hash_to_jsonapi_array(hash, key = :id)
     return hash if hash.is_a?(Array)
+
     hash.to_unsafe_h.map { |k, v| { key => k }.reverse_merge!(v).with_indifferent_access }
   end
 
@@ -144,6 +149,7 @@ class NotificationPreferencesController < ApplicationController
       raise ActiveRecord::RecordNotFound unless @cc
     end
     return unless @user == @current_user || authorized_action(@user, @current_user, :view_statistics)
+
     @cc.user = @user
   end
 end

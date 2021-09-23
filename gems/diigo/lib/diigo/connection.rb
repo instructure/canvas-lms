@@ -20,6 +20,7 @@
 
 module Diigo
   class Error < ::Exception; end
+
   class TooManyRedirectsError < Diigo::Error; end
 
   class Connection
@@ -27,7 +28,7 @@ module Diigo
       "https://www.diigo.com/api/v2/bookmarks?key=#{CGI.escape(key)}&user=#{CGI.escape(service.service_user_name)}"
     end
 
-    def self.diigo_generate_request(url, method, user_name, password, form_data=nil)
+    def self.diigo_generate_request(url, method, user_name, password, form_data = nil)
       redirect_limit = 3
       loop do
         raise(TooManyRedirectsError) if redirect_limit <= 0
@@ -65,12 +66,12 @@ module Diigo
     end
 
     def self.diigo_post_bookmark(service, url, title, desc, tags)
-      form_data = {:title => title, :url => url, :tags => tags.join(","), :desc => desc}
+      form_data = { :title => title, :url => url, :tags => tags.join(","), :desc => desc }
       response = diigo_generate_request(diigo_url(service), 'POST', service.service_user_name, service.decrypted_password, form_data)
       ActiveSupport::JSON.decode(response.body)
     end
 
-    def self.key(key=nil)
+    def self.key(key = nil)
       self.config['api_key']
     end
 
@@ -83,6 +84,7 @@ module Diigo
       if !config.is_a?(Proc)
         raise "Config must be a Proc"
       end
+
       @config = config
     end
 

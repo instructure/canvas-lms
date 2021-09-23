@@ -259,11 +259,11 @@ describe UsersController do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/messages/avatar-50.png"
 
-        diff = data.select{|k,v|k =~ /avatar_img/}.size - orig_size
+        diff = data.select { |k, v| k =~ /avatar_img/ }.size - orig_size
         expect(diff).to be > 0
 
-        @user.update_attribute(:avatar_image, {'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif'})
-        expect(data.select{|k,v|k =~ /avatar_img/}.size).to eq orig_size
+        @user.update_attribute(:avatar_image, { 'type' => 'attachment', 'url' => '/images/thumbnails/foo.gif' })
+        expect(data.select { |k, v| k =~ /avatar_img/ }.size).to eq orig_size
 
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/thumbnails/foo.gif"
@@ -291,7 +291,7 @@ describe UsersController do
       @first_course = @course
       course_with_student(:user => @student, :active_all => true)
       role = custom_account_role('grade viewer', :account => Account.default)
-      account_admin_user_with_role_changes(:role => role, :role_changes => {:view_all_grades => true})
+      account_admin_user_with_role_changes(:role => role, :role_changes => { :view_all_grades => true })
       user_session(@user)
 
       get "/users/#{@student.id}/grades"
@@ -349,9 +349,9 @@ describe UsersController do
     end
 
     it 'should pass the type down to the media fetcher even with a malformed url' do
-      expect(media_source_fetcher).to receive(:fetch_preferred_source_url).
-          with(media_id: 'someMediaId', file_extension: 'mp4', media_type: nil).
-          and_return('http://example.com/media.mp4')
+      expect(media_source_fetcher).to receive(:fetch_preferred_source_url)
+        .with(media_id: 'someMediaId', file_extension: 'mp4', media_type: nil)
+        .and_return('http://example.com/media.mp4')
 
       # this url actually passes "mp4" into params[:format] instead of params[:type] now
       # but we're going to handle it anyway because we're so nice

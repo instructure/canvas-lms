@@ -114,7 +114,7 @@ describe TatlTael::Linters::SimpleLinter do
       end
       let(:simple_linter) do
         described_class.new(config: config_with_pretty_requirement,
-                                                changes: changes)
+                            changes: changes)
       end
 
       context "changes exist for the requirement query" do

@@ -39,7 +39,7 @@ describe "links", priority: "2" do
 
     it "should navigate user to home page after home link is clicked" do
       expect_new_page_load { fln('Home').click }
-			expect(f("#course_home_content")).to be_displayed
+      expect(f("#course_home_content")).to be_displayed
     end
 
     it "should navigate user to announcements page after announcements link is clicked" do
@@ -112,7 +112,7 @@ describe "links", priority: "2" do
       context 'when react_inbox feature flag is off' do
         it "should navigate user to conversations page after inbox link is clicked" do
           Account.default.set_feature_flag! :react_inbox, 'off'
-          expect_new_page_load { fj('#global_nav_conversations_link').click}
+          expect_new_page_load { fj('#global_nav_conversations_link').click }
           expect(f("i.icon-email")).to be_displayed
         end
       end
@@ -127,7 +127,6 @@ describe "links", priority: "2" do
     end
 
     context "global nav links" do
-
       it "should navigate user to main page after canvas logo link is clicked" do
         expect_new_page_load { f('#header .ic-app-header__logomark').click }
         expect(driver.current_url).to eq dashboard_url

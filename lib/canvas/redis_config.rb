@@ -21,7 +21,7 @@ module Canvas
   class RedisConfig
     attr_reader :redis
 
-    def initialize(servers, database=nil, options=nil)
+    def initialize(servers, database = nil, options = nil)
       @redis = RedisConfig.from_servers(servers, options)
       @redis.select database if database.present?
     end

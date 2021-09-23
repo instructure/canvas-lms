@@ -20,7 +20,6 @@
 require_relative '../../spec_helper.rb'
 
 describe AuthenticationProvider::OpenIDConnect do
-
   describe '#scope_for_options' do
     it 'automatically infers according to requested claims' do
       connect = described_class.new
@@ -35,7 +34,7 @@ describe AuthenticationProvider::OpenIDConnect do
       connect = described_class.new
       payload = { sub: "some-login-attribute" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      uid = connect.unique_id(double(params: {'id_token' => id_token}, options: {}))
+      uid = connect.unique_id(double(params: { 'id_token' => id_token }, options: {}))
       expect(uid).to eq("some-login-attribute")
     end
 
@@ -45,7 +44,7 @@ describe AuthenticationProvider::OpenIDConnect do
       connect.login_attribute = 'not_in_id_token'
       payload = { sub: "1" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = double(options: {}, params: {'id_token' => id_token})
+      token = double(options: {}, params: { 'id_token' => id_token })
       expect(token).to receive(:get).with('moar').and_return(double(parsed: { 'not_in_id_token' => 'myid', 'sub' => '1' }))
       expect(connect.unique_id(token)).to eq 'myid'
     end
@@ -56,14 +55,14 @@ describe AuthenticationProvider::OpenIDConnect do
       connect.login_attribute = 'not_in_id_token'
       payload = { sub: "1" }
       id_token = Canvas::Security.create_jwt(payload, nil, :unsigned)
-      token = double(options: {}, params: {'id_token' => id_token})
+      token = double(options: {}, params: { 'id_token' => id_token })
       expect(token).to receive(:get).with('moar').and_return(double(parsed: { 'not_in_id_token' => 'myid', 'sub' => '2' }))
       expect(connect.unique_id(token)).to be_nil
     end
 
     it "returns nil if the id_token is missing" do
       connect = described_class.new
-      uid = connect.unique_id(double(params: {'id_token' => nil}, options: {}))
+      uid = connect.unique_id(double(params: { 'id_token' => nil }, options: {}))
       expect(uid).to be_nil
     end
   end

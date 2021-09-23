@@ -24,7 +24,7 @@ require 'nokogiri'
 
 describe "enrollment_date_restrictions" do
   before do
-    Account.default.tap{|a| a.settings[:restrict_student_future_view] = {:value => true}}.save!
+    Account.default.tap { |a| a.settings[:restrict_student_future_view] = { :value => true } }.save!
   end
 
   it "should not list inactive enrollments in the course list" do

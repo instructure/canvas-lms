@@ -21,15 +21,15 @@
 module CdcFixtures
   def self.create_enrollment
     Enrollment.new({
-      id: 1,
-      user_id: 1,
-      course_id: 1,
-      type: 'StudentEnrollment',
-      workflow_state: 'active',
-      course_section_id: 1,
-      root_account_id: 1,
-      limit_privileges_to_course_section: false,
-      role_id: 1
-    })
+                     id: 1,
+                     user_id: 1,
+                     course_id: 1,
+                     type: 'StudentEnrollment',
+                     workflow_state: 'active',
+                     course_section_id: 1,
+                     root_account_id: 1,
+                     limit_privileges_to_course_section: false,
+                     role_id: 1
+                   })
   end
 end

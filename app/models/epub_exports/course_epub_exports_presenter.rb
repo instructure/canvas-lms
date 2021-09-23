@@ -35,15 +35,15 @@ module EpubExports
     end
 
     private
-    def courses_not_including_epub_exports
 
-      @_courses_not_including_epub_exports ||= Course.joins(:enrollments).
-        where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions).
-        where(
-        'enrollments.type IN (?) AND enrollments.user_id = ?',
-        [StudentEnrollment, TeacherEnrollment, TaEnrollment],
-        current_user
-      ).to_a
+    def courses_not_including_epub_exports
+      @_courses_not_including_epub_exports ||= Course.joins(:enrollments)
+                                                     .where(Enrollment::QueryBuilder.new(:current_and_concluded).conditions)
+                                                     .where(
+                                                       'enrollments.type IN (?) AND enrollments.user_id = ?',
+                                                       [StudentEnrollment, TeacherEnrollment, TaEnrollment],
+                                                       current_user
+                                                     ).to_a
     end
 
     def courses_with_feature_enabled
@@ -56,12 +56,12 @@ module EpubExports
       @_epub_exports ||=
         begin
           exports = EpubExport.where({
-            course_id: courses_with_feature_enabled,
-            user_id: current_user,
-            type: nil
-            }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*").
-            order("course_id, created_at DESC").
-            preload(:epub_attachment, :job_progress, :zip_attachment).to_a
+                                       course_id: courses_with_feature_enabled,
+                                       user_id: current_user,
+                                       type: nil
+                                     }).select("DISTINCT ON (epub_exports.course_id) epub_exports.*")
+                              .order("course_id, created_at DESC")
+                              .preload(:epub_attachment, :job_progress, :zip_attachment).to_a
           EpubExport.fail_stuck_epub_exports(exports)
           exports
         end

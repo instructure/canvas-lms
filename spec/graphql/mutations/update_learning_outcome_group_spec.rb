@@ -34,7 +34,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
     @new_parent_global_group = LearningOutcomeGroup.create(title: 'New Parent Global Group')
   end
 
-  let(:context) {{ current_user: @admin }}
+  let(:context) { { current_user: @admin } }
 
   def mutation_str(**attrs)
     <<~GQL
@@ -168,7 +168,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
             vendorGuid: 'vg--1',
             parentOutcomeGroupId: @new_parent_global_group.id
           ),
-          {current_user: site_admin_user}
+          { current_user: site_admin_user }
         )
         expect(result.dig('errors')).to be_nil
         expect(result.dig('data', 'updateLearningOutcomeGroup', 'errors')).to be_nil
@@ -218,7 +218,7 @@ describe Mutations::UpdateLearningOutcomeGroup do
     it "requires user to have manage_outcomes permission to update learning outcome group" do
       result = execute_query(
         mutation_str(id: @group.id),
-        {current_user: @teacher}
+        { current_user: @teacher }
       )
       expect_error(result, 'Insufficient permissions')
     end

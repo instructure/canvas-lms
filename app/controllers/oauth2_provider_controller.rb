@@ -19,7 +19,6 @@
 #
 
 class Oauth2ProviderController < ApplicationController
-
   rescue_from Canvas::Oauth::RequestError, with: :oauth_error
   protect_from_forgery except: %i[token destroy], with: :exception
   before_action :run_login_hooks, only: %i[token]
@@ -55,14 +54,14 @@ class Oauth2ProviderController < ApplicationController
 
     unless provider.key.authorized_for_account?(@domain_root_account)
       return redirect_to Canvas::Oauth::Provider.final_redirect(self,
-        error: "unauthorized_client",
-        error_description: "Client does not have access to the specified Canvas account.")
+                                                                error: "unauthorized_client",
+                                                                error_description: "Client does not have access to the specified Canvas account.")
     end
 
     unless params[:response_type] == 'code'
       return redirect_to Canvas::Oauth::Provider.final_redirect(self,
-        error: "unsupported_response_type",
-        error_description: "Only response_type=code is permitted")
+                                                                error: "unsupported_response_type",
+                                                                error_description: "Only response_type=code is permitted")
     end
 
     case params[:prompt]
@@ -71,26 +70,26 @@ class Oauth2ProviderController < ApplicationController
     when 'none'
       if !logged_in_user
         return redirect_to Canvas::Oauth::Provider.final_redirect(self,
-          error: 'login_required',
-          error_description: 'prompt=none but there is no current session')
+                                                                  error: 'login_required',
+                                                                  error_description: 'prompt=none but there is no current session')
       elsif !provider.authorized_token?(@current_user, real_user: logged_in_user)
         return redirect_to Canvas::Oauth::Provider.final_redirect(self,
-          error: 'interaction_required',
-          error_description: 'prompt=none but a token cannot be granted without user interaction')
+                                                                  error: 'interaction_required',
+                                                                  error_description: 'prompt=none but a token cannot be granted without user interaction')
       else
         redirect_params = Canvas::Oauth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user)
         return redirect_to Canvas::Oauth::Provider.final_redirect(self, redirect_params)
       end
     else
       return redirect_to Canvas::Oauth::Provider.final_redirect(self,
-        error: 'unsupported_prompt_type',
-        error_description: 'prompt must be "none" (or omitted)')
+                                                                error: 'unsupported_prompt_type',
+                                                                error_description: 'prompt must be "none" (or omitted)')
     end
 
     if @current_pseudonym && !params[:force_login]
       redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, @current_user, logged_in_user)
     else
-      params["pseudonym_session"] = {"unique_id" => params[:unique_id]} if params.key?(:unique_id)
+      params["pseudonym_session"] = { "unique_id" => params[:unique_id] } if params.key?(:unique_id)
       redirect_to login_url(params.permit(:canvas_login, :force_login,
                                           :authentication_provider, pseudonym_session: :unique_id))
     end
@@ -111,12 +110,14 @@ class Oauth2ProviderController < ApplicationController
 
   def accept
     return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
+
     redirect_params = Canvas::Oauth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::Oauth::Provider.final_redirect(self, redirect_params)
   end
 
   def deny
     return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
+
     params = { error: "access_denied" }
     params[:state] = session[:oauth2][:state] if session[:oauth2].key? :state
     redirect_to Canvas::Oauth::Provider.final_redirect(self, params)
@@ -128,14 +129,14 @@ class Oauth2ProviderController < ApplicationController
     secret = params[:client_secret].presence || basic_pass
 
     granter = if grant_type == "authorization_code"
-      Canvas::Oauth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
-    elsif grant_type == "refresh_token"
-      Canvas::Oauth::GrantTypes::RefreshToken.new(client_id, secret, params)
-    elsif grant_type == 'client_credentials'
-      Canvas::Oauth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
-    else
-      Canvas::Oauth::GrantTypes::BaseType.new(client_id, secret, params)
-    end
+                Canvas::Oauth::GrantTypes::AuthorizationCode.new(client_id, secret, params)
+              elsif grant_type == "refresh_token"
+                Canvas::Oauth::GrantTypes::RefreshToken.new(client_id, secret, params)
+              elsif grant_type == 'client_credentials'
+                Canvas::Oauth::GrantTypes::ClientCredentials.new(params, request.host_with_port, request.protocol)
+              else
+                Canvas::Oauth::GrantTypes::BaseType.new(client_id, secret, params)
+              end
 
     raise Canvas::Oauth::RequestError, :unsupported_grant_type unless granter.supported_type?
 
@@ -162,6 +163,7 @@ class Oauth2ProviderController < ApplicationController
       logout_current_user
     end
     return render :json => { :message => "can't delete OAuth access token when not using an OAuth access token" }, :status => 400 unless @access_token
+
     @access_token.destroy
     response = {}
     response[:forward_url] = redirect if redirect
@@ -175,6 +177,7 @@ class Oauth2ProviderController < ApplicationController
   end
 
   private
+
   def oauth_error(exception)
     if @should_not_redirect || params[:redirect_uri] == Canvas::Oauth::Provider::OAUTH2_OOB_URI || params[:redirect_uri].blank?
       response['WWW-Authenticate'] = 'Canvas OAuth 2.0' if exception.http_status == 401

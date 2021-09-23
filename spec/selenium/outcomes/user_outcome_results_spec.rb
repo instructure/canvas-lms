@@ -43,5 +43,4 @@ describe "user outcome results page as a teacher" do
     btn.click
     expect(btn.text).to eq "Show All Artifacts"
   end
-
 end

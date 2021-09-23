@@ -23,9 +23,9 @@ class ParallelImporter < ActiveRecord::Base
   belongs_to :attachment
   has_many :sis_batch_errors, foreign_key: :parallel_importer_id, inverse_of: :parallel_importer
 
-  scope :running, -> {where(workflow_state: 'running')}
-  scope :completed, -> {where(workflow_state: 'completed')}
-  scope :not_completed, -> {where(workflow_state: %w{pending queued running retry})}
+  scope :running, -> { where(workflow_state: 'running') }
+  scope :completed, -> { where(workflow_state: 'completed') }
+  scope :not_completed, -> { where(workflow_state: %w{pending queued running retry}) }
 
   include Workflow
   workflow do
@@ -54,8 +54,8 @@ class ParallelImporter < ActiveRecord::Base
     self.update!(:workflow_state => "aborted", :ended_at => Time.now.utc)
   end
 
-  def complete(opts={})
-    updates = {:workflow_state => "completed", :ended_at => Time.now.utc}.merge(opts)
+  def complete(opts = {})
+    updates = { :workflow_state => "completed", :ended_at => Time.now.utc }.merge(opts)
     self.update!(updates)
   end
 end

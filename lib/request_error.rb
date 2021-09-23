@@ -20,7 +20,7 @@
 class RequestError < ::RuntimeError
   attr_accessor :response_status
 
-  def initialize(message, status=:bad_request)
+  def initialize(message, status = :bad_request)
     self.response_status = Rack::Utils.status_code(status)
     super(message)
   end

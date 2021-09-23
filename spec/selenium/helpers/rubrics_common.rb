@@ -49,12 +49,12 @@ module RubricsCommon
     @assignment = create_assignment_with_points(points)
     rubric_model(title: title, data:
                                         [{
-                                             description: "Some criterion",
-                                             points: points,
-                                             id: 'crit1',
-                                             ratings:
-                                                 [{description: "Good", points: points, id: 'rat1', criterion_id: 'crit1'}]
-                                         }], description: 'new rubric description')
+                                          description: "Some criterion",
+                                          points: points,
+                                          id: 'crit1',
+                                          ratings:
+                                                 [{ description: "Good", points: points, id: 'rat1', criterion_id: 'crit1' }]
+                                        }], description: 'new rubric description')
     @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: false)
   end
 
@@ -75,12 +75,12 @@ module RubricsCommon
               :description => "Amazing",
             },
             "1" => {
-                :points => points*0.30,
-                :description => "Reduced Marks",
+              :points => points * 0.30,
+              :description => "Reduced Marks",
             },
             "2" => {
-                :points => 0,
-                :description => "No Marks",
+              :points => 0,
+              :description => "No Marks",
             }
           }
         }

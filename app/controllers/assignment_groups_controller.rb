@@ -162,14 +162,14 @@ class AssignmentGroupsController < ApplicationController
       order = params[:order].split(',')
       @context.assignment_groups.first.update_order(order)
       new_order = @context.assignment_groups.pluck(:id)
-      render :json => {:reorder => true, :order => new_order}, :status => :ok
+      render :json => { :reorder => true, :order => new_order }, :status => :ok
     end
   end
 
   def reorder_assignments
     @group = @context.assignment_groups.find(params[:assignment_group_id])
     if authorized_action(@group, @current_user, :update)
-      order = params[:order].split(',').map{|id| id.to_i }
+      order = params[:order].split(',').map { |id| id.to_i }
       group_ids = ([@group.id] + (order.empty? ? [] : @context.assignments.where(id: order).distinct.except(:order).pluck(:assignment_group_id)))
       assignments = @context.active_assignments.where(id: order)
 
@@ -198,10 +198,10 @@ class AssignmentGroupsController < ApplicationController
       @group.assignments.first.update_order(order) unless @group.assignments.empty?
       groups = AssignmentGroup.where(id: group_ids)
       groups.touch_all
-      groups.each{|assignment_group| AssignmentGroup.notify_observers(:assignments_changed, assignment_group)}
+      groups.each { |assignment_group| AssignmentGroup.notify_observers(:assignments_changed, assignment_group) }
       ids = @group.active_assignments.map(&:id)
       @context.recompute_student_scores rescue nil
-      render json: { reorder: true, order: ids}, status: :ok
+      render json: { reorder: true, order: ids }, status: :ok
     end
   end
 
@@ -217,7 +217,7 @@ class AssignmentGroupsController < ApplicationController
     if authorized_action(@assignment_group, @current_user, :read)
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url, @assignment_group.context_id)) }
-        format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}) }
+        format.json { render :json => @assignment_group.as_json(:permissions => { :user => @current_user, :session => session }) }
       end
     end
   end
@@ -226,6 +226,7 @@ class AssignmentGroupsController < ApplicationController
     unless valid_integration_data?
       return render :json => 'Invalid integration data', :status => :bad_request
     end
+
     @assignment_group = @context.assignment_groups.temp_record(assignment_group_params)
     if authorized_action(@assignment_group, @current_user, :create)
       respond_to do |format|
@@ -233,7 +234,7 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group.insert_at(1)
           flash[:notice] = t 'notices.created', 'Assignment Group was successfully created.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+          format.json { render :json => @assignment_group.as_json(:permissions => { :user => @current_user, :session => session }), :status => :created }
         else
           format.json { render :json => @assignment_group.errors, :status => :bad_request }
         end
@@ -245,6 +246,7 @@ class AssignmentGroupsController < ApplicationController
     unless valid_integration_data?
       return render :json => 'Invalid integration data', :status => :bad_request
     end
+
     @assignment_group = @context.assignment_groups.find(params[:id])
     if authorized_action(@assignment_group, @current_user, :update)
       respond_to do |format|
@@ -253,7 +255,7 @@ class AssignmentGroupsController < ApplicationController
           @assignment_group = updated
           flash[:notice] = t 'notices.updated', 'Assignment Group was successfully updated.'
           format.html { redirect_to named_context_url(@context, :context_assignments_url) }
-          format.json { render :json => @assignment_group.as_json(:permissions => {:user => @current_user, :session => session}), :status => :ok }
+          format.json { render :json => @assignment_group.as_json(:permissions => { :user => @current_user, :session => session }), :status => :ok }
         else
           format.json { render :json => @assignment_group.errors, :status => :bad_request }
         end
@@ -280,10 +282,12 @@ class AssignmentGroupsController < ApplicationController
 
       respond_to do |format|
         format.html { redirect_to(named_context_url(@context, :context_assignments_url)) }
-        format.json { render :json => {
-          assignment_group: @assignment_group.as_json(include_root: false, include: :active_assignments),
-          new_assignment_group: @new_group.as_json(include_root: false, include: :active_assignments)
-        }}
+        format.json {
+          render :json => {
+            assignment_group: @assignment_group.as_json(include_root: false, include: :active_assignments),
+            new_assignment_group: @new_group.as_json(include_root: false, include: :active_assignments)
+          }
+        }
       end
     end
   end
@@ -296,15 +300,15 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_group_params
-    result = params.require(:assignment_group).
-      permit(:assignment_weighting_scheme,
-             :default_assignment_name,
-             :group_weight,
-             :name,
-             :position,
-             :rules,
-             :sis_source_id,
-             :integration_data => strong_anything)
+    result = params.require(:assignment_group)
+                   .permit(:assignment_weighting_scheme,
+                           :default_assignment_name,
+                           :group_weight,
+                           :name,
+                           :position,
+                           :rules,
+                           :sis_source_id,
+                           :integration_data => strong_anything)
     result[:integration_data] = nil if result[:integration_data] == ''
     result
   end
@@ -314,7 +318,7 @@ class AssignmentGroupsController < ApplicationController
   end
 
   def assignment_includes
-    includes = [:context, :external_tool_tag, {:quiz => :context}]
+    includes = [:context, :external_tool_tag, { :quiz => :context }]
     includes += [:rubric, :rubric_association] unless assignment_excludes.include?('rubric')
     includes << :discussion_topic if include_params.include?("discussion_topic")
     includes << :assignment_overrides if include_overrides?
@@ -405,10 +409,10 @@ class AssignmentGroupsController < ApplicationController
     return Assignment.none unless include_params.include?('assignments')
 
     assignment_ids = if params[:assignment_ids].is_a?(String)
-      params[:assignment_ids].split(",")
-    else
-      params[:assignment_ids]
-    end
+                       params[:assignment_ids].split(",")
+                     else
+                       params[:assignment_ids]
+                     end
 
     assignments = AssignmentGroup.visible_assignments(
       current_user,
@@ -421,7 +425,7 @@ class AssignmentGroupsController < ApplicationController
     if params[:exclude_assignment_submission_types].present?
       exclude_types = params[:exclude_assignment_submission_types]
       exclude_types = Array.wrap(exclude_types) &
-        %w(online_quiz discussion_topic wiki_page external_tool)
+                      %w(online_quiz discussion_topic wiki_page external_tool)
       assignments = assignments.where.not(submission_types: exclude_types)
     end
 
@@ -456,7 +460,7 @@ class AssignmentGroupsController < ApplicationController
     return assignments unless grading_period
 
     if params[:scope_assignments_to_student] &&
-      course.user_is_student?(@current_user, include_future: true, include_fake_student: true)
+       course.user_is_student?(@current_user, include_future: true, include_fake_student: true)
       grading_period.assignments_for_student(course, assignments, @current_user)
     else
       grading_period.assignments(course, assignments)

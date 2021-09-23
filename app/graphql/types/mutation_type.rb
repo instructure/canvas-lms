@@ -83,6 +83,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_discussion_read_state, mutation: Mutations::UpdateDiscussionReadState
   field :update_discussion_entries_read_state, mutation: Mutations::UpdateDiscussionEntriesReadState
   field :create_discussion_entry, mutation: Mutations::CreateDiscussionEntry
+  field :create_discussion_entry_draft, mutation: Mutations::CreateDiscussionEntryDraft
   field :update_discussion_entry, mutation: Mutations::UpdateDiscussionEntry
   field :update_discussion_thread_read_state, mutation: Mutations::UpdateDiscussionThreadReadState
   field :update_discussion_entry_participant, mutation: Mutations::UpdateDiscussionEntryParticipant

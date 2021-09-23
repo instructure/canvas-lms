@@ -44,13 +44,13 @@ describe Bookmarks::BookmarksController do
 
     describe "GET 'show'" do
       it "should succeed" do
-        get 'show', params: {id: bookmark.id}, format: 'json'
+        get 'show', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end
 
       it "includes data" do
-        bookmark.update(data: {foo: "bar"})
-        get 'show', params: {id: bookmark.id}, format: 'json'
+        bookmark.update(data: { foo: "bar" })
+        get 'show', params: { id: bookmark.id }, format: 'json'
         json = json_parse
         expect(json["data"]["foo"]).to eq("bar")
       end
@@ -58,13 +58,13 @@ describe Bookmarks::BookmarksController do
       it "restricts to own bookmarks" do
         u2 = user_factory
         bookmark2 = Bookmarks::Bookmark.create(user_id: u2.id, name: 'bio 101', url: '/courses/1')
-        get 'show', params: {id: bookmark2.id}, format: 'json'
+        get 'show', params: { id: bookmark2.id }, format: 'json'
         expect(response).to_not be_successful
       end
     end
 
     describe "POST 'create'" do
-      let(:params) { { name: 'chem 101', url: '/courses/2'} }
+      let(:params) { { name: 'chem 101', url: '/courses/2' } }
 
       it "should succeed" do
         post 'create', params: params, format: 'json'
@@ -81,7 +81,7 @@ describe Bookmarks::BookmarksController do
       end
 
       it "should set data" do
-        post 'create', params: params.merge(data: {foo: "bar"}), format: 'json'
+        post 'create', params: params.merge(data: { foo: "bar" }), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last.data["foo"]).to eq("bar")
       end
 
@@ -103,14 +103,14 @@ describe Bookmarks::BookmarksController do
 
     describe "PUT 'update'" do
       it "should succeed" do
-        put 'update', params: {id: bookmark.id}, format: 'json'
+        put 'update', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end
     end
 
     describe "DELETE 'delete'" do
       it "should succeed" do
-        delete 'destroy', params: {id: bookmark.id}, format: 'json'
+        delete 'destroy', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end
     end

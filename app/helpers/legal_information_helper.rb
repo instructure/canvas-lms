@@ -27,7 +27,8 @@ module LegalInformationHelper
     Setting.get('privacy_policy_url', 'http://www.canvaslms.com/policies/privacy-policy')
   end
 
-protected
+  protected
+
   # extension point
   def legal_information
     {}

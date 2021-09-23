@@ -24,8 +24,7 @@
 
 module Lti
   class VariableExpander
-
-    SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze #matches only the stuff inside `${}`
+    SUBSTRING_REGEX = /(?<=\${).*?(?=})/.freeze # matches only the stuff inside `${}`
     PARAMETERS_REGEX = /^(\$.+)\<(.+)\>$/.freeze # matches key and argument
 
     attr_reader :context, :root_account, :controller, :current_user
@@ -62,6 +61,7 @@ module Lti
 
     def self.find_expansion(key)
       return unless key.respond_to?(:to_sym)
+
       if (md = key.to_s.match(PARAMETERS_REGEX))
         real_key = md[1] + "<>"
         if (expansion = self.expansions[real_key.to_sym])
@@ -74,8 +74,10 @@ module Lti
 
     CONTROLLER_GUARD = -> { !!@controller }
     COURSE_GUARD = -> { @context.is_a? Course }
-    TERM_START_DATE_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term &&
-                                 @context.enrollment_term.start_at }
+    TERM_START_DATE_GUARD = -> {
+      @context.is_a?(Course) && @context.enrollment_term &&
+        @context.enrollment_term.start_at
+    }
     TERM_NAME_GUARD = -> { @context.is_a?(Course) && @context.enrollment_term&.name }
     USER_GUARD = -> { @current_user }
     SIS_USER_GUARD = -> { sis_pseudonym&.sis_user_id }
@@ -86,9 +88,9 @@ module Lti
     ASSIGNMENT_GUARD = -> { @assignment }
     FILE_UPLOAD_GUARD = -> { !!@assignment && @assignment.submission_types.split(',').include?('online_upload') }
     COLLABORATION_GUARD = -> { @collaboration }
-    MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object}
-    USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights}
-    MEDIA_OBJECT_ID_GUARD = -> {@attachment && (@attachment.media_object || @attachment.media_entry_id )}
+    MEDIA_OBJECT_GUARD = -> { @attachment && @attachment.media_object }
+    USAGE_RIGHTS_GUARD = -> { @attachment && @attachment.usage_rights }
+    MEDIA_OBJECT_ID_GUARD = -> { @attachment && (@attachment.media_object || @attachment.media_entry_id) }
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
     MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
@@ -120,7 +122,6 @@ module Lti
       expansion, args = self.class.find_expansion(k)
       expansion.expand(self, *args) if expansion
     end
-
 
     def expand_variables!(var_hash)
       var_hash.update(var_hash) do |_, v|
@@ -161,17 +162,17 @@ module Lti
     #    All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
     #   ```
     register_expansion 'com.instructure.User.observees', [],
-                      -> do
-                        observed_users = ObserverEnrollment.observed_students(@context, @current_user).
-                          keys
-                          if @tool.use_1_3?
-                            observed_users.map{ |u| u.lookup_lti_id(@context) }.join(',')
-                          else
-                            observed_users.map{ |u| Lti::Asset.opaque_identifier_for(u) }.join(',')
-                          end
-                      end,
-                      COURSE_GUARD,
-                      default_name: 'com_instructure_user_observees'
+                       -> do
+                         observed_users = ObserverEnrollment.observed_students(@context, @current_user)
+                                                            .keys
+                         if @tool.use_1_3?
+                           observed_users.map { |u| u.lookup_lti_id(@context) }.join(',')
+                         else
+                           observed_users.map { |u| Lti::Asset.opaque_identifier_for(u) }.join(',')
+                         end
+                       end,
+                       COURSE_GUARD,
+                       default_name: 'com_instructure_user_observees'
 
     # Returns an array of the section names that the user is enrolled in, if the
     # context of the tool launch is within a course.
@@ -192,12 +193,12 @@ module Lti
     #   "A123,B456,..."
     #   ```
     register_expansion 'com.instructure.Observee.sisIds', [],
-                        -> do
-                          observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
-                          observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(',')
-                        end,
-                        COURSE_GUARD,
-                        default_name: 'com_instructure_observee_sis_ids'
+                       -> do
+                         observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
+                         observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(',')
+                       end,
+                       COURSE_GUARD,
+                       default_name: 'com_instructure_observee_sis_ids'
 
     # The title of the context
     # @launch_parameter context_title
@@ -216,7 +217,7 @@ module Lti
     #   "This text was in the editor"
     #   ```
     register_expansion 'com.instructure.Editor.contents', [],
-                       -> { @editor_contents},
+                       -> { @editor_contents },
                        EDITOR_GUARD,
                        default_name: 'com_instructure_editor_contents'
 
@@ -240,9 +241,9 @@ module Lti
     #   "9ae4170c-6b64-444d-9246-0b7dedd5f560"
     #   ```
     register_expansion 'com.instructure.PostMessageToken', [],
-                      -> { @post_message_token || @launch.post_message_token },
-                      MESSAGE_TOKEN_GUARD,
-                      default_name: 'com_instructure_post_message_token'
+                       -> { @post_message_token || @launch.post_message_token },
+                       MESSAGE_TOKEN_GUARD,
+                       default_name: 'com_instructure_post_message_token'
 
     # The LTI assignment id of an assignment. This value corresponds with
     # the `ext_lti_assignment_id` send in various launches and webhooks.
@@ -253,13 +254,13 @@ module Lti
     #   ```
     register_expansion 'com.instructure.Assignment.lti.id', [],
                        -> do
-                        if @assignment
-                          @assignment.lti_context_id
-                        elsif @originality_report
-                          @originality_report.submission.assignment.lti_context_id
-                        elsif @secure_params.present?
-                          Lti::Security.decoded_lti_assignment_id(@secure_params)
-                        end
+                         if @assignment
+                           @assignment.lti_context_id
+                         elsif @originality_report
+                           @originality_report.submission.assignment.lti_context_id
+                         elsif @secure_params.present?
+                           Lti::Security.decoded_lti_assignment_id(@secure_params)
+                         end
                        end,
                        LTI_ASSIGN_ID,
                        default_name: 'com_instructure_assignment_lti_id'
@@ -288,7 +289,7 @@ module Lti
     #   ```
     register_expansion 'com.instructure.OriginalityReport.id', [],
                        -> do
-                        @originality_report.id
+                         @originality_report.id
                        end,
                        ORIGINALITY_REPORT_GUARD,
                        default_name: 'com_instructure_originality_report_id'
@@ -301,9 +302,9 @@ module Lti
     #   23
     #   ```
     register_expansion 'com.instructure.Submission.id', [],
-                      -> { @originality_report.submission.id },
-                      ORIGINALITY_REPORT_GUARD,
-                      default_name: 'com_instructure_submission_id'
+                       -> { @originality_report.submission.id },
+                       ORIGINALITY_REPORT_GUARD,
+                       default_name: 'com_instructure_submission_id'
 
     # The Canvas id of the file associated with the submission
     # in the launch.
@@ -313,9 +314,9 @@ module Lti
     #   23
     #   ```
     register_expansion 'com.instructure.File.id', [],
-                     -> { @originality_report.attachment.id },
-                     ORIGINALITY_REPORT_ATTACHMENT_GUARD,
-                     default_name: 'com_instructure_file_id'
+                       -> { @originality_report.attachment.id },
+                       ORIGINALITY_REPORT_ATTACHMENT_GUARD,
+                       default_name: 'com_instructure_file_id'
 
     # the LIS identifier for the course offering
     # @launch_parameter lis_course_offering_sourcedid
@@ -473,8 +474,10 @@ module Lti
     #   "http://example.url/path"
     #   ```
     register_expansion 'Canvas.externalTool.url', [],
-                       -> { @controller.named_context_url(@tool.context, :api_v1_context_external_tools_update_url,
-                                                          @tool.id, include_host:true) },
+                       -> {
+                         @controller.named_context_url(@tool.context, :api_v1_context_external_tools_update_url,
+                                                       @tool.id, include_host: true)
+                       },
                        CONTROLLER_GUARD,
                        LTI1_GUARD
 
@@ -514,8 +517,10 @@ module Lti
     #   "http://example.url/path.css"
     #   ```
     register_expansion 'Canvas.css.common', [],
-                       -> { URI.parse(@request.url).
-                         merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s },
+                       -> {
+                         URI.parse(@request.url)
+                            .merge(@controller.view_context.stylesheet_path(@controller.css_url_for(:common))).to_s
+                       },
                        CONTROLLER_GUARD
 
     # returns the shard id for the current context.
@@ -638,14 +643,14 @@ module Lti
     # returns true if the current course has the setting "Hide grade distribution graphs from students" enabled
     # @internal
     register_expansion 'Canvas.course.hideDistributionGraphs', [],
-      -> { @context.hide_distribution_graphs? },
-      COURSE_GUARD
+                       -> { @context.hide_distribution_graphs? },
+                       COURSE_GUARD
 
     # returns grade passback setting for the course.
     # @internal
     register_expansion 'Canvas.course.gradePassbackSetting', [],
-      -> { @context.grade_passback_setting },
-      COURSE_GUARD
+                       -> { @context.grade_passback_setting },
+                       COURSE_GUARD
 
     # returns the current course's term start date.
     # @example
@@ -662,9 +667,9 @@ module Lti
     #   "W1 2017"
     #   ```
     register_expansion 'Canvas.term.name', [],
-                        -> { @context.enrollment_term.name },
-                        TERM_NAME_GUARD,
-                        default_name: 'canvas_term_name'
+                       -> { @context.enrollment_term.name },
+                       TERM_NAME_GUARD,
+                       default_name: 'canvas_term_name'
 
     # returns the current course sis source id
     # to return the section source id use Canvas.course.sectionIds
@@ -705,7 +710,7 @@ module Lti
     #   "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
     #   ```
     register_expansion 'com.Instructure.membership.roles', [],
-                       -> { lti_helper.current_canvas_roles_lis_v2(lti_1_3? ? 'lti1_3' : 'lis2')},
+                       -> { lti_helper.current_canvas_roles_lis_v2(lti_1_3? ? 'lti1_3' : 'lis2') },
                        ROLES_GUARD,
                        default_name: 'com_instructure_membership_roles'
 
@@ -737,8 +742,8 @@ module Lti
     #   "example_permission_1,example_permission_2"
     #   ```
     register_expansion 'Canvas.membership.permissions<>', [],
-                        -> (permissions_str) { lti_helper.granted_permissions(permissions_str.split(",")) },
-                        ROLES_GUARD
+                       ->(permissions_str) { lti_helper.granted_permissions(permissions_str.split(",")) },
+                       ROLES_GUARD
 
     # With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
     #
@@ -853,7 +858,7 @@ module Lti
     #   "john.doe@example.com"
     #   ```
     register_expansion 'vnd.Canvas.Person.email.sis', [],
-                       -> {lti_helper.sis_email}, SIS_USER_GUARD
+                       -> { lti_helper.sis_email }, SIS_USER_GUARD
 
     # Returns the name of the timezone of the launching user.
     # @example
@@ -936,16 +941,17 @@ module Lti
                        COURSE_GUARD,
                        default_name: 'com_instructure_course_groupids'
 
-
     # returns the context ids for the groups the user belongs to in the course.
     # @example
     #   ```
     #   "1c16f0de65a080803785ecb3097da99872616f0d,d4d8d6ae1611e2c7581ce1b2f5c58019d928b79d,..."
     #   ```
     register_expansion 'Canvas.group.contextIds', [],
-                       -> { @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
-                              Lti::Asset.opaque_identifier_for(g)
-                            end.join(',') },
+                       -> {
+                         @current_user.groups.active.where(context_type: 'Course', context_id: @context.id).map do |g|
+                           Lti::Asset.opaque_identifier_for(g)
+                         end.join(',')
+                       },
                        -> { @current_user && @context.is_a?(Course) }
 
     # Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
@@ -993,7 +999,7 @@ module Lti
     #   420000000000042
     #   ```
     register_expansion 'Canvas.user.globalId', [],
-                       -> { @current_user.global_id},
+                       -> { @current_user.global_id },
                        USER_GUARD
 
     # Returns true for root account admins and false for all other roles.
@@ -1001,9 +1007,9 @@ module Lti
     #   ```
     #   true
     #   ```
-   register_expansion 'Canvas.user.isRootAccountAdmin', [],
-                      -> { @current_user.roles(@root_account).include? 'root_admin' },
-                      USER_GUARD
+    register_expansion 'Canvas.user.isRootAccountAdmin', [],
+                       -> { @current_user.roles(@root_account).include? 'root_admin' },
+                       USER_GUARD
 
     # Username/Login ID for the primary pseudonym for the user for the account.
     # This may not be the pseudonym the user is actually logged in with.
@@ -1132,8 +1138,8 @@ module Lti
     #   true
     #   ```
     register_expansion 'Canvas.course.sectionRestricted', [],
-      -> { lti_helper.section_restricted },
-      ENROLLMENT_GUARD
+                       -> { lti_helper.section_restricted },
+                       ENROLLMENT_GUARD
 
     # Returns a comma separated list of section sis_id's that the user is enrolled in.
     #
@@ -1259,7 +1265,7 @@ module Lti
     #   ```
     register_expansion 'Canvas.assignment.unlockAt.iso8601', [],
                        -> { @assignment.unlock_at.utc.iso8601 },
-                       -> {@assignment && @assignment.unlock_at.present?}
+                       -> { @assignment && @assignment.unlock_at.present? }
 
     # Returns the `lock_at` date of the assignment that was launched.
     # Only available when launched as an assignment with a `lock_at` set.
@@ -1270,7 +1276,7 @@ module Lti
     #   ```
     register_expansion 'Canvas.assignment.lockAt.iso8601', [],
                        -> { @assignment.lock_at.utc.iso8601 },
-                       -> {@assignment && @assignment.lock_at.present?}
+                       -> { @assignment && @assignment.lock_at.present? }
 
     # Returns the `due_at` date of the assignment that was launched.
     # Only available when launched as an assignment with a `due_at` set.
@@ -1281,7 +1287,7 @@ module Lti
     #   ```
     register_expansion 'Canvas.assignment.dueAt.iso8601', [],
                        -> { @assignment.due_at.utc.iso8601 },
-                       -> {@assignment && @assignment.due_at.present?}
+                       -> { @assignment && @assignment.due_at.present? }
 
     # Returns true if the assignment that was launched is published.
     # Only available when launched as an assignment.
@@ -1363,7 +1369,7 @@ module Lti
     #   "https://<domain>.instructure.com/api/lti/accounts/<account_id>/tool_consumer_profile/<opaque_id>"
     #   ```
     register_expansion 'ToolConsumerProfile.url', [],
-                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile])},
+                       -> { @controller.polymorphic_url([@tool.context, :tool_consumer_profile]) },
                        CONTROLLER_GUARD,
                        -> { @tool && @tool.is_a?(Lti::ToolProxy) }
 
@@ -1374,12 +1380,12 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
     #   ```
     register_expansion 'vnd.Canvas.OriginalityReport.url', [],
-                        -> do
-                          OriginalityReportsApiController::SERVICE_DEFINITIONS.find do |s|
-                            s[:id] == 'vnd.Canvas.OriginalityReport'
-                          end[:endpoint]
-                        end,
-                        default_name: 'vnd_canvas_originality_report_url'
+                       -> do
+                         OriginalityReportsApiController::SERVICE_DEFINITIONS.find do |s|
+                           s[:id] == 'vnd.Canvas.OriginalityReport'
+                         end[:endpoint]
+                       end,
+                       default_name: 'vnd_canvas_originality_report_url'
 
     # The submission LTI2 service endpoint
     # @launch_parameter vnd_canvas_submission_url
@@ -1388,12 +1394,12 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}"
     #   ```
     register_expansion 'vnd.Canvas.submission.url', [],
-                        -> do
-                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
-                            s[:id] == 'vnd.Canvas.submission'
-                          end[:endpoint]
-                        end,
-                        default_name: 'vnd_canvas_submission_url'
+                       -> do
+                         Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                           s[:id] == 'vnd.Canvas.submission'
+                         end[:endpoint]
+                       end,
+                       default_name: 'vnd_canvas_submission_url'
 
     # The submission history LTI2 service endpoint
     # @launch_parameter vnd_canvas_submission_history_url
@@ -1402,43 +1408,43 @@ module Lti
     #   "api/lti/assignments/{assignment_id}/submissions/{submission_id}/history"
     #   ```
     register_expansion 'vnd.Canvas.submission.history.url', [],
-                        -> do
-                          Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
-                            s[:id] == 'vnd.Canvas.submission.history'
-                          end[:endpoint]
-                        end,
-                        default_name: 'vnd_canvas_submission_history_url'
+                       -> do
+                         Lti::SubmissionsApiController::SERVICE_DEFINITIONS.find do |s|
+                           s[:id] == 'vnd.Canvas.submission.history'
+                         end[:endpoint]
+                       end,
+                       default_name: 'vnd_canvas_submission_history_url'
 
     register_expansion 'Canvas.file.media.id', [],
                        -> { (@attachment.media_object && @attachment.media_object.media_id) || @attachment.media_entry_id },
                        MEDIA_OBJECT_ID_GUARD
 
     register_expansion 'Canvas.file.media.type', [],
-                       -> {@attachment.media_object.media_type},
+                       -> { @attachment.media_object.media_type },
                        MEDIA_OBJECT_GUARD
 
     register_expansion 'Canvas.file.media.duration', [],
-                       -> {@attachment.media_object.duration},
+                       -> { @attachment.media_object.duration },
                        MEDIA_OBJECT_GUARD
 
     register_expansion 'Canvas.file.media.size', [],
-                       -> {@attachment.media_object.total_size},
+                       -> { @attachment.media_object.total_size },
                        MEDIA_OBJECT_GUARD
 
     register_expansion 'Canvas.file.media.title', [],
-                       -> {@attachment.media_object.user_entered_title || @attachment.media_object.title},
+                       -> { @attachment.media_object.user_entered_title || @attachment.media_object.title },
                        MEDIA_OBJECT_GUARD
 
     register_expansion 'Canvas.file.usageRights.name', [],
-                       -> {@attachment.usage_rights.license_name},
+                       -> { @attachment.usage_rights.license_name },
                        USAGE_RIGHTS_GUARD
 
     register_expansion 'Canvas.file.usageRights.url', [],
-                       -> {@attachment.usage_rights.license_url},
+                       -> { @attachment.usage_rights.license_url },
                        USAGE_RIGHTS_GUARD
 
     register_expansion 'Canvas.file.usageRights.copyrightText', [],
-                       -> {@attachment.usage_rights.legal_copyright},
+                       -> { @attachment.usage_rights.legal_copyright },
                        USAGE_RIGHTS_GUARD
 
     # Returns the types of resources that can be imported to the current page, forwarded from the request.
@@ -1509,11 +1515,11 @@ module Lti
                            # replace with the data here because it's too much to pass in via the launch url
                            case val.first["type"]
                            when "module"
-                             val = Course.find(course_id).modules_visible_to(@current_user).pluck(:id, :name).
-                               map{|id, name| {"id" => id, "name" => name} }
+                             val = Course.find(course_id).modules_visible_to(@current_user).pluck(:id, :name)
+                                         .map { |id, name| { "id" => id, "name" => name } }
                            when "assignment_group"
-                             val = Course.find(course_id).assignment_groups.active.pluck(:id, :name).
-                               map{|id, name| {"id" => id, "name" => name} }
+                             val = Course.find(course_id).assignment_groups.active.pluck(:id, :name)
+                                         .map { |id, name| { "id" => id, "name" => name } }
                            end
                          end
                          val&.to_json

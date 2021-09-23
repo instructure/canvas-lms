@@ -84,7 +84,7 @@ describe "collaborations" do
       @collaboration = Collaboration.typed_collaboration_instance('EtherPad')
       @collaboration.context = @course
       @collaboration.attributes = { :title => 'My collaboration',
-                                    :user  => @teacher }
+                                    :user => @teacher }
       @collaboration.update_members([@student])
       @collaboration.save!
 
@@ -95,4 +95,3 @@ describe "collaborations" do
     end
   end
 end
-

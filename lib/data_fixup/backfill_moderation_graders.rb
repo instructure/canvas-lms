@@ -26,9 +26,9 @@ module DataFixup::BackfillModerationGraders
     return if courses.blank?
 
     # Find all provisional graders for this batch of assignments
-    graders = ModeratedGrading::ProvisionalGrade.joins(:submission).
-      where("submissions.assignment_id IN (?)", assignments.select(:id)).
-      pluck(Arel.sql("distinct submissions.assignment_id, moderated_grading_provisional_grades.scorer_id"))
+    graders = ModeratedGrading::ProvisionalGrade.joins(:submission)
+                                                .where("submissions.assignment_id IN (?)", assignments.select(:id))
+                                                .pluck(Arel.sql("distinct submissions.assignment_id, moderated_grading_provisional_grades.scorer_id"))
     created_at = Time.zone.now
 
     Assignment.transaction do

@@ -22,9 +22,9 @@ class SisBatchError < ActiveRecord::Base
   belongs_to :parallel_importer, inverse_of: :sis_batch_errors
   belongs_to :root_account, class_name: 'Account', inverse_of: :sis_batch_errors
 
-  scope :expired_errors, -> {where('created_at < ?', 30.days.ago)}
-  scope :failed, -> {where(failure: true)}
-  scope :warnings, -> {where(failure: false)}
+  scope :expired_errors, -> { where('created_at < ?', 30.days.ago) }
+  scope :failed, -> { where(failure: true) }
+  scope :warnings, -> { where(failure: false) }
 
   def self.cleanup_old_errors
     expired_errors.in_batches(of: 10_000).delete_all
@@ -33,5 +33,4 @@ class SisBatchError < ActiveRecord::Base
   def description
     (self.file || "") + " - " + (self.message || "")
   end
-
 end

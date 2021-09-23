@@ -27,10 +27,10 @@ module CdcFixtures
     raise CdcFixtures::ForeignKeyNotSatisfied unless assignment
 
     AssignmentOverride.new({
-      workflow_state: 'default',
-      title: 'default',
-      set_id: 1,
-      assignment_id: assignment.id
-    })
+                             workflow_state: 'default',
+                             title: 'default',
+                             set_id: 1,
+                             assignment_id: assignment.id
+                           })
   end
 end

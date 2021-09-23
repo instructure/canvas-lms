@@ -28,7 +28,7 @@ describe SupportHelpers::PlagiarismPlatformController do
     let_once(:assignment) { assignment_model }
     let_once(:submission) { submission_model(assignment: assignment) }
 
-    let(:params) { {assignment_id: assignment.id} }
+    let(:params) { { assignment_id: assignment.id } }
 
     before do
       user_session(user)

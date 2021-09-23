@@ -88,7 +88,7 @@ module Lti
       end
 
       context 'when "developer_key_id" is blank' do
-        before { tool_configuration.settings = {foo: 'bar'} }
+        before { tool_configuration.settings = { foo: 'bar' } }
 
         it { is_expected.to eq false }
       end
@@ -191,7 +191,7 @@ module Lti
           s['title'] = 'new title!'
           s
         end
-        let(:changes) { {settings: changed_settings} }
+        let(:changes) { { settings: changed_settings } }
 
         it 'calls update_external_tools! on the developer key' do
           expect(developer_key).to receive(:update_external_tools!)
@@ -200,7 +200,7 @@ module Lti
       end
 
       context 'when a change to the settings hash was not made' do
-        let(:changes) { {disabled_placements: []} }
+        let(:changes) { { disabled_placements: [] } }
 
         it 'does not call update_external_tools! on the developer key' do
           expect(developer_key).not_to receive(:update_external_tools!)
@@ -210,7 +210,7 @@ module Lti
     end
 
     describe '#new_external_tool' do
-      subject{ tool_configuration.new_external_tool(context) }
+      subject { tool_configuration.new_external_tool(context) }
 
       let(:extensions) { settings['extensions'].first }
 
@@ -290,7 +290,7 @@ module Lti
         end
 
         it 'uses the correct top-level custom params' do
-          expect(subject.custom_fields).to eq({"has_expansion"=>"$Canvas.user.id", "no_expansion"=>"foo"})
+          expect(subject.custom_fields).to eq({ "has_expansion" => "$Canvas.user.id", "no_expansion" => "foo" })
         end
 
         it 'uses the correct icon url' do
@@ -314,7 +314,7 @@ module Lti
         end
 
         context 'placements' do
-          subject{ tool_configuration.new_external_tool(context).settings['course_navigation'] }
+          subject { tool_configuration.new_external_tool(context).settings['course_navigation'] }
 
           let(:placement_settings) { extensions['settings']['placements'].first }
 
@@ -348,7 +348,7 @@ module Lti
         end
 
         context 'with non-canvas extensions in settings' do
-          subject{ tool_configuration.new_external_tool(context) }
+          subject { tool_configuration.new_external_tool(context) }
 
           let(:settings) do
             sets = super()
@@ -459,7 +459,7 @@ module Lti
           before { allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error) }
 
           it 'raises exception if timeout occurs' do
-            expect{ tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
+            expect { tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
           end
         end
 
@@ -479,7 +479,7 @@ module Lti
             end
 
             it 'adds a "not found error to the model' do
-              expect{ tool_configuration }.to raise_error /Not found/
+              expect { tool_configuration }.to raise_error /Not found/
             end
           end
 
@@ -490,7 +490,7 @@ module Lti
             end
 
             it 'adds a "unauthorized error to the model' do
-              expect{ tool_configuration }.to raise_error /Unauthorized/
+              expect { tool_configuration }.to raise_error /Unauthorized/
             end
           end
 
@@ -501,7 +501,7 @@ module Lti
             end
 
             it 'adds a "internal server error to the model' do
-              expect{ tool_configuration }.to raise_error /Internal server error/
+              expect { tool_configuration }.to raise_error /Internal server error/
             end
           end
 
@@ -512,7 +512,7 @@ module Lti
             end
 
             it 'adds an error to the model' do
-              expect{ tool_configuration }.to raise_error /Content type must be \"application\/json\"/
+              expect { tool_configuration }.to raise_error /Content type must be \"application\/json\"/
             end
           end
         end

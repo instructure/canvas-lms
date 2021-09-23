@@ -37,31 +37,39 @@ describe Polling::PollSubmission do
 
   context "creating a poll submission" do
     it "requires an associated poll" do
-      expect { Polling::PollSubmission.create!(poll_choice: @poll_choice,
-                                               user: @student,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /Poll can't be blank/)
+      expect {
+        Polling::PollSubmission.create!(poll_choice: @poll_choice,
+                                        user: @student,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /Poll can't be blank/)
     end
 
     it "requires an associated poll choice" do
-      expect { Polling::PollSubmission.create!(poll: @poll,
-                                               user: @student,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /Poll choice can't be blank/)
+      expect {
+        Polling::PollSubmission.create!(poll: @poll,
+                                        user: @student,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /Poll choice can't be blank/)
     end
 
     it "requires a user" do
-      expect { Polling::PollSubmission.create!(poll: @poll,
-                                               poll_choice: @poll_choice,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /User can't be blank/)
+      expect {
+        Polling::PollSubmission.create!(poll: @poll,
+                                        poll_choice: @poll_choice,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /User can't be blank/)
     end
 
     it "requires a poll session" do
-      lambda { expect(Polling::PollSubmission.create!(poll: @poll,
+      lambda {
+        expect(Polling::PollSubmission.create!(poll: @poll,
                                                user: @student,
                                                poll_choice: @poll_choice)).to raise_error(ActiveRecord::RecordInvalid,
-                                                                                             /Poll session can't be blank/)}
+                                                                                          /Poll session can't be blank/)
+      }
     end
 
     it "saves successfully" do
@@ -73,11 +81,13 @@ describe Polling::PollSubmission do
       @poll_submission = Polling::PollSubmission.create!(poll: @poll, user: @student, poll_choice: @poll_choice, poll_session: @session)
       expect(@poll_submission).to be_valid
 
-      expect { Polling::PollSubmission.create!(poll: @poll,
-                                               user: @student,
-                                               poll_choice: @poll_choice,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /can only submit one choice per poll session/)
+      expect {
+        Polling::PollSubmission.create!(poll: @poll,
+                                        user: @student,
+                                        poll_choice: @poll_choice,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /can only submit one choice per poll session/)
     end
 
     it "allows multiple submissions across multiple sessions" do
@@ -93,11 +103,13 @@ describe Polling::PollSubmission do
 
     it "insures the associated poll session is published" do
       @session.close!
-      expect { Polling::PollSubmission.create!(poll: @poll,
-                                               user: @student,
-                                               poll_choice: @poll_choice,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /This poll session is not open for submissions/)
+      expect {
+        Polling::PollSubmission.create!(poll: @poll,
+                                        user: @student,
+                                        poll_choice: @poll_choice,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /This poll session is not open for submissions/)
     end
 
     it "insures the poll choice is associated to the submission's poll" do
@@ -106,11 +118,13 @@ describe Polling::PollSubmission do
       poll_choice.is_correct = true
       poll_choice.save
 
-      expect { Polling::PollSubmission.create!(poll: @poll,
-                                               user: @student,
-                                               poll_choice: poll_choice,
-                                               poll_session: @session) }.to raise_error(ActiveRecord::RecordInvalid,
-                                                                                            /That poll choice does not belong to the existing poll/)
+      expect {
+        Polling::PollSubmission.create!(poll: @poll,
+                                        user: @student,
+                                        poll_choice: poll_choice,
+                                        poll_session: @session)
+      }.to raise_error(ActiveRecord::RecordInvalid,
+                       /That poll choice does not belong to the existing poll/)
     end
   end
 end

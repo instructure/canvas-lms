@@ -85,7 +85,6 @@ describe "course settings" do
       expect(options).to include 'homeroom1'
       expect(options).to include 'homeroom2'
     end
-
   end
 
   context "considering homeroom courses" do
@@ -148,7 +147,7 @@ describe "course settings" do
     end
 
     it "should show the correct status with a tooltip when published and graded submissions" do
-      course_with_student_submissions({submission_points: true})
+      course_with_student_submissions({ submission_points: true })
       get "/courses/#{@course.id}/settings"
       course_status = f('#course-status')
       expect(course_status.text).to eq 'Course is Published'
@@ -200,8 +199,8 @@ describe "course settings" do
       wait.until do
         el = f('.self_enrollment_message')
         el.present? &&
-        el.text != nil &&
-        el.text != ""
+          el.text != nil &&
+          el.text != ""
       end
       message = f('.self_enrollment_message')
       expect(message).to include_text(code)
@@ -293,15 +292,13 @@ describe "course settings" do
       expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
       expect(element_exists?('#course_lock_all_announcements')).to be_falsey
     end
-
   end
 
   describe "course items" do
-
     def admin_cog(id)
       f(id).find_element(:css, '.admin-links').displayed?
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
     end
 
     it 'should not show cog menu for disabling or moving on home nav item' do
@@ -337,12 +334,12 @@ describe "course settings" do
     end
 
     it "should only allow less resrictive options in Customize visibility" do
-       get "/courses/#{@course.id}/settings"
-       click_option('#course_course_visibility', 'institution', :value)
-       f('#course_custom_course_visibility').click
-       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
-       click_option('#course_course_visibility', 'course', :value)
-       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
+      get "/courses/#{@course.id}/settings"
+      click_option('#course_course_visibility', 'institution', :value)
+      f('#course_custom_course_visibility').click
+      expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
+      click_option('#course_course_visibility', 'course', :value)
+      expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
     end
 
     it "should disable from Course Navigation tab", priority: "1", test_id: 112172 do
@@ -363,8 +360,8 @@ describe "course settings" do
       it "should return focus to cog menu button when disabling an item" do
         get "/courses/#{@course.id}/settings#tab-navigation"
         cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".disable_nav_item_link")[2].click    # click "Disable"
+        cog_menu_button.click # open the menu
+        ff(".disable_nav_item_link")[2].click # click "Disable"
         check_element_has_focus(cog_menu_button)
       end
     end
@@ -468,7 +465,7 @@ describe "course settings" do
   end
 
   it "should restrict student access inputs be hidden" do
-    @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+    @account.settings[:restrict_student_future_view] = { :locked => true, :value => true }
     @account.save!
 
     get "/courses/#{@course.id}/settings"
@@ -534,8 +531,8 @@ describe "course settings" do
       @course.save!
 
       bank = @course.assessment_question_banks.create!(:title => 'bank')
-      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question',
-        'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+      aq = bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question',
+                                                                 'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
       assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
       event = @course.calendar_events.create!(:title => "event", :description => html)
@@ -549,7 +546,7 @@ describe "course settings" do
 
       get "/courses/#{@course.id}/settings"
 
-      expect_new_page_load{ f(".validator_link").click }
+      expect_new_page_load { f(".validator_link").click }
 
       f('#link_validator_wrapper button').click
       wait_for_ajaximations
@@ -561,17 +558,17 @@ describe "course settings" do
       expect(f("#all-results .alert")).to include_text("Found 17 broken links")
 
       result_links = ff("#all-results .result h2 a")
-      expect(result_links.map{|link| link.text.strip}).to match_array([
-        'Course Syllabus',
-        aq.question_data[:question_name],
-        qq.question_data[:question_name],
-        assmnt.title,
-        event.title,
-        topic.title,
-        mod.name,
-        quiz.title,
-        page.title
-      ])
+      expect(result_links.map { |link| link.text.strip }).to match_array([
+                                                                           'Course Syllabus',
+                                                                           aq.question_data[:question_name],
+                                                                           qq.question_data[:question_name],
+                                                                           assmnt.title,
+                                                                           event.title,
+                                                                           topic.title,
+                                                                           mod.name,
+                                                                           quiz.title,
+                                                                           page.title
+                                                                         ])
     end
 
     it "should be able to filter links to unpublished content" do
@@ -605,10 +602,10 @@ describe "course settings" do
       expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
-      syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}
+      syllabus_result = ff('#all-results .result').detect { |r| r.text.include?("Course Syllabus") }
       expect(syllabus_result).to include_text('unpublished link')
       expect(syllabus_result).to include_text('deleted link')
-      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      page_result = ff('#all-results .result').detect { |r| r.text.include?(page.title) }
       expect(page_result).to include_text('unpublished link')
 
       # hide the unpublished results
@@ -625,7 +622,7 @@ describe "course settings" do
       move_to_click('label[for=show_unpublished]')
 
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
-      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      page_result = ff('#all-results .result').detect { |r| r.text.include?(page.title) }
       expect(page_result).to include_text('unpublished link')
     end
   end

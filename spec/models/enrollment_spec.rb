@@ -55,7 +55,7 @@ describe Enrollment do
 
     describe 'creation_pending' do
       subject(:enrollment) do
-        @enrollment.tap {|e| e.update!(workflow_state: :creation_pending) }
+        @enrollment.tap { |e| e.update!(workflow_state: :creation_pending) }
       end
 
       it { is_expected.to be_creation_pending }
@@ -68,7 +68,7 @@ describe Enrollment do
 
     describe 'active' do
       subject(:enrollment) do
-        @enrollment.tap {|e| e.update!(workflow_state: :active) }
+        @enrollment.tap { |e| e.update!(workflow_state: :active) }
       end
 
       it { is_expected.to be_active }
@@ -90,14 +90,14 @@ describe Enrollment do
     end
 
     describe 'deleted' do
-      subject { @enrollment.tap {|e| e.update!(workflow_state: :deleted) } }
+      subject { @enrollment.tap { |e| e.update!(workflow_state: :deleted) } }
 
       it { is_expected.to be_deleted }
     end
 
     describe 'rejected' do
       subject(:enrollment) do
-        @enrollment.tap {|e| e.update!(workflow_state: :rejected) }
+        @enrollment.tap { |e| e.update!(workflow_state: :rejected) }
       end
 
       it { is_expected.to be_rejected }
@@ -109,13 +109,13 @@ describe Enrollment do
     end
 
     describe 'completed' do
-      subject { @enrollment.tap {|e| e.update!(workflow_state: :completed) } }
+      subject { @enrollment.tap { |e| e.update!(workflow_state: :completed) } }
 
       it { is_expected.to be_completed }
     end
 
     describe 'inactive' do
-      subject { @enrollment.tap {|e| e.update!(workflow_state: :inactive) } }
+      subject { @enrollment.tap { |e| e.update!(workflow_state: :inactive) } }
 
       it { is_expected.to be_inactive }
     end
@@ -1443,14 +1443,14 @@ describe Enrollment do
     before(:once) { course_with_student }
 
     it "should raise an exception if called with more than one user" do
-      expect { Enrollment.recompute_final_score_in_singleton([@user.id, 5], @course.id) }.
-        to raise_error(ArgumentError)
+      expect { Enrollment.recompute_final_score_in_singleton([@user.id, 5], @course.id) }
+        .to raise_error(ArgumentError)
     end
 
     it "sends later for a single student" do
-      expect(Enrollment).to receive(:delay_if_production).
-        with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:")).
-        and_return(Enrollment)
+      expect(Enrollment).to receive(:delay_if_production)
+        .with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"))
+        .and_return(Enrollment)
       # The delegation works correctly in both cases, just the introspection of the method
       # kwargs by rspec is different between ruby versions
       if RUBY_VERSION >= '2.7.0'
@@ -1511,7 +1511,7 @@ describe Enrollment do
         end
       end
 
-      def course_section_availability_test(should_be_invited=false)
+      def course_section_availability_test(should_be_invited = false)
         @section = @course.course_sections.first
         expect(@section).not_to be_nil
         @enrollment.course_section = @section
@@ -2514,7 +2514,7 @@ describe Enrollment do
       membership.save!
 
       # delete the enrollment to trigger audit_groups_for_deleted_enrollments processing
-      expect {enrollment.destroy}.not_to raise_error
+      expect { enrollment.destroy }.not_to raise_error
 
       # she should still be removed from the group
       expect(group.users.size).to eq 0
@@ -2530,7 +2530,7 @@ describe Enrollment do
     it "should return candidate enrollments" do
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      communication_channel(@user, {username: 'jt@instructure.com'})
+      communication_channel(@user, { username: 'jt@instructure.com' })
       @course.enroll_user(@user)
       expect(Enrollment.invited.for_email('jt@instructure.com').count).to eq 1
     end
@@ -2539,27 +2539,27 @@ describe Enrollment do
       # mismatched e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      communication_channel(@user, {username: 'bob@instructure.com'})
+      communication_channel(@user, { username: 'bob@instructure.com' })
       @course.enroll_user(@user)
       # registered user
       user_factory
-      communication_channel(@user, {username: 'jt@instructure.com'})
+      communication_channel(@user, { username: 'jt@instructure.com' })
       @user.register!
       @course.enroll_user(@user)
       # active e-mail
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      communication_channel(@user, {username: 'jt@instructure.com', active_cc: true})
+      communication_channel(@user, { username: 'jt@instructure.com', active_cc: true })
       @course.enroll_user(@user)
       # accepted enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      communication_channel(@user, {username: 'jt@instructure.com'})
+      communication_channel(@user, { username: 'jt@instructure.com' })
       @course.enroll_user(@user).accept
       # rejected enrollment
       user_factory
       @user.update_attribute(:workflow_state, 'creation_pending')
-      communication_channel(@user, {username: 'jt@instructure.com'})
+      communication_channel(@user, { username: 'jt@instructure.com' })
       @course.enroll_user(@user).reject
 
       expect(Enrollment.invited.for_email('jt@instructure.com')).to eq []
@@ -2572,7 +2572,7 @@ describe Enrollment do
         course_factory(active_all: true)
         user_factory
         @user.update_attribute(:workflow_state, 'creation_pending')
-        communication_channel(@user, {username: 'jt@instructure.com'})
+        communication_channel(@user, { username: 'jt@instructure.com' })
         @enrollment = @course.enroll_user(@user)
         expect(Enrollment.cached_temporary_invitations('jt@instructure.com').length).to eq 1
         @enrollment.accept
@@ -2629,14 +2629,14 @@ describe Enrollment do
           course_factory(active_all: true)
           user_factory
           @user.update_attribute(:workflow_state, 'creation_pending')
-          communication_channel(@user, {username: 'jt@instructure.com'})
+          communication_channel(@user, { username: 'jt@instructure.com' })
           @enrollment1 = @course.enroll_user(@user)
           @shard1.activate do
             account = Account.create!
             course_factory(active_all: true, :account => account)
             user_factory
             @user.update_attribute(:workflow_state, 'creation_pending')
-            communication_channel(@user, {username: 'jt@instructure.com'})
+            communication_channel(@user, { username: 'jt@instructure.com' })
             @enrollment2 = @course.enroll_user(@user)
           end
         end
@@ -2681,7 +2681,6 @@ describe Enrollment do
             end
             expect(Enrollment.cached_temporary_invitations('jt@instructure.com')).to eq []
           end
-
         end
       end
     end
@@ -2841,7 +2840,7 @@ describe Enrollment do
         course_with_student(:active_all => 1)
         User.where(:id => @user).update_all(:updated_at => 1.day.ago)
         @user.reload
-        expect(@user.cached_currentish_enrollments).to eq [ @enrollment ]
+        expect(@user.cached_currentish_enrollments).to eq [@enrollment]
         @enrollment.conclude
         @user.reload
         expect(@user.cached_currentish_enrollments).to eq []
@@ -2936,7 +2935,6 @@ describe Enrollment do
   end
 
   describe '#can_be_deleted_by' do
-
     describe 'on a student enrollment without granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
       let(:session) { double }
@@ -2978,7 +2976,6 @@ describe Enrollment do
         expect(@enrollment.can_be_deleted_by(user, @course, session)).to be_falsey
       end
     end
-
 
     describe 'on a student enrollment with granular_permissions_manage_users' do
       let(:user) { double(:id => 42) }
@@ -3175,8 +3172,8 @@ describe Enrollment do
         @enrollment.destroy
         expect(@override.reload.workflow_state).to eq 'deleted'
         expect(@student_override.reload.workflow_state).to eq 'deleted'
-        @enrollment.enrollment_state.update(state:'invited')
-        @enrollment.update(workflow_state:'invited')
+        @enrollment.enrollment_state.update(state: 'invited')
+        @enrollment.update(workflow_state: 'invited')
         @enrollment.reload.accept!
         expect(@override.reload.workflow_state).to eq 'active'
         expect(@student_override.reload.workflow_state).to eq 'active'
@@ -3189,8 +3186,8 @@ describe Enrollment do
         @enrollment.destroy
         expect(@override.reload.workflow_state).to eq 'active'
         expect(@student_override.reload.workflow_state).to eq 'deleted'
-        @enrollment.enrollment_state.update(state:'invited')
-        @enrollment.update(workflow_state:'invited')
+        @enrollment.enrollment_state.update(state: 'invited')
+        @enrollment.update(workflow_state: 'invited')
         @enrollment.reload.accept!
         expect(@override.reload.workflow_state).to eq 'active'
         expect(@student_override.reload.workflow_state).to eq 'active'
@@ -3345,8 +3342,8 @@ describe Enrollment do
       e.save!
     end
 
-    enrolls = Enrollment.where(:id => [restricted_enroll, future_enroll, active_enroll]).
-      joins(:enrollment_state).order(Enrollment.state_by_date_rank_sql).to_a
+    enrolls = Enrollment.where(:id => [restricted_enroll, future_enroll, active_enroll])
+                        .joins(:enrollment_state).order(Enrollment.state_by_date_rank_sql).to_a
     expect(enrolls).to eq [active_enroll, future_enroll, restricted_enroll]
   end
 
@@ -3408,7 +3405,7 @@ describe Enrollment do
 
     it "infers the appropriate workflow state for pending review submissions when restoring them" do
       quiz_with_graded_submission(
-        [{question_data: {name: 'Q1', points_possible: 1, 'question_type' => 'essay_question'}}],
+        [{ question_data: { name: 'Q1', points_possible: 1, 'question_type' => 'essay_question' } }],
         user: @student,
         course: @course
       )

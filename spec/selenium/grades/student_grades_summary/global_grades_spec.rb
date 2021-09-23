@@ -46,7 +46,6 @@ describe 'Global Grades' do
     @student = user_factory(active_all: true)
     @course_no_gp.enroll_student(@student, enrollment_state: 'active')
 
-
     # create a second course, associate with second term created above, and enroll student
     @course_with_gp = course_factory(course_name: "Course 2", active_course: true)
     @course_with_gp.enrollment_term_id = second_term.id
@@ -64,7 +63,7 @@ describe 'Global Grades' do
                                 close_date: 2.days.from_now(now),
                                 title: "old grading period"
     gpg.grading_periods.create! start_date: 2.months.ago(now),
-                                end_date:   2.months.from_now(now),
+                                end_date: 2.months.from_now(now),
                                 close_date: 3.months.from_now(now),
                                 title: "current grading period"
     term = @course_with_gp.enrollment_term
@@ -114,12 +113,12 @@ describe 'Global Grades' do
     @assignment4.grade_student(@student, grade: SCORE4, grader: @teacher)
     @assignment5.grade_student(@student, grade: SCORE5, grader: @teacher)
 
-    GRADE_CURRENT_GP = ((SCORE1 + SCORE2 + SCORE3)/(@assignment1.points_possible + @assignment2.points_possible +
-      @assignment3.points_possible))*100
-    GRADE_OLD_GP = ((SCORE4/@assignment4.points_possible)*100)
-    GRADE_TOTAL_GP = ((SCORE1 + SCORE2 + SCORE3 + SCORE4)/(@assignment1.points_possible + @assignment2.points_possible +
-      @assignment3.points_possible + @assignment4.points_possible))*100
-    GRADE_TOTAL_NO_GP = (SCORE5/@assignment5.points_possible)*100
+    GRADE_CURRENT_GP = ((SCORE1 + SCORE2 + SCORE3) / (@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible)) * 100
+    GRADE_OLD_GP = ((SCORE4 / @assignment4.points_possible) * 100)
+    GRADE_TOTAL_GP = ((SCORE1 + SCORE2 + SCORE3 + SCORE4) / (@assignment1.points_possible + @assignment2.points_possible +
+      @assignment3.points_possible + @assignment4.points_possible)) * 100
+    GRADE_TOTAL_NO_GP = (SCORE5 / @assignment5.points_possible) * 100
   end
 
   context 'as student' do
@@ -134,7 +133,7 @@ describe 'Global Grades' do
       # grab score to compare
       course_score = GlobalGrades.get_score_for_course(@course_with_gp)
       # find link for Second Course and click
-      wait_for_new_page_load{ GlobalGrades.click_course_link(@course_with_gp) }
+      wait_for_new_page_load { GlobalGrades.click_course_link(@course_with_gp) }
 
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/grades/#{@student.id}"
@@ -179,7 +178,7 @@ describe 'Global Grades' do
 
     it 'goes to gradebook page', priority: "1", test_id: 3494790 do
       # find link for Second Course and click
-      wait_for_new_page_load{ GlobalGrades.click_course_link(@course_with_gp) }
+      wait_for_new_page_load { GlobalGrades.click_course_link(@course_with_gp) }
 
       # verify url has correct course id
       expect(driver.current_url).to eq app_url + "/courses/#{@course_with_gp.id}/gradebook"
@@ -188,7 +187,7 @@ describe 'Global Grades' do
     end
 
     it 'goes to student interactions report', priority: "1", test_id: 3500433 do
-      wait_for_new_page_load{ GlobalGrades.click_report_link(@course_with_gp) }
+      wait_for_new_page_load { GlobalGrades.click_report_link(@course_with_gp) }
 
       expect(StudentInteractionsReport.report).to be_displayed
       # verify current score

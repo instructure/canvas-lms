@@ -39,18 +39,18 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
         # search results cannot look at the messages from deleted
         # discussion_entries, so they need to be excluded.
         scope = scope.active.joins(:user).where(UserSearch.like_condition('message'), pattern: UserSearch.like_string_for(@search_term))
-          .or(scope.joins(:user).where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(@search_term)))
+                     .or(scope.joins(:user).where(UserSearch.like_condition('users.name'), pattern: UserSearch.like_string_for(@search_term)))
       end
 
       if @root_entries
         sort_sql = ActiveRecord::Base.sanitize_sql("COALESCE(children.created_at, discussion_entries.created_at) #{@sort_order}")
         scope = scope
-          .joins("LEFT OUTER JOIN #{DiscussionEntry.quoted_table_name} AS children
+                .joins("LEFT OUTER JOIN #{DiscussionEntry.quoted_table_name} AS children
                   ON children.root_entry_id=discussion_entries.id
                   AND children.created_at = (SELECT MAX(children2.created_at)
                                              FROM #{DiscussionEntry.quoted_table_name} AS children2
                                              WHERE children2.root_entry_id=discussion_entries.id)")
-          .reorder(Arel.sql(sort_sql))
+                .reorder(Arel.sql(sort_sql))
       end
 
       if @relative_entry_id
@@ -83,5 +83,4 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
       end
     end
   end
-
 end

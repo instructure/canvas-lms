@@ -34,7 +34,6 @@ class WebConference < ActiveRecord::Base
   validates_presence_of :conference_type, :title, :context_id, :context_type, :user_id
   validate :lti_tool_valid, if: -> { conference_type == 'LtiConference' }
 
-
   MAX_DURATION = 99999999
   validates_numericality_of :duration, :less_than_or_equal_to => MAX_DURATION, :allow_nil => true
 
@@ -48,7 +47,7 @@ class WebConference < ActiveRecord::Base
 
   scope :for_context_codes, lambda { |context_codes| where(:context_code => context_codes) }
 
-  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map{|ct| ct['conference_type']}) }
+  scope :with_config_for, ->(context:) { where(conference_type: WebConference.conference_types(context).map { |ct| ct['conference_type'] }) }
 
   scope :live, -> { where("web_conferences.started_at BETWEEN (NOW() - interval '1 day') AND NOW() AND (web_conferences.ended_at IS NULL OR web_conferences.ended_at > NOW())") }
 
@@ -64,6 +63,7 @@ class WebConference < ActiveRecord::Base
     unless user_settings.empty?
       (type ? type.constantize : self).user_setting_fields.each do |name, field_data|
         next if field_data[:restricted_to] && !field_data[:restricted_to].call(self)
+
         settings[name] = cast_setting(user_settings[name], field_data[:type])
       end
       @user_settings = nil
@@ -80,7 +80,7 @@ class WebConference < ActiveRecord::Base
 
   def user_settings
     @user_settings ||=
-      self.class.user_setting_fields.keys.inject({}){ |hash, key|
+      self.class.user_setting_fields.keys.inject({}) { |hash, key|
         hash[key] = settings[key]
         hash
       }
@@ -124,28 +124,28 @@ class WebConference < ActiveRecord::Base
 
   def cast_setting(value, type)
     case type
-      when :boolean
-        ['1', 'on', 'true'].include?(value.to_s)
-      else value
+    when :boolean
+      ['1', 'on', 'true'].include?(value.to_s)
+    else value
     end
   end
 
   def friendly_setting(value)
     case value
-      when true
-        t('#web_conference.settings.boolean.true', "On")
-      when false
-        t('#web_conference.settings.boolean.false', "Off")
-      else value.to_s
+    when true
+      t('#web_conference.settings.boolean.true', "On")
+    when false
+      t('#web_conference.settings.boolean.false', "Off")
+    else value.to_s
     end
   end
 
   def default_settings
     @default_settings ||=
-    self.class.user_setting_fields.inject({}){ |hash, (name, data)|
-      hash[name] = data[:default] if data[:default]
-      hash
-    }
+      self.class.user_setting_fields.inject({}) { |hash, (name, data)|
+        hash[name] = data[:default] if data[:default]
+        hash
+      }
   end
 
   def self.user_setting_field(name, options)
@@ -169,7 +169,7 @@ class WebConference < ActiveRecord::Base
   end
 
   def external_urls
-    @external_urls ||= self.class.external_urls.dup.delete_if{ |key, info| info[:restricted_to] && !info[:restricted_to].call(self) }
+    @external_urls ||= self.class.external_urls.dup.delete_if { |key, info| info[:restricted_to] && !info[:restricted_to].call(self) }
   end
 
   # #{key}_external_url should return an array of hashes with url information (:name, :id, and :url).
@@ -178,13 +178,14 @@ class WebConference < ActiveRecord::Base
   # regenerated)
   def external_url_for(key, user, url_id = nil)
     external_urls[key.to_sym] &&
-    respond_to?("#{key}_external_url") &&
-    send("#{key}_external_url", user, url_id) || []
+      respond_to?("#{key}_external_url") &&
+      send("#{key}_external_url", user, url_id) || []
   end
 
   def self.external_urls
     @external_urls ||= {}
   end
+
   def self.external_urls=(val)
     @external_urls = val
   end
@@ -237,6 +238,7 @@ class WebConference < ActiveRecord::Base
 
   def add_user(user, type)
     return unless user
+
     p = self.web_conference_participants.where(user_id: user).first
     p ||= self.web_conference_participants.build(user: user)
     p.participation_type = type unless type == 'attendee' && p.participation_type == 'initiator'
@@ -293,11 +295,11 @@ class WebConference < ActiveRecord::Base
     conf_type = if val == 'LtiConference'
                   { conference_type: 'LtiConference', class_name: 'LtiConference' }
                 else
-                  WebConference.conference_types(context).detect{|t| t[:conference_type] == val }
+                  WebConference.conference_types(context).detect { |t| t[:conference_type] == val }
                 end
     if conf_type
-      write_attribute(:conference_type, conf_type[:conference_type] )
-      write_attribute(:type, conf_type[:class_name] )
+      write_attribute(:conference_type, conf_type[:conference_type])
+      write_attribute(:type, conf_type[:class_name])
       conf_type[:conference_type]
     else
       nil
@@ -369,7 +371,7 @@ class WebConference < ActiveRecord::Base
     nil
   end
 
-  def active?(force_check=false, allow_check=true)
+  def active?(force_check = false, allow_check = true)
     if !force_check
       return false if self.ended_at && Time.now > self.ended_at
       return true if self.start_at && (self.end_at.nil? || self.end_at && Time.now > self.start_at && Time.now < self.end_at)
@@ -381,6 +383,7 @@ class WebConference < ActiveRecord::Base
       # assume it's inactive
       return false
     end
+
     @conference_active = (conference_status == :active)
     # If somehow the end_at didn't get set, set the end date
     # based on the start time and duration
@@ -433,7 +436,7 @@ class WebConference < ActiveRecord::Base
     []
   end
 
-  def craft_url(user=nil,session=nil,return_to="http://www.instructure.com")
+  def craft_url(user = nil, session = nil, return_to = "http://www.instructure.com")
     user ||= self.user
     initiate_conference and touch or return nil
     if user == self.user || self.grants_right?(user, session, :initiate)
@@ -493,12 +496,12 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.active_conference_type_names
-    WebConference.plugins.map{|p| p.id.classify}
+    WebConference.plugins.map { |p| p.id.classify }
   end
 
   scope :active, -> { where(:conference_type => WebConference.active_conference_type_names) }
 
-  def as_json(options={})
+  def as_json(options = {})
     url = options.delete(:url)
     join_url = options.delete(:join_url)
     options.reverse_merge!(:only => %w(id title description conference_type duration started_at ended_at user_ids context_id context_type context_code))
@@ -551,10 +554,11 @@ class WebConference < ActiveRecord::Base
   end
 
   def self.plugin_types
-    plugins.map{ |plugin|
+    plugins.map { |plugin|
       next unless plugin.enabled? &&
-          (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
-          klass < self.base_class
+                  (klass = (plugin.base || "#{plugin.id.classify}Conference").constantize rescue nil) &&
+                  klass < self.base_class
+
       plugin.settings.merge(
         :conference_type => plugin.id.classify,
         :class_name => (plugin.base || "#{plugin.id.classify}Conference"),
@@ -567,7 +571,7 @@ class WebConference < ActiveRecord::Base
 
   def self.config(context: nil, class_name: nil)
     if class_name
-      conference_types(context).detect{ |c| c[:class_name] == class_name }
+      conference_types(context).detect { |c| c[:class_name] == class_name }
     else
       conference_types(context).first
     end

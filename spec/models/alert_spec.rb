@@ -30,15 +30,15 @@ describe Alert do
     context "mass assignment" do
       it "should accept mass assignment of criteria" do
         alert = Alert.new(:context => Account.default, :recipients => [:student])
-        alert.criteria = [{:criterion_type => 'Interaction', :threshold => 1}]
+        alert.criteria = [{ :criterion_type => 'Interaction', :threshold => 1 }]
         expect(alert.criteria.length).to eq 1
         expect(alert.criteria.first.criterion_type).to eq 'Interaction'
         expect(alert.criteria.first.threshold).to eq 1
         alert.save!
         original_criterion_id = alert.criteria.first.id
 
-        alert.criteria = [{:criterion_type => 'Interaction', :threshold => 7, :id => alert.criteria.first.id},
-                          {:criterion_type => 'UserNote', :threshold => 6}]
+        alert.criteria = [{ :criterion_type => 'Interaction', :threshold => 7, :id => alert.criteria.first.id },
+                          { :criterion_type => 'UserNote', :threshold => 6 }]
         expect(alert.criteria.length).to eq 2
         expect(alert.criteria.first.id).to eq original_criterion_id
         expect(alert.criteria.first.threshold).to eq 7
@@ -53,12 +53,12 @@ describe Alert do
 
     context "validation" do
       it "should require a context" do
-        alert = Alert.new(:recipients => [:student], :criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+        alert = Alert.new(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
         expect(alert.save).to be_falsey
       end
 
       it "should require recipients" do
-        alert = Account.default.alerts.build(:criteria => [{:criterion_type => 'Interaction', :threshold => 7}])
+        alert = Account.default.alerts.build(:criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
         expect(alert.save).to be_falsey
       end
 
@@ -72,20 +72,20 @@ describe Alert do
   context "#resolve_recipients" do
     it "resolves to a student based on recipients list" do
       alert = Alert.new(:context => Account.default, :recipients => [:student])
-      recipients = alert.resolve_recipients(1, [2,3])
+      recipients = alert.resolve_recipients(1, [2, 3])
       expect(recipients).to eq [1]
     end
 
     it "resolves to teachers based on recipients list" do
       alert = Alert.new(:context => Account.default, :recipients => [:teachers])
-      recipients = alert.resolve_recipients(1, [2,3])
-      expect(recipients).to eq [2,3]
+      recipients = alert.resolve_recipients(1, [2, 3])
+      expect(recipients).to eq [2, 3]
     end
 
     it "resolves to an admin based on recipients list" do
       admin = account_admin_user
       alert = Alert.new(:context => Account.default, :recipients => ['AccountAdmin'])
-      recipients = alert.resolve_recipients(1, [2,3])
+      recipients = alert.resolve_recipients(1, [2, 3])
       expect(recipients).to eq [admin.id]
     end
   end

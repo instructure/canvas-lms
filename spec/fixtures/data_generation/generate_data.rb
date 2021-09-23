@@ -40,7 +40,7 @@ include Factories
 
 # rubocop:disable Specs/ScopeHelperModules
 def toggle_k5_setting(account, enable = true)
-  account.settings[:enable_as_k5_account] = {:value => enable, :locked => enable}
+  account.settings[:enable_as_k5_account] = { :value => enable, :locked => enable }
   account.root_account.settings[:k5_accounts] = enable ? [account.id] : []
   account.save!
 end
@@ -115,13 +115,13 @@ def course_with_students_enrolled
 end
 
 def create_assignment(course, title, points_possible = 10)
-    course.assignments.create!(
-      title: "#{title} #{SecureRandom.alphanumeric(10)}",
-      description: "General Assignment",
-      points_possible: points_possible,
-      submission_types: 'online_text_entry',
-      workflow_state: 'published'
-    )
+  course.assignments.create!(
+    title: "#{title} #{SecureRandom.alphanumeric(10)}",
+    description: "General Assignment",
+    points_possible: points_possible,
+    submission_types: 'online_text_entry',
+    workflow_state: 'published'
+  )
 end
 
 def create_discussion(course, creator)
@@ -135,8 +135,8 @@ end
 
 def create_quiz(course)
   due_at = 1.day.from_now(Time.zone.now)
-  unlock_at = Time.zone.now.advance(days:-2)
-  lock_at = Time.zone.now.advance(days:4)
+  unlock_at = Time.zone.now.advance(days: -2)
+  lock_at = Time.zone.now.advance(days: 4)
   title = "Test Quiz #{SecureRandom.alphanumeric(10)}"
   @context = course
   @quiz = quiz_model
@@ -151,7 +151,7 @@ def create_quiz(course)
       name: 'Quiz Questions',
       question_type: 'fill_in_multiple_blanks_question',
       question_text: '[color1]',
-      answers: [ {text: 'one', id: 1}, {text: 'two', id: 2}, {text: 'three', id: 3} ],
+      answers: [{ text: 'one', id: 1 }, { text: 'two', id: 2 }, { text: 'three', id: 3 }],
       points_possible: 1
     }
   )
@@ -240,7 +240,7 @@ def generate_course_and_submissions
   student_list = course_with_enrollments
   assignment = create_assignment(@course, 'Assignment to submit')
   student_list.each do |student|
-    assignment.submit_homework(student, {submission_type: "online_text_entry", body: "Here it is"})
+    assignment.submit_homework(student, { submission_type: "online_text_entry", body: "Here it is" })
     assignment.grade_student(student, grader: @teacher, score: 75, points_deducted: 0)
   end
 end
@@ -271,29 +271,29 @@ def generate_mastery_path_course
 
   ranges = [
     ConditionalRelease::ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
-      ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-        ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id),
-        ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => disc_assignment.id)
-      ])
-    ]),
+                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => disc_assignment.id)
+                                                                                 ])
+                                         ]),
     ConditionalRelease::ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
-      ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
-        ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
-        ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
-      ])
-    ]),
+                                           ConditionalRelease::AssignmentSet.new(:assignment_set_associations => [
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
+                                                                                   ConditionalRelease::AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
+                                                                                 ])
+                                         ]),
     ConditionalRelease::ScoringRange.new(:lower_bound => 0, :upper_bound => 0.4, :assignment_sets => [
-      ConditionalRelease::AssignmentSet.new(
-        :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-          :assignment_id => @set3a_assmt.id
-        )]
-      ),
-      ConditionalRelease::AssignmentSet.new(
-        :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
-          :assignment_id => @set3b_assmt.id
-        )]
-      )
-    ])
+                                           ConditionalRelease::AssignmentSet.new(
+                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
+                                               :assignment_id => @set3a_assmt.id
+                                             )]
+                                           ),
+                                           ConditionalRelease::AssignmentSet.new(
+                                             :assignment_set_associations => [ConditionalRelease::AssignmentSetAssociation.new(
+                                               :assignment_id => @set3b_assmt.id
+                                             )]
+                                           )
+                                         ])
   ]
   @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assignment, :scoring_ranges => ranges)
 end
@@ -375,20 +375,20 @@ options = {}
 ARGV << '-h' if ARGV.empty?
 option_parser = OptionParser.new do |opts|
   opts.banner = "Usage: script/rails runner generate_data.rb [-abdgklmprsth] [-c course_name] [-n number_of_students]"
-  opts.on("-a","--all_data", "Create all the available data with defaults")
-  opts.on("-b","--basic_course", "Course with teacher and students")
-  opts.on("-c","--course_name=COURSENAME", "Course Name")
-  opts.on("-d","--dated_assignments", "Course with Dated Assignments")
-  opts.on("-g","--assignment_groups", "Course with Assignments in assignment groups")
-  opts.on("-i","--account_id=ACCOUNTID", "Id Number of the root account")
-  opts.on("-k","--k5_dash", "K5 Dashboard Homeroom and subjects")
-  opts.on("-l","--loaded_course", "Loaded Course with teacher and students")
-  opts.on("-m","--mastery_path", "Mastery Path Course")
-  opts.on("-n","--num_students=NUMSTUDENTS", Integer, "Number of students in course")
-  opts.on("-p","--blueprint", "Blueprint Course and Association")
-  opts.on("-r","--rubric", "Course with Outcome Rubric Assignment")
-  opts.on("-s","--submissions", "Course and Assignments and Submissions")
-  opts.on("-t","--sections", "Course with Students in Sections")
+  opts.on("-a", "--all_data", "Create all the available data with defaults")
+  opts.on("-b", "--basic_course", "Course with teacher and students")
+  opts.on("-c", "--course_name=COURSENAME", "Course Name")
+  opts.on("-d", "--dated_assignments", "Course with Dated Assignments")
+  opts.on("-g", "--assignment_groups", "Course with Assignments in assignment groups")
+  opts.on("-i", "--account_id=ACCOUNTID", "Id Number of the root account")
+  opts.on("-k", "--k5_dash", "K5 Dashboard Homeroom and subjects")
+  opts.on("-l", "--loaded_course", "Loaded Course with teacher and students")
+  opts.on("-m", "--mastery_path", "Mastery Path Course")
+  opts.on("-n", "--num_students=NUMSTUDENTS", Integer, "Number of students in course")
+  opts.on("-p", "--blueprint", "Blueprint Course and Association")
+  opts.on("-r", "--rubric", "Course with Outcome Rubric Assignment")
+  opts.on("-s", "--submissions", "Course and Assignments and Submissions")
+  opts.on("-t", "--sections", "Course with Students in Sections")
   opts.on_tail("-h", "--help", "Help") do
     puts opts
     exit
@@ -450,9 +450,3 @@ options.each_key do |key|
 end
 
 exit 0
-
-
-
-
-
-

@@ -98,8 +98,8 @@ describe Mutations::MoveOutcomeLinks do
     moved_links = response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks").map { |link| link['_id'] }
     expect(moved_links).to eql([@outcome_link.id.to_s])
     expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
-      {"attribute"=>@outcome_other_context_link.id.to_s, "message"=>"Could not find associated outcome in this context"}
-    ])
+                                                                                { "attribute" => @outcome_other_context_link.id.to_s, "message" => "Could not find associated outcome in this context" }
+                                                                              ])
   end
 
   it "touches parent group" do
@@ -203,8 +203,8 @@ describe Mutations::MoveOutcomeLinks do
 
       expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks")).to eql([])
       expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
-        {"attribute"=>"123123", "message"=>"Could not find associated outcome in this context"}
-      ])
+                                                                                  { "attribute" => "123123", "message" => "Could not find associated outcome in this context" }
+                                                                                ])
     end
 
     it "validates when outcomes exists in different context" do
@@ -220,8 +220,8 @@ describe Mutations::MoveOutcomeLinks do
 
       expect(response.dig("data", "moveOutcomeLinks", "movedOutcomeLinks")).to eql([])
       expect(response.dig("data", "moveOutcomeLinks", "errors")).to match_array([
-        {"attribute"=>@outcome_other_context_link.id.to_s, "message"=>"Could not find associated outcome in this context"}
-      ])
+                                                                                  { "attribute" => @outcome_other_context_link.id.to_s, "message" => "Could not find associated outcome in this context" }
+                                                                                ])
     end
   end
 end

@@ -76,7 +76,7 @@ describe "/eportfolios/show" do
     course_with_student(user: @user, active_all: true)
     submission_model(course: @course, user: @user)
     assign(:owner_view, true)
-    @submission.update_columns({workflow_state: 'graded', score: 0})
+    @submission.update_columns({ workflow_state: 'graded', score: 0 })
     render "eportfolios/show"
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css("#recent_submission_#{@submission.id} .view_submission_url")).to be_present

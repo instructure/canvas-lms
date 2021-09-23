@@ -125,7 +125,7 @@ describe DiscussionTopicSectionVisibility do
     # We needed to save the second section first because section specific topics
     # actually have to have sections
     DiscussionTopicSectionVisibility.where(:discussion_topic => announcement1,
-      :course_section => section3a).first.destroy!
+                                           :course_section => section3a).first.destroy!
     # Now that we deleted the first section 3a visibility, we can add another one
     reborn_section3a_visibility = DiscussionTopicSectionVisibility.new(
       :discussion_topic => announcement1,

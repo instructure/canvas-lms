@@ -22,11 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe PluginSetting do
   before(:all) do
-    Canvas::Plugin.register('plugin_setting_test', nil, {:encrypted_settings => [:foo], :settings => {:bar => 'asdf'}} )
+    Canvas::Plugin.register('plugin_setting_test', nil, { :encrypted_settings => [:foo], :settings => { :bar => 'asdf' } })
   end
 
   it "should encrypt/decrypt transparently" do
-    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
     s.reload
     expect(s.valid_settings?).to be_truthy
     expect(s.settings.keys.sort_by(&:to_s)).to eql([:bar, :foo, :foo_dec, :foo_enc, :foo_salt])
@@ -36,21 +36,21 @@ describe PluginSetting do
 
   context "dirty_checking" do
     it 'should consider a new object to be dirty' do
-      s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
+      s = PluginSetting.new(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
       expect(s.changed?).to be_truthy
     end
 
     it 'should consider a freshly loaded encrypted object to be clean' do
-      PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo => "asdf"})
+      PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
       settings = PluginSetting.find_by(name: "plugin_setting_test")
       expect(settings.changed?).to_not be_truthy
     end
   end
 
   it "should not be valid if there are decrypt errors" do
-    s = PluginSetting.new(:name => "plugin_setting_test", :settings => {:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid"})
+    s = PluginSetting.new(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid" })
     expect(s.valid_settings?).to be_falsey
-    expect(s.settings).to eql({:bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING})
+    expect(s.settings).to eql({ :bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING })
   end
 
   it "should return default content if no setting is set" do
@@ -60,14 +60,14 @@ describe PluginSetting do
   end
 
   it "should return updated content if created" do
-    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
   end
 
   it "should return default content if the setting is disabled" do
-    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+    s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
@@ -80,15 +80,15 @@ describe PluginSetting do
 
   it "should immediately uncache on save" do
     enable_cache do
-      s = PluginSetting.create!(:name => "plugin_setting_test", :settings => {:bar => "qwerty"})
+      s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
       # cache it
       settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-      expect(settings).to eq({:bar => "qwerty"})
-      s.settings = {:food => "bar"}
+      expect(settings).to eq({ :bar => "qwerty" })
+      s.settings = { :food => "bar" }
       s.save!
       # new settings
       settings = PluginSetting.settings_for_plugin("plugin_setting_test")
-      expect(settings).to eq({:food => "bar"})
+      expect(settings).to eq({ :food => "bar" })
     end
   end
 
@@ -96,7 +96,7 @@ describe PluginSetting do
     RequestCache.enable do
       enable_cache do
         name = "plugin_setting_test"
-        s = PluginSetting.create!(:name => name, :settings => {:bar => "qwerty"})
+        s = PluginSetting.create!(:name => name, :settings => { :bar => "qwerty" })
         expect(MultiCache.cache).to receive(:fetch_multi).once.and_return(s)
         PluginSetting.cached_plugin_setting(name) # sets the cache
         PluginSetting.cached_plugin_setting(name) # 2nd lookup

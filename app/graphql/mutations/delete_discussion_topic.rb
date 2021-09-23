@@ -33,7 +33,7 @@ class Mutations::DeleteDiscussionTopic < Mutations::BaseMutation
       raise GraphQL::ExecutionError, "Insufficient permissions"
     end
 
-    context[:deleted_models] = { discussion_topic: {}}
+    context[:deleted_models] = { discussion_topic: {} }
     context[:deleted_models][:discussion_topic] = record
     record.destroy
     {

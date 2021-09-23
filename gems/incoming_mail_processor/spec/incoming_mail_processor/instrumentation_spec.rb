@@ -22,27 +22,25 @@ require 'spec_helper'
 describe IncomingMailProcessor::Instrumentation do
   let(:mailbox) do
     obj = double()
-    allow(obj).to receive(:unprocessed_message_count).and_return(4,nil,0,50)
+    allow(obj).to receive(:unprocessed_message_count).and_return(4, nil, 0, 50)
     obj
   end
 
   let(:single_config) do
     { 'imap' => {
-        'address' => "fake@fake.fake"
-      }
-    }
+      'address' => "fake@fake.fake"
+    } }
   end
 
   let(:multi_config) do
     { 'imap' => {
-        'accounts' => [
-          { 'username' => 'user1@fake.fake' },
-          { 'username' => 'user2@fake.fake' },
-          { 'username' => 'user3@fake.fake' },
-          { 'username' => 'user4@fake.fake' },
-        ],
-      },
-    }
+      'accounts' => [
+        { 'username' => 'user1@fake.fake' },
+        { 'username' => 'user2@fake.fake' },
+        { 'username' => 'user3@fake.fake' },
+        { 'username' => 'user4@fake.fake' },
+      ],
+    }, }
   end
 
   describe ".process" do
@@ -54,8 +52,8 @@ describe IncomingMailProcessor::Instrumentation do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake", 4,
-                                                         {short_stat: "incoming_mail_processor.mailbox_queue_size",
-                                                          tags: {identifier: "fake@fake_fake"}})
+                                                         { short_stat: "incoming_mail_processor.mailbox_queue_size",
+                                                           tags: { identifier: "fake@fake_fake" } })
 
       IncomingMailProcessor::Instrumentation.process
     end
@@ -64,14 +62,14 @@ describe IncomingMailProcessor::Instrumentation do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4,
-                                                         {short_stat: "incoming_mail_processor.mailbox_queue_size",
-                                                          tags: {identifier: "user1@fake_fake"}})
+                                                         { short_stat: "incoming_mail_processor.mailbox_queue_size",
+                                                           tags: { identifier: "user1@fake_fake" } })
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user3@fake_fake", 0,
-                                                         {short_stat: "incoming_mail_processor.mailbox_queue_size",
-                                                          tags: {identifier: "user3@fake_fake"}})
+                                                         { short_stat: "incoming_mail_processor.mailbox_queue_size",
+                                                           tags: { identifier: "user3@fake_fake" } })
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user4@fake_fake", 50,
-                                                         {short_stat: "incoming_mail_processor.mailbox_queue_size",
-                                                          tags: {identifier: "user4@fake_fake"}})
+                                                         { short_stat: "incoming_mail_processor.mailbox_queue_size",
+                                                           tags: { identifier: "user4@fake_fake" } })
 
       IncomingMailProcessor::Instrumentation.process
     end

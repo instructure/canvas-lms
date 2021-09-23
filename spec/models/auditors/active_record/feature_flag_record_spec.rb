@@ -21,14 +21,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helper.rb')
 
 describe Auditors::ActiveRecord::FeatureFlagRecord do
-  let(:request_id){ 'abcde-12345'}
-  let(:feature_name){ 'root_account_feature'}
+  let(:request_id) { 'abcde-12345' }
+  let(:feature_name) { 'root_account_feature' }
 
   before(:each) do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
     allow(Feature).to receive(:definitions).and_return({
-      feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
-    })
+                                                         feature_name => Feature.new(feature: feature_name, applies_to: 'RootAccount')
+                                                       })
   end
 
   it "it appropriately connected to a table" do
@@ -44,8 +44,8 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
       flag.id = -1
       flag
     end
-    let(:user){ user_model }
-    let(:es_record){ Auditors::FeatureFlag::Record.generate(flag_record, user, 'nonexistent') }
+    let(:user) { user_model }
+    let(:es_record) { Auditors::FeatureFlag::Record.generate(flag_record, user, 'nonexistent') }
 
     it "is creatable from an event_stream record of the correct type" do
       ar_rec = Auditors::ActiveRecord::FeatureFlagRecord.create_from_event_stream!(es_record)
@@ -72,5 +72,4 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
       end.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
-
 end

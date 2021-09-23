@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def course_factory(opts={})
+  def course_factory(opts = {})
     account = opts[:account] || Account.default
     account.shard.activate do
       @course = Course.create!(
@@ -45,7 +45,7 @@ module Factories
     @course
   end
 
-  def course_model(opts={})
+  def course_model(opts = {})
     allow_reusable = opts.delete :reusable
     @course = factory_with_protected_attributes(Course, course_valid_attributes.merge(opts))
     @teacher = user_model
@@ -66,7 +66,7 @@ module Factories
     }
   end
 
-  def course_with_user(enrollment_type, opts={})
+  def course_with_user(enrollment_type, opts = {})
     @course = opts[:course] || course_factory(opts)
     @user = opts[:user] || @course.shard.activate { user_factory(opts) }
     @enrollment = @course.enroll_user(@user, enrollment_type, opts)
@@ -80,52 +80,52 @@ module Factories
     @enrollment
   end
 
-  def course_with_student(opts={})
+  def course_with_student(opts = {})
     course_with_user('StudentEnrollment', opts)
     @student = @user
     @enrollment
   end
 
-  def course_with_ta(opts={})
+  def course_with_ta(opts = {})
     course_with_user("TaEnrollment", opts)
     @ta = @user
     @enrollment
   end
 
-  def course_with_student_logged_in(opts={})
+  def course_with_student_logged_in(opts = {})
     course_with_student(opts)
     user_session(@user)
   end
 
-  def course_with_teacher(opts={})
+  def course_with_teacher(opts = {})
     course_with_user('TeacherEnrollment', opts)
     @teacher = @user
     @enrollment
   end
 
-  def course_with_designer(opts={})
+  def course_with_designer(opts = {})
     course_with_user('DesignerEnrollment', opts)
     @designer = @user
     @enrollment
   end
 
-  def course_with_teacher_logged_in(opts={})
+  def course_with_teacher_logged_in(opts = {})
     course_with_teacher(opts)
     user_session(@user)
   end
 
-  def course_with_observer(opts={})
+  def course_with_observer(opts = {})
     course_with_user('ObserverEnrollment', opts)
     @observer = @user
     @enrollment
   end
 
-  def course_with_observer_logged_in(opts={})
+  def course_with_observer_logged_in(opts = {})
     course_with_observer(opts)
     user_session(@user)
   end
 
-  def course_with_student_submissions(opts={})
+  def course_with_student_submissions(opts = {})
     course_with_teacher_logged_in(opts)
     student_in_course
     @course.claim! if opts[:unpublished]
@@ -139,7 +139,7 @@ module Factories
 
   # quickly create a course, bypassing all that AR crap
   def create_course(options = {})
-    create_courses(1, options.merge({return_type: :record}))[0]
+    create_courses(1, options.merge({ return_type: :record }))[0]
   end
 
   # create a bunch of courses at once, optionally enrolling a user in them
@@ -147,7 +147,7 @@ module Factories
   # hashes of attributes you want to insert
   def create_courses(records, options = {})
     account = options[:account] || Account.default
-    records = records.times.map{ |i| { name: "Course #{i}" } } if records.is_a?(Integer)
+    records = records.times.map { |i| { name: "Course #{i}" } } if records.is_a?(Integer)
     now = Time.now.utc
     records = records.map { |record| course_valid_attributes.merge(account_id: account.id, root_account_id: account.id, workflow_state: 'available', enrollment_term_id: account.default_enrollment_term.id, created_at: now, updated_at: now).merge(record) }
     course_data = create_records(Course, records, options[:return_type])
@@ -156,14 +156,14 @@ module Factories
       course_data
 
     if options[:account_associations]
-      create_records(CourseAccountAssociation, course_ids.map{ |id| {account_id: account.id, course_id: id, depth: 0, root_account_id: account.resolved_root_account_id, created_at: now, updated_at: now }})
+      create_records(CourseAccountAssociation, course_ids.map { |id| { account_id: account.id, course_id: id, depth: 0, root_account_id: account.resolved_root_account_id, created_at: now, updated_at: now } })
     end
     if user = options[:enroll_user]
-      section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now}})
+      section_ids = create_records(CourseSection, course_ids.map { |id| { course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now } })
       type = options[:enrollment_type] || "TeacherEnrollment"
       role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id
-      result = create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', role_id: role_id, created_at: now, updated_at: now}})
-      create_enrollment_states(result, {state: "active", root_account_id: account.id})
+      result = create_records(Enrollment, course_ids.each_with_index.map { |id, i| { course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', role_id: role_id, created_at: now, updated_at: now } })
+      create_enrollment_states(result, { state: "active", root_account_id: account.id })
     end
     course_data
   end
@@ -173,12 +173,12 @@ module Factories
     @teacher = @user
     student_in_course(active_all: true)
     @assignment = @course.assignments.create!({
-      title: "some assignment",
-      submission_types: "online_url,online_upload"
-    })
+                                                title: "some assignment",
+                                                submission_types: "online_url,online_upload"
+                                              })
     @submission = @assignment.submit_homework(@user, {
-      submission_type: "online_url",
-      url: "http://www.google.com"
-    })
+                                                submission_type: "online_url",
+                                                url: "http://www.google.com"
+                                              })
   end
 end

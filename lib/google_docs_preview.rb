@@ -47,8 +47,8 @@ module GoogleDocsPreview
 
   def self.previewable?(account, attachment)
     account&.service_enabled?(:google_docs_previews) &&
-    PREVIEWABLE_TYPES.include?(attachment.content_type) &&
-    attachment.downloadable?
+      PREVIEWABLE_TYPES.include?(attachment.content_type) &&
+      attachment.downloadable?
   end
 
   def self.url_for(attachment)

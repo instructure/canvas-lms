@@ -27,7 +27,7 @@ describe "Gradebook" do
   include GradebookCommon
   include ColorCommon
 
-  let(:extra_setup) { }
+  let(:extra_setup) {}
   let(:students) { @course.students }
 
   before :once do
@@ -119,7 +119,6 @@ describe "Gradebook" do
   end
 
   context "return focus to view options menu when it closes" do
-
     before { Gradebook.visit(@course) }
 
     it 'returns focus to the view options menu after clicking the "Notes" option' do
@@ -395,7 +394,7 @@ describe "Gradebook" do
   end
 
   context "assignment header focus" do
-    before { Gradebook.visit(@course)}
+    before { Gradebook.visit(@course) }
     let(:assignment) { @course.assignments.first }
 
     it 'is placed on assignment header trigger upon sort' do

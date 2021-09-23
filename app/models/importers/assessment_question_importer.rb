@@ -21,7 +21,6 @@ require_dependency 'importers'
 
 module Importers
   class AssessmentQuestionImporter < Importer
-
     self.item_class = AssessmentQuestion
 
     def self.preprocess_migration_data(data)
@@ -37,15 +36,15 @@ module Importers
     def self.process_migration(data, migration)
       data = data.with_indifferent_access
       Importers::AssessmentQuestionImporter.preprocess_migration_data(data) # just in case
-      question_data = {:aq_data => {}, :qq_ids => {}}
+      question_data = { :aq_data => {}, :qq_ids => {} }
       questions = data['assessment_questions'] ? data['assessment_questions']['assessment_questions'] : []
       questions ||= []
 
-      existing_questions = migration.context.assessment_questions.
-          except(:select).
-          select("assessment_questions.id, assessment_questions.migration_id").
-          where("assessment_questions.migration_id IS NOT NULL").reorder(nil).
-          index_by(&:migration_id)
+      existing_questions = migration.context.assessment_questions
+                                    .except(:select)
+                                    .select("assessment_questions.id, assessment_questions.migration_id")
+                                    .where("assessment_questions.migration_id IS NOT NULL").reorder(nil)
+                                    .index_by(&:migration_id)
       questions.each do |q|
         existing_question = existing_questions[q['migration_id']]
         q['assessment_question_id'] = existing_question.id if existing_question
@@ -63,10 +62,11 @@ module Importers
           mig_id = aqb_hash["migration_id"]
           bank = bank_map[mig_id]
           next unless bank # only include pre-existing banks
+
           bank.mark_as_importing!(migration)
           next if bank.edit_types_locked_for_overwrite_on_import.include?(:content)
 
-          aq_ids = questions.select{|aq| aq["question_bank_migration_id"] == mig_id}.map{|aq| aq["assessment_question_id"]}.compact
+          aq_ids = questions.select { |aq| aq["question_bank_migration_id"] == mig_id }.map { |aq| aq["assessment_question_id"] }.compact
           bank.assessment_questions.active.where.not(:migration_id => aq_ids).update_all(:workflow_state => 'deleted')
         end
       end
@@ -84,7 +84,7 @@ module Importers
 
         if !question_bank
           question_bank = migration.context.assessment_question_banks.temp_record
-          if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == bank_mig_id}
+          if bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == bank_mig_id }
             question_bank.title = bank_hash['title']
             if question_bank.title && question_bank.title.length > ActiveRecord::Base.maximum_string_length
               migration.add_warning(t("The title of the following question bank was truncated: \"%{title}\"", :title => question_bank.title))
@@ -94,7 +94,7 @@ module Importers
           question_bank.title ||= default_title
           question_bank.migration_id = bank_mig_id
         elsif data['assessment_question_banks']
-          if bank_hash = data['assessment_question_banks'].detect{|qb_hash| qb_hash['migration_id'] == question_bank.migration_id}
+          if bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == question_bank.migration_id }
             question_bank.title = bank_hash['title'] # we should update the title i guess?
           end
         end
@@ -127,7 +127,7 @@ module Importers
       end
 
       if migration.context.is_a?(Course)
-        imported_aq_ids = question_data[:aq_data].values.map{|aq| aq['assessment_question_id']}.compact
+        imported_aq_ids = question_data[:aq_data].values.map { |aq| aq['assessment_question_id'] }.compact
         imported_aq_ids.each_slice(100) do |sliced_aq_ids|
           migration.context.quiz_questions.generated.where(:assessment_question_id => sliced_aq_ids).update_all(:assessment_question_version => nil)
         end
@@ -136,7 +136,7 @@ module Importers
       question_data
     end
 
-    def self.import_from_migration(hash, context, migration, bank, options={})
+    def self.import_from_migration(hash, context, migration, bank, options = {})
       hash = hash.with_indifferent_access
       hash.delete(:question_bank_migration_id) if hash.has_key?(:question_bank_migration_id)
 
@@ -152,8 +152,8 @@ module Importers
 
       if id = hash['assessment_question_id']
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash,
-            workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
-            assessment_question_bank_id: bank.id)
+                                                    workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
+                                                    assessment_question_bank_id: bank.id)
       else
         sql = <<~SQL
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)
@@ -165,7 +165,7 @@ module Importers
         )
         GuardRail.activate(:primary) do
           id = AssessmentQuestion.connection.insert(query, "#{name} Create",
-            AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
+                                                    AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
           hash['assessment_question_id'] = id
         end
       end
@@ -173,8 +173,8 @@ module Importers
       if import_warnings
         import_warnings.each do |warning|
           migration.add_warning(warning, {
-            :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
-          })
+                                  :fix_issue_html_url => "/#{context.class.to_s.underscore.pluralize}/#{context.id}/question_banks/#{bank.id}#question_#{hash['assessment_question_id']}_question_text"
+                                })
         end
       end
       hash
@@ -185,13 +185,13 @@ module Importers
 
       if hash[:is_cc_pattern_match]
         migration.add_unique_warning(:cc_pattern_match,
-          t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
+                                     t("This package includes the question type, Pattern Match, which is not compatible with Canvas. We have converted the question type to Fill in the Blank"))
       end
 
       [:question_text, :correct_comments_html, :incorrect_comments_html, :neutral_comments_html, :more_comments_html].each do |field|
         if hash[field].present?
           hash[field] = migration.convert_html(
-            hash[field], item_type, hash[:migration_id], field, {:remove_outer_nodes_if_one_child => true}
+            hash[field], item_type, hash[:migration_id], field, { :remove_outer_nodes_if_one_child => true }
           )
         end
       end
@@ -199,7 +199,7 @@ module Importers
       if hash[:question_text]&.length&.> 16.kilobytes
         hash[:question_text] = t("The imported question text for this question was too long.")
         migration.add_warning(t("The question text for the question \"%{question_name}\" was too long.",
-          :question_name => hash[:question_name]))
+                                :question_name => hash[:question_name]))
       end
 
       [:correct_comments, :incorrect_comments, :neutral_comments, :more_comments].each do |field|
@@ -215,7 +215,7 @@ module Importers
 
           if answer[field].present?
             answer[field] = migration.convert_html(
-              answer[field], item_type, hash[:migration_id], key, {:remove_outer_nodes_if_one_child => true}
+              answer[field], item_type, hash[:migration_id], key, { :remove_outer_nodes_if_one_child => true }
             )
           end
         end

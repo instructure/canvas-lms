@@ -30,26 +30,26 @@ describe AssignmentExtensionsController, type: :request do
   end
 
   describe "POST /api/v1/courses/:course_id/assignments/:assignment_id/extensions (create)" do
-    def api_create_assignment_extensions(assignment_extension_params, opts={}, raw=false)
+    def api_create_assignment_extensions(assignment_extension_params, opts = {}, raw = false)
       api_method = raw ? :raw_api_call : :api_call
 
       send(api_method,
-        :post,
-        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/extensions",
-        {
-          controller: "assignment_extensions",
-          action: "create",
-          format: "json",
-          course_id: @course.id.to_s,
-          assignment_id: @assignment.id.to_s
-        },
-        {
-          assignment_extensions: assignment_extension_params
-        },
-        {
-          "Accept" => "application/vnd.api+json"
-        },
-        opts)
+           :post,
+           "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/extensions",
+           {
+             controller: "assignment_extensions",
+             action: "create",
+             format: "json",
+             course_id: @course.id.to_s,
+             assignment_id: @assignment.id.to_s
+           },
+           {
+             assignment_extensions: assignment_extension_params
+           },
+           {
+             "Accept" => "application/vnd.api+json"
+           },
+           opts)
     end
 
     context "as a student" do
@@ -106,8 +106,8 @@ describe AssignmentExtensionsController, type: :request do
         expect(submission_1.reload.extra_attempts).to be_nil
         expect(submission_2.reload.extra_attempts).to be_nil
         expect(response["errors"]).to eq([
-          { "user_id" => @student.id, "errors" => ["Extra attempts must be greater than or equal to 0"] }
-        ])
+                                           { "user_id" => @student.id, "errors" => ["Extra attempts must be greater than or equal to 0"] }
+                                         ])
       end
     end
   end

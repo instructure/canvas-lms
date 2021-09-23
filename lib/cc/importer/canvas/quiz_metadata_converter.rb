@@ -23,12 +23,12 @@ module CC::Importer::Canvas
 
     def post_process_assessments
       return unless @course[:assessments] && @course[:assessments][:assessments]
+
       quiz_map = {}
-      @course[:assessments][:assessments].each {|a| quiz_map[File.join(a[:migration_id], ASSESSMENT_META)] = a }
+      @course[:assessments][:assessments].each { |a| quiz_map[File.join(a[:migration_id], ASSESSMENT_META)] = a }
 
       @manifest.css('resource[type$="learning-application-resource"]').each do |res|
-
-        res.css('file').select{|f| f['href'].to_s.end_with?(ASSESSMENT_META)}.each do |file|
+        res.css('file').select { |f| f['href'].to_s.end_with?(ASSESSMENT_META) }.each do |file|
           meta_path = file['href']
           if quiz = quiz_map[meta_path]
             doc = open_file_xml(@package_root.item_path(meta_path))
@@ -88,6 +88,7 @@ module CC::Importer::Canvas
           }
           AssignmentOverride.overridden_dates.each do |field|
             next unless override_node.has_attribute?(field.to_s)
+
             override[field] = override_node[field.to_s]
           end
           quiz['assignment_overrides'] << override

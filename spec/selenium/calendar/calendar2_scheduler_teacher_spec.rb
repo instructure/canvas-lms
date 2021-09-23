@@ -25,7 +25,6 @@ describe "scheduler" do
   include Calendar2Common
 
   context "as a teacher" do
-
     before(:once) do
       Account.default.tap do |a|
         a.settings[:show_scheduler]   = true
@@ -37,14 +36,13 @@ describe "scheduler" do
 
     before(:each) do
       user_session(@teacher)
-
     end
 
     it "should validate the appointment group shows on all views after a student signed up", priority: "1", test_id: 1729408 do
       date = Time.zone.today.to_s
       create_appointment_group(:new_appointments => [
-        [date + ' 12:00:00', date + ' 13:00:00'],
-      ])
+                                 [date + ' 12:00:00', date + ' 13:00:00'],
+                               ])
       ag = AppointmentGroup.first
       student_in_course(course: @course, active_all: true)
       ag.appointments.first.reserve_for(@user, @user, comments: 'this is important')

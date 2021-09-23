@@ -56,6 +56,7 @@ class ObserverAlertThreshold < ActiveRecord::Base
   def users_are_still_linked?
     return true if observer.as_observer_observation_links.active.where(student: student).exists?
     return true if observer.enrollments.active.where(associated_user: student).shard(observer).exists?
+
     false
   end
 
@@ -81,10 +82,10 @@ class ObserverAlertThreshold < ActiveRecord::Base
   def validate_threshold_low_high
     if ALERT_TYPES_WITH_THRESHOLD.include? self.alert_type
       opposite_type = if self.alert_type.include? 'high'
-        self.alert_type.gsub('high', 'low')
-      else
-        self.alert_type.gsub('low', 'high')
-      end
+                        self.alert_type.gsub('high', 'low')
+                      else
+                        self.alert_type.gsub('low', 'high')
+                      end
 
       opposite = observer.as_observer_observer_alert_thresholds.where(alert_type: opposite_type)
       if opposite.any?

@@ -38,7 +38,7 @@ Rails.configuration.to_prepare do
   HostUrl.outgoing_email_default_name = config[:default_name]
 
   IncomingMail::ReplyToAddress.address_pool = config[:reply_to_addresses] ||
-    Array(HostUrl.outgoing_email_address)
+                                              Array(HostUrl.outgoing_email_address)
   IncomingMailProcessor::MailboxAccount.default_outgoing_email = HostUrl.outgoing_email_address
   IncomingMailProcessor::MailboxAccount.reply_to_enabled = config[:reply_to_disabled].blank?
 end

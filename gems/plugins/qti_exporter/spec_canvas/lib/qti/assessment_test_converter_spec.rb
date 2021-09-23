@@ -33,7 +33,7 @@ describe Qti::AssessmentTestConverter do
     expect(assess.parse_time_limit("M120")).to eq 120
     expect(assess.parse_time_limit("m14")).to eq 14
 
-    #Canvas uses minutes, QTI uses seconds
+    # Canvas uses minutes, QTI uses seconds
     expect(assess.parse_time_limit("60")).to eq 1
     expect(assess.parse_time_limit("3600")).to eq 60
   end

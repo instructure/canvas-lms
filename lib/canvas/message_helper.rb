@@ -74,11 +74,12 @@ module Canvas::MessageHelper
     using[:delay_for] ||= args[2] # delay
     # 'txt' is the legacy message body. Pull name from first line.
     if args[4].present?
-       # txt
+      # txt
       split_txt = args[4].strip.split("\n").map { |line| line.strip }
       using[:name] ||= split_txt[0]
     end
     raise 'Name is required' unless using[:name]
+
     n = Notification.where(name: using[:name]).first_or_initialize
     begin
       n.update(:delay_for => using[:delay_for], :category => using[:category])

@@ -21,9 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Canvas::Builders::EnrollmentDateBuilder do
-
   describe "#build" do
-
     before do
       course_with_teacher(:active_all => true)
       @teacher_enrollment = @enrollment
@@ -35,7 +33,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
     end
 
     def test_builder(enrollment, res)
-      expect(Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map{|d|d.map(&:to_i)}).to eq res.map{|d|d.map(&:to_i)}
+      expect(Canvas::Builders::EnrollmentDateBuilder.build(enrollment).map { |d| d.map(&:to_i) }).to eq res.map { |d| d.map(&:to_i) }
     end
 
     context "has enrollment dates from enrollment" do
@@ -79,7 +77,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @term.start_at = nil
         @term.end_at = nil
         @term.save!
-        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at], [nil,nil]]
+        test_builder @teacher_enrollment, [[@section.start_at, @section.end_at], [nil, nil]]
       end
 
       it "for student" do
@@ -109,7 +107,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         @term.start_at = nil
         @term.end_at = nil
         @term.save!
-        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil,nil]]
+        test_builder @teacher_enrollment, [[@course.start_at, @course.end_at], [nil, nil]]
       end
 
       it "for student" do
@@ -134,7 +132,6 @@ describe Canvas::Builders::EnrollmentDateBuilder do
         test_builder @student_enrollment, [[@term.start_at, @term.end_at]]
       end
     end
-
   end
 
   describe ".preload" do

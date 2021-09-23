@@ -23,15 +23,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper'
 
 describe QuizzesNext::QuizzesApiController, type: :request do
   describe "GET /courses/:course_id/all_quizzes (index)" do
-    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}"} }
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
     let(:assignments) do
       (0..2).map do |i|
-        @course.assignments.create! title:"assignment_#{i}", workflow_state: 'unpublished'
+        @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
       end
     end
     let(:new_quizzes) do
       (3..5).map do |i|
-        quiz = @course.assignments.create! title:"assignment_#{i}", workflow_state: 'unpublished'
+        quiz = @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
         quiz.quiz_lti!
         quiz.save!
         quiz
@@ -71,12 +71,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
       it "should return list of old quizzes" do
         quiz_collection = subject.collect.reject { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map{ |q| q['id'] }).to eq quizzes.map(&:id)
+        expect(quiz_collection.map { |q| q['id'] }).to eq quizzes.map(&:id)
       end
 
       it "should return list of assignments (new quizzes)" do
         quiz_collection = subject.collect.select { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map{ |q| q['id'] }).to eq new_quizzes.map(&:id)
+        expect(quiz_collection.map { |q| q['id'] }).to eq new_quizzes.map(&:id)
       end
 
       describe 'search_term query param' do
@@ -134,7 +134,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
 
         it "should deterministically order quizzes for pagination" do
           found_quiz_ids = []
-          (quiz_count*2).times do |i|
+          (quiz_count * 2).times do |i|
             page_num = i + 1
             response = api_call(
               :get,

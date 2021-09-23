@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 # SafeRedisRaceCondition is for handling the case
 # where some cache store needs to be able to "lock"
 # when someone asks for a given entry that has expired so that we don't have
@@ -32,7 +31,6 @@
 # an ActiveSupport::Cache::RedisStore, and overrides methods in that internal
 # implementation (depending on the existance of a redis client).
 module ActiveSupport::Cache::SafeRedisRaceCondition
-
   # this is originally defined in ActiveSupport::Cache::Store,
   # and that implementation DOES handle race_condition_ttl by rewriting the
   # stale value back the cache with a slightly extended expiry.
@@ -44,6 +42,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   def handle_expired_entry(entry, key, options)
     @safe_redis_internal_options = {}
     return super unless options[:race_condition_ttl]
+
     lock_key = "lock:#{key}"
 
     unless entry
@@ -79,6 +78,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
     super
   rescue => e
     raise unless @safe_redis_internal_options[:stale_entry]
+
     # if we have old stale data, silently swallow any
     # errors fetching fresh data, and return the stale entry
     Canvas::Errors.capture(e)
@@ -117,6 +117,7 @@ module ActiveSupport::Cache::SafeRedisRaceCondition
   # is passed
   def unlock(key, nonce)
     raise ArgumentError("nonce can't be nil") unless nonce
+
     node = redis
     node = redis.node_for(key) if redis.is_a?(Redis::Distributed)
     delif_script.run(node, [key], [nonce])

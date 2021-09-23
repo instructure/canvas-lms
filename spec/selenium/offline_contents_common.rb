@@ -26,9 +26,9 @@ require_relative 'helpers/shared_examples_common'
 
 shared_examples 'show courses for ePub generation' do |context|
   include SharedExamplesCommon
-  
+
   it "should show the courses the user is enrolled in and feature enabled in ePub exports page",
-                            priority: "1", test_id: pick_test_id(context, teacher: "417579", student: "498316") do
+     priority: "1", test_id: pick_test_id(context, teacher: "417579", student: "498316") do
     @course2 = course_model(name: 'Second Course')
     @course2.offer!
     enroll_context_user(context)
@@ -76,4 +76,3 @@ shared_examples 'generate and download ePub' do |context|
     expect(f('.ig-admin .Button')).to include_text('Regenerate ePub')
   end
 end
-

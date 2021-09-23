@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module LtiProviderStateHelper
-
   def self.set_lti_context_id(account)
     # Set lti_context_id to the same one used when generating the contracts
     # in the live-events-lti repo.
@@ -67,8 +66,8 @@ module LtiProviderStateHelper
 
   def self.create_external_tool(developer_key)
     configuration = {
-      "title":"Canvas Data Services",
-      "scopes":[
+      "title": "Canvas Data Services",
+      "scopes": [
         "https://canvas.instructure.com/lti/public_jwk/scope/update",
         "https://canvas.instructure.com/lti/data_services/scope/create",
         "https://canvas.instructure.com/lti/data_services/scope/show",
@@ -78,33 +77,33 @@ module LtiProviderStateHelper
         "https://canvas.instructure.com/lti/data_services/scope/list_event_types",
         "https://canvas.instructure.com/lti/feature_flags/scope/show"
       ],
-      "public_jwk_url":"http://live-events-lti/api/jwks",
-      "description":"Data service management for Canvas LMS",
-      "target_link_uri":"http://live-events-lti/resource_link_request",
-      "oidc_initiation_url":"http://live-events-lti/login",
-      "extensions":[
+      "public_jwk_url": "http://live-events-lti/api/jwks",
+      "description": "Data service management for Canvas LMS",
+      "target_link_uri": "http://live-events-lti/resource_link_request",
+      "oidc_initiation_url": "http://live-events-lti/login",
+      "extensions": [
         {
-          "platform":"canvas.instructure.com",
-          "domain":"http://live-events-lti",
-          "privacy_level":"public",
-          "settings":{
-            "placements":[
+          "platform": "canvas.instructure.com",
+          "domain": "http://live-events-lti",
+          "privacy_level": "public",
+          "settings": {
+            "placements": [
               {
-                "text":"Data Services",
-                "enabled":true,
-                "placement":"account_navigation",
-                "target_link_uri":"http://live-events-lti/resource_link_request",
-                "required_permissions":"manage_data_services"
+                "text": "Data Services",
+                "enabled": true,
+                "placement": "account_navigation",
+                "target_link_uri": "http://live-events-lti/resource_link_request",
+                "required_permissions": "manage_data_services"
               }
             ]
           }
         }
       ],
-      "custom_fields":{
-        "canvas_account_uuid":"$vnd.Canvas.root_account.uuid",
-        "canvas_api_domain":"$Canvas.api.domain",
-        "canvas_user_uuid":"$Canvas.user.globalId",
-        "canvas_high_contrast_enabled":"$Canvas.user.prefersHighContrast"
+      "custom_fields": {
+        "canvas_account_uuid": "$vnd.Canvas.root_account.uuid",
+        "canvas_api_domain": "$Canvas.api.domain",
+        "canvas_user_uuid": "$Canvas.user.globalId",
+        "canvas_high_contrast_enabled": "$Canvas.user.prefersHighContrast"
       }
     }
     tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: 'public')
@@ -114,7 +113,6 @@ module LtiProviderStateHelper
 end
 
 Pact.provider_states_for PactConfig::Consumers::ALL do
-
   provider_state 'an account with an LTI developer key' do
     set_up do
       account = Pact::Canvas.base_state.account
@@ -123,11 +121,11 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       jwk = LtiProviderStateHelper.jwk
       developer_key = LtiProviderStateHelper.developer_key(jwk)
 
-      allow_any_instance_of(Canvas::Oauth::Provider).
-        to receive(:key).and_return(developer_key)
+      allow_any_instance_of(Canvas::Oauth::Provider)
+        .to receive(:key).and_return(developer_key)
 
-      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider).
-        to receive(:get_jwk_from_url).and_return(jwk)
+      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider)
+        .to receive(:get_jwk_from_url).and_return(jwk)
     end
   end
 
@@ -140,11 +138,11 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
       account = Pact::Canvas.base_state.account
       LtiProviderStateHelper.set_lti_context_id(account)
 
-      allow_any_instance_of(Canvas::Oauth::Provider).
-        to receive(:key).and_return(developer_key)
+      allow_any_instance_of(Canvas::Oauth::Provider)
+        .to receive(:key).and_return(developer_key)
 
-      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider).
-        to receive(:get_jwk_from_url).and_return(jwk)
+      allow_any_instance_of(Canvas::Oauth::ClientCredentialsProvider)
+        .to receive(:get_jwk_from_url).and_return(jwk)
 
       # The jwt_signing_key file is the same one used to sign the JWTs in the contract
       # tests in the live-events-lti repo. Make that key be the one that Canvas uses
@@ -166,10 +164,10 @@ Pact.provider_states_for PactConfig::Consumers::ALL do
           "encryption-secret" => "astringthatisactually32byteslong"
         }
       )
-      allow(Canvas::DynamicSettings).to receive(:find).
-        with('live-events-subscription-service', any_args).and_return({
-          'app-host' => ENV.fetch('SUBSCRIPTION_SERVICE_HOST', 'http://les.docker:80')
-        })
+      allow(Canvas::DynamicSettings).to receive(:find)
+        .with('live-events-subscription-service', any_args).and_return({
+                                                                         'app-host' => ENV.fetch('SUBSCRIPTION_SERVICE_HOST', 'http://les.docker:80')
+                                                                       })
 
       # Always set ignore_expiration to true when calling the decode_jwt method.
       CanvasSecurity.class_eval do

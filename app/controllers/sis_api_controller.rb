@@ -400,11 +400,11 @@ class SisApiController < ApplicationController
   end
 
   def published_assignments
-    assignments = Assignment.published.
-      where(post_to_sis: true).
-      where(context_type: 'Course', context_id: published_course_ids).
-      preload(:assignment_group).
-      preload(context: {active_course_sections: [:nonxlist_course]})
+    assignments = Assignment.published
+                            .where(post_to_sis: true)
+                            .where(context_type: 'Course', context_id: published_course_ids)
+                            .preload(:assignment_group)
+                            .preload(context: { active_course_sections: [:nonxlist_course] })
 
     if include_student_overrides?
       assignments = assignments.preload(
