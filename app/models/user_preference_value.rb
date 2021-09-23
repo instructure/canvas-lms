@@ -120,7 +120,9 @@ class UserPreferenceValue < ActiveRecord::Base
       migrate_preferences_if_needed
 
       if value.present? || sub_key
-        if preference_row_exists?(key, sub_key)
+        if value.nil?
+          remove_user_preference_value(key, sub_key)
+        elsif preference_row_exists?(key, sub_key)
           update_user_preference_value(key, sub_key, value)
         else
           create_user_preference_value(key, sub_key, value)
@@ -134,7 +136,8 @@ class UserPreferenceValue < ActiveRecord::Base
 
     def clear_all_preferences_for(key)
       if UserPreferenceValue.settings[key]&.[](:use_sub_keys)
-        self.user_preference_values.where(:key => key).update_all(:value => nil)
+        self.user_preference_values.where(:key => key).delete_all
+        @existing_preference_rows&.clear
         self.preferences[key] = {}
         self.save! if self.changed?
       else
@@ -164,6 +167,11 @@ class UserPreferenceValue < ActiveRecord::Base
 
     def update_user_preference_value(key, sub_key, value)
       self.user_preference_values.where(:key => key, :sub_key => sub_key).update_all(:value => value)
+    end
+
+    def remove_user_preference_value(key, sub_key)
+      self.user_preference_values.where(:key => key, :sub_key => sub_key).delete_all
+      @existing_preference_rows&.delete([key, sub_key])
     end
 
     # --- here are some hacks so we can split up the gradebook column size setting better ---
