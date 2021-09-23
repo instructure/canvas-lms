@@ -150,6 +150,12 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
+          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
+            draft =>
+              draft.rootEntryId != newDiscussionEntry.rootEntryId &&
+              draft.discussionTopicID != newDiscussionEntry.discussionTopicID
+          )
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
