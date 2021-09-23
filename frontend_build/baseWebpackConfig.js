@@ -75,7 +75,6 @@ module.exports = {
           'canvas-rce-old-async-chunk',
           'discussion_topic_edit',
           'k5_dashboard',
-          'permissions',
           'discussion_topics_post',
         ]
         return (
