@@ -160,7 +160,7 @@ describe AcademicBenchmark do
     outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
-  it "should successfully import the standards" do
+  it "successfullies import the standards" do
     @cm.export_content
     run_jobs
     @cm.reload
@@ -170,7 +170,7 @@ describe AcademicBenchmark do
     verify_full_import()
   end
 
-  it "should reject creating global outcomes if no permissions" do
+  it "rejects creating global outcomes if no permissions" do
     @cm.user = nil
     @cm.save!
     @cm.export_content
@@ -190,7 +190,7 @@ describe AcademicBenchmark do
       @cm.save!
     end
 
-    it "should fail with no partner ID" do
+    it "fails with no partner ID" do
       @plugin.settings[:partner_id] = nil
       @plugin.settings[:partner_key] = "a"
       @cm.export_content
@@ -202,7 +202,7 @@ describe AcademicBenchmark do
       expect(@cm.workflow_state).to eq 'failed'
     end
 
-    it "should fail with an empty string partner ID" do
+    it "fails with an empty string partner ID" do
       current_settings = @plugin.settings
       new_settings = current_settings.merge(:partner_id => "", :partner_key => "a")
       allow(@plugin).to receive(:settings).and_return(new_settings)

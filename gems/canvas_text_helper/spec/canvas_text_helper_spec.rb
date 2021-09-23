@@ -21,12 +21,12 @@ require 'spec_helper' # File.expand_path(File.dirname(__FILE__) + '/../spec_help
 
 describe CanvasTextHelper do
   describe "#truncate_text" do
-    it "should not split if max_length is exact text length" do
+    it "does not split if max_length is exact text length" do
       str = "I am an exact length"
       expect(CanvasTextHelper::truncate_text(str, :max_length => str.length)).to eq(str)
     end
 
-    it "should split on multi-byte character boundaries" do
+    it "splits on multi-byte character boundaries" do
       str = "This\ntext\nhere\n获\nis\nutf-8"
 
       expect(CanvasTextHelper::truncate_text(str, :max_length => 9)).to eq("This\nt...")
@@ -39,7 +39,7 @@ describe CanvasTextHelper do
       expect(CanvasTextHelper::truncate_text(str, :max_length => 80)).to eq(str)
     end
 
-    it "should split on words if specified" do
+    it "splits on words if specified" do
       str = "I am a sentence with areallylongwordattheendthatcantbesplit and then a few more words"
       expect(CanvasTextHelper::truncate_text(str, :max_words => 4, :max_length => 30)).to eq("I am a sentence")
       expect(CanvasTextHelper::truncate_text(str, :max_words => 6, :max_length => 30)).to eq("I am a sentence with areall...")
@@ -48,11 +48,11 @@ describe CanvasTextHelper do
   end
 
   describe "#indent" do
-    it "should prepend two spaces to each line after the first by default" do
+    it "prepends two spaces to each line after the first by default" do
       expect(CanvasTextHelper::indent("test string\nnext line\nanother line")).to eq("test string\n  next line\n  another line")
     end
 
-    it "should prepend n spaces to each line after the first" do
+    it "prepends n spaces to each line after the first" do
       expect(CanvasTextHelper::indent("test string\nnext line\nanother line", 0)).to eq("test string\nnext line\nanother line")
       expect(CanvasTextHelper::indent("test string\nnext line\nanother line", 1)).to eq("test string\n next line\n another line")
       expect(CanvasTextHelper::indent("test string\nnext line\nanother line", 2)).to eq("test string\n  next line\n  another line")
@@ -61,15 +61,15 @@ describe CanvasTextHelper do
   end
 
   describe "cgi_escape_truncate" do
-    it "should not truncate strings that fit" do
+    it "does not truncate strings that fit" do
       expect(CanvasTextHelper::cgi_escape_truncate('!!!', 9)).to eql("%21%21%21")
     end
 
-    it "should not split escape sequences" do
+    it "does not split escape sequences" do
       expect(CanvasTextHelper::cgi_escape_truncate('!!!', 8)).to eql("%21%21")
     end
 
-    it "should not split UTF-8 characters" do
+    it "does not split UTF-8 characters" do
       expect(CanvasTextHelper::cgi_escape_truncate("\u2600\u2603", 15)).to eql("%E2%98%80")
     end
   end

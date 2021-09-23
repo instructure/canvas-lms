@@ -32,7 +32,7 @@ describe "Account Reports" do
   end
 
   describe "account report files" do
-    it "should have different filenames for each report even when md5 matches" do
+    it "has different filenames for each report even when md5 matches" do
       report1 = run_report('unpublished_courses_csv')
       report2 = run_report('unpublished_courses_csv')
 

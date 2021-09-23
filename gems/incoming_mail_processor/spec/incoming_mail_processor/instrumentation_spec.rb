@@ -48,7 +48,7 @@ describe IncomingMailProcessor::Instrumentation do
       allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:create_mailbox).and_return(mailbox)
     end
 
-    it 'should push to statsd for one mailbox' do
+    it 'pushes to statsd for one mailbox' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(single_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.fake@fake_fake", 4,
@@ -58,7 +58,7 @@ describe IncomingMailProcessor::Instrumentation do
       IncomingMailProcessor::Instrumentation.process
     end
 
-    it 'should push to statsd for multiple mailboxes' do
+    it 'pushes to statsd for multiple mailboxes' do
       IncomingMailProcessor::IncomingMessageProcessor.configure(multi_config)
 
       expect(InstStatsd::Statsd).to receive(:gauge).with("incoming_mail_processor.mailbox_queue_size.user1@fake_fake", 4,

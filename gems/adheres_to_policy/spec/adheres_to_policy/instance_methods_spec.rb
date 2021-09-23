@@ -36,19 +36,19 @@ describe AdheresToPolicy::InstanceMethods do
     end
   end
 
-  it "should have setup a series of methods on the instance" do
+  it "has setup a series of methods on the instance" do
     %w(rights_status granted_rights grants_right? grants_any_right? grants_all_rights?).each do |method|
       expect(@some_class.new).to respond_to(method)
     end
   end
 
-  it "should be able to check a policy" do
+  it "is able to check a policy" do
     some_instance = @some_class.new
     some_instance.user = 1
     expect(some_instance.grants_right?(1, :read)).to eq true
   end
 
-  it "should allow multiple forms of can statements" do
+  it "allows multiple forms of can statements" do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
       set_policy do
@@ -69,7 +69,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.rights_status(3, :read, :manage, :set_permissions)).to eq({ read: false, manage: true, set_permissions: true })
   end
 
-  it 'should check parent conditions' do
+  it 'checks parent conditions' do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
       set_policy do
@@ -88,7 +88,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.rights_status([true, true])).to eq(do_stuff: true)
   end
 
-  it 'should check deeply nested parent conditions' do
+  it 'checks deeply nested parent conditions' do
     actor_class = Class.new do
       extend AdheresToPolicy::ClassMethods
       set_policy do
@@ -115,7 +115,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.rights_status([true, true, true])).to eq(do_stuff: true, do_things: true)
   end
 
-  it "should execute all conditions when searching for all rights" do
+  it "executes all conditions when searching for all rights" do
     actor_class = Class.new do
       attr_accessor :total
 
@@ -142,7 +142,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.total).to eq 3
   end
 
-  it "should skip duplicate conditions when searching for all rights" do
+  it "skips duplicate conditions when searching for all rights" do
     actor_class = Class.new do
       attr_accessor :total
 
@@ -169,7 +169,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.total).to eq 2
   end
 
-  it "should only execute relevant conditions when searching for specific rights" do
+  it "onlies execute relevant conditions when searching for specific rights" do
     actor_class = Class.new do
       attr_accessor :total
 
@@ -196,7 +196,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.total).to eq 1
   end
 
-  it "should skip duplicate conditions when searching for specific rights" do
+  it "skips duplicate conditions when searching for specific rights" do
     actor_class = Class.new do
       attr_accessor :total
 
@@ -263,13 +263,13 @@ describe AdheresToPolicy::InstanceMethods do
       end
     end
 
-    it "should check the policy" do
+    it "checks the policy" do
       sample = sample_class.new
       expect(sample.grants_any_right?(1, :read, :write)).to eq true
       expect(sample.grants_any_right?(1, :asdf)).to eq false
     end
 
-    it "should return false if no specific ones are sought" do
+    it "returns false if no specific ones are sought" do
       sample = sample_class.new
       expect(sample.grants_any_right?(1)).to eq false
     end
@@ -290,21 +290,21 @@ describe AdheresToPolicy::InstanceMethods do
       end
     end
 
-    it "should check the policy" do
+    it "checks the policy" do
       sample = sample_class.new
       expect(sample.grants_all_rights?(1, :read, :write)).to eq false
       expect(sample.grants_all_rights?(2, :read, :write)).to eq true
       expect(sample.grants_all_rights?(3, :read, :asdf)).to eq false
     end
 
-    it "should return false if no specific ones are sought" do
+    it "returns false if no specific ones are sought" do
       sample = sample_class.new
       expect(sample.grants_all_rights?(1)).to eq false
     end
   end
 
   context "check_condition?" do
-    it "should run condition based on its arity" do
+    it "runs condition based on its arity" do
       actor_class = Class.new do
         attr_accessor :total
 
@@ -344,24 +344,24 @@ describe AdheresToPolicy::InstanceMethods do
       end
     end
 
-    it "should check the policy" do
+    it "checks the policy" do
       non_context = @actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect(non_context.grants_right?("allowed actor", :asdf)).to eq false
     end
 
-    it "should return false if no specific ones are sought" do
+    it "returns false if no specific ones are sought" do
       non_context = @actor_class.new
       expect(non_context.grants_right?("allowed actor")).to eq false
     end
 
-    it "should return false if no user is provided" do
+    it "returns false if no user is provided" do
       non_context = @actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect(non_context.grants_right?(nil, :read)).to eq false
     end
 
-    it "should raise argument exception if anything other then one right is provided" do
+    it "raises argument exception if anything other then one right is provided" do
       non_context = @actor_class.new
       expect(non_context.grants_right?("allowed actor", :read)).to eq true
       expect {
@@ -374,7 +374,7 @@ describe AdheresToPolicy::InstanceMethods do
         AdheresToPolicy.configuration.reset!
       end
 
-      it "should cache permissions" do
+      it "caches permissions" do
         user = User.new
         actor = @actor_class.new
 
@@ -384,7 +384,7 @@ describe AdheresToPolicy::InstanceMethods do
         actor.rights_status(nil)
       end
 
-      it "should not nil the session argument when not caching" do
+      it "does not nil the session argument when not caching" do
         actor_class = Class.new do
           attr_reader :session
 
@@ -400,7 +400,7 @@ describe AdheresToPolicy::InstanceMethods do
         expect(actor.session).not_to be_nil
       end
 
-      it "should change cache key based on session[:permissions_key]" do
+      it "changes cache key based on session[:permissions_key]" do
         session = {
           permissions_key: 'permissions_key',
           session_id: 'session_id'

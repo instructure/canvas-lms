@@ -76,7 +76,7 @@ describe BroadcastPolicy do
       Object.send(:remove_const, :Parent)
     end
 
-    it "should overwrite any inherited blocks" do
+    it "overwrites any inherited blocks" do
       policy_list = Child.broadcast_policy_list
       expect(policy_list.find_policy_for('Foo')).to be(nil)
       expect(policy_list.find_policy_for('Bar')).not_to be(nil)

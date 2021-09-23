@@ -30,25 +30,25 @@ describe I18nliner::Extractors::RubyExtractor do
   end
 
   context "labels" do
-    it "should interpret symbol names as the key" do
+    it "interprets symbol names as the key" do
       expect(extract("label :thing, :the_foo, :foo, :en => 'Foo'")).to eq({ 'asdf.labels.foo' => "Foo" })
       expect(extract("f.label :the_foo, :foo, :en => 'Foo'")).to eq({ 'asdf.labels.foo' => "Foo" })
       expect(extract("label_tag :the_foo, :foo, :en => 'Foo'")).to eq({ 'asdf.labels.foo' => "Foo" })
     end
 
-    it "should infer the key from the method if not provided" do
+    it "infers the key from the method if not provided" do
       expect(extract("label :thing, :the_foo, :en => 'Foo'")).to eq({ 'asdf.labels.the_foo' => "Foo" })
       expect(extract("f.label :the_foo, :en => 'Foo'")).to eq({ 'asdf.labels.the_foo' => "Foo" })
       expect(extract("label_tag :the_foo, :en => 'Foo'")).to eq({ 'asdf.labels.the_foo' => "Foo" })
     end
 
-    it "should skip label calls with non-symbol keys (i.e. just a standard label)" do
+    it "skips label calls with non-symbol keys (i.e. just a standard label)" do
       expect(extract("label :thing, :the_foo, 'foo'")).to eq({})
       expect(extract("f.label :the_foo, 'foo'")).to eq({})
       expect(extract("label_tag :thing, 'foo'")).to eq({})
     end
 
-    it "should not auto-scope absolute keys" do
+    it "does not auto-scope absolute keys" do
       expect(extract("label :thing, :the_foo, :'#foo', :en => 'Foo'")).to eq({ "foo" => "Foo" })
       expect(extract("f.label :the_foo, :'#foo', :en => 'Foo'")).to eq({ "foo" => "Foo" })
       expect(extract("label_tag :the_foo, :'#foo', :en => 'Foo'")).to eq({ "foo" => "Foo" })
@@ -56,49 +56,49 @@ describe I18nliner::Extractors::RubyExtractor do
   end
 
   context "nesting" do
-    it "should ignore i18n calls within i18n method definitions" do
+    it "ignores i18n calls within i18n method definitions" do
       expect(extract("def t(*args); other.t *args; end")).to eq({})
     end
   end
 
   context "scoping" do
-    it "should auto-scope relative keys to the current scope" do
+    it "auto-scopes relative keys to the current scope" do
       expect(extract("t 'foo', 'Foo'")).to eq({ 'asdf.foo' => "Foo" })
     end
 
-    it "should not auto-scope absolute keys" do
+    it "does not auto-scope absolute keys" do
       expect(extract("t '#foo', 'Foo'")).to eq({ 'foo' => "Foo" })
     end
 
-    it "should not auto-scope keys with I18n as the receiver" do
+    it "does not auto-scope keys with I18n as the receiver" do
       expect(extract("I18n.t 'foo', 'Foo'")).to eq({ 'foo' => 'Foo' })
     end
 
-    it "should auto-scope plugin registration" do
+    it "auto-scopes plugin registration" do
       expect(extract("Canvas::Plugin.register('dim_dim', :web_conferencing, {:name => lambda{ t :name, \"DimDim\" }})")).to eq(
         { 'plugins.dim_dim.name' => "DimDim" }
       )
     end
 
-    it "should require explicit keys if a key is provided and there is no scope" do
+    it "requires explicit keys if a key is provided and there is no scope" do
       expect { extract("t 'foo', 'Foo'", I18nliner::Scope.root) }.to raise_error /ambiguous translation key/
     end
 
-    it "should not require explicit keys if the key is inferred and there is no scope" do
+    it "does not require explicit keys if the key is inferred and there is no scope" do
       expect(extract("t 'Foo'", I18nliner::Scope.root)).to eq({ 'foo_f44ad75d' => 'Foo' })
     end
 
-    it "should not scope inferred keys" do
+    it "does not scope inferred keys" do
       expect(extract("t 'Hello World'")).to eq({ 'hello_world_e2033670' => 'Hello World' })
     end
   end
 
   context "sanitization" do
-    it "should reject stuff that looks sufficiently html-y" do
+    it "rejects stuff that looks sufficiently html-y" do
       expect { extract "t 'dude', 'this is <em>important</em>'" }.to raise_error /html tags in default translation/
     end
 
-    it "should generally be ok with angle brackets" do
+    it "generallies be ok with angle brackets" do
       expect(extract("t 'obvious', 'TIL 1 < 2'")).to eq({ 'asdf.obvious' => 'TIL 1 < 2' })
       expect(extract("t 'email', 'please enter an email, e.g. Joe User <joe@example.com>'")).to eq({ 'asdf.email' => 'please enter an email, e.g. Joe User <joe@example.com>' })
     end

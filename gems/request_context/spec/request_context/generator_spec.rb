@@ -26,7 +26,7 @@ describe "RequestContext::Generator" do
   let(:request) { double('Rack::Request', path_parameters: { controller: 'users', action: 'index' }) }
   let(:context) { double('Course', class: 'Course', id: 15) }
 
-  it "should generate the X-Canvas-Meta response header" do
+  it "generates the X-Canvas-Meta response header" do
     _, headers, _ = RequestContext::Generator.new(->(env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.add_meta_header("a2", "test2")
@@ -36,7 +36,7 @@ describe "RequestContext::Generator" do
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;a2=test2;"
   end
 
-  it "should add request data to X-Canvas-Meta" do
+  it "adds request data to X-Canvas-Meta" do
     _, headers, _ = RequestContext::Generator.new(->(env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, nil)
@@ -45,7 +45,7 @@ describe "RequestContext::Generator" do
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;"
   end
 
-  it "should add request and context data to X-Canvas-Meta" do
+  it "adds request and context data to X-Canvas-Meta" do
     _, headers, _ = RequestContext::Generator.new(->(env) {
       RequestContext::Generator.add_meta_header("a1", "test1")
       RequestContext::Generator.store_request_meta(request, context)
@@ -54,7 +54,7 @@ describe "RequestContext::Generator" do
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;o=users;n=index;t=Course;i=15;"
   end
 
-  it "should add page view data to X-Canvas-Meta" do
+  it "adds page view data to X-Canvas-Meta" do
     fake_pv_class = Class.new do
       def initialize(attrs)
         @attrs = attrs
@@ -86,13 +86,13 @@ describe "RequestContext::Generator" do
     expect(headers['X-Canvas-Meta']).to eq "a1=test1;x=5.0;p=f;f=#{f};"
   end
 
-  it "should generate a request_id and store it in Thread.current" do
+  it "generates a request_id and store it in Thread.current" do
     Thread.current[:context] = nil
     _, _, _ = RequestContext::Generator.new(->(env) { [200, {}, []] }).call(env)
     expect(Thread.current[:context][:request_id]).to be_present
   end
 
-  it "should add the request_id to X-Request-Context-Id" do
+  it "adds the request_id to X-Request-Context-Id" do
     Thread.current[:context] = nil
     _, headers, _ = RequestContext::Generator.new(->(env) {
       [200, {}, []]
@@ -100,14 +100,14 @@ describe "RequestContext::Generator" do
     expect(headers['X-Request-Context-Id']).to be_present
   end
 
-  it "should find the session_id in a cookie and store it in Thread.current" do
+  it "finds the session_id in a cookie and store it in Thread.current" do
     Thread.current[:context] = nil
     env['action_dispatch.cookies'] = { log_session_id: 'abc' }
     _, _, _ = RequestContext::Generator.new(->(env) { [200, {}, []] }).call(env)
     expect(Thread.current[:context][:session_id]).to eq 'abc'
   end
 
-  it "should find the session_id from the rack session and add it to X-Session-Id" do
+  it "finds the session_id from the rack session and add it to X-Session-Id" do
     Thread.current[:context] = nil
     env['rack.session.options'] = { id: 'abc' }
     _, headers, _ = RequestContext::Generator.new(->(env) {
@@ -116,7 +116,7 @@ describe "RequestContext::Generator" do
     expect(headers['X-Session-Id']).to eq 'abc'
   end
 
-  it "should calculate the 'queued' time if header is passed" do
+  it "calculates the 'queued' time if header is passed" do
     Timecop.freeze do
       Thread.current[:context] = nil
       env['HTTP_X_REQUEST_START'] = "t=#{(1.minute.ago.to_f * 1000000).to_i}"

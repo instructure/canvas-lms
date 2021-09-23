@@ -128,7 +128,7 @@ describe "CanvasHttp" do
   end
 
   describe ".get" do
-    it "should return response objects" do
+    it "returns response objects" do
       stub_request(:get, "http://www.example.com/a/b")
         .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a/b")
@@ -147,7 +147,7 @@ describe "CanvasHttp" do
       CanvasHttp.get("http://www.example.com/a/b")
     end
 
-    it "should use ssl" do
+    it "uses ssl" do
       http = double
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
@@ -160,7 +160,7 @@ describe "CanvasHttp" do
       expect(CanvasHttp.get("https://www.example.com/a/b").body).to eq("Hello SSL")
     end
 
-    it "should follow redirects" do
+    it "follows redirects" do
       stub_request(:get, "http://www.example.com/a")
         .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
       stub_request(:get, "http://www.example2.com/a")
@@ -172,7 +172,7 @@ describe "CanvasHttp" do
       expect(res.body).to eq("Hello")
     end
 
-    it "should follow relative redirects" do
+    it "follows relative redirects" do
       stub_request(:get, "http://www.example.com/a")
         .to_return(status: 301, headers: { 'Location' => '/b' })
       stub_request(:get, "http://www.example.com/b")
@@ -182,7 +182,7 @@ describe "CanvasHttp" do
       expect(res.body).to eq("Hello")
     end
 
-    it "should fail on too many redirects" do
+    it "fails on too many redirects" do
       stub_request(:get, "http://www.example.com/a")
         .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
       stub_request(:get, "http://www.example2.com/a")
@@ -190,7 +190,7 @@ describe "CanvasHttp" do
       expect { CanvasHttp.get("http://www.example.com/a", redirect_limit: 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
 
-    it "should yield requests to blocks" do
+    it "yields requests to blocks" do
       res = nil
       stub_request(:get, "http://www.example.com/a/b")
         .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
@@ -201,7 +201,7 @@ describe "CanvasHttp" do
       expect(res.body).to eq("Hello")
     end
 
-    it "should check host before running" do
+    it "checks host before running" do
       res = nil
       stub_request(:get, "http://www.example.com/a/b")
         .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
@@ -225,7 +225,7 @@ describe "CanvasHttp" do
       end
 
       context 'when the response body is <= max_response_body_length' do
-        it 'should return a response with a string body' do
+        it 'returns a response with a string body' do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           res = CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 100)
           expect(res.body).to eq("Hello" * 20)
@@ -233,7 +233,7 @@ describe "CanvasHttp" do
       end
 
       context 'when the response body is larger than this (one chunk)' do
-        it 'should raise a ResponseTooLargeError' do
+        it 'raises a ResponseTooLargeError' do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           expect do
             CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 99)
@@ -256,7 +256,7 @@ describe "CanvasHttp" do
       end
 
       context 'if the total response body is larger than the max length' do
-        it 'should raise a ResponseTooLargeError' do
+        it 'raises a ResponseTooLargeError' do
           expect { CanvasHttp.read_body_max_length(mock_response, 99) }.to \
             raise_error(CanvasHttp::ResponseTooLargeError)
         end
@@ -280,7 +280,7 @@ describe "CanvasHttp" do
       CanvasHttp.blocked_ip_filters = old_filters
     end
 
-    it "should check for insecure hosts" do
+    it "checks for insecure hosts" do
       expect(CanvasHttp.insecure_host?('example.com')).to eq false
       expect(CanvasHttp.insecure_host?('localhost')).to eq true
       expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true

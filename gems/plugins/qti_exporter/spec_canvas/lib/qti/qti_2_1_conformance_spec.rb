@@ -42,7 +42,7 @@ if Qti.migration_executable
       expect(@migration.migration_issues).to be_empty
     end
 
-    it "should import VE_IP_01" do
+    it "imports VE_IP_01" do
       import_fixture('VE_IP_01.zip')
       expect(@course.quizzes.count).to eq 0
       expect(@course.assessment_questions.count).to eq 1
@@ -59,7 +59,7 @@ if Qti.migration_executable
       expect(answers.map { |a| a['weight'] }.sort).to eq [0, 100]
     end
 
-    it "should import VE_IP_02" do
+    it "imports VE_IP_02" do
       import_fixture('VE_IP_02.zip')
 
       expect(@course.quizzes.count).to eq 0
@@ -82,7 +82,7 @@ if Qti.migration_executable
       expect(answers.map { |h| h['weight'] }).to eq [0, 0, 0, 100, 0]
     end
 
-    it "should import VE_IP_03" do
+    it "imports VE_IP_03" do
       import_fixture('VE_IP_03.zip')
       expect(@course.quizzes.count).to eq 0
       expect(@course.assessment_questions.count).to eq 1
@@ -110,7 +110,7 @@ if Qti.migration_executable
       ]
     end
 
-    it "should import VE_IP_04" do
+    it "imports VE_IP_04" do
       import_fixture('VE_IP_04.zip')
       expect(@course.quizzes.count).to eq 0
       expect(@course.assessment_questions.count).to eq 1
@@ -129,7 +129,7 @@ if Qti.migration_executable
       expect(answer['blank_id']).to eq 'RESPONSE'
     end
 
-    it "should import VE_IP_05" do
+    it "imports VE_IP_05" do
       import_fixture('VE_IP_05.zip')
       expect(@course.quizzes.count).to eq 0
       expect(@course.assessment_questions.count).to eq 1
@@ -146,12 +146,12 @@ if Qti.migration_executable
       expect(q.question_data['answers'].count).to eq 0
     end
 
-    it "should import VE_IP_06" do
+    it "imports VE_IP_06" do
       skip('hotspot questions')
       import_fixture('VE_IP_06.zip')
     end
 
-    it "should import VE_IP_07" do
+    it "imports VE_IP_07" do
       import_fixture('VE_IP_07.zip')
       expect(@course.quizzes.count).to eq 0
       expect(@course.assessment_questions.count).to eq 1
@@ -184,7 +184,7 @@ if Qti.migration_executable
       end
     end
 
-    it "should import VE_IP_11" do
+    it "imports VE_IP_11" do
       import_fixture('VE_IP_11.zip')
       expect(@course.assessment_questions.count).to eq 5
       expect(@course.assessment_questions.map { |q| q.question_data['question_type'] }.sort).to eq [
@@ -196,7 +196,7 @@ if Qti.migration_executable
       ]
     end
 
-    it "should import VE_TP_01" do
+    it "imports VE_TP_01" do
       import_fixture('VE_TP_01.zip')
       expect(@course.assessment_questions.count).to eq 1
       expect(@course.quizzes.count).to eq 1
@@ -212,7 +212,7 @@ if Qti.migration_executable
       expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
-    it "should import VE_TP_02" do
+    it "imports VE_TP_02" do
       import_fixture('VE_TP_02.zip')
       expect(@course.assessment_questions.count).to eq 1
       expect(@course.quizzes.count).to eq 1
@@ -228,7 +228,7 @@ if Qti.migration_executable
       expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
-    it "should import VE_TP_03" do
+    it "imports VE_TP_03" do
       import_fixture('VE_TP_03.zip')
       expect(@course.assessment_questions.count).to eq 1
       expect(@course.quizzes.count).to eq 1
@@ -244,7 +244,7 @@ if Qti.migration_executable
       expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
-    it "should import VE_TP_04" do
+    it "imports VE_TP_04" do
       import_fixture('VE_TP_04.zip')
       expect(@course.assessment_questions.count).to eq 1
       expect(@course.quizzes.count).to eq 1
@@ -260,7 +260,7 @@ if Qti.migration_executable
       expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
-    it "should import VE_TP_05" do
+    it "imports VE_TP_05" do
       import_fixture('VE_TP_05.zip')
       expect(@course.assessment_questions.count).to eq 1
       expect(@course.quizzes.count).to eq 1
@@ -276,7 +276,7 @@ if Qti.migration_executable
       expect(question.assessment_question_id).to eq @course.assessment_questions.first.id
     end
 
-    it "should import VE_TP_06" do
+    it "imports VE_TP_06" do
       import_fixture('VE_TP_06.zip')
       expect(@course.assessment_questions.count).to eq 5
       expect(@course.quizzes.count).to eq 1

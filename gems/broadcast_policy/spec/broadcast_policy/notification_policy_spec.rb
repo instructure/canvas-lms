@@ -35,40 +35,40 @@ describe BroadcastPolicy::NotificationPolicy do
     BroadcastPolicy.notification_finder = MockNotificationFinder.new(test_notification: test_notification)
   end
 
-  it 'should send_notification for each slice of users' do
+  it 'send_notifications for each slice of users' do
     allow(BroadcastPolicy::NotificationPolicy).to receive(:slice_size).and_return(1)
     record = double('test record', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     expect(BroadcastPolicy.notifier).to receive(:send_notification).twice
     subject.broadcast(record)
   end
 
-  it "should call the notifier" do
+  it "calls the notifier" do
     record = double('test record', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages.count).to eq(1)
   end
 
-  it "should not send if skip_broadcasts is set" do
+  it "does not send if skip_broadcasts is set" do
     record = double('test object', skip_broadcasts: true)
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should not send if conditions are not met" do
+  it "does not send if conditions are not met" do
     record = double('test object', skip_broadcasts: false)
     subject.whenever = ->(_) { false }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should not send if there is not a recipient list" do
+  it "does not send if there is not a recipient list" do
     record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.to = ->(_) { nil }
     subject.broadcast(record)
     expect(BroadcastPolicy.notifier.messages).to be_empty
   end
 
-  it "should send even if there isn't data" do
+  it "sends even if there isn't data" do
     record = double('test object', skip_broadcasts: false, class: double(connection: test_connection_class.new))
     subject.data = ->(_) { nil }
     subject.broadcast(record)

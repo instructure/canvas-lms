@@ -36,7 +36,7 @@ describe GoogleDrive::Connection do
   end
 
   describe "#file_extension from headers" do
-    it "should pull the file extension from the response header" do
+    it "pulls the file extension from the response header" do
       headers = {
         'content-disposition' => 'attachment;filename="Testing.docx"'
       }
@@ -47,7 +47,7 @@ describe GoogleDrive::Connection do
       expect(file_extension).to eq("docx")
     end
 
-    it "should pull the file extension from the entry if its not in the response header" do
+    it "pulls the file extension from the entry if its not in the response header" do
       headers = {
         'content-disposition' => 'attachment"'
       }
@@ -57,7 +57,7 @@ describe GoogleDrive::Connection do
       expect(file_extension).to eq("not")
     end
 
-    it "should use unknown as a last resort file extension" do
+    it "uses unknown as a last resort file extension" do
       headers = {
         'content-disposition' => 'attachment"'
       }
@@ -67,7 +67,7 @@ describe GoogleDrive::Connection do
       expect(file_extension).to eq("unknown")
     end
 
-    it "should use unknown as file extension when extension is nil" do
+    it "uses unknown as file extension when extension is nil" do
       headers = {}
       entry = double('Entry', extension: nil)
 
@@ -77,7 +77,7 @@ describe GoogleDrive::Connection do
   end
 
   describe "#normalize_document_id" do
-    it "should remove prefixes" do
+    it "removes prefixes" do
       spreadsheet_id = connection.send(:normalize_document_id, "spreadsheet:awesome-spreadsheet-id")
       expect(spreadsheet_id).to eq("awesome-spreadsheet-id")
 
@@ -120,22 +120,22 @@ describe GoogleDrive::Connection do
       before { request }
 
       context 'with 200 success response' do
-        it "should submit `trashed = false` parameter" do
+        it "submits `trashed = false` parameter" do
           connection.list_with_extension_filter('txt')
           expect(WebMock).to have_requested(:get, url)
         end
 
-        it "should return allowed extension" do
+        it "returns allowed extension" do
           returned_list = connection.list_with_extension_filter('png')
           expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
         end
 
-        it "should not return other extension" do
+        it "does not return other extension" do
           returned_list = connection.list_with_extension_filter('txt')
           expect(returned_list.files).to be_empty
         end
 
-        it "should return all extensions if no extension filter provided" do
+        it "returns all extensions if no extension filter provided" do
           returned_list = connection.list_with_extension_filter('')
           expect(returned_list.files.select { |a| a.entry["fileExtension"] == 'png' }).not_to be_empty
         end

@@ -111,7 +111,7 @@ describe "Default Account Reports" do
       @enrollment1.find_score.update_attribute(:override_score, 102)
     end
 
-    it "should run grade export for a term and return one line per enrollment" do
+    it "runs grade export for a term and return one line per enrollment" do
       user_with_managed_pseudonym(user: @user1, account: @account)
       p = @account.pseudonyms.where(sis_user_id: 'user_sis_id_01').take
       @enrollment1.sis_pseudonym = p
@@ -133,7 +133,7 @@ describe "Default Account Reports" do
                                @term1.id.to_s, "fall12", nil, "97.0", "active", nil, nil, nil, nil, "A", nil, nil, nil]
     end
 
-    it "should run grade export for a term using sis_id" do
+    it "runs grade export for a term using sis_id" do
       parameters = {}
       parameters["enrollment_term"] = "sis_term_id:fall12"
       parsed = read_report('grade_export_csv', { order: 13, params: parameters })
@@ -149,7 +149,7 @@ describe "Default Account Reports" do
                                @term1.id.to_s, "fall12", nil, "97.0", "active", nil, nil, nil, nil, "A", nil, nil, nil]
     end
 
-    it "should run grade export with no parameters" do
+    it "runs grade export with no parameters" do
       parsed = read_report('grade_export_csv', { order: 13 })
       expect(parsed.length).to eq 5
 
@@ -170,7 +170,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "active", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should run grade export with empty string parameter" do
+    it "runs grade export with empty string parameter" do
       parameters = {}
       parameters["enrollment_term"] = ""
       parsed = read_report('grade_export_csv', { order: 13, params: parameters })
@@ -193,7 +193,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "active", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should run grade export with deleted users" do
+    it "runs grade export with deleted users" do
       @course2.destroy
       @enrollment1.destroy
       @enrollment2.workflow_state = 'inactive'
@@ -221,7 +221,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "deleted", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should run grade export on a sub account" do
+    it "runs grade export on a sub account" do
       sub_account = Account.create(:parent_account => @account, :name => 'English')
       @course2.account = sub_account
       @course2.save!
@@ -238,7 +238,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "active", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should run a grade export on concluded courses with an limiting period given" do
+    it "runs a grade export on concluded courses with an limiting period given" do
       @course1.complete!
       @enrollment1.conclude
       @enrollment5.workflow_state = 'inactive'
@@ -276,7 +276,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "inactive", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should not return results that don't fall within the limiting period" do
+    it "does not return results that don't fall within the limiting period" do
       @course1.complete!
       @course1.conclude_at = Date.today - 3.days
       @course1.save!
@@ -296,7 +296,7 @@ describe "Default Account Reports" do
                                @default_term.id.to_s, nil, nil, "99.0", "active", nil, nil, nil, nil, nil, nil, nil, nil]
     end
 
-    it "should return a deleted courses within an limiting period" do
+    it "returns a deleted courses within an limiting period" do
       @enrollment3.destroy
       parameters = {}
       parameters["include_deleted"] = true

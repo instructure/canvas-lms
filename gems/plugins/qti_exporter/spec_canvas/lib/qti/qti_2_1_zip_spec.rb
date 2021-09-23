@@ -29,16 +29,16 @@ if Qti.migration_executable
       @course_data = exporter.course.with_indifferent_access
     end
 
-    it "should convert the questions" do
+    it "converts the questions" do
       expect(@course_data[:assessment_questions][:assessment_questions].length).to eq 4
     end
 
-    it "should have file paths" do
+    it "has file paths" do
       expect(@course_data[:overview_file_path].index("overview.json")).not_to be_nil
       expect(@course_data[:full_export_file_path].index('course_export.json')).not_to be_nil
     end
 
-    it "should properly detect whether a package is QTI 2.1" do
+    it "properlies detect whether a package is QTI 2.1" do
       qti1 = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_1_2.xml')
       qti2 = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_2_1.xml')
       expect(Qti::Converter.is_qti_2(qti1)).to be_falsey

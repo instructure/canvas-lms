@@ -21,15 +21,15 @@
 require 'spec_helper'
 
 describe JSONToken do
-  it 'should encode' do
+  it 'encodes' do
     expect(JSONToken.encode({ a: 123, b: [1, 2, '13'] })).to eq "eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19"
   end
 
-  it 'should decode' do
+  it 'decodes' do
     expect(JSONToken.decode("eyJhIjoxMjMsImIiOlsxLDIsIjEzIl19")).to eq({ "a" => 123, "b" => [1, 2, "13"] })
   end
 
-  it 'should handle binary strings' do
+  it 'handles binary strings' do
     messy = (+"\xD1\x9B\x86").force_encoding("ASCII-8BIT")
     expect(JSONToken.decode(JSONToken.encode(messy))).to eq messy
   end

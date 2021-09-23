@@ -34,7 +34,7 @@ describe Moodle::Converter do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
-  it "should successfully import the course" do
+  it "successfullies import the course" do
     allowed_warnings = [
       "Multiple Dropdowns question may have been imported incorrectly",
       "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",
@@ -45,7 +45,7 @@ describe Moodle::Converter do
   end
 
   context "discussion topics" do
-    it "should convert discussion topics and announcements" do
+    it "converts discussion topics and announcements" do
       expect(@course.discussion_topics.count).to eq 2
 
       dt = @course.discussion_topics.first
@@ -60,7 +60,7 @@ describe Moodle::Converter do
   end
 
   context "assignments" do
-    it "should convert assignments" do
+    it "converts assignments" do
       expect(@course.assignments.count).to eq 2
 
       assignment2 = @course.assignments.where(title: 'Hidden Assignmnet').first
@@ -70,7 +70,7 @@ describe Moodle::Converter do
   end
 
   context "wiki pages" do
-    it "should convert wikis" do
+    it "converts wikis" do
       wiki = @course.wiki
       expect(wiki).not_to be_nil
       expect(wiki.wiki_pages.count).to eq 12
@@ -86,17 +86,17 @@ describe Moodle::Converter do
       skip if !Qti.qti_enabled?
     end
 
-    it "should convert quizzes" do
+    it "converts quizzes" do
       expect(@course.quizzes.count).to eq 2
     end
 
-    it "should convert Moodle Quiz module to a quiz" do
+    it "converts Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.where(title: "Quiz Name").first
       expect(quiz.description).to match /Quiz Description/
       expect(quiz.quiz_questions.count).to eq 11
     end
 
-    it "should convert Moodle Questionnaire module to a quiz" do
+    it "converts Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.where(title: "Questionnaire Name").first
       expect(quiz.description).to match /Sumary/
       expect(quiz.quiz_type).to eq 'survey'
@@ -105,7 +105,7 @@ describe Moodle::Converter do
   end
 
   context "modules" do
-    it "should convert modules and module items" do
+    it "converts modules and module items" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       expect(@course.context_modules.count).to eq 8

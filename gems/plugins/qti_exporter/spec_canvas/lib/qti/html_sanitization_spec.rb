@@ -20,26 +20,26 @@ require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "HTML Sanitization of" do
     describe "question text" do
-      it "should sanitize qti v2p1 escaped html" do
+      it "sanitizes qti v2p1 escaped html" do
         manifest_node = get_manifest_node('multiple_answer')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('escaped'))
         expect(hash[:question_text]).to match_ignoring_whitespace "The Media Wizard also allows you to embed images, audio and video from popular websites, such as YouTube and Picasa. You can also link to an image or audio or video file stored on another server. The advantage to linking to a file is that you don't have to copy the original media content to your online course – you just add a link to it. <br><br><b>Question: </b>Respondus can embed video, audio and images from which two popular websites mentioned above?"
       end
 
-      it "should try to escape unmatched brackets" do
+      it "tries to escape unmatched brackets" do
         manifest_node = get_manifest_node('unmatched_brackets')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('escaped'))
         expect(hash[:question_text]).to match_ignoring_whitespace "<br> I\"m not good at xml so i\"m going to put in some unmatched &lt; brackets here <br> oh here have some more &gt; &gt; &lt;"
       end
 
-      it "should sanitize other escaped html" do # e.g. angel proprietary
+      it "sanitizes other escaped html" do # e.g. angel proprietary
         qti_data = file_as_string(html_sanitization_question_dir('escaped'), 'angel_essay.xml')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data, :interaction_type => 'essay_question', :custom_type => 'angel')
         expect(hash[:question_text]).to eq "<div>Rhode Island is neither a road nor an island. Discuss. </div>"
       end
     end
     describe "multiple choice text" do
-      it "should sanitize and strip qti v2p1 escaped html" do
+      it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('multiple_choice')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('escaped'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
@@ -52,7 +52,7 @@ if Qti.migration_executable
             :text => "No answer text provided." }
         ]
       end
-      it "should sanitize and strip qti v2p1 html nodes" do
+      it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('multiple_choice')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
@@ -65,7 +65,7 @@ if Qti.migration_executable
       end
     end
     describe "multiple answer text" do
-      it "should sanitize and strip qti v2p1 escaped html" do
+      it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('multiple_answer')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('escaped'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
@@ -78,7 +78,7 @@ if Qti.migration_executable
         expect(hash[:answers][3][:html]).to eq nil
         expect(hash[:answers][3][:text]).to eq "Twitter" # we've stripped off extraneous whitespace
       end
-      it "should sanitize and strip qti v2p1 html nodes" do
+      it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('multiple_answer')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
@@ -91,7 +91,7 @@ if Qti.migration_executable
       end
     end
     describe "matching text" do
-      it "should sanitize and strip qti v2p1 escaped html" do
+      it "sanitizes and strip qti v2p1 escaped html" do
         manifest_node = get_manifest_node('matching')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('escaped'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }
@@ -103,7 +103,7 @@ if Qti.migration_executable
           { :html => nil, :text => "Sydney" }
         ]
       end
-      it "should sanitize and strip qti v2p1 html nodes" do
+      it "sanitizes and strip qti v2p1 html nodes" do
         manifest_node = get_manifest_node('matching')
         hash = Qti::AssessmentItemConverter.create_instructure_question(:manifest_node => manifest_node, :base_dir => html_sanitization_question_dir('nodes'))
         hash[:answers].each { |a| a.replace(:html => a[:html], :text => a[:text]) }

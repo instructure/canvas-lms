@@ -24,31 +24,31 @@ if Qti.migration_executable
       @opts = { :flavor => Qti::Flavors::D2L }
     end
 
-    it "should convert multiple choice" do
+    it "converts multiple choice" do
       expect(get_question_hash(d2l_question_dir, 'multiple_choice', true, @opts)).to eq D2LExpected::MULTIPLE_CHOICE
     end
 
-    it "should convert true false" do
+    it "converts true false" do
       expect(get_question_hash(d2l_question_dir, 'true_false', true, @opts)).to eq D2LExpected::TRUE_FALSE
     end
 
-    it "should convert short answer" do
+    it "converts short answer" do
       expect(get_question_hash(d2l_question_dir, 'short_answer', true, @opts)).to eq D2LExpected::SHORT_ANSWER
     end
 
-    it "should convert multi select" do
+    it "converts multi select" do
       expect(get_question_hash(d2l_question_dir, 'multi_select', true, @opts)).to eq D2LExpected::MULTI_SELECT
     end
 
-    it "should convert multiple short" do
+    it "converts multiple short" do
       expect(get_question_hash(d2l_question_dir, 'multiple_short', true, @opts)).to eq D2LExpected::MULTIPLE_SHORT
     end
 
-    it "should convert fill in the blank with multiple blanks" do
+    it "converts fill in the blank with multiple blanks" do
       expect(get_question_hash(d2l_question_dir, 'fib', true, @opts)).to eq D2LExpected::FIB
     end
 
-    it "should convert matching" do
+    it "converts matching" do
       # pp get_question_hash(d2l_question_dir, 'matching', false)
       hash = get_question_hash(d2l_question_dir, 'matching', false, @opts)
       matches = {}
@@ -62,36 +62,36 @@ if Qti.migration_executable
       expect(hash).to eq D2LExpected::MATCHING
     end
 
-    it "should flag ordering question as an error" do
+    it "flags ordering question as an error" do
       expect(get_question_hash(d2l_question_dir, 'ordering', true, @opts)).to eq D2LExpected::ORDERING
     end
 
-    it "should convert math question" do
+    it "converts math question" do
       expect(get_question_hash(d2l_question_dir, 'math', true, @opts)).to eq D2LExpected::MATH
     end
 
-    it "should convert a simple math question to a numeric question" do
+    it "converts a simple math question to a numeric question" do
       expect(get_question_hash(d2l_question_dir, 'simple_math', true, @opts)).to eq D2LExpected::SIMPLE_MATH
     end
 
-    it "should convert long answer" do
+    it "converts long answer" do
       expect(get_question_hash(d2l_question_dir, 'long_answer', true, @opts)).to eq D2LExpected::LONG_ANSWER
     end
 
-    it "should convert an item with a response condition with no condition" do
+    it "converts an item with a response condition with no condition" do
       expect(get_question_hash(d2l_question_dir, 'no_condition', true, @opts)).to eq D2LExpected::NO_CONDITION
     end
 
-    it "should convert the assessment into a quiz" do
+    it "converts the assessment into a quiz" do
       allow_any_instance_of(Qti::AssessmentTestConverter).to receive(:unique_local_id).and_return("random")
       expect(get_quiz_data(d2l_question_dir, 'assessment', @opts).last.first).to eq D2LExpected::ASSESSMENT
     end
 
-    it "should convert the assessment references into a quiz" do
+    it "converts the assessment references into a quiz" do
       expect(get_quiz_data(d2l_question_dir, 'assessment_references', @opts).last.first).to eq D2LExpected::ASSESSMENT_REFS
     end
 
-    it "should convert text only questions" do
+    it "converts text only questions" do
       expect(get_quiz_data(d2l_question_dir, 'text_only', @opts).first).to eq D2LExpected::TEXT_ONLY
     end
   end

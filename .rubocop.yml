@@ -32,8 +32,6 @@ RSpec/DescribeClass:
   Enabled: false
 RSpec/DescribedClass:
   Enabled: false
-RSpec/ExampleWording:
-  Enabled: false
 RSpec/ExpectChange:
   Enabled: false
 RSpec/HookArgument:

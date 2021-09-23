@@ -98,7 +98,7 @@ describe 'Student reports' do
       s.save!
     end
 
-    it 'should find users that with no submissions after a date in all states' do
+    it 'finds users that with no submissions after a date in all states' do
       Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
       Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
       Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
@@ -130,7 +130,7 @@ describe 'Student reports' do
                                @course2.id.to_s, nil, 'Math 101', 'deleted']
     end
 
-    it 'should filter on enrollment states' do
+    it 'filters on enrollment states' do
       Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
       Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
       Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
@@ -152,7 +152,7 @@ describe 'Student reports' do
                                @course2.id.to_s, nil, 'Math 101', 'invited']
     end
 
-    it 'should filter on enrollment state' do
+    it 'filters on enrollment state' do
       Enrollment.where(id: @e_u1_c1).update_all(workflow_state: 'completed')
       Enrollment.where(id: @e_u2_c2).update_all(workflow_state: 'deleted')
       Enrollment.where(id: @e_u1_c2).update_all(workflow_state: 'invited')
@@ -170,7 +170,7 @@ describe 'Student reports' do
                                'active']
     end
 
-    it 'should find users that have not submitted anything in a date range' do
+    it 'finds users that have not submitted anything in a date range' do
       parameters = {}
       parameters['start_at'] = 45.days.ago
       parameters['end_at'] = 35.days.ago
@@ -187,7 +187,7 @@ describe 'Student reports' do
                                @course2.id.to_s, nil, 'Math 101']
     end
 
-    it 'should find users that have not submitted anything in the past 2 weeks' do
+    it 'finds users that have not submitted anything in the past 2 weeks' do
       parsed = read_report(@type, { order: [1, 8] })
 
       expect(parsed[0]).to eq [@user1.id.to_s, 'user_sis_id_01',
@@ -209,7 +209,7 @@ describe 'Student reports' do
       expect(parsed.length).to eq 4
     end
 
-    it 'should adjust date range to 2 weeks' do
+    it 'adjusts date range to 2 weeks' do
       @term1 = @account.enrollment_terms.create(:name => 'Fall')
       @term1.save!
       @course1.enrollment_term = @term1
@@ -232,7 +232,7 @@ describe 'Student reports' do
       expect(parsed.length).to eq 2
     end
 
-    it 'should find users that have not submitted under a sub account' do
+    it 'finds users that have not submitted under a sub account' do
       sub_account = Account.create(:parent_account => @account,
                                    :name => 'English')
       @course2.account = sub_account
@@ -250,7 +250,7 @@ describe 'Student reports' do
       expect(parsed.length).to eq 2
     end
 
-    it 'should find users that have not submitted for one course' do
+    it 'finds users that have not submitted for one course' do
       parameters = {}
       parameters['course'] = @course2.id
       parameters['include_enrollment_state'] = true
@@ -294,7 +294,7 @@ describe 'Student reports' do
       @course4.save
     end
 
-    it 'should run the zero activity report for course' do
+    it 'runs the zero activity report for course' do
       param = {}
       param['course'] = @course1.id
       parsed = read_report(@type, { params: param, order: 1 })
@@ -306,7 +306,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run the zero activity report for term' do
+    it 'runs the zero activity report for term' do
       @course1.enrollment_term = @term1
       @course1.save
       param = {}
@@ -322,7 +322,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run the zero activity report with no params' do
+    it 'runs the zero activity report with no params' do
       report = run_report
       expect(report.parameters["extra_text"]).to eq "Term: All Terms;"
       parsed = parse_report(report, { order: 1 })
@@ -339,7 +339,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run zero activity report on a sub account' do
+    it 'runs zero activity report on a sub account' do
       sub_account = Account.create(parent_account: @account, name: 'Math')
       @course2.account = sub_account
       @course2.save!
@@ -351,7 +351,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should ignore everything before the start date' do
+    it 'ignores everything before the start date' do
       @user1.enrollments.where(course_id: @course1).update_all(last_activity_at: 6.days.ago)
       parameter = {}
       parameter['start_at'] = 3.days.ago
@@ -372,7 +372,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should exclude multi-section users who have activity in at least one section' do
+    it 'excludes multi-section users who have activity in at least one section' do
       lonely_section = @course1.course_sections.create!(name: "forever alone")
       active_enrollment = lonely_section.enroll_user(@user2, 'StudentEnrollment', 'active')
       active_enrollment.update_attribute(:last_activity_at, 1.day.ago)
@@ -407,7 +407,7 @@ describe 'Student reports' do
       @p3.save
     end
 
-    it 'should run the last user access report' do
+    it 'runs the last user access report' do
       parsed = read_report(@type, { order: 1 })
       expect(parsed).to eq_stringified_array [
         [@user1.id, 'user_sis_id_01', 'Clair, John St.', @last_login_time2.iso8601, @p1.current_login_ip],
@@ -416,7 +416,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run the last user access report for a term' do
+    it 'runs the last user access report for a term' do
       @term1 = EnrollmentTerm.create(name: 'Fall')
       @term1.root_account = @account
       @term1.save!
@@ -431,7 +431,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run the last user access report for a course' do
+    it 'runs the last user access report for a course' do
       param = {}
       param['course'] = @course.id
       parsed = read_report(@type, { params: param, order: 1 })
@@ -441,7 +441,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should not include a user multiple times for multiple enrollments' do
+    it 'does not include a user multiple times for multiple enrollments' do
       @course1.enroll_user(@user1, 'ObserverEnrollment', { enrollment_state: 'active' })
       term1 = @account.enrollment_terms.create(name: 'Fall')
       term1.root_account = @account
@@ -458,7 +458,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should include each pseudonym for users' do
+    it 'includes each pseudonym for users' do
       @course1.enroll_user(@user1, 'ObserverEnrollment', { enrollment_state: 'active' })
       term1 = @account.enrollment_terms.create(name: 'Fall')
       term1.root_account = @account
@@ -484,7 +484,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should not include a user with a deleted enrollment' do
+    it 'does not include a user with a deleted enrollment' do
       @course2.enroll_user(@user3, 'StudentEnrollment', { :enrollment_state => 'deleted' })
       param = {}
       param['course'] = @course2.id
@@ -496,7 +496,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should include a user with a deleted enrollment' do
+    it 'includes a user with a deleted enrollment' do
       @course2.enroll_user(@user3, 'StudentEnrollment', { :enrollment_state => 'deleted' })
       param = {}
       param['course'] = @course2.id
@@ -524,7 +524,7 @@ describe 'Student reports' do
       [@e_u1_c1, @e_u2_c2, @e_u1_c2, @e_u2_c1].each(&:save!)
     end
 
-    it 'should show the lastest activity for each user' do
+    it 'shows the lastest activity for each user' do
       report = run_report(@type)
       parsed = parse_report(report, { order: 1 })
 
@@ -546,7 +546,7 @@ describe 'Student reports' do
       expect(parsed).to eq_stringified_array [[@user2.id.to_s, 'Bolton, Michael', @later_activity.iso8601]]
     end
 
-    it 'should scope by course if param given' do
+    it 'scopes by course if param given' do
       parameters = {}
       parameters['course'] = @course1.id
       report = run_report(@type, { params: parameters })
@@ -559,7 +559,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should scope by term if param given' do
+    it 'scopes by term if param given' do
       @term1 = @account.enrollment_terms.create(name: 'Fall')
       @term1.save!
       @course1.enrollment_term = @term1
@@ -577,7 +577,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should show data for users in other accounts with enrollments on this account' do
+    it 'shows data for users in other accounts with enrollments on this account' do
       @different_account = Account.create(name: 'New Account', default_time_zone: 'UTC')
 
       @course3 = course_factory(course_name: 'English 101', account: @account, active_course: true)
@@ -630,7 +630,7 @@ describe 'Student reports' do
       )
     end
 
-    it 'should run and include deleted users' do
+    it 'runs and include deleted users' do
       parsed = read_report(@type, { params: { "include_deleted" => true }, order: 1 })
       expect(parsed).to eq_stringified_array [
         [@user3.id, "Astley, Rick", @at3.token_hint.gsub(/.+~/, ''), 'never',
@@ -642,7 +642,7 @@ describe 'Student reports' do
       ]
     end
 
-    it 'should run and exclude deleted users' do
+    it 'runs and exclude deleted users' do
       parsed = read_report(@type, { order: 1 })
       expect(parsed.length).to eq 2
     end

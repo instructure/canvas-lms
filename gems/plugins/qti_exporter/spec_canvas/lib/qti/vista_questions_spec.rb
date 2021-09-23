@@ -49,13 +49,13 @@ if Qti.migration_executable
       question
     end
 
-    it "should have matching ids for assessments and questions" do
+    it "has matching ids for assessments and questions" do
       @assessment[:questions].each do |question|
         expect(get_question(question[:migration_id], false)).not_to be_nil
       end
     end
 
-    it "should mock the manifest node correctly" do
+    it "mocks the manifest node correctly" do
       manifest_node = get_manifest_node('multiple_choice', :interaction_type => 'extendedTextInteraction', :bb_question_type => 'Calculated')
       expect(manifest_node.at_css("instructureMetadata")).to eq manifest_node
       expect(manifest_node['identifier']).to eq nil
@@ -74,57 +74,57 @@ if Qti.migration_executable
       end
     end
 
-    it "should convert multiple choice" do
+    it "converts multiple choice" do
       hash = get_question("ID_4609865476341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MULTIPLE_CHOICE
     end
 
-    it "should not fail with missing response identifier" do
+    it "does not fail with missing response identifier" do
       expect {
         hash = get_question_hash(vista_question_dir, 'no_response_id', delete_answer_ids = true, opts = {})
       }.not_to raise_error
     end
 
-    it "should convert images correctly" do
+    it "converts images correctly" do
       manifest_node = get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => vista_question_dir).with_indifferent_access
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::TRUE_FALSE2
     end
 
-    it "should convert image reference" do
+    it "converts image reference" do
       hash = get_question_hash(vista_question_dir, 'mc', delete_answer_ids = true, opts = {})
       expect(hash[:question_text]).to match %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
     end
 
-    it "should convert short answer questions with multiple required answers to fimb" do
+    it "converts short answer questions with multiple required answers to fimb" do
       hash = get_question_hash(vista_question_dir, 'short_to_fimb', delete_answer_ids = true, opts = {})
       expect(hash[:question_type]).to eq "fill_in_multiple_blanks_question"
       expect(hash[:question_text]).to include("[SA01]")
       expect(hash[:question_text]).to include("[SA02]")
     end
 
-    it "should convert true/false questions" do
+    it "converts true/false questions" do
       hash = get_question("ID_4609865577341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::TRUE_FALSE
     end
 
-    it "should convert multiple choice questions with multiple correct answers (multiple answer)" do
+    it "converts multiple choice questions with multiple correct answers (multiple answer)" do
       hash = get_question("ID_4609865392341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MULTIPLE_ANSWER
     end
 
-    it "should convert essay questions" do
+    it "converts essay questions" do
       hash = get_question("ID_4609842537341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::ESSAY
     end
 
-    it "should convert short answer questions" do
+    it "converts short answer questions" do
       hash = get_question("ID_4609865550341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::SHORT_ANSWER
     end
 
-    it "should convert matching questions" do
+    it "converts matching questions" do
       hash = get_question("ID_4609865194341", false)
       # make sure the ids are correctly referencing each other
       matches = {}
@@ -139,36 +139,36 @@ if Qti.migration_executable
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MATCHING
     end
 
-    it "should convert the assessments into quizzes" do
+    it "converts the assessments into quizzes" do
       expect(@assessment).to eq VistaExpected::ASSESSMENT
     end
 
-    it "should convert simple calculated questions" do
+    it "converts simple calculated questions" do
       hash = get_question("ID_4609842344341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::CALCULATED_SIMPLE
     end
 
-    it "should convert complex calculated questions" do
+    it "converts complex calculated questions" do
       hash = get_question("ID_4609823478341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::CALCULATED_COMPLEX
     end
 
-    it "should convert combination to multiple choice" do
+    it "converts combination to multiple choice" do
       hash = get_question("ID_4609885376341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::COMBINATION
     end
 
-    it "should convert fill in multiple blanks questions" do
+    it "converts fill in multiple blanks questions" do
       hash = get_question("ID_4609842630341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
     end
 
-    it "should mark jumbled sentence as not supported" do
+    it "marks jumbled sentence as not supported" do
       hash = get_question("ID_4609842882341")
       expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::JUMBLED_SENTENCE
     end
 
-    it "should correctly reference associated files" do
+    it "correctlies reference associated files" do
       import_into_course
 
       q = @course.assessment_questions.where(migration_id: "ID_81847332876966484848484950729496134337732113114455").first

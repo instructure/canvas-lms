@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 
 if Qti.migration_executable
   describe "Converting Blackboard 9 qti" do
-    it "should convert matching questions" do
+    it "converts matching questions" do
       manifest_node = get_manifest_node('matching', :interaction_type => 'choiceInteraction', :bb_question_type => 'Matching')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => bb9_question_dir)
       # make sure the ids are correctly referencing each other
@@ -36,7 +36,7 @@ if Qti.migration_executable
       expect(hash).to eq BB9Expected::MATCHING
     end
 
-    it "should convert matching questions if the divs precede the choice Interactions" do
+    it "converts matching questions if the divs precede the choice Interactions" do
       manifest_node = get_manifest_node('matching3', :interaction_type => 'choiceInteraction', :bb_question_type => 'Matching')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => bb9_question_dir)
       # make sure the ids are correctly referencing each other
@@ -51,18 +51,18 @@ if Qti.migration_executable
       expect(hash).to eq BB9Expected::MATCHING
     end
 
-    it "should find question references in selection_metadata" do
+    it "finds question references in selection_metadata" do
       hash = get_quiz_data(BB9_FIXTURE_DIR, 'group_with_selection_references')[1][0]
       expect(hash[:questions].first[:questions].first).to eq({ :question_type => "question_reference", :migration_id => "_428569_1" })
     end
 
-    it "should import multiple-answers questions" do
+    it "imports multiple-answers questions" do
       hash = get_quiz_data(bb9_question_dir, 'multiple_answers')[0].detect { |qq| qq[:migration_id] == 'question_22_1' }
       expect(hash[:question_type]).to eq 'multiple_answers_question'
       expect(hash[:answers].sort_by { |answer| answer[:migration_id] }.map { |answer| answer[:weight] }).to eq [100, 0, 100, 100]
     end
 
-    it "should convert matching questions where the answers are given out of order" do
+    it "converts matching questions where the answers are given out of order" do
       hash = get_question_hash(bb9_question_dir, 'matching2', false)
       matches = {}
       hash[:matches].each { |m| matches[m[:match_id]] = m[:text] }
@@ -75,7 +75,7 @@ if Qti.migration_executable
       expect(hash).to eq BB9Expected::MATCHING2
     end
 
-    it "should convert true/false questions using identifiers, not mattext" do
+    it "converts true/false questions using identifiers, not mattext" do
       hash = get_question_hash(bb9_question_dir, 'true_false', false, :flavor => Qti::Flavors::BBLEARN)
       hash[:answers].each { |m| expect(m[:migration_id]).to eq m[:text].downcase }
     end

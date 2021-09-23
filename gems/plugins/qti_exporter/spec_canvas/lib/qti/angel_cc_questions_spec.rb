@@ -20,34 +20,34 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "Converting Angel CC QTI" do
-    it "should convert multiple choice" do
+    it "converts multiple choice" do
       manifest_node = get_manifest_node('multiple_choice')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_CHOICE
     end
 
-    it "should convert true false" do
+    it "converts true false" do
       manifest_node = get_manifest_node('true_false')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::TRUE_FALSE
     end
 
-    it "should convert multiple response" do
+    it "converts multiple response" do
       manifest_node = get_manifest_node('multiple_answer')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => angel_question_dir)
       hash[:answers].each { |a| a.delete(:id) }
       expect(hash).to eq AngelExpected::MULTIPLE_ANSWER
     end
 
-    it "should convert essay" do
+    it "converts essay" do
       manifest_node = get_manifest_node('essay')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => angel_question_dir)
       expect(hash).to eq AngelExpected::ESSAY
     end
 
-    it "should convert the assessment into a quiz" do
+    it "converts the assessment into a quiz" do
       manifest_node = get_manifest_node('assessment', :quiz_type => 'Test')
       a = Qti::AssessmentTestConverter.new(manifest_node, angel_question_dir)
       a.create_instructure_quiz

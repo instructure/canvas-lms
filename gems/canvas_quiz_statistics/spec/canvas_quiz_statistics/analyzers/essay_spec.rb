@@ -23,7 +23,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
   let(:question_data) { QuestionHelpers.fixture('essay_question') }
   subject { described_class.new(question_data) }
 
-  it 'should not blow up when no responses are provided' do
+  it 'does not blow up when no responses are provided' do
     expect {
       expect(subject.run([])).to be_present
     }.to_not raise_error
@@ -33,11 +33,11 @@ describe CanvasQuizStatistics::Analyzers::Essay do
 
   describe 'output [#run]' do
     describe '[:responses]' do
-      it 'should count students who have written anything' do
+      it 'counts students who have written anything' do
         expect(subject.run([{ text: 'foo' }])[:responses]).to eq(1)
       end
 
-      it 'should not count students who have written a blank response' do
+      it 'does not count students who have written a blank response' do
         expect(subject.run([{}])[:responses]).to eq(0)
         expect(subject.run([{ text: nil }])[:responses]).to eq(0)
         expect(subject.run([{ text: '' }])[:responses]).to eq(0)
@@ -57,7 +57,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         { points_possible: 3 }
       end
 
-      it 'should count all students who received full credit' do
+      it 'counts all students who received full credit' do
         output = subject.run([
                                { points: 3 }, { points: 2 }, { points: 3 }
                              ])
@@ -65,7 +65,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         expect(output[:full_credit]).to eq(2)
       end
 
-      it 'should count students who received more than full credit' do
+      it 'counts students who received more than full credit' do
         output = subject.run([
                                { points: 3 }, { points: 2 }, { points: 5 }
                              ])
@@ -73,7 +73,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         expect(output[:full_credit]).to eq(2)
       end
 
-      it 'should be 0 otherwise' do
+      it 'is 0 otherwise' do
         output = subject.run([
                                { points: 1 }
                              ])
@@ -81,7 +81,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         expect(output[:full_credit]).to eq(0)
       end
 
-      it 'should count those who exceed the maximum points possible' do
+      it 'counts those who exceed the maximum points possible' do
         output = subject.run([{ points: 5 }])
         expect(output[:full_credit]).to eq(1)
       end
@@ -92,7 +92,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         { points_possible: 10 }
       end
 
-      it 'should group items into answer type buckets with appropriate data' do
+      it 'groups items into answer type buckets with appropriate data' do
         output = subject.run([
                                { points: 0, correct: 'undefined', user_id: 100, user_name: 'Joe0' },
                                { points: 0, correct: 'undefined', user_id: 100, user_name: 'Joe0' },
@@ -136,7 +136,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
     end
 
     describe ':point_distribution' do
-      it 'should map each score to the number of receivers' do
+      it 'maps each score to the number of receivers' do
         output = subject.run([
                                { points: 1, user_id: 1 },
                                { points: 3, user_id: 2 }, { points: 3, user_id: 3 },
@@ -148,7 +148,7 @@ describe CanvasQuizStatistics::Analyzers::Essay do
         expect(output[:point_distribution]).to include({ score: 3, count: 2 })
       end
 
-      it 'should sort them in score ascending mode' do
+      it 'sorts them in score ascending mode' do
         output = subject.run([
                                { points: 3, user_id: 2 }, { points: 3, user_id: 3 },
                                { points: 1, user_id: 1 },

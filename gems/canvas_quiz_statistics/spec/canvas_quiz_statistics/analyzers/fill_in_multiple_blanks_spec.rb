@@ -23,7 +23,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   let(:question_data) { QuestionHelpers.fixture('fill_in_multiple_blanks_question') }
   subject { described_class.new(question_data) }
 
-  it 'should not blow up when no responses are provided' do
+  it 'does not blow up when no responses are provided' do
     expect {
       subject.run([])
     }.to_not raise_error
@@ -31,7 +31,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
 
   describe '[:answer_sets]' do
     describe '[][:answers][:responses]' do
-      it 'should count those who filled in a correct answer' do
+      it 'counts those who filled in a correct answer' do
         stats = subject.run([
                               {
                                 answer_for_color1: "Red",
@@ -44,7 +44,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should stringify ids' do
+      it 'stringifies ids' do
         stats = subject.run([
                               {
                                 answer_for_color1: "Red",
@@ -57,7 +57,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should count those who filled in an unknown answer' do
+      it 'counts those who filled in an unknown answer' do
         stats = subject.run([
                               {
                                 answer_for_color1: "purple",
@@ -71,7 +71,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should count those who did not fill in any answer' do
+      it 'counts those who did not fill in any answer' do
         stats = subject.run([
                               {
                                 answer_for_color1: "",
@@ -85,7 +85,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should not generate the unknown or missing answers unless needed' do
+      it 'does not generate the unknown or missing answers unless needed' do
         stats = subject.run([
                               {
                                 answer_for_color1: "Red",
@@ -118,7 +118,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   it_behaves_like '[:incorrect]'
 
   describe '[:responses]' do
-    it 'should count all students who have filled any blank' do
+    it 'counts all students who have filled any blank' do
       stats = subject.run([
                             {
                               answer_id_for_color1: "9711"
@@ -128,11 +128,11 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
       expect(stats[:responses]).to eq(1)
     end
 
-    it 'should not count students who didnt' do
+    it 'does not count students who didnt' do
       expect(subject.run([{}])[:responses]).to eq(0)
     end
 
-    it "should not consider an answer to be present if it's empty" do
+    it "does not consider an answer to be present if it's empty" do
       expect(subject.run([{
                            answer_for_color: ''
                          }])[:responses]).to eq(0)
@@ -144,7 +144,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
   end
 
   describe '[:answered]' do
-    it 'should count students who have filled every blank' do
+    it 'counts students who have filled every blank' do
       stats = subject.run([
                             {
                               answer_id_for_color1: "9711",
@@ -155,7 +155,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'should count students who have filled every blank, even if incorrectly' do
+    it 'counts students who have filled every blank, even if incorrectly' do
       stats = subject.run([
                             {
                               answer_for_color1: 'foo',
@@ -166,7 +166,7 @@ describe CanvasQuizStatistics::Analyzers::FillInMultipleBlanks do
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'should not count a student who has left any blank' do
+    it 'does not count a student who has left any blank' do
       stats = subject.run([
                             {
                               answer_for_color1: "purple"

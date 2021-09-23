@@ -71,7 +71,7 @@ describe "Respondus SOAP API", type: :request do
     @question_bank = AssessmentQuestionBank.create!(:title => 'questionbank1', :context => @course)
   end
 
-  it "should identify the server without user credentials" do
+  it "identifies the server without user credentials" do
     soap_response = soap_request('IdentifyServer', '', '', '')
     expect(soap_response.first).to eq "Success"
     expect(soap_response.last).to eq %{
@@ -80,7 +80,7 @@ Contract version: 1
 Implemented for: Canvas LMS}
   end
 
-  it "should authenticate an existing user" do
+  it "authenticates an existing user" do
     soap_response = soap_request('ValidateAuth',
                                  'nobody@example.com', 'asdfasdf',
                                  '',
@@ -88,7 +88,7 @@ Implemented for: Canvas LMS}
     expect(soap_response.first).to eq "Success"
   end
 
-  it "should reject a user with bad auth" do
+  it "rejects a user with bad auth" do
     soap_response = soap_request('ValidateAuth',
                                  'nobody@example.com', 'hax0r',
                                  '',
@@ -97,7 +97,7 @@ Implemented for: Canvas LMS}
   end
 
   if Canvas.redis_enabled?
-    it "should limit the max failed login attempts" do
+    it "limits the max failed login attempts" do
       Setting.set('login_attempts_total', '2')
       soap_response = soap_request('ValidateAuth',
                                    'nobody@example.com', 'hax0r',
@@ -124,7 +124,7 @@ Implemented for: Canvas LMS}
       @account = account_with_cas(:account => Account.default)
     end
 
-    it "should error if token is required" do
+    it "errors if token is required" do
       soap_response = soap_request('ValidateAuth',
                                    'nobody@example.com', 'hax0r',
                                    '',
@@ -132,7 +132,7 @@ Implemented for: Canvas LMS}
       expect(soap_response.first).to eq "Access token required"
     end
 
-    it "should allow using an oauth token for delegated auth" do
+    it "allows using an oauth token for delegated auth" do
       uname = 'oauth_access_token'
       # we already test the oauth flow in spec/apis/oauth_spec, so shortcut here
       @key = DeveloperKey.create!
@@ -160,7 +160,7 @@ Implemented for: Canvas LMS}
       expect(status).to eq "Success"
     end
 
-    it "should continue to allow canvas login for delegated domains, for now" do
+    it "continues to allow canvas login for delegated domains, for now" do
       soap_response = soap_request('ValidateAuth',
                                    'nobody@example.com', 'asdfasdf',
                                    '',
@@ -169,7 +169,7 @@ Implemented for: Canvas LMS}
     end
   end
 
-  it "should reject a session created for a different user" do
+  it "rejects a session created for a different user" do
     user1 = @user
     user2 = user_with_pseudonym :active_user => true,
                                 :username => "nobody2@example.com",
@@ -198,7 +198,7 @@ Implemented for: Canvas LMS}
     expect(status).to eq "Invalid context"
   end
 
-  it "should allow selecting a course" do
+  it "allows selecting a course" do
     status, details, context, list = soap_request('GetServerItems',
                                                   'nobody@example.com', 'asdfasdf',
                                                   '', ['itemType', 'course'])
@@ -238,7 +238,7 @@ Implemented for: Canvas LMS}
     expect(data['selection_state']).to eq [@course.to_param]
   end
 
-  it "should queue QTI quiz uploads for processing" do
+  it "queues QTI quiz uploads for processing" do
     Setting.set('respondus_endpoint.polling_api', 'false')
 
     status, details, context = soap_request('SelectServerItem',
@@ -293,7 +293,7 @@ Implemented for: Canvas LMS}
       @token = context
     end
 
-    it "should respond immediately and allow polling for completion" do
+    it "responds immediately and allow polling for completion" do
       status, details, context, item_id = soap_request(
         'PublishServerItem', 'nobody@example.com', 'asdfasdf', @token,
         ['itemType', 'quiz'], ['itemName', 'my quiz'], ['uploadType', 'zipPackage'],
@@ -315,7 +315,7 @@ Implemented for: Canvas LMS}
       expect(item_id).to eq 'xyz'
     end
 
-    it "should respond with failures asynchronously as well" do
+    it "responds with failures asynchronously as well" do
       @mock_migration.migration_settings[:imported_assets] = []
       @mock_migration.workflow_state = 'failed'
 

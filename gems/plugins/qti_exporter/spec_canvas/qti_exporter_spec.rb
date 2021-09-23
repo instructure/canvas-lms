@@ -26,7 +26,7 @@ if Qti.migration_executable
       course_with_teacher(:active_all => true)
     end
 
-    it "should import duplicate files once, without munging" do
+    it "imports duplicate files once, without munging" do
       setup_migration
       do_migration
 
@@ -53,7 +53,7 @@ if Qti.migration_executable
       expect(quiz.assignment).to_not be_nil
     end
 
-    it "should bring in canvas meta data" do
+    it "brings in canvas meta data" do
       setup_migration(File.expand_path("../fixtures/qti/canvas_qti.zip", __FILE__))
       do_migration
       expect(@course.quizzes.count).to eq 1
@@ -79,7 +79,7 @@ if Qti.migration_executable
         @migration.save!
       end
 
-      it "should publish as assignment on import if specified" do
+      it "publishes as assignment on import if specified" do
         do_migration
 
         quiz = @course.quizzes.last
@@ -89,7 +89,7 @@ if Qti.migration_executable
         expect(quiz.assignment).to be_published
       end
 
-      it "should re-use the same assignment on update" do
+      it "re-uses the same assignment on update" do
         do_migration
 
         setup_migration(@copy.path)
@@ -106,7 +106,7 @@ if Qti.migration_executable
         expect(quiz.assignment).to be_published
       end
 
-      it "should correctly set the assignment submission_type" do
+      it "correctlies set the assignment submission_type" do
         do_migration
         assign = @course.assignments.last
         expect(assign.submission_types).to eq 'online_quiz'
@@ -114,7 +114,7 @@ if Qti.migration_executable
       end
     end
 
-    it "should publish spec-canvas-1 correctly" do
+    it "publishes spec-canvas-1 correctly" do
       setup_migration
       do_migration
 
@@ -135,7 +135,7 @@ if Qti.migration_executable
       expect(d['answers'].map { |a| a['comments_html'] }).to eq [nil, %{yes! <img src="/courses/#{@course.id}/files/#{attachment.id}/preview" alt="">}, nil]
     end
 
-    it "should import respondus question types" do
+    it "imports respondus question types" do
       setup_migration(File.expand_path("../fixtures/canvas_respondus_question_types.zip", __FILE__))
       do_migration
 
@@ -147,7 +147,7 @@ if Qti.migration_executable
       match_ignoring(quiz.quiz_questions.map(&:question_data), RESPONDUS_QUESTIONS, %w[id assessment_question_id match_id prepped_for_import is_quiz_question_bank question_bank_migration_id quiz_question_id])
     end
 
-    it "should apply respondus settings" do
+    it "applies respondus settings" do
       setup_migration(File.expand_path("../fixtures/canvas_respondus_question_types.zip", __FILE__))
       @migration.update_migration_settings(:apply_respondus_settings_file => true)
       @migration.save!
@@ -158,7 +158,7 @@ if Qti.migration_executable
       expect(quiz).to be_available
     end
 
-    it "should be able to import directly into an assessment question bank" do
+    it "is able to import directly into an assessment question bank" do
       setup_migration(File.expand_path("../fixtures/canvas_respondus_question_types.zip", __FILE__))
       @migration.update_migration_settings(:migration_ids_to_import =>
                                                { :copy => { :all_quizzes => false, :all_assessment_question_banks => true } })

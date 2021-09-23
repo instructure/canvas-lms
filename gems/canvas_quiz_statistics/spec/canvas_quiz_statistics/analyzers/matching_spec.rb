@@ -39,16 +39,16 @@ describe CanvasQuizStatistics::Analyzers::Matching do
 
   subject { described_class.new(question_data) }
 
-  it 'should not blow up when no responses are provided' do
+  it 'does not blow up when no responses are provided' do
     expect { subject.run([]) }.to_not raise_error
   end
 
   describe '[:responses]' do
-    it 'should count students who made any match' do
+    it 'counts students who made any match' do
       expect(subject.run([{ answer_8796: "4393" }])[:responses]).to eq(1)
     end
 
-    it "should not count students who didn't make any match" do
+    it "does not count students who didn't make any match" do
       expect(subject.run([{}])[:responses]).to eq(0)
 
       # empty match id
@@ -63,19 +63,19 @@ describe CanvasQuizStatistics::Analyzers::Matching do
   end
 
   describe '[:answered]' do
-    it 'should count students who matched everything' do
+    it 'counts students who matched everything' do
       expect(subject.run([
                            correct_answer
                          ])[:answered]).to eq(1)
     end
 
-    it 'should count students who matched everything even if incorrectly' do
+    it 'counts students who matched everything even if incorrectly' do
       expect(subject.run([
                            partially_correct_answer
                          ])[:answered]).to eq(1)
     end
 
-    it "should not count students who skipped at least one matching" do
+    it "does not count students who skipped at least one matching" do
       expect(subject.run([
                            {
                              answer_8796: "1525",
@@ -86,7 +86,7 @@ describe CanvasQuizStatistics::Analyzers::Matching do
   end
 
   describe '[:answer_sets]' do
-    it 'should break down every answer against all possible matches' do
+    it 'breaks down every answer against all possible matches' do
       stats = subject.run([])
       expect(stats[:answer_sets]).to be_present
       expect(stats[:answer_sets].length).to eq(3)
@@ -97,7 +97,7 @@ describe CanvasQuizStatistics::Analyzers::Matching do
     end
 
     describe '[][:answers][:responses]' do
-      it 'should count all students who attempted to match the blank' do
+      it 'counts all students who attempted to match the blank' do
         stats = subject.run([
                               { answer_8796: '1525' }
                             ])
@@ -110,7 +110,7 @@ describe CanvasQuizStatistics::Analyzers::Matching do
       end
     end
 
-    it 'should generate a NoAnswer for those who didnt make any match' do
+    it 'generates a NoAnswer for those who didnt make any match' do
       stats = subject.run([
                             {}
                           ])

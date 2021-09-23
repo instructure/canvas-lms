@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe 'Time Marshal override' do
-  it "should preserve the old marshalling for post-1900 dates" do
+  it "preserves the old marshalling for post-1900 dates" do
     raw_time = Time.zone.parse('2013-02-16 05:43:21.15Z').time
     dumped = Marshal.dump(raw_time)
     expect(dumped).to be_include(":\tTime\r\x05F\x1C#{0xc0.chr}#{0xf0.chr}IR#{0xad.chr}")
@@ -28,7 +28,7 @@ describe 'Time Marshal override' do
     expect(reloaded).to eq(raw_time)
   end
 
-  it "should not fail for pre-1900 dates" do
+  it "does not fail for pre-1900 dates" do
     old_time = Time.zone.parse('0010-05-13 04:12:51Z')
     raw_time = old_time.time
     dumped = Marshal.dump(raw_time)
@@ -51,7 +51,7 @@ describe "utc_datetime" do
     expect(Time.now.utc_datetime).to be_a(DateTime)
   end
 
-  it "should be initialized from the given time" do
+  it "is initialized from the given time" do
     t = Time.utc(2000, "jan", 3, 20, 15, 1)
     utc_datetime = t.utc_datetime
 

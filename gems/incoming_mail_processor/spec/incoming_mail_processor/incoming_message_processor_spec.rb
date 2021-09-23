@@ -107,18 +107,18 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
   end
 
   describe ".configure" do
-    it "should raise on invalid configuration settings" do
+    it "raises on invalid configuration settings" do
       expect { IncomingMessageProcessor.configure('bogus_setting' => 42) }.to raise_error(StandardError)
     end
 
-    it "should accept legacy mailman configurations" do
+    it "accepts legacy mailman configurations" do
       IncomingMessageProcessor.logger = logger
       IncomingMessageProcessor.configure('poll_interval' => 42, 'ignore_stdin' => true)
     end
   end
 
   describe ".run_periodically?" do
-    it "should consult .poll_interval and .ignore_stdin for backwards compatibility" do
+    it "consults .poll_interval and .ignore_stdin for backwards compatibility" do
       IncomingMessageProcessor.logger = logger
       IncomingMessageProcessor.configure('poll_interval' => 0, 'ignore_stdin' => true)
       expect(IncomingMessageProcessor.run_periodically?).to be_truthy
@@ -130,7 +130,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(IncomingMessageProcessor.run_periodically?).to be_falsey
     end
 
-    it "should use 'run_periodically' configuration setting" do
+    it "uses 'run_periodically' configuration setting" do
       IncomingMessageProcessor.configure({})
       expect(IncomingMessageProcessor.run_periodically?).to be_falsey
 
@@ -144,7 +144,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect_no_errors
     end
 
-    it "should not choke on invalid UTF-8" do
+    it "does not choke on invalid UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
                                                                                      content_type 'text/plain; charset=UTF-8'
                                                                                      body (+"he\xffllo").force_encoding(Encoding::BINARY)
@@ -154,7 +154,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(message_handler.html_body).to eq("hello")
     end
 
-    it "should convert another charset to UTF-8" do
+    it "converts another charset to UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
                                                                                      content_type 'text/plain; charset=Shift_JIS'
                                                                                      body (+"\x83\x40").force_encoding(Encoding::BINARY)
@@ -166,7 +166,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(message_handler.html_body).to eq(comparison_string)
     end
 
-    it "should pick up html from a multipart" do
+    it "picks up html from a multipart" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
                                                                                      text_part do
                                                                                        body 'This is plain text'
@@ -180,7 +180,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(message_handler.html_body).to eq('<h1>This is HTML</h1>')
     end
 
-    it "should not send a bounce reply when the incoming message is an auto-response" do
+    it "does not send a bounce reply when the incoming message is an auto-response" do
       incoming_bounce_message = Mail.new
       incoming_bounce_message['Auto-Submitted'] = 'auto-generated' # but don't bounce with this header
 
@@ -213,15 +213,15 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       test_message('multipart_mixed_no_html_part.eml')
     end
 
-    it "should be able to extract text and html bodies from nested_multipart_sample.eml" do
+    it "is able to extract text and html bodies from nested_multipart_sample.eml" do
       test_message('nested_multipart_sample.eml')
     end
 
-    it "should be able to extract text and html bodies from multipart_mixed.eml" do
+    it "is able to extract text and html bodies from multipart_mixed.eml" do
       test_message('multipart_mixed.eml')
     end
 
-    it "should be able to extract text and html bodies from no_image.eml" do
+    it "is able to extract text and html bodies from no_image.eml" do
       test_message('no_image.eml')
     end
 
@@ -267,7 +267,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       allow(IncomingMessageProcessor).to receive(:create_mailbox).and_return(@mock_mailbox)
     end
 
-    it "should support original incoming_mail configuration format for a single inbox" do
+    it "supports original incoming_mail configuration format for a single inbox" do
       IncomingMessageProcessor.logger = logger
       config = {
         'poll_interval' => 42,
@@ -294,7 +294,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       IncomingMessageProcessor.new(message_handler, error_reporter).process
     end
 
-    it "should process incoming_mail configuration with multiple accounts" do
+    it "processes incoming_mail configuration with multiple accounts" do
       IncomingMessageProcessor.logger = logger
       config = {
         'poll_interval' => 0,
@@ -327,7 +327,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       IncomingMessageProcessor.new(message_handler, error_reporter).process
     end
 
-    it "should extract special values from account settings" do
+    it "extracts special values from account settings" do
       config = {
         'imap' => {
           'server' => 'fake',
@@ -404,7 +404,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
                                            })
       end
 
-      it "should perform normal message processing of messages retrieved from mailbox" do
+      it "performs normal message processing of messages retrieved from mailbox" do
         foo = "To: me+123-1@fake.fake\r\n\r\nfoo body"
         bar = "To: me+456-2@fake.fake\r\n\r\nbar body"
         baz = "To: me+abc-3@fake.fake\r\n\r\nbaz body"
@@ -426,7 +426,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         imp.process
       end
 
-      it "should process messages that have irrelevant parsing errors" do
+      it "processes messages that have irrelevant parsing errors" do
         # malformed Received header
         foo = "Received: one two three; 5 Jun 2013 10:05:43 -0600\r\nTo: me+123-1@fake.fake\r\n\r\nfoo body"
 
@@ -443,7 +443,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         imp.process
       end
 
-      it "should move aside messages that have relevant parsing errors" do
+      it "moves aside messages that have relevant parsing errors" do
         foo = "To: me+123-1@fake.f\n ake\r\n\r\nfoo body" # illegal folding of "to" header
 
         expect(@mock_mailbox).to receive(:connect)
@@ -457,7 +457,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         IncomingMessageProcessor.new(message_handler, error_reporter).process
       end
 
-      it "should move aside messages that raise errors" do
+      it "moves aside messages that raise errors" do
         foo = "To: me+123-1@fake.fake\r\n\r\nfoo body"
 
         allow(Mail).to receive(:new).and_raise(StandardError)
@@ -473,7 +473,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
         IncomingMessageProcessor.new(message_handler, error_reporter).process
       end
 
-      it "should abort account processing on exception, but continue processing other accounts" do
+      it "aborts account processing on exception, but continue processing other accounts" do
         IncomingMessageProcessor.configure({
                                              'imap' => {
                                                'error_folder' => 'errors_go_here',
@@ -495,7 +495,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       end
     end
 
-    it "should accept multiple account types with overrides" do
+    it "accepts multiple account types with overrides" do
       config = {
         'imap' => {
           'server' => 'fake',
@@ -520,7 +520,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       expect(usernames.count(nil)).to eql 1
     end
 
-    it "should not try to load messages with invalid address tag" do
+    it "does not try to load messages with invalid address tag" do
       # this should be tested through the public "process" method
       # rather than calling the private "find_matching_to_address" directly
       account, message = [double, double]
@@ -548,7 +548,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
       end
     end
 
-    it "should abort processing on timeout, but continue with next account" do
+    it "aborts processing on timeout, but continue with next account" do
       IncomingMessageProcessor.configure({
                                            'imap' => {
                                              'accounts' => [
