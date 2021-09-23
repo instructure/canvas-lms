@@ -23,6 +23,7 @@ class DiscussionFilterType < Types::BaseEnum
   description 'Search types that can be associated with discussions'
   value 'all'
   value 'unread'
+  value 'drafts'
   value 'deleted'
 end
 
