@@ -112,6 +112,32 @@ const DiscussionTopicManager = props => {
     fetchPolicy: searchTerm ? 'no-cache' : 'cache-and-network'
   })
 
+  const updateDraftCache = (cache, result) => {
+    try {
+      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
+      const options = {
+        query: DISCUSSION_QUERY,
+        variables: {...variables, page: btoa(lastPage * PER_PAGE)}
+      }
+      const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
+      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      if (currentDiscussion && newDiscussionEntryDraft) {
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
+          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
+            draft => draft.id != newDiscussionEntryDraft.id
+          )
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.push(
+          newDiscussionEntryDraft
+        )
+
+        cache.writeQuery({...options, data: currentDiscussion})
+      }
+    } catch (e) {
+      discussionTopicQuery.refetch(variables)
+    }
+  }
+
   const updateCache = (cache, result) => {
     try {
       const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
@@ -169,6 +195,7 @@ const DiscussionTopicManager = props => {
     <SearchContext.Provider value={searchContext}>
       <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
+        updateDraftCache={updateDraftCache}
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {
           createDiscussionEntry({
