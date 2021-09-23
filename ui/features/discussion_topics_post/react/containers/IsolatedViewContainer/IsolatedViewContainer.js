@@ -209,6 +209,7 @@ export const IsolatedViewContainer = props => {
   }
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
     },
@@ -522,6 +523,7 @@ IsolatedViewContainer.propTypes = {
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
   replyFromId: PropTypes.string,
+  updateDraftCache: PropTypes.func,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string
 }

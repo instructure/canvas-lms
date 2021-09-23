@@ -231,6 +231,7 @@ const DiscussionTopicManager = props => {
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
           relativeEntryId={relativeEntryId}
+          updateDraftCache={updateDraftCache}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
           replyFromId={replyFromId}
