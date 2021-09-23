@@ -28,7 +28,7 @@ Layout/IndentationConsistency:
   Exclude:
     - "**/Gemfile.d/*" # we purposely indent dependent gems
 Layout/LineLength:
-  Enabled: false
+  Enabled: false # TODO. Maybe.
 
 Lint/Debugger:
   Severity: error
@@ -51,17 +51,23 @@ Naming/FileName:
 Rails:
   Exclude:
     - "**/Gemfile.d/*" # Rails isn't loaded yet, so can't use their helpers in the Gemfile
+Rails/ApplicationRecord:
+  Enabled: false # we never bothered creating an ApplicationRecord
+Rails/SkipsModelValidations:
+  Enabled: false # Canvas skips validations in many places for optimization reasons
 
 RSpec/EmptyExampleGroup:
   Severity: error
 RSpec/ExampleLength:
-  Enabled: false
+  Enabled: false # this is a Metrics-style cop
 RSpec/InstanceVariable:
-  Enabled: false
+  Enabled: false # legacy code
+RSpec/MessageSpies:
+  Enabled: false # we don't use spies
 RSpec/MultipleExpectations:
-  Enabled: false
+  Enabled: false # we don't write specs in this style
 RSpec/NestedGroups:
-  Enabled: false
+  Enabled: false # legacy code
 RSpec/RepeatedDescription:
   Severity: error
 
@@ -69,12 +75,16 @@ Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
 Style/AsciiComments:
-  Enabled: false
+  Enabled: false # we have comments in other languages
 Style/Documentation:
-  Enabled: false
+  Enabled: false # most things don't need to be documented
 Style/FrozenStringLiteralComment:
   Severity: error
+Style/HashSyntax:
+  Enabled: false # TODO. Maybe.
+Style/PerlBackrefs:
+  Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/SpecialGlobalVars:
-  Enabled: false
+  Enabled: false # $! and $? are fine
 Style/StringLiterals:
-  Enabled: false
+  Enabled: false # TODO. Maybe.

@@ -1,117 +1,100 @@
 inherit_from: .rubocop.common.yml
 
 AllCops:
-  NewCops: enable
+  NewCops: enable # TODO
 
-Gemspec/RequiredRubyVersion:
-  Enabled: false
-
-Lint/AmbiguousBlockAssociation:
+Lint/AmbiguousBlockAssociation: # TODO
   Exclude:
     - spec/**/*
 
-Naming/VariableNumber:
+Naming/VariableNumber: # TODO
   Enabled: false
 
-Rails/ApplicationRecord:
-  Enabled: false # we never bothered creating an ApplicationRecord
-Rails/HasManyOrHasOneDependent:
-  # It whines about update_all too much, which we use a lot specifically to
-  # bypass validations and any other AR-ness
+Rails/HasManyOrHasOneDependent: # TODO
   Enabled: false
-Rails/ReadWriteAttribute:
+Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
   Enabled: false # accessors are often defined in terms of read_attribute
-Rails/SkipsModelValidations:
-  Enabled: false
-Rails/TimeZone:
+Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
 
-RSpec/ContextWording:
+RSpec/ContextWording: # TODO
   Enabled: false
-RSpec/DescribeClass:
+RSpec/DescribeClass: # TODO
   Enabled: false
-RSpec/DescribedClass:
+RSpec/DescribedClass: # TODO: autocorrect (unsafe)
   Enabled: false
-RSpec/ExpectChange:
+RSpec/ExpectChange: # TODO: autocorrect (unsafe)
   Enabled: false
-RSpec/HookArgument:
+RSpec/HookArgument: # TODO: autocorrect
   Enabled: false
-RSpec/MessageSpies:
+RSpec/NamedSubject: # TODO
   Enabled: false
-RSpec/NamedSubject:
+RSpec/NotToNot: # TODO: autocorrect
   Enabled: false
-RSpec/NotToNot:
+RSpec/ScatteredSetup: # TODO: investigate if these are required
   Enabled: false
-RSpec/ScatteredSetup:
-  Enabled: false
-RSpec/VerifiedDoubles:
+RSpec/VerifiedDoubles: # TODO
   Enabled: false
 
-Style/BlockDelimiters:
+Style/BlockDelimiters: # TODO: autocorrect
   Enabled: true
   Exclude:
     - spec/**/*_spec.rb
     - spec/shared_examples/**/*.rb
-Style/ClassAndModuleChildren:
+Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/DateTime:
+Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/DoubleNegation:
+Style/Dir: # TODO: autocorrect
   Enabled: false
-Style/Dir:
+Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
-Style/FormatStringToken:
+Style/GuardClause: # TODO
   Enabled: false
-Style/IfUnlessModifier:
+Style/IfUnlessModifier: # TODO: autocorrect
   Enabled: false
-Style/GuardClause:
+Style/Lambda: # TODO: autocorrect
   Enabled: false
-Style/HashSyntax:
+Style/MethodCallWithArgsParentheses: # TODO: autocorrect
   Enabled: false
-Style/Lambda:
+Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
   Enabled: false
-Style/MethodCallWithArgsParentheses:
+Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
-Style/MethodCallWithoutArgsParentheses:
+Style/NumericPredicate: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/NumericLiterals:
+Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
   Enabled: false
-Style/NumericPredicate:
+Style/PercentLiteralDelimiters: # TODO: autocorrect
   Enabled: false
-Style/ParallelAssignment:
+Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false
-Style/PercentLiteralDelimiters:
+Style/RedundantSelf: # TODO: autocorrect
   Enabled: false
-Style/PercentQLiterals:
+Style/RegexpLiteral: # TODO: autocorrect
   Enabled: false
-Style/RedundantSelf:
-  Enabled: false
-Style/RegexpLiteral:
-  Enabled: false
-Style/RescueModifier:
+Style/RescueModifier: # TODO
   Severity: warning
-Style/RescueStandardError:
+Style/RescueStandardError: # TODO: autocorrect
   EnforcedStyle: implicit
   Enabled: false
-Style/ReturnNil:
+Style/ReturnNil: # TODO: autocorrect (investigate violations)
   Enabled: false
-Style/SignalException:
+Style/SignalException: # TODO: autocorrect
   Enabled: false
-Style/StderrPuts:
+Style/StderrPuts: # TODO: autocorrect
   Enabled: false
-Style/StringLiterals:
+Style/SymbolArray: # TODO: autocorrect
   Enabled: false
-Style/SymbolArray:
+Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
-Style/TrailingCommaInArguments:
+Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
-Style/TrailingCommaInArrayLiteral:
+Style/TrailingCommaInHashLiteral: # TODO: autocorrect
   Enabled: false
-Style/TrailingCommaInHashLiteral:
+Style/WhileUntilModifier: # TODO: autocorrect
   Enabled: false
-Style/WhileUntilModifier:
+Style/WordArray: # TODO: autocorrect
   Enabled: false
-Style/WordArray:
-  Enabled: false
-Style/ZeroLengthPredicate:
+Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
   Enabled: false
