@@ -139,7 +139,7 @@ describe('FindOutcomesView', () => {
       <FindOutcomesView
         {...defaultProps({
           outcomesGroup: {
-            ...defaultProps.outcomesGroup,
+            ...defaultProps().outcomesGroup,
             outcomesCount: 0
           }
         })}

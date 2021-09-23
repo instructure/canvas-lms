@@ -138,7 +138,6 @@ const ignoredErrors = [
   /The prop `outcomeGroup.title` is marked as required in `(GroupDescriptionModal|GroupEditModal|ManageOutcomesView)`/,
   /The prop `outcomes.1._id` is marked as required in `OutcomesPopover`/,
   /The prop `outcomes\[0\].mastery_points` is marked as required in `(Gradebook|ScoresGrid)`/,
-  /The prop `outcomesGroup._id` is marked as required in `FindOutcomesView`/,
   /The prop `permissionName` is marked as required in `PermissionTray`/,
   /The prop `pollTimeout` is marked as required in `LinkValidator`/,
   /The prop `pollTimeoutInitial` is marked as required in `LinkValidator`/,
