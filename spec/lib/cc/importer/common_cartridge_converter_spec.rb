@@ -40,7 +40,7 @@ describe "Standard Common Cartridge importing" do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
-  it "should import webcontent" do
+  it "imports webcontent" do
     expect(@course.attachments.count).to eq 10
     atts = %w{I_00001_R I_00006_Media I_media_R f3 f4 f5 8612e3db71e452d5d2952ff64647c0d8 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
     atts.each do |mig_id|
@@ -48,14 +48,14 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
-  it "should import files as assignments with intended_use set" do
+  it "imports files as assignments with intended_use set" do
     assignment = @course.assignments.where(:migration_id => "f5").first
     att = @course.attachments.where(:migration_id => "8612e3db71e452d5d2952ff64647c0d8").first
     expect(assignment.description).to match_ignoring_whitespace(%{<img src="/courses/#{@course.id}/files/#{att.id}/preview">})
     expect(assignment.title).to eq "Assignment 2"
   end
 
-  it "should import discussion topics" do
+  it "imports discussion topics" do
     expect(@course.discussion_topics.count).to eq 2
     file1_id = @course.attachments.where(migration_id: "I_media_R").first.id
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
@@ -69,7 +69,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class
-  it "should import modules from organization" do
+  it "imports modules from organization" do
     expect(@course.context_modules.count).to eq 3
     expect(@course.context_modules.map(&:position)).to eql [1, 2, 3]
 
@@ -148,7 +148,7 @@ describe "Standard Common Cartridge importing" do
     expect(tag.indent).to eq 0
   end
 
-  it "should import external tools" do
+  it "imports external tools" do
     expect(@course.context_external_tools.count).to eq 2
     et = @course.context_external_tools.where(migration_id: "I_00010_R").first
     expect(et.name).to eq "BLTI Test"
@@ -172,7 +172,7 @@ describe "Standard Common Cartridge importing" do
     expect(asmnt.external_tool_tag.content_type).to eq 'ContextExternalTool'
   end
 
-  it "should import assessment data" do
+  it "imports assessment data" do
     if Qti.qti_enabled?
       quiz = @course.quizzes.where(migration_id: "I_00003_R").first
       expect(quiz.active_quiz_questions.size).to eq 11
@@ -192,7 +192,7 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
-  it "should import assessment data into an active question bank" do
+  it "imports assessment data into an active question bank" do
     if Qti.qti_enabled?
       bank = @course.assessment_question_banks.where(migration_id: "I_00004_R_QDB_1").first
       expect(bank.assessment_questions.count).to eq 11
@@ -213,7 +213,7 @@ describe "Standard Common Cartridge importing" do
     end
   end
 
-  it "should find update urls in questions" do
+  it "finds update urls in questions" do
     if Qti.qti_enabled?
       q = @course.assessment_questions.where(migration_id: "I_00003_R_QUE_104045").first
 
@@ -232,7 +232,7 @@ describe "Standard Common Cartridge importing" do
       Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration2)
     end
 
-    it "should import webcontent" do
+    it "imports webcontent" do
       expect(@course.attachments.active.count).to eq 10
       mig_ids = %w{I_00001_R I_00006_Media I_media_R f3 f4 I_00003_R_IMAGERESOURCE 7acb90d1653008e73753aa2cafb16298 6a35b0974f59819404dc86d48fe39fc3}
       mig_ids.each do |mig_id|
@@ -242,7 +242,7 @@ describe "Standard Common Cartridge importing" do
       end
     end
 
-    it "should point to new attachment from module" do
+    it "points to new attachment from module" do
       expect(@course.context_modules.count).to eq 3
 
       mod1 = @course.context_modules.where(migration_id: "I_00000").first
@@ -255,7 +255,7 @@ describe "Standard Common Cartridge importing" do
   end
 
   context "selective import" do
-    it "should selectively import files" do
+    it "selectivelies import files" do
       @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
@@ -301,7 +301,7 @@ describe "Standard Common Cartridge importing" do
       expect(@course.discussion_topics.first.migration_id).to eq 'I_00006_R'
     end
 
-    it "should not import all attachments if :files does not exist" do
+    it "does not import all attachments if :files does not exist" do
       @course = course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
@@ -355,7 +355,7 @@ describe "Standard Common Cartridge importing" do
         }
     end
 
-    it "should fix position conflicts for modules" do
+    it "fixes position conflicts for modules" do
       @course = course_factory
 
       mod1 = @course.context_modules.create :name => "ponies"
@@ -382,7 +382,7 @@ describe "Standard Common Cartridge importing" do
       expect(mods.map(&:name)).to eql %w(ponies monsters monkeys last)
     end
 
-    it "should fix position conflicts for assignment groups" do
+    it "fixes position conflicts for assignment groups" do
       @course = course_factory
 
       ag1 = @course.assignment_groups.create :name => "ponies"
@@ -423,7 +423,7 @@ describe "Standard Common Cartridge importing" do
       expect(sub_mod2['migration_id']).to eq "sf2"
     end
 
-    it "should import submodules individually if selected" do
+    it "imports submodules individually if selected" do
       course_factory
       @migration = ContentMigration.create(:context => @course)
       @migration.migration_settings[:migration_ids_to_import] = {
@@ -458,7 +458,7 @@ describe "More Standard Common Cartridge importing" do
     allow(@migration).to receive(:add_imported_item)
   end
 
-  it "should properly handle top-level resource references" do
+  it "properlies handle top-level resource references" do
     orgs = <<~XML
       <organizations>
         <organization structure="rooted-hierarchy" identifier="org_1">
@@ -542,7 +542,7 @@ describe "More Standard Common Cartridge importing" do
     expect(mod3.position).to eq 3
   end
 
-  it "should handle back-slashed paths" do
+  it "handles back-slashed paths" do
     resources = <<~XML
       <resources>
         <resource href="a1\\a1.html" identifier="a1" type="webcontent" intendeduse="assignment">
@@ -568,7 +568,7 @@ describe "More Standard Common Cartridge importing" do
 end
 
 describe "non-ASCII attachment names" do
-  it "should not fail to create all_files.zip" do
+  it "does not fail to create all_files.zip" do
     archive_file_path = File.join(File.dirname(__FILE__) + "/../../../fixtures/migration/unicode-filename-test-export.imscc")
     @converter = CC::Importer::Standard::Converter.new(:export_archive_path => archive_file_path)
     expect { @converter.export }.not_to raise_error
@@ -606,7 +606,7 @@ describe "LTI tool combination" do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
-  it "should combine lti tools in cc packages when possible" do
+  it "combines lti tools in cc packages when possible" do
     expect(@course.context_external_tools.count).to eq 2
     expect(@course.context_external_tools.map(&:migration_id).sort).to eq ["TOOL_1", "TOOL_3"]
 
@@ -649,7 +649,7 @@ describe "other cc files" do
       import_cc_file("cc_assignment_extension.zip")
     end
 
-    it "should parse canvas data from cc extension" do
+    it "parses canvas data from cc extension" do
       expect(@migration.migration_issues.count).to eq 0
 
       att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
@@ -670,7 +670,7 @@ describe "other cc files" do
   end
 
   describe "cc optional html file to page conversation" do
-    it "should do some possibly broken converting" do
+    it "does some possibly broken converting" do
       Account.default.enable_feature!(:common_cartridge_page_conversion)
       import_cc_file("cc_file_to_page_test.zip")
       img = @course.attachments.where(:migration_id => "I_00001_R_1").first
@@ -683,7 +683,7 @@ describe "other cc files" do
       expect(tag.content).to eq page
     end
 
-    it "should just bring them over as files without the feature" do
+    it "justs bring them over as files without the feature" do
       import_cc_file("cc_file_to_page_test.zip")
       expect(@course.wiki_pages.count).to eq 0
 
@@ -694,7 +694,7 @@ describe "other cc files" do
   end
 
   describe "cc pattern match questions" do
-    it "should produce a warning" do
+    it "produces a warning" do
       next unless Qti.qti_enabled?
 
       import_cc_file("cc_pattern_match.zip")
@@ -703,7 +703,7 @@ describe "other cc files" do
   end
 
   describe "cc unsupported resource types" do
-    it "should produce warnings" do
+    it "produces warnings" do
       next unless Qti.qti_enabled?
 
       import_cc_file("cc_unsupported_resources.zip")
@@ -715,14 +715,14 @@ describe "other cc files" do
   end
 
   describe "cc syllabus intendeduse" do
-    it "should import" do
+    it "imports" do
       import_cc_file("cc_syllabus.zip")
       expect(@course.reload.syllabus_body).to include("<p>beep beep</p>")
     end
   end
 
   describe "empty file link name inference" do
-    it "should add the file name to empty links in html content" do
+    it "adds the file name to empty links in html content" do
       import_cc_file("cc_empty_link.zip")
       assmt = @course.assignments.where(:migration_id => "assignment1").first
       file = @course.attachments.where(:migration_id => "file1").first

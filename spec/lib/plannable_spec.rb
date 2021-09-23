@@ -56,7 +56,7 @@ describe Plannable do
       expect(assignment.planner_override_for(@student)).to eq discussion_override
     end
 
-    it 'should not return deleted overrides' do
+    it 'does not return deleted overrides' do
       assignment = assignment_model
       override = assignment.planner_overrides.create!(user: @student)
       override.destroy!

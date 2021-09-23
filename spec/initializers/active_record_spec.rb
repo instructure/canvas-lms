@@ -66,7 +66,7 @@ module ActiveRecord
           skip "needs PostgreSQL" unless Account.connection.adapter_name == 'PostgreSQL'
         end
 
-        it "should iterate through all selected rows" do
+        it "iterates through all selected rows" do
           users = Set.new
           3.times { users << user_model }
           found = Set.new
@@ -119,7 +119,7 @@ module ActiveRecord
           end
         end
 
-        it "should use a temp table when you select without an id" do
+        it "uses a temp table when you select without an id" do
           expect do
             User.create!
             User.select(:name).find_in_batches do |batch|
@@ -128,21 +128,21 @@ module ActiveRecord
           end.to_not raise_error
         end
 
-        it "should not use a temp table for a plain query" do
+        it "does not use a temp table for a plain query" do
           User.create!
           User.find_in_batches do
             expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.all.to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
-        it "should not use a temp table for a select with id" do
+        it "does not use a temp table for a select with id" do
           User.create!
           User.select(:id).find_in_batches do
             expect { User.connection.select_value("SELECT COUNT(*) FROM users_in_batches_temp_table_#{User.select(:id).to_sql.hash.abs.to_s(36)}") }.to raise_error(ActiveRecord::StatementInvalid)
           end
         end
 
-        it 'should not bomb when you try to force past the cursor option on selects with the primary key' do
+        it 'does not bomb when you try to force past the cursor option on selects with the primary key' do
           selectors = ["*", "users.*", "users.id, users.updated_at"]
           User.create!
           selectors.each do |selector|
@@ -196,7 +196,7 @@ module ActiveRecord
       end
 
       describe "with id plucking" do
-        it "should iterate through all selected rows" do
+        it "iterates through all selected rows" do
           users = Set.new
           3.times { users << user_model }
           found = Set.new
@@ -265,7 +265,7 @@ module ActiveRecord
 
     describe "deconstruct_joins" do
       describe "delete_all" do
-        it "should allow delete all on inner join with alias" do
+        it "allows delete all on inner join with alias" do
           User.create(name: 'dr who')
           User.create(name: 'dr who')
 
@@ -365,7 +365,7 @@ module ActiveRecord
 
     describe "union" do
       shared_examples_for "query creation" do
-        it "should include conditions after the union inside of the subquery" do
+        it "includes conditions after the union inside of the subquery" do
           scope = base.active.where(id: 99).union(User.where(id: 1))
           wheres = scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 1
@@ -374,7 +374,7 @@ module ActiveRecord
           expect(sql_after_union).not_to include('"id" = 99')
         end
 
-        it "should include conditions prior to the union outside of the subquery" do
+        it "includes conditions prior to the union outside of the subquery" do
           scope = base.active.union(User.where(id: 1)).where(id: 99)
           wheres = scope.where_clause.send(:predicates)
           expect(wheres.count).to eq 2
@@ -415,35 +415,35 @@ module ActiveRecord
 
   describe 'ConnectionAdapters' do
     describe 'SchemaStatements' do
-      it 'should find the name of a foreign key on the default column' do
+      it 'finds the name of a foreign key on the default column' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:enrollments, :users)
         expect(fk_name).to eq('fk_rails_e860e0e46b')
       end
 
-      it 'should find the name of a foreign key on a specific column' do
+      it 'finds the name of a foreign key on a specific column' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:accounts, :outcome_imports,
                                                            column: 'latest_outcome_import_id')
         expect(fk_name).to eq('fk_rails_3f0c8923c0')
       end
 
-      it 'should not find a foreign key if there is not one' do
+      it 'does not find a foreign key if there is not one' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:users, :courses)
         other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :users)
         expect(fk_name).to be_nil
         expect(other_fk_name).to be_nil
       end
 
-      it 'should not find a foreign key on a column that is not one' do
+      it 'does not find a foreign key on a column that is not one' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:users, :pseudonyms, column: 'time_zone')
         expect(fk_name).to be_nil
       end
 
-      it 'should not crash on a non-existant column' do
+      it 'does not crash on a non-existant column' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:users, :pseudonyms, column: 'notacolumn')
         expect(fk_name).to be_nil
       end
 
-      it 'should not crash on a non-existant table' do
+      it 'does not crash on a non-existant table' do
         fk_name = ActiveRecord::Migration.find_foreign_key(:notatable, :users)
         other_fk_name = ActiveRecord::Migration.find_foreign_key(:users, :notatable)
         expect(fk_name).to be_nil

@@ -41,11 +41,11 @@ describe "Exporter" do
       CC::Exporter::WebZip::Exporter.new(@attachment.open, false, :web_zip)
     end
 
-    it "should sort content by module" do
+    it "sorts content by module" do
       expect(exporter.base_template).to eq "../templates/module_sorting_template.html.erb"
     end
 
-    it "should not URL escape file names" do
+    it "does not URL escape file names" do
       expect(exporter.unsupported_files[1][:file_name]).to eq '!@#$%^&*().txt'
     end
   end

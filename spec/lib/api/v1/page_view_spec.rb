@@ -64,7 +64,7 @@ describe Api::V1::PageView do
     )
   end
 
-  it "should be formatted as a page view hash" do
+  it "is formatted as a page view hash" do
     page_view = page_view_json(@page_view, @student, @session)
 
     expect(page_view[:id]).to eq @page_view.request_id
@@ -88,7 +88,7 @@ describe Api::V1::PageView do
     expect(page_view[:links][:account]).to eq @page_view.account_id
   end
 
-  it "should be formatted as an array of page view hashes" do
+  it "is formatted as an array of page view hashes" do
     expect(page_views_json(@page_views, @student, @session).size).to eql(@page_views.size)
   end
 end

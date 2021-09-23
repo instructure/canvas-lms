@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_select_content_dialog" do
-  it "should indicate plural file upload" do
+  it "indicates plural file upload" do
     course_with_teacher
     view_context
     render partial: 'shared/select_content_dialog'
@@ -191,7 +191,7 @@ describe "shared/_select_content_dialog" do
     end
   end
 
-  it "should include unpublished wiki pages" do
+  it "includes unpublished wiki pages" do
     course_with_teacher
     published_page = @course.wiki_pages.build title: 'published_page'
     published_page.workflow_state = 'active'
@@ -206,7 +206,7 @@ describe "shared/_select_content_dialog" do
     expect(%w(unpublished_page published_page) - options.map(&:text)).to be_empty
   end
 
-  it "should not offer to create assignments or quizzes if the user doesn't have permission" do
+  it "does not offer to create assignments or quizzes if the user doesn't have permission" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     existing_quiz = @course.quizzes.create! title: 'existing quiz'
@@ -219,7 +219,7 @@ describe "shared/_select_content_dialog" do
     expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).to be_empty
   end
 
-  it "should offer to create assignments if the user has permission" do
+  it "offers to create assignments if the user has permission" do
     @account = Account.default
     course_with_ta account: @account, active_all: true
     view_context
@@ -228,7 +228,7 @@ describe "shared/_select_content_dialog" do
     expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).not_to be_empty
   end
 
-  it "should create new topics in unpublished state if draft state is enabled" do
+  it "creates new topics in unpublished state if draft state is enabled" do
     course_with_teacher(active_all: true)
     view_context
     render partial: 'shared/select_content_dialog'

@@ -88,13 +88,13 @@ describe AuthenticationMethods do
         allow(PseudonymSession).to receive(:find_with_validation).and_return(@pseudonym_session)
       end
 
-      it "should set the user and pseudonym" do
+      it "sets the user and pseudonym" do
         expect(@controller.send(:load_user)).to eq @user
         expect(@controller.instance_variable_get(:@current_user)).to eq @user
         expect(@controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
       end
 
-      it "should destroy session if user was explicitly logged out" do
+      it "destroys session if user was explicitly logged out" do
         @user.stamp_logout_time!
         @pseudonym.reload
         expect(@controller).to receive(:destroy_session).once
@@ -112,7 +112,7 @@ describe AuthenticationMethods do
         expect(@controller.instance_variable_get(:@current_pseudonym)).to be_nil
       end
 
-      it "should not destroy session if user was logged out in the future" do
+      it "does not destroy session if user was logged out in the future" do
         Timecop.freeze(5.minutes.from_now) do
           @user.stamp_logout_time!
         end
@@ -122,7 +122,7 @@ describe AuthenticationMethods do
         expect(@controller.instance_variable_get(:@current_pseudonym)).to eq @pseudonym
       end
 
-      it "should set the CSRF cookie" do
+      it "sets the CSRF cookie" do
         @controller.send(:load_user)
         expect(@controller.cookies['_csrf_token']).not_to be nil
       end
@@ -300,34 +300,34 @@ describe AuthenticationMethods do
       expect(CanvasRails::Application.config).to receive(:session_options).at_least(:once).and_return(@session_options)
     end
 
-    it "should not set SSL-only explicitly if session_options doesn't specify" do
+    it "does not set SSL-only explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token']).not_to be_has_key(:secure)
     end
 
-    it "should set SSL-only if session_options specifies" do
+    it "sets SSL-only if session_options specifies" do
       @session_options[:secure] = true
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:secure]).to be true
     end
 
-    it "should set httponly explicitly false on a non-files host" do
+    it "sets httponly explicitly false on a non-files host" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:httponly]).to be false
     end
 
-    it "should set httponly explicitly true on a files host" do
+    it "sets httponly explicitly true on a files host" do
       expect(HostUrl).to receive(:is_file_host?).once.with(@request.host_with_port).and_return(true)
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:httponly]).to be true
     end
 
-    it "should not set a cookie domain explicitly if session_options doesn't specify" do
+    it "does not set a cookie domain explicitly if session_options doesn't specify" do
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token']).not_to be_has_key(:domain)
     end
 
-    it "should set a cookie domain explicitly if session_options specifies" do
+    it "sets a cookie domain explicitly if session_options specifies" do
       @session_options[:domain] = "cookie domain"
       @controller.send(:masked_authenticity_token)
       expect(@controller.cookies['_csrf_token'][:domain]).to eq @session_options[:domain]

@@ -40,7 +40,7 @@ describe EquationImagesController do
       expect(assigns(:latex)).to match(/\%2B/)
     end
 
-    it 'should redirect image requests to codecogs' do
+    it 'redirects image requests to codecogs' do
       get 'show', params: { :id => 'foo' }
       expect(response).to redirect_to('http://latex.codecogs.com/gif.latex?foo')
     end

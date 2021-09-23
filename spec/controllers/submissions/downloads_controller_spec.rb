@@ -36,7 +36,7 @@ describe Submissions::DownloadsController do
         user_session(@student)
       end
 
-      it 'should set flash error' do
+      it 'sets flash error' do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -46,7 +46,7 @@ describe Submissions::DownloadsController do
         expect(flash[:error]).not_to be_nil
       end
 
-      it "should redirect to context assignment url" do
+      it "redirects to context assignment url" do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -160,7 +160,7 @@ describe Submissions::DownloadsController do
       end
     end
 
-    it "should redirect download requests with the download_frd parameter" do
+    it "redirects download requests with the download_frd parameter" do
       # This is because the files controller looks for download_frd to indicate a forced download
       course_with_teacher_logged_in
       assignment = assignment_model(course: @course)

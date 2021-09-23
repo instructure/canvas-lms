@@ -40,7 +40,7 @@ describe 'Account Reports API', type: :request do
   end
 
   describe 'available_reports' do
-    it 'should list all available reports' do
+    it 'lists all available reports' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports",
                       { :controller => 'account_reports', :action => 'available_reports', :format => 'json', :account_id => @admin.account.id.to_s })
       json.each do |report|
@@ -57,7 +57,7 @@ describe 'Account Reports API', type: :request do
   end
 
   describe 'create' do
-    it 'should create a student report' do
+    it 'creates a student report' do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { report: @report.report_type, controller: 'account_reports', action: 'create',
                           format: 'json', account_id: @admin.account.id.to_s })
@@ -66,14 +66,14 @@ describe 'Account Reports API', type: :request do
       expect(keys - report.keys).to be_empty
     end
 
-    it 'should work with parameters' do
+    it 'works with parameters' do
       report = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                         { :report => @report.report_type, :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s,
                           :parameters => { 'some_param' => 1 } })
       expect(report.key?('id')).to be_truthy
     end
 
-    it 'should 404 for non existing reports' do
+    it '404S for non existing reports' do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
                    { :report => 'bad_report_csv', :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
       assert_status(404)
@@ -81,7 +81,7 @@ describe 'Account Reports API', type: :request do
   end
 
   describe 'index' do
-    it 'should list all generated reports' do
+    it 'lists all generated reports' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}",
                       { :report => @report.report_type, :controller => 'account_reports', :action => 'index', :format => 'json', :account_id => @admin.account.id.to_s })
 
@@ -95,7 +95,7 @@ describe 'Account Reports API', type: :request do
       end
     end
 
-    it 'should paginate reports' do
+    it 'paginates reports' do
       report2 = AccountReport.new
       report2.account = @admin.account
       report2.user = @admin
@@ -120,7 +120,7 @@ describe 'Account Reports API', type: :request do
   end
 
   describe 'show' do
-    it 'should get all info about a report' do
+    it 'gets all info about a report' do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/reports/#{@report.report_type}/#{@report.id}",
                       { :report => @report.report_type, :controller => 'account_reports', :action => 'show', :format => 'json', :account_id => @admin.account.id.to_s, :id => @report.id.to_s })
 

@@ -47,7 +47,7 @@ describe "master courses - child courses - quiz locking" do
     stub_rcs_config
   end
 
-  it "should allow editing questions if content is not locked" do
+  it "allows editing questions if content is not locked" do
     # this test is here mostly to validate that the previous test is valid,
     # since it's looking "not_to contain_css('.edit_question_link')", I better
     # have a test to prove what's not supposed to be there is there when it's supposed to be

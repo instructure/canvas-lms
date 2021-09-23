@@ -27,7 +27,7 @@ describe "root account basic settings" do
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
   include_examples "settings basic tests", :root_account
 
-  it "should be able to disable enable_gravatar" do
+  it "is able to disable enable_gravatar" do
     account_admin_user(:active_all => true)
     user_session(@admin)
     get account_settings_url
@@ -51,7 +51,7 @@ describe "root account basic settings" do
       @admin.account.enable_feature!(:slack_notifications)
     end
 
-    it 'should be able to update slack key' do
+    it 'is able to update slack key' do
       get "/accounts/#{@account.id}/settings"
 
       slack_api_input = f('*[placeholder="New Slack Api Key"]')
@@ -160,7 +160,7 @@ describe "root account basic settings" do
     expect(f('#zero_activity_csv_form')).to contain_css('.ui-datepicker-trigger')
   end
 
-  it "should change the default user quota", priority: "1", test_id: 250002 do
+  it "changes the default user quota", priority: "1", test_id: 250002 do
     course_with_admin_logged_in
     group_model(context: @course)
     get account_settings_url
@@ -187,7 +187,7 @@ describe "root account basic settings" do
     expect(fj('[name="default_user_storage_quota_mb"]')).to have_value(user_quota.to_s) # fj to avoid selenium caching
   end
 
-  it "should be able to remove account quiz ip filters" do
+  it "is able to remove account quiz ip filters" do
     account.ip_filters = { "name" => "192.168.217.1/24" }
     account.save!
 

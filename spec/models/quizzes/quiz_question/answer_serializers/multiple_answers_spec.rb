@@ -56,7 +56,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
   context 'validations' do
     include_examples 'Id Answer Serializers'
 
-    it 'should reject unexpected types' do
+    it 'rejects unexpected types' do
       [nil, 'asdf'].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil

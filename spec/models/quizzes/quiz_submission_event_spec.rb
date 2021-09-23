@@ -26,11 +26,11 @@ describe Quizzes::QuizSubmissionEvent do
         subject.event_type = Quizzes::QuizSubmissionEvent::EVT_QUESTION_ANSWERED
       end
 
-      it 'should be true if it has no answer records' do
+      it 'is true if it has no answer records' do
         expect(subject).to be_empty
       end
 
-      it 'should not be true if it has any answer record' do
+      it 'is not true if it has any answer record' do
         subject.answers = [{}]
         expect(subject).not_to be_empty
       end

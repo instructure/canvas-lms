@@ -50,12 +50,12 @@ describe AssessmentRequest do
       NotificationPolicy.create!(:notification => notification, :communication_channel => @student.communication_channel, :frequency => 'immediately')
     end
 
-    it 'should send a notification if the course and assignment are published' do
+    it 'sends a notification if the course and assignment are published' do
       @request.send_reminder!
       expect(@request.messages_sent.keys).to include(@notification_name)
     end
 
-    it 'should not send a notification if the course is unpublished' do
+    it 'does not send a notification if the course is unpublished' do
       submission = @assignment.find_or_create_submission(@user)
       assessor_submission = @assignment.find_or_create_submission(@review_student)
       @course.update!(workflow_state: 'created')
@@ -65,7 +65,7 @@ describe AssessmentRequest do
       expect(peer_review_request.messages_sent.keys).to be_empty
     end
 
-    it 'should not send a notification if the assignment is unpublished' do
+    it 'does not send a notification if the assignment is unpublished' do
       @assignment.update!(workflow_state: 'unpublished')
       submission = @assignment.find_or_create_submission(@user)
       assessor_submission = @assignment.find_or_create_submission(@review_student)
@@ -80,7 +80,7 @@ describe AssessmentRequest do
     let(:notification_name) { 'Rubric Assessment Submission Reminder' }
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
-    it "should send submission reminders" do
+    it "sends submission reminders" do
       communication_channel(@student, { username: 'test@example.com', active_cc: true })
       NotificationPolicy.create!(:notification => notification,
                                  :communication_channel => @student.communication_channel, :frequency => 'immediately')
@@ -99,7 +99,7 @@ describe AssessmentRequest do
       expect(message.body).to include(@assignment.title)
     end
 
-    it "should send to the correct url if anonymous" do
+    it "sends to the correct url if anonymous" do
       communication_channel(@student, { username: 'test@example.com', active_cc: true })
       NotificationPolicy.create!(:notification => notification,
                                  :communication_channel => @student.communication_channel, :frequency => 'immediately')
@@ -130,15 +130,15 @@ describe AssessmentRequest do
       @assessment_request.save!
     end
 
-    it "should prevent reviewer from seeing reviewed name" do
+    it "prevents reviewer from seeing reviewed name" do
       expect(@assessment_request.grants_right?(@reviewer, :read_assessment_user)).to be_falsey
     end
 
-    it "should allow reviewed to see own name" do
+    it "allows reviewed to see own name" do
       expect(@assessment_request.grants_right?(@reviewed, :read_assessment_user)).to be_truthy
     end
 
-    it "should allow teacher to see reviewed users name" do
+    it "allows teacher to see reviewed users name" do
       expect(@assessment_request.grants_right?(@teacher, :read_assessment_user)).to be_truthy
     end
   end
@@ -148,17 +148,17 @@ describe AssessmentRequest do
       @ignore = Ignore.create!(asset: @request, user: @student, purpose: 'reviewing')
     end
 
-    it 'should delete ignores if the request is completed' do
+    it 'deletes ignores if the request is completed' do
       @request.complete!
       expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should delete ignores if the request is deleted' do
+    it 'deletes ignores if the request is deleted' do
       @request.destroy!
       expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should not delete ignores if the request is updated, but not completed or deleted' do
+    it 'does not delete ignores if the request is updated, but not completed or deleted' do
       @request.assessor = @teacher
       @request.save!
       expect(@ignore.reload).to eq @ignore

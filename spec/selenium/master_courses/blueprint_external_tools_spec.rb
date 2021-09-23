@@ -42,7 +42,7 @@ describe "master courses - child courses - external tool locking" do
     user_session(@teacher)
   end
 
-  it "should not show the cog-menu options on the index when locked" do
+  it "does not show the cog-menu options on the index when locked" do
     @tag.update(restrictions: { all: true })
 
     get "/courses/#{@copy_to.id}/settings#tab-tools"
@@ -52,7 +52,7 @@ describe "master courses - child courses - external tool locking" do
     expect(f('.ExternalToolsTableRow')).not_to contain_css('.al-trigger')
   end
 
-  it "should show the cog-menu options on the index when not locked" do
+  it "shows the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
     expect(f('.master-course-cell')).to contain_css('.icon-blueprint')

@@ -29,24 +29,24 @@ describe UserList do
     @account.save!
   end
 
-  it "should complain about invalid input" do
+  it "complains about invalid input" do
     ul = UserList.new "i\x01nstructure"
     expect(ul.errors).to eq [{ :address => "i\x01nstructure", :details => :unparseable }]
   end
 
-  it "should not fail with unicode names" do
+  it "does not fail with unicode names" do
     ul = UserList.new '"senor molé" <blah@instructure.com>'
     expect(ul.errors).to eq []
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eq [["senor molé", "blah@instructure.com"]]
   end
 
-  it "should not cause error with nothing past to it" do
+  it "does not cause error with nothing past to it" do
     ul = UserList.new(nil)
     expect(ul.errors).to eq []
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eq []
   end
 
-  it "should find by SMS number" do
+  it "finds by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserList.new '(801) 555-5555'
@@ -60,7 +60,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should process a list of emails" do
+  it "processes a list of emails" do
     ul = UserList.new(regular)
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw, Ryan", "ryankshaw@gmail.com"],
@@ -70,7 +70,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should process a list of irregular emails" do
+  it "processes a list of irregular emails" do
     ul = UserList.new(%{ Shaw "Ryan" <ryankshaw@gmail.com>, \"whoopsies\" <stuff@stuff.stuff>,
           guess what my name has an@sign <blah@gmail.com>, <derp@derp.depr>})
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
@@ -83,7 +83,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should process a list of only emails, without brackets" do
+  it "processes a list of only emails, without brackets" do
     ul = UserList.new without_brackets
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       [nil, "ryankshaw@gmail.com"],
@@ -93,7 +93,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should work with a mixed entry list" do
+  it "works with a mixed entry list" do
     ul = UserList.new regular + "," + %{otherryankshaw@gmail.com, otherlastfirst@gmail.com}
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       ["Shaw, Ryan", "ryankshaw@gmail.com"],
@@ -105,7 +105,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should work well with a single address" do
+  it "works well with a single address" do
     ul = UserList.new('ryankshaw@gmail.com')
     expect(ul.addresses.map { |x| [x[:name], x[:address]] }).to eql([
                                                                       [nil, "ryankshaw@gmail.com"]
@@ -114,7 +114,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should remove duplicates" do
+  it "removes duplicates" do
     user = User.create!(:name => 'A 123451')
     user.pseudonyms.create!(:unique_id => "A123451", :account => @account)
     user = User.create!(:name => 'user 3')
@@ -150,7 +150,7 @@ describe UserList do
                                                                                         ])
   end
 
-  it "should be case insensitive when finding existing users" do
+  it "is case insensitive when finding existing users" do
     @account.settings = { :open_registration => false }
     @account.save!
 
@@ -168,13 +168,13 @@ describe UserList do
     expect(ul.errors).to eq []
   end
 
-  it "should be case insensitive when finding duplicates" do
+  it "is case insensitive when finding duplicates" do
     ul = UserList.new 'jt@instructure.com, JT@INSTRUCTURE.COM'
     expect(ul.addresses.length).to eq 1
     expect(ul.duplicate_addresses.length).to eq 1
   end
 
-  it "should process login ids, SIS ids, and email addresses" do
+  it "processes login ids, SIS ids, and email addresses" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
@@ -199,7 +199,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should not process login ids if they don't exist" do
+  it "does not process login ids if they don't exist" do
     user = User.create!(:name => 'A 112351243')
     user.pseudonyms.create!(:unique_id => "A112351243", :account => @account)
     user = User.create!(:name => 'user 1')
@@ -236,7 +236,7 @@ describe UserList do
     expect(ul.duplicate_addresses).to eq []
   end
 
-  it "should work with a list of paths" do
+  it "works with a list of paths" do
     ul = UserList.new(['leonard@example.com', 'sheldon@example.com'],
                       :root_account => @account, :search_method => :preferred)
     expect(ul.addresses.count).to eq 2
@@ -249,14 +249,14 @@ describe UserList do
       @account.save!
     end
 
-    it "should not return non-existing users if open registration is disabled" do
+    it "does not return non-existing users if open registration is disabled" do
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses).to eq []
       expect(ul.errors.length).to eq 1
       expect(ul.errors.first[:details]).to eq :not_found
     end
 
-    it "should pick the pseudonym, even if someone else has the CC" do
+    it "picks the pseudonym, even if someone else has the CC" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       @user1 = @user
       user_with_pseudonym(:name => 'JT 1', :username => 'jt+1@instructure.com', :active_all => 1)
@@ -267,7 +267,7 @@ describe UserList do
       expect(ul.duplicate_addresses).to eq []
     end
 
-    it "should complain if multiple people have the CC" do
+    it "complains if multiple people have the CC" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => true)
       communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
       user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => true)
@@ -278,7 +278,7 @@ describe UserList do
       expect(ul.duplicate_addresses).to eq []
     end
 
-    it "should not think that multiple pseudonyms for the same user is multiple users" do
+    it "does not think that multiple pseudonyms for the same user is multiple users" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @user.pseudonyms.create!(:unique_id => 'jt+2@instructure.com')
       communication_channel(@user, { username: 'jt+3@instructure.com', active_cc: true })
@@ -288,7 +288,7 @@ describe UserList do
       expect(ul.duplicate_addresses).to eq []
     end
 
-    it "should detect duplicates, even from different CCs" do
+    it "detects duplicates, even from different CCs" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       cc = communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
       ul = UserList.new 'jt@instructure.com, (801) 555-5555'
@@ -297,7 +297,7 @@ describe UserList do
       expect(ul.duplicate_addresses).to eq [{ :address => '(801) 555-5555', :type => :sms, :user_id => @user.id, :name => 'JT', :shard => Shard.default }]
     end
 
-    it "should choose the active CC if there is 1 active and n unconfirmed" do
+    it "chooses the active CC if there is 1 active and n unconfirmed" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
       @user1 = @user
@@ -310,7 +310,7 @@ describe UserList do
     end
 
     # create the CCs in reverse order to check the logic when we see them in a different order
-    it "should choose the active CC if there is 1 active and n unconfirmed, try 2" do
+    it "chooses the active CC if there is 1 active and n unconfirmed, try 2" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       communication_channel(@user, { username: 'jt+2@instructure.com' })
       @user1 = @user
@@ -322,7 +322,7 @@ describe UserList do
       expect(ul.duplicate_addresses).to eq []
     end
 
-    it "should not find users from untrusted accounts" do
+    it "does not find users from untrusted accounts" do
       account = Account.create!
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
       ul = UserList.new 'jt@instructure.com'
@@ -348,7 +348,7 @@ describe UserList do
       expect(ul.errors).to eq []
     end
 
-    it "should find users from trusted accounts" do
+    it "finds users from trusted accounts" do
       account = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
@@ -357,7 +357,7 @@ describe UserList do
       expect(ul.errors).to eq []
     end
 
-    it "should prefer a user from the current account instead of a trusted account" do
+    it "prefers a user from the current account instead of a trusted account" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @user1 = @user
       account = Account.create!
@@ -368,7 +368,7 @@ describe UserList do
       expect(ul.errors).to eq []
     end
 
-    it "should prefer a user from the current account instead of a trusted account (reverse order)" do
+    it "prefers a user from the current account instead of a trusted account (reverse order)" do
       account = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
@@ -379,7 +379,7 @@ describe UserList do
     end
 
     context 'when searching by sis id' do
-      it "should prefer a user from the current account instead of a trusted account" do
+      it "prefers a user from the current account instead of a trusted account" do
         account1 = Account.create!
         account2 = Account.create!
         allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
@@ -391,7 +391,7 @@ describe UserList do
         expect(ul.errors).to eq []
       end
 
-      it "should prefer a user from the current account instead of a trusted account (reverse order)" do
+      it "prefers a user from the current account instead of a trusted account (reverse order)" do
         account1 = Account.create!
         account2 = Account.create!
         allow(account2).to receive(:trusted_account_ids).and_return([account1.id])
@@ -403,7 +403,7 @@ describe UserList do
       end
     end
 
-    it "should not find a user if there is a conflict of unique_ids from not-this-account" do
+    it "does not find a user if there is a conflict of unique_ids from not-this-account" do
       account1 = Account.create!
       account2 = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
@@ -414,7 +414,7 @@ describe UserList do
       expect(ul.errors).to eq [{ :address => 'jt@instructure.com', :type => :pseudonym, :details => :non_unique }]
     end
 
-    it "should find a user with multiple not-this-account pseudonyms" do
+    it "finds a user with multiple not-this-account pseudonyms" do
       account1 = Account.create!
       account2 = Account.create!
       allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
@@ -425,7 +425,7 @@ describe UserList do
       expect(ul.errors).to eq []
     end
 
-    it "should not find a user from a different account by SMS" do
+    it "does not find a user from a different account by SMS" do
       account = Account.create!
       user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
       communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
@@ -437,7 +437,7 @@ describe UserList do
   end
 
   context "preferred selection" do
-    it "should find an existing user if there is only one" do
+    it "finds an existing user if there is only one" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => 1)
       communication_channel(@user, { username: 'jt+2@instructure.com', active_cc: true })
       ul = UserList.new 'jt+2@instructure.com', :search_method => :preferred
@@ -447,14 +447,14 @@ describe UserList do
       expect(ul.users).to eq [@user]
     end
 
-    it "should create a new user if none exists" do
+    it "creates a new user if none exists" do
       ul = UserList.new 'jt@instructure.com', :search_method => :preferred
       expect(ul.addresses).to eq [{ :address => 'jt@instructure.com', :type => :email, :name => nil }]
       expect(ul.errors).to eq []
       expect(ul.duplicate_addresses).to eq []
     end
 
-    it "should create a new user if multiple matching users are found" do
+    it "creates a new user if multiple matching users are found" do
       @user1 = user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com')
       @user2 = user_with_pseudonym(:name => 'JT', :username => 'jt+2@instructure.com')
       communication_channel(@user1, { username: 'jt@instructure.com', active_cc: true })
@@ -469,7 +469,7 @@ describe UserList do
       expect(users.first).not_to eq @user2
     end
 
-    it "should not create a new user for non-matching non-email" do
+    it "does not create a new user for non-matching non-email" do
       ul = UserList.new 'jt', :search_method => :preferred
       expect(ul.addresses).to eq []
       expect(ul.errors).to eq [{ :address => 'jt', :type => :pseudonym, :details => :not_found }]
@@ -478,7 +478,7 @@ describe UserList do
   end
 
   context "user creation" do
-    it "should create new users in creation_pending state" do
+    it "creates new users in creation_pending state" do
       ul = UserList.new 'jt@instructure.com'
       expect(ul.addresses.length).to eq 1
       expect(ul.addresses.first[:user_id]).to be_nil
@@ -496,7 +496,7 @@ describe UserList do
       expect(cc.path).to eq 'jt@instructure.com'
     end
 
-    it "should create new users even if a user already exists" do
+    it "creates new users even if a user already exists" do
       user_with_pseudonym(:name => 'JT', :username => 'jt+1@instructure.com', :active_all => 1)
       communication_channel(@user, { username: 'jt@instructure.com', active_cc: true })
       ul = UserList.new 'Bob <jt@instructure.com>'
@@ -515,7 +515,7 @@ describe UserList do
       expect(cc).not_to eq @cc
     end
 
-    it "should not create new users for users found by email" do
+    it "does not create new users for users found by email" do
       user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
       @pseudonym.update_attribute(:unique_id, 'jt')
       ul = UserList.new 'jt@instructure.com', :root_account => Account.default, :search_method => :closed
@@ -525,7 +525,7 @@ describe UserList do
       expect(ul.users).to eq [@user]
     end
 
-    it "should default initial_enrollment_type for new users" do
+    it "defaults initial_enrollment_type for new users" do
       ul = UserList.new 'student1@instructure.com', :initial_type => 'StudentEnrollment'
       expect(ul.users.first.initial_enrollment_type).to eq 'student'
       ul = UserList.new 'student1@instructure.com', :initial_type => 'student'
@@ -558,7 +558,7 @@ describe UserList do
   context "sharding" do
     specs_require_sharding
 
-    it "should find a user from a trusted account in a different shard" do
+    it "finds a user from a trusted account in a different shard" do
       @shard1.activate do
         @account = Account.create!
         user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)

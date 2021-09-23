@@ -59,12 +59,12 @@ describe 'Canvadoc' do
       allow_any_instance_of(Canvadocs::API).to receive(:upload).and_return "id" => 1234
     end
 
-    it 'should have the annotations checkbox in plugin settings', priority: "1", test_id: 345729 do
+    it 'has the annotations checkbox in plugin settings', priority: "1", test_id: 345729 do
       turn_on_plugin_settings
       expect(fj('#settings_annotations_supported:visible')).to be_displayed
     end
 
-    it 'should allow annotations settings to be saved', priority: "1", test_id: 345730 do
+    it 'allows annotations settings to be saved', priority: "1", test_id: 345730 do
       turn_on_plugin_settings
       fj('#settings_annotations_supported').click
       f('.save_button').click

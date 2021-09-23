@@ -107,7 +107,7 @@ describe "admin_tools" do
     end
 
     context "as SiteAdmin" do
-      it "should perform search without account setting or user permission" do
+      it "performs search without account setting or user permission" do
         @account.settings[:admins_can_view_notifications] = false
         @account.save!
         site_admin_user
@@ -126,7 +126,7 @@ describe "admin_tools" do
 
     context "as AccountAdmin" do
       context "with permissions" do
-        it "should perform search" do
+        it "performs search" do
           message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
@@ -136,7 +136,7 @@ describe "admin_tools" do
           expect(f('#commMessagesSearchResults .message-body').text).to include('foo bar')
         end
 
-        it "should display nothing found" do
+        it "displays nothing found" do
           message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
@@ -148,7 +148,7 @@ describe "admin_tools" do
           expect(f("#content")).not_to contain_css('#commMessagesSearchResults .message-body')
         end
 
-        it "should display valid search params used" do
+        it "displays valid search params used" do
           message_model(:user_id => @student.id, :body => 'foo bar', :root_account_id => @account.id)
           load_admin_tools_page
           click_view_notifications_tab
@@ -173,7 +173,7 @@ describe "admin_tools" do
           expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")
         end
 
-        it "should display an error when given invalid input data" do
+        it "displays an error when given invalid input data" do
           load_admin_tools_page
           click_view_notifications_tab
           perform_user_search("#commMessagesSearchForm", @student.id)
@@ -186,7 +186,7 @@ describe "admin_tools" do
           assert_error_box("[name='messages_end_time']")
         end
 
-        it "should hide tab if account setting disabled" do
+        it "hides tab if account setting disabled" do
           @account.settings[:admins_can_view_notifications] = false
           @account.save!
 
@@ -197,7 +197,7 @@ describe "admin_tools" do
       end
 
       context "without permissions" do
-        it "should not see tab" do
+        it "does not see tab" do
           setup_account_admin({ :view_notifications => false })
           load_admin_tools_page
           wait_for_ajaximations
@@ -210,7 +210,7 @@ describe "admin_tools" do
   context "Logging" do
     include_examples "cassandra audit logs"
 
-    it "should change log types with dropdown" do
+    it "changes log types with dropdown" do
       load_admin_tools_page
       click_view_tab "logging"
 
@@ -226,7 +226,7 @@ describe "admin_tools" do
     end
 
     context "permissions" do
-      it "should include options activity with permissions" do
+      it "includes options activity with permissions" do
         setup_account_admin
         load_admin_tools_page
         wait_for_ajaximations
@@ -249,7 +249,7 @@ describe "admin_tools" do
       end
 
       context "without permissions" do
-        it "should not see tab" do
+        it "does not see tab" do
           setup_account_admin(
             view_statistics: false,
             manage_user_logins: false,
@@ -261,7 +261,7 @@ describe "admin_tools" do
           expect(f('#adminToolsTabs')).not_to contain_css('.logging')
         end
 
-        it "should not include login activity option for revoked permission" do
+        it "does not include login activity option for revoked permission" do
           setup_account_admin(view_statistics: false, manage_user_logins: false)
           load_admin_tools_page
           wait_for_ajaximations
@@ -273,7 +273,7 @@ describe "admin_tools" do
           expect(options).not_to include("Login / Logout Activity")
         end
 
-        it "should not include grade change activity option for revoked permission" do
+        it "does not include grade change activity option for revoked permission" do
           setup_account_admin(view_grade_changes: false)
           load_admin_tools_page
           wait_for_ajaximations
@@ -285,7 +285,7 @@ describe "admin_tools" do
           expect(options).not_to include("Grade Change Activity")
         end
 
-        it "should not include course change activity option for revoked permission" do
+        it "does not include course change activity option for revoked permission" do
           setup_account_admin(view_course_changes: false)
           load_admin_tools_page
           wait_for_ajaximations
@@ -313,7 +313,7 @@ describe "admin_tools" do
       change_log_type("Authentication")
     end
 
-    it "should show log history" do
+    it "shows log history" do
       perform_user_search("#authLoggingSearchForm", @student.id)
       f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
       wait_for_ajaximations
@@ -323,7 +323,7 @@ describe "admin_tools" do
       expect(cols.last.text).to eq "LOGOUT"
     end
 
-    it "should search by user name" do
+    it "searches by user name" do
       perform_user_search("#authLoggingSearchForm", 'testuser')
       f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
       wait_for_ajaximations
@@ -355,7 +355,7 @@ describe "admin_tools" do
       change_log_type("GradeChange")
     end
 
-    it "should search by grader name and show history" do
+    it "searches by grader name and show history" do
       perform_autocomplete_search("#grader_id-autocompleteField", @teacher.name)
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
@@ -382,21 +382,21 @@ describe "admin_tools" do
       expect(cols[8].text).to eq "y"
     end
 
-    it "should search by student name" do
+    it "searches by student name" do
       perform_autocomplete_search("#student_id-autocompleteField", @student.name)
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
 
-    it "should search by course id" do
+    it "searches by course id" do
       set_value f("#gradeChangeCourseSearch"), @course.id
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
 
-    it "should search by assignment id" do
+    it "searches by assignment id" do
       set_value f("#gradeChangeAssignmentSearch"), @assignment.id
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
@@ -404,7 +404,7 @@ describe "admin_tools" do
       expect(ff('#gradeChangeLoggingSearchResults table tbody tr').length).to eq 3
     end
 
-    it "should fail gracefully with invalid ids" do
+    it "fails gracefully with invalid ids" do
       set_value f("#gradeChangeAssignmentSearch"), "notarealid"
       f('#loggingGradeChange button[name=gradeChange_submit]').click
       wait_for_ajaximations
@@ -423,7 +423,7 @@ describe "admin_tools" do
       change_log_type("Course")
     end
 
-    it "should search by course name and show history" do
+    it "searches by course name and show history" do
       @events = []
       (1..5).each do |index|
         @course.name = "Course #{index}"
@@ -450,7 +450,7 @@ describe "admin_tools" do
       expect(cols[5].text).to eq "View Details"
     end
 
-    it "should search by course id" do
+    it "searches by course id" do
       @course.name = "Course Updated"
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
 
@@ -461,14 +461,14 @@ describe "admin_tools" do
       expect(cols.size).to eq 6
     end
 
-    it "should fail gracefully with invalid ids" do
+    it "fails gracefully with invalid ids" do
       set_value f("#course_id-autocompleteField"), "notarealid"
       f('#loggingCourse button[name=course_submit]').click
       wait_for_ajaximations
       expect(f('#courseLoggingSearchResults ').text).to eq 'No items found'
     end
 
-    it "should find courses in any workflow state" do
+    it "finds courses in any workflow state" do
       @event = Auditors::Course.record_concluded(@course, @teacher)
       @course.destroy
 
@@ -482,7 +482,7 @@ describe "admin_tools" do
       expect(cols.size).to eq 6
     end
 
-    it "should show created event details" do
+    it "shows created event details" do
       # Simulate a new course
       course = Course.new
       course.name = @course.name
@@ -495,7 +495,7 @@ describe "admin_tools" do
       expect(cols[1].text).to eq @course.name
     end
 
-    it "should show updated event details" do
+    it "shows updated event details" do
       old_name = @course.name
       @course.name = "Course Updated"
       @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
@@ -512,7 +512,7 @@ describe "admin_tools" do
       expect(cols[2].text).to eq @course.name
     end
 
-    it "should show sis batch id if source is sis" do
+    it "shows sis batch id if source is sis" do
       old_name = @course.name
       @course.name = "Course Updated"
 
@@ -525,32 +525,32 @@ describe "admin_tools" do
       expect(items[5].text).to eq sis_batch.id.to_s
     end
 
-    it "should show concluded event details" do
+    it "shows concluded event details" do
       @event = Auditors::Course.record_concluded(@course, @teacher)
       show_event_details("Concluded")
     end
 
-    it "should show unconcluded event details" do
+    it "shows unconcluded event details" do
       @event = Auditors::Course.record_unconcluded(@course, @teacher)
       show_event_details("Unconcluded")
     end
 
-    it "should show deleted event details" do
+    it "shows deleted event details" do
       @event = Auditors::Course.record_deleted(@course, @teacher)
       show_event_details("Deleted")
     end
 
-    it "should show restored event details" do
+    it "shows restored event details" do
       @event = Auditors::Course.record_restored(@course, @teacher)
       show_event_details("Restored")
     end
 
-    it "should show published event details" do
+    it "shows published event details" do
       @event = Auditors::Course.record_published(@course, @teacher)
       show_event_details("Published")
     end
 
-    it "should show copied_to event details" do
+    it "shows copied_to event details" do
       @course, @copied_course = @course, course_factory(active_course: true, course_name: "Copied Course")
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
@@ -558,7 +558,7 @@ describe "admin_tools" do
       expect(fj('.ui-dialog dl dd:last').text).to eq @copied_course.name
     end
 
-    it "should show copied_from event details" do
+    it "shows copied_from event details" do
       @course, @copied_course = @course, course_factory(active_course: true, course_name: "Copied Course")
       @from_event, @to_event = Auditors::Course.record_copied(@course, @copied_course, @teacher)
 
@@ -566,7 +566,7 @@ describe "admin_tools" do
       expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
     end
 
-    it "should show reset_to event details" do
+    it "shows reset_to event details" do
       @course, @reset_course = @course, course_factory(active_course: true, course_name: "Reset Course")
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 
@@ -574,7 +574,7 @@ describe "admin_tools" do
       expect(fj('.ui-dialog dl dd:last').text).to eq @reset_course.name
     end
 
-    it "should show reset_from event details" do
+    it "shows reset_from event details" do
       @course, @reset_course = @course, course_factory(active_course: true, course_name: "Reset Course")
       @from_event, @to_event = Auditors::Course.record_reset(@course, @reset_course, @teacher)
 

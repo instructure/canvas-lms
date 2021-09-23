@@ -25,21 +25,21 @@ require 'nokogiri'
 describe "course" do
   # normally this would be a controller test, but there is a some code in the
   # views that i need to not explode
-  it "should not require authorization for public courses" do
+  it "does not require authorization for public courses" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}"
     expect(response).to be_successful
   end
 
-  it "should load syllabus on public course with no user logged in" do
+  it "loads syllabus on public course with no user logged in" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public, true)
     get "/courses/#{@course.id}/assignments/syllabus"
     expect(response).to be_successful
   end
 
-  it "should show the migration-in-progress notice" do
+  it "shows the migration-in-progress notice" do
     enable_cache do
       course_factory(active_all: true)
       user_session(@teacher)
@@ -59,7 +59,7 @@ describe "course" do
     end
   end
 
-  it "should not show the migration-in-progress notice to students" do
+  it "does not show the migration-in-progress notice to students" do
     enable_cache do
       course_factory(active_all: true)
       student_in_course active_all: true
@@ -75,7 +75,7 @@ describe "course" do
     end
   end
 
-  it "should use nicknames in the course index" do
+  it "uses nicknames in the course index" do
     course_with_student(:active_all => true, :course_name => "Course 1")
     course_with_student(:user => @student, :active_all => true, :course_name => "Course 2")
     @student.set_preference(:course_nicknames, @course.id, 'A nickname or something')
@@ -88,7 +88,7 @@ describe "course" do
     expect(course_rows[2].to_s).to include 'A nickname or something'
   end
 
-  it "should not show links to unpublished courses in course index" do
+  it "does not show links to unpublished courses in course index" do
     course_with_student(:course_name => "Course 1")
     c1 = @course
     @student.enrollments.first.update_attribute(:workflow_state, "active") # force active, like with sis
@@ -105,7 +105,7 @@ describe "course" do
     expect(course_rows[1].to_s).to include("href=\"/courses/#{c2.id}\"") # published
   end
 
-  it "should not show students' nicknames to admins on the student's account profile page" do
+  it "does not show students' nicknames to admins on the student's account profile page" do
     course_with_student(:active_all => true)
     @student.set_preference(:course_nicknames, @course.id, 'STUDENT_NICKNAME')
     user_session(account_admin_user)

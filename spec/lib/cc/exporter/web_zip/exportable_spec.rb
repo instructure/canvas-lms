@@ -102,7 +102,7 @@ describe "Exportable" do
       File.open(zip_path)
     end
 
-    it "should create a zip file" do
+    it "creates a zip file" do
       expect(zip).not_to be_nil
     end
 
@@ -113,7 +113,7 @@ describe "Exportable" do
     end
 
     context "course-data.js file" do
-      it "should create a course-data.js file" do
+      it "creates a course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
@@ -122,7 +122,7 @@ describe "Exportable" do
         end
       end
 
-      it "should create a 'files' key in the course-data.js file" do
+      it "creates a 'files' key in the course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
@@ -131,7 +131,7 @@ describe "Exportable" do
         end
       end
 
-      it "should create the right structure in the 'files' key" do
+      it "creates the right structure in the 'files' key" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
@@ -144,7 +144,7 @@ describe "Exportable" do
         end
       end
 
-      it "should add course data to the course-data.js file" do
+      it "adds course data to the course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
@@ -157,7 +157,7 @@ describe "Exportable" do
     end
 
     context "canvas_offline_course_viewer files" do
-      it "should insert the index.html file" do
+      it "inserts the index.html file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/index.html').first
           expect(file.name).not_to include '//'
@@ -167,7 +167,7 @@ describe "Exportable" do
         end
       end
 
-      it "should insert the viewer/bundle.js file" do
+      it "inserts the viewer/bundle.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/bundle.js').first
           expect(file.name).not_to include '//'

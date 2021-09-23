@@ -49,7 +49,7 @@ describe "quizzes" do
       user_session(@teacher)
     end
 
-    it "should show a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
+    it "shows a summary of due dates if there are multiple", priority: "1", test_id: 210054 do
       create_quiz_with_due_date
       get "/courses/#{@course.id}/quizzes"
       expect(f('.item-group-container .date-available')).not_to include_text "Multiple Dates"
@@ -64,7 +64,7 @@ describe "quizzes" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "should asynchronously load student quiz results", priority: "2", test_id: 210058 do
+    it "asynchronouslies load student quiz results", priority: "2", test_id: 210058 do
       @context = @course
       q = quiz_model
       q.generate_quiz_data
@@ -77,7 +77,7 @@ describe "quizzes" do
       expect(f('#quiz_details')).to be_displayed
     end
 
-    it "should open and close the send to dialog" do
+    it "opens and close the send to dialog" do
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -89,7 +89,7 @@ describe "quizzes" do
       check_element_has_focus(f('.al-trigger'))
     end
 
-    it "should open and close the copy to tray" do
+    it "opens and close the copy to tray" do
       @context = @course
       quiz_model
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -101,7 +101,7 @@ describe "quizzes" do
       check_element_has_focus(f('.al-trigger'))
     end
 
-    it "should create a new question group", priority: "1", test_id: 210060 do
+    it "creates a new question group", priority: "1", test_id: 210060 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
 
@@ -116,7 +116,7 @@ describe "quizzes" do
 
     it "should update a question group", priority: "1", test_id: 210061
 
-    it "should not let you exceed the question limit", priority: "2", test_id: 210062 do
+    it "does not let you exceed the question limit", priority: "2", test_id: 210062 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
 
@@ -151,7 +151,7 @@ describe "quizzes" do
     end
 
     describe "insufficient count warnings" do
-      it "should show a warning for groups picking too many questions", priority: "2", test_id: 539340 do
+      it "shows a warning for groups picking too many questions", priority: "2", test_id: 539340 do
         get "/courses/#{@course.id}/quizzes"
         click_new_quiz_button
         click_questions_tab
@@ -188,7 +188,7 @@ describe "quizzes" do
         expect(f(".insufficient_count_warning")).to_not be_displayed
       end
 
-      it "should show a warning for groups picking too many questions from a bank", priority: "2", test_id: 539341 do
+      it "shows a warning for groups picking too many questions from a bank", priority: "2", test_id: 539341 do
         bank = @course.assessment_question_banks.create!
         assessment_question_model(bank: bank)
 
@@ -240,7 +240,7 @@ describe "quizzes" do
         @quiz.save!
       end
 
-      it "should moderate quiz", priority: "1", test_id: 210063 do
+      it "moderates quiz", priority: "1", test_id: 210063 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
         f('.moderate_student_link').click
 
@@ -257,7 +257,7 @@ describe "quizzes" do
         expect(f('.attempts_left').text).to eq '3'
       end
 
-      it "should preserve extra time values", priority: "2", test_id: 210064 do
+      it "preserves extra time values", priority: "2", test_id: 210064 do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/moderate"
         f('.moderate_student_link').click
 
@@ -273,7 +273,7 @@ describe "quizzes" do
       end
     end
 
-    it "should validate numerical input data", priority: "1", test_id: 210066 do
+    it "validates numerical input data", priority: "1", test_id: 210066 do
       skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
         aq = bank.assessment_questions.create!
@@ -304,7 +304,7 @@ describe "quizzes" do
 
     it "should mark dropdown questions as answered", priority: "2", test_id: 210067
 
-    it "should give a student extra time if the time limit is extended", priority: "2", test_id: 210068 do
+    it "gives a student extra time if the time limit is extended", priority: "2", test_id: 210068 do
       @context = @course
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       q = quiz_model
@@ -410,7 +410,7 @@ describe "quizzes" do
 
     it "should notify a student of extra time given by a moderator", priority: "2", test_id: 210070
 
-    it "should display a link to quiz statistics for a MOOC", priority: "2", test_id: 210072 do
+    it "displays a link to quiz statistics for a MOOC", priority: "2", test_id: 210072 do
       quiz_with_submission
       @course.large_roster = true
       @course.save!
@@ -419,7 +419,7 @@ describe "quizzes" do
       expect(f('#right-side')).to include_text('Quiz Statistics')
     end
 
-    it "should not allow a teacher to take a quiz" do
+    it "does not allow a teacher to take a quiz" do
       @quiz = quiz_model({ course: @course, time_limit: 5 })
       @quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       @quiz.generate_quiz_data

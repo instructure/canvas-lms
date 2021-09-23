@@ -92,7 +92,7 @@ describe "context modules" do
       expect(f('.prerequisites_entry', edit_form)).to be_displayed
     end
 
-    it "should save the requirement count chosen in the Edit Module form" do
+    it "saves the requirement count chosen in the Edit Module form" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
 
@@ -120,7 +120,7 @@ describe "context modules" do
       expect(f('.pill li').text).to eq "Complete One Item"
     end
 
-    it "should prompt relock when adding an unlock_at date" do
+    it "prompts relock when adding an unlock_at date" do
       lock_until = format_date_for_view(Time.zone.today + 2.days)
       @course.context_modules.create!(name: "name")
       get "/courses/#{@course.id}/modules"
@@ -148,7 +148,7 @@ describe "context modules" do
       expect(format_time_for_view(unlock_date_in_dialog.attribute("value"))).to eq unlock_date
     end
 
-    it "should only display out-of on an assignment min score restriction when the assignment has a total" do
+    it "onlies display out-of on an assignment min score restriction when the assignment has a total" do
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -189,7 +189,7 @@ describe "context modules" do
       expect(f("body")).not_to contain_jqcss(".points_possible_parent:visible")
     end
 
-    it "should add and remove completion criteria" do
+    it "adds and remove completion criteria" do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
 
@@ -290,7 +290,7 @@ describe "context modules" do
       end
     end
 
-    it "should still display due date and points possible after indent change" do
+    it "stills display due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last

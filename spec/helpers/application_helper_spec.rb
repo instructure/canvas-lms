@@ -40,7 +40,7 @@ describe ApplicationHelper do
       @all_folders = [@f, @f_1, @f_2, @f_2_1, @f_2_1_1]
     end
 
-    it "should work work recursively" do
+    it "works work recursively" do
       option_string = folders_as_options([@f], :all_folders => @all_folders)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
@@ -50,7 +50,7 @@ describe ApplicationHelper do
       expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
     end
 
-    it "should limit depth" do
+    it "limits depth" do
       option_string = folders_as_options([@f], :all_folders => @all_folders, :max_depth => 1)
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
@@ -60,7 +60,7 @@ describe ApplicationHelper do
       expect(html.css('option')[2].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
     end
 
-    it "should work without supplying all folders" do
+    it "works without supplying all folders" do
       option_string = folders_as_options([@f])
 
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
@@ -74,7 +74,7 @@ describe ApplicationHelper do
   context 'show_user_create_course_button' do
     before(:once) { @domain_root_account = Account.default }
 
-    it 'should work (non-granular)' do
+    it 'works (non-granular)' do
       @domain_root_account.disable_feature!(:granular_permissions_manage_courses)
       @domain_root_account.update_attribute(
         :settings,
@@ -89,7 +89,7 @@ describe ApplicationHelper do
       expect(show_user_create_course_button(@admin)).to be_truthy
     end
 
-    it 'should work for no enrollments setting (granular permissions)' do
+    it 'works for no enrollments setting (granular permissions)' do
       @domain_root_account.enable_feature!(:granular_permissions_manage_courses)
       @domain_root_account.update(settings: { no_enrollments_can_create_courses: true })
       expect(show_user_create_course_button(nil)).to be_falsey
@@ -103,7 +103,7 @@ describe ApplicationHelper do
   end
 
   describe "tomorrow_at_midnight" do
-    it "should always return a time in the future" do
+    it "alwayses return a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
       expect(tomorrow_at_midnight).to be > now
     end
@@ -248,21 +248,21 @@ describe ApplicationHelper do
       end
 
       context "with no custom css" do
-        it "should be empty" do
+        it "is empty" do
           allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_css).to be_nil
         end
       end
 
       context "with custom css" do
-        it "should include account css" do
+        it "includes account css" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output).to match %r{https://example.com/path/to/overrides.css}
         end
 
-        it "should include site_admin css even if there is no active brand" do
+        it "includes site_admin css even if there is no active brand" do
           allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
                                                     css_overrides: 'https://example.com/site_admin/account.css',
@@ -273,7 +273,7 @@ describe ApplicationHelper do
           expect(output).to match %r{https://example.com/site_admin/account.css}
         end
 
-        it "should not include anything if param is set to 0" do
+        it "does not include anything if param is set to 0" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
@@ -305,7 +305,7 @@ describe ApplicationHelper do
       context "sub-accounts" do
         before { set_up_subaccounts }
 
-        it "should include sub-account css when viewing the subaccount or any course or group in it" do
+        it "includes sub-account css when viewing the subaccount or any course or group in it" do
           course = @grandchild_account.courses.create!
           group = course.groups.create!
           [@grandchild_account, course, group].each do |context|
@@ -316,14 +316,14 @@ describe ApplicationHelper do
           end
         end
 
-        it "should not include sub-account css when root account is context" do
+        it "does not include sub-account css when root account is context" do
           @context = @domain_root_account
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
-        it "should use include sub-account css, if sub-account is lowest common account context" do
+        it "uses include sub-account css, if sub-account is lowest common account context" do
           @course = @grandchild_account.courses.create!
           @course.offer!
           student_in_course(active_all: true)
@@ -334,7 +334,7 @@ describe ApplicationHelper do
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child'], ['grandchild']]
         end
 
-        it "should work using common_account_chain starting from lowest common account context with enrollments" do
+        it "works using common_account_chain starting from lowest common account context with enrollments" do
           course1 = @child_account.courses.create!
           course1.offer!
           course2 = @grandchild_account.courses.create!
@@ -348,14 +348,14 @@ describe ApplicationHelper do
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root'], ['child']]
         end
 
-        it "should fall-back to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
+        it "fall-backs to @domain_root_account's branding if I'm logged in but not enrolled in anything" do
           @current_user = user_factory
           output = helper.include_account_css
           expect(output).to have_tag 'link'
           expect(output.scan(%r{https://example.com/(root|child|grandchild)?/account.css})).to eql [['root']]
         end
 
-        it "should load custom css even for high contrast users" do
+        it "loads custom css even for high contrast users" do
           @current_user = user_factory
           user_factory.enable_feature!(:high_contrast)
           @context = @grandchild_account
@@ -375,20 +375,20 @@ describe ApplicationHelper do
       end
 
       context "with no custom js" do
-        it "should be empty" do
+        it "is empty" do
           allow(helper).to receive(:active_brand_config).and_return(nil)
           expect(helper.include_account_js).to be_nil
         end
       end
 
       context "with custom js" do
-        it "should include account javascript" do
+        it "includes account javascript" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
           output = helper.include_account_js
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/path\\/to\\/overrides.js}
         end
 
-        it "should include site_admin javascript even if there is no active brand" do
+        it "includes site_admin javascript even if there is no active brand" do
           allow(helper).to receive(:active_brand_config).and_return nil
           Account.site_admin.create_brand_config!({
                                                     css_overrides: 'https://example.com/site_admin/account.css',
@@ -409,7 +409,7 @@ describe ApplicationHelper do
         context "sub-accounts" do
           before { set_up_subaccounts }
 
-          it "should just include domain root account's when there is no context or @current_user" do
+          it "justs include domain root account's when there is no context or @current_user" do
             output = helper.include_account_js
             expect(output).to have_tag 'script'
             expect(output).to eq("<script>
@@ -425,7 +425,7 @@ describe ApplicationHelper do
 </script>")
           end
 
-          it "should load custom js even for high contrast users" do
+          it "loads custom js even for high contrast users" do
             @current_user = user_factory
             user_factory.enable_feature!(:high_contrast)
             output = helper.include_account_js
@@ -442,7 +442,7 @@ describe ApplicationHelper do
 </script>")
           end
 
-          it "should include granchild, child, and root when viewing the grandchild or any course or group in it" do
+          it "includes granchild, child, and root when viewing the grandchild or any course or group in it" do
             course = @grandchild_account.courses.create!
             group = course.groups.create!
             [@grandchild_account, course, group].each do |context|
@@ -466,12 +466,12 @@ describe ApplicationHelper do
   end
 
   describe "help link" do
-    it "should configure the help link to display the dialog by default" do
+    it "configures the help link to display the dialog by default" do
       expect(helper.help_link_url).to eq '#'
       expect(helper.help_link_classes).to eq 'help_dialog_trigger'
     end
 
-    it "should override default help link with the configured support url" do
+    it "overrides default help link with the configured support url" do
       support_url = 'http://instructure.com'
       Account.default.update_attribute(:settings, { :support_url => support_url })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -482,7 +482,7 @@ describe ApplicationHelper do
       expect(helper.help_link_classes).to eq 'support_url help_dialog_trigger'
     end
 
-    it "should return the configured icon" do
+    it "returns the configured icon" do
       icon = 'inbox'
       Account.default.update_attribute(:settings, { :help_link_icon => icon })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -490,7 +490,7 @@ describe ApplicationHelper do
       expect(helper.help_link_icon).to eq icon
     end
 
-    it "should return the configured help link name" do
+    it "returns the configured help link name" do
       link_name = 'Links'
       Account.default.update_attribute(:settings, { :help_link_name => link_name })
       helper.instance_variable_set(:@domain_root_account, Account.default)
@@ -500,7 +500,7 @@ describe ApplicationHelper do
   end
 
   describe "collection_cache_key" do
-    it "should generate a cache key, changing when an element cache_key changes" do
+    it "generates a cache key, changing when an element cache_key changes" do
       collection = [user_factory, user_factory, user_factory]
       key1 = collection_cache_key(collection)
       key2 = collection_cache_key(collection)
@@ -558,11 +558,11 @@ describe ApplicationHelper do
   end
 
   context "include_custom_meta_tags" do
-    it "should be nil if @meta_tags is not defined" do
+    it "is nil if @meta_tags is not defined" do
       expect(include_custom_meta_tags).to be_nil
     end
 
-    it "should include tags if present" do
+    it "includes tags if present" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
       result = include_custom_meta_tags
       expect(result).to match(/meta/)
@@ -570,14 +570,14 @@ describe ApplicationHelper do
       expect(result).to match(/content="there"/)
     end
 
-    it "should html_safe-ify them" do
+    it "html_safe-ifies them" do
       @meta_tags = [{ :name => "hi", :content => "there" }]
       expect(include_custom_meta_tags).to be_html_safe
     end
   end
 
   describe "editor_buttons" do
-    it "should return hash of tools if in group" do
+    it "returns hash of tools if in group" do
       @course = course_model
       @group = @course.groups.create!(:name => "some group")
       tool = @course.context_external_tools.new(
@@ -605,7 +605,7 @@ describe ApplicationHelper do
                                    }])
     end
 
-    it "should return hash of tools if in course" do
+    it "returns hash of tools if in course" do
       @course = course_model
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "test", :shared_secret => "secret", :url => "http://example.com")
       tool.editor_button = { :url => "http://example.com", :icon_url => "http://example.com", :canvas_icon_class => 'icon-commons' }
@@ -627,7 +627,7 @@ describe ApplicationHelper do
                                    }])
     end
 
-    it "should not include tools from the domain_root_account for users" do
+    it "does not include tools from the domain_root_account for users" do
       @domain_root_account = Account.default
       account_admin_user
       tool = @domain_root_account.context_external_tools.new(
@@ -670,7 +670,7 @@ describe ApplicationHelper do
           allow(controller).to receive(:controller_name).and_return('external_tools')
         end
 
-        it "it doesn't return true for '/accounts'" do
+        it "doesn't return true for '/accounts'" do
           expect(active_path?('/accounts')).to be_falsey
         end
       end
@@ -856,7 +856,7 @@ describe ApplicationHelper do
 
       let(:logged_in_user) { user_model }
 
-      it "should return logged_in_user" do
+      it "returns logged_in_user" do
         expect(file_access_real_user).to be logged_in_user
       end
     end
@@ -866,20 +866,20 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return real access user from session" do
+      it "returns real access user from session" do
         real_access_user = user_model
         session['file_access_real_user_id'] = real_access_user.id
         expect(file_access_real_user).to eql real_access_user
       end
 
-      it "should return access user from session if real access user not set" do
+      it "returns access user from session if real access user not set" do
         access_user = user_model
         session['file_access_user_id'] = access_user.id
         session['file_access_real_user_id'] = nil
         expect(file_access_real_user).to eql access_user
       end
 
-      it "should return real access user over access user if both set" do
+      it "returns real access user over access user if both set" do
         access_user = user_model
         real_access_user = user_model
         session['file_access_user_id'] = access_user.id
@@ -887,7 +887,7 @@ describe ApplicationHelper do
         expect(file_access_real_user).to eql real_access_user
       end
 
-      it "should return nil if neither set" do
+      it "returns nil if neither set" do
         expect(file_access_real_user).to be nil
       end
     end
@@ -899,14 +899,14 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return token's developer_key with @access_token set" do
+      it "returns token's developer_key with @access_token set" do
         user = user_model
         developer_key = DeveloperKey.create!
         @access_token = user.access_tokens.where(developer_key_id: developer_key).create!
         expect(file_access_developer_key).to eql developer_key
       end
 
-      it "should return nil without @access_token set" do
+      it "returns nil without @access_token set" do
         expect(file_access_developer_key).to be nil
       end
     end
@@ -916,13 +916,13 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return developer key from session" do
+      it "returns developer key from session" do
         developer_key = DeveloperKey.create!
         session['file_access_developer_key_id'] = developer_key.id
         expect(file_access_developer_key).to eql developer_key
       end
 
-      it "should return nil if developer key in session not set" do
+      it "returns nil if developer key in session not set" do
         expect(file_access_developer_key).to eql nil
       end
     end
@@ -935,7 +935,7 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return @domain_root_account" do
+      it "returns @domain_root_account" do
         expect(file_access_root_account).to eql Account.default
       end
     end
@@ -945,12 +945,12 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return root account from session" do
+      it "returns root account from session" do
         session['file_access_root_account_id'] = Account.default.id
         expect(file_access_root_account).to eql Account.default
       end
 
-      it "should return nil if root account in session not set" do
+      it "returns nil if root account in session not set" do
         expect(file_access_root_account).to eql nil
       end
     end
@@ -967,7 +967,7 @@ describe ApplicationHelper do
         @files_domain = false
       end
 
-      it "should return the request's host" do
+      it "returns the request's host" do
         expect(file_access_oauth_host).to eql host
       end
     end
@@ -979,12 +979,12 @@ describe ApplicationHelper do
         @files_domain = true
       end
 
-      it "should return the host from the session" do
+      it "returns the host from the session" do
         session['file_access_oauth_host'] = host
         expect(file_access_oauth_host).to eql host
       end
 
-      it "should return nil if no host in the session" do
+      it "returns nil if no host in the session" do
         expect(file_access_oauth_host).to eql nil
       end
     end

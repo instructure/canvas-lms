@@ -25,7 +25,7 @@ describe "sections" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-    it "should only show users enrolled in the section on the section page" do
+    it "onlies show users enrolled in the section on the section page" do
       course_with_teacher_logged_in(:active_course => true, :active_user => true)
       @section = @course.course_sections.create!
       e2 = student_in_course(:active_all => true, :name => "Señor Chang")

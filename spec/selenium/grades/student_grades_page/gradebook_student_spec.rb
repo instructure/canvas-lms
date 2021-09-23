@@ -214,7 +214,7 @@ describe 'Student Gradebook' do
     # leave a comment as a teacher
     let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job') }
 
-    it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
+    it 'displays comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)
       get "/courses/#{published_course.id}/grades"
 
@@ -226,7 +226,7 @@ describe 'Student Gradebook' do
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end
 
-    it 'should not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
+    it 'does not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
@@ -234,14 +234,14 @@ describe 'Student Gradebook' do
       expect(f("#comments_thread_#{assignment.id}")).not_to include_text('good job')
     end
 
-    it 'should display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
+    it 'displays comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
       user_session(student)
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
       expect(fj('.comments.module .comment:first')).to include_text('good job')
     end
 
-    it 'should not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
+    it 'does not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 

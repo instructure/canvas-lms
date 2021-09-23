@@ -39,7 +39,7 @@ describe "student interactions report" do
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
     end
 
-    it "should have sortable columns, except the email header" do
+    it "has sortable columns, except the email header" do
       ths = ff(".report th")
       expect(ths[0]).to have_class("header")
       expect(ths[1]).to have_class("header")
@@ -49,7 +49,7 @@ describe "student interactions report" do
       expect(ths[5]).to have_class("sorter-false")
     end
 
-    it "should allow sorting by columns" do
+    it "allows sorting by columns" do
       ths = ff(".report th")
       trs = ff(".report tbody tr")
       ths[0].click

@@ -20,7 +20,7 @@
 require_relative '../spec_helper'
 
 describe DataFixup::SplitUpUserPreferences do
-  it "should work" do
+  it "works" do
     u = User.create!
     original_prefs = { :selected_calendar_contexts => ["course_1000"], :course_nicknames => { 2 => "Why am i taking this course" }, :some_other_thing => true }
     User.where(:id => u).update_all(:preferences => original_prefs)

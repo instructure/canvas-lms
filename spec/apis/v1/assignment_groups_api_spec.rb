@@ -141,7 +141,7 @@ describe AssignmentGroupsController, type: :request do
     ]
   end
 
-  it "should include full assignment jsonification when specified" do
+  it "includes full assignment jsonification when specified" do
     setup_groups
     setup_four_assignments
 
@@ -285,7 +285,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   context "differentiated assignments" do
-    it "should only return visible assignments when differentiated assignments is on" do
+    it "onlies return visible assignments when differentiated assignments is on" do
       setup_groups
       setup_four_assignments(only_visible_to_overrides: true)
       @user.enrollments.each(&:destroy_permanently!)
@@ -310,7 +310,7 @@ describe AssignmentGroupsController, type: :request do
       end
     end
 
-    it "should allow designers to see unpublished assignments" do
+    it "allows designers to see unpublished assignments" do
       setup_groups
       setup_four_assignments(only_visible_to_overrides: true)
       course_with_designer(course: @course)
@@ -327,7 +327,7 @@ describe AssignmentGroupsController, type: :request do
       end
     end
 
-    it "should include assignment_visibility when requested" do
+    it "includes assignment_visibility when requested" do
       @course.assignments.create!
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json",
@@ -360,19 +360,19 @@ describe AssignmentGroupsController, type: :request do
         }
       end
 
-      it "should only return assignments within the grading period" do
+      it "onlies return assignments within the grading period" do
         json = api_call(:get, api_path, api_settings)
         expect(json[1]['assignments'].length).to eq 1
       end
 
-      it "should not return assignments outside the grading period" do
+      it "does not return assignments outside the grading period" do
         json = api_call(:get, api_path, api_settings)
         expect(json[0]['assignments'].length).to eq 0
       end
     end
 
     describe "#show" do
-      it "should only return assignments and submissions within the grading period" do
+      it "onlies return assignments and submissions within the grading period" do
         student = User.create!
         @course.enroll_student(student)
         api_path = "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
@@ -415,7 +415,7 @@ describe AssignmentGroupsController, type: :request do
     end
   end
 
-  it "should not include all dates" do
+  it "does not include all dates" do
     group = @course.assignment_groups.build(name: 'group1')
     group.position = 10
     group.group_weight = 40
@@ -461,7 +461,7 @@ describe AssignmentGroupsController, type: :request do
     expect(json).to eq expected
   end
 
-  it "should include all dates" do
+  it "includes all dates" do
     group = @course.assignment_groups.build(name: 'group1')
     group.position = 10
     group.group_weight = 40
@@ -504,7 +504,7 @@ describe AssignmentGroupsController, type: :request do
     expect(json).to eq expected
   end
 
-  it "should exclude deleted assignments" do
+  it "excludes deleted assignments" do
     group1 = @course.assignment_groups.create!(name: 'group1')
     group1.update_attribute(:position, 10)
 
@@ -524,7 +524,7 @@ describe AssignmentGroupsController, type: :request do
     expect(group['assignments'].first['name']).to eq 'test1'
   end
 
-  it "should return weights that aren't being applied" do
+  it "returns weights that aren't being applied" do
     @course.update_attribute(:group_weighting_scheme, 'equal')
 
     @course.assignment_groups.create!(name: 'group1', group_weight: 50)
@@ -537,7 +537,7 @@ describe AssignmentGroupsController, type: :request do
     json.each { |group| expect(group['group_weight']).to eq 50 }
   end
 
-  it "should not explode on assignments with <objects> with percentile widths" do
+  it "does not explode on assignments with <objects> with percentile widths" do
     group = @course.assignment_groups.create!(name: 'group')
     assignment = @course.assignments.create!(title: "test", assignment_group: group, points_possible: 10)
     assignment.description = '<object width="100%" />'
@@ -552,7 +552,7 @@ describe AssignmentGroupsController, type: :request do
     assert_status(200)
   end
 
-  it "should not return unpublished assignments to students" do
+  it "does not return unpublished assignments to students" do
     student_in_course(active_all: true)
     @course.require_assignment_group
     assignment = @course.assignments.create! do |a|
@@ -604,7 +604,7 @@ describe AssignmentGroupsApiController, type: :request do
       @group = @course.assignment_groups.create!(name: 'group', rules: rules_in_db)
     end
 
-    it 'should succeed' do
+    it 'succeeds' do
       response = raw_api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{assignment_group.id}",
                               controller: 'assignment_groups_api',
                               action: 'show',
@@ -615,7 +615,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(response).to eq(200)
     end
 
-    it 'should fail if the assignment group does not exist' do
+    it 'fails if the assignment group does not exist' do
       non_existing_assignment_group_id = assignment_group.id + 1
       response = raw_api_call(:get,
                               "/api/v1/courses/#{@course.id}/assignment_groups/#{non_existing_assignment_group_id}",
@@ -637,7 +637,7 @@ describe AssignmentGroupsApiController, type: :request do
                                                   })
       end
 
-      it 'should include assignments' do
+      it 'includes assignments' do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}?include[]=assignments",
                         controller: 'assignment_groups_api',
                         action: 'show',
@@ -649,7 +649,7 @@ describe AssignmentGroupsApiController, type: :request do
         expect(json['assignments']).not_to be_empty
       end
 
-      it 'should include submission when flag is present' do
+      it 'includes submission when flag is present' do
         student_in_course(active_all: true)
         teacher_in_course(active_all: true, course: @course)
         @submission = bare_submission_model(@assignment, @student, {
@@ -673,7 +673,7 @@ describe AssignmentGroupsApiController, type: :request do
       end
     end
 
-    it 'should only return assignments in the given grading period with MGP on' do
+    it 'onlies return assignments in the given grading period with MGP on' do
       @course.enroll_student(User.create!)
       setup_grading_periods
 
@@ -689,7 +689,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(json['assignments'].length).to eq 1
     end
 
-    it 'should not return an error when there are grading periods and no grading_period_id is passed in' do
+    it 'does not return an error when there are grading periods and no grading_period_id is passed in' do
       setup_grading_periods
 
       api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}?include[]=assignments",
@@ -703,7 +703,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(response).to be_ok
     end
 
-    it "should include assignment_visibility when requested and with DA on" do
+    it "includes assignment_visibility when requested and with DA on" do
       @course.assignments.create!(title: "test", assignment_group: @group, points_possible: 10)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
                       {
@@ -719,7 +719,7 @@ describe AssignmentGroupsApiController, type: :request do
       end
     end
 
-    it "should not include assignment_visibility when requested as a student" do
+    it "does not include assignment_visibility when requested as a student" do
       student_in_course(active_all: true)
       @course.assignments.create!(title: "test", assignment_group: @group, points_possible: 10)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}.json",
@@ -736,7 +736,7 @@ describe AssignmentGroupsApiController, type: :request do
       end
     end
 
-    it 'should return never_drop rules as strings with Accept header' do
+    it 'returns never_drop rules as strings with Accept header' do
       rules = { 'never_drop' => ["1", "2"], 'drop_lowest' => 1, 'drop_highest' => 1 }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
                         controller: 'assignment_groups_api',
@@ -751,7 +751,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(json['rules']).to eq rules
     end
 
-    it 'should return never_drop rules as ints without Accept header' do
+    it 'returns never_drop rules as ints without Accept header' do
       rules = { 'never_drop' => [1, 2], 'drop_lowest' => 1, 'drop_highest' => 1 }
       json = api_call(:get, "/api/v1/courses/#{@course.id}/assignment_groups/#{@group.id}", {
                         controller: 'assignment_groups_api',
@@ -770,7 +770,7 @@ describe AssignmentGroupsApiController, type: :request do
       course_with_teacher(active_all: true)
     end
 
-    it 'should create an assignment_group' do
+    it 'creates an assignment_group' do
       api_call(:post, "/api/v1/courses/#{@course.id}/assignment_groups", {
                  controller: 'assignment_groups_api',
                  action: 'create',
@@ -849,7 +849,7 @@ describe AssignmentGroupsApiController, type: :request do
                                                             integration_data: { "oh" => 'hello' })
     end
 
-    it 'should update an assignment group' do
+    it 'updates an assignment group' do
       response = api_call(:put, put_url, api_details, updated_params)
 
       # Check the api response
@@ -864,7 +864,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data.merge(updated_integration_data))
     end
 
-    it 'should update an assignment group when integration_data is nil' do
+    it 'updates an assignment group when integration_data is nil' do
       updated_params['integration_data'] = nil
       response = api_call(:put, put_url, api_details, updated_params)
 
@@ -878,7 +878,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'should update an assignment group when integration_data is {}' do
+    it 'updates an assignment group when integration_data is {}' do
       updated_params['integration_data'] = {}
       response = api_call(:put, put_url, api_details, updated_params)
 
@@ -892,7 +892,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(assignment_group.integration_data).to eq(integration_data)
     end
 
-    it 'should update an assignment group without integration_data' do
+    it 'updates an assignment group without integration_data' do
       updated_params.delete('integration_data')
       response = api_call(:put, put_url, api_details, updated_params)
 
@@ -923,7 +923,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(response).to eq(400)
     end
 
-    it 'should update rules properly' do
+    it 'updates rules properly' do
       rules = { 'never_drop' => ["1", "2"], 'drop_lowest' => 1, 'drop_highest' => 1 }
       rules_in_db = "drop_lowest:1\ndrop_highest:1\nnever_drop:1\nnever_drop:2\n"
       params = { 'rules' => rules }
@@ -1038,7 +1038,7 @@ describe AssignmentGroupsApiController, type: :request do
       @assignment_group = @course.assignment_groups.create!(name: 'Some group', position: 1)
     end
 
-    it 'should destroy an assignment group' do
+    it 'destroys an assignment group' do
       api_call(:delete, "/api/v1/courses/#{@course.id}/assignment_groups/#{@assignment_group.id}",
                controller: 'assignment_groups_api',
                action: 'destroy',
@@ -1049,7 +1049,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
 
-    it 'should destroy assignments' do
+    it 'destroys assignments' do
       a1 = @course.assignments.create!(title: "test1", assignment_group: @assignment_group, points_possible: 10)
       a2 = @course.assignments.create!(title: "test2", assignment_group: @assignment_group, points_possible: 12)
 
@@ -1065,7 +1065,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(a2.reload.workflow_state).to eq 'deleted'
     end
 
-    it 'should move assignments to a specified assignment group' do
+    it 'moves assignments to a specified assignment group' do
       @course.assignment_groups.create!(name: 'Another group', position: 2)
       group3 = @course.assignment_groups.create!(name: 'Yet Another group', position: 3)
 
@@ -1088,7 +1088,7 @@ describe AssignmentGroupsApiController, type: :request do
       expect(@assignment_group.reload.workflow_state).to eq 'deleted'
     end
 
-    it 'should recalculate results if move_assignments_to is provided' do
+    it 'recalculates results if move_assignments_to is provided' do
       @course.assignment_groups.create!(name: 'Another group', position: 2)
       group3 = @course.assignment_groups.create!(name: 'Yet Another group', position: 3)
 

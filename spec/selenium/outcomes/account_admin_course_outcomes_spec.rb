@@ -34,46 +34,46 @@ describe "account admin outcomes" do
     end
 
     context "create/edit/delete outcomes" do
-      it "should create a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
+      it "creates a learning outcome with a new rating (root level)", priority: "1", test_id: 250229 do
         should_create_a_learning_outcome_with_a_new_rating_root_level
       end
 
-      it "should create a learning outcome (nested)", priority: "1", test_id: 250230 do
+      it "creates a learning outcome (nested)", priority: "1", test_id: 250230 do
         should_create_a_learning_outcome_nested
       end
 
-      it "should edit a learning outcome and delete a rating", priority: "1", test_id: 250231 do
+      it "edits a learning outcome and delete a rating", priority: "1", test_id: 250231 do
         should_edit_a_learning_outcome_and_delete_a_rating
       end
 
-      it "should delete a learning outcome", priority: "1", test_id: 250232 do
+      it "deletes a learning outcome", priority: "1", test_id: 250232 do
         skip_if_safari(:alert)
         should_delete_a_learning_outcome
       end
 
-      it "should validate decaying average_range", priority: "2", test_id: 250235 do
+      it "validates decaying average_range", priority: "2", test_id: 250235 do
         should_validate_decaying_average_range
       end
 
-      it "should validate n mastery_range", priority: "2", test_id: 250236 do
+      it "validates n mastery_range", priority: "2", test_id: 250236 do
         should_validate_n_mastery_range
       end
     end
 
     context "create/edit/delete outcome groups" do
-      it "should create an outcome group (root level)", priority: "2", test_id: 56016 do
+      it "creates an outcome group (root level)", priority: "2", test_id: 56016 do
         should_create_an_outcome_group_root_level
       end
 
-      it "should create an outcome group (nested)", priority: "2", test_id: 250237 do
+      it "creates an outcome group (nested)", priority: "2", test_id: 250237 do
         should_create_an_outcome_group_nested
       end
 
-      it "should edit an outcome group", priority: "2", test_id: 114335 do
+      it "edits an outcome group", priority: "2", test_id: 114335 do
         should_edit_an_outcome_group
       end
 
-      it "should delete an outcome group", priority: "2", test_id: 250238 do
+      it "deletes an outcome group", priority: "2", test_id: 250238 do
         skip_if_safari(:alert)
         should_delete_an_outcome_group
       end
@@ -88,7 +88,7 @@ describe "account admin outcomes" do
         click_on_state_standards
       end
 
-      it "should expand/collapse outcome groups", priority: "2", test_id: 114338 do
+      it "expand/collapses outcome groups", priority: "2", test_id: 114338 do
         skip_if_safari(:alert)
         import_state_standart_into_account
 
@@ -105,7 +105,7 @@ describe "account admin outcomes" do
     end
 
     describe "find/import dialog" do
-      it "should not allow importing top level groups", priority: "2", test_id: 250239 do
+      it "does not allow importing top level groups", priority: "2", test_id: 250239 do
         get outcome_url
         wait_for_ajaximations
 

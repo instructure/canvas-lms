@@ -53,7 +53,7 @@ describe AssignmentExtensionsController, type: :request do
     end
 
     context "as a student" do
-      it "should be unauthorized" do
+      it "is unauthorized" do
         @user = @student
         assignment_extension_params = [
           { user_id: @student.id, extra_attempts: 3 },
@@ -71,7 +71,7 @@ describe AssignmentExtensionsController, type: :request do
         @user = @teacher
       end
 
-      it "should extend attempts for the existing submission" do
+      it "extends attempts for the existing submission" do
         submission = @student.submissions.find_by(assignment_id: @assignment.id)
         assignment_extension_params = [
           { user_id: @student.id, extra_attempts: 3 },
@@ -81,7 +81,7 @@ describe AssignmentExtensionsController, type: :request do
         expect(submission.reload.extra_attempts).to eq(3)
       end
 
-      it "should extend attempts for multiple students" do
+      it "extends attempts for multiple students" do
         submission_1 = @student.submissions.find_by(assignment_id: @assignment.id)
         submission_2 = @student2.submissions.find_by(assignment_id: @assignment.id)
         assignment_extension_params = [
@@ -94,7 +94,7 @@ describe AssignmentExtensionsController, type: :request do
         expect(submission_2.reload.extra_attempts).to eq(10)
       end
 
-      it "should error out if any of the extensions were invalid, and the response should indicate which ones were incorrect" do
+      it "errors out if any of the extensions were invalid, and the response should indicate which ones were incorrect" do
         submission_1 = @student.submissions.find_by(assignment_id: @assignment.id)
         submission_2 = @student2.submissions.find_by(assignment_id: @assignment.id)
         assignment_extension_params = [

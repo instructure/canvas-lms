@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::AccountImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     before_count = Account.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "account_id,parent_account_id,name,status",
@@ -42,7 +42,7 @@ describe SIS::CSV::AccountImporter do
                                    "No name given for account A004, skipping"]
   end
 
-  it 'should create accounts' do
+  it 'creates accounts' do
     before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -72,7 +72,7 @@ describe SIS::CSV::AccountImporter do
     expect(a3.name).to eq 'English Literature'
   end
 
-  it 'should update the hierarchies of existing accounts' do
+  it 'updates the hierarchies of existing accounts' do
     before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
@@ -110,7 +110,7 @@ describe SIS::CSV::AccountImporter do
     expect(Account.where(sis_source_id: 'A003').first.name).to eq "English Literature"
   end
 
-  it 'should not allow deleting accounts with content' do
+  it 'does not allow deleting accounts with content' do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -125,7 +125,7 @@ describe SIS::CSV::AccountImporter do
     expect(errors).to eq ["Cannot delete the sub_account with ID: A001 because it has active sub accounts."]
   end
 
-  it 'should support sticky fields' do
+  it 'supports sticky fields' do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active"
@@ -147,7 +147,7 @@ describe SIS::CSV::AccountImporter do
     expect(Account.where(sis_source_id: 'A001').first.name).to eq "Science"
   end
 
-  it 'should treat parent_account_id as stickyish' do
+  it 'treats parent_account_id as stickyish' do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Math,active",
@@ -173,7 +173,7 @@ describe SIS::CSV::AccountImporter do
     expect(sub.reload.parent_account.sis_source_id).to eq "A002" # should override
   end
 
-  it 'should match headers case-insensitively' do
+  it 'matches headers case-insensitively' do
     before_count = Account.where.not(:sis_source_id => nil).count
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
@@ -188,7 +188,7 @@ describe SIS::CSV::AccountImporter do
     expect(a1.name).to eq 'Humanities'
   end
 
-  it 'should not allow the creation of loops in account chains' do
+  it 'does not allow the creation of loops in account chains' do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active",
@@ -202,7 +202,7 @@ describe SIS::CSV::AccountImporter do
     expect(errors).to eq ["Setting account A001's parent to A002 would create a loop"]
   end
 
-  it 'should update batch id on unchanging accounts' do
+  it 'updates batch id on unchanging accounts' do
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",
       "A001,,Humanities,active"
@@ -218,7 +218,7 @@ describe SIS::CSV::AccountImporter do
     expect(a1.sis_batch_id).to eq batch.id
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "Account_ID,Parent_Account_ID,Name,Status",

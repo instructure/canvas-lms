@@ -25,7 +25,7 @@ describe PluginSetting do
     Canvas::Plugin.register('plugin_setting_test', nil, { :encrypted_settings => [:foo], :settings => { :bar => 'asdf' } })
   end
 
-  it "should encrypt/decrypt transparently" do
+  it "encrypt/decrypts transparently" do
     s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
     s.reload
     expect(s.valid_settings?).to be_truthy
@@ -35,38 +35,38 @@ describe PluginSetting do
   end
 
   context "dirty_checking" do
-    it 'should consider a new object to be dirty' do
+    it 'considers a new object to be dirty' do
       s = PluginSetting.new(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
       expect(s.changed?).to be_truthy
     end
 
-    it 'should consider a freshly loaded encrypted object to be clean' do
+    it 'considers a freshly loaded encrypted object to be clean' do
       PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo => "asdf" })
       settings = PluginSetting.find_by(name: "plugin_setting_test")
       expect(settings.changed?).to_not be_truthy
     end
   end
 
-  it "should not be valid if there are decrypt errors" do
+  it "is not valid if there are decrypt errors" do
     s = PluginSetting.new(:name => "plugin_setting_test", :settings => { :bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid" })
     expect(s.valid_settings?).to be_falsey
     expect(s.settings).to eql({ :bar => "qwerty", :foo_enc => "invalid", :foo_salt => "invalid", :foo => PluginSetting::DUMMY_STRING })
   end
 
-  it "should return default content if no setting is set" do
+  it "returns default content if no setting is set" do
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "asdf"
   end
 
-  it "should return updated content if created" do
+  it "returns updated content if created" do
     s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
     expect(settings[:bar]).to eq "qwerty"
   end
 
-  it "should return default content if the setting is disabled" do
+  it "returns default content if the setting is disabled" do
     s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
     settings = PluginSetting.settings_for_plugin("plugin_setting_test")
     expect(settings).not_to be_nil
@@ -78,7 +78,7 @@ describe PluginSetting do
     expect(settings[:bar]).to eq "asdf"
   end
 
-  it "should immediately uncache on save" do
+  it "immediatelies uncache on save" do
     enable_cache do
       s = PluginSetting.create!(:name => "plugin_setting_test", :settings => { :bar => "qwerty" })
       # cache it
@@ -92,7 +92,7 @@ describe PluginSetting do
     end
   end
 
-  it "should cache in-process" do
+  it "caches in-process" do
     RequestCache.enable do
       enable_cache do
         name = "plugin_setting_test"

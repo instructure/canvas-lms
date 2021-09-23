@@ -29,11 +29,11 @@ describe ExternalToolsController, type: :request do
       @group = group_model(:context => @course)
     end
 
-    it "should show an external tool" do
+    it "shows an external tool" do
       show_call(@course)
     end
 
-    it "should include allow_membership_service_access if feature flag enabled" do
+    it "includes allow_membership_service_access if feature flag enabled" do
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_return(false)
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:membership_service_for_lti_tools).and_return(true)
       et = tool_with_everything(@course, allow_membership_service_access: true)
@@ -43,48 +43,48 @@ describe ExternalToolsController, type: :request do
       expect(json['allow_membership_service_access']).to eq true
     end
 
-    it "should return 404 for not found tool" do
+    it "returns 404 for not found tool" do
       not_found_call(@course)
     end
 
-    it "should return external tools" do
+    it "returns external tools" do
       index_call(@course)
     end
 
-    it "should return filtered external tools" do
+    it "returns filtered external tools" do
       index_call_with_placment(@course, "collaboration")
     end
 
-    it "should search for external tools by name" do
+    it "searches for external tools by name" do
       search_call(@course)
     end
 
-    it "should only find selectable tools" do
+    it "onlies find selectable tools" do
       only_selectables(@course)
     end
 
-    it "should create an external tool" do
+    it "creates an external tool" do
       create_call(@course)
     end
 
-    it "should update an external tool" do
+    it "updates an external tool" do
       update_call(@course)
     end
 
-    it "should destroy an external tool" do
+    it "destroys an external tool" do
       destroy_call(@course)
     end
 
-    it "should give errors for required properties that aren't included" do
+    it "gives errors for required properties that aren't included" do
       error_call(@course)
     end
 
-    it "should give authorized response" do
+    it "gives authorized response" do
       course_with_student_logged_in(:active_all => true, :course => @course, :name => "student")
       authorized_call(@course)
     end
 
-    it "should paginate" do
+    it "paginates" do
       paginate_call(@course)
     end
 
@@ -93,7 +93,7 @@ describe ExternalToolsController, type: :request do
       describe 'sessionless launch' do
         let(:tool) { tool_with_everything(@course) }
 
-        it 'should allow sessionless launches by url' do
+        it 'allows sessionless launches by url' do
           response = sessionless_launch(@course, 'course', { url: tool.url })
           expect(response.code).to eq '200'
 
@@ -102,7 +102,7 @@ describe ExternalToolsController, type: :request do
           expect(doc.at_css('form')['action']).to eq tool.url
         end
 
-        it 'should allow sessionless launches by tool id' do
+        it 'allows sessionless launches by tool id' do
           response = sessionless_launch(@course, 'course', { id: tool.id.to_s })
           expect(response.code).to eq '200'
 
@@ -247,11 +247,11 @@ describe ExternalToolsController, type: :request do
     end
 
     describe "in a group" do
-      it "should return course level external tools" do
+      it "returns course level external tools" do
         group_index_call(@group)
       end
 
-      it "should paginate" do
+      it "paginates" do
         group_index_paginate_call(@group)
       end
     end
@@ -264,44 +264,44 @@ describe ExternalToolsController, type: :request do
       @group = group_model(:context => @account)
     end
 
-    it "should show an external tool" do
+    it "shows an external tool" do
       show_call(@account, "account")
     end
 
-    it "should return 404 for not found tool" do
+    it "returns 404 for not found tool" do
       not_found_call(@account, "account")
     end
 
-    it "should return external tools" do
+    it "returns external tools" do
       index_call(@account, "account")
     end
 
-    it "should search for external tools by name" do
+    it "searches for external tools by name" do
       search_call(@account, "account")
     end
 
-    it "should only find selectable tools" do
+    it "onlies find selectable tools" do
       only_selectables(@account, "account")
     end
 
-    it "should create an external tool" do
+    it "creates an external tool" do
       create_call(@account, "account")
     end
 
-    it "should update an external tool" do
+    it "updates an external tool" do
       update_call(@account, "account")
     end
 
-    it "should destroy an external tool" do
+    it "destroys an external tool" do
       destroy_call(@account, "account")
     end
 
-    it "should give unauthorized response" do
+    it "gives unauthorized response" do
       course_with_student_logged_in(:active_all => true, :name => "student")
       unauthorized_call(@account, "account")
     end
 
-    it "should paginate" do
+    it "paginates" do
       paginate_call(@account, "account")
     end
 
@@ -309,7 +309,7 @@ describe ExternalToolsController, type: :request do
       describe 'sessionless launch' do
         let(:tool) { tool_with_everything(@account) }
 
-        it 'should allow sessionless launches by url' do
+        it 'allows sessionless launches by url' do
           response = sessionless_launch(@account, 'account', { url: tool.url })
           expect(response.code).to eq '200'
 
@@ -318,7 +318,7 @@ describe ExternalToolsController, type: :request do
           expect(doc.at_css('form')['action']).to eq tool.url
         end
 
-        it 'should allow sessionless launches by tool id' do
+        it 'allows sessionless launches by tool id' do
           response = sessionless_launch(@account, 'account', { id: tool.id.to_s })
           expect(response.code).to eq '200'
 
@@ -330,7 +330,7 @@ describe ExternalToolsController, type: :request do
     end
 
     describe "in a group" do
-      it "should return account level external tools" do
+      it "returns account level external tools" do
         group_index_call(@group)
       end
     end

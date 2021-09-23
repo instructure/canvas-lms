@@ -37,7 +37,7 @@ describe TermsApiController, type: :request do
       json['enrollment_terms']
     end
 
-    it "should show sis_batch_id" do
+    it "shows sis_batch_id" do
       @term2.destroy
       sis_batch = @term1.root_account.sis_batches.create
       @term1.sis_batch_id = sis_batch.id
@@ -51,42 +51,42 @@ describe TermsApiController, type: :request do
         @term2.destroy
       end
 
-      it "should list all active terms by default" do
+      it "lists all active terms by default" do
         json = get_terms
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
-      it "should list active terms with state=active" do
+      it "lists active terms with state=active" do
         json = get_terms(workflow_state: 'active')
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
-      it "should list deleted terms with state=deleted" do
+      it "lists deleted terms with state=deleted" do
         json = get_terms(workflow_state: 'deleted')
         names = json.map { |t| t['name'] }
         expect(names).not_to include(@term1.name)
         expect(names).to include(@term2.name)
       end
 
-      it "should list all terms, active and deleted, with state=all" do
+      it "lists all terms, active and deleted, with state=all" do
         json = get_terms(workflow_state: 'all')
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).to include(@term2.name)
       end
 
-      it "should not blow up for invalid state parameters" do
+      it "does not blow up for invalid state parameters" do
         json = get_terms(workflow_state: ['blall'])
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
         expect(names).not_to include(@term2.name)
       end
 
-      it "should list all terms, active and deleted, with state=[all]" do
+      it "lists all terms, active and deleted, with state=[all]" do
         json = get_terms(workflow_state: ['all'])
         names = json.map { |t| t['name'] }
         expect(names).to include(@term1.name)
@@ -95,7 +95,7 @@ describe TermsApiController, type: :request do
     end
 
     describe "ordering" do
-      it "should order by start_at first" do
+      it "orders by start_at first" do
         @term1.update(start_at: 1.day.ago, end_at: 5.days.from_now)
         @term2.update(start_at: 2.days.ago, end_at: 6.days.from_now)
 
@@ -104,7 +104,7 @@ describe TermsApiController, type: :request do
         expect(json.last['name']).to eq @term2.name
       end
 
-      it "should order by end_at second" do
+      it "orders by end_at second" do
         start_at = 1.day.ago
         @term1.update(start_at: start_at, end_at: 6.days.from_now)
         @term2.update(start_at: start_at, end_at: 5.days.from_now)
@@ -114,7 +114,7 @@ describe TermsApiController, type: :request do
         expect(json.last['name']).to eq @term2.name
       end
 
-      it "should order by id last" do
+      it "orders by id last" do
         start_at = 1.day.ago
         end_at = 5.days.from_now
         @term1.update(start_at: start_at, end_at: end_at)
@@ -126,7 +126,7 @@ describe TermsApiController, type: :request do
       end
     end
 
-    it "should paginate" do
+    it "paginates" do
       json = get_terms(per_page: 1)
       expect(json.size).to eq 1
       expect(response.headers).to include('Link')
@@ -150,33 +150,33 @@ describe TermsApiController, type: :request do
                  { expected_status: 401 })
       end
 
-      it "should require auth for the right account" do
+      it "requires auth for the right account" do
         other_account = Account.create(name: 'other')
         account_admin_user(account: other_account)
         expect_terms_index_401
       end
 
-      it "should allow sub-account admins to view" do
+      it "allows sub-account admins to view" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
         res = get_terms.map { |t| t['name'] }
         expect(res).to match_array([@term1.name, @term2.name])
       end
 
-      it "should allow teachers to view" do
+      it "allows teachers to view" do
         c = @account.courses.create!(:enrollment_term => @term1)
         teacher_in_course(:course => c, :active_all => true)
         res = get_terms.map { |t| t['name'] }
         expect(res).to match_array([@term1.name, @term2.name])
       end
 
-      it "should not allow other enrollment types to view" do
+      it "does not allow other enrollment types to view" do
         c = @account.courses.create!(:enrollment_term => @term1)
         student_in_course(:course => c, :active_all => true)
         expect_terms_index_401
       end
 
-      it "should require context to be root_account and error nicely" do
+      it "requires context to be root_account and error nicely" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: @account)
         json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/terms",
@@ -187,7 +187,7 @@ describe TermsApiController, type: :request do
         expect(json['message']).to eq 'Terms only belong to root_accounts.'
       end
 
-      it "should allow account admins without manage_account_settings to view" do
+      it "allows account admins without manage_account_settings to view" do
         role = custom_account_role("custom")
         account_admin_user_with_role_changes(account: @account, role: role)
         res = get_terms.map { |t| t['name'] }
@@ -210,7 +210,7 @@ describe TermsApiController, type: :request do
                body_params)
     end
 
-    it "should show sis_batch_id" do
+    it "shows sis_batch_id" do
       sis_batch = @account.sis_batches.create
       @term.sis_batch_id = sis_batch.id
       @term.save!
@@ -233,20 +233,20 @@ describe TermsApiController, type: :request do
                  { expected_status: 401 })
       end
 
-      it "should require auth for the right account" do
+      it "requires auth for the right account" do
         other_account = Account.create(name: 'other')
         account_admin_user(account: other_account)
         expect_terms_show_401
       end
 
-      it "should allow sub-account admins to view" do
+      it "allows sub-account admins to view" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
         res = get_term
         expect(res["id"]).to eq @term.id
       end
 
-      it "should require context to be root_account and error nicely" do
+      it "requires context to be root_account and error nicely" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: @account)
         json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/terms/#{@term.id}",
@@ -257,7 +257,7 @@ describe TermsApiController, type: :request do
         expect(json['message']).to eq 'Terms only belong to root_accounts.'
       end
 
-      it "should allow account admins without manage_account_settings to view" do
+      it "allows account admins without manage_account_settings to view" do
         role = custom_account_role("custom")
         account_admin_user_with_role_changes(account: @account, role: role)
         res = get_term
@@ -276,7 +276,7 @@ describe TermsController, type: :request do
   end
 
   describe "create" do
-    it "should allow creating a term" do
+    it "allows creating a term" do
       start_at = 3.days.ago
       end_at = 3.days.from_now
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/terms",
@@ -343,13 +343,13 @@ describe TermsController, type: :request do
                  { expected_status: 401 })
       end
 
-      it "should require auth for the right account" do
+      it "requires auth for the right account" do
         other_account = Account.create(name: 'other')
         account_admin_user(account: other_account)
         expect_terms_create_401
       end
 
-      it "should require root domain auth" do
+      it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
         expect_terms_create_401
@@ -358,7 +358,7 @@ describe TermsController, type: :request do
   end
 
   describe "update" do
-    it "should allow updating a term" do
+    it "allows updating a term" do
       start_at = 3.days.ago
       end_at = 3.days.from_now
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
@@ -476,13 +476,13 @@ describe TermsController, type: :request do
                  { :expected_status => 401 })
       end
 
-      it "should require auth for the right account" do
+      it "requires auth for the right account" do
         other_account = Account.create(name: 'other')
         account_admin_user(account: other_account)
         expect_terms_update_401
       end
 
-      it "should require root domain auth" do
+      it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
         expect_terms_update_401
@@ -491,7 +491,7 @@ describe TermsController, type: :request do
   end
 
   describe "destroy" do
-    it "should allow deleting a term" do
+    it "allows deleting a term" do
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
                       { controller: 'terms', action: 'destroy', format: 'json', account_id: @account.to_param, id: @term1.to_param })
 
@@ -508,13 +508,13 @@ describe TermsController, type: :request do
                  { :expected_status => 401 })
       end
 
-      it "should require auth for the right account" do
+      it "requires auth for the right account" do
         other_account = Account.create(name: 'other')
         account_admin_user(account: other_account)
         expect_terms_destroy_401
       end
 
-      it "should require root domain auth" do
+      it "requires root domain auth" do
         subaccount = @account.sub_accounts.create!(name: 'subaccount')
         account_admin_user(account: subaccount)
         expect_terms_destroy_401

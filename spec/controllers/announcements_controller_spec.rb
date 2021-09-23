@@ -33,12 +33,12 @@ describe AnnouncementsController do
   end
 
   describe "GET 'index'" do
-    it "should return unauthorized without a valid session" do
+    it "returns unauthorized without a valid session" do
       get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@user)
       @course.update_attribute(:tab_configuration, [{ 'id' => 14, 'hidden' => true }])
       get 'index', params: { :course_id => @course.id }
@@ -76,12 +76,12 @@ describe AnnouncementsController do
       announcement_model
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code + 'x' }
       expect(assigns[:problem]).to match /The verification code does not match/
     end
 
-    it "should include absolute path for rel='self' link" do
+    it "includes absolute path for rel='self' link" do
       get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
@@ -89,7 +89,7 @@ describe AnnouncementsController do
       expect(feed.links.first.href).to match(/http:\/\//)
     end
 
-    it "should include an author for each entry" do
+    it "includes an author for each entry" do
       get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code }
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil

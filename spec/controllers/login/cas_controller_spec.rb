@@ -34,7 +34,7 @@ describe Login::CasController do
     allow_any_instance_of(AuthenticationProvider::CAS).to receive(:client).and_return(cas_client) if use_mock
   end
 
-  it "should logout with specific cas ticket" do
+  it "logouts with specific cas ticket" do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
 
@@ -106,7 +106,7 @@ describe Login::CasController do
     expect(response).to redirect_to(login_url)
   end
 
-  it "should accept extra attributes" do
+  it "accepts extra attributes" do
     account = account_with_cas(account: Account.default)
     user_with_pseudonym(active_all: true, account: account)
 
@@ -138,7 +138,7 @@ describe Login::CasController do
     expect(assigns[:current_pseudonym].authentication_provider).to eq account.authentication_providers.active.find('cas')
   end
 
-  it "should scope logins to the correct domain root account" do
+  it "scopes logins to the correct domain root account" do
     unique_id = 'foo@example.com'
 
     account1 = account_with_cas
@@ -180,7 +180,7 @@ describe Login::CasController do
       stubby("yes\nfoo@example.com\n")
     end
 
-    it "should redirect when a user is authorized but not found in canvas" do
+    it "redirects when a user is authorized but not found in canvas" do
       # We dont want to log them out of everything.
       expect(controller).to receive(:logout_user_action).never
 
@@ -227,7 +227,7 @@ describe Login::CasController do
     end
   end
 
-  it "should time out correctly" do
+  it "times out correctly" do
     Setting.set('cas_timelimit', 0.01)
     account_with_cas(account: Account.default)
 
@@ -243,7 +243,7 @@ describe Login::CasController do
     expect(session[:sentinel]).to eq true
   end
 
-  it "should set a cookie for site admin login" do
+  it "sets a cookie for site admin login" do
     user_with_pseudonym(account: Account.site_admin)
     stubby("yes\n#{@pseudonym.unique_id}\n")
     account_with_cas(account: Account.site_admin)
@@ -255,7 +255,7 @@ describe Login::CasController do
     expect(cookies['canvas_sa_delegated']).to eq '1'
   end
 
-  it "should redirect to site admin CAS if cookie set" do
+  it "redirects to site admin CAS if cookie set" do
     user_with_pseudonym(account: Account.site_admin)
     stubby("yes\n#{@pseudonym.unique_id}\n")
     account_with_cas(account: Account.site_admin)
@@ -268,7 +268,7 @@ describe Login::CasController do
     expect(response).to be_redirect
   end
 
-  it "should not force otp reconfiguration on succesful login" do
+  it "does not force otp reconfiguration on succesful login" do
     Account.default.settings[:mfa_settings] = :required
     Account.default.save!
     account_with_cas(account: Account.default)

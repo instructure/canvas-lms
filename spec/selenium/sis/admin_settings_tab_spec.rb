@@ -58,7 +58,7 @@ describe "admin settings tab" do
   context "SIS Agent Token Authentication" do
     let(:sis_token) { 'too much tuna' }
 
-    it "should test SIS Agent Token Authentication with post_grades feature enabled", priority: "2", test_id: 132577 do
+    it "tests SIS Agent Token Authentication with post_grades feature enabled", priority: "2", test_id: 132577 do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
       course_with_admin_logged_in(account: Account.default, user: user)
       account.enable_feature!(:post_grades)
@@ -72,7 +72,7 @@ describe "admin settings tab" do
       expect(token).to have_value(sis_token)
     end
 
-    it "should test SIS Agent Token Authentication with post_grades feature disabled", priority: "2", test_id: 132578 do
+    it "tests SIS Agent Token Authentication with post_grades feature disabled", priority: "2", test_id: 132578 do
       user = account_admin_user({ active_user: true }.merge(account: Account.site_admin))
       course_with_admin_logged_in(account: Account.default, user: user)
       get_settings_page(account)
@@ -160,7 +160,7 @@ describe "admin settings tab" do
         get_settings_page(sub_account)
       end
 
-      it "should have SIS name setting disabled for sub accounts" do
+      it "has SIS name setting disabled for sub accounts" do
         name_setting = f(sis_name)
         expect(name_setting.displayed?).to be_truthy
         expect(name_setting.enabled?).to be_falsey
@@ -172,7 +172,7 @@ describe "admin settings tab" do
         account.set_feature_flag! :new_sis_integrations, 'on'
       end
 
-      it "should persist custom SIS name" do
+      it "persists custom SIS name" do
         get_settings_page(account)
         custom_sis_name = "PowerSchool"
         f(sis_name).send_keys(custom_sis_name)
@@ -262,7 +262,7 @@ describe "admin settings tab" do
             test_checkbox_off(assignment_name_length)
           end
 
-          it "should test sis assignment name length" do
+          it "tests sis assignment name length" do
             set_checkbox_via_label(default_grade_export, true)
             set_checkbox_via_label(assignment_name_length, true)
             name_length = 123

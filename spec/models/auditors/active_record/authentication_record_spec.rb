@@ -27,7 +27,7 @@ describe Auditors::ActiveRecord::AuthenticationRecord do
     allow(RequestContextGenerator).to receive_messages(request_id: request_id)
   end
 
-  it "it appropriately connected to a table" do
+  it "appropriately connected to a table" do
     Auditors::ActiveRecord::AuthenticationRecord.delete_all
     expect(Auditors::ActiveRecord::AuthenticationRecord.count).to eq(0)
   end

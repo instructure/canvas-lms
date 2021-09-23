@@ -84,26 +84,26 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
       end
     end
 
-    it "should not calculate margin of tolerance for answers if answer text is nil" do
+    it "does not calculate margin of tolerance for answers if answer text is nil" do
       answer_data = { :"question_#{question_id}" => nil }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_nil
     end
 
-    it "should not calculate margin of tolerance for answers if answer text is blank" do
+    it "does not calculate margin of tolerance for answers if answer text is blank" do
       answer_data = { :"question_#{question_id}" => "" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer falls within start/end range" do
+    it "calculates if answer falls within start/end range" do
       answer_data = { :"question_#{question_id}" => "2.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
-    it "should calculate if answer falls out of start/end range" do
+    it "calculates if answer falls out of start/end range" do
       answer_data = { :"question_#{question_id}" => "4" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 

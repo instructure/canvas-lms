@@ -639,14 +639,14 @@ describe GradebooksController do
       end
 
       describe 'js_env enhanced_gradebook_filters' do
-        it "should set enhanced_gradebook_filters in js_env as true if enabled" do
+        it "sets enhanced_gradebook_filters in js_env as true if enabled" do
           Account.site_admin.enable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:enhanced_gradebook_filters]).to eq(true)
         end
 
-        it "should set enhanced_gradebook_filters in js_env as false if disabled" do
+        it "sets enhanced_gradebook_filters in js_env as false if disabled" do
           Account.site_admin.disable_feature!(:enhanced_gradebook_filters)
           user_session(@teacher)
           get :show, params: { course_id: @course.id }
@@ -765,13 +765,13 @@ describe GradebooksController do
       end
 
       describe "gradebook_assignment_search_and_redesign" do
-        it "should set gradebook_assignment_search_and_redesign in js_env as true if enabled" do
+        it "sets gradebook_assignment_search_and_redesign in js_env as true if enabled" do
           Account.site_admin.enable_feature!(:gradebook_assignment_search_and_redesign)
           get :show, params: { course_id: @course.id }
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_assignment_search_and_redesign]).to eq(true)
         end
 
-        it "should set gradebook_assignment_search_and_redesign in js_env as false if disabled" do
+        it "sets gradebook_assignment_search_and_redesign in js_env as false if disabled" do
           Account.site_admin.disable_feature!(:gradebook_assignment_search_and_redesign)
           get :show, params: { course_id: @course.id }
           expect(assigns[:js_env][:GRADEBOOK_OPTIONS][:gradebook_assignment_search_and_redesign]).to eq(false)
@@ -1153,7 +1153,7 @@ describe GradebooksController do
           expect(Enrollment).to receive(:recompute_final_score).never
           get 'show', params: { :course_id => @course.id, :init => 1, :assignments => 1 }, :format => 'csv'
         end
-        it "should get all the expected datas even with multibytes characters" do
+        it "gets all the expected datas even with multibytes characters" do
           @course.assignments.create(:title => "Déjà vu")
           exporter = GradebookExporter.new(
             @course,
@@ -2219,7 +2219,7 @@ describe GradebooksController do
         expect(response.body).to include("The maximum number of graders has been reached for this assignment")
       end
 
-      it "should create a provisional grade even if the student has one but is in the moderation set" do
+      it "creates a provisional grade even if the student has one but is in the moderation set" do
         submission = @assignment.submit_homework(@student, :body => "hello")
         other_teacher = teacher_in_course(:course => @course, :active_all => true).user
         submission.find_or_create_provisional_grade!(other_teacher)
@@ -2886,7 +2886,7 @@ describe GradebooksController do
     context "sharding" do
       specs_require_sharding
 
-      it "should fetch rubrics from a cross-shard course" do
+      it "fetches rubrics from a cross-shard course" do
         user_session(@teacher)
         @shard1.activate do
           a = Account.create!

@@ -50,7 +50,7 @@ describe FeatureFlags do
   end
 
   describe "#feature_enabled?" do
-    it "should report correctly" do
+    it "reports correctly" do
       expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
       expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
       expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
@@ -58,7 +58,7 @@ describe FeatureFlags do
       expect(Account.find(0).feature_enabled?(:account_feature)).to eq false
     end
 
-    it "should log feature enablement" do
+    it "logs feature enablement" do
       t_sub_account.feature_enabled?(:course_feature)
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", tags: {
                                                                      feature: :course_feature,
@@ -84,15 +84,15 @@ describe FeatureFlags do
   end
 
   describe "lookup_feature_flag" do
-    it "should return nil if the feature is currently disabled" do
+    it "returns nil if the feature is currently disabled" do
       expect(t_course.lookup_feature_flag('disabled_feature')).to be_nil
     end
 
-    it "should return nil if the feature doesn't apply" do
+    it "returns nil if the feature doesn't apply" do
       expect(t_course.lookup_feature_flag('user_feature')).to be_nil
     end
 
-    it "should return nil if the visible_on returns false" do
+    it "returns nil if the visible_on returns false" do
       feature = double(
         "Feature double",
         feature: 'some_feature',
@@ -105,22 +105,22 @@ describe FeatureFlags do
       expect(t_course.lookup_feature_flag('some_feature')).to be_nil
     end
 
-    it "should return defaults when no flags exist" do
+    it "returns defaults when no flags exist" do
       expect(t_user.lookup_feature_flag('user_feature')).to be_default
     end
 
     context "overrides at site admin" do
-      it "should ignore site admin settings if definition doesn't allow override" do
+      it "ignores site admin settings if definition doesn't allow override" do
         t_site_admin.feature_flags.create! feature: 'root_account_feature', state: 'allowed'
         expect(t_root_account.lookup_feature_flag('root_account_feature')).to be_default
       end
 
-      it "should apply site admin settings if definition does allow override" do
+      it "applies site admin settings if definition does allow override" do
         t_site_admin.feature_flags.create! feature: 'course_feature', state: 'on'
         expect(t_course.lookup_feature_flag('course_feature').context).to eql t_site_admin
       end
 
-      it "should override lower settings if not allowed" do
+      it "overrides lower settings if not allowed" do
         t_root_account.feature_flags.create! feature: 'course_feature', state: 'on'
         expect(t_root_account.lookup_feature_flag('course_feature').context).to eql t_root_account
         expect(t_course.feature_enabled?('course_feature')).to be_truthy
@@ -133,7 +133,7 @@ describe FeatureFlags do
     end
 
     context "site admin flags" do
-      it "should work for site admin overrides" do
+      it "works for site admin overrides" do
         expect(t_site_admin.feature_enabled?('site_admin_feature')).to be_falsey
         t_site_admin.feature_flags.create! feature: 'site_admin_feature', state: 'on'
         t_site_admin.instance_variable_set(:@feature_flag_cache, nil)
@@ -142,7 +142,7 @@ describe FeatureFlags do
     end
 
     context "account flags" do
-      it "should apply settings at the sub-account level" do
+      it "applies settings at the sub-account level" do
         t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
         expect(t_root_account.lookup_feature_flag('course_feature')).to be_default
         expect(t_root_account.feature_enabled?('course_feature')).to be_falsey
@@ -152,7 +152,7 @@ describe FeatureFlags do
         expect(course_model(account: t_root_account).feature_enabled?('course_feature')).to be_falsey
       end
 
-      it "should ignore settings locked by a higher account" do
+      it "ignores settings locked by a higher account" do
         t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
         t_root_account.feature_flags.create! feature: 'course_feature', state: 'off'
         expect(t_sub_account.lookup_feature_flag('course_feature').context).to eql t_root_account
@@ -160,7 +160,7 @@ describe FeatureFlags do
         expect(t_course.feature_enabled?('course_feature')).to be_falsey
       end
 
-      it "should cache the lookup" do
+      it "caches the lookup" do
         t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
         t_root_account.feature_flags.create! feature: 'course_feature', state: 'off'
         expect(t_sub_account.lookup_feature_flag('course_feature').context).to eql t_root_account
@@ -170,7 +170,7 @@ describe FeatureFlags do
     end
 
     context "course flags" do
-      it "should apply settings at the course level" do
+      it "applies settings at the course level" do
         other_course = t_sub_account.courses.create!
         other_course.feature_flags.create! feature: 'course_feature', state: 'on'
         expect(other_course.feature_enabled?('course_feature')).to be_truthy
@@ -179,7 +179,7 @@ describe FeatureFlags do
     end
 
     context "user flags" do
-      it "should apply settings at the site admin level" do
+      it "applies settings at the site admin level" do
         expect(t_user.lookup_feature_flag('user_feature')).to be_default
         t_site_admin.feature_flags.create! feature: 'user_feature', state: 'off'
         t_user.instance_variable_set(:@feature_flag_cache, nil)
@@ -187,7 +187,7 @@ describe FeatureFlags do
         expect(t_user.feature_enabled?('user_feature')).to be_falsey
       end
 
-      it "should apply settings at the user level" do
+      it "applies settings at the user level" do
         t_user.feature_flags.create! feature: 'user_feature', state: 'off'
         expect(t_user.lookup_feature_flag('user_feature').context).to eql t_user
         expect(t_user.feature_allowed?('user_feature')).to be_falsey
@@ -197,14 +197,14 @@ describe FeatureFlags do
 
     describe "root_opt_in" do
       context "with no feature flags" do
-        it "should not find the feature beneath the root account" do
+        it "does not find the feature beneath the root account" do
           expect(t_site_admin.lookup_feature_flag('root_opt_in_feature')).to be_default
           expect(t_root_account.lookup_feature_flag('root_opt_in_feature')).to be_new_record
           expect(t_sub_account.lookup_feature_flag('root_opt_in_feature')).to be_nil
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
         end
 
-        it "should cache the nil of the feature beneath the root account" do
+        it "caches the nil of the feature beneath the root account" do
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
           expect_any_instance_of(Account).to receive(:feature_flag).never
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
@@ -212,7 +212,7 @@ describe FeatureFlags do
       end
 
       context "with site admin feature flag" do
-        it "should not find the feature beneath the root account" do
+        it "does not find the feature beneath the root account" do
           t_site_admin.feature_flags.create! feature: 'root_opt_in_feature'
 
           expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
@@ -221,7 +221,7 @@ describe FeatureFlags do
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
         end
 
-        it "should find the default_on feature beneath the root account" do
+        it "finds the default_on feature beneath the root account" do
           t_site_admin.feature_flags.create! feature: 'root_opt_in_feature', state: Feature::STATE_DEFAULT_ON
           expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
           expect(t_root_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
@@ -235,7 +235,7 @@ describe FeatureFlags do
           t_root_account.feature_flags.create! feature: 'root_opt_in_feature'
         end
 
-        it "should find the feature beneath the root account" do
+        it "finds the feature beneath the root account" do
           expect(t_root_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_root_account
           expect(t_sub_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_root_account
           expect(t_course.lookup_feature_flag('root_opt_in_feature').context).to eql t_root_account
@@ -245,7 +245,7 @@ describe FeatureFlags do
 
     describe "hidden" do
       context "with no feature flags" do
-        it "should not find the feature beneath site admin" do
+        it "does not find the feature beneath site admin" do
           expect(t_site_admin.lookup_feature_flag('hidden_feature')).to be_default
           expect(t_root_account.lookup_feature_flag('hidden_feature')).to be_nil
           expect(t_sub_account.lookup_feature_flag('hidden_feature')).to be_nil
@@ -253,7 +253,7 @@ describe FeatureFlags do
           expect(t_user.lookup_feature_flag('hidden_user_feature')).to be_nil
         end
 
-        it "should find hidden features if override_hidden is given" do
+        it "finds hidden features if override_hidden is given" do
           expect(t_site_admin.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
           expect(t_root_account.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
           expect(t_sub_account.lookup_feature_flag('hidden_feature', override_hidden: true)).to be_default
@@ -261,7 +261,7 @@ describe FeatureFlags do
           expect(t_user.lookup_feature_flag('hidden_user_feature', override_hidden: true)).to be_default
         end
 
-        it "should not create the implicit-off root_opt_in flag" do
+        it "does not create the implicit-off root_opt_in flag" do
           flag = t_root_account.lookup_feature_flag('hidden_root_opt_in_feature', override_hidden: true)
           expect(flag).to be_default
           expect(flag).to be_hidden
@@ -280,7 +280,7 @@ describe FeatureFlags do
           t_site_admin.feature_flags.create! feature: 'hidden_user_feature'
         end
 
-        it "should find the feature beneath site admin" do
+        it "finds the feature beneath site admin" do
           expect(t_site_admin.lookup_feature_flag('hidden_feature').context).to eql t_site_admin
           expect(t_root_account.lookup_feature_flag('hidden_feature').context).to eql t_site_admin
           expect(t_sub_account.lookup_feature_flag('hidden_feature').context).to eql t_site_admin
@@ -288,7 +288,7 @@ describe FeatureFlags do
           expect(t_user.lookup_feature_flag('hidden_user_feature').context).to eql t_site_admin
         end
 
-        it "should create the implicit-off root_opt_in flag" do
+        it "creates the implicit-off root_opt_in flag" do
           t_site_admin.feature_flags.create! feature: 'hidden_root_opt_in_feature'
           flag = t_root_account.lookup_feature_flag('hidden_root_opt_in_feature')
           expect(flag).to be_new_record
@@ -302,14 +302,14 @@ describe FeatureFlags do
           t_root_account.feature_flags.create! feature: 'hidden_feature'
         end
 
-        it "should find the feature beneath site admin" do
+        it "finds the feature beneath site admin" do
           expect(t_site_admin.lookup_feature_flag('hidden_feature')).to be_default
           expect(t_root_account.lookup_feature_flag('hidden_feature').context).to eql t_root_account
           expect(t_sub_account.lookup_feature_flag('hidden_feature').context).to eql t_root_account
           expect(t_course.lookup_feature_flag('hidden_feature').context).to eql t_root_account
         end
 
-        it "should not find the feature on a root account without a flag" do
+        it "does not find the feature on a root account without a flag" do
           expect(account_model.lookup_feature_flag('hidden_feature')).to be_nil
         end
       end
@@ -318,7 +318,7 @@ describe FeatureFlags do
     context "cross-sharding" do
       specs_require_sharding
 
-      it "should search on the correct shard" do
+      it "searches on the correct shard" do
         t_sub_account.feature_flags.create! feature: 'course_feature', state: 'on'
         @other_course = t_sub_account.courses.create!
 
@@ -329,7 +329,7 @@ describe FeatureFlags do
         end
       end
 
-      it "should search for site admin flags on the correct shard" do
+      it "searches for site admin flags on the correct shard" do
         t_site_admin.feature_flags.create! feature: 'course_feature', state: 'on'
 
         @shard1.activate do
@@ -344,12 +344,12 @@ describe FeatureFlags do
   end
 
   describe "set_feature_flag!" do
-    it "should create a feature flag" do
+    it "creates a feature flag" do
       t_root_account.set_feature_flag!(:course_feature, 'allowed')
       expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_can_override
     end
 
-    it "should update a feature flag" do
+    it "updates a feature flag" do
       flag = t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
       t_root_account.set_feature_flag!(:course_feature, 'on')
       expect(flag.reload).to be_enabled
@@ -357,17 +357,17 @@ describe FeatureFlags do
   end
 
   describe "convenience methods" do
-    it "should enable_feature!" do
+    it "enable_feature!s" do
       t_root_account.enable_feature! :course_feature
       expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_enabled
     end
 
-    it "should allow_feature!" do
+    it "allow_feature!s" do
       t_root_account.allow_feature! :course_feature
       expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_can_override
     end
 
-    it "should reset_feature!" do
+    it "reset_feature!s" do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
       t_root_account.reset_feature! :course_feature
       expect(t_root_account.feature_flags.where(feature: 'course_feature')).not_to be_any
@@ -380,14 +380,14 @@ describe FeatureFlags do
       t_root_account.feature_flags.create! feature: 'course_feature', state: 'allowed'
     end
 
-    it "should cache an object's feature flag" do
+    it "caches an object's feature flag" do
       enable_cache do
         t_root_account.feature_flag('course_feature')
         expect(Rails.cache).to be_exist(t_cache_key)
       end
     end
 
-    it "should cache a nil result" do
+    it "caches a nil result" do
       enable_cache do
         t_root_account.feature_flag('course_feature2')
         expect(Rails.cache).to be_exist(t_root_account.feature_flag_cache_key('course_feature2'))
@@ -396,7 +396,7 @@ describe FeatureFlags do
       end
     end
 
-    it "should invalidate the cache when a feature flag is changed" do
+    it "invalidates the cache when a feature flag is changed" do
       enable_cache do
         t_root_account.feature_flag('course_feature')
         t_root_account.feature_flags.where(feature: 'course_feature').first.update_attribute(:state, 'on')
@@ -404,7 +404,7 @@ describe FeatureFlags do
       end
     end
 
-    it "should invalidate the cache when a feature flag is destroyed" do
+    it "invalidates the cache when a feature flag is destroyed" do
       enable_cache do
         t_root_account.feature_flag('course_feature')
         t_root_account.feature_flags.where(feature: 'course_feature').first.destroy
@@ -412,7 +412,7 @@ describe FeatureFlags do
       end
     end
 
-    it "should skip the cache if requested" do
+    it "skips the cache if requested" do
       enable_cache do
         flag = t_root_account.feature_flag('course_feature')
         expect(flag.state).to eq 'allowed'

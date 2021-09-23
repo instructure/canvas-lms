@@ -548,7 +548,7 @@ describe DeveloperKey do
     context 'when site admin' do
       let(:key) { DeveloperKey.create!(account: nil) }
 
-      it 'it creates a binding on save' do
+      it 'creates a binding on save' do
         expect(key.developer_key_account_bindings.find_by(account: Account.site_admin)).to be_present
       end
 
@@ -612,7 +612,7 @@ describe DeveloperKey do
     end
 
     context 'when not site admin' do
-      it 'it creates a binding on save' do
+      it 'creates a binding on save' do
         key = DeveloperKey.create!(account: account)
         expect(key.developer_key_account_bindings.find_by(account: account)).to be_present
       end
@@ -858,7 +858,7 @@ describe DeveloperKey do
     context "sharding" do
       specs_require_sharding
 
-      it "should always create the default key on the default shard" do
+      it "alwayses create the default key on the default shard" do
         @shard1.activate do
           expect(DeveloperKey.default.shard).to be_default
         end
@@ -965,7 +965,7 @@ describe DeveloperKey do
   end
 
   describe "#redirect_domain_matches?" do
-    it "should match domains exactly, and sub-domains" do
+    it "matches domains exactly, and sub-domains" do
       developer_key_not_saved.redirect_uri = "http://example.com/a/b"
 
       expect(developer_key_not_saved.redirect_domain_matches?("http://example.com/a/b")).to be_truthy
@@ -1010,11 +1010,11 @@ describe DeveloperKey do
 
   context "Account scoped keys" do
     shared_examples "authorized_for_account?" do
-      it "should allow access to its own account" do
+      it "allows access to its own account" do
         expect(@key.authorized_for_account?(Account.find(@account.id))).to be true
       end
 
-      it "shouldn't allow access to a foreign account" do
+      it "does not allow access to a foreign account" do
         expect(@key.authorized_for_account?(@not_sub_account)).to be false
       end
 

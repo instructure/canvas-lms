@@ -31,7 +31,7 @@ describe "updated_wiki_page" do
 
   include_examples "a message"
   context "locked Wiki Pages" do
-    it "should send locked notification if availibility date is locked for email" do
+    it "sends locked notification if availibility date is locked for email" do
       enrollment = course_with_student(active_all: true)
       context_module = @course.context_modules.create!(name: 'some module')
       page = @course.wiki_pages.create!(:title => "some page")
@@ -51,7 +51,7 @@ describe "updated_wiki_page" do
       expect(message.body).to include("Wiki page content is locked or not yet available")
     end
 
-    it "should send Wiki Page notification with Wiki Pages content when unlocked for email" do
+    it "sends Wiki Page notification with Wiki Pages content when unlocked for email" do
       enrollment = course_with_student(active_all: true)
       context_module = @course.context_modules.create!(name: 'some module')
       page = @course.wiki_pages.create!(:title => "some page")

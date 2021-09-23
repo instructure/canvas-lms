@@ -52,7 +52,7 @@ describe SearchController, type: :request do
       @group.users = [@me, @bob, @joe]
     end
 
-    it "should return recipients" do
+    it "returns recipients" do
       json = api_call(:get, "/api/v1/search/recipients.json?search=o",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
       json.each { |c| c.delete("avatar_url") }
@@ -68,7 +68,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should return recipients for a given course" do
+    it "returns recipients for a given course" do
       json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
       json.each { |c| c.delete("avatar_url") }
@@ -82,7 +82,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should return recipients for a given group" do
+    it "returns recipients for a given group" do
       json = api_call(:get, "/api/v1/search/recipients.json?context=group_#{@group.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :context => "group_#{@group.id}" })
       json.each { |c| c.delete("avatar_url") }
@@ -93,7 +93,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should not duplicate group recipients if users are also in other groups" do
+    it "does not duplicate group recipients if users are also in other groups" do
       @group2 = @course.groups.create(:name => "another group")
       @group2.users = [@bob]
       @group2.save!
@@ -103,7 +103,7 @@ describe SearchController, type: :request do
       expect(json.map { |h| h["id"] }).to match_array([@joe.id, @me.id, @bob.id])
     end
 
-    it "should return recipients for a given section" do
+    it "returns recipients for a given section" do
       json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}" })
       json.each { |c| c.delete("avatar_url") }
@@ -116,7 +116,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should return recipients found by id" do
+    it "returns recipients found by id" do
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{@bob.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s })
       json.each { |c| c.delete("avatar_url") }
@@ -125,7 +125,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should return recipients found by sis id" do
+    it "returns recipients found by sis id" do
       p = Pseudonym.create(account: @account, user: @bob, unique_id: 'bob@example.com')
       p.sis_user_id = 'abc123'
       p.save!
@@ -137,7 +137,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should ignore other parameters when searching by id" do
+    it "ignores other parameters when searching by id" do
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{@bob.id}&search=asdf",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => @bob.id.to_s, :search => "asdf" })
       json.each { |c| c.delete("avatar_url") }
@@ -146,7 +146,7 @@ describe SearchController, type: :request do
       ]
     end
 
-    it "should return recipients by id if contactable, or if a shared conversation is referenced" do
+    it "returns recipients by id if contactable, or if a shared conversation is referenced" do
       other = User.create(:name => "other personage")
       json = api_call(:get, "/api/v1/search/recipients?user_id=#{other.id}",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :user_id => other.id.to_s })
@@ -182,7 +182,7 @@ describe SearchController, type: :request do
         @lonely = observer_in_course(:name => "lonely observer")
       end
 
-      it "should show all observers to a teacher" do
+      it "shows all observers to a teacher" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
@@ -198,7 +198,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should not show non-linked students to observers" do
+      it "does not show non-linked students to observers" do
         json = api_call_as_user(@bobs_mom, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
@@ -217,7 +217,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should not show non-linked observers to students" do
+      it "does not show non-linked observers to students" do
         json = api_call_as_user(@bob, :get, "/api/v1/search/recipients.json?context=course_#{@course.id}",
                                 { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}" })
         json.each { |c| c.delete("avatar_url") }
@@ -249,7 +249,7 @@ describe SearchController, type: :request do
     end
 
     context "synthetic contexts" do
-      it "should return synthetic contexts within a course" do
+      it "returns synthetic contexts within a course" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}&synthetic_contexts=1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
@@ -261,7 +261,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should return synthetic contexts within a section" do
+      it "returns synthetic contexts within a section" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=section_#{@course.default_section.id}&synthetic_contexts=1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "section_#{@course.default_section.id}", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
@@ -271,7 +271,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should return groups within a course" do
+      it "returns groups within a course" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
@@ -280,7 +280,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should return sections within a course" do
+      it "returns sections within a course" do
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_sections&synthetic_contexts=1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_sections", :synthetic_contexts => "1" })
         json.each { |c| c.delete("avatar_url") }
@@ -292,7 +292,7 @@ describe SearchController, type: :request do
     end
 
     context "permissions" do
-      it "should return valid permission data" do
+      it "returns valid permission data" do
         json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=send_messages_all",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'the o', :permissions => ["send_messages_all"] })
         json.each { |c| c.delete("avatar_url") }
@@ -304,7 +304,7 @@ describe SearchController, type: :request do
         ]
       end
 
-      it "should not return invalid permission data" do
+      it "does not return invalid permission data" do
         json = api_call(:get, "/api/v1/search/recipients.json?search=the%20o&permissions[]=foo_bar",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'the o', :permissions => ["foo_bar"] })
         json.each { |c| c.delete("avatar_url") }
@@ -318,7 +318,7 @@ describe SearchController, type: :request do
     end
 
     context "pagination" do
-      it "should paginate even if no type is specified" do
+      it "paginates even if no type is specified" do
         create_users_in_course(@course, 4.times.map { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&per_page=3",
@@ -327,7 +327,7 @@ describe SearchController, type: :request do
         expect(response.headers['Link']).not_to be_nil
       end
 
-      it "should paginate users and return proper pagination headers" do
+      it "paginates users and return proper pagination headers" do
         create_users_in_course(@course, 4.times.map { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=3",
@@ -357,7 +357,7 @@ describe SearchController, type: :request do
         expect(links.map { |l| l[:rel] }).to eq ['current', 'first', 'last']
       end
 
-      it "should paginate contexts and return proper pagination headers" do
+      it "paginates contexts and return proper pagination headers" do
         create_courses(4.times.map { { name: "ofcourse" } }, enroll_user: @user)
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=ofcourse&type=context&per_page=3",
@@ -387,7 +387,7 @@ describe SearchController, type: :request do
         expect(links.map { |l| l[:rel] }).to eq ['current', 'first', 'last']
       end
 
-      it "should ignore invalid per_page" do
+      it "ignores invalid per_page" do
         create_users_in_course(@course, 11.times.map { { name: "cletus", sortable_name: "cletus" } })
 
         json = api_call(:get, "/api/v1/search/recipients.json?search=cletus&type=user&per_page=-1",
@@ -417,7 +417,7 @@ describe SearchController, type: :request do
         expect(links.map { |l| l[:rel] }).to eq ['current', 'first', 'last']
       end
 
-      it "should paginate combined context/user results" do
+      it "paginates combined context/user results" do
         # 6 courses, 6 users, 12 items total
         courses = create_courses(6.times.map { { name: "term" } }, enroll_user: @user, return_type: :record)
         course_ids = courses.map(&:asset_string)
@@ -470,7 +470,7 @@ describe SearchController, type: :request do
     end
 
     describe "sorting contexts" do
-      it "should sort contexts by workflow state first when searching" do
+      it "sorts contexts by workflow state first when searching" do
         course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
         course1 = @course
         course1.update_attribute(:name, "Context Alpha")
@@ -485,7 +485,7 @@ describe SearchController, type: :request do
         expect(json.map { |item| item['id'] }).to eq [course2.asset_string, course1.asset_string]
       end
 
-      it "should sort contexts by type second when searching" do
+      it "sorts contexts by type second when searching" do
         @course.update_attribute(:name, "Context Beta")
         @group.update_attribute(:name, "Context Alpha")
         json = api_call(:get, "/api/v1/search/recipients.json?type=context&search=Context",
@@ -493,7 +493,7 @@ describe SearchController, type: :request do
         expect(json.map { |item| item['id'] }).to eq [@course.asset_string, @group.asset_string]
       end
 
-      it "should sort contexts by name third when searching" do
+      it "sorts contexts by name third when searching" do
         course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
         course1 = @course
         course_with_teacher(:active_course => true, :active_enrollment => true, :user => @user)
@@ -511,7 +511,7 @@ describe SearchController, type: :request do
     context "caching" do
       specs_require_cache(:redis_cache_store)
 
-      it "should show new groups in existing categories" do
+      it "shows new groups in existing categories" do
         skip('investigate cause for failures beginning 05/05/21 FOO-1950')
         json = api_call(:get, "/api/v1/search/recipients.json?context=course_#{@course.id}_groups&synthetic_contexts=1",
                         { :controller => 'search', :action => 'recipients', :format => 'json', :context => "course_#{@course.id}_groups", :synthetic_contexts => "1" })
@@ -538,7 +538,7 @@ describe SearchController, type: :request do
     context "sharding" do
       specs_require_sharding
 
-      it "should find top-level groups from any shard" do
+      it "finds top-level groups from any shard" do
         @me.associate_with_shard(@shard1)
         @me.associate_with_shard(@shard2)
         @bob.associate_with_shard(@shard1)

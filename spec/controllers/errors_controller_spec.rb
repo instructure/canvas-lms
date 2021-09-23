@@ -29,7 +29,7 @@ describe ErrorsController do
   describe 'index' do
     before { authenticate_user! }
 
-    it "should not error" do
+    it "does not error" do
       get 'index'
     end
   end
@@ -61,7 +61,7 @@ describe ErrorsController do
       assert_recorded_error
     end
 
-    it "should be successful without data" do
+    it "is successful without data" do
       post 'create'
       assert_recorded_error
     end
@@ -71,25 +71,25 @@ describe ErrorsController do
       assert_recorded_error
     end
 
-    it "should not choke on non-integer ids" do
+    it "does not choke on non-integer ids" do
       post 'create', params: { error: { id: 'garbage' } }
       assert_recorded_error
       expect(ErrorReport.last.message).not_to eq "Error Report Creation failed"
     end
 
-    it "should not return nil.id if report creation failed" do
+    it "does not return nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post 'create', params: { error: { id: 1 } }, format: 'json'
       expect(JSON.parse(response.body)).to eq({ 'logged' => true, 'id' => nil })
     end
 
-    it "should not record the user as nil.id if report creation failed" do
+    it "does not record the user as nil.id if report creation failed" do
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")
       post 'create', params: { error: { id: 1 } }
       expect(ErrorReport.last.user_id).to be_nil
     end
 
-    it "should record the user if report creation failed" do
+    it "records the user if report creation failed" do
       user = User.create!
       user_session(user)
       expect(ErrorReport).to receive(:where).once.and_raise("failed!")

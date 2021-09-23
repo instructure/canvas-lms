@@ -53,7 +53,7 @@ describe Quizzes::QuizStatisticsService do
       end
     end
 
-    it 'should generate for all quiz versions' do
+    it 'generates for all quiz versions' do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {
@@ -66,7 +66,7 @@ describe Quizzes::QuizStatisticsService do
       subject.generate_aggregate_statistics(true)
     end
 
-    it 'should generate for the latest quiz version' do
+    it 'generates for the latest quiz version' do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return false
 
       expect(quiz).to receive(:current_statistics_for).with('student_analysis', {

@@ -26,7 +26,7 @@ describe DataFixup::FixPlannerOverridesMarkedCompleteData do
     DataFixup::FixPlannerOverridesMarkedCompleteData
   end
 
-  it "should flip the value on 'marked_complete'" do
+  it "flips the value on 'marked_complete'" do
     course_with_student
     student1 = @student
     course_with_student(course: @course)

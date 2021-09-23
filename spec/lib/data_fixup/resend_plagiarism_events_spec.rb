@@ -79,7 +79,7 @@ describe DataFixup::ResendPlagiarismEvents do
   end
 
   describe '#trigger_plagiarism_resubmit_by_id' do
-    it 'should trigger the next job in the batch after it finishes' do
+    it 'triggers the next job in the batch after it finishes' do
       Setting.set('trigger_plagiarism_resubmit', '1,10')
       dj = Delayed::Job.create(strand: "plagiarism_event_resend", locked_at: nil, run_at: 1.year.from_now)
       expect(Canvas::LiveEvents).to receive(:post_event_stringified).twice.with('plagiarism_resubmit', anything, anything)

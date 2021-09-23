@@ -52,7 +52,7 @@ describe KalturaMediaFileHandler do
         end
       end
 
-      it "should work for user context" do
+      it "works for user context" do
         KalturaMediaFileHandler.new.add_media_files(attachment, wait_for_completion)
       end
 

@@ -25,7 +25,7 @@ describe "auth" do
   include LogoutPage
 
   describe "logout" do
-    it "should present confirmation on GET /logout" do
+    it "presents confirmation on GET /logout" do
       user_with_pseudonym active_user: true
       login_as
 

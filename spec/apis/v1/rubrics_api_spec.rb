@@ -189,7 +189,7 @@ describe "Rubrics API", type: :request do
         assert_status(401)
       end
 
-      it "should paginate" do
+      it "paginates" do
         paginate_call(@course, 'course')
       end
     end
@@ -484,7 +484,7 @@ describe "Rubrics API", type: :request do
         assert_status(401)
       end
 
-      it "should paginate" do
+      it "paginates" do
         paginate_call(@account, 'account')
       end
 

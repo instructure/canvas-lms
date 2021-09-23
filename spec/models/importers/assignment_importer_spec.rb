@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../lti2_spec_helper')
 describe "Importing assignments" do
   SYSTEMS.each do |system|
     if import_data_exists? system, 'assignment'
-      it "should import assignments for #{system}" do
+      it "imports assignments for #{system}" do
         data = get_import_data(system, 'assignment')
         context = get_import_context(system)
         migration = context.content_migrations.create!
@@ -50,7 +50,7 @@ describe "Importing assignments" do
     end
   end
 
-  it "should import grading information when rubric is included" do
+  it "imports grading information when rubric is included" do
     file_data = get_import_data('', 'assignment')
     context = get_import_context('')
     migration = context.content_migrations.create!
@@ -67,7 +67,7 @@ describe "Importing assignments" do
     expect(a.points_possible).to eq rubric.points_possible
   end
 
-  it "should import association settings when rubric is included" do
+  it "imports association settings when rubric is included" do
     file_data = get_import_data('', 'assignment')
     context = get_import_context('')
     migration = context.content_migrations.create!
@@ -85,7 +85,7 @@ describe "Importing assignments" do
     expect(ra.hide_outcome_results).to be true
   end
 
-  it "should import group category into existing group with same name when marked as a group assignment" do
+  it "imports group category into existing group with same name when marked as a group assignment" do
     file_data = get_import_data('', 'assignment')
     context = get_import_context('')
     assignment_hash = file_data.find { |h| h['migration_id'] == '4469882339232' }.with_indifferent_access
@@ -98,7 +98,7 @@ describe "Importing assignments" do
     expect(a.group_category.name).to eq assignment_hash[:group_category]
   end
 
-  it "should infer the default name when importing a nameless assignment" do
+  it "infers the default name when importing a nameless assignment" do
     course_model
     migration = @course.content_migrations.create!
     nameless_assignment_hash = {
@@ -125,7 +125,7 @@ describe "Importing assignments" do
     expect(assignment.title).to eq 'untitled assignment'
   end
 
-  it "should schedule auto peer reviews if dates are not shifted " do
+  it "schedules auto peer reviews if dates are not shifted" do
     course_model
     migration = @course.content_migrations.create!
     assign_hash = {
@@ -145,7 +145,7 @@ describe "Importing assignments" do
     }
   end
 
-  it "should not schedule auto peer reviews if dates are shifted (it'll be scheduled later)" do
+  it "does not schedule auto peer reviews if dates are shifted (it'll be scheduled later)" do
     course_model
     assign_hash = {
       "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
@@ -166,7 +166,7 @@ describe "Importing assignments" do
     }
   end
 
-  it "should include turnitin_settings" do
+  it "includes turnitin_settings" do
     course_model
     expect(@course).to receive(:turnitin_enabled?).at_least(1).and_return(true)
     migration = @course.content_migrations.create!
@@ -207,7 +207,7 @@ describe "Importing assignments" do
     end
   end
 
-  it "should not explode if it tries to import negative points possible" do
+  it "does not explode if it tries to import negative points possible" do
     course_model
     assign_hash = {
       "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
@@ -225,7 +225,7 @@ describe "Importing assignments" do
     expect(assignment.points_possible).to eq 0
   end
 
-  it "should not clear dates if these are null in the source hash" do
+  it "does not clear dates if these are null in the source hash" do
     course_model
     assign_hash = {
       "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",

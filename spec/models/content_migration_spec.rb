@@ -129,7 +129,7 @@ describe ContentMigration do
   end
 
   context "#prepare_data" do
-    it "should strip invalid utf8" do
+    it "strips invalid utf8" do
       data = {
         'assessment_questions' => [{
           'question_name' => +"hai\xfbabcd"
@@ -140,30 +140,30 @@ describe ContentMigration do
   end
 
   context "import_object?" do
-    it "should return true for everything if there are no copy options" do
+    it "returns true for everything if there are no copy options" do
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
-    it "should return true for everything if 'everything' is selected" do
+    it "returns true for everything if 'everything' is selected" do
       @cm.migration_ids_to_import = { :copy => { :everything => "1" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
-    it "should return true if there are no copy options" do
+    it "returns true if there are no copy options" do
       @cm.migration_ids_to_import = { :copy => {} }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
-    it "should return false for nil objects" do
+    it "returns false for nil objects" do
       expect(@cm.import_object?("content_migrations", nil)).to eq false
     end
 
-    it "should return true for all object types if the all_ option is true" do
+    it "returns true for all object types if the all_ option is true" do
       @cm.migration_ids_to_import = { :copy => { :all_content_migrations => "1" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
 
-    it "should return false for objects not selected" do
+    it "returns false for objects not selected" do
       @cm.save!
       @cm.migration_ids_to_import = { :copy => { :all_content_migrations => "0" } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
@@ -173,14 +173,14 @@ describe ContentMigration do
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq false
     end
 
-    it "should return true for selected objects" do
+    it "returns true for selected objects" do
       @cm.save!
       @cm.migration_ids_to_import = { :copy => { :content_migrations => { CC::CCHelper.create_key(@cm) => "1" } } }
       expect(@cm.import_object?("content_migrations", CC::CCHelper.create_key(@cm))).to eq true
     end
   end
 
-  it "should exclude user-hidden migration plugins" do
+  it "excludes user-hidden migration plugins" do
     ab = Canvas::Plugin.find(:academic_benchmark_importer)
     expect(ContentMigration.migration_plugins(true).include?(ab)).to be_falsey
   end
@@ -213,13 +213,13 @@ describe ContentMigration do
       expect(context.reload.attachments.count).to eq filecount
     end
 
-    it "should import into a course" do
+    it "imports into a course" do
       cm = setup_zip_import(@course)
       expect(cm.root_account).to eq @course.root_account
       test_zip_import(@course, cm)
     end
 
-    it "should go through instfs if enabled" do
+    it "goes through instfs if enabled" do
       cm = setup_zip_import(@course)
       allow(InstFS).to receive(:enabled?).and_return(true)
       @uuid = "1234-abcd"
@@ -230,39 +230,39 @@ describe ContentMigration do
       expect(attachment.instfs_uuid).to eq(@uuid)
     end
 
-    it "should import into a user" do
+    it "imports into a user" do
       cm = setup_zip_import(@user)
       expect(cm.root_account_id).to eq 0
       test_zip_import(@user, cm)
     end
 
-    it "should import into a group" do
+    it "imports into a group" do
       group_with_user
       cm = setup_zip_import(@group)
       expect(cm.root_account).to eq @group.root_account
       test_zip_import(@group, cm)
     end
 
-    it "should not expand the mac system folder" do
+    it "does not expand the mac system folder" do
       cm = setup_zip_import(@course, "macfile.zip")
       test_zip_import(@course, cm, 4)
       expect(@course.folders.pluck(:name)).to_not include("__MACOSX")
     end
 
-    it "should update unzip progress often" do
+    it "updates unzip progress often" do
       cm = setup_zip_import(@course, "macfile.zip")
       expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
       run_jobs
     end
 
-    it "should update unzip progress often with fast import" do
+    it "updates unzip progress often with fast import" do
       cm = setup_zip_import(@course, "macfile.zip", true)
       expect_any_instantiation_of(cm).to receive(:update_import_progress).exactly(6).times
       run_jobs
     end
   end
 
-  it "should use url for migration file" do
+  it "uses url for migration file" do
     cm = @cm
     cm.migration_type = 'zip_file_importer'
     cm.migration_settings[:folder_id] = Folder.root_folders(@course).first.id
@@ -278,7 +278,7 @@ describe ContentMigration do
   end
 
   context "account-level import" do
-    it "should import question banks from qti migrations" do
+    it "imports question banks from qti migrations" do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
@@ -313,7 +313,7 @@ describe ContentMigration do
       expect(bank.assessment_questions.count).to eq 1
     end
 
-    it "should import questions from quizzes into question banks" do
+    it "imports questions from quizzes into question banks" do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
@@ -345,7 +345,7 @@ describe ContentMigration do
       expect(bank.assessment_questions.count).to eq 1
     end
 
-    it "should not re-use the question_bank without overwrite_quizzes" do
+    it "does not re-use the question_bank without overwrite_quizzes" do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
@@ -381,7 +381,7 @@ describe ContentMigration do
       end
     end
 
-    it "should re-use the question_bank (and everything else) with overwrite_quizzes" do
+    it "re-uses the question_bank (and everything else) with overwrite_quizzes" do
       skip unless Qti.qti_enabled?
 
       account = Account.create!(:name => 'account')
@@ -424,7 +424,7 @@ describe ContentMigration do
     end
   end
 
-  it "should not overwrite deleted quizzes unless overwrite_quizzes is true" do
+  it "does not overwrite deleted quizzes unless overwrite_quizzes is true" do
     skip unless Qti.qti_enabled?
 
     cm = @cm
@@ -540,7 +540,7 @@ describe ContentMigration do
     expect(plain_text).to eq "This is &lt;b&gt;Bold&lt;/b&gt;"
   end
 
-  it "should identify and import compressed tarball archives" do
+  it "identifies and import compressed tarball archives" do
     skip unless Qti.qti_enabled?
 
     cm = @cm
@@ -566,7 +566,7 @@ describe ContentMigration do
     expect(@course.assessment_question_banks.count).to eq 1
   end
 
-  it "should try to handle utf-16 encoding errors" do
+  it "tries to handle utf-16 encoding errors" do
     cm = @cm
     cm.migration_type = 'canvas_cartridge_importer'
     cm.migration_settings['import_immediately'] = true
@@ -588,7 +588,7 @@ describe ContentMigration do
     expect(cm.migration_issues).to be_empty
   end
 
-  it "should correclty handle media comment resolution in quizzes" do
+  it "correclties handle media comment resolution in quizzes" do
     skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
     cm = @cm
@@ -635,14 +635,14 @@ describe ContentMigration do
       cm
     end
 
-    it "should not throw an error when checking if blocked by current migration" do
+    it "does not throw an error when checking if blocked by current migration" do
       cm = create_ab_cm
       cm.queue_migration
       cm = create_ab_cm
       expect(cm.blocked_by_current_migration?(nil, 0, nil)).to be_truthy
     end
 
-    it "should not throw an error checking for blocked migrations on save" do
+    it "does not throw an error checking for blocked migrations on save" do
       cm1 = create_ab_cm
       cm1.queue_migration
       cm2 = create_ab_cm
@@ -714,7 +714,7 @@ describe ContentMigration do
     run_jobs # even though the requeue is set to happen in the future, it should get run right away after the first one completes
   end
 
-  it "should try to handle zip files with a nested root directory" do
+  it "tries to handle zip files with a nested root directory" do
     cm = @cm
     cm.migration_type = 'common_cartridge_importer'
     cm.migration_settings['import_immediately'] = true

@@ -43,7 +43,7 @@ describe CourseForMenuPresenter do
       expect(presenter.to_h[:links]).to be_empty
     end
 
-    it 'should show all the tab links to a teacher' do
+    it 'shows all the tab links to a teacher' do
       course.enroll_teacher(user).accept
       course.assignments.create!
       course.discussion_topics.create!
@@ -58,7 +58,7 @@ describe CourseForMenuPresenter do
                                                     ])
     end
 
-    it 'should only show the tabs a student has access to to students' do
+    it 'onlies show the tabs a student has access to to students' do
       course.enroll_student(user).accept
       course.assignments.create!
       course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')

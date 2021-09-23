@@ -60,7 +60,7 @@ describe "master courses - add and remove course associations" do
     user_session(@admin)
   end
 
-  it "should add associated courses", priority: "1", test_id: "3078972" do
+  it "adds associated courses", priority: "1", test_id: "3078972" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
@@ -96,7 +96,7 @@ describe "master courses - add and remove course associations" do
     expect(minions[1].attribute('id')).to eq(course1_id)
   end
 
-  it "should remove an associated course", priority: "1", test_id: "3077488" do
+  it "removes an associated course", priority: "1", test_id: "3077488" do
     @minion0 = @template.add_child_course!(@course0).child_course
     @minion1 = @template.add_child_course!(@course1).child_course
 
@@ -130,7 +130,7 @@ describe "master courses - add and remove course associations" do
     expect(f("#course_#{@course0.id}", table)).to be_displayed
   end
 
-  it "should add and remove a to-be-added course", priority: "1", test_id: "3077487" do
+  it "adds and remove a to-be-added course", priority: "1", test_id: "3077487" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list

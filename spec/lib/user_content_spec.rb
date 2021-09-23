@@ -24,7 +24,7 @@ require 'nokogiri'
 
 describe UserContent do
   describe ".find_user_content" do
-    it "should not yield non-string width/height fields" do
+    it "does not yield non-string width/height fields" do
       doc = Nokogiri::HTML5.fragment('<object width="100%" />')
       UserContent.find_user_content(doc) do |_, uc|
         expect(uc.width).to eq '100%'
@@ -47,36 +47,36 @@ describe UserContent do
   end
 
   describe "css_size" do
-    it "should be nil for non-numbers" do
+    it "is nil for non-numbers" do
       expect(UserContent.css_size(nil)).to be_nil
       expect(UserContent.css_size('')).to be_nil
       expect(UserContent.css_size('non-number')).to be_nil
     end
 
-    it "should be nil for numbers that equate to 0" do
+    it "is nil for numbers that equate to 0" do
       expect(UserContent.css_size('0%')).to be_nil
       expect(UserContent.css_size('0px')).to be_nil
       expect(UserContent.css_size('0')).to be_nil
     end
 
-    it "should preserve percents" do
+    it "preserves percents" do
       expect(UserContent.css_size('100%')).to eq '100%'
     end
 
-    it "should preserve px" do
+    it "preserves px" do
       expect(UserContent.css_size('100px')).to eq '100px'
     end
 
     # TODO: these ones are questionable
-    it "should add 10 to raw numbers and make them px" do
+    it "adds 10 to raw numbers and make them px" do
       expect(UserContent.css_size('100')).to eq '110px'
     end
 
-    it "should be nil for numbers with an unrecognized prefix" do
+    it "is nil for numbers with an unrecognized prefix" do
       expect(UserContent.css_size('x-100')).to be_nil
     end
 
-    it "should keep just the raw number from numbers with an unrecognized suffix" do
+    it "keeps just the raw number from numbers with an unrecognized suffix" do
       expect(UserContent.css_size('100-x')).to eq '100'
     end
   end
@@ -107,7 +107,7 @@ describe UserContent do
       expect(called).to be_truthy
     end
 
-    it "should not grant public access to locked files" do
+    it "does not grant public access to locked files" do
       course_factory
       att1 = attachment_model(context: @course)
       att2 = attachment_model(context: @course)

@@ -109,7 +109,7 @@ RSpec.describe AnonymousSubmissionsController do
       expect(body['published_score']).to be nil
     end
 
-    it "should show rubric assessments to peer reviewers" do
+    it "shows rubric assessments to peer reviewers" do
       course_with_student(active_all: true)
       @course.account.enable_service(:avatars)
       @assessor = @student

@@ -28,7 +28,7 @@ describe UsersController, type: :request do
   end
 
   context "without current_user" do
-    it "should check for auth" do
+    it "checks for auth" do
       get("/api/v1/users/self/upcoming_events")
       assert_status(401)
     end

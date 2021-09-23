@@ -51,7 +51,7 @@ describe "master courses - child courses - wiki page locking" do
       f('tbody .al-trigger')
     end
 
-    it "should not show the edit/delete cog-menu options on the index when locked" do
+    it "does not show the edit/delete cog-menu options on the index when locked" do
       @tag.update(restrictions: { :content => true })
 
       get "/courses/#{@copy_to.id}/pages"
@@ -63,7 +63,7 @@ describe "master courses - child courses - wiki page locking" do
       expect(options_panel).not_to contain_css('.delete-menu-item')
     end
 
-    it "should show the edit/delete cog-menu options on the index when not locked" do
+    it "shows the edit/delete cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/pages"
 
       expect(f('.master-content-lock-cell .icon-blueprint')).to be_displayed
@@ -75,7 +75,7 @@ describe "master courses - child courses - wiki page locking" do
   end
 
   describe "on show page" do
-    it "should not show the delete option when locked" do
+    it "does not show the delete option when locked" do
       @tag.update(restrictions: { :points => true })
 
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
@@ -84,7 +84,7 @@ describe "master courses - child courses - wiki page locking" do
       expect(options_panel).not_to contain_css('.delete_page')
     end
 
-    it "should show the edit/delete cog-menu options when not locked" do
+    it "shows the edit/delete cog-menu options when not locked" do
       get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
       expect(f('#content')).to contain_css('.edit-wiki')

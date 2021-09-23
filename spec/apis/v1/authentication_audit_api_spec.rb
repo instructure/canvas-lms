@@ -30,7 +30,7 @@ describe "AuthenticationAudit API", type: :request do
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
-    it "should 404" do
+    it "404S" do
       raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
       assert_status(404)
     end
@@ -109,11 +109,11 @@ describe "AuthenticationAudit API", type: :request do
         @json = fetch_for_context(@user)
       end
 
-      it "should have correct root keys" do
+      it "has correct root keys" do
         expect(@json.keys.sort).to eq %w{events linked links}
       end
 
-      it "should have a formatted links key" do
+      it "has a formatted links key" do
         links = {
           "events.login" => nil,
           "events.account" => "http://www.example.com/api/v1/accounts/{events.account}",
@@ -123,7 +123,7 @@ describe "AuthenticationAudit API", type: :request do
         expect(@json['links']).to eq links
       end
 
-      it "should have a formatted linked key" do
+      it "has a formatted linked key" do
         expect(@json['linked'].keys.sort).to eq %w{accounts logins page_views users}
         expect(@json['linked']['accounts'].is_a?(Array)).to be_truthy
         expect(@json['linked']['logins'].is_a?(Array)).to be_truthy
@@ -136,7 +136,7 @@ describe "AuthenticationAudit API", type: :request do
           @json = @json['events']
         end
 
-        it "should be formatted as an array of AuthenticationEvent objects" do
+        it "is formatted as an array of AuthenticationEvent objects" do
           expect(@json).to eq [{
             "id" => @event.id,
             "created_at" => @event.created_at.in_time_zone.iso8601,
@@ -156,7 +156,7 @@ describe "AuthenticationAudit API", type: :request do
           @json = @json['linked']['logins']
         end
 
-        it "should be formatted as an array of Pseudonym objects" do
+        it "is formatted as an array of Pseudonym objects" do
           expect(@json).to eq [{
             "id" => @pseudonym.id,
             "created_at" => @pseudonym.created_at.iso8601,
@@ -176,7 +176,7 @@ describe "AuthenticationAudit API", type: :request do
           @json = @json['linked']['accounts']
         end
 
-        it "should be formatted as an array of Account objects" do
+        it "is formatted as an array of Account objects" do
           expect(@json).to eq [{
             "id" => @account.id,
             "uuid" => @account.uuid,
@@ -197,7 +197,7 @@ describe "AuthenticationAudit API", type: :request do
           @json = @json['linked']['users']
         end
 
-        it "should be formatted as an array of User objects" do
+        it "is formatted as an array of User objects" do
           expect(@json).to eq [{
             "id" => @user.id,
             "created_at" => @user.created_at.iso8601,
@@ -217,22 +217,22 @@ describe "AuthenticationAudit API", type: :request do
           @json = @json['linked']['page_views']
         end
 
-        it "should be formatted as an array of page_view objects" do
+        it "is formatted as an array of page_view objects" do
           expect(@json.size).to eql(1)
         end
       end
     end
 
     context "nominal cases" do
-      it "should include events at login endpoint" do
+      it "includes events at login endpoint" do
         expect_event_for_context(@pseudonym, @event, type: 'login')
       end
 
-      it "should include events at account endpoint" do
+      it "includes events at account endpoint" do
         expect_event_for_context(@account, @event)
       end
 
-      it "should include events at user endpoint" do
+      it "includes events at user endpoint" do
         expect_event_for_context(@user, @event)
       end
     end
@@ -243,15 +243,15 @@ describe "AuthenticationAudit API", type: :request do
         user_with_pseudonym(user: @user, account: @account, active_all: true)
       end
 
-      it "should not include cross-account events at login endpoint" do
+      it "does not include cross-account events at login endpoint" do
         forbid_event_for_context(@pseudonym, @event, type: 'login')
       end
 
-      it "should not include cross-account events at account endpoint" do
+      it "does not include cross-account events at account endpoint" do
         forbid_event_for_context(@account, @event)
       end
 
-      it "should include cross-account events at user endpoint" do
+      it "includes cross-account events at user endpoint" do
         expect_event_for_context(@user, @event)
       end
     end
@@ -261,15 +261,15 @@ describe "AuthenticationAudit API", type: :request do
         user_with_pseudonym(active_all: true)
       end
 
-      it "should not include cross-user events at login endpoint" do
+      it "does not include cross-user events at login endpoint" do
         forbid_event_for_context(@pseudonym, @event, type: 'login')
       end
 
-      it "should include cross-user events at account endpoint" do
+      it "includes cross-user events at account endpoint" do
         expect_event_for_context(@account, @event)
       end
 
-      it "should not include cross-user events at user endpoint" do
+      it "does not include cross-user events at user endpoint" do
         forbid_event_for_context(@user, @event)
       end
     end
@@ -287,51 +287,51 @@ describe "AuthenticationAudit API", type: :request do
         end
       end
 
-      it "should recognize :start_time for logins" do
+      it "recognizes :start_time for logins" do
         expect_event_for_context(@pseudonym, @event, start_time: 12.hours.ago, type: 'login')
         forbid_event_for_context(@pseudonym, @event2, start_time: 12.hours.ago, type: 'login')
       end
 
-      it "should recognize :newest for logins" do
+      it "recognizes :newest for logins" do
         expect_event_for_context(@pseudonym, @event2, end_time: 12.hours.ago, type: 'login')
         forbid_event_for_context(@pseudonym, @event, end_time: 12.hours.ago, type: 'login')
       end
 
-      it "should recognize :start_time for accounts" do
+      it "recognizes :start_time for accounts" do
         expect_event_for_context(@account, @event, start_time: 12.hours.ago)
         forbid_event_for_context(@account, @event2, start_time: 12.hours.ago)
       end
 
-      it "should recognize :newest for accounts" do
+      it "recognizes :newest for accounts" do
         expect_event_for_context(@account, @event2, end_time: 12.hours.ago)
         forbid_event_for_context(@account, @event, end_time: 12.hours.ago)
       end
 
-      it "should recognize :start_time for users" do
+      it "recognizes :start_time for users" do
         expect_event_for_context(@user, @event, start_time: 12.hours.ago)
         forbid_event_for_context(@user, @event2, start_time: 12.hours.ago)
       end
 
-      it "should recognize :newest for users" do
+      it "recognizes :newest for users" do
         expect_event_for_context(@user, @event2, end_time: 12.hours.ago)
         forbid_event_for_context(@user, @event, end_time: 12.hours.ago)
       end
     end
 
     context "deleted entities" do
-      it "should 404 for inactive logins" do
+      it "404S for inactive logins" do
         @pseudonym.destroy
         fetch_for_context(@pseudonym, expected_status: 404, type: 'login')
       end
 
-      it "should 404 for inactive accounts" do
+      it "404S for inactive accounts" do
         # can't just delete Account.default
         @account = account_model
         @account.destroy
         fetch_for_context(@account, expected_status: 404)
       end
 
-      it "should 404 for inactive users" do
+      it "404S for inactive users" do
         @user.destroy
         fetch_for_context(@user, expected_status: 404)
       end
@@ -342,7 +342,7 @@ describe "AuthenticationAudit API", type: :request do
         @user, @viewing_user = @user, user_model
       end
 
-      it "should not allow other account models" do
+      it "does not allow other account models" do
         new_root_account = Account.create!(name: 'New Account')
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @user, @pseudonym, @viewing_user = @user, @pseudonym, user_with_pseudonym(account: new_root_account)
@@ -353,15 +353,15 @@ describe "AuthenticationAudit API", type: :request do
       end
 
       context "no permission on account" do
-        it "should not authorize the login endpoint" do
+        it "does not authorize the login endpoint" do
           fetch_for_context(@pseudonym, expected_status: 401, type: 'login')
         end
 
-        it "should not authorize the account endpoint" do
+        it "does not authorize the account endpoint" do
           fetch_for_context(@account, expected_status: 401)
         end
 
-        it "should not authorize the user endpoint" do
+        it "does not authorize the user endpoint" do
           fetch_for_context(@user, expected_status: 401)
         end
       end
@@ -375,15 +375,15 @@ describe "AuthenticationAudit API", type: :request do
           )
         end
 
-        it "should authorize the login endpoint" do
+        it "authorizes the login endpoint" do
           fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
         end
 
-        it "should authorize the account endpoint" do
+        it "authorizes the account endpoint" do
           fetch_for_context(@account, expected_status: 200)
         end
 
-        it "should authorize the user endpoint" do
+        it "authorizes the user endpoint" do
           fetch_for_context(@user, expected_status: 200)
         end
       end
@@ -397,15 +397,15 @@ describe "AuthenticationAudit API", type: :request do
           )
         end
 
-        it "should authorize the login endpoint" do
+        it "authorizes the login endpoint" do
           fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
         end
 
-        it "should authorize the account endpoint" do
+        it "authorizes the account endpoint" do
           fetch_for_context(@account, expected_status: 200)
         end
 
-        it "should authorize the user endpoint" do
+        it "authorizes the user endpoint" do
           fetch_for_context(@user, expected_status: 200)
         end
       end
@@ -419,15 +419,15 @@ describe "AuthenticationAudit API", type: :request do
           )
         end
 
-        it "should authorize the login endpoint" do
+        it "authorizes the login endpoint" do
           fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
         end
 
-        it "should authorize the account endpoint" do
+        it "authorizes the account endpoint" do
           fetch_for_context(@account, expected_status: 200)
         end
 
-        it "should authorize the user endpoint" do
+        it "authorizes the user endpoint" do
           fetch_for_context(@user, expected_status: 200)
         end
       end
@@ -441,15 +441,15 @@ describe "AuthenticationAudit API", type: :request do
           )
         end
 
-        it "should authorize the login endpoint" do
+        it "authorizes the login endpoint" do
           fetch_for_context(@pseudonym, expected_status: 200, type: 'login')
         end
 
-        it "should authorize the account endpoint" do
+        it "authorizes the account endpoint" do
           fetch_for_context(@account, expected_status: 200)
         end
 
-        it "should authorize the user endpoint" do
+        it "authorizes the user endpoint" do
           fetch_for_context(@user, expected_status: 200)
         end
       end
@@ -467,7 +467,7 @@ describe "AuthenticationAudit API", type: :request do
         end
 
         context "without permission on the second account" do
-          it "should not include cross-account events at user endpoint" do
+          it "does not include cross-account events at user endpoint" do
             forbid_event_for_context(@user, @event)
           end
         end
@@ -481,7 +481,7 @@ describe "AuthenticationAudit API", type: :request do
             )
           end
 
-          it "should include cross-account events at user endpoint" do
+          it "includes cross-account events at user endpoint" do
             expect_event_for_context(@user, @event)
           end
         end
@@ -491,7 +491,7 @@ describe "AuthenticationAudit API", type: :request do
             @viewing_user = @user
           end
 
-          it "should include cross-account events at user endpoint" do
+          it "includes cross-account events at user endpoint" do
             expect_event_for_context(@user, @event)
           end
         end
@@ -509,7 +509,7 @@ describe "AuthenticationAudit API", type: :request do
         end
       end
 
-      it "should see events on both shards" do
+      it "sees events on both shards" do
         expect_event_for_context(@user, @event)
         expect_event_for_context(@user, @event2)
       end
@@ -527,11 +527,11 @@ describe "AuthenticationAudit API", type: :request do
           end
         end
 
-        it "should include events from visible accounts" do
+        it "includes events from visible accounts" do
           expect_event_for_context(@user, @event2)
         end
 
-        it "should not include events from non-visible accounts" do
+        it "does not include events from non-visible accounts" do
           forbid_event_for_context(@user, @event)
         end
       end
@@ -545,11 +545,11 @@ describe "AuthenticationAudit API", type: :request do
         @json = fetch_for_context(@user, :per_page => 2)
       end
 
-      it "should only return one page of results" do
+      it "onlies return one page of results" do
         expect(@json['events'].size).to eq 2
       end
 
-      it "should have pagination headers" do
+      it "has pagination headers" do
         expect(response.headers['Link']).to match(/rel="next"/)
       end
     end

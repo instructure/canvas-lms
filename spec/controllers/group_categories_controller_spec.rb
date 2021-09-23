@@ -27,7 +27,7 @@ describe GroupCategoriesController do
   end
 
   describe "POST create" do
-    it "should require authorization" do
+    it "requires authorization" do
       user_session(@student)
       @group = @course.groups.create(:name => "some groups")
       post 'create', params: { :course_id => @course.id, :category => {} }
@@ -41,7 +41,7 @@ describe GroupCategoriesController do
       expect(response).to be_successful
     end
 
-    it "should not be authorized without :manage_groups_add enabled (granular permissions)" do
+    it "is not authorized without :manage_groups_add enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.root_account.role_overrides.create!(
         permission: 'manage_groups_add',
@@ -53,7 +53,7 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@teacher)
       @group = @course.groups.create(:name => "some groups")
       create_users_in_course(@course, 5) # plus one student in before block
@@ -66,7 +66,7 @@ describe GroupCategoriesController do
       expect(groups[1].users.length).to eql(3)
     end
 
-    it "should give the new groups the right group_category" do
+    it "gives the new groups the right group_category" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :split_group_count => 1, :split_groups => '1' } }
       expect(response).to be_successful
@@ -74,26 +74,26 @@ describe GroupCategoriesController do
       expect(assigns[:group_category].groups[0].group_category.name).to eq "Study Groups"
     end
 
-    it "should error if the group name is protected" do
+    it "errors if the group name is protected" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Student Groups" } }
       expect(response).not_to be_successful
     end
 
-    it "should error if the group name is already in use" do
+    it "errors if the group name is already in use" do
       user_session(@teacher)
       @course.group_categories.create(:name => "My Category")
       post 'create', params: { :course_id => @course.id, :category => { :name => "My Category" } }
       expect(response).not_to be_successful
     end
 
-    it "should require the group name" do
+    it "requires the group name" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => {} }
       expect(response).not_to be_successful
     end
 
-    it "should respect enable_self_signup" do
+    it "respects enable_self_signup" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :enable_self_signup => '1' } }
       expect(response).to be_successful
@@ -102,7 +102,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).to be_unrestricted_self_signup
     end
 
-    it "should use create_group_count when self-signup" do
+    it "uses create_group_count when self-signup" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :enable_self_signup => '1', :create_group_count => '3' } }
       expect(response).to be_successful
@@ -118,7 +118,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category].auto_leader).to eq 'random'
     end
 
-    it "should respect the max new-category group count" do
+    it "respects the max new-category group count" do
       user_session(@teacher)
       Setting.set('max_groups_in_new_category', '5')
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :enable_self_signup => '1', :create_group_count => '7' } }
@@ -126,7 +126,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category].groups.size).to eq 5
     end
 
-    it "should not distribute students when self-signup" do
+    it "does not distribute students when self-signup" do
       user_session(@teacher)
       create_users_in_course(@course, 3)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :enable_self_signup => '1', :create_category_count => '2' } }
@@ -135,7 +135,7 @@ describe GroupCategoriesController do
       assigns[:group_category].groups.all? { |g| expect(g.users).to be_empty }
     end
 
-    it "should respect restrict_self_signup" do
+    it "respects restrict_self_signup" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :category => { :name => "Study Groups", :enable_self_signup => '1', :restrict_self_signup => '1' } }
       expect(response).to be_successful
@@ -149,12 +149,12 @@ describe GroupCategoriesController do
       @group_category = @course.group_categories.create(:name => "My Category")
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => {} }
       assert_unauthorized
     end
 
-    it "should update category" do
+    it "updates category" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => "Different Category", :enable_self_signup => "1" } }
       expect(response).to be_successful
@@ -163,7 +163,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).to be_self_signup
     end
 
-    it "should update category (granular permissions)" do
+    it "updates category (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => "Different Category", :enable_self_signup => "1" } }
@@ -173,7 +173,7 @@ describe GroupCategoriesController do
       expect(assigns[:group_category]).to be_self_signup
     end
 
-    it "should not update category if :manage_groups_manage is not enabled (granular permissions)" do
+    it "does not update category if :manage_groups_manage is not enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_manage',
@@ -185,40 +185,40 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "should leave the name alone if not given" do
+    it "leaves the name alone if not given" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => {} }
       expect(response).to be_successful
       expect(assigns[:group_category].name).to eq "My Category"
     end
 
-    it "should not accept a sent but empty name" do
+    it "does not accept a sent but empty name" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => '' } }
       expect(response).not_to be_successful
     end
 
-    it "should error if the name is protected" do
+    it "errors if the name is protected" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => "Student Groups" } }
       expect(response).not_to be_successful
     end
 
-    it "should error if the name is already in use" do
+    it "errors if the name is already in use" do
       user_session(@teacher)
       @course.group_categories.create(:name => "Other Category")
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => "Other Category" } }
       expect(response).not_to be_successful
     end
 
-    it "should not error if the name is the current name" do
+    it "does not error if the name is the current name" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @group_category.id, :category => { :name => "My Category" } }
       expect(response).to be_successful
       expect(assigns[:group_category].name).to eql("My Category")
     end
 
-    it "should error if restrict_self_signups is specified but the category has heterogenous groups" do
+    it "errors if restrict_self_signups is specified but the category has heterogenous groups" do
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -234,13 +234,13 @@ describe GroupCategoriesController do
   end
 
   describe "DELETE delete" do
-    it "should require authorization" do
+    it "requires authorization" do
       group_category = @course.group_categories.create(:name => "Study Groups")
       delete 'destroy', params: { :course_id => @course.id, :id => group_category.id }
       assert_unauthorized
     end
 
-    it "should delete the category and groups" do
+    it "deletes the category and groups" do
       user_session(@teacher)
       category1 = @course.group_categories.create(:name => "Study Groups")
       category2 = @course.group_categories.create(:name => "Other Groups")
@@ -255,7 +255,7 @@ describe GroupCategoriesController do
       expect(@course.groups.active.length).to eql(1)
     end
 
-    it "should delete the category and groups (granular permissions)" do
+    it "deletes the category and groups (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       category1 = @course.group_categories.create(:name => "Study Groups")
@@ -271,7 +271,7 @@ describe GroupCategoriesController do
       expect(@course.groups.active.length).to eql(1)
     end
 
-    it "shouldn't delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
+    it "does not delete the category/groups if :manage_groups_delete is not enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_delete',
@@ -287,13 +287,13 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it "should fail if category doesn't exist" do
+    it "fails if category doesn't exist" do
       user_session(@teacher)
       delete 'destroy', params: { :course_id => @course.id, :id => 11235 }
       expect(response).not_to be_successful
     end
 
-    it "should fail if category is protected" do
+    it "fails if category is protected" do
       user_session(@teacher)
       delete 'destroy', params: { :course_id => @course.id, :id => GroupCategory.student_organized_for(@course).id }
       expect(response).not_to be_successful
@@ -314,7 +314,7 @@ describe GroupCategoriesController do
       @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
     end
 
-    it "should include group submissions if param is present" do
+    it "includes group submissions if param is present" do
       user_session(@teacher)
       get 'users', params: { :course_id => @course.id, :group_category_id => @category.id, include: ['group_submissions'] }
       json = JSON.parse(response.body)
@@ -324,7 +324,7 @@ describe GroupCategoriesController do
       expect(json[0]["group_submissions"][0]).to be_equal @sub.id
     end
 
-    it "should not include group submissions if param is absent" do
+    it "does not include group submissions if param is absent" do
       user_session(@teacher)
       get 'users', params: { :course_id => @course.id, :group_category_id => @category.id }
       json = JSON.parse(response.body)
@@ -343,7 +343,7 @@ describe GroupCategoriesController do
       @category = @course.group_categories.create(name: 'Group Category')
     end
 
-    it 'should require authorization' do
+    it 'requires authorization' do
       post 'import', params: {
         course_id: @course.id,
         group_category_id: @category.id,
@@ -352,7 +352,7 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it 'should render progress_json' do
+    it 'renders progress_json' do
       user_session(@teacher)
       post 'import', params: {
         course_id: @course.id,
@@ -366,7 +366,7 @@ describe GroupCategoriesController do
       expect(json['completion']).to eq 0
     end
 
-    it 'should initiate import (granular permissions)' do
+    it 'initiates import (granular permissions)' do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       post 'import', params: {
@@ -381,7 +381,7 @@ describe GroupCategoriesController do
       expect(json['completion']).to eq 0
     end
 
-    it 'should not initiate import if :manage_groups_add is not enabled (granular permissions)' do
+    it 'does not initiate import if :manage_groups_add is not enabled (granular permissions)' do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_add',
@@ -397,7 +397,7 @@ describe GroupCategoriesController do
       assert_unauthorized
     end
 
-    it 'should create the groups and add users as specified in the csv' do
+    it 'creates the groups and add users as specified in the csv' do
       user_session(@teacher)
       post 'import', params: {
         course_id: @course.id,

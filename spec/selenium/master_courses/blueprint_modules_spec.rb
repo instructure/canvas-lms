@@ -52,7 +52,7 @@ describe "master courses - child courses - module item locking" do
       user_session(@teacher)
     end
 
-    it "should show all the icons on the modules index" do
+    it "shows all the icons on the modules index" do
       get "/courses/#{@copy_to.id}/modules"
 
       # objects inherited from master show the lock
@@ -63,7 +63,7 @@ describe "master courses - child courses - module item locking" do
       expect(f("#context_module_item_#{@normal_tag.id} .lock-icon")).not_to contain_css('.icon-blueprint')
     end
 
-    it "should disable the title edit input for locked items" do
+    it "disables the title edit input for locked items" do
       get "/courses/#{@copy_to.id}/modules"
 
       f("#context_module_item_#{@locked_tag.id} .al-trigger").click
@@ -71,7 +71,7 @@ describe "master courses - child courses - module item locking" do
       expect(f("#content_tag_title")).to be_disabled
     end
 
-    it "should not disable the title edit input for unlocked items" do
+    it "does not disable the title edit input for unlocked items" do
       get "/courses/#{@copy_to.id}/modules"
 
       f("#context_module_item_#{@unlocked_tag.id} .al-trigger").click
@@ -129,7 +129,7 @@ describe "master courses - child courses - module item locking" do
       user_session(@teacher)
     end
 
-    it "should show all the icons on the modules index" do
+    it "shows all the icons on the modules index" do
       get "/courses/#{@course.id}/modules"
 
       expect(f("#context_module_item_#{@assmt_mod_tag.id} .lock-icon")).to contain_css('.icon-blueprint')

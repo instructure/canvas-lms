@@ -133,7 +133,7 @@ describe Submissions::AnonymousDownloadsController do
       end
     end
 
-    it "should redirect download requests with the download_frd parameter" do
+    it "redirects download requests with the download_frd parameter" do
       # This is because the files controller looks for download_frd to indicate a forced download
       course_with_teacher_logged_in
       @course.account.enable_service(:avatars)

@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::TermImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -40,7 +40,7 @@ describe SIS::CSV::TermImporter do
                           "No name given for term T003"]
   end
 
-  it 'should create terms' do
+  it 'creates terms' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -65,7 +65,7 @@ describe SIS::CSV::TermImporter do
     expect(importer.errors.map { |r| r.last }).to eq ["Bad date format for term T002"]
   end
 
-  it 'should support stickiness' do
+  it 'supports stickiness' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -103,7 +103,7 @@ describe SIS::CSV::TermImporter do
     end
   end
 
-  it 'should not delete terms with active courses' do
+  it 'does not delete terms with active courses' do
     process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00",
@@ -135,7 +135,7 @@ describe SIS::CSV::TermImporter do
     expect(t1).to be_deleted
   end
 
-  it 'should allow setting and removing enrollment type date overrides' do
+  it 'allows setting and removing enrollment type date overrides' do
     process_csv_data(
       "term_id,name,status,start_date,end_date,date_override_enrollment_type",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00,",
@@ -155,7 +155,7 @@ describe SIS::CSV::TermImporter do
     expect(t1.enrollment_dates_overrides.where(:enrollment_type => "StudentEnrollment").first).to be_nil
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"

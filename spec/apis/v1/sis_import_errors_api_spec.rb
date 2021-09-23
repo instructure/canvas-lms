@@ -36,7 +36,7 @@ describe SisImportsApiController, type: :request do
     end
   end
 
-  it 'should show errors for a sis_batch' do
+  it 'shows errors for a sis_batch' do
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/#{@batch.id}/errors",
                     { controller: 'sis_import_errors_api', action: 'index',
                       format: 'json', account_id: @account.id.to_s, id: @batch.id.to_s })
@@ -48,7 +48,7 @@ describe SisImportsApiController, type: :request do
                                                "message" => "some error message 0", "row_info" => nil, "row" => 0 }]
   end
 
-  it 'should show errors for a root_account' do
+  it 'shows errors for a root_account' do
     batch = @account.sis_batches.create
     2.times do |i|
       batch.sis_batch_errors.create(root_account: @account,

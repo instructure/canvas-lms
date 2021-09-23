@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::AbstractCourseImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     before_count = AbstractCourse.count
     importer = process_csv_data(
       "abstract_course_id,short_name,long_name,account_id,term_id,status",
@@ -43,7 +43,7 @@ describe SIS::CSV::AbstractCourseImporter do
     ]
   end
 
-  it 'should support sticky fields' do
+  it 'supports sticky fields' do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -92,7 +92,7 @@ describe SIS::CSV::AbstractCourseImporter do
     end
   end
 
-  it 'should create new abstract courses' do
+  it 'creates new abstract courses' do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -118,7 +118,7 @@ describe SIS::CSV::AbstractCourseImporter do
     }
   end
 
-  it 'should allow instantiations of abstract courses' do
+  it 'allows instantiations of abstract courses' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,"
@@ -146,7 +146,7 @@ describe SIS::CSV::AbstractCourseImporter do
     }
   end
 
-  it 'should skip references to nonexistent abstract courses' do
+  it 'skips references to nonexistent abstract courses' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,"
@@ -192,7 +192,7 @@ describe SIS::CSV::AbstractCourseImporter do
     }
   end
 
-  it "should support falling back to a fallback account if the primary one doesn't exist" do
+  it "supports falling back to a fallback account if the primary one doesn't exist" do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",

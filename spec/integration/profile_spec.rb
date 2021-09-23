@@ -30,7 +30,7 @@ describe ProfileController do
     expect(session[:become_user_id]).to eq @fake_student.id.to_s
   end
 
-  it "should respect account setting for editing names" do
+  it "respects account setting for editing names" do
     a = Account.create!
     u = user_with_pseudonym(:account => a, :active_user => true)
     u.short_name = 'Bracken'
@@ -57,7 +57,7 @@ describe ProfileController do
     expect(u.reload.short_name).to eq 'Cody'
   end
 
-  it "should not show student view student edit profile or other services options" do
+  it "does not show student view student edit profile or other services options" do
     course_with_teacher_logged_in(:active_all => true)
     enter_student_view
 

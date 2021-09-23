@@ -62,7 +62,7 @@ describe Rubric do
           @outcome.rubric_criterion = criterion
         end
 
-        it "should allow updating learning outcome criteria" do
+        it "allows updating learning outcome criteria" do
           @rubric.update_learning_outcome_criteria(@outcome)
           rubric_criterion = @rubric.criteria_object.first
           expect(rubric_criterion.description).to eq 'alpha'
@@ -78,7 +78,7 @@ describe Rubric do
           expect(@rubric.points_possible).to eq 12
         end
 
-        it 'should only update learning outcome text when mastery scales are enabled' do
+        it 'onlies update learning outcome text when mastery scales are enabled' do
           Account.default.enable_feature! :account_level_mastery_scales
           @rubric.update_learning_outcome_criteria(@outcome)
           rubric_criterion = @rubric.criteria_object.first
@@ -96,7 +96,7 @@ describe Rubric do
           @rubric.update_mastery_scales
         end
 
-        it 'should update scale and points from mastery scales' do
+        it 'updates scale and points from mastery scales' do
           rubric_criterion = @rubric.criteria_object.first
           expect(rubric_criterion.description).to eq 'Outcome row'
           expect(rubric_criterion.long_description).to eq @outcome.description
@@ -172,13 +172,13 @@ describe Rubric do
       end
     end
 
-    it "should allow learning outcome rows in the rubric" do
+    it "allows learning outcome rows in the rubric" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
 
-    it "should delete learning outcome tags when they no longer exist" do
+    it "deletes learning outcome tags when they no longer exist" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
@@ -187,7 +187,7 @@ describe Rubric do
       expect(@rubric.learning_outcome_alignments.active).to be_empty
     end
 
-    it "should create learning outcome associations for multiple outcome rows" do
+    it "creates learning outcome associations for multiple outcome rows" do
       outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric.data[1][:learning_outcome_id] = outcome2.id
       @rubric.save!
@@ -196,7 +196,7 @@ describe Rubric do
       expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, outcome2.id].sort)
     end
 
-    it "should create outcome results when outcome-aligned rubrics are assessed" do
+    it "creates outcome results when outcome-aligned rubrics are assessed" do
       expect(@rubric).not_to be_new_record
       expect(@rubric.learning_outcome_alignments.reload).not_to be_empty
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
@@ -225,7 +225,7 @@ describe Rubric do
       expect(result.mastery).to be_truthy
     end
 
-    it "should destroy an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
+    it "destroys an outcome link after the assignment using it is destroyed (if it's not used anywhere else)" do
       outcome2 = @course.account.created_learning_outcomes.create!(:title => 'outcome')
       link = @course.root_outcome_group.add_outcome(outcome2)
       rubric = rubric_model
@@ -251,7 +251,7 @@ describe Rubric do
   end
 
   context "with fractional_points" do
-    it "should allow fractional points" do
+    it "allows fractional points" do
       course_factory
       data = [
         {
@@ -299,7 +299,7 @@ describe Rubric do
     end
   end
 
-  it "should be cool about duplicate titles" do
+  it "is cool about duplicate titles" do
     course_with_teacher
 
     r1 = rubric_model({ context: @course, title: "rubric" })

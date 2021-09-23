@@ -28,7 +28,7 @@ describe Submissions::PreviewsController do
       user_session(@student)
     end
 
-    it "should render show_preview" do
+    it "renders show_preview" do
       get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id, preview: true }
       expect(response).to render_template(:show_preview)
     end
@@ -38,7 +38,7 @@ describe Submissions::PreviewsController do
         quiz_with_submission
       end
 
-      it "should redirect to course_quiz_url" do
+      it "redirects to course_quiz_url" do
         get :show, params: { course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true }
         expect(response).to redirect_to(course_quiz_url(@context, @quiz, headless: 1))
       end
@@ -52,7 +52,7 @@ describe Submissions::PreviewsController do
           end
         end
 
-        it "should redirect to course_quiz_history_url" do
+        it "redirects to course_quiz_history_url" do
           get :show, params: { course_id: @context.id, assignment_id: @quiz.assignment.id, id: @student.id, preview: true }
           expect(response).to redirect_to(course_quiz_history_url(@context, @quiz, {
                                                                     headless: 1,
@@ -61,7 +61,7 @@ describe Submissions::PreviewsController do
                                                                   }))
         end
 
-        it "should favor params[:version] when set" do
+        it "favors params[:version] when set" do
           version = 1
           get :show, params: {
             course_id: @context.id,

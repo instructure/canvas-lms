@@ -104,7 +104,7 @@ describe CrocodocSessionsController do
     end
   end
 
-  it "should 404 if a crocodoc document is unavailable" do
+  it "404S if a crocodoc document is unavailable" do
     get :show, params: { blob: @blob, hmac: @hmac }
     assert_status(404)
   end
@@ -121,13 +121,13 @@ describe CrocodocSessionsController do
                             :settings => { "base_url" => "https://canvadocs.instructure.docker" }
     end
 
-    it "should redirect to a canvadocs session instead of crocodoc when enabled" do
+    it "redirects to a canvadocs session instead of crocodoc when enabled" do
       allow(Canvadocs).to receive(:hijack_crocodoc_sessions?).and_return true
       get :show, params: { blob: @blob, hmac: @hmac }
       expect(response.body).to include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
     end
 
-    it "should not redirect to a canvadocs session instead of crocodoc when disabled" do
+    it "does not redirect to a canvadocs session instead of crocodoc when disabled" do
       get :show, params: { blob: @blob, hmac: @hmac }
       expect(response.body).to_not include 'https://canvadocs.instructure.docker/sessions/SESSION/view'
     end

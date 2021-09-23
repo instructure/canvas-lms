@@ -127,7 +127,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
   describe '#plagiarism_subscription' do
     let(:subscription_helper) { Lti::PlagiarismSubscriptionsHelper.new(tool_proxy) }
 
-    it 'should have associated fields' do
+    it 'has associated fields' do
       expect(subscription_helper.plagiarism_subscription(tool_proxy, tool_proxy.product_family)).to eq({
                                                                                                          'SystemEventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,
                                                                                                          'UserEventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,

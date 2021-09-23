@@ -35,31 +35,31 @@ shared_examples_for "statistics basic tests" do
       admin_logged_in
     end
 
-    it "should validate recently created courses display" do
+    it "validates recently created courses display" do
       skip('list is not available on sub account level') if account != Account.default
       get url
       validate_item_list(list_css[:created], @course.name)
     end
 
-    it "should validate recently started courses display" do
+    it "validates recently started courses display" do
       skip('spec is broken on sub account level') if account != Account.default
       get url
       validate_item_list(list_css[:started], @course.name)
     end
 
-    it "should validate no info in list display" do
+    it "validates no info in list display" do
       get url
       validate_item_list(list_css[:ended], 'None to show')
     end
 
-    it "should validate link works in list" do
+    it "validates link works in list" do
       skip('spec is broken on sub account level') if account != Account.default
       get url
       expect_new_page_load { f(list_css[:started]).find_element(:css, '.header').click }
       expect(f('#breadcrumbs .home + li a')).to include_text(@course.name)
     end
 
-    it "should validate recently ended courses display" do
+    it "validates recently ended courses display" do
       skip('spec is broken on sub account level') if account != Account.default
       concluded_course = Course.create!(:name => 'concluded course', :account => account)
       concluded_course.update(:conclude_at => 1.day.ago)
@@ -68,7 +68,7 @@ shared_examples_for "statistics basic tests" do
     end
   end
 
-  it "should validate recently logged-in courses display" do
+  it "validates recently logged-in courses display" do
     course = Course.create!(:name => 'new course', :account => account)
     course.offer!
     student = user_factory(active_user: true)

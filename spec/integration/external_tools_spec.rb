@@ -35,7 +35,7 @@ describe "External Tools" do
       @tag.save!
     end
 
-    it "should generate valid LTI parameters" do
+    it "generates valid LTI parameters" do
       student_in_course(:course => @course, :active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -53,7 +53,7 @@ describe "External Tools" do
       expect(form.at_css('input#roles')['value']).to eq "Learner"
     end
 
-    it "should include outcome service params when viewing as student" do
+    it "includes outcome service params when viewing as student" do
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
       allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
@@ -69,7 +69,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#ext_ims_lis_basic_outcome_url')['value']).to eq blti_legacy_grade_passback_api_url(@tool)
     end
 
-    it "should not include outcome service sourcedid when viewing as teacher" do
+    it "does not include outcome service sourcedid when viewing as teacher" do
       @course.enroll_teacher(user_factory(:active_all => true))
       user_session(@user)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -79,7 +79,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#lis_outcome_service_url')).not_to be_nil
     end
 
-    it "should include time zone in LTI paramaters if included in custom fields" do
+    it "includes time zone in LTI paramaters if included in custom fields" do
       @tool.custom_fields = {
         "custom_time_zone" => "$Person.address.timezone",
       }
@@ -105,7 +105,7 @@ describe "External Tools" do
       expect(doc.at_css('form#tool_form input#custom_time_zone')['value']).to eq "Pacific/Honolulu"
     end
 
-    it "should redirect if the tool can't be configured" do
+    it "redirects if the tool can't be configured" do
       @tag.update_attribute(:url, "http://example.net")
 
       student_in_course(:active_all => true)
@@ -115,7 +115,7 @@ describe "External Tools" do
       expect(flash[:error]).to be_present
     end
 
-    it "should render inline external tool links with a full return url" do
+    it "renders inline external tool links with a full return url" do
       student_in_course(:active_all => true)
       user_session(@user)
       get "/courses/#{@course.id}/external_tools/retrieve?url=#{CGI.escape(@tag.url)}"
@@ -125,7 +125,7 @@ describe "External Tools" do
       expect(doc.at_css("input[name='launch_presentation_return_url']")['value']).to match(/^http/)
     end
 
-    it "should render user navigation tools with a full return url" do
+    it "renders user navigation tools with a full return url" do
       tool = @course.root_account.context_external_tools.build(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com', :privacy_level => 'public')
       tool.user_navigation = { :url => "http://www.example.com", :text => "Example URL" }
       tool.save!
@@ -140,7 +140,7 @@ describe "External Tools" do
     end
   end
 
-  it "should highlight the navigation tab when using an external tool" do
+  it "highlights the navigation tab when using an external tool" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
@@ -155,7 +155,7 @@ describe "External Tools" do
     expect(tab['class'].split).to include("active")
   end
 
-  it "should prevent access for unverified users if account requires it" do
+  it "prevents access for unverified users if account requires it" do
     course_with_teacher_logged_in(:active_all => true)
 
     @tool = @course.context_external_tools.create!(:shared_secret => 'test_secret', :consumer_key => 'test_key', :name => 'my grade passback test tool', :domain => 'example.com')
@@ -183,7 +183,7 @@ describe "External Tools" do
       @permissiony_tool.save!
     end
 
-    it "should show the admin level global navigation menu items to teachers" do
+    it "shows the admin level global navigation menu items to teachers" do
       course_with_teacher_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful
@@ -200,7 +200,7 @@ describe "External Tools" do
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
-    it "should only show the member level global navigation menu items to students" do
+    it "onlies show the member level global navigation menu items to students" do
       course_with_student_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful

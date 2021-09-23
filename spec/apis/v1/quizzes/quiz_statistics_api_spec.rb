@@ -51,19 +51,19 @@ describe Quizzes::QuizStatisticsController, type: :request do
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/statistics [index]' do
-    it 'should generate statistics implicitly, never return an empty list' do
+    it 'generates statistics implicitly, never return an empty list' do
       Quizzes::QuizStatistics.destroy_all
       json = api_index
       expect(json['quiz_statistics']).not_to eq({})
     end
 
-    it 'should deny unauthorized access' do
+    it 'denies unauthorized access' do
       student_in_course
       api_index raw: true
       assert_status(401)
     end
 
-    it 'should respect the all_versions parameter' do
+    it 'respects the all_versions parameter' do
       json1 = api_index({}, { all_versions: true })
       json2 = api_index({}, { all_versions: false })
 
@@ -73,7 +73,7 @@ describe Quizzes::QuizStatisticsController, type: :request do
       end
     end
 
-    it 'should render' do
+    it 'renders' do
       json = api_index
       expect(json.has_key?('quiz_statistics')).to be_truthy
       expect(json['quiz_statistics'].size).to eq 1
@@ -81,14 +81,14 @@ describe Quizzes::QuizStatisticsController, type: :request do
       expect(json['quiz_statistics'][0]).to have_key('links')
       expect(json['quiz_statistics'][0]).not_to have_key('quiz_id')
     end
-    it "should return :no_content for large quizzes" do
+    it "returns :no_content for large quizzes" do
       allow(Quizzes::QuizStatistics).to receive(:large_quiz?).and_return true
 
       expect(api_index(raw: true)).to be_equal(204)
     end
 
     context 'JSON-API compliance' do
-      it 'should conform to the JSON-API spec when returning the object' do
+      it 'conforms to the JSON-API spec when returning the object' do
         json = api_index
         assert_jsonapi_compliance(json, 'quiz_statistics')
       end

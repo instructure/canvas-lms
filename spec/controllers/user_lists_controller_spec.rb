@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe UserListsController do
-  it "should not fail for permission to add students (non-granular)" do
+  it "does not fail for permission to add students (non-granular)" do
     course_factory
     @course.root_account.disable_feature!(:granular_permissions_manage_users)
     role = custom_account_role('myadmin', :account => @course.account)
@@ -32,7 +32,7 @@ describe UserListsController do
     expect(response).to be_successful
   end
 
-  it "should not fail for permission to add students (granular)" do
+  it "does not fail for permission to add students (granular)" do
     course_factory
     @course.root_account.enable_feature!(:granular_permissions_manage_users)
     role = custom_account_role('myadmin', :account => @course.account)
@@ -43,7 +43,7 @@ describe UserListsController do
     expect(response).to be_successful
   end
 
-  it "should use version 2 if requested" do
+  it "uses version 2 if requested" do
     course_with_teacher(:active_all => true)
     user_session(@user)
 

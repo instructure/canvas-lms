@@ -149,7 +149,7 @@ describe RubricAssessment do
 
   it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
 
-  it "should htmlify the rating comments" do
+  it "htmlifies the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
     assessment = @association.assess({
                                        :user => @student,
@@ -171,7 +171,7 @@ describe RubricAssessment do
   end
 
   context "grading" do
-    it "should update scores if used for grading" do
+    it "updates scores if used for grading" do
       assessment = @association.assess({
                                          :user => @student,
                                          :assessor => @teacher,
@@ -194,7 +194,7 @@ describe RubricAssessment do
       expect(assessment.data.first[:comments_html]).to be_nil
     end
 
-    it "should allow observers the ability to view rubric assessments with course association" do
+    it "allows observers the ability to view rubric assessments with course association" do
       submission = @assignment.find_or_create_submission(@student)
       assessment = @association.assess(
         {
@@ -213,7 +213,7 @@ describe RubricAssessment do
       expect(visible_rubric_assessments.length).to eql(1)
     end
 
-    it "should allow observers the ability to view rubric assessments with account association" do
+    it "allows observers the ability to view rubric assessments with account association" do
       submission = @assignment.find_or_create_submission(@student)
       account_association = @rubric.associate_with(@assignment, @account, :purpose => 'grading', :use_for_grading => true)
       assessment = account_association.assess(
@@ -233,7 +233,7 @@ describe RubricAssessment do
       expect(visible_rubric_assessments.length).to eql(1)
     end
 
-    it "should update scores anonymously if graded anonymously" do
+    it "updates scores anonymously if graded anonymously" do
       assessment = @association.assess({
                                          :graded_anonymously => true,
                                          :user => @student,
@@ -247,7 +247,7 @@ describe RubricAssessment do
       expect(assessment.artifact.graded_anonymously).to be_truthy
     end
 
-    it "should not mutate null/empty string score text to 0" do
+    it "does not mutate null/empty string score text to 0" do
       assessment = @association.assess({
                                          :user => @student,
                                          :assessor => @teacher,
@@ -263,7 +263,7 @@ describe RubricAssessment do
       expect(assessment.artifact.score).to eql(nil)
     end
 
-    it "should allow points to exceed max points possible for criterion" do
+    it "allows points to exceed max points possible for criterion" do
       assessment = @association.assess({
                                          :user => @student,
                                          :assessor => @teacher,
@@ -353,7 +353,7 @@ describe RubricAssessment do
         expect(InstStatsd::Statsd).to have_received(:increment).with('learning_outcome_result.create')
       end
 
-      it 'should use default ratings for scoring' do
+      it 'uses default ratings for scoring' do
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({
@@ -371,7 +371,7 @@ describe RubricAssessment do
         expect(assessment.artifact.score).to be 3.0
       end
 
-      it "should not allow points to exceed max points possible" do
+      it "does not allow points to exceed max points possible" do
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         assessment = @association.assess({
                                            :user => @student,
@@ -425,7 +425,7 @@ describe RubricAssessment do
         expect(LearningOutcomeResult.last.hide_points).to be true
       end
 
-      it "should truncate the learning outcome result title to 250 characters" do
+      it "truncates the learning outcome result title to 250 characters" do
         @association.update!(title: 'a' * 255)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
         @association.assess({
@@ -526,7 +526,7 @@ describe RubricAssessment do
       end
     end
 
-    it "should not update scores if not used for grading" do
+    it "does not update scores if not used for grading" do
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => false)
       assessment = @association.assess({
@@ -550,7 +550,7 @@ describe RubricAssessment do
       expect(assessment.artifact.score).to eql(nil)
     end
 
-    it "should not update scores if not a valid grader" do
+    it "does not update scores if not a valid grader" do
       @student2 = user_factory(active_all: true)
       @course.enroll_student(@student2).accept
       assessment = @association.assess({
@@ -644,19 +644,19 @@ describe RubricAssessment do
                                                   })
       end
 
-      it "should prevent reviewed from seeing reviewer's name" do
+      it "prevents reviewed from seeing reviewer's name" do
         expect(@assessment.grants_right?(@reviewed, :read_assessor)).to be_falsey
       end
 
-      it "should allow reviewer to see own name" do
+      it "allows reviewer to see own name" do
         expect(@assessment.grants_right?(@reviewer, :read_assessor)).to be_truthy
       end
 
-      it "should allow teacher to see reviewer's name" do
+      it "allows teacher to see reviewer's name" do
         expect(@assessment.grants_right?(@teacher, :read_assessor)).to be_truthy
       end
 
-      it "should allow reviewed to see reviewer's name if reviewer is teacher" do
+      it "allows reviewed to see reviewer's name if reviewer is teacher" do
         expect(@teacher_assessment.grants_right?(@reviewed, :read_assessor)).to be_truthy
       end
     end
@@ -672,7 +672,7 @@ describe RubricAssessment do
                                  })
       }
 
-      it "should not blow up without a rubric_association" do
+      it "does not blow up without a rubric_association" do
         expect { assessment.considered_anonymous? }.not_to raise_error
       end
     end
@@ -725,7 +725,7 @@ describe RubricAssessment do
         end
       end
 
-      it 'should set group on submission' do
+      it 'sets group on submission' do
         group_category = @course.group_categories.create!(name: "Test Group Set")
         group = @course.groups.create!(name: "Group A", group_category: group_category)
         group.add_user @student

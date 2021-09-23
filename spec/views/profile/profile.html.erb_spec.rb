@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/profile/profile" do
-  it "should render" do
+  it "renders" do
     course_with_student(:active_user => true)
     view_context
 
@@ -39,7 +39,7 @@ describe "/profile/profile" do
     expect(response).not_to be_nil
   end
 
-  it "should not show the delete link for SIS pseudonyms without manage_sis" do
+  it "does not show the delete link for SIS pseudonyms without manage_sis" do
     account_admin_user_with_role_changes(active_user: true, role_changes: { manage_sis: false })
     view_context
 
@@ -59,7 +59,7 @@ describe "/profile/profile" do
     expect(page.css("#pseudonym_#{sis_pseudonym.id} .delete_pseudonym_link").first['style']).to eq 'display: none;'
   end
 
-  it "should not show the pseudonym delete link to non-admins" do
+  it "does not show the pseudonym delete link to non-admins" do
     course_with_student(:active_user => true)
     view_context
 

@@ -62,7 +62,7 @@ describe 'native canvas conditional release' do
   end
 
   context "Quizzes Classic as part of Mastery Paths" do
-    it 'should display Mastery Paths tab in quizzes edit page' do
+    it 'displays Mastery Paths tab in quizzes edit page' do
       course_quiz
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit"
 
@@ -72,7 +72,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.cr_editor_exists?).to eq(true)
     end
 
-    it 'should disable Mastery Paths tab in quizzes for quiz types other than graded' do
+    it 'disables Mastery Paths tab in quizzes for quiz types other than graded' do
       course_quiz
 
       quiz_types_without_mastery_paths = [
@@ -91,7 +91,7 @@ describe 'native canvas conditional release' do
   end
 
   context 'Discussions as part of Mastery Paths' do
-    it 'should display Mastery paths tab from (graded) Discussions edit page' do
+    it 'displays Mastery paths tab from (graded) Discussions edit page' do
       discussion_topic_model(:context => @course)
 
       get "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
@@ -104,7 +104,7 @@ describe 'native canvas conditional release' do
   end
 
   context "Assignment Mastery Paths" do
-    it "should display Mastery Paths tab in assignments edit page" do
+    it "displays Mastery Paths tab in assignments edit page" do
       assignment = assignment_model(course: @course)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
 
@@ -114,7 +114,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.conditional_release_editor_exists?).to eq(true)
     end
 
-    it 'should be able to see default conditional release editor' do
+    it 'is able to see default conditional release editor' do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
@@ -122,7 +122,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.top_scoring_boundary.text).to eq("100 pts")
     end
 
-    it 'should be able to set scoring range' do
+    it 'is able to set scoring range' do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
@@ -134,7 +134,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.division_cutoff2.attribute("value")).to eq("47 pts")
     end
 
-    it 'should be able to add an assignment to a range', ignore_js_errors: true do
+    it 'is able to add an assignment to a range', ignore_js_errors: true do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment for MP")
       get "/courses/#{@course.id}/assignments/#{main_assignment.id}/edit"
@@ -146,7 +146,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.assignment_card_exists?(assignment_for_mp.title)).to eq(true)
     end
 
-    it 'should be able to toggle and/or between two assignments', ignore_js_errors: true do
+    it 'is able to toggle and/or between two assignments', ignore_js_errors: true do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment1_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment 1 for MP")
       assignment2_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment 2 for MP")
@@ -168,7 +168,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.and_toggle_button_exists?).to eq(true)
     end
 
-    it 'should be able to move assignment to next row', ignore_js_errors: true do
+    it 'is able to move assignment to next row', ignore_js_errors: true do
       main_assignment = assignment_model(course: @course, points_possible: 100)
       assignment_for_mp = assignment_model(course: @course, points_possible: 10, title: "Assignment for MP")
       get "/courses/#{@course.id}/assignments/#{main_assignment.id}/edit"
@@ -183,7 +183,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.assignment_exists_in_scoring_range?(1, assignment_for_mp.title)).to be(true)
     end
 
-    it 'should be able see errors for invalid scoring ranges' do
+    it 'is able see errors for invalid scoring ranges' do
       assignment = assignment_model(course: @course, points_possible: 100)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
@@ -195,7 +195,7 @@ describe 'native canvas conditional release' do
       expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to eq(true)
     end
 
-    it 'should not show error setting middle range to 0' do
+    it 'does not show error setting middle range to 0' do
       assignment = assignment_model(course: @course, points_possible: 4)
       get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
       ConditionalReleaseObjects.conditional_release_link.click
@@ -238,13 +238,13 @@ describe 'native canvas conditional release' do
       @rule = @course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
     end
 
-    it 'should show Mastery Path Breakdown for an Assignment' do
+    it 'shows Mastery Path Breakdown for an Assignment' do
       get "/courses/#{@course.id}/assignments/#{@trigger_assmt.id}"
 
       expect(ConditionalReleaseObjects.breakdown_graph_exists?).to eq(true)
     end
 
-    it 'should show Mastery Path Breakdown for a Discussion' do
+    it 'shows Mastery Path Breakdown for a Discussion' do
       graded_discussion = @course.discussion_topics.build(assignment: @trigger_assmt, title: 'graded discussion')
       graded_discussion.save!
       get "/courses/#{@course.id}/discussion_topics/#{graded_discussion.id}"

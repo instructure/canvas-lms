@@ -27,7 +27,7 @@ describe WikiPagesController do
   end
 
   describe "GET 'front_page'" do
-    it "should redirect" do
+    it "redirects" do
       get 'front_page', params: { :course_id => @course.id }
       expect(response).to be_redirect
       expect(response.location).to match(%r{/courses/#{@course.id}/pages})
@@ -48,7 +48,7 @@ describe WikiPagesController do
     end
 
     describe "GET 'show_redirect'" do
-      it "should redirect" do
+      it "redirects" do
         get 'show_redirect', params: { :course_id => @course.id, :id => @page.url }
         expect(response).to be_redirect
         expect(response.location).to match(%r{/courses/#{@course.id}/pages/#{@page.url}})
@@ -56,21 +56,21 @@ describe WikiPagesController do
     end
 
     describe "GET 'show'" do
-      it "should render" do
+      it "renders" do
         get 'show', params: { course_id: @course.id, id: @page.url }
         expect(response).to be_successful
       end
     end
 
     describe "GET 'edit'" do
-      it "should render" do
+      it "renders" do
         get 'edit', params: { course_id: @course.id, id: @page.url }
         expect(response).to be_successful
       end
     end
 
     describe "GET 'revisions'" do
-      it "should render" do
+      it "renders" do
         get 'revisions', params: { course_id: @course.id, wiki_page_id: @page.url }
         expect(response).to be_successful
       end
@@ -133,17 +133,17 @@ describe WikiPagesController do
           user_session(@student_without_override)
         end
 
-        it "should allow show" do
+        it "allows show" do
           get 'show', params: { course_id: @course.id, id: @page.url }
           expect(response.code).to eq "200"
         end
 
-        it "should allow edit" do
+        it "allows edit" do
           get 'edit', params: { course_id: @course.id, id: @page.url }
           expect(response.code).to eq "200"
         end
 
-        it "should allow revisions" do
+        it "allows revisions" do
           get 'revisions', params: { course_id: @course.id, wiki_page_id: @page.url }
           expect(response.code).to eq "200"
         end
@@ -154,19 +154,19 @@ describe WikiPagesController do
             @course.enable_feature!(:conditional_release)
           end
 
-          it "should forbid show" do
+          it "forbids show" do
             get 'show', params: { course_id: @course.id, id: @page.url }
             expect(response).to be_redirect
             expect(response.location).to eq course_wiki_pages_url(@course)
           end
 
-          it "should forbid edit" do
+          it "forbids edit" do
             get 'edit', params: { course_id: @course.id, id: @page.url }
             expect(response).to be_redirect
             expect(response.location).to eq course_wiki_pages_url(@course)
           end
 
-          it "should forbid revisions" do
+          it "forbids revisions" do
             get 'revisions', params: { course_id: @course.id, wiki_page_id: @page.url }
             expect(response).to be_redirect
             expect(response.location).to eq course_wiki_pages_url(@course)
@@ -180,18 +180,18 @@ describe WikiPagesController do
           user_session(@student_with_override)
         end
 
-        it "should allow show" do
+        it "allows show" do
           get 'show', params: { course_id: @course.id, id: @page.url }
           expect(response.code).to eq "200"
         end
 
-        it "should allow edit" do
+        it "allows edit" do
           get 'edit', params: { course_id: @course.id, id: @page.url }
           expect(response.code).to eq "200"
           expect(controller.js_env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
         end
 
-        it "should allow revisions" do
+        it "allows revisions" do
           get 'revisions', params: { course_id: @course.id, wiki_page_id: @page.url }
           expect(response.code).to eq "200"
         end

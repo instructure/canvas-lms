@@ -53,13 +53,13 @@ describe "User Profile API", type: :request do
     user_with_pseudonym(:user => @user)
   end
 
-  it "should return another user's avatars, if allowed" do
+  it "returns another user's avatars, if allowed" do
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                     :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
     expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
-  it "should return user info for users with no pseudonym" do
+  it "returns user info for users with no pseudonym" do
     @me = @user
     new_user = user_factory(:name => 'new guy')
     @user = @me
@@ -86,7 +86,7 @@ describe "User Profile API", type: :request do
     get("/courses/#{@course.id}/students")
   end
 
-  it "should return this user's profile" do
+  it "returns this user's profile" do
     json = api_call(:get, "/api/v1/users/self/profile",
                     :controller => "profile", :action => "settings", :user_id => 'self', :format => 'json')
     expect(json).to eq({
@@ -110,7 +110,7 @@ describe "User Profile API", type: :request do
                        })
   end
 
-  it 'should return the correct locale if not using the system default' do
+  it 'returns the correct locale if not using the system default' do
     @user = @student
     @student.locale = 'es'
     @student.save!
@@ -136,7 +136,7 @@ describe "User Profile API", type: :request do
                        })
   end
 
-  it "should return this user's profile (non-admin)" do
+  it "returns this user's profile (non-admin)" do
     @user = @student
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
                     :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
@@ -169,7 +169,7 @@ describe "User Profile API", type: :request do
     expect(json['primary_email']).to be_nil
   end
 
-  it "should return this user's avatars, if allowed" do
+  it "returns this user's avatars, if allowed" do
     @user = @student
     @student.register
     json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
@@ -177,7 +177,7 @@ describe "User Profile API", type: :request do
     expect(json.map { |j| j['type'] }.sort).to eql ['gravatar', 'no_pic']
   end
 
-  it "shouldn't return disallowed profiles" do
+  it "does not return disallowed profiles" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/profile",
                  :controller => "profile", :action => "settings", :user_id => @admin.to_param, :format => 'json')
@@ -195,7 +195,7 @@ describe "User Profile API", type: :request do
       allow(Twitter::Connection).to receive(:config).and_return({ :some_hash => "fullofstuff" })
     end
 
-    it "should return user_services, if requested" do
+    it "returns user_services, if requested" do
       @user = @student
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
                       :controller => "profile", :action => "settings",
@@ -207,7 +207,7 @@ describe "User Profile API", type: :request do
       ]
     end
 
-    it "should only return visible services for other users" do
+    it "onlies return visible services for other users" do
       @user = @admin
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
                       :controller => "profile", :action => "settings",
@@ -218,7 +218,7 @@ describe "User Profile API", type: :request do
       ]
     end
 
-    it "should return profile links, if requested" do
+    it "returns profile links, if requested" do
       @student.profile.save
       @student.profile.links.create! :url => "http://instructure.com",
                                      :title => "Instructure"
@@ -234,7 +234,7 @@ describe "User Profile API", type: :request do
   end
 
   context 'canvas for elementary' do
-    it 'should return k5_user false if not a k5 user' do
+    it 'returns k5_user false if not a k5 user' do
       toggle_k5_setting(@course.account, false)
 
       @user = @student
@@ -250,7 +250,7 @@ describe "User Profile API", type: :request do
         toggle_k5_setting(@course.account, true)
       end
 
-      it 'should return k5_user true for current_user' do
+      it 'returns k5_user true for current_user' do
         @user = @student
         json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
                         controller: "profile", action: "settings",
@@ -258,7 +258,7 @@ describe "User Profile API", type: :request do
         expect(json['k5_user']).to eq(true)
       end
 
-      it 'should return k5_user nil for other users' do
+      it 'returns k5_user nil for other users' do
         course_with_teacher(active_all: true, course: @course)
         @user = @teacher
         json = api_call(:get, "/api/v1/users/#{@student.id}/profile",

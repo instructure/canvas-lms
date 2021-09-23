@@ -25,16 +25,16 @@ describe Canvas::Plugins::Validators::AdobeConnectValidator do
 
   subject { Canvas::Plugins::Validators::AdobeConnectValidator }
 
-  it 'should allow an empty hash' do
+  it 'allows an empty hash' do
     expect(subject.validate({}, plugin_setting)).to eql Hash.new
   end
 
-  it 'should error on missing keys' do
+  it 'errors on missing keys' do
     expect(plugin_setting).to receive(:errors).and_return(double(add: true))
     expect(subject.validate({ :domain => 'example.com' }, plugin_setting)).to be_falsey
   end
 
-  it 'should pass if all keys exist' do
+  it 'passes if all keys exist' do
     valid_keys = {
       :domain => 'example.com',
       :login => 'username',

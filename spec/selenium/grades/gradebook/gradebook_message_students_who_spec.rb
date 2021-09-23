@@ -32,7 +32,7 @@ describe "Gradebook - message students who" do
     user_session(@teacher)
   end
 
-  it "should send messages" do
+  it "sends messages" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
@@ -47,7 +47,7 @@ describe "Gradebook - message students who" do
     end.to change(ConversationMessage, :count).by_at_least(2)
   end
 
-  it "should only send messages to students who have not submitted and have not been graded" do
+  it "onlies send messages to students who have not submitted and have not been graded" do
     # student 1 submitted but not graded yet
     @third_submission = @third_assignment.submit_homework(@student_1, body: ' student 1 submission assignment 4')
     @third_submission.save!
@@ -71,7 +71,7 @@ describe "Gradebook - message students who" do
     end.to change { ConversationMessage.count(:conversation_id) }.by(2)
   end
 
-  it "should send messages when Scored more than X points" do
+  it "sends messages when Scored more than X points" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
@@ -88,7 +88,7 @@ describe "Gradebook - message students who" do
     end.to change(ConversationMessage, :count).by_at_least(2)
   end
 
-  it "should show not-submitted students", priority: "2", test_id: 3265183 do
+  it "shows not-submitted students", priority: "2", test_id: 3265183 do
     # student 2 has submitted assignment 3, but it hasn't been graded
     submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
     submission.save!
@@ -102,7 +102,7 @@ describe "Gradebook - message students who" do
     expect(visible_students[0]).to include_text @student_name_1
   end
 
-  it "should show ungraded students", priority: "2", test_id: 3440541 do
+  it "shows ungraded students", priority: "2", test_id: 3440541 do
     # student 2 has submitted assignment 3, but it hasn't been graded
     submission = @third_assignment.submit_homework(@student_2, body: 'student 2 submission assignment 3')
     submission.save!
@@ -119,7 +119,7 @@ describe "Gradebook - message students who" do
     expect(visible_students[1]).to include_text @student_name_3
   end
 
-  it "should create separate conversations" do
+  it "creates separate conversations" do
     message_text = "This is a message"
 
     Gradebook.visit(@course)
@@ -201,7 +201,7 @@ describe "Gradebook - message students who" do
     expect(message_form.find_element(:css, '.send_button')).to have_class('disabled')
   end
 
-  it "should not send messages to inactive students" do
+  it "does not send messages to inactive students" do
     en = @student_1.student_enrollments.first
     en.deactivate
 

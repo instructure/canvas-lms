@@ -36,16 +36,16 @@ def notification_set(opts = {})
 end
 
 describe Notification do
-  it "should create a new instance given valid attributes" do
+  it "creates a new instance given valid attributes" do
     Notification.create!(notification_valid_attributes)
   end
 
-  it "should have a default delay_for" do
+  it "has a default delay_for" do
     notification_model
     expect(@notification.delay_for).to be >= 0
   end
 
-  it "should have a decent state machine" do
+  it "has a decent state machine" do
     notification_model
     expect(@notification.state).to eql(:active)
     @notification.deactivate
@@ -54,7 +54,7 @@ describe Notification do
     expect(@notification.state).to eql(:active)
   end
 
-  it "should always have some subject" do
+  it "alwayses have some subject" do
     expect(Notification.create!(:name => 'Testing').subject).not_to be_nil
   end
 

@@ -25,7 +25,7 @@ describe Login::SamlController do
     skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
   end
 
-  it "should scope logins to the correct domain root account" do
+  it "scopes logins to the correct domain root account" do
     unique_id = 'foo@example.com'
 
     account1 = account_with_saml
@@ -143,7 +143,7 @@ describe Login::SamlController do
     expect(response).to redirect_to(login_url)
   end
 
-  it "should redirect when a user is authenticated but is not found in canvas" do
+  it "redirects when a user is authenticated but is not found in canvas" do
     unique_id = 'foo@example.com'
 
     account = account_with_saml
@@ -379,7 +379,7 @@ describe Login::SamlController do
       expect(response.location).to match(%r{^https://example.com/idp1/sso\?SAMLRequest=})
     end
 
-    it "should saml_consume login with multiple authorization configs" do
+    it "saml_consumes login with multiple authorization configs" do
       response = SAML2::Response.new
       response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
       response.assertions << (assertion = SAML2::Assertion.new)
@@ -396,7 +396,7 @@ describe Login::SamlController do
       expect(session[:saml_unique_id]).to eq @unique_id
     end
 
-    it "should saml_logout with multiple authorization configs" do
+    it "saml_logouts with multiple authorization configs" do
       logout_response = SAML2::LogoutResponse.new
       logout_response.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
       expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
@@ -476,12 +476,12 @@ describe Login::SamlController do
         end
       end
 
-      it "should redirect to default login" do
+      it "redirects to default login" do
         get_new
         expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
       end
 
-      it "should use the specified AAC" do
+      it "uses the specified AAC" do
         get_new("#{@aac1.id}")
         expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
         controller.instance_variable_set(:@aac, nil)
@@ -502,13 +502,13 @@ describe Login::SamlController do
       end
 
       describe '#destroy' do
-        it "should return bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
+        it "returns bad request if a SAMLResponse or SAMLRequest parameter is not provided" do
           expect(controller).to receive(:logout_user_action).never
           get :destroy
           expect(response.status).to eq 400
         end
 
-        it "should find the correct AAC" do
+        it "finds the correct AAC" do
           expect_any_instantiation_of(@aac1).to receive(:debugging?).never
           expect_any_instantiation_of(@aac2).to receive(:debugging?).at_least(1)
 
@@ -521,7 +521,7 @@ describe Login::SamlController do
           expect(response).to redirect_to(saml_login_url(@aac2))
         end
 
-        it "should redirect a response to idp on logout with a SAMLRequest parameter" do
+        it "redirects a response to idp on logout with a SAMLRequest parameter" do
           expect(controller).to receive(:logout_current_user)
           logout_request = SAML2::LogoutRequest.new
           logout_request.issuer = SAML2::NameID.new(@aac2.idp_entity_id)
@@ -564,7 +564,7 @@ describe Login::SamlController do
   context "#destroy" do
     let(:certificates) { ['MIIFnzCCBIegAwIBAgIQItX5wssh0ecd46K65PkSNDANBgkqhkiG9w0BAQsFADCBkDELMAkGA1UEBhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEaMBgGA1UEChMRQ09NT0RPIENBIExpbWl0ZWQxNjA0BgNVBAMTLUNPTU9ETyBSU0EgRG9tYWluIFZhbGlkYXRpb24gU2VjdXJlIFNlcnZlciBDQTAeFw0xNjA5MDgwMDAwMDBaFw0xOTEwMjUyMzU5NTlaMIGeMSEwHwYDVQQLExhEb21haW4gQ29udHJvbCBWYWxpZGF0ZWQxSTBHBgNVBAsTQElzc3VlZCB0aHJvdWdoIEl2eSBUZWNoIENvbW11bml0eSBDb2xsZWdlIG9mIEluZGlhbmEgRS1QS0kgTWFuYWcxEzARBgNVBAsTCkNPTU9ETyBTU0wxGTAXBgNVBAMTEGFkZnMuaXZ5dGVjaC5lZHUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQC58zHz7VsV9S2XZMRjgqiWxBZ6M9y6/3zkrbObJ9hZqO7giCoonNDuELUiNt8pBqF8aHef8qbDOecBBXkz8rPAJL1S6lzvbxHIBuvEy+xOpVdUNMoyOaAYHOI5T6ueL1Q4iGMKfnWuXSvVTyB+9wAF/aWVFSoz+alUOiQtqTYyfgIKzHIAmFX7/SjFA9UjKVtqatcvzWsSWZHL4imeTmPosXXjmJVZnl+jaeFsnmW59o66sdGR+NYkhsBcVRnuP3MdxVgr5xSJMN+/BgZwCncX+4LJq5664eeQcJM5Km9kbQ/jMFhYy765ejszcL0vWe/fS7tdXQCfoKjRZ5LzNEb3AgMBAAGjggHjMIIB3zAfBgNVHSMEGDAWgBSQr2o6lFoL2JDqElZz30O0Oija5zAdBgNVHQ4EFgQUdFr6SnHaXUqLAEdOL9qrTJS/3AYwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCME8GA1UdIARIMEYwOgYLKwYBBAGyMQECAgcwKzApBggrBgEFBQcCARYdaHR0cHM6Ly9zZWN1cmUuY29tb2RvLmNvbS9DUFMwCAYGZ4EMAQIBMFQGA1UdHwRNMEswSaBHoEWGQ2h0dHA6Ly9jcmwuY29tb2RvY2EuY29tL0NPTU9ET1JTQURvbWFpblZhbGlkYXRpb25TZWN1cmVTZXJ2ZXJDQS5jcmwwgYUGCCsGAQUFBwEBBHkwdzBPBggrBgEFBQcwAoZDaHR0cDovL2NydC5jb21vZG9jYS5jb20vQ09NT0RPUlNBRG9tYWluVmFsaWRhdGlvblNlY3VyZVNlcnZlckNBLmNydDAkBggrBgEFBQcwAYYYaHR0cDovL29jc3AuY29tb2RvY2EuY29tMDEGA1UdEQQqMCiCEGFkZnMuaXZ5dGVjaC5lZHWCFHd3dy5hZGZzLml2eXRlY2guZWR1MA0GCSqGSIb3DQEBCwUAA4IBAQA0dXP0leDcdrr/iKk4nDSCofllPAWE8LE3mD9Yb9K+/oVymxpqNIVJesDPLtf1HqWk6S6eafcYvfzl9aTMcvwEkL27g2l9UQuICkQgqSEY5qTsK//u/2S98JqXep2oRyvxo3UHX+3Ouc3i49hQ0v05Faoeap/ZT3JEsMV2Go9UKRJbYBG9Nqq/CDBuTgyopKJ7fvCtsGxwsvlUAz/NMuNoUphPQ2S+O/SjabjR4XsAGU78Hji2tqJyvPyKPanxc0ioDdnL5lvrk4uZ/6Dy159C5FOFeLU2ZfiNLXRR85KFfhtX954qvX6jmM7CPmcidhzEnZV8fQv9G6XYPfrNL7bh'] }
 
-    it "should return bad request if SAML is not configured for account" do
+    it "returns bad request if SAML is not configured for account" do
       logout_response = SAML2::LogoutResponse.new
       logout_response.issuer = SAML2::NameID.new('entity')
       expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_response)
@@ -651,7 +651,7 @@ describe Login::SamlController do
       @aac = @account.authentication_providers.first
     end
 
-    it "should use the eduPersonPrincipalName attribute with the domain stripped" do
+    it "uses the eduPersonPrincipalName attribute with the domain stripped" do
       @aac.login_attribute = 'eduPersonPrincipalName_stripped'
       @aac.save
 
@@ -672,7 +672,7 @@ describe Login::SamlController do
       expect(session[:saml_unique_id]).to eq @unique_id
     end
 
-    it "should use the NameID if no login attribute is specified" do
+    it "uses the NameID if no login attribute is specified" do
       @aac.login_attribute = nil
       @aac.save
 
@@ -693,7 +693,7 @@ describe Login::SamlController do
     end
   end
 
-  it "should use the eppn saml attribute if configured" do
+  it "uses the eppn saml attribute if configured" do
     unique_id = 'foo'
 
     account = account_with_saml
@@ -722,7 +722,7 @@ describe Login::SamlController do
     expect(session[:saml_unique_id]).to eq unique_id
   end
 
-  it "should redirect to RelayState relative urls" do
+  it "redirects to RelayState relative urls" do
     unique_id = 'foo@example.com'
 
     account = account_with_saml
@@ -851,7 +851,7 @@ describe Login::SamlController do
     SAML
   end
 
-  it "should decode an actual saml response" do
+  it "decodes an actual saml response" do
     unique_id = 'student@example.edu'
 
     account_with_saml
@@ -878,7 +878,7 @@ describe Login::SamlController do
     end
   end
 
-  it "should decode an actual saml response via SAML2" do
+  it "decodes an actual saml response via SAML2" do
     unique_id = 'student@example.edu'
 
     account_with_saml

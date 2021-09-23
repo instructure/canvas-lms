@@ -85,7 +85,7 @@ describe EnrollmentTerm do
     end
   end
 
-  it "should handle the translated Default Term names correctly" do
+  it "handles the translated Default Term names correctly" do
     account_model
     term = @account.default_enrollment_term
 
@@ -116,13 +116,13 @@ describe EnrollmentTerm do
       @term = @account.enrollment_terms.create!
     end
 
-    it "should return the dates for a single enrollment" do
+    it "returns the dates for a single enrollment" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       enrollment = student_in_course
       expect(@term.overridden_term_dates([enrollment])).to eq([Date.parse('2014-12-01'), Date.parse('2014-12-31')])
     end
 
-    it "should return the most favorable dates given multiple enrollments" do
+    it "returns the most favorable dates given multiple enrollments" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2015-01-31' },
                                     'ObserverEnrollment' => { start_at: '2014-11-01', end_at: '2014-12-31' })
       student_enrollment = student_in_course
@@ -130,7 +130,7 @@ describe EnrollmentTerm do
       expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse('2014-11-01'), Date.parse('2015-01-31')])
     end
 
-    it "should prioritize nil (unrestricted) dates if present" do
+    it "prioritizes nil (unrestricted) dates if present" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: nil },
                                     'TaEnrollment' => { start_at: nil, end_at: '2014-12-31' })
       student_enrollment = student_in_course
@@ -144,11 +144,11 @@ describe EnrollmentTerm do
       @account = account_model
     end
 
-    it "should not be able to delete a default term" do
+    it "is not able to delete a default term" do
       expect { @account.default_enrollment_term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "should not be able to delete an enrollment term with active courses" do
+    it "is not able to delete an enrollment term with active courses" do
       @term = @account.enrollment_terms.create!
       course_factory account: @account
       @course.enrollment_term = @term
@@ -269,27 +269,27 @@ describe EnrollmentTerm do
       expect(expected_ids).to eq(actual_ids)
     end
 
-    it "should limit by active terms" do
+    it "limits by active terms" do
       validate_scope(:active, @terms.keys, include_default: true)
     end
 
-    it "should limit by ended terms" do
+    it "limits by ended terms" do
       validate_scope(:ended)
     end
 
-    it "should limit by started terms" do
+    it "limits by started terms" do
       validate_scope(:started, @terms.except(:not_started).keys, include_default: true)
     end
 
-    it "should limit by not ended terms" do
+    it "limits by not ended terms" do
       validate_scope(:not_ended, @terms.except(:ended).keys, include_default: true)
     end
 
-    it "should limit by not started terms" do
+    it "limits by not started terms" do
       validate_scope(:not_started)
     end
 
-    it "should limit by non-default terms" do
+    it "limits by non-default terms" do
       validate_scope(:not_default, @terms.keys)
     end
   end

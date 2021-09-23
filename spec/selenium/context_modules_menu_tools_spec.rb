@@ -56,19 +56,19 @@ describe "context modules" do
       expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', :modules => [@module1.id])
     end
 
-    it "should show tool launch links in the gear for modules" do
+    it "shows tool launch links in the gear for modules" do
       get "/courses/#{@course.id}/modules"
       should_have_menu_tool_link_in_gear
     end
 
-    it "should show tool launch links in the gear for modules on course home if set to modules" do
+    it "shows tool launch links in the gear for modules on course home if set to modules" do
       @course.default_view = 'modules'
       @course.save!
       get "/courses/#{@course.id}"
       should_have_menu_tool_link_in_gear
     end
 
-    it "should show tool launch links in the gear for exportable module items" do
+    it "shows tool launch links in the gear for exportable module items" do
       get "/courses/#{@course.id}/modules"
 
       type_to_tag = {
@@ -99,7 +99,7 @@ describe "context modules" do
       expect(f("#context_module_item_#{@subheader_tag.id}")).not_to contain_css("a.menu_tool_link")
     end
 
-    it "should add links to newly created modules" do
+    it "adds links to newly created modules" do
       get "/courses/#{@course.id}/modules"
 
       f(".add_module_link").click
@@ -120,7 +120,7 @@ describe "context modules" do
       expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'module_menu', :modules => [new_module.id])
     end
 
-    it "should add links to newly created module items" do
+    it "adds links to newly created module items" do
       get "/courses/#{@course.id}/modules"
       f("#context_module_#{@module1.id} .add_module_item_link").click
       wait_for_ajaximations
@@ -151,7 +151,7 @@ describe "context modules" do
       expect(link['href']).to eq course_external_tool_url(@course, @tool, launch_type: 'wiki_page_menu', :module_items => [new_tag.id])
     end
 
-    it "should not show add links to newly created module items if not exportable" do
+    it "does not show add links to newly created module items if not exportable" do
       get "/courses/#{@course.id}/modules"
 
       f("#context_module_#{@module1.id} .add_module_item_link").click

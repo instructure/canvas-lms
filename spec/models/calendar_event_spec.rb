@@ -25,7 +25,7 @@ describe CalendarEvent do
     Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
-  it "should sanitize description" do
+  it "sanitizes description" do
     course_model
     @c = CalendarEvent.new
     @c.description = "<a href='#' onclick='alert(12);'>only this should stay</a>"
@@ -49,13 +49,13 @@ describe CalendarEvent do
       )
     end
 
-    it "should get localized start_at" do
+    it "gets localized start_at" do
       df = "%Y-%m-%d %H:%M"
       expect(@event.start_at.strftime(df)).to eq "2008-09-03 12:05"
       expect(@event.zoned_start_at.strftime(df)).to eq "2008-09-03 06:05"
     end
 
-    it "should populate missing dates" do
+    it "populates missing dates" do
       event_1 = calendar_event_model
       event_1.start_at = @original_start_at
       event_1.end_at = nil
@@ -75,7 +75,7 @@ describe CalendarEvent do
       expect(event_3.end_at).to eql(event_3.start_at)
     end
 
-    it "should populate all day flag" do
+    it "populates all day flag" do
       midnight = Time.at(1361862000) # 2013-02-26 00:00:00
 
       event_1 = calendar_event_model(:time_zone_edited => "Mountain Time (US & Canada)")
@@ -103,7 +103,7 @@ describe CalendarEvent do
       expect(event_3.end_at).to eql(event_3.start_at)
     end
 
-    it "should retain all day flag when date is changed (calls :default_values)" do
+    it "retains all day flag when date is changed (calls :default_values)" do
       # Flag the event as all day
       @event.update({ :start_at => @original_start_at, :end_at => @original_end_at, :all_day => true })
       expect(@event.all_day?).to be_truthy
@@ -133,7 +133,7 @@ describe CalendarEvent do
       )
     end
 
-    it "should not retain all day flag when times are changed (calls :default_values)" do
+    it "does not retain all day flag when times are changed (calls :default_values)" do
       # set the start and end to midnight and make sure all_day is automatically set
       @event.update({ :start_at => @midnight, :end_at => @midnight })
       expect(@event.all_day?).to be_truthy
@@ -147,20 +147,20 @@ describe CalendarEvent do
 
   context "ical" do
     describe "to_ics" do
-      it "should not fail for null times" do
+      it "does not fail for null times" do
         calendar_event_model(:start_at => "", :end_at => "")
         res = @event.to_ics
         expect(res).not_to be_nil
         expect(res.match(/DTSTART/)).to be_nil
       end
 
-      it "should not return data for null times" do
+      it "does not return data for null times" do
         calendar_event_model(:start_at => "", :end_at => "")
         res = @event.to_ics(in_own_calendar: false)
         expect(res).to be_nil
       end
 
-      it "should return string data for events with times" do
+      it "returns string data for events with times" do
         Time.zone = 'UTC'
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
@@ -172,7 +172,7 @@ describe CalendarEvent do
         expect(res.match(/DTSTAMP:20080903T120500Z/)).not_to be_nil
       end
 
-      it "should return string data for events with times in correct tz" do
+      it "returns string data for events with times in correct tz" do
         Time.zone = 'Alaska' # -0800
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
@@ -184,7 +184,7 @@ describe CalendarEvent do
         expect(res.match(/DTSTAMP:20080903T200500Z/)).not_to be_nil
       end
 
-      it "should return data for events with times" do
+      it "returns data for events with times" do
         Time.zone = 'UTC'
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
@@ -199,7 +199,7 @@ describe CalendarEvent do
         expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
       end
 
-      it "should return data for events with times in correct tz" do
+      it "returns data for events with times in correct tz" do
         Time.zone = 'Alaska' # -0800
         calendar_event_model(:start_at => "Sep 3 2008 11:55am", :end_at => "Sep 3 2008 12:00pm")
         # force known value so we can check serialization
@@ -214,12 +214,12 @@ describe CalendarEvent do
         expect(res.dtstamp.strftime('%Y-%m-%dT%H:%M:%S')).to eq Time.zone.parse("Sep 3 2008 12:05pm").in_time_zone('UTC').strftime('%Y-%m-%dT%H:%M:00')
       end
 
-      it 'should not fail with no date for all_day event' do
+      it 'does not fail with no date for all_day event' do
         res = calendar_event_model(all_day: true).to_ics
         expect(res).not_to be_nil
       end
 
-      it "should return string dates for all_day events" do
+      it "returns string dates for all_day events" do
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
         expect(@event.all_day).to eql(true)
         expect(@event.end_at).to eql(@event.start_at)
@@ -228,7 +228,7 @@ describe CalendarEvent do
         expect(res.match(/DTEND;VALUE=DATE:20080903/)).not_to be_nil
       end
 
-      it "should return a plain-text description" do
+      it "returns a plain-text description" do
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => <<-HTML)
       <p>
         This assignment is due December 16th. <b>Please</b> do the reading.
@@ -241,7 +241,7 @@ describe CalendarEvent do
         expect(ev.x_alt_desc.first).to eq @event.description
       end
 
-      it "should not add verifiers to files unless course or attachment is public" do
+      it "does not add verifiers to files unless course or attachment is public" do
         attachment_model(:context => course_factory)
         html = %{<div><a href="/courses/#{@course.id}/files/#{@attachment.id}/download?wrap=1">here</a></div>}
         calendar_event_model(:start_at => "Sep 3 2008 12:00am", :description => html)
@@ -266,7 +266,7 @@ describe CalendarEvent do
         expect(ev.description).to include("verifier")
       end
 
-      it "should work with media comments in course section events" do
+      it "works with media comments in course section events" do
         course_model
         @course.offer
         @course.is_public = true
@@ -281,7 +281,7 @@ describe CalendarEvent do
         expect(ics.gsub(/\s+/, '')).to include("/courses/#{@course.id}/media_download?entryId=0_12345678")
       end
 
-      it "should add a course code to the summary of an event that has a course as an effective_context" do
+      it "adds a course code to the summary of an event that has a course as an effective_context" do
         course_model
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
         @event.effective_context_code = @course.asset_string
@@ -289,7 +289,7 @@ describe CalendarEvent do
         expect(ics).to include("SUMMARY:#{@event.title} [#{@course.course_code}]")
       end
 
-      it "should add a course code to the summary of an event that has a course as its effective_context's context" do
+      it "adds a course code to the summary of an event that has a course as its effective_context's context" do
         course_model
         group(:context => @course)
         calendar_event_model(:start_at => "Sep 3 2008 12:00am")
@@ -301,7 +301,7 @@ describe CalendarEvent do
   end
 
   context 'root account' do
-    it 'should set the root_account when the context is an appointment_group' do
+    it 'sets the root_account when the context is an appointment_group' do
       course = Course.create!
       ag = AppointmentGroup.create(:title => "test", :contexts => [course])
       ag.publish!
@@ -309,40 +309,40 @@ describe CalendarEvent do
       expect(appointment.root_account_id).to eq ag.context.root_account_id
     end
 
-    it 'should set the root_account when the context is a course' do
+    it 'sets the root_account when the context is a course' do
       course = Course.create!
       appointment = CalendarEvent.create!(title: 'test', context: course)
       expect(appointment.root_account_id).to eq course.root_account_id
     end
 
-    it 'should set the root_account when the context is a user if the effective context is set and is not a user' do
+    it 'sets the root_account when the context is a user if the effective context is set and is not a user' do
       user = User.create!
       course = Course.create!
       appointment = CalendarEvent.create!(title: 'test', context: user, effective_context_code: course.asset_string)
       expect(appointment.root_account_id).to eq course.root_account_id
     end
 
-    it 'should set the root_account_id to 0 when the context is a user and there is no effective context' do
+    it 'sets the root_account_id to 0 when the context is a user and there is no effective context' do
       user = User.create!
       appointment = CalendarEvent.create!(title: 'test', context: user)
       expect(appointment.root_account_id).to eq 0
     end
 
-    it 'should set the root_account when the context is a group' do
+    it 'sets the root_account when the context is a group' do
       account = Account.create!
       group = Group.create!(context: account)
       appointment = CalendarEvent.create!(title: 'test', context: group)
       expect(appointment.root_account_id).to eq group.root_account_id
     end
 
-    it 'should set the root_account when the context is a course_section' do
+    it 'sets the root_account when the context is a course_section' do
       course = Course.create!
       section = course.course_sections.create!
       appointment = CalendarEvent.create!(title: 'test', context: section)
       expect(appointment.root_account_id).to eq section.root_account_id
     end
 
-    it 'should set the root_account when assignment_group is not yet assigned to a course context' do
+    it 'sets the root_account when assignment_group is not yet assigned to a course context' do
       course = Course.create!
       ag = AppointmentGroup.create(
         :title => "test",
@@ -364,7 +364,7 @@ describe CalendarEvent do
       @e3 = Course.create.calendar_events.create!
     end
 
-    it "should return events explicitly tied to the contexts" do
+    it "returns events explicitly tied to the contexts" do
       expect(CalendarEvent.for_user_and_context_codes(@student, [@course.asset_string]).sort_by(&:id))
         .to eql [@e1]
 
@@ -372,7 +372,7 @@ describe CalendarEvent do
         .to eql [@e1, @e2]
     end
 
-    it "should return events implicitly tied to the contexts (via effective_context_string)" do
+    it "returns events implicitly tied to the contexts (via effective_context_string)" do
       @teacher = user_factory
       @course.enroll_teacher(@teacher).accept!
       course1 = @course
@@ -442,18 +442,18 @@ describe CalendarEvent do
           @users = @event1.messages_sent["New Event Created"].map(&:user_id)
         end
 
-        it "should send to participants", priority: "1", test_id: 186751 do
+        it "sends to participants", priority: "1", test_id: 186751 do
           expect(@event1.messages_sent).to be_include("New Event Created")
           expect(@users).to include(@student.id)
         end
 
-        it "should have correct URL" do
+        it "has correct URL" do
           @event1.messages_sent["New Event Created"].each do |message|
             expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{@event1.id}"
           end
         end
 
-        it "should not send to creating teacher" do
+        it "does not send to creating teacher" do
           expect(@users).not_to include(@teacher.id)
         end
 
@@ -472,18 +472,18 @@ describe CalendarEvent do
             @users = @event1.messages_sent["Event Date Changed"].map(&:user_id)
           end
 
-          it "should send to participants", priority: "1", test_id: 193162 do
+          it "sends to participants", priority: "1", test_id: 193162 do
             expect(@event1.messages_sent).to be_include("Event Date Changed")
             expect(@users).to include(@student.id)
           end
 
-          it "should have correct url" do
+          it "has correct url" do
             @event1.messages_sent["Event Date Changed"].each do |message|
               expect(message.url).to include "/courses/#{@course.id}/calendar_events/#{@event1.id}"
             end
           end
 
-          it "should not send to editing teacher" do
+          it "does not send to editing teacher" do
             expect(@users).not_to include(@teacher.id)
           end
 
@@ -494,7 +494,7 @@ describe CalendarEvent do
       end
     end
 
-    it "should not send notifications to participants if hidden" do
+    it "does not send notifications to participants if hidden" do
       course_with_student(:active_all => true)
       event = @course.calendar_events.build(:title => "test", :child_event_data => [{ :start_at => "2012-01-01", :end_at => "2012-01-02", :context_code => @course.default_section.asset_string }])
       event.updating_user = @teacher
@@ -551,12 +551,12 @@ describe CalendarEvent do
         Message.where(notification_id: BroadcastPolicy.notification_finder.by_name(notification_name), user_id: @expected_users).pluck(:user_id).sort
       end
 
-      it 'should include course_ids from appointment_groups' do
+      it 'includes course_ids from appointment_groups' do
         reservation = @appointment2.reserve_for(@group, @student1)
         expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id] })
       end
 
-      it 'should include multiple course_ids' do
+      it 'includes multiple course_ids' do
         course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
         course2.enroll_teacher(@teacher).accept!
         ag = AppointmentGroup.create!(title: "test", contexts: [@course, course2])
@@ -565,26 +565,26 @@ describe CalendarEvent do
         expect(reservation.course_broadcast_data).to eql({ root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id] })
       end
 
-      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
+      it "notifies all participants except the person reserving", priority: "1", test_id: 193149 do
         @appointment2.reserve_for(@group, @student1)
         expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
-      it "should notify all participants except the person canceling the reservation" do
+      it "notifies all participants except the person canceling the reservation" do
         reservation = @appointment2.reserve_for(@group, @student1)
         reservation.updating_user = @student1
         reservation.destroy
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
-      it "should notify participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
+      it "notifies participants if teacher deletes the appointment time slot", priority: "1", test_id: 193148 do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         @appointment2.destroy
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "should notify all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
+      it "notifies all participants when the the time slot is canceled", priority: "1", test_id: 502005 do
         reservation = @appointment2.reserve_for(@group, @student1)
         @appointment2.updating_user = @teacher
         user_evt = CalendarEvent.where(context_type: 'Group').first
@@ -593,7 +593,7 @@ describe CalendarEvent do
         expect(message_recipients_for('Appointment Deleted For User')).to eq @expected_users - [@teacher.id]
       end
 
-      it "should notify admins and observers when a user reserves", priority: "1", test_id: 193144 do
+      it "notifies admins and observers when a user reserves", priority: "1", test_id: 193144 do
         reservation = @appointment.reserve_for(@student1, @student1)
         messages = reservation.messages_sent["Appointment Reserved By User"]
         expect(messages).to be_present
@@ -601,13 +601,13 @@ describe CalendarEvent do
         expect(messages.map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "should notify admins and observers when a user reserves a group appointment" do
+      it "notifies admins and observers when a user reserves a group appointment" do
         reservation = @appointment2.reserve_for(@group, @student1)
         expect(reservation.messages_sent).to be_include("Appointment Reserved By User")
         expect(reservation.messages_sent["Appointment Reserved By User"].map(&:user_id).sort.uniq).to eql (@course.instructors.map(&:id) + [@observer.id]).sort
       end
 
-      it "should notify admins and observers when a user cancels", priority: "1", test_id: 193147 do
+      it "notifies admins and observers when a user cancels", priority: "1", test_id: 193147 do
         reservation = @appointment.reserve_for(@student1, @student1)
         reservation.updating_user = @student1
         reservation.destroy
@@ -616,7 +616,7 @@ describe CalendarEvent do
       end
     end
 
-    it 'should update the appointment group when a related event is deleted' do
+    it 'updates the appointment group when a related event is deleted' do
       ag = AppointmentGroup.create!(
         :title => 'testing...',
         :contexts => [@course],
@@ -632,7 +632,7 @@ describe CalendarEvent do
       expect(AppointmentGroup.find(ag.id).start_at).to eq('2012-01-02 13:00:00')
     end
 
-    it "should allow multiple participants in an appointment, up to the limit" do
+    it "allows multiple participants in an appointment, up to the limit" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
                                    :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       ag.publish!
@@ -648,7 +648,7 @@ describe CalendarEvent do
       expect { appointment.reserve_for(@unlucky_student, @unlucky_student) }.to raise_error(CalendarEvent::ReservationError)
     end
 
-    it "should give preference to the calendar's appointment limit" do
+    it "gives preference to the calendar's appointment limit" do
       ag = AppointmentGroup.create!(
         :title => "testing...",
         :contexts => [@course],
@@ -676,7 +676,7 @@ describe CalendarEvent do
       expect(appointment.reserve_for(s3, s3)).not_to be_nil
     end
 
-    it "should revert to the appointment group's participant_limit when appropriate" do
+    it "reverts to the appointment group's participant_limit when appropriate" do
       ag = AppointmentGroup.create!(
         :title => "testing...",
         :contexts => [@course],
@@ -697,7 +697,7 @@ describe CalendarEvent do
       expect(appointment.participants_per_appointment).to eql 2
     end
 
-    it "should not let participants exceed max_appointments_per_participant" do
+    it "does not let participants exceed max_appointments_per_participant" do
       ag = AppointmentGroup.create(
         :title => "test",
         :contexts => [@course],
@@ -713,7 +713,7 @@ describe CalendarEvent do
       expect { appointment2.reserve_for(@student1, @student1) }.to raise_error(CalendarEvent::ReservationError)
     end
 
-    it "should cancel existing reservations if cancel_existing = true and the appointment is in the future" do
+    it "cancels existing reservations if cancel_existing = true and the appointment is in the future" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
                                    :new_appointments => [[1.hour.from_now, 2.hours.from_now], [3.hours.from_now, 4.hours.from_now]])
       ag.publish!
@@ -725,7 +725,7 @@ describe CalendarEvent do
       expect(r1.reload).to be_deleted
     end
 
-    it "should refuse to cancel existing reservations if cancel_existing = true and the appointment is in the past" do
+    it "refuses to cancel existing reservations if cancel_existing = true and the appointment is in the past" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
                                    :new_appointments => [[2.hours.ago, 1.hour.ago], [1.hour.from_now, 2.hours.from_now]])
       ag.publish!
@@ -737,7 +737,7 @@ describe CalendarEvent do
       expect(r1.reload).not_to be_deleted
     end
 
-    it "should save comments with appointment" do
+    it "saves comments with appointment" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course],
                                    :max_appointments_per_participant => 1,
                                    :new_appointments => [['2012-01-01 12:00:00',
@@ -751,7 +751,7 @@ describe CalendarEvent do
       expect(r1.comments).to eq("my appointment notes")
     end
 
-    it "should enforce the section" do
+    it "enforces the section" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course.course_sections.create],
                                    :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       ag.publish!
@@ -760,7 +760,7 @@ describe CalendarEvent do
       expect { appointment.reserve_for(@student1, @student1) }.to raise_error(CalendarEvent::ReservationError)
     end
 
-    it "should enforce the group category" do
+    it "enforces the group category" do
       teacher = user_factory(active_all: true)
       @course.enroll_teacher(teacher).accept!
       c1 = group_category
@@ -777,7 +777,7 @@ describe CalendarEvent do
       expect { appointment.reserve_for(g1, teacher) }.not_to raise_error
     end
 
-    it "should only accept users with StudentEnrollments as valid user participants" do
+    it "onlies accept users with StudentEnrollments as valid user participants" do
       expect(@ag.eligible_participant?(@student1)).to be_truthy
       expect { @appointment.reserve_for(@student1, @student1) }.not_to raise_error
 
@@ -794,13 +794,13 @@ describe CalendarEvent do
       expect { @appointment.reserve_for(@user, @user) }.to raise_error(CalendarEvent::ReservationError)
     end
 
-    it "should lock the appointment once it is reserved" do
+    it "locks the appointment once it is reserved" do
       expect(@appointment).to be_active
       expect(@appointment.reserve_for(@student1, @student1)).not_to be_nil
       expect(@appointment).to be_locked
     end
 
-    it "should unlock the appointment when the last reservation is canceled" do
+    it "unlocks the appointment when the last reservation is canceled" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 2,
                                    :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       appointment = ag.appointments.first
@@ -817,7 +817,7 @@ describe CalendarEvent do
       expect(appointment.reload).to be_active
     end
 
-    it "should copy the group attributes to the initial appointments" do
+    it "copies the group attributes to the initial appointments" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello world",
                                    :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']])
       e = ag.appointments.first
@@ -825,14 +825,14 @@ describe CalendarEvent do
       expect(e.description).to eql "hello world"
     end
 
-    it "should copy changed group attributes to existing appointments" do
+    it "copies changed group attributes to existing appointments" do
       @ag.update(:title => 'changed!', :description => "test123")
       e = @ag.appointments.first.reload
       expect(e.title).to eql 'changed!'
       expect(e.description).to eql "test123"
     end
 
-    it "should not copy group description if appointment is overridden" do
+    it "does not copy group description if appointment is overridden" do
       @appointment.description = "pizza party"
       @appointment.save!
 
@@ -843,7 +843,7 @@ describe CalendarEvent do
       expect(@ag.description).to eq "boring meeting"
     end
 
-    it "should copy the group attributes to subsequent appointments" do
+    it "copies the group attributes to subsequent appointments" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course])
       ag.update(
         :title => 'haha',
@@ -853,13 +853,13 @@ describe CalendarEvent do
       expect(e.title).to eql 'haha'
     end
 
-    it "should ignore changes to locked attributes on the appointment" do
+    it "ignores changes to locked attributes on the appointment" do
       @appointment.update(:start_at => '2012-01-01 12:30:00', :title => 'you wish')
       expect(@appointment.title).to eql 'test'
       expect(@appointment.start_at).to eql Time.parse('2012-01-01 12:30:00Z')
     end
 
-    it "should allow a user to re-reserve a slot after canceling" do
+    it "allows a user to re-reserve a slot after canceling" do
       ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :participants_per_appointment => 1,
                                    :new_appointments => [['2012-01-01 13:00:00', '2012-01-01 14:00:00']])
       appointment = ag.appointments.first
@@ -872,7 +872,7 @@ describe CalendarEvent do
       expect(ag.reload.available_slots).to eql 0
     end
 
-    it "should always allow editing the description on an appointment" do
+    it "alwayses allow editing the description on an appointment" do
       @appointment.update_attribute :workflow_state, "locked"
       @appointment.description = "bacon"
       @appointment.save!
@@ -881,7 +881,7 @@ describe CalendarEvent do
   end
 
   context "child_events" do
-    it "should delete child events when deleting the parent" do
+    it "deletes child events when deleting the parent" do
       calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
       child = @event.child_events.build
       child.context = user_factory
@@ -909,7 +909,7 @@ describe CalendarEvent do
         course_with_teacher
       end
 
-      it "should validate child events" do
+      it "validates child events" do
         expect {
           @course.calendar_events.create! :title => "ohai",
                                           :child_event_data => [
@@ -947,7 +947,7 @@ describe CalendarEvent do
         }.to raise_error(/Duplicate child event contexts/)
       end
 
-      it "should create child events" do
+      it "creates child events" do
         s2 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
                                            :child_event_data => [
@@ -965,7 +965,7 @@ describe CalendarEvent do
         expect(e1.end_at).to eql events.last.end_at
       end
 
-      it "should update child events" do
+      it "updates child events" do
         s2 = @course.course_sections.create!
         s3 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
@@ -990,7 +990,7 @@ describe CalendarEvent do
         expect(events1.last.reload).to be_deleted
       end
 
-      it "should not try to migrate resources to section context" do
+      it "does not try to migrate resources to section context" do
         attachment_with_context(@course)
         s2 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
@@ -1008,7 +1008,7 @@ describe CalendarEvent do
         expect { e1.save! }.not_to raise_error
       end
 
-      it "should delete all child events" do
+      it "deletes all child events" do
         s2 = @course.course_sections.create!
         s3 = @course.course_sections.create!
         e1 = @course.calendar_events.build :title => "ohai",
@@ -1046,7 +1046,7 @@ describe CalendarEvent do
     end
 
     context "cascading" do
-      it "should copy cascaded attributes when creating a child event" do
+      it "copies cascaded attributes when creating a child event" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1055,7 +1055,7 @@ describe CalendarEvent do
         expect(child.title).to eql @event.title
       end
 
-      it "should update cascaded attributes on the child events whenever the parent is updated" do
+      it "updates cascaded attributes on the child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1070,7 +1070,7 @@ describe CalendarEvent do
         expect(child.start_at).to eql orig_start_at
       end
 
-      it "should disregard attempted changes to cascaded attributes" do
+      it "disregards attempted changes to cascaded attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1087,7 +1087,7 @@ describe CalendarEvent do
     end
 
     context "locking" do
-      it "should copy all attributes when creating a locked child event" do
+      it "copies all attributes when creating a locked child event" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1097,7 +1097,7 @@ describe CalendarEvent do
         expect(child.title).to eql @event.title
       end
 
-      it "should update locked child events whenever the parent is updated" do
+      it "updates locked child events whenever the parent is updated" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1109,7 +1109,7 @@ describe CalendarEvent do
         expect(child.reload.title).to eql 'asdf'
       end
 
-      it "should disregard attempted changes to locked attributes" do
+      it "disregards attempted changes to locked attributes" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = user_factory
@@ -1121,7 +1121,7 @@ describe CalendarEvent do
         expect(child.title).to eql 'some event'
       end
 
-      it "should unlock events when the last child is deleted" do
+      it "unlocks events when the last child is deleted" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         @event.workflow_state = :locked
         @event.save!

@@ -138,7 +138,7 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq 'yo'
   end
 
-  it 'should not allow creating conversations in concluded courses for students' do
+  it 'does not allow creating conversations in concluded courses for students' do
     @course.update!(workflow_state: 'completed')
 
     result = run_mutation(recipients: [@teacher.id.to_s], body: 'yo', context_code: @course.asset_string)
@@ -149,7 +149,7 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq "Unable to send messages to users in #{@course.name}"
   end
 
-  it 'should allow creating conversations in concluded courses for teachers' do
+  it 'allows creating conversations in concluded courses for teachers' do
     teacher2 = teacher_in_course(active_all: true).user
     @course.update!(workflow_state: 'claimed')
 
@@ -172,7 +172,7 @@ RSpec.describe Mutations::CreateConversation do
     ).to eq 'Invalid recipients'
   end
 
-  it 'should allow sending to instructors even if permissions are disabled' do
+  it 'allows sending to instructors even if permissions are disabled' do
     @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
     result = run_mutation(recipients: [@teacher.id.to_s], body: 'yo', context_code: @course.asset_string)
@@ -316,7 +316,7 @@ RSpec.describe Mutations::CreateConversation do
   end
 
   describe 'for recipients the sender has no relationship with' do
-    it 'should fail for normal users' do
+    it 'fails for normal users' do
       result = run_mutation(recipients: [User.create.id.to_s], body: 'foo')
 
       expect(result.dig('data', 'createConversation', 'conversations')).to be nil
@@ -325,7 +325,7 @@ RSpec.describe Mutations::CreateConversation do
       ).to eql 'Invalid recipients'
     end
 
-    it 'should succeed for siteadmins with send_messages grants' do
+    it 'succeeds for siteadmins with send_messages grants' do
       result = run_mutation({ recipients: [User.create.id.to_s], body: 'foo' }, site_admin_user)
 
       expect(

@@ -63,19 +63,19 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     @quiz.quiz_questions.where(workflow_state: "generated").last
   end
 
-  it 'should be a no-op for :settings_only submissions (has no quiz_data)' do
+  it 'is a no-op for :settings_only submissions (has no quiz_data)' do
     quiz_submission.quiz_data = nil
     expect(subject.run!(quiz_submission)).to eq(nil)
   end
 
-  it 'should be a no-op if the data fix has already been applied' do
+  it 'is a no-op if the data fix has already been applied' do
     quiz_submission.quiz_data = []
     quiz_submission.question_references_fixed = true
 
     expect(subject.run!(quiz_submission)).to eq(nil)
   end
 
-  it 'should create missing questions' do
+  it 'creates missing questions' do
     expect(subject.run!(quiz_submission)).to eq(true)
 
     expect(@quiz.quiz_questions.count).to eq(2),
@@ -85,14 +85,14 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                        'the created QuizQuestion has a workflow state of "generated"'
   end
 
-  it 'should update the IDs in quiz_data to point to newly created questions' do
+  it 'updates the IDs in quiz_data to point to newly created questions' do
     expect(subject.run!(quiz_submission)).to eq(true)
     expect(quiz_submission.quiz_data[0][:id])
       .to eq(generated_quiz_question.id)
   end
 
   context 'with a graded submission' do
-    it 'should update all grading records for affected questions' do
+    it 'updates all grading records for affected questions' do
       quiz_submission.submission_data = [
         {
           question_id: @aq.id,
@@ -110,7 +110,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
   end # context: with a graded submission
 
   context 'with a graded submission mixed with group and bank questions' do
-    it 'should update submission data to reflect new ids' do
+    it 'updates submission data to reflect new ids' do
       @quiz.add_assessment_questions([@aq])
 
       quiz_submission.submission_data = [
@@ -140,7 +140,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
 
     # question_xxx => question_yyy
-    it 'should update all answer records for affected questions' do
+    it 'updates all answer records for affected questions' do
       run_with_submission_data({
                                  "question_#{@aq.id}" => "2",
                                })
@@ -155,7 +155,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
 
     # question_xxx_marked => question_yyy_marked
-    it 'should update the "marker"/flag records' do
+    it 'updates the "marker"/flag records' do
       run_with_submission_data({
                                  "question_#{@aq.id}_marked" => true,
                                })
@@ -170,7 +170,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end
 
     # _question_xxx_read => _question_yyy_read
-    it 'should update the "was read" records' do
+    it 'updates the "was read" records' do
       run_with_submission_data({
                                  "_question_#{@aq.id}_read" => true,
                                })
@@ -184,7 +184,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                          })
     end
 
-    it 'should not touch irrelevant records' do
+    it 'does not touch irrelevant records' do
       run_with_submission_data({
                                  "question_5" => "don't touch me",
                                  "_question_5_read" => true,
@@ -201,7 +201,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     context 'OQAAT quizzes' do
       # next_question_path for OQAAT quizzes needs to be adjusted:
       #   /courses/.../questions/xxx => /courses/.../questions/yyy
-      it 'should adjust the "next_question_path" record' do
+      it 'adjusts the "next_question_path" record' do
         run_with_submission_data({
                                    "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@aq.id}",
                                  })
@@ -211,7 +211,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
       end
 
       # ... but only if it's our question:
-      it 'should do nothing for a QuizQuestion reference' do
+      it 'does nothing for a QuizQuestion reference' do
         run_with_submission_data({
                                    "next_question_path" => "/courses/1/quizzes/1/take/questions/#{@qq.assessment_question_id}"
                                  })
@@ -223,7 +223,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
 
     context 'OQAAT + CantGoBack quizzes' do
       # last_question_id for OQAAT + CantGoBack needs to be adjusted as well:
-      it 'should adjust "last_question_id"' do
+      it 'adjusts "last_question_id"' do
         run_with_submission_data({
                                    "last_question_id" => "#{@aq.id}",
                                  })
@@ -233,7 +233,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
                                            })
       end
 
-      it 'should do nothing for a QuizQuestion reference' do
+      it 'does nothing for a QuizQuestion reference' do
         run_with_submission_data({
                                    "last_question_id" => "#{@qq.assessment_question_id}"
                                  })
@@ -244,7 +244,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
     end # context: OQAAT + CantGoBack quizzes
 
     context 'with everything put together' do
-      it 'should work' do
+      it 'works' do
         run_with_submission_data({
                                    "question_#{@aq.id}" => "2",
                                    "question_#{@aq.id}_marked" => true,
@@ -271,7 +271,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
   end # context: with an active submission
 
   context 'with multiple versions' do
-    it 'should fix previous versions just like the current one' do
+    it 'fixes previous versions just like the current one' do
       # this will be version 1
       quiz_submission.quiz_data = [@aq.data]
       quiz_submission.with_versioning { quiz_submission.save! }
@@ -292,7 +292,7 @@ describe Quizzes::QuizSubmission::QuestionReferenceDataFixer do
   end
 
   context 'with an existing quiz question' do
-    it 'should not generate another, only link to the existing one' do
+    it 'does not generate another, only link to the existing one' do
       @qq2 = @aq.create_quiz_question(@quiz.id)
 
       expect(subject.run!(quiz_submission)).to eq(true)

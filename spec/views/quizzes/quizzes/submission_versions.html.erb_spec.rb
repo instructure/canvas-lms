@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/submission_versions" do
-  it "should render" do
+  it "renders" do
     course_with_teacher(:active_all => true)
     course_quiz
 

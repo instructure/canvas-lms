@@ -28,7 +28,7 @@ describe "external tool assignments" do
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')
   end
 
-  it "should allow creating through index", priority: "2", test_id: 209971 do
+  it "allows creating through index", priority: "2", test_id: 209971 do
     get "/courses/#{@course.id}/assignments"
     expect_no_flash_message :error
     # create assignment
@@ -47,7 +47,7 @@ describe "external tool assignments" do
     expect(a.submission_types).to eq 'external_tool'
   end
 
-  it "should allow creating through the 'More Options' link", priority: "2", test_id: 209973 do
+  it "allows creating through the 'More Options' link", priority: "2", test_id: 209973 do
     get "/courses/#{@course.id}/assignments"
 
     # create assignment
@@ -82,7 +82,7 @@ describe "external tool assignments" do
     expect(a.external_tool_tag.new_tab).to be_falsey
   end
 
-  it "should allow editing", priority: "2", test_id: 209974 do
+  it "allows editing", priority: "2", test_id: 209974 do
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
     a.create_external_tool_tag(:url => @t1.url)
     a.external_tool_tag.update_attribute(:content_type, 'ContextExternalTool')
@@ -106,7 +106,7 @@ describe "external tool assignments" do
     expect(a.external_tool_tag.url).to eq @t1.url
   end
 
-  it "should show module sequence even without module_item_id param" do
+  it "shows module sequence even without module_item_id param" do
     allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     a = assignment_model(:course => @course, :title => "test2", :submission_types => 'external_tool')
@@ -133,7 +133,7 @@ describe "external tool assignments" do
       end
     end
 
-    it "should be able to select the tool directly from the submission type drop-down" do
+    it "is able to select the tool directly from the submission type drop-down" do
       get "/courses/#{@course.id}/assignments/new"
 
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
@@ -154,7 +154,7 @@ describe "external tool assignments" do
       expect(assmt.external_tool_tag.url).to eq @t2.url
     end
 
-    it "should show the tool as selected when editing a saved configured assignment" do
+    it "shows the tool as selected when editing a saved configured assignment" do
       assmt = @course.assignments.create!(:title => "blah", :submission_types => "external_tool",
                                           :external_tool_tag_attributes => { :content => @t1, :url => @t1.url })
       get "/courses/#{@course.id}/assignments/#{assmt.id}/edit"
@@ -165,7 +165,7 @@ describe "external tool assignments" do
       expect(button.text).to include("link to #{@t1.name} or whatever") # the launch button uses the placement text
     end
 
-    it "should display external data for mastery connect" do
+    it "displays external data for mastery connect" do
       ext_data = {
         key: "https://canvas.instructure.com/lti/mastery_connect_assessment",
         points: 10,
@@ -191,7 +191,7 @@ describe "external tool assignments" do
       expect(f('#mc_external_data_students').text).to eq("#{ext_data[:studentCount]} Students")
     end
 
-    it "should be bring up modal when submission type link is clicked" do
+    it "is bring up modal when submission type link is clicked" do
       get "/courses/#{@course.id}/assignments/new"
       click_option("#assignment_submission_type", @t1.name) # should use the tool name for drop-down
       f("#assignment_submission_type_selection_tool_launch_container .btn-primary").click

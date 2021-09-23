@@ -63,19 +63,19 @@ describe GroupLeadership do
       end
 
       context "leader membership" do
-        it "should revoke when deleted" do
+        it "revokes when deleted" do
           expect(@group.leader).not_to be_nil
           @leader_membership.destroy_permanently!
           expect(@group.reload.leader).to be_nil
         end
 
-        it "should revoke when soft deleted" do
+        it "revokes when soft deleted" do
           expect(@group.leader).not_to be_nil
           @leader_membership.destroy
           expect(@group.reload.leader).to be_nil
         end
 
-        it "should revoke when group is changed" do
+        it "revokes when group is changed" do
           expect(@group.leader).not_to be_nil
           group2 = @category.groups.create!(:context => @course)
           @leader_membership.update_attribute(:group_id, group2.id)
@@ -84,13 +84,13 @@ describe GroupLeadership do
       end
 
       context "non-leader membership" do
-        it "should not revoke when deleted" do
+        it "does not revoke when deleted" do
           expect(@group.leader).not_to be_nil
           @membership.destroy_permanently!
           expect(@group.reload.leader).not_to be_nil
         end
 
-        it "should not revoke when group is changed" do
+        it "does not revoke when group is changed" do
           expect(@group.leader).not_to be_nil
           group2 = @category.groups.create!(:context => @course)
           @membership.update_attribute(:group_id, group2.id)

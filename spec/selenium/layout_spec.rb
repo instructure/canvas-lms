@@ -28,11 +28,11 @@ describe "layout" do
     get "/"
   end
 
-  it "should have ENV available to the JavaScript from js_env" do
+  it "has ENV available to the JavaScript from js_env" do
     expect(driver.execute_script("return ENV.current_user_id")).to eq @user.id.to_s
   end
 
-  it "should escape JSON injected directly into the view" do
+  it "escapes JSON injected directly into the view" do
     expect(driver.execute_script("return ENV.current_user.display_name")).to eq "</script><b>evil html & name</b>"
   end
 end

@@ -178,7 +178,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
     context 'when g2 title is updated with a letter that will proceed others' do
       before { g2.update!(title: 'A Group 3') }
 
-      it 'should return the g2s outcome (o3) first' do
+      it 'returns the g2s outcome (o3) first' do
         outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(
           [
@@ -212,7 +212,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
         o6.update!(short_description: 'A Outcome 4.3')
       }
 
-      it 'should return the g4s outcomes first and o6 should be first before other Outcomes 4.x' do
+      it 'returns the g4s outcomes first and o6 should be first before other Outcomes 4.x' do
         outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
         expect(outcomes).to match_array(
           [

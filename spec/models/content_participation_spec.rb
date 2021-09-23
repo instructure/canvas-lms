@@ -29,7 +29,7 @@ describe ContentParticipation do
   end
 
   describe "create_or_update" do
-    it "should create if it doesn't exist" do
+    it "creates if it doesn't exist" do
       expect {
         ContentParticipation.create_or_update({
                                                 :content => @content,
@@ -39,7 +39,7 @@ describe ContentParticipation do
       }.to change(ContentParticipation, :count).by 1
     end
 
-    it "should update existing if one already exists" do
+    it "updates existing if one already exists" do
       expect {
         ContentParticipation.create_or_update({
                                                 :content => @content,
@@ -62,7 +62,7 @@ describe ContentParticipation do
   end
 
   describe "update_participation_count" do
-    it "should update the participation count automatically when the workflow state changes" do
+    it "updates the participation count automatically when the workflow state changes" do
       expect {
         ContentParticipation.create_or_update({
                                                 :content => @content,
@@ -80,7 +80,7 @@ describe ContentParticipation do
       expect(cpc.unread_count).to eq 1
     end
 
-    it "should not update participation count if workflow_state doesn't change" do
+    it "does not update participation count if workflow_state doesn't change" do
       expect {
         ContentParticipation.create_or_update({
                                                 :content => @content,
@@ -100,7 +100,7 @@ describe ContentParticipation do
   end
 
   describe 'create' do
-    it 'should set the root_account_id from the submissions assignment' do
+    it 'sets the root_account_id from the submissions assignment' do
       participant = ContentParticipation.create_or_update({
                                                             :content => @content,
                                                             :user => @student,

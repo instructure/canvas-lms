@@ -69,7 +69,7 @@ describe "profile" do
     wait_for_new_page_load { submit_form(edit_form) }
   end
 
-  it "should give error - wrong old password" do
+  it "gives error - wrong old password" do
     log_in_to_settings
     change_password('wrongoldpassword', 'newpassword')
     # check to see if error box popped up
@@ -78,7 +78,7 @@ describe "profile" do
     expect(errorboxes.any? { |errorbox| errorbox.text =~ /Invalid old password for the login/ }).to be_truthy
   end
 
-  it "should change the password" do
+  it "changes the password" do
     log_in_to_settings
     change_password('asdfasdf', 'newpassword')
     # login with new password
@@ -108,7 +108,7 @@ describe "profile" do
       f('#right-side .add_email_link').click
     end
 
-    it "should add a new email address on profile settings page" do
+    it "adds a new email address on profile settings page" do
       @user.account.enable_feature!(:international_sms)
       notification_model(:category => 'Grading')
       notification_policy_model(:notification_id => @notification.id)
@@ -134,7 +134,7 @@ describe "profile" do
       expect(f('.email_channels')).to include_text(test_email)
     end
 
-    it "should change default email address" do
+    it "changes default email address" do
       @user.communication_channel.confirm!
       channel = communication_channel(@user, { username: 'walter_white@example.com', active_cc: true })
 
@@ -147,7 +147,7 @@ describe "profile" do
       expect(f(".default_email.display_data")).to include_text('walter_white@example.com')
     end
 
-    it "should edit full name" do
+    it "edits full name" do
       new_user_name = 'new user name'
       get "/profile/settings"
       edit_form = click_edit
@@ -156,7 +156,7 @@ describe "profile" do
       expect(f('.full_name')).to include_text new_user_name
     end
 
-    it "should edit display name and validate" do
+    it "edits display name and validate" do
       new_display_name = 'test name'
       get "/profile/settings"
       edit_form = click_edit
@@ -166,7 +166,7 @@ describe "profile" do
       expect(displayed_username).to eq(new_display_name)
     end
 
-    it "should change the language" do
+    it "changes the language" do
       get "/profile/settings"
       edit_form = click_edit
       click_option('#user_locale', 'Español')
@@ -174,7 +174,7 @@ describe "profile" do
       expect(get_value('#user_locale')).to eq 'es'
     end
 
-    it "should change the language even if you can't update your name" do
+    it "changes the language even if you can't update your name" do
       a = Account.default
       a.settings[:users_can_edit_name] = false
       a.save!
@@ -193,7 +193,7 @@ describe "profile" do
         @user.account.save!
       end
 
-      it "should change pronouns" do
+      it "changes pronouns" do
         get "/profile/settings"
         desired_pronoun = 'She/Her'
         edit_form = click_edit
@@ -203,7 +203,7 @@ describe "profile" do
       end
     end
 
-    it "should add another contact method - sms" do
+    it "adds another contact method - sms" do
       @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
       get "/profile/settings"
@@ -219,7 +219,7 @@ describe "profile" do
       expect(f('.other_channels .path')).to include_text(test_cell_number)
     end
 
-    it 'should add another contact method - slack' do
+    it 'adds another contact method - slack' do
       @user.account.enable_feature!(:slack_notifications)
       test_slack_email = 'sburnett@instructure.com'
       get '/profile/settings'
@@ -234,12 +234,12 @@ describe "profile" do
       expect(f('.other_channels .path')).to include_text(test_slack_email)
     end
 
-    it "should register a service" do
+    it "registers a service" do
       get "/profile/settings"
       add_skype_service
     end
 
-    it "should delete a service" do
+    it "deletes a service" do
       get "/profile/settings"
       add_skype_service
       driver.action.move_to(f('.service')).perform
@@ -250,7 +250,7 @@ describe "profile" do
       expect(f('#unregistered_services')).to include_text("Skype")
     end
 
-    it "should toggle user services visibility" do
+    it "toggles user services visibility" do
       get "/profile/settings"
       add_skype_service
       selector = "#show_user_services"
@@ -266,7 +266,7 @@ describe "profile" do
       expect(f(selector).selected?).to be_truthy
     end
 
-    it "should generate a new access token without an expiration", priority: "2", test_id: 588918 do
+    it "generates a new access token without an expiration", priority: "2", test_id: 588918 do
       get "/profile/settings"
       generate_access_token('testing', true)
       # some jquery replaces the expiration which makes it hard to select until refresh
@@ -274,7 +274,7 @@ describe "profile" do
       expect(f('.access_token .expires')).to include_text('never')
     end
 
-    it "should generate a new access token with an expiration", priority: "2", test_id: 588919 do
+    it "generates a new access token with an expiration", priority: "2", test_id: 588919 do
       Timecop.freeze do
         get "/profile/settings"
         generate_access_token_with_expiration(format_date_for_view(2.days.from_now, :medium))
@@ -285,7 +285,7 @@ describe "profile" do
       expect(f('.access_token .expires')).to include_text(format_time_for_view(2.days.from_now.midnight))
     end
 
-    it "should regenerate a new access token", priority: "2", test_id: 588920 do
+    it "regenerates a new access token", priority: "2", test_id: 588920 do
       skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token
@@ -298,7 +298,7 @@ describe "profile" do
       expect(token).not_to eql(new_token)
     end
 
-    it "should test canceling creating a new access token" do
+    it "tests canceling creating a new access token" do
       get "/profile/settings"
       f('.add_access_token_link').click
       access_token_form = f('#access_token_form')
@@ -306,7 +306,7 @@ describe "profile" do
       expect(access_token_form).not_to be_displayed
     end
 
-    it "should view the details of an access token" do
+    it "views the details of an access token" do
       get "/profile/settings"
       generate_access_token('testing', true)
       # had to use :visible because it was failing saying element wasn't visible
@@ -314,7 +314,7 @@ describe "profile" do
       expect(f('#token_details_dialog')).to be_displayed
     end
 
-    it "should delete an access token", priority: "2", test_id: 588921 do
+    it "deletes an access token", priority: "2", test_id: 588921 do
       skip_if_safari(:alert)
       get "/profile/settings"
       generate_access_token('testing', true)
@@ -327,7 +327,7 @@ describe "profile" do
       check_element_has_focus f(".add_access_token_link")
     end
 
-    it "should set focus to the previous access token when deleting and multiple exist" do
+    it "sets focus to the previous access token when deleting and multiple exist" do
       @token1 = @user.access_tokens.create! purpose: 'token_one'
       @token2 = @user.access_tokens.create! purpose: 'token_two'
       get "/profile/settings"
@@ -344,7 +344,7 @@ describe "profile" do
       course_with_teacher_logged_in
     end
 
-    it "should link back to profile/settings in oauth callbacks" do
+    it "links back to profile/settings in oauth callbacks" do
       get "/profile/settings"
       links = ff('#unregistered_services .service .content a')
       links.each do |l|
@@ -358,7 +358,7 @@ describe "profile" do
       local_storage!
     end
 
-    it "should save admin profile pics setting", priority: "1", test_id: 68933 do
+    it "saves admin profile pics setting", priority: "1", test_id: 68933 do
       site_admin_logged_in
       get "/accounts/#{Account.default.id}/settings"
       f('#account_services_avatars').click
@@ -370,7 +370,7 @@ describe "profile" do
     # TODO: reimplement per CNVS-29610, but make sure we're testing at the right level
     it "should successfully upload profile pictures"
 
-    it "should allow users to choose an avatar from their profile page" do
+    it "allows users to choose an avatar from their profile page" do
       course_with_teacher_logged_in
 
       account = Account.default
@@ -415,7 +415,7 @@ describe "profile" do
       student_in_course(:course => @course, :user => @other_student, :active_all => true)
     end
 
-    it "should be able to report inappropriate pictures without profiles enabled" do
+    it "is able to report inappropriate pictures without profiles enabled" do
       get "/courses/#{@course.id}/users/#{@other_student.id}"
       f('.report_avatar_picture_link').click
       wait_for_ajaximations
@@ -424,7 +424,7 @@ describe "profile" do
       expect(@other_student.avatar_state).to eq :reported
     end
 
-    it "should be able to report inappropriate pictures with profiles enabled" do
+    it "is able to report inappropriate pictures with profiles enabled" do
       Account.default.settings[:enable_profiles] = true
       Account.default.save!
       get "/courses/#{@course.id}/users/#{@other_student.id}"

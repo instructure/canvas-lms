@@ -93,7 +93,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       @course.wiki_pages.create!(title: page_title, body: content)
     end
 
-    it 'should click on sidebar wiki page to create link in body', ignore_js_errors: true do
+    it 'clicks on sidebar wiki page to create link in body', ignore_js_errors: true do
       title = 'test_page'
       unpublished = false
       edit_roles = 'public'
@@ -116,7 +116,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'links' do
-      it 'should respect selected text when creating a course link in body',
+      it 'respects selected text when creating a course link in body',
          ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
@@ -142,7 +142,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should respect selected text when creating an external link in body',
+      it 'respects selected text when creating an external link in body',
          ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
@@ -164,7 +164,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should update selected text when creating an external link in body',
+      it 'updates selected text when creating an external link in body',
          ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
@@ -186,7 +186,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should update the text when editing a link' do
+      it 'updates the text when editing a link' do
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -293,7 +293,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should not magically create youtube video preview on a link', ignore_js_errors: true do
+      it 'does not magically create youtube video preview on a link', ignore_js_errors: true do
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -311,7 +311,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar assignment page to create link in body' do
+      it 'clicks on sidebar assignment page to create link in body' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
 
@@ -331,7 +331,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar quizzes page to create link in body' do
+      it 'clicks on sidebar quizzes page to create link in body' do
         title = 'Quiz-Title'
         @quiz = @course.quizzes.create!(workflow_state: 'available', title: title)
 
@@ -348,7 +348,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar announcements page to create link in body' do
+      it 'clicks on sidebar announcements page to create link in body' do
         title = 'Announcement-Title'
         message = 'Announcement 1 detail'
         @announcement = @course.announcements.create!(title: title, message: message)
@@ -369,7 +369,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar discussions page to create link in body' do
+      it 'clicks on sidebar discussions page to create link in body' do
         title = 'Discussion-Title'
         @discussion = @course.discussion_topics.create!(title: title)
 
@@ -389,7 +389,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
+      it 'clicks on sidebar modules page to create link in body', ignore_js_errors: true do
         title = 'Module-Title'
         @module = @course.context_modules.create!(name: title)
 
@@ -406,7 +406,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on sidebar course navigation page to create link in body',
+      it 'clicks on sidebar course navigation page to create link in body',
          ignore_js_errors: true do
         title = 'Files'
         visit_front_page_edit(@course)
@@ -422,7 +422,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on assignment in sidebar to create link to it in announcement page',
+      it 'clicks on assignment in sidebar to create link to it in announcement page',
          ignore_js_errors: true do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
@@ -443,7 +443,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on module in sidebar to create link to it in assignment page',
+      it 'clicks on module in sidebar to create link to it in assignment page',
          ignore_js_errors: true do
         title = 'Module-Title'
         @module = @course.context_modules.create!(name: title)
@@ -461,7 +461,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on assignment in sidebar to create link to it in discussion page' do
+      it 'clicks on assignment in sidebar to create link to it in discussion page' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
 
@@ -480,7 +480,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on assignment in sidebar to create link to it in quiz page' do
+      it 'clicks on assignment in sidebar to create link to it in quiz page' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
         @quiz = @course.quizzes.create!
@@ -501,7 +501,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should click on assignment in sidebar to create link to it in syllabus page' do
+      it 'clicks on assignment in sidebar to create link to it in syllabus page' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
 
@@ -522,7 +522,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should close links tray if open when opening link options' do
+      it 'closes links tray if open when opening link options' do
         skip('still flakey. Needs to be addressed in LS-1814')
         visit_front_page_edit(@course)
         wait_for_tiny(edit_wiki_css)
@@ -554,7 +554,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         3.times { switch_trays }
       end
 
-      it 'should display assignment publish status in links accordion' do
+      it 'displays assignment publish status in links accordion' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title, workflow_state: 'published')
 
@@ -575,7 +575,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(assignment_unpublished_status).to be_displayed
       end
 
-      it 'should display assignment due date in links accordion' do
+      it 'displays assignment due date in links accordion' do
         title = 'Assignment-Title'
         due_at = 3.days.from_now
         @assignment =
@@ -599,7 +599,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           )
         end
 
-        it 'should still allow inserting course links' do
+        it 'stills allow inserting course links' do
           title = 'Discussion-Title'
           @discussion = @course.discussion_topics.create!(title: title)
 
@@ -622,7 +622,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'sidebar search' do
-      it 'should search for wiki course link to create link in body', ignore_js_errors: true do
+      it 'searches for wiki course link to create link in body', ignore_js_errors: true do
         title = 'test_page'
         title2 = 'test_page2'
         unpublished = false
@@ -652,7 +652,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should search for document link to add to body', ignore_js_errors: true do
+      it 'searches for document link to add to body', ignore_js_errors: true do
         title1 = 'text_file1.txt'
         title2 = 'text_file2.txt'
         create_course_text_file(title1)
@@ -676,7 +676,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should search for an image in sidebar in image tray', ignore_js_errors: true do
+      it 'searches for an image in sidebar in image tray', ignore_js_errors: true do
         title1 = 'email.png'
         title2 = 'image_icon.gif'
         add_embedded_image(title1)
@@ -699,7 +699,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should search for items when different accordian section opened',
+      it 'searches for items when different accordian section opened',
          ignore_js_errors: true do
         # Add two pages
         title = 'test_page'
@@ -739,7 +739,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should click on sidebar images tab' do
+    it 'clicks on sidebar images tab' do
       visit_front_page_edit(@course)
       click_images_toolbar_menu_button
       click_course_images
@@ -747,7 +747,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       expect(course_images_tray).to be_displayed
     end
 
-    it 'should click on an image in sidebar to display in body', ignore_js_errors: true do
+    it 'clicks on an image in sidebar to display in body', ignore_js_errors: true do
       title = 'email.png'
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(context: @course)
@@ -767,7 +767,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should link image to selected text' do
+    it 'links image to selected text' do
       title = 'email.png'
       @root_folder = Folder.root_folders(@course).first
       @image = @root_folder.attachments.build(context: @course)
@@ -793,7 +793,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should open tray when clicking options button on existing image' do
+    it 'opens tray when clicking options button on existing image' do
       page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
 
@@ -805,7 +805,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       expect(image_options_tray).to be_displayed
     end
 
-    it 'should close links tray if open when opening image options' do
+    it 'closes links tray if open when opening image options' do
       skip('still flakey. Needs to be addressed in LS-1814')
       page_title = 'Page1'
       image = add_embedded_image('email.png')
@@ -838,7 +838,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       3.times { switch_trays }
     end
 
-    it 'should change embedded image to link when selecting option' do
+    it 'changes embedded image to link when selecting option' do
       page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
 
@@ -855,7 +855,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should add alt text to image using options tray' do
+    it 'adds alt text to image using options tray' do
       alt_text = 'fear is the mindkiller'
       page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
@@ -873,7 +873,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should guarantees an alt text when selecting decorative' do
+    it 'guaranteeses an alt text when selecting decorative' do
       skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-154')
       page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
@@ -892,7 +892,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should click on a document in sidebar to display in body' do
+    it 'clicks on a document in sidebar to display in body' do
       title = 'text_file.txt'
       create_course_text_file(title)
 
@@ -909,7 +909,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'status bar functions' do
-      it 'should open a11y checker when clicking button in status bar' do
+      it 'opens a11y checker when clicking button in status bar' do
         visit_front_page_edit(@course)
 
         click_a11y_checker_button
@@ -958,7 +958,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         }).to be_truthy
       end
 
-      it 'should open keyboard shortcut modal when clicking button in status bar' do
+      it 'opens keyboard shortcut modal when clicking button in status bar' do
         visit_front_page_edit(@course)
 
         click_visible_keyboard_shortcut_button
@@ -966,7 +966,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(keyboard_shortcut_modal).to be_displayed
       end
 
-      it 'should open rce in full screen with button in status bar' do
+      it 'opens rce in full screen with button in status bar' do
         visit_front_page_edit(@course)
 
         click_full_screen_button
@@ -979,7 +979,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should close the course links tray when pressing esc', ignore_js_errors: true do
+    it 'closes the course links tray when pressing esc', ignore_js_errors: true do
       visit_front_page_edit(@course)
 
       click_links_toolbar_menu_button
@@ -997,7 +997,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should close the course images tray when pressing esc', ignore_js_errors: true do
+    it 'closes the course images tray when pressing esc', ignore_js_errors: true do
       visit_front_page_edit(@course)
 
       click_images_toolbar_menu_button
@@ -1011,7 +1011,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should open upload image modal when clicking upload option' do
+    it 'opens upload image modal when clicking upload option' do
       visit_front_page_edit(@course)
 
       click_images_toolbar_menu_button
@@ -1021,7 +1021,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'kaltura interaction' do
-      it 'should include media upload option if kaltura is enabled' do
+      it 'includes media upload option if kaltura is enabled' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
@@ -1035,7 +1035,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(menu_items_by_menu_id(menu_id).length).to be(3)
       end
 
-      it 'should not include media upload option if kaltura is disabled' do
+      it 'does not include media upload option if kaltura is disabled' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
         visit_front_page_edit(@course)
@@ -1048,7 +1048,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(menu_items_by_menu_id(menu_id).length).to be(2)
       end
 
-      it 'should not include media upload option if button is disabled' do
+      it 'does not include media upload option if button is disabled' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({ 'hide_rte_button' => true })
         visit_front_page_edit(@course)
@@ -1061,7 +1061,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(menu_items_by_menu_id(menu_id).length).to be(2)
       end
 
-      it 'should open upload document modal when clicking upload option' do
+      it 'opens upload document modal when clicking upload option' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
@@ -1071,7 +1071,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(upload_document_modal).to be_displayed
       end
 
-      it 'should open upload media modal when clicking upload option' do
+      it 'opens upload media modal when clicking upload option' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         visit_front_page_edit(@course)
@@ -1083,7 +1083,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should close sidebar after drag and drop' do
+    it 'closes sidebar after drag and drop' do
       skip('kills many selenium tests. Address in CORE-3147')
       title = 'Assignment-Title'
       @assignment = @course.assignments.create!(name: title)
@@ -1101,7 +1101,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       expect(f('body')).not_to contain_css('[data-testid="CanvasContentTray"]')
     end
 
-    it 'should add a title attribute to an inserted iframe' do
+    it 'adds a title attribute to an inserted iframe' do
       # as typically happens when embedding media, like a youtube video
       double('CanvasKaltura::ClientV3')
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
@@ -1120,7 +1120,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       expect(f('iframe[title="embedded content"][src="https://example.com/"]')).to be_displayed # save the page
     end
 
-    it 'should not load duplicate data when opening sidebar tray multiple times' do
+    it 'does not load duplicate data when opening sidebar tray multiple times' do
       user_attachment = @user.attachments.build(filename: 'myimage.png', context: @student)
       user_attachment.content_type = 'image/png'
       user_attachment.save!
@@ -1142,7 +1142,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'keyboard shortcuts' do
-      it 'should open keyboard shortcut modal with alt-f8' do
+      it 'opens keyboard shortcut modal with alt-f8' do
         visit_front_page_edit(@course)
         rce = f('.tox-edit-area__iframe')
         rce.send_keys %i[alt f8]
@@ -1150,7 +1150,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(keyboard_shortcut_modal).to be_displayed
       end
 
-      it 'should focus the menubar with alt-f9' do
+      it 'focuses the menubar with alt-f9' do
         visit_front_page_edit(@course)
         rce = f('.tox-edit-area__iframe')
         expect(f('.tox-menubar')).to be_displayed # always show menubar now
@@ -1160,7 +1160,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(fj('.tox-menubar button:contains("Edit")')).to eq(driver.switch_to.active_element)
       end
 
-      it 'should focus the toolbar with alt-f10' do
+      it 'focuses the toolbar with alt-f10' do
         visit_front_page_edit(@course)
         rce = f('.tox-edit-area__iframe')
         rce.send_keys %i[alt f10]
@@ -1170,7 +1170,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         )
       end
 
-      it 'should focus table context toolbar with ctrl-f9' do
+      it 'focuses table context toolbar with ctrl-f9' do
         page_title = 'Page-with-table'
         create_wiki_page_with_content(page_title)
 
@@ -1185,7 +1185,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         ) # put the cursor in the table
       end
 
-      it 'should focus course file link context toolbar with ctrl-f9' do
+      it 'focuses course file link context toolbar with ctrl-f9' do
         page_title = 'Page-with-link'
         create_wiki_page_with_content(page_title)
 
@@ -1229,7 +1229,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         @tool.save!
       end
 
-      it 'should display lti icon with a tool enabled for the course', ignore_js_errors: true do
+      it 'displays lti icon with a tool enabled for the course', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1240,7 +1240,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       # if there's mru data in local_storage we get the menu button
       # if not we get a button that opens the modal directly
-      it 'should display the lti tool modal', ignore_js_errors: true do
+      it 'displays the lti tool modal', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1255,7 +1255,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(lti_tools_modal).to be_displayed
       end
 
-      it 'should display the lti tool modal, reprise', ignore_js_errors: true do
+      it 'displays the lti tool modal, reprise', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1275,7 +1275,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         driver.local_storage.clear
       end
 
-      it 'should show favorited LTI tool icon when a tool is favorited', ignore_js_errors: true do
+      it 'shows favorited LTI tool icon when a tool is favorited', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1284,7 +1284,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(lti_favorite_button).to be_displayed
       end
 
-      it 'should display the favorited lti tool modal', ignore_js_errors: true do
+      it 'displays the favorited lti tool modal', ignore_js_errors: true do
         page_title = 'Page1'
         create_wiki_page_with_embedded_image(page_title)
 
@@ -1295,14 +1295,14 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
 
       describe 'Tools menubar menu', ignore_js_errors: true do
-        it 'should include Apps menu item in' do
+        it 'includes Apps menu item in' do
           rce_wysiwyg_state_setup(@course)
 
           menubar_open_menu('Tools')
           expect(menubar_menu_item('Apps')).to be_displayed
         end
 
-        it 'should show "View All" in the Tools > Apps submenu', ignore_js_errors: true do
+        it 'shows "View All" in the Tools > Apps submenu', ignore_js_errors: true do
           rce_wysiwyg_state_setup(@course)
 
           click_menubar_submenu_item('Tools', 'Apps')
@@ -1310,7 +1310,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect(f('body')).not_to contain_css(menubar_menu_item_css('Commons Favorites'))
         end
 
-        it 'should show MRU tools in the Tools > Apps submenu', ignore_js_errors: true do
+        it 'shows MRU tools in the Tools > Apps submenu', ignore_js_errors: true do
           rce_wysiwyg_state_setup(@course)
           driver.local_storage['ltimru'] = "[#{@tool.id}]"
 
@@ -1323,7 +1323,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'fonts', ignore_js_errors: true do
-      it 'should successfully change to Balsamiq Sans font with menubar options' do
+      it 'successfullies change to Balsamiq Sans font with menubar options' do
         text = 'Hello font'
         rce_wysiwyg_state_setup(@course, text)
         select_all_in_tiny(f('#wiki_page_body'))
@@ -1336,7 +1336,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         )
       end
 
-      it 'should successfully change to Architects Daughter font with menubar options' do
+      it 'successfullies change to Architects Daughter font with menubar options' do
         text = 'Hello font'
         rce_wysiwyg_state_setup(@course, text)
         select_all_in_tiny(f('#wiki_page_body'))
@@ -1351,7 +1351,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     describe 'Insert menubar menu' do
-      it 'should show content insertion menu items' do
+      it 'shows content insertion menu items' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         rce_wysiwyg_state_setup(@course)
@@ -1382,7 +1382,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
     describe 'Insert content toolbar button default actions' do
-      it 'should do the right thing when clicking the toolbar button' do
+      it 'does the right thing when clicking the toolbar button' do
         double('CanvasKaltura::ClientV3')
         allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
         rce_wysiwyg_state_setup(@course)
@@ -1408,7 +1408,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     describe 'the content tray' do
       after(:each) { driver.local_storage.clear }
 
-      it 'should show course links after user files' do
+      it 'shows course links after user files' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
 

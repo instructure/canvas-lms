@@ -63,12 +63,12 @@ describe "Exportable" do
       File.open(zip_path)
     end
 
-    it "should create an epub file" do
+    it "creates an epub file" do
       skip 'LS-1504 (9/30/2020)'
       expect(epub).not_to be_nil
     end
 
-    it "should create a zip file" do
+    it "creates a zip file" do
       skip 'LS-1504 (9/30/2020)'
       expect(zip).not_to be_nil
     end

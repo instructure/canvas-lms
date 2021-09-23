@@ -37,7 +37,7 @@ describe Canvas::LockExplanation do
     context "with a :lock_at key in the hash" do
       let(:hash) { { lock_at: DateTime.tomorrow } }
       context "with a type of 'page'" do
-        it "should return the correct explanation string" do
+        it "returns the correct explanation string" do
           expect(result).to match(/This page was locked /)
         end
       end
@@ -67,14 +67,14 @@ describe Canvas::LockExplanation do
                 g
               }
 
-              it "should use the group's course in the link " do
+              it "uses the group's course in the link" do
                 expect(host).to receive(:course_context_modules_url).with(course, { :anchor => 'module_1' })
                 result
               end
 
               context "when the group's context is an account" do
                 let(:context) { Group.new(context: Account.new) }
-                it "should raise" do
+                it "raises" do
                   expect { result }.to raise_error("Either Context or Group context must be a Course")
                 end
               end
@@ -82,7 +82,7 @@ describe Canvas::LockExplanation do
 
             context "when the context is an account" do
               let(:context) { Account.new }
-              it "should raise" do
+              it "raises" do
                 expect { result }.to raise_error("Either Context or Group context must be a Course")
               end
             end

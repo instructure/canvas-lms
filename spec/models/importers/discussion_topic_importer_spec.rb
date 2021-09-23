@@ -25,7 +25,7 @@ require 'nokogiri'
 describe Importers::DiscussionTopicImporter do
   SYSTEMS.each do |system|
     if import_data_exists? system, 'discussion_topic'
-      it "should import topics for #{system}" do
+      it "imports topics for #{system}" do
         data = get_import_data(system, 'discussion_topic')
         data = data.first
         data = data.with_indifferent_access
@@ -61,7 +61,7 @@ describe Importers::DiscussionTopicImporter do
     # RuboCop can't detect the examples that are dynamically defined
     SYSTEMS.each do |system|
       if import_data_exists? system, 'announcements'
-        it "should import assignments for #{system}" do
+        it "imports assignments for #{system}" do
           data = get_import_data(system, 'announcements')
           context = get_import_context(system)
           migration = context.content_migrations.create!
@@ -82,7 +82,7 @@ describe Importers::DiscussionTopicImporter do
     end
   end
 
-  it "should not attach files when no attachment_migration_id is specified" do
+  it "does not attach files when no attachment_migration_id is specified" do
     data = get_import_data('bb8', 'discussion_topic').first.with_indifferent_access
     context = get_import_context('bb8')
     migration = context.content_migrations.create!

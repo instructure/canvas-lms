@@ -27,7 +27,7 @@ describe Auditors::ActiveRecord::CourseRecord do
     Auditors::ActiveRecord::Partitioner.process
   end
 
-  it "it appropriately connected to a table" do
+  it "appropriately connected to a table" do
     expect(Auditors::ActiveRecord::CourseRecord.count).to eq(0)
   end
 

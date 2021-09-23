@@ -22,7 +22,7 @@ require 'spec_helper'
 
 describe CanvasMetadatum do
   describe "getting" do
-    it 'should get the default value as a hash' do
+    it 'gets the default value as a hash' do
       expect(CanvasMetadatum.get('some_key', { state: 23 })[:state]).to eq 23
     end
 
@@ -30,7 +30,7 @@ describe CanvasMetadatum do
       expect { CanvasMetadatum.get('some_key', 'some value') }.to raise_error(CanvasMetadatum::MetadataArgumentError)
     end
 
-    it 'should return set values' do
+    it 'returns set values' do
       CanvasMetadatum.set('some_key', { int_val: 23, string_val: "asdf", array_val: [2, 4, 8, 16], hash_val: { nested: "string_value" } })
       payload = CanvasMetadatum.get('some_key')
       expect(payload[:int_val]).to eq(23)

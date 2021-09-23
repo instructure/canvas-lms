@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "SummaryMessageConsolidator" do
-  it "should process in batches" do
+  it "processes in batches" do
     Setting.set('summary_message_consolidator_batch_size', '2')
     users = (0..3).map { user_with_communication_channel }
     messages = []
@@ -35,7 +35,7 @@ describe "SummaryMessageConsolidator" do
     expect(queued.map(&:to_i).sort).to eq messages.map(&:id).sort
   end
 
-  it "should not double-send messages" do
+  it "does not double-send messages" do
     all_messages = []
     u = user_with_communication_channel
     2.times { all_messages << delayed_message_model(:cc => u.communication_channels.first, :send_at => 1.day.ago) }
@@ -48,7 +48,7 @@ describe "SummaryMessageConsolidator" do
     expect(created_jobs.first.payload_object.args.first).to eq [message_to_send.id]
   end
 
-  it "should send summaries from different accounts in separate messages" do
+  it "sends summaries from different accounts in separate messages" do
     users = (0..3).map { user_with_communication_channel }
     dms = []
     account_ids = [1, 2, 3]

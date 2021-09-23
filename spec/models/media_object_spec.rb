@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe MediaObject do
   context "loading with legacy support" do
-    it "should load by either media_id or old_media_id" do
+    it "loads by either media_id or old_media_id" do
       course_factory
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :old_media_id => '1_01234567', :context => @course)
 
@@ -30,19 +30,19 @@ describe MediaObject do
       expect(MediaObject.by_media_id('1_01234567').first).to eq mo
     end
 
-    it "should not find an arbitrary MediaObject when given a nil id" do
+    it "does not find an arbitrary MediaObject when given a nil id" do
       course_factory
       mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
       expect(MediaObject.by_media_id(nil).first).to be_nil
     end
 
-    it "should raise an error if someone tries to use find_by_media_id" do
+    it "raises an error if someone tries to use find_by_media_id" do
       expect { MediaObject.find_by_media_id('fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
     end
   end
 
   describe ".build_media_objects" do
-    it "should delete attachments created temporarily for import" do
+    it "deletes attachments created temporarily for import" do
       course_factory
       folder = Folder.assert_path(CC::CCHelper::MEDIA_OBJECTS_FOLDER, @course)
       @a1 = attachment_model(:folder => folder, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
@@ -58,7 +58,7 @@ describe MediaObject do
       expect(@a2.reload.file_state).to eq 'available'
     end
 
-    it "should build media objects from attachment_id" do
+    it "builds media objects from attachment_id" do
       course_factory
       @a1 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
       @a3 = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
@@ -84,20 +84,20 @@ describe MediaObject do
   end
 
   describe ".ensure_media_object" do
-    it "should not create if the media object exists already" do
+    it "does not create if the media object exists already" do
       MediaObject.create!(:context => user_factory, :media_id => "test")
       expect(MediaObject).to receive(:create!).never
       MediaObject.ensure_media_object("test", {})
     end
 
-    it "should not create if the media id doesn't exist in kaltura" do
+    it "does not create if the media id doesn't exist in kaltura" do
       expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(false)
       expect(MediaObject).to receive(:create!).never
       MediaObject.ensure_media_object("test", {})
       run_jobs
     end
 
-    it "should create the media object" do
+    it "creates the media object" do
       expect(MediaObject).to receive(:media_id_exists?).with("test").and_return(true)
       MediaObject.ensure_media_object("test", { :context => user_factory })
       run_jobs
@@ -146,7 +146,7 @@ describe MediaObject do
 
   context "permissions" do
     context "captions" do
-      it "should allow course admin users to add_captions to userless objects" do
+      it "allows course admin users to add_captions to userless objects" do
         course_with_teacher
         mo = media_object
 
@@ -157,7 +157,7 @@ describe MediaObject do
         expect(mo.grants_right?(@teacher, :delete_captions)).to eq true
       end
 
-      it "should not allow course non-admin users to add_captions to userless objects" do
+      it "does not allow course non-admin users to add_captions to userless objects" do
         course_with_student
         mo = media_object
 
@@ -168,7 +168,7 @@ describe MediaObject do
         expect(mo.grants_right?(@student, :delete_captions)).to eq false
       end
 
-      it "should allow course non-admin users to add_captions to objects belonging to them" do
+      it "allows course non-admin users to add_captions to objects belonging to them" do
         course_with_student
         mo = media_object
 
@@ -179,7 +179,7 @@ describe MediaObject do
         expect(mo.grants_right?(@student, :delete_captions)).to eq true
       end
 
-      it "should not allow course non-admin users to add_captions to objects not belonging to them" do
+      it "does not allow course non-admin users to add_captions to objects not belonging to them" do
         course_with_student
         mo = media_object
         user_factory

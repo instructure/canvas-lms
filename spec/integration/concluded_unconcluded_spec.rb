@@ -51,7 +51,7 @@ describe "concluded/unconcluded courses" do
     @sub = @qsub.submission
   end
 
-  it "should let the teacher change grades in the speed grader by default" do
+  it "lets the teacher change grades in the speed grader by default" do
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
     expect(response).to be_successful
 
@@ -60,7 +60,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css('#grade_container').length).to eq 1
   end
 
-  it "should not let the teacher change grades in the speed grader when concluded" do
+  it "does not let the teacher change grades in the speed grader when concluded" do
     @e.conclude
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -71,7 +71,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css('#grade_container').length).to eq 0
   end
 
-  it "should let the teacher change grades on the submission details page by default" do
+  it "lets the teacher change grades on the submission details page by default" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
     expect(response).to be_successful
 
@@ -80,7 +80,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css('#add_comment_form').length).to eq 1
   end
 
-  it "should not let the teacher change grades on the submission details page when concluded" do
+  it "does not let the teacher change grades on the submission details page when concluded" do
     @e.conclude
 
     get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
@@ -91,7 +91,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css('#add_comment_form')[0]['style']).to match(/display: none/)
   end
 
-  it "should let the teacher change quiz submission scores by default" do
+  it "lets the teacher change quiz submission scores by default" do
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
     expect(response).to be_successful
 
@@ -101,7 +101,7 @@ describe "concluded/unconcluded courses" do
     expect(html.css('.user_points .question_input').length).to eq 1
   end
 
-  it "should not let the teacher change quiz submission scores when concluded" do
+  it "does not let the teacher change quiz submission scores when concluded" do
     @e.conclude
 
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"

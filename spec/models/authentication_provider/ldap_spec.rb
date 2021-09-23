@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe AuthenticationProvider::LDAP do
-  it "should not escape auth_filter" do
+  it "does not escape auth_filter" do
     @account = Account.new
     @account_config = @account.authentication_providers.build(
       auth_type: 'ldap',
@@ -33,7 +33,7 @@ describe AuthenticationProvider::LDAP do
   end
 
   describe "#test_ldap_search" do
-    it "should validate filter syntax" do
+    it "validates filter syntax" do
       aac = AuthenticationProvider::LDAP.new
       aac.auth_type = 'ldap'
       aac.ldap_filter = 'bob'
@@ -57,7 +57,7 @@ describe AuthenticationProvider::LDAP do
       @aac.save!
     end
 
-    it "should not attempt to bind with a blank password" do
+    it "does not attempt to bind with a blank password" do
       aac = AuthenticationProvider::LDAP.new
       aac.auth_type = 'ldap'
       aac.ldap_filter = 'bob'
@@ -77,7 +77,7 @@ describe AuthenticationProvider::LDAP do
         allow(InstStatsd::Statsd).to receive(:increment)
       end
 
-      it "should send to statsd on success" do
+      it "sends to statsd on success" do
         allow(@ldap).to receive(:bind_as).and_return(true)
         @aac.ldap_bind_result('user', 'pass')
         expect(InstStatsd::Statsd).to have_received(:increment).with(
@@ -87,7 +87,7 @@ describe AuthenticationProvider::LDAP do
         )
       end
 
-      it "should send to statsd on failure" do
+      it "sends to statsd on failure" do
         allow(@ldap).to receive(:bind_as).and_return(false)
         @aac.ldap_bind_result('user', 'pass')
         expect(InstStatsd::Statsd).to have_received(:increment).with(
@@ -97,7 +97,7 @@ describe AuthenticationProvider::LDAP do
         )
       end
 
-      it "should send to statsd on timeout" do
+      it "sends to statsd on timeout" do
         allow(@ldap).to receive(:bind_as).and_raise(Timeout::Error)
         @aac.ldap_bind_result('user', 'pass')
         expect(InstStatsd::Statsd).to have_received(:increment).with(
@@ -110,7 +110,7 @@ describe AuthenticationProvider::LDAP do
         )
       end
 
-      it "should send to statsd on exception" do
+      it "sends to statsd on exception" do
         allow(@ldap).to receive(:bind_as).and_raise(StandardError)
         @aac.ldap_bind_result('user', 'pass')
         expect(InstStatsd::Statsd).to have_received(:increment).with(

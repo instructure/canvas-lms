@@ -33,17 +33,17 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Main Dashboard" do
-      it "should not show inaccessible assignments in the To Do section" do
+      it "does not show inaccessible assignments in the To Do section" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
         expect(f("#right-side")).not_to include_text("Turn in DA assignment")
       end
-      it "should show assignments with an override in the To Do section" do
+      it "shows assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment, due_at: 4.days.from_now)
         get "/"
         expect(f("#right-side")).to include_text("DA assignment")
       end
-      it "should not show inaccessible assignments in Recent activity" do
+      it "does not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
         f('#DashboardOptionsMenu_Container button').click
@@ -55,13 +55,13 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Course Dashboard" do
-      it "should not show inaccessible assignments in the To Do section" do
+      it "does not show inaccessible assignments in the To Do section" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}"
         # make sure this element isn't visible as there should be nothing to do.
         expect(f("#content")).not_to contain_css(".to-do-list")
       end
-      it "should show assignments with an override in the To Do section" do
+      it "shows assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}"
         expect(f("#planner-todosidebar-item-list")).to include_text("DA assignment")
@@ -69,18 +69,18 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Calendar" do
-      it "should not show inaccessible assignments" do
+      it "does not show inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1, :due_at => Time.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-title should be nil
         expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
-      it "should show assignments with an override" do
+      it "shows assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
-      it "should show assignments with a graded submission" do
+      it "shows assignments with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)
@@ -100,17 +100,17 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Main Dashboard" do
-      it "should not show inaccessible assignments in the To Do section" do
+      it "does not show inaccessible assignments in the To Do section" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
         expect(f("#right-side")).not_to include_text("DA assignment")
       end
-      it "should show assignments with an override in the To Do section" do
+      it "shows assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment)
         get "/"
         expect(f("#right-side")).to include_text("DA assignment")
       end
-      it "should not show inaccessible assignments in Recent activity" do
+      it "does not show inaccessible assignments in Recent activity" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/"
         f('#DashboardOptionsMenu_Container button').click
@@ -122,13 +122,13 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Course Dashboard" do
-      it "should not show inaccessible assignments in the To Do section" do
+      it "does not show inaccessible assignments in the To Do section" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1)
         get "/courses/#{@course.id}"
         # make sure this element isn't visible as there should be nothing to do.
         expect(f("#content")).not_to contain_css(".to-do-list")
       end
-      it "should show assignments with an override in the To Do section" do
+      it "shows assignments with an override in the To Do section" do
         create_section_override_for_assignment(@da_assignment)
         get "/courses/#{@course.id}"
         expect(f(".coming_up")).to include_text("DA assignment")
@@ -136,18 +136,18 @@ describe "interaction with differentiated assignments on the dashboard and calen
     end
 
     context "Calendar" do
-      it "should not show inaccessible assignments" do
+      it "does not show inaccessible assignments" do
         create_section_override_for_assignment(@da_assignment, course_section: @section1, :due_at => Time.now)
         get "/calendar"
         # there should be no events for this user to see, thus .fc-event-month should be nil
         expect(f(".fc-month-view")).not_to include_text(@da_assignment.title)
       end
-      it "should show assignments with an override" do
+      it "shows assignments with an override" do
         create_section_override_for_assignment(@da_assignment, :due_at => Time.now)
         get "/calendar"
         expect(f(".fc-month-view")).to include_text(@da_assignment.title)
       end
-      it "should show assignments with a graded submission" do
+      it "shows assignments with a graded submission" do
         @teacher = User.create!
         @course.enroll_teacher(@teacher)
         @da_assignment.grade_student(@student, grade: 10, grader: @teacher)

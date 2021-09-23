@@ -110,24 +110,24 @@ describe "master courses sidebar" do
       user_session(@master_teacher)
     end
 
-    it "should show sidebar trigger tab" do
+    it "shows sidebar trigger tab" do
       get "/courses/#{@master.id}"
       expect(blueprint_open_sidebar_button).to be_displayed
     end
 
-    it "should show sidebar when trigger is clicked" do
+    it "shows sidebar when trigger is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).to be_displayed
     end
 
-    it "should not show the Associations button" do
+    it "does not show the Associations button" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).not_to contain_css('button#mcSidebarAsscBtn')
     end
 
-    it "should show Sync History modal when button is clicked" do
+    it "shows Sync History modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSyncHistoryBtn').click
@@ -135,7 +135,7 @@ describe "master courses sidebar" do
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
-    it "should show Unsynced Changes modal when button is clicked" do
+    it "shows Unsynced Changes modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       wait_for_ajaximations
@@ -145,7 +145,7 @@ describe "master courses sidebar" do
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
-    it "should not show the tutorial sidebar button" do
+    it "does not show the tutorial sidebar button" do
       get "/courses/#{@master.id}"
       expect(f('body')).not_to contain_css('.TutorialToggleHolder button')
     end
@@ -160,20 +160,20 @@ describe "master courses sidebar" do
       user_session(@admin)
     end
 
-    it "should show the Associations button" do
+    it "shows the Associations button" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).to contain_css('button#mcSidebarAsscBtn')
     end
 
-    it "should show Associations modal when button is clicked" do
+    it "shows Associations modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSidebarAsscBtn').click
       expect(f('span[aria-label="Associations"]')).to be_displayed
     end
 
-    it "should open and close Associations modal from course settings page" do
+    it "opens and close Associations modal from course settings page" do
       # see jira ticket ADMIN-5
       get "/courses/#{@master.id}/settings"
       blueprint_open_sidebar_button.click

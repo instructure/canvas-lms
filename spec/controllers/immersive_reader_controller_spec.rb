@@ -28,19 +28,19 @@ describe ImmersiveReaderController do
     WebMock.enable_net_connect!
   end
 
-  it 'should require a user be logged in' do
+  it 'requires a user be logged in' do
     get 'authenticate'
     assert_unauthorized
   end
 
-  it 'should require the plugin be configured' do
+  it 'requires the plugin be configured' do
     user_model
     user_session(@user)
     get 'authenticate'
     assert_status(404)
   end
 
-  it 'should authenticate with cognitive services' do
+  it 'authenticates with cognitive services' do
     user_model
     user_session(@user)
     stub_request(:post, 'https://login.windows.net')

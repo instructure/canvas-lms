@@ -169,7 +169,7 @@ describe PacePlansController, type: :controller do
   end
 
   describe "PUT #update" do
-    it "should update the PacePlan" do
+    it "updates the PacePlan" do
       put :update, params: { course_id: @course.id, id: @pace_plan.id, pace_plan: valid_update_params }
       expect(response).to be_successful
       expect(@pace_plan.reload.start_date.to_s).to eq(valid_update_params[:start_date])
@@ -190,7 +190,7 @@ describe PacePlansController, type: :controller do
   describe "POST #create" do
     let(:create_params) { valid_update_params.merge(course_id: @course.id, user_id: @student.id) }
 
-    it "should create the PacePlan and all the PacePlanModuleItems" do
+    it "creates the PacePlan and all the PacePlanModuleItems" do
       pace_plan_count_before = PacePlan.count
       pace_plan_module_item_count_before = PacePlanModuleItem.count
 

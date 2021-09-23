@@ -132,7 +132,7 @@ describe ConditionalRelease::Service do
     end
 
     context "active_rules" do
-      it "should show all the rules in the course to teachers" do
+      it "shows all the rules in the course to teachers" do
         data = CRService.active_rules(@course, @teacher, nil)
         # basically it's just the same thing as returned by the api
         expect(data.first["scoring_ranges"].first["assignment_sets"].first["assignment_set_associations"].first["assignment_id"]).to eq @set1_assmt1.id
@@ -142,7 +142,7 @@ describe ConditionalRelease::Service do
       context "caching" do
         specs_require_cache(:redis_cache_store)
 
-        it "should cache across admins" do
+        it "caches across admins" do
           old_teacher = @teacher
           teacher_in_course(:course => @course)
           data = CRService.active_rules(@course, old_teacher, nil)
@@ -150,19 +150,19 @@ describe ConditionalRelease::Service do
           expect(CRService.active_rules(@course, @teacher, nil)).to eq data # doesn't matter who accesses it if they have rights
         end
 
-        it "should invalidate cache when a rule is saved" do
+        it "invalidates cache when a rule is saved" do
           CRService.active_rules(@course, @teacher, nil)
           @rule.update_attribute(:deleted_at, Time.now.utc)
           expect(CRService.active_rules(@course, @teacher, nil)).to eq []
         end
 
-        it "should invalidate cache when a trigger assignment is deleted" do
+        it "invalidates cache when a trigger assignment is deleted" do
           CRService.active_rules(@course, @teacher, nil)
           @trigger_assmt.destroy
           expect(CRService.active_rules(@course, @teacher, nil)).to eq []
         end
 
-        it "should invalidate cache when a releasable assignment is deleted" do
+        it "invalidates cache when a releasable assignment is deleted" do
           old_data = CRService.active_rules(@course, @teacher, nil)
           @set1_assmt1.destroy
           data = CRService.active_rules(@course, @teacher, nil)
@@ -173,7 +173,7 @@ describe ConditionalRelease::Service do
     end
 
     context "rules_for" do
-      it "should return no assignment set data for unreleased rules" do
+      it "returns no assignment set data for unreleased rules" do
         data = CRService.rules_for(@course, @student, nil)
         expect(data.count).to eq 1
         rule_hash = data.first
@@ -183,7 +183,7 @@ describe ConditionalRelease::Service do
         expect(rule_hash['assignment_sets']).to eq []
       end
 
-      it "should return data about released assignment sets" do
+      it "returns data about released assignment sets" do
         @trigger_assmt.grade_student(@student, grade: 9, grader: @teacher)
         rule_hash = CRService.rules_for(@course, @student, nil).first
         expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
@@ -195,7 +195,7 @@ describe ConditionalRelease::Service do
         expect(set_hash['assignment_set_associations'].first['model']).to eq @set1_assmt1
       end
 
-      it "should return data about multiple assignment set choices" do
+      it "returns data about multiple assignment set choices" do
         @trigger_assmt.grade_student(@student, grade: 2, grader: @teacher) # has two choices now
         rule_hash = CRService.rules_for(@course, @student, nil).first
         expect(rule_hash['trigger_assignment_id']).to eq @trigger_assmt.id
@@ -208,19 +208,19 @@ describe ConditionalRelease::Service do
       context "caching" do
         specs_require_cache(:redis_cache_store)
 
-        it "should cache" do
+        it "caches" do
           data = CRService.rules_for(@course, @student, nil)
           @course.conditional_release_rules.update_all(:deleted_at => Time.now.utc) # skip callbacks
           expect(CRService.rules_for(@course, @student, nil)).to eq data
         end
 
-        it "should invalidate cache on rule change" do
+        it "invalidates cache on rule change" do
           data = CRService.rules_for(@course, @student, nil)
           @rule.update_attribute(:deleted_at, Time.now.utc)
           expect(CRService.rules_for(@course, @student, nil)).to eq []
         end
 
-        it "should invalidate cache on submission change" do
+        it "invalidates cache on submission change" do
           data = CRService.rules_for(@course, @student, nil)
           @trigger_assmt.grade_student(@student, grade: 8, grader: @teacher)
           expect(CRService.rules_for(@course, @student, nil)).to_not eq data
@@ -240,7 +240,7 @@ describe ConditionalRelease::Service do
         Feature.definitions['conditional_release'].after_state_change_proc.call(@teacher, @course, 'on', 'off')
       end
 
-      it "should release mastery paths assigned assignments" do
+      it "releases mastery paths assigned assignments" do
         assmt = assignment_model(course: @course, workflow_state: 'published', only_visible_to_overrides: true)
         assignment_override_model(assignment: assmt,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
@@ -252,7 +252,7 @@ describe ConditionalRelease::Service do
         expect(@course.module_items_visible_to(@student).to_a).to eq [tag]
       end
 
-      it "should release mastery paths assigned ungraded quizzes" do
+      it "releases mastery paths assigned ungraded quizzes" do
         quiz = quiz_model(course: @course, quiz_type: "survey", only_visible_to_overrides: true)
         assignment_override_model(quiz: quiz,
                                   set_type: AssignmentOverride::SET_TYPE_NOOP,
@@ -264,7 +264,7 @@ describe ConditionalRelease::Service do
         expect(@course.module_items_visible_to(@student).to_a).to eq [tag]
       end
 
-      it "should release mastery paths assigned wiki pages" do
+      it "releases mastery paths assigned wiki pages" do
         wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
         tag = @module.add_item(:id => @page.id, :type => "wiki_page")
         expect(@course.module_items_visible_to(@student).to_a).to eq []

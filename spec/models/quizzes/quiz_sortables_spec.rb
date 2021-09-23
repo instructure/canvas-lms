@@ -21,14 +21,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSortables do
   describe ".initialize" do
-    it "should assign the quiz" do
+    it "assigns the quiz" do
       quiz = Quizzes::Quiz.new
       sortables = Quizzes::QuizSortables.new(:quiz => quiz, :order => [])
 
       expect(sortables.quiz).to eq quiz
     end
 
-    it "should assign the group and quiz" do
+    it "assigns the group and quiz" do
       quiz  = double
       group = double(:quiz => quiz)
 
@@ -38,7 +38,7 @@ describe Quizzes::QuizSortables do
       expect(sortables.quiz).to  eq quiz
     end
 
-    it "should build the list of items" do
+    it "builds the list of items" do
       group = Quizzes::QuizGroup.new
       group.id = 234
       groups = [group]
@@ -56,7 +56,7 @@ describe Quizzes::QuizSortables do
       expect(sortables.items).to eq [group, question]
     end
 
-    it "should ignore items that dont have valid ids" do
+    it "ignores items that dont have valid ids" do
       groups = [Quizzes::QuizGroup.new]
       questions = double(:active => [Quizzes::QuizQuestion.new])
 
@@ -91,7 +91,7 @@ describe Quizzes::QuizSortables do
         expect(@sortables).to receive(:update_object_positions!)
       end
 
-      it "should update quiz_group_ids of group questions" do
+      it "updates quiz_group_ids of group questions" do
         expect(@question1).to receive(:quiz_group_id=).with(@group.id)
         expect(@question2).to receive(:quiz_group_id=).with(@group.id)
         @sortables.reorder!
@@ -116,19 +116,19 @@ describe Quizzes::QuizSortables do
         expect(@sortables).to receive(:update_object_positions!)
       end
 
-      it "should update positions attribute of questions" do
+      it "updates positions attribute of questions" do
         expect(@group).to receive(:position=).with(1)
         expect(@question).to receive(:position=).with(2)
 
         @sortables.reorder!
       end
 
-      it "should update quiz_group_ids of quiz questions" do
+      it "updates quiz_group_ids of quiz questions" do
         expect(@question).to receive(:quiz_group_id=).with(nil)
         @sortables.reorder!
       end
 
-      it "should mark quiz as edited" do
+      it "marks quiz as edited" do
         expect(@quiz).to receive(:mark_edited!)
         @sortables.reorder!
       end

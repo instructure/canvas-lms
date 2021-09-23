@@ -72,7 +72,7 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    it "should show student progressions to teachers" do
+    it "shows student progressions to teachers" do
       get "/courses/#{@course.id}/modules/progressions"
 
       expect(f("#progression_student_#{@students[0].id}_module_#{@module1.id} .status").text).to include("Complete")
@@ -100,7 +100,7 @@ describe "context modules" do
       expect(f("#progression_student_#{@students[3].id}_module_#{@module2.id} .status").text).to include("Locked")
     end
 
-    it "should show progression to individual students", priority: "1", test_id: 251029 do
+    it "shows progression to individual students", priority: "1", test_id: 251029 do
       user_session(@students[1])
       get "/courses/#{@course.id}/modules/progressions"
       expect(f("#progression_students")).not_to be_displayed
@@ -110,7 +110,7 @@ describe "context modules" do
       expect(f("#progression_student_#{@students[1].id}_module_#{@module2.id} .status").text).to include("Locked")
     end
 
-    it "should show multiple student progressions to observers" do
+    it "shows multiple student progressions to observers" do
       @observer = user_factory
       @course.enroll_user(@observer, 'ObserverEnrollment', { :allow_multiple_enrollments => true,
                                                              :associated_user_id => @students[0].id })
@@ -144,7 +144,7 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    it "should show progressions link in modules home page", priority: "2" do
+    it "shows progressions link in modules home page", priority: "2" do
       # progression link is the "View Progress" button
       create_modules(1)
       @course.default_view = 'modules'
@@ -155,7 +155,7 @@ describe "context modules" do
       expect_new_page_load { link.click }
     end
 
-    it "should show student progress page when view progress button is clicked", priority: "1", test_id: 140811 do
+    it "shows student progress page when view progress button is clicked", priority: "1", test_id: 140811 do
       create_modules(1)
       @course.default_view = 'modules'
       @course.save!
@@ -168,7 +168,7 @@ describe "context modules" do
       expect(f('#breadcrumbs')).to include_text('Student Progress')
     end
 
-    it "should not show progressions link in modules home page for large rosters (MOOCs)", priority: "2" do
+    it "does not show progressions link in modules home page for large rosters (MOOCs)", priority: "2" do
       create_modules(1)
       @course.default_view = 'modules'
       @course.large_roster = true
@@ -177,13 +177,13 @@ describe "context modules" do
       expect(f("#content")).not_to contain_css('.module_progressions_link')
     end
 
-    it "should show progressions link if user has grading permission but not content management" do
+    it "shows progressions link if user has grading permission but not content management" do
       RoleOverride.create!(:context => Account.default, :permission => 'manage_content', :role => teacher_role, :enabled => false)
       get "/courses/#{@course.id}/modules"
       expect(f("#content")).to contain_css('.module_progressions_link')
     end
 
-    it "should not show progressions link in modules page if user lacks grading permission" do
+    it "does not show progressions link in modules page if user lacks grading permission" do
       RoleOverride.create!(:context => Account.default, :permission => 'view_all_grades', :role => teacher_role, :enabled => false)
       get "/courses/#{@course.id}/modules"
       expect(f("#content")).not_to contain_css('.module_progressions_link')
@@ -224,7 +224,7 @@ describe "context modules" do
       expect(ff(".locked_icon")[1]).to be_displayed
     end
 
-    it "should show student progress once assignment-view requirement is met", priority: "1", test_id: 126690 do
+    it "shows student progress once assignment-view requirement is met", priority: "1", test_id: 126690 do
       @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_view' } })
@@ -232,7 +232,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once assignment-submit requirement is met", priority: "1", test_id: 126691 do
+    it "shows student progress once assignment-submit requirement is met", priority: "1", test_id: 126691 do
       @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_submit' } })
@@ -240,7 +240,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once assignment-score atleast requirement is met", priority: "1", test_id: 126689 do
+    it "shows student progress once assignment-score atleast requirement is met", priority: "1", test_id: 126689 do
       @assignment_1 = @course.assignments.create!(name: "assignment 1", submission_types: ["online_text_entry"], :points_possible => 20)
       tag = @module1.add_item({ id: @assignment_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'min_score', min_score: 10 } })
@@ -249,7 +249,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once quiz-view requirement is met", priority: "1", test_id: 126697 do
+    it "shows student progress once quiz-view requirement is met", priority: "1", test_id: 126697 do
       @quiz_1 = @course.quizzes.create!(title: "some quiz")
       @quiz_1.publish!
       tag = @module1.add_item({ id: @quiz_1.id, type: 'quiz' })
@@ -258,7 +258,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once quiz-submit requirement is met", priority: "1", test_id: 126698 do
+    it "shows student progress once quiz-submit requirement is met", priority: "1", test_id: 126698 do
       @quiz_1 = @course.quizzes.create!(title: "some quiz")
       @quiz_1.publish!
       tag = @module1.add_item({ id: @quiz_1.id, type: 'quiz' })
@@ -270,7 +270,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once quiz-score atleast requirement is met", priority: "1", test_id: 126696 do
+    it "shows student progress once quiz-score atleast requirement is met", priority: "1", test_id: 126696 do
       @quiz_1 = quiz_helper.quiz_create(course: @course)
       tag = @module1.add_item({ id: @quiz_1.id, type: 'quiz' })
       add_requirement({ tag.id => { type: 'min_score', min_score: 0.5 } })
@@ -282,7 +282,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once discussion-view requirement is met", priority: "1", test_id: 126694 do
+    it "shows student progress once discussion-view requirement is met", priority: "1", test_id: 126694 do
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({ id: @discussion_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_view' } })
@@ -291,7 +291,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once discussion-contribute requirement is met", priority: "1", test_id: 126693 do
+    it "shows student progress once discussion-contribute requirement is met", priority: "1", test_id: 126693 do
       @discussion_1 = @course.assignments.create!(name: "Discuss!", points_possible: "5", submission_types: "discussion_topic")
       tag = @module1.add_item({ id: @discussion_1.id, type: 'assignment' })
       add_requirement({ tag.id => { type: 'must_contribute' } })
@@ -304,7 +304,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do
+    it "shows student progress once wiki page-view requirement is met", priority: "1", test_id: 126700 do
       @wiki_page = @course.wiki_pages.create!(title: 'Wiki Page')
       tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
       add_requirement({ tag.id => { type: 'must_view' } })
@@ -313,7 +313,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once wiki page-contribute requirement is met", priority: "1", test_id: 126699 do
+    it "shows student progress once wiki page-contribute requirement is met", priority: "1", test_id: 126699 do
       @wiki_page = @course.wiki_pages.create(title: "Wiki_page", editing_roles: "public", notify_of_update: true)
       tag = @module1.add_item(id: @wiki_page.id, type: 'wiki_page')
       add_requirement({ tag.id => { type: 'must_contribute' } })
@@ -323,7 +323,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once External tool-view requirement is met", priority: "1", test_id: 126701 do
+    it "shows student progress once External tool-view requirement is met", priority: "1", test_id: 126701 do
       @tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
       tag = @module1.add_item(title: 'External_tool', type: 'external_tool', id: @tool.id, url: 'http://what.example.org/A')
       get "/courses/#{@course.id}/modules/"
@@ -335,7 +335,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once External URL-view requirement is met", priority: "1", test_id: 126702 do
+    it "shows student progress once External URL-view requirement is met", priority: "1", test_id: 126702 do
       @external_url_tag = @module1.add_item(type: 'external_url', url: 'http://example.com/lolcats',
                                             title: 'External_URL', indent: 1)
       @external_url_tag.publish!
@@ -345,7 +345,7 @@ describe "context modules" do
       validate_access_to_module
     end
 
-    it "should show student progress once File-view requirement is met", priority: "1", test_id: 126703 do
+    it "shows student progress once File-view requirement is met", priority: "1", test_id: 126703 do
       @file = @course.attachments.create!(display_name: "file", uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain'))
       @file.context = @course
       @file.save!

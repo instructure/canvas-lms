@@ -43,7 +43,7 @@ describe "login/canvas/new.html.erb" do
     expect(doc.at_css('form#login_form')['action']).to eq '/login/ldap'
   end
 
-  it "should use internal forgot password mechanism by default" do
+  it "uses internal forgot password mechanism by default" do
     render
     page = Nokogiri(response.body)
     expect(page.css("#login_forgot_password")[0]['href']).to eq '#'
@@ -61,7 +61,7 @@ describe "login/canvas/new.html.erb" do
       assign(:domain_root_account, account)
     end
 
-    it "should use external forgot password mechanism" do
+    it "uses external forgot password mechanism" do
       render
       page = Nokogiri(response.body)
       expect(page.css("#login_forgot_password")[0]['href'])

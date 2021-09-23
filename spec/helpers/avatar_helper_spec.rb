@@ -133,12 +133,12 @@ describe AvatarHelper do
     context "with avatar service off" do
       let(:services) { { avatars: false } }
 
-      it "should return full URIs for users" do
+      it "returns full URIs for users" do
         expect(avatar_url_for_user(user)).to match(%r{\Ahttps?://})
       end
     end
 
-    it "should return full URIs for users" do
+    it "returns full URIs for users" do
       user_factory
       expect(avatar_url_for_user(@user)).to match(%r{\Ahttps?://})
 
@@ -164,12 +164,12 @@ describe AvatarHelper do
       expect(avatar_url_for_user(@user)).to eq "http://www.example.com/path"
     end
 
-    it "should return full URIs for groups" do
+    it "returns full URIs for groups" do
       expect(avatar_url_for_group).to match(%r{\Ahttps?://})
     end
     context "from other shard" do
       specs_require_sharding
-      it "should return full path across shards" do
+      it "returns full path across shards" do
         @user.account.set_service_availability(:avatars, true)
         @user.avatar_image_source = 'attachment'
         @user.avatar_image_url = "/relative/canvas/path"

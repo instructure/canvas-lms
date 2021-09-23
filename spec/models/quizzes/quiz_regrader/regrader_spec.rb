@@ -87,7 +87,7 @@ describe Quizzes::QuizRegrader::Regrader do
   end
 
   describe "#submissions" do
-    it 'should skip submissions that are in progress' do
+    it 'skips submissions that are in progress' do
       questions << double(:id => 5, :question_data => { :regrade_option => 'no_regrade' })
 
       uncompleted_submission = double(:id => 5, :completed? => false)

@@ -43,24 +43,24 @@ class Enrollment
       let(:now) { Time.zone.now }
 
       describe "#record!" do
-        it "should record on the first call (last_activity_at is nil)" do
+        it "records on the first call (last_activity_at is nil)" do
           recent_activity.record!
           expect(@enrollment.last_activity_at).not_to be_nil
         end
 
-        it "should not record anything within the time threshold" do
+        it "does not record anything within the time threshold" do
           recent_activity.record!(now)
           recent_activity.record!(now + 1.minutes)
           expect(@enrollment.last_activity_at.to_s).to eq now.to_s
         end
 
-        it "should record again after the threshold is done" do
+        it "records again after the threshold is done" do
           recent_activity.record!(now)
           recent_activity.record!(now + 11.minutes)
           expect(@enrollment.last_activity_at.to_s).to eq (now + 11.minutes).to_s
         end
 
-        it "should update total_activity_time within the time threshold" do
+        it "updates total_activity_time within the time threshold" do
           expect(@enrollment.total_activity_time).to eq 0
           recent_activity.record!(now)
           recent_activity.record!(now + 1.minutes)
@@ -71,7 +71,7 @@ class Enrollment
           expect(@enrollment.total_activity_time).to eq 3.minutes.to_i
         end
 
-        it "should update total_activity_time based on the maximum" do
+        it "updates total_activity_time based on the maximum" do
           section2 = @course.course_sections.create!
           enrollment2 = @course.enroll_student(@student, :allow_multiple_enrollments => true, :section => section2)
           Enrollment.where(:id => enrollment2).update_all(:total_activity_time => 39.minutes.to_i)

@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 describe MasterCourses::FolderHelper do
-  it "should be able to fetch a list of folder ids with restricted files (even recursively via sub-folders)" do
+  it "is able to fetch a list of folder ids with restricted files (even recursively via sub-folders)" do
     @copy_from = course_factory
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
 

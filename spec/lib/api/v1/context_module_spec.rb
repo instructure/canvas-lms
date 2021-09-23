@@ -70,12 +70,12 @@ describe Api::V1::ContextModule do
       @tg.save!
     end
 
-    it "should use the content tag's content url when the tag's url is not defined" do
+    it "uses the content tag's content url when the tag's url is not defined" do
       json = subject.module_item_json(@tg, @user, @session, @cm)
       expect(json[:url]).to eq "http://www.toolurl.com?id=#{@tool.id}&url=http%3A%2F%2Fwww.toolurl.com"
     end
 
-    it "should use the content tag's url when the tag's url is defined" do
+    it "uses the content tag's url when the tag's url is defined" do
       @tool.url = nil
       @tool.save!
 

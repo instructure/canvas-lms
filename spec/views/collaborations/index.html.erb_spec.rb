@@ -28,12 +28,12 @@ describe "/collaborations/index" do
     assign(:collaborations, [@course.collaborations.create!(user: @user, title: "my collab!")])
   end
 
-  it "should render" do
+  it "renders" do
     render 'collaborations/index'
     expect(response).not_to be_nil
   end
 
-  it "should provide labels for accessibility devices i.e. screen readers" do
+  it "provides labels for accessibility devices i.e. screen readers" do
     render :partial => "collaborations/forms"
     expect(response).not_to be_nil
     expect(response).to have_tag("label[for=collaboration_title]", :text => "Document name:")

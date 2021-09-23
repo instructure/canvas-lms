@@ -58,21 +58,21 @@ describe "Migration package importers" do
     }
 
     supported.each_pair do |key, val|
-      it "should find converter for #{key}" do
+      it "finds converter for #{key}" do
         settings = get_settings(val.first)
         expect(Canvas::Migration::Worker::get_converter(settings)).to eq val.last
       end
     end
 
     unsupported.each_pair do |key, val|
-      it "should correctly identify package type for #{key}" do
+      it "correctlies identify package type for #{key}" do
         settings = get_settings(val.first)
         archive = Canvas::Migration::Archive.new(settings)
         expect(Canvas::Migration::PackageIdentifier.new(archive).identify_package).to eq val.last
       end
     end
 
-    it "should raise a traceable error for invalid packages" do
+    it "raises a traceable error for invalid packages" do
       settings = get_settings('invalid')
       archive = Canvas::Migration::Archive.new(settings)
       expect {
@@ -82,7 +82,7 @@ describe "Migration package importers" do
   end
 
   context "migrator" do
-    it "should deal with backslashes path separators in migrations" do
+    it "deals with backslashes path separators in migrations" do
       file = File.new(File.dirname(__FILE__) + "/../../fixtures/migration/whatthebackslash.zip")
       cm = ContentMigration.create!(:context => course_factory)
 

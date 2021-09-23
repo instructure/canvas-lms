@@ -60,7 +60,7 @@ describe ConversationsController, type: :request do
   end
 
   context "conversations" do
-    it "should return the conversation list" do
+    it "returns the conversation list" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
       @c3 = conversation(@jane, :workflow_state => 'archived') # won't show up, since it's archived
@@ -126,7 +126,7 @@ describe ConversationsController, type: :request do
       ]
     end
 
-    it "should properly respond to include[]=participant_avatars" do
+    it "properlies respond to include[]=participant_avatars" do
       conversation(@bob, :workflow_state => 'read')
 
       json = api_call(:get, "/api/v1/conversations.json",
@@ -139,7 +139,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should ignore include[]=participant_avatars if you're going to break everything" do
+    it "ignores include[]=participant_avatars if you're going to break everything" do
       conversation(@bob, :workflow_state => 'read')
 
       Setting.set('max_conversation_participant_count_for_avatars', '1')
@@ -154,7 +154,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should stringify audience ids if requested" do
+    it "stringifies audience ids if requested" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
 
@@ -169,7 +169,7 @@ describe ConversationsController, type: :request do
       ]
     end
 
-    it "should paginate and return proper pagination headers" do
+    it "paginates and return proper pagination headers" do
       students = create_users_in_course(@course, 7, return_type: :record)
       students.each { |s| conversation(s) }
       expect(@user.conversations.size).to eql 7
@@ -196,7 +196,7 @@ describe ConversationsController, type: :request do
       expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
     end
 
-    it "should filter conversations by scope" do
+    it "filters conversations by scope" do
       @c1 = conversation(@bob, :workflow_state => 'read')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread', :subscribed => false)
       @c3 = conversation(@jane, :workflow_state => 'read')
@@ -250,7 +250,7 @@ describe ConversationsController, type: :request do
       end
 
       describe 'index' do
-        it "should prefer the context but fall back to the first context tag" do
+        it "prefers the context but fall back to the first context tag" do
           json = api_call(:get, "/api/v1/conversations.json",
                           { :controller => 'conversations', :action => 'index', :format => 'json' })
           expect(json.map { |c| c["context_name"] }).to eql([nil, 'the other course', 'the course'])
@@ -258,7 +258,7 @@ describe ConversationsController, type: :request do
       end
 
       describe 'show' do
-        it "should prefer the context but fall back to the first context tag" do
+        it "prefers the context but fall back to the first context tag" do
           json = api_call(:get, "/api/v1/conversations/#{@c1.conversation.id}",
                           { :controller => 'conversations', :action => 'show', :id => @c1.conversation.id.to_s, :format => 'json' })
           expect(json["context_name"]).to eql('the course')
@@ -301,15 +301,15 @@ describe ConversationsController, type: :request do
           @conversations << @shard1.activate { conversation(@buster) }
         end
 
-        it "should recognize filter on the default shard" do
+        it "recognizes filter on the default shard" do
           verify_filter(@course.asset_string)
         end
 
-        it "should recognize filter on an unrelated shard" do
+        it "recognizes filter on an unrelated shard" do
           @shard2.activate { verify_filter(@course.asset_string) }
         end
 
-        it "should recognize explicitly global filter on the default shard" do
+        it "recognizes explicitly global filter on the default shard" do
           verify_filter(@course.global_asset_string)
         end
       end
@@ -328,19 +328,19 @@ describe ConversationsController, type: :request do
           @conversations << conversation(@buster)
         end
 
-        it "should recognize filter on the default shard" do
+        it "recognizes filter on the default shard" do
           verify_filter(@course.asset_string)
         end
 
-        it "should recognize filter on the context's shard" do
+        it "recognizes filter on the context's shard" do
           @shard1.activate { verify_filter(@course.asset_string) }
         end
 
-        it "should recognize filter on an unrelated shard" do
+        it "recognizes filter on an unrelated shard" do
           @shard2.activate { verify_filter(@course.asset_string) }
         end
 
-        it "should recognize explicitly global filter on the context's shard" do
+        it "recognizes explicitly global filter on the context's shard" do
           @shard1.activate { verify_filter(@course.global_asset_string) }
         end
       end
@@ -357,11 +357,11 @@ describe ConversationsController, type: :request do
           @conversations << conversation(@alex)
         end
 
-        it "should recognize filter on the default shard" do
+        it "recognizes filter on the default shard" do
           verify_filter(@alex.asset_string)
         end
 
-        it "should recognize filter on an unrelated shard" do
+        it "recognizes filter on an unrelated shard" do
           @shard2.activate { verify_filter(@alex.asset_string) }
         end
       end
@@ -379,22 +379,22 @@ describe ConversationsController, type: :request do
           @conversations << @shard1.activate { conversation(@alex) }
         end
 
-        it "should recognize filter on the default shard" do
+        it "recognizes filter on the default shard" do
           verify_filter(@alex.asset_string)
         end
 
-        it "should recognize filter on the user's shard" do
+        it "recognizes filter on the user's shard" do
           @shard1.activate { verify_filter(@alex.asset_string) }
         end
 
-        it "should recognize filter on an unrelated shard" do
+        it "recognizes filter on an unrelated shard" do
           @shard2.activate { verify_filter(@alex.asset_string) }
         end
       end
     end
 
     context "sent scope" do
-      it "should sort by last authored date" do
+      it "sorts by last authored date" do
         expected_times = 5.times.to_a.reverse.map { |h| Time.parse((Time.now.utc - h.hours).to_s) }
         Timecop.travel(expected_times[0]) do
           @c1 = conversation(@bob)
@@ -444,7 +444,7 @@ describe ConversationsController, type: :request do
         expect(json[2]['last_authored_message']).to eql 'test'
       end
 
-      it "should include conversations with at least one message by the author, regardless of workflow_state" do
+      it "includes conversations with at least one message by the author, regardless of workflow_state" do
         @c1 = conversation(@bob)
         @c2 = conversation(@bob, @billy)
         @c2.conversation.add_message(@bob, 'ohai')
@@ -458,7 +458,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should show the calculated audience_contexts if the tags have not been migrated yet" do
+    it "shows the calculated audience_contexts if the tags have not been migrated yet" do
       @c1 = conversation(@bob, @billy)
       Conversation.update_all "tags = NULL"
       ConversationParticipant.update_all "tags = NULL"
@@ -474,7 +474,7 @@ describe ConversationsController, type: :request do
       expect(json.first["audience_contexts"]).to eql({ "groups" => {}, "courses" => { @course.id.to_s => [] } })
     end
 
-    it "should include starred conversations in starred scope regardless of if read or archived" do
+    it "includes starred conversations in starred scope regardless of if read or archived" do
       @c1 = conversation(@bob, :workflow_state => 'unread', :starred => true)
       @c2 = conversation(@billy, :workflow_state => 'read', :starred => true)
       @c3 = conversation(@jane, :workflow_state => 'archived', :starred => true)
@@ -485,7 +485,7 @@ describe ConversationsController, type: :request do
       expect(json.map { |c| c["id"] }.sort).to eq [@c1, @c2, @c3].map { |c| c.conversation_id }.sort
     end
 
-    it "should not include unstarred conversations in starred scope regardless of if read or archived" do
+    it "does not include unstarred conversations in starred scope regardless of if read or archived" do
       @c1 = conversation(@bob, :workflow_state => 'unread')
       @c2 = conversation(@billy, :workflow_state => 'read')
       @c3 = conversation(@jane, :workflow_state => 'archived')
@@ -495,7 +495,7 @@ describe ConversationsController, type: :request do
       expect(json).to be_empty
     end
 
-    it "should mark all conversations as read" do
+    it "marks all conversations as read" do
       @c1 = conversation(@bob, :workflow_state => 'unread')
       @c2 = conversation(@bob, @billy, :workflow_state => 'unread')
       @c3 = conversation(@jane, :workflow_state => 'archived')
@@ -510,7 +510,7 @@ describe ConversationsController, type: :request do
     end
 
     context "create" do
-      it "should render error if no body is provided" do
+      it "renders error if no body is provided" do
         course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
         @bob = student_in_course(:name => "bob")
 
@@ -523,7 +523,7 @@ describe ConversationsController, type: :request do
         assert_status(400)
       end
 
-      it "should create a private conversation" do
+      it "creates a private conversation" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test" })
@@ -568,14 +568,14 @@ describe ConversationsController, type: :request do
         ]
       end
 
-      it "should add a context to a private conversation" do
+      it "adds a context to a private conversation" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :context_code => "course_#{@course.id}" })
         expect(@bob.conversations.last.conversation.context).to eql(@course)
       end
 
-      it "should not re-use a private conversation with a different explicit context" do
+      it "does not re-use a private conversation with a different explicit context" do
         course1 = @course
         course2 = course_with_teacher(:user => @me, :active_all => true).course
         course_with_student(:course => course2, :user => @bob, :active_all => true)
@@ -593,7 +593,7 @@ describe ConversationsController, type: :request do
         expect(conv2.context).to eql(course2)
       end
 
-      it "should re-use a private conversation with an old contextless private hash if the original context matches" do
+      it "re-uses a private conversation with an old contextless private hash if the original context matches" do
         course1 = @course
         course2 = course_with_teacher(:user => @me, :active_all => true).course
         course_with_student(:course => course2, :user => @bob, :active_all => true)
@@ -620,7 +620,7 @@ describe ConversationsController, type: :request do
         expect(json3.first["id"]).to_not eq conv1.id # should make a new one
       end
 
-      it "should create a new conversation if force_new parameter is provided" do
+      it "creates a new conversation if force_new parameter is provided" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :subject => "subject_1", :force_new => "true" })
@@ -633,7 +633,7 @@ describe ConversationsController, type: :request do
         expect(conv2.id).to_not eq conv1.id # should make a new one
       end
 
-      it "should not break trying to pull cached conversations for re-use" do
+      it "does not break trying to pull cached conversations for re-use" do
         course1 = @course
         course_with_student(:course => course1, :user => @billy, :active_all => true)
         course2 = course_with_teacher(:user => @me, :active_all => true).course
@@ -658,7 +658,7 @@ describe ConversationsController, type: :request do
       end
 
       describe "context is an account for admins validation" do
-        it "should allow root account context if the user is an admin on that account" do
+        it "allows root account context if the user is an admin on that account" do
           account_admin_user active_all: true
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -667,14 +667,14 @@ describe ConversationsController, type: :request do
           expect(conv.context).to eq Account.default
         end
 
-        it "should not allow account context if the user is not an admin in that account" do
+        it "does not allow account context if the user is not an admin in that account" do
           raw_api_call(:post, "/api/v1/conversations",
                        { :controller => 'conversations', :action => 'create', :format => 'json' },
                        { :recipients => [@bob.id], :body => "test", :context_code => "account_#{Account.default.id}" })
           assert_status(400)
         end
 
-        it "should allow an admin to send a message in course context" do
+        it "allows an admin to send a message in course context" do
           account_admin_user active_all: true
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -685,7 +685,7 @@ describe ConversationsController, type: :request do
 
         # Otherwise, students can't reply to admins because admins are not in the course
         # context
-        it "should use account context if messages are coming from an admin through a course" do
+        it "uses account context if messages are coming from an admin through a course" do
           account_admin_user active_all: true
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -693,7 +693,7 @@ describe ConversationsController, type: :request do
           expect(json.first["context_code"]).to eq "account_#{Account.default.id}"
         end
 
-        it "should still use course context if messages are NOT coming from an admin through a course " do
+        it "stills use course context if messages are NOT coming from an admin through a course" do
           conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
           json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
                           { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s,
@@ -701,7 +701,7 @@ describe ConversationsController, type: :request do
           expect(json["context_code"]).to eq @course.asset_string
         end
 
-        it "should always have the right tags when sending a bulk message in course context" do
+        it "alwayses have the right tags when sending a bulk message in course context" do
           other_course = Account.default.courses.create!(:workflow_state => 'available')
           other_course.enroll_teacher(@user).accept!
           other_course.enroll_student(@bob).accept!
@@ -726,7 +726,7 @@ describe ConversationsController, type: :request do
           expect(json[0]['messages'][0]['participating_user_ids']).to eq([@user.id])
         end
 
-        it "should allow site admin to set any account context" do
+        it "allows site admin to set any account context" do
           site_admin_user(name: "site admin", active_all: true)
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -743,7 +743,7 @@ describe ConversationsController, type: :request do
             account_admin_user(account: @sub_account, name: "sub admin", active_all: true)
           end
 
-          it "should allow root account context if the user is an admin on a sub-account" do
+          it "allows root account context if the user is an admin on a sub-account" do
             course_with_student(account: @sub_account, name: "sub student", active_all: true)
             @user = @admin
             json = api_call(:post, "/api/v1/conversations",
@@ -753,7 +753,7 @@ describe ConversationsController, type: :request do
             expect(conv.context).to eq Account.default
           end
 
-          it "should not allow non-root account context" do
+          it "does not allow non-root account context" do
             raw_api_call(:post, "/api/v1/conversations",
                          { :controller => 'conversations', :action => 'create', :format => 'json' },
                          { :recipients => [@bob.id], :body => "test", :context_code => "account_#{@sub_account.id}" })
@@ -763,7 +763,7 @@ describe ConversationsController, type: :request do
           context "cross-shard" do
             specs_require_sharding
 
-            it 'should find valid context for user on other shard' do
+            it 'finds valid context for user on other shard' do
               @shard1.activate do
                 new_root = Account.create!(name: 'shard2 account')
                 sub_account = new_root.sub_accounts.create!(name: 'sub dept')
@@ -781,7 +781,7 @@ describe ConversationsController, type: :request do
         end
       end
 
-      it "should create a group conversation" do
+      it "creates a group conversation" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @billy.id], :body => "test", :group_conversation => true })
@@ -831,7 +831,7 @@ describe ConversationsController, type: :request do
         # set up a private conversation in advance
         before(:once) { @conversation = conversation(@bob) }
 
-        it "should update the private conversation if it already exists" do
+        it "updates the private conversation if it already exists" do
           conversation = @conversation
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -877,7 +877,7 @@ describe ConversationsController, type: :request do
           ]
         end
 
-        it "should create/update bulk private conversations synchronously" do
+        it "create/updates bulk private conversations synchronously" do
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
                           { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test" })
@@ -895,7 +895,7 @@ describe ConversationsController, type: :request do
           expect(@joe.conversations.size).to eql(1)
         end
 
-        it "should set the context on new synchronous bulk private conversations" do
+        it "sets the context on new synchronous bulk private conversations" do
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
                           { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :context_code => "course_#{@course.id}" })
@@ -917,7 +917,7 @@ describe ConversationsController, type: :request do
           expect(json['errors']['subject']).to be_present
         end
 
-        it "should create/update bulk private conversations asynchronously" do
+        it "create/updates bulk private conversations asynchronously" do
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
                           { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :mode => "async" })
@@ -935,7 +935,7 @@ describe ConversationsController, type: :request do
           expect(@joe.conversations.size).to eql(1)
         end
 
-        it "should set the context on new asynchronous bulk private conversations" do
+        it "sets the context on new asynchronous bulk private conversations" do
           json = api_call(:post, "/api/v1/conversations",
                           { :controller => 'conversations', :action => 'create', :format => 'json' },
                           { :recipients => [@bob.id, @joe.id, @billy.id], :body => "test", :mode => "async", :context_code => "course_#{@course.id}" })
@@ -951,7 +951,7 @@ describe ConversationsController, type: :request do
         end
       end
 
-      it "should create a conversation with forwarded messages" do
+      it "creates a conversation with forwarded messages" do
         forwarded_message = conversation(@me, :sender => @bob).messages.first
         attachment = @bob.conversation_attachments_folder.attachments.create!(:context => @bob, :uploaded_data => stub_png_data)
         forwarded_message.attachment_ids = [attachment.id]
@@ -1039,7 +1039,7 @@ describe ConversationsController, type: :request do
       context "cross-shard message forwarding" do
         specs_require_sharding
 
-        it "should not asplode" do
+        it "does not asplode" do
           @shard1.activate do
             course_with_teacher(:active_course => true, :active_enrollment => true, :user => @me)
             @bob = student_in_course(:name => "bob")
@@ -1055,7 +1055,7 @@ describe ConversationsController, type: :request do
         end
       end
 
-      it "should set subject" do
+      it "sets subject" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :subject => "lunch" })
@@ -1100,7 +1100,7 @@ describe ConversationsController, type: :request do
         ]
       end
 
-      it "should set subject on batch conversations" do
+      it "sets subject on batch conversations" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @joe.id], :body => "test", :subject => "dinner" })
@@ -1110,7 +1110,7 @@ describe ConversationsController, type: :request do
         }
       end
 
-      it "should constrain subject length" do
+      it "constrains subject length" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test", :subject => "a" * 256 },
@@ -1148,7 +1148,7 @@ describe ConversationsController, type: :request do
                  { expected_status: 201 })
       end
 
-      it "should send bulk group messages" do
+      it "sends bulk group messages" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id, @joe.id], :body => "test",
@@ -1156,7 +1156,7 @@ describe ConversationsController, type: :request do
         expect(json.size).to eql 2
       end
 
-      it "should send bulk group messages with a single recipient" do
+      it "sends bulk group messages with a single recipient" do
         json = api_call(:post, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'create', :format => 'json' },
                         { :recipients => [@bob.id], :body => "test",
@@ -1167,7 +1167,7 @@ describe ConversationsController, type: :request do
       context "cross-shard creation" do
         specs_require_sharding
 
-        it "should create the conversation on the context's shard" do
+        it "creates the conversation on the context's shard" do
           @shard1.activate do
             @other_account = Account.create
             course_with_teacher(:active_all => true, :account => @other_account, :user => @me)
@@ -1183,7 +1183,7 @@ describe ConversationsController, type: :request do
           expect(@other_student.conversations.last.conversation.shard).to eq @shard1
         end
 
-        it "should create a conversation batch on the context's shard" do
+        it "creates a conversation batch on the context's shard" do
           @shard1.activate do
             @other_account = Account.create
             course_factory(:active_all => true, :account => @other_account)
@@ -1201,7 +1201,7 @@ describe ConversationsController, type: :request do
           @other_students.each { |s| expect(s.conversations.last.conversation.shard).to eq @shard1 }
         end
 
-        it "should send async bulk messages correctly cross-shard" do
+        it "sends async bulk messages correctly cross-shard" do
           @shard1.activate do
             @other_account = Account.create
             course_factory(:active_all => true, :account => @other_account)
@@ -1223,7 +1223,7 @@ describe ConversationsController, type: :request do
           @other_students.each { |s| expect(s.conversations.last.conversation.shard).to eq @shard1 }
         end
 
-        it "should work cross-shard with local file" do
+        it "works cross-shard with local file" do
           @shard1.activate do
             @other_account = Account.create
             course_factory(active_all: true, account: @other_account)
@@ -1249,7 +1249,7 @@ describe ConversationsController, type: :request do
   end
 
   context "conversation" do
-    it "should return the conversation" do
+    it "returns the conversation" do
       conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
 
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
@@ -1345,7 +1345,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should indicate if conversation permissions for the context are missing" do
+    it "indicates if conversation permissions for the context are missing" do
       @user = @billy
       conversation = conversation(@bob, :sender => @billy, :context_type => "Course", :context_id => @course.id)
 
@@ -1363,7 +1363,7 @@ describe ConversationsController, type: :request do
         @user = @bobs_mom
       end
 
-      it "should not set cannot_reply for observer observee relationship" do
+      it "does not set cannot_reply for observer observee relationship" do
         conversation = conversation(@bobs_mom, :sender => @bob, :context_type => "Course", :context_id => @course.id)
 
         json = api_call(
@@ -1378,7 +1378,7 @@ describe ConversationsController, type: :request do
         expect(json["cannot_reply"]).to be_nil
       end
 
-      it "should set cannot_reply to true if non-observed student" do
+      it "sets cannot_reply to true if non-observed student" do
         conversation = conversation(@bobs_mom, :sender => @billy, :context_type => "Course", :context_id => @course.id)
 
         json = api_call(
@@ -1394,7 +1394,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should not explode on account group conversations" do
+    it "does not explode on account group conversations" do
       @user = @billy
       group
       @group.add_user(@bob)
@@ -1407,7 +1407,7 @@ describe ConversationsController, type: :request do
       expect(json["cannot_reply"]).to_not be_truthy
     end
 
-    it "should still include attachment verifiers when using session auth" do
+    it "stills include attachment verifiers when using session auth" do
       conversation = conversation(@bob)
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
@@ -1418,7 +1418,7 @@ describe ConversationsController, type: :request do
       expect(json['messages'][0]['attachments'][0]['url']).to eq "http://www.example.com/files/#{attachment.id}/download?download_frd=1&verifier=#{attachment.uuid}"
     end
 
-    it "should use participant's last_message_at and not consult the most recent message" do
+    it "uses participant's last_message_at and not consult the most recent message" do
       expected_lma = '2012-12-21T12:42:00Z'
       conversation = conversation(@bob)
       conversation.last_message_at = Time.zone.parse(expected_lma)
@@ -1474,7 +1474,7 @@ describe ConversationsController, type: :request do
         expect(json).to eq expected
       end
 
-      it "should show ids relative to the current shard" do
+      it "shows ids relative to the current shard" do
         Setting.set('conversations_sharding_migration_still_running', '0')
         @conversation = @shard1.activate { conversation(@bob) }
         check_conversation
@@ -1483,7 +1483,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should auto-mark-as-read if unread" do
+    it "auto-mark-as-reads if unread" do
       conversation = conversation(@bob, :workflow_state => 'unread')
 
       json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread",
@@ -1492,7 +1492,7 @@ describe ConversationsController, type: :request do
       expect(conversation.reload).to be_read
     end
 
-    it "should not auto-mark-as-read if auto_mark_as_read = false" do
+    it "does not auto-mark-as-read if auto_mark_as_read = false" do
       conversation = conversation(@bob, :workflow_state => 'unread')
 
       json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}?scope=unread&auto_mark_as_read=0",
@@ -1501,7 +1501,7 @@ describe ConversationsController, type: :request do
       expect(conversation.reload).to be_unread
     end
 
-    it "should properly flag if starred in the response" do
+    it "properlies flag if starred in the response" do
       conversation1 = conversation(@bob)
       conversation2 = conversation(@billy, :starred => true)
 
@@ -1514,7 +1514,7 @@ describe ConversationsController, type: :request do
       expect(json["starred"]).to be_truthy
     end
 
-    it "should not link submission comments and conversations anymore" do
+    it "does not link submission comments and conversations anymore" do
       submission1 = submission_model(:course => @course, :user => @bob)
       submission2 = submission_model(:course => @course, :user => @bob)
       conversation(@bob)
@@ -1529,7 +1529,7 @@ describe ConversationsController, type: :request do
       expect(json['submissions'].size).to eq 0
     end
 
-    it "should add a message to the conversation" do
+    it "adds a message to the conversation" do
       conversation = conversation(@bob)
 
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
@@ -1572,7 +1572,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should only add participants for the new message to the given recipients" do
+    it "onlies add participants for the new message to the given recipients" do
       conversation = conversation(@bob, private: false)
 
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",
@@ -1617,7 +1617,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should return an error if trying to add more participants than the maximum group size on add_message" do
+    it "returns an error if trying to add more participants than the maximum group size on add_message" do
       conversation = conversation(@bob, private: false)
 
       Setting.set("max_group_conversation_size", 1)
@@ -1628,7 +1628,7 @@ describe ConversationsController, type: :request do
       expect(json.first["message"]).to include("too many participants")
     end
 
-    it "should add participants for the given messages to the given recipients" do
+    it "adds participants for the given messages to the given recipients" do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("another one")
 
@@ -1676,7 +1676,7 @@ describe ConversationsController, type: :request do
       expect(message.conversation_message_participants.where(:user_id => @billy.id).exists?).to be_truthy
     end
 
-    it "should exclude participants that aren't in the recipient list" do
+    it "excludes participants that aren't in the recipient list" do
       conversation = conversation(@bob, @billy, private: false)
       message = conversation.add_message("another one")
 
@@ -1724,7 +1724,7 @@ describe ConversationsController, type: :request do
       expect(message.conversation_message_participants.where(:user_id => @billy.id).exists?).to be_truthy
     end
 
-    it "should add message participants for all conversation participants (if recipients are not specified) to included messages only" do
+    it "adds message participants for all conversation participants (if recipients are not specified) to included messages only" do
       conversation = conversation(@bob, private: false)
       message = conversation.add_message("you're swell, @bob")
 
@@ -1783,7 +1783,7 @@ describe ConversationsController, type: :request do
       expect(bob_sucks.conversation_message_participants.where(:user_id => @bob.id).exists?).to be_falsey
     end
 
-    it "should allow users to respond to admin initiated conversations" do
+    it "allows users to respond to admin initiated conversations" do
       account_admin_user active_all: true
       cp = conversation(@other, sender: @admin, private: false)
       real_conversation = cp.conversation
@@ -1799,7 +1799,7 @@ describe ConversationsController, type: :request do
       expect(new_message.conversation_message_participants.size).to eq 2
     end
 
-    it "should allow users to respond to anyone who is already a participant" do
+    it "allows users to respond to anyone who is already a participant" do
       cp = conversation(@bob, @billy, @jane, @joe, sender: @bob)
       real_conversation = cp.conversation
       real_conversation.context = @course
@@ -1815,7 +1815,7 @@ describe ConversationsController, type: :request do
       expect(new_message.conversation_message_participants.size).to eq 4
     end
 
-    it "should create a media object if it doesn't exist" do
+    it "creates a media object if it doesn't exist" do
       conversation = conversation(@bob)
 
       expect(MediaObject.count).to eql 0
@@ -1830,7 +1830,7 @@ describe ConversationsController, type: :request do
       expect(MediaObject.count).to eql 1
     end
 
-    it "should add recipients to the conversation" do
+    it "adds recipients to the conversation" do
       conversation = conversation(@bob, @billy)
 
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_recipients",
@@ -1877,7 +1877,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should return an error if trying to add more participants than the maximum group size on add_recipients" do
+    it "returns an error if trying to add more participants than the maximum group size on add_recipients" do
       conversation = conversation(@bob, @billy, @joe)
 
       Setting.set("max_group_conversation_size", 2)
@@ -1888,7 +1888,7 @@ describe ConversationsController, type: :request do
       expect(json.first["message"]).to include("too many participants")
     end
 
-    it "should not cache an old audience when adding recipients" do
+    it "does not cache an old audience when adding recipients" do
       enable_cache do
         Timecop.freeze(5.seconds.ago) do
           @conversation = conversation(@bob, @billy)
@@ -1903,7 +1903,7 @@ describe ConversationsController, type: :request do
       end
     end
 
-    it "should update the conversation" do
+    it "updates the conversation" do
       conversation = conversation(@bob, @billy)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -1943,7 +1943,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should be able to star the conversation via update" do
+    it "is able to star the conversation via update" do
       conversation = conversation(@bob, @billy)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -1952,7 +1952,7 @@ describe ConversationsController, type: :request do
       expect(json["starred"]).to be_truthy
     end
 
-    it "should be able to unstar the conversation via update" do
+    it "is able to unstar the conversation via update" do
       conversation = conversation(@bob, @billy, :starred => true)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -1961,7 +1961,7 @@ describe ConversationsController, type: :request do
       expect(json["starred"]).to be_falsey
     end
 
-    it "should leave starryness alone when left out of update" do
+    it "leaves starryness alone when left out of update" do
       conversation = conversation(@bob, @billy, :starred => true)
 
       json = api_call(:put, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -1970,7 +1970,7 @@ describe ConversationsController, type: :request do
       expect(json["starred"]).to be_truthy
     end
 
-    it "should delete messages from the conversation" do
+    it "deletes messages from the conversation" do
       conversation = conversation(@bob)
       message = conversation.add_message("another one")
 
@@ -2011,7 +2011,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "should delete the conversation" do
+    it "deletes the conversation" do
       conversation = conversation(@bob)
 
       json = api_call(:delete, "/api/v1/conversations/#{conversation.conversation_id}",
@@ -2054,7 +2054,7 @@ describe ConversationsController, type: :request do
       @group.users = [@me, @bob, @joe]
     end
 
-    it "should support the deprecated route" do
+    it "supports the deprecated route" do
       json = api_call(:get, "/api/v1/conversations/find_recipients.json?search=o",
                       { :controller => 'search', :action => 'recipients', :format => 'json', :search => 'o' })
       json.each { |c| c.delete("avatar_url") }
@@ -2072,7 +2072,7 @@ describe ConversationsController, type: :request do
   end
 
   context "batches" do
-    it "should return all in-progress batches" do
+    it "returns all in-progress batches" do
       batch1 = ConversationBatch.generate(Conversation.build_message(@me, "hi all"), [@bob, @billy], :async)
       batch2 = ConversationBatch.generate(Conversation.build_message(@me, "ohai"), [@bob, @billy], :sync)
       batch3 = ConversationBatch.generate(Conversation.build_message(@bob, "sup"), [@me, @billy], :async)
@@ -2088,7 +2088,7 @@ describe ConversationsController, type: :request do
   end
 
   describe "visibility inference" do
-    it "should not break with empty string as filter" do
+    it "does not break with empty string as filter" do
       # added for 1.9.3
       json = api_call(:post, "/api/v1/conversations",
                       { :controller => 'conversations', :action => 'create', :format => 'json' },
@@ -2102,7 +2102,7 @@ describe ConversationsController, type: :request do
     let_once(:c2) { conversation(@me, @jane, :workflow_state => 'read') }
     let_once(:conversation_ids) { [c1, c2].map { |c| c.conversation.id } }
 
-    it "should mark conversations as read" do
+    it "marks conversations as read" do
       json = api_call(:put, "/api/v1/conversations",
                       { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                       { :event => 'mark_as_read', :conversation_ids => conversation_ids })
@@ -2114,7 +2114,7 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(0)
     end
 
-    it "should mark conversations as unread" do
+    it "marks conversations as unread" do
       json = api_call(:put, "/api/v1/conversations",
                       { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                       { :event => 'mark_as_unread', :conversation_ids => conversation_ids })
@@ -2126,7 +2126,7 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(2)
     end
 
-    it "should mark conversations as starred" do
+    it "marks conversations as starred" do
       c1.update_attribute :starred, true
 
       json = api_call(:put, "/api/v1/conversations",
@@ -2140,7 +2140,7 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(1)
     end
 
-    it "should mark conversations as unstarred" do
+    it "marks conversations as unstarred" do
       c1.update_attribute :starred, true
 
       json = api_call(:put, "/api/v1/conversations",
@@ -2156,7 +2156,7 @@ describe ConversationsController, type: :request do
 
     # it "should mark conversations as subscribed"
     # it "should mark conversations as unsubscribed"
-    it "should archive conversations" do
+    it "archives conversations" do
       conversations = %w(archived read unread).map do |state|
         conversation(@me, @bob, :workflow_state => state)
       end
@@ -2175,7 +2175,7 @@ describe ConversationsController, type: :request do
       expect(@me.reload.unread_conversations_count).to eql(0)
     end
 
-    it "should destroy conversations" do
+    it "destroys conversations" do
       json = api_call(:put, "/api/v1/conversations",
                       { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                       { :event => 'destroy', :conversation_ids => conversation_ids })
@@ -2188,7 +2188,7 @@ describe ConversationsController, type: :request do
     end
 
     describe "immediate failures" do
-      it "should fail if event is invalid" do
+      it "fails if event is invalid" do
         json = api_call(:put, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                         { :event => 'NONSENSE', :conversation_ids => conversation_ids },
@@ -2197,7 +2197,7 @@ describe ConversationsController, type: :request do
         expect(json['message']).to include 'invalid event'
       end
 
-      it "should fail if event parameter is not specified" do
+      it "fails if event parameter is not specified" do
         json = api_call(:put, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                         { :conversation_ids => conversation_ids },
@@ -2206,7 +2206,7 @@ describe ConversationsController, type: :request do
         expect(json['message']).to include 'event not specified'
       end
 
-      it "should fail if conversation_ids is not specified" do
+      it "fails if conversation_ids is not specified" do
         json = api_call(:put, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                         { :event => 'mark_as_read' },
@@ -2215,7 +2215,7 @@ describe ConversationsController, type: :request do
         expect(json['message']).to include 'conversation_ids not specified'
       end
 
-      it "should fail if batch size limit is exceeded" do
+      it "fails if batch size limit is exceeded" do
         conversation_ids = (1..501).to_a
         json = api_call(:put, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
@@ -2226,7 +2226,7 @@ describe ConversationsController, type: :request do
     end
 
     describe "progress" do
-      it "should create and update a progress object" do
+      it "creates and update a progress object" do
         json = api_call(:put, "/api/v1/conversations",
                         { :controller => 'conversations', :action => 'batch_update', :format => 'json' },
                         { :event => 'mark_as_read', :conversation_ids => conversation_ids })
@@ -2240,7 +2240,7 @@ describe ConversationsController, type: :request do
       end
 
       describe "progress failures" do
-        it "should not update conversations the current user does not participate in" do
+        it "does not update conversations the current user does not participate in" do
           c3 = conversation(@bob, @jane, :sender => @bob, :workflow_state => 'unread')
           conversation_ids = [c1, c2, c3].map { |c| c.conversation.id }
 
@@ -2258,7 +2258,7 @@ describe ConversationsController, type: :request do
           expect(progress.message).to include '2 conversations processed'
         end
 
-        it "should fail if all conversation ids are invalid" do
+        it "fails if all conversation ids are invalid" do
           c1 = conversation(@bob, @jane, :sender => @bob, :workflow_state => 'unread')
           conversation_ids = [c1.conversation.id]
 
@@ -2275,7 +2275,7 @@ describe ConversationsController, type: :request do
           expect(progress.message).to include '0 conversations processed'
         end
 
-        it "should fail progress if exception is raised in job" do
+        it "fails progress if exception is raised in job" do
           allow_any_instance_of(Progress).to receive(:complete!).and_raise "crazy exception"
 
           c1 = conversation(@me, @jane, :workflow_state => 'unread')
@@ -2293,7 +2293,7 @@ describe ConversationsController, type: :request do
   end
 
   describe "delete_for_all" do
-    it "should require site_admin with manage_students permissions" do
+    it "requires site_admin with manage_students permissions" do
       cp = conversation(@me, @bob, @billy, @jane, @joe, @tommy, :sender => @me)
       conv = cp.conversation
       expect(@joe.conversations.size).to eql 1
@@ -2321,7 +2321,7 @@ describe ConversationsController, type: :request do
       expect(@joe.conversations.size).to eql 1
     end
 
-    it "should fail if conversation doesn't exist" do
+    it "fails if conversation doesn't exist" do
       site_admin_user
       json = raw_api_call(:delete, "/api/v1/conversations/0/delete_for_all",
                           { :controller => 'conversations', :action => 'delete_for_all', :format => 'json', :id => "0" },
@@ -2329,7 +2329,7 @@ describe ConversationsController, type: :request do
       assert_status(404)
     end
 
-    it "should delete the conversation for all participants" do
+    it "deletes the conversation for all participants" do
       users = [@me, @bob, @billy, @jane, @joe, @tommy]
       cp = conversation(*users)
       conv = cp.conversation
@@ -2359,7 +2359,7 @@ describe ConversationsController, type: :request do
     context "sharding" do
       specs_require_sharding
 
-      it "should delete the conversation for users on multiple shards" do
+      it "deletes the conversation for users on multiple shards" do
         users = [@me]
         users << @shard1.activate { User.create! }
 
@@ -2393,7 +2393,7 @@ describe ConversationsController, type: :request do
   end
 
   describe 'unread_count' do
-    it 'should return the number of unread conversations for the current user' do
+    it 'returns the number of unread conversations for the current user' do
       conversation(student_in_course, :workflow_state => 'unread')
       json = api_call(:get, '/api/v1/conversations/unread_count.json',
                       { :controller => 'conversations', :action => 'unread_count', :format => 'json' })

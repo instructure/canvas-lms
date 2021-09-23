@@ -39,28 +39,28 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
     let(:question_id)     { 1 }
     let(:points_possible) { 100 }
 
-    it "should calculate if answer is too far below of the answer tolerance" do
+    it "calculates if answer is too far below of the answer tolerance" do
       answer_data = { :"question_#{question_id}" => "7.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer is too far above of the answer tolerance" do
+    it "calculates if answer is too far above of the answer tolerance" do
       answer_data = { :"question_#{question_id}" => "12.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer is below the answer but within tolerance" do
+    it "calculates if answer is below the answer but within tolerance" do
       answer_data = { :"question_#{question_id}" => "9" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
-    it "should calculate if answer is above the the answer but within tolerance answer tolerance" do
+    it "calculates if answer is above the the answer but within tolerance answer tolerance" do
       answer_data = { :"question_#{question_id}" => "11" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
@@ -76,28 +76,28 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
     let(:question_id)     { 1 }
     let(:points_possible) { 100 }
 
-    it "should calculate if answer is too far below of the answer tolerance" do
+    it "calculates if answer is too far below of the answer tolerance" do
       answer_data = { :"question_#{question_id}" => "7.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer is too far above of the answer tolerance" do
+    it "calculates if answer is too far above of the answer tolerance" do
       answer_data = { :"question_#{question_id}" => "12.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer is below the answer but within tolerance" do
+    it "calculates if answer is below the answer but within tolerance" do
       answer_data = { :"question_#{question_id}" => "9" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
-    it "should calculate if answer is above the the answer but within tolerance answer tolerance" do
+    it "calculates if answer is above the the answer but within tolerance answer tolerance" do
       answer_data = { :"question_#{question_id}" => "11" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
@@ -113,7 +113,7 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
     let(:question_id)     { 1 }
     let(:points_possible) { 100 }
 
-    it "should calculate if negative answer is below the answer but within tolerance" do
+    it "calculates if negative answer is below the answer but within tolerance" do
       answer_data = { :"question_#{question_id}" => "-9" }
 
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
@@ -121,7 +121,7 @@ describe Quizzes::QuizQuestion::CalculatedQuestion do
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
-    it "should calculate if negative answer is above the the answer but within tolerance answer tolerance" do
+    it "calculates if negative answer is above the the answer but within tolerance answer tolerance" do
       answer_data = { :"question_#{question_id}" => "-11" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 

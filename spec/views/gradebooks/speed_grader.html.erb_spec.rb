@@ -116,7 +116,7 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 
-  it 'it renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
+  it 'renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
     allow_any_instance_of(Assignment).to receive(:assignment_configuration_tool_lookup_ids) { [1] }
     render template: 'gradebooks/speed_grader', locals: locals
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"

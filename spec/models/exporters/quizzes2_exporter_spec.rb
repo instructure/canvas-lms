@@ -45,13 +45,13 @@ describe "Quizzes2 Exporter" do
       @quizzes2 = Exporters::Quizzes2Exporter.new(@ce)
     end
 
-    it "should create a Quizzes2 assignment group if it doesn't exist" do
+    it "creates a Quizzes2 assignment group if it doesn't exist" do
       expect(@course.assignment_groups.exists?(name: Exporters::Quizzes2Exporter::GROUP_NAME)).to eq false
       @quizzes2.export
       expect(@course.assignment_groups.exists?(name: Exporters::Quizzes2Exporter::GROUP_NAME)).to eq true
     end
 
-    it "should create a Quizzes2 assignment group if it was previously deleted" do
+    it "creates a Quizzes2 assignment group if it was previously deleted" do
       old_group = @course.assignment_groups.create(name: Exporters::Quizzes2Exporter::GROUP_NAME)
       old_group.destroy
       @quizzes2.export
@@ -64,7 +64,7 @@ describe "Quizzes2 Exporter" do
       expect(@course.assignment_groups.where(name: Exporters::Quizzes2Exporter::GROUP_NAME).count).to eq 1
     end
 
-    it "should create a Quizzes2 assignment" do
+    it "creates a Quizzes2 assignment" do
       @course.enable_feature!(:post_grades)
       @quiz.assignment.update!(post_to_sis: true)
       @quizzes2.export

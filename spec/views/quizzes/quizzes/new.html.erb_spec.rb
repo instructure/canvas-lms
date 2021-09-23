@@ -33,7 +33,7 @@ describe "/quizzes/quizzes/new" do
     @quiz.quiz_questions.create
   end
 
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
@@ -50,13 +50,13 @@ describe "/quizzes/quizzes/new" do
       assign(:js_env, { quiz_max_combination_count: 200 })
       view_context
     end
-    it "should not display 'NOTE:' message when questions within limit" do
+    it "does not display 'NOTE:' message when questions within limit" do
       Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT.times { quiz_question }
       render 'quizzes/quizzes/new'
       expect(response.inspect).not_to include('NOTE: Question details not available when more than')
     end
 
-    it "should explain why 'Show Question Details' is disabled" do
+    it "explains why 'Show Question Details' is disabled" do
       (Quizzes::QuizzesController::QUIZ_QUESTIONS_DETAIL_LIMIT + 1).times { quiz_question }
       render 'quizzes/quizzes/new'
       expect(response.inspect).to include('NOTE: Question details not available when more than')

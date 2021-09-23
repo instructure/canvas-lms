@@ -189,7 +189,7 @@ describe Quizzes::QuizGroupsController, type: :request do
       expect(res['name']).to eq('Test Group')
     end
 
-    it "should be unauthorized for unenrolled users" do
+    it "is unauthorized for unenrolled users" do
       @user = User.create!(name: 'unenrolled user')
       raw_api_call(:get, path, params)
       assert_status 401

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/show" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
@@ -30,7 +30,7 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to be_nil
   end
 
-  it "should render a notice instead of grades when grades have not been posted" do
+  it "renders a notice instead of grades when grades have not been posted" do
     course_with_student(:active_all => true)
     quiz = @course.quizzes.create
     quiz.workflow_state = "available"
@@ -62,7 +62,7 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to have_tag ".unpublished_warning"
   end
 
-  it "should show header bar and publish button" do
+  it "shows header bar and publish button" do
     course_with_teacher(:active_all => true)
     assign(:quiz, @course.quizzes.create!)
 
@@ -73,7 +73,7 @@ describe "/quizzes/quizzes/show" do
     expect(response).to have_tag "#quiz-publish-link"
   end
 
-  it "should show unpublished quiz changes to instructors" do
+  it "shows unpublished quiz changes to instructors" do
     course_with_teacher(:active_all => true)
     @quiz = @course.quizzes.create!
     @quiz.workflow_state = "available"
@@ -90,7 +90,7 @@ describe "/quizzes/quizzes/show" do
     expect(response).not_to have_tag ".unpublished_quiz_warning"
   end
 
-  it "should hide points possible for ungraded surveys" do
+  it "hides points possible for ungraded surveys" do
     points = 5
 
     course_with_teacher(active_all: true)
@@ -106,7 +106,7 @@ describe "/quizzes/quizzes/show" do
     end
   end
 
-  it 'should render teacher partial for teachers' do
+  it 'renders teacher partial for teachers' do
     course_with_teacher(active_all: true)
     view_context
     assign(:quiz, @course.quizzes.create!)
@@ -115,7 +115,7 @@ describe "/quizzes/quizzes/show" do
     expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_student'
   end
 
-  it 'should not render direct share menu options for students' do
+  it 'does not render direct share menu options for students' do
     course_with_student(active_all: true)
     view_context
     assign(:quiz, @course.quizzes.create!)
@@ -124,7 +124,7 @@ describe "/quizzes/quizzes/show" do
     expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
   end
 
-  it 'should render direct share menu options for user with :read_as_admin, even without manage permission' do
+  it 'renders direct share menu options for user with :read_as_admin, even without manage permission' do
     @account = Account.default
     @role = custom_teacher_role('No Manage')
     @account.role_overrides.create!(permission: :manage_assignments, role: @role, enabled: false)
@@ -145,7 +145,7 @@ describe "/quizzes/quizzes/show" do
     expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
   end
 
-  it 'should render student partial for students' do
+  it 'renders student partial for students' do
     course_with_student(active_all: true)
     quiz = @course.quizzes.build
     quiz.publish!
@@ -156,7 +156,7 @@ describe "/quizzes/quizzes/show" do
     expect(view).not_to have_rendered '/quizzes/quizzes/_quiz_show_teacher'
   end
 
-  it 'should render draft version warning' do
+  it 'renders draft version warning' do
     course_with_student(active_all: true)
     quiz = @course.quizzes.create
     quiz.workflow_state = 'available'

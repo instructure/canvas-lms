@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "accounts/_sis_batch_counts.html.erb" do
-  it "should render sis count data" do
+  it "renders sis count data" do
     data = { counts: { xlists: 2, enrollments: 3, courses: 5, users: 6, terms: 6,
                        group_memberships: 7, group_categories: 2, groups: 8,
                        sections: 9, accounts: 10, admins: 1, user_observers: 3,

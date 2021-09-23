@@ -38,11 +38,11 @@ describe Types::TermType do
     expect(@term_type.resolve("_id", current_user: @student)).to be_nil
   end
 
-  it 'should have coursesConnection' do
+  it 'has coursesConnection' do
     expect(@term_type.resolve("coursesConnection { nodes { _id } }", current_user: @admin)).to eq [@course.id.to_s]
   end
 
-  it 'should require admin privilege' do
+  it 'requires admin privilege' do
     expect(@term_type.resolve("coursesConnection { nodes { _id } }", current_user: @student)).to be_nil
   end
 

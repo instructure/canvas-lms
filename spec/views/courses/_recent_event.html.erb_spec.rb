@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/courses/_recent_event" do
-  it "should render" do
+  it "renders" do
     course_with_student
     assignment = @course.assignments.create!(:title => 'my assignment')
     view_context
@@ -31,7 +31,7 @@ describe "/courses/_recent_event" do
     expect(response.body).to match %r{<b class="event-details__title">my assignment</b>}
   end
 
-  it "should render without a user" do
+  it "renders without a user" do
     course_factory
     assignment = @course.assignments.create!(:title => 'my assignment')
     view_context
@@ -112,14 +112,14 @@ describe "/courses/_recent_event" do
       allow_any_instance_of(Submission).to receive(:grade).and_return('1234567890')
     end
 
-    it "should show the grade for a non-muted assignment" do
+    it "shows the grade for a non-muted assignment" do
       render :partial => "courses/recent_event",
              :object => @quiz.assignment,
              :locals => { :is_hidden => false, :submissions => [@submission] }
       expect(response.body).to match(/1,234,567,890/)
     end
 
-    it "should not show the grade for a muted assignment" do
+    it "does not show the grade for a muted assignment" do
       @quiz.assignment.mute!
       render :partial => "courses/recent_event",
              :object => @quiz.assignment,

@@ -31,13 +31,13 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       subject.run!(event.answers, predecessors)
     end
 
-    it 'should be a noop if there are no previous events' do
+    it 'is a noop if there are no previous events' do
       event = build_event [{ quiz_question_id: 1, answer: '11' }]
 
       expect(run(event, [])).to eq false
     end
 
-    it 'should include newly recorded answers' do
+    it 'includes newly recorded answers' do
       event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
       event2 = build_event [{ quiz_question_id: '2', answer: '21' }]
 
@@ -45,7 +45,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       expect(event2.answers.length).to eq 1
     end
 
-    it 'should include answers that have changed' do
+    it 'includes answers that have changed' do
       event1 = build_event [{ quiz_question_id: '1', answer: '11' }]
       event2 = build_event [{ quiz_question_id: '1', answer: '12' }]
 
@@ -53,7 +53,7 @@ describe Quizzes::LogAuditing::QuestionAnsweredEventOptimizer do
       expect(event2.answers.length).to eq 1
     end
 
-    it 'should not include answers otherwise' do
+    it 'does not include answers otherwise' do
       event1 = build_event [
         { quiz_question_id: '1', answer: '11' },
         { quiz_question_id: '2', answer: '21' }

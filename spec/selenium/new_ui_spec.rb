@@ -108,14 +108,14 @@ describe 'new ui' do
       expect(f('.home + li .ellipsible')).to include_text("#{@course.course_code}")
     end
 
-    it 'should show new files folder icon in course files', priority: "2", test_id: 248683 do
+    it 'shows new files folder icon in course files', priority: "2", test_id: 248683 do
       get "/courses/#{@course.id}/files"
       add_folder
       # verifying new files folder icon css property still displays with new ui
       expect(f('.media-object.ef-big-icon.FilesystemObjectThumbnail.mimeClass-folder')).to be_displayed
     end
 
-    it 'should not override high contrast theme', priority: "2", test_id: 244898 do
+    it 'does not override high contrast theme', priority: "2", test_id: 244898 do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       @user.enable_feature!('high_contrast')
       get '/profile/settings'
@@ -124,7 +124,7 @@ describe 'new ui' do
       expect(menu_link.css_value('color')).to eq('rgba(45, 59, 69, 1)')
     end
 
-    it 'should not break tiny mce css', priority: "2", test_id: 244891 do
+    it 'does not break tiny mce css', priority: "2", test_id: 244891 do
       skip_if_chrome('Chrome does not get these values properly')
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       mce_icons = f('.mce-ico')
@@ -139,7 +139,7 @@ describe 'new ui' do
       expect(mce_icons.css_value('height')).to eq('16px')
     end
 
-    it 'should not break equation editor css', priority: "2", test_id: 273600 do
+    it 'does not break equation editor css', priority: "2", test_id: 273600 do
       get "/courses/#{@course.id}/assignments/new"
       wait_for_tiny(f('#assignment_description'))
       select_math_equation_from_toolbar
@@ -149,7 +149,7 @@ describe 'new ui' do
   end
 
   context 'as student' do
-    it 'should still have courses icon when only course is unpublished', priority: "1", test_id: 288860 do
+    it 'stills have courses icon when only course is unpublished', priority: "1", test_id: 288860 do
       course_with_student_logged_in(active_course: false)
       get "/"
       # make sure that "courses" shows up in the global nav even though we only have an unpublisned course

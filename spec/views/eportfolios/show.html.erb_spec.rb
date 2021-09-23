@@ -34,18 +34,18 @@ describe "/eportfolios/show" do
     assign(:page, @portfolio.eportfolio_entries.create!(:name => "some entry", :eportfolio_category => category))
   end
 
-  it "should render" do
+  it "renders" do
     render "eportfolios/show"
     expect(response).not_to be_nil
   end
 
-  it "should not link the user name if @owner_url is not set" do
+  it "does not link the user name if @owner_url is not set" do
     render "eportfolios/show"
     expect(view.content_for(:left_side)[/<a [^>]*id="section-tabs-header-subtitle"/]).to be_nil
     expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).not_to be_nil
   end
 
-  it "should link the user name if @owner_url is set" do
+  it "links the user name if @owner_url is set" do
     owner_url = assign(:owner_url, user_url(@portfolio.user, :host => "test.host"))
     render "eportfolios/show"
     expect(view.content_for(:left_side)[owner_url]).not_to be_nil
@@ -53,7 +53,7 @@ describe "/eportfolios/show" do
     expect(view.content_for(:left_side)[/<span [^>]*id="section-tabs-header-subtitle"/]).to be_nil
   end
 
-  it "should show the share link explicitly" do
+  it "shows the share link explicitly" do
     assign(:owner_view, true)
     render "eportfolios/show"
     doc = Nokogiri::HTML5(response.body)

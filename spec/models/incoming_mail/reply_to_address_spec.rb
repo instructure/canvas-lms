@@ -25,20 +25,20 @@ describe IncomingMail::ReplyToAddress do
   let(:expect_secure_id) { Canvas::Security.hmac_sha1(Shard.short_id_for(@shard1.global_id_for(42))) }
 
   describe 'initialize' do
-    it 'should persist the message argument' do
+    it 'persists the message argument' do
       expect(IncomingMail::ReplyToAddress.new("some message").message).to eq "some message"
     end
   end
 
   describe 'address' do
-    it 'should return nil for SMS messages' do
+    it 'returns nil for SMS messages' do
       message = double()
       expect(message).to receive(:path_type).and_return('sms')
 
       expect(IncomingMail::ReplyToAddress.new(message).address).to be_nil
     end
 
-    it 'should return the message from address for error reports' do
+    it 'returns the message from address for error reports' do
       message = double()
       expect(message).to receive(:path_type).and_return('email')
       expect(message).to receive(:context_type).and_return('ErrorReport')
@@ -50,7 +50,7 @@ describe IncomingMail::ReplyToAddress do
     context 'sharding' do
       specs_require_sharding
 
-      it 'should generate a reply-to address for email messages' do
+      it 'generates a reply-to address for email messages' do
         message = double()
 
         expect(message).to receive(:path_type).and_return('email')
@@ -66,7 +66,7 @@ describe IncomingMail::ReplyToAddress do
         expect(IncomingMail::ReplyToAddress.new(message).address).to eq "canvas+#{expect_secure_id[0..15]}-#{short_id}-#{created_at.to_i}@example.com"
       end
 
-      it 'should limit a reply-to address to 64 chars before @' do
+      it 'limits a reply-to address to 64 chars before @' do
         message = double()
 
         expect(message).to receive(:path_type).and_return('email')
@@ -82,7 +82,7 @@ describe IncomingMail::ReplyToAddress do
         expect(IncomingMail::ReplyToAddress.new(message).address.split('@').first.length < 64).to be_truthy
       end
 
-      it 'should be a valid hmac in the reply address' do
+      it 'is a valid hmac in the reply address' do
         message = double()
         expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
         secure_id = IncomingMail::ReplyToAddress.new(message).secure_id
@@ -96,7 +96,7 @@ describe IncomingMail::ReplyToAddress do
   describe 'secure_id' do
     specs_require_sharding
 
-    it 'should generate a unique hash for the message' do
+    it 'generates a unique hash for the message' do
       message = double()
       expect(message).to receive(:global_id).and_return(@shard1.global_id_for(42))
 
@@ -105,7 +105,7 @@ describe IncomingMail::ReplyToAddress do
   end
 
   describe 'self.address_pool=' do
-    it 'should persist an address pool' do
+    it 'persists an address pool' do
       pool = %w{canvas@example.com canvas2@example.com}
       IncomingMail::ReplyToAddress.address_pool = pool
 
@@ -114,7 +114,7 @@ describe IncomingMail::ReplyToAddress do
   end
 
   describe 'self.address_from_pool' do
-    it 'should return an address from the pool in a deterministic way' do
+    it 'returns an address from the pool in a deterministic way' do
       message, message2 = [double(), double()]
 
       expect(message).to receive(:id).twice.and_return(14)
@@ -125,7 +125,7 @@ describe IncomingMail::ReplyToAddress do
       expect(IncomingMail::ReplyToAddress.address_from_pool(message2)).to eq 'canvas2@example.com'
     end
 
-    it 'should raise EmptyReplyAddressPool if pool is empty' do
+    it 'raises EmptyReplyAddressPool if pool is empty' do
       message = double()
       IncomingMail::ReplyToAddress.address_pool = []
 
@@ -134,7 +134,7 @@ describe IncomingMail::ReplyToAddress do
       }.to raise_error(IncomingMail::ReplyToAddress::EmptyReplyAddressPool)
     end
 
-    it 'should randomly select a pool address if the message has no id' do
+    it 'randomlies select a pool address if the message has no id' do
       message = double()
 
       expect(message).to receive(:id).and_return(nil)

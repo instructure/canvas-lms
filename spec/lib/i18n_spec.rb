@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe I18n do
   context "_core_en.js" do
-    it "should be up-to-date" do
+    it "is up-to-date" do
       skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
       translations = { 'en' => I18n.backend.send(:translations)[:en].slice(*I18nTasks::Utils::CORE_KEYS) }
 
@@ -35,7 +35,7 @@ describe I18n do
   end
 
   context "DontTrustI18nPluralizations" do
-    it "should not raise an exception for a bad pluralization entry" do
+    it "does not raise an exception for a bad pluralization entry" do
       missing_other_key = { en: { __pluralize_test: { one: "One thing" } } }
       I18n.backend.stub(missing_other_key) do
         expect(I18n.t(:__pluralize_test, count: 123)).to eq ""
@@ -47,7 +47,7 @@ describe I18n do
     before { I18n.locale = I18n.default_locale }
     after { I18n.locale = I18n.default_locale }
 
-    it "should fall back to en if the current locale's interpolation is broken" do
+    it "falls back to en if the current locale's interpolation is broken" do
       I18n.locale = :es
       I18n.backend.stub es: { __interpolation_test: "Hola %{mundo}" } do
         expect(I18n.t(:__interpolation_test, "Hello %{mundo}", { mundo: "WORLD" }))
@@ -57,13 +57,13 @@ describe I18n do
       end
     end
 
-    it "should raise an error if the the en interpolation is broken" do
+    it "raises an error if the the en interpolation is broken" do
       expect {
         I18n.t(:__interpolation_test, "Hello %{world}", { foo: "bar" })
       }.to raise_error(I18n::MissingInterpolationArgument)
     end
 
-    it "should format count numbers" do
+    it "formats count numbers" do
       I18n.backend.stub(en: { __interpolation_test: { one: "One thing", other: "%{count} things" } }) do
         expect(I18n.t(:__interpolation_test,
                       one: "One thing",

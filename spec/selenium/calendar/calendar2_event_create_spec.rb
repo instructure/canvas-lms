@@ -42,7 +42,7 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
     context "event creation" do
-      it "should create an event by hitting the '+' in the top bar" do
+      it "creates an event by hitting the '+' in the top bar" do
         event_title = 'new event'
         get "/calendar2"
 
@@ -51,14 +51,14 @@ describe "calendar2" do
         expect(edit_event_dialog).to be_displayed
       end
 
-      it "should create an event with a location name" do
+      it "creates an event with a location name" do
         event_name = 'event with location'
         create_middle_day_event(event_name, false, true)
         fj('.fc-event:visible').click
         expect(fj('.event-details-content:visible')).to include_text('location title')
       end
 
-      it 'should create an event with name and address' do
+      it 'creates an event with name and address' do
         get "/calendar2"
         event_title = 'event title'
         location_name = 'my house'
@@ -82,7 +82,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.location_address).to eq location_address
       end
 
-      it 'should cosistently format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
+      it 'cosistentlies format date <input> value to what datepicker would set it as, even in langs that have funky formatting' do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         @user.locale = 'fr'
@@ -105,7 +105,7 @@ describe "calendar2" do
         expect(CalendarEvent.last.start_at).to eq Time.utc(2018, 3, 2)
       end
 
-      it "should go to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
+      it "goes to calendar event modal when a syllabus link is clicked", priority: "1", test_id: 186581 do
         event_title = "Test Event"
         make_event(title: event_title, context: @course)
 
@@ -118,7 +118,7 @@ describe "calendar2" do
         expect(f('.view_event_link')).to include_text(event_title)
       end
 
-      it "should be able to create an event for a group" do
+      it "is able to create an event for a group" do
         group(:context => @course)
 
         get "/groups/#{@group.id}"
@@ -130,7 +130,7 @@ describe "calendar2" do
         expect(event.title).to eq event_name
       end
 
-      it "should create an event that is recurring", priority: "1", test_id: 223510 do
+      it "creates an event that is recurring", priority: "1", test_id: 223510 do
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
@@ -156,7 +156,7 @@ describe "calendar2" do
         expect(repeat_event[2].start_at.to_date).to eq(first_start_date + 2.weeks)
       end
 
-      it "should create recurring section-specific events" do
+      it "creates recurring section-specific events" do
         section1 = @course.course_sections.first
         section2 = @course.course_sections.create!(:name => "other section")
 
@@ -201,7 +201,7 @@ describe "calendar2" do
         expect(s2_events[1].start_at.to_date).to eq (s2_events[0].start_at.to_date + 1.week)
       end
 
-      it "should query for all the sections in a course when creating an event" do
+      it "queries for all the sections in a course when creating an event" do
         15.times.with_index { |i| add_section("Section #{i}") }
 
         num_sections = @course.course_sections.count
@@ -215,7 +215,7 @@ describe "calendar2" do
         expect(num_rows).to be_equal(num_sections)
       end
 
-      it "should create an event with an important date in a k5 subject" do
+      it "creates an event with an important date in a k5 subject" do
         Account.site_admin.enable_feature!(:important_dates)
         toggle_k5_setting(@course.account)
 

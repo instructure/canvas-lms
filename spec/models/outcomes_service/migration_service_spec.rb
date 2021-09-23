@@ -99,7 +99,7 @@ describe OutcomesService::MigrationService do
                                                                              })
         end
 
-        it 'should request course wiki page' do
+        it 'requests course wiki page' do
           stub_post_content_export.to_return(status: 200, body: '{"id":123}')
           expect(described_class.begin_export(course, {})).to eq({
                                                                    export_id: 123,
@@ -107,12 +107,12 @@ describe OutcomesService::MigrationService do
                                                                  })
         end
 
-        it 'should raise error on non 2xx response' do
+        it 'raises error on non 2xx response' do
           stub_post_content_export.to_return(status: 401, body: '{"valid_jwt":false}')
           expect { described_class.begin_export(course, {}) }.to raise_error(/Error queueing export for Outcomes Service/)
         end
 
-        it 'should request selective course wiki page' do
+        it 'requests selective course wiki page' do
           stub_post_content_export(['2']).to_return(status: 200, body: '{"id":123}')
           expect(described_class.begin_export(course, {
                                                 selective: true,
@@ -123,7 +123,7 @@ describe OutcomesService::MigrationService do
                                                         })
         end
 
-        it 'should return no export if no artifacts requested' do
+        it 'returns no export if no artifacts requested' do
           expect(described_class.begin_export(course, {
                                                 selective: true,
                                                 exported_assets: []

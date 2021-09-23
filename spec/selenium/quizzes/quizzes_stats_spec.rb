@@ -29,7 +29,7 @@ describe 'quizzes stats' do
       course_with_teacher_logged_in
     end
 
-    it 'should display quiz statistics', priority: "1", test_id: 270036 do
+    it 'displays quiz statistics', priority: "1", test_id: 270036 do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
@@ -38,7 +38,7 @@ describe 'quizzes stats' do
       expect(f('#content .question-statistics .question-text')).to include_text("Which book(s) are required for this course?")
     end
 
-    it 'should have a link to the new quiz stats page', priority: "2", test_id: 270037 do
+    it 'has a link to the new quiz stats page', priority: "2", test_id: 270037 do
       quiz_with_submission
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
@@ -48,7 +48,7 @@ describe 'quizzes stats' do
     end
 
     context 'teacher preview' do
-      it 'should not show a quiz stats button if there was a teacher preview', priority: "2", test_id: 140645 do
+      it 'does not show a quiz stats button if there was a teacher preview', priority: "2", test_id: 140645 do
         skip_if_safari(:alert)
         quiz_with_new_questions(!:goto_edit)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -70,7 +70,7 @@ describe 'quizzes stats' do
       end
 
       ['Student Analysis', 'Item Analysis'].each do |report_type|
-        it "should have a item #{report_type} button tooltip", priority: "2", test_id: 270040 do
+        it "has a item #{report_type} button tooltip", priority: "2", test_id: 270040 do
           expect(fj(".report-generator:contains('#{report_type}')")).not_to include_text('Report has been generated')
 
           # move mouse over button
@@ -79,7 +79,7 @@ describe 'quizzes stats' do
           expect(fj(".report-generator:contains('#{report_type}')")).to include_text("Generate #{report_type.downcase} report")
         end
 
-        it 'should download a csv when pressing #{report_type} button ', priority: "1", test_id: 270039 do
+        it 'downloads a csv when pressing #{report_type} button', priority: "1", test_id: 270039 do
           skip("QUIZ-5120")
           button = fj(".generate-report:contains('#{report_type}')")
           button.click

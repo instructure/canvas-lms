@@ -479,11 +479,11 @@ module Lti
         end
       end
 
-      it "should return previous canvas course ids" do
+      it "returns previous canvas course ids" do
         expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
       end
 
-      it "should return previous lti context_ids" do
+      it "returns previous lti context_ids" do
         expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
       end
     end
@@ -494,7 +494,7 @@ module Lti
           course.save!
         end
 
-        it "should return empty (no previous lti context_ids)" do
+        it "returns empty (no previous lti context_ids)" do
           expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
         end
       end
@@ -536,11 +536,11 @@ module Lti
           )
         end
 
-        it "should return previous lti context_ids" do
+        it "returns previous lti context_ids" do
           expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
         end
 
-        it "should invalidate cache on last copied migration" do
+        it "invalidates cache on last copied migration" do
           enable_cache do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
             @c4 = Course.create!(root_account: root_account, account: account, lti_context_id: 'jkl')
@@ -561,13 +561,13 @@ module Lti
             )
           end
 
-          it "should not return duplicates but still return in chronological order" do
+          it "does not return duplicates but still return in chronological order" do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'def,ghi,abc'
           end
         end
 
         context "when there are more than (limit=1000) content migration courses in the history" do
-          it 'should truncate after the limit of ids' do
+          it 'truncates after the limit of ids' do
             4.upto(11) do
               c = Course.create!
               c.root_account = root_account
@@ -622,21 +622,21 @@ module Lti
           @e2 = multiple_student_enrollment(user, @sec2, course: course)
         end
 
-        it "should return all canvas section ids" do
+        it "returns all canvas section ids" do
           expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
         end
 
-        it "should return section restricted if all enrollments are restricted" do
+        it "returns section restricted if all enrollments are restricted" do
           [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
           expect(subject.section_restricted).to eq true
         end
 
-        it "should not return section restricted if only one is" do
+        it "does not return section restricted if only one is" do
           @e1.update_attribute(:limit_privileges_to_course_section, true)
           expect(subject.section_restricted).to eq false
         end
 
-        it "should return all canvas section sis ids" do
+        it "returns all canvas section sis ids" do
           expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
         end
       end

@@ -26,7 +26,7 @@ describe 'MessageDispatcher' do
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
     end
 
-    it "should reschedule on Mailer delivery error" do
+    it "reschedules on Mailer delivery error" do
       track_jobs { MessageDispatcher.dispatch(@message) }
       expect(created_jobs.size).to eq 1
       job = created_jobs.first
@@ -37,7 +37,7 @@ describe 'MessageDispatcher' do
       expect(job.run_at).to eq @message.dispatch_at
     end
 
-    it "should not reschedule on canceled Message" do
+    it "does not reschedule on canceled Message" do
       track_jobs { MessageDispatcher.dispatch(@message) }
       expect(created_jobs.size).to eq 1
       job = created_jobs.first
@@ -53,7 +53,7 @@ describe 'MessageDispatcher' do
       @messages = (0...3).map { message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email') }
     end
 
-    it "should reschedule on Mailer delivery error, but not on canceled Message" do
+    it "reschedules on Mailer delivery error, but not on canceled Message" do
       track_jobs { MessageDispatcher.batch_dispatch(@messages) }
       expect(created_jobs.size).to eq 1
       job = created_jobs.first

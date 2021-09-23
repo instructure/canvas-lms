@@ -48,12 +48,12 @@ describe Quizzes::QuizQuestionsController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :quiz_id => @quiz, :question => {} }
       assert_unauthorized
     end
 
-    it "should create a quiz question" do
+    it "creates a quiz question" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
@@ -73,7 +73,7 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:question].question_data[:answers].length).to eql(2)
       expect(assigns[:quiz]).to eql(@quiz)
     end
-    it "should preserve ids, if provided, on create" do
+    it "preserves ids, if provided, on create" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :quiz_id => @quiz, :question => {
         :question_type => "multiple_choice_question",
@@ -151,12 +151,12 @@ describe Quizzes::QuizQuestionsController do
   describe "PUT 'update'" do
     before(:once) { quiz_question }
 
-    it "should require authorization" do
+    it "requires authorization" do
       put 'update', params: { :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {} }
       assert_unauthorized
     end
 
-    it "should update a quiz question" do
+    it "updates a quiz question" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
@@ -181,7 +181,7 @@ describe Quizzes::QuizQuestionsController do
       expect(assigns[:quiz]).to eql(@quiz)
     end
 
-    it "should preserve ids, if provided, on update" do
+    it "preserves ids, if provided, on update" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :quiz_id => @quiz, :id => @question.id, :question => {
         :question_type => "multiple_choice_question",
@@ -224,7 +224,7 @@ describe Quizzes::QuizQuestionsController do
       expect(response.body).to match /max length is 16384/
     end
 
-    it "should delete non-html comments if needed" do
+    it "deletes non-html comments if needed" do
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       aq = bank.assessment_questions.create!(:question_data => {
                                                :question_type => 'essay_question', :correct_comments => 'stuff', :correct_comments_html => "stuff"
@@ -244,7 +244,7 @@ describe Quizzes::QuizQuestionsController do
       expect(linked_question.question_data['correct_comments']).to be_blank
     end
 
-    it "should leave assessment question verifiers" do
+    it "leaves assessment question verifiers" do
       @attachment = attachment_with_context(@course)
       bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
       aq = bank.assessment_questions.create!(:question_data => {

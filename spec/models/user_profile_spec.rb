@@ -24,7 +24,7 @@ describe UserProfile do
   describe "tabs available" do
     let(:account) { Account.default }
 
-    it "should show the profile tab when profiles are enabled" do
+    it "shows the profile tab when profiles are enabled" do
       student_in_course(:active_all => true)
       tabs = @student.profile
                      .tabs_available(@user, :root_account => account)
@@ -37,20 +37,20 @@ describe UserProfile do
     end
 
     describe "shared content tab" do
-      it "should show shared content tab when user has any non-student enrollment" do
+      it "shows shared content tab when user has any non-student enrollment" do
         teacher_in_course(:active_all => true)
         tabs = @teacher.profile
                        .tabs_available(@teacher, :root_account => account)
         expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
       end
 
-      it "should show shared content tab when user has account membership" do
+      it "shows shared content tab when user has account membership" do
         account_admin_user(account: account)
         tabs = @admin.profile.tabs_available(@admin, :root_account => account)
         expect(tabs.map { |t| t[:id] }).to include UserProfile::TAB_CONTENT_SHARES
       end
 
-      it "should not show shared content tab when user has only student enrollments" do
+      it "does not show shared content tab when user has only student enrollments" do
         student_in_course(:active_all => true)
         tabs = @student.profile
                        .tabs_available(@student, :root_account => account)
@@ -58,7 +58,7 @@ describe UserProfile do
       end
     end
 
-    it "should be i18n'd" do
+    it "is i18n'd" do
       student_in_course(:active_all => true)
       I18n.locale = :es
       tabs = @student.profile.tabs_available(@user, :root_account => account)
@@ -200,7 +200,7 @@ describe UserProfile do
       end
     end
 
-    it "should show announcements tab" do
+    it "shows announcements tab" do
       student_in_course(active_all: true)
       tabs = @student.profile
                      .tabs_available(@student, root_account: account)
@@ -213,7 +213,7 @@ describe UserProfile do
       end
 
       context "IMP is present and mobile_qr_login setting is enabled" do
-        it "should show the QR mobile login tab" do
+        it "shows the QR mobile login tab" do
           account.settings[:mobile_qr_login_is_enabled] = true
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
           tabs = @user.profile.tabs_available(@user, :root_account => account)
@@ -222,7 +222,7 @@ describe UserProfile do
       end
 
       context "mobile_qr_login setting is disabled" do
-        it "should not show the QR mobile login tab" do
+        it "does not show the QR mobile login tab" do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(true)
           account.settings[:mobile_qr_login_is_enabled] = false
           tabs = @user.profile.tabs_available(@user, :root_account => account)
@@ -231,7 +231,7 @@ describe UserProfile do
       end
 
       context "IMP is not present" do
-        it "should not show the QR mobile login tab" do
+        it "does not show the QR mobile login tab" do
           allow_any_instance_of(UserProfile).to receive(:instructure_misc_plugin_available?).and_return(false)
           account.settings[:mobile_qr_login_is_enabled] = true
           tabs = @user.profile.tabs_available(@user, :root_account => account)

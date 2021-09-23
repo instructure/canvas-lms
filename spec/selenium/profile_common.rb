@@ -27,7 +27,7 @@ require_relative 'helpers/shared_examples_common'
 shared_examples 'profile_settings_page' do |context|
   include SharedExamplesCommon
 
-  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
+  it 'gives option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 68936, teacher: 352617, admin: 352618) do
     enable_avatars(false)
     get "/profile/settings"
     driver.action.move_to(f('.avatar.profile_pic_link.none')).perform
@@ -44,7 +44,7 @@ end
 shared_examples 'profile_user_about_page' do |context|
   include SharedExamplesCommon
 
-  it 'should give option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
+  it 'gives option to change profile pic', priority: "2", test_id: pick_test_id(context, student: 358573, teacher: 358574, admin: 358575) do
     enable_avatars(false)
     get "/about/#{@user.id}"
 
@@ -60,7 +60,7 @@ end
 shared_examples 'user settings page change pic window' do |context|
   include SharedExamplesCommon
 
-  it 'should allow user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'allows user to click to change profile pic', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
     skip('ADMIN-2680')
     enable_avatars(true)
     get '/profile/settings'
@@ -92,7 +92,7 @@ end
 shared_examples 'with gravatar settings' do |context|
   include SharedExamplesCommon
 
-  it 'should not allow user to see gravatar when disabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'does not allow user to see gravatar when disabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
     enable_avatars(false)
     get '/profile/settings'
 
@@ -101,7 +101,7 @@ shared_examples 'with gravatar settings' do |context|
     expect(fj('.nav.nav-pills li')).not_to include_text("From Gravatar")
   end
 
-  it 'should allow user to see gravatar when enabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
+  it 'allows user to see gravatar when enabled', priority: "1", test_id: pick_test_id(context, student: 68938, teacher: 368784, admin: 368785) do
     enable_avatars(true)
     get '/profile/settings'
 

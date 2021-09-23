@@ -35,7 +35,7 @@ describe "assignment groups" do
       course_with_teacher_logged_in
     end
 
-    it "should create an assignment with default dates", priority: "1", test_id: 216344 do
+    it "creates an assignment with default dates", priority: "1", test_id: 216344 do
       visit_new_assignment_page
       fill_assignment_title 'vdd assignment'
       fill_assignment_overrides
@@ -50,7 +50,7 @@ describe "assignment groups" do
       compare_assignment_times(a)
     end
 
-    it "should load existing due data into the form", priority: "2", test_id: 216345 do
+    it "loads existing due data into the form", priority: "2", test_id: 216345 do
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
 
@@ -62,7 +62,7 @@ describe "assignment groups" do
         .to match format_date_for_view(lock_at)
     end
 
-    it "should edit a due date", priority: "2", test_id: 216346 do
+    it "edits a due date", priority: "2", test_id: 216346 do
       skip('flaky spec, LA-749')
       assignment = create_assignment!
       visit_assignment_edit_page(assignment)
@@ -76,7 +76,7 @@ describe "assignment groups" do
         .to eq due_at.to_date
     end
 
-    it "should clear a due date", priority: "2", test_id: 216348 do
+    it "clears a due date", priority: "2", test_id: 216348 do
       assign = @course.assignments.create!(:title => "due tomorrow", :due_at => Time.zone.now + 2.days)
       get "/courses/#{@course.id}/assignments/#{assign.id}/edit"
 
@@ -86,7 +86,7 @@ describe "assignment groups" do
       expect(assign.reload.due_at).to be_nil
     end
 
-    it "should allow setting overrides", priority: "1", test_id: 216349 do
+    it "allows setting overrides", priority: "1", test_id: 216349 do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
       allow(ConditionalRelease::Service).to receive(:jwt_for).and_return(:jwt)
 
@@ -125,7 +125,7 @@ describe "assignment groups" do
         .to eq other_section_due.to_date
     end
 
-    it "should not show inactive students when setting overrides" do
+    it "does not show inactive students when setting overrides" do
       student_in_course(:course => @course, :name => "real student")
       enrollment = student_in_course(:course => @course, :name => "inactive student")
       enrollment.deactivate
@@ -146,7 +146,7 @@ describe "assignment groups" do
       expect(students.first).to include_text("real")
     end
 
-    it "should validate override dates against proper section", priority: "1", test_id: 216350 do
+    it "validates override dates against proper section", priority: "1", test_id: 216350 do
       date = Time.zone.now
       date2 = Time.zone.now - 10.days
       due_date = Time.zone.now + 5.days
@@ -189,7 +189,7 @@ describe "assignment groups" do
       update_assignment!
     end
 
-    it "should show a vdd tooltip summary on the course assignments page", priority: "2", test_id: 216352 do
+    it "shows a vdd tooltip summary on the course assignments page", priority: "2", test_id: 216352 do
       assignment = create_assignment!
       get "/courses/#{@course.id}/assignments"
       expect(f('.assignment .assignment-date-due')).not_to include_text "Multiple Dates"
@@ -214,7 +214,7 @@ describe "assignment groups" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should show the available date range when overrides are set", priority: "2", test_id: 216353 do
+    it "shows the available date range when overrides are set", priority: "2", test_id: 216353 do
       assign = create_assignment!
       get "/courses/#{@course.id}/assignments/#{assign.id}"
       wait_for_ajaximations

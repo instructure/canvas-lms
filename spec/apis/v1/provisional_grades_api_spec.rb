@@ -219,13 +219,13 @@ describe 'Provisional Grades API', type: :request do
                   :provisional_grade_id => @pg.to_param }
     end
 
-    it "should fail if the student isn't in the moderation set" do
+    it "fails if the student isn't in the moderation set" do
       @assignment.moderated_grading_selections.destroy_all
       json = api_call_as_user(@teacher, :put, @path, @params, {}, {}, { :expected_status => 400 })
       expect(json['message']).to eq 'student not in moderation set'
     end
 
-    it "should select a provisional grade" do
+    it "selects a provisional grade" do
       json = api_call_as_user(@teacher, :put, @path, @params)
       expect(json).to eq({
                            'assignment_id' => @assignment.id,
@@ -241,7 +241,7 @@ describe 'Provisional Grades API', type: :request do
       }.from(0).to(1)
     end
 
-    it "should use anonymous_id instead of student_id if user cannot view student names" do
+    it "uses anonymous_id instead of student_id if user cannot view student names" do
       allow_any_instance_of(Assignment).to receive(:can_view_student_names?).and_return false
       json = api_call_as_user(@teacher, :put, @path, @params)
       expect(json).to eq({

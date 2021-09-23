@@ -24,23 +24,23 @@ describe "grading standards" do
   include_context "in-process server selenium tests"
   include GradingSchemesCommon
 
-  it "should allow creating grading standards", priority: "1", test_id: 163993 do
+  it "allows creating grading standards", priority: "1", test_id: 163993 do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/grading_standards"
     should_add_a_grading_scheme
   end
 
-  it "should allow editing a grading standard", priority: "1", test_id: 210076 do
+  it "allows editing a grading standard", priority: "1", test_id: 210076 do
     course_with_teacher_logged_in
     should_edit_a_grading_scheme(@course, "/courses/#{@course.id}/grading_standards")
   end
 
-  it "should allow deleting grading standards", priority: "1", test_id: 210112 do
+  it "allows deleting grading standards", priority: "1", test_id: 210112 do
     course_with_teacher_logged_in
     should_delete_a_grading_scheme(@course, "/courses/#{@course.id}/grading_standards")
   end
 
-  it "should display correct info when multiple standards are added without refreshing page", priority: "1", test_id: 217598 do
+  it "displays correct info when multiple standards are added without refreshing page", priority: "1", test_id: 217598 do
     course_with_teacher_logged_in
     get "/courses/#{@course.id}/grading_standards"
     should_add_a_grading_scheme(name: "First Grading Standard")
@@ -51,7 +51,7 @@ describe "grading standards" do
     expect(fj("#grading_standard_#{second_grading_standard.id} .standard_title .title")).to include_text("Second Grading Standard")
   end
 
-  it "should allow setting a grading standard for an assignment", priority: "1", test_id: 217599 do
+  it "allows setting a grading standard for an assignment", priority: "1", test_id: 217599 do
     course_with_teacher_logged_in
 
     @assignment = @course.assignments.create!(title: "new assignment")
@@ -92,7 +92,7 @@ describe "grading standards" do
     expect(@assignment.reload.grading_standard_id).to eq @standard.id
   end
 
-  it "should allow setting a grading standard for a course", priority: "1", test_id: 217600 do
+  it "allows setting a grading standard for a course", priority: "1", test_id: 217600 do
     skip_if_safari(:alert)
     course_with_teacher_logged_in
 
@@ -138,7 +138,7 @@ describe "grading standards" do
     expect(is_checked('#course_form #course_grading_standard_enabled')).to be_falsey
   end
 
-  it "should extend ranges to fractional values at the boundary with the next range", priority: "1", test_id: 217597 do
+  it "extends ranges to fractional values at the boundary with the next range", priority: "1", test_id: 217597 do
     student = user_factory(active_all: true)
     course_with_teacher_logged_in(active_all: true)
     @course.enroll_student(student).accept!
@@ -153,7 +153,7 @@ describe "grading standards" do
     expect(f("#final_letter_grade_text").text).to eq 'B+'
   end
 
-  it "should allow editing the standard again without reloading the page", priority: "1", test_id: 217601 do
+  it "allows editing the standard again without reloading the page", priority: "1", test_id: 217601 do
     user_session(account_admin_user)
     @standard = simple_grading_standard(Account.default)
     get("/accounts/#{Account.default.id}/grading_standards")

@@ -23,7 +23,7 @@ describe "help dialog" do
   include_context "in-process server selenium tests"
 
   context "no user logged in" do
-    it "should work with no logged in user" do
+    it "works with no logged in user" do
       Setting.set('show_feedback_link', 'true')
       get("/login")
       f('#footer .help_dialog_trigger').click
@@ -31,7 +31,7 @@ describe "help dialog" do
       expect(f("#help-dialog-options")).to be_displayed
     end
 
-    it "should no longer show a browser warning for IE" do
+    it "noes longer show a browser warning for IE" do
       Setting.set('show_feedback_link', 'true')
       get("/login")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")
@@ -46,7 +46,7 @@ describe "help dialog" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should show the Help dialog when help is clicked and feedback is enabled" do
+    it "shows the Help dialog when help is clicked and feedback is enabled" do
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       expect(f("body")).not_to contain_css('#help_tray')
@@ -66,7 +66,7 @@ describe "help dialog" do
       expect(f("#help_tray a[href='#teacher_feedback']")).to be_displayed
     end
 
-    it "should show the support url link in global nav correctly" do
+    it "shows the support url link in global nav correctly" do
       # if @domain_root_account or Account.default have settings[:support_url] set there should be a link to that site
       support_url = 'http://example.com/support'
       Account.default.update_attribute(:settings, { :support_url => support_url })
@@ -75,7 +75,7 @@ describe "help dialog" do
       expect(link['id']).to eq 'global_nav_help_link'
     end
 
-    it "should allow sending the teacher a message" do
+    it "allows sending the teacher a message" do
       Setting.set('show_feedback_link', 'true')
       course_with_ta(course: @course)
       get "/courses/#{@course.id}"
@@ -111,7 +111,7 @@ describe "help dialog" do
       course_with_teacher_logged_in(:active_all => true)
     end
 
-    it "should not show the Message teacher button if not a student" do
+    it "does not show the Message teacher button if not a student" do
       Setting.set('show_feedback_link', 'true')
       get "/dashboard"
       f('#global_nav_help_link').click
@@ -146,7 +146,7 @@ describe "help dialog" do
       user_logged_in(:active_all => true)
     end
 
-    it "should show the link to root account admins" do
+    it "shows the link to root account admins" do
       Account.default.account_users.create!(:user => @user)
       get "/"
       wait_for_ajaximations
@@ -155,7 +155,7 @@ describe "help dialog" do
       expect(f("#help_tray")).to include_text("Customize this menu")
     end
 
-    it "should not show the link to sub account admins" do
+    it "does not show the link to sub account admins" do
       sub = Account.default.sub_accounts.create!
       sub.account_users.create!(:user => @user)
       get "/"
@@ -173,7 +173,7 @@ describe "help dialog" do
       Account.default.account_users.create!(:user => @user)
     end
 
-    it "should have the default link at the top of the tray" do
+    it "has the default link at the top of the tray" do
       get "/accounts/#{Account.default.id}/settings"
       f('.HelpMenuOptions__Container button').click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click
@@ -189,7 +189,7 @@ describe "help dialog" do
       expect(fxpath("//span[img[@alt = 'Cheerful panda holding a map']]//span[contains(text(),'FEATURED LINK')]")).to include_text("FEATURED LINK")
     end
 
-    it "should have a New Link in the tray" do
+    it "has a New Link in the tray" do
       get "/accounts/#{Account.default.id}/settings"
       f('.HelpMenuOptions__Container button').click
       fj('[role="menuitemradio"] span:contains("Add Custom Link")').click

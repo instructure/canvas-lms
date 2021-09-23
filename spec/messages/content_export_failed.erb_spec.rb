@@ -36,7 +36,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
-      it "should render the content export id" do
+      it "renders the content export id" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("ContentExport:#{asset.id}")
       end
@@ -44,7 +44,7 @@ describe 'content_export_failed' do
 
     context ".email.html" do
       let(:path_type) { :summary }
-      it "should render the content export id" do
+      it "renders the content export id" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("ContentExport:#{asset.id}")
       end
@@ -60,7 +60,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
-      it 'should render the epub export id' do
+      it 'renders the epub export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("EpubExport:#{asset.id}")
       end
@@ -68,7 +68,7 @@ describe 'content_export_failed' do
 
     context ".summary" do
       let(:path_type) { :summary }
-      it 'should render the epub export id' do
+      it 'renders the epub export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("EpubExport:#{asset.id}")
       end
@@ -84,7 +84,7 @@ describe 'content_export_failed' do
 
     context ".email" do
       let(:path_type) { :email }
-      it 'should render the web zip export id' do
+      it 'renders the web zip export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("WebZipExport:#{asset.id}")
       end
@@ -92,7 +92,7 @@ describe 'content_export_failed' do
 
     context ".summary" do
       let(:path_type) { :summary }
-      it 'should render the web zip export id' do
+      it 'renders the web zip export id' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("WebZipExport:#{asset.id}")
       end

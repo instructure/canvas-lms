@@ -29,7 +29,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
     end
 
     ['Only teachers', 'Teachers and students', 'Anyone'].each_with_index do |permission, i|
-      it "should validate correct permissions for #{permission}" do
+      it "validates correct permissions for #{permission}" do
         title = "test_page"
         unpublished = false
         edit_roles = "public"
@@ -49,7 +49,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
     end
 
-    it "should take user to page history" do
+    it "takes user to page history" do
       title = "test_page"
       unpublished = false
       edit_roles = "public"
@@ -68,7 +68,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(ff('.revision').length).to eq 2
     end
 
-    it "should load the previous version of the page and roll-back page" do
+    it "loads the previous version of the page and roll-back page" do
       title = "test_page"
       unpublished = false
       edit_roles = "public"

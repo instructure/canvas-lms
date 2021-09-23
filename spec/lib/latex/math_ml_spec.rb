@@ -108,7 +108,7 @@ describe Latex::MathMl do
           math_ml.parse
         end
 
-        it "should cache" do
+        it "caches" do
           enable_cache do
             expect(CanvasHttp).to receive(:get).and_return(OpenStruct.new(code: '200', body: mml_doc)).once
 

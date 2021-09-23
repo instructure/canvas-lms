@@ -39,7 +39,7 @@ describe "context modules" do
       Account.default.enable_feature!(:commons_favorites)
     end
 
-    it "should be able to launch the index menu tool via the tray", custom_timeout: 30 do
+    it "is able to launch the index menu tool via the tray", custom_timeout: 30 do
       visit_modules_index_page(@course.id)
       modules_index_settings_button.click
       expect(module_index_settings_menu).to include_text("Import Stuff")
@@ -61,7 +61,7 @@ describe "context modules" do
       }] # will replace with the modules on the variable expansion
     end
 
-    it "should be able to launch the individual module menu tool via the tray", custom_timeout: 60 do
+    it "is able to launch the individual module menu tool via the tray", custom_timeout: 60 do
       visit_modules_index_page(@course.id)
       manage_module_button(@module2).click
       expect(module_settings_menu(@module2.id)).to include_text("Import Stuff Here")

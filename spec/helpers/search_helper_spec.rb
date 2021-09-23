@@ -24,7 +24,7 @@ describe SearchHelper do
   include SearchHelper
 
   context "load_all_contexts" do
-    it "should return requested permissions" do
+    it "returns requested permissions" do
       course_factory(active_all: true)
       @current_user = @teacher
 
@@ -89,12 +89,12 @@ describe SearchHelper do
         @shard2.activate { course_with_teacher(:account => Account.create!, :user => @current_user, :active_all => true) }
       end
 
-      it "should include courses from shards other than the user's native shard" do
+      it "includes courses from shards other than the user's native shard" do
         load_all_contexts
         expect(@contexts[:courses]).to have_key(@course.id)
       end
 
-      it "should include sections from shards other than the user's native shard" do
+      it "includes sections from shards other than the user's native shard" do
         # needs at least two sections for any sections to show up
         second_section = @course.course_sections.create!(:name => 'second section')
         load_all_contexts

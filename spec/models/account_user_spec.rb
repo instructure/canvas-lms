@@ -27,7 +27,7 @@ describe AccountUser do
   end
 
   shared_examples_for "touching" do
-    it "should recache permissions when created" do
+    it "recaches permissions when created" do
       enable_cache do
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
         @user.reload
@@ -39,7 +39,7 @@ describe AccountUser do
       end
     end
 
-    it "should recache permissions when deleted" do
+    it "recaches permissions when deleted" do
       enable_cache do
         au = @account.account_users.create!(user: @user)
         @user.shard.activate { User.update_all(:updated_at => 1.month.ago) }
@@ -74,7 +74,7 @@ describe AccountUser do
   end
 
   describe "all_permissions_for" do
-    it "should include granted permissions from multiple roles" do
+    it "includes granted permissions from multiple roles" do
       user = User.create!
       manage_wiki_permissions = { :manage_wiki_create => true, :manage_wiki_update => true, :manage_wiki_delete => true }
       account_admin_user_with_role_changes(:user => user, :role => @role1, :role_changes => { :manage_sis => true })
@@ -99,12 +99,12 @@ describe AccountUser do
       @au2 = Account.default.account_users.create!(user: @user2, role: @role2)
     end
 
-    it "should be symmetric for applies_to everything" do
+    it "is symmetric for applies_to everything" do
       expect(@au1.is_subset_of?(@user2)).to be_truthy
       expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
-    it "should be symmetric for applies_to self" do
+    it "is symmetric for applies_to self" do
       @ro1.applies_to_descendants = false
       @ro1.save!
       @ro2.applies_to_descendants = false
@@ -113,7 +113,7 @@ describe AccountUser do
       expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
-    it "should be symmetric for applies_to descendants" do
+    it "is symmetric for applies_to descendants" do
       @ro1.applies_to_self = false
       @ro1.save!
       @ro2.applies_to_self = false
@@ -122,21 +122,21 @@ describe AccountUser do
       expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
-    it "should properly compute differing applies_to (descendants vs. all)" do
+    it "properlies compute differing applies_to (descendants vs. all)" do
       @ro1.applies_to_self = false
       @ro1.save!
       expect(@au1.is_subset_of?(@user2)).to be_truthy
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
-    it "should properly compute differing applies_to (self vs. all)" do
+    it "properlies compute differing applies_to (self vs. all)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
       expect(@au1.is_subset_of?(@user2)).to be_truthy
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
-    it "should properly compute differing applies_to (self vs. descendants)" do
+    it "properlies compute differing applies_to (self vs. descendants)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
       @ro2.applies_to_self = false
@@ -147,7 +147,7 @@ describe AccountUser do
   end
 
   describe "set_policy" do
-    it "should not allow a lesser admin to create" do
+    it "does not allow a lesser admin to create" do
       lesser_role = custom_account_role('lesser', :account => Account.default)
 
       account_admin_user_with_role_changes(role: lesser_role, role_changes: { manage_account_memberships: true })

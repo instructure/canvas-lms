@@ -31,7 +31,7 @@ describe "Session Timeout" do
         course_with_student(:active_all => true, :user => user_with_pseudonym(:active_user => true))
       end
 
-      it "should time out after 40 minutes of inactivity" do
+      it "times out after 40 minutes of inactivity" do
         login_as
 
         now = Time.now
@@ -43,7 +43,7 @@ describe "Session Timeout" do
         expect(response).to redirect_to "http://www.example.com/login"
       end
 
-      it "should not time out if the user remains active" do
+      it "does not time out if the user remains active" do
         login_as
 
         now = Time.now

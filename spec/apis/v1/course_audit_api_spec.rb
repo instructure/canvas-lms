@@ -29,7 +29,7 @@ describe "CourseAudit API", type: :request do
       course_factory
     end
 
-    it "should 404" do
+    it "404S" do
       raw_api_call(:get, "/api/v1/audit/course/courses/#{@course.id}", controller: 'course_audit_api', action: "for_course", course_id: @course.id.to_s, format: 'json')
       assert_status(404)
     end
@@ -104,7 +104,7 @@ describe "CourseAudit API", type: :request do
     end
 
     context "nominal cases" do
-      it "should include events at context endpoint" do
+      it "includes events at context endpoint" do
         expect_event_for_context(@course, @event)
         expect_event_for_context(@domain_root_account, @event)
 
@@ -130,12 +130,12 @@ describe "CourseAudit API", type: :request do
         @event2 = Auditors::Course::Stream.insert(record)
       end
 
-      it "should recognize :start_time" do
+      it "recognizes :start_time" do
         json = expect_event_for_context(@course, @event, start_time: 12.hours.ago)
         forbid_event_for_context(@course, @event2, start_time: 12.hours.ago, json: json)
       end
 
-      it "should recognize :end_time" do
+      it "recognizes :end_time" do
         json = forbid_event_for_context(@course, @event, end_time: 12.hours.ago)
         expect_event_for_context(@course, @event2, end_time: 12.hours.ago, json: json)
       end
@@ -147,28 +147,28 @@ describe "CourseAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "should 200 for inactive courses" do
+      it "200S for inactive courses" do
         @course.destroy
         fetch_for_context(@course, expected_status: 200)
       end
     end
 
     describe "permissions" do
-      it "should not authorize the endpoints with no permissions" do
+      it "does not authorize the endpoints with no permissions" do
         @user, @viewing_user = @user, user_model
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@domain_root_account, expected_status: 401)
       end
 
-      it "should not authorize the endpoints with revoking the :view_course_changes permission" do
+      it "does not authorize the endpoints with revoking the :view_course_changes permission" do
         RoleOverride.manage_role_override(@account_user.account, @account_user.role, :view_course_changes.to_s, :override => false)
 
         fetch_for_context(@course, expected_status: 401)
         fetch_for_context(@domain_root_account, expected_status: 401)
       end
 
-      it "should not allow other account models" do
+      it "does not allow other account models" do
         new_root_account = Account.create!(name: 'New Account')
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @viewing_user = user_with_pseudonym(account: new_root_account)
@@ -184,11 +184,11 @@ describe "CourseAudit API", type: :request do
         @json = fetch_for_context(@course, per_page: 2)
       end
 
-      it "should only return one page of results" do
+      it "onlies return one page of results" do
         expect(@json['events'].size).to eq 2
       end
 
-      it "should have pagination headers" do
+      it "has pagination headers" do
         expect(response.headers['Link']).to match(/rel="next"/)
       end
     end

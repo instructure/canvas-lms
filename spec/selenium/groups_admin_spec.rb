@@ -25,7 +25,7 @@ describe 'account groups' do
   include GroupsCommon
 
   describe 'as an admin' do
-    it 'should list uncategorized groups' do
+    it 'lists uncategorized groups' do
       a = Account.default
       admin_logged_in
       # no group category means uncategorized

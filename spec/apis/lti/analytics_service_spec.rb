@@ -49,12 +49,12 @@ describe LtiApiController, type: :request do
   end
 
   context 'xAPI' do
-    it "should require a content-type of application/json" do
+    it "requires a content-type of application/json" do
       make_call('content-type' => 'application/xml')
       assert_status(415)
     end
 
-    it "should require the correct shared secret" do
+    it "requires the correct shared secret" do
       make_call('secret' => 'bad secret is bad')
       assert_status(401)
     end
@@ -84,7 +84,7 @@ describe LtiApiController, type: :request do
       }
     end
 
-    it "should increment activity time" do
+    it "increments activity time" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
@@ -94,7 +94,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
 
-    it "should create an asset user access" do
+    it "creates an asset user access" do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
@@ -106,7 +106,7 @@ describe LtiApiController, type: :request do
     describe "page view creation" do
       before { Setting.set 'enable_page_views', 'db' }
 
-      it "should include url and interaction_seconds" do
+      it "includes url and interaction_seconds" do
         page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
         previous_count = page_views.count
         body = xapi_body
@@ -121,7 +121,7 @@ describe LtiApiController, type: :request do
       end
     end
 
-    it "should handle requests without durations" do
+    it "handles requests without durations" do
       body = xapi_body
       body.delete(:result)
       make_call('body' => body)
@@ -130,7 +130,7 @@ describe LtiApiController, type: :request do
   end
 
   context 'caliper' do
-    it "should require the correct shared secret" do
+    it "requires the correct shared secret" do
       make_call('secret' => 'bad secret is bad', 'path' => "/api/lti/v1/caliper/#{@token}")
       assert_status(401)
     end
@@ -161,7 +161,7 @@ describe LtiApiController, type: :request do
       }
     end
 
-    it "should increment activity time" do
+    it "increments activity time" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
@@ -171,7 +171,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
 
-    it "should not increment activity time for different event types" do
+    it "does not increment activity time for different event types" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
       body = caliper_body
@@ -183,7 +183,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time
     end
 
-    it "should create an asset user access" do
+    it "creates an asset user access" do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
@@ -195,7 +195,7 @@ describe LtiApiController, type: :request do
     describe "page view creation" do
       before { Setting.set 'enable_page_views', 'db' }
 
-      it "should include url and interaction_seconds" do
+      it "includes url and interaction_seconds" do
         page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
         previous_count = page_views.count
         body = caliper_body
@@ -210,7 +210,7 @@ describe LtiApiController, type: :request do
       end
     end
 
-    it "should handle requests without durations" do
+    it "handles requests without durations" do
       body = caliper_body
       body.delete('duration')
       make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")

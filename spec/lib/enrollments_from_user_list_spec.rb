@@ -38,24 +38,24 @@ describe EnrollmentsFromUserList do
   end
 
   context "initialized object" do
-    it "should initialize with a course id" do
+    it "initializes with a course id" do
       expect { EnrollmentsFromUserList.new }.to raise_error(ArgumentError, /^wrong number of arguments/)
       e = EnrollmentsFromUserList.new(@course)
       expect(e.course).to eql(@course)
     end
 
-    it "should process with an user list" do
+    it "processes with an user list" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? { |e| expect(e).to be_is_a(StudentEnrollment) }
     end
 
-    it "should process repeat addresses without creating new users" do
+    it "processes repeat addresses without creating new users" do
       @el = UserList.new(list_to_parse_with_repeats)
       enrollments = EnrollmentsFromUserList.process(@el, @course)
       expect(enrollments.length).to eql(3)
     end
 
-    it "should respect the section option when a user is already enrolled in another section" do
+    it "respects the section option when a user is already enrolled in another section" do
       othersection = @course.course_sections.create! name: 'othersection'
       @teacher.pseudonyms.create! unique_id: 'teacher@example.com'
       @el = UserList.new('teacher@example.com')
@@ -66,7 +66,7 @@ describe EnrollmentsFromUserList do
   end
 
   context "EnrollmentsFromUserList.process" do
-    it "should be able to process from the class" do
+    it "is able to process from the class" do
       enrollments = EnrollmentsFromUserList.process(@el, @course)
       enrollments.all? { |e| expect(e).to be_is_a(StudentEnrollment) }
     end

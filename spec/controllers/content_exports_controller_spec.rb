@@ -25,7 +25,7 @@ describe ContentExportsController do
   include K5Common
 
   describe "POST 'create'" do
-    it "should explicitly export everything" do
+    it "explicitlies export everything" do
       course_with_teacher_logged_in(:active_all => true)
       post 'create', params: { :course_id => @course.id }
       expect(response).to be_successful
@@ -107,19 +107,19 @@ describe ContentExportsController do
       end
 
       describe "show" do
-        it "should find course exports" do
+        it "finds course exports" do
           user_session(@teacher)
           get :show, params: { course_id: @course.id, id: @acx.id }
           expect(response).to be_successful
         end
 
-        it "should find teacher's file exports" do
+        it "finds teacher's file exports" do
           user_session(@teacher)
           get :show, params: { course_id: @course.id, id: @tzx.id }
           expect(response).to be_successful
         end
 
-        it "should not find other's file exports" do
+        it "does not find other's file exports" do
           user_session(@teacher)
           get :show, params: { course_id: @course.id, id: @szx.id }
           assert_status(404)
@@ -137,7 +137,7 @@ describe ContentExportsController do
       end
 
       describe "index" do
-        it "should show one's own exports" do
+        it "shows one's own exports" do
           user_session(@student)
           get :index
           expect(response).to be_successful
@@ -146,13 +146,13 @@ describe ContentExportsController do
       end
 
       describe "show" do
-        it "should find one's own export" do
+        it "finds one's own export" do
           user_session(@student)
           get :show, params: { id: @sdx.id }
           expect(response).to be_successful
         end
 
-        it "should not find another's export" do
+        it "does not find another's export" do
           user_session(@student)
           get :show, params: { id: @tzx.id }
           assert_status(404)

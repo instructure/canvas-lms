@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DelayedMessage do
-  it "should create a new instance given valid attributes" do
+  it "creates a new instance given valid attributes" do
     delayed_message_model
   end
 
@@ -30,44 +30,44 @@ describe DelayedMessage do
       DelayedMessage.delete_all
     end
 
-    it "should have scope for :daily" do
+    it "has scope for :daily" do
       delayed_message_model(:frequency => 'daily')
       expect(DelayedMessage.for(:daily)).to eq [@delayed_message]
     end
 
-    it "should scope for :weekly" do
+    it "scopes for :weekly" do
       delayed_message_model(:frequency => 'weekly')
       expect(DelayedMessage.for(:weekly)).to eq [@delayed_message]
     end
 
-    it "should scope for notification" do
+    it "scopes for notification" do
       notification_model
       delayed_message_model
       expect(DelayedMessage.for(@notification)).to eq [@delayed_message]
     end
 
-    it "should scope for notification_policy" do
+    it "scopes for notification_policy" do
       notification_policy_model
       delayed_message_model(:notification_policy_id => @notification_policy.id)
       expect(@notification_policy).to be_is_a(NotificationPolicy)
       expect(DelayedMessage.for(@notification_policy)).to eq [@delayed_message]
     end
 
-    it "should scope for communication_channel" do
+    it "scopes for communication_channel" do
       communication_channel_model
       delayed_message_model(:communication_channel_id => @communication_channel.id)
       expect(@communication_channel).to be_is_a(CommunicationChannel)
       expect(DelayedMessage.for(@communication_channel)).to eq [@delayed_message]
     end
 
-    it "should scope for context" do
+    it "scopes for context" do
       delayed_message_model
       @delayed_message.context = assignment_model
       @delayed_message.save!
       expect(DelayedMessage.for(@assignment)).to eq [@delayed_message]
     end
 
-    it "should have a scope to filter by the state" do
+    it "has a scope to filter by the state" do
       notification = notification_model :name => 'New Stuff'
       delayed_message_model(:workflow_state => 'pending')
       delayed_message_model(:workflow_state => 'cancelled')
@@ -86,22 +86,22 @@ describe DelayedMessage do
       delayed_message_model
     end
 
-    it "should start the workflow with pending" do
+    it "starts the workflow with pending" do
       expect(@delayed_message.state).to eql(:pending)
     end
 
-    it "should should be able to go to cancelled from pending" do
+    it "shoulds be able to go to cancelled from pending" do
       @delayed_message.cancel
       expect(@delayed_message.state).to eql(:cancelled)
     end
 
-    it "should be able to be sent from pending" do
+    it "is able to be sent from pending" do
       @delayed_message.begin_send
       expect(@delayed_message.state).to eql(:sent)
     end
   end
 
-  it "should use the user's main account domain for links" do
+  it "uses the user's main account domain for links" do
     Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
@@ -117,7 +117,7 @@ describe DelayedMessage do
     expect(message.body.to_s).to match(%r{http://dm.dummy.test.host/})
   end
 
-  it 'should return nil if the delayed messages are using a retired communication channel' do
+  it 'returns nil if the delayed messages are using a retired communication channel' do
     Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
     account = Account.create!(:name => 'new acct')
     user = user_with_pseudonym(:account => account)
@@ -145,7 +145,7 @@ describe DelayedMessage do
   context "sharding" do
     specs_require_sharding
 
-    it "should create messages on the user's shard" do
+    it "creates messages on the user's shard" do
       Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
 
       @shard1.activate do
@@ -192,20 +192,20 @@ describe DelayedMessage do
       @dm = DelayedMessage.new(:context => @account, :communication_channel => @user.communication_channel)
     end
 
-    it "should do nothing if the CC isn't set yet" do
+    it "does nothing if the CC isn't set yet" do
       @dm.communication_channel = nil
       @dm.send(:set_send_at)
       expect(@dm.send_at).to be_nil
     end
 
-    it "should do nothing if send_at is already set" do
+    it "does nothing if send_at is already set" do
       send_at = @true_now - 5.days
       @dm.send_at = send_at
       @dm.send(:set_send_at)
       expect(@dm.send_at).to eq send_at
     end
 
-    it "should set to 6pm in the user's time zone for non-weekly messages" do
+    it "sets to 6pm in the user's time zone for non-weekly messages" do
       Timecop.freeze(@central.now.change(:hour => 12)) do
         @dm.frequency = 'daily'
         @dm.send(:set_send_at)
@@ -213,7 +213,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should set to 6pm in the Mountain time zone for non-weekly messages when the user hasn't set a time zone" do
+    it "sets to 6pm in the Mountain time zone for non-weekly messages when the user hasn't set a time zone" do
       @user.time_zone = nil
       @user.save
 
@@ -224,7 +224,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should set to 6pm the next day for non-weekly messages created after 6pm" do
+    it "sets to 6pm the next day for non-weekly messages created after 6pm" do
       Timecop.freeze(@central.now.change(:hour => 20)) do
         @dm.frequency = 'daily'
         @dm.send(:set_send_at)
@@ -232,7 +232,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should set to next saturday (Eastern-time) for weekly messages" do
+    it "sets to next saturday (Eastern-time) for weekly messages" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
       sunday = saturday + 1.day
@@ -250,7 +250,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should set to next saturday (Eastern-time) for weekly messages scheduled later saturday" do
+    it "sets to next saturday (Eastern-time) for weekly messages scheduled later saturday" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
 
@@ -266,7 +266,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should use the same time of day across weeks for weekly messages for the same user" do
+    it "uses the same time of day across weeks for weekly messages for the same user" do
       # anchor to January 1st to avoid DST; we're consigned to slightly weird
       # behavior around DST, but don't want it failing tests
       monday = @eastern.now.change(:month => 1, :day => 1).monday
@@ -285,7 +285,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should spread weekly messages for users in different accounts over the windows" do
+    it "spreads weekly messages for users in different accounts over the windows" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
 
@@ -307,7 +307,7 @@ describe DelayedMessage do
       end
     end
 
-    it "should spread weekly messages for different users in the same account over the same window" do
+    it "spreads weekly messages for different users in the same account over the same window" do
       monday = @eastern.now.monday
       saturday = monday + 5.days
 

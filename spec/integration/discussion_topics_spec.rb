@@ -28,7 +28,7 @@ describe "discussion_topics" do
     @topic = DiscussionTopic.where(assignment_id: @assignment).first
   end
 
-  it "should show assignment group discussions without errors" do
+  it "shows assignment group discussions without errors" do
     course_with_student_logged_in(:course => @course, :active_all => true)
     group_assignment_discussion(course: @course)
     @group.users << @user
@@ -43,7 +43,7 @@ describe "discussion_topics" do
     expect(response).to be_successful
   end
 
-  it "should show a course name for group subtopics" do
+  it "shows a course name for group subtopics" do
     course_with_student_logged_in(:active_all => true)
     @course.update_attribute(:short_name, "some name")
     group_assignment_discussion(course: @course)
@@ -56,7 +56,7 @@ describe "discussion_topics" do
     expect(link_text).to eq @course.short_name
   end
 
-  it "should not allow concluded students to update topic" do
+  it "does not allow concluded students to update topic" do
     student_enrollment = course_with_student(:course => @course, :active_all => true)
     @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @user)
     @topic.save!
@@ -66,7 +66,7 @@ describe "discussion_topics" do
     expect(@topic.grants_right?(@user, :update)).not_to be
   end
 
-  it "should allow teachers to edit concluded students topics" do
+  it "allows teachers to edit concluded students topics" do
     course_with_teacher(:course => @course, :user => @teacher, :active_enrollment => true)
     student_enrollment = course_with_student(:course => @course, :user => @student, :active_enrollment => true)
     @topic = DiscussionTopic.new(:context => @course, :title => "will this work?", :user => @student)
@@ -77,7 +77,7 @@ describe "discussion_topics" do
     expect(@topic.grants_right?(@teacher, :update)).to be
   end
 
-  it "should show speed grader button" do
+  it "shows speed grader button" do
     course_with_teacher_logged_in(:active_all => true)
     discussion_assignment
 
@@ -87,7 +87,7 @@ describe "discussion_topics" do
     expect(doc.at_css('.admin-links .icon-speed-grader')).not_to be_nil
   end
 
-  it "should show peer reviews button" do
+  it "shows peer reviews button" do
     course_with_teacher_logged_in(:active_all => true)
     discussion_assignment
     @assignment.peer_reviews = true

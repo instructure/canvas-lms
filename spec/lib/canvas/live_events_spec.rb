@@ -119,7 +119,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".conversation_created" do
-    it "should trigger a conversation live event with conversation details" do
+    it "triggers a conversation live event with conversation details" do
       user1 = user_model
       user2 = user_model
       conversation = conversation(user1, user2)
@@ -132,13 +132,13 @@ describe Canvas::LiveEvents do
   end
 
   describe ".enrollment_updated" do
-    it "should not include associated_user_id for non-observer enrollments" do
+    it "does not include associated_user_id for non-observer enrollments" do
       enrollment = course_with_student
       expect_event('enrollment_updated', hash_excluding(:associated_user_id))
       Canvas::LiveEvents.enrollment_updated(enrollment)
     end
 
-    it "should include non-nil associated_user_id for assigned observer enrollment" do
+    it "includes non-nil associated_user_id for assigned observer enrollment" do
       observee = user_model
       enrollment = course_with_observer
       enrollment.associated_user = observee
@@ -151,7 +151,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.group_category_created' do
-    it 'should include the context' do
+    it 'includes the context' do
       course = course_model
       group_category = group_category(context: course, group_limit: 2)
       expect_event('group_category_created',
@@ -165,7 +165,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.group_category_updated' do
-    it 'should include the context' do
+    it 'includes the context' do
       course = course_model
       group_category = group_category(context: course, group_limit: 2)
       expect_event('group_category_updated',
@@ -179,7 +179,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".group_updated" do
-    it "should include the context" do
+    it "includes the context" do
       course = course_model
       group = group_model(context: course, max_membership: 2)
       expect_event('group_updated',
@@ -192,7 +192,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.group_updated(group)
     end
 
-    it "should include the account" do
+    it "includes the account" do
       account = account_model
       course = course_model(account: account)
       group = group_model(context: course)
@@ -204,7 +204,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.group_updated(group)
     end
 
-    it "should include the workflow_state" do
+    it "includes the workflow_state" do
       group = group_model
       expect_event('group_updated',
                    hash_including(
@@ -216,7 +216,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".group_membership_updated" do
-    it "should include the workflow_state" do
+    it "includes the workflow_state" do
       user = user_model
       group = group_model
       membership = group_membership_model(group: group, user: user)
@@ -240,7 +240,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.wiki_page_updated(@page, @page.title_changed? ? @page.title_was : nil, @page.body_changed? ? @page.body_was : nil)
     end
 
-    it "should not set old_title or old_body if they don't change" do
+    it "does not set old_title or old_body if they don't change" do
       expect_event('wiki_page_updated', {
                      wiki_page_id: @page.global_id.to_s,
                      title: "old title",
@@ -250,7 +250,7 @@ describe Canvas::LiveEvents do
       wiki_page_updated
     end
 
-    it "should set old_title if the title changed" do
+    it "sets old_title if the title changed" do
       @page.title = "new title"
 
       expect_event('wiki_page_updated', {
@@ -263,7 +263,7 @@ describe Canvas::LiveEvents do
       wiki_page_updated
     end
 
-    it "should set old_body if the body changed" do
+    it "sets old_body if the body changed" do
       @page.body = "new body"
 
       expect_event('wiki_page_updated', {
@@ -285,7 +285,7 @@ describe Canvas::LiveEvents do
       @convo.add_message(@user1, 'Hi! You are doing great...')
     end
 
-    it "should trigger live event if a new user is added to a conversation" do
+    it "triggers live event if a new user is added to a conversation" do
       @user3 = user_model
       @convo.add_participants(@user1, [@user3])
       expect_event('conversation_forwarded',
@@ -297,7 +297,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".conversation_message_created" do
-    it "should include the author id, conversation message id, and conversation id" do
+    it "includes the author id, conversation message id, and conversation id" do
       user1 = user_model
       user2 = user_model
       convo = Conversation.initiate([user1, user2], false)
@@ -318,7 +318,7 @@ describe Canvas::LiveEvents do
       @course = Course.create!
     end
 
-    it 'should include the course context, current scores and old scores' do
+    it 'includes the course context, current scores and old scores' do
       enrollment_model
       score = Score.new(
         course_score: true, enrollment: @enrollment,
@@ -343,7 +343,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".grade_changed" do
-    it "should set the grader to nil for an autograded quiz" do
+    it "sets the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
       expect_event('grade_change', hash_including({
@@ -358,7 +358,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(@quiz_submission.submission, @quiz_submission.submission.versions.current.model)
     end
 
-    it "should set the grader when a teacher grades an assignment" do
+    it "sets the grader when a teacher grades an assignment" do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
@@ -377,7 +377,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(submission)
     end
 
-    it "should include the user_id and assignment_id" do
+    it "includes the user_id and assignment_id" do
       course_with_student_submissions
       submission = @course.assignments.first.submissions.first
 
@@ -392,7 +392,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
-    it "should include the student_sis_id if present" do
+    it "includes the student_sis_id if present" do
       course_with_student_submissions
       user_with_pseudonym(user: @student)
       @pseudonym.sis_user_id = 'sis-id-1'
@@ -406,7 +406,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(submission, 0)
     end
 
-    it "should include previous score attributes" do
+    it "includes previous score attributes" do
       course_with_student_submissions submission_points: true
       submission = @course.assignments.first.submissions.first
 
@@ -419,7 +419,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.grade_changed(submission, submission.versions.current.model)
     end
 
-    it "should include previous points_possible attributes" do
+    it "includes previous points_possible attributes" do
       course_with_student_submissions
       assignment = @course.assignments.first
       assignment.points_possible = 5
@@ -558,7 +558,7 @@ describe Canvas::LiveEvents do
     before { submission }
 
     shared_examples_for 'a submission event' do |event_name|
-      it "should include the user_id and assignment_id" do
+      it "includes the user_id and assignment_id" do
         expect_event(
           event_name,
           hash_including(
@@ -573,7 +573,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.send(event_name.to_sym, submission)
       end
 
-      it 'should include the group_id if assignment is a group assignment' do
+      it 'includes the group_id if assignment is a group assignment' do
         submission.update(group: group)
 
         expect_event(
@@ -598,7 +598,7 @@ describe Canvas::LiveEvents do
           )
         end
 
-        it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
+        it 'includes the associated_integration_id if there is an installed tool proxy with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(
             tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com',
@@ -626,7 +626,7 @@ describe Canvas::LiveEvents do
           Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
 
-        it 'should temporarily include multiple associated_integration_ids if there is an installed tool proxy' do
+        it 'temporarilies include multiple associated_integration_ids if there is an installed tool proxy' do
           submission.assignment.assignment_configuration_tool_lookups.create!(
             tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com',
@@ -654,7 +654,7 @@ describe Canvas::LiveEvents do
           Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
 
-        it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
+        it 'does not include the associated_integration_id if there is no longer an installed tool with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
                                                                               tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
@@ -677,7 +677,7 @@ describe Canvas::LiveEvents do
     describe ".submission_updated" do
       it_behaves_like 'a submission event', 'submission_updated'
 
-      it 'should include late and missing flags' do
+      it 'includes late and missing flags' do
         submission.update(late_policy_status: 'missing')
 
         expect_event(
@@ -691,7 +691,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.submission_updated(submission)
       end
 
-      it 'should include posted_at' do
+      it 'includes posted_at' do
         post_time = Time.zone.now
         submission.update(posted_at: post_time)
 
@@ -747,7 +747,7 @@ describe Canvas::LiveEvents do
     end
 
     describe '.submission_comment_created' do
-      it 'should trigger a submission comment created live event' do
+      it 'triggers a submission comment created live event' do
         comment = submission.submission_comments.create!(
           comment: "here is a comment",
           submission_id: submission.id, author_id: @student.id
@@ -770,7 +770,7 @@ describe Canvas::LiveEvents do
   end
 
   describe ".asset_access" do
-    it "should trigger a live event without an asset subtype" do
+    it "triggers a live event without an asset subtype" do
       course_factory
 
       expect_event('asset_accessed', {
@@ -786,7 +786,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access(@course, 'category', 'role', 'participation')
     end
 
-    it "should trigger a live event with an asset subtype" do
+    it "triggers a live event with an asset subtype" do
       course_factory
 
       expect_event('asset_accessed', {
@@ -818,7 +818,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access(@page, 'category', 'role', 'participation')
     end
 
-    it "should include filename and display_name if asset is an attachment" do
+    it "includes filename and display_name if asset is an attachment" do
       attachment_model
 
       expect_event('asset_accessed', {
@@ -836,7 +836,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation')
     end
 
-    it "should provide a different context if a different context is provided" do
+    it "provides a different context if a different context is provided" do
       attachment_model
       context = OpenStruct.new(global_id: '1')
 
@@ -860,7 +860,7 @@ describe Canvas::LiveEvents do
       Canvas::LiveEvents.asset_access(@attachment, 'files', 'role', 'participation', context: context)
     end
 
-    it "should include enrollment data if provided" do
+    it "includes enrollment data if provided" do
       course_with_student
 
       expect_event('asset_accessed', {
@@ -922,7 +922,7 @@ describe Canvas::LiveEvents do
         )
       end
 
-      it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
+      it 'includes the associated_integration_id if there is an installed tool proxy with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(
           tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com',
@@ -946,7 +946,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.assignment_created(@assignment)
       end
 
-      it 'should temporarily include multiple associated_integration_ids if there is an installed tool proxy' do
+      it 'temporarilies include multiple associated_integration_ids if there is an installed tool proxy' do
         @assignment.assignment_configuration_tool_lookups.create!(
           tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com',
@@ -970,7 +970,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.assignment_created(@assignment)
       end
 
-      it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
+      it 'does not include the associated_integration_id if there is no longer an installed tool with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(
           tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com',
@@ -1029,7 +1029,7 @@ describe Canvas::LiveEvents do
         )
       end
 
-      it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
+      it 'includes the associated_integration_id if there is an installed tool proxy with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(
           tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com',
@@ -1054,7 +1054,7 @@ describe Canvas::LiveEvents do
         Canvas::LiveEvents.assignment_updated(@assignment)
       end
 
-      it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
+      it 'does not include the associated_integration_id if there is no longer an installed tool with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
                                                                   tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
@@ -1239,7 +1239,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.course_section_created' do
-    it 'should trigger a course section creation live event' do
+    it 'triggers a course section creation live event' do
       course_with_student_submissions
       section = @course.course_sections.first
 
@@ -1268,7 +1268,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.course_section_updated' do
-    it 'should trigger a course section creation live event' do
+    it 'triggers a course section creation live event' do
       course_with_student_submissions
       section = @course.course_sections.first
 
@@ -1320,7 +1320,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.quizzes_next_quiz_duplicated' do
-    it 'should trigger a quiz duplicated live event' do
+    it 'triggers a quiz duplicated live event' do
       event_payload = {
         original_course_id: '1234',
         new_course_id: '5678',
@@ -1336,7 +1336,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.module_created' do
-    it 'should trigger a context module created live event' do
+    it 'triggers a context module created live event' do
       course_with_student_submissions
       context_module = ContextModule.create!(context: @course)
 
@@ -1356,7 +1356,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.module_updated' do
-    it 'should trigger a context module updated live event' do
+    it 'triggers a context module updated live event' do
       course_with_student_submissions
       context_module = ContextModule.create!(context: @course)
 
@@ -1376,7 +1376,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.module_item_created' do
-    it 'should trigger a context module item created live event' do
+    it 'triggers a context module item created live event' do
       course_with_student_submissions
       context_module = ContextModule.create!(context: @course)
       content_tag = ContentTag.create!(
@@ -1402,7 +1402,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.module_item_updated' do
-    it 'should trigger a context module updated live event' do
+    it 'triggers a context module updated live event' do
       course_with_student_submissions
       context_module = ContextModule.create!(context: @course)
       content_tag = ContentTag.create!(
@@ -1428,7 +1428,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.course_completed' do
-    it 'should trigger a course completed live event' do
+    it 'triggers a course completed live event' do
       course = course_model(sis_source_id: "abc123")
       user = user_model
       context_module = course.context_modules.create!
@@ -1448,7 +1448,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.course_progress' do
-    it 'should trigger a course progress live event' do
+    it 'triggers a course progress live event' do
       course = course_model(sis_source_id: "abc123")
       user = user_model
       context_module = course.context_modules.create!
@@ -1492,7 +1492,7 @@ describe Canvas::LiveEvents do
   end
 
   describe '.discussion_topic_created' do
-    it 'should trigger a discussion topic created live event' do
+    it 'triggers a discussion topic created live event' do
       course = course_model
       assignment = course.assignments.create!
       topic = course.discussion_topics.create!(
@@ -1520,7 +1520,7 @@ describe Canvas::LiveEvents do
 
   describe '.discussion_entry_submitted' do
     context 'with non graded discussion' do
-      it 'should create a discussion entry created live event' do
+      it 'creates a discussion entry created live event' do
         course_with_student
         topic = @course.discussion_topics.create!(
           title: "test title",
@@ -1544,7 +1544,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'with graded discussion' do
-      it 'should include assignment and submission in created live event' do
+      it 'includes assignment and submission in created live event' do
         course_with_student_submissions
         assignment = @course.assignments.first
         submission = assignment.submission_for_student_id(@student.id)
@@ -1601,7 +1601,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should include result in created live event' do
+      it 'includes result in created live event' do
         expect_event('learning_outcome_result_created', {
           learning_outcome_id: result.learning_outcome_id.to_s,
           mastery: result.mastery,
@@ -1623,7 +1623,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should include result in updated live event' do
+      it 'includes result in updated live event' do
         result.update!(attempt: 1)
         expect_event('learning_outcome_result_updated', {
           learning_outcome_id: result.learning_outcome_id.to_s,
@@ -1649,7 +1649,7 @@ describe Canvas::LiveEvents do
 
   describe 'user' do
     context 'created' do
-      it 'should trigger a user_created live event' do
+      it 'triggers a user_created live event' do
         user_with_pseudonym
 
         expect_event('user_created', {
@@ -1669,7 +1669,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger a user_updated live event' do
+      it 'triggers a user_updated live event' do
         user_with_pseudonym
 
         @user.update!(name: "Test Name")
@@ -1697,7 +1697,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger a learning_outcome_created live event' do
+      it 'triggers a learning_outcome_created live event' do
         outcome_model
 
         expect_event('learning_outcome_created', {
@@ -1720,7 +1720,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger a learning_outcome_updated live event' do
+      it 'triggers a learning_outcome_updated live event' do
         outcome_model
 
         @outcome.update!(short_description: 'this is new')
@@ -1752,7 +1752,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger a learning_outcome_group_created live event' do
+      it 'triggers a learning_outcome_group_created live event' do
         outcome_group_model
 
         expect_event('learning_outcome_group_created', {
@@ -1771,7 +1771,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger a learning_outcome_group_updated live event' do
+      it 'triggers a learning_outcome_group_updated live event' do
         outcome_group_model
 
         @outcome_group.update!(title: 'this is new')
@@ -1799,7 +1799,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger a learning_outcome_link_created live event' do
+      it 'triggers a learning_outcome_link_created live event' do
         outcome_model
         outcome_group_model
 
@@ -1819,7 +1819,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger a learning_outcome_link_updated live event' do
+      it 'triggers a learning_outcome_link_updated live event' do
         outcome_model
         outcome_group_model
 
@@ -1861,7 +1861,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger an outcome_proficiency_created live event' do
+      it 'triggers an outcome_proficiency_created live event' do
         expect_event('outcome_proficiency_created', {
           outcome_proficiency_id: @proficiency.id.to_s,
           context_id: @proficiency.context_id.to_s,
@@ -1875,7 +1875,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger an outcome_proficiency_updated live event' do
+      it 'triggers an outcome_proficiency_updated live event' do
         @proficiency.outcome_proficiency_ratings = [@rating1]
         @proficiency.save!
         expect_event('outcome_proficiency_updated', {
@@ -1898,7 +1898,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger an outcome_calculation_method_created live event' do
+      it 'triggers an outcome_calculation_method_created live event' do
         expect_event('outcome_calculation_method_created', {
           outcome_calculation_method_id: @calculation_method.id.to_s,
           calculation_int: @calculation_method.calculation_int,
@@ -1913,7 +1913,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger an outcome_calculation_method_updated live event' do
+      it 'triggers an outcome_calculation_method_updated live event' do
         expect_event('outcome_calculation_method_updated', {
           outcome_calculation_method_id: @calculation_method.id.to_s,
           calculation_int: @calculation_method.calculation_int,
@@ -1954,7 +1954,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'created' do
-      it 'should trigger an outcome_friendly_description_created live event' do
+      it 'triggers an outcome_friendly_description_created live event' do
         expect_event('outcome_friendly_description_created', {
                        outcome_friendly_description_id: @friendlyDescription.id.to_s,
                        context_type: @friendlyDescription.context_type,
@@ -1970,7 +1970,7 @@ describe Canvas::LiveEvents do
     end
 
     context 'updated' do
-      it 'should trigger an outcome_friendly_description_updated live event' do
+      it 'triggers an outcome_friendly_description_updated live event' do
         new_description = 'A new friendly description'
         @friendlyDescription.description = new_description
         @friendlyDescription.save!

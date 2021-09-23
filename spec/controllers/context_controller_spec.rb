@@ -27,12 +27,12 @@ describe ContextController do
   end
 
   describe "GET 'roster'" do
-    it 'should require authorization' do
+    it 'requires authorization' do
       get 'roster', params: { course_id: @course.id }
       assert_unauthorized
     end
 
-    it 'should work when the context is a group in a course' do
+    it 'works when the context is a group in a course' do
       user_session(@student)
       @group = @course.groups.create!
       @group.add_user(@student, 'accepted')
@@ -42,7 +42,7 @@ describe ContextController do
                                                                                              .map(&:id)
     end
 
-    it 'should only show active group members to students' do
+    it 'onlies show active group members to students' do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
       inactive_student = user_factory
@@ -59,7 +59,7 @@ describe ContextController do
       ]
     end
 
-    it 'should only show active course instructors to students' do
+    it 'onlies show active course instructors to students' do
       active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
       inactive_teacher = user_factory
@@ -74,7 +74,7 @@ describe ContextController do
       expect(teacher_ids & [active_teacher.id, inactive_teacher.id]).to eq [active_teacher.id]
     end
 
-    it 'should show all group members to admins' do
+    it 'shows all group members to admins' do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
       inactive_student = user_factory
@@ -91,7 +91,7 @@ describe ContextController do
       ]
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(
         :tab_configuration,
@@ -121,12 +121,12 @@ describe ContextController do
   end
 
   describe "GET 'roster_user'" do
-    it 'should require authorization' do
+    it 'requires authorization' do
       get 'roster_user', params: { course_id: @course.id, id: @user.id }
       assert_unauthorized
     end
 
-    it 'should assign variables' do
+    it 'assigns variables' do
       user_session(@teacher)
       @enrollment = @course.enroll_student(user_factory(active_all: true))
       @enrollment.accept!
@@ -299,12 +299,12 @@ describe ContextController do
       @hmac = Canvas::Security.hmac_sha1(@data)
     end
 
-    it 'should require a valid HMAC' do
+    it 'requires a valid HMAC' do
       post 'object_snippet', params: { object_data: @data, s: 'DENIED' }
       assert_status(400)
     end
 
-    it 'should render given a correct HMAC' do
+    it 'renders given a correct HMAC' do
       post 'object_snippet', params: { object_data: @data, s: @hmac }
       expect(response).to be_successful
       expect(response['X-XSS-Protection']).to eq '0'
@@ -312,7 +312,7 @@ describe ContextController do
   end
 
   describe "GET '/media_objects/:id/thumbnail" do
-    it 'should redirect to kaltura even if the MediaObject does not exist' do
+    it 'redirects to kaltura even if the MediaObject does not exist' do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return(
         'http://example.com/thumbnail_redirect'
@@ -329,14 +329,14 @@ describe ContextController do
       user_session(@student)
     end
 
-    it 'should match the create_media_object route' do
+    it 'matches the create_media_object route' do
       assert_recognizes(
         { controller: 'context', action: 'create_media_object' },
         { path: 'media_objects', method: :post }
       )
     end
 
-    it 'should update the object if it already exists' do
+    it 'updates the object if it already exists' do
       @media_object = @user.media_objects.build(media_id: 'new_object')
       @media_object.media_type = 'audio'
       @media_object.title = 'original title'
@@ -359,7 +359,7 @@ describe ContextController do
       expect(@user.media_objects.count).to eq @original_count
     end
 
-    it "should create the object if it doesn't already exist" do
+    it "creates the object if it doesn't already exist" do
       @original_count = @user.media_objects.count
 
       post :create_media_object,
@@ -376,7 +376,7 @@ describe ContextController do
       expect(@media_object.title).to eq 'title'
     end
 
-    it 'should truncate the title and user_entered_title' do
+    it 'truncates the title and user_entered_title' do
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}",
@@ -390,7 +390,7 @@ describe ContextController do
       expect(@media_object.user_entered_title.size).to be <= 255
     end
 
-    it 'should return the embedded_iframe_url' do
+    it 'returns the embedded_iframe_url' do
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}", id: 'new_object', type: 'audio', title: 'title'
@@ -409,7 +409,7 @@ describe ContextController do
       @course.student_enrollments.update_all(workflow_state: 'completed')
     end
 
-    it 'should paginate' do
+    it 'paginates' do
       get :prior_users, params: { course_id: @course.id }
       expect(response).to be_successful
       expect(assigns[:prior_users].size).to eql 20
@@ -417,7 +417,7 @@ describe ContextController do
   end
 
   describe "GET 'undelete_index'" do
-    it 'should work' do
+    it 'works' do
       user_session(@teacher)
       assignment_model(course: @course)
       @assignment.destroy
@@ -427,7 +427,7 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(@assignment)
     end
 
-    it 'should show group_categories' do
+    it 'shows group_categories' do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)
       category.destroy
@@ -437,7 +437,7 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(category)
     end
 
-    it 'should show groups' do
+    it 'shows groups' do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)
       g1 = category.groups.create!(context: @course, name: 'group_a')

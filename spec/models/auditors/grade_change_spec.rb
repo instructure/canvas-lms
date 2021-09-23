@@ -88,7 +88,7 @@ describe Auditors::GradeChange do
         expect(@event.submission_id).to eq(@submission.id)
       end
 
-      it "should include event" do
+      it "includes event" do
         expect(@event.created_at).to eq @event_time
         expect(Auditors::GradeChange.for_assignment(@assignment).paginate(:per_page => 5)).to include(@event)
         expect(Auditors::GradeChange.for_course(@course).paginate(:per_page => 5)).to include(@event)
@@ -103,7 +103,7 @@ describe Auditors::GradeChange do
         end
       end
 
-      it "should include event for nil grader" do
+      it "includes event for nil grader" do
         # We don't want to index events for nil graders.
 
         @submission = @assignment.grade_student(@student, grade: 6, grader: @teacher).first
@@ -121,7 +121,7 @@ describe Auditors::GradeChange do
           .paginate(:per_page => 5)).to include(@event)
       end
 
-      it "should include event for auto grader" do
+      it "includes event for auto grader" do
         # Currently we are not indexing events for auto grader in cassandra.
 
         @submission.score = 5
@@ -140,7 +140,7 @@ describe Auditors::GradeChange do
           .paginate(:per_page => 5)).to include(@event)
       end
 
-      it "should set request_id" do
+      it "sets request_id" do
         expect(@event.request_id).to eq request_id.to_s
       end
     end
@@ -256,7 +256,7 @@ describe Auditors::GradeChange do
         @event2 = Auditors::GradeChange::Stream.insert(record)
       end
 
-      it "should recognize :oldest" do
+      it "recognizes :oldest" do
         page = Auditors::GradeChange.for_assignment(@assignment, oldest: 12.hours.ago).paginate(:per_page => 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
@@ -274,7 +274,7 @@ describe Auditors::GradeChange do
         expect(page).not_to include(@event2)
       end
 
-      it "should recognize :newest" do
+      it "recognizes :newest" do
         page = Auditors::GradeChange.for_assignment(@assignment, newest: 12.hours.ago).paginate(:per_page => 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)

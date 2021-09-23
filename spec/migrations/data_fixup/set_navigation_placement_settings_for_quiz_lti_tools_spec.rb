@@ -50,7 +50,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     )
   end
 
-  it 'should set account_navigation settings for each Quiz LTI tool' do
+  it 'sets account_navigation settings for each Quiz LTI tool' do
     ContextExternalTool.quiz_lti.each do |quiz_tool|
       expect(quiz_tool.settings[:account_navigation]).to be_nil
     end
@@ -68,7 +68,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     ContextExternalTool.quiz_lti.find_by(workflow_state: 'deleted')
   end
 
-  it 'should set course_navigation settings for each Quiz LTI tool' do
+  it 'sets course_navigation settings for each Quiz LTI tool' do
     ContextExternalTool.quiz_lti.each do |quiz_tool|
       expect(quiz_tool.settings[:course_navigation]).to be_nil
     end
@@ -84,7 +84,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     end
   end
 
-  it 'should not set navigation placement settings for deleted Quiz LTI tools' do
+  it 'does not set navigation placement settings for deleted Quiz LTI tools' do
     ContextExternalTool.quiz_lti.last.update!(workflow_state: 'deleted')
 
     ContextExternalTool.quiz_lti.each do |quiz_tool|
@@ -104,7 +104,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     end
   end
 
-  it 'should not set navigation placement settings for tools that are not Quiz LTI' do
+  it 'does not set navigation placement settings for tools that are not Quiz LTI' do
     some_tool = ContextExternalTool.find_by(tool_id: 'Some tool')
 
     expect(some_tool.quiz_lti?).to eq false
@@ -114,7 +114,7 @@ describe DataFixup::SetNavigationPlacementSettingsForQuizLtiTools do
     }.to not_change { some_tool.settings }
   end
 
-  it 'should not set navigation placement settings for Quiz LTI tools where context_type is not Account' do
+  it 'does not set navigation placement settings for Quiz LTI tools where context_type is not Account' do
     quiz_tool = ContextExternalTool.quiz_lti.last
     quiz_tool.update!(context_type: 'Course')
 

@@ -54,7 +54,7 @@ describe "context modules" do
       wait_for_ajaximations
     end
 
-    it "should show all module items", priority: "1", test_id: 126743 do
+    it "shows all module items", priority: "1", test_id: 126743 do
       module_with_two_items
       f(".expand_module_link").click
       wait_for_animations
@@ -68,13 +68,13 @@ describe "context modules" do
       expect(f('.icon-mini-arrow-down')).to be_displayed
     end
 
-    it "should hide module items", priority: "1", test_id: 280415 do
+    it "hides module items", priority: "1", test_id: 280415 do
       module_with_two_items
       wait_for_animations
       expect(f('.context_module .content')).not_to be_displayed
     end
 
-    it "should rearrange child objects in same module", priority: "1", test_id: 126733 do
+    it "rearranges child objects in same module", priority: "1", test_id: 126733 do
       modules = create_modules(1, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -91,7 +91,7 @@ describe "context modules" do
       expect(list_prior_drag[1]).to eq list_post_drag[0]
     end
 
-    it "should rearrange child object to new module", priority: "1", test_id: 126734 do
+    it "rearranges child object to new module", priority: "1", test_id: 126734 do
       modules = create_modules(2, true)
       # attach 1 assignment to module 1 and 2 assignments to module 2 and add completion reqs
       item1_mod1 = modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -109,7 +109,7 @@ describe "context modules" do
       expect(f("#content")).not_to contain_css('#context_modules .context_module:last-child .context_module_items .context_module_item')
     end
 
-    it "should delete a module item", priority: "1", test_id: 126739 do
+    it "deletes a module item", priority: "1", test_id: 126739 do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -120,7 +120,7 @@ describe "context modules" do
       expect(f('.context_module_items')).not_to include_text(@assignment.title)
     end
 
-    it "should edit a module item and validate the changes stick", priority: "1", test_id: 126737 do
+    it "edits a module item and validate the changes stick", priority: "1", test_id: 126737 do
       get "/courses/#{@course.id}/modules"
 
       item_edit_text = "Assignment Edit 1"
@@ -139,7 +139,7 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id} .title").text).to eq item_edit_text
     end
 
-    it "should rename all instances of an item" do
+    it "renames all instances of an item" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -181,7 +181,7 @@ describe "context modules" do
       expect(tag.reload).to be_published
     end
 
-    it "should add the 'with-completion-requirements' class to rows that have requirements" do
+    it "adds the 'with-completion-requirements' class to rows that have requirements" do
       mod = @course.context_modules.create! name: 'TestModule'
       tag = mod.add_item({ :id => @assignment.id, :type => 'assignment' })
 
@@ -194,7 +194,7 @@ describe "context modules" do
       expect(ig_rows).not_to be_empty
     end
 
-    it "should add a new quiz to a module in a specific assignment group" do
+    it "adds a new quiz to a module in a specific assignment group" do
       @course.context_modules.create!(name: "Quiz")
       get "/courses/#{@course.id}/modules"
 
@@ -205,7 +205,7 @@ describe "context modules" do
       expect(@ag2.assignments.first.title).to eq "New Quiz"
     end
 
-    it "should add a text header to a module", priority: "1", test_id: 126729 do
+    it "adds a text header to a module", priority: "1", test_id: 126729 do
       get "/courses/#{@course.id}/modules"
       header_text = 'new header text'
       add_module('Text Header Module')
@@ -219,7 +219,7 @@ describe "context modules" do
       expect(module_item).to include_text(header_text)
     end
 
-    it "should always show module contents on empty module", priority: "1", test_id: 126732 do
+    it "alwayses show module contents on empty module", priority: "1", test_id: 126732 do
       get "/courses/#{@course.id}/modules"
       add_module 'Test module'
       ff(".icon-mini-arrow-down")[0].click
@@ -227,7 +227,7 @@ describe "context modules" do
       expect(ff(".icon-mini-arrow-down")[0]).to be_displayed
     end
 
-    it "should allow adding an item twice" do
+    it "allows adding an item twice" do
       @course.context_modules.create!(name: "External Tool")
       get "/courses/#{@course.id}/modules"
       tag = add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
@@ -238,7 +238,7 @@ describe "context modules" do
       expect(@assignment.reload.context_module_tags.size).to eq 2
     end
 
-    it "should not save an invalid external tool", priority: "1", test_id: 2624908 do
+    it "does not save an invalid external tool", priority: "1", test_id: 2624908 do
       get "/courses/#{@course.id}/modules"
 
       add_module 'Test module'
@@ -270,7 +270,7 @@ describe "context modules" do
       expect(f('.prerequisites_entry', form)).to be_displayed
     end
 
-    it "should rearrange modules" do
+    it "rearranges modules" do
       m1 = @course.context_modules.create!(:name => 'module 1')
       m2 = @course.context_modules.create!(:name => 'module 2')
 
@@ -288,7 +288,7 @@ describe "context modules" do
       expect(m2.position).to eq 1
     end
 
-    it "should validate locking a module item display functionality" do
+    it "validates locking a module item display functionality" do
       get "/courses/#{@course.id}/modules"
       add_form = new_module_form
       lock_check_click(add_form)
@@ -300,7 +300,7 @@ describe "context modules" do
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
 
-    it "should properly change indent of an item with arrows" do
+    it "properlies change indent of an item with arrows" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -313,7 +313,7 @@ describe "context modules" do
       expect(tag.indent).to eq 1
     end
 
-    it "should properly change indent of an item from edit dialog" do
+    it "properlies change indent of an item from edit dialog" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -339,7 +339,7 @@ describe "context modules" do
         override.save!
       end
 
-      it "should indicate when course sections have multiple due dates" do
+      it "indicates when course sections have multiple due dates" do
         modules = create_modules(1, true)
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
 
@@ -354,7 +354,7 @@ describe "context modules" do
         expect(f(".due_date_display").text).to eq "Multiple Due Dates"
       end
 
-      it "should not indicate multiple due dates if the sections' dates are the same" do
+      it "does not indicate multiple due dates if the sections' dates are the same" do
         skip("needs to ignore base if all visible sections are overridden")
         modules = create_modules(1, true)
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -372,7 +372,7 @@ describe "context modules" do
         expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
       end
 
-      it "should use assignment due date if there is no section override" do
+      it "uses assignment due date if there is no section override" do
         modules = create_modules(1, true)
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
 
@@ -389,7 +389,7 @@ describe "context modules" do
         expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
       end
 
-      it "should only use the sections the user is restricted to" do
+      it "onlies use the sections the user is restricted to" do
         skip("needs to ignore base if all visible sections are overridden")
         modules = create_modules(1, true)
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })
@@ -414,7 +414,7 @@ describe "context modules" do
       end
     end
 
-    it "should show a vdd tooltip summary for assignments with multiple due dates" do
+    it "shows a vdd tooltip summary for assignments with multiple due dates" do
       selector = "li.Assignment_#{@assignment2.id} .due_date_display"
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
@@ -438,7 +438,7 @@ describe "context modules" do
       expect(tooltip).to include_text 'Everyone else'
     end
 
-    it "should publish a file from the modules page", priority: "1", test_id: 126727 do
+    it "publishes a file from the modules page", priority: "1", test_id: 126727 do
       @module = @course.context_modules.create!(:name => "some module")
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data, :locked => true)
       @tag = @module.add_item({ :id => @file.id, :type => 'attachment' })
@@ -452,7 +452,7 @@ describe "context modules" do
       expect(f("[data-id='#{@file.id}'] > button.published-status")[:title]).to eq("Published")
     end
 
-    it "should show the file publish button on course home" do
+    it "shows the file publish button on course home" do
       @course.default_view = 'modules'
       @course.save!
 
@@ -464,7 +464,7 @@ describe "context modules" do
       expect(f(".context_module_item.attachment .icon-publish")).to be_displayed
     end
 
-    it "should render publish buttons in collapsed modules" do
+    it "renders publish buttons in collapsed modules" do
       @module = @course.context_modules.create! name: "collapsed"
       tag = @module.add_item(type: 'assignment', id: @assignment2.id)
       @progression = @module.evaluate_for(@user)
@@ -475,21 +475,21 @@ describe "context modules" do
       expect(f(".context_module_item.assignment .icon-publish")).to be_displayed
     end
 
-    it "should add a discussion item to a module", priority: "1", test_id: 126711 do
+    it "adds a discussion item to a module", priority: "1", test_id: 126711 do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_module_item('#discussion_topics_select', 'Discussion', '[ New Topic ]', 'New Discussion Title')
       verify_persistence('New Discussion Title')
     end
 
-    it "should add an external url item to a module", priority: "1", test_id: 126707 do
+    it "adds an external url item to a module", priority: "1", test_id: 126707 do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External URL', 'www.google.com', 'Google')
       expect(fln('Google')).to be_displayed
     end
 
-    it "should require a url for external url items" do
+    it "requires a url for external url items" do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       f('.ig-header-admin .al-trigger').click
@@ -507,7 +507,7 @@ describe "context modules" do
       expect(f("#select_context_content_dialog")).to be_displayed
     end
 
-    it "should add an external tool item to a module", priority: "1", test_id: 2624909 do
+    it "adds an external tool item to a module", priority: "1", test_id: 2624909 do
       @course.context_modules.create!(name: "New Module")
       get "/courses/#{@course.id}/modules"
       add_new_external_item('External Tool', 'www.instructure.com', 'Instructure')
@@ -515,7 +515,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it "should not render links for subheader type items", priority: "1" do
+    it "does not render links for subheader type items", priority: "1" do
       mod = @course.context_modules.create! name: 'Test Module'
       tag = mod.add_item(title: 'Example text header', type: 'sub_header')
       get "/courses/#{@course.id}/modules"
@@ -523,7 +523,7 @@ describe "context modules" do
       expect(f("#context_module_item_#{tag.id}")).not_to contain_css("a.for-nvda")
     end
 
-    it "should render links for wiki page type items", priority: "1" do
+    it "renders links for wiki page type items", priority: "1" do
       mod = @course.context_modules.create! name: 'Test Module'
       page = @course.wiki_pages.create title: 'A Page'
       page.workflow_state = 'unpublished'
@@ -556,13 +556,13 @@ describe "context modules" do
         expect(f("#context_module_#{@mod[1].id} .content")).to be_displayed
       end
 
-      it "should display collapse all button at top of page" do
+      it "displays collapse all button at top of page" do
         button = f("button#expand_collapse_all")
         expect(button).to be_displayed
         expect(button.attribute("data-expand")).to eq("false")
       end
 
-      it "should collapse and expand all modules when clicked and persist after refresh" do
+      it "collapses and expand all modules when clicked and persist after refresh" do
         button = f("button#expand_collapse_all")
         button.click
         wait_for_ajaximations
@@ -578,7 +578,7 @@ describe "context modules" do
         assert_expanded
       end
 
-      it "should collapse all after collapsing individually" do
+      it "collapses all after collapsing individually" do
         f("#context_module_#{@mod[0].id} span.collapse_module_link").click
         wait_for_ajaximations
         button = f("button#expand_collapse_all")

@@ -32,26 +32,26 @@ describe "sub account shared rubric specs" do
     course_with_admin_logged_in
   end
 
-  it "should delete a rubric" do
+  it "deletes a rubric" do
     should_delete_a_rubric
   end
-  it "should edit a rubric" do
+  it "edits a rubric" do
     should_edit_a_rubric
   end
 
-  it "should allow fractional points" do
+  it "allows fractional points" do
     should_allow_fractional_points
   end
 
-  it "should round to 2 decimal places" do
+  it "rounds to 2 decimal places" do
     should_round_to_2_decimal_places
   end
 
-  it "should round to an integer when splitting" do
+  it "rounds to an integer when splitting" do
     should_round_to_an_integer_when_splitting
   end
 
-  it "should pick the lower value when splitting without room for an integer" do
+  it "picks the lower value when splitting without room for an integer" do
     skip('fragile - need to refactor split_ratings method')
     should_pick_the_lower_value_when_splitting_without_room_for_an_integer
   end

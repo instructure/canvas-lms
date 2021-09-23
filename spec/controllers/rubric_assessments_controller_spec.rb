@@ -22,20 +22,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe RubricAssessmentsController do
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
-    it "should assign variables" do
+    it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @user.to_param, :assessment_type => "no_reason" } }
       expect(response).to be_successful
     end
 
-    it "should not pass invalid ids through to the database" do
+    it "does not pass invalid ids through to the database" do
       course_with_teacher_logged_in(:active_all => true)
       assert_page_not_found do
         rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
@@ -47,21 +47,21 @@ describe RubricAssessmentsController do
   end
 
   describe "PUT 'update'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       put 'update', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => { :user_id => @user.to_param } }
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course, :purpose => 'grading')
       put 'update', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id, :rubric_assessment => { :user_id => @user.to_param, :assessment_type => "no_reason" } }
       expect(response).to be_successful
     end
 
-    it "should return anonymized user comments when anonymous grading is enabled" do
+    it "returns anonymized user comments when anonymous grading is enabled" do
       course_with_teacher_logged_in(:active_all => true)
       @student = factory_with_protected_attributes(User, :name => "Some Student", :workflow_state => "registered")
       @course.enroll_student(@student).accept!
@@ -330,11 +330,11 @@ describe RubricAssessmentsController do
       @assessment_request = @rubric_association.assessment_requests.create!(user: @user, asset: user_asset, assessor: assessor, assessor_asset: assessor_asset)
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       assert_unauthorized
     end
-    it "should send reminder" do
+    it "sends reminder" do
       user_session(@teacher)
       post 'remind', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :assessment_request_id => @assessment_request.id }
       expect(assigns[:request]).not_to be_nil
@@ -344,14 +344,14 @@ describe RubricAssessmentsController do
   end
 
   describe "DELETE 'destroy'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       delete 'destroy', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id }
       assert_unauthorized
     end
 
-    it "should delete the assessment" do
+    it "deletes the assessment" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       delete 'destroy', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id }
@@ -359,7 +359,7 @@ describe RubricAssessmentsController do
       expect(assigns[:assessment]).to be_frozen
     end
 
-    it "should delete related learning_outcome_result" do
+    it "deletes related learning_outcome_result" do
       outcome_model
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
@@ -388,7 +388,7 @@ describe RubricAssessmentsController do
   end
 
   describe "Assignment assessments" do
-    it "should follow: actions from two teachers should only create one assessment" do
+    it "follow:s actions from two teachers should only create one assessment" do
       setup_course_assessment
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "grading" } }
       expect(response).to be_successful
@@ -400,7 +400,7 @@ describe RubricAssessmentsController do
       expect(assigns[:assessment]).to eql(@assessment)
     end
 
-    it "should follow: multiple peer reviews for the same submission should work fine" do
+    it "follow:s multiple peer reviews for the same submission should work fine" do
       setup_course_assessment
       user_session(@student2)
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "peer_review" } }
@@ -419,7 +419,7 @@ describe RubricAssessmentsController do
       expect(assigns[:assessment]).not_to eql(@assessment)
     end
 
-    it "should follow: multiple peer reviews for the same submission should work fine, even with a teacher assessment in play" do
+    it "follow:s multiple peer reviews for the same submission should work fine, even with a teacher assessment in play" do
       setup_course_assessment
       user_session(@teacher2)
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student1.to_param, :assessment_type => "grading" } }
@@ -445,7 +445,7 @@ describe RubricAssessmentsController do
       expect(assigns[:assessment]).not_to eql(@grading_assessment)
     end
 
-    it "should not allow assessing fellow students for a submission" do
+    it "does not allow assessing fellow students for a submission" do
       setup_course_assessment
       user_session(@student1)
       post 'create', params: { :course_id => @course.id, :rubric_association_id => @rubric_association.id, :rubric_assessment => { :user_id => @student2.to_param, :assessment_type => 'peer_review' } }

@@ -40,7 +40,7 @@ describe Quizzes::QuizQuestionBuilder do
       quiz_question_builder.build_submission_questions(@quiz.id, @quiz.stored_questions)
     end
 
-    it 'should use a local question' do
+    it 'uses a local question' do
       questions = quiz_question_builder.build_submission_questions(1, [
                                                                      {
                                                                        id: 1,
@@ -76,7 +76,7 @@ describe Quizzes::QuizQuestionBuilder do
         @quiz = @course.quizzes.create!
       end
 
-      it 'should pull questions from a bank' do
+      it 'pulls questions from a bank' do
         aqs = [
           assessment_question_model(bank: @bank, name: 'Group Question 1'),
           assessment_question_model(bank: @bank, name: 'Group Question 2'),
@@ -105,7 +105,7 @@ describe Quizzes::QuizQuestionBuilder do
           .to eq(questions.map { |q| q[:id] }.sort)
       end
 
-      it 'should duplicate questions to fill the group' do
+      it 'duplicates questions to fill the group' do
         aq = assessment_question_model(bank: @bank, name: 'Group Question 1')
 
         @group = @quiz.quiz_groups.create!({
@@ -128,7 +128,7 @@ describe Quizzes::QuizQuestionBuilder do
           .to eq(questions.map { |q| q[:id] }.sort)
       end
 
-      it "should duplicate questions from a bank" do
+      it "duplicates questions from a bank" do
         assessment_question_model(bank: @bank)
 
         # both groups pull from the same bank
@@ -162,7 +162,7 @@ describe Quizzes::QuizQuestionBuilder do
                                            })
       end
 
-      it 'should use a question defined locally in a group' do
+      it 'uses a question defined locally in a group' do
         @qq = @quiz.quiz_questions.create!({
                                              quiz_group_id: @group.id,
                                              question_data: {
@@ -182,7 +182,7 @@ describe Quizzes::QuizQuestionBuilder do
           @group.update_attribute(:assessment_question_bank_id, @bank.id)
         end
 
-        it 'should pull questions from the bank a group is linked to' do
+        it 'pulls questions from the bank a group is linked to' do
           aqs = [
             assessment_question_model(bank: @bank),
             assessment_question_model(bank: @bank),
@@ -197,7 +197,7 @@ describe Quizzes::QuizQuestionBuilder do
         end
 
         context 'when the pick count is higher than the available questions' do
-          it 'should duplicate as many questions as needed' do
+          it 'duplicates as many questions as needed' do
             aqs = [
               @bank.assessment_questions.create!({
                                                    question_data: {

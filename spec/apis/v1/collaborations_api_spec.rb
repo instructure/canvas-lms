@@ -64,7 +64,7 @@ describe CollaborationsController, type: :request do
       }
     end
 
-    it 'should require authorization' do
+    it 'requires authorization' do
       user_factory
       raw_api_call(:get, url, url_options)
       expect(response.code).to eq '401'
@@ -147,22 +147,22 @@ describe CollaborationsController, type: :request do
     }
 
     describe 'a group member' do
-      it 'should see group members' do
+      it 'sees group members' do
         json = api_call(:get, url, url_options)
         expect(json.count).to eq 6
       end
 
-      it 'should receive a paginated response' do
+      it 'receives a paginated response' do
         json = api_call(:get, "#{url}?per_page=1", url_options.merge(:per_page => '1'))
         expect(json.count).to eq 1
       end
 
-      it 'should be formatted by collaborator_json' do
+      it 'is formatted by collaborator_json' do
         json = api_call(:get, url, url_options)
         expect(json.first.keys.sort).to eq %w{collaborator_id id name type}
       end
 
-      it 'should include groups' do
+      it 'includes groups' do
         group_model(:context => @course)
         Collaborator.create!(:user => nil, :group => @group, :collaboration => @collaboration)
         users, groups = api_call(:get, url, url_options).partition { |c| c['type'] == 'user' }
@@ -177,7 +177,7 @@ describe CollaborationsController, type: :request do
         user_factory
       end
 
-      it 'should receive a 401' do
+      it 'receives a 401' do
         raw_api_call(:get, url, url_options)
         expect(response.code).to eq '401'
       end

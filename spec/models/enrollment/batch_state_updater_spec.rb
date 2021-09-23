@@ -20,12 +20,12 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe "Enrollment::BatchStateUpdater" do
-  it 'should fail with more than 1000 enrollments' do
+  it 'fails with more than 1000 enrollments' do
     expect { Enrollment::BatchStateUpdater.destroy_batch(1..1001) }
       .to raise_error(ArgumentError, 'Cannot call with more than 1000 enrollments')
   end
 
-  it 'should not fail with more than empty batch' do
+  it 'does not fail with more than empty batch' do
     expect { Enrollment::BatchStateUpdater.run_call_backs_for([], root_account: nil) }.to_not raise_error
   end
 
@@ -36,7 +36,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   describe '.mark_enrollments_as_deleted' do
-    it 'should delete each enrollment and scores' do
+    it 'deletes each enrollment and scores' do
       score = @enrollment.scores.create!
       Enrollment::BatchStateUpdater.mark_enrollments_as_deleted([@enrollment.id, @enrollment2.id])
       expect(@enrollment.reload.workflow_state).to eq('deleted')
@@ -44,7 +44,7 @@ describe "Enrollment::BatchStateUpdater" do
       expect(score.reload).to be_deleted
     end
 
-    it 'should update user_account_associations' do
+    it 'updates user_account_associations' do
       expect(@user.associated_accounts).to eq [Account.default]
       Enrollment::BatchStateUpdater.mark_enrollments_as_deleted([@enrollment.id, @enrollment2.id])
       Enrollment::BatchStateUpdater.touch_and_update_associations([@user.id])
@@ -53,7 +53,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   describe '.remove_group_memberships' do
-    it 'should remove group_memberships' do
+    it 'removes group_memberships' do
       user3 = User.create!
       enrollment3 = StudentEnrollment.create!(user: user3, course: @course)
       # enrollment4 for second enrollment for user3
@@ -73,7 +73,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   describe '.clear_email_caches' do
-    it 'should delete cache for email invitations' do
+    it 'deletes cache for email invitations' do
       enable_cache do
         user = User.create!
         user.update_attribute(:workflow_state, 'creation_pending')
@@ -89,7 +89,7 @@ describe "Enrollment::BatchStateUpdater" do
   end
 
   describe '.cancel_future_appointments' do
-    it 'should delete appointment participants' do
+    it 'deletes appointment participants' do
       ag = AppointmentGroup.create(title: 'test', contexts: [@course], new_appointments: [[1.week.from_now, 8.days.from_now]])
       appt = ag.appointments.first
       participant = appt.reserve_for(@user, @user2)
@@ -98,7 +98,7 @@ describe "Enrollment::BatchStateUpdater" do
       expect(participant.reload).to be_deleted
     end
 
-    it 'should not delete appointment participants if enrollment remains' do
+    it 'does not delete appointment participants if enrollment remains' do
       StudentEnrollment.create!(user: @user, course: @course, course_section: @course.course_sections.create(name: 's'))
       ag = AppointmentGroup.create(title: 'test', contexts: [@course], new_appointments: [[1.week.from_now, 8.days.from_now]])
       appt = ag.appointments.first
@@ -165,11 +165,11 @@ describe "Enrollment::BatchStateUpdater" do
           @course.root_account.save!
         end
 
-        it 'should enqueue a job' do
+        it 'enqueues a job' do
           expect { update_batch }.to change { Delayed::Job.count }.by 1
         end
 
-        it 'should enqueue one job for each course' do
+        it 'enqueues one job for each course' do
           course2 = course_factory
           course3 = course_factory
           MicrosoftSync::Group.create!(course: course2)
@@ -183,7 +183,7 @@ describe "Enrollment::BatchStateUpdater" do
     end
   end
 
-  it 'should account for all enrollment callbacks in Enrollment::BatchStateUpdater.destroy_batch' do
+  it 'accounts for all enrollment callbacks in Enrollment::BatchStateUpdater.destroy_batch' do
     accounted_for_callbacks = %i(
       add_to_favorites_later
       assign_uuid

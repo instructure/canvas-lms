@@ -353,7 +353,7 @@ describe "Screenreader Gradebook" do
       end
     end
 
-    it "should focus on accessible elements when setting default grades", priority: '1', test_id: 209991 do
+    it "focuses on accessible elements when setting default grades", priority: '1', test_id: 209991 do
       skip_if_safari(:alert)
       SRGB.visit(@course.id)
       SRGB.select_assignment(@second_assignment)

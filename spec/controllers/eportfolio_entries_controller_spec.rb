@@ -40,12 +40,12 @@ describe EportfolioEntriesController do
 
   describe "GET 'show'" do
     before(:once) { eportfolio_entry(@category) }
-    it "should require authorization" do
+    it "requires authorization" do
       get 'show', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@user)
       attachment = @portfolio.user.attachments.build(:filename => 'some_file.pdf')
       attachment.content_type = ''
@@ -62,7 +62,7 @@ describe EportfolioEntriesController do
       expect(assigns[:attachments]).not_to be_empty
     end
 
-    it "should work off of category and entry names" do
+    it "works off of category and entry names" do
       user_session(@user)
       @category.name = "some category"
       @category.save!
@@ -146,12 +146,12 @@ describe EportfolioEntriesController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :eportfolio_id => @portfolio.id }
       assert_unauthorized
     end
 
-    it "should create entry" do
+    it "creates entry" do
       user_session(@user)
       post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_entry => { :eportfolio_category_id => @category.id, :name => "some entry" } }
       expect(response).to be_redirect
@@ -163,12 +163,12 @@ describe EportfolioEntriesController do
 
   describe "PUT 'update'" do
     before(:once) { eportfolio_entry(@category) }
-    it "should require authorization" do
+    it "requires authorization" do
       put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
-    it "should update entry" do
+    it "updates entry" do
       user_session(@user)
       put 'update', params: { :eportfolio_id => @portfolio.id, :id => @entry.id, :eportfolio_entry => { :name => "new name" } }
       expect(response).to be_redirect
@@ -179,12 +179,12 @@ describe EportfolioEntriesController do
 
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_entry(@category) }
-    it "should require authorization" do
+    it "requires authorization" do
       delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       assert_unauthorized
     end
 
-    it "should delete entry" do
+    it "deletes entry" do
       user_session(@user)
       delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @entry.id }
       expect(response).to be_redirect
@@ -195,7 +195,7 @@ describe EportfolioEntriesController do
 
   describe "GET 'attachment'" do
     before(:once) { eportfolio_entry(@category) }
-    it "should require authorization" do
+    it "requires authorization" do
       get 'attachment', params: { :eportfolio_id => @portfolio.id, :entry_id => @entry.id, :attachment_id => 1 }
       assert_unauthorized
     end
@@ -209,7 +209,7 @@ describe EportfolioEntriesController do
     describe "with sharding" do
       specs_require_sharding
 
-      it "should find attachments on all shards associated with user" do
+      it "finds attachments on all shards associated with user" do
         user_session(@user)
         @shard1.activate do
           @user.associate_with_shard(@shard1)

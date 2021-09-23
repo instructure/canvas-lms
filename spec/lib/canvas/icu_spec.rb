@@ -23,14 +23,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Canvas::ICU do
   shared_examples_for "Collator" do
     describe ".collate_by" do
-      it "should work" do
+      it "works" do
         array = [{ id: 2, str: 'a' }, { id: 1, str: 'b' }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
         expect(result.last[:id]).to eq 1
       end
 
-      it "should handle CanvasSort::First" do
+      it "handles CanvasSort::First" do
         array = [{ id: 2, str: CanvasSort::First }, { id: 1, str: 'b' }]
         result = Canvas::ICU.collate_by(array) { |x| x[:str] }
         expect(result.first[:id]).to eq 2
@@ -39,7 +39,7 @@ describe Canvas::ICU do
     end
 
     describe ".collation_key" do
-      it "should return something that's comparable" do
+      it "returns something that's comparable" do
         a = "a"; b = "b"
         a_prime = Canvas::ICU.collation_key(a)
         expect(a.object_id).not_to eq a_prime.object_id
@@ -47,33 +47,33 @@ describe Canvas::ICU do
         expect(a_prime <=> b_prime).to eq -1
       end
 
-      it "should pass-thru CanvasSort::First" do
+      it "pass-thrus CanvasSort::First" do
         expect(Canvas::ICU.collation_key(CanvasSort::First)).to eq CanvasSort::First
       end
     end
 
     describe ".compare" do
-      it "should work" do
+      it "works" do
         expect(Canvas::ICU.compare("a", "b")).to eq -1
       end
 
-      it "should handle CanvasSort::First" do
+      it "handles CanvasSort::First" do
         expect(Canvas::ICU.compare(CanvasSort::First, "a")).to eq -1
       end
     end
 
     describe ".collate" do
-      it "should work" do
+      it "works" do
         expect(Canvas::ICU.collate(["b", "a"])).to eq ["a", "b"]
       end
 
-      it "should at the least be case insensitive" do
+      it "ats the least be case insensitive" do
         results = Canvas::ICU.collate(["b", "a", "A", "B"])
         expect(results[0..1].sort).to eq ["a", "A"].sort
         expect(results[2..3].sort).to eq ["b", "B"].sort
       end
 
-      it "should not ignore punctuation" do
+      it "does not ignore punctuation" do
         expect(Canvas::ICU.collate(["ab, cd", "a, bcd"])).to eq ["a, bcd", "ab, cd"]
       end
     end

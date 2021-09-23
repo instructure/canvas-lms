@@ -693,14 +693,14 @@ module Lti
                           }, context: account_model)
       end
 
-      it 'should create subscriptions for Plagiarism ToolProxies' do
+      it 'creates subscriptions for Plagiarism ToolProxies' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('subscription_id')
         tool_proxy.raw_data['enabled_capability'] = [placement]
         tool_proxy.save!
         expect(tool_proxy.subscription_id).to eq 'subscription_id'
       end
 
-      it 'should not create subscriptions if one already exists' do
+      it 'does not create subscriptions if one already exists' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
         tool_proxy.raw_data['enabled_capability'] = [placement]
         tool_proxy.subscription_id = 'subscription_id1'
@@ -708,7 +708,7 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'subscription_id1'
       end
 
-      it 'should create a subscription if another matching tool already has one' do
+      it 'creates a subscription if another matching tool already has one' do
         ToolProxy.create!(
           raw_data: {
             'enabled_capability' => [placement],
@@ -733,14 +733,14 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'subscription_id2'
       end
 
-      it 'should not create subscriptions for non-plagiarism tools' do
+      it 'does not create subscriptions for non-plagiarism tools' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
         tool_proxy.raw_data['enabled_capability'] = []
         tool_proxy.save!
         expect(tool_proxy.subscription_id).to be nil
       end
 
-      it 'should delete subscriptions for tools that are soft-deleted' do
+      it 'deletes subscriptions for tools that are soft-deleted' do
         tool_proxy.subscription_id = 'subscription_id1'
         tool_proxy.save!
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
@@ -768,7 +768,7 @@ module Lti
                           }, context: account_model)
       end
 
-      it 'should delete subscriptions' do
+      it 'deletes subscriptions' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
         tool_proxy.subscription_id = 'subscription_id1'
         tool_proxy.save!

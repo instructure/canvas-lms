@@ -27,7 +27,7 @@ describe "Common Cartridge exporting" do
     get_ccc_schema
   end
 
-  it "should collect errors and finish running" do
+  it "collects errors and finish running" do
     skip("skip and fix with LS-2168")
     course = course_model
     user = user_model
@@ -87,7 +87,7 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    it "should selectively export all object types" do
+    it "selectivelies export all object types" do
       # create 2 of everything
       @dt1 = @course.discussion_topics.create!(:message => "hi", :title => "discussion title")
       @dt2 = @course.discussion_topics.create!(:message => "hey", :title => "discussion title 2")
@@ -211,7 +211,7 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
-    it "should use instfs to host export files if it is enabled" do
+    it "uses instfs to host export files if it is enabled" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
@@ -219,7 +219,7 @@ describe "Common Cartridge exporting" do
       expect(@ce.attachments.first.instfs_uuid).to eq(uuid)
     end
 
-    it "should create a quizzes-only export" do
+    it "creates a quizzes-only export" do
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 
@@ -241,7 +241,7 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css("resource[identifier=#{alt_mig_id2}][type=\"#{CC::CCHelper::LOR}\"]")).not_to be_nil
     end
 
-    it "should export quizzes with groups that point to external banks" do
+    it "exports quizzes with groups that point to external banks" do
       orig_course = @course
       course_with_teacher(:user => @user)
       different_course = @course
@@ -272,7 +272,7 @@ describe "Common Cartridge exporting" do
       expect(selections[1].at_css("selection_extension sourcebank_context").text).to eq bank2.context.asset_string
     end
 
-    it "should selectively create a quizzes-only export" do
+    it "selectivelies create a quizzes-only export" do
       @q1 = @course.quizzes.create!(:title => 'quiz1')
       @q2 = @course.quizzes.create!(:title => 'quiz2')
 
@@ -288,7 +288,7 @@ describe "Common Cartridge exporting" do
       check_resource_node(@q2, CC::CCHelper::QTI_ASSESSMENT_TYPE, false)
     end
 
-    it "should include any files referenced in html" do
+    it "includes any files referenced in html" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @q1 = @course.quizzes.create(:title => 'quiz1')
@@ -334,7 +334,7 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
-    it "should include media objects" do
+    it "includes media objects" do
       skip 'PHO-360 (9/17/2020)'
 
       @q1 = @course.quizzes.create(:title => 'quiz1')
@@ -395,7 +395,7 @@ describe "Common Cartridge exporting" do
       expect(@zip_file.find_entry(path)).not_to be_nil
     end
 
-    it "should export web content files properly when display name is changed" do
+    it "exports web content files properly when display name is changed" do
       @att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @att.display_name = "not_actually_first.png"
       @att.save!
@@ -449,7 +449,7 @@ describe "Common Cartridge exporting" do
       expect(description).to include 'img src="$IMS-CC-FILEBASE$/unfiled/first.png'
     end
 
-    it "should not fail when answers are missing for FIMB" do
+    it "does not fail when answers are missing for FIMB" do
       @q1 = @course.quizzes.create(:title => 'quiz1')
 
       qq = @q1.quiz_questions.create!
@@ -479,7 +479,7 @@ describe "Common Cartridge exporting" do
       run_export
     end
 
-    it "should deal with file URLs in anchor bodies" do
+    it "deals with file URLs in anchor bodies" do
       @att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       link_thing = %{<a href="/courses/#{@course.id}/files/#{@att.id}/download?wrap=1">/courses/#{@course.id}/files/#{@att.id}/download?wrap=1</a>}
       @course.syllabus_body = link_thing
@@ -513,7 +513,7 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(doc)).to be_empty
     end
 
-    it "should not export syllabus if not selected" do
+    it "does not export syllabus if not selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
       @ce.selected_content = {
@@ -525,7 +525,7 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css('resource[href="course_settings/syllabus.html"]')).to be_nil
     end
 
-    it "should export syllabus when selected" do
+    it "exports syllabus when selected" do
       @course.syllabus_body = "<p>Bodylicious</p>"
 
       @ce.selected_content = {
@@ -545,7 +545,7 @@ describe "Common Cartridge exporting" do
         tool_proxy.save!
       end
 
-      it "should export tool profiles" do
+      it "exports tool profiles" do
         run_export
 
         resource = @manifest_doc.at_css('resource[type="tool_profile"]')
@@ -555,20 +555,20 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    it "should use canvas_export.txt as flag" do
+    it "uses canvas_export.txt as flag" do
       run_export
 
       expect(@manifest_doc.at_css('resource[href="course_settings/canvas_export.txt"]')).not_to be_nil
       expect(@zip_file.find_entry('course_settings/canvas_export.txt')).not_to be_nil
     end
 
-    it "should not error if the course name is too long" do
+    it "does not error if the course name is too long" do
       @course.name = "a" * Course.maximum_string_length
 
       run_export
     end
 
-    it "should export media tracks" do
+    it "exports media tracks" do
       stub_kaltura
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return('http://www.example.com/blah.flv')
@@ -591,7 +591,7 @@ describe "Common Cartridge exporting" do
       expect(ccc_schema.validate(track_doc)).to be_empty
     end
 
-    it "should export CC 1.3 assignments" do
+    it "exports CC 1.3 assignments" do
       @file = Attachment.create!(:filename => 'test.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @course.assignments.create! name: 'test assignment', description: %Q{<a href="/courses/#{@course.id}/files/#{@file.id}/preview">what?</a>}, points_possible: 11,
                                   submission_types: 'online_text_entry,online_upload,online_url'
@@ -833,7 +833,7 @@ describe "Common Cartridge exporting" do
       end
     end
 
-    it "should export unpublished modules and items" do
+    it "exports unpublished modules and items" do
       cm1 = @course.context_modules.create!(name: "published module")
       cm1.publish
       cm2 = @course.context_modules.create!(name: "unpublished module")
@@ -859,7 +859,7 @@ describe "Common Cartridge exporting" do
       expect(@manifest_doc.at_css("item[identifier=#{mig_id(tag2_1)}]")).not_to be_nil
     end
 
-    it "should export file copyright information" do
+    it "exports file copyright information" do
       @att1 = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai1'), :folder => Folder.unfiled_folder(@course), :context => @course)
       @att1.usage_rights = @course.usage_rights.create! use_justification: 'fair_use', legal_copyright: '(C) 2014 Sienar Fleet Systems'
       @att1.save!
@@ -905,14 +905,14 @@ describe "Common Cartridge exporting" do
         @ce.save!
       end
 
-      it "should show unpublished assignmnets for a teacher" do
+      it "shows unpublished assignmnets for a teacher" do
         run_export
 
         check_resource_node(@published, CC::CCHelper::LOR)
         check_resource_node(@unpublished, CC::CCHelper::LOR)
       end
 
-      it "should not show unpublished assignments for a student" do
+      it "does not show unpublished assignments for a student" do
         student_in_course(active_all: true, user_name: "a student")
         @ce.user = @student
         @ce.save!
@@ -923,7 +923,7 @@ describe "Common Cartridge exporting" do
         check_resource_node(@unpublished, CC::CCHelper::LOR, false)
       end
 
-      it "should always use relevant migration ids in anchor tags when exporting for ePub" do
+      it "alwayses use relevant migration ids in anchor tags when exporting for ePub" do
         cm1 = @course.context_modules.create!(name: "unlocked module")
         cm1.publish
         cm2 = @course.context_modules.create!({
@@ -956,7 +956,7 @@ describe "Common Cartridge exporting" do
     end
 
     context 'locked items' do
-      it "should not export locked items for a student" do
+      it "does not export locked items for a student" do
         student_in_course(active_all: true, user_name: "a student")
         assignment = @course.assignments.create!({ title: 'assignment', unlock_at: 5.days.from_now })
         quiz = @course.quizzes.create!(title: 'quiz', unlock_at: 5.days.from_now)
@@ -1020,7 +1020,7 @@ describe "Common Cartridge exporting" do
         @ce.save!
       end
 
-      it "should include all files for teacher" do
+      it "includes all files for teacher" do
         run_export
 
         check_resource_node(@visible, CC::CCHelper::WEBCONTENT)
@@ -1028,7 +1028,7 @@ describe "Common Cartridge exporting" do
         check_resource_node(@locked, CC::CCHelper::WEBCONTENT)
       end
 
-      it "should not include hidden or locked attachments for student" do
+      it "does not include hidden or locked attachments for student" do
         student_in_course(active_all: true, user_name: "a student", course: @course)
         @ce.user = @student
         @ce.save!

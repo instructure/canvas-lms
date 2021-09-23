@@ -23,18 +23,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 describe UserObservationLink do
   let_once(:student) { user_factory }
 
-  it 'should fail when there is not observer or observee' do
+  it 'fails when there is not observer or observee' do
     expect { UserObservationLink.create_or_restore(student: nil, observer: student, root_account: Account.default) }
       .to raise_error(ArgumentError, 'student, observer and root_account are required')
   end
 
-  it "should not allow a user to observe oneself" do
+  it "does not allow a user to observe oneself" do
     expect {
       UserObservationLink.create_or_restore(observer: student, student: student, root_account: Account.default)
     }.to raise_error(ActiveRecord::RecordInvalid)
   end
 
-  it 'should restore deleted observees instead of creating a new one' do
+  it 'restores deleted observees instead of creating a new one' do
     observer = user_with_pseudonym
     UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     observee = observer.as_observer_observation_links.first
@@ -45,7 +45,7 @@ describe UserObservationLink do
     expect(re_observee.workflow_state).to eq 'active'
   end
 
-  it 'should restore deleted observer enrollments on "restore" (even if nothing about the observee changed)' do
+  it 'restores deleted observer enrollments on "restore" (even if nothing about the observee changed)' do
     # i'm like 66% sure someone will complain about this
     student_enroll = student_in_course(:user => student)
 
@@ -58,13 +58,13 @@ describe UserObservationLink do
     expect(observer_enroll.reload).to_not be_deleted
   end
 
-  it 'should create an observees when one does not exist' do
+  it 'creates an observees when one does not exist' do
     observer = user_with_pseudonym
     re_observee = UserObservationLink.create_or_restore(observer: observer, student: student, root_account: Account.default)
     expect(re_observee).to eq student.as_student_observation_links.first
   end
 
-  it 'should create an observees when there is bad data' do
+  it 'creates an observees when there is bad data' do
     observer = user_with_pseudonym
     course1 = course_factory
     course2 = course_factory
@@ -78,7 +78,7 @@ describe UserObservationLink do
     expect(re_observee).to eq student.as_student_observation_links.first
   end
 
-  it "should enroll the observer in all pending/active courses and restore them after destroy" do
+  it "enrolls the observer in all pending/active courses and restore them after destroy" do
     c1 = course_factory(active_all: true)
     e1 = student_in_course(:course => c1, :user => student)
     c2 = course_factory(active_all: true)
@@ -106,7 +106,7 @@ describe UserObservationLink do
     expect(enrollments.reload.map(&:workflow_state)).to eql ["active", "active"]
   end
 
-  it "should be able to preload observers" do
+  it "is able to preload observers" do
     c1 = course_factory(active_all: true)
     e1 = student_in_course(:course => c1, :user => student)
 
@@ -121,7 +121,7 @@ describe UserObservationLink do
     expect(User.where(:id => student).preload(:linked_observers).first.linked_observers).to eq []
   end
 
-  it "should enroll the observer in courses when the student is inactive" do
+  it "enrolls the observer in courses when the student is inactive" do
     c1 = course_factory(active_all: true)
     enroll = student_in_course(:course => c1, :user => student)
     enroll.deactivate
@@ -139,7 +139,7 @@ describe UserObservationLink do
     expect(new_o_enroll).to be_active
   end
 
-  it "should not enroll the observer if the user_observer record is deleted" do
+  it "does not enroll the observer if the user_observer record is deleted" do
     c1 = course_factory(active_all: true)
 
     observer = user_with_pseudonym
@@ -156,7 +156,7 @@ describe UserObservationLink do
     expect(observer.observer_enrollments.first).to be_nil
   end
 
-  it "should not enroll the observer in institutions where they lack a login" do
+  it "does not enroll the observer in institutions where they lack a login" do
     unless has_sharding?
       skip 'Sharding specs fail without additional support from a multi-tenancy plugin'
     end
@@ -191,13 +191,13 @@ describe UserObservationLink do
       @observer_enrollment = @observer.enrollments.where(type: 'ObserverEnrollment', course_id: @course, associated_user_id: student).first
     end
 
-    it "should not attempt to add a duplicate observer enrollment" do
+    it "does not attempt to add a duplicate observer enrollment" do
       expect {
         @course.enroll_student student, role: @custom_student_role
       }.not_to raise_error
     end
 
-    it "should recycle an existing deleted observer enrollment" do
+    it "recycles an existing deleted observer enrollment" do
       @observer_enrollment.destroy
       expect {
         @course.enroll_student student, role: @custom_student_role
@@ -271,14 +271,14 @@ describe UserObservationLink do
       pseudonym(@observer, account: @a2)
     end
 
-    it "should only add the observer in courses on the same root account as the link when created" do
+    it "onlies add the observer in courses on the same root account as the link when created" do
       e1 = student_in_course(course: @c1, user: student, active_all: true)
       e2 = student_in_course(course: @c2, user: student, active_all: true)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
     end
 
-    it "should only add observers linked on the same root account to a new student enrollment" do
+    it "onlies add observers linked on the same root account to a new student enrollment" do
       @observer2 = user_with_pseudonym(account: @a2)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer2, student: student, root_account: @a2)
@@ -287,7 +287,7 @@ describe UserObservationLink do
       expect(@observer2.enrollments).to be_empty
     end
 
-    it "should only remove the observer in courses on the same root account as the link" do
+    it "onlies remove the observer in courses on the same root account as the link" do
       e1 = student_in_course(course: @c1, user: student, active_all: true)
       e2 = student_in_course(course: @c2, user: student, active_all: true)
       link1 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
@@ -297,7 +297,7 @@ describe UserObservationLink do
       expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
     end
 
-    it "should only update observer enrollments linked on the same root account" do
+    it "onlies update observer enrollments linked on the same root account" do
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
       e1 = student_in_course(course: @c1, user: student, active_all: true)

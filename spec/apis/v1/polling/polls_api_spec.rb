@@ -124,7 +124,7 @@ describe Polling::PollsController, type: :request do
         expect(poll_json).not_to have_key("total_results")
       end
 
-      it "shouldn't return the id of the user that created the poll" do
+      it "does not return the id of the user that created the poll" do
         student_in_course(:active_all => true, :course => @course)
         session = @poll.poll_sessions.create!(course: @course)
         session.publish!

@@ -51,7 +51,7 @@ describe "student groups" do
         get("/courses/#{@course.id}/groups")
       end
 
-      it "should have warning text", priority: "1", test_id: 182055 do
+      it "has warning text", priority: "1", test_id: 182055 do
         expect(f(".alert")).to include_text("These groups are self-organized by students")
       end
 
@@ -70,7 +70,7 @@ describe "student groups" do
         expect(f("#content")).not_to contain_css(".group-name")
       end
 
-      it "should list all students in the student group", priority: "1", test_id: 182061 do
+      it "lists all students in the student group", priority: "1", test_id: 182061 do
         # expand group
         f(".group-name").click
         wait_for_animations
@@ -83,7 +83,7 @@ describe "student groups" do
         end
       end
 
-      it "should set a student as a group leader", priority: "1", test_id: 184461 do
+      it "sets a student as a group leader", priority: "1", test_id: 184461 do
         # expand group
         f(".group-name").click
         wait_for_animations

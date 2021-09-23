@@ -38,12 +38,12 @@ describe ConferencesController do
   end
 
   describe "GET 'index'" do
-    it "should require authorization" do
+    it "requires authorization" do
       get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{ 'id' => 12, 'hidden' => true }])
       get 'index', params: { :course_id => @course.id }
@@ -51,13 +51,13 @@ describe ConferencesController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@student)
       get 'index', params: { :course_id => @course.id }
       expect(response).to be_successful
     end
 
-    it "should not redirect from group context" do
+    it "does not redirect from group context" do
       user_session(@student)
       @group = @course.groups.create!(:name => "some group")
       @group.add_user(@student)
@@ -65,7 +65,7 @@ describe ConferencesController do
       expect(response).to be_successful
     end
 
-    it "should not include the student view student" do
+    it "does not include the student view student" do
       user_session(@teacher)
       @student_view_student = @course.student_view_student
       get 'index', params: { :course_id => @course.id }
@@ -80,7 +80,7 @@ describe ConferencesController do
       expect(assigns[:users].include?(@inactive_student)).to be_falsey
     end
 
-    it "should not allow the student view student to access collaborations" do
+    it "does not allow the student view student to access collaborations" do
       course_with_teacher_logged_in(:active_user => true)
       expect(@course).not_to be_available
       @fake_student = @course.student_view_student
@@ -90,7 +90,7 @@ describe ConferencesController do
       assert_unauthorized
     end
 
-    it "should not list conferences that use a disabled plugin" do
+    it "does not list conferences that use a disabled plugin" do
       user_session(@teacher)
       plugin = PluginSetting.create!(name: 'adobe_connect')
       plugin.update_attribute(:settings, { :domain => 'adobe_connect.test' })
@@ -102,7 +102,7 @@ describe ConferencesController do
       expect(assigns[:new_conferences]).to be_empty
     end
 
-    it "should preload recordings for BBB conferences" do
+    it "preloads recordings for BBB conferences" do
       PluginSetting.create!(name: 'big_blue_button',
                             :settings => {
                               :domain => "bbb.totallyanexampleplzdontcallthis.com",
@@ -119,7 +119,7 @@ describe ConferencesController do
       expect(response).to be_successful
     end
 
-    it "should include group and section data in the js_env" do
+    it "includes group and section data in the js_env" do
       group(context: @course)
       user_session(@teacher)
       get 'index', params: { course_id: @course.id }
@@ -130,13 +130,13 @@ describe ConferencesController do
     end
 
     context "sets render_alternatives variable" do
-      it "should set to false by default" do
+      it "sets to false by default" do
         user_session(@teacher)
         get 'index', params: { course_id: @course.id }
         expect(assigns[:js_env][:render_alternatives]).to be_falsey
       end
 
-      it "should set to true if plugins are set to replace_with_alternatives" do
+      it "sets to true if plugins are set to replace_with_alternatives" do
         user_session(@teacher)
         @plugin.update_attribute(:settings, @plugin.settings.merge(replace_with_alternatives: true))
         get 'index', params: { course_id: @course.id }
@@ -166,18 +166,18 @@ describe ConferencesController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :web_conference => { :title => "My Conference", :conference_type => 'Wimba' } }
       assert_unauthorized
     end
 
-    it "should create a conference" do
+    it "creates a conference" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :web_conference => { :title => "My Conference", :conference_type => 'Wimba' } }, :format => 'json'
       expect(response).to be_successful
     end
 
-    it "should create a conference with observers removed" do
+    it "creates a conference with observers removed" do
       user_session(@teacher)
       enrollment = observer_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
       post 'create', params: { :observers => { :remove => "1" }, :course_id => @course.id, :web_conference => { :title => "My Conference", :conference_type => 'Wimba' } }, :format => 'json'
@@ -188,7 +188,7 @@ describe ConferencesController do
 
     context 'with concluded students in context' do
       context "with a course context" do
-        it 'should not invite students with a concluded enrollment' do
+        it 'does not invite students with a concluded enrollment' do
           user_session(@teacher)
           enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
           enrollment.conclude
@@ -199,7 +199,7 @@ describe ConferencesController do
       end
 
       context 'with a group context' do
-        it 'should not invite students with a concluded enrollment' do
+        it 'does not invite students with a concluded enrollment' do
           user_session(@teacher)
           concluded_enrollment = student_in_course(active_all: true, user: user_with_pseudonym(active_all: true))
           concluded_enrollment.conclude
@@ -220,19 +220,19 @@ describe ConferencesController do
   end
 
   describe "POST 'update'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :web_conference => { :title => "My Conference", :conference_type => 'Wimba' } }
       assert_unauthorized
     end
 
-    it "should update a conference" do
+    it "updates a conference" do
       user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       post 'update', params: { :course_id => @course.id, :id => @conference, :web_conference => { :title => "Something else" } }, :format => 'json'
       expect(response).to be_successful
     end
 
-    it "should return user ids" do
+    it "returns user ids" do
       user_session(@teacher)
       @conference = @course.web_conferences.create!(conference_type: "Wimba", user: @teacher)
       params = {
@@ -250,13 +250,13 @@ describe ConferencesController do
   end
 
   describe "POST 'join'" do
-    it "should require authorization" do
+    it "requires authorization" do
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
       assert_unauthorized
     end
 
-    it "should let admins join a conference" do
+    it "lets admins join a conference" do
       user_session(@teacher)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
@@ -264,7 +264,7 @@ describe ConferencesController do
       expect(response['Location']).to match /wimba\.test/
     end
 
-    it "should let students join an inactive long running conference" do
+    it "lets students join an inactive long running conference" do
       user_session(@student)
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :user => @teacher)
       @conference.update_attribute :start_at, 1.month.ago
@@ -285,7 +285,7 @@ describe ConferencesController do
         user_session(@student)
       end
 
-      it "should not let students join an inactive conference" do
+      it "does not let students join an inactive conference" do
         expect_any_instance_of(WimbaConference).to receive(:active?).and_return(false)
         post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
         expect(response).to be_redirect
@@ -300,7 +300,7 @@ describe ConferencesController do
           post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
         end
 
-        it "should let students join an active conference" do
+        it "lets students join an active conference" do
           expect(response).to be_redirect
           expect(response['Location']).to match /wimba\.test/
         end

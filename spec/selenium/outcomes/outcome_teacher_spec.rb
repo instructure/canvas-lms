@@ -45,17 +45,17 @@ describe "outcomes as a teacher" do
       goto_account_default_outcomes
     end
 
-    it "should have account outcomes available for course" do
+    it "has account outcomes available for course" do
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
     end
 
-    it "should add account outcomes to course" do
+    it "adds account outcomes to course" do
       f(".ellipsis[title='outcome 0']").click
       import_account_level_outcomes()
       expect(f(".ellipsis[title='outcome 0']")).to be_displayed
     end
 
-    it "should remove account outcomes from course" do
+    it "removes account outcomes from course" do
       skip("no delete button when seeding, functionality should be available")
       f(".ellipsis[title='outcome 0']").click
       import_account_level_outcomes()
@@ -73,7 +73,7 @@ describe "outcomes as a teacher" do
       account_outcome(1)
     end
 
-    it "should not allow importing top level groups" do
+    it "does not allow importing top level groups" do
       get outcome_url
       wait_for_ajaximations
 
@@ -87,7 +87,7 @@ describe "outcomes as a teacher" do
       end
     end
 
-    it "should update the selected group when re-opened" do
+    it "updates the selected group when re-opened" do
       group1 = outcome_group_model(title: 'outcome group 1', context: @course)
       group2 = outcome_group_model(title: 'outcome group 2', context: @course)
 
@@ -128,7 +128,7 @@ describe "outcomes as a teacher" do
       course_with_teacher_logged_in
     end
 
-    it "should load groups and then outcomes" do
+    it "loads groups and then outcomes" do
       num = 2
       course_bulk_outcome_groups_course(num, num)
       course_outcome(num)
@@ -138,14 +138,14 @@ describe "outcomes as a teacher" do
       expect(levels.last).to have_class("outcome-link")
     end
 
-    it "should be able to display 20 groups" do
+    it "is able to display 20 groups" do
       num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
       expect(ff(".outcome-group")).to have_size 20
     end
 
-    it "should be able to display 20 nested outcomes" do
+    it "is able to display 20 nested outcomes" do
       num = 20
       course_bulk_outcome_groups_course(num, num)
       get outcome_url
@@ -155,7 +155,7 @@ describe "outcomes as a teacher" do
     end
 
     context "instructions" do
-      it "should display outcome instructions" do
+      it "displays outcome instructions" do
         course_bulk_outcome_groups_course(2, 2)
         get outcome_url
         wait_for_ajaximations
@@ -170,7 +170,7 @@ describe "outcomes as a teacher" do
       who_to_login == 'teacher' ? @context = @course : @context = account
     end
 
-    it "should alert user if attempting to move with no directory selected" do
+    it "alerts user if attempting to move with no directory selected" do
       outcome_model
       get outcome_url
       wait_for_ajaximations
@@ -188,7 +188,7 @@ describe "outcomes as a teacher" do
       expect(f('.ic-flash-error').text).to include "No directory is selected, please select a directory before clicking 'move'"
     end
 
-    it "should move a learning outcome via tree modal" do
+    it "moves a learning outcome via tree modal" do
       outcome = outcome_model
       group = outcome_group_model
       get outcome_url
@@ -231,7 +231,7 @@ describe "outcomes as a teacher" do
       expect(f('.ic-flash-error').text).to include "first new outcome is already located in new outcome group"
     end
 
-    it "should move a learning outcome group via tree modal" do
+    it "moves a learning outcome group via tree modal" do
       group1 = outcome_group_model(title: 'outcome group 1')
       group2 = outcome_group_model(title: 'outcome group 2')
       get outcome_url

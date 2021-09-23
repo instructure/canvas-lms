@@ -176,7 +176,7 @@ describe GradebookHistoryApiController, type: :request do
       }
     end
 
-    it 'should return all applicable versions' do
+    it 'returns all applicable versions' do
       create_versions
 
       expect(api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json", {
@@ -187,7 +187,7 @@ describe GradebookHistoryApiController, type: :request do
                               }).size).to eq 8
     end
 
-    it 'should paginate the versions' do
+    it 'paginates the versions' do
       create_versions
 
       expect(api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/gradebook_history/feed.json?per_page=5", {
@@ -213,7 +213,7 @@ describe GradebookHistoryApiController, type: :request do
                               }).size).to eq 3
     end
 
-    it 'should order the most recent versions first' do
+    it 'orders the most recent versions first' do
       @submission3.with_versioning(:explicit => true) {
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       }
@@ -230,7 +230,7 @@ describe GradebookHistoryApiController, type: :request do
       expect(json["grader_id"]).to eq @other_grader.id
     end
 
-    it 'should optionally restrict by assignment_id' do
+    it 'optionallies restrict by assignment_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -247,7 +247,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["assignment_id"]).to eq @assignment2.id }
     end
 
-    it 'should optionally restrict by user_id' do
+    it 'optionallies restrict by user_id' do
       @submission4.with_versioning(:explicit => true) {
         @submission4.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 70)
       }
@@ -264,7 +264,7 @@ describe GradebookHistoryApiController, type: :request do
       json.each { |entry| expect(entry["user_id"]).to eq @student1.id }
     end
 
-    it 'should optionally reverse ordering to oldest version first' do
+    it 'optionallies reverse ordering to oldest version first' do
       @submission3.with_versioning(:explicit => true) {
         @submission3.update!(:graded_at => 24.hours.ago, :grader_id => @other_grader.id, :score => 80)
       }

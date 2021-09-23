@@ -30,12 +30,12 @@ describe CalendarsController do
   before(:each) { user_session(@student) }
 
   describe "GET 'show'" do
-    it "should not redirect to the old calendar even with default settings" do
+    it "does not redirect to the old calendar even with default settings" do
       get 'show', params: { :user_id => @user.id }
       expect(response).not_to redirect_to(calendar_url(anchor: ' '))
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       course_event
       get 'show', params: { :user_id => @user.id }
       expect(response).to be_successful
@@ -98,7 +98,7 @@ describe CalendarsController do
 
     specs_require_sharding
 
-    it "should set permissions using contexts from the correct shard" do
+    it "sets permissions using contexts from the correct shard" do
       # non-shard-aware code could use a shard2 id on shard1. this could grab the wrong course,
       # or no course at all. this sort of aliasing used to break a permission check in show
       invalid_shard1_course_id = (Course.maximum(:id) || 0) + 1
@@ -130,14 +130,14 @@ describe CalendarEventsApiController do
       @course.assignments.create!(:title => "some assignment")
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       get 'public_feed', params: { :feed_code => "course_#{@course.uuid}" }, :format => 'ics'
       expect(response).to be_successful
       expect(assigns[:events]).to be_present
       expect(assigns[:events][0]).to eql(@event)
     end
 
-    it "should use the relevant event for that section, in the course feed" do
+    it "uses the relevant event for that section, in the course feed" do
       skip "requires changing the format of the course feed url to include user information"
       s2 = @course.course_sections.create!(:name => 's2')
       c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
@@ -149,7 +149,7 @@ describe CalendarEventsApiController do
     end
 
     context "for a user context" do
-      it "should use the relevant event for that section" do
+      it "uses the relevant event for that section" do
         s2 = @course.course_sections.create!(:name => 's2')
         c1 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => @course.default_section, :start_at => 2.hours.ago, :end_at => 1.hour.ago)
         c2 = factory_with_protected_attributes(@event.child_events, :description => @event.description, :title => @event.title, :context => s2, :start_at => 3.hours.ago, :end_at => 2.hours.ago)
@@ -159,12 +159,12 @@ describe CalendarEventsApiController do
         expect(assigns[:events]).to eq [c1]
       end
 
-      it "should require authorization" do
+      it "requires authorization" do
         get 'public_feed', params: { :feed_code => @user.feed_code + 'x' }, :format => 'atom'
         expect(response).to render_template('shared/unauthorized_feed')
       end
 
-      it "should include absolute path for rel='self' link" do
+      it "includes absolute path for rel='self' link" do
         get 'public_feed', params: { :feed_code => @user.feed_code }, :format => 'atom'
         feed = Atom::Feed.load_feed(response.body) rescue nil
         expect(feed).not_to be_nil
@@ -172,7 +172,7 @@ describe CalendarEventsApiController do
         expect(feed.links.first.href).to match(/http:\/\//)
       end
 
-      it "should include an author for each entry" do
+      it "includes an author for each entry" do
         get 'public_feed', params: { :feed_code => @user.feed_code }, :format => 'atom'
         feed = Atom::Feed.load_feed(response.body) rescue nil
         expect(feed).not_to be_nil
@@ -180,7 +180,7 @@ describe CalendarEventsApiController do
         expect(feed.entries.all? { |e| e.authors.present? }).to be_truthy
       end
 
-      it "should include description in event for unlocked assignment" do
+      it "includes description in event for unlocked assignment" do
         assignment = @course.assignments.create!({
                                                    title: "assignment event test",
                                                    description: "foo",
@@ -190,7 +190,7 @@ describe CalendarEventsApiController do
         expect(response.body).to include("DESCRIPTION:#{assignment.description}")
       end
 
-      it "should not include description in event for locked assignment" do
+      it "does not include description in event for locked assignment" do
         assignment = @course.assignments.create!({
                                                    title: "assignment event test",
                                                    description: "foo",

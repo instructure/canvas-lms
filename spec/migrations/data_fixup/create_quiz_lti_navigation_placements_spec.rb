@@ -21,7 +21,7 @@ require_relative "../../spec_helper"
 
 describe DataFixup::CreateQuizLtiNavigationPlacements do
   context 'when there are no Quiz LTI tools' do
-    it 'should not create context_external_tool_placements' do
+    it 'does not create context_external_tool_placements' do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
@@ -63,7 +63,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       )
     end
 
-    it 'should create an account level placement associated for each Quiz LTI tool' do
+    it 'creates an account level placement associated for each Quiz LTI tool' do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
@@ -77,7 +77,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       end
     end
 
-    it 'should not create navigation placements for deleted Quiz LTI tools' do
+    it 'does not create navigation placements for deleted Quiz LTI tools' do
       ContextExternalTool.quiz_lti.last.update!(workflow_state: 'deleted')
 
       expect(ContextExternalToolPlacement.count).to eq 0
@@ -93,7 +93,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       end
     end
 
-    it 'should not create navigation placements if the placements where already created' do
+    it 'does not create navigation placements if the placements where already created' do
       expect(ContextExternalToolPlacement.count).to eq 0
 
       DataFixup::CreateQuizLtiNavigationPlacements.run
@@ -105,7 +105,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       }.to not_change { ContextExternalToolPlacement.count }
     end
 
-    it 'should not create navigation placements for tools that are not Quiz LTI' do
+    it 'does not create navigation placements for tools that are not Quiz LTI' do
       some_tool = ContextExternalTool.find_by(tool_id: 'Some tool')
 
       expect(some_tool.quiz_lti?).to eq false
@@ -115,7 +115,7 @@ describe DataFixup::CreateQuizLtiNavigationPlacements do
       }.to not_change { some_tool.context_external_tool_placements.count }
     end
 
-    it 'should not create navigation placements for Quiz LTI tools where context_type is not Account' do
+    it 'does not create navigation placements for Quiz LTI tools where context_type is not Account' do
       quiz_tool = ContextExternalTool.quiz_lti.last
       quiz_tool.update!(context_type: 'Course')
 

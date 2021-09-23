@@ -156,8 +156,7 @@ describe OutcomeResultsController do
   end
 
   describe "retrieving outcome results" do
-    it "should not have a false failure if an outcome exists in two places " \
-      "within the same context" do
+    it "does not have a false failure if an outcome exists in two places within the same context" do
       user_session(@teacher)
       outcome_group = @course.root_outcome_group.child_outcome_groups.build(
         :title => "Child outcome group", :context => @course
@@ -190,7 +189,7 @@ describe OutcomeResultsController do
       expect(links[0]['outcome']['id']).to eq @outcome.id
     end
 
-    it 'should validate aggregate_stat parameter' do
+    it 'validates aggregate_stat parameter' do
       user_session(@teacher)
       get 'rollups', params: { :context_id => @course.id,
                                :course_id => @course.id,
@@ -433,23 +432,23 @@ describe OutcomeResultsController do
     end
 
     context 'sorting' do
-      it 'should validate sort_by parameter' do
+      it 'validates sort_by parameter' do
         get_rollups(sort_by: 'garbage')
         expect(response).not_to be_successful
       end
 
-      it 'should validate sort_order parameter' do
+      it 'validates sort_order parameter' do
         get_rollups(sort_by: 'student', sort_order: 'random')
         expect(response).not_to be_successful
       end
 
       context 'by outcome' do
-        it 'should validate a missing sort_outcome_id parameter' do
+        it 'validates a missing sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome')
           expect(response).not_to be_successful
         end
 
-        it 'should validate an invalid sort_outcome_id parameter' do
+        it 'validates an invalid sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: 'NaN')
           expect(response).not_to be_successful
         end
@@ -469,14 +468,14 @@ describe OutcomeResultsController do
       end
 
       context 'by student' do
-        it 'should sort rollups by ascending student name' do
+        it 'sorts rollups by ascending student name' do
           get_rollups(sort_by: 'student')
           expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student1, @student2, @student3])
         end
 
-        it 'should sort rollups by descending student name' do
+        it 'sorts rollups by descending student name' do
           get_rollups(sort_by: 'student', sort_order: 'desc')
           expect(response).to be_successful
           json = parse_response(response)
@@ -501,7 +500,7 @@ describe OutcomeResultsController do
               @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
             end
 
-            it 'should only return students in the teachers section' do
+            it 'onlies return students in the teachers section' do
               get_rollups(sort_by: 'student', sort_order: 'desc')
               json = parse_response(response)
               expect_user_order(json['rollups'], [@student2])
@@ -572,17 +571,17 @@ describe OutcomeResultsController do
             end
 
             context 'should paginate by user, rather than by enrollment' do
-              it 'should return student1 on first page' do
+              it 'returns student1 on first page' do
                 expect_students_in_pagination(1, [@student1], include: ['users'])
                 expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student1.id.to_s]
               end
 
-              it 'should return student2 on second page' do
+              it 'returns student2 on second page' do
                 expect_students_in_pagination(2, [@student2, @student2, @student2], include: ['users'])
                 expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student2.id.to_s]
               end
 
-              it 'should return student3 on third page' do
+              it 'returns student3 on third page' do
                 expect_students_in_pagination(3, [@student3, @student3], include: ['users'])
                 expect(json['linked']['users'].map { |u| u['id'] }).to eq [@student3.id.to_s]
               end
@@ -597,7 +596,7 @@ describe OutcomeResultsController do
       end
 
       context 'by outcome' do
-        it 'should sort rollups by ascending rollup score' do
+        it 'sorts rollups by ascending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id)
           expect(response).to be_successful
           json = parse_response(response)
@@ -605,7 +604,7 @@ describe OutcomeResultsController do
           expect_score_order(json['rollups'], [1, 3, nil])
         end
 
-        it 'should sort rollups by descending rollup score' do
+        it 'sorts rollups by descending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: 'desc')
           expect(response).to be_successful
           json = parse_response(response)

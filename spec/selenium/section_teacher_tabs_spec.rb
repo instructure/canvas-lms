@@ -23,7 +23,7 @@ describe "section tabs on the left side" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-    it "should highlight which tab is active" do
+    it "highlights which tab is active" do
       BrandableCSS.save_default!('css') # make sure variable css file is up to date
       course_with_teacher_logged_in
       %w{assignments quizzes settings}.each do |feature|

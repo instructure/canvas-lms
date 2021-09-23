@@ -27,14 +27,14 @@ describe PermissionsHelper do
       @teacher_role = teacher_role
     end
 
-    it 'should return enrollments that have permission by default' do
+    it 'returns enrollments that have permission by default' do
       course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
       expect(enrollments).to match_array([teacher_enrollment])
     end
 
-    it 'should return enrollments that have permission from a direct account override' do
+    it 'returns enrollments that have permission from a direct account override' do
       student_enrollment = course_with_student(active_all: true)
       course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: @student_role, account: Account.default)
@@ -43,7 +43,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment])
     end
 
-    it 'should return enrollments that have permission from an ancestor account override' do
+    it 'returns enrollments that have permission from an ancestor account override' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -54,7 +54,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment2])
     end
 
-    it 'should only return enrollments that have permission for the given override' do
+    it 'onlies return enrollments that have permission for the given override' do
       course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_grades', enabled: true, role: @student_role, account: Account.default)
@@ -63,7 +63,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([teacher_enrollment])
     end
 
-    it 'should return enrollments that have permission from an account role' do
+    it 'returns enrollments that have permission from an account role' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
@@ -75,7 +75,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([student_enrollment, teacher_enrollment])
     end
 
-    it 'should handle AccountAdmin roles' do
+    it 'handles AccountAdmin roles' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       @user.account_users.create!(account: Account.default, role: admin_role)
@@ -86,7 +86,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([teacher_enrollment])
     end
 
-    it 'should inherit AccountAdmin rights from a parent account' do
+    it 'inherits AccountAdmin rights from a parent account' do
       subaccount = Account.default.sub_accounts.create!
       student_enrollment = course_with_student(active_all: true, account: subaccount)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true, account: subaccount)
@@ -98,7 +98,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([teacher_enrollment])
     end
 
-    it 'should use AccountAdmin permissions when another role disables the permission' do
+    it 'uses AccountAdmin permissions when another role disables the permission' do
       student_enrollment = course_with_student(active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: custom_role, account: Account.default)
@@ -108,7 +108,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment])
     end
 
-    it 'should handle account role overrides that conflict with course role overrides' do
+    it 'handles account role overrides that conflict with course role overrides' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
@@ -121,7 +121,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([student_enrollment, teacher_enrollment])
     end
 
-    it 'should handle account role overrides from a higher account that conflict with course role overrides' do
+    it 'handles account role overrides from a higher account that conflict with course role overrides' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -137,7 +137,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([teacher_enrollment1, teacher_enrollment2])
     end
 
-    it 'should handle course role overrides from a higher account that conflict with account role overrides' do
+    it 'handles course role overrides from a higher account that conflict with account role overrides' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -153,7 +153,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([teacher_enrollment2])
     end
 
-    it 'should handle role override disabling the permission in a lower account' do
+    it 'handles role override disabling the permission in a lower account' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -169,7 +169,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([])
     end
 
-    it 'should handle account role overrides from a lower account than the account the role belongs to' do
+    it 'handles account role overrides from a lower account than the account the role belongs to' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -181,7 +181,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment])
     end
 
-    it 'should not be affected by role overrides in a sub-account of the current enrollment' do
+    it 'is not affected by role overrides in a sub-account of the current enrollment' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -193,7 +193,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([])
     end
 
-    it 'should handle conflicting course enrollments' do
+    it 'handles conflicting course enrollments' do
       teacher_enrollment = course_with_teacher(active_all: true)
       student_enrollment = course_with_student(user: @user, account: Account.default, course: @course, active_all: true)
       enrollments = @user.manageable_enrollments_by_permission(:manage_calendar)
@@ -204,7 +204,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([student_enrollment])
     end
 
-    it 'should handle role overrides that are turned on and off by sub-account' do
+    it 'handles role overrides that are turned on and off by sub-account' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -218,7 +218,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([teacher_enrollment_account1])
     end
 
-    it 'should handle locked overrides when there are sub-account overrides' do
+    it 'handles locked overrides when there are sub-account overrides' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       course_with_teacher(account: Account.default, active_all: true)
@@ -229,7 +229,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([])
     end
 
-    it 'should handle role overrides that do not apply to self' do
+    it 'handles role overrides that do not apply to self' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       course_with_teacher(account: Account.default, active_all: true)
@@ -240,7 +240,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([teacher_enrollment_account1])
     end
 
-    it 'should handle role overrides that do not apply to descendants' do
+    it 'handles role overrides that do not apply to descendants' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       student_enrollment_root = course_with_student(account: Account.default, active_all: true)
@@ -251,7 +251,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment_root])
     end
 
-    it 'should handle role overrides that do not apply to descendants and are locked' do
+    it 'handles role overrides that do not apply to descendants and are locked' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       student_enrollment_root = course_with_student(account: root_account, active_all: true)
@@ -264,7 +264,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment_root])
     end
 
-    it 'should handle AccountAdmin when the permission is off by default' do
+    it 'handles AccountAdmin when the permission is off by default' do
       student_enrollment = course_with_student(active_all: true)
       @user.account_users.create!(account: Account.default, role: admin_role)
       enrollments1 = @user.manageable_enrollments_by_permission(:view_notifications)
@@ -274,7 +274,7 @@ describe PermissionsHelper do
       expect(enrollments2).to match_array([student_enrollment])
     end
 
-    it 'should handle role overrides that turn off the permission for AccountAdmin but on for another account admin' do
+    it 'handles role overrides that turn off the permission for AccountAdmin but on for another account admin' do
       student_enrollment = course_with_student(active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
       @user.account_users.create!(account: Account.default, role: custom_role)
@@ -285,7 +285,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment])
     end
 
-    it 'should handle role overrides that turn off the permission for AccountAdmin and a course role that has it on by default' do
+    it 'handles role overrides that turn off the permission for AccountAdmin and a course role that has it on by default' do
       teacher_enrollment = course_with_teacher(active_all: true)
       @user.account_users.create!(account: Account.default, role: admin_role)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: admin_role, account: Account.default)
@@ -293,7 +293,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([teacher_enrollment])
     end
 
-    it 'should handle AccountAdmin with the permission on when another override turns it off' do
+    it 'handles AccountAdmin with the permission on when another override turns it off' do
       teacher_enrollment = course_with_teacher(active_all: true)
       @user.account_users.create!(account: Account.default, role: admin_role)
       RoleOverride.create!(permission: 'manage_calendar', enabled: false, role: @teacher_role, account: Account.default)
@@ -301,7 +301,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([teacher_enrollment])
     end
 
-    it 'should handle conflicting account role overrides' do
+    it 'handles conflicting account role overrides' do
       student_enrollment = course_with_student(active_all: true)
       custom_role1 = custom_account_role('OverrideTest1', account: Account.default)
       custom_role2 = custom_account_role('OverrideTest2', account: Account.default)
@@ -316,7 +316,7 @@ describe PermissionsHelper do
     context "cross-sharding" do
       specs_require_sharding
 
-      it "should handle cross-shard enrollment permissions" do
+      it "handles cross-shard enrollment permissions" do
         @shard1.activate do
           @another_account = Account.create!
           course_with_student(active_all: true, account: @another_account)
@@ -328,7 +328,7 @@ describe PermissionsHelper do
         expect(enrollments).to match_array([teacher_enrollment2, @teacher_enrollment1])
       end
 
-      it "should handle non-standard cross-shard enrollment permissions" do
+      it "handles non-standard cross-shard enrollment permissions" do
         @shard1.activate do
           @another_account = Account.create!
           @student_enrollment1 = course_with_student(active_all: true, account: @another_account)
@@ -352,7 +352,7 @@ describe PermissionsHelper do
       Hash[permissions_hash.map { |k, v| [k, v.except(:read, :read_grades, :read_as_admin, :participate_as_student)] }]
     end
 
-    it "should return other course-level (non-standard) permission values for active enrollments" do
+    it "returns other course-level (non-standard) permission values for active enrollments" do
       invited_student_enrollment = course_with_student(:active_course => true)
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
@@ -364,7 +364,7 @@ describe PermissionsHelper do
                                                                                             })
     end
 
-    it "should still let concluded term teachers read_as_admin" do
+    it "stills let concluded term teachers read_as_admin" do
       concluded_teacher_term = Account.default.enrollment_terms.create!(:name => "concluded")
       concluded_teacher_term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       concluded_teacher_enrollment = course_with_teacher(user: @user, active_all: true)
@@ -375,7 +375,7 @@ describe PermissionsHelper do
                                                                                               })
     end
 
-    it 'should return true for enrollments that have permission from a direct account override' do
+    it 'returns true for enrollments that have permission from a direct account override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_calendar', enabled: true, role: student_role, account: Account.default)
@@ -388,7 +388,7 @@ describe PermissionsHelper do
                                                                                                            })
     end
 
-    it 'should return true for enrollments that have permission from an ancestor account override' do
+    it 'returns true for enrollments that have permission from an ancestor account override' do
       root_account = Account.default
       sub_account1 = Account.create!(name: 'Sub-account 1', parent_account: root_account)
       sub_account2 = Account.create!(name: 'Sub-account 2', parent_account: sub_account1)
@@ -403,7 +403,7 @@ describe PermissionsHelper do
                                                                                                            })
     end
 
-    it 'should only return true for enrollments that have permission for the given override' do
+    it 'onlies return true for enrollments that have permission for the given override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_grades', enabled: true, role: student_role, account: Account.default) # can't actually turn manage_grades on for students
@@ -416,7 +416,7 @@ describe PermissionsHelper do
                                                                                                                            })
     end
 
-    it 'should return true for enrollments that have permission from an account role' do
+    it 'returns true for enrollments that have permission from an account role' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       custom_role = custom_account_role('OverrideTest', account: Account.default)
@@ -435,7 +435,7 @@ describe PermissionsHelper do
                                                                                                                            })
     end
 
-    it "should work with future restricted permissions" do
+    it "works with future restricted permissions" do
       invited_student_enrollment = course_with_student(:active_course => true)
       expect(invited_student_enrollment).to be_invited
       active_student_enrollment = course_with_student(:user => @user, :active_all => true)
@@ -447,7 +447,7 @@ describe PermissionsHelper do
                                                                                                                        })
     end
 
-    it "should work with unenrolled account admins" do
+    it "works with unenrolled account admins" do
       @course1 = course_factory
       sub_account = Account.default.sub_accounts.create!
       @course2 = course_factory(:account => sub_account)
@@ -457,7 +457,7 @@ describe PermissionsHelper do
       expect(result).to eq({ @course1.global_id => expected, @course2.global_id => expected })
     end
 
-    it "should work with concluded-available permissions" do
+    it "works with concluded-available permissions" do
       RoleOverride.create!(permission: 'moderate_forum', enabled: true, role: student_role, account: Account.default)
       concluded_student_enrollment = course_with_student(:active_all => true)
       @course.update(:start_at => 1.month.ago, :conclude_at => 2.weeks.ago, :restrict_enrollments_to_course_dates => true)
@@ -483,7 +483,7 @@ describe PermissionsHelper do
     context "sharding" do
       specs_require_sharding
 
-      it "should work across shards" do
+      it "works across shards" do
         @shard1.activate do
           @another_account = Account.create!
           @student_enrollment1 = course_with_student(active_all: true, account: @another_account)
@@ -509,7 +509,7 @@ describe PermissionsHelper do
         end
       end
 
-      it "should not try to precalculate for a cross-shard admin" do
+      it "does not try to precalculate for a cross-shard admin" do
         @shard1.activate do
           @another_account = Account.create!
           @cs_course = course_factory(active_all: true, account: @another_account)

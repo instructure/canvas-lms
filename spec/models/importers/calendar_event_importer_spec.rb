@@ -143,7 +143,7 @@ describe Importers::CalendarEventImporter do
 
   SYSTEMS.each do |system|
     if import_data_exists? system, 'calendar_event'
-      it "should import calendar events for #{system}" do
+      it "imports calendar events for #{system}" do
         data = get_import_data(system, 'calendar_event')
         context = get_import_context(system)
         migration = context.content_migrations.create!

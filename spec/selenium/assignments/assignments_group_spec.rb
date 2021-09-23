@@ -57,7 +57,7 @@ describe "assignment groups" do
     @course.assignments.create(name: "test", assignment_group: @assignment_group)
   end
 
-  it "should create a new assignment group", priority: "1", test_id: 120673 do
+  it "creates a new assignment group", priority: "1", test_id: 120673 do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
 
@@ -71,7 +71,7 @@ describe "assignment groups" do
     expect(ff('.assignment_group .ig-header h2').map(&:text)).to include("Second AG")
   end
 
-  it "should default to proper group when using group's inline add assignment button", priority: "2", test_id: 209998 do
+  it "defaults to proper group when using group's inline add assignment button", priority: "2", test_id: 209998 do
     @course.require_assignment_group
     ag = @course.assignment_groups.create!(name: "Pamplemousse")
 
@@ -89,7 +89,7 @@ describe "assignment groups" do
 
   # Per selenium guidelines, we should not test buttons navigating to a page
   # We could test that the page loads with the correct info from the params elsewhere
-  it "should remember entered settings when 'more options' is pressed", priority: "2", test_id: 209999 do
+  it "remembers entered settings when 'more options' is pressed", priority: "2", test_id: 209999 do
     ag2 = @course.assignment_groups.create!(name: "blah")
 
     get "/courses/#{@course.id}/assignments"
@@ -107,7 +107,7 @@ describe "assignment groups" do
     expect(get_value("#assignment_group_id")).to eq ag2.id.to_s
   end
 
-  it "should edit group details", priority: "1", test_id: 120672 do
+  it "edits group details", priority: "1", test_id: 120672 do
     assignment_group = @course.assignment_groups.create!(name: "first test group")
     4.times do
       @course.assignments.create(title: 'other assignment', assignment_group: assignment_group)
@@ -144,7 +144,7 @@ describe "assignment groups" do
     expect(assignment_group.rules_hash["never_drop"]).to eq [assignment.id]
   end
 
-  it "should edit assignment groups grade weights", priority: "1", test_id: 120675 do
+  it "edits assignment groups grade weights", priority: "1", test_id: 120675 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(name: "first group")
 
@@ -161,7 +161,7 @@ describe "assignment groups" do
     expect(f("#assignment_group_#{ag1.id} .ag-header-controls")).to include_text('50% of Total')
   end
 
-  it "should round group weights to 2 decimal places", priority: "2", test_id: 120676 do
+  it "rounds group weights to 2 decimal places", priority: "2", test_id: 120676 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(name: "first group")
 
@@ -178,7 +178,7 @@ describe "assignment groups" do
   end
 
   # This feels like it would be better suited here than in QUnit
-  it "should not remove new assignments when editing a group", priority: "1", test_id: 210000 do
+  it "does not remove new assignments when editing a group", priority: "1", test_id: 210000 do
     get "/courses/#{@course.id}/assignments"
     wait_for_ajaximations
     ag = @course.assignment_groups.first
@@ -204,7 +204,7 @@ describe "assignment groups" do
   end
 
   # Because of the way this feature was made, i recommend we keep this one
-  it "should move assignments to another assignment group", priority: "2", test_id: 210001 do
+  it "moves assignments to another assignment group", priority: "2", test_id: 210001 do
     before_count = @assignment_group.assignments.count
     @ag2 = @course.assignment_groups.create!(name: "2nd Group")
     @assignment = @course.assignments.create(name: "Test assignment", assignment_group: @ag2)
@@ -228,7 +228,7 @@ describe "assignment groups" do
     expect(@assignment.assignment_group).to eq @assignment_group
   end
 
-  it "should reorder assignment groups with drag and drop", priority: "2", test_id: 210010 do
+  it "reorders assignment groups with drag and drop", priority: "2", test_id: 210010 do
     ags = [@assignment_group]
     4.times do |i|
       ags << @course.assignment_groups.create!(name: "group_#{i}")
@@ -297,7 +297,7 @@ describe "assignment groups" do
     end
   end
 
-  it "should allow quick-adding two assignments to a group (dealing with form re-render)", priority: "2", test_id: 210084 do
+  it "allows quick-adding two assignments to a group (dealing with form re-render)", priority: "2", test_id: 210084 do
     @course.require_assignment_group
     ag = @course.assignment_groups.first
 
@@ -316,7 +316,7 @@ describe "assignment groups" do
     expect(f("#ag_#{ag.id}_assignment_name")).to be_displayed
   end
 
-  it "should correctly add group weights", priority: "2", test_id: 237014 do
+  it "correctlies add group weights", priority: "2", test_id: 237014 do
     @course.update_attribute(:group_weighting_scheme, 'percent')
     ag1 = @course.assignment_groups.create!(name: 'Group 1')
     ag2 = @course.assignment_groups.create!(name: 'Group 2')
@@ -360,13 +360,13 @@ describe "assignment groups" do
       @frozen_assign = frozen_assignment(default_group)
     end
 
-    it "should not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2", test_id: 210085 do
+    it "does not allow assignment group to be deleted by teacher if assignment group id frozen", priority: "2", test_id: 210085 do
       get "/courses/#{@course.id}/assignments"
       expect(f("#content")).not_to contain_css("#group_#{@frozen_assign.assignment_group_id} .delete_group_link")
       expect(f("#content")).not_to contain_css("#assignment_#{@frozen_assign.id} .delete_assignment_link")
     end
 
-    it "should not be locked for admin", priority: "2", test_id: 210086 do
+    it "is not locked for admin", priority: "2", test_id: 210086 do
       @course.assignment_groups.create!(name: "other")
       course_with_admin_logged_in(course: @course, name: "admin user")
       orig_title = @frozen_assign.title
@@ -386,7 +386,7 @@ describe "assignment groups" do
     end
   end
 
-  it "Should be able to delete assignments when deleting assignment Groups", priority: "2", test_id: 56007 do
+  it "is able to delete assignments when deleting assignment Groups", priority: "2", test_id: 56007 do
     group0 = @course.assignment_groups.create!(name: "Guybrush Group")
     assignment = @course.assignments.create!(title: "Fine Leather Jacket", assignment_group: group0,)
     get "/courses/#{@course.id}/assignments"

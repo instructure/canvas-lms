@@ -41,13 +41,13 @@ describe 'quizzes observers' do
       @quiz.save!
     end
 
-    it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
+    it "does not show correct answers on first attempt", priority: "1", test_id: 474288 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@qsub.id}"
       expect(f("#content")).not_to contain_css('.correct_answer')
     end
   end
 
-  it "should show quiz descriptions" do
+  it "shows quiz descriptions" do
     @context = @course
     quiz = quiz_model
     description = "some description"

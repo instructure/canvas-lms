@@ -106,7 +106,7 @@ RSpec.describe SubmissionCommentsController do
   end
 
   describe "DELETE 'destroy'" do
-    it "should delete the comment" do
+    it "deletes the comment" do
       course_with_teacher_logged_in(:active_all => true)
       submission_comment_model(:author => @user)
       delete 'destroy', params: { :id => @submission_comment.id }, format: "json"

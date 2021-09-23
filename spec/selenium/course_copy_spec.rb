@@ -30,7 +30,7 @@ describe "course copy" do
     expect(header.text).to eq @course.course_code
   end
 
-  it "should copy the course" do
+  it "copies the course" do
     course_with_admin_logged_in
     @course.syllabus_body = "<p>haha</p>"
     @course.tab_configuration = [{ "id" => 0 }, { "id" => 14 }, { "id" => 8 }, { "id" => 5 }, { "id" => 6 }, { "id" => 2 }, { "id" => 3, "hidden" => true }]
@@ -53,7 +53,7 @@ describe "course copy" do
   # TODO reimplement per CNVS-29604, but make sure we're testing at the right level
   it "should copy the course with different settings"
 
-  it "should set the course name and code correctly" do
+  it "sets the course name and code correctly" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -70,7 +70,7 @@ describe "course copy" do
     expect(new_course.course_code).to eq "course code of testing"
   end
 
-  it "should adjust the dates" do
+  it "adjusts the dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -102,7 +102,7 @@ describe "course copy" do
     end
   end
 
-  it "should remove dates" do
+  it "removes dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"
@@ -115,7 +115,7 @@ describe "course copy" do
     expect(opts['remove_dates']).to eq '1'
   end
 
-  it "should create the new course in the same sub-account" do
+  it "creates the new course in the same sub-account" do
     account_model
     subaccount = @account.sub_accounts.create!(:name => "subadubdub")
     course_with_admin_logged_in(:account => subaccount)
@@ -136,7 +136,7 @@ describe "course copy" do
     expect(@new_course.syllabus_body).to eq @course.syllabus_body
   end
 
-  it "should not be able to submit invalid course dates" do
+  it "is not able to submit invalid course dates" do
     course_with_admin_logged_in
 
     get "/courses/#{@course.id}/copy"

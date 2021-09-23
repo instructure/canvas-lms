@@ -41,18 +41,18 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@bank.assessment_question_count).to eql(2)
       expect(@sub.score).to eql(1.0)
     end
-    it "should create learning outcome results" do
+    it "creates learning outcome results" do
       expect(@quiz_results.size).to eql(1)
       expect(@question_results.size).to eql(2)
     end
-    it "should have root account ids on learning outcome question results" do
+    it "has root account ids on learning outcome question results" do
       expect(@question_results.first.root_account_id).to eq @course.root_account_id
     end
-    it 'should consider scores in aggregate' do
+    it 'considers scores in aggregate' do
       expect(@quiz_result.possible).to eql(2.0)
       expect(@quiz_result.score).to eql(1.0)
     end
-    it "shouldn't declare mastery" do
+    it "does not declare mastery" do
       expect(@quiz_result.mastery).to eql(false)
     end
 
@@ -119,15 +119,15 @@ describe Quizzes::QuizOutcomeResultBuilder do
         expect(@bank.assessment_question_count).to eql(2)
         expect(@bank2.assessment_question_count).to eql(2)
       end
-      it "should create two learning outcome results" do
+      it "creates two learning outcome results" do
         expect(@question_results.map(&:size)).to eql([2, 2])
         expect(@quiz_results.size).to eql(2)
       end
-      it 'should consider scores in aggregate' do
+      it 'considers scores in aggregate' do
         expect(@quiz_results.map(&:possible)).to eql([2.0, 2.0])
         expect(@quiz_results.map(&:score)).to eql([1.0, 1.0])
       end
-      it "should declare mastery when equal" do
+      it "declares mastery when equal" do
         expect(@quiz_results.map(&:mastery)).to eql([false, true])
       end
     end
@@ -181,7 +181,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
   end
 
   describe "question level learning outcomes" do
-    it "should create learning outcome results when aligned to assessment questions" do
+    it "creates learning outcome results when aligned to assessment questions" do
       build_course_quiz_questions_and_a_bank
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
@@ -205,7 +205,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@results.last.mastery).to eql(false)
     end
 
-    it "should update learning outcome results when aligned to assessment questions and kept score will update" do
+    it "updates learning outcome results when aligned to assessment questions and kept score will update" do
       build_course_quiz_questions_and_a_bank({}, { scoring_policy: "keep_latest" })
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
@@ -245,7 +245,7 @@ describe Quizzes::QuizOutcomeResultBuilder do
       expect(@results.last.original_mastery).to eql(false)
     end
 
-    it "should not update learning outcome results when kept score will not update" do
+    it "does not update learning outcome results when kept score will not update" do
       build_course_quiz_questions_and_a_bank
       expect(@bank.learning_outcome_alignments.length).to eql(1)
       expect(@q2.assessment_question.assessment_question_bank).to eql(@bank)
@@ -361,21 +361,21 @@ describe Quizzes::QuizOutcomeResultBuilder do
       answer_a_question(@q2, @sub, correct: false)
     end
 
-    it "should not create learning outcome results for an ungraded survey" do
+    it "does not create learning outcome results for an ungraded survey" do
       @quiz.update_attribute('quiz_type', 'survey')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
       expect(@outcome.learning_outcome_results.active.where(user_id: @user).length).to eql(0)
     end
 
-    it "should not create learning outcome results for a graded survey" do
+    it "does not create learning outcome results for a graded survey" do
       @quiz.update_attribute('quiz_type', 'graded_survey')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload
       expect(@outcome.learning_outcome_results.active.where(user_id: @user).length).to eql(0)
     end
 
-    it "should not create learning outcome results for a practice quiz" do
+    it "does not create learning outcome results for a practice quiz" do
       @quiz.update_attribute('quiz_type', 'practice_quiz')
       Quizzes::SubmissionGrader.new(@sub).grade_submission
       @outcome.reload

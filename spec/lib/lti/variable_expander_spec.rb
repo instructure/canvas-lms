@@ -506,7 +506,7 @@ module Lti
         let(:expansion) { '$com.instructure.Assignment.allowedFileExtensions' }
         let(:variable_expander_opts) { super().merge(context: course, assignment: assignment) }
 
-        it 'it expands when an assignment with online_upload submission type and extensions is present' do
+        it 'expands when an assignment with online_upload submission type and extensions is present' do
           assignment.update!(allowed_extensions: allowed_extensions, submission_types: 'online_upload')
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq allowed_extensions

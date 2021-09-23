@@ -59,12 +59,12 @@ describe Auditors::FeatureFlag do
         expect(@event.class).to eq(Auditors::FeatureFlag::Record)
       end
 
-      it "should include event for feature_flag index" do
+      it "includes event for feature_flag index" do
         expect(Auditors::FeatureFlag.for_feature_flag(@flag).paginate(:per_page => 10))
           .to include(@event)
       end
 
-      it "should set request_id" do
+      it "sets request_id" do
         expect(@event.request_id).to eq request_id.to_s
       end
 

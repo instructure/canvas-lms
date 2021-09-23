@@ -31,7 +31,7 @@ describe PageView do
   describe "sharding" do
     specs_require_sharding
 
-    it "should not assign the default shard" do
+    it "does not assign the default shard" do
       expect(PageView.new.shard).to eq Shard.default
       @shard1.activate do
         expect(PageView.new.shard).to eq @shard1
@@ -40,7 +40,7 @@ describe PageView do
   end
 
   describe "token" do
-    it "should generate a valid jwt token" do
+    it "generates a valid jwt token" do
       token = @page_view.token
       data = Canvas::Security.decode_jwt(token)
       expect(data[:i]).to eq @page_view.request_id
@@ -51,7 +51,7 @@ describe PageView do
 
   describe "cassandra page views" do
     include_examples "cassandra page views"
-    it "should store and load from cassandra" do
+    it "stores and load from cassandra" do
       expect {
         @page_view.request_id = "abcde1"
         @page_view.save!
@@ -60,7 +60,7 @@ describe PageView do
       expect { PageView.find("junk") }.to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should not start a db transaction on save" do
+    it "does not start a db transaction on save" do
       PageView.new { |p| p.assign_attributes({ :user => @user, :url => "http://test.one/", :session_id => "phony", :context => @course, :controller => 'courses', :action => 'show', :user_request => true, :render_time => 0.01, :user_agent => 'None', :account_id => Account.default.id, :request_id => "abcdef", :interaction_seconds => 5 }) }.store
       expect(PageView.connection).to receive(:transaction).never
       expect(PageView.find("abcdef")).to be_present
@@ -73,7 +73,7 @@ describe PageView do
     describe "sharding" do
       specs_require_sharding
 
-      it "should always assign the birth shard" do
+      it "alwayses assign the birth shard" do
         expect(PageView.new.shard).to eq Shard.birth
         pv = nil
         u = User.create!
@@ -96,7 +96,7 @@ describe PageView do
         expect(pv.interaction_seconds).to eq 25
       end
 
-      it "should store and load from cassandra when the birth shard is not the default shard" do
+      it "stores and load from cassandra when the birth shard is not the default shard" do
         allow(Shard).to receive(:birth).and_return(@shard1)
         @shard2.activate do
           expect {
@@ -109,7 +109,7 @@ describe PageView do
       end
     end
 
-    it "should paginate with a willpaginate-like array" do
+    it "paginates with a willpaginate-like array" do
       # some page views we shouldn't find
       page_view_model(:user => user_model)
       page_view_model(:user => user_model)
@@ -133,7 +133,7 @@ describe PageView do
       expect(second_half.next_page).to be_nil
     end
 
-    it "should halt pagination after a set time period" do
+    it "halts pagination after a set time period" do
       p1 = page_view_model(:user => @user)
       p2 = page_view_model(:user => @user, :created_at => 13.months.ago)
       coll = @user.page_views.paginate(:per_page => 3)
@@ -141,7 +141,7 @@ describe PageView do
       expect(coll.next_page).to be_blank
     end
 
-    it "should ignore an invalid page" do
+    it "ignores an invalid page" do
       @page_view.save!
       expect(@user.page_views.paginate(:per_page => 2, :page => '3')).to eq [@page_view]
     end
@@ -169,7 +169,7 @@ describe PageView do
     end
 
     describe "db migrator" do
-      it "should migrate the relevant page views" do
+      it "migrates the relevant page views" do
         a1 = account_model
         a2 = account_model
         a3 = account_model
@@ -217,14 +217,14 @@ describe PageView do
     end
   end
 
-  it "should store directly to the db in db mode" do
+  it "stores directly to the db in db mode" do
     Setting.set('enable_page_views', 'db')
     expect(@page_view.store).to be_truthy
     expect(PageView.count).to eq 1
     expect(PageView.find(@page_view.id)).to eq @page_view
   end
 
-  it "should not store if the page view has no user" do
+  it "does not store if the page view has no user" do
     Setting.set('enable_page_views', 'db')
     @page_view.user = nil
     expect(@page_view).not_to be_valid
@@ -236,24 +236,24 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should generate bucket names" do
+      it "generates bucket names" do
         expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T13:41:17Z'))).to be_starts_with 'active_users:2012-01-20T13:40:00Z'
         expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:25:00Z'))).to be_starts_with 'active_users:2012-01-20T03:25:00Z'
         expect(PageView.user_count_bucket_for_time(Time.zone.parse('2012-01-20T03:29:59Z'))).to be_starts_with 'active_users:2012-01-20T03:25:00Z'
       end
 
-      it "should do nothing if not enabled" do
+      it "does nothing if not enabled" do
         Setting.set('page_views_store_active_user_counts', 'false')
         expect(@page_view.store).to be_truthy
         expect(Canvas.redis.smembers(PageView.user_count_bucket_for_time(Time.now))).to eq []
       end
 
-      it "should store if enabled" do
+      it "stores if enabled" do
         Setting.set('page_views_store_active_user_counts', 'redis')
         expect(@page_view.store).to be_truthy
       end
 
-      it "should store user ids in the set for page views" do
+      it "stores user ids in the set for page views" do
         Setting.set('page_views_store_active_user_counts', 'redis')
         store_time = Time.zone.parse('2012-01-13T15:43:21Z')
         @page_view.created_at = store_time
@@ -286,17 +286,17 @@ describe PageView do
       @page_view.save!
     end
 
-    it "should work with User objects" do
+    it "works with User objects" do
       expect(PageView.for_users([@user])).to eq [@page_view]
       expect(PageView.for_users([User.create!])).to eq []
     end
 
-    it "should work with a User ids" do
+    it "works with a User ids" do
       expect(PageView.for_users([@user.id])).to eq [@page_view]
       expect(PageView.for_users([@user.id + 1])).to eq []
     end
 
-    it "should with with an empty list" do
+    it "withs with an empty list" do
       expect(PageView.for_users([])).to eq []
     end
   end
@@ -372,20 +372,20 @@ describe PageView do
       it { is_expected.to eq '0.0.0.0' }
     end
 
-    it "should filter sensitive url params" do
+    it "filters sensitive url params" do
       @url = 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET'
       pv = PageView.generate(request, attributes)
       expect(pv.url).to eq 'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
 
-    it "should filter sensitive url params on the way out" do
+    it "filters sensitive url params on the way out" do
       pv = PageView.generate(request, attributes)
       pv.update_attribute(:url, 'http://canvas.example.com/api/v1/courses/1?access_token=SUPERSECRET')
       pv.reload
       expect(pv.url).to eq  'http://canvas.example.com/api/v1/courses/1?access_token=[FILTERED]'
     end
 
-    it "should force encoding on string fields" do
+    it "forces encoding on string fields" do
       request = double(:url => (@url || 'host.com/some/path'), :path_parameters => params, :user_agent => 'Mozilla', :session_options => session, :method => :get, :remote_ip => '0.0.0.0'.encode(Encoding::US_ASCII), :request_method => 'GET')
       pv = PageView.generate(request, attributes)
 
@@ -399,14 +399,14 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
 
-      it "should return nothing with unknown request id" do
+      it "returns nothing with unknown request id" do
         expect(PageView.find_all_by_id(['unknown', 'unknown']).size).to eql(0)
       end
     end
@@ -414,14 +414,14 @@ describe PageView do
     context "cassandra-backed" do
       include_examples "cassandra page views"
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         page_views = (0..3).map { |index| page_view_model }
         page_view_ids = page_views.map { |page_view| page_view.request_id }
 
         expect(PageView.find_all_by_id(page_view_ids)).to match_array page_views
       end
 
-      it "should return nothing with unknown request id" do
+      it "returns nothing with unknown request id" do
         expect(PageView.find_all_by_id(['unknown', 'unknown']).size).to eql(0)
       end
     end
@@ -433,12 +433,12 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find_by_id(pv.request_id)).to eq pv
       end
 
-      it "should return nothing with unknown request id" do
+      it "returns nothing with unknown request id" do
         expect(PageView.find_by_id('unknown')).to be_nil
       end
     end
@@ -446,12 +446,12 @@ describe PageView do
     context "cassandra-backed" do
       include_examples "cassandra page views"
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find_by_id(pv.request_id)).to eq pv
       end
 
-      it "should return nothing with unknown request id" do
+      it "returns nothing with unknown request id" do
         expect(PageView.find_by_id('unknown')).to be_nil
       end
     end
@@ -463,12 +463,12 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find(pv.request_id)).to eq pv
       end
 
-      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+      it "raises ActiveRecord::RecordNotFound with unknown request id" do
         expect { PageView.find('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -476,12 +476,12 @@ describe PageView do
     context "cassandra-backed" do
       include_examples "cassandra page views"
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find(pv.request_id)).to eq pv
       end
 
-      it "should raise ActiveRecord::RecordNotFound with unknown request id" do
+      it "raises ActiveRecord::RecordNotFound with unknown request id" do
         expect { PageView.find('unknown') }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
@@ -493,12 +493,12 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find_for_update(pv.request_id)).to eq pv
       end
 
-      it "should return nothing with unknown request id" do
+      it "returns nothing with unknown request id" do
         expect(PageView.find_for_update('unknown')).to be_nil
       end
     end
@@ -506,7 +506,7 @@ describe PageView do
     context "cassandra-backed" do
       include_examples "cassandra page views"
 
-      it "should return the existing page view" do
+      it "returns the existing page view" do
         pv = page_view_model
         expect(PageView.find_for_update(pv.request_id)).to eq pv
       end
@@ -520,19 +520,19 @@ describe PageView do
       @attributes = valid_page_view_attributes.stringify_keys
     end
 
-    it "should return a PageView object" do
+    it "returns a PageView object" do
       expect(PageView.from_attributes(@attributes)).to be_a(PageView)
     end
 
-    it "should look like an existing PageView" do
+    it "looks like an existing PageView" do
       expect(PageView.from_attributes(@attributes)).not_to be_new_record
     end
 
-    it "should use the provided attributes" do
+    it "uses the provided attributes" do
       expect(PageView.from_attributes(@attributes).url).to eq @attributes['url']
     end
 
-    it "should set missing attributes to nil" do
+    it "sets missing attributes to nil" do
       expect(PageView.from_attributes(@attributes).user_id).to be_nil
     end
 
@@ -541,7 +541,7 @@ describe PageView do
         Setting.set('enable_page_views', 'db')
       end
 
-      it "should interpret ids relative to the current shard" do
+      it "interprets ids relative to the current shard" do
         user_id = 1
         attributes = @attributes.merge('user_id' => user_id)
         page_view1 = @shard1.activate { PageView.from_attributes(attributes) }
@@ -558,7 +558,7 @@ describe PageView do
     context "cassandra-backed" do
       include_examples "cassandra page views"
 
-      it "should interpret ids relative to the default shard" do
+      it "interprets ids relative to the default shard" do
         user_id = 1
         attributes = @attributes.merge('user_id' => user_id)
         page_view1 = @shard1.activate { PageView.from_attributes(attributes) }

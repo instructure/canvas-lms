@@ -32,7 +32,7 @@ describe "canvas_quizzes" do
   end
 
   describe 'statistics app' do
-    it 'should mount' do
+    it 'mounts' do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/statistics"
       wait = Selenium::WebDriver::Wait.new(timeout: 5)
       wait.until { f("#summary-statistics").present? }
@@ -41,7 +41,7 @@ describe "canvas_quizzes" do
   end
 
   describe 'events app' do
-    it 'should mount' do
+    it 'mounts' do
       Account.default.enable_feature!(:quiz_log_auditing)
       sub = @quiz.quiz_submissions.first
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{sub.id}/log"

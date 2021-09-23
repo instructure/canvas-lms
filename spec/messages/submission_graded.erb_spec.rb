@@ -31,7 +31,7 @@ describe "submission_graded" do
 
   include_examples "a message"
 
-  it "should include the submission's submitter name if receiver is not the submitter and has the setting turned on" do
+  it "includes the submission's submitter name if receiver is not the submitter and has the setting turned on" do
     observer = user_model
     message = generate_message(:submission_graded, :summary, asset, user: observer)
     expect(message.body).not_to match("For #{@submission.user.name}")
@@ -42,7 +42,7 @@ describe "submission_graded" do
     expect(message.body).to match("For #{@submission.user.name}")
   end
 
-  it "should not fail for twitter message" do
+  it "does not fail for twitter message" do
     observer = user_model
     observer.preferences[:send_observed_names_in_notifications] = true
     message = generate_message(:submission_graded, :twitter, asset, user: observer)

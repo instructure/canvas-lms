@@ -58,7 +58,7 @@ describe GroupAndMembershipImporter do
   end
 
   context "imports groups" do
-    it "should return a progress" do
+    it "returns a progress" do
       progress = create_group_import(%{user_id,group_name
                                        user_0, first group
                                        user_1, second group
@@ -68,7 +68,7 @@ describe GroupAndMembershipImporter do
       expect(progress.class_name).to eq 'Progress'
     end
 
-    it 'should update workflow_state to failed on error' do
+    it 'updates workflow_state to failed on error' do
       import = GroupAndMembershipImporter.create!(group_category: gc1)
       progress = Progress.new(context: gc1, tag: "course_group_import")
       expect(import).to receive(:progress).exactly(3).and_return(progress)
@@ -76,7 +76,7 @@ describe GroupAndMembershipImporter do
       expect(import.reload.workflow_state).to eq 'failed'
     end
 
-    it 'should work' do
+    it 'works' do
       progress = import_csv_data(%{user_id,group_name
                                    user_0, first group
                                    user_1, second group
@@ -91,7 +91,7 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq 'completed'
     end
 
-    it 'should skip invalid_users' do
+    it 'skips invalid_users' do
       progress = import_csv_data(%{user_id,group_name
                                    user_0, first group
                                    invalid, first group
@@ -101,7 +101,7 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq 'completed'
     end
 
-    it 'should ignore extra columns' do
+    it 'ignores extra columns' do
       progress = import_csv_data(%{user_id,group_name,sections
                                    user_0, first group,sections
                                    user_4, first group,"s1,s2"})
@@ -111,7 +111,7 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq 'completed'
     end
 
-    it 'should ignore invalid groups' do
+    it 'ignores invalid groups' do
       progress = import_csv_data(%{user_id,group_id
                                    user_0, invalid
                                    user_4,#{group1.sis_source_id}})
@@ -121,28 +121,28 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq 'completed'
     end
 
-    it 'should restore deleted groups when sis id is passed in' do
+    it 'restores deleted groups when sis id is passed in' do
       group1.destroy
       import_csv_data(%{user_id,group_id
                         user_4,#{group1.sis_source_id}})
       expect(group1.reload.workflow_state).to eq 'available'
     end
 
-    it 'should restore deleted groups when id is passed in' do
+    it 'restores deleted groups when id is passed in' do
       group1.destroy
       import_csv_data(%{user_id,canvas_group_id
                         user_4,#{group1.id}})
       expect(group1.reload.workflow_state).to eq 'available'
     end
 
-    it 'should work for invited students' do
+    it 'works for invited students' do
       @course.student_enrollments.update_all(workflow_state: 'invited')
       import_csv_data(%{user_id,canvas_group_id
                         user_4,#{group1.id}})
       expect(@user.groups.pluck(:name)).to eq ["manual group"]
     end
 
-    it 'should create new group when named group is deleted' do
+    it 'creates new group when named group is deleted' do
       group1.destroy
       import_csv_data(%{user_id,group_name
                         user_4,#{group1.name}})
@@ -152,13 +152,13 @@ describe GroupAndMembershipImporter do
       expect(@user.groups.pluck(:name)).to eq [group1.name]
     end
 
-    it 'should find users by id' do
+    it 'finds users by id' do
       import_csv_data(%{canvas_user_id,group_name
                         #{@user.id}, first group})
       expect(@user.groups.pluck(:name)).to eq ["first group"]
     end
 
-    it 'should work for future courses' do
+    it 'works for future courses' do
       @course.start_at = 1.week.from_now
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -167,34 +167,34 @@ describe GroupAndMembershipImporter do
       expect(@user.groups.pluck(:name)).to eq ["first group"]
     end
 
-    it 'should find users by login_id' do
+    it 'finds users by login_id' do
       import_csv_data(%{login_id,group_name
                         #{@user.pseudonym.unique_id}, first group})
       expect(@user.groups.pluck(:name)).to eq ["first group"]
     end
 
-    it 'should find existing groups' do
+    it 'finds existing groups' do
       import_csv_data(%{user_id,group_name
                         user_4,#{group1.name}})
       expect(gc1.groups.count).to eq 1
       expect(@user.groups.pluck(:name)).to eq ["manual group"]
     end
 
-    it 'should find existing group by sis_id' do
+    it 'finds existing group by sis_id' do
       import_csv_data(%{user_id,group_id
                         user_4,#{group1.sis_source_id}})
       expect(gc1.groups.count).to eq 1
       expect(@user.groups.pluck(:name)).to eq ["manual group"]
     end
 
-    it 'should find existing group by id' do
+    it 'finds existing group by id' do
       import_csv_data(%{user_id,canvas_group_id
                         user_4,#{group1.id}})
       expect(gc1.groups.count).to eq 1
       expect(@user.groups.pluck(:name)).to eq ["manual group"]
     end
 
-    it 'should log stat on new groups' do
+    it 'logs stat on new groups' do
       allow(InstStatsd::Statsd).to receive(:increment)
       import_csv_data(%{user_id,group_name
         user_4,anugroup})

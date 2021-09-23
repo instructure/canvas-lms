@@ -43,7 +43,7 @@ describe Quizzes::QuizzesController do
       include TextHelper
 
       context "with no overrides" do
-        it "should show a due date for 'Everyone'" do
+        it "shows a due date for 'Everyone'" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML5(response.body)
@@ -58,7 +58,7 @@ describe Quizzes::QuizzesController do
           create_section_override(@cs1, @due_at)
         end
 
-        it "should show an overridden due date for student" do
+        it "shows an overridden due date for student" do
           @course.enroll_user(user_factory, 'StudentEnrollment')
           user_session(@user)
 
@@ -68,7 +68,7 @@ describe Quizzes::QuizzesController do
           expect(doc.css("#quiz_student_details .value").first.text).to include(datetime_string(@due_at))
         end
 
-        it "should show 'Everyone else' when some sections have a due date override" do
+        it "shows 'Everyone else' when some sections have a due date override" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML5(response.body)
@@ -83,7 +83,7 @@ describe Quizzes::QuizzesController do
           create_section_override(@cs2, @due_at2)
         end
 
-        it "should show multiple due dates to teachers" do
+        it "shows multiple due dates to teachers" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML5(response.body)
@@ -92,7 +92,7 @@ describe Quizzes::QuizzesController do
             .to include(datetime_string(@due_at1), datetime_string(@due_at2))
         end
 
-        it "should not show a date for 'Everyone else'" do
+        it "does not show a date for 'Everyone else'" do
           get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
           doc = Nokogiri::HTML5(response.body)
@@ -102,21 +102,21 @@ describe Quizzes::QuizzesController do
     end
 
     context "SpeedGrader" do
-      it "should link to SpeedGrader when not large_roster" do
+      it "links to SpeedGrader when not large_roster" do
         @course.large_roster = false
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(response.body).to match(%r{SpeedGrader})
       end
 
-      it "should not link to SpeedGrader when large_roster" do
+      it "does not link to SpeedGrader when large_roster" do
         @course.large_roster = true
         @course.save!
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(response.body).not_to match(%r{SpeedGrader})
       end
 
-      it "should not link to SpeedGrader when moderated grader limit is reached" do
+      it "does not link to SpeedGrader when moderated grader limit is reached" do
         allow_any_instance_of(Assignment).to receive(:can_view_speed_grader?).and_return(false)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
         expect(response.body).not_to match(%r{SpeedGrader})
@@ -134,7 +134,7 @@ describe Quizzes::QuizzesController do
     end
 
     context "Show Center resume button" do
-      it "should show resume button in the center" do
+      it "shows resume button in the center" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML5(response.body)
@@ -143,7 +143,7 @@ describe Quizzes::QuizzesController do
     end
 
     context "Not show right_side resume button" do
-      it "should not show resume button on right_side" do
+      it "does not show resume button on right_side" do
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 
         doc = Nokogiri::HTML5(response.body)
@@ -166,7 +166,7 @@ describe Quizzes::QuizzesController do
         course_with_teacher_logged_in(:active_all => true, :course => @course)
       end
 
-      it "should list the questions needing review" do
+      it "lists the questions needing review" do
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"
         expect(response.body).to match(%r{The following questions need review})
@@ -177,7 +177,7 @@ describe Quizzes::QuizzesController do
         expect(needing_review.children.css('li a').map { |n| n.text }).to eq @quiz.quiz_data.map { |qq| qq['name'] }
       end
 
-      it "should display message about the quiz changing significantly" do
+      it "displays message about the quiz changing significantly" do
         allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         @quiz.check_if_submissions_need_review
@@ -188,7 +188,7 @@ describe Quizzes::QuizzesController do
         expect(response.body).to match(%r{The quiz has changed significantly since this submission was made})
       end
 
-      it "should display both messages" do
+      it "displays both messages" do
         allow_any_instance_of(Quizzes::Quiz).to receive(:changed_significantly_since?).and_return(true)
         mkquiz
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}/history?quiz_submission_id=#{@quiz_submission.id}"

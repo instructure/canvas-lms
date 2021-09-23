@@ -34,7 +34,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Essay do
     }.with_indifferent_access
   end
 
-  it 'should return nil when un-answered' do
+  it 'returns nil when un-answered' do
     expect(subject.deserialize({})).to eq nil
   end
 

@@ -27,7 +27,7 @@ describe "accessibility assignments", priority: "2" do
     get "/courses/#{@course.id}/assignments"
   end
 
-  it "should be accessible" do
+  it "is accessible" do
     val_image_alt_tags_not_empty
     val_input_alt_tags_present
     # pending('not passing') val_input_alt_tags_not_empty

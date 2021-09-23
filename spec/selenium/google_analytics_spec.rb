@@ -22,13 +22,13 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "google analytics" do
   include_context "in-process server selenium tests"
 
-  it "should not include tracking script if not asked to" do
+  it "does not include tracking script if not asked to" do
     get "/"
     wait_for_ajaximations
     expect(f("#content")).not_to contain_jqcss('script[src$="google-analytics.com/analytics.js"]')
   end
 
-  it "should include tracking script if google_analytics_key is configured" do
+  it "includes tracking script if google_analytics_key is configured" do
     Setting.set('google_analytics_key', 'testing123')
     get "/"
     wait_for_ajaximations
@@ -70,37 +70,37 @@ describe "google analytics" do
       wait_for_ajaximations
     end
 
-    it "should include user roles as dimensions" do
+    it "includes user roles as dimensions" do
       start_with { nil } # anonymous
 
       expect_dimensions_to_include({})
     end
 
-    it "should include student status as a dimension" do
+    it "includes student status as a dimension" do
       start_with { course_with_student_logged_in }
 
       expect_dimensions_to_include(enrollments: '100')
     end
 
-    it "should include teacher status as a dimension" do
+    it "includes teacher status as a dimension" do
       start_with { course_with_teacher_logged_in }
 
       expect_dimensions_to_include(enrollments: '010')
     end
 
-    it "should include observer status as a dimension" do
+    it "includes observer status as a dimension" do
       start_with { course_with_observer_logged_in }
 
       expect_dimensions_to_include(enrollments: '001')
     end
 
-    it "should include admin status as a dimension" do
+    it "includes admin status as a dimension" do
       start_with { admin_logged_in }
 
       expect_dimensions_to_include(admin: '11')
     end
 
-    it "should include masquerading status as a dimension" do
+    it "includes masquerading status as a dimension" do
       start_with do
         admin_logged_in
 
@@ -122,7 +122,7 @@ describe "google analytics" do
       )
     end
 
-    it "should identify the user" do
+    it "identifies the user" do
       start_with { course_with_student_logged_in }
 
       alternative_user_id = GoogleAnalyticsDimensions.calculate(
@@ -136,7 +136,7 @@ describe "google analytics" do
       )
     end
 
-    it "should report the org type as a dimension" do
+    it "reports the org type as a dimension" do
       start_with do
         Account.default.external_integration_keys.create!(
           key_type: 'salesforce_org_type',

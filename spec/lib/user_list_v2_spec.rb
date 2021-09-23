@@ -29,7 +29,7 @@ describe UserListV2 do
     @account.save!
   end
 
-  it "should complain about invalid input" do
+  it "complains about invalid input" do
     ul = UserListV2.new "i\x01nstructure", search_type: 'unique_id'
     expect(ul.errors).to eq [{ :address => "i\x01nstructure", :details => :unparseable }]
   end
@@ -39,12 +39,12 @@ describe UserListV2 do
       .to raise_error(UserListV2::ParameterError)
   end
 
-  it "should not fail with unicode names" do
+  it "does not fail with unicode names" do
     ul = UserListV2.new '"senor molé" <blah@instructure.com>', search_type: 'unique_id'
     expect(ul.missing_results.map { |x| [x[:user_name], x[:address]] }).to eq [["senor molé", "blah@instructure.com"]]
   end
 
-  it "should find by SMS number" do
+  it "finds by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
     ul = UserListV2.new('(801) 555-5555', search_type: "cc_path")
@@ -58,7 +58,7 @@ describe UserListV2 do
     expect(ul.resolved_results.first[:user_token]).to eq @user.token
   end
 
-  it "should find duplicates by SMS number" do
+  it "finds duplicates by SMS number" do
     user_with_pseudonym(:name => "JT", :active_all => 1)
     @user1 = @user
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
@@ -100,7 +100,7 @@ describe UserListV2 do
     expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user.token])
   end
 
-  it "should not find users from untrusted accounts" do
+  it "does not find users from untrusted accounts" do
     account = Account.create!
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
     ul = UserListV2.new('jt@instructure.com', search_type: 'unique_id')
@@ -126,7 +126,7 @@ describe UserListV2 do
     expect(ul.resolved_results.first[:address]).to eq 'jt@instructure.com'
   end
 
-  it "should find users from trusted accounts" do
+  it "finds users from trusted accounts" do
     account = Account.create!(:name => "naem")
     allow(Account.default).to receive(:trusted_account_ids).and_return([account.id])
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => account)
@@ -134,7 +134,7 @@ describe UserListV2 do
     expect(ul.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :user_name => 'JT', :account_id => account.id, :account_name => account.name }]
   end
 
-  it "should show duplicates for two results from the current account and the trusted account" do
+  it "shows duplicates for two results from the current account and the trusted account" do
     user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
     @user1 = @user
     account = Account.create!
@@ -149,13 +149,13 @@ describe UserListV2 do
   end
 
   context 'when searching by sis id' do
-    it "should raise an error without can_read_sis" do
+    it "raises an error without can_read_sis" do
       expect {
         UserListV2.new('SISID', root_account: @account, search_type: 'sis_user_id', can_read_sis: false)
       }.to raise_error("cannot read sis ids")
     end
 
-    it "should show duplicates for two results from the current account and the trusted account" do
+    it "shows duplicates for two results from the current account and the trusted account" do
       account1 = Account.create!
       account2 = Account.create!
       allow(account1).to receive(:trusted_account_ids).and_return([account2.id])
@@ -179,7 +179,7 @@ describe UserListV2 do
     end
   end
 
-  it "should show duplicates if there is a conflict of unique_ids from not-this-account" do
+  it "shows duplicates if there is a conflict of unique_ids from not-this-account" do
     account1 = Account.create!
     account2 = Account.create!
     allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
@@ -199,7 +199,7 @@ describe UserListV2 do
     end
   end
 
-  it "should find a user with multiple not-this-account pseudonyms" do
+  it "finds a user with multiple not-this-account pseudonyms" do
     account1 = Account.create!
     account2 = Account.create!
     allow(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
@@ -212,7 +212,7 @@ describe UserListV2 do
     expect(ul.resolved_results.first[:user_token]).to eq @user.token
   end
 
-  it "should not find a user from a different account by SMS" do
+  it "does not find a user from a different account by SMS" do
     account = Account.create!
     user_with_pseudonym(:name => "JT", :active_all => 1, :account => account)
     communication_channel(@user, { username: '8015555555@txt.att.net', path_type: 'sms', active_cc: true })
@@ -224,7 +224,7 @@ describe UserListV2 do
   context "sharding" do
     specs_require_sharding
 
-    it "should find a user from a trusted account in a different shard" do
+    it "finds a user from a trusted account in a different shard" do
       @shard1.activate do
         @account = Account.create!(:name => "accountnaem")
         user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true, :account => @account)
@@ -237,7 +237,7 @@ describe UserListV2 do
       expect(ul2.resolved_results).to eq [{ :address => 'jt@instructure.com', :user_id => @user.id, :user_token => @user.token, :account_id => @account.id, :user_name => 'JT', :account_name => @account.name }]
     end
 
-    it "should not get confused when dealing with cross-shard duplicate results that actually point to the same user" do
+    it "does not get confused when dealing with cross-shard duplicate results that actually point to the same user" do
       user_with_pseudonym(:name => 'JT', :username => 'jt@instructure.com', :active_all => true)
       @shard1.activate do
         @account = Account.create!(:name => "accountnaem")
@@ -292,7 +292,7 @@ describe UserListV2 do
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
       end
 
-      it "should look on every shard if there aren't that many shards to look on" do
+      it "looks on every shard if there aren't that many shards to look on" do
         # identifiable as `undefined method `associated_shards_for_column' for class `#<Class:0x00007f87ade80828>'`
         skip_if_prepended_class_method_stubs_broken
         Setting.set('global_lookups_shard_threshold', '3') # i.e. if we'd have to look on more than 3 shards, we should use global lookups
@@ -304,7 +304,7 @@ describe UserListV2 do
         expect(ul.duplicate_results.first.map { |r| r[:user_token] }).to match_array([@user1.token, @user2.token])
       end
 
-      it "should use the global lookups to restrict searched shard if there are enough shards to look on" do
+      it "uses the global lookups to restrict searched shard if there are enough shards to look on" do
         skip_if_prepended_class_method_stubs_broken
         Setting.set('global_lookups_shard_threshold', '1') # i.e. if we'd have to look on more than 1 shards, we should use global lookups
 

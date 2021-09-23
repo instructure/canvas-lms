@@ -97,7 +97,7 @@ describe "blueprint courses quizzes" do
       user_session(@teacher)
     end
 
-    it "should not show the cog-menu options on the index when locked" do
+    it "does not show the cog-menu options on the index when locked" do
       @tag.update(restrictions: { all: true })
 
       get "/courses/#{@copy_to.id}/quizzes"
@@ -108,7 +108,7 @@ describe "blueprint courses quizzes" do
       expect(quiz_panel).not_to contain_css('a.delete-item')
     end
 
-    it "should show the cog-menu options on the index when not locked" do
+    it "shows the cog-menu options on the index when not locked" do
       get "/courses/#{@copy_to.id}/quizzes"
 
       expect(f("#summary_quiz_#{@quiz_copy.id}")).to contain_css('.icon-blueprint')
@@ -118,7 +118,7 @@ describe "blueprint courses quizzes" do
       expect(quiz_panel).not_to contain_css('a.delete-item.disabled')
     end
 
-    it "should not show the edit/delete options on the show page when locked" do
+    it "does not show the edit/delete options on the show page when locked" do
       @tag.update(restrictions: { all: true })
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
@@ -128,14 +128,14 @@ describe "blueprint courses quizzes" do
       expect(options_panel).not_to contain_css('.delete_quiz_link')
     end
 
-    it "should show the edit/delete cog-menu options on the show when not locked" do
+    it "shows the edit/delete cog-menu options on the show when not locked" do
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}"
 
       options_button.click
       expect(options_panel).to contain_css('.delete_quiz_link')
     end
 
-    it "should not allow editing of restricted items" do
+    it "does not allow editing of restricted items" do
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
@@ -145,7 +145,7 @@ describe "blueprint courses quizzes" do
       expect(f('#quiz_edit_wrapper #due_at').attribute('readonly')).to eq "true"
     end
 
-    it "should prevent editing/deleting questions if content is locked" do
+    it "prevents editing/deleting questions if content is locked" do
       @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
@@ -166,7 +166,7 @@ describe "blueprint courses quizzes" do
       expect(tab).not_to contain_css('.find_question_link')
     end
 
-    it "should allow editing/deleting questions if content/points are not locked" do
+    it "allows editing/deleting questions if content/points are not locked" do
       # this test is here mostly to validate that the previous test is valid,
       # since it's looking "not_to contain_css('.edit_question_link')", I better
       # have a test to prove what's not supposed to be there is there when it's supposed to be

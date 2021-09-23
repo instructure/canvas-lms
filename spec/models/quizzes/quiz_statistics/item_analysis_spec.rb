@@ -39,7 +39,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
     )
   end
 
-  it "should generate a csv" do
+  it "generates a csv" do
     quiz_statistics = @quiz.statistics_csv('item_analysis')
     qs = @quiz.active_quiz_questions
     csv = quiz_statistics.csv_attachment.open.read
@@ -51,7 +51,7 @@ describe Quizzes::QuizStatistics::ItemAnalysis do
     expect(stats[4]).to eq [qs[3].id.to_s, "Question text", "5", "2", "2", "1", "4", "3", "2", "0.6", "0.4", "2", "1", "0", "0.24000000000000005", "0.48989794855663565", "0.6", "0.7786666666666666", "0.6000991981489792", "0.13363062095621223", "-0.8685990362153794", nil]
   end
 
-  it 'should generate' do
+  it 'generates' do
     qs = @quiz.active_quiz_questions
     stats = @quiz.current_statistics_for('item_analysis')
     items = stats.report.generate

@@ -45,7 +45,7 @@ describe "assignments" do
       @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)
     end
 
-    it "should validate an assignment created with the type of discussion" do
+    it "validates an assignment created with the type of discussion" do
       @assignment.update(:submission_types => 'discussion_topic')
 
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -54,41 +54,41 @@ describe "assignments" do
       expect(f('h1.discussion-title')).to include_text(@assignment.title)
     end
 
-    it "should validate an assignment created with the type of not graded" do
+    it "validates an assignment created with the type of not graded" do
       @assignment.update(:submission_types => 'not_graded')
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
-    it "should validate on paper submission assignment type" do
+    it "validates on paper submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, 'on_paper', false)
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
-    it "should validate no submission assignment type" do
+    it "validates no submission assignment type" do
       update_assignment_attributes(@assignment, :submission_types, nil, false)
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
-    it "should validate that website url submissions are allowed" do
+    it "validates that website url submissions are allowed" do
       update_assignment_attributes(@assignment, :submission_types, 'online_url')
       expect(f('#submission_url')).to be_displayed
     end
 
-    it "should validate that text entry submissions are allowed" do
+    it "validates that text entry submissions are allowed" do
       update_assignment_attributes(@assignment, :submission_types, 'online_text_entry')
       expect(f('.submit_online_text_entry_option')).to be_displayed
     end
 
-    it "should allow an assignment with all 3 online submission types" do
+    it "allows an assignment with all 3 online submission types" do
       update_assignment_attributes(@assignment, :submission_types, 'online_text_entry, online_url, online_upload')
       expect(f('.submit_online_text_entry_option')).to be_displayed
       expect(f('.submit_online_url_option')).to be_displayed
       expect(f('.submit_online_upload_option')).to be_displayed
     end
 
-    it "should validate an assignment created with the type of external tool", priority: "1", test_id: 2624905 do
+    it "validates an assignment created with the type of external tool", priority: "1", test_id: 2624905 do
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
       t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.example.com/", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')

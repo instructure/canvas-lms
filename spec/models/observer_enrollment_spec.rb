@@ -43,7 +43,7 @@ describe ObserverEnrollment do
   end
 
   describe 'observed_students' do
-    it "should not fail if the observed has been deleted" do
+    it "does not fail if the observed has been deleted" do
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({ @student => [@student_enrollment] })
       @student_enrollment.destroy
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
@@ -84,7 +84,7 @@ describe ObserverEnrollment do
     end
   end
   describe 'observed_student_ids_by_observer_id' do
-    it "should return a properly formatted hash" do
+    it "returns a properly formatted hash" do
       @observer_two = user_factory
       @observer_enrollment_two = @course1.enroll_user(@observer_two, 'ObserverEnrollment')
       expect(ObserverEnrollment

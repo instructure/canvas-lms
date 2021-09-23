@@ -30,24 +30,24 @@ describe LocaleSelection do
   end
 
   context 'accept-language' do
-    it "should ignore malformed accept-language headers" do
+    it "ignores malformed accept-language headers" do
       expect(ls.infer_browser_locale("en not valid", 'en' => nil)).to be_nil
     end
 
-    it "should match valid locale ranges" do
+    it "matches valid locale ranges" do
       expect(ls.infer_browser_locale("en", 'en' => nil)).to eql('en')
     end
 
-    it "should not match invalid locale ranges" do
+    it "does not match invalid locale ranges" do
       expect(ls.infer_browser_locale("it", 'en' => nil)).to be_nil
     end
 
-    it "should do case-insensitive matching" do
+    it "does case-insensitive matching" do
       expect(ls.infer_browser_locale("en-us", 'en-US' => nil)).to eql('en-US')
     end
 
     # see rfc2616 ... en means any en(-.*)? is acceptable
-    it "should do range prefix-matching" do
+    it "does range prefix-matching" do
       expect(ls.infer_browser_locale("en", 'en-US' => nil)).to eql('en-US')
     end
 
@@ -58,11 +58,11 @@ describe LocaleSelection do
     #   will be served any kind of English document if British English is not
     #   available. A user agent might suggest in such a case to add "en" to
     #   get the best matching behavior.
-    it "should not do tag prefix-matching" do
+    it "does not do tag prefix-matching" do
       expect(ls.infer_browser_locale("en-US", 'en' => nil)).to be_nil
     end
 
-    it "should assign quality values based on the best match" do
+    it "assigns quality values based on the best match" do
       expect(ls.infer_browser_locale("en-US, es;q=0.9, en;q=0.8", 'en-US' => nil, 'es' => nil)).to eql('en-US')
 
       # no tag prefix-matching
@@ -77,7 +77,7 @@ describe LocaleSelection do
       expect(ls.infer_browser_locale("en, es;q=0.9, en-US;q=0.8", 'en-US' => nil, 'es' => nil)).to eql('es')
     end
 
-    it "should understand wildcards" do
+    it "understands wildcards" do
       expect(ls.infer_browser_locale("*, pt;q=0.8", 'ru' => nil, 'pt' => nil)).to eql('ru')
       expect(ls.infer_browser_locale("*, pt;q=0.8, ru;q=0.7", 'ru' => nil, 'pt' => nil)).to eql('pt')
       # the pt range is explicitly rejected, so we don't get a locale
@@ -109,14 +109,14 @@ describe LocaleSelection do
       I18n.config.clear_available_locales_set
     end
 
-    it "should use the default locale if there is no other context" do
+    it "uses the default locale if there is no other context" do
       expect(ls.infer_locale).to eql('en')
       expect(ls.infer_locale(:root_account => @root_account)).to eql('en')
       expect(ls.infer_locale(:root_account => @root_account, :user => @user)).to eql('en')
       expect(ls.infer_locale(:root_account => @root_account, :user => @user, :context => @course)).to eql('en')
     end
 
-    it "should infer the locale from the accept_language" do
+    it "infers the locale from the accept_language" do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account)).to eql('it')
       expect(@user.browser_locale).to be_nil
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('it')
@@ -125,7 +125,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('it')
     end
 
-    it "should infer the locale from the root account" do
+    it "infers the locale from the root account" do
       @root_account.update_attribute(:default_locale, 'es')
 
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user)).to eql('es')
@@ -133,7 +133,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('es')
     end
 
-    it "should infer the locale from the account" do
+    it "infers the locale from the account" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
 
@@ -142,7 +142,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
     end
 
-    it "should infer the locale from the user" do
+    it "infers the locale from the user" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
@@ -152,7 +152,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('de')
     end
 
-    it "should ignore bogus locales" do
+    it "ignores bogus locales" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
       allow(@user).to receive(:locale).and_return('bogus')
@@ -162,7 +162,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('fr')
     end
 
-    it "should infer the locale from the course" do
+    it "infers the locale from the course" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')
@@ -173,7 +173,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => @course)).to eql('pt')
     end
 
-    it "should infer the locale of a group from the group's context" do
+    it "infers the locale of a group from the group's context" do
       @course.update_attribute(:locale, 'es')
       course_gc = @course.group_categories.create!(:name => "Discussion Groups")
       course_gr = Group.create!(:name => "Group 1", :group_category => course_gc, :context => @course)
@@ -186,7 +186,7 @@ describe LocaleSelection do
       expect(ls.infer_locale(:accept_language => "it", :root_account => @root_account, :user => @user, :context => course_gr)).to eql('es')
     end
 
-    it "should infer the locale from the session" do
+    it "infers the locale from the session" do
       @root_account.update_attribute(:default_locale, 'es')
       @account.update_attribute(:default_locale, 'fr')
       @user.update_attribute(:locale, 'de')

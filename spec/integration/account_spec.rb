@@ -29,13 +29,13 @@ describe AccountsController do
       @account = Account.create!(:name => "test")
     end
 
-    it 'should render for non SAML configured accounts' do
+    it 'renders for non SAML configured accounts' do
       get "/saml2"
       expect(response).to be_successful
       expect(response.body).not_to eq ""
     end
 
-    it "should use the correct entity_id" do
+    it "uses the correct entity_id" do
       allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
       @aac = @account.authentication_providers.create!(:auth_type => "saml")
 
@@ -56,7 +56,7 @@ describe AccountsController do
   end
 
   context "section tabs" do
-    it "should change in response to role override changes" do
+    it "changes in response to role override changes" do
       enable_cache do
         # cache permissions and tabs for a user
         @account = Account.default

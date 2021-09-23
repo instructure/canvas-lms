@@ -50,7 +50,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       @course.enroll_teacher(@teacher).accept
     end
 
-    it 'should add a file to the page and validate a student can see it' do
+    it 'adds a file to the page and validate a student can see it' do
       create_session(@teacher.pseudonym)
       get "/courses/#{@course.id}/pages/front-page/edit"
       wait_for_tiny(f("form.edit-form .edit-content"))
@@ -94,7 +94,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       @user_attachment.save!
     end
 
-    it 'should show one image in student image sidebar' do
+    it 'shows one image in student image sidebar' do
       get "/courses/#{@course.id}/discussion_topics/new"
       click_images_toolbar_menu_button
       click_user_images
@@ -102,7 +102,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       expect(tray_container).to include_text('bar.png')
     end
 
-    it 'should only show one image for student after saving additional to course' do
+    it 'onlies show one image for student after saving additional to course' do
       @new_attachment = @course.attachments.build(filename: 'new_course.png', folder: @root_folder)
       @new_attachment.content_type = 'image/png'
       @new_attachment.save!
@@ -140,7 +140,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       @user_attachment2.save!
     end
 
-    it 'should show 2 documents when clicking course documents dropdown' do
+    it 'shows 2 documents when clicking course documents dropdown' do
       visit_front_page_edit(@course)
       click_document_toolbar_menu_button
       click_course_documents
@@ -149,7 +149,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       expect(tray_container).to include_text('foo.txt')
     end
 
-    it 'should show 1 document when clicking user documents dropdown' do
+    it 'shows 1 document when clicking user documents dropdown' do
       visit_front_page_edit(@course)
       click_document_toolbar_menu_button
       click_user_documents
@@ -158,7 +158,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       expect(tray_container).to include_text('bar.txt')
     end
 
-    it 'should show 2 media files when clicking course media dropdown' do
+    it 'shows 2 media files when clicking course media dropdown' do
       skip('Media object creation issues - LA-385, LA-386 to fix')
       visit_front_page_edit(@course)
       click_media_toolbar_button
@@ -168,7 +168,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       expect(tray_container).to include_text('foo.mp4')
     end
 
-    it 'should show 1 media file when clicking my media dropdown' do
+    it 'shows 1 media file when clicking my media dropdown' do
       skip('Media object creation issues - LA-385, LA-386 to fix')
       visit_front_page_edit(@course)
       click_media_toolbar_button

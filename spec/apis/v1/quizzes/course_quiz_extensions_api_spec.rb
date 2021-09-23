@@ -40,7 +40,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
     end
 
     context "as a student" do
-      it "should be unauthorized" do
+      it "is unauthorized" do
         quiz_extension_params = [
           { user_id: @student.id, extra_attempts: 2 }
         ]
@@ -60,7 +60,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
         @teacher  = teacher_in_course(course: @course, active_all: true).user
       end
 
-      it "should extend attempts for a existing submission" do
+      it "extends attempts for a existing submission" do
         quiz_submissions = @quizzes.map { |q| q.generate_submission(@student1) }
         quiz_submissions.map { |qs| qs.grants_right?(@teacher, :add_attempts) }
 
@@ -71,7 +71,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
         expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
-      it "should extend attempts for a new submission" do
+      it "extends attempts for a new submission" do
         quiz_extension_params = [
           { user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id) }
         ]
@@ -79,7 +79,7 @@ describe Quizzes::CourseQuizExtensionsController, type: :request do
         expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
-      it "should extend attempts for multiple students" do
+      it "extends attempts for multiple students" do
         quiz_extension_params = [
           { user_id: @student1.id, extra_attempts: 2, quiz_ids: @quizzes.map(&:id) },
           { user_id: @student2.id, extra_attempts: 3, quiz_ids: @quizzes.map(&:id) }

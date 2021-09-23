@@ -94,7 +94,7 @@ describe "course syllabus" do
       @course = public_course
     end
 
-    it "should not display course syllabus when show course summary is false" do
+    it "does not display course syllabus when show course summary is false" do
       # set the syllabus_course_summary attribute to false
       @course.syllabus_course_summary = false
       @course.save!

@@ -203,7 +203,7 @@ describe Api::V1::GradebookHistory do
       @submission.save!
     end
 
-    it 'should be an array of submissions' do
+    it 'is an array of submissions' do
       harness = GradebookHistoryHarness.new
       submissions_hash = harness.submissions_for(@course, api_context, now, @grader2.id, @assignment.id)
       expect(submissions_hash.first[:submission_id]).to eq @submission.id
@@ -231,7 +231,7 @@ describe Api::V1::GradebookHistory do
       expect(submissions.first[:submission_id]).to eq submission.id
     end
 
-    it 'should properly set pervious_* attributes' do
+    it 'properlies set pervious_* attributes' do
       # regrade to get a second version
       @submission.score = '80'
       @submission.with_versioning(:explicit => true) { @submission.save! }

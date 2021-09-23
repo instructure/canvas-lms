@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "self enrollment" do
   include_context "in-process server selenium tests"
 
-  it "should not be allowed in a full course" do
+  it "is not allowed in a full course" do
     Account.default.allow_self_enrollment!
     course_factory(active_all: true)
     @course.self_enrollment = true
@@ -32,7 +32,7 @@ describe "self enrollment" do
     expect(f("#content")).not_to contain_css("form#enroll_form")
   end
 
-  it "should not be allowed in a blueprint course" do
+  it "is not allowed in a blueprint course" do
     Account.default.allow_self_enrollment!
     course_factory(active_all: true)
     @course.self_enrollment = true
@@ -53,7 +53,7 @@ describe "self enrollment" do
       @course.update_attribute(:self_enrollment, true)
     end
 
-    it "should register a new user" do
+    it "registers a new user" do
       get "/enroll/#{@course.self_enrollment_code}"
       f("#student_email").send_keys('new@example.com')
       move_to_click('#initial_action label[for=selfEnrollmentAuthRegCreate]')
@@ -69,7 +69,7 @@ describe "self enrollment" do
       assert_valid_dashboard
     end
 
-    it "should authenticate and register an existing user" do
+    it "authenticates and register an existing user" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       custom_label = "silly id"
       allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
@@ -88,7 +88,7 @@ describe "self enrollment" do
       assert_valid_dashboard
     end
 
-    it "should register an authenticated user" do
+    it "registers an authenticated user" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
@@ -101,7 +101,7 @@ describe "self enrollment" do
       assert_valid_dashboard
     end
 
-    it "should not error with a user that is already enrolled" do
+    it "does not error with a user that is already enrolled" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       student_in_course(:course => @course, :user => @user, :active_enrollment => true)
 
@@ -128,13 +128,13 @@ describe "self enrollment" do
       @course.update_attribute(:self_enrollment, true)
     end
 
-    it "should not register a new user" do
+    it "does not register a new user" do
       get "/enroll/#{@course.self_enrollment_code}"
       expect(f("#content")).not_to contain_css("input[type=radio][name=user_type]")
       expect(f("#content")).not_to contain_css("input[name='user[name]']")
     end
 
-    it "should authenticate and register an existing user" do
+    it "authenticates and register an existing user" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       custom_label = "silly id"
       allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
@@ -152,7 +152,7 @@ describe "self enrollment" do
       assert_valid_dashboard
     end
 
-    it "should register an authenticated user" do
+    it "registers an authenticated user" do
       user_logged_in
       get "/enroll/#{@course.self_enrollment_code}"
       # no option to log in/register, since already authenticated
@@ -165,7 +165,7 @@ describe "self enrollment" do
       assert_valid_dashboard
     end
 
-    it "should not error with a user that is already enrolled" do
+    it "does not error with a user that is already enrolled" do
       user_with_pseudonym(:active_all => true, :username => "existing@example.com", :password => "asdfasdf")
       student_in_course(:course => @course, :user => @user, :active_enrollment => true)
 

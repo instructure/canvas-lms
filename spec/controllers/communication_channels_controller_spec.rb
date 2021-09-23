@@ -29,7 +29,7 @@ describe CommunicationChannelsController do
   describe "POST 'create'" do
     before(:once) { user_model }
 
-    it "should create a new CC unconfirmed" do
+    it "creates a new CC unconfirmed" do
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).to be_successful
@@ -38,7 +38,7 @@ describe CommunicationChannelsController do
       expect(@user.email_channel.path).to eq 'jt@instructure.com'
     end
 
-    it "should create a new CC regardless of conflicts" do
+    it "creates a new CC regardless of conflicts" do
       u = User.create!
       cc = u.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
@@ -50,7 +50,7 @@ describe CommunicationChannelsController do
       expect(@user.email_channel.path).to eq 'jt@instructure.com'
     end
 
-    it "should resurrect retired CCs" do
+    it "resurrects retired CCs" do
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc|
         cc.workflow_state = 'retired'
         cc.bounce_count = CommunicationChannel::RETIRE_THRESHOLD
@@ -64,14 +64,14 @@ describe CommunicationChannelsController do
       expect(@user.email_channel).to eq cc
     end
 
-    it "should not allow duplicate active CCs for a single user" do
+    it "does not allow duplicate active CCs for a single user" do
       cc = @user.communication_channels.create!(:path => 'jt@instructure.com', :path_type => 'email') { |cc| cc.workflow_state = 'active' }
       user_session(@user)
       post 'create', params: { :user_id => @user.id, :communication_channel => { :address => 'jt@instructure.com', :type => 'email' } }
       expect(response).not_to be_successful
     end
 
-    it 'should prevent CC from being created if at the maximum number of CCs allowed' do
+    it 'prevents CC from being created if at the maximum number of CCs allowed' do
       domain_root_account = Account.default
       domain_root_account.settings[:max_communication_channels] = 1
       @user.communication_channels.create!(:path => 'cc@test.com')
@@ -93,7 +93,7 @@ describe CommunicationChannelsController do
     context "add CC to existing user" do
       before(:once) { user_with_pseudonym(active_user: 1) }
 
-      it "should confirm an unconfirmed CC" do
+      it "confirms an unconfirmed CC" do
         user_session(@user, @pseudonym)
         get 'confirm', params: { :nonce => @cc.confirmation_code }
         expect(response).to be_redirect
@@ -102,13 +102,13 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
-      it "should redirect to login when trying to confirm" do
+      it "redirects to login when trying to confirm" do
         get 'confirm', params: { :nonce => @cc.confirmation_code }
         expect(response).to be_redirect
         expect(response).to redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
-      it "should require the correct user to confirm a cc" do
+      it "requires the correct user to confirm a cc" do
         @user1 = @user
         @pseudonym1 = @pseudonym
         user_with_pseudonym(:active_user => 1, :username => 'jt@instructure.com')
@@ -119,7 +119,7 @@ describe CommunicationChannelsController do
         expect(response).to redirect_to(login_url(:pseudonym_session => { :unique_id => @pseudonym.unique_id }, :expected_user_id => @pseudonym.user_id))
       end
 
-      it "should not confirm an already-confirmed CC with a registered user" do
+      it "does not confirm an already-confirmed CC with a registered user" do
         user_with_pseudonym
         @user.register
         user_session(@user, @pseudonym)
@@ -141,7 +141,7 @@ describe CommunicationChannelsController do
         expect(response).to render_template("confirm_failed")
       end
 
-      it "should confirm an already-confirmed CC with a pre-registered user" do
+      it "confirms an already-confirmed CC with a pre-registered user" do
         user_with_pseudonym
         user_session(@user, @pseudonym)
         code = @cc.confirmation_code
@@ -160,7 +160,7 @@ describe CommunicationChannelsController do
         user_factory
       end
 
-      it "should show a pre-registered user the confirmation form" do
+      it "shows a pre-registered user the confirmation form" do
         user_with_pseudonym(:password => :autogenerate)
         @user.accept_terms
         @user.save
@@ -174,7 +174,7 @@ describe CommunicationChannelsController do
         expect(@user).not_to be_registered
       end
 
-      it "should finalize registration for a pre-registered user" do
+      it "finalizes registration for a pre-registered user" do
         user_with_pseudonym(:password => :autogenerate)
         @user.accept_terms
         @user.save
@@ -188,7 +188,7 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
-      it "should not break when trying to register when psuedonym is not a valid email" do
+      it "does not break when trying to register when psuedonym is not a valid email" do
         user_with_pseudonym(:password => :autogenerate, :username => 'notanemail')
         @user.accept_terms
         @user.save
@@ -201,7 +201,7 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
-      it "should properly validate pseudonym for a pre-registered user" do
+      it "properlies validate pseudonym for a pre-registered user" do
         u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
         cc1 = @cc
         # another user claimed the pseudonym
@@ -213,7 +213,7 @@ describe CommunicationChannelsController do
         expect(u1).not_to be_registered
       end
 
-      it "should not forget the account when registering for a non-default account" do
+      it "does not forget the account when registering for a non-default account" do
         @course = Course.create!(:account => @account) { |c| c.workflow_state = 'available' }
         user_with_pseudonym(:account => @account, :password => :autogenerate)
         @user.accept_terms
@@ -230,7 +230,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.account).to eq @account
       end
 
-      it "should figure out the correct domain when registering" do
+      it "figures out the correct domain when registering" do
         user_with_pseudonym(:account => @account, :password => :autogenerate)
         expect(@pseudonym.account).to eq @account
         expect(@user).to be_pre_registered
@@ -243,7 +243,7 @@ describe CommunicationChannelsController do
         expect(assigns[:root_account]).to eq @account
       end
 
-      it "should not finalize registration for invalid parameters" do
+      it "does not finalize registration for invalid parameters" do
         user_with_pseudonym(:password => :autogenerate)
         @cc.confirm!
         get 'confirm', params: { :nonce => "asdf" }
@@ -252,7 +252,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.user).not_to be_registered
       end
 
-      it "should show the confirm form for a creation_pending user" do
+      it "shows the confirm form for a creation_pending user" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -266,7 +266,7 @@ describe CommunicationChannelsController do
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
       end
 
-      it "should register creation_pending user" do
+      it "registers creation_pending user" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -291,7 +291,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.communication_channel_id).to eq @cc.id
       end
 
-      it "should show the confirm form for a creation_pending user that's logged in (masquerading)" do
+      it "shows the confirm form for a creation_pending user that's logged in (masquerading)" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -304,7 +304,7 @@ describe CommunicationChannelsController do
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
       end
 
-      it "should register creation_pending user that's logged in (masquerading)" do
+      it "registers creation_pending user that's logged in (masquerading)" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -327,7 +327,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.communication_channel_id).to eq @cc.id
       end
 
-      it "should prepare to register a creation_pending user in the correct account" do
+      it "prepares to register a creation_pending user in the correct account" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -343,7 +343,7 @@ describe CommunicationChannelsController do
         expect(assigns[:root_account]).to eq @account
       end
 
-      it "should register creation_pending user in the correct account" do
+      it "registers creation_pending user in the correct account" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -368,7 +368,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.communication_channel_id).to eq @cc.id
       end
 
-      it "should prepare to register a creation_pending user in the correct account (admin)" do
+      it "prepares to register a creation_pending user in the correct account (admin)" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.account_users.create!(user: @user)
@@ -383,7 +383,7 @@ describe CommunicationChannelsController do
         expect(assigns[:root_account]).to eq @account
       end
 
-      it "should register creation_pending user in the correct account (admin)" do
+      it "registers creation_pending user in the correct account (admin)" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @account.account_users.create!(user: @user)
@@ -405,7 +405,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.communication_channel_id).to eq @cc.id
       end
 
-      it "should show the confirm form for old creation_pending users that have a pseudonym" do
+      it "shows the confirm form for old creation_pending users that have a pseudonym" do
         course_factory(active_all: true)
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
@@ -419,7 +419,7 @@ describe CommunicationChannelsController do
         expect(assigns[:pseudonym]).to eq @pseudonym
       end
 
-      it "should work for old creation_pending users that have a pseudonym" do
+      it "works for old creation_pending users that have a pseudonym" do
         course_factory(active_all: true)
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
@@ -445,7 +445,7 @@ describe CommunicationChannelsController do
         expect(@pseudonym.communication_channel_id).to eq @cc.id
       end
 
-      it "should allow the user to pick a new pseudonym if a conflict already exists" do
+      it "allows the user to pick a new pseudonym if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course_factory(active_all: true)
         user_factory
@@ -462,7 +462,7 @@ describe CommunicationChannelsController do
         expect(assigns[:pseudonym].unique_id).to be_blank
       end
 
-      it "should force the user to provide a unique_id if a conflict already exists" do
+      it "forces the user to provide a unique_id if a conflict already exists" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         course_factory(active_all: true)
         user_factory
@@ -477,7 +477,7 @@ describe CommunicationChannelsController do
         assert_status(400)
       end
 
-      it "should redirect to the confirmation_redirect url when present" do
+      it "redirects to the confirmation_redirect url when present" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(path: 'jt@instructure.com', confirmation_redirect: 'http://some.place/in-the-world')
@@ -493,7 +493,7 @@ describe CommunicationChannelsController do
         @account2 = Account.create!(:name => 'B')
       end
 
-      it "should prepare to merge with an already-logged-in user" do
+      it "prepares to merge with an already-logged-in user" do
         user_with_pseudonym(:username => 'jt+1@instructure.com')
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
@@ -506,7 +506,7 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user, [@pseudonym]]]
       end
 
-      it "should merge with an already-logged-in user" do
+      it "merges with an already-logged-in user" do
         user_with_pseudonym(:username => 'jt+1@instructure.com')
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
@@ -525,7 +525,7 @@ describe CommunicationChannelsController do
         expect(@logged_user.communication_channels.all? { |cc| cc.active? }).to be_truthy
       end
 
-      it "should not allow merging with someone that's observed through a UserObserver relationship" do
+      it "does not allow merging with someone that's observed through a UserObserver relationship" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
@@ -539,7 +539,7 @@ describe CommunicationChannelsController do
         expect(response).to render_template('confirm_failed')
       end
 
-      it "should not allow merging with someone that's observing through a UserObserver relationship" do
+      it "does not allow merging with someone that's observing through a UserObserver relationship" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
@@ -553,7 +553,7 @@ describe CommunicationChannelsController do
         expect(response).to render_template('confirm_failed')
       end
 
-      it "should not allow merging with someone that's not a merge opportunity" do
+      it "does not allow merging with someone that's not a merge opportunity" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @not_logged_user = @user
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
@@ -564,7 +564,7 @@ describe CommunicationChannelsController do
         expect(response).to render_template('confirm_failed')
       end
 
-      it "should show merge opportunities for active users" do
+      it "shows merge opportunities for active users" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1)
         @user1 = @user
         user_with_pseudonym(:username => 'jt+1@instructure.com', :active_all => 1)
@@ -586,7 +586,7 @@ describe CommunicationChannelsController do
         expect(response).to redirect_to dashboard_url
       end
 
-      it "should not show users that can't have a pseudonym created for the correct account" do
+      it "does not show users that can't have a pseudonym created for the correct account" do
         @account1.authentication_providers.scope.delete_all
         @account1.authentication_providers.create!(:auth_type => 'cas')
         user_with_pseudonym(:active_all => 1, :account => @account1, :username => 'jt@instructure.com')
@@ -602,7 +602,7 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq []
       end
 
-      it "should create a pseudonym in the target account by copying an existing pseudonym when merging" do
+      it "creates a pseudonym in the target account by copying an existing pseudonym when merging" do
         user_with_pseudonym(:active_all => 1, :username => 'jt@instructure.com')
         @old_user = @user
 
@@ -624,7 +624,7 @@ describe CommunicationChannelsController do
         expect(@old_user.pseudonyms.detect { |p| p.account == @account2 }.unique_id).to eq 'jt@instructure.com'
       end
 
-      it "should include all pseudonyms if there are multiple" do
+      it "includes all pseudonyms if there are multiple" do
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
         @pseudonym1 = @pseudonym
         @user1 = @user
@@ -638,7 +638,7 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@pseudonym1, @pseudonym2]]]
       end
 
-      it "should only include the current account's pseudonym if there are multiple" do
+      it "onlies include the current account's pseudonym if there are multiple" do
         @account1 = Account.default
         @account2 = Account.create!
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
@@ -672,7 +672,7 @@ describe CommunicationChannelsController do
     describe "invitations" do
       before(:once) { course_with_student(:active_course => 1) }
 
-      it "should prepare to accept an invitation when creating a new user" do
+      it "prepares to accept an invitation when creating a new user" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
 
@@ -683,7 +683,7 @@ describe CommunicationChannelsController do
         expect(assigns[:pseudonym].unique_id).to eq 'jt@instructure.com'
       end
 
-      it "should accept an invitation when creating a new user" do
+      it "accepts an invitation when creating a new user" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -700,7 +700,7 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
-      it "should reject pseudonym unique_id changes when creating a new user" do
+      it "rejects pseudonym unique_id changes when creating a new user" do
         @user.accept_terms
         @user.update_attribute(:workflow_state, 'creation_pending')
         @cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
@@ -710,7 +710,7 @@ describe CommunicationChannelsController do
         expect(@user.reload.pseudonyms.first.unique_id).to eq "jt@instructure.com"
       end
 
-      it "should preview acceptance of an invitation when merging with the current user" do
+      it "previews acceptance of an invitation when merging with the current user" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user
@@ -726,7 +726,7 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user, [@pseudonym]]]
       end
 
-      it "should accept an invitation when merging with the current user" do
+      it "accepts an invitation when merging with the current user" do
         @user.update_attribute(:workflow_state, 'creation_pending')
         @old_cc = @user.communication_channels.create!(:path => 'jt@instructure.com')
         @old_user = @user
@@ -747,7 +747,7 @@ describe CommunicationChannelsController do
         expect(@old_cc.user).to eq @user
       end
 
-      it "should prepare to transfer an enrollment to a different user" do
+      it "prepares to transfer an enrollment to a different user" do
         course_with_student(:active_user => 1, :active_course => 1)
         @student_cc = @user.communication_channels.create!(:path => 'someone@somewhere.com') { |cc| cc.workflow_state = 'active' }
         user_with_pseudonym(:active_all => 1)
@@ -757,7 +757,7 @@ describe CommunicationChannelsController do
         expect(response).to render_template('confirm')
       end
 
-      it "should transfer an enrollment to a different user" do
+      it "transfers an enrollment to a different user" do
         course_with_student(:active_user => 1, :active_course => 1)
         @student_cc = @user.communication_channels.create!(:path => 'someone@somewhere.com') { |cc| cc.workflow_state = 'active' }
         user_with_pseudonym(:active_all => 1)
@@ -771,7 +771,7 @@ describe CommunicationChannelsController do
       end
     end
 
-    it "should uncache user's cc's when confirming a CC" do
+    it "uncaches user's cc's when confirming a CC" do
       user_with_pseudonym(:active_user => true)
       user_session(@user, @pseudonym)
       User.record_timestamps = false
@@ -792,7 +792,7 @@ describe CommunicationChannelsController do
   end
 
   describe "POST 'reset_bounce_count'" do
-    it 'should allow siteadmins to reset the bounce count' do
+    it 'allows siteadmins to reset the bounce count' do
       u = user_with_pseudonym
       cc1 = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') do |cc|
         cc.workflow_state = 'active'
@@ -807,7 +807,7 @@ describe CommunicationChannelsController do
       expect(cc1.bounce_count).to eq(0)
     end
 
-    it 'should not allow account admins to reset the bounce count' do
+    it 'does not allow account admins to reset the bounce count' do
       u = user_with_pseudonym
       cc1 = u.communication_channels.create!(:path => 'test@example.com', :path_type => 'email') do |cc|
         cc.workflow_state = 'active'
@@ -1249,7 +1249,7 @@ describe CommunicationChannelsController do
   end
 
   context "re-sending confirmations" do
-    it "should re-send communication channel invitation for an invited channel" do
+    it "re-sends communication channel invitation for an invited channel" do
       Notification.create(:name => 'Confirm Email Communication Channel')
       user_session(@user)
       get 're_send_confirmation', params: { :user_id => @pseudonym.user_id, :id => @cc.id }
@@ -1259,19 +1259,19 @@ describe CommunicationChannelsController do
       expect(assigns[:cc].messages_sent).not_to be_nil
     end
 
-    it "should require a logged-in user" do
+    it "requires a logged-in user" do
       get 're_send_confirmation', params: { :user_id => @pseudonym.user_id, :id => @cc.id }
       assert_unauthorized
     end
 
-    it "should require self to be logged in to re-send (without enrollment)" do
+    it "requires self to be logged in to re-send (without enrollment)" do
       user_session(@user)
       user_with_pseudonym(:active_all => true) # new user
       get 're_send_confirmation', params: { :user_id => @pseudonym.user_id, :id => @cc.id }
       assert_unauthorized
     end
 
-    it "should allow an account admin to re-send" do
+    it "allows an account admin to re-send" do
       account_admin_user(:user => @user)
       user_session(@user)
       user_with_pseudonym(:active_all => true) # new user
@@ -1279,7 +1279,7 @@ describe CommunicationChannelsController do
       expect(response).to be_successful
     end
 
-    it "should re-send enrollment invitation for an invited user" do
+    it "re-sends enrollment invitation for an invited user" do
       course_with_teacher_logged_in(active_all: true)
 
       user_with_pseudonym(:active_all => true) # new user
@@ -1294,7 +1294,7 @@ describe CommunicationChannelsController do
       expect(assigns[:enrollment].messages_sent).not_to be_nil
     end
 
-    it "should not re-send registration to a registered user when trying to re-send invitation for an unavailable course" do
+    it "does not re-send registration to a registered user when trying to re-send invitation for an unavailable course" do
       course_with_teacher_logged_in(active_all: true)
       @course.update(:start_at => 1.week.from_now, :restrict_student_future_view => true,
                      :restrict_enrollments_to_course_dates => true)
@@ -1307,7 +1307,7 @@ describe CommunicationChannelsController do
       expect(response).to be_successful
     end
 
-    it "should require an admin with rights in the course" do
+    it "requires an admin with rights in the course" do
       course_with_teacher_logged_in(:active_all => true) # other course
 
       user_with_pseudonym(:active_all => true)
@@ -1320,7 +1320,7 @@ describe CommunicationChannelsController do
 
     context "cross-shard user" do
       specs_require_sharding
-      it "should re-send enrollment invitation for a cross-shard user" do
+      it "re-sends enrollment invitation for a cross-shard user" do
         course_with_teacher_logged_in(active_all: true)
         enrollment = nil
         @shard1.activate do
@@ -1336,7 +1336,7 @@ describe CommunicationChannelsController do
     end
   end
 
-  it "should uncache user's cc's when retiring a CC" do
+  it "uncaches user's cc's when retiring a CC" do
     user_session(@user, @pseudonym)
     User.record_timestamps = false
     begin
@@ -1354,7 +1354,7 @@ describe CommunicationChannelsController do
     end
   end
 
-  it "should not delete a required institutional channel" do
+  it "does not delete a required institutional channel" do
     user_session(@user, @pseudonym)
     Account.default.settings[:edit_institution_email] = false
     Account.default.save!
@@ -1381,14 +1381,14 @@ describe CommunicationChannelsController do
     let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
     let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
 
-    it 'should 404 if there is no communication channel', type: :request do
+    it '404S if there is no communication channel', type: :request do
       status = raw_api_call(:delete, "/api/v1/users/self/communication_channels/push",
                             { controller: 'communication_channels', action: 'delete_push_token', format: 'json',
                               push_token: 'notatoken' }, { push_token: 'notatoken' })
       expect(status).to eq(404)
     end
 
-    it 'should delete a push_token', type: :request do
+    it 'deletes a push_token', type: :request do
       fake_token = 'insttothemoon'
       sns_access_token.notification_endpoints.create!(token: fake_token)
       sns_channel
@@ -1428,7 +1428,7 @@ describe CommunicationChannelsController do
         context "cross-shard user" do
           specs_require_sharding
 
-          it 'should delete endpoints from all_shards', type: :request do
+          it 'deletes endpoints from all_shards', type: :request do
             @shard1.activate { @new_user = User.create!(name: 'shard one') }
             UserMerge.from(@user).into(@new_user)
             @user = @new_user
@@ -1441,7 +1441,7 @@ describe CommunicationChannelsController do
           end
         end
 
-        it 'should delete a push_token', type: :request do
+        it 'deletes a push_token', type: :request do
           json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                           { controller: 'communication_channels', action: 'delete_push_token', format: 'json',
                             push_token: fake_token }, { push_token: fake_token })
@@ -1450,7 +1450,7 @@ describe CommunicationChannelsController do
           expect(endpoints.length).to eq 0
         end
 
-        it 'should only delete specified endpoint', type: :request do
+        it 'onlies delete specified endpoint', type: :request do
           another_token = 'another'
           another_endpoint = second_sns_access_token.notification_endpoints.create!(token: another_token)
 
@@ -1461,14 +1461,14 @@ describe CommunicationChannelsController do
           expect(NotificationEndpoint.where(token: fake_token).take.workflow_state).to eq('deleted')
         end
 
-        it 'should not delete the communication channel', type: :request do
+        it 'does not delete the communication channel', type: :request do
           api_call(:delete, "/api/v1/users/self/communication_channels/push",
                    { controller: 'communication_channels', action: 'delete_push_token', format: 'json',
                      push_token: fake_token }, { push_token: fake_token })
           expect(CommunicationChannel.where(path: 'push').take).to be_truthy
         end
 
-        it 'should delete all endpoints for the given token', type: :request do
+        it 'deletes all endpoints for the given token', type: :request do
           second_sns_access_token.notification_endpoints.create!(token: fake_token)
           api_call(:delete, "/api/v1/users/self/communication_channels/push",
                    { controller: 'communication_channels', action: 'delete_push_token', format: 'json',

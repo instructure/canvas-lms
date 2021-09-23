@@ -38,15 +38,15 @@ describe "collaborations" do
         setup_google_drive
       end
 
-      it 'should be editable', priority: "1", test_id: 158504 do
+      it 'is editable', priority: "1", test_id: 158504 do
         be_editable(type, title)
       end
 
-      it 'should be delete-able', priority: "1", test_id: 158505 do
+      it 'is delete-able', priority: "1", test_id: 158505 do
         be_deletable(type, title)
       end
 
-      it 'should display available collaborators', priority: "1", test_id: 162356 do
+      it 'displays available collaborators', priority: "1", test_id: 162356 do
         display_available_collaborators(type)
       end
 
@@ -62,11 +62,11 @@ describe "collaborations" do
         setup_google_drive(false, false)
       end
 
-      it 'should not be editable if google drive does not have access to your account', priority: "1", test_id: 162363 do
+      it 'is not editable if google drive does not have access to your account', priority: "1", test_id: 162363 do
         no_edit_with_no_access
       end
 
-      it 'should not be delete-able if google drive does not have access to your account', priority: "2", test_id: 162365 do
+      it 'is not delete-able if google drive does not have access to your account', priority: "2", test_id: 162365 do
         no_delete_with_no_access
       end
     end
@@ -78,7 +78,7 @@ describe "collaborations" do
       student_in_course(:course => @course, :name => 'Don Draper')
     end
 
-    it 'should be visible to the student', priority: "1", test_id: 138616 do
+    it 'is visible to the student', priority: "1", test_id: 138616 do
       PluginSetting.create!(:name => 'etherpad', :settings => {})
 
       @collaboration = Collaboration.typed_collaboration_instance('EtherPad')

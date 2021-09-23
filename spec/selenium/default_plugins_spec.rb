@@ -27,7 +27,7 @@ describe "default plugins" do
     Account.site_admin.account_users.create!(user: @user)
   end
 
-  it "should allow configuring twitter plugin" do
+  it "allows configuring twitter plugin" do
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     expect(settings).to be_nil
 
@@ -57,7 +57,7 @@ describe "default plugins" do
     expect(settings[:consumer_secret_dec]).to eq 'asdf'
   end
 
-  it "should allow configuring etherpad plugin" do
+  it "allows configuring etherpad plugin" do
     settings = Canvas::Plugin.find(:etherpad).try(:settings)
     expect(settings).to be_nil
 
@@ -83,7 +83,7 @@ describe "default plugins" do
     expect(settings[:name]).to eq 'asdf'
   end
 
-  it "should allow configuring linked in plugin" do
+  it "allows configuring linked in plugin" do
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     expect(settings).to be_nil
 

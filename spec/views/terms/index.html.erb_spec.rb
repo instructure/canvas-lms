@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/terms/index" do
-  it "should allow deletion of terms with only deleted courses" do
+  it "allows deletion of terms with only deleted courses" do
     assign(:context, assign(:root_account, Account.default))
     term = Account.default.enrollment_terms.create!
     term.courses.create! { |c| c.workflow_state = 'deleted' }

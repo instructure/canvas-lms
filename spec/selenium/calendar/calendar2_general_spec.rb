@@ -42,7 +42,7 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
-    it "should let me go to the Edit Appointment group page from the appointment group slot dialog" do
+    it "lets me go to the Edit Appointment group page from the appointment group slot dialog" do
       date = Date.today.to_s
       create_appointment_group :new_appointments => [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
@@ -58,7 +58,7 @@ describe "calendar2" do
       expect(driver.current_url).to include("appointment_groups/#{AppointmentGroup.last.id}/edit")
     end
 
-    it "should let me message students who have signed up for an appointment" do
+    it "lets me message students who have signed up for an appointment" do
       date = Date.today.to_s
       create_appointment_group :new_appointments => [
         ["#{date} 12:00:00", "#{date} 13:00:00"],
@@ -148,7 +148,7 @@ describe "calendar2" do
       expect(f('.more_options_link')['href']).to match(original_more_options)
     end
 
-    it "should make an assignment undated if you delete the start date" do
+    it "makes an assignment undated if you delete the start date" do
       skip_if_chrome('can not replace content')
       create_middle_day_assignment("undate me")
       f('.fc-event:not(.event_pending)').click
@@ -164,7 +164,7 @@ describe "calendar2" do
     end
 
     context "event editing", priority: "1", test_id: 138853 do
-      it "should allow editing appointment events" do
+      it "allows editing appointment events" do
         create_appointment_group
         ag = AppointmentGroup.first
         student_in_course(:course => @course, :active_all => true)
@@ -202,7 +202,7 @@ describe "calendar2" do
         @user.save!
       end
 
-      it "should display popup with correct day on an event" do
+      it "displays popup with correct day on an event" do
         local_now = @user.time_zone.now
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         make_event(:start => event_start)
@@ -211,7 +211,7 @@ describe "calendar2" do
         expect(f('.event-details-timestring').text).to include event_start.strftime("%b %e")
       end
 
-      it "should display popup with correct day on an assignment" do
+      it "displays popup with correct day on an assignment" do
         local_now = @user.time_zone.now
         event_start = @user.time_zone.local(local_now.year, local_now.month, 15, 22, 0, 0)
         @course.assignments.create!(
@@ -223,7 +223,7 @@ describe "calendar2" do
         expect(f('.event-details-timestring').text).to include event_start.strftime("%b %e")
       end
 
-      it "should display popup with correct day on an assignment override" do
+      it "displays popup with correct day on an assignment override" do
         @student = course_with_student_logged_in.user
         @student.time_zone = 'America/Denver'
         @student.save!
@@ -250,7 +250,7 @@ describe "calendar2" do
       end
     end
 
-    it "should test the today button" do
+    it "tests the today button" do
       get "/calendar2"
       current_month_num = Time.now.month
       current_month = Date::MONTHNAMES[current_month_num]
@@ -261,7 +261,7 @@ describe "calendar2" do
       expect(header_text).to eq(current_month + ' ' + Time.zone.now.year.to_s)
     end
 
-    it "should allow viewing an unenrolled calendar via include_contexts" do
+    it "allows viewing an unenrolled calendar via include_contexts" do
       # also make sure the redirect from calendar -> calendar2 keeps the param
       unrelated_course = Course.create!(:account => Account.default, :name => "unrelated course")
       # make the user an admin so they can view the course's calendar without an enrollment
@@ -278,7 +278,7 @@ describe "calendar2" do
       expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
     end
 
-    it "should only consider active enrollments for upcoming events list", priority: "2", test_id: 854796 do
+    it "onlies consider active enrollments for upcoming events list", priority: "2", test_id: 854796 do
       make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
       get "/"
       expect(f('.coming_up').text).to include('Test Event')

@@ -106,7 +106,7 @@ describe SisApiController, type: :request do
           expect(json_parse.length).to eq(0)
         end
 
-        it "should return courses starting before starts_before" do
+        it "returns courses starting before starts_before" do
           context.courses.each(&:destroy)
           start_at = 1.week.ago
           course1 = context.courses.create!
@@ -130,7 +130,7 @@ describe SisApiController, type: :request do
           expect(result.map { |h| h['course_id'] }).to match_array [course1.id, course2.id, course4.id]
         end
 
-        it "should return courses concluding after ends_after" do
+        it "returns courses concluding after ends_after" do
           context.courses.each(&:destroy)
           end_at = 1.week.from_now
           course1 = context.courses.create!
@@ -280,7 +280,7 @@ describe SisApiController, type: :request do
           expect(result_json[0]).to include('id' => assignment8.id)
         end
 
-        it 'should return an assignment with an override' do
+        it 'returns an assignment with an override' do
           get "/api/sis/courses/#{@course.id}/assignments", params: { course_id: @course.id, per_page: 2, page: 2 }
           result_json = json_parse
           assignment = result_json.detect { |a| a['id'] == assignment7.id }

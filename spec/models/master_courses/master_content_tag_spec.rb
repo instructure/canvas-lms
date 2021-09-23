@@ -26,7 +26,7 @@ describe MasterCourses::MasterContentTag do
   end
 
   describe "#migration_id" do
-    it "should match the generated migration_ids from CCHelper" do
+    it "matches the generated migration_ids from CCHelper" do
       ann = @course.announcements.create!(:message => "blah")
       topic = @course.discussion_topics.create!
       page = @course.wiki_pages.create!(:title => "blah")
@@ -46,18 +46,18 @@ describe MasterCourses::MasterContentTag do
       DiscussionTopic.where(:id => @topic).update_all(:updated_at => @time)
     end
 
-    it "should not touch when the tag is created" do
+    it "does not touch when the tag is created" do
       tag = @template.create_content_tag_for!(@topic, :restrictions => { :content => true })
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
     end
 
-    it "should touch when the tag has any restriction tighted" do
+    it "touches when the tag has any restriction tighted" do
       tag = @template.create_content_tag_for!(@topic, :restrictions => { :content => true })
       tag.update_attribute(:restrictions, { :lock_settings => true })
       expect(@topic.reload.updated_at.to_i).to_not eq @time.to_i
     end
 
-    it "should not touch when the tag has restrictions loosened" do
+    it "does not touch when the tag has restrictions loosened" do
       tag = @template.create_content_tag_for!(@topic, :restrictions => { :content => true, :settings => true })
       tag.update_attribute(:restrictions, { :lock_settings => false })
       expect(@topic.reload.updated_at.to_i).to eq @time.to_i
@@ -65,7 +65,7 @@ describe MasterCourses::MasterContentTag do
   end
 
   describe "fetch_module_item_restrictions_for_child" do
-    it "should fetch restrictions for module items in a most fancy fashion" do
+    it "fetches restrictions for module items in a most fancy fashion" do
       @copy_from = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       topic = @copy_from.discussion_topics.create!
@@ -91,7 +91,7 @@ describe MasterCourses::MasterContentTag do
   end
 
   describe "fetch_module_item_restrictions_for_master" do
-    it "should fetch restrictions for module items on the master-side" do
+    it "fetches restrictions for module items on the master-side" do
       @copy_from = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
       topic = @copy_from.discussion_topics.create!

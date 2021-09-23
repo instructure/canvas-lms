@@ -209,7 +209,7 @@ RSpec.describe GradingPeriodSetsController, type: :controller do
       let(:sub_account) { root_account.sub_accounts.create! }
 
       describe "GET #index" do
-        it "it fetches sets through the root account" do
+        it "fetches sets through the root account" do
           grading_period_set = group_helper.create_for_account(root_account)
 
           get :index, params: { account_id: sub_account.to_param }, session: valid_session

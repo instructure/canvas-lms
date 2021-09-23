@@ -18,7 +18,8 @@ OPT_IN = {
   nil => %w[Gemfile.d].freeze,
   'Bundler' => nil,
   'Gemspec' => nil,
-  'Layout' => nil
+  'Layout' => nil,
+  'RSpec/ExampleWording' => nil
 }.freeze
 
 # this code generates a configuration that disables all cops for all files

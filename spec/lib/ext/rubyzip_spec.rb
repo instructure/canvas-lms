@@ -54,21 +54,21 @@ describe "rubyzip encoding fix patch" do
     end
 
     describe "entries" do
-      it "should return UTF-8 names in UTF-8 encoding" do
+      it "returns UTF-8 names in UTF-8 encoding" do
         expect(@arch.entries.map(&:name).select { |filename| filename.encoding.to_s == 'UTF-8' }).to eql [@utf8_name]
       end
 
-      it "should return non-UTF-8 names in ASCII-8BIT encoding" do
+      it "returns non-UTF-8 names in ASCII-8BIT encoding" do
         expect(@arch.entries.map(&:name).select { |filename| filename.encoding.to_s == 'ASCII-8BIT' }).to eql [@ascii_name]
       end
     end
 
     describe "find_entry" do
-      it "should find a UTF-8 name" do
+      it "finds a UTF-8 name" do
         expect(@arch.find_entry(@utf8_name)).not_to be_nil
       end
 
-      it "should find a non-UTF-8 name" do
+      it "finds a non-UTF-8 name" do
         expect(@arch.find_entry(@ascii_name)).not_to be_nil
       end
     end

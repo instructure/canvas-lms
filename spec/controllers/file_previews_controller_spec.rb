@@ -31,34 +31,34 @@ describe FilePreviewsController do
     user_session(@student)
   end
 
-  it "should require authorization to view the file" do
+  it "requires authorization to view the file" do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response.status).to eq 401
   end
 
-  it 'should accept a valid verifier token' do
+  it 'accepts a valid verifier token' do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: @attachment.uuid }
     expect(response.status).to eq 200
   end
 
-  it 'should not accept an invalid verifier token' do
+  it 'does not accept an invalid verifier token' do
     course_model
     attachment_model
     get :show, params: { course_id: @course.id, file_id: @attachment.id, verifier: 'nope' }
     expect(response.status).to eq 401
   end
 
-  it "should render lock information for the file" do
+  it "renders lock information for the file" do
     attachment_model locked: true
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response).to render_template 'lock_explanation'
   end
 
-  it "should 404 (w/o canvas chrome) if the file doesn't exist" do
+  it "404S (w/o canvas chrome) if the file doesn't exist" do
     attachment_model
     file_id = @attachment.id
     @attachment.destroy_permanently!
@@ -68,7 +68,7 @@ describe FilePreviewsController do
     expect(assigns['show_left_side']).to eq false
   end
 
-  it "should redirect to crododoc_url if available and params[:annotate] is given" do
+  it "redirects to crododoc_url if available and params[:annotate] is given" do
     allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return('http://example.com/fake_crocodoc_url')
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
@@ -76,7 +76,7 @@ describe FilePreviewsController do
     expect(response).to redirect_to @attachment.crocodoc_url
   end
 
-  it "should redirect to canvadocs_url if available" do
+  it "redirects to canvadocs_url if available" do
     allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return('http://example.com/fake_crocodoc_url')
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return('http://example.com/fake_canvadoc_url')
     attachment_model content_type: 'application/msword'
@@ -84,7 +84,7 @@ describe FilePreviewsController do
     expect(response).to redirect_to @attachment.canvadoc_url
   end
 
-  it "should redirect to a google doc preview if available" do
+  it "redirects to a google doc preview if available" do
     allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: 'application/msword'
@@ -93,7 +93,7 @@ describe FilePreviewsController do
     expect(response.location).to match %r{\A//docs.google.com/viewer}
   end
 
-  it "should redirect to file if it's html" do
+  it "redirects to file if it's html" do
     allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     attachment_model content_type: 'text/html'
@@ -102,7 +102,7 @@ describe FilePreviewsController do
     expect(response.location).to match %r{/courses/#{@course.id}/files/#{@attachment.id}/preview}
   end
 
-  it "should render a download link if no previews are available" do
+  it "renders a download link if no previews are available" do
     allow_any_instance_of(Attachment).to receive(:crocodoc_url).and_return(nil)
     allow_any_instance_of(Attachment).to receive(:canvadoc_url).and_return(nil)
     @account.disable_service(:google_docs_previews)
@@ -113,21 +113,21 @@ describe FilePreviewsController do
     expect(response).to render_template 'no_preview'
   end
 
-  it "should render an img element for image types" do
+  it "renders an img element for image types" do
     attachment_model content_type: 'image/png'
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response.status).to eq 200
     expect(response).to render_template 'img_preview'
   end
 
-  it "should render a media tag for media types" do
+  it "renders a media tag for media types" do
     attachment_model content_type: 'video/mp4'
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
     expect(response.status).to eq 200
     expect(response).to render_template 'media_preview'
   end
 
-  it "should fulfill module completion requirements" do
+  it "fulfills module completion requirements" do
     attachment_model content_type: 'application/msword'
     mod = @course.context_modules.create!(:name => "some module")
     tag = mod.add_item(:id => @attachment.id, :type => 'attachment')
@@ -138,7 +138,7 @@ describe FilePreviewsController do
     expect(mod.evaluate_for(@user).workflow_state).to eq "completed"
   end
 
-  it "should log asset accesses when previewable" do
+  it "logs asset accesses when previewable" do
     Setting.set('enable_page_views', 'db')
     attachment_model content_type: 'image/png'
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -146,7 +146,7 @@ describe FilePreviewsController do
     expect(access.asset).to eq @attachment
   end
 
-  it "should not log asset accesses when not previewable" do
+  it "does not log asset accesses when not previewable" do
     Setting.set('enable_page_views', 'db')
     attachment_model content_type: 'unknown/unknown'
     get :show, params: { course_id: @course.id, file_id: @attachment.id }
@@ -154,7 +154,7 @@ describe FilePreviewsController do
     expect(access).to be_empty
   end
 
-  it "should work with hidden files" do
+  it "works with hidden files" do
     attachment_model content_type: 'image/png'
     @attachment.update_attribute(:file_state, 'hidden')
     get :show, params: { course_id: @course.id, file_id: @attachment.id }

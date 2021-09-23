@@ -38,7 +38,7 @@ describe UsersController do
       @e2.update_attribute(:course_section, @s2)
     end
 
-    it "should count conversations as interaction" do
+    it "counts conversations as interaction" do
       get user_student_teacher_activity_url(@teacher, @e1.user)
       expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
 
@@ -49,7 +49,7 @@ describe UsersController do
       expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/less than 1 day/)
     end
 
-    it "should use conversation message participants when calculating interaction" do
+    it "uses conversation message participants when calculating interaction" do
       other_student = user_factory(:active_all => true)
       @e1.course.enroll_student(other_student, :enrollment_state => 'active')
 
@@ -63,14 +63,14 @@ describe UsersController do
       expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
     end
 
-    it "should only include students the teacher can view" do
+    it "onlies include students the teacher can view" do
       get user_course_teacher_activity_url(@teacher, @course)
       expect(response).to be_successful
       expect(response.body).to match(/studentname1/)
       expect(response.body).not_to match(/studentname2/)
     end
 
-    it "should show user notes if enabled" do
+    it "shows user notes if enabled" do
       get user_course_teacher_activity_url(@teacher, @course)
       expect(response.body).not_to match(/journal entry/i)
       @course.root_account.update_attribute(:enable_user_notes, true)
@@ -78,7 +78,7 @@ describe UsersController do
       expect(response.body).to match(/journal entry/i)
     end
 
-    it "should show individual user info across courses" do
+    it "shows individual user info across courses" do
       @course1 = @course
       @course2 = course_factory(active_course: true)
       @course2.update_attribute(:name, 'coursename2')
@@ -98,7 +98,7 @@ describe UsersController do
       expect(response.body).to match(/coursename2/)
     end
 
-    it "should be available for concluded courses/enrollments" do
+    it "is available for concluded courses/enrollments" do
       account_admin_user(:username => "admin")
       user_session(@admin)
 
@@ -115,7 +115,7 @@ describe UsersController do
       expect(response.body).to match(/studentname1/)
     end
 
-    it "should show concluded students to active teachers" do
+    it "shows concluded students to active teachers" do
       @e1.conclude
 
       get user_student_teacher_activity_url(@teacher, @e1.user)
@@ -130,7 +130,7 @@ describe UsersController do
     context "sharding" do
       specs_require_sharding
 
-      it "should show activity for students located on another shard" do
+      it "shows activity for students located on another shard" do
         @shard1.activate do
           @student = user_factory(:name => "im2spoopy4u")
         end
@@ -144,7 +144,7 @@ describe UsersController do
   end
 
   describe "#index" do
-    it "should render" do
+    it "renders" do
       user_with_pseudonym(:active_all => 1)
       Account.default.account_users.create!(user: @user)
       user_session(@user, @pseudonym)
@@ -154,7 +154,7 @@ describe UsersController do
   end
 
   describe "#show" do
-    it "should allow admins to view users in their account" do
+    it "allows admins to view users in their account" do
       @admin = account_admin_user
       user_session(@admin)
 
@@ -169,7 +169,7 @@ describe UsersController do
       assert_status(404)
     end
 
-    it "should show user to account users that have the read_roster permission" do
+    it "shows user to account users that have the read_roster permission" do
       account_model
       student_in_course(:account => @account)
 
@@ -183,7 +183,7 @@ describe UsersController do
       expect(response).to be_successful
     end
 
-    it "should show course user to account users that have the read_roster permission" do
+    it "shows course user to account users that have the read_roster permission" do
       account_model
       student_in_course(:account => @account)
       role = custom_account_role('custom', :account => @account)
@@ -214,7 +214,7 @@ describe UsersController do
       @a.save!
     end
 
-    it "should return default avatar for user id and actual avatar for avatar_key" do
+    it "returns default avatar for user id and actual avatar for avatar_key" do
       enable_cache do
         get "/images/users/#{@user.id}"
         expect(response).to redirect_to "/images/messages/avatar-50.png"
@@ -230,7 +230,7 @@ describe UsersController do
       end
     end
 
-    it "should maintain protocol and domain name in fallback" do
+    it "maintains protocol and domain name in fallback" do
       disable_avatars!
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
@@ -241,7 +241,7 @@ describe UsersController do
       end
     end
 
-    it "should maintain protocol and domain name in default avatar redirect fallback" do
+    it "maintains protocol and domain name in default avatar redirect fallback" do
       enable_cache do
         get "http://someschool.instructure.com/images/users/#{User.avatar_key(@user.id)}"
         expect(response).to redirect_to "http://someschool.instructure.com/images/messages/avatar-50.png"
@@ -251,7 +251,7 @@ describe UsersController do
       end
     end
 
-    it "should forget all cached urls when the avatar changes" do
+    it "forgets all cached urls when the avatar changes" do
       enable_cache do
         data = Rails.cache.instance_variable_get(:@data)
         orig_size = data.size
@@ -272,7 +272,7 @@ describe UsersController do
   end
 
   describe "#grades" do
-    it "should only list courses once for multiple enrollments" do
+    it "onlies list courses once for multiple enrollments" do
       course_with_student_logged_in(:active_all => true)
       @first_course = @course
       add_section("other section")
@@ -286,7 +286,7 @@ describe UsersController do
       expect(student_grades.text).to match /#{@course.name}/
     end
 
-    it "should let an admin with view_all_grades view" do
+    it "lets an admin with view_all_grades view" do
       course_with_student(:active_all => true)
       @first_course = @course
       course_with_student(:user => @student, :active_all => true)
@@ -303,7 +303,7 @@ describe UsersController do
   end
 
   describe "admin_merge" do
-    it "should work for the whole flow" do
+    it "works for the whole flow" do
       user_with_pseudonym(:active_all => 1)
       Account.default.account_users.create!(user: @user)
       @admin = @user
@@ -348,7 +348,7 @@ describe UsersController do
       user_session(@student)
     end
 
-    it 'should pass the type down to the media fetcher even with a malformed url' do
+    it 'passes the type down to the media fetcher even with a malformed url' do
       expect(media_source_fetcher).to receive(:fetch_preferred_source_url)
         .with(media_id: 'someMediaId', file_extension: 'mp4', media_type: nil)
         .and_return('http://example.com/media.mp4')

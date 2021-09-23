@@ -42,7 +42,7 @@ describe PlannerController do
   end
 
   context "unauthenticated" do
-    it "should return unauthorized" do
+    it "returns unauthorized" do
       get :index
       assert_unauthorized
     end
@@ -78,7 +78,7 @@ describe PlannerController do
         expect(found_planner_items_request).to be true
       end
 
-      it "should show wiki pages with todo dates" do
+      it "shows wiki pages with todo dates" do
         wiki_page_model(course: @course)
         @page.todo_date = 1.day.from_now
         @page.save!
@@ -89,7 +89,7 @@ describe PlannerController do
         expect(page["plannable_type"]).to eq 'wiki_page'
       end
 
-      it "should show planner notes for the user" do
+      it "shows planner notes for the user" do
         planner_note_model(course: @course)
         get :index
         response_json = json_parse(response.body)
@@ -98,7 +98,7 @@ describe PlannerController do
         expect(note["plannable"]["title"]).to eq @planner_note.title
       end
 
-      it "should show calendar events for the course and user" do
+      it "shows calendar events for the course and user" do
         ce = calendar_event_model(start_at: 1.day.from_now)
         ue = @student.calendar_events.create!(start_at: 2.days.from_now, title: 'user_event')
         get :index
@@ -109,7 +109,7 @@ describe PlannerController do
         expect(user_event['plannable']['title']).to eq 'user_event'
       end
 
-      it "should not show group events from inactive courses" do
+      it "does not show group events from inactive courses" do
         @course1 = course_factory
         @course2 = course_factory
 
@@ -169,7 +169,7 @@ describe PlannerController do
         expect(event_ids).not_to include my_event_id
       end
 
-      it "should show appointment group reservations" do
+      it "shows appointment group reservations" do
         ag = appointment_group_model(title: 'appointment group')
         ap = appointment_participant_model(participant: @student, course: @course, appointment_group: ag)
         get :index
@@ -178,7 +178,7 @@ describe PlannerController do
         expect(event['plannable']['title']).to eq 'appointment group'
       end
 
-      it "should only show section specific announcements to students who can view them" do
+      it "onlies show section specific announcements to students who can view them" do
         a1 = @course.announcements.create!(:message => "for the defaults", :is_section_specific => true, :course_sections => [@course.default_section])
         sec2 = @course.course_sections.create!
         a2 = @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
@@ -188,7 +188,7 @@ describe PlannerController do
         expect(response_json.select { |i| i['plannable_type'] == 'announcement' }.map { |i| i['plannable_id'] }).to eq [a1.id]
       end
 
-      it "should show planner overrides created on quizzes" do
+      it "shows planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
         PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
         get :index
@@ -198,7 +198,7 @@ describe PlannerController do
         expect(quiz_json['planner_override']['plannable_type']).to eq 'quiz'
       end
 
-      it "should show planner overrides created on discussions" do
+      it "shows planner overrides created on discussions" do
         discussion = discussion_topic_model(context: @course, todo_date: 1.day.from_now)
         PlannerOverride.create!(plannable_id: discussion.id, plannable_type: DiscussionTopic, user_id: @student.id)
         get :index
@@ -208,7 +208,7 @@ describe PlannerController do
         expect(disc_json['planner_override']['plannable_type']).to eq 'discussion_topic'
       end
 
-      it "should show planner overrides created on wiki pages" do
+      it "shows planner overrides created on wiki pages" do
         page = wiki_page_model(course: @course, todo_date: 1.day.from_now)
         PlannerOverride.create!(plannable_id: page.id, plannable_type: WikiPage, user_id: @student.id)
         get :index
@@ -218,7 +218,7 @@ describe PlannerController do
         expect(page_json['planner_override']['plannable_type']).to eq 'wiki_page'
       end
 
-      it "should show peer review tasks for the user" do
+      it "shows peer review tasks for the user" do
         @current_user = @student
         reviewee = course_with_student(course: @course, active_all: true).user
         assignment_model(course: @course, peer_reviews: true)
@@ -232,7 +232,7 @@ describe PlannerController do
         expect(peer_review['html_url']).to match "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       end
 
-      it "should show peer reviews for assignments with no 'everyone' date and no peer review date" do
+      it "shows peer reviews for assignments with no 'everyone' date and no peer review date" do
         @current_user = @student
         reviewee = user_model
         differentiated_assignment(course: @course, peer_reviews: true, due_at: nil)
@@ -248,7 +248,7 @@ describe PlannerController do
         expect(peer_review['plannable_date']).to eq @assignment.submissions.find_by(user: @current_user).cached_due_date.iso8601
       end
 
-      it "should mark peer reviews as done when they are completed, if they have been marked as incomplete by an override" do
+      it "marks peer reviews as done when they are completed, if they have been marked as incomplete by an override" do
         @current_user = @student
         reviewee = course_with_student(course: @course, active_all: true).user
         assignment_model(course: @course, peer_reviews: true, due_at: 1.day.ago, peer_reviews_due_at: 1.day.from_now)
@@ -283,7 +283,7 @@ describe PlannerController do
           user_session(@u)
         end
 
-        it "should not include objects from concluded courses by default" do
+        it "does not include objects from concluded courses by default" do
           get :index
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
@@ -293,7 +293,7 @@ describe PlannerController do
           expect(items).not_to include ['planner_note', @pn2.id]
         end
 
-        it "should include objects from concluded courses if specified" do
+        it "includes objects from concluded courses if specified" do
           get :index, params: { include: %w{concluded} }
           response_json = json_parse(response.body)
           items = response_json.map { |i| [i["plannable_type"], i["plannable"]["id"]] }
@@ -337,7 +337,7 @@ describe PlannerController do
           user_session(@student)
         end
 
-        it "should include all data by default" do
+        it "includes all data by default" do
           get :index, params: { per_page: 50 }
           response_json = json_parse(response.body)
           expect(response_json.length).to be 16
@@ -351,7 +351,7 @@ describe PlannerController do
           assert_status(200)
         end
 
-        it "should only return data from contexted courses if specified" do
+        it "onlies return data from contexted courses if specified" do
           get :index, params: { context_codes: [@course1.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -366,7 +366,7 @@ describe PlannerController do
           expect(response_hash.length).to be 8
         end
 
-        it "should only return data from contexted users if specified" do
+        it "onlies return data from contexted users if specified" do
           get :index, params: { context_codes: [@user.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -375,7 +375,7 @@ describe PlannerController do
           expect(response_hash.length).to be 2
         end
 
-        it "should return items from all context_codes specified" do
+        it "returns items from all context_codes specified" do
           get :index, params: { context_codes: [@user.asset_string, @group.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -387,7 +387,7 @@ describe PlannerController do
           expect(response_hash.length).to be 5
         end
 
-        it "should return items from all context_codes specified for group and a different course" do
+        it "returns items from all context_codes specified for group and a different course" do
           get :index, params: { context_codes: [@group.asset_string, @course2.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -515,7 +515,7 @@ describe PlannerController do
       end
 
       context "date sorting" do
-        it "should return results in order by date" do
+        it "returns results in order by date" do
           wiki_page_model(course: @course)
           @page.todo_date = 1.day.from_now
           @page.save!
@@ -544,7 +544,7 @@ describe PlannerController do
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
-        it "should behave consistently with different object types on the same datetime" do
+        it "behaves consistently with different object types on the same datetime" do
           time = 4.days.from_now
           @assignment.update_attribute(:due_at, time)
           @assignment2.update_attribute(:due_at, time)
@@ -564,7 +564,7 @@ describe PlannerController do
           expect(json_parse(response.body).map { |i| [i["plannable_type"], i["plannable_id"]] }).to eq original_order[3..4]
         end
 
-        it "should use the right bookmarker in different time zones" do
+        it "uses the right bookmarker in different time zones" do
           Account.default.default_time_zone = "America/Denver"
           time = 2.days.from_now
           @assignment.update_attribute(:due_at, time)
@@ -578,7 +578,7 @@ describe PlannerController do
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@assignment2.id]
         end
 
-        it "should return results in reverse order by date if requested" do
+        it "returns results in reverse order by date if requested" do
           wiki_page_model(course: @course, todo_date: 1.day.from_now)
           @assignment3 = course_assignment
           @assignment3.due_at = 1.week.ago
@@ -596,7 +596,7 @@ describe PlannerController do
           expect(json_parse(response.body).map { |i| i["plannable_id"] }).to eq [@page.id, @assignment3.id]
         end
 
-        it "should not try to compare missing dates" do
+        it "does not try to compare missing dates" do
           @assignment3 = @course.assignments.create!(:submission_types => "online_text_entry")
           # doesn't have a due_at, so it should coalesce to the created_at
           override = @assignment3.assignment_overrides.new(:set => @course.default_section)
@@ -610,7 +610,7 @@ describe PlannerController do
           expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignment3.id, @assignment.id, @assignment2.id]
         end
 
-        it "should order with unread items as well" do
+        it "orders with unread items as well" do
           dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 3.days.from_now)
           dt.change_all_read_state("unread", @student)
 
@@ -644,7 +644,7 @@ describe PlannerController do
             user_session(@student)
           end
 
-          it "should order assignments with no overrides correctly" do
+          it "orders assignments with no overrides correctly" do
             assignment1 = assignment_model(course: @course, due_at: Time.zone.now)
             assignment2 = assignment_model(course: @course, due_at: 2.days.from_now)
             DueDateCacher.recompute_course(@course, run_immediately: true)
@@ -655,7 +655,7 @@ describe PlannerController do
             expect(response_json.map { |i| i["plannable_id"] }).to eq([@planner_note1.id, assignment1.id, @planner_note2.id, assignment2.id])
           end
 
-          it "should order assignments with overridden due dates correctly" do
+          it "orders assignments with overridden due dates correctly" do
             assignment1 = assignment_model(course: @course, due_at: Time.zone.now, only_visible_to_overrides: true)
             assign1_override_due_at = 2.days.ago
             create_adhoc_override_for_assignment(assignment1, @student, { due_at: assign1_override_due_at })
@@ -670,7 +670,7 @@ describe PlannerController do
             expect(response_json.map { |i| i["plannable_id"] }).to eq([assignment1.id, @planner_note1.id, assignment2.id, @planner_note2.id])
           end
 
-          it "should order ungraded quizzes with overridden due dates correctly" do
+          it "orders ungraded quizzes with overridden due dates correctly" do
             quiz1 = @course.quizzes.create!(quiz_type: 'practice_quiz', due_at: Time.zone.now).publish!
             quiz1_override_due_at = 2.days.ago
             create_adhoc_override_for_assignment(quiz1, @student, { due_at: quiz1_override_due_at })
@@ -684,7 +684,7 @@ describe PlannerController do
             expect(response_json.map { |i| i["plannable_id"] }).to eq([quiz1.id, @planner_note1.id, quiz2.id, @planner_note2.id])
           end
 
-          it "should order graded discussions with overridden due dates correctly" do
+          it "orders graded discussions with overridden due dates correctly" do
             topic1 = discussion_topic_model(context: @course, todo_date: Time.zone.now)
             topic2 = group_assignment_discussion(course: @course)
             topic2_override_due_at = 2.days.from_now.change(min: 1)
@@ -705,7 +705,7 @@ describe PlannerController do
                                                                                              ])
           end
 
-          it "should order mastery path wiki_pages by todo date if applied" do
+          it "orders mastery path wiki_pages by todo date if applied" do
             page1 = wiki_page_model(course: @course, todo_date: 2.days.ago)
             wiki_page_assignment_model(course: @course)
             @page.todo_date = Time.zone.now
@@ -757,7 +757,7 @@ describe PlannerController do
           end
         end
 
-        it "should ignore shards other than the current account's" do
+        it "ignores shards other than the current account's" do
           @shard1.activate do
             @another_assignment = @another_course.assignments.create!(:title => "title", :due_at => 1.day.from_now)
             @student = user_with_pseudonym(:active_all => true, :account => @another_account)
@@ -813,7 +813,7 @@ describe PlannerController do
           )
         end
 
-        it "should still work with context code if the student is from another shard" do
+        it "stills work with context code if the student is from another shard" do
           @shard1.activate do
             @cs_student = user_factory(:active_all => true, :account => Account.create!)
             @original_course.enroll_user(@cs_student, 'StudentEnrollment', :enrollment_state => 'active')
@@ -865,21 +865,21 @@ describe PlannerController do
           end
         end
 
-        it "should adhere to per_page" do
+        it "adheres to per_page" do
           get :index, params: { per_page: 2 }
           response_json = json_parse(response.body)
           expect(response_json.length).to eq 2
           expect(response_json.map { |i| i["plannable_id"] }).to eq [@assignments[0].id, @assignments[1].id]
         end
 
-        it "should paginate results in correct order" do
+        it "paginates results in correct order" do
           next_page = ''
           10.times do
             next_page = test_page(next_page)
           end
         end
 
-        it "should include link headers in cached response" do
+        it "includes link headers in cached response" do
           enable_cache
           next_link = test_page
           expect(next_link).not_to be_nil
@@ -895,7 +895,7 @@ describe PlannerController do
           @end_date = 2.weeks.from_now.iso8601
         end
 
-        it "should show new activity when a new discussion topic has been created" do
+        it "shows new activity when a new discussion topic has been created" do
           get :index, params: { start_date: @start_date, end_date: @end_date }
           discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           get :index, params: { start_date: @start_date, end_date: @end_date }
@@ -903,7 +903,7 @@ describe PlannerController do
           expect(topic_json['new_activity']).to be true
         end
 
-        it "should not show new activity after an unread discussion has been viewed" do
+        it "does not show new activity after an unread discussion has been viewed" do
           discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           get :index, params: { start_date: @start_date, end_date: @end_date }
           topic_json = json_parse(response.body).find { |j| j['plannable_id'] == @topic.id && j['plannable_type'] == 'discussion_topic' }
@@ -915,7 +915,7 @@ describe PlannerController do
           expect(topic_json['new_activity']).to be false
         end
 
-        it "should show new activity when a new discussion entry has been created" do
+        it "shows new activity when a new discussion entry has been created" do
           @topic = discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           @topic.change_read_state('read', @student)
           get :index, params: { start_date: @start_date, end_date: @end_date }
@@ -929,7 +929,7 @@ describe PlannerController do
           expect(topic_json['new_activity']).to be true
         end
 
-        it "should not show new activity after an unread discussion entry has been viewed" do
+        it "does not show new activity after an unread discussion entry has been viewed" do
           @topic = discussion_topic_model(context: @course, todo_date: 1.day.from_now)
           @topic.change_read_state('read', @student)
           entry = @topic.discussion_entries.create!(message: 'hi', user: @teacher)
@@ -944,7 +944,7 @@ describe PlannerController do
           expect(topic_json['new_activity']).to be false
         end
 
-        it "should show new activity when a new submission comment has been created" do
+        it "shows new activity when a new submission comment has been created" do
           @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
           submission = @assignment.submissions.find_by(user: @student)
           get :index, params: { start_date: @start_date, end_date: @end_date }
@@ -958,7 +958,7 @@ describe PlannerController do
           expect(assign_json['new_activity']).to be true
         end
 
-        it "should not show new activity when a new submission comment has been viewed" do
+        it "does not show new activity when a new submission comment has been viewed" do
           @assignment.submit_homework(@student, { :url => "http://www.instructure.com/" })
           submission = @assignment.submissions.find_by(user: @student)
           submission.submission_comments.create!(author: @teacher, comment: 'hi')
@@ -975,7 +975,7 @@ describe PlannerController do
       end
 
       context "new activity filter" do
-        it "should return newly created & unseen items" do
+        it "returns newly created & unseen items" do
           dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: Time.zone.now)
           dt.change_all_read_state("unread", @student)
           get :index, params: { filter: "new_activity" }
@@ -984,7 +984,7 @@ describe PlannerController do
           expect(response_json.map { |i| i["plannable"]["id"].to_s }).to include(dt.id.to_s)
         end
 
-        it "should return newly graded items" do
+        it "returns newly graded items" do
           @assignment.grade_student @student, grade: 10, grader: @teacher
           get :index, params: { filter: "new_activity" }
           response_json = json_parse(response.body)
@@ -992,7 +992,7 @@ describe PlannerController do
           expect(response_json.first["plannable"]["id"]).to eq @assignment.id
         end
 
-        it "should return items with new submission comments" do
+        it "returns items with new submission comments" do
           @sub = @assignment2.submit_homework(@student)
           @sub.add_comment(comment: "hello", author: @teacher)
           get :index, params: { filter: "new_activity" }
@@ -1001,7 +1001,7 @@ describe PlannerController do
           expect(response_json.first["plannable"]["id"]).to eq @assignment2.id
         end
 
-        it "should mark submitted stuff within start and end dates" do
+        it "marks submitted stuff within start and end dates" do
           @assignment4 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.from_now)
           @assignment5 = @course.assignments.create!(:submission_types => "online_text_entry", :due_at => 4.weeks.ago)
           @assignment4.submit_homework(@student, :submission_type => "online_text_entry")
@@ -1026,7 +1026,7 @@ describe PlannerController do
           expect(found_assignment_5).to be true
         end
 
-        it "shouldn't return things from other courses" do
+        it "does not return things from other courses" do
           course_with_student(:active_all => true) # another course
           @course.discussion_topics.create!(title: "srsly", message: "cmon", todo_date: Time.zone.now)
           other_assignment = course_assignment
@@ -1040,7 +1040,7 @@ describe PlannerController do
         end
 
         context "date range" do
-          it "should not return items before the specified start_date" do
+          it "does not return items before the specified start_date" do
             dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.ago)
             dt.change_all_read_state("unread", @student)
             get :index, params: { filter: "new_activity", start_date: 1.week.from_now.to_date.to_s }
@@ -1048,7 +1048,7 @@ describe PlannerController do
             expect(response_json.length).to eq 0
           end
 
-          it "should not return items after the specified end_date" do
+          it "does not return items after the specified end_date" do
             dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @teacher, todo_date: 1.week.from_now)
             dt.change_all_read_state("unread", @student)
             get :index, params: { filter: "new_activity", end_date: 1.week.ago.to_date.to_s }
@@ -1056,7 +1056,7 @@ describe PlannerController do
             expect(response_json.length).to eq 0
           end
 
-          it "should return items within the start_date and end_date" do
+          it "returns items within the start_date and end_date" do
             dt = @course.discussion_topics.create!(title: "Yes", message: "Please", user: @student, todo_date: Time.zone.now)
             dt.change_all_read_state("unread", @student)
             get :index, params: { filter: "new_activity",
@@ -1075,21 +1075,21 @@ describe PlannerController do
             @topic.save!
           end
 
-          it "should return new discussion topics" do
+          it "returns new discussion topics" do
             get :index, params: { filter: "new_activity" }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 1
             expect(response_json.first["plannable"]["id"]).to eq @topic.id
           end
 
-          it "should not return read discussion topics" do
+          it "does not return read discussion topics" do
             @topic.change_read_state("read", @student)
             get :index, params: { filter: "new_activity" }
             response_json = json_parse(response.body)
             expect(response_json.length).to eq 0
           end
 
-          it "should return discussion topics with unread replies" do
+          it "returns discussion topics with unread replies" do
             expect(@topic.unread_count(@student)).to eq 0
             @entry = @topic.discussion_entries.create!(:message => "Hello!", :user => @student)
             @reply = @entry.reply_from(:user => @teacher, :text => "ohai!")
@@ -1114,7 +1114,7 @@ describe PlannerController do
             expect(json_parse(response.body).length).to eq 1
           end
 
-          it "should return graded discussions with unread replies" do
+          it "returns graded discussions with unread replies" do
             @topic.change_read_state('read', @student)
             assign = assignment_model(course: @course, due_at: Time.zone.now)
             topic = @course.discussion_topics.create!(course: @course, assignment: assign)
@@ -1138,7 +1138,7 @@ describe PlannerController do
             expect(json_parse(response.body)).to be_empty
           end
 
-          it "should exclude unpublished graded discussion topics" do
+          it "excludes unpublished graded discussion topics" do
             @topic.change_read_state('read', @student)
             assign = assignment_model(course: @course, due_at: Time.zone.now)
             topic = @course.discussion_topics.create!(course: @course, assignment: assign)
@@ -1155,7 +1155,7 @@ describe PlannerController do
             expect(json_parse(response.body)).to be_empty
           end
 
-          it 'should calculate unread count correctly' do
+          it 'calculates unread count correctly' do
             get :index
             topic_json = json_parse(response.body).first
             expect(topic_json['plannable']['unread_count']).to be 0

@@ -60,7 +60,7 @@ describe Api::V1::User do
   end
 
   context 'user_json' do
-    it 'should support optionally providing the avatar if avatars are enabled' do
+    it 'supports optionally providing the avatar if avatars are enabled' do
       @student.account.set_service_availability(:avatars, false)
       @student.account.save!
       expect(@test_api.user_json(@student, @admin, {}, ['avatar_url'], @course).has_key?("avatar_url")).to be_falsey
@@ -79,14 +79,14 @@ describe Api::V1::User do
       @test_api.user_json(@student, @admin, {}, [], @course, [ta_enrollment, teacher_enrollment])
     end
 
-    it 'should support optionally including group_ids' do
+    it 'supports optionally including group_ids' do
       @group = @course.groups.create!(:name => "My Group")
       @group.add_user(@student, 'accepted', true)
       expect(@test_api.user_json(@student, @admin, {}, [], @course).has_key?("group_ids")).to be_falsey
       expect(@test_api.user_json(@student, @admin, {}, ['group_ids'], @course)["group_ids"]).to eq([@group.id])
     end
 
-    it 'should use the correct SIS pseudonym' do
+    it 'uses the correct SIS pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2) { |p| p.sis_user_id = 'abc' }
@@ -104,13 +104,13 @@ describe Api::V1::User do
                                                                                 })
     end
 
-    it 'should only try to search on in region shards' do
+    it 'onlies try to search on in region shards' do
       @user = User.create!(:name => 'User')
       expect(@user).to receive(:in_region_associated_shards).and_call_original
       @test_api.user_json(@user, @admin, {}, [], Account.default)
     end
 
-    it 'should show SIS data to sub account admins' do
+    it 'shows SIS data to sub account admins' do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
@@ -131,7 +131,7 @@ describe Api::V1::User do
                                                                             })
     end
 
-    it 'should show SIS data to teachers only in courses they are teachers in' do
+    it 'shows SIS data to teachers only in courses they are teachers in' do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
@@ -161,7 +161,7 @@ describe Api::V1::User do
                                                                            })
     end
 
-    it 'should show SIS data to teachers in groups in their courses' do
+    it 'shows SIS data to teachers in groups in their courses' do
       student = User.create!(:name => 'User')
       student.pseudonyms.create!(:unique_id => 'xyz', :account => Account.default) { |p| p.sis_user_id = 'xyz' }
 
@@ -193,7 +193,7 @@ describe Api::V1::User do
                                                                           })
     end
 
-    it 'should use the SIS pseudonym instead of another pseudonym' do
+    it 'uses the SIS pseudonym instead of another pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => Account.default)
@@ -214,7 +214,7 @@ describe Api::V1::User do
                                                                                 })
     end
 
-    it 'should use an sis pseudonym from another account if necessary' do
+    it 'uses an sis pseudonym from another account if necessary' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.destroy_all
@@ -237,7 +237,7 @@ describe Api::V1::User do
                                                                                 })
     end
 
-    it 'should use the correct pseudonym' do
+    it 'uses the correct pseudonym' do
       @user = User.create!(:name => 'User')
       @account2 = Account.create!
       @user.pseudonyms.create!(:unique_id => 'abc', :account => @account2)
@@ -302,7 +302,7 @@ describe Api::V1::User do
         @course.update!(grading_standard_enabled: true)
       end
 
-      it "should return posted course scores as admin" do
+      it "returns posted course scores as admin" do
         json = @test_api.user_json(@student1, @admin, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
                                                             "html_url" => "",
@@ -317,7 +317,7 @@ describe Api::V1::User do
                                                           })
       end
 
-      it "should not return unposted course scores as a student" do
+      it "does not return unposted course scores as a student" do
         json = @test_api.user_json(@student1, @student1, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
                                                             "html_url" => "",
@@ -328,7 +328,7 @@ describe Api::V1::User do
                                                           })
       end
 
-      it "should not return course scores as another student" do
+      it "does not return course scores as another student" do
         json = @test_api.user_json(@student1, @student2, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades'].keys).to eq ["html_url"]
       end
@@ -357,12 +357,12 @@ describe Api::V1::User do
                          })
     end
 
-    it 'should support manually passing the context' do
+    it 'supports manually passing the context' do
       mock_context = double()
       test_context(mock_context, mock_context)
     end
 
-    it 'should support loading the context as a member var' do
+    it 'supports loading the context as a member var' do
       @test_api.context = double()
       test_context(@test_api.context, nil)
     end
@@ -635,7 +635,7 @@ describe Api::V1::User do
   end
 
   context 'user_json_is_admin?' do
-    it 'should support manually passing the current user' do
+    it 'supports manually passing the current user' do
       @test_api.context = double()
       expect(@test_api.context).to receive(:global_id).and_return(42)
       expect(@test_api.context).to receive(:account).and_return(@test_api.context)
@@ -644,7 +644,7 @@ describe Api::V1::User do
       expect(@test_api.user_json_is_admin?).to eq true
     end
 
-    it 'should support loading the current user as a member var' do
+    it 'supports loading the current user as a member var' do
       mock_context = double()
       expect(mock_context).to receive(:global_id).and_return(42)
       expect(mock_context).to receive(:account).and_return(mock_context)
@@ -653,7 +653,7 @@ describe Api::V1::User do
       expect(@test_api.user_json_is_admin?(mock_context, @admin)).to eq true
     end
 
-    it 'should support loading multiple different things (via args)' do
+    it 'supports loading multiple different things (via args)' do
       expect(@test_api.user_json_is_admin?(@admin, @student)).to be_falsey
       expect(@test_api.user_json_is_admin?(@student, @admin)).to be_truthy
       expect(@test_api.user_json_is_admin?(@student, @admin)).to be_truthy
@@ -661,7 +661,7 @@ describe Api::V1::User do
       expect(@test_api.user_json_is_admin?(@admin, @student)).to be_falsey
     end
 
-    it 'should support loading multiple different things (via member vars)' do
+    it 'supports loading multiple different things (via member vars)' do
       @test_api.current_user = @student
       @test_api.context = @admin
       expect(@test_api.user_json_is_admin?).to be_falsey
@@ -691,7 +691,7 @@ describe "Users API", type: :request do
     user_with_pseudonym(:user => @user)
   end
 
-  it "shouldn't return disallowed avatars" do
+  it "does not return disallowed avatars" do
     @user = @student
     raw_api_call(:get, "/api/v1/users/#{@admin.id}/avatars",
                  :controller => "profile", :action => "profile_pics", :user_id => @admin.to_param, :format => 'json')
@@ -707,7 +707,7 @@ describe "Users API", type: :request do
         page_view_model(:user => @student, :created_at => @timestamp, developer_key: DeveloperKey.default)
       end
 
-      it "should return page view history" do
+      it "returns page view history" do
         Setting.set('api_max_per_page', '2')
         json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?per_page=1000",
                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :per_page => '1000' })
@@ -730,7 +730,7 @@ describe "Users API", type: :request do
         expect(response.headers['Link']).to match /last/
       end
 
-      it "should recognize start_time parameter" do
+      it "recognizes start_time parameter" do
         Setting.set('api_max_per_page', '3')
         start_time = @timestamp.iso8601
         json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?start_time=#{start_time}",
@@ -739,7 +739,7 @@ describe "Users API", type: :request do
         json.each { |j| expect(CanvasTime.try_parse(j['created_at']).to_i).to be >= @timestamp.to_i }
       end
 
-      it "should recognize end_time parameter" do
+      it "recognizes end_time parameter" do
         Setting.set('api_max_per_page', '3')
         end_time = @timestamp.iso8601
         json = api_call(:get, "/api/v1/users/#{@student.id}/page_views?end_time=#{end_time}",
@@ -762,7 +762,7 @@ describe "Users API", type: :request do
     include_examples "page view api"
   end
 
-  it "shouldn't find users in other root accounts by sis id" do
+  it "does not find users in other root accounts by sis id" do
     acct = account_model(:name => 'other root')
     acct.account_users.create!(user: @user)
     @me = @user
@@ -776,7 +776,7 @@ describe "Users API", type: :request do
     assert_status(404)
   end
 
-  it "should allow id of 'self'" do
+  it "allows id of 'self'" do
     page_view_model(:user => @admin)
     json = api_call(:get, "/api/v1/users/self/page_views?per_page=1000",
                     { :controller => "page_views", :action => "index", :user_id => 'self', :format => 'json', :per_page => '1000' })
@@ -791,7 +791,7 @@ describe "Users API", type: :request do
       Account.default.tap { |a| a.disable_service(:avatars) }.save
     end
 
-    it "should retrieve user details as an admin user" do
+    it "retrieves user details as an admin user" do
       account_admin_user
       json = api_call(:get, "/api/v1/users/#{@other_user.id}",
                       { :controller => 'users', :action => 'api_show', :id => @other_user.id.to_param, :format => 'json' })
@@ -816,7 +816,7 @@ describe "Users API", type: :request do
                          })
     end
 
-    it "should retrieve limited user details as self" do
+    it "retrieves limited user details as self" do
       @user = @other_user
       json = api_call(:get, "/api/v1/users/self",
                       { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
@@ -836,7 +836,7 @@ describe "Users API", type: :request do
                          })
     end
 
-    it "should retrieve the right permissions" do
+    it "retrieves the right permissions" do
       @user = @other_user
       Account.default.tap { |a| a.settings[:users_can_edit_name] = false }.save
       json = api_call(:get, "/api/v1/users/self",
@@ -866,7 +866,7 @@ describe "Users API", type: :request do
                                         })
     end
 
-    it "should retrieve the right avatar permissions" do
+    it "retrieves the right avatar permissions" do
       @user = @other_user
       json = api_call(:get, "/api/v1/users/self",
                       { :controller => 'users', :action => 'api_show', :id => 'self', :format => 'json' })
@@ -922,7 +922,7 @@ describe "Users API", type: :request do
   end
 
   describe "user account listing" do
-    it "should return users for an account" do
+    it "returns users for an account" do
       @account = Account.default
       users = []
       [['Test User1', 'test@example.com'], ['Test User2', 'test2@example.com'], ['Test User3', 'test3@example.com']].each_with_index do |u, i|
@@ -949,7 +949,7 @@ describe "Users API", type: :request do
       end
     end
 
-    it "should limit the maximum number of users returned" do
+    it "limits the maximum number of users returned" do
       @account = @user.account
       3.times do |n|
         user = User.create(:name => "u#{n}")
@@ -960,7 +960,7 @@ describe "Users API", type: :request do
       expect(api_call(:get, "/api/v1/accounts/#{@account.id}/users?per_page=2", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => 'json', :per_page => '2').size).to eq 1
     end
 
-    it "should return unauthorized for users without permissions" do
+    it "returns unauthorized for users without permissions" do
       @account = @student.account
       @user    = @student
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/users", :controller => "users", :action => "api_index", :account_id => @account.id.to_param, :format => "json")
@@ -1032,39 +1032,39 @@ describe "Users API", type: :request do
         @p.save!
       end
 
-      it 'should include last login' do
+      it 'includes last login' do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users", { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param }, { include: ['last_login'], search_term: @u.id.to_s })
         expect(json.count).to eq 1
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
       end
 
-      it 'should include last login for a specific user' do
+      it 'includes last login for a specific user' do
         json = api_call(:get, "/api/v1/users/#{@u.id}", { :controller => 'users', :action => "api_show", :format => 'json', :id => @u.id }, { include: ['last_login'] })
         expect(json.fetch('last_login')).to eq @p.current_login_at.iso8601
       end
 
-      it 'should sort too' do
+      it 'sorts too' do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                         { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
                         { include: ['last_login'], sort: "last_login", order: 'desc' })
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
       end
 
-      it 'should include automatically when sorting by last login' do
+      it 'includes automatically when sorting by last login' do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                         { :controller => 'users', :action => "api_index", :format => 'json', :account_id => @account.id.to_param },
                         { sort: "last_login", order: 'desc' })
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
       end
 
-      it 'should work with search terms' do
+      it 'works with search terms' do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/users",
                         { controller: 'users', action: 'api_index', format: 'json', account_id: @account.id.to_param },
                         { sort: 'last_login', order: 'desc', search_term: 'test' })
         expect(json.first['last_login']).to eq @p.current_login_at.iso8601
       end
 
-      it "shouldn't include last_logins from a different account" do
+      it "does not include last_logins from a different account" do
         account = @account
         p2 = @u.pseudonyms.create!(account: account_model, unique_id: 'user')
         p2.current_login_at = Time.now.utc
@@ -1079,7 +1079,7 @@ describe "Users API", type: :request do
       context "sharding" do
         specs_require_sharding
 
-        it "should take all relevant pseudonyms and return the maximum current_login_at" do
+        it "takes all relevant pseudonyms and return the maximum current_login_at" do
           @shard3.activate do
             p4 = @u.pseudonyms.create!(account: @account, unique_id: 'p4')
             p4.current_login_at = 4.minutes.ago
@@ -1229,7 +1229,7 @@ describe "Users API", type: :request do
         end
       end
 
-      it "should allow site admins to create users" do
+      it "allows site admins to create users" do
         json = api_call(:post, "/api/v1/accounts/#{@site_admin.account.id}/users",
                         { :controller => 'users', :action => 'create', :format => 'json', :account_id => @site_admin.account.id.to_s },
                         {
@@ -1328,7 +1328,7 @@ describe "Users API", type: :request do
       end
 
       context "sis reactivation" do
-        it "should allow reactivating deleting users using sis_user_id" do
+        it "allows reactivating deleting users using sis_user_id" do
           other_user = user_with_pseudonym(:active_all => true)
           @pseudonym.sis_user_id = "12345"
           @pseudonym.save!
@@ -1353,7 +1353,7 @@ describe "Users API", type: :request do
           expect(other_user.communication_channel.workflow_state).to eq('active')
         end
 
-        it "should raise an error trying to reactivate an active section" do
+        it "raises an error trying to reactivate an active section" do
           other_user = user_with_pseudonym(:active_all => true)
           @pseudonym.sis_user_id = "12345"
           @pseudonym.save!
@@ -1365,7 +1365,7 @@ describe "Users API", type: :request do
                             :pseudonym => { :unique_id => "test@example.com", :password => "password123", :sis_user_id => "12345" },  }, {}, { :expected_status => 400 })
         end
 
-        it "should carry on if there's no section to reactivate" do
+        it "carries on if there's no section to reactivate" do
           json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/users",
                           { :controller => 'users', :action => 'create', :format => 'json', :account_id => Account.default.id.to_s },
                           { :enable_sis_reactivation => '1', :user => { :name => "Test User" },
@@ -1376,13 +1376,13 @@ describe "Users API", type: :request do
         end
       end
 
-      it "should allow site admins to create users and auto-validate communication channel" do
+      it "allows site admins to create users and auto-validate communication channel" do
         create_user_skip_cc_confirm(@site_admin)
       end
 
       context "sharding" do
         specs_require_sharding
-        it "should allow creating users on cross-shard accounts" do
+        it "allows creating users on cross-shard accounts" do
           @other_account = @shard1.activate { Account.create! }
           json = api_call(:post, "/api/v1/accounts/#{@other_account.id}/users",
                           { :controller => 'users', :action => 'create', :format => 'json', :account_id => @other_account.id.to_s },
@@ -1392,7 +1392,7 @@ describe "Users API", type: :request do
           expect(new_user.pseudonym.account).to eq @other_account
         end
 
-        it "should not error when there is not a local pseudonym" do
+        it "does not error when there is not a local pseudonym" do
           @user = User.create!(name: 'default shard user')
           @shard1.activate do
             account = Account.create!
@@ -1441,7 +1441,7 @@ describe "Users API", type: :request do
     end
 
     context 'as an account admin' do
-      it "should allow account admins to create users and auto-validate communication channel" do
+      it "allows account admins to create users and auto-validate communication channel" do
         create_user_skip_cc_confirm(@admin)
       end
     end
@@ -1451,7 +1451,7 @@ describe "Users API", type: :request do
         user_factory(active_all: true)
       end
 
-      it "should not let you create a user if self_registration is off" do
+      it "does not let you create a user if self_registration is off" do
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
                      { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
                      {
@@ -1461,7 +1461,7 @@ describe "Users API", type: :request do
         assert_status(403)
       end
 
-      it "should require an email pseudonym" do
+      it "requires an email pseudonym" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
@@ -1473,7 +1473,7 @@ describe "Users API", type: :request do
         assert_status(400)
       end
 
-      it "should require acceptance of the terms" do
+      it "requires acceptance of the terms" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.create_terms_of_service!(terms_type: "default", passive: false)
         @admin.account.save!
@@ -1486,7 +1486,7 @@ describe "Users API", type: :request do
         assert_status(400)
       end
 
-      it "should let you create a user if you pass all the validations" do
+      it "lets you create a user if you pass all the validations" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         @admin.account.save!
         json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
@@ -1499,7 +1499,7 @@ describe "Users API", type: :request do
       end
     end
 
-    it "should send a confirmation if send_confirmation is set to 1" do
+    it "sends a confirmation if send_confirmation is set to 1" do
       expect_any_instance_of(Pseudonym).to receive(:send_registration_done_notification!)
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
                { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -1515,7 +1515,7 @@ describe "Users API", type: :request do
                })
     end
 
-    it "should return a 400 error if the request doesn't include a unique id" do
+    it "returns a 400 error if the request doesn't include a unique id" do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
                    { :controller => 'users', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s },
                    {
@@ -1528,7 +1528,7 @@ describe "Users API", type: :request do
       expect(errors['pseudonym']['unique_id']).to be_present
     end
 
-    it "should set user's email address via communication_channel[address]" do
+    it "sets user's email address via communication_channel[address]" do
       api_call(:post, "/api/v1/accounts/#{@admin.account.id}/users",
                { :controller => 'users',
                  :action => 'create',
@@ -1561,7 +1561,7 @@ describe "Users API", type: :request do
         @user = nil
       end
 
-      it "should not let you create a user if self_registration is off" do
+      it "does not let you create a user if self_registration is off" do
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
                      {
@@ -1571,7 +1571,7 @@ describe "Users API", type: :request do
         assert_status(403)
       end
 
-      it "should require an email pseudonym" do
+      it "requires an email pseudonym" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -1582,7 +1582,7 @@ describe "Users API", type: :request do
         assert_status(400)
       end
 
-      it "should require acceptance of the terms" do
+      it "requires acceptance of the terms" do
         @admin.account.create_terms_of_service!(terms_type: "default", passive: false)
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
@@ -1594,7 +1594,7 @@ describe "Users API", type: :request do
         assert_status(400)
       end
 
-      it "should let you create a user if you pass all the validations" do
+      it "lets you create a user if you pass all the validations" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         json = api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                         { :controller => 'users', :action => 'create_self_registered_user', :format => 'json', :account_id => @admin.account.id.to_s },
@@ -1605,7 +1605,7 @@ describe "Users API", type: :request do
         expect(json['name']).to eq 'Test User'
       end
 
-      it "should return a 400 error if the request doesn't include a unique id" do
+      it "returns a 400 error if the request doesn't include a unique id" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                      { :controller => 'users',
@@ -1622,7 +1622,7 @@ describe "Users API", type: :request do
         expect(errors['pseudonym']['unique_id']).to be_present
       end
 
-      it "should set user's email address via communication_channel[address]" do
+      it "sets user's email address via communication_channel[address]" do
         @admin.account.canvas_authentication_provider.update_attribute(:self_registration, true)
         api_call(:post, "/api/v1/accounts/#{@admin.account.id}/self_registration",
                  { :controller => 'users',
@@ -1666,7 +1666,7 @@ describe "Users API", type: :request do
     end
 
     context "an admin user" do
-      it "should be able to update a user" do
+      it "is able to update a user" do
         birthday = Time.now
         json = api_call(:put, @path, @path_options, {
                           :user => {
@@ -1699,7 +1699,7 @@ describe "Users API", type: :request do
         expect(user.time_zone.name).to eql 'Tijuana'
       end
 
-      it "should be able to update email alone" do
+      it "is able to update email alone" do
         enable_cache do
           @student.email
 
@@ -1725,7 +1725,7 @@ describe "Users API", type: :request do
             end
           end
 
-          it "should clear attribute when empty string is passed" do
+          it "clears attribute when empty string is passed" do
             @student.pronouns = "He/Him"
             @student.save!
             json = api_call(:put, @path, @path_options, { :user => { :pronouns => "" } })
@@ -1733,7 +1733,7 @@ describe "Users API", type: :request do
             expect(@student.reload.pronouns).to be_nil
           end
 
-          it "should update with a default pronoun" do
+          it "updates with a default pronoun" do
             approved_pronoun = "He/Him"
             json = api_call(:put, @path, @path_options, { :user => { :pronouns => approved_pronoun } })
             expect(json['pronouns']).to eq approved_pronoun
@@ -1741,7 +1741,7 @@ describe "Users API", type: :request do
             expect(@student.read_attribute(:pronouns)).to eq "he_him"
           end
 
-          it "should fix the case when pronoun does not match default pronoun case" do
+          it "fixes the case when pronoun does not match default pronoun case" do
             wrong_case_pronoun = "he/him"
             expected_pronoun = "He/Him"
             json = api_call(:put, @path, @path_options, { :user => { :pronouns => wrong_case_pronoun } })
@@ -1750,7 +1750,7 @@ describe "Users API", type: :request do
             expect(@student.read_attribute(:pronouns)).to eq "he_him"
           end
 
-          it "should fix the case when pronoun does not match custom pronoun case" do
+          it "fixes the case when pronoun does not match custom pronoun case" do
             Account.default.tap do |a|
               a.pronouns = ["Siya/Siya", "Ito/Iyan"]
               a.save!
@@ -1763,7 +1763,7 @@ describe "Users API", type: :request do
             expect(@student.read_attribute(:pronouns)).to eq expected_pronoun
           end
 
-          it "should not update when pronoun is not approved" do
+          it "does not update when pronoun is not approved" do
             @student.pronouns = "She/Her"
             @student.save!
             original_pronoun = @student.pronouns
@@ -1798,7 +1798,7 @@ describe "Users API", type: :request do
         end
       end
 
-      it "should be able to update a user's profile" do
+      it "is able to update a user's profile" do
         Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
@@ -1818,7 +1818,7 @@ describe "Users API", type: :request do
         expect(user.profile.reload.title).to eq another_title
       end
 
-      it "should be able to update a user's profile with email" do
+      it "is able to update a user's profile with email" do
         Account.default.tap { |a| a.settings[:enable_profiles] = true; a.save! }
         new_title = "Burninator"
         new_bio = "burninating the countryside"
@@ -1842,12 +1842,12 @@ describe "Users API", type: :request do
         expect(user.profile.reload.title).to eq another_title
       end
 
-      it "should allow updating without any params" do
+      it "allows updating without any params" do
         json = api_call(:put, @path, @path_options, {})
         expect(json).not_to be_nil
       end
 
-      it "should update the user's avatar with a token" do
+      it "updates the user's avatar with a token" do
         json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                         :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
         to_set = json.first
@@ -1865,7 +1865,7 @@ describe "Users API", type: :request do
         expect(user.avatar_state).to eql :approved
       end
 
-      it "should re-lock the avatar after being updated by an admin" do
+      it "re-locks the avatar after being updated by an admin" do
         json = api_call(:get, "/api/v1/users/#{@student.id}/avatars",
                         :controller => "profile", :action => "profile_pics", :user_id => @student.to_param, :format => 'json')
         to_set = json.first
@@ -1888,7 +1888,7 @@ describe "Users API", type: :request do
         expect(user.avatar_state).to eql :locked
       end
 
-      it "should not allow the user's avatar to be set to an external url" do
+      it "does not allow the user's avatar to be set to an external url" do
         url_to_set = 'https://www.instructure.example.com/image.jpg'
         json = api_call(:put, @path, @path_options, {
                           :user => {
@@ -1902,7 +1902,7 @@ describe "Users API", type: :request do
         expect(user.avatar_image_url).to eql nil
       end
 
-      it "should be able to update a name without changing sortable name if sent together" do
+      it "is able to update a name without changing sortable name if sent together" do
         sortable = "Name, Sortable"
         @student.update(:name => "Sortable Name", :sortable_name => sortable)
         api_call(:put, @path, @path_options, {
@@ -1960,7 +1960,7 @@ describe "Users API", type: :request do
           @course.root_account.save!
         end
 
-        it "should allow user to rename self" do
+        it "allows user to rename self" do
           json = api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id),
                           { user: { name: "Blue Ivy Carter" } })
           expect(json["name"]).to eq "Blue Ivy Carter"
@@ -1973,7 +1973,7 @@ describe "Users API", type: :request do
           @course.root_account.save!
         end
 
-        it "should not allow user to rename self" do
+        it "does not allow user to rename self" do
           api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id),
                    { user: { name: "Ovaltine Jenkins" } }, {}, { expected_status: 401 })
         end
@@ -1981,7 +1981,7 @@ describe "Users API", type: :request do
     end
 
     context "an unauthorized user" do
-      it "should receive a 401" do
+      it "receives a 401" do
         user_factory
         raw_api_call(:put, @path, @path_options, {
                        :user => { :name => 'Gob Bluth' }
@@ -2004,7 +2004,7 @@ describe "Users API", type: :request do
     }
 
     context "an admin user" do
-      it "should be able to view other users' settings" do
+      it "is able to view other users' settings" do
         @student.preferences[:collapse_global_nav] = true; @student.save!
         json = api_call(:get, path, path_options)
         expect(json['manual_mark_as_read']).to eq false
@@ -2012,7 +2012,7 @@ describe "Users API", type: :request do
         expect(json['hide_dashcard_color_overlays']).to eq false
       end
 
-      it "should be able to update other users' settings" do
+      it "is able to update other users' settings" do
         json = api_call(:put, path, path_options, manual_mark_as_read: true, hide_dashcard_color_overlays: false, comment_library_suggestions_enabled: true)
         expect(json['manual_mark_as_read']).to eq true
         expect(json['hide_dashcard_color_overlays']).to eq false
@@ -2030,12 +2030,12 @@ describe "Users API", type: :request do
         @user = @student
       end
 
-      it "should be able to view its own settings" do
+      it "is able to view its own settings" do
         json = api_call(:get, path, path_options)
         expect(json['manual_mark_as_read']).to be_falsey
       end
 
-      it "should be able to update its own settings" do
+      it "is able to update its own settings" do
         json = api_call(:put, path, path_options, manual_mark_as_read: true)
         expect(json['manual_mark_as_read']).to be_truthy
 
@@ -2043,7 +2043,7 @@ describe "Users API", type: :request do
         expect(json['manual_mark_as_read']).to be_falsey
       end
 
-      it "should receive 401 if updating another user's settings" do
+      it "receives 401 if updating another user's settings" do
         @course.enroll_student(user_factory).accept!
         raw_api_call(:put, path, path_options, manual_mark_as_read: true)
         expect(response.code).to eq '401'
@@ -2152,7 +2152,7 @@ describe "Users API", type: :request do
     end
 
     context "a user with permissions" do
-      it "should be able to delete a user" do
+      it "is able to delete a user" do
         Timecop.freeze do
           json = api_call(:delete, @path, @path_options)
           expect(@student.associated_accounts).not_to include(Account.default)
@@ -2160,7 +2160,7 @@ describe "Users API", type: :request do
         end
       end
 
-      it "should be able to delete a user by SIS ID" do
+      it "is able to delete a user by SIS ID" do
         @student.pseudonym.update_attribute(:sis_user_id, '12345')
         id_param = "sis_user_id:#{@student.pseudonyms.first.sis_user_id}"
 
@@ -2171,7 +2171,7 @@ describe "Users API", type: :request do
         expect(@student.associated_accounts).not_to include(Account.default)
       end
 
-      it 'should be able to delete itself' do
+      it 'is able to delete itself' do
         Timecop.freeze do
           path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@user.id}"
           json = api_call(:delete, path, @path_options.merge(:user_id => @user.to_param))
@@ -2182,7 +2182,7 @@ describe "Users API", type: :request do
     end
 
     context 'an unauthorized user' do
-      it "should receive a 401" do
+      it "receives a 401" do
         user_factory
         raw_api_call(:delete, @path, @path_options)
         expect(response.code).to eql '401'
@@ -2190,7 +2190,7 @@ describe "Users API", type: :request do
     end
 
     context 'a non-admin user' do
-      it 'should not be able to delete itself' do
+      it 'is not able to delete itself' do
         path = "/api/v1/accounts/#{Account.default.to_param}/users/#{@student.id}"
         api_call_as_user(@student, :delete, path, @path_options.merge(:user_id => @student.to_param), {}, {}, expected_status: 401)
       end
@@ -2221,7 +2221,7 @@ describe "Users API", type: :request do
       @user
     end
 
-    it "should not allow uploading to other users" do
+    it "does not allow uploading to other users" do
       user2 = User.create!
       api_call(:post, "/api/v1/users/#{user2.id}/files",
                { :controller => "users", :action => "create_file", :format => "json", :user_id => user2.to_param, },
@@ -2243,7 +2243,7 @@ describe "Users API", type: :request do
       @user = account_admin_user(account: @account)
     end
 
-    it "should merge and split users" do
+    it "merges and split users" do
       api_call(
         :put, "/api/v1/users/#{@user2.id}/merge_into/#{@user1.id}",
         { controller: 'users', action: 'merge_into', format: 'json',
@@ -2259,7 +2259,7 @@ describe "Users API", type: :request do
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
-    it "should merge and split users cross accounts" do
+    it "merges and split users cross accounts" do
       account = Account.create(name: 'new account')
       @user1.pseudonym.account_id = account.id
       @user1.pseudonym.save!
@@ -2283,7 +2283,7 @@ describe "Users API", type: :request do
       expect(Pseudonym.where(sis_user_id: 'user_sis_id_02').first.user_id).to eq @user2.id
     end
 
-    it "should fail to merge users cross accounts without permissions" do
+    it "fails to merge users cross accounts without permissions" do
       account = Account.create(name: 'new account')
       @user1.pseudonym.account_id = account.id
       @user1.pseudonym.save!
@@ -2297,7 +2297,7 @@ describe "Users API", type: :request do
       assert_status(401)
     end
 
-    it "should fail to split users that have not been merged" do
+    it "fails to split users that have not been merged" do
       raw_api_call(:post, "/api/v1/users/#{@user2.id}/split/",
                    { controller: 'users', action: 'split', format: 'json', id: @user2.to_param })
       assert_status(400)
@@ -2319,7 +2319,7 @@ describe "Users API", type: :request do
                              })
       end
 
-      it "should return an empty object if nothing is stored" do
+      it "returns an empty object if nothing is stored" do
         @user.set_preference(:custom_colors, nil)
 
         json = api_call(
@@ -2332,7 +2332,7 @@ describe "Users API", type: :request do
         expect(json['custom_colors'].size).to eq 0
       end
 
-      it "should return all custom colors for the user" do
+      it "returns all custom colors for the user" do
         json = api_call(
           :get,
           "/api/v1/users/#{@user.id}/colors",
@@ -2343,7 +2343,7 @@ describe "Users API", type: :request do
         expect(json['custom_colors'].size).to eq 2
       end
 
-      it "should return the color for a context when requested" do
+      it "returns the color for a context when requested" do
         json = api_call(
           :get,
           "/api/v1/users/#{@user.id}/colors/user_#{@user.id}",
@@ -2356,7 +2356,7 @@ describe "Users API", type: :request do
     end
 
     describe 'PUT custom colors' do
-      it "should not allow creating entries for entities that do not exist" do
+      it "does not allow creating entries for entities that do not exist" do
         api_call(
           :put,
           "/api/v1/users/#{@user.id}/colors/course_999",
@@ -2368,7 +2368,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should not allow creating entries for entities the user doesn't have read access to" do
+      it "does not allow creating entries for entities the user doesn't have read access to" do
         course_with_teacher
 
         api_call(
@@ -2382,7 +2382,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should throw a bad request if a color isn't provided" do
+      it "throws a bad request if a color isn't provided" do
         course_with_student(active_all: true)
         @user = @student
         api_call(
@@ -2396,7 +2396,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should throw a bad request if an invalid hexcode is provided" do
+      it "throws a bad request if an invalid hexcode is provided" do
         course_with_student(active_all: true)
         @user = @student
         api_call(
@@ -2410,7 +2410,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should add an entry for entities the user has access to" do
+      it "adds an entry for entities the user has access to" do
         course_with_student(active_all: true)
         @user = @student
         json = api_call(
@@ -2441,7 +2441,7 @@ describe "Users API", type: :request do
         @cs_course.enroll_student(@user, :enrollment_state => 'active')
       end
 
-      it "should save colors relative to user's shard" do
+      it "saves colors relative to user's shard" do
         @user.set_preference(:custom_colors, { "course_#{@local_course.local_id}" => "#bababa" })
         json = api_call(:put, "/api/v1/users/#{@user.id}/colors/course_#{@cs_course.id}",
                         { controller: 'users', action: 'set_custom_color', format: 'json',
@@ -2451,7 +2451,7 @@ describe "Users API", type: :request do
         expect(@user.reload.get_preference(:custom_colors)["course_#{@local_course.local_id}"]).to eq '#bababa' # should leave existing colors alone
       end
 
-      it "should retrieve colors relative to user's shard" do
+      it "retrieves colors relative to user's shard" do
         @user.set_preference(:custom_colors, {
                                "course_#{@cs_course.global_id}" => '#ababab',
                                "course_#{@local_course.local_id}" => '#bababa',
@@ -2462,7 +2462,7 @@ describe "Users API", type: :request do
         expect(json["custom_colors"]["course_#{@local_course.global_id}"]).to eq '#bababa'
       end
 
-      it "should ignore old cross-shard data" do
+      it "ignores old cross-shard data" do
         @user.set_preference(:custom_colors, {
                                "course_#{@local_course.global_id}" => '#ffffff', # old data plz ignore
                                "course_#{@local_course.local_id}" => '#ababab' # new data
@@ -2490,7 +2490,7 @@ describe "Users API", type: :request do
                              })
       end
 
-      it "should return dashboard postions for a user" do
+      it "returns dashboard postions for a user" do
         json = api_call(
           :get,
           "/api/v1/users/#{@user.id}/dashboard_positions",
@@ -2501,7 +2501,7 @@ describe "Users API", type: :request do
         expect(json["dashboard_positions"].size).to eq 3
       end
 
-      it "should return an empty if the user has no ordering set" do
+      it "returns an empty if the user has no ordering set" do
         @user.set_preference(:dashboard_positions, nil)
 
         json = api_call(
@@ -2516,7 +2516,7 @@ describe "Users API", type: :request do
     end
 
     describe "PUT dashboard positions" do
-      it "should error when trying to use a large number" do
+      it "errors when trying to use a large number" do
         course1 = course_factory(active_all: true)
         course2 = course_factory(active_all: true)
 
@@ -2537,7 +2537,7 @@ describe "Users API", type: :request do
         expect(json['message']).to eq 'Position 2000 is too high. Your dashboard cards can probably be sorted with numbers 1-5, you could even use a 0.'
       end
 
-      it "should allow setting dashboard positions" do
+      it "allows setting dashboard positions" do
         course1 = course_factory(active_all: true)
         course2 = course_factory(active_all: true)
         json = api_call(
@@ -2561,7 +2561,7 @@ describe "Users API", type: :request do
         expect(json["dashboard_positions"]).to eq expected
       end
 
-      it "should not allow creating entries for entities that do not exist" do
+      it "does not allow creating entries for entities that do not exist" do
         course1 = course_factory(active_all: true)
         course1.enroll_user(@user, "TeacherEnrollment").accept!
         api_call(
@@ -2580,7 +2580,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should not allow creating entries for entities that the user doesn't have read access to" do
+      it "does not allow creating entries for entities that the user doesn't have read access to" do
         course_with_student(:active_all => true)
         course1 = @course
         course2 = course_factory
@@ -2601,7 +2601,7 @@ describe "Users API", type: :request do
         )
       end
 
-      it "should not allow setting positions to strings" do
+      it "does not allow setting positions to strings" do
         course1 = course_factory(active_all: true)
         course2 = course_factory(active_all: true)
 
@@ -2638,7 +2638,7 @@ describe "Users API", type: :request do
                              })
       end
 
-      it "should return new user tutorial collapsed statuses for a user" do
+      it "returns new user tutorial collapsed statuses for a user" do
         json = api_call(
           :get,
           "/api/v1/users/#{@user.id}/new_user_tutorial_statuses",
@@ -2648,7 +2648,7 @@ describe "Users API", type: :request do
         expect(json).to eq({ "new_user_tutorial_statuses" => { "collapsed" => { "home" => true, "modules" => false } } })
       end
 
-      it "should return empty if the user has no preference set" do
+      it "returns empty if the user has no preference set" do
         @user.set_preference(:new_user_tutorial_statuses, nil)
 
         json = api_call(
@@ -2662,7 +2662,7 @@ describe "Users API", type: :request do
     end
 
     describe "PUT new user tutorial status" do
-      it "should allow setting new user tutorial status" do
+      it "allows setting new user tutorial status" do
         page_name = "modules"
         json = api_call(
           :put,
@@ -2677,7 +2677,7 @@ describe "Users API", type: :request do
         expect(json["new_user_tutorial_statuses"]["collapsed"]["modules"]).to eq true
       end
 
-      it "should reject setting status for pages that are not whitelisted" do
+      it "rejects setting status for pages that are not whitelisted" do
         page_name = "some_random_page"
         api_call(
           :put,
@@ -2706,12 +2706,12 @@ describe "Users API", type: :request do
       @params = { controller: "users", action: "missing_submissions", user_id: @student.id, format: "json" }
     end
 
-    it "should return unsubmitted assignments due in the past" do
+    it "returns unsubmitted assignments due in the past" do
       json = api_call(:get, @path, @params)
       expect(json.length).to eql 2
     end
 
-    it "should return assignments in order of the submission time for the user" do
+    it "returns assignments in order of the submission time for the user" do
       assign = @course.assignments.create!(due_at: 5.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
       create_adhoc_override_for_assignment(assign, @student, due_at: 3.days.ago)
       DueDateCacher.recompute(assign)
@@ -2726,7 +2726,7 @@ describe "Users API", type: :request do
       expect([id1, id2]).to eq @course.assignments.pluck(:id).sort
     end
 
-    it "should not return locked assignments if filter is set to 'submittable'" do
+    it "does not return locked assignments if filter is set to 'submittable'" do
       @course.assignments.create!(due_at: 3.days.ago,
                                   workflow_state: 'published',
                                   submission_types: 'online_text_entry',
@@ -2738,13 +2738,13 @@ describe "Users API", type: :request do
       expect(submittable_json.length).to eql 2
     end
 
-    it "should return course information if requested" do
+    it "returns course information if requested" do
       @params['include'] = ['course']
       json = api_call(:get, @path, @params)
       expect(json.first['course']['name']).to eq(@course.name)
     end
 
-    it "should filter results to the specified course_ids if requested" do
+    it "filters results to the specified course_ids if requested" do
       @course2 = @course
       course_with_student(active_all: true, user: @student)
       @course.assignments.create!(due_at: 5.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
@@ -2755,19 +2755,19 @@ describe "Users API", type: :request do
       expect(json.first['course_id']).to eq(@course.id)
     end
 
-    it "should not return submitted assignments due in the past" do
+    it "does not return submitted assignments due in the past" do
       @course.assignments.first.submit_homework @student, :submission_type => "online_text_entry"
       json = api_call(:get, @path, @params)
       expect(json.length).to be 1
     end
 
-    it "should not return assignments that don't expect a submission" do
+    it "does not return assignments that don't expect a submission" do
       ungraded = @course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
       json = api_call(:get, @path, @params)
       expect(json.map { |a| a['id'] }).not_to include ungraded.id
     end
 
-    it "should show assignments past their due dates because of overrides" do
+    it "shows assignments past their due dates because of overrides" do
       assignment_with_override(course: @course, due_at: 1.day.from_now, submission_types: ['online_text_entry'])
       @override.due_at_overridden = true
       @override.due_at = 1.day.ago
@@ -2778,7 +2778,7 @@ describe "Users API", type: :request do
       expect(json.last["due_at"]).to eq @override.due_at.iso8601
     end
 
-    it "should not show assignments past their due dates if the user is not assigned" do
+    it "does not show assignments past their due dates if the user is not assigned" do
       add_section('Section 1')
       differentiated_assignment(course: @course, course_section: @course_section, due_at: 1.day.ago,
                                 submission_types: ['online_text_entry'], only_visible_to_overrides: true)
@@ -2786,14 +2786,14 @@ describe "Users API", type: :request do
       expect(json.length).to eq 2
     end
 
-    it "should not show deleted assignments" do
+    it "does not show deleted assignments" do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'published', submission_types: "online_text_entry")
       a.destroy
       json = api_call(:get, @path, @params)
       expect(json.map { |i| i["id"] }).not_to be_include a.id
     end
 
-    it "should not show unpublished assignments" do
+    it "does not show unpublished assignments" do
       a = @course.assignments.create!(due_at: 2.days.ago, workflow_state: 'unpublished', submission_types: "online_text_entry")
       json = api_call(:get, @path, @params)
       expect(json.map { |i| i["id"] }).not_to be_include a.id

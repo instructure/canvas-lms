@@ -62,7 +62,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @user = @teacher
     end
 
-    it 'should deny unauthorized access' do
+    it 'denies unauthorized access' do
       student_in_course
       @user = @teacher
       @quiz_submission = @quiz.quiz_submissions.last
@@ -70,13 +70,13 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       assert_status(401)
     end
 
-    it "should respond with no_content success" do
+    it "responds with no_content success" do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
       expect(api_create({ raw: true }, { "quiz_submission_events" => events_data })).to eq 204
     end
 
-    it 'should store the passed values into the DB table' do
+    it 'stores the passed values into the DB table' do
       scope = Quizzes::QuizSubmissionEvent
 
       @quiz_submission = @quiz.quiz_submissions.last
@@ -95,7 +95,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
     end
 
-    it "should store both client_timestamp and created_at" do
+    it "stores both client_timestamp and created_at" do
       scope = Quizzes::QuizSubmissionEvent
 
       @quiz_submission = @quiz.quiz_submissions.last
@@ -112,7 +112,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
     end
 
-    it 'should not succeed when the QS is `settings_only`' do
+    it 'does not succeed when the QS is `settings_only`' do
       student_in_course
       @quiz_submission = @quiz.quiz_submissions.create!(user: @user, workflow_state: 'settings_only')
       expect(api_create({ raw: true }, { 'quiz_submission_events' => events_data })).to eq 404
@@ -127,7 +127,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz.save!
       end
 
-      it 'should respond with no_content success' do
+      it 'responds with no_content success' do
         student_in_course
         @user = @teacher
         @quiz_submission = @quiz.quiz_submissions.last
@@ -165,7 +165,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         student_in_course(course: @course)
       end
 
-      it 'should not let me in' do
+      it 'does not let me in' do
         @quiz_submission = @quiz.generate_submission(@student)
         api_index({ raw: true })
         assert_status(401)
@@ -178,7 +178,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'should let me in' do
+      it 'lets me in' do
         expect(api_index()).to have_key('quiz_submission_events')
       end
 
@@ -196,7 +196,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
           teacher_in_course(course: @course)
         end
 
-        it 'should work' do
+        it 'works' do
           api_index({ attempt: 1 })['quiz_submission_events'].tap do |events|
             expect(events.count).to eq(2)
             expect(events[0]['event_type']).to eq('submission_created')
@@ -221,7 +221,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         end
 
         describe 'JSON-API compliance' do
-          it 'should conform to the JSON-API spec when returning the object' do
+          it 'conforms to the JSON-API spec when returning the object' do
             json = api_index
             assert_jsonapi_compliance(json, 'quiz_submission_events')
           end
@@ -237,7 +237,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'should not let me in' do
+      it 'does not let me in' do
         api_index(raw: true)
         assert_status(401)
       end

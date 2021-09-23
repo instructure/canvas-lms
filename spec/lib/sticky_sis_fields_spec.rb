@@ -31,7 +31,7 @@ describe StickySisFields do
     end
   end
 
-  it 'should set sis stickiness for changed fields' do
+  it 'sets sis stickiness for changed fields' do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -78,7 +78,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it 'should set sis stickiness for changed fields without reloading' do
+  it 'sets sis stickiness for changed fields without reloading' do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -116,7 +116,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it 'should set sis stickiness for changed fields with new models' do
+  it 'sets sis stickiness for changed fields with new models' do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "3"
@@ -164,7 +164,7 @@ describe StickySisFields do
   end
 
   context 'clear_sis_stickiness' do
-    it 'should clear out fields that are in the saved list' do
+    it 'clears out fields that are in the saved list' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -178,7 +178,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
 
-    it 'should clear out fields that are in the stuck list' do
+    it 'clears out fields that are in the stuck list' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.add_sis_stickiness(:name)
@@ -190,7 +190,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [].to_set
     end
 
-    it 'should ignore fields that already unstuck' do
+    it 'ignores fields that already unstuck' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -213,7 +213,7 @@ describe StickySisFields do
   end
 
   context 'add_sis_stickiness' do
-    it 'should ignore fields that are in the saved list' do
+    it 'ignores fields that are in the saved list' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -227,7 +227,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [:name].to_set
     end
 
-    it 'should ignore fields that are in the stuck list' do
+    it 'ignores fields that are in the stuck list' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.add_sis_stickiness(:name)
@@ -239,7 +239,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [:name].to_set
     end
 
-    it 'should add fields that are in the unstuck list' do
+    it 'adds fields that are in the unstuck list' do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.name = "ac name"
@@ -255,7 +255,7 @@ describe StickySisFields do
       expect(ac.stuck_sis_fields).to eq [:name].to_set
     end
 
-    it "should add fields that aren't anywhere yet" do
+    it "adds fields that aren't anywhere yet" do
       ac = create_abstract_course
       expect(ac.stuck_sis_fields).to eq [].to_set
       ac.add_sis_stickiness(:name)
@@ -287,7 +287,7 @@ describe StickySisFields do
     ac.save!
   end
 
-  it "should always return an empty list and not run callbacks when just overriding" do
+  it "alwayses return an empty list and not run callbacks when just overriding" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -305,7 +305,7 @@ describe StickySisFields do
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name].to_set
   end
 
-  it "should always return an empty list and run callbacks when overriding and adding" do
+  it "alwayses return an empty list and run callbacks when overriding and adding" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -323,7 +323,7 @@ describe StickySisFields do
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it "should always return an empty list and run callbacks when overriding and clearing" do
+  it "alwayses return an empty list and run callbacks when overriding and clearing" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -341,7 +341,7 @@ describe StickySisFields do
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [].to_set
   end
 
-  it "should allow setting via stuck_sis_fields=" do
+  it "allows setting via stuck_sis_fields=" do
     ac = create_abstract_course
     ac.stuck_sis_fields = [:name]
     expect(ac.stuck_sis_fields).to eq [:name].to_set
@@ -366,7 +366,7 @@ describe StickySisFields do
   end
 
   context "clear_sis_stickiness option" do
-    it "should clear out the saved list" do
+    it "clears out the saved list" do
       ac = create_abstract_course
       ac.stuck_sis_fields = [:name]
       expect(ac.stuck_sis_fields).to eq [:name].to_set
@@ -379,7 +379,7 @@ describe StickySisFields do
       expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [].to_set
     end
 
-    it "should clear out the work lists and cache" do
+    it "clears out the work lists and cache" do
       ac = create_abstract_course
       ac.add_sis_stickiness :name
       ac.save!
@@ -397,7 +397,7 @@ describe StickySisFields do
     end
   end
 
-  it "should only process changed fields marked as sticky" do
+  it "onlies process changed fields marked as sticky" do
     old_sticky_sis_fields = AbstractCourse.sticky_sis_fields
     begin
       ac = create_abstract_course
@@ -427,7 +427,7 @@ describe StickySisFields do
     end
   end
 
-  it "should leave fields (that may be invalid) in the db alone if untouched" do
+  it "leaves fields (that may be invalid) in the db alone if untouched" do
     old_sticky_sis_fields = AbstractCourse.sticky_sis_fields
     begin
       ac = create_abstract_course
@@ -456,7 +456,7 @@ describe StickySisFields do
     end
   end
 
-  it "should allow removing changed fields" do
+  it "allows removing changed fields" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "name 2"
@@ -468,7 +468,7 @@ describe StickySisFields do
     expect(ac.stuck_sis_fields).to eq [].to_set
   end
 
-  it "should allow removing changed and added fields" do
+  it "allows removing changed and added fields" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.add_sis_stickiness :name
@@ -483,7 +483,7 @@ describe StickySisFields do
   end
 
   context "process_as_sis" do
-    it "should work nested (should save and restore options)" do
+    it "works nested (should save and restore options)" do
       old_sis_stickiness_options = {}
       begin
         AbstractCourse.sis_stickiness_options = {}

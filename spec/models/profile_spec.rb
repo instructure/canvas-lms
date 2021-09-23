@@ -38,22 +38,22 @@ describe Profile do
     end
 
     describe "initialization" do
-      it "should be set by default" do
+      it "is set by default" do
         expect(Foo.new.profile).not_to be_nil
       end
 
-      it "should have the correct class when initialized" do
+      it "has the correct class when initialized" do
         expect(Foo.new.profile.class).to eq FooProfile
       end
 
-      it "should have the correct class when found" do
+      it "has the correct class when found" do
         Foo.new(:name => "foo", :workflow_state => 'registered').profile.save!
         expect(Profile.all.first.class).to eq FooProfile
       end
     end
 
     describe ".path" do
-      it "should be inferred from the title" do
+      it "is inferred from the title" do
         profile = Foo.create!(:name => "My Foo!", :workflow_state => 'registered').profile
         expect(profile.path).to eq "my-foo"
         profile.save!
@@ -64,7 +64,7 @@ describe Profile do
     end
 
     describe "#data" do
-      it "should add accessors" do
+      it "adds accessors" do
         FooProfile.class_eval do
           data :bar, :default => []
         end

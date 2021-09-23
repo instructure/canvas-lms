@@ -24,13 +24,13 @@ describe "a mock static site" do
     WebMock.reset!
   end
 
-  it "should throw exception if static site directory doesn't exist" do
+  it "throws exception if static site directory doesn't exist" do
     expect {
       MockStaticSite.new('asdf.test', 'non_existant_location')
     }.to raise_error(NonexistentMockSiteError)
   end
 
-  it "should create a MockStaticSite if the directory does exist" do
+  it "creates a MockStaticSite if the directory does exist" do
     expect {
       MockStaticSite.new('asdf.test', 'sample_site')
     }.not_to raise_error

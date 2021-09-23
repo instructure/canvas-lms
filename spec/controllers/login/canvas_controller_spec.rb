@@ -46,20 +46,20 @@ describe Login::CanvasController do
       end
     end
 
-    it "should render normal layout if not iphone/ipod" do
+    it "renders normal layout if not iphone/ipod" do
       get 'new'
       expect(response).to render_template(:new)
     end
 
-    it "should render special iPhone/iPod layout if coming from one of those" do
+    it "renders special iPhone/iPod layout if coming from one of those" do
       confirm_mobile_layout { get 'new' }
     end
 
-    it "should render special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
+    it "renders special iPhone/iPod layout if coming from one of those and it's the wrong password'" do
       confirm_mobile_layout { post 'create' }
     end
 
-    it "should render a plain text error message on mobile, not the hash" do
+    it "renders a plain text error message on mobile, not the hash" do
       controller.js_env.clear
       request.env['HTTP_USER_AGENT'] = mobile_agents[0]
       post 'create', params: { :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => '' } }
@@ -67,33 +67,33 @@ describe Login::CanvasController do
     end
   end
 
-  it "should show sso buttons on load" do
+  it "shows sso buttons on load" do
     aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
     get 'new'
     expect(assigns[:aacs_with_buttons]).to eq [aac]
   end
 
-  it "should still show sso buttons on login error" do
+  it "stills show sso buttons on login error" do
     aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
     post 'create'
     expect(assigns[:aacs_with_buttons]).to eq [aac]
   end
 
-  it "should re-render if no user" do
+  it "re-renders if no user" do
     post 'create'
     assert_status(400)
     expect(response).to render_template(:new)
   end
 
-  it "should re-render if incorrect password" do
+  it "re-renders if incorrect password" do
     post 'create', params: { :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'dvorak' } }
     assert_status(400)
     expect(response).to render_template(:new)
   end
 
-  it "should re-render if no password given and render a hash for the error" do
+  it "re-renders if no password given and render a hash for the error" do
     post 'create', params: { :pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => '' } }
     assert_status(400)
     expect(response).to render_template(:new)
@@ -170,7 +170,7 @@ describe Login::CanvasController do
     expect(assigns[:pseudonym_session].record).to eq @pseudonym
   end
 
-  it "should re-render if authenticity token is invalid and referer is not trusted" do
+  it "re-renders if authenticity token is invalid and referer is not trusted" do
     expect(controller).to receive(:verify_authenticity_token).and_raise(ActionController::InvalidAuthenticityToken)
     session[:sentinel] = true
     post 'create', params: { :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
@@ -182,7 +182,7 @@ describe Login::CanvasController do
     expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
-  it "should re-render if authenticity token is invalid and referer is trusted" do
+  it "re-renders if authenticity token is invalid and referer is trusted" do
     expect(controller).to receive(:verify_authenticity_token).and_raise(ActionController::InvalidAuthenticityToken)
     post 'create', params: { :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' },
                              :authenticity_token => '42' }
@@ -192,7 +192,7 @@ describe Login::CanvasController do
     expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
-  it "should login if authenticity token is invalid and referer is trusted" do
+  it "logins if authenticity token is invalid and referer is trusted" do
     expect_any_instance_of(Account).to receive(:trusted_referer?).and_return(true)
     post 'create', params: { :pseudonym_session => { :unique_id => ' jtfrd@instructure.com ', :password => 'qwertyuiop' } }
     expect(response).to be_redirect
@@ -208,7 +208,7 @@ describe Login::CanvasController do
   end
 
   context "ldap" do
-    it "should log in a user with a identifier_format" do
+    it "logs in a user with a identifier_format" do
       user_with_pseudonym(:username => '12345', :active_all => 1)
       @pseudonym.update_attribute(:sis_user_id, '12345')
       aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
@@ -252,7 +252,7 @@ describe Login::CanvasController do
       assert_status(400)
     end
 
-    it "should only query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
+    it "onlies query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
       aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       expect_any_instantiation_of(aac).to receive(:ldap_bind_result).once.with('username', 'password').and_return(nil)
@@ -333,7 +333,7 @@ describe Login::CanvasController do
   end
 
   context "trusted logins" do
-    it "should login for a pseudonym from a different account" do
+    it "logins for a pseudonym from a different account" do
       account = Account.create!
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(username: 'jt@instructure.com',
@@ -346,7 +346,7 @@ describe Login::CanvasController do
       expect(flash[:notice]).to be_present
     end
 
-    it "should send users to their home domain if they have no associations with the current account" do
+    it "sends users to their home domain if they have no associations with the current account" do
       account = Account.create!
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
       user_with_pseudonym(username: 'jt@instructure.com',
@@ -372,7 +372,7 @@ describe Login::CanvasController do
       expect(flash[:notice]).to be_present
     end
 
-    it "should login for a user with multiple identical pseudonyms" do
+    it "logins for a user with multiple identical pseudonyms" do
       account1 = Account.create!
       user_with_pseudonym(username: 'jt@instructure.com',
                           active_all: 1,
@@ -389,7 +389,7 @@ describe Login::CanvasController do
       expect(assigns[:pseudonym_session].record).to eq @pseudonym
     end
 
-    it "should not login for multiple users with identical pseudonyms" do
+    it "does not login for multiple users with identical pseudonyms" do
       account1 = Account.create!
       account2 = Account.create!
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account1.id, account2.id])
@@ -406,7 +406,7 @@ describe Login::CanvasController do
       expect(response).to render_template(:new)
     end
 
-    it "should login a site admin user with other identical pseudonyms" do
+    it "logins a site admin user with other identical pseudonyms" do
       account1 = Account.create!
       allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account1.id, Account.site_admin.id])
       user_with_pseudonym(username: 'jt@instructure.com',
@@ -427,7 +427,7 @@ describe Login::CanvasController do
     context "sharding" do
       specs_require_sharding
 
-      it "should login for a user from a different shard" do
+      it "logins for a user from a different shard" do
         user_with_pseudonym(username: 'jt@instructure.com',
                             active_all: 1,
                             password: 'qwertyuiop',
@@ -445,7 +445,7 @@ describe Login::CanvasController do
   end
 
   context "merging" do
-    it "should redirect back to merge users" do
+    it "redirects back to merge users" do
       communication_channel(@user, { username: 'jt+1@instructure.com' })
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
@@ -458,7 +458,7 @@ describe Login::CanvasController do
   end
 
   context "otp" do
-    it "should not ask for verification of unenrolled, optional user" do
+    it "does not ask for verification of unenrolled, optional user" do
       Account.default.settings[:mfa_settings] = :optional
       Account.default.save!
       user_with_pseudonym(:active_all => 1, :password => 'qwertyuiop')
@@ -482,25 +482,25 @@ describe Login::CanvasController do
       allow_any_instance_of(ActionController::TestRequest).to receive(:remote_ip).and_return('127.0.0.1')
     end
 
-    it "should skip otp verification for a valid cookie" do
+    it "skips otp verification for a valid cookie" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, '127.0.0.1')
       post 'create', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
       expect(response).to redirect_to dashboard_url(:login_success => 1)
     end
 
-    it "should ignore a bogus cookie" do
+    it "ignores a bogus cookie" do
       cookies['canvas_otp_remember_me'] = 'bogus'
       post 'create', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
       expect(response).to redirect_to(otp_login_url)
     end
 
-    it "should ignore an expired cookie" do
+    it "ignores an expired cookie" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
       post 'create', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
       expect(response).to redirect_to(otp_login_url)
     end
 
-    it "should ignore a cookie from an old secret_key" do
+    it "ignores a cookie from an old secret_key" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(6.months.ago, nil, '127.0.0.1')
 
       @user.otp_secret_key = ROTP::Base32.random
@@ -510,7 +510,7 @@ describe Login::CanvasController do
       expect(response).to redirect_to(otp_login_url)
     end
 
-    it "should ignore a cookie for a different IP" do
+    it "ignores a cookie for a different IP" do
       cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, '127.0.0.2')
       post 'create', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
       expect(response).to redirect_to(otp_login_url)
@@ -533,14 +533,14 @@ describe Login::CanvasController do
     let_once(:key) { DeveloperKey.create! :redirect_uri => 'https://example.com' }
     let(:params) { { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } } }
 
-    it 'should redirect to the confirm url if the user has no token' do
+    it 'redirects to the confirm url if the user has no token' do
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
       post :create, params: params, session: { :oauth2 => provider.session_hash }
       expect(response).to redirect_to(oauth2_auth_confirm_url)
     end
 
-    it 'should redirect to the redirect uri if the user already has remember-me token' do
+    it 'redirects to the redirect uri if the user already has remember-me token' do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
 
@@ -549,7 +549,7 @@ describe Login::CanvasController do
       expect(response.location).to match(/https:\/\/example.com/)
     end
 
-    it 'should redirect to the redirect uri with the provided state' do
+    it 'redirects to the redirect uri with the provided state' do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, ['/auth/userinfo'], nil)
 
@@ -559,7 +559,7 @@ describe Login::CanvasController do
       expect(response.location).to match(/state=supersekrit/)
     end
 
-    it 'should not reuse userinfo tokens for other scopes' do
+    it 'does not reuse userinfo tokens for other scopes' do
       @user.access_tokens.create!(developer_key: key, remember_access: true, scopes: ['/auth/userinfo'], purpose: nil)
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)
 
@@ -567,7 +567,7 @@ describe Login::CanvasController do
       expect(response).to redirect_to(oauth2_auth_confirm_url)
     end
 
-    it 'should redirect to the redirect uri if the developer key is trusted' do
+    it 'redirects to the redirect uri if the developer key is trusted' do
       key.trusted = true
       key.save!
       provider = Canvas::Oauth::Provider.new(key.id, key.redirect_uri, [], nil)

@@ -51,7 +51,7 @@ describe RoleOverridesController do
     end
   end
 
-  it "should deactivate a role" do
+  it "deactivates a role" do
     role = @account.roles.build(:name => 'NewRole')
     role.base_role_type = Role::DEFAULT_ACCOUNT_TYPE
     role.workflow_state = 'active'
@@ -74,7 +74,7 @@ describe RoleOverridesController do
       put('update', params: { account_id: @account.id, id: @role.id, permissions: permissions })
     end
 
-    it 'should let you update a permission' do
+    it 'lets you update a permission' do
       update_permissions({ @permission => { enabled: true, explicit: true } })
       override = RoleOverride.last
       expect(override.permission).to eq @permission
@@ -82,14 +82,14 @@ describe RoleOverridesController do
       expect(override.enabled).to eq true
     end
 
-    it 'should return an error if the updated permission is invalid' do
+    it 'returns an error if the updated permission is invalid' do
       resp = update_permissions({ @permission => { applies_to_descendants: false, applies_to_self: false } })
       expect(resp.status).to eq 400
       expect(resp.body).to include("Permission must be enabled for someone")
       expect(RoleOverride.count).to eq 0
     end
 
-    it 'should not commit any changes if any permission update fails' do
+    it 'does not commit any changes if any permission update fails' do
       updates = {
         manage_students: { enabled: true, explicit: true },
         read_reports: { applies_to_descendants: false, applies_to_self: false },
@@ -106,7 +106,7 @@ describe RoleOverridesController do
         @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
       end
 
-      it 'should update all permissions in a group' do
+      it 'updates all permissions in a group' do
         update_permissions({ @grouped_permission => { enabled: true, explicit: true } })
         expect(RoleOverride.count).to eq 3
         expect(RoleOverride.pluck(:permission)).to match_array @granular_permissions
@@ -114,7 +114,7 @@ describe RoleOverridesController do
         expect(RoleOverride.pluck(:enabled)).to match_array Array.new(3, true)
       end
 
-      it 'should allow locking all permissions in a group' do
+      it 'allows locking all permissions in a group' do
         update_permissions({ @grouped_permission => { locked: true } })
         expect(RoleOverride.count).to eq 3
         expect(RoleOverride.pluck(:locked)).to match_array Array.new(3, true)
@@ -132,7 +132,7 @@ describe RoleOverridesController do
         expect(RoleOverride.pluck(:enabled)).to match_array [true, true, false]
       end
 
-      it 'should allow updating an individual permissions that belongs to a group' do
+      it 'allows updating an individual permissions that belongs to a group' do
         update_permissions({ @granular_permissions[0] => { enabled: true, explicit: true } })
         expect(RoleOverride.count).to eq 1
 
@@ -142,14 +142,14 @@ describe RoleOverridesController do
         expect(override.enabled).to eq true
       end
 
-      it 'should not allow locking an individual permissions that belongs to a group' do
+      it 'does not allow locking an individual permissions that belongs to a group' do
         resp = update_permissions({ @granular_permissions[0] => { locked: true } })
         expect(resp.status).to eq 400
         expect(resp.body).to include("Cannot change locked status on granular permission")
         expect(RoleOverride.count).to eq 0
       end
 
-      it 'should handle updating a group and individual permission in the same group in one request' do
+      it 'handles updating a group and individual permission in the same group in one request' do
         updates = {
           @grouped_permission => { enabled: true, explicit: true },
           @granular_permissions[0] => { enabled: false, explicit: true },
@@ -189,14 +189,14 @@ describe RoleOverridesController do
         @initial_count = @account.role_overrides.size
       end
 
-      it "should update an existing override if override has a value" do
+      it "updates an existing override if override has a value" do
         post_with_settings(:override => 'unchecked')
         expect(@account.role_overrides.reload.size).to eq @initial_count
         @existing_override.reload
         expect(@existing_override.enabled).to be_falsey
       end
 
-      it "should update an existing override if override is nil but locked is truthy" do
+      it "updates an existing override if override is nil but locked is truthy" do
         post_with_settings(:locked => 'true')
         expect(@account.role_overrides.reload.size).to eq @initial_count
         @existing_override.reload
@@ -218,7 +218,7 @@ describe RoleOverridesController do
         expect(@existing_override.enabled).to be_truthy
       end
 
-      it "should delete an existing override if override is nil and locked is not truthy" do
+      it "deletes an existing override if override is nil and locked is not truthy" do
         post_with_settings(:locked => '0')
         expect(@account.role_overrides.reload.size).to eq @initial_count - 1
         expect(RoleOverride.where(id: @existing_override).first).to be_nil
@@ -230,12 +230,12 @@ describe RoleOverridesController do
         @initial_count = @account.role_overrides.size
       end
 
-      it "should not create an override if override is nil and locked is not truthy" do
+      it "does not create an override if override is nil and locked is not truthy" do
         post_with_settings(:locked => '0')
         expect(@account.role_overrides.reload.size).to eq @initial_count
       end
 
-      it "should create the override if override has a value" do
+      it "creates the override if override has a value" do
         post_with_settings(:override => 'unchecked')
         expect(@account.role_overrides.reload.size).to eq @initial_count + 1
         override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
@@ -243,7 +243,7 @@ describe RoleOverridesController do
         expect(override.enabled).to be_falsey
       end
 
-      it "should create the override if override is nil but locked is truthy" do
+      it "creates the override if override is nil but locked is truthy" do
         post_with_settings(:locked => 'true')
         expect(@account.role_overrides.reload.size).to eq @initial_count + 1
         override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first

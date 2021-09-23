@@ -106,7 +106,7 @@ describe BrandableCSS do
       expect(brand_variables["ic-link-color"]).to eq '#008EE2'
     end
 
-    it "it has high contrast overrides for link and brand-primary" do
+    it "has high contrast overrides for link and brand-primary" do
       brand_variables = JSON.parse(BrandableCSS.default('json', !!:high_contrast))
       expect(brand_variables["ic-brand-primary"]).to eq "#0770A3"
       expect(brand_variables["ic-link-color"]).to eq "#0073A7"

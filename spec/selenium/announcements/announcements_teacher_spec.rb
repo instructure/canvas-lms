@@ -37,7 +37,7 @@ describe "announcements" do
       stub_rcs_config
     end
 
-    it "should allow saving of section announcement", test_id: 3469728, priority: "1" do
+    it "allows saving of section announcement", test_id: 3469728, priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -49,7 +49,7 @@ describe "announcements" do
                                             .individual_announcement_url(Announcement.last))
     end
 
-    it "should not allow empty sections", test_id: 3469730, priority: "1" do
+    it "does not allow empty sections", test_id: 3469730, priority: "1" do
       @course.course_sections.create!(name: "Section 1")
       @course.course_sections.create!(name: "Section 2")
       AnnouncementNewEdit.visit_new(@course)
@@ -59,14 +59,14 @@ describe "announcements" do
       expect(AnnouncementNewEdit.section_error).to include("A section is required")
     end
 
-    it "should not show the allow comments checkbox if globally disabled" do
+    it "does not show the allow comments checkbox if globally disabled" do
       @course.lock_all_announcements = true
       @course.save!
       AnnouncementNewEdit.visit_new(@course)
       expect { f("#allow_user_comments") }.to raise_error(Selenium::WebDriver::Error::NoSuchElementError)
     end
 
-    it "should show the comments checkbox if not globally disabled" do
+    it "shows the comments checkbox if not globally disabled" do
       AnnouncementNewEdit.visit_new(@course)
       expect { f("#allow_user_comments") }.not_to raise_error
     end
@@ -87,7 +87,7 @@ describe "announcements" do
         student_in_section(@section, user: @student1)
       end
 
-      it "should be visible to teacher in course" do
+      it "is visible to teacher in course" do
         user_session(@teacher)
         get "/courses/#{@course.id}/discussion_topics/#{@announcement.id}"
         expect(f(".discussion-title")).to include_text(@announcement.title)
@@ -104,14 +104,14 @@ describe "announcements" do
         @context = @course
       end
 
-      it "should start a new topic", priority: "1", test_id: 150528 do
+      it "starts a new topic", priority: "1", test_id: 150528 do
         get url
 
         expect_new_page_load { f('#add_announcement').click }
         edit_announcement(@topic_title, 'new topic')
       end
 
-      it "should add an attachment to a new topic", priority: "1", test_id: 150529 do
+      it "adds an attachment to a new topic", priority: "1", test_id: 150529 do
         topic_title = 'new topic with file'
         get new_url
         wait_for_tiny(f('#discussion-edit-view textarea[name=message]'))
@@ -121,7 +121,7 @@ describe "announcements" do
         expect(what_to_create.where(title: topic_title).first.attachment_id).to be_present
       end
 
-      it "should perform front-end validation for message", priority: "1", test_id: 220366 do
+      it "performs front-end validation for message", priority: "1", test_id: 220366 do
         skip("Skip for now -- message box is not emitted with enhanced RCE LS-1851")
 
         topic_title = 'new topic with file'
@@ -135,7 +135,7 @@ describe "announcements" do
         expect(ff('.error_box').any? { |box| box.text.include?("A message is required") }).to be_truthy
       end
 
-      it "should add an attachment to a graded topic", priority: "1", test_id: 220367 do
+      it "adds an attachment to a graded topic", priority: "1", test_id: 220367 do
         what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => 'graded attachment topic', :user => @user) : announcement_model(:title => 'graded attachment topic', :user => @user)
         if what_to_create == DiscussionTopic
           what_to_create.last.update(:assignment => @course.assignments.create!(:name => 'graded topic assignment'))
@@ -147,7 +147,7 @@ describe "announcements" do
         add_attachment_and_validate
       end
 
-      it "should edit a topic", priority: "1", test_id: 150530 do
+      it "edits a topic", priority: "1", test_id: 150530 do
         edit_name = 'edited discussion name'
         topic = what_to_create == DiscussionTopic ? @course.discussion_topics.create!(:title => @topic_title, :user => @user) : announcement_model(:title => @topic_title, :user => @user)
         get "#{url}/#{topic.id}"
@@ -157,7 +157,7 @@ describe "announcements" do
       end
     end
 
-    it "should create a delayed announcement with an attachment", priority: "1", test_id: 150531 do
+    it "creates a delayed announcement with an attachment", priority: "1", test_id: 150531 do
       AnnouncementNewEdit.visit_new(@course)
       f('input[type=checkbox][name=delay_posting]').click
       replace_content(f('input[name=title]'), "First Announcement")
@@ -197,7 +197,7 @@ describe "announcements" do
       expect(f('.discussion-fyi')).to include_text(time_new)
     end
 
-    it "should remove delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do
+    it "removes delayed_post_at when unchecking delay_posting", priority: "1", test_id: 220371 do
       topic = @course.announcements.create!(:title => @topic_title, :user => @user, :delayed_post_at => 10.days.ago, :message => "message")
       get "/courses/#{@course.id}/announcements/#{topic.id}"
       expect_new_page_load { f(".edit-btn").click }
@@ -220,7 +220,7 @@ describe "announcements" do
       expect(DiscussionEntry.last.message).to include(entry_text)
     end
 
-    it "should show announcements to student view student", priority: "1", test_id: 220373 do
+    it "shows announcements to student view student", priority: "1", test_id: 220373 do
       create_announcement
       enter_student_view
       get "/courses/#{@course.id}/announcements"
@@ -229,7 +229,7 @@ describe "announcements" do
       expect(announcement.find_element(:css, '.ic-announcement-row__content')).to include_text(@announcement.message)
     end
 
-    it "should always see student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
+    it "alwayses see student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
       skip_if_chrome('Student view breaks this test')
       student_entry = 'this is my reply'
 
@@ -246,7 +246,7 @@ describe "announcements" do
       expect(ff('.discussion_entry .message')[1]).to include_text(student_entry)
     end
 
-    it "should create an announcement that requires an initial post", priority: "1", test_id: 3293292 do
+    it "creates an announcement that requires an initial post", priority: "1", test_id: 3293292 do
       get "/courses/#{@course.id}/discussion_topics/new?is_announcement=true"
       replace_content(f('input[name=title]'), 'title')
       type_in_tiny('textarea[name=message]', 'hi')

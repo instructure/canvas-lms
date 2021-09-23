@@ -81,7 +81,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
   context 'validations' do
     include_examples 'Textual Answer Serializers'
 
-    it 'should reject unexpected types' do
+    it 'rejects unexpected types' do
       ['asdf', nil].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
@@ -89,7 +89,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
       end
     end
 
-    it 'should reject an answer to an unknown blank' do
+    it 'rejects an answer to an unknown blank' do
       rc = subject.serialize({ foobar: 'yeeeeeeeeee' })
       expect(rc.error).not_to be_nil
       expect(rc.error).to match /unknown blank/i

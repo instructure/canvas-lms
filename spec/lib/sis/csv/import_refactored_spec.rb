@@ -23,7 +23,7 @@ require 'spec_helper'
 describe SIS::CSV::ImportRefactored do
   before { account_model }
 
-  it "should error files with unknown headers" do
+  it "errors files with unknown headers" do
     importer = process_csv_data(
       "course_id,randomness,smelly",
       "test_1,TC 101,Test Course 101,,,active"
@@ -31,7 +31,7 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Couldn't find Canvas CSV import headers"
   end
 
-  it "should error files with invalid UTF-8" do
+  it "errors files with invalid UTF-8" do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
       (+"ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active").force_encoding("UTF-8")
@@ -39,7 +39,7 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Invalid UTF-8"
   end
 
-  it "should work with valid UTF-8 when split across bytes" do
+  it "works with valid UTF-8 when split across bytes" do
     allow(Attachment).to receive(:read_file_chunk_size).and_return(1) # force it to split
     importer = process_csv_data(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -48,7 +48,7 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors).to be_empty
   end
 
-  it "should work handle empty columns" do
+  it "works handle empty columns" do
     importer = process_csv_data(
       "course_id,short_name,long_name,account_id,term_id,status,,",
       "test_1,TC 101,Test Course 1,,,active,invalid,"
@@ -56,14 +56,14 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors).to be_empty
   end
 
-  it "should error files with invalid CSV headers " do
+  it "errors files with invalid CSV headers" do
     importer = process_csv_data(
       "xlist_course_id,\"section_id,status"
     )
     expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
-  it "should error files with invalid CSV" do
+  it "errors files with invalid CSV" do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
       "ABC2119_ccutrer_2012201_xlist,\"26076.20122"
@@ -71,7 +71,7 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
-  it "should error files with invalid CSV way down" do
+  it "errors files with invalid CSV way down" do
     lines = []
     lines << "xlist_course_id,section_id,status"
     lines.concat(["ABC2119_ccutrer_2012201_xlist,26076.20122"] * 100)
@@ -80,7 +80,7 @@ describe SIS::CSV::ImportRefactored do
     expect(importer.errors.first.last).to eq "Malformed CSV"
   end
 
-  it "should work for a mass import" do
+  it "works for a mass import" do
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
       "U001,user1,User,One,user1@example.com,active",
@@ -168,7 +168,7 @@ describe SIS::CSV::ImportRefactored do
     }.not_to raise_error
   end
 
-  it 'should support sis stickiness overriding' do
+  it 'supports sis stickiness overriding' do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -229,7 +229,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'should allow turning on stickiness' do
+  it 'allows turning on stickiness' do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -273,7 +273,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it 'should allow turning off stickiness' do
+  it 'allows turning off stickiness' do
     before_count = AbstractCourse.count
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
@@ -335,7 +335,7 @@ describe SIS::CSV::ImportRefactored do
     end
   end
 
-  it "should not invalidly break up UTF-8 characters" do
+  it "does not invalidly break up UTF-8 characters" do
     expect {
       process_csv_data_cleanly(
         File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/utf8.csv"))
@@ -343,7 +343,7 @@ describe SIS::CSV::ImportRefactored do
     }.not_to raise_error
   end
 
-  it "should ignore BOM chars" do
+  it "ignores BOM chars" do
     expect do
       process_csv_data_cleanly(
         File.read(File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/with_bom.csv"))
@@ -351,14 +351,14 @@ describe SIS::CSV::ImportRefactored do
     end.not_to raise_error
   end
 
-  it 'should not fail on mac zip files' do
+  it 'does not fail on mac zip files' do
     path = File.expand_path("#{File.dirname(__FILE__)}/../../../fixtures/sis/mac_sis_batch.zip")
     importer = process_csv_data(files: path)
     expect(importer.errors).to eq []
   end
 
   describe "parallel imports" do
-    it 'should retry an importer once locally' do
+    it 'retries an importer once locally' do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).twice.and_call_original
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:try_importing_segment).twice.and_call_original
       # don't actually run the job.
@@ -371,7 +371,7 @@ describe SIS::CSV::ImportRefactored do
       )
     end
 
-    it 'should also retry in a new job' do
+    it 'alsoes retry in a new job' do
       Setting.set('number_of_tries_before_failing', 2)
       allow(InstStatsd::Statsd).to receive(:increment)
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).exactly(6).and_call_original
@@ -396,7 +396,7 @@ describe SIS::CSV::ImportRefactored do
       end
     end
 
-    it 'should only run an importer once if successful' do
+    it 'onlies run an importer once if successful' do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
       process_csv_data(
         "term_id,name,status",

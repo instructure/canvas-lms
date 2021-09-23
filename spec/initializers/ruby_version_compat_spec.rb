@@ -30,7 +30,7 @@ describe 'ruby_version_compat' do
   end
 
   describe 'backport of ruby #7278' do
-    it "should not output to stdout/stderr" do
+    it "does not output to stdout/stderr" do
       output = capture_io do
         # this file is marked utf-8 for one of the specs below, so we need to force these string literals to be binary
         sio = StringIO.new((+"").force_encoding('binary'))
@@ -49,7 +49,7 @@ describe 'ruby_version_compat' do
   end
 
   describe "force_utf8_params" do
-    it "should allow null filenames through" do
+    it "allows null filenames through" do
       testfile = fixture_file_upload("docs/txt.txt", "text/plain", true)
       testfile.instance_variable_set(:@original_filename, nil)
       controller = ApplicationController.new
@@ -61,7 +61,7 @@ describe 'ruby_version_compat' do
   end
 
   describe "ERB::Util.html_escape" do
-    it "should be silent and escape properly with the regexp utf-8 monkey patch" do
+    it "is silent and escape properly with the regexp utf-8 monkey patch" do
       stdout, stderr = capture_io do
         escaped = ERB::Util.html_escape("åß∂åß∂<>")
         expect(escaped.encoding).to eq Encoding::UTF_8
@@ -73,7 +73,7 @@ describe 'ruby_version_compat' do
   end
 
   describe "ActiveSupport::Inflector#transliterate" do
-    it "should be silent and return equivalent strings" do
+    it "is silent and return equivalent strings" do
       stdout, stderr = capture_io do
         expect(ActiveSupport::Inflector.transliterate("a string")).to eq "a string"
         complex = ERB::Util.html_escape("test ßå")

@@ -69,7 +69,7 @@ module ConditionalRelease
       expect(action.valid?).to be true
     end
 
-    it "should be valid when assignment_set does not exist" do
+    it "is valid when assignment_set does not exist" do
       action = create :assignment_set_action
       set_id = action.assignment_set.id
       action.assignment_set.destroy!
@@ -78,7 +78,7 @@ module ConditionalRelease
     end
 
     describe "self.latest" do
-      it "should select only the most recent Action for each Set and user_id" do
+      it "selects only the most recent Action for each Set and user_id" do
         actions = []
         actions << create(:assignment_set_action, student_id: 2, assignment_set: create(:assignment_set))
         set = create :assignment_set
@@ -90,7 +90,7 @@ module ConditionalRelease
     end
 
     describe "self.current_assignments" do
-      it "should select only actions that have not been unassigned" do
+      it "selects only actions that have not been unassigned" do
         set = create :assignment_set
         create(:assignment_set_action, action: 'assign', student_id: 1, assignment_set: set, created_at: 1.hour.ago)
         create(:assignment_set_action, action: 'unassign', student_id: 1, assignment_set: set)
@@ -99,7 +99,7 @@ module ConditionalRelease
         expect(AssignmentSetAction.current_assignments(1)).to eq [recent]
       end
 
-      it "should select only actions for the specified sets" do
+      it "selects only actions for the specified sets" do
         actions = Array.new(3) { create(:assignment_set_action, student_id: 1) }
         selected_sets = actions[1..2].map(&:assignment_set)
         expect(AssignmentSetAction.current_assignments(1, selected_sets).order(:id)).to eq actions[1..2]
@@ -107,7 +107,7 @@ module ConditionalRelease
     end
 
     describe "self.create_from_sets" do
-      it 'should create records' do
+      it 'creates records' do
         range = create :scoring_range_with_assignments, assignment_set_count: 4
         assigned = range.assignment_sets[0..1]
         unassigned = range.assignment_sets[2..3]

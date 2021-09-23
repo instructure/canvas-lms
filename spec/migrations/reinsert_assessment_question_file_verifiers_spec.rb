@@ -21,7 +21,7 @@
 require_relative '../spec_helper'
 
 describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
-  it "should work" do
+  it "works" do
     course_factory
     @att1 = attachment_with_context(@course)
     @att2 = attachment_with_context(@course)
@@ -60,7 +60,7 @@ describe 'DataFixup::ReinsertAssessmentQuestionFileVerifiers' do
     expect(linked_question.reload.question_data["question_text"]).to eq original_text
   end
 
-  it "should be able to fix the broken yaml with another fixup" do
+  it "is able to fix the broken yaml with another fixup" do
     course_factory
     @att1 = attachment_with_context(@course)
     bank = @course.assessment_question_banks.create!(:title => 'Test Bank')

@@ -29,7 +29,7 @@ describe 'quizzes question banks' do
       course_with_teacher_logged_in
     end
 
-    it 'should be able to create question bank', priority: "1", test_id: 140667 do
+    it 'is able to create question bank', priority: "1", test_id: 140667 do
       get "/courses/#{@course.id}/question_banks"
       f('.add_bank_link').click
       wait_for_ajaximations
@@ -55,7 +55,7 @@ describe 'quizzes question banks' do
       expect { create_multiple_choice_question }.to change(AssessmentQuestion, :count).by(1)
     end
 
-    it 'should tally up question bank question points', priority: "1", test_id: 201930 do
+    it 'tallies up question bank question points', priority: "1", test_id: 201930 do
       quiz = @course.quizzes.create!(title: 'My Quiz')
       bank = AssessmentQuestionBank.create!(context: @course)
       3.times { assessment_question_model(bank: bank) }
@@ -74,7 +74,7 @@ describe 'quizzes question banks' do
       expect(f('#quiz_display_points_possible .points_possible')).to include_text '17'
     end
 
-    it 'should allow you to use inherited question banks', custom_timeout: 30, priority: "1", test_id: 201931 do
+    it 'allows you to use inherited question banks', custom_timeout: 30, priority: "1", test_id: 201931 do
       @course.account = Account.default
       @course.save
       quiz = @course.quizzes.create!(title: 'My Quiz')
@@ -107,7 +107,7 @@ describe 'quizzes question banks' do
       expect(f('#quiz_display_points_possible .points_possible')).to include_text '2'
     end
 
-    it 'should allow you to use bookmarked question banks', custom_timeout: 30, priority: "1", test_id: 201932 do
+    it 'allows you to use bookmarked question banks', custom_timeout: 30, priority: "1", test_id: 201932 do
       @course.account = Account.default
       @course.save
       quiz = @course.quizzes.create!(title: 'My Quiz')
@@ -143,7 +143,7 @@ describe 'quizzes question banks' do
       expect(f('#quiz_display_points_possible .points_possible')).to include_text '2'
     end
 
-    it 'should check permissions when retrieving question banks', priority: "1", test_id: 201933 do
+    it 'checks permissions when retrieving question banks', priority: "1", test_id: 201933 do
       @course.account = Account.default
       @course.account.role_overrides.create!(
         permission: 'read_question_banks',
@@ -169,7 +169,7 @@ describe 'quizzes question banks' do
       expect(f("#content")).not_to contain_css('.find_bank_link')
     end
 
-    it 'should create a question group from a question bank', custom_timeout: 30, priority: "1", test_id: 319907 do
+    it 'creates a question group from a question bank', custom_timeout: 30, priority: "1", test_id: 319907 do
       bank = AssessmentQuestionBank.create!(context: @course)
       3.times { assessment_question_model(bank: bank) }
 
@@ -261,7 +261,7 @@ describe 'quizzes question banks' do
       expect(@bank.assessment_questions.select { |aq| !aq.deleted? }.length).to eq 59
     end
 
-    it 'should allow editing quiz questions that belong to a quiz bank', priority: "1", test_id: 217531 do
+    it 'allows editing quiz questions that belong to a quiz bank', priority: "1", test_id: 217531 do
       skip_if_chrome('fragile')
       @course.account = Account.default
       @course.save
@@ -295,7 +295,7 @@ describe 'quizzes question banks' do
       expect(f("#question_#{@quest1.id}")).to include_text new_question_text
     end
 
-    it "should let teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2", test_id: 456150 do
+    it "lets teachers view question banks in a soft-concluded course (but not edit)", custom_timeout: 30, priority: "2", test_id: 456150 do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
       @course.enrollment_term = term
@@ -319,7 +319,7 @@ describe 'quizzes question banks' do
       expect_new_page_load { view_bank_link.click }
     end
 
-    it "should let account admins view question banks without :manage_assignments (but not edit)", custom_timeout: 30, priority: "2", test_id: 456162 do
+    it "lets account admins view question banks without :manage_assignments (but not edit)", custom_timeout: 30, priority: "2", test_id: 456162 do
       user_factory(active_all: true)
       user_session(@user)
       @role = custom_account_role 'weakling', :account => @course.account
@@ -346,7 +346,7 @@ describe 'quizzes question banks' do
       expect_new_page_load { view_bank_link.click }
     end
 
-    it "should lock out teachers when :read_question_banks is disabled", priority: "2", test_id: 456163 do
+    it "locks out teachers when :read_question_banks is disabled", priority: "2", test_id: 456163 do
       term = Account.default.enrollment_terms.create!
       term.set_overrides(Account.default, 'TeacherEnrollment' => { :end_at => 3.days.ago })
       @course.enrollment_term = term
@@ -367,7 +367,7 @@ describe 'quizzes question banks' do
       expect(f('#unauthorized_message')).to be_displayed
     end
 
-    it "should move paginated questions in a question bank from one bank to another", custom_timeout: 30, priority: "2", test_id: 312864 do
+    it "moves paginated questions in a question bank from one bank to another", custom_timeout: 30, priority: "2", test_id: 312864 do
       @context = @course
       source_bank = @course.assessment_question_banks.create!(title: 'Source Bank')
       target_bank = @course.assessment_question_banks.create!(title: 'Target Bank')

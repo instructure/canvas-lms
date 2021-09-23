@@ -20,13 +20,13 @@
 require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
 
 describe 'Delayed::Job' do
-  it "should define job.account" do
+  it "defines job.account" do
     job = Delayed::Job.new
     expect(job).to respond_to(:account)
   end
 
   shared_examples_for "delayed_jobs_shards" do
-    it "should keep track of the current shard on child jobs" do
+    it "keeps track of the current shard on child jobs" do
       shard = @shard1 || Shard.default
       shard.activate do
         Delayed::Batch.serial_batch {

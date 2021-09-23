@@ -37,12 +37,12 @@ describe ConversationsController do
       course_with_student(:active_all => true)
     end
 
-    it "should require login" do
+    it "requires login" do
       get 'index'
       assert_require_login
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@student)
       conversation
 
@@ -54,7 +54,7 @@ describe ConversationsController do
       expect(assigns[:js_env]).not_to be_nil
     end
 
-    it "should assign variables for json" do
+    it "assigns variables for json" do
       user_session(@student)
       conversation
 
@@ -64,7 +64,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json].map { |c| c[:id] }).to eq @user.conversations.map(&:conversation_id)
     end
 
-    it "should work for an admin as well" do
+    it "works for an admin as well" do
       account_admin_user
       user_session(@user)
       conversation
@@ -74,7 +74,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json].map { |c| c[:id] }).to eq @user.conversations.map(&:conversation_id)
     end
 
-    it "should return all sent conversations" do
+    it "returns all sent conversations" do
       user_session(@student)
       @c1 = conversation
       @c2 = conversation
@@ -86,7 +86,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json].size).to eql 3
     end
 
-    it "should return conversations matching the specified filter" do
+    it "returns conversations matching the specified filter" do
       user_session(@student)
       @c1 = conversation
       @other_course = course_factory(active_all: true)
@@ -102,7 +102,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json][0][:id]).to eq @c2.conversation_id
     end
 
-    it "should use the boolean operation in filter_mode when combining multiple filters" do
+    it "uses the boolean operation in filter_mode when combining multiple filters" do
       user_session(@student)
       @course1 = @course
       @c1 = conversation(:course => @course1)
@@ -130,7 +130,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json]).to eql []
     end
 
-    it "should return conversations matching a user filter" do
+    it "returns conversations matching a user filter" do
       user_session(@student)
       @c1 = conversation
       @other_course = course_factory(active_all: true)
@@ -145,7 +145,7 @@ describe ConversationsController do
       expect(assigns[:conversations_json].size).to eql 2
     end
 
-    it "should not allow student view student to load inbox" do
+    it "does not allow student view student to load inbox" do
       course_with_teacher_logged_in(:active_all => true)
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
@@ -171,20 +171,20 @@ describe ConversationsController do
         session[:become_user_id] = @student.id
       end
 
-      it "should filter conversations" do
+      it "filters conversations" do
         get 'index', :format => 'json'
         expect(response).to be_successful
         expect(assigns[:conversations_json].size).to eql 1
       end
 
-      it "should filter conversations when returning ids" do
+      it "filters conversations when returning ids" do
         get 'index', params: { :include_all_conversation_ids => true }, :format => 'json'
         expect(response).to be_successful
         expect(assigns[:conversations_json][:conversations].size).to eql 1
         expect(assigns[:conversations_json][:conversation_ids].size).to eql 1
       end
 
-      it "should recompute inbox count" do
+      it "recomputes inbox count" do
         # In an effort to make the data fix easy to do and self-healing,
         # recompute the unread inbox count when the page is loaded.
         course_with_student_logged_in(:active_all => true)
@@ -221,12 +221,12 @@ describe ConversationsController do
       conversation
     end
 
-    it "should redirect if not xhr" do
+    it "redirects if not xhr" do
       get 'show', params: { :id => @conversation.conversation_id }
       expect(response).to be_redirect
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       get 'show', params: { :id => @conversation.conversation_id }, xhr: true
       expect(response).to be_successful
       expect(assigns[:conversation]).to eq @conversation
@@ -239,7 +239,7 @@ describe ConversationsController do
       student_in_course(active_all: true)
     end
 
-    it "should create the conversation" do
+    it "creates the conversation" do
       user_session(@student)
 
       new_user = User.create
@@ -251,7 +251,7 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it 'should not allow creating conversations in concluded courses for students' do
+    it 'does not allow creating conversations in concluded courses for students' do
       user_session(@student)
       @course.update!(workflow_state: 'completed')
 
@@ -260,7 +260,7 @@ describe ConversationsController do
       expect(response.body).to include('Unable to send messages')
     end
 
-    it 'should allow creating conversations in concluded courses for teachers' do
+    it 'allows creating conversations in concluded courses for teachers' do
       user_session(@teacher)
       teacher2 = teacher_in_course(active_all: true).user
       @course.update!(workflow_state: 'claimed')
@@ -270,7 +270,7 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it "should require permissions for sending to other students" do
+    it "requires permissions for sending to other students" do
       user_session(@student)
 
       new_user = User.create
@@ -283,7 +283,7 @@ describe ConversationsController do
       expect(response).to_not be_successful
     end
 
-    it "should allow sending to instructors even if permissions are disabled" do
+    it "allows sending to instructors even if permissions are disabled" do
       user_session(@student)
       @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
 
@@ -292,7 +292,7 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it "should not add the wrong tags in a certain terrible cached edge case" do
+    it "does not add the wrong tags in a certain terrible cached edge case" do
       # tl;dr - not including the updated_at when we instantiate the users
       # can cause us to grab stale conversation_context_codes
       # which screws everything up
@@ -333,7 +333,7 @@ describe ConversationsController do
       end
     end
 
-    it "should allow messages to be forwarded from the conversation" do
+    it "allows messages to be forwarded from the conversation" do
       user_session(@student)
       conversation.update_attribute(:workflow_state, "unread")
 
@@ -373,7 +373,7 @@ describe ConversationsController do
       end
 
       ["1", "true", "yes", "on"].each do |truish|
-        it "should create a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
+        it "creates a conversation shared by all recipients if group_conversation=#{truish.inspect}" do
           post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: truish }
           expect(response).to be_successful
 
@@ -382,7 +382,7 @@ describe ConversationsController do
       end
 
       [nil, "", "0", "false", "no", "off", "wat"].each do |falsish|
-        it "should create one conversation per recipient if group_conversation=#{falsish.inspect}" do
+        it "creates one conversation per recipient if group_conversation=#{falsish.inspect}" do
           post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: falsish }
           expect(response).to be_successful
 
@@ -390,7 +390,7 @@ describe ConversationsController do
         end
       end
 
-      it "should set the root account id to the participants for group conversations" do
+      it "sets the root account id to the participants for group conversations" do
         post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", group_conversation: "true" }
         expect(response).to be_successful
 
@@ -403,7 +403,7 @@ describe ConversationsController do
         end
       end
 
-      it "should set the root account id to the participants for bulk private messages" do
+      it "sets the root account id to the participants for bulk private messages" do
         post 'create', params: { recipients: [@new_user1.id.to_s, @new_user2.id.to_s], body: "yo", mode: "sync" }
         expect(response).to be_successful
 
@@ -425,7 +425,7 @@ describe ConversationsController do
       end
     end
 
-    it "should correctly infer context tags" do
+    it "correctlies infer context tags" do
       course_with_teacher_logged_in(:active_all => true)
       @course1 = @course
       @course2 = course_factory(active_all: true)
@@ -469,7 +469,7 @@ describe ConversationsController do
       # group3 from context_code, course3 inferred from group3
     end
 
-    it "should populate subject" do
+    it "populates subject" do
       user_session(@student)
 
       new_user = User.create
@@ -481,7 +481,7 @@ describe ConversationsController do
       expect(assigns[:conversation].conversation.subject).not_to be_nil
     end
 
-    it "should populate subject on batch conversations" do
+    it "populates subject on batch conversations" do
       user_session(@student)
 
       new_user1 = User.create
@@ -509,17 +509,17 @@ describe ConversationsController do
         @students = create_users_in_course(@course, 2, account_associations: true, return_type: :record)
       end
 
-      it "should create user notes" do
+      it "creates user notes" do
         post 'create', params: { recipients: @students.map(&:id), body: "yo", subject: "greetings", user_note: '1' }
         @students.each { |x| expect(x.user_notes.size).to be(1) }
       end
 
-      it "should _not_ create user notes if asked not to" do
+      it "_not_s create user notes if asked not to" do
         post 'create', params: { recipients: @students.map(&:id), body: "yolo", subject: "salutations", user_note: '0' }
         @students.each { |x| expect(x.user_notes.size).to be(0) }
       end
 
-      it "should include the domain root account in the user note" do
+      it "includes the domain root account in the user note" do
         post "create", params: { recipients: @students.map(&:id), body: "hi there", subject: "hi there", user_note: true }
         note = UserNote.last
         expect(note.root_account_id).to eql Account.default.id
@@ -527,14 +527,14 @@ describe ConversationsController do
     end
 
     describe "for recipients the sender has no relationship with" do
-      it "should fail" do
+      it "fails" do
         user_session(@student)
         post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
         expect(response.status).to eq 400
       end
 
       context "as a siteadmin user with send_messages grants" do
-        it "should succeed" do
+        it "succeeds" do
           user_session(site_admin_user)
           post 'create', params: { recipients: [User.create.id.to_s], body: "foo" }
           expect(response.status).to eq 201
@@ -544,7 +544,7 @@ describe ConversationsController do
   end
 
   describe "POST 'update'" do
-    it "should update the conversation" do
+    it "updates the conversation" do
       course_with_student_logged_in(:active_all => true)
       conversation(:num_other_users => 2).update_attribute(:workflow_state, "unread")
 
@@ -558,7 +558,7 @@ describe ConversationsController do
   end
 
   describe "POST 'add_message'" do
-    it "should add a message" do
+    it "adds a message" do
       course_with_student_logged_in(:active_all => true)
       conversation
       expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
@@ -571,7 +571,7 @@ describe ConversationsController do
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
-    it "should require permissions" do
+    it "requires permissions" do
       course_with_student_logged_in(:active_all => true)
       conversation
       @course.account.role_overrides.create!(:permission => :send_messages, :role => student_role, :enabled => false)
@@ -580,7 +580,7 @@ describe ConversationsController do
       assert_unauthorized
     end
 
-    it "should queue a job if needed" do
+    it "queues a job if needed" do
       course_with_student_logged_in(:active_all => true)
       conversation
       expected_lma = Time.zone.parse('2012-12-21T12:42:00Z')
@@ -597,7 +597,7 @@ describe ConversationsController do
       expect(@conversation.reload.last_message_at).to eql expected_lma
     end
 
-    it "should generate a user note when requested" do
+    it "generates a user note when requested" do
       Account.default.update_attribute :enable_user_notes, true
       course_with_teacher_logged_in(:active_all => true)
       conversation
@@ -615,7 +615,7 @@ describe ConversationsController do
       expect(student.user_notes.size).to eq 1
     end
 
-    it "should not allow new messages in concluded courses for students" do
+    it "does not allow new messages in concluded courses for students" do
       course_with_student_logged_in(:active_all => true)
       conversation
       @course.update!({ workflow_state: 'completed' })
@@ -624,7 +624,7 @@ describe ConversationsController do
       assert_unauthorized
     end
 
-    it "should allow new messages in concluded courses for teachers" do
+    it "allows new messages in concluded courses for teachers" do
       course_with_teacher_logged_in(:active_all => true)
       conversation
       @course.update!({ workflow_state: 'completed' })
@@ -634,7 +634,7 @@ describe ConversationsController do
       expect(assigns[:conversation]).not_to be_nil
     end
 
-    it "should refrain from duplicating the RCE-created media_comment" do
+    it "refrains from duplicating the RCE-created media_comment" do
       course_with_student_logged_in(:active_all => true)
       conversation
       @student.media_objects.where(media_id: 'm-whatever', media_type: 'video/mp4').first_or_create!
@@ -651,7 +651,7 @@ describe ConversationsController do
     end
     before(:each) { user_session(@student) }
 
-    it "should add recipients" do
+    it "adds recipients" do
       new_user = User.create
       enrollment = @course.enroll_student(new_user)
       enrollment.workflow_state = 'active'
@@ -661,7 +661,7 @@ describe ConversationsController do
       expect(@conversation.reload.participants.size).to eq 4 # includes @user
     end
 
-    it "should correctly infer context tags" do
+    it "correctlies infer context tags" do
       a = Account.default
       @group = a.groups.create!
       @conversation.participants.each { |user| @group.users << user }
@@ -680,7 +680,7 @@ describe ConversationsController do
     before(:once) { course_with_student(active_all: true) }
     before(:each) { user_session(@student) }
 
-    it "should remove messages" do
+    it "removes messages" do
       message = conversation.add_message('another')
 
       post 'remove_messages', params: { :conversation_id => @conversation.conversation_id, :remove => [message.id.to_s] }
@@ -688,7 +688,7 @@ describe ConversationsController do
       expect(@conversation.messages.size).to eq 1
     end
 
-    it "should null a conversation_participant's last_message_at if all message_participants have been destroyed" do
+    it "nulls a conversation_participant's last_message_at if all message_participants have been destroyed" do
       message = conversation.conversation.conversation_messages.first
 
       post 'remove_messages', params: { conversation_id: @conversation.conversation_id, :remove => [message.id.to_s] }
@@ -697,7 +697,7 @@ describe ConversationsController do
   end
 
   describe "DELETE 'destroy'" do
-    it "should delete conversations" do
+    it "deletes conversations" do
       course_with_student_logged_in(:active_all => true)
       conversation
 
@@ -713,13 +713,13 @@ describe ConversationsController do
       course_with_student(:course_name => "Message Course", :active_all => true)
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       conversation
       get 'public_feed', params: { :feed_code => @student.feed_code + "x" }, :format => 'atom'
       expect(assigns[:problem]).to eql("The verification code is invalid.")
     end
 
-    it "should return basic feed attributes" do
+    it "returns basic feed attributes" do
       conversation
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
@@ -728,21 +728,21 @@ describe ConversationsController do
       expect(feed.links.first.href).to match(/conversations/)
     end
 
-    it "should include message entries" do
+    it "includes message entries" do
       conversation
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
       expect(assigns[:entries].length).to eq 1
       expect(response).to be_successful
     end
 
-    it "should not include messages the user is not a part of" do
+    it "does not include messages the user is not a part of" do
       conversation
       student_in_course
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
       expect(assigns[:entries]).to be_empty
     end
 
-    it "should include part the message text in the title" do
+    it "includes part the message text in the title" do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:message => message)
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
@@ -752,7 +752,7 @@ describe ConversationsController do
       expect(feed.entries.first.title).not_to match(message)
     end
 
-    it "should include the message in the content" do
+    it "includes the message in the content" do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:message => message)
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
@@ -761,7 +761,7 @@ describe ConversationsController do
       expect(feed.entries.first.content).to match(message)
     end
 
-    it "should include context about the conversation" do
+    it "includes context about the conversation" do
       message = "Sending a test message to some random users, in the hopes that it really works."
       conversation(:num_other_users => 4, :message => message)
       get 'public_feed', params: { :feed_code => @student.feed_code }, :format => 'atom'
@@ -772,7 +772,7 @@ describe ConversationsController do
       expect(feed.entries.first.content).to match(/others/)
     end
 
-    it "should include an attachment if one exists" do
+    it "includes an attachment if one exists" do
       conversation
       attachment = @user.conversation_attachments_folder.attachments.create!(:filename => "somefile.doc", :context => @user, :uploaded_data => StringIO.new('test'))
       @conversation.add_message('test attachment', :attachment_ids => [attachment.id])
@@ -788,7 +788,7 @@ describe ConversationsController do
     specs_require_sharding
 
     describe 'index' do
-      it "should list conversation_ids across shards" do
+      it "lists conversation_ids across shards" do
         users = []
         # Create three users on different shards
         users << user_factory(:name => 'a')
@@ -832,7 +832,7 @@ describe ConversationsController do
     end
 
     describe "show" do
-      it "should find conversations across shards" do
+      it "finds conversations across shards" do
         users = []
         users << user_factory(:name => 'a')
         @shard1.activate { users << user_factory(:name => 'b') }

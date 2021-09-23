@@ -26,17 +26,17 @@ describe AccountNotification do
     user_factory
   end
 
-  it "should find notifications" do
+  it "finds notifications" do
     expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
   end
 
-  it "should find site admin announcements" do
+  it "finds site admin announcements" do
     @announcement.destroy
     account_notification(:account => Account.site_admin)
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq [@announcement]
   end
 
-  it "should find announcements only if user has a role in the list of roles to which the announcement is restricted" do
+  it "finds announcements only if user has a role in the list of roles to which the announcement is restricted" do
     @announcement.destroy
     role_ids = [teacher_role, admin_role].map(&:id)
     account_notification(:role_ids => role_ids, :message => "Announcement 1")
@@ -73,7 +73,7 @@ describe AccountNotification do
   end
 
   describe 'current announcements' do
-    it 'should return true if time matches end_at' do
+    it 'returns true if time matches end_at' do
       Timecop.freeze do
         @announcement.update(start_at: Time.zone.now - 1.minute)
         @announcement.update(end_at: Time.zone.now)
@@ -81,13 +81,13 @@ describe AccountNotification do
       end
     end
 
-    it 'should return true if announcement is current' do
+    it 'returns true if announcement is current' do
       @announcement.update(start_at: Time.zone.now - 1.minute)
       @announcement.update(end_at: Time.zone.now + 1.minute)
       expect(@announcement.current).to eq true
     end
 
-    it 'should return false if announcement is past' do
+    it 'returns false if announcement is past' do
       @announcement.update(start_at: Time.zone.now - 2.minutes)
       @announcement.update(end_at: Time.zone.now - 1.minute)
       expect(@announcement.current).to eq false
@@ -95,20 +95,20 @@ describe AccountNotification do
   end
 
   describe 'past announcements' do
-    it 'should return true if announcement is past' do
+    it 'returns true if announcement is past' do
       @announcement.update(start_at: Time.zone.now - 2.minutes)
       @announcement.update(end_at: Time.zone.now - 1.minute)
       expect(@announcement.past).to eq true
     end
 
-    it 'should return false if announcement is current' do
+    it 'returns false if announcement is current' do
       @announcement.update(start_at: Time.zone.now - 1.minute)
       @announcement.update(end_at: Time.zone.now + 1.minute)
       expect(@announcement.past).to eq false
     end
   end
 
-  it 'should sort' do
+  it 'sorts' do
     @announcement.destroy
     role_ids = ["TeacherEnrollment", "AccountAdmin"].map { |name| Role.get_built_in_role(name, root_account_id: Account.default.id).id }
     account_notification(:role_ids => role_ids, :message => "Announcement 1")
@@ -130,13 +130,13 @@ describe AccountNotification do
     expect(AccountNotification.for_user_and_account(@teacher, @account)).to eq [@a3, @a1]
   end
 
-  it "should allow closing an announcement" do
+  it "allows closing an announcement" do
     @user.close_announcement(@announcement)
     expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]
     expect(AccountNotification.for_user_and_account(@user, Account.default)).to eq []
   end
 
-  it "should remove non-applicable announcements from user preferences" do
+  it "removes non-applicable announcements from user preferences" do
     @user.close_announcement(@announcement)
     expect(@user.get_preference(:closed_notifications)).to eq [@announcement.id]
     @announcement.destroy
@@ -168,7 +168,7 @@ describe AccountNotification do
       @sub_account = Account.default.sub_accounts.create!
     end
 
-    it "should find announcements where user is enrolled" do
+    it "finds announcements where user is enrolled" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -184,7 +184,7 @@ describe AccountNotification do
       expect(unenrolled_notifications).not_to include(sub_account_announcement)
     end
 
-    it "should not care about announcements where user is not actively enrolled" do
+    it "does not care about announcements where user is not actively enrolled" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -198,7 +198,7 @@ describe AccountNotification do
       expect(students_notifications).to_not include(sub_account_announcement)
     end
 
-    it "should find announcements from parent accounts to sub-accounts where user is enrolled" do
+    it "finds announcements from parent accounts to sub-accounts where user is enrolled" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -212,7 +212,7 @@ describe AccountNotification do
       expect(students_notifications).to include(sub_account_announcement)
     end
 
-    it "should find announcements where user is an account admin" do
+    it "finds announcements where user is an account admin" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -228,7 +228,7 @@ describe AccountNotification do
       expect(non_admin_notifications).not_to include(sub_account_announcement)
     end
 
-    it "should find announcements with no specified roles if users has any sub account role" do
+    it "finds announcements with no specified roles if users has any sub account role" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -245,7 +245,7 @@ describe AccountNotification do
       expect(unenrolled_notifications).not_to include(sub_account_announcement)
     end
 
-    it "should cache based on sub_account_ids" do
+    it "caches based on sub_account_ids" do
       params = {
         subject: 'sub account notification',
         account: @sub_account,
@@ -319,7 +319,7 @@ describe AccountNotification do
   end
 
   describe "survey notifications" do
-    it "should only display for flagged accounts" do
+    it "onlies display for flagged accounts" do
       flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
       account_notification(:required_account_service => flag, :account => Account.site_admin)
       @a1 = account_model
@@ -331,7 +331,7 @@ describe AccountNotification do
     end
 
     describe "display_for_user?" do
-      it "should select each mod value once throughout the cycle" do
+      it "selects each mod value once throughout the cycle" do
         expect(AccountNotification.display_for_user?(5, 3, Time.zone.parse('2012-04-02'))).to eq false
         expect(AccountNotification.display_for_user?(6, 3, Time.zone.parse('2012-04-02'))).to eq false
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02'))).to eq true
@@ -345,7 +345,7 @@ describe AccountNotification do
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-06-04'))).to eq false
       end
 
-      it "should shift the mod values each new cycle" do
+      it "shifts the mod values each new cycle" do
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-04-02'))).to eq true
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-07-02'))).to eq false
         expect(AccountNotification.display_for_user?(7, 3, Time.zone.parse('2012-09-02'))).to eq true
@@ -372,7 +372,7 @@ describe AccountNotification do
         @student = @user
       end
 
-      it "should exclude students on surveys if the account restricts a student" do
+      it "excludes students on surveys if the account restricts a student" do
         @a1.settings[:include_students_in_global_survey] = false
         @a1.save!
 
@@ -383,7 +383,7 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@unenrolled, @a1).map(&:id).sort).to eq [@survey.id]
       end
 
-      it "should exclude students on surveys by default" do
+      it "excludes students on surveys by default" do
         expect(AccountNotification.for_user_and_account(@teacher, @a1).map(&:id).sort).to eq [@survey.id]
         expect(AccountNotification.for_user_and_account(@admin, @a1).map(&:id).sort).to eq [@survey.id]
         expect(AccountNotification.for_user_and_account(@student, @a1).map(&:id).sort).to eq []
@@ -391,7 +391,7 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@unenrolled, @a1).map(&:id).sort).to eq [@survey.id]
       end
 
-      it "should include students on surveys when checked" do
+      it "includes students on surveys when checked" do
         @a1.settings[:include_students_in_global_survey] = true
         @a1.save!
 
@@ -431,36 +431,36 @@ describe AccountNotification do
         end
       end
 
-      it "should get all active users in a root account" do
+      it "gets all active users in a root account" do
         an = account_notification(:account => Account.default)
         expected_users = @users.values.flatten
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should get all active users in a sub account" do
+      it "gets all active users in a sub account" do
         an = account_notification(:account => @accounts[:sub1])
         expected_users = @users[:sub1] + @users[:sub1sub]
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should filter by course role" do
+      it "filters by course role" do
         an = account_notification(:account => @accounts[:sub1], :role_ids => [teacher_role.id])
         expected_users = [@teachers[:sub1], @teachers[:sub1sub]]
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should filter by account role" do
+      it "filters by account role" do
         an = account_notification(:account => @accounts[:sub2], :role_ids => [admin_role.id])
         expect(an.applicable_user_ids).to eq [@account_admins[:sub2].id]
       end
 
-      it "should filter by both types of roles together" do
+      it "filters by both types of roles together" do
         an = account_notification(:account => @accounts[:sub1sub], :role_ids => [student_role.id, @custom_admin_role.id])
         expected_users = [@students[:sub1sub], @custom_admins[:sub1sub]]
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should exclude deleted admins" do
+      it "excludes deleted admins" do
         an = account_notification(:account => @accounts[:sub1sub])
         deleted_admin = @account_admins[:sub1sub]
         deleted_admin.account_users.first.destroy
@@ -468,7 +468,7 @@ describe AccountNotification do
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should exclude deleted enrollments" do
+      it "excludes deleted enrollments" do
         an = account_notification(:account => @accounts[:sub1sub])
         deleted_student = @students[:sub1sub]
         deleted_student.enrollments.first.destroy
@@ -476,7 +476,7 @@ describe AccountNotification do
         expect(an.applicable_user_ids).to match_array(expected_users.map(&:id))
       end
 
-      it "should exclude deleted courses" do
+      it "excludes deleted courses" do
         an = account_notification(:account => @accounts[:sub1])
         Course.where(:id => @courses[:sub1sub]).update_all(:workflow_state => "deleted")
         expected_users = @users[:sub1] + @users[:sub1sub] - [@students[:sub1sub], @teachers[:sub1sub]]
@@ -485,14 +485,14 @@ describe AccountNotification do
     end
 
     context "queue_message_broadcast" do
-      it "shouldn't let site admin account notifications even try" do
+      it "does not let site admin account notifications even try" do
         an = account_notification(:account => Account.site_admin)
         an.send_message = true
         expect(an).to_not be_valid
         expect(an.errors[:send_message]).to eq ["Cannot send messages for site admin accounts"]
       end
 
-      it "should queue a job to send_message when announcement starts" do
+      it "queues a job to send_message when announcement starts" do
         an = account_notification(:account => Account.default, :send_message => true,
                                   :start_at => 1.day.from_now, :end_at => 2.days.from_now)
         job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
@@ -500,7 +500,7 @@ describe AccountNotification do
         expect(job.run_at.to_i).to eq an.start_at.to_i
       end
 
-      it "should not queue a job when saving an announcement that already had messages sent" do
+      it "does not queue a job when saving an announcement that already had messages sent" do
         an = account_notification(:account => Account.default)
         an.messages_sent_at = 1.day.ago
         an.send_message = true
@@ -509,7 +509,7 @@ describe AccountNotification do
     end
 
     context "broadcast_messages" do
-      it "should perform a sanity-check before" do
+      it "performs a sanity-check before" do
         an = account_notification(:account => Account.default)
         expect(an).to receive(:applicable_user_ids).never
         an.broadcast_messages # send_message? not set
@@ -531,7 +531,7 @@ describe AccountNotification do
         [anything, anything, anything, user_ids.map { |id| "user_#{id}" }, anything]
       end
 
-      it "should send messages out in batches" do
+      it "sends messages out in batches" do
         Notification.create!(:name => 'Account Notification', :category => "TestImmediately")
 
         an = account_notification(:account => Account.default, :send_message => true, :role_ids => [student_role.id], :message => "wazzuuuuup")
@@ -553,7 +553,7 @@ describe AccountNotification do
   context "sharding" do
     specs_require_sharding
 
-    it "should always find notifications for site admin" do
+    it "alwayses find notifications for site admin" do
       account_notification(:account => Account.site_admin)
 
       @shard1.activate do
@@ -567,7 +567,7 @@ describe AccountNotification do
       end
     end
 
-    it "should respect preferences regardless of current shard" do
+    it "respects preferences regardless of current shard" do
       @shard1.activate do
         @user.close_announcement(@announcement)
       end
@@ -577,7 +577,7 @@ describe AccountNotification do
       end
     end
 
-    it "should properly adjust for built in roles across shards" do
+    it "properlies adjust for built in roles across shards" do
       @announcement.destroy
 
       @shard2.activate do
@@ -617,7 +617,7 @@ describe AccountNotification do
         end
       end
 
-      it "should use the correct roles for the respective root accounts" do
+      it "uses the correct roles for the respective root accounts" do
         # visible notifications
         @visible1 = account_notification(:account => @subaccount1, :role_ids => [teacher_role.id])
         @visible2 = account_notification(:account => @account2, :role_ids => [ta_role.id])
@@ -638,7 +638,7 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to match_array(expected)
       end
 
-      it "should be able to set notifications to be restricted to own domain" do
+      it "is able to set notifications to be restricted to own domain" do
         expected = []
         expected << account_notification(:account => @account1, :domain_specific => true)
         expected << account_notification(:account => @subaccount1, :domain_specific => true)
@@ -648,7 +648,7 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, @shard2_account)).to eq []
       end
 
-      it "should find notifications on cross-sharded sub-accounts properly" do
+      it "finds notifications on cross-sharded sub-accounts properly" do
         # and perhaps more importantly, don't find notifications for accounts the user doesn't belong in
         id = 1
         while [Shard.default, @shard2].any? { |s| s.activate { Account.where(:id => id).exists? } } # make sure this id is free

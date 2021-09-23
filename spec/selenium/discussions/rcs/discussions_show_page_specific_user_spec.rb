@@ -70,7 +70,7 @@ describe "discussions" do
       context "teacher topic" do
         let(:topic) { teacher_topic }
 
-        it "should allow students to reply to a discussion even if they cannot create a topic", priority: "2", test_id: 344535 do
+        it "allows students to reply to a discussion even if they cannot create a topic", priority: "2", test_id: 344535 do
           course.allow_student_discussion_topics = false
           course.save!
           get url
@@ -82,7 +82,7 @@ describe "discussions" do
           expect(f('#content')).to include_text(new_student_entry_text)
         end
 
-        it "should display the subscribe button after an initial post", priority: "1", test_id: 150484 do
+        it "displays the subscribe button after an initial post", priority: "1", test_id: 150484 do
           topic.unsubscribe(student)
           topic.require_initial_post = true
           topic.save!
@@ -101,7 +101,7 @@ describe "discussions" do
           expect(f('.topic-unsubscribe-button')).to be_displayed
         end
 
-        it "should allow you to subscribe and unsubscribe" do
+        it "allows you to subscribe and unsubscribe" do
           get url
           expect(f('.topic-subscribe-button').text).to eq("Subscribe")
           expect(f('.topic-unsubscribe-button')).not_to be_displayed
@@ -117,7 +117,7 @@ describe "discussions" do
           expect(f('.topic-unsubscribe-button')).not_to be_displayed
         end
 
-        it "should validate that a student can see it and reply to a discussion", priority: "1", test_id: 150475 do
+        it "validates that a student can see it and reply to a discussion", priority: "1", test_id: 150475 do
           new_student_entry_text = 'new student entry'
           get url
           expect(f('.message_wrapper')).to include_text('teacher')
@@ -126,7 +126,7 @@ describe "discussions" do
           expect(f('#content')).to include_text(new_student_entry_text)
         end
 
-        it "should let students post to a post-first discussion", priority: "1", test_id: 150476 do
+        it "lets students post to a post-first discussion", priority: "1", test_id: 150476 do
           new_student_entry_text = 'new student entry'
           topic.require_initial_post = true
           topic.save
@@ -151,7 +151,7 @@ describe "discussions" do
         user_session(teacher)
       end
 
-      it "should create a group discussion", priority: "1", test_id: 150473 do
+      it "creates a group discussion", priority: "1", test_id: 150473 do
         group
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f('#add_discussion').click }
@@ -167,7 +167,7 @@ describe "discussions" do
                                                   " Here are the ones you have access to:\nsome group")
       end
 
-      it "should create a graded discussion", priority: "1", test_id: 150477 do
+      it "creates a graded discussion", priority: "1", test_id: 150477 do
         assignment_group
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f('#add_discussion').click }
@@ -184,7 +184,7 @@ describe "discussions" do
         expect(f('#discussion_container').text).to include('This is a graded discussion: 10 points possible')
       end
 
-      it "should create a graded group discussion", priority: "1" do
+      it "creates a graded group discussion", priority: "1" do
         assignment_group
         group
         get "/courses/#{course.id}/discussion_topics/new"
@@ -209,7 +209,7 @@ describe "discussions" do
         expect(f("a.discussion-reply-action[role='button']")).to be_present
       end
 
-      it "should show attachment", priority: "1", test_id: 150478 do
+      it "shows attachment", priority: "1", test_id: 150478 do
         get "/courses/#{course.id}/discussion_topics"
         expect_new_page_load { f('#add_discussion').click }
         filename, fullpath, _data = get_file("graded.png")
@@ -220,7 +220,7 @@ describe "discussions" do
         expect(f('.image').text).to include(filename)
       end
 
-      it "should escape correctly when posting an attachment", priority: "2", test_id: 344538 do
+      it "escapes correctly when posting an attachment", priority: "2", test_id: 344538 do
         get url
         message = "message that needs escaping ' \" & !@#^&*()$%{}[];: blah"
         add_reply(message, 'graded.png')
@@ -228,7 +228,7 @@ describe "discussions" do
       end
 
       context "in student view" do
-        it "should allow student view student to read/post", priority: "2", test_id: 344545 do
+        it "allows student view student to read/post", priority: "2", test_id: 344545 do
           skip_if_chrome('Can not get to student view in Chrome')
           enter_student_view
           get url

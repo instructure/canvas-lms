@@ -31,7 +31,7 @@ describe "large enrollments", priority: "2" do
       create_users_in_course @course, 500
     end
 
-    it "should display course homepage" do
+    it "displays course homepage" do
       get "/courses/#{@course.id}/"
       expect_no_flash_message :error
     end

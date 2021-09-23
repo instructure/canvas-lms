@@ -231,7 +231,7 @@ describe CanvadocSessionsController do
       assert_status(401)
     end
 
-    it "should send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
+    it "sends o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = true
       Account.default.save!
 
@@ -249,7 +249,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should not send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is not enabled" do
+    it "does not send o365 as a preferred plugin when the 'Prefer Office 365 file viewer' account setting is not enabled" do
       Account.default.settings[:canvadocs_prefer_office_online] = false
       Account.default.save!
 
@@ -266,7 +266,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should always send PDFjs as a preferred plugin" do
+    it "alwayses send PDFjs as a preferred plugin" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -276,7 +276,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send canvas_base_url when annotatable" do
+    it "sends canvas_base_url when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -286,7 +286,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should contain multiple submission_user_ids when group assignment" do
+    it "contains multiple submission_user_ids when group assignment" do
       group = @course.groups.create(:name => "some group")
       student2 = User.create
       group.add_user(@student, 'accepted', true)
@@ -307,7 +307,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send user_id when annotatable" do
+    it "sends user_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -317,7 +317,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send submission_user_ids when annotatable" do
+    it "sends submission_user_ids when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -327,7 +327,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send course_id when annotatable" do
+    it "sends course_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -337,7 +337,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send assignment_id when annotatable" do
+    it "sends assignment_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -347,7 +347,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send submission_id when annotatable" do
+    it "sends submission_id when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -357,7 +357,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send disable_annotation_notifications as false by default" do
+    it "sends disable_annotation_notifications as false by default" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
         expect(arg2[:disable_annotation_notifications]).to eq false
@@ -365,7 +365,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send disable_annotation_notifications as true" do
+    it "sends disable_annotation_notifications as true" do
       @blob[:disable_annotation_notifications] = true
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |_, arg2|
@@ -374,7 +374,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send post_manually when annotatable" do
+    it "sends post_manually when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -384,7 +384,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send posted_at when annotatable" do
+    it "sends posted_at when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1
@@ -394,7 +394,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "should send assignment_name when annotatable" do
+    it "sends assignment_name when annotatable" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1

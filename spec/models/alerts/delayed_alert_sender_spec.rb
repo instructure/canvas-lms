@@ -30,21 +30,21 @@ module Alerts
       end
 
       context "basic evaluation" do
-        it "should not trigger any alerts for unpublished courses" do
+        it "does not trigger any alerts for unpublished courses" do
           course = double('Course', :available? => false)
           expect_any_instance_of(Notification).to receive(:create_message).never
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
 
-        it "should not trigger any alerts for courses with no alerts" do
+        it "does not trigger any alerts for courses with no alerts" do
           course = double('Course', :available? => true, :alerts => [])
           expect_any_instance_of(Notification).to receive(:create_message).never
 
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
 
-        it "should not trigger any alerts when there are no students in the class" do
+        it "does not trigger any alerts when there are no students in the class" do
           course = Account.default.courses.create!
           course.offer!
           course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
@@ -53,7 +53,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(course, nil)
         end
 
-        it "should not trigger any alerts when there are no teachers in the class" do
+        it "does not trigger any alerts when there are no teachers in the class" do
           course_with_student(:active_course => true)
           @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
           expect_any_instance_of(Notification).to receive(:create_message).never
@@ -61,7 +61,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(@course, nil)
         end
 
-        it "should not trigger any alerts in subsequent courses" do
+        it "does not trigger any alerts in subsequent courses" do
           course_with_teacher(:active_all => true)
           student_in_course(:active_all => true)
           @course.alerts.create!(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
@@ -73,7 +73,7 @@ module Alerts
           expect(account_alerts).to eq []
         end
 
-        it "should not trigger to rejected teacher enrollments" do
+        it "does not trigger to rejected teacher enrollments" do
           course_with_teacher(:active_course => true)
           student_in_course(:active_all => true)
           @teacher.enrollments.first.reject!
@@ -88,7 +88,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(@course, [])
         end
 
-        it "should not trigger to rejected student enrollments" do
+        it "does not trigger to rejected student enrollments" do
           course_with_teacher(:active_course => true)
           student_in_course(:active_all => true)
           @student.enrollments.first.reject!
@@ -105,7 +105,7 @@ module Alerts
       end
 
       context 'repetition' do
-        it "should not keep sending alerts when repetition is nil" do
+        it "does not keep sending alerts when repetition is nil" do
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
@@ -118,7 +118,7 @@ module Alerts
           end
         end
 
-        it "should not keep sending alerts when run on the same day" do
+        it "does not keep sending alerts when run on the same day" do
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
@@ -131,7 +131,7 @@ module Alerts
           end
         end
 
-        it "should keep sending alerts for daily repetition" do
+        it "keeps sending alerts for daily repetition" do
           enable_cache do
             course_with_teacher(:active_all => 1)
             student_in_course(:active_all => 1)
@@ -149,7 +149,7 @@ module Alerts
       end
 
       context 'interaction' do
-        it "should alert" do
+        it "alerts" do
           course_with_teacher(:active_all => 1)
           student_in_course(:active_all => 1)
           alert = @course.alerts.build(:recipients => [:student])
@@ -187,7 +187,7 @@ module Alerts
       end
 
       context 'ungraded count' do
-        it "should alert" do
+        it "alerts" do
           course_with_teacher(:active_all => 1)
           @teacher = @user
           @user = nil
@@ -207,7 +207,7 @@ module Alerts
       end
 
       context 'ungraded timespan' do
-        it "should alert" do
+        it "alerts" do
           course_with_teacher(:active_all => 1)
           @teacher = @user
           @user = nil
@@ -228,7 +228,7 @@ module Alerts
       end
 
       context 'user notes' do
-        it "should alert" do
+        it "alerts" do
           course_with_teacher(:active_all => 1)
           root_account = @course.root_account
           root_account.enable_user_notes = true
@@ -265,7 +265,7 @@ module Alerts
           allow(Pseudonym).to receive(:find_by_user_id).and_return(@pseudonym)
         end
 
-        it "should tell you what the alert is about timespan" do
+        it "tells you what the alert is about timespan" do
           @submission.update_attribute(:submitted_at, Time.zone.now - 30.days)
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UngradedTimespan', :threshold => 7)
@@ -277,7 +277,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(@course, nil)
         end
 
-        it "should tell you what the alert is about count" do
+        it "tells you what the alert is about count" do
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'UngradedCount', :threshold => 1)
           alert.save!
@@ -288,7 +288,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(@course, nil)
         end
 
-        it "should tell you what the alert is about note" do
+        it "tells you what the alert is about note" do
           root_account = @course.root_account
           root_account.enable_user_notes = true
           root_account.save!
@@ -305,7 +305,7 @@ module Alerts
           DelayedAlertSender.evaluate_for_course(@course, nil)
         end
 
-        it "should tell you what the alert is about interaction" do
+        it "tells you what the alert is about interaction" do
           alert = @course.alerts.build(:recipients => [:student])
           alert.criteria.build(:criterion_type => 'Interaction', :threshold => 7)
           alert.save!
@@ -319,7 +319,7 @@ module Alerts
       end
     end
 
-    it "should work end to end" do
+    it "works end to end" do
       Notification.create(:name => "Alert")
 
       course_with_teacher(:active_all => 1)

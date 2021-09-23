@@ -69,12 +69,12 @@ describe CalendarEventsController do
   end
 
   describe "GET 'show'" do
-    it "should require authorization" do
+    it "requires authorization" do
       get 'show', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@student)
       get 'show', params: { :course_id => @course.id, :id => @event.id }, :format => :json
       # response.should be_successful
@@ -82,7 +82,7 @@ describe CalendarEventsController do
       expect(assigns[:event]).to eql(@event)
     end
 
-    it "should render show page" do
+    it "renders show page" do
       user_session(@student)
       get 'show', params: { :course_id => @course.id, :id => @event.id }
       expect(assigns[:event]).not_to be_nil
@@ -90,7 +90,7 @@ describe CalendarEventsController do
       expect(response).to render_template('calendar_events/show')
     end
 
-    it "should redirect for course section events" do
+    it "redirects for course section events" do
       section = @course.default_section
       section_event = section.calendar_events.create!(title: "Sub event")
       user_session(@student)
@@ -100,12 +100,12 @@ describe CalendarEventsController do
   end
 
   describe "GET 'new'" do
-    it "should require authorization" do
+    it "requires authorization" do
       get 'new', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should not allow students to create" do
+    it "does not allow students to create" do
       user_session(@student)
       get 'new', params: { :course_id => @course.id }
       assert_unauthorized
@@ -144,18 +144,18 @@ describe CalendarEventsController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :calendar_event => { :title => "some event" } }
       assert_unauthorized
     end
 
-    it "should not allow students to create" do
+    it "does not allow students to create" do
       user_session(@student)
       post 'create', params: { :course_id => @course.id, :calendar_event => { :title => "some event" } }
       assert_unauthorized
     end
 
-    it "should create a new event" do
+    it "creates a new event" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :calendar_event => { :title => "some event" } }
       expect(response).to be_redirect
@@ -174,12 +174,12 @@ describe CalendarEventsController do
   end
 
   describe "GET 'edit'" do
-    it "should require authorization" do
+    it "requires authorization" do
       get 'edit', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should not allow students to update" do
+    it "does not allow students to update" do
       user_session(@student)
       get 'edit', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
@@ -194,7 +194,7 @@ describe CalendarEventsController do
       end
     end
 
-    it 'should allow editing of event assigned to section' do
+    it 'allows editing of event assigned to section' do
       course_with_teacher
       section = add_section('Section 01', course: @course)
       section_event = section.calendar_events.create(:title => "some assignment")
@@ -227,18 +227,18 @@ describe CalendarEventsController do
   end
 
   describe "PUT 'update'" do
-    it "should require authorization" do
+    it "requires authorization" do
       put 'update', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should not allow students to update" do
+    it "does not allow students to update" do
       user_session(@student)
       put 'update', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should update the event" do
+    it "updates the event" do
       user_session(@teacher)
       put 'update', params: { :course_id => @course.id, :id => @event.id, :calendar_event => { :title => "new title" } }
       expect(response).to be_redirect
@@ -247,7 +247,7 @@ describe CalendarEventsController do
       expect(assigns[:event].title).to eql("new title")
     end
 
-    it 'should allow updating of event assigned to section' do
+    it 'allows updating of event assigned to section' do
       course_with_teacher
       section = add_section('Section 01', course: @course)
       section_event = section.calendar_events.create(:title => "some assignment")
@@ -267,18 +267,18 @@ describe CalendarEventsController do
   end
 
   describe "DELETE 'destroy'" do
-    it "should require authorization" do
+    it "requires authorization" do
       delete 'destroy', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should not allow students to delete" do
+    it "does not allow students to delete" do
       user_session(@student)
       delete 'destroy', params: { :course_id => @course.id, :id => @event.id }
       assert_unauthorized
     end
 
-    it "should delete the event" do
+    it "deletes the event" do
       user_session(@teacher)
       delete 'destroy', params: { :course_id => @course.id, :id => @event.id }
       expect(response).to be_redirect

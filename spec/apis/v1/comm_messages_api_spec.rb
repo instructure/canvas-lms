@@ -29,7 +29,7 @@ describe CommMessagesApiController, type: :request do
           site_admin_user
         end
 
-        it "should be able to see all messages" do
+        it "is able to see all messages" do
           Message.create!(:user => @test_user, :body => "site admin message", :root_account_id => Account.site_admin.id)
           Message.create!(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
           json = api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
@@ -42,7 +42,7 @@ describe CommMessagesApiController, type: :request do
           expect(json.map { |m| m['body'] }.sort).to eql ['account message', 'site admin message']
         end
 
-        it "should require a valid user_id parameter" do
+        it "requires a valid user_id parameter" do
           raw_api_call(:get, "/api/v1/comm_messages", {
                          :controller => 'comm_messages_api', :action => 'index', :format => 'json'
                        })
@@ -55,7 +55,7 @@ describe CommMessagesApiController, type: :request do
           expect(response.code).to eql '404'
         end
 
-        it "should use start_time and end_time parameters to limit results" do
+        it "uses start_time and end_time parameters to limit results" do
           m = Message.new(:user => @test_user, :body => "account message", :root_account_id => Account.default.id)
           m.write_attribute(:created_at, Time.zone.now + 1.day)
           m.save!
@@ -71,7 +71,7 @@ describe CommMessagesApiController, type: :request do
           expect(json.first["id"]).to eq m2.id
         end
 
-        it "should paginate results" do
+        it "paginates results" do
           5.times do |v|
             Message.create!(:user => @test_user, :body => "body #{v}", :root_account_id => Account.default.id)
           end
@@ -102,7 +102,7 @@ describe CommMessagesApiController, type: :request do
                                                :role_changes => { :read_messages => false })
         end
 
-        it "should receive unauthorized" do
+        it "receives unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                          :controller => 'comm_messages_api', :action => 'index', :format => 'json',
                          :user_id => @test_user.to_param
@@ -120,7 +120,7 @@ describe CommMessagesApiController, type: :request do
                                                :role_changes => { :view_notifications => true })
         end
 
-        it "should receive unauthorized if account setting disabled" do
+        it "receives unauthorized if account setting disabled" do
           Account.default.settings[:admins_can_view_notifications] = false
           Account.default.save!
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
@@ -130,7 +130,7 @@ describe CommMessagesApiController, type: :request do
           expect(response.code).to eql '401'
         end
 
-        it "should only be able to see associated account's messages" do
+        it "onlies be able to see associated account's messages" do
           Account.default.settings[:admins_can_view_notifications] = true
           Account.default.save!
           Message.create!(:user => @test_user, :body => "site admin message", :root_account_id => Account.site_admin.id)
@@ -151,7 +151,7 @@ describe CommMessagesApiController, type: :request do
                                                :role_changes => { :view_notifications => false })
         end
 
-        it "should receive unauthorized" do
+        it "receives unauthorized" do
           raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                          :controller => 'comm_messages_api', :action => 'index', :format => 'json',
                          :user_id => @test_user.to_param
@@ -167,7 +167,7 @@ describe CommMessagesApiController, type: :request do
         @user = user_factory(active_all: true)
       end
 
-      it "should receive unauthorized" do
+      it "receives unauthorized" do
         raw_api_call(:get, "/api/v1/comm_messages?user_id=#{@test_user.id}", {
                        :controller => 'comm_messages_api', :action => 'index', :format => 'json',
                        :user_id => @test_user.to_param

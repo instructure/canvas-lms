@@ -51,14 +51,14 @@ describe "discussion assignments" do
       click_option('#assignment_group_category_id', 'category 1')
     end
 
-    it "should create a group discussion ungraded", priority: "1", test_id: 150517 do
+    it "creates a group discussion ungraded", priority: "1", test_id: 150517 do
       expect_new_page_load { submit_form('.form-actions') }
       expect(f('#discussion_container').text).to include("Since this is a group discussion,"\
                                                   " each group has its own conversation for this topic."\
                                                   " Here are the ones you have access to:\nsome group")
     end
 
-    it "should create a group discussion graded", priority: "1", test_id: 150518 do
+    it "creates a group discussion graded", priority: "1", test_id: 150518 do
       f('#use_for_grading').click
       f('#discussion_topic_assignment_points_possible').send_keys('10')
       click_option('#assignment_group_id', 'Assignment Group')
@@ -81,7 +81,7 @@ describe "discussion assignments" do
       @g1.add_user @student1
     end
 
-    it "should allow the student to reply and teacher to see the unread count", priority: "1", test_id: 150519, ignore_js_errors: true do
+    it "allows the student to reply and teacher to see the unread count", priority: "1", test_id: 150519, ignore_js_errors: true do
       get "/courses/#{@course.id}/discussion_topics/#{@discussion_topic.id}"
       expect(f('.new-and-total-badge .new-items').text).to include ""
       user_session(@student1)

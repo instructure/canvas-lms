@@ -58,24 +58,24 @@ describe AssessmentRequestHelper do
                                                       asset: @submission, assessor_asset: submission2, assessor: @student2)
     end
 
-    it 'should return assessment user name' do
+    it 'returns assessment user name' do
       @current_user = @student1
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'should return assessment user name for assessor when anonymous reviews are disabled' do
+    it 'returns assessment user name for assessor when anonymous reviews are disabled' do
       @current_user = @student2
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'should return assessment user name when anonymous reviews are enabled and user has permission' do
+    it 'returns assessment user name when anonymous reviews are enabled and user has permission' do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @assessment_request.reload
       @current_user = @student1
       expect(submission_author_name_for(@assessment_request)).to eq(@student1.short_name)
     end
 
-    it 'should return anonymous user when anonymous peer reviews are enabled' do
+    it 'returns anonymous user when anonymous peer reviews are enabled' do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       @assessment_request.reload
       @current_user = @student2

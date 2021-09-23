@@ -88,7 +88,7 @@ describe "Enrollment::QueryBuilder" do
       let(:options) { { strict_checks: false } }
 
       context "with :enforce_course_workflow_state=true" do
-        it "should reject enrollments in courses with a different workflow_state" do
+        it "rejects enrollments in courses with a different workflow_state" do
           create_enrollments(
             [state.to_s, "available", "StudentEnrollment"]
           )
@@ -117,7 +117,7 @@ describe "Enrollment::QueryBuilder" do
       context "with strict_checks:true" do
         let(:options) { { strict_checks: true } }
 
-        it "should return sensible defaults" do
+        it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
             %w{active available StudentEnrollment},
@@ -126,7 +126,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should return active enrollments in available courses" do
+        it "returns active enrollments in available courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
           expect(matches_for(result)).to eq [
@@ -135,7 +135,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should return visible enrollments in unpublished courses" do
+        it "returns visible enrollments in unpublished courses" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
           expect(matches_for(result)).to eq [
@@ -143,7 +143,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should return nothing for other course workflow states" do
+        it "returns nothing for other course workflow states" do
           options[:course_workflow_state] = 'deleted'
           expect(conditions).to be_nil
         end
@@ -152,7 +152,7 @@ describe "Enrollment::QueryBuilder" do
       context "with strict_checks:false" do
         let(:options) { { strict_checks: false } }
 
-        it "should return sensible defaults" do
+        it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
             %w{active available StudentEnrollment},
@@ -162,12 +162,12 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should not return anything if the course is deleted" do
+        it "does not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
           expect(conditions).to be_nil
         end
 
-        it "should return all active enrollments in non-deleted courses" do
+        it "returns all active enrollments in non-deleted courses" do
           options[:course_workflow_state] = 'claimed' # not enforcing state, so we get both claimed and available
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
@@ -202,7 +202,7 @@ describe "Enrollment::QueryBuilder" do
       context "with strict_checks:true" do
         let(:options) { { strict_checks: true } }
 
-        it "should return sensible defaults" do
+        it "returns sensible defaults" do
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
             %w{invited available StudentEnrollment},
@@ -211,7 +211,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should return invitations in published courses" do
+        it "returns invitations in published courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments('available').where(conditions)
           expect(matches_for(result)).to eq [
@@ -220,7 +220,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should return invitations for admins in unpublished courses" do
+        it "returns invitations for admins in unpublished courses" do
           options[:course_workflow_state] = 'claimed'
           result = enrollments('claimed').where(conditions)
           expect(matches_for(result)).to eq [
@@ -228,7 +228,7 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should not return anything if the course is deleted" do
+        it "does not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
           expect(conditions).to be_nil
         end
@@ -237,7 +237,7 @@ describe "Enrollment::QueryBuilder" do
       context "with strict_checks:false" do
         let(:options) { { strict_checks: false } }
 
-        it "should return sensible defaults" do
+        it "returns sensible defaults" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
@@ -252,12 +252,12 @@ describe "Enrollment::QueryBuilder" do
           ]
         end
 
-        it "should not return anything if the course is deleted" do
+        it "does not return anything if the course is deleted" do
           options[:course_workflow_state] = 'deleted'
           expect(conditions).to be_nil
         end
 
-        it "should return all invitation enrollments in non-deleted courses" do
+        it "returns all invitation enrollments in non-deleted courses" do
           options[:course_workflow_state] = 'available'
           result = enrollments.where(conditions)
           expect(matches_for(result)).to eq [
@@ -280,7 +280,7 @@ describe "Enrollment::QueryBuilder" do
       context "with #{state.inspect}" do
         let(:state) { state }
 
-        it "should only return #{state} enrollments" do
+        it "onlies return #{state} enrollments" do
           create_enrollments(
             %w{active available StudentEnrollment},
             [state.to_s, "available", "StudentEnrollment"]
@@ -300,7 +300,7 @@ describe "Enrollment::QueryBuilder" do
     context "with :current_and_invited" do
       let(:state) { :current_and_invited }
 
-      it "should return sensible defaults" do
+      it "returns sensible defaults" do
         create_enrollments(
           %w{active available StudentEnrollment},
           %w{active available TeacherEnrollment},
@@ -328,7 +328,7 @@ describe "Enrollment::QueryBuilder" do
     context "with :current_and_future" do
       let(:state) { :current_and_future }
 
-      it "should return sensible defaults" do
+      it "returns sensible defaults" do
         create_enrollments(
           %w{active available StudentEnrollment},
           %w{active available TeacherEnrollment},
@@ -357,7 +357,7 @@ describe "Enrollment::QueryBuilder" do
     context "with :current_and_concluded" do
       let(:state) { :current_and_concluded }
 
-      it "should return sensible defaults" do
+      it "returns sensible defaults" do
         create_enrollments(
           %w{active available StudentEnrollment},
           %w{active available TeacherEnrollment},

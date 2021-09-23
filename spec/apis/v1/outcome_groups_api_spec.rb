@@ -130,7 +130,7 @@ describe "Outcome Groups API", type: :request do
         @account_user = @user.account_users.create(:account => Account.site_admin)
       end
 
-      it "should not require permission" do
+      it "does not require permission" do
         revoke_permission(@account_user, :manage_outcomes)
         revoke_permission(@account_user, :manage_global_outcomes)
         raw_api_call(:get, "/api/v1/global/root_outcome_group",
@@ -140,7 +140,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(302)
       end
 
-      it "should require a user" do
+      it "requires a user" do
         @user = nil
         raw_api_call(:get, "/api/v1/global/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -149,7 +149,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(401)
       end
 
-      it "should redirect to the root global group" do
+      it "redirects to the root global group" do
         root = LearningOutcomeGroup.global_root_outcome_group
         raw_api_call(:get, "/api/v1/global/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -159,7 +159,7 @@ describe "Outcome Groups API", type: :request do
         expect(response.location).to eq polymorphic_url([:api_v1, :global, :outcome_group], :id => root.id)
       end
 
-      it "should create the root global group if necessary" do
+      it "creates the root global group if necessary" do
         LearningOutcomeGroup.update_all(:workflow_state => 'deleted')
         raw_api_call(:get, "/api/v1/global/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -178,7 +178,7 @@ describe "Outcome Groups API", type: :request do
         @account_user = @user.account_users.create(:account => @account)
       end
 
-      it "should not require manage permission to read" do
+      it "does not require manage permission to read" do
         revoke_permission(@account_user, :manage_outcomes)
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -188,7 +188,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(302)
       end
 
-      it "should require read permission to read" do
+      it "requires read permission to read" do
         # new user, doesn't have a tie to the account
         user_with_pseudonym(:account => Account.create!, :active_all => true)
         allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).and_return(true)
@@ -200,7 +200,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(401)
       end
 
-      it "should redirect to the root group" do
+      it "redirects to the root group" do
         root = @account.root_outcome_group
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -211,7 +211,7 @@ describe "Outcome Groups API", type: :request do
         expect(response.location).to eq polymorphic_url([:api_v1, @account, :outcome_group], :id => root.id)
       end
 
-      it "should create the root group if necessary" do
+      it "creates the root group if necessary" do
         @account.learning_outcome_groups.update_all(:workflow_state => 'deleted')
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/root_outcome_group",
                      :controller => 'outcome_groups_api',
@@ -226,7 +226,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     describe "course context" do
-      it "should be recognized also" do
+      it "is recognized also" do
         course_with_teacher(:user => @user, :active_all => true)
         root = @course.root_outcome_group
         raw_api_call(:get, "/api/v1/courses/#{@course.id}/root_outcome_group",
@@ -246,7 +246,7 @@ describe "Outcome Groups API", type: :request do
       @account_user = @user.account_users.create(:account => @account)
     end
 
-    it "should return active groups" do
+    it "returns active groups" do
       @child_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'child group')
       @deleted_group = @account.root_outcome_group.child_outcome_groups.create!(title: 'deleted group')
       @deleted_group.workflow_state = 'deleted'
@@ -267,7 +267,7 @@ describe "Outcome Groups API", type: :request do
       @links = 3.times.map { create_outcome }
     end
 
-    it "should return active links" do
+    it "returns active links" do
       link = @links.pop
       link.workflow_state = 'deleted'
       link.save!
@@ -283,7 +283,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.map { |j| j['outcome_group']['id'] }.sort).to eq expected_group_ids
     end
 
-    it "should return links ordered by id when paginated" do
+    it "returns links ordered by id when paginated" do
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_group_links?per_page=2",
                       controller: 'outcome_groups_api',
                       action: 'link_index',
@@ -298,7 +298,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.map { |j| j['outcome']['id'] }).to eq expected_outcome_ids
     end
 
-    it "should return friendly description if friendly description is set on outcome for the given context and feature flag is on" do
+    it "returns friendly description if friendly description is set on outcome for the given context and feature flag is on" do
       Account.site_admin.enable_feature! :outcomes_friendly_description
       friendly_description = "a friendly description"
       OutcomeFriendlyDescription.create!({
@@ -318,7 +318,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.map { |j| j['outcome']['friendly_description'] }).to eq expected_outcome_descriptions
     end
 
-    it "should return course friendly description if outcome has course and account-level friendly descriptions" do
+    it "returns course friendly description if outcome has course and account-level friendly descriptions" do
       course_with_teacher(:user => @user, :active_all => true)
       Account.site_admin.enable_feature! :outcomes_friendly_description
       @course.root_outcome_group.add_outcome(@outcome)
@@ -481,7 +481,7 @@ describe "Outcome Groups API", type: :request do
         @account.enable_feature!(:account_level_mastery_scales)
       end
 
-      it 'should correctly serialize mastery scale data for each link' do
+      it 'correctlies serialize mastery scale data for each link' do
         json = api_call(
           :get,
           "/api/v1/accounts/#{@account.id}/outcome_group_links",
@@ -506,7 +506,7 @@ describe "Outcome Groups API", type: :request do
         @account_user = @user.account_users.create(:account => Account.site_admin)
       end
 
-      it "should not require permission" do
+      it "does not require permission" do
         revoke_permission(@account_user, :manage_outcomes)
         revoke_permission(@account_user, :manage_global_outcomes)
         group = LearningOutcomeGroup.global_root_outcome_group
@@ -518,7 +518,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(200)
       end
 
-      it "should 404 for non-global groups" do
+      it "404S for non-global groups" do
         group = Account.default.root_outcome_group
         raw_api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -528,7 +528,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(404)
       end
 
-      it "should 404 for deleted groups" do
+      it "404S for deleted groups" do
         group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!(:title => 'subgroup')
         group.destroy
         raw_api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
@@ -539,7 +539,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(404)
       end
 
-      it "should return the group json" do
+      it "returns the group json" do
         group = LearningOutcomeGroup.global_root_outcome_group
         json = api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
                         :controller => 'outcome_groups_api',
@@ -561,7 +561,7 @@ describe "Outcome Groups API", type: :request do
                            })
       end
 
-      it "should include parent_outcome_group if non-root" do
+      it "includes parent_outcome_group if non-root" do
         parent_group = LearningOutcomeGroup.global_root_outcome_group
         group = parent_group.child_outcome_groups.create!(
           :title => 'Group Name',
@@ -606,7 +606,7 @@ describe "Outcome Groups API", type: :request do
         @account_user = @user.account_users.create(:account => @account)
       end
 
-      it "should 404 for groups outside the context" do
+      it "404S for groups outside the context" do
         group = LearningOutcomeGroup.global_root_outcome_group
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -617,7 +617,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(404)
       end
 
-      it "should include the account in the group json" do
+      it "includes the account in the group json" do
         group = @account.root_outcome_group
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{group.id}",
                         :controller => 'outcome_groups_api',
@@ -653,7 +653,7 @@ describe "Outcome Groups API", type: :request do
       )
     end
 
-    it "should require permission" do
+    it "requires permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -664,7 +664,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should require manage_global_outcomes permission for global outcomes" do
+    it "requires manage_global_outcomes permission for global outcomes" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @root_group = LearningOutcomeGroup.global_root_outcome_group
       @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
@@ -677,7 +677,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should fail for root groups" do
+    it "fails for root groups" do
       @group = @root_group
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -688,7 +688,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should allow setting title and description" do
+    it "allows setting title and description" do
       api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                { :controller => 'outcome_groups_api',
                  :action => 'update',
@@ -703,7 +703,7 @@ describe "Outcome Groups API", type: :request do
       expect(@group.description).to eq "New Description"
     end
 
-    it "should leave alone fields not provided" do
+    it "leaves alone fields not provided" do
       api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                { :controller => 'outcome_groups_api',
                  :action => 'update',
@@ -717,7 +717,7 @@ describe "Outcome Groups API", type: :request do
       expect(@group.description).to eq "Original Description"
     end
 
-    it "should allow changing the group's parent" do
+    it "allows changing the group's parent" do
       groupA = @root_group.child_outcome_groups.create!(:title => 'subgroup')
       groupB = @root_group.child_outcome_groups.create!(:title => 'subgroup')
       groupC = groupA.child_outcome_groups.create!(:title => 'subgroup')
@@ -736,7 +736,7 @@ describe "Outcome Groups API", type: :request do
       expect(groupB.child_outcome_groups.reload).to eq [groupC]
     end
 
-    it "should fail if changed parentage would create a cycle" do
+    it "fails if changed parentage would create a cycle" do
       child_group = @group.child_outcome_groups.create!(:title => 'subgroup')
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    { :controller => 'outcome_groups_api',
@@ -748,7 +748,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should fail (400) if the update is invalid" do
+    it "fails (400) if the update is invalid" do
       too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
       raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    { :controller => 'outcome_groups_api',
@@ -761,7 +761,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should return the updated group json" do
+    it "returns the updated group json" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                       { :controller => 'outcome_groups_api',
                         :action => 'update',
@@ -805,7 +805,7 @@ describe "Outcome Groups API", type: :request do
       @group = @root_group.child_outcome_groups.create!(:title => 'subgroup', :vendor_guid => "vendorguid9001")
     end
 
-    it "should require permission" do
+    it "requires permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -816,7 +816,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should require manage_global_outcomes permission for global outcomes" do
+    it "requires manage_global_outcomes permission for global outcomes" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @root_group = LearningOutcomeGroup.global_root_outcome_group
       @group = @root_group.child_outcome_groups.create!(:title => 'subgroup')
@@ -829,7 +829,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should fail for root groups" do
+    it "fails for root groups" do
       @group = @root_group
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                    :controller => 'outcome_groups_api',
@@ -840,7 +840,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should delete the group" do
+    it "deletes the group" do
       api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                :controller => 'outcome_groups_api',
                :action => 'destroy',
@@ -852,7 +852,7 @@ describe "Outcome Groups API", type: :request do
       expect(@group).to be_deleted
     end
 
-    it "should return json of the deleted group" do
+    it "returns json of the deleted group" do
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}",
                       :controller => 'outcome_groups_api',
                       :action => 'destroy',
@@ -892,7 +892,7 @@ describe "Outcome Groups API", type: :request do
       @group = @account.root_outcome_group
     end
 
-    it "should NOT require permission to read" do
+    it "does not require permission to read" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                    :controller => 'outcome_groups_api',
@@ -903,7 +903,7 @@ describe "Outcome Groups API", type: :request do
       expect(response).to be_successful
     end
 
-    it "should return the outcomes linked into the group" do
+    it "returns the outcomes linked into the group" do
       3.times { create_outcome }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       :controller => 'outcome_groups_api',
@@ -943,7 +943,7 @@ describe "Outcome Groups API", type: :request do
       end.sort_by { |link| link['outcome']['id'] })
     end
 
-    it "should return additional information when 'full' arg passed" do
+    it "returns additional information when 'full' arg passed" do
       description = "some really cool description"
       create_outcome(:description => description)
 
@@ -958,7 +958,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.first['outcome']['description']).to eq description
     end
 
-    it "should not include deleted links" do
+    it "does not include deleted links" do
       @outcome1 = @account.created_learning_outcomes.create!(:title => 'outcome')
       @outcome2 = @account.created_learning_outcomes.create!(:title => 'outcome')
       @link1 = @group.add_outcome(@outcome1)
@@ -976,7 +976,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.first['outcome']['id']).to eq @outcome1.id
     end
 
-    it "should order links by outcome title" do
+    it "orders links by outcome title" do
       @links = ["B", "A", "C"].map { |title| create_outcome(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       :controller => 'outcome_groups_api',
@@ -989,7 +989,7 @@ describe "Outcome Groups API", type: :request do
       )
     end
 
-    it "should paginate the links" do
+    it "paginates the links" do
       links = 5.times.map { |i| create_outcome(:title => "#{i}".object_id) }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes?per_page=2",
@@ -1103,7 +1103,7 @@ describe "Outcome Groups API", type: :request do
         )
       end
 
-      it "should return can_unlink of 'false' if it cannot unlink" do
+      it "returns can_unlink of 'false' if it cannot unlink" do
         create_outcome(:title => "Un outcome")
 
         course_with_teacher(active_all: true)
@@ -1141,7 +1141,7 @@ describe "Outcome Groups API", type: :request do
         @outcome = LearningOutcome.global.create!(:title => 'subgroup', :vendor_guid => "vendorguid9000")
       end
 
-      it "should require permission" do
+      it "requires permission" do
         revoke_permission(@account_user, :manage_outcomes)
         raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                      :controller => 'outcome_groups_api',
@@ -1153,7 +1153,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(401)
       end
 
-      it "should require manage_global_outcomes permission for global groups" do
+      it "requires manage_global_outcomes permission for global groups" do
         @account_user = @user.account_users.create(:account => Account.site_admin)
         @group = LearningOutcomeGroup.global_root_outcome_group
         revoke_permission(@account_user, :manage_global_outcomes)
@@ -1166,7 +1166,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(401)
       end
 
-      it "should fail if the outcome isn't available to the context" do
+      it "fails if the outcome isn't available to the context" do
         @subaccount = @account.sub_accounts.create!
         @outcome = @subaccount.created_learning_outcomes.create!(:title => 'outcome')
         raw_api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
@@ -1179,7 +1179,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(400)
       end
 
-      it "should link the outcome into the group" do
+      it "links the outcome into the group" do
         expect(@group.child_outcome_links).to be_empty
         api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                  :controller => 'outcome_groups_api',
@@ -1199,7 +1199,7 @@ describe "Outcome Groups API", type: :request do
           add_outcome_to_group(sub_group)
         end
 
-        it "should re-use an old link if move_from is included" do
+        it "re-uses an old link if move_from is included" do
           sub_group = sub_group_with_outcome
           api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    controller: 'outcome_groups_api',
@@ -1214,7 +1214,7 @@ describe "Outcome Groups API", type: :request do
           expect(sub_group.child_outcome_links.reload).to be_empty
         end
 
-        it "should be allowed for global level" do
+        it "is allowed for global level" do
           @account_user = @user.account_users.create(:account => Account.site_admin)
           global_group = LearningOutcomeGroup.global_root_outcome_group
           add_outcome_to_group(global_group)
@@ -1232,7 +1232,7 @@ describe "Outcome Groups API", type: :request do
           expect(global_group.child_outcome_links.reload).to be_empty
         end
 
-        it "should not re-use an old link if move_from is omitted" do
+        it "does not re-use an old link if move_from is omitted" do
           sub_group = sub_group_with_outcome
           api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    controller: 'outcome_groups_api',
@@ -1248,7 +1248,7 @@ describe "Outcome Groups API", type: :request do
         end
       end
 
-      it "should return json of the new link" do
+      it "returns json of the new link" do
         json = api_call(:put, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                         :controller => 'outcome_groups_api',
                         :action => 'link',
@@ -1295,7 +1295,7 @@ describe "Outcome Groups API", type: :request do
       @group = @account.root_outcome_group
     end
 
-    it "should fail (400) if the new outcome is invalid" do
+    it "fails (400) if the new outcome is invalid" do
       too_long_description = ([0] * (ActiveRecord::Base.maximum_text_length + 1)).join('')
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                    { :controller => 'outcome_groups_api',
@@ -1314,7 +1314,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should create a new outcome" do
+    it "creates a new outcome" do
       LearningOutcome.update_all(:workflow_state => 'deleted')
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                { :controller => 'outcome_groups_api',
@@ -1348,7 +1348,7 @@ describe "Outcome Groups API", type: :request do
                                                      })
     end
 
-    it "should create a new global outcome" do
+    it "creates a new global outcome" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @global_group = LearningOutcomeGroup.global_root_outcome_group
       json = api_call(:post, "/api/v1/global/outcome_groups/#{@global_group.id}/outcomes",
@@ -1383,7 +1383,7 @@ describe "Outcome Groups API", type: :request do
                                                      })
     end
 
-    it "should create a new outcome with default values for mastery calculation" do
+    it "creates a new outcome with default values for mastery calculation" do
       prev_count = LearningOutcome.active.count
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                       { :controller => 'outcome_groups_api',
@@ -1420,7 +1420,7 @@ describe "Outcome Groups API", type: :request do
       expect(@outcome.calculation_int).to be 65
     end
 
-    it "should link the new outcome into the group" do
+    it "links the new outcome into the group" do
       LearningOutcome.update_all(:workflow_state => 'deleted')
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                { :controller => 'outcome_groups_api',
@@ -1436,7 +1436,7 @@ describe "Outcome Groups API", type: :request do
     end
 
     context "creating with calculation options specified" do
-      it "should create a new outcome with calculation options specified" do
+      it "creates a new outcome with calculation options specified" do
         LearningOutcome.update_all(:workflow_state => 'deleted')
         api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                  { :controller => 'outcome_groups_api',
@@ -1474,7 +1474,7 @@ describe "Outcome Groups API", type: :request do
         expect(@outcome.calculation_int).to eq(4)
       end
 
-      it "should fail (400) to create a new outcome with illegal calculation options" do
+      it "fails (400) to create a new outcome with illegal calculation options" do
         LearningOutcome.update_all(:workflow_state => 'deleted')
         json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                         { :controller => 'outcome_groups_api',
@@ -1513,7 +1513,7 @@ describe "Outcome Groups API", type: :request do
         ]
 
         methods.each do |method|
-          it "should fail (400) to create a new outcome with an illegal calculation_int" do
+          it "fails (400) to create a new outcome with an illegal calculation_int" do
             LearningOutcome.update_all(:workflow_state => 'deleted')
             json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes",
                             { :controller => 'outcome_groups_api',
@@ -1560,7 +1560,7 @@ describe "Outcome Groups API", type: :request do
       @group.add_outcome(@outcome)
     end
 
-    it "should require permission" do
+    it "requires permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
@@ -1572,7 +1572,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should require manage_global_outcomes permission for global groups" do
+    it "requires manage_global_outcomes permission for global groups" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @group = LearningOutcomeGroup.global_root_outcome_group
       @group.add_outcome(@outcome)
@@ -1586,7 +1586,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should 404 if the outcome isn't linked in the group" do
+    it "404S if the outcome isn't linked in the group" do
       @outcome = LearningOutcome.global.create!(:title => 'outcome')
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
@@ -1598,7 +1598,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(404)
     end
 
-    it "should fail (400) if this is the last link for an aligned outcome" do
+    it "fails (400) if this is the last link for an aligned outcome" do
       aqb = @account.assessment_question_banks.create!
       exp_warning = /Outcome \'#{@outcome.short_description}\' cannot be deleted because it is aligned to content\./
       @outcome.align(aqb, @account, :mastery_type => "none")
@@ -1614,7 +1614,7 @@ describe "Outcome Groups API", type: :request do
       expect(parsed_body['message']).to match exp_warning
     end
 
-    it "should unlink the outcome from the group" do
+    it "unlinks the outcome from the group" do
       expect(@group.child_outcome_links.active.size).to eq 1
       api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                :controller => 'outcome_groups_api',
@@ -1626,7 +1626,7 @@ describe "Outcome Groups API", type: :request do
       expect(@group.child_outcome_links.active.size).to eq 0
     end
 
-    it "should return json of the removed link" do
+    it "returns json of the removed link" do
       json = api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                       :controller => 'outcome_groups_api',
                       :action => 'unlink',
@@ -1670,7 +1670,7 @@ describe "Outcome Groups API", type: :request do
       @group = @account.root_outcome_group
     end
 
-    it "should NOT require permission to read" do
+    it "does not require permission to read" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                    :controller => 'outcome_groups_api',
@@ -1681,7 +1681,7 @@ describe "Outcome Groups API", type: :request do
       expect(response).to be_successful
     end
 
-    it "should return the subgroups under the group" do
+    it "returns the subgroups under the group" do
       3.times { create_subgroup }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       :controller => 'outcome_groups_api',
@@ -1702,7 +1702,7 @@ describe "Outcome Groups API", type: :request do
       end.sort_by { |subgroup| subgroup['id'] })
     end
 
-    it "should not include deleted subgroups" do
+    it "does not include deleted subgroups" do
       @subgroup1 = create_subgroup
       @subgroup2 = create_subgroup
       @subgroup2.destroy
@@ -1718,7 +1718,7 @@ describe "Outcome Groups API", type: :request do
       expect(json.first['id']).to eq @subgroup1.id
     end
 
-    it "should order subgroups by title" do
+    it "orders subgroups by title" do
       @subgroups = ["B", "A", "C"].map { |title| create_subgroup(:title => title) }
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       :controller => 'outcome_groups_api',
@@ -1731,7 +1731,7 @@ describe "Outcome Groups API", type: :request do
       )
     end
 
-    it "should paginate the subgroups" do
+    it "paginates the subgroups" do
       subgroups = 5.times.map { |i| create_subgroup }
 
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups?per_page=2",
@@ -1764,7 +1764,7 @@ describe "Outcome Groups API", type: :request do
       @group = @account.root_outcome_group
     end
 
-    it "should require permission" do
+    it "requires permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                    :controller => 'outcome_groups_api',
@@ -1775,7 +1775,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should require manage_global_outcomes permission for global groups" do
+    it "requires manage_global_outcomes permission for global groups" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @group = LearningOutcomeGroup.global_root_outcome_group
       revoke_permission(@account_user, :manage_global_outcomes)
@@ -1787,7 +1787,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should create a new outcome group" do
+    it "creates a new outcome group" do
       expect(@group.child_outcome_groups.size).to eq 0
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                { :controller => 'outcome_groups_api',
@@ -1803,7 +1803,7 @@ describe "Outcome Groups API", type: :request do
       expect(@subgroup.description).to eq "Description of my subgroup"
     end
 
-    it "should return json of the new subgroup" do
+    it "returns json of the new subgroup" do
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/subgroups",
                       { :controller => 'outcome_groups_api',
                         :action => 'create',
@@ -1851,7 +1851,7 @@ describe "Outcome Groups API", type: :request do
       @target_group = @account.root_outcome_group
     end
 
-    it "should require permission" do
+    it "requires permission" do
       revoke_permission(@account_user, :manage_outcomes)
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
                    { :controller => 'outcome_groups_api',
@@ -1863,7 +1863,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should require manage_global_outcomes permission for global groups" do
+    it "requires manage_global_outcomes permission for global groups" do
       @account_user = @user.account_users.create(:account => Account.site_admin)
       @target_group = LearningOutcomeGroup.global_root_outcome_group
       revoke_permission(@account_user, :manage_global_outcomes)
@@ -1876,7 +1876,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "should fail if the source group doesn't exist (or is deleted)" do
+    it "fails if the source group doesn't exist (or is deleted)" do
       @source_group.destroy
       revoke_permission(@account_user, :manage_global_outcomes)
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
@@ -1889,7 +1889,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should fail if the source group isn't available to the context" do
+    it "fails if the source group isn't available to the context" do
       @subaccount = @account.sub_accounts.create!
       @source_group = @subaccount.root_outcome_group.child_outcome_groups.create!(:title => 'subgroup')
       raw_api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
@@ -1902,7 +1902,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(400)
     end
 
-    it "should create a new outcome group" do
+    it "creates a new outcome group" do
       expect(@target_group.child_outcome_groups.size).to eq 0
       api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
                { :controller => 'outcome_groups_api',
@@ -1917,7 +1917,7 @@ describe "Outcome Groups API", type: :request do
       expect(@subgroup.description).to eq @source_group.description
     end
 
-    it "should return json of the new subgroup" do
+    it "returns json of the new subgroup" do
       json = api_call(:post, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@target_group.id}/import",
                       { :controller => 'outcome_groups_api',
                         :action => 'import',

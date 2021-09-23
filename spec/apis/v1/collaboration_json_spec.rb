@@ -36,7 +36,7 @@ describe Api::V1::Collaboration do
     @collaboration.save!
   end
 
-  it 'should properly serialize' do
+  it 'properlies serialize' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['id']).to eq @collaboration.id
@@ -56,13 +56,13 @@ describe Api::V1::Collaboration do
     expect(json['deleted_at']).to eq nil
   end
 
-  it 'should include the owning users name' do
+  it 'includes the owning users name' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['user_name']).to eq @current_user.name
   end
 
-  it 'should include the update_url' do
+  it 'includes the update_url' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['update_url']).to eq @collaboration.update_url

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/gradebooks/grade_summary" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment")
@@ -31,7 +31,7 @@ describe "/gradebooks/grade_summary" do
     expect(response).not_to be_nil
   end
 
-  it "should not show totals if configured so" do
+  it "does not show totals if configured so" do
     course_with_student
     @course.hide_final_grades = true
     view_context
@@ -43,7 +43,7 @@ describe "/gradebooks/grade_summary" do
     expect(page.css(".final_grade").length).to eq 0
   end
 
-  it "should not show 'what if' if not the student" do
+  it "does not show 'what if' if not the student" do
     course_with_teacher
     student_in_course(active_all: true)
     @student = @user
@@ -57,7 +57,7 @@ describe "/gradebooks/grade_summary" do
     expect(response.body).not_to match(/Click any score/)
   end
 
-  it "should know the types of media comments" do
+  it "knows the types of media comments" do
     stub_kaltura
     course_with_teacher
     student_in_course(active_all: true)
@@ -89,7 +89,7 @@ describe "/gradebooks/grade_summary" do
     expect(doc.at_css('.video_comment ~ span.media_comment_id').text).to eql '0_ijklmnop'
   end
 
-  it "should show a disabled message for grade stats for the test student" do
+  it "shows a disabled message for grade stats for the test student" do
     course_with_teacher(:active_all => true)
     @student = @course.student_view_student
     @user = @teacher

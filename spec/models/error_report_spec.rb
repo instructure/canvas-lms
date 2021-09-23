@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ErrorReport do
   describe ".log_exception_from_canvas_errors" do
-    it "should not fail with invalid UTF-8" do
+    it "does not fail with invalid UTF-8" do
       message = "he" +
                 255.chr +
                 "llo"
@@ -37,13 +37,13 @@ describe ErrorReport do
         .to_not raise_error
     end
 
-    it "should use class name for category" do
+    it "uses class name for category" do
       e = Exception.new("error")
       report = described_class.log_exception_from_canvas_errors(e, { extra: {} })
       expect(report.category).to eq(e.class.name)
     end
 
-    it "should ignore category 404" do
+    it "ignores category 404" do
       count = ErrorReport.count
       ErrorReport.log_error('404', {})
       expect(ErrorReport.count).to eq(count)
@@ -56,7 +56,7 @@ describe ErrorReport do
       expect(report).to be_nil
     end
 
-    it "should plug together with Canvas::Errors::Info to log the user" do
+    it "plugs together with Canvas::Errors::Info to log the user" do
       req = instance_double("request", request_method_symbol: "GET", format: "html")
       allow(Canvas::Errors::Info).to receive(:useful_http_env_stuff_from_request)
         .and_return({})
@@ -69,7 +69,7 @@ describe ErrorReport do
     end
   end
 
-  it "should return categories" do
+  it "returns categories" do
     expect(ErrorReport.categories).to eq []
     ErrorReport.create! { |r| r.category = 'bob' }
     expect(ErrorReport.categories).to eq ['bob']
@@ -81,13 +81,13 @@ describe ErrorReport do
     expect(ErrorReport.categories).to eq ['bob', 'fred', 'george']
   end
 
-  it "should filter the url when it is assigned" do
+  it "filters the url when it is assigned" do
     report = ErrorReport.new
     report.url = "https://www.instructure.example.com?access_token=abcdef"
     expect(report.url).to eq "https://www.instructure.example.com?access_token=[FILTERED]"
   end
 
-  it "should filter params" do
+  it "filters params" do
     mock_attrs = {
       :env => {
         "QUERY_STRING" => "access_token=abcdef&pseudonym[password]=zzz",
@@ -113,14 +113,14 @@ describe ErrorReport do
     expect(report.data["request_parameters"]).to eq({ "client_secret" => "[FILTERED]" }.inspect)
   end
 
-  it "should not try to assign protected fields" do
+  it "does not try to assign protected fields" do
     report = described_class.new
     report.assign_data(id: 1)
     expect(report.id).to be_nil
     expect(report.data["id"]).to eq 1
   end
 
-  it "should truncate absurdly long messages" do
+  it "truncates absurdly long messages" do
     report = described_class.new
     long_message = (0...100000).map { 'a' }.join
     report.assign_data(message: long_message)

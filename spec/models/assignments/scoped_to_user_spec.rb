@@ -48,13 +48,13 @@ module Assignments
     end
 
     describe '#scope' do
-      it 'should not include inactive assignments' do
+      it 'does not include inactive assignments' do
         expect(inactive.workflow_state).to eq('deleted'), 'precondition'
         scope_filter = Assignments::ScopedToUser.new(@course, @student)
         expect(scope_filter.scope).not_to include(inactive)
       end
 
-      it 'should return unpublished assignments if user can :manage_assignments' do
+      it 'returns unpublished assignments if user can :manage_assignments' do
         expect(@course.grants_right?(@teacher, :manage_assignments)).to be_truthy,
                                                                         'precondition'
         expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
@@ -62,7 +62,7 @@ module Assignments
         expect(scope_filter.scope).to include(unpublished)
       end
 
-      it 'should not return unpublished assignments if user cannot :manage_assignments' do
+      it 'does not return unpublished assignments if user cannot :manage_assignments' do
         expect(@course.grants_right?(@student, :manage_assignments)).to be_falsey,
                                                                         'precondition'
         expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
@@ -70,7 +70,7 @@ module Assignments
         expect(scope_filter.scope).not_to include(unpublished)
       end
 
-      it 'should return unpublished assignments if user can :read_as_admin' do
+      it 'returns unpublished assignments if user can :read_as_admin' do
         @course.account.role_overrides.create!({
                                                  role: teacher_role,
                                                  permission: 'manage_assignments',

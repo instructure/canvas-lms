@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe 'HostUrl' do
   describe "protocol" do
-    it "should return https if domain config says ssl" do
+    it "returns https if domain config says ssl" do
       expect(ConfigFile).to receive(:load).with("domain").and_return({})
       allow(Attachment).to receive(:file_store_config).and_return({})
       expect(HostUrl.protocol).to eq 'http'
@@ -31,13 +31,13 @@ describe 'HostUrl' do
       expect(HostUrl.protocol).to eq 'https'
     end
 
-    it "should return https if file store config says secure" do
+    it "returns https if file store config says secure" do
       allow(ConfigFile).to receive(:load).with("domain").and_return({})
       allow(Attachment).to receive(:file_store_config).and_return('secure' => true)
       expect(HostUrl.protocol).to eq 'https'
     end
 
-    it "should return https for production" do
+    it "returns https for production" do
       expect(HostUrl.protocol).to eq 'http'
       HostUrl.reset_cache!
       expect(Rails.env).to receive(:production?).and_return(true)

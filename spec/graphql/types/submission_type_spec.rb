@@ -198,29 +198,29 @@ describe Types::SubmissionType do
 
     let(:submission_type_quiz) { GraphQLTypeTester.new(@quiz_submission, current_user: @teacher) }
 
-    it "should contain submissionStatus field" do
+    it "contains submissionStatus field" do
       expect(submission_type.resolve("submissionStatus")).to eq "unsubmitted"
     end
 
-    it "should preload quiz type assignments" do
+    it "preloads quiz type assignments" do
       expect(submission_type_quiz.resolve("submissionStatus")).to eq "submitted"
     end
   end
 
   describe "late policy" do
-    it "should show late policy" do
+    it "shows late policy" do
       @submission.update!(late_policy_status: :missing)
       expect(submission_type.resolve("latePolicyStatus")).to eq "missing"
     end
   end
 
   describe '#attempt' do
-    it 'should show the attempt' do
+    it 'shows the attempt' do
       @submission.update_column(:attempt, 1) # bypass infer_values callback
       expect(submission_type.resolve('attempt')).to eq 1
     end
 
-    it 'should translate nil in the database to 0 in graphql' do
+    it 'translates nil in the database to 0 in graphql' do
       @submission.update_column(:attempt, nil) # bypass infer_values callback
       expect(submission_type.resolve('attempt')).to eq 0
     end

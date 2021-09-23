@@ -38,7 +38,7 @@ describe "calendar2" do
 
     describe "main calendar" do
       context "the event modal" do
-        it "should allow other users to see attendees after reservation" do
+        it "allows other users to see attendees after reservation" do
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",
@@ -60,7 +60,7 @@ describe "calendar2" do
           expect(f("#reservations li")).to include_text "nobody@example.com"
         end
 
-        it "should allow users to see all attendees on events up to 25 reservations" do
+        it "allows users to see all attendees on events up to 25 reservations" do
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",
@@ -83,7 +83,7 @@ describe "calendar2" do
           expect(f("#reservations")).to include_text expected_string
         end
 
-        it "should show dots indicating more users available if more than 25 reservations" do
+        it "shows dots indicating more users available if more than 25 reservations" do
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",
@@ -106,7 +106,7 @@ describe "calendar2" do
           expect(f("#reservations")).to include_text expected_string
         end
 
-        it "should not display attendees for reservation with no participants" do
+        it "does not display attendees for reservation with no participants" do
           create_appointment_group(
             :contexts => [@course],
             :title => "eh",
@@ -128,7 +128,7 @@ describe "calendar2" do
         end
       end
 
-      it "should show section-level events for the student's section" do
+      it "shows section-level events for the student's section" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(:name => "other section!")
         date = Date.today
@@ -152,7 +152,7 @@ describe "calendar2" do
         expect(details.text).to include(@course.default_section.name)
       end
 
-      it "should display title link and go to event details page" do
+      it "displays title link and go to event details page" do
         make_event(:context => @course, :start => 0.days.from_now, :title => "future event")
         get "/calendar2"
 
@@ -166,7 +166,7 @@ describe "calendar2" do
         expect(page_title.text).to eq 'future event'
       end
 
-      it "should not redirect but load the event details page" do
+      it "does not redirect but load the event details page" do
         event = make_event(:context => @course, :start => 2.months.from_now, :title => "future event")
         get "/courses/#{@course.id}/calendar_events/#{event.id}"
         page_title = f('.title')
@@ -174,7 +174,7 @@ describe "calendar2" do
         expect(page_title.text).to eq 'future event'
       end
 
-      it "should let the group members create a calendar event for the group", priority: "1", test_id: 323330 do
+      it "lets the group members create a calendar event for the group", priority: "1", test_id: 323330 do
         group = @course.groups.create!(name: "Test Group")
         group.add_user @student
         group.save!
@@ -205,7 +205,7 @@ describe "calendar2" do
     end
 
     describe "main calendar" do
-      it "should display in Spanish" do
+      it "displays in Spanish" do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         date = Date.new(2012, 7, 12)
         # Use event to  open to a specific and testable month
@@ -224,7 +224,7 @@ describe "calendar2" do
     end
 
     describe "mini calendar" do
-      it "should display in Spanish" do
+      it "displays in Spanish" do
         skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
         skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
         get "/calendar2"

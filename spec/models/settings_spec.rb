@@ -22,21 +22,21 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Setting do
   context "getting" do
-    it 'should get the default value as a string' do
+    it 'gets the default value as a string' do
       expect(Setting.get('my_new_setting', true)).to eq 'true'
     end
 
-    it 'should get the default value as a string for dates' do
+    it 'gets the default value as a string for dates' do
       time = Time.now.utc
       expect(Setting.get('my_new_setting', time)).to eq time.to_s
     end
 
-    it 'should return set values' do
+    it 'returns set values' do
       Setting.set('my_new_setting', '1')
       expect(Setting.get('my_new_setting', '0')).to eq '1'
     end
 
-    it 'should allow passing a cache expiration' do
+    it 'allows passing a cache expiration' do
       # cache 0 in process
       expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '0'
       # some other process sets the value out from under us
@@ -60,12 +60,12 @@ describe Setting do
   end
 
   context "setting" do
-    it 'should set boolean values as strings' do
+    it 'sets boolean values as strings' do
       Setting.set('my_new_setting', true)
       expect(Setting.get('my_new_setting', '1')).to eq 'true'
     end
 
-    it 'should set time values as strings' do
+    it 'sets time values as strings' do
       time = Time.now.utc
       Setting.set('my_new_setting', time)
       expect(Setting.get('my_new_setting', '1')).to eq time.to_s

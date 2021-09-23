@@ -23,7 +23,7 @@ describe ContentMigration do
   context "course copy outcomes" do
     include_examples "course copy"
 
-    it "should copy all learning outcomes and their groups if selected" do
+    it "copies all learning outcomes and their groups if selected" do
       default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
@@ -52,7 +52,7 @@ describe ContentMigration do
       expect(@copy_to.learning_outcome_groups.where(migration_id: mig_id(log)).first).not_to be_nil
     end
 
-    it "should copy learning outcome alignments with question banks" do
+    it "copies learning outcome alignments with question banks" do
       skip unless Qti.qti_enabled?
       default = @copy_from.root_outcome_group
       lo = @copy_from.created_learning_outcomes.new
@@ -83,7 +83,7 @@ describe ContentMigration do
       expect(new_alignment.mastery_score).to eq 50.0
     end
 
-    it "should copy learning outcomes into the new course" do
+    it "copies learning outcomes into the new course" do
       old_root = @copy_from.root_outcome_group
 
       lo = create_outcome(@copy_from, old_root)
@@ -157,7 +157,7 @@ describe ContentMigration do
       expect(lo3_new.data).to eq lo3.data
     end
 
-    it "should not copy deleted learning outcomes into the new course" do
+    it "does not copy deleted learning outcomes into the new course" do
       old_root = @copy_from.root_outcome_group
 
       log = @copy_from.learning_outcome_groups.new
@@ -177,7 +177,7 @@ describe ContentMigration do
       expect(@copy_to.created_learning_outcomes.first.migration_id).to eq mig_id(lo)
     end
 
-    it "should relink to external outcomes" do
+    it "relinks to external outcomes" do
       account = @copy_from.account
       a_group = account.root_outcome_group
 
@@ -199,7 +199,7 @@ describe ContentMigration do
       expect(to_root.child_outcome_links.where(content_id: lo2.id).first).not_to be_nil
     end
 
-    it "should copy external learning outcomes linked to banks correctly" do
+    it "copies external learning outcomes linked to banks correctly" do
       account = @copy_from.account
       a_group = account.root_outcome_group
       lo = create_outcome(account, a_group)
@@ -223,7 +223,7 @@ describe ContentMigration do
       expect(to_root.child_outcome_links.count).to eq 0
     end
 
-    it "should create outcomes in new course if external context not found" do
+    it "creates outcomes in new course if external context not found" do
       hash = { "is_global_outcome" => true,
                "points_possible" => nil,
                "type" => "learning_outcome",
@@ -246,7 +246,7 @@ describe ContentMigration do
       expect(new_lo.short_description).to eq hash["title"]
     end
 
-    it "should create rubrics in new course if external context not found" do
+    it "creates rubrics in new course if external context not found" do
       hash = {
         "reusable" => false,
         "public" => false,
@@ -279,7 +279,7 @@ describe ContentMigration do
       expect(new_rubric.title).to eq hash["title"]
     end
 
-    it "should link rubric (and assignments) to outcomes" do
+    it "links rubric (and assignments) to outcomes" do
       root_group = LearningOutcomeGroup.create!(:title => "contextless group")
 
       lo = create_outcome(nil, root_group)
@@ -326,7 +326,7 @@ describe ContentMigration do
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
     end
 
-    it "should still associate rubrics and assignments and copy rubric association properties" do
+    it "stills associate rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
       @assoc.summary_data = { :saved_comments => { "309_6312" => ["what the comment", "hey"] } }
       @assoc.save!
@@ -352,7 +352,7 @@ describe ContentMigration do
       expect(asmnt2.rubric_association.summary_data).to eq @assoc.summary_data
     end
 
-    it "should copy rubrics associated with assignments when rubric isn't selected" do
+    it "copies rubrics associated with assignments when rubric isn't selected" do
       create_rubric_asmnt
       @cm.copy_options = {
         :assignments => { mig_id(@assignment) => "1" },
@@ -366,7 +366,7 @@ describe ContentMigration do
       expect(asmnt2.rubric.id).to eq rub.id
     end
 
-    it "should restore deleted learning outcome groups on re-copy" do
+    it "restores deleted learning outcome groups on re-copy" do
       default = @copy_from.root_outcome_group
       log = @copy_from.learning_outcome_groups.new
       log.context = @copy_from
@@ -394,7 +394,7 @@ describe ContentMigration do
       expect(group.reload).to be_active
     end
 
-    it "should still work when copying the same outcome twice" do
+    it "stills work when copying the same outcome twice" do
       default = @copy_from.root_outcome_group
       log1 = @copy_from.learning_outcome_groups.create!(:title => "some group")
       default.adopt_outcome_group(log1)

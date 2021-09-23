@@ -24,14 +24,14 @@ describe "Assessment Question import from hash" do
   SYSTEMS.each do |system|
     QUESTIONS.each do |q|
       if import_data_exists? [system, 'quiz'], q[0]
-        it "should import #{q[0]} questions for #{system}" do
+        it "imports #{q[0]} questions for #{system}" do
           test_question_import(q[0], system, q[1])
         end
       end
     end
   end
 
-  it "should only import assessment question once" do
+  it "onlies import assessment question once" do
     context = get_import_context
     data = get_import_data '', 'single_question'
     data = { 'assessment_questions' => { 'assessment_questions' => data } }
@@ -46,7 +46,7 @@ describe "Assessment Question import from hash" do
     expect(context.assessment_questions.count).to eq 1
   end
 
-  it "should update assessment question on re-import" do
+  it "updates assessment question on re-import" do
     context = get_import_context
     data = get_import_data '', 'single_question'
     data = { 'assessment_questions' => { 'assessment_questions' => data } }
@@ -63,7 +63,7 @@ describe "Assessment Question import from hash" do
     expect(context.assessment_questions.first.name).to eq "Bee2"
   end
 
-  it "should use the question bank settings" do
+  it "uses the question bank settings" do
     q = get_import_data 'cengage', 'question'
     context = get_import_context('cengage')
     data = { 'assessment_questions' => { 'assessment_questions' => [q] } }
@@ -75,7 +75,7 @@ describe "Assessment Question import from hash" do
     expect(bank.assessment_questions.first.migration_id).to eq q[:migration_id]
   end
 
-  it "should use the specified question group" do
+  it "uses the specified question group" do
     context = course_model
     data = get_import_data [], 'question_group'
     q_hash = data['assessment_questions']['assessment_questions'].first
@@ -89,7 +89,7 @@ describe "Assessment Question import from hash" do
     expect(bank_aq.id).to eq q.id
   end
 
-  it "should use the default question group if none specified" do
+  it "uses the default question group if none specified" do
     context = course_model
     data = get_import_data [], 'question_group'
     q_hash = data['assessment_questions']['assessment_questions'].last
@@ -103,7 +103,7 @@ describe "Assessment Question import from hash" do
     expect(bank_aq.id).to eq q.id
   end
 
-  it "should use the correct question bank" do
+  it "uses the correct question bank" do
     context = course_model
     migration = ContentMigration.create!(:context => context)
     migration.question_bank_name = "test question bank"
@@ -129,7 +129,7 @@ describe "Assessment Question import from hash" do
     expect(bank.assessment_questions.first.migration_id).to eql('4')
   end
 
-  it "should allow question groups to point to question banks" do
+  it "allows question groups to point to question banks" do
     question = get_import_data 'cengage', 'question'
     context = get_import_context('cengage')
     data = { 'assessment_questions' => { 'assessment_questions' => [question] } }

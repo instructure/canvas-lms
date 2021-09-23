@@ -38,7 +38,7 @@ describe SIS::CSV::DiffGenerator do
   end
 
   describe '#generate_csvs' do
-    it 'should skip diffing if previous is empty' do
+    it 'skips diffing if previous is empty' do
       previous = {
       }
 
@@ -53,7 +53,7 @@ describe SIS::CSV::DiffGenerator do
       expect(@batch.sis_batch_errors).to be_empty
     end
 
-    it 'should skip diffing if previous has more than one file of type' do
+    it 'skips diffing if previous has more than one file of type' do
       previous = {
         user: [{ file: 'users1.csv' }, { file: 'users2.csv' }],
       }
@@ -70,7 +70,7 @@ describe SIS::CSV::DiffGenerator do
       expect(warning.message).to match(%r{diffing against more than one})
     end
 
-    it 'should skip diffing if current has more than one file of type' do
+    it 'skips diffing if current has more than one file of type' do
       previous = {
         user: [{ file: 'users.csv' }],
       }
@@ -87,7 +87,7 @@ describe SIS::CSV::DiffGenerator do
       expect(warning.message).to match(%r{diffing against more than one})
     end
 
-    it 'should generate multiple diffs for different file types' do
+    it 'generates multiple diffs for different file types' do
       previous = {
         user: [{ file: 'users1.csv' }, { file: 'users2.csv' }],
         course: [csv("courses", "course_id,short_name,status\ncourse_1,test1,active\n")],

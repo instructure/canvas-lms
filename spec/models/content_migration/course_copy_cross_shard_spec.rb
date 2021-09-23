@@ -17,7 +17,7 @@ describe ContentMigration do
       @cm.update_attribute(:source_course, @copy_from)
     end
 
-    it "should copy everything" do
+    it "copies everything" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hi", :title => "discussion title")
       cm = @copy_from.context_modules.create!(:name => "some module")
       att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from))
@@ -63,7 +63,7 @@ describe ContentMigration do
       expect(@copy_to.calendar_events.where(migration_id: mig_id(cal)).first.workflow_state).to eq 'active'
     end
 
-    it "should use local ids if we're possibly re-importing a previously copied course" do
+    it "uses local ids if we're possibly re-importing a previously copied course" do
       prev_export = @copy_from.content_exports.create!(:export_type => ContentExport::COURSE_COPY)
       prev_export.update_attribute(:global_identifiers, false)
 
@@ -78,7 +78,7 @@ describe ContentMigration do
       expect(dt_to.migration_id).to eq CC::CCHelper.create_key("discussion_topic_#{dt.local_id}", global: false)
     end
 
-    it "should try to find existing root attachments on destination account" do
+    it "tries to find existing root attachments on destination account" do
       att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from))
       dest_root = @copy_to.attachments.create!(:filename => 'totallydifferentname.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to))
 
@@ -88,7 +88,7 @@ describe ContentMigration do
       expect(att_to.root_attachment).to eq dest_root
     end
 
-    it "should not blow up with usage rights" do
+    it "does not blow up with usage rights" do
       ur = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2015 Wyndham Systems'
       att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
                                            :folder => Folder.unfiled_folder(@copy_from), :usage_rights => ur)

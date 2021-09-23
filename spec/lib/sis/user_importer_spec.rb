@@ -50,7 +50,7 @@ describe SIS::UserImporter do
     end
   end
 
-  it 'should handle user_ids as integers just in case' do
+  it 'handles user_ids as integers just in case' do
     user1 = SIS::Models::User.new(user_id: 12345, login_id: 'user1', status: 'active',
                                   full_name: 'User One', email: 'user1@example.com')
     SIS::UserImporter.new(account_model, { batch: @account.sis_batches.create! }).process([]) do |importer|

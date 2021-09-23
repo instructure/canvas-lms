@@ -23,7 +23,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WikiPage do
-  it "should send page updated notifications" do
+  it "sends page updated notifications" do
     course_with_teacher(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -40,7 +40,7 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
   end
 
-  it "should send page updated notifications to students if active" do
+  it "sends page updated notifications to students if active" do
     course_with_student(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -52,7 +52,7 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
   end
 
-  it "should not send page updated notifications to students if not active" do
+  it "does not send page updated notifications to students if not active" do
     course_with_student(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -104,7 +104,7 @@ describe WikiPage do
     end
   end
 
-  it "should validate the title" do
+  it "validates the title" do
     course_with_teacher(:active_all => true)
     expect(@course.wiki_pages.new(:title => "").valid?).not_to be_truthy
     expect(@course.wiki_pages.new(:title => "!!!").valid?).not_to be_truthy
@@ -112,7 +112,7 @@ describe WikiPage do
     expect(@course.wiki_pages.new(:title => "asdf").valid?).to be_truthy
   end
 
-  it "should set as front page" do
+  it "sets as front page" do
     course_with_teacher(:active_all => true)
 
     new_front_page = @course.wiki_pages.create!(:title => "asdf")
@@ -122,7 +122,7 @@ describe WikiPage do
     expect(@course.wiki.front_page).to eq new_front_page
   end
 
-  it "should validate that the front page is always visible" do
+  it "validates that the front page is always visible" do
     course_with_teacher(:active_all => true)
     @course.wiki.set_front_page_url!('front-page')
     front_page = @course.wiki.front_page
@@ -142,7 +142,7 @@ describe WikiPage do
     expect(new_front_page.valid?).not_to be_truthy
   end
 
-  it "shouldn't allow the front page to be unpublished" do
+  it "does not allow the front page to be unpublished" do
     course_with_teacher(active_all: true)
     @course.wiki.set_front_page_url!('front-page')
 
@@ -153,13 +153,13 @@ describe WikiPage do
     # front_page.should_not be_valid
   end
 
-  it "should transliterate unicode characters in the title for the url" do
+  it "transliterates unicode characters in the title for the url" do
     course_with_teacher(:active_all => true)
     page = @course.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")
     expect(page.url).to eq 'ae-very-sspecial-namae-1-slash-4'
   end
 
-  it "should make the title/url unique" do
+  it "makes the title/url unique" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create(:title => "Asdf")
     p2 = @course.wiki_pages.create(:title => "Asdf")
@@ -167,7 +167,7 @@ describe WikiPage do
     expect(p2.url).to eql('asdf-2')
   end
 
-  it "should make the title unique and truncate to proper length" do
+  it "makes the title unique and truncate to proper length" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create!(:title => "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki_pages.create!(:title => p1.title)
@@ -181,7 +181,7 @@ describe WikiPage do
     expect(p4.title.end_with?('-4')).to be_truthy
   end
 
-  it "should let you reuse the title/url of a deleted page" do
+  it "lets you reuse the title/url of a deleted page" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create(:title => "Asdf")
     p1.workflow_state = 'deleted'
@@ -217,12 +217,12 @@ describe WikiPage do
       @page.save!
     end
 
-    it "should not allow students to read" do
+    it "does not allow students to read" do
       student_in_course(:course => @course, :active_all => true)
       expect(@page.can_read_page?(@student)).to eq false
     end
 
-    it "should allow teachers to read" do
+    it "allows teachers to read" do
       expect(@page.can_read_page?(@teacher)).to eq true
     end
 
@@ -304,7 +304,7 @@ describe WikiPage do
         user_session(@user)
       end
 
-      it 'should set the front page body' do
+      it 'sets the front page body' do
         @course.wiki.set_front_page_url!('front-page')
         front_page = @course.wiki.front_page
         expect(front_page.body).to be_nil
@@ -312,14 +312,14 @@ describe WikiPage do
         expect(front_page.body).not_to be_empty
       end
 
-      it 'should publish the front page' do
+      it 'publishes the front page' do
         @course.wiki.set_front_page_url!('front-page')
         front_page = @course.wiki.front_page
         front_page.initialize_wiki_page(@teacher)
         expect(front_page).to be_published
       end
 
-      it 'should not change the URL in a wiki page link' do
+      it 'does not change the URL in a wiki page link' do
         allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
         course = course_factory()
         some_other_course = course_factory()
@@ -336,7 +336,7 @@ describe WikiPage do
         group_with_user
       end
 
-      it 'should set the front page body' do
+      it 'sets the front page body' do
         @group.wiki.set_front_page_url!('front-page')
         front_page = @group.wiki.front_page
         expect(front_page.body).to be_nil
@@ -358,23 +358,23 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'should be given read rights' do
+      it 'is given read rights' do
         expect(@page.grants_right?(@admin, :read)).to be_truthy
       end
 
-      it 'should be given create rights' do
+      it 'is given create rights' do
         expect(@page.grants_right?(@admin, :create)).to be_truthy
       end
 
-      it 'should be given update rights' do
+      it 'is given update rights' do
         expect(@page.grants_right?(@admin, :update)).to be_truthy
       end
 
-      it 'should be given delete rights' do
+      it 'is given delete rights' do
         expect(@page.grants_right?(@admin, :delete)).to be_truthy
       end
 
-      it 'should be given delete rights for unpublished pages' do
+      it 'is given delete rights for unpublished pages' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@admin, :delete)).to be_truthy
       end
@@ -387,23 +387,23 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'should be given read rights' do
+      it 'is given read rights' do
         expect(@page.grants_right?(@teacher, :read)).to be_truthy
       end
 
-      it 'should be given create rights' do
+      it 'is given create rights' do
         expect(@page.grants_right?(@teacher, :create)).to be_truthy
       end
 
-      it 'should be given update rights' do
+      it 'is given update rights' do
         expect(@page.grants_right?(@teacher, :update)).to be_truthy
       end
 
-      it 'should be given delete rights' do
+      it 'is given delete rights' do
         expect(@page.grants_right?(@teacher, :delete)).to be_truthy
       end
 
-      it 'should be given delete rights for unpublished pages' do
+      it 'is given delete rights for unpublished pages' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@teacher, :delete)).to be_truthy
       end
@@ -416,33 +416,33 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'should be given read rights' do
+      it 'is given read rights' do
         expect(@page.grants_right?(@user, :read)).to be_truthy
       end
 
-      it 'should be given read rights, unless hidden from students' do
+      it 'is given read rights, unless hidden from students' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@user, :read)).to be_falsey
       end
 
-      it 'should be given read rights, unless unpublished' do
+      it 'is given read rights, unless unpublished' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@user, :read)).to be_falsey
       end
 
-      it 'should not be given create rights' do
+      it 'is not given create rights' do
         expect(@page.grants_right?(@user, :create)).to be_falsey
       end
 
-      it 'should not be given update rights' do
+      it 'is not given update rights' do
         expect(@page.grants_right?(@user, :update)).to be_falsey
       end
 
-      it 'should not be given update_content rights' do
+      it 'is not given update_content rights' do
         expect(@page.grants_right?(@user, :update_content)).to be_falsey
       end
 
-      it 'should not be given delete rights' do
+      it 'is not given delete rights' do
         expect(@page.grants_right?(@user, :delete)).to be_falsey
       end
 
@@ -451,19 +451,19 @@ describe WikiPage do
           @page.editing_roles = 'teachers,students'
         end
 
-        it 'should be given update_content rights' do
+        it 'is given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_truthy
         end
 
-        it 'should not be given create rights' do
+        it 'is not given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'should not be given update rights' do
+        it 'is not given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'should not be given delete rights' do
+        it 'is not given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -475,19 +475,19 @@ describe WikiPage do
           @page.reload
         end
 
-        it 'should be given create rights' do
+        it 'is given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_truthy
         end
 
-        it 'should be given update rights' do
+        it 'is given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_truthy
         end
 
-        it 'should be given update_content rights' do
+        it 'is given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_truthy
         end
 
-        it 'should not be given delete rights' do
+        it 'is not given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -498,19 +498,19 @@ describe WikiPage do
           @page.editing_roles = 'teachers'
         end
 
-        it 'should not be given create rights' do
+        it 'is not given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'should not be given update rights' do
+        it 'is not given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'should not be given update_content rights' do
+        it 'is not given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_falsey
         end
 
-        it 'should not be given delete rights' do
+        it 'is not given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -521,19 +521,19 @@ describe WikiPage do
           @page.workflow_state = 'unpublished'
         end
 
-        it 'should not be given create rights' do
+        it 'is not given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'should not be given update rights' do
+        it 'is not given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'should not be given update_content rights' do
+        it 'is not given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_falsey
         end
 
-        it 'should not be given delete rights' do
+        it 'is not given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -543,7 +543,7 @@ describe WikiPage do
   describe "destroy" do
     before (:once) { course_factory }
 
-    it "should destroy its assignment if enabled" do
+    it "destroys its assignment if enabled" do
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @page.destroy
@@ -551,14 +551,14 @@ describe WikiPage do
       expect(@assignment.reload).to be_deleted
     end
 
-    it "should not destroy its assignment" do
+    it "does not destroy its assignment" do
       wiki_page_assignment_model course: @course
       @page.destroy
       expect(@page.reload).to be_deleted
       expect(@assignment.reload).not_to be_deleted
     end
 
-    it "should destroy its content tags" do
+    it "destroys its content tags" do
       @page = @course.wiki_pages.create! title: 'destroy me'
       @module = @course.context_modules.create!(:name => "module")
       tag = @module.add_item(type: 'WikiPage', title: 'kill meeee', id: @page.id)
@@ -571,14 +571,14 @@ describe WikiPage do
   describe "restore" do
     before (:once) { course_factory }
 
-    it "should restore to unpublished state" do
+    it "restores to unpublished state" do
       @page = @course.wiki_pages.create! title: 'dot dot dot'
       @page.update_attribute(:workflow_state, 'deleted')
       @page.restore
       expect(@page.reload).to be_unpublished
     end
 
-    it "should restore a linked assignment if enabled" do
+    it "restores a linked assignment if enabled" do
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
@@ -589,14 +589,14 @@ describe WikiPage do
       expect(@page.assignment).to be_unpublished
     end
 
-    it "should not restore a linked assignment" do
+    it "does not restore a linked assignment" do
       wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
       expect { @page.save! }.not_to change { @assignment.workflow_state }
       expect { @page.restore }.not_to change { @assignment.workflow_state }
     end
 
-    it "should not restore its content tags" do
+    it "does not restore its content tags" do
       @page = @course.wiki_pages.create! title: 'dot dot dot'
       @module = @course.context_modules.create!(:name => "module")
       tag = @module.add_item(type: 'WikiPage', title: 'dash dash dash', id: @page.id)
@@ -608,7 +608,7 @@ describe WikiPage do
   end
 
   describe "context_module_action" do
-    it "should process all content tags" do
+    it "processes all content tags" do
       course_with_student active_all: true
       page = @course.wiki_pages.create! title: 'teh page'
       mod1 = @course.context_modules.create name: 'module1'
@@ -626,7 +626,7 @@ describe WikiPage do
   end
 
   describe "locked_for?" do
-    it "should lock by preceding item and sequential progress" do
+    it "locks by preceding item and sequential progress" do
       course_with_student active_all: true
       pageB = @course.wiki_pages.create! title: 'B'
       pageC = @course.wiki_pages.create! title: 'C'

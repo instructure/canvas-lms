@@ -33,12 +33,12 @@ describe "master courses - pages locking" do
     user_session(@teacher)
   end
 
-  it "should show unlocked button on index page for unlocked page" do
+  it "shows unlocked button on index page for unlocked page" do
     get "/courses/#{@course.id}/pages"
     expect(f('.master-content-lock-cell i.icon-blueprint')).to be_displayed
   end
 
-  it "should show locked button on index page for locked page" do
+  it "shows locked button on index page for locked page" do
     # restrict something
     @tag.update_attribute(:restrictions, { :content => true })
 

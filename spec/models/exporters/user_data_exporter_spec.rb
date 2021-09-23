@@ -35,7 +35,7 @@ describe "User data exports" do
     @sub3 = @assignment.submit_homework(@student, :url => "http://reddit.com/r/mylittlepony", :submission_type => "online_url")
   end
 
-  it "should export student submissions" do
+  it "exports student submissions" do
     exported_attachment = Exporters::UserDataExporter.create_user_data_export(@student)
     expect(exported_attachment.context).to eq @student
     expect(exported_attachment.folder.name).to eq "data exports"
@@ -56,7 +56,7 @@ describe "User data exports" do
     expect(zipfile.entries.any? { |e| e.to_s.end_with?(@file.filename) }).to be_truthy
   end
 
-  it "should use inst-fs if enabled" do
+  it "uses inst-fs if enabled" do
     allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
     allow(InstFS).to receive(:direct_upload).and_return(uuid)
