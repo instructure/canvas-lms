@@ -306,7 +306,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               </Text>
             </Alert>
           )}
-          {!isSearch && (
+          {!isSearch && filter !== 'drafts' && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
                 <Flex.Item>

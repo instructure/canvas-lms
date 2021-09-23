@@ -32,7 +32,7 @@ import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResu
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {searchTerm, setPageNumber} = useContext(SearchContext)
+  const {filter, searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
@@ -55,7 +55,7 @@ export const DiscussionTopicRepliesContainer = props => {
   })
 
   useEffect(() => {
-    if (discussionEntriesToUpdate.size > 0) {
+    if (discussionEntriesToUpdate.size > 0 && filter !== 'drafts') {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AUTO_MARK_AS_READ_DELAY} from '../../utils/constants'
+import {AUTO_MARK_AS_READ_DELAY, SearchContext} from '../../utils/constants'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import DateHelper from '../../../../../shared/datetime/dateHelper'
 import {Discussion} from '../../../graphql/Discussion'
@@ -181,6 +181,7 @@ const IsolatedThreadContainer = props => {
   const threadActions = []
   const [isEditing, setIsEditing] = useState(false)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
+  const {filter} = useContext(SearchContext)
 
   const threadRef = useRef()
 
@@ -189,7 +190,8 @@ const IsolatedThreadContainer = props => {
     if (
       !ENV.manual_mark_as_read &&
       !props.discussionEntry.entryParticipant?.read &&
-      !props.discussionEntry?.entryParticipant?.forcedReadState
+      !props.discussionEntry?.entryParticipant?.forcedReadState &&
+      filter !== 'drafts'
     ) {
       const observer = new IntersectionObserver(
         () => props.setToBeMarkedAsRead(props.discussionEntry._id),
@@ -206,7 +208,7 @@ const IsolatedThreadContainer = props => {
         if (threadRef.current) observer.unobserve(threadRef.current)
       }
     }
-  }, [threadRef, props.discussionEntry.entryParticipant.read, props])
+  }, [threadRef, props.discussionEntry.entryParticipant.read, props, filter])
 
   const [updateDiscussionEntry] = useMutation(UPDATE_DISCUSSION_ENTRY, {
     onCompleted: data => {
