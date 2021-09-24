@@ -18,7 +18,7 @@
 
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
-import {defaultColors} from '../../constants/colors'
+import {defaultColors, statusColors} from '../../constants/colors'
 import ViewOptionsTabPanel from '../ViewOptionsTabPanel'
 
 describe('ViewOptionsTabPanel', () => {
@@ -43,7 +43,7 @@ describe('ViewOptionsTabPanel', () => {
         onChange: jest.fn()
       },
       statusColors: {
-        currentValues: defaultColors,
+        currentValues: statusColors(),
         onChange: jest.fn()
       },
       viewUngradedAsZero: {
@@ -196,7 +196,7 @@ describe('ViewOptionsTabPanel', () => {
     it('renders the status color panel with the colors supplied in .currentValues', () => {
       const {getByRole} = renderPanel({
         statusColors: {
-          currentValues: {...defaultColors, excused: '#ffffff'},
+          currentValues: {...statusColors(), excused: '#ffffff'},
           onChange: () => {}
         }
       })
@@ -210,7 +210,7 @@ describe('ViewOptionsTabPanel', () => {
       const onChange = jest.fn()
       const {getByRole} = renderPanel({
         statusColors: {
-          currentValues: {...defaultColors, excused: '#ffffff'},
+          currentValues: {...statusColors(), excused: '#ffffff'},
           onChange
         }
       })

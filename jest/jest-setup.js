@@ -86,7 +86,6 @@ const ignoredErrors = [
   /The prop `canReadAnnouncements` is marked as required in `(K5Announcement|K5Course)`/,
   /The prop `children` is marked as required in `TruncateText`/,
   /The prop `color` is marked as required in `StatusColorListItem`/,
-  /The prop `colors.late` is marked as required in `StatusColorPanel`/,
   /The prop `conferenceTypes\[0\].name` is marked as required in `(AddConference|ConferenceButton)`/,
   /The prop `containingContext.userId` is marked as required in `CanvasContentTray`/,
   /The prop `courseId` is marked as required in `(LatestAnnouncementLink|PublishButton)`/,
