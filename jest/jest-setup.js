@@ -64,7 +64,7 @@ const ignoredErrors = [
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `conversation._id` of type `number` supplied to `ComposeModalManager`/,
   /Invalid prop `currentUserId` of type `number` supplied to `AddStudentModal`/,
-  /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/,
+  /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `firstAnnouncement.postedDate` of type `String` supplied to `K5Announcement`/,
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
@@ -74,7 +74,6 @@ const ignoredErrors = [
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invalid prop `shares\[0\].content_export.id` of type `number` supplied to `ReceivedTable`/,
-  /Invalid prop `submissions\[0\].submissionDraft.submissionAttempt` of type `number` supplied to `StudentsTable`/,
   /Invalid prop `value` of type `object` supplied to `CanvasSelect`/,
   /Invariant Violation/,
   /It looks like you're using the wrong act/,
@@ -177,14 +176,11 @@ const ignoredWarnings = [
   /`waitForElement` has been deprecated/,
   /Error getting \/media_objects\/dummy_media_id\/info/,
   /Exactly one focusable child is required/,
-  /Found @client directives in a query but no ApolloClient resolvers were specified/,
   /is deprecated and will be removed/,
-  /Missing field __typename in/,
   /Missing field errors in/,
   /Missing field moduleItem in/,
   /Please update the following components: %s/,
   /shared_brand_configs.* not called/,
-  /The `renderSortLabel` prop should be provided when Table is sortable/,
   /toBeEmpty has been deprecated/,
   /Translation for .* is missing/,
   /value provided is not in a recognized RFC2822 or ISO format/

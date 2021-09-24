@@ -289,7 +289,7 @@ export default class StudentsTable extends React.Component {
             <ScreenReaderContent>{I18n.t('Overview of student status')}</ScreenReaderContent>
           }
         >
-          <Head>
+          <Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
             <Row>{HEADERS.map(this.renderHeader)}</Row>
           </Head>
           <Body>{this.renderStudents()}</Body>

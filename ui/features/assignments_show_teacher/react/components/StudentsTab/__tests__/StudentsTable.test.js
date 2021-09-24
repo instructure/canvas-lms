@@ -111,7 +111,7 @@ it('indicates when a submission draft is present', () => {
   const submission = mockSubmission({
     nodes: [user],
     submissionHistories: {nodes: []},
-    submissionDraft: {submissionAttempt: 0}
+    submissionDraft: {submissionAttempt: '0'}
   })
   const assignment = mockAssignment()
 
