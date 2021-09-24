@@ -222,7 +222,7 @@ export const DiscussionThreadContainer = props => {
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.entryParticipant?.rating}
+        isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
