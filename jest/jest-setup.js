@@ -103,7 +103,6 @@ const ignoredErrors = [
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
   /The prop `hasLoaded` is marked as required in `HistoryList`/,
-  /The prop `homeroomAnnouncements` is marked as required in `HomeroomPage`/,
   /The prop `host` is marked as required in `CanvasContentTray`/,
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
   /The prop `imageUrl` is marked as required in `GenericErrorPage`/,
