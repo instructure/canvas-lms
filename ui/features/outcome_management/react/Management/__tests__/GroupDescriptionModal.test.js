@@ -26,6 +26,7 @@ describe('GroupDescriptionModal', () => {
   let onCloseHandlerMock
   const defaultProps = (props = {}) => ({
     outcomeGroup: {
+      _id: '1',
       title: 'Group Title',
       description: 'Group Description'
     },
