@@ -32,8 +32,8 @@ module AssignmentUtil
 
   def self.due_date_ok?(assignment)
     !due_date_required?(assignment) ||
-    assignment.due_at.present? ||
-    assignment.grading_type == 'not_graded'
+      assignment.due_at.present? ||
+      assignment.grading_type == 'not_graded'
   end
 
   def self.assignment_name_length_required?(assignment)
@@ -53,15 +53,15 @@ module AssignmentUtil
   def self.name_length_required_for_account?(context)
     account = Context.get_account(context)
     account.try(:sis_syncing).try(:[], :value) &&
-    account.try(:sis_assignment_name_length).try(:[], :value) &&
-    sis_integration_settings_enabled?(context)
+      account.try(:sis_assignment_name_length).try(:[], :value) &&
+      sis_integration_settings_enabled?(context)
   end
 
   def self.due_date_required_for_account?(context)
     account = Context.get_account(context)
     account.try(:sis_syncing).try(:[], :value).present? &&
-    account.try(:sis_require_assignment_due_date).try(:[], :value) &&
-    sis_integration_settings_enabled?(context)
+      account.try(:sis_require_assignment_due_date).try(:[], :value) &&
+      sis_integration_settings_enabled?(context)
   end
 
   def self.sis_integration_settings_enabled?(context)
@@ -100,18 +100,18 @@ module AssignmentUtil
 
     def initialize(context_type, context_id)
       @context = case context_type
-      when 'Assignment'
-        Assignment.active.where(id: context_id).first
-      when 'AssignmentOverride'
-        AssignmentOverride.active.where(id: context_id).first
-      end
+                 when 'Assignment'
+                   Assignment.active.where(id: context_id).first
+                 when 'AssignmentOverride'
+                   AssignmentOverride.active.where(id: context_id).first
+                 end
 
       @assignment = case context_type
-      when 'Assignment'
-        @context
-      when 'AssignmentOverride'
-        @context&.assignment
-      end
+                    when 'Assignment'
+                      @context
+                    when 'AssignmentOverride'
+                      @context&.assignment
+                    end
     end
 
     def apply(&block)
@@ -137,15 +137,15 @@ module AssignmentUtil
         @context.submissions.active.where(workflow_state: 'unsubmitted')
       when AssignmentOverride
         students = case @context.set_type
-        when 'ADHOC'
-          @context.assignment_override_students
-        when 'CourseSection'
-          @context.set.participating_students
-        when 'Group'
-          @context.set.participants
-        else
-          []
-        end
+                   when 'ADHOC'
+                     @context.assignment_override_students
+                   when 'CourseSection'
+                     @context.set.participating_students
+                   when 'Group'
+                     @context.set.participants
+                   else
+                     []
+                   end
 
         @context.assignment.submissions.active.where(
           workflow_state: 'unsubmitted',

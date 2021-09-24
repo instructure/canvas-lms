@@ -25,7 +25,7 @@ lib = (Class.new do
   def api_v1_outcome_path(opts)
     "/api/v1/outcome/#{opts.fetch(:id)}"
   end
-s
+  s
   def polymorphic_path(*_args)
     '/test'
   end
@@ -38,13 +38,13 @@ RSpec.describe "Api::V1::Outcome" do
 
   def new_outcome(creation_params = {})
     creation_params.reverse_merge!({
-      :title => 'TMNT Beats',
-      :calculation_method => 'decaying_average',
-      :calculation_int => 65,
-      :display_name => "Ninja Rap",
-      :description => "Turtles with Vanilla Ice",
-      :vendor_guid => "TurtleTime4002",
-    })
+                                     :title => 'TMNT Beats',
+                                     :calculation_method => 'decaying_average',
+                                     :calculation_int => 65,
+                                     :display_name => "Ninja Rap",
+                                     :description => "Turtles with Vanilla Ice",
+                                     :vendor_guid => "TurtleTime4002",
+                                   })
 
     @outcome = LearningOutcome.create!(creation_params)
     @outcome
@@ -95,7 +95,7 @@ RSpec.describe "Api::V1::Outcome" do
 
       it "returns the json for multiple outcomes" do
         outcomes = []
-        10.times{ outcomes.push(new_outcome) }
+        10.times { outcomes.push(new_outcome) }
         lib.outcomes_json(outcomes, nil, nil, opts).each { |o| check_outcome_json.call(o) }
       end
 
@@ -111,7 +111,7 @@ RSpec.describe "Api::V1::Outcome" do
           end
 
           it "returns the outcome proficiency and calculation method values of the provided context" do
-            json = lib.outcome_json(new_outcome({**outcome_params, :context => @account}), nil, nil, context: @course)
+            json = lib.outcome_json(new_outcome({ **outcome_params, :context => @account }), nil, nil, context: @course)
             expect(json['calculation_method']).to eq(@course_calculation_method.calculation_method)
             expect(json['calculation_int']).to eq(@course_calculation_method.calculation_int)
             expect(json['ratings']).to eq(@course_proficiency.ratings_hash.map(&:stringify_keys))
@@ -127,7 +127,7 @@ RSpec.describe "Api::V1::Outcome" do
 
           it "ignores the resolved_outcome_proficiency and resolved_calculation_method of the provided context" do
             opts.merge!(context: @course)
-            check_outcome_json.call(lib.outcome_json(new_outcome(({**outcome_params, :context => @course})), nil, nil, opts))
+            check_outcome_json.call(lib.outcome_json(new_outcome(({ **outcome_params, :context => @course })), nil, nil, opts))
           end
         end
       end
@@ -155,7 +155,7 @@ RSpec.describe "Api::V1::Outcome" do
 
       it "returns the json for multiple outcome links" do
         course_with_teacher(active_all: true)  # sets @course
-        outcome_links = 10.times.map{ new_outcome_link(outcome_params, @course) }
+        outcome_links = 10.times.map { new_outcome_link(outcome_params, @course) }
         lib.outcome_links_json(outcome_links, nil, nil).each do |ol|
           check_outcome_link_json.call(
             LearningOutcome.find(ol["outcome"]["id"]),

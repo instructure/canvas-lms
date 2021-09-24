@@ -21,7 +21,6 @@
 module Lti
   module MembershipService
     class CourseGroupCollator < CollatorBase
-
       def memberships
         @_memberships ||= collate_memberships
       end

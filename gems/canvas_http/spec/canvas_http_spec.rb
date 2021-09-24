@@ -24,12 +24,12 @@ require 'tempfile'
 require 'multipart'
 
 describe "CanvasHttp" do
-
   include WebMock::API
 
   around :each do |block|
     fake_logger = Class.new do
       attr_reader :messages
+
       def initialize()
         @messages = []
         super
@@ -58,8 +58,8 @@ describe "CanvasHttp" do
     it "allows you to send a body" do
       url = "www.example.com/a"
       body = "abc"
-      stub_request(:post, url).with(body: "abc").
-        to_return(status: 200)
+      stub_request(:post, url).with(body: "abc")
+                              .to_return(status: 200)
       expect(CanvasHttp.post(url, body: body).code).to eq "200"
       logs = CanvasHttp.logger.messages
       expect(logs.size).to eq(3)
@@ -73,8 +73,8 @@ describe "CanvasHttp" do
       url = "www.example.com/a"
       body = "abc"
       content_type = "plain/text"
-      stub_request(:post, url).with(body: "abc", :headers => {'Content-Type'=>content_type}).
-        to_return(status: 200)
+      stub_request(:post, url).with(body: "abc", :headers => { 'Content-Type' => content_type })
+                              .to_return(status: 200)
       expect(CanvasHttp.post(url, body: body, content_type: content_type).code).to eq "200"
     end
 
@@ -128,9 +128,9 @@ describe "CanvasHttp" do
   end
 
   describe ".get" do
-    it "should return response objects" do
-      stub_request(:get, "http://www.example.com/a/b").
-        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+    it "returns response objects" do
+      stub_request(:get, "http://www.example.com/a/b")
+        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a/b")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
@@ -147,7 +147,7 @@ describe "CanvasHttp" do
       CanvasHttp.get("http://www.example.com/a/b")
     end
 
-    it "should use ssl" do
+    it "uses ssl" do
       http = double
       allow(Net::HTTP).to receive(:new) { http }
       expect(http).to receive(:use_ssl=).with(true)
@@ -160,40 +160,40 @@ describe "CanvasHttp" do
       expect(CanvasHttp.get("https://www.example.com/a/b").body).to eq("Hello SSL")
     end
 
-    it "should follow redirects" do
-      stub_request(:get, "http://www.example.com/a").
-        to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
-      stub_request(:get, "http://www.example2.com/a").
-        to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
-      stub_request(:get, "http://www.example3.com/a").
-        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+    it "follows redirects" do
+      stub_request(:get, "http://www.example.com/a")
+        .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
+      stub_request(:get, "http://www.example2.com/a")
+        .to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a' })
+      stub_request(:get, "http://www.example3.com/a")
+        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
     end
 
-    it "should follow relative redirects" do
-      stub_request(:get, "http://www.example.com/a").
-        to_return(status: 301, headers: { 'Location' => '/b'})
-      stub_request(:get, "http://www.example.com/b").
-        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+    it "follows relative redirects" do
+      stub_request(:get, "http://www.example.com/a")
+        .to_return(status: 301, headers: { 'Location' => '/b' })
+      stub_request(:get, "http://www.example.com/b")
+        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       res = CanvasHttp.get("http://www.example.com/a")
       expect(res).to be_a Net::HTTPOK
       expect(res.body).to eq("Hello")
     end
 
-    it "should fail on too many redirects" do
-      stub_request(:get, "http://www.example.com/a").
-        to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a'})
-      stub_request(:get, "http://www.example2.com/a").
-        to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a'})
+    it "fails on too many redirects" do
+      stub_request(:get, "http://www.example.com/a")
+        .to_return(status: 301, headers: { 'Location' => 'http://www.example2.com/a' })
+      stub_request(:get, "http://www.example2.com/a")
+        .to_return(status: 301, headers: { 'Location' => 'http://www.example3.com/a' })
       expect { CanvasHttp.get("http://www.example.com/a", redirect_limit: 2) }.to raise_error(CanvasHttp::TooManyRedirectsError)
     end
 
-    it "should yield requests to blocks" do
+    it "yields requests to blocks" do
       res = nil
-      stub_request(:get, "http://www.example.com/a/b").
-        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      stub_request(:get, "http://www.example.com/a/b")
+        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       CanvasHttp.get("http://www.example.com/a/b") do |yielded_res|
         res = yielded_res
       end
@@ -201,12 +201,12 @@ describe "CanvasHttp" do
       expect(res.body).to eq("Hello")
     end
 
-    it "should check host before running" do
+    it "checks host before running" do
       res = nil
-      stub_request(:get, "http://www.example.com/a/b").
-        to_return(body: "Hello", headers: { 'Content-Length' => 5 })
+      stub_request(:get, "http://www.example.com/a/b")
+        .to_return(body: "Hello", headers: { 'Content-Length' => 5 })
       expect(CanvasHttp).to receive(:insecure_host?).with("www.example.com").and_return(true)
-      expect{ CanvasHttp.get("http://www.example.com/a/b") }.to raise_error(CanvasHttp::InsecureUriError)
+      expect { CanvasHttp.get("http://www.example.com/a/b") }.to raise_error(CanvasHttp::InsecureUriError)
     end
 
     context 'when given a max_response_body_length' do
@@ -225,7 +225,7 @@ describe "CanvasHttp" do
       end
 
       context 'when the response body is <= max_response_body_length' do
-        it 'should return a response with a string body' do
+        it 'returns a response with a string body' do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           res = CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 100)
           expect(res.body).to eq("Hello" * 20)
@@ -233,7 +233,7 @@ describe "CanvasHttp" do
       end
 
       context 'when the response body is larger than this (one chunk)' do
-        it 'should raise a ResponseTooLargeError' do
+        it 'raises a ResponseTooLargeError' do
           stub_request(:get, "http://www.example.com/a/b").to_return(body: "Hello" * 20)
           expect do
             CanvasHttp.get("http://www.example.com/a/b", max_response_body_length: 99)
@@ -256,7 +256,7 @@ describe "CanvasHttp" do
       end
 
       context 'if the total response body is larger than the max length' do
-        it 'should raise a ResponseTooLargeError' do
+        it 'raises a ResponseTooLargeError' do
           expect { CanvasHttp.read_body_max_length(mock_response, 99) }.to \
             raise_error(CanvasHttp::ResponseTooLargeError)
         end
@@ -274,13 +274,13 @@ describe "CanvasHttp" do
   describe '#insecure_host?' do
     around(:each) do |example|
       old_filters = CanvasHttp.blocked_ip_filters
-      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
+      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16'] }
       example.call
     ensure
       CanvasHttp.blocked_ip_filters = old_filters
     end
 
-    it "should check for insecure hosts" do
+    it "checks for insecure hosts" do
       expect(CanvasHttp.insecure_host?('example.com')).to eq false
       expect(CanvasHttp.insecure_host?('localhost')).to eq true
       expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
@@ -291,13 +291,13 @@ describe "CanvasHttp" do
 
     it "raises an error when URL is not resolveable" do
       bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
-      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
+      expect { CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
 
     it "won't continue to process a host with no valid IPs" do
       bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
       expect(Resolv).to receive(:getaddresses).with(bad_url).and_return(["not.an.ip.address"])
-      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
+      expect { CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
   end
 

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module AddressBook
-
   # base interface and partial implementation of AddressBook, including
   # documentation.
   #
@@ -29,6 +28,7 @@ module AddressBook
   class Base
     def self.inherited(derived)
       return unless derived.superclass == AddressBook::Base
+
       derived.prepend(AddressBook::Caching)
     end
 
@@ -53,12 +53,12 @@ module AddressBook
     # the :conversation_id option indicates that any participants in the
     # existing conversation should be considered known; ignored if the sender
     # is not already a participant in that conversation.
-    def known_users(users, options={})
+    def known_users(users, options = {})
       raise NotImplemented
     end
 
     # as known_users, but for just the one user
-    def known_user(user, options={})
+    def known_user(user, options = {})
       known_users([user], options).first
     end
 
@@ -125,7 +125,7 @@ module AddressBook
     # implementation note: we don't need to worry about top-level pagination of
     # the result -- we know it's used in a merge -- so all it needs to
     # implement are depth, new_pager, and execute_page.
-    def search_users(options={})
+    def search_users(options = {})
       raise NotImplemented
     end
 

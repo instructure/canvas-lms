@@ -24,7 +24,7 @@ module AddressBook
       @service_tap = AddressBook::Service.new(sender, ignore_result: true)
     end
 
-    def known_users(users, options={})
+    def known_users(users, options = {})
       @service_tap.known_users(users, options)
       super
     end
@@ -46,7 +46,7 @@ module AddressBook
     class TapProxy < PaginatedCollection::Proxy
       def initialize(source_collection:, tap_collection:)
         @source_collection = source_collection
-        super lambda{ |source_pager|
+        super lambda { |source_pager|
           tap_pager = tap_collection.configure_pager(
             tap_collection.new_pager,
             per_page: source_pager.per_page,
@@ -70,7 +70,7 @@ module AddressBook
       end
     end
 
-    def search_users(options={})
+    def search_users(options = {})
       TapProxy.new(
         source_collection: super,
         tap_collection: @service_tap.search_users(options)

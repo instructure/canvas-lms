@@ -51,6 +51,7 @@ class BounceNotificationProcessor
 
   def process
     return nil unless self.class.enabled?
+
     start = Time.now.utc
 
     bounce_queue.poll(config.slice(*POLL_PARAMS)) do |message|
@@ -72,6 +73,7 @@ class BounceNotificationProcessor
 
   def bounce_queue
     return @bounce_queue if defined?(@bounce_queue)
+
     sqs = Aws::SQS::Client.new(config.slice(:access_key_id, :secret_access_key, :region, :endpoint))
     @bounce_queue = Aws::SQS::QueuePoller.new(sqs.get_queue_url(queue_name: config[:bounce_queue_name]).queue_url, client: sqs)
   end
@@ -84,12 +86,12 @@ class BounceNotificationProcessor
 
   def process_bounce_notification(bounce_notification)
     type = if is_suppression_bounce?(bounce_notification)
-      'suppression'
-    elsif is_permanent_bounce?(bounce_notification)
-      'permanent'
-    else
-      'transient'
-    end
+             'suppression'
+           elsif is_permanent_bounce?(bounce_notification)
+             'permanent'
+           else
+             'transient'
+           end
     InstStatsd::Statsd.increment("bounce_notification_processor.processed.#{type}")
 
     bouncy_addresses(bounce_notification).each do |address|
@@ -135,6 +137,6 @@ class BounceNotificationProcessor
   end
 
   def bouncy_addresses(bounce)
-    bounce['bouncedRecipients'].map {|r| r['emailAddress'] }
+    bounce['bouncedRecipients'].map { |r| r['emailAddress'] }
   end
 end

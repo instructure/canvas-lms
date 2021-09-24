@@ -20,20 +20,20 @@
 module Canvas::Migration::ExternalContent
   class Migrator
     class << self
-
       def registered_services
         @registered_services ||= {}
       end
 
       def register_service(key, service)
         raise "service with the key #{key} is already registered" if self.registered_services[key] && self.registered_services[key] != service
+
         Canvas::Migration::ExternalContent::ServiceInterface.validate_service!(service)
         self.registered_services[key] = service
       end
 
       # tells the services to begin exporting
       # should return the info we need to go retrieve the exported data later (e.g. a status url)
-      def begin_exports(course, opts={})
+      def begin_exports(course, opts = {})
         pending_exports = {}
         pending_exports.merge!(Lti::ContentMigrationService.begin_exports(course, opts)) if Lti::ContentMigrationService.enabled?
         self.registered_services.each do |key, service|
@@ -137,7 +137,7 @@ module Canvas::Migration::ExternalContent
       end
 
       private def import_service_for(key)
-        if Lti::ContentMigrationService::KEY_REGEX  =~ key
+        if Lti::ContentMigrationService::KEY_REGEX =~ key
           Lti::ContentMigrationService.importer_for(key)
         else
           self.registered_services[key]

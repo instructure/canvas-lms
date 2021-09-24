@@ -22,40 +22,38 @@ require 'spec_helper'
 
 describe LtiOutbound::VariableSubstitutor do
   describe "#substitute" do
-
     it "leaves the value unchanged for unkown keys" do
-      data_hash = {'canvas_course_id' => '$Invalid.key'}
+      data_hash = { 'canvas_course_id' => '$Invalid.key' }
       expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Invalid.key'
     end
 
     it "substitutes nil values" do
-      data_hash = {'canvas_course_id' => '$My.custom.variable'}
+      data_hash = { 'canvas_course_id' => '$My.custom.variable' }
       subject.add_substitution '$My.custom.variable', nil
 
       expect(subject.substitute!(data_hash)['canvas_course_id']).to eq nil
     end
 
     it "leaves the value unchanged for missing models" do
-      data_hash = {'canvas_course_id' => '$Canvas.account.id'}
+      data_hash = { 'canvas_course_id' => '$Canvas.account.id' }
       expect(subject.substitute!(data_hash)['canvas_course_id']).to eq '$Canvas.account.id'
     end
 
     describe 'variable_substitutions' do
-
       it 'can accept variable substitutions' do
         subject.add_substitution '$My.custom.variable', 'blah'
-        data_hash = {custom_var: '$My.custom.variable'}
+        data_hash = { custom_var: '$My.custom.variable' }
         subject.substitute!(data_hash)
 
-        expect(data_hash).to eq({custom_var: 'blah'})
+        expect(data_hash).to eq({ custom_var: 'blah' })
       end
 
       it 'can evaluate a proc' do
-        subject.add_substitution '$My.custom.proc', Proc.new {'blah'}
-        data_hash = {custom_var: '$My.custom.proc'}
+        subject.add_substitution '$My.custom.proc', Proc.new { 'blah' }
+        data_hash = { custom_var: '$My.custom.proc' }
         subject.substitute!(data_hash)
 
-        expect(data_hash).to eq({custom_var: 'blah'})
+        expect(data_hash).to eq({ custom_var: 'blah' })
       end
     end
 

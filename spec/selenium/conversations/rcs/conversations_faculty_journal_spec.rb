@@ -27,8 +27,8 @@ describe "conversations new" do
 
   let(:account) { Account.default }
   let(:account_settings_url) { "/accounts/#{account.id}/settings" }
-  let(:user_notes_url) { "/courses/#{@course.id}/user_notes"}
-  let(:student_user_notes_url) {"/users/#{@s1.id}/user_notes"}
+  let(:user_notes_url) { "/courses/#{@course.id}/user_notes" }
+  let(:student_user_notes_url) { "/users/#{@s1.id}/user_notes" }
 
   before do
     conversation_setup
@@ -47,7 +47,7 @@ describe "conversations new" do
       stub_rcs_config
     end
 
-    it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
+    it "allows a site admin to enable faculty journal", priority: "2", test_id: 75005 do
       get account_settings_url
       f('#account_enable_user_notes').click
       f('.Button.Button--primary[type="submit"]').click

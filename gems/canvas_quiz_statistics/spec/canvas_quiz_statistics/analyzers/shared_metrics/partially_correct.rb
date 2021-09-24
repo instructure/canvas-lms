@@ -18,11 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 shared_examples '[:partially_correct]' do
-  it 'should count all partially correct responses' do
+  it 'counts all partially correct responses' do
     stats = subject.run([
-      { correct: "true" },
-      { correct: "partial" }
-    ])
+                          { correct: "true" },
+                          { correct: "partial" }
+                        ])
 
     expect(stats[:partially_correct]).to eq(1)
   end

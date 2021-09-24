@@ -36,7 +36,7 @@ class CanvasCacheInit
       # our caching, and so we have to break the chain somewhere.  We're starting
       # with the caching.  TODO: Once canvas errors is out on it's own we can let
       # CanvasCache take a dependency on it directly and forego this injection.
-      CanvasCache.on_captured_error = ->(e){ Canvas::Errors.capture_exception(:redis, e, :warn) }
+      CanvasCache.on_captured_error = ->(e) { Canvas::Errors.capture_exception(:redis, e, :warn) }
     end
   end
 end

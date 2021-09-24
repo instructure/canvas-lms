@@ -203,17 +203,17 @@ class PermissionsIndex
     # on the close button. Wait for it here.
     def wait_for_tray_ready
       keep_trying_until(2) do
-        disable_implicit_wait{ yield == current_active_element }
+        disable_implicit_wait { yield == current_active_element }
       end
     end
 
     def open_edit_role_tray(role)
       role_name(role).click
-      wait_for_tray_ready{ close_role_tray_button }
+      wait_for_tray_ready { close_role_tray_button }
 
       keep_trying_until do
-        disable_implicit_wait{edit_role_icon.click}
-        disable_implicit_wait{edit_name_box.displayed?}
+        disable_implicit_wait { edit_role_icon.click }
+        disable_implicit_wait { edit_name_box.displayed? }
       end
       # sometimes the input loads and the value takes longer, wait for value
       wait_for(method: nil, timeout: 1) { edit_name_box.attribute('value') == role.name }
@@ -221,7 +221,7 @@ class PermissionsIndex
 
     def add_role(name)
       add_role_button.click
-      wait_for_tray_ready{ close_add_role_tray_button }
+      wait_for_tray_ready { close_add_role_tray_button }
       add_role_input.click
       set_value(add_role_input, name)
       add_role_submit_button.click
@@ -257,7 +257,7 @@ class PermissionsIndex
 
     def open_permission_tray(permission_name)
       permission_link(permission_name).click
-      wait_for_tray_ready{ close_permission_tray_button }
+      wait_for_tray_ready { close_permission_tray_button }
     end
   end
 end

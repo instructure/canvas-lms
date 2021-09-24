@@ -31,7 +31,6 @@ class UserListV2
   # - only search on particular columns
   # - don't worry about whether we can create users or not: they either exist or they don't
 
-
   SEARCH_TYPES = %w{unique_id sis_user_id cc_path}.freeze
 
   def initialize(list_in, root_account: Account.default, search_type: nil, current_user: nil, can_read_sis: false)
@@ -57,6 +56,7 @@ class UserListV2
       resolve_by_unique_id
     when "sis_user_id"
       raise "cannot read sis ids" unless @can_read_sis
+
       resolve_by_sis_user_id
     when "cc_path"
       resolve_by_cc_path
@@ -92,9 +92,10 @@ class UserListV2
 
   def restrict_shards
     return unless GlobalLookups.enabled?
+
     # we can use the global lookups to restrict our search to only the necessary shards
 
-    all_shards = Set.new(all_account_ids.map{|id| Shard.shard_for(id)}.uniq)
+    all_shards = Set.new(all_account_ids.map { |id| Shard.shard_for(id) }.uniq)
     # however it doesn't seem like it makes much sense to all hit the global_lookups if we're looking on at most 2-3 shards
     return if all_shards.count <= Setting.get('global_lookups_shard_threshold', '3').to_i
 
@@ -108,25 +109,25 @@ class UserListV2
   end
 
   def add_rows(rows, original_shard)
-    rows.uniq!{|r| r[1]} # unique on user_id
+    rows.uniq! { |r| r[1] } # unique on user_id
     rows.each do |address, user_id, user_uuid, account_id, user_name, account_name|
       if Shard.current != original_shard
         user_id = Shard.relative_id_for(user_id, Shard.current, original_shard)
         account_id = Shard.relative_id_for(account_id, Shard.current, original_shard)
       end
-      @all_results << {:address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid),
-                       :user_name => user_name, :account_id => account_id, :account_name => account_name}
+      @all_results << { :address => address, :user_id => user_id, :user_token => User.token(user_id, user_uuid),
+                        :user_name => user_name, :account_id => account_id, :account_name => account_name }
     end
   end
 
   def resolve_duplicates_and_missing
-    grouped_results = @all_results.group_by{|r| @lowercase ? r[:address].downcase : r[:address]}
+    grouped_results = @all_results.group_by { |r| @lowercase ? r[:address].downcase : r[:address] }
 
     grouped_results.each do |_a, results|
       if results.count == 1
         @resolved_results << results.first
-      elsif results.uniq{|r| Shard.global_id_for(r[:user_id])}.count == 1
-        @resolved_results << results.detect{|r| r[:account_id] == @root_account.id} || results.first # prioritize local result first
+      elsif results.uniq { |r| Shard.global_id_for(r[:user_id]) }.count == 1
+        @resolved_results << results.detect { |r| r[:account_id] == @root_account.id } || results.first # prioritize local result first
       else
         @duplicate_results << results
       end
@@ -147,7 +148,7 @@ class UserListV2
   def add_additional_data_for_duplicates
     return unless @duplicate_results.any?
 
-    duplicate_user_ids = @duplicate_results.map{|set| set.map{|h| h[:user_id]}}.flatten.uniq
+    duplicate_user_ids = @duplicate_results.map { |set| set.map { |h| h[:user_id] } }.flatten.uniq
     user_map = User.where(:id => duplicate_user_ids).preload(:pseudonyms).to_a.index_by(&:id)
 
     @duplicate_results.each do |set|
@@ -168,6 +169,7 @@ class UserListV2
     original_shard = Shard.current
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if restricted_shards && !restricted_shards.include?(Shard.current)
+
       add_rows(yield(account_ids), original_shard)
     end
   end
@@ -177,12 +179,12 @@ class UserListV2
       Pseudonym.associated_shards_for_column(:unique_id, address)
     end
 
-    unique_ids = @addresses.map{|a| a[:address].downcase}
+    unique_ids = @addresses.map { |a| a[:address].downcase }
 
     search_for_results(restricted_shards) do |account_ids|
-      Pseudonym.active.where(:account_id => account_ids).
-        where("LOWER(unique_id) IN (?)", unique_ids).joins(:user, :account).
-        pluck(:unique_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
+      Pseudonym.active.where(:account_id => account_ids)
+               .where("LOWER(unique_id) IN (?)", unique_ids).joins(:user, :account)
+               .pluck(:unique_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
     end
     @lowercase = true
   end
@@ -194,12 +196,12 @@ class UserListV2
         Pseudonym.associated_shards_for_column(:integration_id, address)
     end
 
-    ids = @addresses.map{|a| a[:address]}
+    ids = @addresses.map { |a| a[:address] }
     search_for_results(restricted_shards) do |account_ids|
-      rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account).
-        pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
-      rows += Pseudonym.active.where(:account_id => account_ids, :integration_id => ids).joins(:user, :account).
-        pluck(:integration_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
+      rows = Pseudonym.active.where(:account_id => account_ids, :sis_user_id => ids).joins(:user, :account)
+                      .pluck(:sis_user_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
+      rows += Pseudonym.active.where(:account_id => account_ids, :integration_id => ids).joins(:user, :account)
+                       .pluck(:integration_id, :user_id, "users.uuid", :account_id, 'users.name', 'accounts.name')
       rows
     end
   end
@@ -230,23 +232,23 @@ class UserListV2
     search_for_results(restricted_shards) do
       ccs = []
       scope = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
-        CommunicationChannel.unretired
-      else
-        CommunicationChannel.active
-      end
-      
+                CommunicationChannel.unretired
+              else
+                CommunicationChannel.active
+              end
+
       if sms_paths.any?
         ccs = scope
-          .sms
-          .preload(user: :pseudonyms)
-          .where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths)
-          .to_a
+              .sms
+              .preload(user: :pseudonyms)
+              .where((["path LIKE ?"] * sms_paths.count).join(" OR "), *sms_paths)
+              .to_a
       end
       ccs += scope
-        .email
-        .preload(user: :pseudonyms)
-        .where("LOWER(path) IN (?)", email_paths)
-        .to_a
+             .email
+             .preload(user: :pseudonyms)
+             .where("LOWER(path) IN (?)", email_paths)
+             .to_a
 
       ccs.map do |cc|
         next unless (p = SisPseudonym.for(cc.user, @root_account, type: :trusted, require_sis: false))

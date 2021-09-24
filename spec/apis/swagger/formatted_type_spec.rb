@@ -23,7 +23,7 @@ require 'formatted_type'
 
 describe FormattedType do
   let(:ft) { FormattedType.new(example) }
-  subject{ ft }
+  subject { ft }
 
   context "integer" do
     let(:example) { 1 }
@@ -45,7 +45,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "integer", "format" => "int64"}) }
+      it { is_expected.to eq({ "type" => "integer", "format" => "int64" }) }
     end
   end
 
@@ -69,7 +69,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "integer", "format" => "int64"}) }
+      it { is_expected.to eq({ "type" => "integer", "format" => "int64" }) }
     end
   end
 
@@ -93,7 +93,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "number", "format" => "double"}) }
+      it { is_expected.to eq({ "type" => "number", "format" => "double" }) }
     end
   end
 
@@ -117,7 +117,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "number", "format" => "double"}) }
+      it { is_expected.to eq({ "type" => "number", "format" => "double" }) }
     end
   end
 
@@ -146,7 +146,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "string"}) }
+      it { is_expected.to eq({ "type" => "string" }) }
     end
   end
 
@@ -180,7 +180,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "boolean"}) }
+      it { is_expected.to eq({ "type" => "boolean" }) }
     end
   end
 
@@ -214,7 +214,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "string", "format" => "date"}) }
+      it { is_expected.to eq({ "type" => "string", "format" => "date" }) }
     end
   end
 
@@ -253,8 +253,7 @@ describe FormattedType do
 
     describe '#to_hash' do
       subject { super().to_hash }
-      it { is_expected.to eq({"type" => "string", "format" => "date-time"}) }
+      it { is_expected.to eq({ "type" => "string", "format" => "date-time" }) }
     end
   end
-
 end

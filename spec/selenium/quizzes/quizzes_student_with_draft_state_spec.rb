@@ -21,7 +21,6 @@ require_relative '../common'
 require_relative '../helpers/quizzes_common'
 require_relative '../helpers/assignment_overrides'
 
-
 describe 'quizzes with draft state' do
   include_context "in-process server selenium tests"
   include QuizzesCommon
@@ -38,9 +37,7 @@ describe 'quizzes with draft state' do
   end
 
   context 'with a student' do
-
     context 'with an unpublished quiz' do
-
       before(:each) do
         @quiz.unpublish!
       end
@@ -59,7 +56,6 @@ describe 'quizzes with draft state' do
     end
 
     context 'when the available date is in the future' do
-
       before(:each) do
         @quiz.unlock_at = Time.now.utc + 200.seconds
         @quiz.publish!

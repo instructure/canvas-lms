@@ -51,7 +51,6 @@ describe Api::V1::SisAssignment do
       ]
     end
 
-
     let(:course_section_1) { CourseSection.new }
     let(:course_section_2) { CourseSection.new }
     let(:course_section_3) { CourseSection.new }
@@ -88,7 +87,7 @@ describe Api::V1::SisAssignment do
     it "creates assignment groups that have name and integration_data with proper data" do
       ag_name = 'chumba choo choo'
       sis_source_id = "my super unique goo-id"
-      integration_data = {'something'=> 'else', 'foo'=> {'bar'=> 'baz'}}
+      integration_data = { 'something' => 'else', 'foo' => { 'bar' => 'baz' } }
       assignment_group = AssignmentGroup.new(name: ag_name,
                                              sis_source_id: sis_source_id,
                                              integration_data: integration_data, group_weight: 8.7)
@@ -196,8 +195,8 @@ describe Api::V1::SisAssignment do
         due_at = Time.zone.parse('2017-02-08 22:11:10')
         assignment_1.update(due_at: nil)
         create_mastery_paths_override_for_assignment(assignment_1, due_at: due_at)
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(:active_assignment_overrides)
+        assignments = Assignment.where(id: assignment_1.id)
+                                .preload(:active_assignment_overrides)
 
         result = generator.sis_assignments_json(assignments)
 
@@ -211,8 +210,8 @@ describe Api::V1::SisAssignment do
         override_due_at = Time.zone.parse('2017-02-08 22:11:10')
         create_mastery_paths_override_for_assignment(assignment_1, due_at: override_due_at)
 
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(:active_assignment_overrides)
+        assignments = Assignment.where(id: assignment_1.id)
+                                .preload(:active_assignment_overrides)
 
         result = generator.sis_assignments_json(assignments)
 
@@ -221,7 +220,7 @@ describe Api::V1::SisAssignment do
     end
 
     context "student_overrides: true" do
-      let(:course) {assignment_1.course}
+      let(:course) { assignment_1.course }
 
       before do
         @student1 = student_in_course(course: course, workflow_state: 'active').user
@@ -233,18 +232,18 @@ describe Api::V1::SisAssignment do
       end
 
       it "adds student assignment override information" do
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
+        assignments = Assignment.where(id: assignment_1.id)
+                                .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
 
         result = generator.sis_assignments_json(assignments, student_overrides: true)
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
-        expect(user_overrides.first).to include({"id" => @override.id, "due_at": @override.due_at})
+        expect(user_overrides.first).to include({ "id" => @override.id, "due_at": @override.due_at })
 
         students = user_overrides.first["students"]
-        expect(students).to include({"user_id" => @student1.id, 'sis_user_id' => nil})
-        expect(students).to include({"user_id" => @student2.id, 'sis_user_id' => 'SIS_ID_2'})
+        expect(students).to include({ "user_id" => @student1.id, 'sis_user_id' => nil })
+        expect(students).to include({ "user_id" => @student2.id, 'sis_user_id' => 'SIS_ID_2' })
         expect(students.size).to eq 2
       end
 
@@ -265,8 +264,8 @@ describe Api::V1::SisAssignment do
       end
 
       it "does not list student sis_ids when users are not preloaded" do
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(active_assignment_overrides: [:assignment_override_students])
+        assignments = Assignment.where(id: assignment_1.id)
+                                .preload(active_assignment_overrides: [:assignment_override_students])
 
         user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
 
@@ -275,14 +274,13 @@ describe Api::V1::SisAssignment do
 
       it 'provides an empty list when there are no overrides' do
         assignment_2 = assignment_model(course: course)
-        assignments = Assignment.where(id: assignment_2.id).
-          preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
+        assignments = Assignment.where(id: assignment_2.id)
+                                .preload(active_assignment_overrides: [assignment_override_students: [user: [:pseudonym]]])
 
         assignment_hash = generator.sis_assignments_json(assignments, student_overrides: true)[0]
 
         expect(assignment_hash['user_overrides']).to eq []
       end
     end
-
   end
 end

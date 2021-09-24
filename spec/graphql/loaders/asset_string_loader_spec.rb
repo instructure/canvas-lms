@@ -51,7 +51,7 @@ describe Loaders::AssetStringLoader do
           expect(assignment).to eq @assignment
         }
       end
-    }.to change{@query_count}.by(2)
+    }.to change { @query_count }.by(2)
   end
 
   it "fulfills with nil if target is not found" do

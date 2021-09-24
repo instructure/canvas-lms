@@ -32,19 +32,19 @@ describe CanvasQuizStatistics::Analyzers::Base do
     end
 
     describe '#metric' do
-      it 'should define a metric calculator' do
+      it 'defines a metric calculator' do
         class Apple < Base
           metric :something do |responses|
             responses.size
           end
         end
 
-        expect(Apple.new({}).run([ {}, {} ])).to eq({ something: 2 })
+        expect(Apple.new({}).run([{}, {}])).to eq({ something: 2 })
 
         unset Apple
       end
 
-      it 'should not conflict with other analyzer metrics' do
+      it 'does not conflict with other analyzer metrics' do
         class Apple < Base
           metric :something do |responses|
             responses.size
@@ -64,13 +64,13 @@ describe CanvasQuizStatistics::Analyzers::Base do
       end
 
       describe 'with context dependencies' do
-        it 'should invoke the context builder and parse dependency' do
+        it 'invokes the context builder and parse dependency' do
           class Apple < Base
             def build_context(responses)
               { colors: responses.map { |r| r[:color] } }
             end
 
-            metric something: [ :colors ] do |responses, colors|
+            metric something: [:colors] do |responses, colors|
               colors.join(', ')
             end
           end
@@ -85,7 +85,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
     end
 
     describe '#inherit_metrics' do
-      it 'should inherit a parent class metrics' do
+      it 'inherits a parent class metrics' do
         class Apple < Base
           metric :something do |responses|
             responses.size
@@ -108,7 +108,7 @@ describe CanvasQuizStatistics::Analyzers::Base do
     end
 
     describe '#inherit' do
-      it 'should inherit a metric from another question type' do
+      it 'inherits a metric from another question type' do
         class Apple < Base
           metric :something do |responses|
             responses.size
@@ -129,6 +129,5 @@ describe CanvasQuizStatistics::Analyzers::Base do
         unset Apple, Orange
       end
     end
-
   end
 end

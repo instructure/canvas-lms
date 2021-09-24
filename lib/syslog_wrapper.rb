@@ -22,15 +22,17 @@ require 'logger'
 require 'syslog'
 
 class SyslogWrapper
-
   attr_accessor :level, :datetime_format
 
   def formatter; nil; end
 
   @@silencer = true
   def self.silencer; @@silencer; end
+
   def silencer; @@silencer; end
+
   def self.silencer=(obj); @@silencer = obj; end
+
   def silencer=(obj); @@silencer = obj; end
 
   def silence(temporary_level = Logger::ERROR)
@@ -63,7 +65,7 @@ class SyslogWrapper
   #   LOG_UUCP - uucp subsystem
   #   LOG_LOCAL0 through LOG_LOCAL7 - locally defined facilities
   # example: SyslogWrapper.new("canvas", Syslog::LOG_USER, :include_pid => true)
-  def initialize(ident, facility=0, options={})
+  def initialize(ident, facility = 0, options = {})
     unless $syslog
       flags = 0
       flags |= Syslog::LOG_CONS if options[:bail_to_console]
@@ -76,7 +78,7 @@ class SyslogWrapper
     @skip_thread_context = options[:skip_thread_context]
     @datetime_format = nil # ignored completely
   end
-  
+
   def close; end
 
   SEVERITY_MAP = {
@@ -85,11 +87,13 @@ class SyslogWrapper
     Logger::WARN => :warning,
     Logger::ERROR => :err,
     Logger::FATAL => :crit,
-    Logger::UNKNOWN => :notice }
+    Logger::UNKNOWN => :notice
+  }
 
-  def add(severity, message=nil, progname=nil)
+  def add(severity, message = nil, progname = nil)
     severity ||= Logger::UNKNOWN
     return if @level > severity
+
     if message.nil?
       if block_given?
         message = yield
@@ -105,20 +109,20 @@ class SyslogWrapper
     $syslog.send(SEVERITY_MAP[severity], "%s", message)
   end
   alias_method :log, :add
-  
+
   def <<(msg); add(@level, msg); end
-  
-  def debug(progname=nil, &block); add(Logger::DEBUG, nil, progname, &block); end
 
-  def info(progname=nil, &block); add(Logger::INFO, nil, progname, &block); end
+  def debug(progname = nil, &block); add(Logger::DEBUG, nil, progname, &block); end
 
-  def warn(progname=nil, &block); add(Logger::WARN, nil, progname, &block); end
+  def info(progname = nil, &block); add(Logger::INFO, nil, progname, &block); end
 
-  def error(progname=nil, &block); add(Logger::ERROR, nil, progname, &block); end
+  def warn(progname = nil, &block); add(Logger::WARN, nil, progname, &block); end
 
-  def fatal(progname=nil, &block); add(Logger::FATAL, nil, progname, &block); end
+  def error(progname = nil, &block); add(Logger::ERROR, nil, progname, &block); end
 
-  def unknown(progname=nil, &block); add(Logger::UNKNOWN, nil, progname, &block); end
+  def fatal(progname = nil, &block); add(Logger::FATAL, nil, progname, &block); end
+
+  def unknown(progname = nil, &block); add(Logger::UNKNOWN, nil, progname, &block); end
 
   def debug?; @level <= Logger::DEBUG; end
 
@@ -129,5 +133,4 @@ class SyslogWrapper
   def error?; @level <= Logger::ERROR; end
 
   def fatal?; @level <= Logger::FATAL; end
-  
 end

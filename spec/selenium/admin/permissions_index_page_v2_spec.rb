@@ -31,8 +31,8 @@ describe "permissions index" do
 
   def create_role_override(permission_name, role, account, opts)
     new_role = RoleOverride.create!(:permission => permission_name, :enabled => opts[:enabled],
-      :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
-      :role_id => role.id, :context_type => 'Account')
+                                    :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
+                                    :role_id => role.id, :context_type => 'Account')
     new_role.id
   end
 
@@ -45,14 +45,14 @@ describe "permissions index" do
 
     it "updates the role to the new name after editing" do
       PermissionsIndex.edit_role(@custom_student_role, "A Better Kitty") # TODO flakiness lies within
-      expect{PermissionsIndex.role_name(@custom_student_role).text}.to become("A Better Kitty")
-      expect{PermissionsIndex.edit_tray_header.text}.to become("Edit A Better Kitty")
+      expect { PermissionsIndex.role_name(@custom_student_role).text }.to become("A Better Kitty")
+      expect { PermissionsIndex.edit_tray_header.text }.to become("Edit A Better Kitty")
     end
 
     it "updates the permission to the correct selection" do
       PermissionsIndex.open_edit_role_tray(@custom_student_role)
       PermissionsIndex.disable_tray_permission("read_announcements", @custom_student_role.id)
-      expect{PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id)}.to become('Disabled')
+      expect { PermissionsIndex.role_tray_permission_state("read_announcements", @custom_student_role.id) }.to become('Disabled')
     end
   end
 
@@ -169,8 +169,8 @@ describe "permissions index" do
     it "updates a permission when changed in the tray" do
       PermissionsIndex.open_permission_tray(@permission_name)
       PermissionsIndex.disable_tray_permission(@permission_name, @role.id)
-      expect{PermissionsIndex.role_tray_permission_state(@permission_name, @role.id)}.to become('Disabled')
-      expect{PermissionsIndex.grid_permission_state(@permission_name, @role.id)}.to become('Disabled')
+      expect { PermissionsIndex.role_tray_permission_state(@permission_name, @role.id) }.to become('Disabled')
+      expect { PermissionsIndex.grid_permission_state(@permission_name, @role.id) }.to become('Disabled')
     end
   end
 

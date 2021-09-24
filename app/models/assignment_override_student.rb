@@ -35,8 +35,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
 
   validates_presence_of :assignment_override, :user
   validates_uniqueness_of :user_id, scope: [:assignment_id, :quiz_id],
-    conditions: -> { where.not(workflow_state: 'deleted') },
-    message: 'already belongs to an assignment override'
+                                    conditions: -> { where.not(workflow_state: 'deleted') },
+                                    message: 'already belongs to an assignment override'
 
   validate :assignment_override, if: :active? do |record|
     if record.assignment_override && record.assignment_override.set_type != 'ADHOC'
@@ -90,14 +90,14 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     return if assignment.new_record?
 
     valid_student_ids = Enrollment
-      .where(course_id: assignment.context_id)
-      .where.not(workflow_state: %w{completed inactive deleted})
-      .pluck(:user_id)
+                        .where(course_id: assignment.context_id)
+                        .where.not(workflow_state: %w{completed inactive deleted})
+                        .pluck(:user_id)
 
     AssignmentOverrideStudent
       .where(assignment: assignment)
       .where.not(user_id: valid_student_ids)
-      .each {|aos| aos.assignment_override.skip_broadcasts = true; aos.destroy}
+      .each { |aos| aos.assignment_override.skip_broadcasts = true; aos.destroy }
   end
 
   attr_writer :no_enrollment
@@ -113,10 +113,11 @@ class AssignmentOverrideStudent < ActiveRecord::Base
     end
   end
 
-  def no_enrollment?(record=self)
+  def no_enrollment?(record = self)
     return @no_enrollment if defined?(@no_enrollment)
 
     return false unless record.user_id && record.context_id
+
     @no_enrollment = !record.user.student_enrollments.shard(record.shard).where(course_id: record.context_id).exists?
   end
 

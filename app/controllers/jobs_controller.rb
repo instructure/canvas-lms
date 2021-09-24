@@ -39,18 +39,18 @@ class JobsController < ApplicationController
       respond_to do |format|
         format.html do
           @running_jobs_refresh_seconds = Setting.get('running_jobs_refresh_seconds', 2.seconds.to_s).to_f
-          @job_tags_refresh_seconds  = Setting.get('job_tags_refresh_seconds', 10.seconds.to_s).to_f
+          @job_tags_refresh_seconds = Setting.get('job_tags_refresh_seconds', 10.seconds.to_s).to_f
         end
 
         format.json do
           case params[:only]
           when 'running'
-            render :json => {running: Delayed::Job.running_jobs.map{ |j| j.as_json(include_root: false, except: [:handler, :last_error]) }}
+            render :json => { running: Delayed::Job.running_jobs.map { |j| j.as_json(include_root: false, except: [:handler, :last_error]) } }
           when 'tags'
-            render :json => {tags: Delayed::Job.tag_counts(@flavor, POPULAR_TAG_COUNTS)}
+            render :json => { tags: Delayed::Job.tag_counts(@flavor, POPULAR_TAG_COUNTS) }
           when 'jobs'
             jobs = jobs(@flavor, params[:limit] || LIMIT, params[:offset].to_i)
-            jobs[:jobs].map!{ |j| j.as_json(:include_root => false, :except => [:handler, :last_error]) }
+            jobs[:jobs].map! { |j| j.as_json(:include_root => false, :except => [:handler, :last_error]) }
             render :json => jobs
           end
         end

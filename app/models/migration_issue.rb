@@ -24,7 +24,7 @@ class MigrationIssue < ActiveRecord::Base
   belongs_to :error_report
 
   validates_presence_of :issue_type, :content_migration_id, :workflow_state
-  validates_inclusion_of :issue_type, :in => %w( todo warning error )
+  validates_inclusion_of :issue_type, :in => %w(todo warning error)
 
   workflow do
     state :active do
@@ -41,5 +41,4 @@ class MigrationIssue < ActiveRecord::Base
     given { |user| Account.site_admin.grants_right?(user, :view_error_reports) }
     can :read_errors
   end
-
 end

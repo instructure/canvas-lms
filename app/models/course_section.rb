@@ -110,7 +110,7 @@ class CourseSection < ActiveRecord::Base
     course.participating_admins.where("enrollments.course_section_id = ? OR NOT COALESCE(enrollments.limit_privileges_to_course_section, ?)", self, false)
   end
 
-  def participants(opts={})
+  def participants(opts = {})
     ps = nil
     if opts[:by_date]
       ps = participating_students_by_date + participating_admins_by_date
@@ -137,6 +137,7 @@ class CourseSection < ActiveRecord::Base
 
   def touch_all_enrollments
     return if new_record?
+
     self.enrollments.touch_all
     User.where(id: all_enrollments.select(:user_id)).touch_all
   end
@@ -163,10 +164,10 @@ class CourseSection < ActiveRecord::Base
 
     given do |user, session|
       manage_perm = if self.root_account.feature_enabled? :granular_permissions_manage_users
-        :allow_course_admin_actions
-      else
-        :manage_admin_users
-      end
+                      :allow_course_admin_actions
+                    else
+                      :manage_admin_users
+                    end
       self.course.grants_any_right?(user, session, :manage_students, manage_perm)
     end
     can :read
@@ -179,14 +180,13 @@ class CourseSection < ActiveRecord::Base
 
     given { |user, session|
       user &&
-      self.course.sections_visible_to(user).where(:id => self).exists? &&
-      self.course.grants_right?(user, session, :read_roster)
+        self.course.sections_visible_to(user).where(:id => self).exists? &&
+        self.course.grants_right?(user, session, :read_roster)
     }
     can :read
 
     given { |user, session| self.course.grants_right?(user, session, :manage_grades) }
     can :manage_grades
-
 
     given { |user, session| self.course.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
@@ -194,8 +194,8 @@ class CourseSection < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (self.saved_change_to_course_id? || self.saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
-      Course.delay_if_production(n_strand: ["update_account_associations", self.root_account_id]).
-        update_account_associations([self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
+      Course.delay_if_production(n_strand: ["update_account_associations", self.root_account_id])
+            .update_account_associations([self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
 
@@ -215,7 +215,6 @@ class CourseSection < ActiveRecord::Base
     self.errors.add(:sis_source_id, t('sis_id_taken', "SIS ID \"%{sis_id}\" is already in use", :sis_id => self.sis_source_id))
     throw :abort
   end
-
 
   def verify_unique_integration_id
     return true unless self.integration_id
@@ -239,6 +238,7 @@ class CourseSection < ActiveRecord::Base
   def infer_defaults
     self.root_account_id ||= (self.course.root_account_id rescue nil) || Account.default.id
     raise "Course required" unless self.course
+
     self.root_account_id = self.course.root_account_id || Account.default.id
     # This is messy, and I hate it.
     # The SIS import actually gives us three names for a section
@@ -267,6 +267,7 @@ class CourseSection < ActiveRecord::Base
 
   def move_to_course(course, **opts)
     return self if self.course_id == course.id
+
     old_course = self.course
     self.course = course
     self.root_account_id = course.root_account_id
@@ -300,8 +301,8 @@ class CourseSection < ActiveRecord::Base
     end
 
     User.clear_cache_keys(user_ids, :enrollments)
-    EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id]).
-      invalidate_states_for_course_or_section(self, invalidate_access: true)
+    EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
+                   .invalidate_states_for_course_or_section(self, invalidate_access: true)
     User.delay_if_production.update_account_associations(user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
       old_course.delay_if_production.update_account_associations unless Course.skip_updating_account_associations?
@@ -321,17 +322,19 @@ class CourseSection < ActiveRecord::Base
   end
 
   def ensure_enrollments_in_correct_section
-    self.enrollments.where.not(:course_id => self.course_id).each {|e| e.update_attribute(:course_id, self.course_id)}
+    self.enrollments.where.not(:course_id => self.course_id).each { |e| e.update_attribute(:course_id, self.course_id) }
   end
 
   def crosslist_to_course(course, **opts)
     return self if self.course_id == course.id
+
     self.nonxlist_course_id ||= self.course_id
     self.move_to_course(course, **opts)
   end
 
   def uncrosslist(**opts)
     return unless self.nonxlist_course_id
+
     if self.nonxlist_course.workflow_state == "deleted"
       self.nonxlist_course.workflow_state = "claimed"
       self.nonxlist_course.save!
@@ -355,7 +358,7 @@ class CourseSection < ActiveRecord::Base
     !self.enrollments.where.not(:workflow_state => 'rejected').not_fake.exists?
   end
 
-  def enroll_user(user, type, state='invited')
+  def enroll_user(user, type, state = 'invited')
     self.course.enroll_user(user, type, :enrollment_state => state, :section => self)
   end
 
@@ -375,6 +378,7 @@ class CourseSection < ActiveRecord::Base
 
   def self.destroy_batch(batch, sis_batch: nil, batch_mode: false)
     raise ArgumentError, 'Cannot call with more than 1000 sections' if batch.count > 1000
+
     cs = CourseSection.where(id: batch).select(:id, :workflow_state).to_a
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
     CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
@@ -398,13 +402,13 @@ class CourseSection < ActiveRecord::Base
   scope :sis_sections, lambda { |account, *source_ids| where(:root_account_id => account, :sis_source_id => source_ids).order(:sis_source_id) }
 
   def common_to_users?(users)
-    users.all?{ |user| self.student_enrollments.active.for_user(user).exists? }
+    users.all? { |user| self.student_enrollments.active.for_user(user).exists? }
   end
 
   def update_enrollment_states_if_necessary
     if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
-      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id]).
-        invalidate_states_for_course_or_section(self)
+      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id])
+                     .invalidate_states_for_course_or_section(self)
     end
   end
 end

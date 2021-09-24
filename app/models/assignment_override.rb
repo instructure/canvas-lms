@@ -38,13 +38,13 @@ class AssignmentOverride < ActiveRecord::Base
   validates_presence_of :title, :workflow_state
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true
-  concrete_set = lambda{ |override| ['CourseSection', 'Group'].include?(override.set_type) }
+  concrete_set = lambda { |override| ['CourseSection', 'Group'].include?(override.set_type) }
 
   validates_presence_of :set, :set_id, :if => concrete_set
   validates_uniqueness_of :set_id, :scope => [:assignment_id, :set_type, :workflow_state],
-    :if => lambda{ |override| override.assignment? && override.active? && concrete_set.call(override) }
+                                   :if => lambda { |override| override.assignment? && override.active? && concrete_set.call(override) }
   validates_uniqueness_of :set_id, :scope => [:quiz_id, :set_type, :workflow_state],
-    :if => lambda{ |override| override.quiz? && override.active? && concrete_set.call(override) }
+                                   :if => lambda { |override| override.quiz? && override.active? && concrete_set.call(override) }
 
   before_create :set_root_account_id
 
@@ -75,9 +75,10 @@ class AssignmentOverride < ActiveRecord::Base
   validate do |record|
     record.assignment_override_students.each do |s|
       next if s.valid?
+
       s.errors.each do |_, error|
         record.errors.add(:assignment_override_students, error.type,
-          message: error.message)
+                          message: error.message)
       end
     end
   end
@@ -90,7 +91,7 @@ class AssignmentOverride < ActiveRecord::Base
   def set_not_empty?
     overridable = assignment? ? assignment : quiz
     ['CourseSection', 'Group', SET_TYPE_NOOP].include?(self.set_type) ||
-    (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
+      (set.any? && overridable.context.current_enrollments.where(user_id: set).exists?)
   end
 
   def update_grading_period_grades
@@ -165,6 +166,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def touch_assignment
     return true if assignment.nil? || dont_touch_assignment
+
     assignment.touch
   end
   private :touch_assignment
@@ -192,10 +194,10 @@ class AssignmentOverride < ActiveRecord::Base
 
   scope :active, -> { where(:workflow_state => 'active') }
 
-  scope :visible_students_only, -> (visible_ids) do
-    scope = select("assignment_overrides.*").
-      joins(:assignment_override_students).
-      distinct
+  scope :visible_students_only, ->(visible_ids) do
+    scope = select("assignment_overrides.*")
+            .joins(:assignment_override_students)
+            .distinct
 
     if ActiveRecord::Relation === visible_ids
       column = visible_ids.klass == User ? :id : visible_ids.select_values.first
@@ -282,8 +284,9 @@ class AssignmentOverride < ActiveRecord::Base
     assignment_override_students.where(user_id: visible_student_ids).exists?
   end
 
-  def self.visible_enrollments_for(overrides, user=nil)
+  def self.visible_enrollments_for(overrides, user = nil)
     return Enrollment.none if overrides.empty? || user.nil?
+
     override = overrides.first
     (override.assignment || override.quiz).context.enrollments_visible_to(user)
   end
@@ -304,7 +307,8 @@ class AssignmentOverride < ActiveRecord::Base
       :due_at => new_due_at,
       :due_at_was => read_attribute(:due_at),
       :all_day_was => read_attribute(:all_day),
-      :all_day_date_was => read_attribute(:all_day_date))
+      :all_day_date_was => read_attribute(:all_day_date)
+    )
 
     write_attribute(:due_at, new_due_at)
     write_attribute(:all_day, new_all_day)
@@ -361,12 +365,12 @@ class AssignmentOverride < ActiveRecord::Base
 
   def notify_change?
     self.assignment &&
-    self.assignment.context.available? &&
-    self.assignment.published? &&
-    self.assignment.created_at < 3.hours.ago &&
-    (saved_change_to_workflow_state? ||
-      saved_change_to_due_at_overridden? ||
-      due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save))
+      self.assignment.context.available? &&
+      self.assignment.published? &&
+      self.assignment.created_at < 3.hours.ago &&
+      (saved_change_to_workflow_state? ||
+        saved_change_to_due_at_overridden? ||
+        due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save))
   end
 
   def set_title_if_needed
@@ -381,6 +385,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def title_from_students(students)
     return t("No Students") if students.blank?
+
     self.class.title_from_student_count(students.count)
   end
 
@@ -390,6 +395,7 @@ class AssignmentOverride < ActiveRecord::Base
 
   def destroy_if_empty_set
     return unless set_type == 'ADHOC'
+
     self.assignment_override_students.reload if self.id_before_last_save.nil? # fixes a problem with rails 4.2 caching an empty association scope
     self.destroy if set.empty?
   end

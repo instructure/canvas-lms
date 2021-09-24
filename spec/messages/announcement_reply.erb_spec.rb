@@ -36,20 +36,20 @@ describe 'announcement_reply' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement value for title: value for name"
       expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
       expect(msg.body).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
     end
 
-    it "should render correct footer if replys are enabled" do
+    it "renders correct footer if replys are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq true
     end
 
-    it "should render correct footer if replys are disabled" do
+    it "renders correct footer if replys are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq false
@@ -65,7 +65,7 @@ describe 'announcement_reply' do
   context ".sms" do
     let(:path_type) { :sms }
 
-    it "should render" do
+    it "renders" do
       generate_message(notification_name, path_type, asset)
     end
   end
@@ -73,7 +73,7 @@ describe 'announcement_reply' do
   context ".summary" do
     let(:path_type) { :summary }
 
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "New Comment on Announcement: value for title: value for name"
       expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
@@ -84,7 +84,7 @@ describe 'announcement_reply' do
   context ".twitter" do
     let(:path_type) { :twitter }
 
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to eq "Canvas Alert"
       expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)

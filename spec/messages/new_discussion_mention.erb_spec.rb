@@ -36,19 +36,19 @@ describe 'new_discussion_mention' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.url).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
       expect(msg.body).to match(/\/courses\/\d+\/discussion_topics\/\d+/)
     end
 
-    it "should render correct footer if replies are enabled" do
+    it "renders correct footer if replies are enabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = true
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq true
     end
 
-    it "should render correct footer if replies are disabled" do
+    it "renders correct footer if replies are disabled" do
       IncomingMailProcessor::MailboxAccount.reply_to_enabled = false
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body.include?("replying to this message")).to eq false

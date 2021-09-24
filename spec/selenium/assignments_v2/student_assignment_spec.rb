@@ -47,7 +47,7 @@ describe 'as a student' do
             description: "Some criterion",
             points: 5,
             id: 'crit1',
-            ratings: [{description: "Good", points: 5, id: 'rat1', criterion_id: 'crit1'}]
+            ratings: [{ description: "Good", points: 5, id: 'rat1', criterion_id: 'crit1' }]
           }],
           description: 'new rubric description'
         )
@@ -191,7 +191,7 @@ describe 'as a student' do
         end
       end
 
-      it 'should be able to be saved as a draft', custom_timeout: 30 do
+      it 'is able to be saved as a draft', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 
@@ -337,8 +337,8 @@ describe 'as a student' do
           submission_types: 'on_paper'
         )
         @module = @course.context_modules.create!(name: 'Module 1')
-        @tag = @module.add_item({id: @assignment.id, type: 'assignment'})
-        @module.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+        @tag = @module.add_item({ id: @assignment.id, type: 'assignment' })
+        @module.completion_requirements = { @tag.id => { type: 'must_mark_done' } }
         @module.save!
       end
 

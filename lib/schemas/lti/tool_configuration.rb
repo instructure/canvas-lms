@@ -186,8 +186,8 @@ module Schemas::Lti
         }.freeze,
         "custom_fields" => {
           "anyOf": [
-            {"type" => "string"}.freeze,
-            {"type" => "object"}.freeze
+            { "type" => "string" }.freeze,
+            { "type" => "object" }.freeze
           ].freeze
         }.freeze
       }.freeze

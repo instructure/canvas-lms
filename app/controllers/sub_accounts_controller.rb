@@ -27,7 +27,7 @@ class SubAccountsController < ApplicationController
   # authorized to act on all its sub-accounts too.
 
   def sub_accounts_of(account, current_depth = 0)
-    account_data = @accounts[account.id] = { :account => account, :course_count => 0}
+    account_data = @accounts[account.id] = { :account => account, :course_count => 0 }
     sub_accounts = account.sub_accounts.active.order(Account.best_unicode_collation_key('name')).limit(101) unless current_depth == 2
     sub_account_ids = (sub_accounts || []).map(&:id)
     if current_depth == 2 || sub_accounts.length > 100
@@ -60,7 +60,7 @@ class SubAccountsController < ApplicationController
       if @context && @context.is_a?(Account)
         @accounts = @context.all_accounts.active.name_like(@query).limit(100).to_a
         @accounts << @context if value_to_boolean(params[:include_self]) && @context.name.downcase.include?(@query.downcase)
-        @accounts.sort_by!{|a| Canvas::ICU.collation_key(a.name)}
+        @accounts.sort_by! { |a| Canvas::ICU.collation_key(a.name) }
       end
       respond_to do |format|
         format.html {
@@ -68,7 +68,7 @@ class SubAccountsController < ApplicationController
         }
         format.json {
           render :json => @accounts.map { |a|
-            {:label => a.name, :url => account_url(a), :id => a.id}
+            { :label => a.name, :url => account_url(a), :id => a.id }
           }
           return
         }
@@ -80,19 +80,19 @@ class SubAccountsController < ApplicationController
     @accounts[:accounts_to_get_sub_account_count] = []
     sub_accounts_of(@context)
     unless @accounts[:accounts_to_get_sub_account_count].empty?
-      counts = Account.active.
-          where(:parent_account_id => @accounts[:accounts_to_get_sub_account_count]).
-          group(:parent_account_id).count
+      counts = Account.active
+                      .where(:parent_account_id => @accounts[:accounts_to_get_sub_account_count])
+                      .group(:parent_account_id).count
       counts.each do |account_id, count|
         @accounts[account_id][:sub_account_count] = count
       end
     end
-    counts = Course.
-        joins(:course_account_associations).
-        group('course_account_associations.account_id').
-        where("course_account_associations.account_id IN (?) AND course_account_associations.course_section_id IS NULL AND
-                 course_account_associations.depth=0 AND courses.workflow_state<>'deleted'", @accounts[:all_account_ids]).
-        distinct.count(:id)
+    counts = Course
+             .joins(:course_account_associations)
+             .group('course_account_associations.account_id')
+             .where("course_account_associations.account_id IN (?) AND course_account_associations.course_section_id IS NULL AND
+                 course_account_associations.depth=0 AND courses.workflow_state<>'deleted'", @accounts[:all_account_ids])
+             .distinct.count(:id)
     counts.each do |account_id, count|
       @accounts[account_id][:course_count] = count
     end
@@ -100,7 +100,7 @@ class SubAccountsController < ApplicationController
 
   def show
     @sub_account = subaccount_or_self(params[:id])
-    ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{:sub_accounts => [:parent_account, :root_account]}])
+    ActiveRecord::Associations::Preloader.new.preload(@sub_account, [{ :sub_accounts => [:parent_account, :root_account] }])
     sub_account_json = @sub_account.as_json(:only => [:id, :name], :methods => [:course_count, :sub_account_count])
     sort_key = Account.best_unicode_collation_key('accounts.name')
     sub_accounts = @sub_account.sub_accounts.order(sort_key).as_json(only: [:id, :name], methods: [:course_count, :sub_account_count])
@@ -171,14 +171,15 @@ class SubAccountsController < ApplicationController
   def destroy
     @sub_account = subaccount_or_self(params[:id])
     if @sub_account.associated_courses.not_deleted.exists?
-      return render json: {message: I18n.t("You can't delete a sub-account that has courses in it.")}, status: 409
+      return render json: { message: I18n.t("You can't delete a sub-account that has courses in it.") }, status: 409
     end
     if @sub_account.sub_accounts.exists?
-      return render json: {message: I18n.t("You can't delete a sub-account that has sub-accounts in it.")}, status: 409
+      return render json: { message: I18n.t("You can't delete a sub-account that has sub-accounts in it.") }, status: 409
     end
     if @sub_account.root_account?
-      return render json: {message: I18n.t("You can't delete a root_account.")}, status: 401
+      return render json: { message: I18n.t("You can't delete a root_account.") }, status: 401
     end
+
     @sub_account.destroy
     render json: account_json(@sub_account, @current_user, session, [])
   end

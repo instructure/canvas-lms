@@ -21,7 +21,7 @@ import {render} from '@testing-library/react'
 import StepItem from '../index'
 
 it('should render', () => {
-  const {getByTestId} = render(<StepItem label={() => {}} />)
+  const {getByTestId} = render(<StepItem label="Foo" />)
   expect(getByTestId('step-item-step')).toBeInTheDocument()
 })
 

@@ -19,7 +19,7 @@
 #
 module CC
   module AssignmentGroups
-    def create_assignment_groups(document=nil)
+    def create_assignment_groups(document = nil)
       return nil unless @course.assignment_groups.active.count > 0
 
       if document
@@ -28,21 +28,22 @@ module CC
       else
         group_file = File.new(File.join(@canvas_resource_dir, CCHelper::ASSIGNMENT_GROUPS), 'w')
         rel_path = File.join(CCHelper::COURSE_SETTINGS_DIR, CCHelper::ASSIGNMENT_GROUPS)
-        document = Builder::XmlMarkup.new(:target=>group_file, :indent=>2)
+        document = Builder::XmlMarkup.new(:target => group_file, :indent => 2)
       end
 
       document.instruct!
       document.assignmentGroups(
-              "xmlns" => CCHelper::CANVAS_NAMESPACE,
-              "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-              "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
+        "xmlns" => CCHelper::CANVAS_NAMESPACE,
+        "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+        "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
       ) do |groups_node|
         @course.assignment_groups.active.each do |group|
           next unless export_object?(group)
+
           add_exported_asset(group)
 
           migration_id = create_key(group)
-          groups_node.assignmentGroup(:identifier=>migration_id) do |group_node|
+          groups_node.assignmentGroup(:identifier => migration_id) do |group_node|
             group_node.title group.name
             group_node.position group.position
             group_node.group_weight group.group_weight if group.group_weight
@@ -51,7 +52,7 @@ module CC
               # "drop_lowest:1\ndrop_highest:2\nnever_drop:259\n"
               # to something like:
               # [["drop_lowest", "1"], ["drop_highest", "2"], ["never_drop", "259"]]
-              rules = group.rules.split("\n").map{|r|r.split(':')}
+              rules = group.rules.split("\n").map { |r| r.split(':') }
               group_node.rules do |rules_node|
                 rules.each do |rule|
                   a = nil

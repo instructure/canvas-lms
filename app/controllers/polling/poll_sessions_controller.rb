@@ -147,7 +147,7 @@ module Polling
       end
 
       @poll_session = @course.poll_sessions.build(poll_session_params.merge(poll: @poll,
-                                                                          course_section: @course_section))
+                                                                            course_section: @course_section))
 
       @poll_session.has_public_results = false if poll_session_params[:has_public_results].blank?
 
@@ -264,12 +264,13 @@ module Polling
     end
 
     protected
-    def paginate_for(poll_sessions, api_url="")
+
+    def paginate_for(poll_sessions, api_url = "")
       meta = {}
       json = if accepts_jsonapi?
-              poll_sessions, meta = Api.jsonapi_paginate(poll_sessions, self, api_url)
-              meta[:primaryCollection] = 'poll_sessions'
-              poll_sessions
+               poll_sessions, meta = Api.jsonapi_paginate(poll_sessions, self, api_url)
+               meta[:primaryCollection] = 'poll_sessions'
+               poll_sessions
              else
                Api.paginate(poll_sessions, self, api_url)
              end
@@ -277,18 +278,17 @@ module Polling
       return json, meta
     end
 
-
     def serialize_jsonapi(poll_sessions, meta = {})
       poll_sessions = Array.wrap(poll_sessions)
 
       Canvas::APIArraySerializer.new(poll_sessions, {
-        each_serializer: Polling::PollSessionSerializer,
-        controller: self,
-        root: :poll_sessions,
-        meta: meta,
-        scope: @current_user,
-        include_root: false
-      }).as_json
+                                       each_serializer: Polling::PollSessionSerializer,
+                                       controller: self,
+                                       root: :poll_sessions,
+                                       meta: meta,
+                                       scope: @current_user,
+                                       include_root: false
+                                     }).as_json
     end
 
     def get_poll_session_params

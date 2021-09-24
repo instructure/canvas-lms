@@ -37,6 +37,7 @@ class DiscussionTopicParticipant < ActiveRecord::Base
   end
 
   private
+
   # Internal: Ensure unread count never drops below 0.
   #
   # Returns nothing.
@@ -46,8 +47,8 @@ class DiscussionTopicParticipant < ActiveRecord::Base
 
   def check_planner_cache
     if id_before_last_save.nil? ||
-      (unread_entry_count_before_last_save == 0 && unread_entry_count > 0) ||
-      (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
+       (unread_entry_count_before_last_save == 0 && unread_entry_count > 0) ||
+       (unread_entry_count_before_last_save > 0 && unread_entry_count == 0)
       PlannerHelper.clear_planner_cache(user)
     end
   end

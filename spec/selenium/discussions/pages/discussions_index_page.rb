@@ -129,7 +129,7 @@ class DiscussionsIndex
     def manage_discussions_menu
       f("ul[role='menu']")
     end
-    
+
     def discussion_settings_button
       f('#discussion_settings')
     end
@@ -236,7 +236,7 @@ class DiscussionsIndex
     end
 
     def click_add_discussion
-       add_discussion_button.click
+      add_discussion_button.click
     end
 
     def click_publish_button(title)

@@ -27,6 +27,7 @@ module TextHelper
 
   def self.date_string(start_date, *args)
     return nil unless start_date
+
     start_date = start_date.in_time_zone.beginning_of_day
     style = args.last.is_a?(Symbol) ? args.pop : :normal
     end_date = args.pop
@@ -36,9 +37,8 @@ module TextHelper
       start_date_display
     else
       I18n.t('time.ranges.different_days', "%{start_date_and_time} to %{end_date_and_time}",
-        :start_date_and_time => start_date_display,
-        :end_date_and_time => Utils::DatePresenter.new(end_date).as_string(style)
-      )
+             :start_date_and_time => start_date_display,
+             :end_date_and_time => Utils::DatePresenter.new(end_date).as_string(style))
     end
   end
 
@@ -46,7 +46,7 @@ module TextHelper
     TextHelper.date_string(*args)
   end
 
-  def time_string(start_time, end_time=nil, zone=nil)
+  def time_string(start_time, end_time = nil, zone = nil)
     presenter = Utils::TimePresenter.new(start_time, zone)
     presenter.as_string(display_as_range: end_time)
   end
@@ -60,7 +60,7 @@ module TextHelper
     end
   end
 
-  def datetime_string(start_datetime, datetime_type=:event, end_datetime=nil, shorten_midnight=false, zone=nil, with_weekday: false)
+  def datetime_string(start_datetime, datetime_type = :event, end_datetime = nil, shorten_midnight = false, zone = nil, with_weekday: false)
     zone ||= ::Time.zone
     presenter = Utils::DatetimeRangePresenter.new(start_datetime, end_datetime, datetime_type, zone, with_weekday: with_weekday)
     presenter.as_string(shorten_midnight: shorten_midnight)
@@ -78,16 +78,16 @@ module TextHelper
     case seconds
     when  0...60
       I18n.t('datetime.distance_in_words.x_seconds',
-        { :one => "1 second", :other => "%{count} seconds" },
-        :count => seconds.round)
+             { :one => "1 second", :other => "%{count} seconds" },
+             :count => seconds.round)
     when 60...3600
       I18n.t('datetime.distance_in_words.x_minutes',
-        { :one => "1 minute", :other => "%{count} minutes" },
-        :count => (seconds / 60.0).round)
+             { :one => "1 minute", :other => "%{count} minutes" },
+             :count => (seconds / 60.0).round)
     else
       I18n.t('datetime.distance_in_words.about_x_hours',
-        { :one => "about 1 hour", :other => "about %{count} hours" },
-        :count => (seconds / 3600.0).round)
+             { :one => "about 1 hour", :other => "about %{count} hours" },
+             :count => (seconds / 3600.0).round)
     end
   end
 
@@ -105,7 +105,7 @@ module TextHelper
 
   # Copied from http://pastie.textmate.org/342485,
   # based on http://henrik.nyh.se/2008/01/rails-truncate-html-helper
-  def truncate_html(input, options={})
+  def truncate_html(input, options = {})
     doc = Nokogiri::HTML(input)
     options[:max_length] ||= 250
     num_words = options[:num_words] || (options[:max_length] / 5) || 30
@@ -122,6 +122,7 @@ module TextHelper
         count += current.text.split.length
         # we reached our limit, let's get outta here!
         break if count > num_words
+
         previous = current
       end
 
@@ -130,7 +131,7 @@ module TextHelper
         # lets descend and look for text nodes
         current = current.children.first
       elsif !current.next.nil?
-        #this has no children, but has a sibling, let's check it out
+        # this has no children, but has a sibling, let's check it out
         current = current.next
       else
         # we are the last child, we need to ascend until we are
@@ -170,7 +171,7 @@ module TextHelper
         # 6 - 4 = 2, so we get 2 words from this node, but words #1-2 are indices #0-1, so
         # we subtract 1.  If this gives us -1, we want nothing from this node. So go back to
         # the previous node instead.
-        index = num_words-(count-new_content.length)-1
+        index = num_words - (count - new_content.length) - 1
         if index >= 0
           new_content = new_content[0..index]
           current.add_previous_sibling(truncate_elem)
@@ -180,7 +181,7 @@ module TextHelper
         else
           current = previous
           # why would we do this next line? it just ends up xml escaping stuff
-          #current.content = current.content
+          # current.content = current.content
           current.add_next_sibling(truncate_elem)
           current = truncate_elem
         end
@@ -206,10 +207,12 @@ module TextHelper
   def self.make_subject_reply_to(subject)
     blank_re = I18n.t('#subject_reply_to', "Re: %{subject}", :subject => '')
     return subject if subject.starts_with?(blank_re)
+
     I18n.t('#subject_reply_to', "Re: %{subject}", :subject => subject)
   end
 
   class MarkdownSafeBuffer < String; end
+
   # use this to flag interpolated parameters as markdown-safe (see
   # mt below) so they get eval'ed rather than escaped, e.g.
   #  mt(:add_description, :example => markdown_safe('`1 + 1 = 2`'))
@@ -219,6 +222,7 @@ module TextHelper
 
   def markdown_escape(string)
     return string if string.is_a?(MarkdownSafeBuffer)
+
     markdown_safe(string.gsub(/([\\`\*_\{\}\[\]\(\)\#\+\-\.!])/, '\\\\\1'))
   end
 
@@ -231,6 +235,7 @@ module TextHelper
       options.each_pair do |key, value|
         next unless value.is_a?(String) && !value.is_a?(MarkdownSafeBuffer) && !value.is_a?(ActiveSupport::SafeBuffer)
         next if key == :wrapper
+
         options[key] = markdown_escape(value).gsub(/\s+/, ' ').strip
       end
     end

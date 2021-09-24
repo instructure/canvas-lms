@@ -24,18 +24,19 @@ CanvasHttp.blocked_ip_filters = -> { Setting.get('http_blocked_ip_ranges', '127.
 
 module CanvasHttpInitializer
   def self.configure_circuit_breaker!
-    # need some place to store circuit breaker information so we don't 
+    # need some place to store circuit breaker information so we don't
     # have to have each process store it's own circuit breaker
     # state
     CanvasHttp::CircuitBreaker.redis = lambda {
       return MultiCache.cache.redis if MultiCache.cache.respond_to?(:redis)
       return Canvas.redis if Canvas.redis_enabled?
+
       nil
     }
 
     # how many failures for a domain trips the circuit breaker
     CanvasHttp::CircuitBreaker.threshold = lambda do |domain|
-      (Setting.get("http_cb_#{domain}_threshold", nil) || 
+      (Setting.get("http_cb_#{domain}_threshold", nil) ||
         Setting.get("http_cb_generic_threshold", CanvasHttp::CircuitBreaker::DEFAULT_THRESHOLD)).to_i
     end
 

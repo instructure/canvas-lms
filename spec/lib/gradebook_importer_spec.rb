@@ -30,17 +30,17 @@ describe GradebookImporter do
   end
 
   context "construction" do
-    let!(:gradebook_course){ course_model }
+    let!(:gradebook_course) { course_model }
 
     it "requires a context, usually a course" do
       user = user_model
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.new
-      expect{ GradebookImporter.new(upload) }.
-        to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
+      expect { GradebookImporter.new(upload) }
+        .to raise_error(ArgumentError, "Must provide a valid context for this gradebook.")
       upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
-      expect{ GradebookImporter.new(upload, valid_gradebook_contents, user, progress) }.
-        not_to raise_error
+      expect { GradebookImporter.new(upload, valid_gradebook_contents, user, progress) }
+        .not_to raise_error
     end
 
     it "stores the context and make it available" do
@@ -51,8 +51,8 @@ describe GradebookImporter do
     it "requires the contents of an upload" do
       progress = Progress.create!(tag: "test", context: @user)
       upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
-      expect{ GradebookImporter.new(upload) }.
-        to raise_error(ArgumentError, "Must provide attachment.")
+      expect { GradebookImporter.new(upload) }
+        .to raise_error(ArgumentError, "Must provide attachment.")
     end
 
     it "handles points possible being sorted in weird places" do
@@ -60,7 +60,8 @@ describe GradebookImporter do
         'Student,ID,Section,Assignment 1,Final Score',
         '"Blend, Bill",6,My Course,-,',
         'Points Possible,,,10,',
-        '"Farner, Todd",4,My Course,-,')
+        '"Farner, Todd",4,My Course,-,'
+      )
       expect(@gi.assignments.length).to eq 1
       expect(@gi.assignments.first.points_possible).to eq 10
       expect(@gi.students.length).to eq 2
@@ -68,11 +69,12 @@ describe GradebookImporter do
 
     it "handles muted line and being sorted in weird places" do
       importer_with_rows(
-          'Student,ID,Section,Assignment 1,Final Score',
-          '"Blend, Bill",6,My Course,-,',
-          'Points Possible,,,10,',
-          ', ,,Muted,',
-          '"Farner, Todd",4,My Course,-,')
+        'Student,ID,Section,Assignment 1,Final Score',
+        '"Blend, Bill",6,My Course,-,',
+        'Points Possible,,,10,',
+        ', ,,Muted,',
+        '"Farner, Todd",4,My Course,-,'
+      )
       expect(@gi.assignments.length).to eq 1
       expect(@gi.assignments.first.points_possible).to eq 10
       expect(@gi.students.length).to eq 2
@@ -250,7 +252,6 @@ describe GradebookImporter do
     end
 
     context "when attachment and gradebook_upload is provided" do
-
       let(:attachment) do
         a = attachment_model
         file = Tempfile.new("gradebook.csv")
@@ -261,7 +262,7 @@ describe GradebookImporter do
         return a
       end
 
-      let(:progress){ Progress.create!(tag: "test", context: gradebook_user) }
+      let(:progress) { Progress.create!(tag: "test", context: gradebook_user) }
 
       let(:upload) do
         GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
@@ -284,7 +285,6 @@ describe GradebookImporter do
       it "sets the uploads course as the importer context" do
         expect(importer.context).to eq(gradebook_course)
       end
-
     end
   end
 
@@ -318,7 +318,7 @@ describe GradebookImporter do
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
-        csv << ["    Points Possible", "", "","", ""]
+        csv << ["    Points Possible", "", "", "", ""]
         csv << [@u1.name, "", "", "", "", 99]
         csv << ["", "", @u2.pseudonym.sis_user_id, "", "", 99]
         csv << ["", "", "", @u3.pseudonym.unique_id, "", 99]
@@ -347,7 +347,7 @@ describe GradebookImporter do
       expect(hash[:students][4][:id]).to eq @u5.id
       expect(hash[:students][4][:previous_id]).to eq @u5.id
 
-      expect(hash[:students][5][:id]).to be <  0
+      expect(hash[:students][5][:id]).to be < 0
       expect(hash[:students][5][:previous_id]).to be_nil
     end
 
@@ -365,7 +365,7 @@ describe GradebookImporter do
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Root Account", "Section", "Assignment 1"]
-        csv << ["    Points Possible", "", "","", "", ""]
+        csv << ["    Points Possible", "", "", "", "", ""]
         csv << ["", "", @u1.pseudonym.sis_user_id, "", "account2", "", 99]
       end
 
@@ -384,7 +384,7 @@ describe GradebookImporter do
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Integration ID", "Section", "Assignment 1"]
-        csv << ["    Points Possible", "", "","", "", ""]
+        csv << ["    Points Possible", "", "", "", "", ""]
         csv << ["", u1.id, "", "", "", "", 99]
       end
 
@@ -414,7 +414,7 @@ describe GradebookImporter do
 
       uploaded_csv = CSV.generate do |csv|
         csv << ["Student", "ID", "SIS User ID", "SIS Login ID", "Section", "Assignment 1"]
-        csv << ["    Points Possible", "", "","", ""]
+        csv << ["    Points Possible", "", "", "", ""]
         csv << ["", "", "0123456", "", "", 99]
         csv << ["", "", "", "0231163", "", 99]
       end
@@ -460,8 +460,8 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
     importer_with_rows(
-        'Student,ID,Section,Assignment 1,Assignment 2',
-        'Some Student,,,,'
+      'Student,ID,Section,Assignment 1,Assignment 2',
+      'Some Student,,,,'
     )
     expect(@gi.assignments.length).to eq 2
     expect(@gi.assignments.first).to eq @assignment1
@@ -514,7 +514,7 @@ describe GradebookImporter do
       upload, valid_gradebook_contents_with_sis_login_id, user, progress
     )
 
-    expect{importer.parse!}.not_to raise_error
+    expect { importer.parse! }.not_to raise_error
   end
 
   it "parses CSVs with semicolons" do
@@ -576,8 +576,8 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1')
     @assignment3 = @course.assignments.create!(:name => 'Assignment 3')
     importer_with_rows(
-        'Student,ID,Section,Assignment 1',
-        'Some Student,,,'
+      'Student,ID,Section,Assignment 1',
+      'Some Student,,,'
     )
     expect(@gi.assignments).to eq [@assignment1]
     expect(@gi.missing_assignments).to eq []
@@ -600,7 +600,6 @@ describe GradebookImporter do
     importer_with_rows(
       'Student,ID,Section,Assignment 1,Readonly,Assignment 2',
       '    Points Possible,,,,(read only),'
-
     )
     expect(@gi.assignments).to eq []
     expect(@gi.missing_assignments).to eq []
@@ -610,8 +609,8 @@ describe GradebookImporter do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1",
-        "Points Possible,,,20"
+      "Student,ID,Section,Assignment 1",
+      "Points Possible,,,20"
     )
     expect(@gi.assignments).to eq [@assignment1]
     expect(@gi.assignments.first).to be_changed
@@ -622,8 +621,8 @@ describe GradebookImporter do
     course_model
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
-        "Points Possible,,,20,,,,,"
+      "Student,ID,Section,Assignment 1,Current Points,Final Points,Current Score,Final Score,Final Grade",
+      "Points Possible,,,20,,,,,"
     )
     expect(@gi.assignments).to eq [@assignment1]
     expect(@gi.missing_assignments).to be_empty
@@ -634,8 +633,8 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment2 = @course.assignments.create!(:name => 'Assignment 2', :points_possible => 10)
     importer_with_rows(
-        "Student,ID,Section,Final Score,Assignment 1,Current Points,Assignment 2,Final Points,Current Score,Final Grade",
-        "Points Possible,,,(read only),20,(read only),20,,,"
+      "Student,ID,Section,Final Score,Assignment 1,Current Points,Assignment 2,Final Points,Current Score,Final Grade",
+      "Points Possible,,,(read only),20,(read only),20,,,"
     )
     expect(@gi.assignments).to include(@assignment1, @assignment2)
     expect(@gi.assignments.map(&:title)).to_not include('Final Score', 'Current Points')
@@ -679,12 +678,12 @@ describe GradebookImporter do
     @student2 = user_factory
     @course.enroll_student(@student2)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1",
-        ",#{@student1.id},,10",
-        "New Student,,,12",
-        ",#{concluded_student.id},,10"
+      "Student,ID,Section,Assignment 1",
+      ",#{@student1.id},,10",
+      "New Student,,,12",
+      ",#{concluded_student.id},,10"
     )
-    expect(@gi.students.length).to eq 2  # doesn't include concluded_student
+    expect(@gi.students.length).to eq 2 # doesn't include concluded_student
     expect(@gi.students.first).to eq @student1
     expect(@gi.students.last).to be_new_record
     expect(@gi.students.last.id).to be < 0
@@ -697,8 +696,8 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, grade: 10, grader: @teacher)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1",
-        ",#{@student.id},,10"
+      "Student,ID,Section,Assignment 1",
+      ",#{@student.id},,10"
     )
     expect(@gi.assignments).to eq []
   end
@@ -720,8 +719,8 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     @assignment1.grade_student(@student, grade: 8, grader: @teacher)
     importer_with_rows(
-        "Student,ID,Section,Assignment 1",
-        ",#{@student.id},,10"
+      "Student,ID,Section,Assignment 1",
+      ",#{@student.id},,10"
     )
     expect(@gi.assignments).to eq [@assignment1]
     submission = @gi.upload.gradebook.fetch('students').first.fetch('submissions').first
@@ -766,8 +765,8 @@ describe GradebookImporter do
     before do
       @student = User.create!
       course_with_student(course: @course, user: @student, active_enrollment: true)
-      @course.custom_gradebook_columns.create!({title: "CustomColumn1", read_only: false})
-      @course.custom_gradebook_columns.create!({title: "CustomColumn2", read_only: false})
+      @course.custom_gradebook_columns.create!({ title: "CustomColumn1", read_only: false })
+      @course.custom_gradebook_columns.create!({ title: "CustomColumn2", read_only: false })
     end
 
     it "includes non read only custom columns" do
@@ -782,7 +781,7 @@ describe GradebookImporter do
     end
 
     it "excludes read only custom columns" do
-      @course.custom_gradebook_columns.create!({title: "CustomColumn3", read_only: true})
+      @course.custom_gradebook_columns.create!({ title: "CustomColumn3", read_only: true })
       importer_with_rows(
         "Student,ID,Section,CustomColumn1,CustomColumn2,CustomColumn3,Assignment 1",
         ",#{@student.id},,test 1,test 2,test 3,10"
@@ -792,7 +791,7 @@ describe GradebookImporter do
     end
 
     it "excludes hidden custom columns" do
-      @course.custom_gradebook_columns.create!({title: "CustomColumn3", workflow_state: :hidden})
+      @course.custom_gradebook_columns.create!({ title: "CustomColumn3", workflow_state: :hidden })
       importer_with_rows(
         "Student,ID,Section,CustomColumn1,CustomColumn2,CustomColumn3,Assignment 1",
         ",#{@student.id},,test 1,test 2,test 3,10"
@@ -805,7 +804,7 @@ describe GradebookImporter do
       it "excludes custom columns with reserved importer column #{reserved_column}" do
         # The custom columns have a validation to prevent this, but since this was allowed for a long time, we will skip
         # the validation that blocks us from creating bad column names.
-        build_col = @course.custom_gradebook_columns.build({title: reserved_column, read_only: false})
+        build_col = @course.custom_gradebook_columns.build({ title: reserved_column, read_only: false })
         build_col.save!(validate: false)
 
         importer_with_rows(
@@ -1047,8 +1046,8 @@ describe GradebookImporter do
 
     it "does not break the creation of new assignments" do
       importer_with_rows(
-          "Student,ID,Section,a1,a2,a3",
-          "#{@student_one.name},#{@student_one.id},,1,2,3"
+        "Student,ID,Section,a1,a2,a3",
+        "#{@student_one.name},#{@student_one.id},,1,2,3"
       )
       expect(@gi.assignments.last.title).to eq 'a3'
       expect(@gi.assignments.last).to be_new_record
@@ -1108,7 +1107,6 @@ describe GradebookImporter do
           course_with_student(course: @course, user: @student, active_enrollment: true)
         end
 
-
         it "excludes entire assignments if no submissions for the assignment are being uploaded" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
@@ -1154,14 +1152,13 @@ describe GradebookImporter do
           end
         end
 
-
         context "submissions do not already exist" do
           it "does not include submissions that will fall in closed grading periods" do
             importer_with_rows(
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5",
             )
-            expect(student_submissions.map {|s| s['assignment_id']}).to_not include @closed_assignment.id
+            expect(student_submissions.map { |s| s['assignment_id'] }).to_not include @closed_assignment.id
           end
 
           it "includes submissions that will not fall in closed grading periods" do
@@ -1169,7 +1166,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5",
             )
-            expect(student_submissions.map {|s| s['assignment_id']}).to include @open_assignment.id
+            expect(student_submissions.map { |s| s['assignment_id'] }).to include @open_assignment.id
           end
         end
 
@@ -1256,7 +1253,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map {|s| s['assignment_id']}
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to_not include @open_assignment.id
           end
 
@@ -1265,7 +1262,7 @@ describe GradebookImporter do
               "Student,ID,Section,Assignment in closed period,Assignment in open period",
               ",#{@student.id},,5,5"
             )
-            assignment_ids = student_submissions.map {|s| s['assignment_id']}
+            assignment_ids = student_submissions.map { |s| s['assignment_id'] }
             expect(assignment_ids).to include @closed_assignment.id
           end
         end
@@ -1312,11 +1309,11 @@ describe GradebookImporter do
     let(:assignments) { [assignment] }
     let(:students) { [student] }
     let(:progress) { Progress.create tag: "test", context: student }
-    let(:gradebook_upload){ GradebookUpload.create!(course: course, user: student, progress: progress) }
+    let(:gradebook_upload) { GradebookUpload.create!(course: course, user: student, progress: progress) }
     let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
 
     it "translates positive score in gradebook_importer_assignments grade to complete" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "3", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "3", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1324,7 +1321,7 @@ describe GradebookImporter do
     end
 
     it "translates positive grade in gradebook_importer_assignments original_grade to complete" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "5"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "5" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
@@ -1332,7 +1329,7 @@ describe GradebookImporter do
     end
 
     it "translates 0 grade in gradebook_importer_assignments grade to incomplete" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "0", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "0", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1340,7 +1337,7 @@ describe GradebookImporter do
     end
 
     it "translates 0 grade in gradebook_importer_assignments original_grade to incomplete" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "0"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "0" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
@@ -1348,7 +1345,7 @@ describe GradebookImporter do
     end
 
     it "doesn't change empty string grade in gradebook_importer_assignments grade" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1356,7 +1353,7 @@ describe GradebookImporter do
     end
 
     it "doesn't change empty string grade in gradebook_importer_assignments original_grade" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       original_grade = gradebook_importer_assignments.fetch(student.id).first['original_grade']
 
@@ -1387,7 +1384,7 @@ describe GradebookImporter do
     let(:importer) { GradebookImporter.new(gradebook_upload, "", student, progress) }
 
     it "changes incomplete submission to excused when marked as 'EX' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "incomplete"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "incomplete" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1395,7 +1392,7 @@ describe GradebookImporter do
     end
 
     it "changes complete submission to excused when marked as 'EX' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "complete"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "complete" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1403,7 +1400,7 @@ describe GradebookImporter do
     end
 
     it "changes empty string grade to excused when marked as 'EX' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1411,7 +1408,7 @@ describe GradebookImporter do
     end
 
     it "changes 0 grade to complete when marked as positive" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "8", "original_grade" => "0"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "8", "original_grade" => "0" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first["grade"]
 
@@ -1424,14 +1421,14 @@ describe GradebookImporter do
         grading_type: "points",
         points_possible: 10
       )
-      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "8"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "EX", "original_grade" => "8" }] }
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
       expect(grade).to eq "EX"
     end
 
     it "changes incomplete submission to excused when marked as 'ex' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => "incomplete"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => "incomplete" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1439,7 +1436,7 @@ describe GradebookImporter do
     end
 
     it "changes complete submission to excused when marked as 'eX' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "eX", "original_grade" => "complete"}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "eX", "original_grade" => "complete" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1447,7 +1444,7 @@ describe GradebookImporter do
     end
 
     it "changes empty string grade to excused when marked as 'ex' in CSV" do
-      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => ""}] }
+      gradebook_importer_assignments = { student.id => [{ "grade" => "ex", "original_grade" => "" }] }
       importer.translate_pass_fail(assignments, students, gradebook_importer_assignments)
       grade = gradebook_importer_assignments.fetch(student.id).first['grade']
 
@@ -1678,7 +1675,7 @@ describe GradebookImporter do
       end
 
       it "handles multiple grading periods and course scores in the same input" do
-        first_grading_period_score = student_with_override.enrollments.first.find_score({grading_period_id: first_grading_period.id})
+        first_grading_period_score = student_with_override.enrollments.first.find_score({ grading_period_id: first_grading_period.id })
         first_grading_period_score.update!(override_score: 40.0)
 
         importer = importer_with_rows(
@@ -1706,7 +1703,7 @@ describe GradebookImporter do
       end
 
       it "filters out any grading periods with no changed override scores" do
-        first_grading_period_score = student_with_override.enrollments.first.find_score({grading_period_id: first_grading_period.id})
+        first_grading_period_score = student_with_override.enrollments.first.find_score({ grading_period_id: first_grading_period.id })
         first_grading_period_score.update!(override_score: 40.0)
 
         # Make changes to First GP and the course score; leave second GP alone

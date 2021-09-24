@@ -27,7 +27,7 @@ describe 'confirm_email_communication_channel' do
     @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com',
                                           password: 'password',
                                           password_confirmation: 'password')
-    @object = communication_channel(@user, {username: 'bob@example.com'})
+    @object = communication_channel(@user, { username: 'bob@example.com' })
   end
 
   let(:asset) { @object }

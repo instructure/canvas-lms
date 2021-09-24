@@ -104,12 +104,13 @@ class Quizzes::QuizQuestion::QuestionData
 
   def question_types
     @question_types ||= %w(calculated essay file_upload fill_in_multiple_blanks matching
-          multiple_answers multiple_choice multiple_dropdowns numerical
-          short_answer text_only unknown ).map(&:to_sym)
+                           multiple_answers multiple_choice multiple_dropdowns numerical
+                           short_answer text_only unknown ).map(&:to_sym)
   end
 
   def set_defaults
     return allows_partial_credit! unless @question.key?(:allow_partial_credit)
+
     @allows_partial_credit = @question[:allow_partial_credit]
   end
 
@@ -125,7 +126,6 @@ class Quizzes::QuizQuestion::QuestionData
   def build_match_group
     Quizzes::QuizQuestion::MatchGroup.new(@question[:matches])
   end
-
 
   def type_to_class(type)
     type.to_s.gsub("_question", "").camelize

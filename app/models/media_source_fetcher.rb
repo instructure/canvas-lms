@@ -22,7 +22,7 @@ class MediaSourceFetcher
     @api_client = api_client
   end
 
-  def fetch_preferred_source_url(options={})
+  def fetch_preferred_source_url(options = {})
     file_extension = options[:file_extension]
     media_type = options[:media_type]
 

@@ -36,16 +36,17 @@ module JSONToken
     # so wrap it in an array
     json = JSON.parse("[#{json}]")
     raise JSON::ParserError unless json.size == 1
+
     return self.walk_json(json.first, self.method(:decode_binary_string))
   end
 
   def self.walk_json(value, method)
     value = method.call(value)
     keys = case value
-      when Hash; value.keys
-      when Array; 0...value.length
-      else; []
-    end
+           when Hash; value.keys
+           when Array; 0...value.length
+           else; []
+           end
     keys.each do |key|
       value[key] = walk_json(value[key], method)
     end
@@ -54,11 +55,13 @@ module JSONToken
 
   def self.encode_binary_string(value)
     return value unless value.is_a?(String) && value.encoding == Encoding::ASCII_8BIT
-    {'_binary' => Base64.encode64(value)}
+
+    { '_binary' => Base64.encode64(value) }
   end
 
   def self.decode_binary_string(value)
     return value unless value.is_a?(Hash) && value.keys == ['_binary']
+
     Base64.decode64(value['_binary'])
   end
 end

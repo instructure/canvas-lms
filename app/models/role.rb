@@ -30,13 +30,13 @@ class Role < ActiveRecord::Base
   KNOWN_TYPES = (BASE_TYPES +
     ['StudentViewEnrollment',
      'NilEnrollment',
-     'teacher', 'ta', 'designer', 'student', 'observer'
-    ]).freeze
+     'teacher', 'ta', 'designer', 'student', 'observer']).freeze
 
   module AssociationHelper
     # this is an override to take advantage of built-in role caching since those are by far the most common
     def role
       return super if association(:role).loaded?
+
       self.role = self.shard.activate do
         Role.get_role_by_id(read_attribute(:role_id)) || (self.respond_to?(:default_role) ? self.default_role : nil)
       end
@@ -118,6 +118,7 @@ class Role < ActiveRecord::Base
 
   def self.built_in_roles(root_account_id:)
     raise "root_account_id required" unless root_account_id
+
     # giving up on in-process built-in role caching because it's probably not really worth it anymore
     RequestCache.cache('built_in_roles', root_account_id) do
       local_id, shard = Shard.local_id_for(root_account_id)
@@ -128,21 +129,22 @@ class Role < ActiveRecord::Base
   end
 
   def self.built_in_course_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select{|role| role.course_role?}
+    built_in_roles(root_account_id: root_account_id).select { |role| role.course_role? }
   end
 
   def self.visible_built_in_roles(root_account_id:)
-    built_in_roles(root_account_id: root_account_id).select{|role| role.visible?}
+    built_in_roles(root_account_id: root_account_id).select { |role| role.visible? }
   end
 
   def self.get_role_by_id(id)
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
+
     Role.where(:id => id).take # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
   def self.get_built_in_role(name, root_account_id:)
-    built_in_roles(root_account_id: root_account_id).detect{|role| role.name == name}
+    built_in_roles(root_account_id: root_account_id).detect { |role| role.name == name }
   end
 
   def ==(other_role)
@@ -168,7 +170,7 @@ class Role < ActiveRecord::Base
   def label
     if self.built_in?
       if self.course_role?
-        RoleOverride.enrollment_type_labels.detect{|label| label[:name] == self.name}[:label].call
+        RoleOverride.enrollment_type_labels.detect { |label| label[:name] == self.name }[:label].call
       elsif self.name == 'AccountAdmin'
         RoleOverride::ACCOUNT_ADMIN_LABEL.call
       else
@@ -202,9 +204,9 @@ class Role < ActiveRecord::Base
   scope :for_courses, -> { where(:base_role_type => ENROLLMENT_TYPES) }
   scope :for_accounts, -> { where(:base_role_type => ACCOUNT_TYPES) }
   scope :full_account_admin, -> { where(base_role_type: 'AccountAdmin') }
-  scope :custom_account_admin_with_permission, -> (permission) do
-    where(base_role_type: 'AccountMembership').
-    where("EXISTS (
+  scope :custom_account_admin_with_permission, ->(permission) do
+    where(base_role_type: 'AccountMembership')
+      .where("EXISTS (
       SELECT 1
       FROM #{RoleOverride.quoted_table_name}
       WHERE role_overrides.role_id = roles.id
@@ -225,15 +227,15 @@ class Role < ActiveRecord::Base
   #             :asset_string => "role_4"
   #             :label => "weirdstudent"}]},
   # ]
-  def self.all_enrollment_roles_for_account(account, include_inactive=false)
+  def self.all_enrollment_roles_for_account(account, include_inactive = false)
     custom_roles = account.available_custom_course_roles(include_inactive)
     RoleOverride.enrollment_type_labels.map do |br|
       new = br.clone
       new[:id] = Role.get_built_in_role(br[:name], root_account_id: account.resolved_root_account_id).id
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
-      new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|
-        {:id => cr.id, :base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name, :asset_string => cr.asset_string, :workflow_state => cr.workflow_state}
+      new[:custom_roles] = custom_roles.select { |cr| cr.base_role_type == new[:base_role_name] }.map do |cr|
+        { :id => cr.id, :base_role_name => cr.base_role_type, :name => cr.name, :label => cr.name, :asset_string => cr.asset_string, :workflow_state => cr.workflow_state }
       end
       new
     end
@@ -241,13 +243,13 @@ class Role < ActiveRecord::Base
 
   # returns same hash as all_enrollment_roles_for_account but adds enrollment
   # counts for the given course to each item
-  def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
+  def self.custom_roles_and_counts_for_course(course, user, include_inactive = false)
     users_scope = course.users_visible_to(user)
     built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
-    base_counts = users_scope.where('enrollments.role_id IN (?)', built_in_role_ids).
-      group('enrollments.type').select('users.id').distinct.count
-    role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids).
-      group('enrollments.role_id').select('users.id').distinct.count
+    base_counts = users_scope.where('enrollments.role_id IN (?)', built_in_role_ids)
+                             .group('enrollments.type').select('users.id').distinct.count
+    role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids)
+                             .group('enrollments.role_id').select('users.id').distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|
@@ -318,7 +320,7 @@ class Role < ActiveRecord::Base
     }
   end
 
-  def self.role_data(course, user, include_inactive=false)
+  def self.role_data(course, user, include_inactive = false)
     role_data = self.custom_roles_and_counts_for_course(course, user, include_inactive)
     self.compile_manageable_roles(role_data, user, course)
   end

@@ -39,6 +39,7 @@ module InstFS
     def login_pixel(user, session, oauth_host)
       return if session[:oauth2] # don't stomp an existing oauth flow in progress
       return if session[:pending_otp]
+
       if !session[:shown_instfs_pixel] && user && enabled?
         session[:shown_instfs_pixel] = true
         pixel_url = login_pixel_url(token: session_jwt(user, oauth_host))
@@ -48,6 +49,7 @@ module InstFS
 
     def logout(user)
       return unless user && enabled?
+
       CanvasHttp.delete(logout_url(user))
     rescue CanvasHttp::Error => e
       Canvas::Errors.capture_exception(:page_view, e, :warn)
@@ -62,13 +64,13 @@ module InstFS
       Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
     end
 
-    def authenticated_url(attachment, options={})
+    def authenticated_url(attachment, options = {})
       query_params = { token: access_jwt(access_path(attachment), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
     end
 
-    def authenticated_metadata_url(attachment, options={})
+    def authenticated_metadata_url(attachment, options = {})
       query_params = { token: access_jwt(metadata_path(attachment), options) }
       metadata_url(attachment, query_params)
     end
@@ -78,14 +80,14 @@ module InstFS
       service_url("/session", query_params)
     end
 
-    def authenticated_thumbnail_url(attachment, options={})
+    def authenticated_thumbnail_url(attachment, options = {})
       query_params = { token: access_jwt(thumbnail_path(attachment), options) }
       query_params[:geometry] = options[:geometry] if options[:geometry]
       thumbnail_url(attachment, query_params)
     end
 
     def export_references_url
-      query_params = { token: export_references_jwt}
+      query_params = { token: export_references_jwt }
       service_url("/references", query_params)
     end
 
@@ -96,7 +98,8 @@ module InstFS
     def jwt_secrets
       secret = setting("secret")
       return [] unless secret
-      secret.split(/\s+/).map{ |key| Base64.decode64(key) }
+
+      secret.split(/\s+/).map { |key| Base64.decode64(key) }
     end
 
     def jwt_secret
@@ -187,6 +190,7 @@ module InstFS
       elsif response.code.to_i == 400
         raise InstFS::BadRequestError, err_message
       end
+
       raise InstFS::DirectUploadError, err_message
     end
 
@@ -238,7 +242,7 @@ module InstFS
         json_response["success"].is_a?(Array) &&
         json_response["success"].length == 1 &&
         json_response["success"][0].is_a?(Hash)
-        json_response["success"][0].key?("id")
+      json_response["success"][0].key?("id")
       raise InstFS::ExportReferenceError, "import succeeded, but response body did not have expected shape" unless well_formed
 
       json_response["success"][0]["id"]
@@ -266,6 +270,7 @@ module InstFS
       unless response.class == Net::HTTPOK
         raise InstFS::DeletionError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
       end
+
       true
     end
 
@@ -275,7 +280,7 @@ module InstFS
       Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     end
 
-    def service_url(path, query_params=nil)
+    def service_url(path, query_params = nil)
       url = "#{app_host}#{path}"
       url += "?#{query_params.to_query}" if query_params
       url
@@ -297,7 +302,7 @@ module InstFS
       service_url(thumbnail_path(attachment), query_params)
     end
 
-    def upload_url(token=nil)
+    def upload_url(token = nil)
       query_string = { token: token } if token
       service_url("/files", query_string)
     end
@@ -332,6 +337,7 @@ module InstFS
       whole, remainder = number.divmod(step)
       whole * step
     end
+
     # If we just say every token was created at Time.now, since that token
     # is included in the url, every time we make a url it will be a new url and no browser
     # will never be able to get it from their cache. Which means, for example: every time you
@@ -360,7 +366,7 @@ module InstFS
       beginning_of_cache_window + this_resources_random_offset
     end
 
-    def access_jwt(resource, options={})
+    def access_jwt(resource, options = {})
       expires_in = options[:expires_in] || Setting.get('instfs.access_jwt.expiration_hours', '24').to_i.hours
       if (expires_in >= 1.hour.to_i) && Setting.get('instfs.access_jwt.use_consistent_iat', 'true') == "true"
         iat = consistent_iat(resource, expires_in)
@@ -403,54 +409,54 @@ module InstFS
     def direct_upload_jwt
       expires_in = Setting.get('instfs.upload_jwt.expiration_minutes', '10').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        user_id: nil,
-        host: "canvas",
-        resource: "/files",
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    user_id: nil,
+                    host: "canvas",
+                    resource: "/files",
+                  }, expires_in)
     end
 
     def session_jwt(user, host)
       expires_in = Setting.get('instfs.session_jwt.expiration_minutes', '5').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        user_id: user.global_id&.to_s,
-        host: host,
-        resource: '/session/ensure'
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    user_id: user.global_id&.to_s,
+                    host: host,
+                    resource: '/session/ensure'
+                  }, expires_in)
     end
 
     def logout_jwt(user)
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        user_id: user.global_id&.to_s,
-        resource: '/session'
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    user_id: user.global_id&.to_s,
+                    resource: '/session'
+                  }, expires_in)
     end
 
     def export_references_jwt
       expires_in = Setting.get('instfs.logout_jwt.expiration_minutes', '5').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        resource: '/references'
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    resource: '/references'
+                  }, expires_in)
     end
 
     def duplicate_file_jwt(instfs_uuid)
       expires_in = Setting.get('instfs.duplicate_file_jwt.expiration_minutes', '5').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        resource: "/files/#{instfs_uuid}/duplicate"
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    resource: "/files/#{instfs_uuid}/duplicate"
+                  }, expires_in)
     end
 
     def delete_file_jwt(instfs_uuid)
       expires_in = Setting.get('instfs.delete_file_jwt.expiration_minutes', '5').to_i.minutes
       service_jwt({
-        iat: Time.now.utc.to_i,
-        resource: "/files/#{instfs_uuid}"
-      }, expires_in)
+                    iat: Time.now.utc.to_i,
+                    resource: "/files/#{instfs_uuid}"
+                  }, expires_in)
     end
 
     def parse_original_url(url)
@@ -496,17 +502,22 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
+
   class ServiceError < DirectUploadError
     def response_status
       502
     end
   end
+
   class BadRequestError < DirectUploadError
     def response_status
       400
     end
   end
+
   class ExportReferenceError < StandardError; end
+
   class DuplicationError < StandardError; end
+
   class DeletionError < StandardError; end
 end

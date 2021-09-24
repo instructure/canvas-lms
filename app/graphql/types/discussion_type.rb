@@ -96,6 +96,11 @@ module Types
       get_entries(args)
     end
 
+    field :discussion_entry_drafts_connection, Types::DiscussionEntryDraftType.connection_type, null: true
+    def discussion_entry_drafts_connection
+      Loaders::DiscussionEntryDraftLoader.for(current_user: current_user).load(object)
+    end
+
     field :entry_counts, Types::DiscussionEntryCountsType, null: true
     def entry_counts
       Loaders::DiscussionEntryCountsLoader.for(current_user: current_user).load(object)
@@ -206,6 +211,7 @@ module Types
 
     def get_entries(search_term: nil, filter: nil, sort_order: :asc, root_entries: false)
       return [] if object.initial_post_required?(current_user, session)
+
       Loaders::DiscussionEntryLoader.for(
         current_user: current_user,
         search_term: search_term,

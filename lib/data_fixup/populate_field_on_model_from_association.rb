@@ -23,8 +23,9 @@ module DataFixup::PopulateFieldOnModelFromAssociation
       if association.present?
         delay_if_production(
           priority: Delayed::MAX_PRIORITY,
-          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
-          populate_column_from_association(table, association, min, max, column, old_value: old_value)
+          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+        )
+          .populate_column_from_association(table, association, min, max, column, old_value: old_value)
       end
     end
   end

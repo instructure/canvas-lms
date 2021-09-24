@@ -59,7 +59,7 @@ describe 'Late Policies:' do
       GradebookIndividualViewPage.select_assignment(@a1)
       GradebookIndividualViewPage.select_student(@course.students.first)
 
-      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id: @a1.id).points_deducted.to_s
 
       # the data from rails and data from ui are not in the same format
       expect(GradebookIndividualViewPage.late_penalty_text.to_f.to_s).to eq late_penalty_value
@@ -69,7 +69,7 @@ describe 'Late Policies:' do
       GradebookIndividualViewPage.select_assignment(@a1)
       GradebookIndividualViewPage.select_student(@course.students.first)
 
-      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
       expect(GradebookIndividualViewPage.late_policy_final_grade_text).to eq final_grade_value
     end
   end

@@ -66,40 +66,40 @@ module DataFixup::ReclaimInstfsAttachments
     # associations associated with the accounts through courses
     course_queries = [
       Attachment.joins(:course),
-      Attachment.joins(assessment_question: {assessment_question_bank: :course}),
+      Attachment.joins(assessment_question: { assessment_question_bank: :course }),
       Attachment.joins(assignment: :course),
       Attachment.joins(content_export: :course),
       Attachment.joins(content_migration: :course),
       Attachment.joins(epub_export: :course),
       Attachment.joins(gradebook_upload: :course),
-      Attachment.joins(submission: {assignment: :course}),
+      Attachment.joins(submission: { assignment: :course }),
       Attachment.joins(context_folder: :course),
       Attachment.joins(context_outcome_import: :course),
       Attachment.joins(quiz: :course),
-      Attachment.joins(quiz_statistics: {quiz: :course}),
-      Attachment.joins(quiz_submission: {quiz: :course}),
-    ].map{ |scope| scope.where(courses: {root_account_id: root_accounts}) }
+      Attachment.joins(quiz_statistics: { quiz: :course }),
+      Attachment.joins(quiz_submission: { quiz: :course }),
+    ].map { |scope| scope.where(courses: { root_account_id: root_accounts }) }
 
     group_queries = [
       Attachment.joins(:group),
       Attachment.joins(content_export: :group),
       Attachment.joins(content_migration: :group),
       Attachment.joins(context_folder: :group),
-    ].map{ |scope| scope.where(groups: {root_account_id: root_accounts}) }
+    ].map { |scope| scope.where(groups: { root_account_id: root_accounts }) }
 
     # attachments associated with the accounts outside of courses
     root_account_ids = root_accounts.map(&:id)
     account_queries = [
       Attachment.joins(:account),
-      Attachment.joins(assessment_question: {assessment_question_bank: :account}),
+      Attachment.joins(assessment_question: { assessment_question_bank: :account }),
       Attachment.joins(content_migration: :account),
       Attachment.joins(context_folder: :account),
       Attachment.joins(context_sis_batch: :account),
       Attachment.joins(context_outcome_import: :account),
-    ].map{ |scope| scope.where("#{Account.resolved_root_account_id_sql} IN (?)", root_account_ids) }
+    ].map { |scope| scope.where("#{Account.resolved_root_account_id_sql} IN (?)", root_account_ids) }
 
-    (course_queries + group_queries + account_queries).
-      map{ |q| q.where("instfs_uuid IS NOT NULL") }.
-      reduce{ |q1, q2| q1.union(q2) }
+    (course_queries + group_queries + account_queries)
+      .map { |q| q.where("instfs_uuid IS NOT NULL") }
+      .reduce { |q1, q2| q1.union(q2) }
   end
 end

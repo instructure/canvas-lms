@@ -42,7 +42,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
         due_at: Time.zone.now,
         points_possible: "1.5",
         submission_types: 'external_tool',
-        external_tool_tag_attributes: {url: tool.url}
+        external_tool_tag_attributes: { url: tool.url }
       }
     )
   end
@@ -137,7 +137,7 @@ describe BasicLTI::QuizzesNextLtiResponse do
     end
 
     it 'handles tools that have a url mismatch with the assignment' do
-      assignment.external_tool_tag_attributes = {url: 'http://example.com/foo'}
+      assignment.external_tool_tag_attributes = { url: 'http://example.com/foo' }
       assignment.save!
       request = BasicLTI::BasicOutcomes.process_request(tool, xml)
       expect(request.code_major).to eq 'failure'
@@ -176,8 +176,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
 
     context "submissions" do
       it "creates a new submission if there isn't one" do
-        expect{BasicLTI::BasicOutcomes.process_request(tool, xml)}.
-          to change{assignment.submissions.not_placeholder.where(user_id: @user.id).count}.from(0).to(1)
+        expect { BasicLTI::BasicOutcomes.process_request(tool, xml) }
+          .to change { assignment.submissions.not_placeholder.where(user_id: @user.id).count }.from(0).to(1)
         # it creates a unsubmitted version as well
         expect(assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count).to be(2)
       end
@@ -216,8 +216,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
               tool,
               request_xml(source_id, launch_urls[2], grades[2])
             )
-          }.
-            not_to change{
+          }
+            .not_to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }
         end
@@ -228,8 +228,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
               tool,
               request_xml(source_id, launch_urls[2], grades[1])
             )
-          }.
-            not_to change{
+          }
+            .not_to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }
         end
@@ -240,8 +240,8 @@ describe BasicLTI::QuizzesNextLtiResponse do
               tool,
               request_xml(source_id, launch_urls[1], grades[2])
             )
-          }.
-            to change{
+          }
+            .to change {
               assignment.submissions.not_placeholder.where(user_id: @user.id).first.versions.count
             }.from(5).to(6)
         end

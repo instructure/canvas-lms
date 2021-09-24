@@ -66,7 +66,7 @@ describe "Gradebook - group weights" do
     @course.reload
   end
 
-  it 'should show total column as points' do
+  it 'shows total column as points' do
     @assignment1.grade_student @student, grade: 20, grader: @teacher
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
@@ -78,7 +78,7 @@ describe "Gradebook - group weights" do
     expect(student_totals).to eq(["25"])
   end
 
-  it 'should show total column as percent' do
+  it 'shows total column as percent' do
     @assignment1.grade_student @student, grade: 20, grader: @teacher
     @assignment2.grade_student @student, grade: 5, grader: @teacher
 
@@ -119,25 +119,25 @@ describe "Gradebook - group weights" do
       @assignment2.grade_student @student, grade: 5, grader: @teacher
     end
 
-    it 'should display a warning icon in the total column', priority: '1', test_id: 164013 do
+    it 'displays a warning icon in the total column', priority: '1', test_id: 164013 do
       Gradebook.visit(@course)
       expect(Gradebook.total_cell_warning_icon_select.size).to eq(1)
     end
 
-    it 'should not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
+    it 'does not display warning icons if group weights are turned off', priority: "1", test_id: 305579 do
       @course.apply_assignment_group_weights = false
       @course.save!
       Gradebook.visit(@course)
       expect(f("body")).not_to contain_css('.icon-warning')
     end
 
-    it 'should display "hidden" icon in total column if an assignment has unposted submissions' do
+    it 'displays "hidden" icon in total column if an assignment has unposted submissions' do
       @assignment1.submissions.update_all(posted_at: nil)
       Gradebook.visit(@course)
       expect(Gradebook.content_selector).to contain_jqcss('.total-cell .icon-off')
     end
 
-    it 'should not display "hidden" icon in total column if no assignments have unposted submissions' do
+    it 'does not display "hidden" icon in total column if no assignments have unposted submissions' do
       Gradebook.visit(@course)
       expect(Gradebook.content_selector).not_to contain_jqcss('.total-cell .icon-off')
     end

@@ -115,16 +115,16 @@ class AssignmentGroup < ActiveRecord::Base
     given do |user, session|
       !self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :manage_assignments) &&
-          (self.context.account_membership_allows(user) ||
-           !any_assignment_in_closed_grading_period?)
+        (self.context.account_membership_allows(user) ||
+         !any_assignment_in_closed_grading_period?)
     end
     can :delete
 
     given do |user, session|
       self.context.root_account.feature_enabled?(:granular_permissions_manage_assignments) &&
         self.context.grants_right?(user, session, :manage_assignments_delete) &&
-          (self.context.account_membership_allows(user) ||
-           !any_assignment_in_closed_grading_period?)
+        (self.context.account_membership_allows(user) ||
+         !any_assignment_in_closed_grading_period?)
     end
     can :delete
   end
@@ -143,8 +143,9 @@ class AssignmentGroup < ActiveRecord::Base
     to_restore.each { |assignment| assignment.restore(:assignment_group) }
   end
 
-  def rules_hash (options={})
+  def rules_hash(options = {})
     return @rules_hash if @rules_hash
+
     @rules_hash = {}.with_indifferent_access
     (rules || "").split("\n").each do |rule|
       split = rule.split(":", 2)
@@ -209,7 +210,7 @@ class AssignmentGroup < ActiveRecord::Base
     p.to { context.participating_students_by_date }
     p.whenever { |record|
       false &&
-      record.changed_in_state(:available, :fields => :group_weight)
+        record.changed_in_state(:available, :fields => :group_weight)
     }
     p.data { course_broadcast_data }
   end
@@ -262,13 +263,13 @@ class AssignmentGroup < ActiveRecord::Base
 
   def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
     scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-      context.active_assignments.where(:assignment_group_id => assignment_groups)
-    elsif user.nil?
-      context.active_assignments.published.where(:assignment_group_id => assignment_groups)
-    else
-      user.assignments_visible_in_course(context).
-        where(:assignment_group_id => assignment_groups).published
-    end
+              context.active_assignments.where(:assignment_group_id => assignment_groups)
+            elsif user.nil?
+              context.active_assignments.published.where(:assignment_group_id => assignment_groups)
+            else
+              user.assignments_visible_in_course(context)
+                  .where(:assignment_group_id => assignment_groups).published
+            end
 
     if assignment_ids&.any?
       scope = scope.where(id: assignment_ids)

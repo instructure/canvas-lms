@@ -36,13 +36,13 @@ shared_examples_for "submittable" do
       @section = @course.course_sections.create!(name: "test section")
       @section2 = @course.course_sections.create!(name: "second test section")
       student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, {course_section: @section})
-      create_section_override_for_assignment(@assignment3, {course_section: @section2})
+      create_section_override_for_assignment(@assignment, { course_section: @section })
+      create_section_override_for_assignment(@assignment3, { course_section: @section2 })
       @course.reload
       @vis_hash = submittable_class.visible_ids_by_user(course_id: @course.id, user_id: [@student1, @student2, @student3].map(&:id))
     end
 
-    it "should return both topics for a student with an override" do
+    it "returns both topics for a student with an override" do
       expect(@vis_hash[@student1.id].sort).to eq [
         @item_without_assignment.id,
         @item_with_assignment_and_only_vis.id,
@@ -50,7 +50,7 @@ shared_examples_for "submittable" do
       ].sort
     end
 
-    it "should not return differentiated topics to a student with no overrides" do
+    it "does not return differentiated topics to a student with no overrides" do
       expect(@vis_hash[@student2.id].sort).to eq [
         @item_without_assignment.id,
         @item_with_assignment_and_visible_to_all.id

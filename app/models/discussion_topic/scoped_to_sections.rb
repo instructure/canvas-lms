@@ -28,6 +28,7 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
   # That allowed for some pages to end up blank. See https://instructure.atlassian.net/browse/KNO-372
   def self.for(consumer, context, user, relation)
     raise "Invalid consumer #{consumer.class}" unless consumer.class == DiscussionTopicsController
+
     DiscussionTopic::ScopedToSections.new(context, user, relation)
   end
 
@@ -38,10 +39,10 @@ class DiscussionTopic::ScopedToSections < ScopeFilter
   end
 
   private
+
   def scope_for_user_sections(scope)
     return scope if context.grants_any_right?(user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS, :manage_content)
 
     context.is_a?(Course) ? scope.visible_to_student_sections(user) : scope
   end
 end
-

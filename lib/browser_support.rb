@@ -23,7 +23,8 @@ BrowserSupport = Struct.new(:browser, :version) do
   class << self
     def supported?(user_agent)
       browser = Browser.new(user_agent)
-      return false if minimum_browsers.any?{ |min| browser.send("#{min.browser}?", "<#{min.version}") }
+      return false if minimum_browsers.any? { |min| browser.send("#{min.browser}?", "<#{min.version}") }
+
       true # if we don't recognize it (e.g. Android), be nice
     end
 
@@ -32,8 +33,8 @@ BrowserSupport = Struct.new(:browser, :version) do
     end
 
     def minimum_browsers
-      @minimum_browsers ||= (configuration['minimums'] || []).
-        map{ |browser, version| new(browser, version.to_s) }
+      @minimum_browsers ||= (configuration['minimums'] || [])
+                            .map { |browser, version| new(browser, version.to_s) }
     end
   end
 end

@@ -25,7 +25,6 @@ require_relative '../admin/pages/account_content_share_page'
 require_relative '../../spec_helper'
 
 describe 'assignments' do
-
   include_context 'in-process server selenium tests'
   include AssignmentsIndexPage
   include CopyToTrayPage

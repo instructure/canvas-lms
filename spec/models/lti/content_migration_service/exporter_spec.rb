@@ -26,12 +26,14 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
   describe '#export_completed?' do
     let(:course) { course_model }
-    let(:tool) { course.context_external_tools.create!({
-      name:          'a',
-      domain:        'lti.example.com',
-      consumer_key:  '12345',
-      shared_secret: 'sekret',
-    }) }
+    let(:tool) {
+      course.context_external_tools.create!({
+                                              name: 'a',
+                                              domain: 'lti.example.com',
+                                              consumer_key: '12345',
+                                              shared_secret: 'sekret',
+                                            })
+    }
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:status_url) { 'https://lti.example.com/export/42/status' }
 
@@ -40,33 +42,35 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     end
 
     it 'must return true when the remote service indicates the export status is completed' do
-      stub_request(:get, status_url).
-        to_return(status: 200, body: {status: 'completed'}.to_json)
+      stub_request(:get, status_url)
+        .to_return(status: 200, body: { status: 'completed' }.to_json)
       expect(migrator).to be_export_completed
     end
 
     it 'must raise an exception with the response message when the export has failed' do
-      stub_request(:get, status_url).
-        to_return(status: 200, body: {status: 'failed', message: 'Oh, noes!'}.to_json)
-      expect { migrator.export_completed? }.
-        to raise_error RuntimeError, 'Oh, noes!'
+      stub_request(:get, status_url)
+        .to_return(status: 200, body: { status: 'failed', message: 'Oh, noes!' }.to_json)
+      expect { migrator.export_completed? }
+        .to raise_error RuntimeError, 'Oh, noes!'
     end
 
     it 'must return false when the remote service indicates the export status neither completed or failed' do
-      stub_request(:get, status_url).
-        to_return(status: 200, body: {status: 'foobar'}.to_json)
+      stub_request(:get, status_url)
+        .to_return(status: 200, body: { status: 'foobar' }.to_json)
       expect(migrator).to_not be_export_completed
     end
   end
 
   describe '#retrieve_export' do
     let(:course) { course_model }
-    let(:tool) { course.context_external_tools.create!({
-      name:          'a',
-      domain:        'lti.example.com',
-      consumer_key:  '12345',
-      shared_secret: 'sekret',
-    }) }
+    let(:tool) {
+      course.context_external_tools.create!({
+                                              name: 'a',
+                                              domain: 'lti.example.com',
+                                              consumer_key: '12345',
+                                              shared_secret: 'sekret',
+                                            })
+    }
     let(:migrator) { Lti::ContentMigrationService::Exporter.new(course, tool, {}) }
     let(:fetch_url) { 'https://lti.example.com/export/42' }
 
@@ -80,19 +84,19 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
     end
 
     it 'must return the parsed response body when the export status indicated completion' do
-      response_body = {foo: 'bar', baz: 'qux'}.to_json
-      stub_request(:get, fetch_url).
-        to_return(:status => 200, :body => response_body, :headers => {})
+      response_body = { foo: 'bar', baz: 'qux' }.to_json
+      stub_request(:get, fetch_url)
+        .to_return(:status => 200, :body => response_body, :headers => {})
       migrator.instance_variable_set(:@export_status, 'completed')
-      expect(migrator.retrieve_export).to eq({'foo' => 'bar', 'baz' => 'qux'})
+      expect(migrator.retrieve_export).to eq({ 'foo' => 'bar', 'baz' => 'qux' })
     end
 
     it 'must raise an exception when the response status is something other than 200' do
-      response_body = {foo: 'bar', baz: 'qux'}.to_json
-      stub_request(:get, fetch_url).
-        to_return(:status => 404, :body => response_body, :headers => {})
-      expect { migrator.retrieve_export }.
-        to raise_error RuntimeError, /404/
+      response_body = { foo: 'bar', baz: 'qux' }.to_json
+      stub_request(:get, fetch_url)
+        .to_return(:status => 404, :body => response_body, :headers => {})
+      expect { migrator.retrieve_export }
+        .to raise_error RuntimeError, /404/
     end
   end
 
@@ -106,30 +110,30 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       @root_account.ensure_defaults
       @root_account.save!
       @tool = @course.context_external_tools.build({
-        name:          'a',
-        domain:        'lti.example.com',
-        consumer_key:  '12345',
-        shared_secret: 'secret',
-      })
+                                                     name: 'a',
+                                                     domain: 'lti.example.com',
+                                                     consumer_key: '12345',
+                                                     shared_secret: 'secret',
+                                                   })
       @tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
-        settings: {
-          'custom_fields' => {
-            'course_id'=>'$Canvas.course.id',
-          },
-          'content_migration' => {
-            'export_start_url'=>export_url,
-            'import_start_url'=>'https://lti.example.com/begin_import'
-          },
-        }
-      })
+                                                                                     settings: {
+                                                                                       'custom_fields' => {
+                                                                                         'course_id' => '$Canvas.course.id',
+                                                                                       },
+                                                                                       'content_migration' => {
+                                                                                         'export_start_url' => export_url,
+                                                                                         'import_start_url' => 'https://lti.example.com/begin_import'
+                                                                                       },
+                                                                                     }
+                                                                                   })
       @tool.save!
 
       response_body = {
         status_url: 'https://lti.example.com/export/42/status',
         fetch_url: 'https://lti.example.com/export/42',
       }.to_json
-      stub_request(:post, export_url).
-        to_return(:status => 200, :body => response_body, :headers => {})
+      stub_request(:post, export_url)
+        .to_return(:status => 200, :body => response_body, :headers => {})
       @options = {}
       @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
     end
@@ -140,32 +144,32 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       end
       it 'must post the context_id to the configured tools' do
         assert_requested(:post, export_url, {
-          body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
-        })
+                           body: hash_including(context_id: Lti::Asset.opaque_identifier_for(@course))
+                         })
       end
 
       it 'must post the tool_consumer_instance_guid to the configured tools' do
         assert_requested(:post, export_url, {
-          body: hash_including(tool_consumer_instance_guid: @root_account.lti_guid)
-        })
+                           body: hash_including(tool_consumer_instance_guid: @root_account.lti_guid)
+                         })
       end
 
       it 'must include a JWT as the Authorization header for each request' do
         assert_requested(:post, export_url, {
-          headers: {'Authorization' => /^Bearer [a-zA-Z0-9\-_]{36,}\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]{43}$/}
-        })
+                           headers: { 'Authorization' => /^Bearer [a-zA-Z0-9\-_]{36,}\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]{43}$/ }
+                         })
       end
 
       it 'must include any variable expansions requested by the tool' do
         assert_requested(:post, export_url, {
-          body: hash_including('custom_course_id' => @course.id.to_s)
-        })
+                           body: hash_including('custom_course_id' => @course.id.to_s)
+                         })
       end
 
       it 'must not include the exported assets key' do
         assert_not_requested(:post, export_url, {
-          body: hash_including('custom_exported_assets' => anything)
-        })
+                               body: hash_including('custom_exported_assets' => anything)
+                             })
       end
 
       it 'must mark the migration as successfully started' do
@@ -175,33 +179,32 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
       context 'for the default body format' do
         it 'must format request body as nested query' do
           assert_requested(:post, export_url, {
-            body: Rack::Utils.build_nested_query({
-              context_id: Lti::Asset.opaque_identifier_for(@course),
-              tool_consumer_instance_guid: @root_account.lti_guid,
-              custom_course_id: @course.id.to_s
-            })
-          })
+                             body: Rack::Utils.build_nested_query({
+                                                                    context_id: Lti::Asset.opaque_identifier_for(@course),
+                                                                    tool_consumer_instance_guid: @root_account.lti_guid,
+                                                                    custom_course_id: @course.id.to_s
+                                                                  })
+                           })
         end
-  
+
         it 'must post with correct content-type' do
           assert_requested(:post, export_url, {
-            headers: {'Content-Type' => 'application/x-www-form-urlencoded'}
-          })
+                             headers: { 'Content-Type' => 'application/x-www-form-urlencoded' }
+                           })
         end
       end
-  
-      context 'for json body format' do
 
+      context 'for json body format' do
         before do
           @tool.settings = Importers::ContextExternalToolImporter.create_tool_settings({
-            settings: {
-              'content_migration' => {
-                'export_start_url'=>export_url,
-                'import_start_url'=>'https://lti.example.com/begin_import',
-                'export_format'=>'json'
-              },
-            }
-          })
+                                                                                         settings: {
+                                                                                           'content_migration' => {
+                                                                                             'export_start_url' => export_url,
+                                                                                             'import_start_url' => 'https://lti.example.com/begin_import',
+                                                                                             'export_format' => 'json'
+                                                                                           },
+                                                                                         }
+                                                                                       })
           @tool.save!
           @migrator = Lti::ContentMigrationService::Exporter.new(@course, @tool, @options)
           @migrator.start!
@@ -209,17 +212,17 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
         it 'must format request body as json' do
           assert_requested(:post, export_url, {
-            body: {
-              context_id: Lti::Asset.opaque_identifier_for(@course),
-              tool_consumer_instance_guid: @root_account.lti_guid,
-            }
-          })
+                             body: {
+                               context_id: Lti::Asset.opaque_identifier_for(@course),
+                               tool_consumer_instance_guid: @root_account.lti_guid,
+                             }
+                           })
         end
-  
+
         it 'must post with correct content-type' do
           assert_requested(:post, export_url, {
-            headers: {'Content-Type' => 'application/json'}
-          })
+                             headers: { 'Content-Type' => 'application/json' }
+                           })
         end
       end
     end
@@ -233,8 +236,8 @@ RSpec.describe Lti::ContentMigrationService::Exporter do
 
       it 'must include the exported assets in the request to the tool' do
         assert_requested(:post, export_url, {
-          body: hash_including('custom_exported_assets' => @exports)
-        })
+                           body: hash_including('custom_exported_assets' => @exports)
+                         })
       end
     end
   end

@@ -123,10 +123,12 @@ class AssignmentOverridesController < ApplicationController
   def group_alias
     @override = find_assignment_override(@assignment, @group)
     raise ActiveRecord::RecordNotFound unless @override
+
     redirect_to api_v1_assignment_override_url(
       :course_id => @course.id,
       :assignment_id => @assignment.id,
-      :id => @override)
+      :id => @override
+    )
   end
 
   # @API Redirect to the assignment override for a section
@@ -136,10 +138,12 @@ class AssignmentOverridesController < ApplicationController
   def section_alias
     @override = find_assignment_override(@assignment, @section)
     raise ActiveRecord::RecordNotFound unless @override
+
     redirect_to api_v1_assignment_override_url(
       :course_id => @course.id,
       :assignment_id => @assignment.id,
-      :id => @override)
+      :id => @override
+    )
   end
 
   # @API Create an assignment override
@@ -313,11 +317,11 @@ class AssignmentOverridesController < ApplicationController
     # check request format
     override_params = deserialize_overrides(params[:assignment_overrides])
     if override_params.blank?
-      return bad_request(errors: [ 'no assignment_overrides values present' ])
+      return bad_request(errors: ['no assignment_overrides values present'])
     elsif !override_params.is_a? Array
-      return bad_request(errors: [ 'must specify an array with entry format { id, assignment_id }' ])
+      return bad_request(errors: ['must specify an array with entry format { id, assignment_id }'])
     elsif !override_params.all? { |o| o.is_a?(ActionController::Parameters) && o.key?('assignment_id') && o.key?('id') }
-      return bad_request(errors: [ 'must specify an array with entry format { id, assignment_id }' ])
+      return bad_request(errors: ['must specify an array with entry format { id, assignment_id }'])
     end
 
     all_requests = override_params.group_by { |req| req['assignment_id'].to_i }
@@ -327,6 +331,7 @@ class AssignmentOverridesController < ApplicationController
       override_ids = requests.map { |r| r['id'].to_i }
       assignment = assignments.find { |a| a.id == assignment_id }
       next unless assignment
+
       find_assignment_overrides(assignment, override_ids)
     end.flatten.compact
 
@@ -426,6 +431,7 @@ class AssignmentOverridesController < ApplicationController
   def require_course
     @course ||= api_find(Course.active, params[:course_id])
     raise ActiveRecord::RecordNotFound if @course.deleted?
+
     @context = @course
     authorized_action(@course, @current_user, :read)
   end

@@ -54,6 +54,7 @@ module PlannerHelper
   # had no submission attribute pointing to a real Submission
   def self.complete_planner_override_for_quiz_submission(quiz_submission)
     return if quiz_submission.submission # handled by Submission model
+
     planner_override = PlannerOverride.find_or_create_by(
       plannable_id: quiz_submission.quiz_id,
       plannable_type: PLANNABLE_TYPES['quiz'],
@@ -64,6 +65,7 @@ module PlannerHelper
 
   def self.complete_planner_override(planner_override)
     return unless planner_override.is_a? PlannerOverride
+
     planner_override.update(marked_complete: true)
     clear_planner_cache(planner_override&.user)
   end
@@ -76,21 +78,21 @@ module PlannerHelper
     return unless submission&.respond_to?(:submission_type) && submission&.respond_to?(:assignment_id)
 
     planner_override = case submission.submission_type
-      when "discussion_topic"
-        discussion_topic_id = DiscussionTopic.find_by(assignment_id: submission.assignment_id)&.id
-        PlannerOverride.find_by(
-          plannable_id: discussion_topic_id,
-          plannable_type: PLANNABLE_TYPES['discussion_topic'],
-          user_id: submission.user_id
-        )
-      when "online_quiz"
-        quiz_id = Quizzes::Quiz.find_by(assignment_id: submission.assignment_id)&.id
-        PlannerOverride.find_by(
-          plannable_id: quiz_id,
-          plannable_type: PLANNABLE_TYPES['quiz'],
-          user_id: submission.user_id
-        )
-    end
+                       when "discussion_topic"
+                         discussion_topic_id = DiscussionTopic.find_by(assignment_id: submission.assignment_id)&.id
+                         PlannerOverride.find_by(
+                           plannable_id: discussion_topic_id,
+                           plannable_type: PLANNABLE_TYPES['discussion_topic'],
+                           user_id: submission.user_id
+                         )
+                       when "online_quiz"
+                         quiz_id = Quizzes::Quiz.find_by(assignment_id: submission.assignment_id)&.id
+                         PlannerOverride.find_by(
+                           plannable_id: quiz_id,
+                           plannable_type: PLANNABLE_TYPES['quiz'],
+                           user_id: submission.user_id
+                         )
+                       end
     planner_override ||= PlannerOverride.find_by(
       plannable_id: submission.assignment_id,
       plannable_type: PLANNABLE_TYPES['assignment'],

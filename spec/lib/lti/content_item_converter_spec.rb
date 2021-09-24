@@ -23,9 +23,7 @@ require_dependency "lti/content_item_converter"
 
 module Lti
   describe ContentItemConverter do
-
     describe '#self.convert_resource_selection' do
-
       let(:fake_selection) do
         {
           url: 'some_file.txt',
@@ -81,7 +79,6 @@ module Lti
       end
 
       context 'placement advice' do
-
         it 'creates placement advice' do
           placement_advice = described_class.convert_resource_selection(fake_selection).placement_advice
           expect(placement_advice).to_not be nil
@@ -101,7 +98,6 @@ module Lti
           placement_advice = described_class.convert_resource_selection(fake_selection).placement_advice
           expect(placement_advice.presentation_document_target).to eq 'window'
         end
-
       end
 
       context 'file_selection' do
@@ -140,7 +136,6 @@ module Lti
           content_item = described_class.convert_resource_selection(file_selection)
           expect(content_item.media_type).to be_nil
         end
-
       end
 
       context 'lti_link' do
@@ -158,7 +153,6 @@ module Lti
           content_item = described_class.convert_resource_selection(lti_link)
           expect(content_item.placement_advice.presentation_document_target).to eq 'frame'
         end
-
       end
 
       context 'url return_type' do
@@ -177,7 +171,6 @@ module Lti
           content_item = described_class.convert_resource_selection(url_selection)
           expect(content_item.placement_advice.presentation_document_target).to eq 'window'
         end
-
       end
 
       context 'image_url return_type' do
@@ -209,7 +202,6 @@ module Lti
           content_item = described_class.convert_resource_selection(image_selection)
           expect(content_item.placement_advice.presentation_document_target).to eq 'embed'
         end
-
       end
 
       context 'iframe return_type' do
@@ -228,7 +220,6 @@ module Lti
           content_item = described_class.convert_resource_selection(iframe_selection)
           expect(content_item.placement_advice.presentation_document_target).to eq 'iframe'
         end
-
       end
 
       context 'rich_content return_type' do
@@ -247,9 +238,7 @@ module Lti
           content_item = described_class.convert_resource_selection(rich_content_selection)
           expect(content_item.placement_advice.presentation_document_target).to eq 'embed'
         end
-
       end
-
     end
 
     describe "#self.convert_oembed" do
@@ -298,7 +287,6 @@ module Lti
         }
       end
 
-
       it 'converts url to id' do
         content_item = described_class.convert_oembed(photo_oembed)
         expect(content_item.id).to eq photo_oembed['url']
@@ -344,9 +332,6 @@ module Lti
           expect(content_item.text).to eq rich_oembed['html']
         end
       end
-
     end
-
-
   end
 end

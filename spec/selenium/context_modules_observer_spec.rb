@@ -36,7 +36,7 @@ describe "context modules" do
       override_for_student(@student, @due_at)
 
       course_module
-      @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.add_item({ :id => @assignment.id, :type => 'assignment' })
 
       user_session(@observer)
     end
@@ -89,7 +89,7 @@ describe "context modules" do
       expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
     end
 
-    it "should indicate multiple due dates for multiple observed students" do
+    it "indicates multiple due dates for multiple observed students" do
       section2 = section_due_date_override(@due_at + 1.day)
 
       student2 = user_factory(active_all: true, :active_state => 'active', :section => section2)

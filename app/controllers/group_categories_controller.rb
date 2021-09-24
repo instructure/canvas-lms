@@ -153,7 +153,6 @@ class GroupCategoriesController < ApplicationController
     end
   end
 
-
   # @API Create a Group Category
   # Create a new group category
   #
@@ -267,7 +266,7 @@ class GroupCategoriesController < ApplicationController
   # @returns Progress
   def import
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_add])
-      return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
+      return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
 
       file_obj = nil
       if params.has_key?(:attachment)
@@ -345,8 +344,9 @@ class GroupCategoriesController < ApplicationController
           end
         end
       else
-        return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
-        return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
+        return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
+        return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
+
         if populate_group_category_from_params
           flash[:notice] = t('notices.update_category_success', 'Category was successfully updated.')
           render :json => @group_category
@@ -367,20 +367,21 @@ class GroupCategoriesController < ApplicationController
   def destroy
     if authorized_action(@context, @current_user, [:manage_groups, :manage_groups_delete])
       @group_category = @group_category || @context.group_categories.where(id: params[:category_id]).first
-      return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
-      return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
+      return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
+      return render(:json => { 'status' => 'unauthorized' }, :status => :unauthorized) if @group_category.protected?
+
       if @group_category.destroy
         if api_request?
           render :json => group_category_json(@group_category, @current_user, session)
         else
           flash[:notice] = t('notices.delete_category_success', "Category successfully deleted")
-          render :json => {:deleted => true}
+          render :json => { :deleted => true }
         end
       else
         if api_request?
           render :json => @group_category.errors, :status => :bad_request
         else
-          render :json => {:deleted => false}
+          render :json => { :deleted => false }
         end
       end
     end
@@ -417,15 +418,15 @@ class GroupCategoriesController < ApplicationController
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
         csv_string = CSV.generate do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
-          users = @context.participating_students.
-            select("users.id, users.sortable_name,
+          users = @context.participating_students
+                          .select("users.id, users.sortable_name,
                   -- we just want any that have an sis_pseudonym_id populated
                   MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
                   -- grab all the section_ids to get the section names
-                  ARRAY_AGG (enrollments.course_section_id) AS course_section_ids").
-            where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
-          gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id)).
-            joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
+                  ARRAY_AGG (enrollments.course_section_id) AS course_section_ids")
+                          .where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
+          gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id))
+                                          .joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
           csv << export_headers(include_sis_id, gms_by_user_id.any?)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
         end
@@ -515,7 +516,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
-    user_json_preloads(users, false, {profile: true})
+    user_json_preloads(users, false, { profile: true })
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @group_category.context_type == "Course"
@@ -633,8 +634,8 @@ class GroupCategoriesController < ApplicationController
       memberships = @group_category.assign_unassigned_members(by_section, updating_user: @current_user)
 
       # render the changes
-      json = memberships.group_by{ |m| m.group_id }.map do |group_id, new_members|
-        { :id => group_id, :new_members => new_members.map{ |m| m.user.group_member_json(@context) } }
+      json = memberships.group_by { |m| m.group_id }.map do |group_id, new_members|
+        { :id => group_id, :new_members => new_members.map { |m| m.user.group_member_json(@context) } }
       end
       render :json => json
     else
@@ -677,17 +678,19 @@ class GroupCategoriesController < ApplicationController
   end
 
   protected
+
   def get_category_context
     begin
       id = api_request? ? params[:group_category_id] : params[:id]
       @group_category = api_find(GroupCategory.active, id)
     rescue ActiveRecord::RecordNotFound
-      return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
+      return render(:json => { 'status' => 'not found' }, :status => :not_found) unless @group_category
     end
     @context = @group_category.context
   end
 
   private
+
   def body_file
     file_obj = request.body
 
@@ -718,8 +721,9 @@ class GroupCategoriesController < ApplicationController
       if charset.present? && charset.casecmp('utf-8') != 0
         raise InvalidContentType
       end
-      params[:extension] ||= {"text/plain" => "csv",
-                              "text/csv" => "csv"}[request2.media_type] || "csv"
+
+      params[:extension] ||= { "text/plain" => "csv",
+                               "text/csv" => "csv" }[request2.media_type] || "csv"
       file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
                                    request2.media_type)
       file_obj

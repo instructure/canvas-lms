@@ -28,6 +28,7 @@ class GradebookCsv < ActiveRecord::Base
   def self.last_successful_export(course:, user:)
     csv = where(course_id: course, user_id: user).first
     return nil if csv.nil? || csv.failed?
+
     csv
   end
 

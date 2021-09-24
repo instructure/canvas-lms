@@ -6,7 +6,7 @@ require 'json'
 require 'jira_ref_parser'
 require 'yaml'
 
-GERGICH_GIT_PATH=ENV.fetch("GERGICH_GIT_PATH", ".")
+GERGICH_GIT_PATH = ENV.fetch("GERGICH_GIT_PATH", ".")
 
 def git(command)
   Dir.chdir(GERGICH_GIT_PATH) do
@@ -22,7 +22,7 @@ def comment(severity, line, message, link_to_guidelines: false)
     end
 
     # NOTE: add 6 to all line numbers, cuz parent/author/commit/dates/etc
-    payload = {path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message}
+    payload = { path: "/COMMIT_MSG", position: (line || 1) + 6, severity: severity, message: message }
     `gergich comment #{Shellwords.escape(payload.to_json)}`
     $stderr.puts "line #{line}: [#{severity}]: #{message}"
   elsif line
@@ -37,7 +37,7 @@ commit_message = case ARGV[0]
                  when "--stdin" then $stdin.read
                  when nil then git("show --pretty=format:%B -s")
                  else File.read(ARGV[0])
-end
+                 end
 
 exit if commit_message.match?(/\A\[?wip($|[\] :-])/i)
 lines = commit_message.split("\n")
@@ -92,7 +92,6 @@ if has_the_word_i
   comment "warn", 1, "just say what the commit does, and not in the first person :P", link_to_guidelines: true
 end
 
-
 BODY_IDEAL_LINE_LENGTH = 75
 
 long_lines = lines.each_with_index.select do |line, _i|
@@ -127,7 +126,7 @@ TICKET_REGEX = /([A-Z]+-[0-9]+)/.freeze
 issue_ids = JiraRefParser.scan_message_for_issue_ids(commit_message)
 if issue_ids.empty? && !gh_issue
   parts = commit_message.gsub(SAFE_PARTS_REGEX, "")
-    .split(TICKET_REGEX)
+                        .split(TICKET_REGEX)
   if parts.size > 1
     jira_hook_words = JiraRefParser::RefKeywords + JiraRefParser::FixKeywords
     comment "warn", parts.first.count("\n") + 1,

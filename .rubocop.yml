@@ -1,254 +1,100 @@
-require:
-  - rubocop-rails
-  - rubocop-rspec
-  - rubocop-performance
-  # this odd relative path is so that rubocop works when run without "bundle
-  # exec", such as from most editors/IDEs.
-  - ./gems/rubocop-canvas/lib/rubocop_canvas
-  - outrigger/cops/migration/tagged
+inherit_from: .rubocop.common.yml
 
 AllCops:
-  TargetRubyVersion: 2.7
-  NewCops: enable
+  NewCops: enable # TODO
 
-# our style changes: disabling style rules we aren't interested in
-Layout/ParameterAlignment:
-  Enabled: false
-Layout/ElseAlignment:
-  Enabled: false
-Layout/EmptyLines:
-  Enabled: false
-Layout/EmptyLinesAroundAccessModifier:
-  Enabled: false
-Layout/EmptyLinesAroundArguments:
-  Enabled: false
-Layout/EmptyLinesAroundBlockBody:
-  Enabled: false
-Layout/EmptyLinesAroundClassBody:
-  Enabled: false
-Layout/EmptyLinesAroundMethodBody:
-  Enabled: false
-Layout/EmptyLinesAroundModuleBody:
-  Enabled: false
-Layout/FirstHashElementIndentation:
-  Enabled: false
-Layout/IndentationConsistency:
-  Enabled: false
-Layout/IndentationWidth:
-  Enabled: false
-Layout/MultilineOperationIndentation:
-  Enabled: false
-Layout/SpaceAfterColon:
-  Enabled: false
-Layout/SpaceAfterComma:
-  Enabled: false
-Layout/SpaceAroundEqualsInParameterDefault:
-  Enabled: false
-Layout/SpaceAroundOperators:
-  Enabled: false
-Layout/SpaceBeforeBlockBraces:
-  Enabled: false
-Layout/SpaceBeforeFirstArg:
-  Enabled: false
-Layout/SpaceInLambdaLiteral:
-  Enabled: false
-Layout/SpaceInsideArrayLiteralBrackets:
-  Enabled: false
-Layout/SpaceInsideBlockBraces:
-  Enabled: false
-Layout/SpaceInsideHashLiteralBraces:
-  Enabled: false
-Layout/SpaceInsideReferenceBrackets:
-  Enabled: false
-Layout/TrailingEmptyLines:
-  Enabled: false
-Layout/TrailingWhitespace:
+Lint/AmbiguousBlockAssociation: # TODO
+  Exclude:
+    - spec/**/*
+
+Naming/VariableNumber: # TODO
   Enabled: false
 
-Style/FormatStringToken:
+Rails/HasManyOrHasOneDependent: # TODO
   Enabled: false
-Style/StringLiterals:
+Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
+  Enabled: false # accessors are often defined in terms of read_attribute
+Rails/TimeZone: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/SignalException:
+
+RSpec/ContextWording: # TODO
   Enabled: false
-Style/NumericLiterals:
+RSpec/DescribeClass: # TODO
   Enabled: false
-Style/PercentLiteralDelimiters:
+RSpec/DescribedClass: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/Documentation:
+RSpec/ExpectChange: # TODO: autocorrect (unsafe)
   Enabled: false
-Style/ClassAndModuleChildren:
+RSpec/HookArgument: # TODO: autocorrect
   Enabled: false
-Style/RegexpLiteral:
+RSpec/NamedSubject: # TODO
   Enabled: false
-Style/GuardClause:
+RSpec/NotToNot: # TODO: autocorrect
   Enabled: false
-Style/RedundantSelf:
+RSpec/ScatteredSetup: # TODO: investigate if these are required
   Enabled: false
-Style/IfUnlessModifier:
+RSpec/VerifiedDoubles: # TODO
   Enabled: false
-Style/WordArray:
-  Enabled: false
-Style/PercentQLiterals:
-  Enabled: false
-Style/DoubleNegation:
-  Enabled: false
-Style/TrailingCommaInArguments:
-  Enabled: false
-Style/TrailingCommaInArrayLiteral:
-  Enabled: false
-Style/TrailingCommaInHashLiteral:
-  Enabled: false
-Style/MethodCallWithoutArgsParentheses:
-  Enabled: false
-Style/MethodCallWithArgsParentheses:
-  Enabled: false
-Layout/HashAlignment:
-  Enabled: false
-Style/Lambda:
-  Enabled: false
-Style/WhileUntilModifier:
-  Enabled: false
-Style/ParallelAssignment:
-  Enabled: false
-Style/ZeroLengthPredicate:
-  Enabled: false
-Style/NumericPredicate:
-  Enabled: false
-Naming/VariableNumber:
-  Enabled: false
-Style/Dir:
-  Enabled: false
-Style/ReturnNil:
-  Enabled: false
-Style/StderrPuts:
-  Enabled: false
-Style/DateTime:
-  Enabled: false
-Style/SymbolArray:
-  Enabled: false
-Style/FrozenStringLiteralComment:
-  Severity: error
-Style/AsciiComments:
-  Enabled: false
-Style/BlockDelimiters:
+
+Style/BlockDelimiters: # TODO: autocorrect
   Enabled: true
   Exclude:
     - spec/**/*_spec.rb
     - spec/shared_examples/**/*.rb
-
-# RSpec cops we don't care about
-RSpec/MessageSpies:
+Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
   Enabled: false
-RSpec/HookArgument:
+Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
-RSpec/VerifiedDoubles:
+Style/Dir: # TODO: autocorrect
   Enabled: false
-RSpec/NamedSubject:
+Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
-RSpec/NotToNot:
+Style/GuardClause: # TODO
   Enabled: false
-# RSpec cops we care extra about
-RSpec/EmptyExampleGroup:
-  Severity: error
-RSpec/RepeatedDescription:
-  Severity: error
-RSpec/ExpectChange:
+Style/IfUnlessModifier: # TODO: autocorrect
   Enabled: false
-
-# this isn't good for us because of how we pin dependencies
-Bundler/OrderedGems:
+Style/Lambda: # TODO: autocorrect
   Enabled: false
-Gemspec/OrderedDependencies:
+Style/MethodCallWithArgsParentheses: # TODO: autocorrect
   Enabled: false
-Gemspec/RequiredRubyVersion:
+Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
   Enabled: false
-
-# Rails style changes
-Migration/Tagged:
-  Enabled: true
-  Severity: error
-  AllowedTags:
-    - predeploy
-    - postdeploy
-    - cassandra
-    - dynamodb
-Rails:
-  Enabled: true
-Rails/TimeZone:
+Style/NumericLiterals: # TODO: autocorrect
   Enabled: false
-# accessors are often defined in terms of read_attribute
-Rails/ReadWriteAttribute:
+Style/NumericPredicate: # TODO: autocorrect (unsafe)
   Enabled: false
-# we never bothered creating an ApplicationRecord
-Rails/ApplicationRecord:
+Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
   Enabled: false
-Rails/HasManyOrHasOneDependent:
+Style/PercentLiteralDelimiters: # TODO: autocorrect
   Enabled: false
-# It whines about update_all too much, which we use a lot specifically to
-# bypass validations and any other AR-ness
-Rails/SkipsModelValidations:
+Style/PercentQLiterals: # TODO: autocorrect
   Enabled: false
-
-# Lint changes
-Lint/AmbiguousRegexpLiteral:
-  Severity: convention
-Lint/AmbiguousBlockAssociation:
-  Exclude:
-    - spec/**/*
-Lint/UselessAssignment:
-  Severity: convention
-Lint/Debugger:
-  Severity: error
-Layout/EndAlignment:
-  EnforcedStyleAlignWith: variable
-  Severity: convention
-
-# Performance changes
-Performance/Detect:
+Style/RedundantSelf: # TODO: autocorrect
+  Enabled: false
+Style/RegexpLiteral: # TODO: autocorrect
+  Enabled: false
+Style/RescueModifier: # TODO
   Severity: warning
-Performance/TimesMap:
-  Exclude:
-    - spec/**/*
-
-# these need better configuration than the default:
-Style/AndOr:
-  EnforcedStyle: conditionals
-Style/RescueModifier:
-  Severity: warning
-Layout/MultilineMethodCallIndentation:
-  EnforcedStyle: indented
-Layout/FirstArrayElementIndentation:
-  EnforcedStyle: consistent
-
-# SnR is just too low to have this enabled
-Metrics:
+Style/RescueStandardError: # TODO: autocorrect
+  EnforcedStyle: implicit
   Enabled: false
-
-RSpec/InstanceVariable:
+Style/ReturnNil: # TODO: autocorrect (investigate violations)
   Enabled: false
-RSpec/ExampleWording:
+Style/SignalException: # TODO: autocorrect
   Enabled: false
-RSpec/ContextWording:
+Style/StderrPuts: # TODO: autocorrect
   Enabled: false
-RSpec/ExampleLength:
-  Max: 48
-RSpec/NestedGroups:
-  Max: 5
-RSpec/DescribedClass:
+Style/SymbolArray: # TODO: autocorrect
   Enabled: false
-RSpec/DescribeClass:
+Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
-Style/HashSyntax:
+Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
-RSpec/MultipleExpectations:
+Style/TrailingCommaInHashLiteral: # TODO: autocorrect
   Enabled: false
-RSpec/ScatteredSetup:
+Style/WhileUntilModifier: # TODO: autocorrect
   Enabled: false
-Style/RescueStandardError:
+Style/WordArray: # TODO: autocorrect
   Enabled: false
-
-Specs/EnsureSpecExtension:
-  Enabled: true
-  Exclude:
-    - spec/shared_examples/**/*
+Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
+  Enabled: false

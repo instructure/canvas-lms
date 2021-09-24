@@ -88,7 +88,7 @@ describe MissingPolicyApplicator do
       grading_period_group.grading_periods.create!(
         title: 'A Grading Period',
         start_date: 10.days.ago(now),
-        end_date:   30.minutes.ago(now),
+        end_date: 30.minutes.ago(now),
         close_date: 30.minutes.ago(now)
       )
     end

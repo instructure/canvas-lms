@@ -23,7 +23,7 @@ class MoveRceFavoritesToAccountSettings < ActiveRecord::Migration[5.2]
 
   def up
     DataFixup::MoveRceFavoritesToAccountSettings.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      n_strand: ["rce_favorites_fixup", Shard.current.database_server.id]).run
+                                                                     n_strand: ["rce_favorites_fixup", Shard.current.database_server.id]).run
   end
 
   def down

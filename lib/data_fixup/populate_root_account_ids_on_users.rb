@@ -23,11 +23,12 @@ module DataFixup::PopulateRootAccountIdsOnUsers
   def self.populate(min, max)
     # clamp to non-shadow users
     return if min >= Shard::IDS_PER_SHARD
+
     max = [max, Shard::IDS_PER_SHARD].min
 
     User.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
-      subquery = UserAccountAssociation.select("array_agg(DISTINCT root_account_id)").
-        where("user_id=users.id").to_sql
+      subquery = UserAccountAssociation.select("array_agg(DISTINCT root_account_id)")
+                                       .where("user_id=users.id").to_sql
       uniquify = "SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, (#{subquery}))) AS a(e) ORDER BY e)"
       User.where(id: batch_min..batch_max).update_all("root_account_ids=(#{uniquify})")
     end
@@ -67,14 +68,15 @@ module DataFixup::PopulateRootAccountIdsOnUsers
       scope = UserAccountAssociation.where("user_id>=? AND user_id<?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)
       scope.find_ids_in_batches do |batch|
         root_accounts = UserAccountAssociation.connection.select_rows(
-          UserAccountAssociation.where(id: batch).
-            select("user_id, array_agg(DISTINCT root_account_id)").
-            group(:user_id).to_sql)
+          UserAccountAssociation.where(id: batch)
+            .select("user_id, array_agg(DISTINCT root_account_id)")
+            .group(:user_id).to_sql
+        )
         # yes, this could probably done in a single query with a VALUES table, but this should be a relatively
         # small case and I don't want to figure out the JOIN with the UPDATE
         root_accounts.each do |(user_id, root_accounts_for_user)|
           root_accounts_for_user = root_accounts_for_user[1..-1].split(',').map(&:to_i)
-          translated_ids = root_accounts_for_user.map {|id| Shard.relative_id_for(id, source_shard, foreign_shard)}
+          translated_ids = root_accounts_for_user.map { |id| Shard.relative_id_for(id, source_shard, foreign_shard) }
 
           uniquify = "SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{translated_ids.join(',')}}'))) AS a(e) ORDER BY e)"
 

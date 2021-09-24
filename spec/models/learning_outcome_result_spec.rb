@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
-
   before :once do
     @account = Account.default
   end
@@ -46,10 +45,10 @@ describe LearningOutcomeResult do
 
     LearningOutcomeResult.new(
       alignment: ContentTag.create!({
-        title: 'content',
-        context: course,
-        learning_outcome: outcome
-      }),
+                                      title: 'content',
+                                      context: course,
+                                      learning_outcome: outcome
+                                    }),
       user: student
     ).tap do |lor|
       lor.association_object = association_object
@@ -76,9 +75,9 @@ describe LearningOutcomeResult do
 
     it 'returns #assessed_at when #submitted_at is not present' do
       learning_outcome_result.assign_attributes({
-        assessed_at: assessed_at,
-        submitted_at: nil
-      })
+                                                  assessed_at: assessed_at,
+                                                  submitted_at: nil
+                                                })
       expect(learning_outcome_result.submitted_or_assessed_at).to eq(assessed_at)
     end
   end
@@ -188,8 +187,8 @@ describe LearningOutcomeResult do
     it "returns accurate results" do
       points_possible = 5.5
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: points_possible, mastery_points: 3.5
-      })
+                                                                            points_possible: points_possible, mastery_points: 3.5
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.6)
       learning_outcome_result.update(score: 6)
       learning_outcome_result.update(possible: 10)
@@ -200,8 +199,8 @@ describe LearningOutcomeResult do
 
     it "properly scales score to parent outcome's mastery level" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 5.0, mastery_points: 3.0
-      })
+                                                                            points_possible: 5.0, mastery_points: 3.0
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update(score: 6)
       learning_outcome_result.update(possible: 10)
@@ -212,8 +211,8 @@ describe LearningOutcomeResult do
 
     it "properly scales score to parent outcome's mastery level with extra credit" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 5.0, mastery_points: 3.0
-      })
+                                                                            points_possible: 5.0, mastery_points: 3.0
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 1.0)
       learning_outcome_result.update(score: 5)
       learning_outcome_result.update(possible: 0.5)
@@ -224,8 +223,8 @@ describe LearningOutcomeResult do
 
     it "properly scales score to parent outcome's mastery level with extra credit and points possible is 0" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 0.0, mastery_points: 3.0
-      })
+                                                                            points_possible: 0.0, mastery_points: 3.0
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 1.0)
       learning_outcome_result.update(score: 5)
       learning_outcome_result.update(possible: 0.5)
@@ -236,8 +235,8 @@ describe LearningOutcomeResult do
 
     it "does not fail if parent outcome has integers instead of floats" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 5, mastery_points: 3
-      })
+                                                                            points_possible: 5, mastery_points: 3
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update(score: 6)
       learning_outcome_result.update(possible: 10)
@@ -248,8 +247,8 @@ describe LearningOutcomeResult do
 
     it "does not use a scale if outcome has 0 mastery points" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 5, mastery_points: 0
-      })
+                                                                            points_possible: 5, mastery_points: 0
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update(score: 6)
       learning_outcome_result.update(possible: 10)
@@ -260,8 +259,8 @@ describe LearningOutcomeResult do
 
     it "does not use a scale if outcome has 0 points possible" do
       allow(learning_outcome_result.learning_outcome).to receive_messages({
-        points_possible: 0, mastery_points: 3
-      })
+                                                                            points_possible: 0, mastery_points: 3
+                                                                          })
       allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
       learning_outcome_result.update(score: 6)
       learning_outcome_result.update(possible: 10)
@@ -290,8 +289,8 @@ describe LearningOutcomeResult do
 
       it "properly scales score to outcome_proficiency mastery level" do
         allow(course.resolved_outcome_proficiency).to receive_messages({
-          points_possible: 5.0, mastery_points: 3.0
-        })
+                                                                         points_possible: 5.0, mastery_points: 3.0
+                                                                       })
         allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
         learning_outcome_result.update(score: 6, possible: 10)
         learning_outcome_result.calculate_percent!
@@ -300,8 +299,8 @@ describe LearningOutcomeResult do
 
       it "properly scales score to outcome_proficiency.mastery_points with extra credit and when proficiency.points_possible is 0" do
         allow(course.resolved_outcome_proficiency).to receive_messages({
-          mastery_points: 3.0, points_possible: 0.0
-        })
+                                                                         mastery_points: 3.0, points_possible: 0.0
+                                                                       })
 
         allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 1.0)
         learning_outcome_result.update(score: 5, possible: 0.5)
@@ -312,8 +311,8 @@ describe LearningOutcomeResult do
 
       it "does not use a scale if the outcome proficiency has 0 points possible" do
         allow(course.resolved_outcome_proficiency).to receive_messages({
-          mastery_points: 3.0, points_possible: 0.0
-        })
+                                                                         mastery_points: 3.0, points_possible: 0.0
+                                                                       })
         allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
         learning_outcome_result.update(score: 6, possible: 10)
         learning_outcome_result.calculate_percent!
@@ -322,8 +321,8 @@ describe LearningOutcomeResult do
 
       it "does not use a scale if the outcome proficiency has 0 mastery points" do
         allow(course.resolved_outcome_proficiency).to receive_messages({
-          points_possible: 5, mastery_points: 0
-        })
+                                                                         points_possible: 5, mastery_points: 0
+                                                                       })
         allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
         learning_outcome_result.update(score: 6, possible: 10)
         learning_outcome_result.calculate_percent!

@@ -48,7 +48,6 @@ end
 
 module CanvasRails
   class Application < Rails::Application
-
     # this CANVAS_ZEITWERK constant flag is defined above in this file.
     # It should be temporary,
     # and removed once we've fully upgraded to zeitwerk autoloading,
@@ -60,7 +59,7 @@ module CanvasRails
       # For now, this lets us figure out why constant loading
       # is not behaving as expected quickly and easily:
       Rails.autoloaders.logger = Logger.new("#{Rails.root}/log/autoloading.log")
-      #Rails.autoloaders.log!
+      # Rails.autoloaders.log!
 
       # TODO: someday we can use this line, which will NOT
       # add anything on the autoload paths the actual ruby
@@ -110,30 +109,30 @@ module CanvasRails
     opts[:skip_thread_context] = true if log_config['log_context'] == false
 
     case log_config["logger"]
-      when "syslog"
-        require 'syslog_wrapper'
-        log_config["app_ident"] ||= "canvas-lms"
-        log_config["daemon_ident"] ||= "canvas-lms-daemon"
-        facilities = 0
-        (log_config["facilities"] || []).each do |facility|
-          facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
-        end
-        ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
-        opts[:include_pid] = true if log_config["include_pid"] == true
-        config.logger = SyslogWrapper.new(ident, facilities, opts)
-        config.logger.level = log_level
-      else
-        log_path = config.paths['log'].first
+    when "syslog"
+      require 'syslog_wrapper'
+      log_config["app_ident"] ||= "canvas-lms"
+      log_config["daemon_ident"] ||= "canvas-lms-daemon"
+      facilities = 0
+      (log_config["facilities"] || []).each do |facility|
+        facilities |= Syslog.const_get "LOG_#{facility.to_s.upcase}"
+      end
+      ident = ENV['RUNNING_AS_DAEMON'] == 'true' ? log_config["daemon_ident"] : log_config["app_ident"]
+      opts[:include_pid] = true if log_config["include_pid"] == true
+      config.logger = SyslogWrapper.new(ident, facilities, opts)
+      config.logger.level = log_level
+    else
+      log_path = config.paths['log'].first
 
-        if ENV['RUNNING_AS_DAEMON'] == 'true'
-          log_path = Rails.root+'log/delayed_job.log'
-        end
+      if ENV['RUNNING_AS_DAEMON'] == 'true'
+        log_path = Rails.root + 'log/delayed_job.log'
+      end
 
-        config.logger = CanvasLogger.new(log_path, log_level, opts)
+      config.logger = CanvasLogger.new(log_path, log_level, opts)
     end
 
     # Activate observers that should always be running
-    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer ]
+    config.active_record.observers = [:cacher, :stream_item_cache, :live_events_observer]
     config.active_record.allow_unsafe_raw_sql = :disabled
 
     config.active_support.encode_big_decimal_as_string = false
@@ -148,10 +147,10 @@ module CanvasRails
                                   #{Rails.root}/ui)
 
     config.middleware.use Rack::Chunked
-    config.middleware.use Rack::Deflater, if: -> (*) {
+    config.middleware.use Rack::Deflater, if: ->(*) {
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation", failsafe: true]
     }
-    config.middleware.use Rack::Brotli, if: -> (*) {
+    config.middleware.use Rack::Brotli, if: ->(*) {
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli", failsafe: true]
     }
 
@@ -229,8 +228,8 @@ module CanvasRails
     end
 
     Autoextend.hook(:"ActiveRecord::Base",
-      PostgreSQLEarlyExtensions::ConnectionHandling,
-        singleton: true)
+                    PostgreSQLEarlyExtensions::ConnectionHandling,
+                    singleton: true)
     Autoextend.hook(:"ActiveRecord::ConnectionAdapters::PostgreSQLAdapter",
                     PostgreSQLEarlyExtensions,
                     method: :prepend)
@@ -247,6 +246,7 @@ module CanvasRails
       # Easiest way to avoid the warning for now is to patch thor
       def validate_default_type!
         return if switch_name == "--serializer"
+
         super
       end
     end

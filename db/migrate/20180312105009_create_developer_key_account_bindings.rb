@@ -23,6 +23,7 @@ class CreateDeveloperKeyAccountBindings < ActiveRecord::Migration[5.0]
 
   def up
     return if table_exists? :developer_key_account_bindings
+
     create_table :developer_key_account_bindings do |t|
       t.integer :account_id, limit: 8, null: false
       t.integer :developer_key_id, limit: 8, null: false

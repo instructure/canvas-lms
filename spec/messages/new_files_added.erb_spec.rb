@@ -27,7 +27,7 @@ describe 'new_files_added' do
   end
 
   let(:asset) { @attachment }
-  let(:message_options) { { data: {count: 5} } }
+  let(:message_options) { { data: { count: 5 } } }
   let(:notification_name) { :new_files_added }
 
   include_examples "a message"

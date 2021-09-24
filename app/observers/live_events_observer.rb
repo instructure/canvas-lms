@@ -52,7 +52,7 @@ class LiveEventsObserver < ActiveRecord::Observer
           :user,
           :wiki_page
 
-  NOP_UPDATE_FIELDS = [ "updated_at", "sis_batch_id" ].freeze
+  NOP_UPDATE_FIELDS = ["updated_at", "sis_batch_id"].freeze
   def after_update(obj)
     changes = obj.saved_changes
     return nil unless changes.except(*NOP_UPDATE_FIELDS).any? || obj.class.try(:emit_live_events_on_any_update?)

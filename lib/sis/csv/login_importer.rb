@@ -23,7 +23,7 @@ module SIS
     # note these are account-level groups, not course groups
     class LoginImporter < CSVBaseImporter
       def self.login_csv?(row)
-        (row&%w{existing_user_id existing_integration_id existing_canvas_user_id}).any?
+        (row & %w{existing_user_id existing_integration_id existing_canvas_user_id}).any?
       end
 
       def self.identifying_fields
@@ -32,7 +32,7 @@ module SIS
 
       # expected columns:
       # existing_user_id user_id,login_id,email
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         messages = []
         count = SIS::UserImporter.new(@root_account, importer_opts).process(messages, login_only: true) do |importer|
           csv_rows(csv, index, count) do |row|
@@ -49,6 +49,7 @@ module SIS
       end
 
       private
+
       def create_user(row, csv)
         SIS::Models::User.new(
           user_id: row['user_id'],

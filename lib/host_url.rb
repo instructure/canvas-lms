@@ -61,11 +61,11 @@ class HostUrl
       @@protocol
     end
 
-    def context_host(context=nil, current_host=nil)
+    def context_host(context = nil, current_host = nil)
       default_host
     end
 
-    def context_hosts(context=nil, current_host=nil)
+    def context_hosts(context = nil, current_host = nil)
       Array(context_host(context, current_host))
     end
 
@@ -80,6 +80,7 @@ class HostUrl
 
     def file_host_with_shard(account, current_host = nil)
       return [@@file_host, Shard.default] if @@file_host
+
       res = nil
       res = @@file_host = domain_config[:files_domain] if domain_config.has_key?(:files_domain)
       Rails.logger.warn("No separate files host specified for account id #{account.id}.  This is a potential security risk.") unless res || !Rails.env.production?
@@ -99,7 +100,7 @@ class HostUrl
       host
     end
 
-    def outgoing_email_address(preferred_user="notifications")
+    def outgoing_email_address(preferred_user = "notifications")
       @outgoing_email_address.presence || "#{preferred_user}@#{outgoing_email_domain}"
     end
 
@@ -114,7 +115,7 @@ class HostUrl
     def default_host=(val)
       @@default_host = val
     end
-    
+
     def is_file_host?(domain)
       safer_host = file_host(Account.default)
       safer_host != default_host && domain == safer_host

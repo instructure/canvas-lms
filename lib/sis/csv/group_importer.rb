@@ -32,7 +32,7 @@ module SIS
 
       # expected columns
       # group_id,account_id,name,status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::GroupImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             begin

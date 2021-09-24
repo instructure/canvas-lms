@@ -93,11 +93,11 @@ class AnnouncementsApiController < ApplicationController
 
     include_unpublished = courses.all? { |course| course.grants_right?(@current_user, :view_unpublished_items) }
     scope = if include_unpublished && !value_to_boolean(params[:active_only])
-      scope.where.not(:workflow_state => 'deleted')
-    else
-      # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
-      scope.where(:workflow_state => 'active').where('delayed_post_at IS NULL OR delayed_post_at<?', Time.now.utc)
-    end
+              scope.where.not(:workflow_state => 'deleted')
+            else
+              # workflow state should be 'post_delayed' if delayed_post_at is in the future, but check because other endpoints do
+              scope.where(:workflow_state => 'active').where('delayed_post_at IS NULL OR delayed_post_at<?', Time.now.utc)
+            end
 
     @start_date ||= 14.days.ago.beginning_of_day
     @end_date ||= @start_date + 28.days
@@ -120,11 +120,10 @@ class AnnouncementsApiController < ApplicationController
     text_only = value_to_boolean(params[:text_only])
 
     render :json => discussion_topics_api_json(@topics, nil, @current_user, session,
-      :user_can_moderate => false, :include_assignment => false,
-      :include_context_code => true, :text_only => text_only,
-      :include_sections => include_params.include?('sections'),
-      :include_sections_user_count => include_params.include?('sections_user_count')
-    )
+                                               :user_can_moderate => false, :include_assignment => false,
+                                               :include_context_code => true, :text_only => text_only,
+                                               :include_sections => include_params.include?('sections'),
+                                               :include_sections_user_count => include_params.include?('sections_user_count'))
   end
 
   private
@@ -134,6 +133,7 @@ class AnnouncementsApiController < ApplicationController
     if context_codes.empty?
       return render :json => { :message => 'Missing context_codes' }, :status => :bad_request
     end
+
     @course_ids = context_codes.inject([]) do |ids, context_code|
       klass, id = ActiveRecord::Base.parse_asset_string(context_code)
       unless klass == 'Course'

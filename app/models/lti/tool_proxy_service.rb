@@ -21,7 +21,6 @@ require 'ims/lti'
 
 module Lti
   class ToolProxyService
-
     attr_reader :tc_half_secret
 
     class << self
@@ -72,7 +71,6 @@ module Lti
       tool_proxy.reload
     end
 
-
     def create_secret(tp)
       security_contract = tp.security_contract
       tp_half_secret = security_contract.tp_half_shared_secret
@@ -89,15 +87,17 @@ module Lti
     def developer_key_mismatch?(tool_proxy, developer_key)
       installing_vendor = tool_proxy&.tool_profile&.product_instance&.product_info&.product_family&.vendor&.code
       return true if installing_vendor.blank?
+
       vendor_dev_keys = DeveloperKey.by_cached_vendor_code(installing_vendor)
       return false if developer_key.blank? && vendor_dev_keys.blank?
+
       !vendor_dev_keys.include?(developer_key)
     end
 
     def deprecated_split_secret?(tp)
       tp.enabled_capability.present? &&
-      tp.enabled_capability.include?("OAuth.splitSecret") &&
-      tp.security_contract.tp_half_shared_secret.present?
+        tp.enabled_capability.include?("OAuth.splitSecret") &&
+        tp.security_contract.tp_half_shared_secret.present?
     end
 
     def create_tool_proxy(tp:, context:, product_family:, tool_proxy: nil, registration_url:, developer_key: nil)
@@ -166,14 +166,13 @@ module Lti
                              tool_proxy_id: tool_proxy).first_or_create!
     end
 
-
     def process_resources(tp, tool_proxy)
       resource_handlers = tp.tool_profile.resource_handlers
       if tp.tool_profile.messages.present?
         product_name = tp.tool_profile.product_instance.product_info.product_name
         r = IMS::LTI::Models::ResourceHandler.new.from_json(
           {
-            resource_type: {code: 'instructure.com:default'},
+            resource_type: { code: 'instructure.com:default' },
             resource_name: product_name
           }.to_json
         )
@@ -201,7 +200,6 @@ module Lti
     end
 
     def create_placements(mh, message_handler)
-
       message_handler.placements.each do |placement|
         placement.destroy unless ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS.include? placement.placement
       end
@@ -212,7 +210,7 @@ module Lti
         end
       else
 
-        mhp = mh.enabled_capability.map {|p| ResourcePlacement::PLACEMENT_LOOKUP[p]}
+        mhp = mh.enabled_capability.map { |p| ResourcePlacement::PLACEMENT_LOOKUP[p] }
         message_handler.placements.each do |placement|
           placement.destroy unless mhp.include? placement.placement
         end
@@ -225,11 +223,10 @@ module Lti
 
     def create_or_update_tool_settings(tp, tool_proxy)
       if tp.custom.present?
-        tool_setting = ToolSetting.where(tool_proxy:tool_proxy).first_or_create!
+        tool_setting = ToolSetting.where(tool_proxy: tool_proxy).first_or_create!
         custom = tool_setting.custom || {}
-        tool_setting.update(custom: custom.merge(tp.custom) )
+        tool_setting.update(custom: custom.merge(tp.custom))
       end
-
     end
 
     def create_json(obj)

@@ -23,18 +23,18 @@ class SpeedUpMaxConcurrentDeleteTrigger < ActiveRecord::Migration[4.2]
           IF OLD.strand IS NOT NULL THEN
             should_lock := true;
             should_be_precise := OLD.id % (OLD.max_concurrent * 4) = 0;
-        
+
             IF NOT should_be_precise AND OLD.max_concurrent > 16 THEN
               running_count := (SELECT COUNT(*) FROM (
                 SELECT 1 as one FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't' LIMIT OLD.max_concurrent
               ) subquery_for_count);
               should_lock := running_count < OLD.max_concurrent;
             END IF;
-        
+
             IF should_lock THEN
               PERFORM pg_advisory_xact_lock(half_md5_as_bigint(OLD.strand));
             END IF;
-        
+
             IF should_be_precise THEN
               running_count := (SELECT COUNT(*) FROM (
                 SELECT 1 as one FROM delayed_jobs WHERE strand = OLD.strand AND next_in_strand = 't' LIMIT OLD.max_concurrent
@@ -98,4 +98,3 @@ class SpeedUpMaxConcurrentDeleteTrigger < ActiveRecord::Migration[4.2]
     end
   end
 end
-

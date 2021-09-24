@@ -36,7 +36,7 @@ class Mutations::CreateModule < Mutations::BaseMutation
     mod = course.context_modules.build(name: input[:name])
     mod.require_presence_of_name = true
     if mod.save
-      {module: mod}
+      { module: mod }
     else
       errors_for(mod)
     end

@@ -25,7 +25,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:student) { student_in_course(course: course, name: 'student', active_all: true).user }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:somebody) { student_in_course(course: course, name: 'somebody', active_all: true).user }
@@ -41,7 +41,7 @@ describe "discussions" do
   context "on the show page" do
     let(:url) { "/courses/#{course.id}/discussion_topics/#{topic.id}/" }
 
-    context "as anyone"  do
+    context "as anyone" do
       let(:topic) { somebody_topic }
       let(:topic_participant) { topic.discussion_topic_participants.find_by(user: somebody) }
 
@@ -55,7 +55,7 @@ describe "discussions" do
         context "someone else's topic" do
           let(:topic) { student_topic }
 
-          it "should update subscribed button when user posts to a topic", priority: "2", test_id: 345483 do
+          it "updates subscribed button when user posts to a topic", priority: "2", test_id: 345483 do
             get url
             expect(f('.topic-subscribe-button')).to be_displayed
             add_reply "student posting"
@@ -64,7 +64,7 @@ describe "discussions" do
         end
       end
 
-      it "should display the current username when adding a reply", priority: "1", test_id: 150485 do
+      it "displays the current username when adding a reply", priority: "1", test_id: 150485 do
         get url
         expect(f("#content")).not_to contain_css("#discussion_subentries .discussion_entry")
         add_reply
@@ -75,7 +75,7 @@ describe "discussions" do
       context "side comments" do
         let(:topic) { side_comment_topic }
 
-        it "should add a side comment", priority: "1", test_id: 345488 do
+        it "adds a side comment", priority: "1", test_id: 345488 do
           side_comment_text = 'new side comment'
           get url
 
@@ -91,7 +91,7 @@ describe "discussions" do
           expect(f("#entry-#{last_entry.id}")).to include_text(side_comment_text)
         end
 
-        it "should edit a side comment", priority: "1", test_id: 345491 do
+        it "edits a side comment", priority: "1", test_id: 345491 do
           edit_text = 'this has been edited'
           text = "new side comment from somebody"
           entry = topic.discussion_entries.create!(:user => somebody, :message => text, :parent_entry => entry)

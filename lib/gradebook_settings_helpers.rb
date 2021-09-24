@@ -47,5 +47,4 @@ module GradebookSettingsHelpers
 
     scope
   end
-
 end

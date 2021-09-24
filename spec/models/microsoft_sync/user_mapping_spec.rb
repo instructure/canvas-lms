@@ -77,11 +77,11 @@ describe MicrosoftSync::UserMapping do
 
       let(:account) do
         account_model(settings: {
-          microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
-          microsoft_sync_login_attribute: 'email',
-          microsoft_sync_login_attribute_suffix: nil,
-          microsoft_sync_remote_attribute: 'upn',
-        })
+                        microsoft_sync_tenant: 'myinstructuretenant.onmicrosoft.com',
+                        microsoft_sync_login_attribute: 'email',
+                        microsoft_sync_login_attribute_suffix: nil,
+                        microsoft_sync_remote_attribute: 'upn',
+                      })
       end
       let(:user1) { user_model }
       let(:user2) { user_model }
@@ -116,7 +116,7 @@ describe MicrosoftSync::UserMapping do
 
             expect { subject }.to \
               raise_microsoft_sync_graceful_cancel_error(klass, msg)
-              .and not_change{described_class.order(:id).map(&:attributes)}
+              .and not_change { described_class.order(:id).map(&:attributes) }
           end
         end
       end
@@ -155,22 +155,22 @@ describe MicrosoftSync::UserMapping do
 
     it 'returns a scope with values for "type" and "aad_id"' do
       expect(subject).to eq([
-        %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
-      ])
+                              %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+                            ])
     end
 
     it 'does not ignore creation_pending enrollments' do
       Enrollment.update_all(workflow_state: 'creation_pending')
       expect(subject).to eq([
-        %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
-      ])
+                              %w[StudentAad StudentEnrollment], %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+                            ])
     end
 
     it 'ignores enrollments of type StudentViewEnrollment' do
       enrollments.first.update!(type: 'StudentViewEnrollment')
       expect(subject).to eq([
-        %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
-      ])
+                              %w[TaAad TaEnrollment], %w[TeacherAad TeacherEnrollment]
+                            ])
     end
 
     %w[completed deleted inactive invited rejected].each do |state|
@@ -222,7 +222,7 @@ describe MicrosoftSync::UserMapping do
       let(:account2) { account_model }
       let(:teacher2) { user_model }
       let(:student2) { user_model }
-      let(:id_to_aad_hash2) { { teacher2.id => "teacher2@example.com", student2.id => "student2@example.com" }}
+      let(:id_to_aad_hash2) { { teacher2.id => "teacher2@example.com", student2.id => "student2@example.com" } }
 
       before(:each) do
         setup_microsoft_sync_data(account2, id_to_aad_hash2)
@@ -238,8 +238,8 @@ describe MicrosoftSync::UserMapping do
 
   describe '.user_ids_without_mappings' do
     it 'filters the given user ids to ones without mappings in the root account' do
-      users = 4.times.map{user_model}
-      accounts = 2.times.map{account_model}
+      users = 4.times.map { user_model }
+      accounts = 2.times.map { account_model }
 
       described_class.create!(root_account: accounts[0], user: users[1])
       described_class.create!(root_account: accounts[1], user: users[0])

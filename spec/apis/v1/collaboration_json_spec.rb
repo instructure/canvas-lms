@@ -24,19 +24,19 @@ describe Api::V1::Collaboration do
   include Api::V1::Collaboration
 
   before(:once) do
-    @current_user  = user_with_pseudonym(:active_all => true)
+    @current_user = user_with_pseudonym(:active_all => true)
     course = course_with_teacher(user: @current_user).course
     @collaboration = ExternalToolCollaboration.new(:title => 'Test collaboration',
-                                       :description => 'Let us collaborate',
-                                       :type => 'ExternalToolCollaboration',
-                                       :url => 'https://google.com',
-                                       :user => @current_user)
+                                                   :description => 'Let us collaborate',
+                                                   :type => 'ExternalToolCollaboration',
+                                                   :url => 'https://google.com',
+                                                   :user => @current_user)
     @collaboration.context = course
-    @collaboration.data = {updateUrl: 'https://google.com'}
+    @collaboration.data = { updateUrl: 'https://google.com' }
     @collaboration.save!
   end
 
-  it 'should properly serialize' do
+  it 'properly serializes' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['id']).to eq @collaboration.id
@@ -56,13 +56,13 @@ describe Api::V1::Collaboration do
     expect(json['deleted_at']).to eq nil
   end
 
-  it 'should include the owning users name' do
+  it 'includes the owning users name' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['user_name']).to eq @current_user.name
   end
 
-  it 'should include the update_url' do
+  it 'includes the update_url' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['update_url']).to eq @collaboration.update_url

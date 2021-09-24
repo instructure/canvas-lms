@@ -137,11 +137,12 @@ module AttachmentFu # :nodoc:
     # You can retrieve the bucket name using the <tt>bucket_name</tt> method.
     module S3Backend
       class RequiredLibraryNotFoundError < StandardError; end
+
       class ConfigFileNotFoundError < StandardError; end
 
       mattr_reader :bucket
 
-      def self.included(base) #:nodoc:
+      def self.included(base) # :nodoc:
         require 'aws-sdk-s3'
 
         s3_config = load_s3_config(base.attachment_options[:s3_config_path])
@@ -174,7 +175,6 @@ module AttachmentFu # :nodoc:
         end
         filename
       end
-
 
       # The attachment ID used in the full path of a file
       def attachment_path_id
@@ -269,60 +269,61 @@ module AttachmentFu # :nodoc:
       end
 
       protected
-        # Called in the after_destroy callback
-        def destroy_file
-          # INSTRUCTURE: We don't want to actually delete objects from s3 (at
-          # least not due to the Attachment being destroyed). With our root
-          # attachment deduplication scheme it just gets too messy and buggy.
-          # We'll just GC them later.
-          true
+
+      # Called in the after_destroy callback
+      def destroy_file
+        # INSTRUCTURE: We don't want to actually delete objects from s3 (at
+        # least not due to the Attachment being destroyed). With our root
+        # attachment deduplication scheme it just gets too messy and buggy.
+        # We'll just GC them later.
+        true
+      end
+
+      def rename_file
+        # INSTRUCTURE: We don't actually want to rename Attachments.
+        # The problem is that we're re-using our s3 storage if you copy
+        # a file or if two files have the same md5 and size.  In that case
+        # there are multiple attachments pointing to the same place on s3
+        # and we don't want to get rid of the original...
+        # TODO: we'll just have to figure out a different way to clean out
+        # the cruft that happens because of this
+        return
+        return unless @old_filename && @old_filename != filename
+
+        old_full_filename = File.join(base_path, @old_filename)
+
+        # INSTRUCTURE: this dies when the file did not already exist,
+        # but we need it to not throw an angry exception in production.
+        # I've added some additional provisions in Attachment.rb, but
+        # it looks like they're not always working for some reason
+        begin
+          bucket.object(old_full_filename).move_to(full_filename, :acl => attachment_options[:s3_access])
+        rescue => e
+          filename = @old_filename
         end
 
-        def rename_file
-          # INSTRUCTURE: We don't actually want to rename Attachments.
-          # The problem is that we're re-using our s3 storage if you copy
-          # a file or if two files have the same md5 and size.  In that case
-          # there are multiple attachments pointing to the same place on s3
-          # and we don't want to get rid of the original...
-          # TODO: we'll just have to figure out a different way to clean out
-          # the cruft that happens because of this
-          return
-          return unless @old_filename && @old_filename != filename
+        @old_filename = nil
+        true
+      end
 
-          old_full_filename = File.join(base_path, @old_filename)
-
-          # INSTRUCTURE: this dies when the file did not already exist,
-          # but we need it to not throw an angry exception in production.
-          # I've added some additional provisions in Attachment.rb, but
-          # it looks like they're not always working for some reason
-          begin
-            bucket.object(old_full_filename).move_to(full_filename, :acl => attachment_options[:s3_access])
-          rescue => e
-            filename = @old_filename
+      def save_to_storage
+        if save_attachment?
+          options = {
+            content_type: content_type,
+            acl: attachment_options[:s3_access]
+          }
+          options.merge!(attachment_options.slice(:cache_control, :expires, :metadata))
+          if temp_path
+            s3object.upload_file(temp_path, options)
+          else
+            options[:body] = temp_data
+            s3object.put(options)
           end
-
-          @old_filename = nil
-          true
         end
 
-        def save_to_storage
-          if save_attachment?
-            options = {
-              content_type: content_type,
-              acl: attachment_options[:s3_access]
-            }
-            options.merge!(attachment_options.slice(:cache_control, :expires, :metadata))
-            if temp_path
-              s3object.upload_file(temp_path, options)
-            else
-              options[:body] = temp_data
-              s3object.put(options)
-            end
-          end
-
-          @old_filename = nil
-          true
-        end
+        @old_filename = nil
+        true
+      end
     end
   end
 end

@@ -21,7 +21,7 @@ module GoogleDrive
   class Folder
     attr_reader :name, :folders, :files
 
-    def initialize(name, folders=[], files=[])
+    def initialize(name, folders = [], files = [])
       @name = name
       @folders, @files = folders, files
     end

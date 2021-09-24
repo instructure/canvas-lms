@@ -27,13 +27,13 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   before_save :clear_last_timeout_failure
 
   def self.recognized_params
-    super + 
-      [ :auth_host, :auth_port, :auth_over_tls, :auth_base,
-        :auth_filter, :auth_username, :auth_password,
-        :identifier_format, :jit_provisioning ].freeze
+    super +
+      [:auth_host, :auth_port, :auth_over_tls, :auth_base,
+       :auth_filter, :auth_username, :auth_password,
+       :identifier_format, :jit_provisioning].freeze
   end
 
-  SENSITIVE_PARAMS = [ :auth_password ].freeze
+  SENSITIVE_PARAMS = [:auth_password].freeze
 
   def clear_last_timeout_failure
     unless self.last_timeout_failure_changed?
@@ -60,6 +60,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
   def ldap_connection
     raise "Not an LDAP config" unless self.auth_type == 'ldap'
+
     require 'net/ldap'
     args = {}
     if auth_over_tls
@@ -81,11 +82,11 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
   end
 
   LDAP_SANITIZE_MAP = {
-      '\\' => '\5c',
-      '*' => '\2a',
-      '(' => '\28',
-      ')' => '\29',
-      "\00" => '\00',
+    '\\' => '\5c',
+    '*' => '\2a',
+    '(' => '\28',
+    ')' => '\29',
+    "\00" => '\00',
   }.freeze
   def sanitized_ldap_login(login)
     login.gsub(/[#{Regexp.escape(LDAP_SANITIZE_MAP.keys.join)}]/, LDAP_SANITIZE_MAP)
@@ -149,7 +150,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       conn = self.ldap_connection
       filter = self.ldap_filter("canvas_ldap_test_user")
       Net::LDAP::Filter.construct(filter)
-      unless (res = conn.search {|s| break s})
+      unless (res = conn.search { |s| break s })
         error = conn.get_operation_result
         self.errors.add(:ldap_search_test, "Error #{error.code}: #{error.message}")
       end
@@ -172,6 +173,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     begin
       res = ldap.bind_as(:base => ldap.base, :filter => filter, :password => password)
       return true if res
+
       self.errors.add(
         :ldap_login_test,
         t(:test_login_auth_failed, "Authentication failed")
@@ -212,23 +214,23 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
     if should_send_to_statsd?
       InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_#{result ? 'success' : 'failure'}",
                                    short_stat: "ldap_#{result ? 'success' : 'failure'}",
-                                   tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
+                                   tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id })
     end
 
     result
   rescue => e
-    ::Canvas::Errors.capture(e, {type: :ldap, account: self.account}, :warn)
+    ::Canvas::Errors.capture(e, { type: :ldap, account: self.account }, :warn)
     if e.is_a?(Timeout::Error)
       if should_send_to_statsd?
         InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout",
                                      short_stat: "ldap_timeout",
-                                     tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
+                                     tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id })
       end
       self.update_attribute(:last_timeout_failure, Time.zone.now)
     elsif should_send_to_statsd?
       InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_error",
                                    short_stat: "ldap_error",
-                                   tags: {account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id})
+                                   tags: { account_id: Shard.global_id_for(account_id), auth_provider_id: self.global_id })
     end
     return nil
   end

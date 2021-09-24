@@ -52,13 +52,13 @@ describe "speed grader - discussion submissions" do
     @first_message = 'first student message'
     @second_message = 'second student message'
     @discussion_topic = DiscussionTopic.find_by_assignment_id(@assignment.id)
-    entry = @discussion_topic.discussion_entries.
-        create!(user: student, message: @first_message)
+    entry = @discussion_topic.discussion_entries
+                             .create!(user: student, message: @first_message)
     entry.update_topic
     entry.context_module_action
     @attachment_thing = attachment_model(context: student_2, filename: 'horse.doc', content_type: 'application/msword')
-    entry_2 = @discussion_topic.discussion_entries.
-        create!(user: student_2, message: @second_message, attachment: @attachment_thing)
+    entry_2 = @discussion_topic.discussion_entries
+                               .create!(user: student_2, message: @second_message, attachment: @attachment_thing)
     entry_2.update_topic
     entry_2.context_module_action
   end
@@ -102,8 +102,8 @@ describe "speed grader - discussion submissions" do
       teacher = @course.teachers.first
       teacher_message = "why did the taco cross the road?"
 
-      teacher_entry = @discussion_topic.discussion_entries.
-        create!(user: teacher, message: teacher_message)
+      teacher_entry = @discussion_topic.discussion_entries
+                                       .create!(user: teacher, message: teacher_message)
       teacher_entry.update_topic
       teacher_entry.context_module_action
 

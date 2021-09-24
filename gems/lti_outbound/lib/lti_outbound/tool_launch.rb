@@ -30,7 +30,7 @@ module LtiOutbound
     def initialize(options)
       @url = options[:url] || raise('URL required for generating LTI content')
       @tool = options[:tool] || raise('Tool required for generating LTI content')
-      @user = options[:user] || LTIUser.new #|| raise('User required for generating LTI content')
+      @user = options[:user] || LTIUser.new # || raise('User required for generating LTI content')
       @account = options[:account] || raise('Account required for generating LTI content')
       @context = options[:context] || raise('Context required for generating LTI content')
       @link_code = options[:link_code] || raise('Link Code required for generating LTI content')
@@ -69,7 +69,7 @@ module LtiOutbound
       add_assignment_substitutions!(assignment)
     end
 
-    def generate(overrides={})
+    def generate(overrides = {})
       hash['lti_message_type'] = 'basic-lti-launch-request'
       hash['lti_version'] = 'LTI-1p0'
       hash['resource_link_id'] = link_code
@@ -156,12 +156,12 @@ module LtiOutbound
 
     def set_resource_type_keys
       if resource_type == 'editor_button'
-        hash['selection_directive'] = 'embed_content' #backwards compatibility
+        hash['selection_directive'] = 'embed_content' # backwards compatibility
         hash['ext_content_intended_use'] = 'embed'
         hash['ext_content_return_types'] = 'oembed,lti_launch_url,url,image_url,iframe'
         hash['ext_content_return_url'] = return_url
       elsif resource_type == 'resource_selection'
-        hash['selection_directive'] = 'select_link' #backwards compatibility
+        hash['selection_directive'] = 'select_link' # backwards compatibility
         hash['ext_content_intended_use'] = 'navigation'
         hash['ext_content_return_types'] = 'lti_launch_url'
         hash['ext_content_return_url'] = return_url
@@ -175,6 +175,5 @@ module LtiOutbound
         hash['ext_content_return_url'] = return_url
       end
     end
-
   end
 end

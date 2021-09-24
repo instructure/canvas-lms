@@ -28,7 +28,7 @@ class ObserverEnrollment < Enrollment
     observed_students = []
     Shard.partition_by_shard(contexts) do |sharded_contexts|
       observer_enrollment_data = user.observer_enrollments.where(course_id: sharded_contexts)
-        .where('associated_user_id IS NOT NULL').pluck(:course_id, :associated_user_id)
+                                     .where('associated_user_id IS NOT NULL').pluck(:course_id, :associated_user_id)
 
       observer_enrollment_data.group_by(&:first).each do |course_id, course_enroll_data|
         associated_user_ids = course_enroll_data.map(&:last)
@@ -58,10 +58,10 @@ class ObserverEnrollment < Enrollment
   def self.observed_students(context, current_user, include_restricted_access: true)
     RequestCache.cache(:observed_students, context, current_user) do
       context.shard.activate do
-        associated_user_ids = context.observer_enrollments.where(user_id: current_user).
-          where("associated_user_id IS NOT NULL").select(:associated_user_id)
-        students = context.student_enrollments.
-          where(user_id: associated_user_ids)
+        associated_user_ids = context.observer_enrollments.where(user_id: current_user)
+                                     .where("associated_user_id IS NOT NULL").select(:associated_user_id)
+        students = context.student_enrollments
+                          .where(user_id: associated_user_ids)
         unless include_restricted_access
           students = students.joins(:enrollment_state).where(enrollment_states: { restricted_access: false })
         end
@@ -81,9 +81,8 @@ class ObserverEnrollment < Enrollment
     # select_all allows plucking multiplecolumns without instantiating AR objects
     obs_hash = {}
 
-    ObserverEnrollment.where(course_id: course, user_id: observers).
-      pluck(:user_id, :associated_user_id).each do |user_id, associated_user_id|
-
+    ObserverEnrollment.where(course_id: course, user_id: observers)
+                      .pluck(:user_id, :associated_user_id).each do |user_id, associated_user_id|
       obs_hash[user_id] ||= []
       obs_hash[user_id] << associated_user_id if associated_user_id
     end

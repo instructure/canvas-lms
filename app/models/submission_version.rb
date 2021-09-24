@@ -33,24 +33,25 @@ class SubmissionVersion < ActiveRecord::Base
     end
 
     def index_versions(versions, options = {})
-      records = versions.map{ |version| extract_version_attributes(version, options) }.compact
+      records = versions.map { |version| extract_version_attributes(version, options) }.compact
       bulk_insert(records) if records.present?
     end
 
     private
+
     def extract_version_attributes(version, options = {})
       model = if options[:ignore_errors]
-        begin
-          return nil unless Submission.active.where(id: version.versionable_id).exists?
+                begin
+                  return nil unless Submission.active.where(id: version.versionable_id).exists?
 
-          version.model
-        rescue Psych::SyntaxError
-          return nil
-        end
-      else
-        version.model
-      end
-    return nil unless model.assignment_id
+                  version.model
+                rescue Psych::SyntaxError
+                  return nil
+                end
+              else
+                version.model
+              end
+      return nil unless model.assignment_id
 
       {
         :context_id => model.course_id,

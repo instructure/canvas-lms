@@ -55,7 +55,7 @@ module Gradebook
         f("#{grading_cell_selector(student, assignment)} input[type='text']")
       end
 
-      def grid_assignment_row_cell(student,assignment)
+      def grid_assignment_row_cell(student, assignment)
         grading_cell(student, assignment).find(".Grid__GradeCell")
       end
 

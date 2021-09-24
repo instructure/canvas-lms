@@ -19,7 +19,5 @@
 #
 
 class ReceivedContentShare < ContentShare
-
   belongs_to :sender, class_name: 'User', inverse_of: :received_content_shares
-
 end

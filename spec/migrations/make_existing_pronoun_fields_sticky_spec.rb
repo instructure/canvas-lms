@@ -24,25 +24,25 @@ require 'db/migrate/20200511171508_make_existing_pronoun_fields_sticky.rb'
 describe 'MakeExistingPronounFieldsSticky' do
   describe "up" do
     it "sets already set pronoun field as a sticky field" do
-        u = User.create!(pronouns: 'she/her')
-        User.where(id: u).update_all(stuck_sis_fields: nil)
-        MakeExistingPronounFieldsSticky.up
-        expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name,pronouns'
+      u = User.create!(pronouns: 'she/her')
+      User.where(id: u).update_all(stuck_sis_fields: nil)
+      MakeExistingPronounFieldsSticky.up
+      expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name,pronouns'
     end
 
     it "doesn't change a non-set pronoun field as a sticky field" do
-        u = User.create!
-        expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
-        MakeExistingPronounFieldsSticky.up
-        expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
+      u = User.create!
+      expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
+      MakeExistingPronounFieldsSticky.up
+      expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
     end
 
     it "doesn't affect other set sticky fields" do
-        u = User.create!(name: 'John Doe')
-        expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
-        u.update(pronouns: 'she/her')
-        MakeExistingPronounFieldsSticky.up
-        expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name,pronouns'
+      u = User.create!(name: 'John Doe')
+      expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name'
+      u.update(pronouns: 'she/her')
+      MakeExistingPronounFieldsSticky.up
+      expect(u.stuck_sis_fields.to_a.join(',')).to eq 'name,sortable_name,pronouns'
     end
   end
 end

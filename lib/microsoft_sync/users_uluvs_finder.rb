@@ -59,7 +59,7 @@ module MicrosoftSync
       # smallest number) and returning the first uluv found to the related user_id.
       users_uluvs
         .uniq(&:first)
-        .map{|user_id, uluv| [user_id, uluv + login_attribute_suffix]}
+        .map { |user_id, uluv| [user_id, uluv + login_attribute_suffix] }
     end
 
     private
@@ -73,10 +73,10 @@ module MicrosoftSync
 
     def find_by_active_pseudonyms_field(field)
       root_account.pseudonyms
-        .active.where(user_id: user_ids)
-        .where.not(field => nil)
-        .order(position: :asc)
-        .pluck(:user_id, field)
+                  .active.where(user_id: user_ids)
+                  .where.not(field => nil)
+                  .order(position: :asc)
+                  .pluck(:user_id, field)
     end
 
     def login_attribute

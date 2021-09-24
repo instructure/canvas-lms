@@ -271,7 +271,7 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
 export default MentionUIManager
 
 MentionUIManager.propTypes = {
-  rceRef: PropTypes.object,
+  rceRef: PropTypes.oneOfType([PropTypes.node, PropTypes.object]),
   onFocusedUserChange: PropTypes.func,
   onExited: PropTypes.func,
   editor: PropTypes.object

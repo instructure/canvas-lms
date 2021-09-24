@@ -19,7 +19,6 @@
 #
 module CC
   module AssignmentResources
-
     def add_assignments
       # @user is nil if it's kicked off by the system, like a course template
       relation = @user ? Assignments::ScopedToUser.new(@course, @user).scope : @course.active_assignments
@@ -80,9 +79,8 @@ module CC
 
         document.assignment("identifier" => migration_id,
                             "xmlns" => CCHelper::ASSIGNMENT_NAMESPACE,
-                            "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                            "xsi:schemaLocation"=> "#{CCHelper::ASSIGNMENT_NAMESPACE} #{CCHelper::ASSIGNMENT_XSD_URI}"
-        ) do |a|
+                            "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                            "xsi:schemaLocation" => "#{CCHelper::ASSIGNMENT_NAMESPACE} #{CCHelper::ASSIGNMENT_XSD_URI}") do |a|
           AssignmentResources.create_cc_assignment(a, assignment, migration_id, @html_exporter, @manifest)
         end
       end
@@ -90,17 +88,14 @@ module CC
       xml_path = File.join(migration_id, CCHelper::ASSIGNMENT_XML)
       @resources.resource(:identifier => migration_id,
                           :type => CCHelper::ASSIGNMENT_TYPE,
-                          :href => xml_path
-      ) do |res|
+                          :href => xml_path) do |res|
         res.file(:href => xml_path)
       end
 
       @resources.resource(:identifier => migration_id + "_fallback",
-                          :type => CCHelper::WEBCONTENT
-      ) do |res|
+                          :type => CCHelper::WEBCONTENT) do |res|
         res.tag!('cpx:variant', :identifier => migration_id + "_variant",
-                                :identifierref => migration_id
-        ) do |var|
+                                :identifierref => migration_id) do |var|
           var.tag!('cpx:metadata')
         end
         res.file(:href => html_path)
@@ -109,15 +104,14 @@ module CC
 
     def add_canvas_assignment(assignment, migration_id, lo_folder, html_path)
       assignment_file = File.new(File.join(lo_folder, CCHelper::ASSIGNMENT_SETTINGS), 'w')
-      document = Builder::XmlMarkup.new(:target=>assignment_file, :indent=>2)
+      document = Builder::XmlMarkup.new(:target => assignment_file, :indent => 2)
       document.instruct!
 
       # Save all the meta-data into a canvas-specific xml schema
       document.assignment("identifier" => migration_id,
                           "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                          "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-      ) do |a|
+                          "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                          "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}") do |a|
         AssignmentResources.create_canvas_assignment(a, assignment, @manifest)
       end
       assignment_file.close
@@ -127,15 +121,15 @@ module CC
         "type" => CCHelper::LOR,
         :href => html_path
       ) do |res|
-        res.file(:href=>html_path)
-        res.file(:href=>File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
+        res.file(:href => html_path)
+        res.file(:href => File.join(migration_id, CCHelper::ASSIGNMENT_SETTINGS))
       end
     end
 
     SUBMISSION_TYPE_MAP = {
-        "online_text_entry" => "html",
-        "online_url" => "url",
-        "online_upload" => "file"
+      "online_text_entry" => "html",
+      "online_url" => "url",
+      "online_upload" => "file"
     }.freeze
 
     def self.create_cc_assignment(node, assignment, migration_id, html_exporter, manifest = nil)
@@ -156,9 +150,8 @@ module CC
       node.extensions do |ext|
         ext.assignment("identifier" => migration_id + "_canvas",
                        "xmlns" => CCHelper::CANVAS_NAMESPACE,
-                       "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-                       "xsi:schemaLocation"=> "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}"
-        ) do |a|
+                       "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                       "xsi:schemaLocation" => "#{CCHelper::CANVAS_NAMESPACE} #{CCHelper::XSD_URI}") do |a|
           AssignmentResources.create_canvas_assignment(a, assignment, manifest)
         end
       end
@@ -167,15 +160,15 @@ module CC
     def self.create_tool_setting_node(tool_setting, node)
       node.tool_setting do |ts_node|
         ts_node.tool_proxy({
-          product_code: tool_setting.product_code,
-          vendor_code: tool_setting.vendor_code,
-          tool_proxy_guid: tool_setting.tool_proxy&.guid
-        })
+                             product_code: tool_setting.product_code,
+                             vendor_code: tool_setting.vendor_code,
+                             tool_proxy_guid: tool_setting.tool_proxy&.guid
+                           })
 
         if tool_setting.custom.present?
           ts_node.custom do |custom_node|
             tool_setting.custom.each do |k, v|
-              custom_node.property({name: k}, v)
+              custom_node.property({ name: k }, v)
             end
           end
         end
@@ -183,7 +176,7 @@ module CC
         if tool_setting.custom_parameters.present?
           ts_node.custom_parameters do |custom_params_node|
             tool_setting.custom_parameters.each do |k, v|
-              custom_params_node.property({name: k}, v)
+              custom_params_node.property({ name: k }, v)
             end
           end
         end
@@ -224,7 +217,7 @@ module CC
           node.saved_rubric_comments do |sc_node|
             assoc.summary_data[:saved_comments].each_pair do |key, vals|
               vals.each do |val|
-                sc_node.comment(:criterion_id => key){|a|a << val}
+                sc_node.comment(:criterion_id => key) { |a| a << val }
               end
             end
           end
@@ -236,6 +229,7 @@ module CC
           override_attrs = o.slice(:set_type, :set_id, :title)
           AssignmentOverride.overridden_dates.each do |field|
             next unless o.send("#{field}_overridden")
+
             override_attrs[field] = o[field]
           end
           ao_node.override(override_attrs)
@@ -253,8 +247,7 @@ module CC
               :moderated_grading, :grader_count, :grader_comments_visible_to_graders,
               :anonymous_grading, :graders_anonymous_to_graders, :grader_names_visible_to_final_grader,
               :anonymous_instructor_annotations,
-              :allowed_attempts
-      ]
+              :allowed_attempts]
       atts.each do |att|
         node.tag!(att, assignment.send(att)) if assignment.send(att) == false || !assignment.send(att).blank?
       end
@@ -280,11 +273,11 @@ module CC
       if assignment.assignment_configuration_tool_lookup_ids.present?
         resource_codes = assignment.tool_settings_tool.try(:resource_codes) || {}
         node.similarity_detection_tool({
-          resource_type_code: resource_codes[:resource_type_code],
-          vendor_code: resource_codes[:vendor_code],
-          product_code: resource_codes[:product_code],
-          visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
-        })
+                                         resource_type_code: resource_codes[:resource_type_code],
+                                         vendor_code: resource_codes[:vendor_code],
+                                         product_code: resource_codes[:product_code],
+                                         visibility: assignment.turnitin_settings.with_indifferent_access[:originality_report_visibility]
+                                       })
 
         tool_setting = Lti::ToolSetting.find_by(
           resource_link_id: assignment.lti_context_id

@@ -91,11 +91,13 @@ class UserService < ActiveRecord::Base
 
   def decrypted_password
     return nil unless self.password_salt && self.crypted_password
+
     Canvas::Security.decrypt_password(self.crypted_password, self.password_salt, 'instructure_user_service')
   end
 
-  def self.register(opts={})
+  def self.register(opts = {})
     raise "User required" unless opts[:user]
+
     token = opts[:access_token] ? opts[:access_token].token : opts[:token]
     secret = opts[:access_token] ? opts[:access_token].secret : opts[:secret]
     domain = opts[:service_domain] || "google.com"
@@ -114,7 +116,7 @@ class UserService < ActiveRecord::Base
     user_service
   end
 
-  def self.register_from_params(user, params={})
+  def self.register_from_params(user, params = {})
     opts = {}
     opts[:user] = user
     opts[:access_token] = nil
@@ -122,25 +124,25 @@ class UserService < ActiveRecord::Base
     opts[:secret] = nil
     opts[:service] = params[:service]
     case opts[:service]
-      when 'delicious'
-        opts[:service_domain] = "delicious.com"
-        opts[:protocol] = "http-auth"
-        opts[:service_user_id] = params[:user_name]
-        opts[:service_user_name] = params[:user_name]
-        opts[:password] = params[:password]
-      when 'diigo'
-        opts[:service_domain] = "diigo.com"
-        opts[:protocol] = "http-auth"
-        opts[:service_user_id] = params[:user_name]
-        opts[:service_user_name] = params[:user_name]
-        opts[:password] = params[:password]
-      when 'skype'
-        opts[:service_domain] = "skype.com"
-        opts[:service_user_id] = params[:user_name]
-        opts[:service_user_name] = params[:user_name]
-        opts[:protocol] = "skype"
-      else
-        raise "Unknown Service Type"
+    when 'delicious'
+      opts[:service_domain] = "delicious.com"
+      opts[:protocol] = "http-auth"
+      opts[:service_user_id] = params[:user_name]
+      opts[:service_user_name] = params[:user_name]
+      opts[:password] = params[:password]
+    when 'diigo'
+      opts[:service_domain] = "diigo.com"
+      opts[:protocol] = "http-auth"
+      opts[:service_user_id] = params[:user_name]
+      opts[:service_user_name] = params[:user_name]
+      opts[:password] = params[:password]
+    when 'skype'
+      opts[:service_domain] = "skype.com"
+      opts[:service_user_id] = params[:user_name]
+      opts[:service_user_name] = params[:user_name]
+      opts[:protocol] = "skype"
+    else
+      raise "Unknown Service Type"
     end
     register(opts)
   end
@@ -210,20 +212,20 @@ class UserService < ActiveRecord::Base
 
   def service_user_link
     case service
-      when 'google_drive'
-        'https://myaccount.google.com/?pli=1'
-      when 'google_calendar'
-        'http://calendar.google.com'
-      when CommunicationChannel::TYPE_TWITTER
-        "http://www.twitter.com/#{service_user_name}"
-      when 'delicious'
-        "http://www.delicious.com/#{service_user_name}"
-      when 'diigo'
-        "http://www.diigo.com/user/#{service_user_name}"
-      when 'skype'
-        "skype:#{service_user_name}?add"
-      else
-        'http://www.instructure.com'
+    when 'google_drive'
+      'https://myaccount.google.com/?pli=1'
+    when 'google_calendar'
+      'http://calendar.google.com'
+    when CommunicationChannel::TYPE_TWITTER
+      "http://www.twitter.com/#{service_user_name}"
+    when 'delicious'
+      "http://www.delicious.com/#{service_user_name}"
+    when 'diigo'
+      "http://www.diigo.com/user/#{service_user_name}"
+    when 'skype'
+      "skype:#{service_user_name}?add"
+    else
+      'http://www.instructure.com'
     end
   end
 
@@ -236,6 +238,7 @@ class UserService < ActiveRecord::Base
       'UserService'
     end
   end
+
   def self.serialization_excludes; [:crypted_password, :password_salt, :token, :secret]; end
 
   def self.associated_shards(service, service_user_id)

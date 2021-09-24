@@ -20,7 +20,6 @@
 
 module DataFixup
   class InitAccountIndexForCourseAuditLog
-
     LAST_BATCH_TABLE = 'courses_index_last_batch'.freeze
 
     def self.run
@@ -33,10 +32,10 @@ module DataFixup
       Rails.logger.debug("InitAccountIndexForCourseAuditLog: #{LAST_BATCH_TABLE} exists? => #{table_exists?(LAST_BATCH_TABLE)}")
       unless table_exists?(LAST_BATCH_TABLE)
         compression_params = if database.db.use_cql3?
-          "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
-        else
-          "WITH compression_parameters:sstable_compression='DeflateCompressor'"
-        end
+                               "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                             else
+                               "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                             end
 
         create_table_command = %{
         CREATE TABLE #{LAST_BATCH_TABLE} (
@@ -96,7 +95,7 @@ module DataFixup
 
         # build course_id to account_id lookup map to speed things up
         course_ids = rows.map { |r| r['course_id'] }.uniq
-        account_course_map = Hash[ Course.where(:id => course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] } ]
+        account_course_map = Hash[Course.where(:id => course_ids).pluck(:id, :account_id).map { |e| [Shard.global_id_for(e[0]), Shard.global_id_for(e[1])] }]
 
         batch_updates = []
         batch_inserts = []
@@ -105,9 +104,9 @@ module DataFixup
         rows.each do |row|
           if row['account_id'].nil?
             # lookup account from course id, can also cache here
-            account_id = account_course_map[ row['course_id'] ]
+            account_id = account_course_map[row['course_id']]
             # update course row with account id
-            batch_updates << [ account_id, row['id'] ]
+            batch_updates << [account_id, row['id']]
             # write account id to index
             batch_inserts << add_course_account_index(row, account_id)
           end
@@ -135,6 +134,7 @@ module DataFixup
 
     def write_batch_updates(updates)
       return if updates.empty?
+
       database.batch { updates.each { |upd| database.execute(UPDATE_CQL, *upd) } }
     end
 
@@ -146,6 +146,7 @@ module DataFixup
 
     def write_batch_inserts(inserts)
       return if inserts.empty?
+
       database.batch { inserts.each { |r| r.index.strategy_for(:cassandra).insert(r.record, r.key) } }
     end
 

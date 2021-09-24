@@ -29,7 +29,7 @@ describe "locale_selection" do
     I18n.locale = I18n.default_locale
   end
 
-  it "should set the locale when authenticated" do
+  it "sets the locale when authenticated" do
     course_with_teacher(:active_all => true, :user => user_with_pseudonym)
     user_session(@user, @pseudonym)
     @user.update_attribute :locale, 'es'
@@ -41,12 +41,11 @@ describe "locale_selection" do
     expect(I18n.locale).to eql(:es)
   end
 
-  it "should set the locale when not authenticated" do
+  it "sets the locale when not authenticated" do
     account = Account.default
     account.update_attribute :default_locale, 'fr'
     get canvas_login_url
     expect(response).to be_successful
     expect(I18n.locale).to eql(:fr)
   end
-
 end

@@ -42,6 +42,7 @@ module Plannable
     @associated_planner_items_need_updating = false
     return if self.new_record?
     return if self.respond_to?(:context_type) && !PlannerOverride::CONTENT_TYPES.include?(self.context_type)
+
     @associated_planner_items_need_updating = true if self.try(:workflow_state_changed?) || self.workflow_state == 'deleted'
   end
 
@@ -52,7 +53,7 @@ module Plannable
     end
 
     if self.association(:planner_overrides).loaded?
-      self.planner_overrides.find{|po| po.user_id == user.id && po.workflow_state != 'deleted'}
+      self.planner_overrides.find { |po| po.user_id == user.id && po.workflow_state != 'deleted' }
     else
       self.planner_overrides.where(user_id: user).where.not(workflow_state: 'deleted').take
     end
@@ -85,12 +86,13 @@ module Plannable
 
     def format_columns(columns)
       columns.map do |col|
-        col.is_a?(Array) ? col.map {|c| format_column(c)} : format_column(col)
+        col.is_a?(Array) ? col.map { |c| format_column(c) } : format_column(col)
       end
     end
 
     def format_column(col)
       return col if col.is_a?(Hash)
+
       col.to_s
     end
 
@@ -102,6 +104,7 @@ module Plannable
       result = {}
       col.each_pair do |key, value|
         return key if value.is_a?(Symbol)
+
         result[key] = value.is_a?(Hash) ? association_to_preload(value) : value
       end
       result
@@ -120,7 +123,7 @@ module Plannable
           rel_hash = nil
         end
       end
-      rel_array.reduce(object) {|val, key| val = val.send(key)}
+      rel_array.reduce(object) { |val, key| val = val.send(key) }
     end
 
     # Grabs the value to use for the bookmark & comparison
@@ -152,9 +155,9 @@ module Plannable
     end
 
     TYPE_MAP = {
-      string: -> (val) { val.is_a?(String) },
-      integer: -> (val) { val.is_a?(Integer) },
-      datetime: -> (val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
+      string: ->(val) { val.is_a?(String) },
+      integer: ->(val) { val.is_a?(Integer) },
+      datetime: ->(val) { val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
     }.freeze
 
     def validate(bookmark)
@@ -189,6 +192,7 @@ module Plannable
     # Gets the object or object's associated column name to be used in the SQL query
     def column_name(col)
       return associated_table_column_name(col) if col.is_a?(Hash)
+
       "#{@model.table_name}.#{col}"
     end
 
@@ -204,12 +208,13 @@ module Plannable
     # returns an array of [table, column]
     def associated_table_column(col)
       return col.to_s unless col.is_a?(Hash)
+
       col.values.first.is_a?(Hash) ? col.values.first.first : col.first
     end
 
     def column_order(col_name)
       if col_name.is_a?(Array)
-        order = "COALESCE(#{col_name.map{|c| column_name(c)}.join(', ')})"
+        order = "COALESCE(#{col_name.map { |c| column_name(c) }.join(', ')})"
       else
         order = column_comparand(col_name)
         if @model.columns_hash[col_name].null
@@ -222,7 +227,7 @@ module Plannable
 
     def column_comparand(column, comparator = '>', placeholder = nil)
       col_name = placeholder ||
-        (column.is_a?(Array) ? "COALESCE(#{column.map{|c| column_name(c)}.join(', ')})" : column_name(column))
+                 (column.is_a?(Array) ? "COALESCE(#{column.map { |c| column_name(c) }.join(', ')})" : column_name(column))
       if comparator != "=" && type_for_column(column) == :string
         col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end
@@ -272,7 +277,7 @@ module Plannable
       while pairs.present?
         col, val = pairs.shift
         clauses = []
-        visited.each do |c,v|
+        visited.each do |c, v|
           clause, *clause_args = column_comparison(c, "=", v)
           clauses << clause
           args.concat(clause_args)

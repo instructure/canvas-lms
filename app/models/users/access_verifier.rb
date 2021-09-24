@@ -47,6 +47,7 @@ module Users
 
     def self.validate(fields)
       return {} if fields[:sf_verifier].blank?
+
       claims = Canvas::Security.decode_jwt(fields[:sf_verifier])
 
       real_user = user = User.where(id: claims[:user_id]).first
@@ -74,7 +75,6 @@ module Users
         oauth_host: oauth_host,
         return_url: return_url
       }
-
     rescue Canvas::Security::InvalidToken
       raise InvalidVerifier
     end

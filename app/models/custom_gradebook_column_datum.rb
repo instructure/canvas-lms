@@ -22,7 +22,7 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
   belongs_to :custom_gradebook_column
 
   validates_length_of :content, :maximum => maximum_string_length,
-    :allow_nil => true
+                                :allow_nil => true
   validates_uniqueness_of :user_id, :scope => :custom_gradebook_column_id
 
   set_policy do
@@ -48,6 +48,7 @@ class CustomGradebookColumnDatum < ActiveRecord::Base
         column_id = data_point.fetch(:column_id)
         custom_column = custom_gradebook_columns.find { |custom_col| custom_col.id == column_id.to_i }
         next if custom_column.blank?
+
         content = data_point.fetch(:content)
         user_id = data_point.fetch(:user_id)
         if content.present?

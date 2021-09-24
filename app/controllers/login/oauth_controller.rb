@@ -25,9 +25,9 @@ class Login::OauthController < Login::OauthBaseController
     timeout_protection do
       request_token = @aac.consumer.get_request_token(oauth_callback: callback_uri)
       session[:oauth] = {
-          callback_confirmed: request_token.callback_confirmed?,
-          request_token: request_token.token,
-          request_secret: request_token.secret
+        callback_confirmed: request_token.callback_confirmed?,
+        request_token: request_token.token,
+        request_secret: request_token.secret
       }
       opts = {}
       opts[oauth_callback: callback_uri] unless request_token.callback_confirmed?

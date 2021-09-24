@@ -37,7 +37,7 @@ describe 'Viewing graded quizzes' do
   end
 
   let_once(:question_data) do
-    [{:question_data => {:name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100'}, {'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0'}]}}]
+    [{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'multiple_choice_question', 'answers' => [{ 'answer_text' => '', 'answer_html' => '<em>zero</em>', 'answer_weight' => '100' }, { 'answer_text' => "", 'answer_html' => "<p>one</p>", 'answer_weight' => '0' }] } }]
   end
 
   before(:once) do

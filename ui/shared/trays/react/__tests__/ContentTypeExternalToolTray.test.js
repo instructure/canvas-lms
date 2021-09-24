@@ -21,7 +21,7 @@ import {render, fireEvent} from '@testing-library/react'
 import ContentTypeExternalToolTray from '../ContentTypeExternalToolTray'
 
 describe('ContentTypeExternalToolTray', () => {
-  const tool = {id: 1, base_url: 'https://one.lti.com/', title: 'First LTI'}
+  const tool = {id: '1', base_url: 'https://one.lti.com/', title: 'First LTI'}
   const onDismiss = jest.fn()
 
   function renderTray(props) {

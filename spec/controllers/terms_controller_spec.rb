@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe TermsController do
-  it "should only touch courses once when setting overrides" do
+  it "only touches courses once when setting overrides" do
     a = Account.default
     u = user_factory(active_all: true)
     a.account_users.create!(user: u)
@@ -30,39 +30,39 @@ describe TermsController do
     term = a.default_enrollment_term
     expect_any_instantiation_of(term).to receive(:touch_all_courses).once
 
-    put 'update', params: {:account_id => a.id, :id => term.id, :enrollment_term => {:start_at => 1.day.ago, :end_at => 1.day.from_now,
-        :overrides => {
-          :student_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
-          :teacher_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
-          :ta_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now},
-      }}}
+    put 'update', params: { :account_id => a.id, :id => term.id, :enrollment_term => { :start_at => 1.day.ago, :end_at => 1.day.from_now,
+                                                                                       :overrides => {
+                                                                                         :student_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now },
+                                                                                         :teacher_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now },
+                                                                                         :ta_enrollment => { :start_at => 1.day.ago, :end_at => 1.day.from_now },
+                                                                                       } } }
   end
 
-  it "should not be able to change the name for a default term" do
+  it "is not able to change the name for a default term" do
     account_model
     account_admin_user(:account => @account)
     user_session(@user)
 
-    put 'update', params: {:account_id => @account.id, :id => @account.default_enrollment_term.id, :enrollment_term => {:name => "new name lol"}}
+    put 'update', params: { :account_id => @account.id, :id => @account.default_enrollment_term.id, :enrollment_term => { :name => "new name lol" } }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["name"].first["message"]
     expect(error).to eq "Cannot change the default term name"
   end
 
-  it "should not be able to delete a default term" do
+  it "is not able to delete a default term" do
     account_model
     account_admin_user(:account => @account)
     user_session(@user)
 
-    delete 'destroy', params: {:account_id => @account.id, :id => @account.default_enrollment_term.id}
+    delete 'destroy', params: { :account_id => @account.id, :id => @account.default_enrollment_term.id }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
     expect(error).to eq "Cannot delete the default term"
   end
 
-  it "should not be able to delete an enrollment term with active courses" do
+  it "is not able to delete an enrollment term with active courses" do
     account_model
     account_admin_user(:account => @account)
     user_session(@user)
@@ -72,7 +72,7 @@ describe TermsController do
     @course.enrollment_term = @term
     @course.save!
 
-    delete 'destroy', params: {:account_id => @account.id, :id => @term.id}
+    delete 'destroy', params: { :account_id => @account.id, :id => @term.id }
 
     expect(response).to_not be_successful
     error = json_parse(response.body)["errors"]["workflow_state"].first["message"]
@@ -80,7 +80,7 @@ describe TermsController do
 
     @course.destroy
 
-    delete 'destroy', params: {:account_id => @account.id, :id => @term.id}
+    delete 'destroy', params: { :account_id => @account.id, :id => @term.id }
 
     expect(response).to be_successful
 

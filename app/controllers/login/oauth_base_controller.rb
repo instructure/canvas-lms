@@ -68,8 +68,8 @@ class Login::OauthBaseController < ApplicationController
       unknown_user_url = @domain_root_account.unknown_user_url.presence || login_url
       logger.warn "Received OAuth2 login with no unique_id"
       flash[:delegated_message] =
-          t("Authentication with %{provider} was successful, but no unique ID for logging in to Canvas was provided.",
-            provider: @aac.class.display_name)
+        t("Authentication with %{provider} was successful, but no unique ID for logging in to Canvas was provided.",
+          provider: @aac.class.display_name)
       return redirect_to unknown_user_url
     end
 

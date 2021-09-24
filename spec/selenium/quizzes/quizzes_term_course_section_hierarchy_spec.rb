@@ -42,14 +42,14 @@ describe "quizzes section hierarchy" do
     @quiz.reload
     @override = @quiz.assignment_overrides.build
     @override.set = @new_section
-    @override.due_at = Time.zone.now.advance(days:3)
+    @override.due_at = Time.zone.now.advance(days: 3)
     @override.due_at_overridden = true
     @override.save!
   end
 
   def take_hierarchy_quiz
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load{f('#take_quiz_link').click}
+    expect_new_page_load { f('#take_quiz_link').click }
     # make sure it does not create a blank submissions
     expect(f("#content")).not_to contain_css('.quiz_score')
     expect(f("#content")).not_to contain_css('.quiz_duration')
@@ -59,7 +59,7 @@ describe "quizzes section hierarchy" do
 
   def verify_quiz_accessible
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-    expect_new_page_load{f('#take_quiz_link').click}
+    expect_new_page_load { f('#take_quiz_link').click }
     # make sure it does not create a blank submissions
     expect(f("#content")).not_to contain_css('.quiz_score')
     expect(f("#content")).not_to contain_css('.quiz_duration')
@@ -70,22 +70,22 @@ describe "quizzes section hierarchy" do
 
   context "section overrides course and term hierarchy" do
     context "course end date in past" do
-      it "should allow the student to take the quiz", priority: "1", test_id: 282619 do
+      it "allows the student to take the quiz", priority: "1", test_id: 282619 do
         # ensure student is able to take the quiz and it does not create a blank submission
         user_session(@student)
         take_hierarchy_quiz
       end
 
-      it "should allow the teacher to preview the quiz", priority: "1", test_id: 282838 do
+      it "allows the teacher to preview the quiz", priority: "1", test_id: 282838 do
         get "/courses/#{@course.id}/quizzes"
         fln('Test Quiz').click
-        expect_new_page_load{f('#preview_quiz_button').click}
+        expect_new_page_load { f('#preview_quiz_button').click }
         expect(f(' .quiz-header')).to include_text('This is a preview of the published version of the quiz')
       end
 
-      it "should work with lock and unlock dates set up", priority: "1", test_id: 323086 do
-        @override.unlock_at = Time.zone.now.advance(days:-1)
-        @override.lock_at = Time.zone.now.advance(days:4)
+      it "works with lock and unlock dates set up", priority: "1", test_id: 323086 do
+        @override.unlock_at = Time.zone.now.advance(days: -1)
+        @override.lock_at = Time.zone.now.advance(days: 4)
         user_session(@student)
         take_hierarchy_quiz
       end
@@ -99,25 +99,25 @@ describe "quizzes section hierarchy" do
         term.save!
       end
 
-      it "should still be accessible for student in the section after term end date", priority: "1", test_id: 323087 do
+      it "is still accessible for student in the section after term end date", priority: "1", test_id: 323087 do
         user_session(@student)
         take_hierarchy_quiz
       end
 
-      it "should work with lock and unlock dates set up", priority: "1", test_id: 323090 do
-        @override.unlock_at = Time.zone.now.advance(days:-1)
-        @override.lock_at = Time.zone.now.advance(days:4)
+      it "works with lock and unlock dates set up", priority: "1", test_id: 323090 do
+        @override.unlock_at = Time.zone.now.advance(days: -1)
+        @override.lock_at = Time.zone.now.advance(days: 4)
         user_session(@student)
         take_hierarchy_quiz
       end
 
-      it "should not be accessible for student in the main section", priority: "1", test_id: 350077 do
+      it "is not accessible for student in the main section", priority: "1", test_id: 350077 do
         student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
         student_in_course(course: @course, user: student1)
         user_session(student1)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(f('#quiz_show .quiz-header .lock_explanation').text).
-            to include('This quiz is no longer available as the course has been concluded')
+        expect(f('#quiz_show .quiz-header .lock_explanation').text)
+          .to include('This quiz is no longer available as the course has been concluded')
       end
     end
   end
@@ -129,11 +129,11 @@ describe "quizzes section hierarchy" do
     end
 
     context "course ends in past" do
-      it "should disallow student to view quiz", priority: "1", test_id: 323323 do
+      it "disallows student to view quiz", priority: "1", test_id: 323323 do
         user_session(@student)
         get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
-        expect(f('#quiz_show .quiz-header .lock_explanation').text).
-                                        to include('This quiz is no longer available as the course has been concluded')
+        expect(f('#quiz_show .quiz-header .lock_explanation').text)
+          .to include('This quiz is no longer available as the course has been concluded')
       end
     end
 
@@ -143,7 +143,7 @@ describe "quizzes section hierarchy" do
         @course.save!
       end
 
-      it "should allow student in section to take quiz", priority: "1", test_id: 323321 do
+      it "allows student in section to take quiz", priority: "1", test_id: 323321 do
         skip_if_safari(:alert)
         user_session(@student)
         verify_quiz_accessible
@@ -160,13 +160,13 @@ describe "quizzes section hierarchy" do
         @new_section.save!
       end
 
-      it "should allow student to take quiz", priority: "1", test_id: 323326 do
+      it "allows student to take quiz", priority: "1", test_id: 323326 do
         skip_if_safari(:alert)
         user_session(@student)
         verify_quiz_accessible
       end
 
-      it "should allow students in the main section to take the quiz", priority: "1", test_id: 350075 do
+      it "allows students in the main section to take the quiz", priority: "1", test_id: 350075 do
         student1 = user_with_pseudonym(username: 'student1@example.com', active_all: 1)
         enrollment = student_in_course(course: @course, user: student1)
         enrollment.accept!

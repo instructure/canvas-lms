@@ -37,7 +37,7 @@ describe DataFixup::AddPostPoliciesToAssignments do
   end
 
   def run_for_courses
-    DataFixup::AddPostPoliciesToAssignments.create_post_policies(course.id, course.id+1)
+    DataFixup::AddPostPoliciesToAssignments.create_post_policies(course.id, course.id + 1)
   end
 
   def clear_post_policy(assignment:)
@@ -180,5 +180,4 @@ describe DataFixup::AddPostPoliciesToAssignments do
       end
     end
   end
-
 end

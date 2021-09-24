@@ -26,12 +26,12 @@ module CdcFixtures
     ps.save!
 
     return WebConference.new({
-      title: 'default',
-      conference_type: 'AdobeConnect',
-      context_id: 1,
-      context_type: 'Course',
-      user_id: 1,
-      root_account_id: 1,
-    })
+                               title: 'default',
+                               conference_type: 'AdobeConnect',
+                               context_id: 1,
+                               context_type: 'Course',
+                               user_id: 1,
+                               root_account_id: 1,
+                             })
   end
 end

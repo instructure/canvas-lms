@@ -23,12 +23,12 @@ class Quizzes::QuizStatistics::Report
   attr_reader :quiz_statistics
 
   def_delegators :quiz_statistics,
-    :quiz,
-    :includes_all_versions?,
-    :includes_sis_ids?,
-    :anonymous?,
-    :update_progress,
-    :t
+                 :quiz,
+                 :includes_all_versions?,
+                 :includes_sis_ids?,
+                 :anonymous?,
+                 :update_progress,
+                 :t
 
   def initialize(quiz_statistics)
     @quiz_statistics = quiz_statistics

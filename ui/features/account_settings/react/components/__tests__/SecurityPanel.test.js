@@ -30,7 +30,7 @@ describe('ConnectedSecurityPanel', () => {
 
   it('updates CSP enabled status when the checkbox is clicked', () => {
     const {getByLabelText} = renderWithRedux(
-      <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} />
+      <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const checkbox = getByLabelText('Enable Content Security Policy')
@@ -41,7 +41,13 @@ describe('ConnectedSecurityPanel', () => {
   describe('isSubAccount prop', () => {
     it('updates CSP inherited status when the inherit checkbox is clicked', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} isSubAccount />
+        <ConnectedSecurityPanel
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          isSubAccount
+        />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')
@@ -51,7 +57,13 @@ describe('ConnectedSecurityPanel', () => {
 
     it('disables the enable checkbox when the inherit option is set to true', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} isSubAccount />
+        <ConnectedSecurityPanel
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          isSubAccount
+        />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')

@@ -24,11 +24,11 @@ describe "Importing Learning Outcome Groups" do
   before :once do
     @context = course_model
     @migration = ContentMigration.create!(:context => @context)
-    @migration.migration_ids_to_import = {:copy=>{}}
+    @migration.migration_ids_to_import = { :copy => {} }
     @migration.outcome_to_id_map = {}
   end
 
-  def outcome_data(overrides={})
+  def outcome_data(overrides = {})
     {
       migration_id: "6a240bdc-957b-11ea-bb37-0242ac130002",
       type: "learning_outcome",
@@ -36,7 +36,7 @@ describe "Importing Learning Outcome Groups" do
     }.merge(overrides)
   end
 
-  def group_data(overrides={})
+  def group_data(overrides = {})
     {
       migration_id: "3c811a5d-7a39-401b-8db5-9ce5fbd2d556",
       type: "learning_outcome_group",
@@ -45,28 +45,28 @@ describe "Importing Learning Outcome Groups" do
     }.merge(overrides)
   end
 
-  it "should not import an outcome group if skip import enabled" do
+  it "does not import an outcome group if skip import enabled" do
     log_data = group_data
     expect do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, nil, true)
     end.not_to change { @context.learning_outcome_groups.count }
   end
 
-  it 'should import outcome group contents if skip import enabled on group' do
+  it 'imports outcome group contents if skip import enabled on group' do
     log_data = group_data(outcomes: [
-      outcome_data,
-      group_data(
-        outcomes: [
-          outcome_data(migration_id: '73b696ec-957b-11ea-bb37-0242ac130002')
-        ]
-      )
-    ])
+                            outcome_data,
+                            group_data(
+                              outcomes: [
+                                outcome_data(migration_id: '73b696ec-957b-11ea-bb37-0242ac130002')
+                              ]
+                            )
+                          ])
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration, nil, true)
     expect(@context.learning_outcome_groups.count).to eq 2
     expect(@context.learning_outcomes.count).to eq 2
   end
 
-  it "should not generate a new outcome group when one already exists with the same guid" do
+  it "does not generate a new outcome group when one already exists with the same guid" do
     log_data = group_data
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
@@ -78,7 +78,7 @@ describe "Importing Learning Outcome Groups" do
     expect(@context.learning_outcome_groups.count).to eq 2
   end
 
-  it "should not generate a new outcome group when already exists a group with the same name in the same folder" do
+  it "does not generate a new outcome group when already exists a group with the same name in the same folder" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
     log_data = group_data(migration_id: 'other-migration-id')
@@ -87,7 +87,7 @@ describe "Importing Learning Outcome Groups" do
     }.to change(@context.learning_outcome_groups, :count).by(0)
   end
 
-  it "should generate a new outcome group when already exists a deleted group with the same name in the same folder" do
+  it "generates a new outcome group when already exists a deleted group with the same name in the same folder" do
     Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
     LearningOutcomeGroup.find_by(title: "Stuff").destroy
@@ -97,7 +97,7 @@ describe "Importing Learning Outcome Groups" do
     }.to change(@context.learning_outcome_groups, :count).by(1)
   end
 
-  it "should not duplicate an outcome group with the same vendor_guid when it already exists in the context" do
+  it "does not duplicate an outcome group with the same vendor_guid when it already exists in the context" do
     log_data = group_data(vendor_guid: "vendor-guid-1")
     Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
     expect(@context.learning_outcome_groups.count).to eq 2
@@ -124,7 +124,7 @@ describe "Importing Learning Outcome Groups" do
   end
 
   context "source_outcome_group" do
-    it "should store source_outcome_group when titles are equal" do
+    it "stores source_outcome_group when titles are equal" do
       source_group = outcome_group_model(context: Account.default, title: "Stuff")
       log_data = group_data(source_outcome_group_id: source_group.id)
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
@@ -132,7 +132,7 @@ describe "Importing Learning Outcome Groups" do
       expect(imported_group.source_outcome_group).to eql(source_group)
     end
 
-    it "should not store source_outcome_group when titles are different" do
+    it "does not store source_outcome_group when titles are different" do
       source_group = outcome_group_model(context: Account.default, title: "Different")
       log_data = group_data(source_outcome_group_id: source_group.id)
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
@@ -140,7 +140,7 @@ describe "Importing Learning Outcome Groups" do
       expect(imported_group.source_outcome_group).to be_nil
     end
 
-    it "should not store source_outcome_group when it belongs to different account" do
+    it "does not store source_outcome_group when it belongs to different account" do
       source_group = outcome_group_model(context: Account.create!)
       log_data = group_data(source_outcome_group_id: source_group.id)
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
@@ -148,7 +148,7 @@ describe "Importing Learning Outcome Groups" do
       expect(imported_group.source_outcome_group).to be_nil
     end
 
-    it "should skip when source group cant be found" do
+    it "skips when source group cant be found" do
       source_group = outcome_group_model(context: Account.default)
       source_group.destroy
       log_data = group_data(source_outcome_group_id: source_group.id)

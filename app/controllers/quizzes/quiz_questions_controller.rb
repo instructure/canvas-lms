@@ -228,11 +228,11 @@ class Quizzes::QuizQuestionsController < ApplicationController
   def show
     if authorized_action(@quiz, @current_user, :update)
       render :json => question_json(@question,
-        @current_user,
-        session,
-        @context,
-        parse_includes,
-        censored?)
+                                    @current_user,
+                                    session,
+                                    @context,
+                                    parse_includes,
+                                    censored?)
     end
   end
 
@@ -277,6 +277,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       if params[:existing_questions]
         return add_questions
       end
+
       question_data = params[:question]&.to_unsafe_h
       question_data ||= {}
       if question_data.key?(:question_text)
@@ -402,6 +403,7 @@ class Quizzes::QuizQuestionsController < ApplicationController
       yield
     rescue Quizzes::QuizQuestion::RawFields::FieldTooLongError => ex
       raise ex unless request.xhr?
+
       render_xhr_exception(ex, ex.message)
     end
   end
@@ -441,8 +443,8 @@ class Quizzes::QuizQuestionsController < ApplicationController
       retrieve_quiz_submission_attempt!(params[:quiz_submission_attempt])
 
       scope = Quizzes::QuizQuestion.where({
-        id: @quiz_submission.quiz_data.map { |question| question['id'] }
-      })
+                                            id: @quiz_submission.quiz_data.map { |question| question['id'] }
+                                          })
 
       results_visible = @quiz_submission.results_visible?(user: @current_user)
       reject! "Cannot view questions due to quiz settings", 401 unless results_visible
@@ -451,19 +453,18 @@ class Quizzes::QuizQuestionsController < ApplicationController
     end
   end
 
-  def render_question_set(scope, quiz_data=nil)
-    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], {:quiz_id => @quiz})
+  def render_question_set(scope, quiz_data = nil)
+    api_route = polymorphic_url([:api, :v1, @context, :quiz_questions], { :quiz_id => @quiz })
     questions = Api.paginate(scope, self, api_route)
 
     render :json => questions_json(questions,
-      @current_user,
-      session,
-      @context,
-      parse_includes,
-      censored?,
-      quiz_data,
-      shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
-    )
+                                   @current_user,
+                                   session,
+                                   @context,
+                                   parse_includes,
+                                   censored?,
+                                   quiz_data,
+                                   shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user))
   end
 
   def process_answer_html_content(question_data)

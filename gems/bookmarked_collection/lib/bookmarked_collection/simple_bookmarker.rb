@@ -69,6 +69,7 @@ module BookmarkedCollection
       end
     end
   end
+
   class SimpleBookmarker
     def initialize(model, *args)
       @model = model
@@ -77,6 +78,7 @@ module BookmarkedCollection
 
     def load_definitions
       return if @column_definitions
+
       # apparently can't do this on intitialization because we sometimes create bookmarker objects before db is loaded
       @column_definitions = {}
       @columns = []
@@ -87,7 +89,8 @@ module BookmarkedCollection
             col_name = col_name.to_s
             @columns << col_name
             @column_definitions[col_name] = validate_definition(
-              existing_column_definition(col_name).merge(definition).merge(:custom => true))
+              existing_column_definition(col_name).merge(definition).merge(:custom => true)
+            )
           end
         else
           col_name = arg.to_s
@@ -112,29 +115,30 @@ module BookmarkedCollection
     end
 
     TYPE_MAP = {
-      string: -> (val) { val.is_a?(String) },
-      integer: -> (val) { val.is_a?(Integer) },
-      datetime: -> (val) { val.is_a?(DateTime) || val.is_a?(Time) || val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
+      string: ->(val) { val.is_a?(String) },
+      integer: ->(val) { val.is_a?(Integer) },
+      datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
     }
 
     def existing_column_definition(col_name)
       col = @model.columns_hash[col_name]
-      col ? {:type => col.type, :null => col.null} : {}
+      col ? { :type => col.type, :null => col.null } : {}
     end
 
     def validate_definition(definition)
-      raise "expected :type and :null to be specified" unless [:type, :null].all?{|k| definition.has_key?(k)}
+      raise "expected :type and :null to be specified" unless [:type, :null].all? { |k| definition.has_key?(k) }
+
       definition
     end
 
     def validate(bookmark)
       bookmark.is_a?(Array) &&
-      bookmark.size == columns.size &&
-      columns.each.with_index.all? do |col, i|
-        type = TYPE_MAP[column_definitions[col][:type]]
-        nullable = column_definitions[col][:null]
-        type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
-      end
+        bookmark.size == columns.size &&
+        columns.each.with_index.all? do |col, i|
+          type = TYPE_MAP[column_definitions[col][:type]]
+          nullable = column_definitions[col][:null]
+          type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
+        end
     end
 
     def restrict_scope(scope, pager)
@@ -161,7 +165,7 @@ module BookmarkedCollection
     def column_comparand(col_name, comparator = '>', placeholder = nil)
       definition = column_definitions[col_name]
       col_name = placeholder ||
-        (definition[:custom] ? col_name : "#{@model.table_name}.#{col_name}")
+                 (definition[:custom] ? col_name : "#{@model.table_name}.#{col_name}")
       if definition[:type] == :string && !definition[:skip_collation] && comparator != "="
         col_name = BookmarkedCollection.best_unicode_collation_key(col_name)
       end
@@ -210,7 +214,7 @@ module BookmarkedCollection
         col, val = pairs.shift
         comparator = ">=" if pairs.empty? && include_bookmark
         clauses = []
-        visited.each do |c,v|
+        visited.each do |c, v|
           clause, *clause_args = column_comparison(c, "=", v)
           clauses << clause
           args.concat(clause_args)

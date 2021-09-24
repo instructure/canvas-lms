@@ -23,7 +23,7 @@ describe "communication channel selenium tests" do
   include_context "in-process server selenium tests"
 
   context "confirm" do
-    it "should register the user" do
+    it "registers the user" do
       Setting.set('terms_required', 'false')
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
@@ -34,7 +34,7 @@ describe "communication channel selenium tests" do
       expect_logout_link_present
     end
 
-    it "should not show a mysterious error" do
+    it "does not show a mysterious error" do
       Setting.set('terms_required', 'false')
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
@@ -46,7 +46,7 @@ describe "communication channel selenium tests" do
       expect(text).to_not include("Doesn't match")
     end
 
-    it "should require the terms if configured to do so" do
+    it "requires the terms if configured to do so" do
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       get "/register/#{u1.communication_channel.confirmation_code}"
       expect(f('input[name="user[terms_of_use]"]')).to be_present
@@ -55,7 +55,7 @@ describe "communication channel selenium tests" do
       assert_error_box 'input[name="user[terms_of_use]"]:visible'
     end
 
-    it "should not require the terms if the user has already accepted them" do
+    it "does not require the terms if the user has already accepted them" do
       u1 = user_with_communication_channel(:user_state => 'creation_pending')
       u1.preferences[:accepted_terms] = Time.now.utc
       u1.save
@@ -63,7 +63,7 @@ describe "communication channel selenium tests" do
       expect(f("#content")).not_to contain_css('input[name="user[terms_of_use]"]')
     end
 
-    it "should allow the user to edit the pseudonym if its already taken" do
+    it "allows the user to edit the pseudonym if its already taken" do
       u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
       u1.accept_terms
       u1.save
@@ -84,7 +84,7 @@ describe "communication channel selenium tests" do
     end
 
     it 'confirms the communication channels', priority: "2", test_id: 193786 do
-      user_with_pseudonym({active_user: true})
+      user_with_pseudonym({ active_user: true })
       create_session(@pseudonym)
 
       get '/profile/settings'
@@ -104,9 +104,9 @@ describe "communication channel selenium tests" do
     end
 
     it 'resends sms confirmations properly' do
-      user_with_pseudonym({active_user: true})
+      user_with_pseudonym({ active_user: true })
       create_session(@pseudonym)
-      sms_cc = communication_channel(@user, {username: '8011235555@example.com', path_type: 'sms'})
+      sms_cc = communication_channel(@user, { username: '8011235555@example.com', path_type: 'sms' })
 
       get '/profile/settings'
       expect(f('.other_channels')).to contain_css('.unconfirmed')
@@ -121,9 +121,9 @@ describe "communication channel selenium tests" do
       expect(m.body).to include(sms_cc.confirmation_code)
     end
 
-    it 'should show the bounce count reset button when a siteadmin is masquerading' do
+    it 'shows the bounce count reset button when a siteadmin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      communication_channel(u, {username: 'test@example.com', active_cc: true, bounce_count: 3})
+      communication_channel(u, { username: 'test@example.com', active_cc: true, bounce_count: 3 })
       site_admin_logged_in
       masquerade_as(u)
 
@@ -132,9 +132,9 @@ describe "communication channel selenium tests" do
       expect(f('.reset_bounce_count_link')).to be_present
     end
 
-    it 'should not show the bounce count reset button when an account admin is masquerading' do
+    it 'does not show the bounce count reset button when an account admin is masquerading' do
       u = user_with_pseudonym(active_all: true)
-      communication_channel(u, {username: 'test@example.com', active_cc: true, bounce_count: 3})
+      communication_channel(u, { username: 'test@example.com', active_cc: true, bounce_count: 3 })
       admin_logged_in
       masquerade_as(u)
 
@@ -143,9 +143,9 @@ describe "communication channel selenium tests" do
       expect(f("#content")).not_to contain_css('.reset_bounce_count_link')
     end
 
-    it 'should not show the bounce count reset button when the channel is not bouncing' do
+    it 'does not show the bounce count reset button when the channel is not bouncing' do
       u = user_with_pseudonym(active_all: true)
-      communication_channel(u, {username: 'test@example.com', active_cc: true})
+      communication_channel(u, { username: 'test@example.com', active_cc: true })
       site_admin_logged_in
       masquerade_as(u)
 

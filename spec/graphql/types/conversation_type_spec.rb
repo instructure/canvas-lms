@@ -26,7 +26,7 @@ describe Types::ConversationType do
     student_in_course(active_all: true)
     @student.update!(name: 'Morty Smith')
     @teacher.update!(name: 'Rick Sanchez')
-    conversation(@student, @teacher, {body: 'You sold a gun to a murderer so you could play video games?'})
+    conversation(@student, @teacher, { body: 'You sold a gun to a murderer so you could play video games?' })
     @media_object = media_object(user: @teacher)
     @attachment = @teacher.conversation_attachments_folder.attachments.create!(
       context: @teacher,

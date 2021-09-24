@@ -39,11 +39,11 @@ module LiveEvents
         )
       end
       return nil unless res && !res['kinesis_stream_name'].blank? &&
-                               (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
+                        (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
 
       unless (defined?(Rails) && Rails.env.production?) ||
-          res['custom_aws_credentials'] ||
-          (res['aws_access_key_id'].present? && res['aws_secret_access_key_dec'].present?)
+             res['custom_aws_credentials'] ||
+             (res['aws_access_key_id'].present? && res['aws_secret_access_key_dec'].present?)
         # Creating Kinesis client with no creds will hang if can't connect to AWS to get creds
         LiveEvents.logger&.warn(
           "LIVE EVENTS: no creds given for kinesis in non-prod environment. Disabling."
@@ -109,14 +109,14 @@ module LiveEvents
         begin
           raise "LiveEvent context is empty!"
         rescue => e
-          LiveEvents.logger.error(([e.message]+e.backtrace).join($INPUT_RECORD_SEPARATOR))
+          LiveEvents.logger.error(([e.message] + e.backtrace).join($INPUT_RECORD_SEPARATOR))
         end
       end
 
       attributes = ctx.except(*ATTRIBUTE_BLACKLIST).merge({
-        event_name: event_name,
-        event_time: time.utc.iso8601(3)
-      })
+                                                            event_name: event_name,
+                                                            event_time: time.utc.iso8601(3)
+                                                          })
 
       event = {
         attributes: attributes,

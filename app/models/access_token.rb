@@ -29,6 +29,7 @@ class AccessToken < ActiveRecord::Base
 
   attr_reader :full_token
   attr_reader :plaintext_refresh_token
+
   belongs_to :developer_key, counter_cache: :access_token_count
   belongs_to :user, inverse_of: :access_tokens
   belongs_to :real_user, inverse_of: :masquerade_tokens, class_name: 'User'
@@ -41,7 +42,7 @@ class AccessToken < ActiveRecord::Base
 
   before_validation -> { self.developer_key ||= DeveloperKey.default }
 
-  resolves_root_account through: -> (instance) { instance.developer_key.root_account_id }
+  resolves_root_account through: ->(instance) { instance.developer_key.root_account_id }
 
   has_a_broadcast_policy
 
@@ -150,14 +151,14 @@ class AccessToken < ActiveRecord::Base
   def token=(new_token)
     self.crypted_token = AccessToken.hashed_token(new_token)
     @full_token = new_token
-    self.token_hint = new_token[0,5]
+    self.token_hint = new_token[0, 5]
   end
 
   def clear_full_token!
     @full_token = nil
   end
 
-  def generate_token(overwrite=false)
+  def generate_token(overwrite = false)
     if overwrite || !self.crypted_token
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
@@ -202,7 +203,7 @@ class AccessToken < ActiveRecord::Base
   def self.always_allowed_scopes
     [
       "/login/oauth2/token"
-    ].map{ |path| Regexp.new("^#{path}$")}
+    ].map { |path| Regexp.new("^#{path}$") }
   end
 
   def url_scopes_for_method(method)
@@ -228,12 +229,13 @@ class AccessToken < ActiveRecord::Base
 
     scopes.size == req_scopes.size &&
       scopes.all? do |scope|
-        req_scopes.any? {|req_scope| scope[/(^|\/)#{req_scope}$/]}
+        req_scopes.any? { |req_scope| scope[/(^|\/)#{req_scope}$/] }
       end
   end
 
   def must_only_include_valid_scopes
     return true if scopes.nil? || !developer_key.require_scopes?
+
     errors.add(:scopes, 'requested scopes must match scopes on developer key') unless scopes.all? { |scope| developer_key.scopes.include?(scope) }
   end
 

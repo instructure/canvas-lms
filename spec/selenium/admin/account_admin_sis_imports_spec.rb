@@ -28,7 +28,7 @@ describe "sis imports ui" do
     user_session(@admin)
   end
 
-  it 'should properly show sis stickiness options' do
+  it 'properly shows sis stickiness options' do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"
@@ -128,7 +128,7 @@ describe "sis imports ui" do
     expect(is_checked('#override_sis_stickiness')).to be_falsey
   end
 
-  it 'should pass options along to the batch' do
+  it 'passes options along to the batch' do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"
@@ -141,11 +141,11 @@ describe "sis imports ui" do
     expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(SisBatch.last.batch_mode).to eq true
     expect(SisBatch.last.options).to eq({
-      skip_deletes: false,
-      override_sis_stickiness: true,
-      add_sis_stickiness: true,
-      update_sis_id_if_login_claimed: false
-    })
+                                          skip_deletes: false,
+                                          override_sis_stickiness: true,
+                                          add_sis_stickiness: true,
+                                          update_sis_id_if_login_claimed: false
+                                        })
 
     get "/accounts/#{@account.id}/sis_import"
     f("#override_sis_stickiness").click
@@ -155,9 +155,9 @@ describe "sis imports ui" do
     expect(f(".sis_messages .sis_error_message")).to include_text "The import failed with these messages:"
     expect(!!SisBatch.last.batch_mode).to be_falsey
     expect(SisBatch.last.options).to eq({
-      skip_deletes: false,
-      override_sis_stickiness: true,
-      update_sis_id_if_login_claimed: false
-    })
+                                          skip_deletes: false,
+                                          override_sis_stickiness: true,
+                                          update_sis_id_if_login_claimed: false
+                                        })
   end
 end

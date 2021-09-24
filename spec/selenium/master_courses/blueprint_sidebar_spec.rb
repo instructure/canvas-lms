@@ -20,7 +20,6 @@
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
-
 shared_context "blueprint sidebar context" do
   def sync_button
     f('.bcs__migration-sync__button button')
@@ -77,12 +76,10 @@ shared_context "blueprint sidebar context" do
   end
 end
 
-
 describe "master courses sidebar" do
   include_context "in-process server selenium tests"
   include_context "blueprint sidebar context"
   include BlueprintCourseCommon
-
 
   before :once do
     @master = course_factory(active_all: true)
@@ -113,24 +110,24 @@ describe "master courses sidebar" do
       user_session(@master_teacher)
     end
 
-    it "should show sidebar trigger tab" do
-     get "/courses/#{@master.id}"
-     expect(blueprint_open_sidebar_button).to be_displayed
+    it "shows sidebar trigger tab" do
+      get "/courses/#{@master.id}"
+      expect(blueprint_open_sidebar_button).to be_displayed
     end
 
-    it "should show sidebar when trigger is clicked" do
+    it "shows sidebar when trigger is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).to be_displayed
     end
 
-    it "should not show the Associations button" do
+    it "does not show the Associations button" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).not_to contain_css('button#mcSidebarAsscBtn')
     end
 
-    it "should show Sync History modal when button is clicked" do
+    it "shows Sync History modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSyncHistoryBtn').click
@@ -138,7 +135,7 @@ describe "master courses sidebar" do
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
-    it "should show Unsynced Changes modal when button is clicked" do
+    it "shows Unsynced Changes modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       wait_for_ajaximations
@@ -148,15 +145,13 @@ describe "master courses sidebar" do
       expect(f('#application')).to have_attribute('aria-hidden', 'true')
     end
 
-    it "should not show the tutorial sidebar button" do
+    it "does not show the tutorial sidebar button" do
       get "/courses/#{@master.id}"
       expect(f('body')).not_to contain_css('.TutorialToggleHolder button')
     end
   end
 
-
   describe "as a master course admin" do
-
     before :once do
       account_admin_user(active_all: true)
     end
@@ -165,20 +160,20 @@ describe "master courses sidebar" do
       user_session(@admin)
     end
 
-    it "should show the Associations button" do
+    it "shows the Associations button" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       expect(bcs_content_panel).to contain_css('button#mcSidebarAsscBtn')
     end
 
-    it "should show Associations modal when button is clicked" do
+    it "shows Associations modal when button is clicked" do
       get "/courses/#{@master.id}"
       blueprint_open_sidebar_button.click
       f('button#mcSidebarAsscBtn').click
       expect(f('span[aria-label="Associations"]')).to be_displayed
     end
 
-    it "should open and close Associations modal from course settings page" do
+    it "opens and close Associations modal from course settings page" do
       # see jira ticket ADMIN-5
       get "/courses/#{@master.id}/settings"
       blueprint_open_sidebar_button.click
@@ -200,7 +195,7 @@ describe "master courses sidebar" do
       open_blueprint_sidebar
       send_notification_checkbox.click
       add_message_checkbox.click
-      notification_message_text_box.send_keys(msg+msg+"A")
+      notification_message_text_box.send_keys(msg + msg + "A")
       expect(character_count).to include_text('(140/140)')
       expect(notification_message_text_box).not_to have_value('A')
     end
@@ -219,7 +214,7 @@ describe "master courses sidebar" do
       # the screenreader message is displayed after a 600ms delay
       # not waiting leads to a flakey spec
       wait = Selenium::WebDriver::Wait.new(:timeout => 0.7)
-      wait.until {expect(fj("#flash_screenreader_holder:contains(#{alert_text})")).to be_present}
+      wait.until { expect(fj("#flash_screenreader_holder:contains(#{alert_text})")).to be_present }
     end
 
     it "issues screenreader alert when message is full" do
@@ -228,14 +223,13 @@ describe "master courses sidebar" do
       open_blueprint_sidebar
       send_notification_checkbox.click
       add_message_checkbox.click
-      notification_message_text_box.send_keys(msg+msg+'12')
+      notification_message_text_box.send_keys(msg + msg + '12')
       alert_text = 'You have reached the limit of 140 characters in the notification message'
 
       expect(fj("#flash_screenreader_holder:contains(#{alert_text})")).to be_present
     end
 
     context "before sync" do
-
       it "shows sync button and options before sync", priority: "2", test_id: 3186721 do
         open_blueprint_sidebar
         bcs_content = bcs_content_panel
@@ -257,7 +251,6 @@ describe "master courses sidebar" do
         expect(bcs_content).to contain_css('.bcs__migration-sync__button')
       end
     end
-
 
     context "after sync" do
       before :each do

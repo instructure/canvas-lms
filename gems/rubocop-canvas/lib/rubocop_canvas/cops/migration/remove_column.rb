@@ -54,6 +54,7 @@ module RuboCop
         ].freeze
 
         private
+
         def remove_column_in_predeploy?(method_name)
           tags.include?(:predeploy) &&
             DISALLOWED_METHOD_NAMES.include?(method_name) &&

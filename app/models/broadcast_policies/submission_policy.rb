@@ -27,51 +27,51 @@ module BroadcastPolicies
 
     def should_dispatch_assignment_submitted_late?
       course.available? &&
-      !submission.group_broadcast_submission &&
-      just_submitted_late? &&
-      submission.submitted? &&
-      submission.has_submission? &&
-      submission.late?
+        !submission.group_broadcast_submission &&
+        just_submitted_late? &&
+        submission.submitted? &&
+        submission.has_submission? &&
+        submission.late?
     end
 
     def should_dispatch_assignment_submitted?
       course.available? &&
-      just_submitted? &&
-      submission.submitted? &&
-      submission.has_submission? &&
-      # don't send a submitted message because we already sent an :assignment_submitted_late message
-      !submission.late?
+        just_submitted? &&
+        submission.submitted? &&
+        submission.has_submission? &&
+        # don't send a submitted message because we already sent an :assignment_submitted_late message
+        !submission.late?
     end
 
     def should_dispatch_assignment_resubmitted?
       course.available? &&
-      submission.submitted? &&
-      is_a_resubmission? &&
-      submission.has_submission? &&
-      # don't send a resubmitted message because we already sent a :assignment_submitted_late message.
-      !submission.late?
+        submission.submitted? &&
+        is_a_resubmission? &&
+        submission.has_submission? &&
+        # don't send a resubmitted message because we already sent a :assignment_submitted_late message.
+        !submission.late?
     end
 
     def should_dispatch_group_assignment_submitted_late?
       course.available? &&
-      submission.group_broadcast_submission &&
-      just_submitted_late? &&
-      submission.submitted? &&
-      submission.late?
+        submission.group_broadcast_submission &&
+        just_submitted_late? &&
+        submission.submitted? &&
+        submission.late?
     end
 
     def should_dispatch_submission_graded?
       broadcasting_grades? &&
-      user_has_visibility? &&
-      (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
+        user_has_visibility? &&
+        (submission.changed_state_to(:graded) || (grade_updated? && graded_recently?))
     end
 
     def should_dispatch_submission_grade_changed?
       broadcasting_grades? &&
-      submission.graded_at &&
-      !graded_recently? &&
-      grade_updated? &&
-      user_has_visibility?
+        submission.graded_at &&
+        !graded_recently? &&
+        grade_updated? &&
+        user_has_visibility?
     end
 
     def should_dispatch_submission_posted?
@@ -82,16 +82,17 @@ module BroadcastPolicies
     end
 
     private
+
     def context_sendable?
       course.available? && !course.concluded?
     end
 
     def broadcasting_grades?
       context_sendable? &&
-      submission.posted? &&
-      assignment.published? &&
-      submission.quiz_submission_id.nil? &&
-      user_active_or_invited?
+        submission.posted? &&
+        assignment.published? &&
+        submission.quiz_submission_id.nil? &&
+        user_active_or_invited?
     end
 
     def assignment
@@ -112,7 +113,7 @@ module BroadcastPolicies
 
     def is_a_resubmission?
       submission.submitted_at_before_last_save &&
-      submission.saved_change_to_submitted_at?
+        submission.saved_change_to_submitted_at?
     end
 
     def grade_updated?
@@ -132,7 +133,7 @@ module BroadcastPolicies
     end
 
     def user_active_or_invited?
-      course.student_enrollments.where(user_id: submission.user_id).preload(:enrollment_state).to_a.any?{|e| e.active? || e.invited?}
+      course.student_enrollments.where(user_id: submission.user_id).preload(:enrollment_state).to_a.any? { |e| e.active? || e.invited? }
     end
   end
 end

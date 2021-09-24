@@ -22,8 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe "/quizzes/quizzes/_multi_answer" do
-
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:quiz, @course.quizzes.create!)
@@ -36,8 +35,7 @@ describe "/quizzes/quizzes/_multi_answer" do
       question_text: 'question text'
     }
     question_type = OpenObject.new
-    render :partial => "quizzes/quizzes/multi_answer", :object => answer, :locals => {:question => question, :question_type => question_type, :user_answer => nil}
+    render :partial => "quizzes/quizzes/multi_answer", :object => answer, :locals => { :question => question, :question_type => question_type, :user_answer => nil }
     expect(response).not_to be_nil
   end
 end
-

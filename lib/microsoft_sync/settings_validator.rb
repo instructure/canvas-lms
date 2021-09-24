@@ -22,10 +22,9 @@ module MicrosoftSync
   # SettingsHelper is a helper class for validating and saving Microsoft Teams Sync settings. It's
   # primary use is in the Accounts controller.
   class SettingsValidator
-
     # A list of all sync settings, as a final source of truth.
     SYNC_SETTINGS = %i(microsoft_sync_enabled microsoft_sync_tenant microsoft_sync_login_attribute
-                      microsoft_sync_login_attribute_suffix microsoft_sync_remote_attribute).freeze
+                       microsoft_sync_login_attribute_suffix microsoft_sync_remote_attribute).freeze
     VALID_SYNC_LOGIN_ATTRIBUTES = %w(email preferred_username sis_user_id integration_id).freeze
     VALID_SYNC_REMOTE_ATTRIBUTES = %w(userPrincipalName mail mailNickname).freeze
 
@@ -108,7 +107,7 @@ module MicrosoftSync
     def valid_settings?
       unless @account.root_account.feature_enabled?(:microsoft_group_enrollments_syncing)
         account.errors.add(:bad_request,
-                            I18n.t("This account does not allow for Microsoft Teams sync to be enabled. Please enable the \"Microsoft Group enrollment syncing\" feature flag before editing any settings."))
+                           I18n.t("This account does not allow for Microsoft Teams sync to be enabled. Please enable the \"Microsoft Group enrollment syncing\" feature flag before editing any settings."))
         return false
       end
 
@@ -121,15 +120,15 @@ module MicrosoftSync
         account.errors.add(:bad_request, I18n.t("Invalid Microsoft Sync tenant given. Please validate your tenant."))
       elsif enabled && !login_attribute_valid?
         account.errors.add(:bad_request,
-                            I18n.t("Invalid Microsoft Teams Sync login attribute. Valid login attributes: %{valid_attributes}",
-                              valid_attributes: VALID_SYNC_LOGIN_ATTRIBUTES.to_sentence(:or)))
+                           I18n.t("Invalid Microsoft Teams Sync login attribute. Valid login attributes: %{valid_attributes}",
+                                  valid_attributes: VALID_SYNC_LOGIN_ATTRIBUTES.to_sentence(:or)))
       elsif enabled && !login_attribute_suffix_valid?
         account.errors.add(:bad_request,
-                            I18n.t("Invalid Microsoft Teams Sync login attribute suffix. A suffix must be less than 255 characters and cannot have any whitespace."))
+                           I18n.t("Invalid Microsoft Teams Sync login attribute suffix. A suffix must be less than 255 characters and cannot have any whitespace."))
       elsif enabled && !remote_attribute_valid?
         account.errors.add(:bad_request,
-                            I18n.t("Invalid Microsoft Team Sync remote attribute. Valid remote attributes: %{VALID_SYNC_REMOTE_ATTRIBUTES}",
-                              VALID_SYNC_REMOTE_ATTRIBUTES: VALID_SYNC_REMOTE_ATTRIBUTES.to_sentence(:or)))
+                           I18n.t("Invalid Microsoft Team Sync remote attribute. Valid remote attributes: %{VALID_SYNC_REMOTE_ATTRIBUTES}",
+                                  VALID_SYNC_REMOTE_ATTRIBUTES: VALID_SYNC_REMOTE_ATTRIBUTES.to_sentence(:or)))
       end
 
       account.errors.empty?

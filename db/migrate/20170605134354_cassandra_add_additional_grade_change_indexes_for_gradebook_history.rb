@@ -41,10 +41,10 @@ class CassandraAddAdditionalGradeChangeIndexesForGradebookHistory < ActiveRecord
 
   def self.up
     compression_params = if cassandra.db.use_cql3?
-      "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
-    else
-      "WITH compression_parameters:sstable_compression='DeflateCompressor'"
-    end
+                           "WITH compression = { 'sstable_compression' : 'DeflateCompressor' }"
+                         else
+                           "WITH compression_parameters:sstable_compression='DeflateCompressor'"
+                         end
 
     indexes.each do |index_name|
       cassandra.execute %{

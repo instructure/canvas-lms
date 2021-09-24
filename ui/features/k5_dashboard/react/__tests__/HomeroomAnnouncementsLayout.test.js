@@ -22,15 +22,17 @@ import HomeroomAnnouncementsLayout from '../HomeroomAnnouncementsLayout'
 
 const homeroomAnnouncements = [
   {
-    courseId: 1234,
+    courseId: '1234',
     courseName: 'Homeroom - Mr. Jessie',
     courseUrl: 'http://google.com/course',
     canEdit: true,
     canReadAnnouncements: true,
     announcement: {
+      id: '1234',
       title: 'Welcome to Class!',
       message: '<p>Yayyyy</p>',
       url: 'http://google.com',
+      postedDate: new Date(),
       attachment: {
         display_name: 'exam1.pdf',
         url: 'http://google.com/download',
@@ -40,20 +42,22 @@ const homeroomAnnouncements = [
     published: true
   },
   {
-    courseId: 1235,
+    courseId: '1235',
     courseName: 'Homeroom 0144232',
     courseUrl: 'http://google.com/course2',
     canEdit: true,
     canReadAnnouncements: true,
     announcement: {
+      id: '1235',
       title: 'Sign the permission slip!',
       message: '<p>Hello</p>',
-      url: 'http://google.com/otherclass'
+      url: 'http://google.com/otherclass',
+      postedDate: new Date()
     },
     published: true
   },
   {
-    courseId: 1236,
+    courseId: '1236',
     courseName: 'New Homeroom',
     courseUrl: 'http://google.com',
     canEdit: true,
@@ -86,7 +90,7 @@ describe('HomeroomAnnouncementsLayout', () => {
         {...getProps({
           homeroomAnnouncements: [
             {
-              courseId: 1236,
+              courseId: '1236',
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
               canEdit: true,
@@ -108,7 +112,7 @@ describe('HomeroomAnnouncementsLayout', () => {
         {...getProps({
           homeroomAnnouncements: [
             {
-              courseId: 1236,
+              courseId: '1236',
               courseName: 'New Homeroom',
               courseUrl: 'http://google.com',
               canEdit: false,

@@ -34,6 +34,7 @@ module RuboCop
         def on_send(node)
           return if named_as_spec?
           return unless top_level_describe?(node)
+
           add_offense node, message: MSG, severity: :warning
         end
 
@@ -42,6 +43,7 @@ module RuboCop
         def top_level_describe?(node)
           _receiver, method_name, *_args = *node
           return false unless METHODS.include?(method_name)
+
           top_level_nodes.include?(node)
         end
 

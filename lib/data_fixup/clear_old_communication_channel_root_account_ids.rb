@@ -23,9 +23,9 @@ module DataFixup
     # Loosely based on DataFixup::BackfillNulls
     def self.run
       CommunicationChannel.find_ids_in_ranges(batch_size: 1000) do |start_id, end_id|
-        CommunicationChannel.where(id: start_id..end_id).
-          where.not(root_account_ids: nil).
-          update_all(root_account_ids: nil)
+        CommunicationChannel.where(id: start_id..end_id)
+                            .where.not(root_account_ids: nil)
+                            .update_all(root_account_ids: nil)
       end
     end
   end

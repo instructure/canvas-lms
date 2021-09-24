@@ -20,25 +20,25 @@
 module DataFixup::SetNavigationPlacementSettingsForQuizLtiTools
   def self.run
     quiz_lti_tools = ContextExternalTool.quiz_lti
-      .where(context_type: 'Account').where.not(workflow_state: 'deleted')
+                                        .where(context_type: 'Account').where.not(workflow_state: 'deleted')
 
     quiz_lti_tools.find_each do |quiz_lti_tool|
       quiz_lti_tool.set_extension_setting(
         :account_navigation,
         {
-          "display_type"=>"full_width",
-          "custom_fields"=>{"item_banks"=>"account"},
-          "default"=>"enabled",
-          "text"=>"Item Banks"
+          "display_type" => "full_width",
+          "custom_fields" => { "item_banks" => "account" },
+          "default" => "enabled",
+          "text" => "Item Banks"
         }
       )
       quiz_lti_tool.set_extension_setting(
         :course_navigation,
         {
-          "display_type"=>"full_width",
-          "custom_fields"=>{"item_banks"=>"course"},
-          "default"=>"enabled",
-          "text"=>"Item Banks"
+          "display_type" => "full_width",
+          "custom_fields" => { "item_banks" => "course" },
+          "default" => "enabled",
+          "text" => "Item Banks"
         }
       )
       quiz_lti_tool.save

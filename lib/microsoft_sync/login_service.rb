@@ -50,7 +50,7 @@ module MicrosoftSync
 
       # Returns JSON returned from endpoint, including 'access_token' and 'expires_in'
       def new_token(tenant)
-        headers = {'Content-Type' => 'application/x-www-form-urlencoded'}
+        headers = { 'Content-Type' => 'application/x-www-form-urlencoded' }
         body = {
           scope: 'https://graph.microsoft.com/.default',
           grant_type: 'client_credentials',
@@ -78,7 +78,7 @@ module MicrosoftSync
 
         raise
       ensure
-        statsd_tags = {status_code: response&.code&.to_s || 'error'}
+        statsd_tags = { status_code: response&.code&.to_s || 'error' }
         InstStatsd::Statsd.increment(STATSD_NAME, tags: statsd_tags)
       end
 

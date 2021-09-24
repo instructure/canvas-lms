@@ -33,6 +33,7 @@ class Quizzes::QuizQuestion::Base
   def self.inherited(klass)
     type_name = klass.question_type
     raise("question type #{type_name} already exists") if question_types.key?(type_name)
+
     question_types[type_name] = klass
   end
 
@@ -113,7 +114,7 @@ class Quizzes::QuizQuestion::Base
     false
   end
 
-  def score_question(answer_data, user_answer=nil)
+  def score_question(answer_data, user_answer = nil)
     user_answer ||= Quizzes::QuizQuestion::UserAnswer.new(self.question_id, self.points_possible, answer_data)
     user_answer.total_parts = total_answer_parts
     correct_parts = correct_answer_parts(user_answer)
@@ -159,7 +160,6 @@ class Quizzes::QuizQuestion::Base
           :text => response[:text]
         }
       end
-
     end
     @question_data.answers = answers
     @question_data.to_hash

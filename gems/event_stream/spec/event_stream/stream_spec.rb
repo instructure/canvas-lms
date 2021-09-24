@@ -25,10 +25,15 @@ describe EventStream::Stream do
   let(:database) do
     database = double('database')
     def database.batch; yield; end
+
     def database.update_record(*args); end
+
     def database.insert_record(*args); end
+
     def database.update(*args); end
+
     def database.available?; true end
+
     def database.keyspace; 'test_db' end
     database
   end
@@ -206,22 +211,22 @@ describe EventStream::Stream do
 
       it "registers callback for execution during insert" do
         spy = double('spy')
-        @stream.on_insert{ spy.trigger }
+        @stream.on_insert { spy.trigger }
         expect(spy).to receive(:trigger).once
         @stream.insert(@record)
       end
 
       it "includes the record in the callback invocation" do
         spy = double('spy')
-        @stream.on_insert{ |record| spy.trigger(record) }
+        @stream.on_insert { |record| spy.trigger(record) }
         expect(spy).to receive(:trigger).once.with(@record)
         @stream.insert(@record)
       end
 
       it "stacks multiple callbacks" do
         spy = double('spy')
-        @stream.on_insert{ spy.trigger1 }
-        @stream.on_insert{ spy.trigger2 }
+        @stream.on_insert { spy.trigger1 }
+        @stream.on_insert { spy.trigger2 }
         expect(spy).to receive(:trigger1).once
         expect(spy).to receive(:trigger2).once
         @stream.insert(@record)
@@ -276,7 +281,7 @@ describe EventStream::Stream do
 
       it "executes its commands in a batch" do
         spy = double('spy')
-        @stream.on_insert{ spy.trigger }
+        @stream.on_insert { spy.trigger }
         expect(database).to receive(:batch).once
         expect(database).to receive(:insert_record).never
         expect(spy).to receive(:trigger).never
@@ -291,22 +296,22 @@ describe EventStream::Stream do
 
       it "registers callback for execution during update" do
         spy = double('spy')
-        @stream.on_update{ spy.trigger }
+        @stream.on_update { spy.trigger }
         expect(spy).to receive(:trigger).once
         @stream.update(@record)
       end
 
       it "includes the record in the callback invocation" do
         spy = double('spy')
-        @stream.on_update{ |record| spy.trigger(record) }
+        @stream.on_update { |record| spy.trigger(record) }
         expect(spy).to receive(:trigger).once.with(@record)
         @stream.update(@record)
       end
 
       it "stacks multiple callbacks" do
         spy = double('spy')
-        @stream.on_update{ spy.trigger1 }
-        @stream.on_update{ spy.trigger2 }
+        @stream.on_update { spy.trigger1 }
+        @stream.on_update { spy.trigger2 }
         expect(spy).to receive(:trigger1).once
         expect(spy).to receive(:trigger2).once
         @stream.update(@record)
@@ -348,7 +353,7 @@ describe EventStream::Stream do
 
       it "executes its commands in a batch" do
         spy = double('spy')
-        @stream.on_update{ spy.trigger }
+        @stream.on_update { spy.trigger }
         expect(database).to receive(:batch).once
         expect(database).to receive(:update_record).never
         expect(spy).to receive(:trigger).never
@@ -417,7 +422,6 @@ describe EventStream::Stream do
         expect(database).to receive(:execute).exactly(3).times.and_return(@results)
         @stream.fetch(['asdf', 'sdfg', 'dfgh'], strategy: :serial)
       end
-
     end
 
     describe "add_index" do
@@ -426,7 +430,7 @@ describe EventStream::Stream do
         table = @table
         @index = @stream.add_index :thing do
           self.table table
-          self.entry_proc lambda{ |record| record.entry }
+          self.entry_proc lambda { |record| record.entry }
         end
         @index_strategy = @index.strategy_for(:cassandra)
 
@@ -456,13 +460,13 @@ describe EventStream::Stream do
         end
 
         it "skips insert if entry_proc and_return nil" do
-          @index.entry_proc lambda{ |_record| nil }
+          @index.entry_proc lambda { |_record| nil }
           expect(@index_strategy).to receive(:insert).never
           @stream.insert(@record)
         end
 
         it "translates the result of the entry_proc through the key_proc if present" do
-          @index.key_proc lambda{ |entry| entry.key }
+          @index.key_proc lambda { |entry| entry.key }
           expect(@index_strategy).to receive(:insert).once.with(anything, @key)
           @stream.insert(@record)
         end
@@ -475,7 +479,7 @@ describe EventStream::Stream do
 
       describe "generated for_thing method" do
         it "forwards argument to index's find_with" do
-          expect(@index).to receive(:find_with).once.with([@entry], {:strategy=>:cassandra})
+          expect(@index).to receive(:find_with).once.with([@entry], { :strategy => :cassandra })
           @stream.for_thing(@entry)
         end
       end
@@ -489,8 +493,8 @@ describe EventStream::Stream do
         @record = double(
           :id => 'id',
           :created_at => Time.zone.now,
-          :attributes => {'attribute' => 'attribute_value'},
-          :changes => {'changed_attribute' => 'changed_value'}
+          :attributes => { 'attribute' => 'attribute_value' },
+          :changes => { 'changed_attribute' => 'changed_value' }
         )
         @exception = StandardError.new
       end
@@ -498,14 +502,14 @@ describe EventStream::Stream do
       shared_examples_for "error callbacks" do
         it "triggers callbacks on failed inserts" do
           spy = double('spy')
-          @stream.on_error{ |*args| spy.capture(*args) }
+          @stream.on_error { |*args| spy.capture(*args) }
           expect(spy).to receive(:capture).once.with(:insert, @record, @exception)
           @stream.insert(@record)
         end
 
         it "triggers callbacks on failed updates" do
           spy = double('spy')
-          @stream.on_error{ |*args| spy.capture(*args) }
+          @stream.on_error { |*args| spy.capture(*args) }
           expect(spy).to receive(:capture).once.with(:update, @record, @exception)
           @stream.update(@record)
         end
@@ -513,9 +517,9 @@ describe EventStream::Stream do
         it "raises error if raises_on_error is true, but still calls callbacks" do
           spy = double('spy')
           @stream.raise_on_error = true
-          @stream.on_error{ spy.trigger }
+          @stream.on_error { spy.trigger }
           expect(spy).to receive(:trigger).once
-          expect{ @stream.insert(@record) }.to raise_exception(StandardError)
+          expect { @stream.insert(@record) }.to raise_exception(StandardError)
         end
       end
 
@@ -535,8 +539,8 @@ describe EventStream::Stream do
           allow(@database).to receive(:keyspace)
 
           exception = @exception
-          @stream.on_insert{ raise exception }
-          @stream.on_update{ raise exception }
+          @stream.on_insert { raise exception }
+          @stream.on_update { raise exception }
         end
 
         it "does not insert a record when insert callback fails" do

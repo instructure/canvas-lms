@@ -22,13 +22,11 @@ require 'thread'
 require 'set'
 
 module CanvasPandaPub
-
   # Internal: Helper for performing PandaPub HTTP requests in a separate
   # thread. The only type of pushes we currently support are ones where later
   # pushes take precedence over earlier pushes.
 
   class AsyncWorker
-
     def initialize(start_thread = true)
       @queue = Queue.new
       @logger = CanvasPandaPub.logger
@@ -46,7 +44,7 @@ module CanvasPandaPub
       # second the Proc that gets run
       # third is a flag of whether or not to actually run it. We may
       # change it to false later
-      @queue << [ tag, p, true ]
+      @queue << [tag, p, true]
       true
     end
 

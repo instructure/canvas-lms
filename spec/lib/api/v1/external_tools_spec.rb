@@ -24,7 +24,7 @@ class ExternalToolTestController
 end
 
 describe Api::V1::ExternalTools do
-  let(:controller) {ExternalToolTestController.new}
+  let(:controller) { ExternalToolTestController.new }
 
   describe "#external_tool_json" do
     before(:each) do
@@ -32,10 +32,10 @@ describe Api::V1::ExternalTools do
     end
 
     let(:tool) do
-      params = {:name => "a", :url => 'www.google.com/tool_launch', :domain => "google.com", :consumer_key => '12345',
-                :shared_secret => 'secret', :privacy_level => 'public'}
+      params = { :name => "a", :url => 'www.google.com/tool_launch', :domain => "google.com", :consumer_key => '12345',
+                 :shared_secret => 'secret', :privacy_level => 'public' }
       tool = @course.context_external_tools.new(params)
-      tool.settings = {:selection_width => 1234, :selection_height => 99, :icon_url => 'www.google.com/icon'}
+      tool.settings = { :selection_width => 1234, :selection_height => 99, :icon_url => 'www.google.com/icon' }
       tool.save
       tool
     end
@@ -70,7 +70,7 @@ describe Api::V1::ExternalTools do
     end
 
     it "gets extension labels" do
-      tool.homework_submission = {:label => {'en' => 'Hi'}}
+      tool.homework_submission = { :label => { 'en' => 'Hi' } }
       tool.save
       @student.locale = 'en'
       @student.save
@@ -86,7 +86,7 @@ describe Api::V1::ExternalTools do
       end
 
       it "includes is_rce_favorite when can_be_rce_favorite?" do
-        root_account_tool.editor_button = {url: 'http://example.com'}
+        root_account_tool.editor_button = { url: 'http://example.com' }
         root_account_tool.is_rce_favorite = true
         root_account_tool.save!
         json = controller.external_tool_json(tool, @course.root_account, account_admin_user, nil)

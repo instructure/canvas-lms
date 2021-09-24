@@ -378,7 +378,7 @@ describe('DiscussionFullPage', () => {
     })
 
     it('should render Teacher and Ta pills', async () => {
-      window.ENV.course_id = 1
+      window.ENV.course_id = '1'
       const container = setup()
       await waitFor(() => expect(container.queryAllByTestId('pill-container')).toBeTruthy())
       await waitFor(() => expect(container.queryAllByTestId('pill-Teacher')).toBeTruthy())

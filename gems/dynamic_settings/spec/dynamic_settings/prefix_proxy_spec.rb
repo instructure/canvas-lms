@@ -166,73 +166,73 @@ module DynamicSettings
 
       it "must pass on the current instance's default ttl if not supplied" do
         proxy
-        expect(PrefixProxy).to receive(:new).
-          with(an_instance_of(String), a_hash_including(default_ttl: 3.minutes))
+        expect(PrefixProxy).to receive(:new)
+          .with(an_instance_of(String), a_hash_including(default_ttl: 3.minutes))
         proxy.for_prefix('baz')
       end
 
       it 'must pass on the supplied default ttl' do
         proxy
-        expect(PrefixProxy).to receive(:new).
-          with(an_instance_of(String), a_hash_including(default_ttl: 5.minutes))
+        expect(PrefixProxy).to receive(:new)
+          .with(an_instance_of(String), a_hash_including(default_ttl: 5.minutes))
         proxy.for_prefix('baz', default_ttl: 5.minutes)
       end
     end
 
     describe '#set_keys' do
-      let(:kvs) { {foo1: 'bar1', foo2: 'bar2', foo3: 'bar3'} }
+      let(:kvs) { { foo1: 'bar1', foo2: 'bar2', foo3: 'bar3' } }
 
       it 'sets multiple key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'foo/bar/foo1',
-              'Value' => 'bar1'
-            }
-          },
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'foo/bar/foo2',
-              'Value' => 'bar2'
-            }
-          },
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'foo/bar/foo3',
-              'Value' => 'bar3'
-            }
-          }
-        ])
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'foo/bar/foo1',
+                                                         'Value' => 'bar1'
+                                                       }
+                                                     },
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'foo/bar/foo2',
+                                                         'Value' => 'bar2'
+                                                       }
+                                                     },
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'foo/bar/foo3',
+                                                         'Value' => 'bar3'
+                                                       }
+                                                     }
+                                                   ])
         proxy.set_keys(kvs)
       end
 
       it 'sets multiple global key value pairs' do
         expect(Diplomat::Kv).to receive(:txn).with([
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'global/foo/bar/foo1',
-              'Value' => 'bar1'
-            }
-          },
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'global/foo/bar/foo2',
-              'Value' => 'bar2'
-            }
-          },
-          {
-            'KV' => {
-              'Verb' => 'set',
-              'Key' => 'global/foo/bar/foo3',
-              'Value' => 'bar3'
-            }
-          }
-        ])
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'global/foo/bar/foo1',
+                                                         'Value' => 'bar1'
+                                                       }
+                                                     },
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'global/foo/bar/foo2',
+                                                         'Value' => 'bar2'
+                                                       }
+                                                     },
+                                                     {
+                                                       'KV' => {
+                                                         'Verb' => 'set',
+                                                         'Key' => 'global/foo/bar/foo3',
+                                                         'Value' => 'bar3'
+                                                       }
+                                                     }
+                                                   ])
         proxy.set_keys(kvs, global: true)
       end
     end

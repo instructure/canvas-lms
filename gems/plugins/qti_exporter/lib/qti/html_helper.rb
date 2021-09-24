@@ -24,12 +24,12 @@ module Qti
   module HtmlHelper
     WEBCT_REL_REGEX = "/webct/RelativeResourceManager/Template/"
 
-    def sanitize_html_string(string, remove_extraneous_nodes=false)
+    def sanitize_html_string(string, remove_extraneous_nodes = false)
       string = escape_unmatched_brackets(string)
       sanitize_html!(Nokogiri::HTML5.fragment(string), remove_extraneous_nodes)
     end
 
-    def sanitize_html!(node, remove_extraneous_nodes=false)
+    def sanitize_html!(node, remove_extraneous_nodes = false)
       # root may not be an html element, so we just sanitize its children so we
       # don't blow away the whole thing
       node.children.each do |child|
@@ -75,11 +75,13 @@ module Qti
         while true
           node.children.each do |child|
             break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+
             child.remove
           end
 
           node.children.reverse_each do |child|
             break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+
             child.remove
           end
           break unless node.children.size == 1 && ['p', 'div', 'span'].include?(node.child.name)
@@ -97,11 +99,11 @@ module Qti
     end
 
     def clear_html(text)
-      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) {|m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
+      text.gsub(/<\/?[^>\n]*>/, "").gsub(/&#\d+;/) { |m| m[2..-1].to_i.chr(text.encoding) rescue '' }.gsub(/&\w+;/, "").gsub(/(?:\\r\\n)+/, "\n")
     end
 
     def find_best_path_match(path)
-      @path_map[path] || @path_map[@sorted_paths.find{|k| k.end_with?(path)}]
+      @path_map[path] || @path_map[@sorted_paths.find { |k| k.end_with?(path) }]
     end
 
     # try to escape unmatched '<' and '>' characters because some people don't format their QTI correctly...

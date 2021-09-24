@@ -21,7 +21,6 @@
 require 'account_reports/report_helper'
 
 module AccountReports
-
   class CourseReports
     include ReportHelper
 
@@ -31,9 +30,9 @@ module AccountReports
     end
 
     def default_courses
-      root_account.all_courses.
-        select([:id, :sis_source_id, :name, :course_code, :start_at,
-                :conclude_at, :restrict_enrollments_to_course_dates])
+      root_account.all_courses
+                  .select([:id, :sis_source_id, :name, :course_code, :start_at,
+                           :conclude_at, :restrict_enrollments_to_course_dates])
     end
 
     def recently_deleted
@@ -54,7 +53,6 @@ module AccountReports
       courses = add_course_sub_account_scope(courses)
       courses = add_term_scope(courses)
 
-
       headers = []
       headers << I18n.t('id')
       headers << I18n.t('sis id')
@@ -66,7 +64,6 @@ module AccountReports
       headers << I18n.t('storage used in MB')
       headers << I18n.t('sum of all files in MB')
       write_report headers do |csv|
-
         total = courses.count(:all)
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
@@ -101,7 +98,6 @@ module AccountReports
       headers << I18n.t('#account_reports.report_header_start_date', 'start date')
       headers << I18n.t('#account_reports.report_header_end_date', 'end date')
       write_report headers do |csv|
-
         total = courses.count(:all)
         GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
@@ -126,15 +122,15 @@ module AccountReports
     end
 
     def unused_courses()
-      courses = root_account.all_courses.active.
-        select("courses.id, courses.name, courses.course_code,
+      courses = root_account.all_courses.active
+                            .select("courses.id, courses.name, courses.course_code,
                 courses.sis_source_id, courses.created_at,
            CASE WHEN courses.workflow_state = 'claimed' THEN 'unpublished'
                 WHEN courses.workflow_state = 'created' THEN 'unpublished'
                 WHEN courses.workflow_state = 'completed' THEN 'concluded'
                 WHEN courses.workflow_state = 'available' THEN 'active'
-            END AS course_state").
-        where("NOT EXISTS (SELECT NULL
+            END AS course_state")
+                            .where("NOT EXISTS (SELECT NULL
                            FROM #{Assignment.quoted_table_name} a
                            WHERE a.context_id = courses.id
                              AND a.context_type = 'Course'
@@ -189,5 +185,4 @@ module AccountReports
       end
     end
   end
-
 end

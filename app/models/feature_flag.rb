@@ -47,6 +47,7 @@ class FeatureFlag < ActiveRecord::Base
   def unhides_feature?
     return false unless Feature.definitions[feature].hidden?
     return true if context.is_a?(Account) && context.site_admin?
+
     parent_setting = Account.find(context.feature_flag_account_ids.last).lookup_feature_flag(feature, override_hidden: true)
     parent_setting.nil? || parent_setting.hidden?
   end
@@ -69,7 +70,7 @@ class FeatureFlag < ActiveRecord::Base
         context.feature_flag_cache.delete(context.feature_flag_cache_key(feature))
         context.touch if Feature.definitions[feature].try(:touch_context) || context.try(:root_account?)
 
-          if context.is_a?(Account)
+        if context.is_a?(Account)
           if context.site_admin?
             Switchman::DatabaseServer.send_in_each_region(context, :clear_cache_key, {}, :feature_flags)
           else
@@ -122,6 +123,7 @@ class FeatureFlag < ActiveRecord::Base
   def default_for_flag
     Feature.definitions[self.feature]&.state || 'undefined'
   end
+
   private
 
   def valid_state

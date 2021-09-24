@@ -59,7 +59,7 @@ describe Api::V1::GradeChangeEvent do
     skip("needs auditors cassandra keyspace configured") unless Auditors::GradeChange::Stream.available?
 
     @request_id = SecureRandom.uuid
-    allow(RequestContextGenerator).to receive_messages( :request_id => @request_id )
+    allow(RequestContextGenerator).to receive_messages(:request_id => @request_id)
 
     @domain_root_account = Account.default
 
@@ -68,14 +68,14 @@ describe Api::V1::GradeChangeEvent do
 
     @page_view = PageView.new { |p|
       p.assign_attributes({
-        :request_id => @request_id,
-        :remote_ip => '10.10.10.10'
-      })
+                            :request_id => @request_id,
+                            :remote_ip => '10.10.10.10'
+                          })
     }
 
     allow(PageView).to receive_messages(
       :find_by_id => @page_view,
-      :find_all_by_id => [ @page_view ]
+      :find_all_by_id => [@page_view]
     )
 
     @events = []
@@ -93,7 +93,7 @@ describe Api::V1::GradeChangeEvent do
     @events << @event
   end
 
-  it "should be formatted as a grade change event hash" do
+  it "is formatted as a grade change event hash" do
     event = subject.grade_change_event_json(@event, @student, @session)
 
     expect(event[:id]).to eq @event.id
@@ -143,22 +143,22 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:excused_after]).to eq false
   end
 
-  it "should be formatted as an array of grade change event hashes" do
+  it "is formatted as an array of grade change event hashes" do
     expect(subject.grade_change_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
-  it "should be formatted as an array of compound grade change event hashes" do
+  it "is formatted as an array of compound grade change event hashes" do
     json_hash = subject.grade_change_events_compound_json(@events, @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]
 
     expect(json_hash[:links]).to eq({
-      "events.assignment" => "#{subject.url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
-      "events.course" => "#{subject.url_root}/api/v1/courses/{events.course}",
-      "events.student" => { href: nil, type: 'user' },
-      "events.grader" => { href: nil, type: 'user' },
-      "events.page_view" => nil
-    })
+                                      "events.assignment" => "#{subject.url_root}/api/v1/courses/{events.course}/assignments/{events.assignment}",
+                                      "events.course" => "#{subject.url_root}/api/v1/courses/{events.course}",
+                                      "events.student" => { href: nil, type: 'user' },
+                                      "events.grader" => { href: nil, type: 'user' },
+                                      "events.page_view" => nil
+                                    })
 
     expect(json_hash[:events]).to eq subject.grade_change_events_json(@events, @user, @session)
 
@@ -170,7 +170,7 @@ describe Api::V1::GradeChangeEvent do
     expect(linked[:page_views].size).to eql(1)
   end
 
-  it "should handle an empty result set" do
+  it "handles an empty result set" do
     json_hash = subject.grade_change_events_compound_json([], @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]

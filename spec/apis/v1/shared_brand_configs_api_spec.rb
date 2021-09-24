@@ -21,11 +21,12 @@
 require_relative '../api_spec_helper'
 
 describe SharedBrandConfigsController, type: :request do
-
-  let(:brand_config) { BrandConfig.create!(variables: {"ic-brand-primary" => "#321"}) }
-  let(:shared_config) { Account.default.shared_brand_configs.create!(
-    name: "name before update",
-    brand_config_md5: brand_config.md5)
+  let(:brand_config) { BrandConfig.create!(variables: { "ic-brand-primary" => "#321" }) }
+  let(:shared_config) {
+    Account.default.shared_brand_configs.create!(
+      name: "name before update",
+      brand_config_md5: brand_config.md5
+    )
   }
 
   describe '#create' do
@@ -39,7 +40,7 @@ describe SharedBrandConfigsController, type: :request do
       }
     }
     let(:params) {
-      {shared_brand_config: {'name' => 'New Theme', 'brand_config_md5' => brand_config.md5}}
+      { shared_brand_config: { 'name' => 'New Theme', 'brand_config_md5' => brand_config.md5 } }
     }
 
     it "doesn't allow unauthorized access" do
@@ -52,27 +53,27 @@ describe SharedBrandConfigsController, type: :request do
       expect {
         json = api_call(:post, url, api_args_for_create, params)
         expect(json).to include({
-          "account_id" => Account.default.id,
-          "brand_config_md5" => brand_config.md5,
-          "name" => "New Theme",
-        })
+                                  "account_id" => Account.default.id,
+                                  "brand_config_md5" => brand_config.md5,
+                                  "name" => "New Theme",
+                                })
       }.to change(Account.default.shared_brand_configs, :count).by(1)
     end
 
     it "errors if invalid" do
       account_admin_user
       raw_api_call(:post, url, api_args_for_create, {
-        shared_brand_config: {
-          'name' => 'New Theme',
-          'brand_config_md5' => 'INVALID'
-        }
-      })
+                     shared_brand_config: {
+                       'name' => 'New Theme',
+                       'brand_config_md5' => 'INVALID'
+                     }
+                   })
       assert_status(422)
     end
   end
 
   describe "#update" do
-    let(:params) { {shared_brand_config: {'name' => 'Updated Name'}} }
+    let(:params) { { shared_brand_config: { 'name' => 'Updated Name' } } }
     let(:api_args_for_update) {
       {
         controller: 'shared_brand_configs',
@@ -82,7 +83,7 @@ describe SharedBrandConfigsController, type: :request do
         id: shared_config.id
       }
     }
-    let(:url) { "/api/v1/accounts/#{Account.default.id}/shared_brand_configs/#{shared_config.id}"}
+    let(:url) { "/api/v1/accounts/#{Account.default.id}/shared_brand_configs/#{shared_config.id}" }
 
     it "doesn't allow unauthorized access" do
       raw_api_call(:put, url, api_args_for_update, params)
@@ -102,12 +103,12 @@ describe SharedBrandConfigsController, type: :request do
     it "returns invalid for a bad md5" do
       account_admin_user
       json = api_call(:put, url, api_args_for_update, {
-        shared_brand_config: { brand_config_md5: 'abc' }
-      }, {}, expected_status: 422)
+                        shared_brand_config: { brand_config_md5: 'abc' }
+                      }, {}, expected_status: 422)
     end
   end
 
-  describe  "#destroy" do
+  describe "#destroy" do
     let(:api_args_for_destroy) {
       {
         controller: 'shared_brand_configs',
@@ -116,7 +117,7 @@ describe SharedBrandConfigsController, type: :request do
         id: shared_config.id
       }
     }
-    let(:url) { "/api/v1/shared_brand_configs/#{shared_config.id}"}
+    let(:url) { "/api/v1/shared_brand_configs/#{shared_config.id}" }
 
     it "doesn't allow unauthorized access" do
       raw_api_call(:delete, url, api_args_for_destroy)

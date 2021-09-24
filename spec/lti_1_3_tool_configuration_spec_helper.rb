@@ -51,17 +51,17 @@ RSpec.shared_context "lti_1_3_tool_configuration_spec_helper", shared_context: :
       'title' => 'LTI 1.3 Tool',
       'description' => '1.3 Tool',
       'target_link_uri' => target_link_uri,
-      'custom_fields' => {'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo'},
+      'custom_fields' => { 'has_expansion' => '$Canvas.user.id', 'no_expansion' => 'foo' },
       'public_jwk' => public_jwk,
       'oidc_initiation_url' => oidc_initiation_url,
       'scopes' => scopes,
-      'extensions' =>  [
+      'extensions' => [
         {
           'platform' => 'canvas.instructure.com',
           'privacy_level' => 'public',
           'tool_id' => 'LTI 1.3 Test Tool',
           'domain' => 'http://lti13testtool.docker',
-          'settings' =>  {
+          'settings' => {
             'icon_url' => 'https://static.thenounproject.com/png/131630-200.png',
             'selection_height' => 500,
             'selection_width' => 500,

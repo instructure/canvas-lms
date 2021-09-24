@@ -80,10 +80,10 @@ class DataServicesEventsLoader
 
   def event_types
     @event_types ||= begin
-      files.
-        group_by { |file_path| extrat_category_from_file_path(file_path) }.
-        sort.
-        to_h
+      files
+        .group_by { |file_path| extrat_category_from_file_path(file_path) }
+        .sort
+        .to_h
     end
   end
 

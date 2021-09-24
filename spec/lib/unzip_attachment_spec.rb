@@ -39,15 +39,15 @@ describe UnzipAttachment do
 
   context "unzipping" do
     let(:filename) { fixture_filename('attachments.zip') }
-    let(:unzipper) { UnzipAttachment.new( :course => @course, :filename => filename) }
+    let(:unzipper) { UnzipAttachment.new(:course => @course, :filename => filename) }
 
-    it "should store a course, course_files_folder, and filename" do
+    it "stores a course, course_files_folder, and filename" do
       expect(unzipper.course).to eql(@course)
       expect(unzipper.filename).to eql(filename)
       expect(unzipper.course_files_folder).to eql(@folder)
     end
 
-    it "should be able to take a root_directory argument" do
+    it "is able to take a root_directory argument" do
       add_folder_to_course('a special folder')
       root_zipper = UnzipAttachment.new(:course => @course, :filename => filename, :root_directory => @folder)
       expect(root_zipper.course_files_folder).to eql(@folder)
@@ -59,15 +59,15 @@ describe UnzipAttachment do
       let(:first_attachment) { @course.attachments.where(display_name: 'first_entry.txt').first }
       let(:second_attachment) { @course.attachments.where(display_name: 'second_entry.txt').first }
 
-      it "should unzip the file, create folders, and stick the contents of the zipped file as attachments in the folders" do
+      it "unzips the file, create folders, and stick the contents of the zipped file as attachments in the folders" do
         expect(first_attachment).not_to be_nil
         expect(first_attachment.folder.name).to eql('course files')
         expect(second_attachment).not_to be_nil
         expect(second_attachment.folder.full_name).to eql('course files/adir')
-        expect(@course.folders.where(full_name:'course files/adir')).to be_exists
+        expect(@course.folders.where(full_name: 'course files/adir')).to be_exists
       end
 
-      it "should be able to overwrite files in a folder on the database (if their md5 differs)" do
+      it "is able to overwrite files in a folder on the database (if their md5 differs)" do
         # Not overwriting FileInContext.attach, so we're actually attaching the files now.
         # The identical @us.process guarantees that every file attached the second time
         # overwrites a file that was already there if it needs to.
@@ -79,14 +79,14 @@ describe UnzipAttachment do
         attachment_group_1 = @course.attachments.where(display_name: 'first_entry.txt').to_a
         expect(attachment_group_1.size).to eql(2)
         expect(first_attachment.reload.file_state).to eq 'deleted'
-        expect(attachment_group_1.any?{|a| a.file_state == 'available' }).to eql(true)
+        expect(attachment_group_1.any? { |a| a.file_state == 'available' }).to eql(true)
 
         attachment_group_2 = @course.attachments.where(display_name: 'second_entry.txt').to_a
         expect(attachment_group_2.size).to eql(1)
         expect(attachment_group_2.first.file_state).to eq 'available'
       end
 
-      it "should update attachment items in modules when overwriting their files via zip upload" do
+      it "updates attachment items in modules when overwriting their files via zip upload" do
         context_module = @course.context_modules.create!(:name => "teh module")
         attachment_tag = context_module.add_item(:id => first_attachment.id, :type => 'attachment')
         Attachment.where(:id => first_attachment).update_all(:md5 => "somethingelse")
@@ -104,14 +104,14 @@ describe UnzipAttachment do
       end
     end
 
-    it "should update progress as it goes" do
+    it "updates progress as it goes" do
       progress = nil
       unzipper.progress_proc = Proc.new { |pct| progress = pct }
       unzipper.process
       expect(progress).not_to be_nil
     end
 
-    it "should import files alphabetically" do
+    it "imports files alphabetically" do
       filename = fixture_filename('alphabet_soup.zip')
       Zip::File.open(filename) do |zip|
         # make sure the files aren't read from the zip in alphabetical order (so it's not alphabetized by chance)
@@ -127,7 +127,7 @@ describe UnzipAttachment do
       end
     end
 
-    it "should not fall over when facing a filename starting with ~" do
+    it "does not fall over when facing a filename starting with ~" do
       filename = fixture_filename('tilde.zip')
       ua = UnzipAttachment.new(:course => @course, :filename => filename)
       expect { ua.process }.not_to raise_error
@@ -135,23 +135,22 @@ describe UnzipAttachment do
     end
 
     describe 'validations' do
-
       let(:filename) { fixture_filename('huge_zip.zip') }
 
       it 'errors when the number of files in the zip exceed the configured limit' do
         current_setting = Setting.get('max_zip_file_count', '100000')
         Setting.set('max_zip_file_count', '9')
-        expect{ unzipper.process }.to raise_error(ArgumentError, "Zip File cannot have more than 9 entries")
+        expect { unzipper.process }.to raise_error(ArgumentError, "Zip File cannot have more than 9 entries")
         Setting.set('max_zip_file_count', current_setting)
       end
 
       it 'errors when the file quotas push the context over its quota' do
-        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
-        expect{ unzipper.process }.to raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
+        expect { unzipper.process }.to raise_error(Attachment::OverQuotaError, "Zip file would exceed quota limit")
       end
 
-      it 'should be able to rescue the file quota error' do
-        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
+      it 'is able to rescue the file quota error' do
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
         unzipper.process rescue nil
       end
     end
@@ -167,25 +166,24 @@ describe UnzipAttachment do
       let(:filename) { fixture_filename('zipbomb.zip') }
 
       it 'double-checks the extracted file sizes in case the central directory lies' do
-        allow(Attachment).to receive(:get_quota).and_return({:quota => 5000, :quota_used => 0})
-        expect{ unzipper.process }.to raise_error(Attachment::OverQuotaError)
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 5000, :quota_used => 0 })
+        expect { unzipper.process }.to raise_error(Attachment::OverQuotaError)
         # a and b should have been attached
         # but we should have bailed once c ate the remaining quota
         expect(@course.attachments.count).to eql 2
       end
 
       it "doesn't interfere when the quota is 0 (unlimited)" do
-        allow(Attachment).to receive(:get_quota).and_return({:quota => 0, :quota_used => 0})
-        expect{ unzipper.process }.not_to raise_error
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 0, :quota_used => 0 })
+        expect { unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end
 
       it "lets incorrect central directory size slide if the quota isn't exceeded" do
-        allow(Attachment).to receive(:get_quota).and_return({:quota => 15000, :quota_used => 0})
-        expect{ unzipper.process }.not_to raise_error
+        allow(Attachment).to receive(:get_quota).and_return({ :quota => 15000, :quota_used => 0 })
+        expect { unzipper.process }.not_to raise_error
         expect(@course.attachments.count).to eql 4
       end
     end
-
   end
 end

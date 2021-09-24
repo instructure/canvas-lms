@@ -44,19 +44,19 @@ module Quizzes::QuizQuestion::AnswerParsers
         # duplicate text in options need the same match_id
         right_text = a[:right]
         if match_ids[right_text]
-          answer[:match_id] =  match_ids[right_text]
+          answer[:match_id] = match_ids[right_text]
         else
           match_ids[right_text] = answer.set_id(answer_group.taken_ids, :match_id)
           answer_group.taken_ids << match_ids[right_text]
         end
         answer_group.taken_ids << answer.set_id(answer_group.taken_ids)
 
-        question[:matches] << {match_id: a[:match_id], text: a[:right]}
+        question[:matches] << { match_id: a[:match_id], text: a[:right] }
 
         answer
       end
       question[:matching_answer_incorrect_matches].split("\n").each do |other|
-        fields = Quizzes::QuizQuestion::RawFields.new({distractor: other[0..255]})
+        fields = Quizzes::QuizQuestion::RawFields.new({ distractor: other[0..255] })
         question.match_group.add(text: fields.fetch_with_enforced_length(:distractor))
       end
 
@@ -65,6 +65,5 @@ module Quizzes::QuizQuestion::AnswerParsers
 
       question
     end
-
   end
 end

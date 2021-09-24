@@ -43,7 +43,6 @@ RSpec.configure do |config|
   end
 end
 
-
 module Rails
   def self.cache
     @cache ||= ActiveSupport::Cache::MemoryStore.new

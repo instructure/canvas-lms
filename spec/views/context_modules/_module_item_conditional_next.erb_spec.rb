@@ -29,7 +29,7 @@ describe "/context_modules/_module_item_conditional_next" do
     context_module.add_item type: 'assignment', id: @assignment.id
   end
 
-  it "should show mastery path selection" do
+  it "shows mastery path selection" do
     render partial: 'context_modules/module_item_conditional_next', locals: {
       module_item: module_item,
       item_data: { mastery_paths: { locked: true } }
@@ -37,7 +37,7 @@ describe "/context_modules/_module_item_conditional_next" do
     expect(rendered).to match(/until .* is graded/)
   end
 
-  it "should show mastery path locked" do
+  it "shows mastery path locked" do
     render partial: 'context_modules/module_item_conditional_next', locals: {
       module_item: module_item,
       item_data: {
@@ -50,7 +50,7 @@ describe "/context_modules/_module_item_conditional_next" do
     expect(rendered).to match('Choose Assignment Group')
   end
 
-  it "should show mastery path still processing" do
+  it "shows mastery path still processing" do
     render partial: 'context_modules/module_item_conditional_next', locals: {
       module_item: module_item,
       item_data: { mastery_paths: { still_processing: true } }

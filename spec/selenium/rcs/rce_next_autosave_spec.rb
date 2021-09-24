@@ -61,7 +61,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       edit_announcement
     end
 
-    it 'should autosave' do
+    it 'autosaves' do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -69,7 +69,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should autosave htmlview entered content' do
+    it 'autosaves htmlview entered content' do
       create_and_edit_announcement
       switch_to_html_view
       f('textarea#discussion-topic-message10').send_keys('html text')
@@ -83,7 +83,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should prompt to restore autosaved content' do
+    it 'prompts to restore autosaved content' do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -102,7 +102,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should be scoped to the user' do
+    it 'is scoped to the user' do
       # Start with the first teacher creating an announcement and verify the data autosaved
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
@@ -130,7 +130,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     end
 
     # localStorage in chrome is limitedto 5120k, and that seems to include the key
-    it 'should handle quota exceeded', ignore_js_errors: true do
+    it 'handles quota exceeded', ignore_js_errors: true do
       # remove ignore_js_errors in LS-1163
       get '/'
       driver.local_storage.clear
@@ -144,7 +144,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     # get '/' is emitting
     # "Warning: [themeable] A theme registry has already been initialized. Ensure that you are importing only one copy of '@instructure/ui-themeable'."
     # It's a warning but logged as an error. I don't believe it is, and I can't find it. Ignore it.
-    it 'should make room if quota is exceeded due to other rce auto save data',
+    it 'makes room if quota is exceeded due to other rce auto save data',
        ignore_js_errors: true do
       get '/'
       driver.local_storage.clear
@@ -157,7 +157,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should clean up expired autosaved entries', ignore_js_errors: true do
+    it 'cleans up expired autosaved entries', ignore_js_errors: true do
       get '/'
       driver.local_storage.clear
       Timecop.freeze(2.hours.ago) do
@@ -170,7 +170,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it "should clean up this page's expired autosaved entries before prompting to restore" do
+    it "cleans up this page's expired autosaved entries before prompting to restore" do
       skip('Hopefully addressed in LA-355')
       # I con't know why, but this fails flakey-spec-catcher. And when it doesn't
       # some other spec in here will. I give up. skipping.
@@ -188,7 +188,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should remove placholder images from autosaved content' do
+    it 'removes placholder images from autosaved content' do
       create_and_edit_announcement
 
       # simulate a placeholder image
@@ -230,7 +230,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       user_session(@admin)
     end
 
-    it 'should not prompt to restore autosaved content if the RCE is hidden',
+    it 'does not prompt to restore autosaved content if the RCE is hidden',
        ignore_js_errors: true do
       get "/accounts/#{@account.id}/settings#tab-announcements"
       wait_for_rce

@@ -38,7 +38,7 @@ module Lti
 
     def initialize(options = {})
       @post_only = options[:post_only]
-      @tool_dimensions = options[:tool_dimensions] || {selection_height: '100%', selection_width: '100%'}
+      @tool_dimensions = options[:tool_dimensions] || { selection_height: '100%', selection_width: '100%' }
     end
 
     def post_message_token
@@ -68,9 +68,8 @@ module Lti
 
     def analytics_message_type
       @analytics_message_type ||
-          (params['lti_message_type'] == 'basic-lti-launch-request' ? 'tool_launch' : params['lti_message_type']) ||
-          'tool_launch'
+        (params['lti_message_type'] == 'basic-lti-launch-request' ? 'tool_launch' : params['lti_message_type']) ||
+        'tool_launch'
     end
-
   end
 end

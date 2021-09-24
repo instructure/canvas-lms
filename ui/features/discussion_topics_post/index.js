@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import renderCanvasDiscussionPosts from './react/index'
+import {DiscussionTopicsPost} from './react/index'
 import ready from '@instructure/ready'
 import $ from 'jquery'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 ready(() => {
-  renderCanvasDiscussionPosts(ENV, $('<div/>').appendTo('#content')[0])
+  ReactDOM.render(
+    <DiscussionTopicsPost discussionTopicId={ENV.discussion_topic_id} />,
+    $('<div/>').appendTo('#content')[0]
+  )
 })
 if (ENV.SEQUENCE != null) {
+  // eslint-disable-next-line promise/catch-or-return
   import('@canvas/module-sequence-footer').then(() => {
     $(() => {
       $('<div id="module_sequence_footer" style="margin-top: 30px" />')

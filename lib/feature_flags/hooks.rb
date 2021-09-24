@@ -95,22 +95,23 @@ module FeatureFlags
     def self.conditional_release_after_change_hook(_user, context, _old_state, new_state)
       if context.is_a?(Course) && new_state == "off"
         ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
-            n_strand: ["conditional_release_unassignment", context.global_root_account_id]).
-          release_mastery_paths_content_in_course(context)
+                                                        n_strand: ["conditional_release_unassignment", context.global_root_account_id])
+                                   .release_mastery_paths_content_in_course(context)
       end
     end
 
     def self.mastery_scales_after_change_hook(_user, context, _old_state, new_state)
       if context.is_a?(Account) && OutcomesService::Service.enabled_in_context?(context)
         OutcomesService::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
-            n_strand: [
-              'outcomes_service_toggle_context_proficiencies_feature_flag',
-              context.global_root_account_id
-            ]).
-          toggle_feature_flag(
-            context.root_account,
-            'context_proficiencies',
-            new_state == 'on')
+                                                     n_strand: [
+                                                       'outcomes_service_toggle_context_proficiencies_feature_flag',
+                                                       context.global_root_account_id
+                                                     ])
+                                .toggle_feature_flag(
+                                  context.root_account,
+                                  'context_proficiencies',
+                                  new_state == 'on'
+                                )
       end
     end
   end

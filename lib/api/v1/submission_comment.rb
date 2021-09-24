@@ -58,16 +58,16 @@ module Api::V1::SubmissionComment
         sc_hash['avatar_path'] = User.default_avatar_fallback
       end
       sc_hash.merge!({
-                      author: {},
-                      author_id: nil,
-                      author_name: I18n.t("Anonymous User")
+                       author: {},
+                       author_id: nil,
+                       author_name: I18n.t("Anonymous User")
                      })
     end
     sc_hash
   end
 
   def submission_comments_json(submission_comments, user)
-    submission_comments.map{ |submission_comment| submission_comment_json(submission_comment, user) }
+    submission_comments.map { |submission_comment| submission_comment_json(submission_comment, user) }
   end
 
   def anonymous_moderated_submission_comments_json(assignment:, submissions:, submission_comments:, current_user:, course:, avatars:)
@@ -86,8 +86,8 @@ module Api::V1::SubmissionComment
       )
 
       if anonymous_students?(current_user: current_user, assignment: assignment) &&
-          student_anonymous_ids.key?(author_id) &&
-          comment.author != current_user
+         student_anonymous_ids.key?(author_id) &&
+         comment.author != current_user
 
         json.delete(:author_id)
         json.delete(:author_name)
@@ -110,30 +110,34 @@ module Api::V1::SubmissionComment
 
   def anonymous_students?(current_user:, assignment:)
     return @anonymous_students if defined? @anonymous_students
+
     @anonymous_students = !assignment.can_view_student_names?(current_user)
   end
 
   def anonymous_graders?(current_user:, assignment:)
     return @anonymous_graders if defined? @anonymous_graders
+
     @anonymous_graders = !assignment.can_view_other_grader_identities?(current_user)
   end
 
   def grader_comments_hidden?(current_user:, assignment:)
     return @grader_comments_hidden if defined? @grader_comments_hidden
+
     @grader_comments_hidden = !assignment.can_view_other_grader_comments?(current_user)
   end
 
   def student_ids_to_anonymous_ids(current_user:, assignment:, course:, submissions:)
     return @student_ids_to_anonymous_ids if defined? @student_ids_to_anonymous_ids
+
     # ensure each student has membership, even without a submission
     student_ids = students(current_user: current_user, assignment: assignment, course: course).pluck(:id)
-    @student_ids_to_anonymous_ids = student_ids.each_with_object({}) {|student_id, map| map[student_id.to_s] = nil}
+    @student_ids_to_anonymous_ids = student_ids.each_with_object({}) { |student_id, map| map[student_id.to_s] = nil }
     missing_student_ids = student_ids - submissions.map(&:user_id)
     missing_submissions = if missing_student_ids.empty?
-      []
-    else
-      Submission.where(assignment: assignment, user_id: missing_student_ids)
-    end
+                            []
+                          else
+                            Submission.where(assignment: assignment, user_id: missing_student_ids)
+                          end
 
     (submissions + missing_submissions).each do |submission|
       @student_ids_to_anonymous_ids[submission.user_id.to_s] = submission.anonymous_id

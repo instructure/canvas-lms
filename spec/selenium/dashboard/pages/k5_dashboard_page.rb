@@ -121,6 +121,10 @@ module K5DashboardPageObject
     "[data-testid = 'empty-dash-panda']:visible"
   end
 
+  def empty_groups_image_selector
+    "[data-testid='empty-groups-image']"
+  end
+
   def empty_subject_home_selector
     "[data-testid = 'empty-home-panda']:visible"
   end
@@ -135,6 +139,18 @@ module K5DashboardPageObject
 
   def grades_tab_selector
     '#tab-tab-grades'
+  end
+
+  def group_management_button_selector(button_type)
+    "button:contains('#{button_type}')"
+  end
+
+  def groups_tab_selector
+    "#tab-tab-groups"
+  end
+
+  def group_titles_selector
+    ".student-group-header h2"
   end
 
   def home_tab_selector
@@ -171,6 +187,10 @@ module K5DashboardPageObject
 
   def manage_button_selector
     "[data-testid = 'manage-button']"
+  end
+
+  def manage_groups_button_selector
+    "#k5-manage-groups-btn"
   end
 
   def manage_home_button_selector
@@ -383,6 +403,10 @@ module K5DashboardPageObject
     fj(empty_dashboard_selector)
   end
 
+  def empty_groups_image
+    f(empty_groups_image_selector)
+  end
+
   def empty_subject_home
     fj(empty_subject_home_selector)
   end
@@ -397,6 +421,18 @@ module K5DashboardPageObject
 
   def grades_tab
     f(grades_tab_selector)
+  end
+
+  def group_management_buttons(button_text)
+    ffj(group_management_button_selector(button_text))
+  end
+
+  def groups_tab
+    f(groups_tab_selector)
+  end
+
+  def group_titles
+    ff(group_titles_selector)
   end
 
   def home_tab
@@ -429,6 +465,10 @@ module K5DashboardPageObject
 
   def manage_button
     f(manage_button_selector)
+  end
+
+  def manage_groups_button
+    f(manage_groups_button_selector)
   end
 
   def manage_home_button
@@ -571,6 +611,10 @@ module K5DashboardPageObject
     subject_items_due(title).click
   end
 
+  def click_group_join_button(button_selector)
+    button_selector.click
+  end
+
   def click_homeroom_course_title(course_title)
     homeroom_course_title_link(course_title).click
   end
@@ -578,6 +622,10 @@ module K5DashboardPageObject
   def click_manage_button
     manage_button.click
     wait_for(method: nil, timeout: 2) { course_navigation_tray }
+  end
+
+  def click_manage_groups_button
+    manage_groups_button.click
   end
 
   def click_missing_subject_item(title)
@@ -668,6 +716,10 @@ module K5DashboardPageObject
 
   #------------------------------Retrieve Text----------------------#
 
+  def group_titles_text_list
+    group_titles.map(&:text)
+  end
+
   def retrieve_title_text
     course_dashboard_title.text
   end
@@ -712,6 +764,10 @@ module K5DashboardPageObject
 
   def input_color_hex_value(hex_value)
     selected_color_input.send_keys(hex_value)
+  end
+
+  def groups_tab_exists?
+    element_exists?(groups_tab_selector)
   end
 
   def modules_tab_exists?

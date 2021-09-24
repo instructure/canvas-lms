@@ -23,8 +23,8 @@ module ConditionalRelease
     include Concerns::ApiToNestedAttributes
 
     before_action :get_context, :require_user
-    before_action :require_course_assignment_edit_permissions, only: [ :update, :destroy ]
-    before_action :require_course_assignment_add_or_edit_permissions, only: [ :create ]
+    before_action :require_course_assignment_edit_permissions, only: [:update, :destroy]
+    before_action :require_course_assignment_add_or_edit_permissions, only: [:create]
     before_action :require_course_view_permissions
 
     # GET /api/rules
@@ -83,7 +83,7 @@ module ConditionalRelease
     def destroy
       rule = get_rule
       rule.destroy!
-      render json: {:success => true}
+      render json: { :success => true }
     end
 
     private
@@ -109,11 +109,9 @@ module ConditionalRelease
     def add_ordering_to(attrs)
       # Loop through each of the ranges, ordering them
       arrange_items(attrs[:scoring_ranges]) do |range|
-
         # Then through each of the sets, ordering them within the context
         # of the range
         arrange_items(range[:assignment_sets]) do |set|
-
           # Then the assignments, in the context of the assignment set within
           # the range
           arrange_items(set[:assignment_set_associations])

@@ -244,16 +244,16 @@ describe "Default Account Reports" do
     @enrollment4 = create_enrollment(@course1, @user3, sis_batch_id: @sis.id)
     @enrollment5 = create_enrollment(@course2, @user3, sis_batch_id: @sis.id)
     @enrollment6 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
-                                     enrollment_state: 'deleted')
+                                                       enrollment_state: 'deleted')
     @enrollment7 = create_enrollment(@course2, @user1, sis_batch_id: @sis.id, enrollment_type: 'ObserverEnrollment',
-                                     associated_user_id: @user3.id)
+                                                       associated_user_id: @user3.id)
     @enrollment8 = create_enrollment(@course4, @user5, enrollment_type: 'TeacherEnrollment')
     @enrollment9 = create_enrollment(@course1, @user4, sis_batch_id: @sis.id, enrollment_type: 'TeacherEnrollment',
-                                     section: @section1)
+                                                       section: @section1)
     @enrollment10 = create_enrollment(@course1, @user6, enrollment_type: 'TeacherEnrollment',
-                                      enrollment_state: 'completed')
+                                                        enrollment_state: 'completed')
     @enrollment11 = create_enrollment(@course2, @user4, sis_batch_id: @sis.id, enrollment_type: 'DesignerEnrollment',
-                                      role: @role)
+                                                        role: @role)
     @enrollment12 = create_enrollment(@course4, @user4, enrollment_state: 'creation_pending')
   end
 
@@ -307,7 +307,7 @@ describe "Default Account Reports" do
     @template2 = MasterCourses::MasterTemplate.set_as_master_course(@bc2)
     @ac1_a = Course.create!(:name => 'ac1 a', :account => @account, :sis_source_id => "SIS_CHILD_BC1_A")
     @ac1_b = Course.create!(:name => 'ac1 b', :account => @account, :sis_source_id => "SIS_CHILD_BC1_B")
-    [@ac1_a, @ac1_b].each{|ac| @template1.add_child_course!(ac)}
+    [@ac1_a, @ac1_b].each { |ac| @template1.add_child_course!(ac) }
     @ac2 = Course.create!(:name => 'ac2', :account => @account, :sis_source_id => "SIS_CHILD_BC2")
     @template2.add_child_course!(@ac2)
   end
@@ -322,7 +322,7 @@ describe "Default Account Reports" do
              when 'provisioning'
                %w(canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
                   full_name sortable_name short_name email status created_by_sis)
-    end
+             end
     header << 'pronouns' if @report.should_add_pronouns?
     header
   end
@@ -341,7 +341,7 @@ describe "Default Account Reports" do
           when 'provisioning'
             [user.id.to_s, pseudonym&.sis_user_id, pseudonym&.integration_id, pseudonym&.authentication_provider_id, pseudonym&.unique_id,
              first_name, last_name, user.name, user.sortable_name, nil, user.email, state, pseudonym&.sis_batch_id?&.to_s]
-    end
+          end
     row << user.pronouns if @report.should_add_pronouns?
     row
   end
@@ -362,22 +362,21 @@ describe "Default Account Reports" do
         @report = AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
       end
 
-      it 'should evaluate to true when enabled' do
+      it 'evaluates to true when enabled' do
         expect(@report.should_add_pronouns?).to eq(true)
       end
 
-      it 'should evaluate to false when not enabled' do
+      it 'evaluates to false when not enabled' do
         @account.settings[:can_add_pronouns] = false
         @account.save!
         expect(@report.should_add_pronouns?).to eq(false)
       end
 
-      it 'should evaluate to false when disabled for just report' do
+      it 'evaluates to false when disabled for just report' do
         @account.settings[:enable_sis_export_pronouns] = false
         @account.save!
         expect(@report.should_add_pronouns?).to eq(false)
       end
-
     end
 
     describe "Users" do
@@ -385,50 +384,50 @@ describe "Default Account Reports" do
         create_some_users_with_pseudonyms
       end
 
-      it "should run sis report with term parameter and include deleted users" do
+      it "runs sis report with term parameter and include deleted users" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
-        #term does not impact user report
+        # term does not impact user report
         parameters["include_deleted"] = true
         parameters["created_by_sis"] = true
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 0 })
         headers = parsed.shift
         expect(headers).to eq user_headers
         expect(parsed.length).to eq 4
         expect(parsed).to eq([@user1, @user2, @user3, @user5].map { |u| expected_user(u) })
       end
 
-      it "should run sis report" do
+      it "runs sis report" do
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed.length).to eq 4
 
         expect(parsed).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
       end
 
-      it "should not add pronouns if not enabled for the account" do
+      it "does not add pronouns if not enabled for the account" do
         @account.settings[:can_add_pronouns] = false
         @account.save!
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed.first.last).to eq('active')
       end
 
-      it "should add pronouns if enabled for the account" do
+      it "adds pronouns if enabled for the account" do
         @account.settings[:can_add_pronouns] = true
         @account.save!
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed.shift.last).to eq 'human/being'
         expect(parsed.shift.last).to eq 'She/Her'
         expect(parsed).to eq([@user3, @user4].map { |u| expected_user(u) })
       end
 
-      it "should run sis report on a sub_account" do
+      it "runs sis report on a sub_account" do
         create_an_account
         @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101')
         @course1.account_id = @sub_account.id
@@ -438,15 +437,15 @@ describe "Default Account Reports" do
 
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, account: @sub_account})
+        parsed = read_report("sis_export_csv", { params: parameters, account: @sub_account })
         expect(parsed.length).to eq 1
         expect(parsed).to match_array([expected_user(@user1)])
       end
 
-      it "should run provisioning report" do
+      it "runs provisioning report" do
         parameters = {}
         parameters["users"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: [1, 2], header: true})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [1, 2], header: true })
 
         headers = parsed.shift
         expect(headers).to eq user_headers(format: 'provisioning')
@@ -454,14 +453,14 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user6, @user7, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') })
       end
 
-      it "should run provisioning report including deleted users for course" do
+      it "runs provisioning report including deleted users for course" do
         c = Course.create(:name => 'course1')
         c.student_view_student
         parameters = {}
         parameters["users"] = true
         parameters["include_deleted"] = true
         parameters["created_by_sis"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: [1, 2]})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [1, 2] })
         expect(parsed.length).to eq 4
 
         expect(parsed).to eq([@user1, @user2, @user3, @user5].map { |u| expected_user(u, format: 'provisioning') })
@@ -473,11 +472,11 @@ describe "Default Account Reports" do
         create_some_accounts
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
         parameters["accounts"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [["sub1", nil, "English", "active"],
@@ -485,20 +484,20 @@ describe "Default Account Reports" do
                                        ["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the SIS report on a sub account" do
+      it "runs the SIS report on a sub account" do
         parameters = {}
         parameters["accounts"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, account: @sub_account})
+        parsed = read_report("sis_export_csv", { params: parameters, account: @sub_account })
 
         expect(parsed.length).to eq 1
         expect(parsed).to match_array [["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the SIS report including deleted accounts" do
+      it "runs the SIS report including deleted accounts" do
         parameters = {}
         parameters["accounts"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [["sub1", nil, "English", "active"],
@@ -507,12 +506,12 @@ describe "Default Account Reports" do
                                        ["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the provisioning report including deleted accounts" do
+      it "runs the provisioning report including deleted accounts" do
         parameters = {}
         parameters["accounts"] = true
         parameters["enrollment_term"] = ''
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
 
         expect(parsed.length).to eq 5
         expect(parsed).to match_array [[@sub_account.id.to_s, "sub1", @account.id.to_s,
@@ -533,12 +532,12 @@ describe "Default Account Reports" do
         create_some_terms
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = @term3.id
         parameters["include_deleted"] = true
         parameters["terms"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 2
         expect(parsed).to match_array [["fall12", "Fall", "active", @term1.start_at.iso8601,
@@ -547,10 +546,10 @@ describe "Default Account Reports" do
                                         @term2.end_at.iso8601]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["terms"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 2})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 2 })
 
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@default_term.id.to_s, nil, "Default Term", "active", nil, nil, "false"],
@@ -560,11 +559,11 @@ describe "Default Account Reports" do
                                         @term3.start_at.iso8601, @term3.end_at.iso8601, "false"]]
       end
 
-      it "should run the provisioning report with deleted terms" do
+      it "runs the provisioning report with deleted terms" do
         parameters = {}
         parameters["terms"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 2})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 2 })
 
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@default_term.id.to_s, nil, "Default Term", "active", nil, nil, "false"],
@@ -582,11 +581,11 @@ describe "Default Account Reports" do
         create_some_courses
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = ''
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@course1.sis_source_id, nil, @course1.course_code, @course1.name,
@@ -597,13 +596,13 @@ describe "Default Account Reports" do
                                        ["SIS_COURSE_ID_3", nil, "SCI101", "Science 101", nil, nil, "active", nil, nil, nil, nil]]
       end
 
-      it "should run the SIS report with sis term and deleted courses" do
+      it "runs the SIS report with sis term and deleted courses" do
         @course1.complete
         parameters = {}
         parameters["enrollment_term_id"] = "sis_term_id:fall12"
         parameters["include_deleted"] = true
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 2
         expect(parsed).to match_array [[@course1.sis_source_id, nil, @course1.course_code, @course1.name,
@@ -613,14 +612,14 @@ describe "Default Account Reports" do
                                         "fall12", "deleted", nil, nil, nil, nil]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         @course6.destroy
         @course4.destroy
         Course.where(id: @course6.id).update_all(updated_at: 122.days.ago)
         parameters = {}
         parameters["include_deleted"] = true
         parameters["courses"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 3})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 3 })
 
         expect(parsed).to match_array [[@course5.id.to_s, @course5.sis_source_id, nil,
                                         @course5.course_code, @course5.name,
@@ -646,19 +645,19 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 5
       end
 
-      it "should run the sis report on a sub account" do
+      it "runs the sis report on a sub account" do
         parameters = {}
         parameters["courses"] = true
         # all I care about is that it didn't throw a database error due to ambiguous columns
         expect {
-          read_report("sis_export_csv", {params: parameters, account: @sub_account})
+          read_report("sis_export_csv", { params: parameters, account: @sub_account })
         }.not_to raise_error
       end
 
-      it "should run the provisioning report on a sub account" do
+      it "runs the provisioning report on a sub account" do
         parameters = {}
         parameters["courses"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 3})
+        parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 3 })
 
         expect(parsed.length).to eq 1
         expect(parsed).to match_array [[@course1.id.to_s, @course1.sis_source_id, nil,
@@ -669,11 +668,11 @@ describe "Default Account Reports" do
                                         @course1.conclude_at.iso8601, @course1.course_format, nil, "true"]]
       end
 
-      it "should run the sis report with the default term" do
+      it "runs the sis report with the default term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 2
         expect(parsed).to match_array [["SIS_COURSE_ID_2", nil, "MAT101", "Math 101", nil,
@@ -681,36 +680,35 @@ describe "Default Account Reports" do
                                        ["SIS_COURSE_ID_3", nil, "SCI101", "Science 101", nil, nil, "active", nil, nil, nil, nil]]
       end
 
-      it "should export blueprint course stuff for sis export" do
+      it "exports blueprint course stuff for sis export" do
         create_some_blueprint_course_stuff
         parsed = read_report("sis_export_csv",
-          {params: {"enrollment_term_id" => @default_term.id, "courses" => true}, order: 0, parse_header: true})
-        expect(parsed.detect{|r| r["course_id"] == @ac1_a.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
-        expect(parsed.detect{|r| r["course_id"] == @ac1_b.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
-        expect(parsed.detect{|r| r["course_id"] == @ac2.sis_source_id}["blueprint_course_id"]).to eq @bc2.sis_source_id
+                             { params: { "enrollment_term_id" => @default_term.id, "courses" => true }, order: 0, parse_header: true })
+        expect(parsed.detect { |r| r["course_id"] == @ac1_a.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect { |r| r["course_id"] == @ac1_b.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect { |r| r["course_id"] == @ac2.sis_source_id }["blueprint_course_id"]).to eq @bc2.sis_source_id
       end
 
-      it "should export blueprint course stuff for provisioning csv" do
+      it "exports blueprint course stuff for provisioning csv" do
         create_some_blueprint_course_stuff
         parsed = read_report("provisioning_csv",
-          {params: {"enrollment_term_id" => @default_term.id, "courses" => true}, order: 0, parse_header: true})
-        expect(parsed.detect{|r| r["course_id"] == @ac1_a.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
-        expect(parsed.detect{|r| r["course_id"] == @ac1_b.sis_source_id}["blueprint_course_id"]).to eq @bc1.sis_source_id
-        expect(parsed.detect{|r| r["course_id"] == @ac2.sis_source_id}["blueprint_course_id"]).to eq @bc2.sis_source_id
+                             { params: { "enrollment_term_id" => @default_term.id, "courses" => true }, order: 0, parse_header: true })
+        expect(parsed.detect { |r| r["course_id"] == @ac1_a.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect { |r| r["course_id"] == @ac1_b.sis_source_id }["blueprint_course_id"]).to eq @bc1.sis_source_id
+        expect(parsed.detect { |r| r["course_id"] == @ac2.sis_source_id }["blueprint_course_id"]).to eq @bc2.sis_source_id
       end
     end
-
 
     describe "Sections" do
       before(:once) do
         create_some_courses_and_sections
       end
 
-      it "should run the SIS report for a term" do
+      it "runs the SIS report for a term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["sections"] = true
-        parsed = read_report("sis_export_csv", {params: parameters})
+        parsed = read_report("sis_export_csv", { params: parameters })
 
         expect(parsed.length).to eq 1
         expect(parsed).to match_array [[@section3.sis_source_id, @course2.sis_source_id,
@@ -718,11 +716,11 @@ describe "Default Account Reports" do
                                         @course2.conclude_at.iso8601]]
       end
 
-      it "should not include sections from deleted courses" do
+      it "does not include sections from deleted courses" do
         @course2.destroy
         parameters = {}
         parameters["sections"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
 
         expect(parsed.length).to eq 2
         expect(parsed).to match_array [[@section1.sis_source_id, @course1.sis_source_id,
@@ -734,11 +732,11 @@ describe "Default Account Reports" do
                                         @course1.conclude_at.iso8601]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         @section1.crosslist_to_course(@course2)
         parameters = {}
         parameters["sections"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@section1.id.to_s, @section1.sis_source_id,
                                         @course2.id.to_s, @course2.sis_source_id, nil,
@@ -762,12 +760,12 @@ describe "Default Account Reports" do
                                         @sub_account.id.to_s, "sub1", "true"]]
       end
 
-      it "should run the provisioning report with deleted sections" do
+      it "runs the provisioning report with deleted sections" do
         @section1.destroy
         parameters = {}
         parameters["sections"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@section4.id.to_s, nil, @course2.id.to_s,
                                         "SIS_COURSE_ID_2", nil, "Math_02", "active",
@@ -790,13 +788,13 @@ describe "Default Account Reports" do
                                         @sub_account.id.to_s, "sub1", "true"]]
       end
 
-      it "should run the provisioning report with deleted sections on a sub account" do
+      it "runs the provisioning report with deleted sections on a sub account" do
         @section2.destroy
 
         parameters = {}
         parameters["sections"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 4 })
         expect(parsed.length).to eq 2
 
         expect(parsed).to match_array [[@section2.id.to_s, @section2.sis_source_id,
@@ -810,7 +808,8 @@ describe "Default Account Reports" do
                                          @section1.name, "active",
                                          @course1.start_at.iso8601,
                                          @course1.conclude_at.iso8601,
-                                         @sub_account.id.to_s, "sub1", "true"]]
+                                         @sub_account.id.to_s, "sub1", "true"
+                                       ]]
       end
     end
 
@@ -819,10 +818,10 @@ describe "Default Account Reports" do
         create_some_enrolled_users
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollments"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: [1, 0]})
+        parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
         # should ignore creation pending enrollments on sis_export
         expect(parsed.length).to eq 8
 
@@ -851,13 +850,13 @@ describe "Default Account Reports" do
                                         @role.id.to_s, nil, "active", nil, "false"]]
       end
 
-      it "should run sis report for a term" do
+      it "runs sis report for a term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
         # this extra pseudonym should not cause an extra row in the output
         @user2.pseudonyms.create!(unique_id: "pseudonym2@instructure.com")
-        parsed = read_report("sis_export_csv", {params: parameters, order: [1, 0]})
+        parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
         expect(parsed.length).to eq 4
 
         expect(parsed).to match_array [["SIS_COURSE_ID_2", "user_sis_id_01", "observer",
@@ -873,14 +872,14 @@ describe "Default Account Reports" do
                                         @role.id.to_s, nil, "active", nil, "false"]]
       end
 
-      it "should run the provisioning report with deleted enrollments" do
+      it "runs the provisioning report with deleted enrollments" do
         c = Course.create(:name => 'course1')
         c.student_view_student
         Course.where(id: @course2.id).update_all(workflow_state: 'deleted')
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: "skip"})
+        parsed = read_report("provisioning_csv", { params: parameters, order: "skip" })
         expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1", @user6.id.to_s, nil,
                                         "teacher", teacher_role(root_account_id: @account.id).id.to_s, @enrollment10.course_section_id.to_s,
                                         nil, "concluded", nil, nil, "false", 'TeacherEnrollment', 'false',
@@ -933,14 +932,14 @@ describe "Default Account Reports" do
                                         'TeacherEnrollment', 'false', @enrollment8.id.to_s]]
       end
 
-      it "should run the provisioning report on a term and sub account with deleted enrollments" do
+      it "runs the provisioning report on a term and sub account with deleted enrollments" do
         @course2.account = @sub_account
         @course2.save
         parameters = {}
         parameters["enrollments"] = true
         parameters["include_deleted"] = true
         parameters["enrollment_term_id"] = @term1.id
-        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [3, 1, 8] })
 
         expect(parsed.length).to eq 6
 
@@ -970,12 +969,12 @@ describe "Default Account Reports" do
                                         @enrollment6.id.to_s]]
       end
 
-      it "should run the provisioning report and return active teachers and ta's" do
+      it "runs the provisioning report and return active teachers and ta's" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_filter"] = 'TeacherEnrollment,TaEnrollment'
         parameters["enrollment_states"] = 'active'
-        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [3, 1, 8] })
 
         expect(parsed.length).to eq 2
 
@@ -989,11 +988,11 @@ describe "Default Account Reports" do
                                         'TeacherEnrollment', 'false', @enrollment9.id.to_s]]
       end
 
-      it "should run the provisioning report with active enrollments" do
+      it "runs the provisioning report with active enrollments" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_states"] = 'active'
-        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [3, 1, 8] })
 
         expect(parsed.length).to eq 8
 
@@ -1032,11 +1031,11 @@ describe "Default Account Reports" do
                                         @enrollment11.id.to_s]]
       end
 
-      it "should run the provisioning report and return only ta's" do
+      it "runs the provisioning report and return only ta's" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_filter"] = 'TaEnrollment'
-        parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+        parsed = read_report("provisioning_csv", { params: parameters, order: [3, 1, 8] })
 
         expect(parsed.length).to eq 1
 
@@ -1046,11 +1045,11 @@ describe "Default Account Reports" do
                                         @enrollment3.id.to_s]]
       end
 
-      it 'should handle cross listed enrollments' do
+      it 'handles cross listed enrollments' do
         sub = @account.sub_accounts.create!
         course = sub.courses.create!(name: 'the course', sis_source_id: 'sis1')
         @section1.crosslist_to_course(course)
-        parsed = read_report("provisioning_csv", {params: {'enrollments' => true}, account: sub, order: 0})
+        parsed = read_report("provisioning_csv", { params: { 'enrollments' => true }, account: sub, order: 0 })
         expect(parsed).to eq [[course.id.to_s, "sis1", @user4.id.to_s, "user_sis_id_04",
                                "teacher", teacher_role(root_account_id: @account.id).id.to_s, @enrollment9.course_section_id.to_s,
                                "english_section_1", "active", nil, nil, "true", 'TeacherEnrollment',
@@ -1060,11 +1059,11 @@ describe "Default Account Reports" do
       describe "sharding" do
         specs_require_sharding
 
-        it "should run with cross shard pseudonyms" do
+        it "runs with cross shard pseudonyms" do
           @shard1.activate do
             @root = Account.create
             @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
-                                                username: 'other_shard@example.com', sis_user_id: 'other_shard')
+                                                 username: 'other_shard@example.com', sis_user_id: 'other_shard')
             @user2 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'James John',
                                                  username: 'other_shar2d@example.com', sis_user_id: 'other_shard2')
           end
@@ -1075,7 +1074,7 @@ describe "Default Account Reports" do
 
           parameters = {}
           parameters["enrollments"] = true
-          parsed = read_report("provisioning_csv", {params: parameters, order: [3, 1, 8]})
+          parsed = read_report("provisioning_csv", { params: parameters, order: [3, 1, 8] })
           expect(parsed.length).to eq 11
 
           expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", @user1.id.to_s,
@@ -1092,24 +1091,24 @@ describe "Default Account Reports" do
         create_some_groups
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["groups"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 2})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 2 })
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [["group1sis", "gc101", nil, nil, "group1name", "available"],
                                        ["group2sis", "gc102", "sub1", nil, "group2name", "available"],
                                        ["group5sis", nil, nil, "SIS_COURSE_ID_1", "group5name", "available"]]
       end
 
-      it "should run the SIS report with deleted groups" do
+      it "runs the SIS report with deleted groups" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["groups"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 2})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 2 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [["group1sis", nil, nil, nil, "group1name", "available"],
                                        ["group2sis", nil, "sub1", nil, "group2name", "available"],
@@ -1117,10 +1116,10 @@ describe "Default Account Reports" do
                                        ["group5sis", nil, nil, "SIS_COURSE_ID_1", "group5name", "available"]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["groups"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@group1.id.to_s, "group1sis", @group1.group_category_id.to_s, nil,
                                         @account.id.to_s, nil, nil, nil, "group1name", "available", "true",
@@ -1137,10 +1136,10 @@ describe "Default Account Reports" do
                                         @course1.id.to_s, 'Course', nil]]
       end
 
-      it "should run the provisioning report on a sub account" do
+      it "runs the provisioning report on a sub account" do
         parameters = {}
         parameters["groups"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 4 })
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil,
                                         @sub_account.id.to_s, "sub1", nil, nil, "group2name", "available",
@@ -1158,7 +1157,7 @@ describe "Default Account Reports" do
         group6 = sub_sub_account.groups.create!(:name => 'group6name')
         parameters = {}
         parameters["groups"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: 4})
+        parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 4 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@group2.id.to_s, "group2sis", @group2.group_category_id.to_s, nil,
                                         @sub_account.id.to_s, "sub1", nil, nil, "group2name", "available", "true",
@@ -1180,10 +1179,10 @@ describe "Default Account Reports" do
         @student_category = GroupCategory.where(name: "Student Groups").first
       end
 
-      it 'should run the provisioning report' do
+      it 'runs the provisioning report' do
         parameters = {}
         parameters["group_categories"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 5})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 5 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [[@group_category1.id.to_s, @group_category1.sis_source_id, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil, 'active'],
                                        [@group_category2.id.to_s, @group_category2.sis_source_id, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first", 'active'],
@@ -1191,13 +1190,13 @@ describe "Default Account Reports" do
                                        [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it 'should run the sis report' do
+      it 'runs the sis report' do
         GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category4).update_all(sis_source_id: 'gc104', sis_batch_id: @sis.id)
         parameters = {}
         parameters["group_categories"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 4})
+        parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 4 })
         expect(parsed.length).to eq 4
         expect(parsed).to match_array [["group_category_id", "account_id", "course_id", "category_name", "status"],
                                        ['gc101', @account.sis_source_id, nil, "Test Group Category", 'active'],
@@ -1205,19 +1204,19 @@ describe "Default Account Reports" do
                                        ['gc104', nil, "SIS_COURSE_ID_3", "Test Group Category Course", 'active']]
       end
 
-      it 'should run the provisioning report for a sub account' do
+      it 'runs the provisioning report for a sub account' do
         parameters = {}
         parameters["group_categories"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 4, account: @sub_account})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 4, account: @sub_account })
         expect(parsed.length).to eq 1
         expect(parsed).to match_array [[@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it 'should run the report for deleted categories' do
+      it 'runs the report for deleted categories' do
         parameters = {}
         parameters["group_categories"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 5})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 5 })
         expect(parsed.length).to eq 5
         expect(parsed).to match_array [[@group_category1.id.to_s, @group_category1.sis_source_id, @account.id.to_s, "Account", "Test Group Category", nil, nil, nil, nil, 'active'],
                                        [@group_category2.id.to_s, @group_category2.sis_source_id, @account.id.to_s, "Account", "Test Group Category2", nil, nil, "2", "first", 'active'],
@@ -1226,7 +1225,7 @@ describe "Default Account Reports" do
                                        [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it "should include account_id column even if there isn't one for any rows" do
+      it "includes account_id column even if there isn't one for any rows" do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,status",
           "C1,COUR,SIS Import Course,active"
@@ -1237,7 +1236,7 @@ describe "Default Account Reports" do
         )
         parameters = {}
         parameters['group_categories'] = true
-        parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 0 })
         expect(parsed).to match_array [['group_category_id', 'account_id', 'course_id', 'category_name', 'status'],
                                        ['GC1', nil, 'C1', 'Some Group Category', 'active']]
       end
@@ -1248,31 +1247,31 @@ describe "Default Account Reports" do
         create_some_group_memberships_n_stuff
       end
 
-      it "should run the sis report" do
+      it "runs the sis report" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["group_membership"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed.length).to eq 2
         expect(parsed).to match_array [[@group1.sis_source_id, "user_sis_id_01", "accepted"],
                                        [@group2.sis_source_id, "user_sis_id_02", "accepted"]]
       end
 
-      it "should run the sis report with deleted group memberships" do
+      it "runs the sis report with deleted group memberships" do
         parameters = {}
         parameters["group_membership"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: [0, 1]})
+        parsed = read_report("sis_export_csv", { params: parameters, order: [0, 1] })
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@group1.sis_source_id, "user_sis_id_01", "accepted"],
                                        [@group2.sis_source_id, "user_sis_id_02", "accepted"],
                                        [@group2.sis_source_id, "user_sis_id_03", "deleted"]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: "skip"})
+        parsed = read_report("provisioning_csv", { params: parameters, order: "skip" })
         expect(parsed).to match_array([
                                         [@group1.id.to_s, @group1.sis_source_id,
                                          @user1.id.to_s, "user_sis_id_01", "accepted", "true"],
@@ -1283,11 +1282,11 @@ describe "Default Account Reports" do
                                       ])
       end
 
-      it "should run the provisioning report for a subaccount" do
+      it "runs the provisioning report for a subaccount" do
         @gm5 = GroupMembership.create(:group => @group5, :user => @user3, :workflow_state => "accepted")
         parameters = {}
         parameters["group_membership"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, account: @sub_account, order: [1, 3]})
+        parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: [1, 3] })
         expect(parsed.length).to eq 3
         expect(parsed).to match_array [[@group3.id.to_s, nil, @user3.id.to_s,
                                         "user_sis_id_03", "accepted", "false"],
@@ -1306,14 +1305,14 @@ describe "Default Account Reports" do
         @section5.crosslist_to_course(@course6)
       end
 
-      it "should run the sis report with the default term" do
+      it "runs the sis report with the default term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
         parameters["include_deleted"] = false
-        report = run_report("sis_export_csv", {params: parameters})
+        report = run_report("sis_export_csv", { params: parameters })
         expect(report.parameters['extra_text']).to eq "Term: Default Term; Reports: xlist "
-        parsed = parse_report(report, {header: true})
+        parsed = parse_report(report, { header: true })
         headers = parsed.shift
         expect(headers).to eq ['xlist_course_id', 'section_id', 'status']
         expect(parsed).to match_array [["SIS_COURSE_ID_2", "english_section_1",
@@ -1321,12 +1320,12 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 1
       end
 
-      it "should run sis report with deleted sections" do
+      it "runs sis report with deleted sections" do
         @section3.destroy
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed).to match_array [["SIS_COURSE_ID_1", "english_section_3",
                                         "deleted"],
                                        ["SIS_COURSE_ID_2", "english_section_1",
@@ -1334,12 +1333,12 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 2
       end
 
-      it "should run sis report with deleted sections on a sub account" do
+      it "runs sis report with deleted sections on a sub account" do
         @section3.destroy
         parameters = {}
         parameters["xlist"] = true
         parameters["include_deleted"] = true
-        report = run_report("sis_export_csv", {params: parameters, account: @sub_account})
+        report = run_report("sis_export_csv", { params: parameters, account: @sub_account })
         expect(report.parameters['extra_text']).to eq "Term: All Terms; Include Deleted Objects; Reports: xlist "
         parsed = parse_report(report)
         expect(parsed).to match_array [["SIS_COURSE_ID_1", "english_section_3",
@@ -1347,10 +1346,10 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 1
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["xlist"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 1})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 1 })
         expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1",
                                         @section3.id.to_s, "english_section_3", "active",
                                         @course2.id.to_s, @course2.sis_source_id],
@@ -1360,11 +1359,11 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 2
       end
 
-      it "should run the provisioning report with deleted sections" do
+      it "runs the provisioning report with deleted sections" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["xlist"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 1})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 1 })
         expect(parsed).to match_array [[@course1.id.to_s, "SIS_COURSE_ID_1",
                                         @section3.id.to_s, "english_section_3", "active",
                                         @course2.id.to_s, @course2.sis_source_id],
@@ -1385,10 +1384,10 @@ describe "Default Account Reports" do
         UserObservationLink.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 
-      it 'should run user_observer provisioning report' do
+      it 'runs user_observer provisioning report' do
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("provisioning_csv", {params: parameters, order: 0, header: true})
+        parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
         expect(parsed).to match_array [['canvas_observer_id', 'observer_id', 'canvas_student_id',
                                         'student_id', 'status', 'created_by_sis'],
                                        [@user2.id.to_s, "user_sis_id_02",
@@ -1400,50 +1399,50 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 4
       end
 
-      it 'should run user_observer sis_export report' do
+      it 'runs user_observer sis_export report' do
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0, header: true})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
         expect(parsed).to match_array [['observer_id', 'student_id', 'status'],
-                                      ["user_sis_id_02", "user_sis_id_01", "active"],
-                                      ["user_sis_id_04", "user_sis_id_03", "active"]]
+                                       ["user_sis_id_02", "user_sis_id_01", "active"],
+                                       ["user_sis_id_04", "user_sis_id_03", "active"]]
         expect(parsed.length).to eq 3
       end
 
-      it 'should exclude deleted observers by default' do
+      it 'excludes deleted observers by default' do
         @uo1.destroy
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed).to match_array [["user_sis_id_04", "user_sis_id_03", "active"]]
         expect(parsed.length).to eq 1
       end
 
-      it 'should include deleted observers by when param is present' do
+      it 'includes deleted observers by when param is present' do
         @uo1.destroy
         parameters = {}
         parameters["user_observers"] = true
         parameters["include_deleted"] = true
-        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
         expect(parsed).to match_array [["user_sis_id_02", "user_sis_id_01", "deleted"],
                                        ["user_sis_id_04", "user_sis_id_03", "active"]]
         expect(parsed.length).to eq 2
       end
 
-      it 'should not include unassociated observers when running from a sub-account' do
+      it 'does not include unassociated observers when running from a sub-account' do
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("sis_export_csv", {account: @sub_account, params: parameters, order: 0, header: true})
+        parsed = read_report("sis_export_csv", { account: @sub_account, params: parameters, order: 0, header: true })
         expect(parsed).to match_array [['observer_id', 'student_id', 'status']]
       end
 
-      it "should include associated observers when running from a sub-account" do
+      it "includes associated observers when running from a sub-account" do
         course_with_student(:account => @sub_account, :user => @user1)
         parameters = {}
         parameters["user_observers"] = true
-        parsed = read_report("sis_export_csv", {account: @sub_account, params: parameters, order: 0, header: true})
+        parsed = read_report("sis_export_csv", { account: @sub_account, params: parameters, order: 0, header: true })
         expect(parsed).to match_array [['observer_id', 'student_id', 'status'],
-          ["user_sis_id_02", "user_sis_id_01", "active"]]
+                                       ["user_sis_id_02", "user_sis_id_01", "active"]]
       end
     end
 
@@ -1453,30 +1452,30 @@ describe "Default Account Reports" do
         @u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001', name: 'user 1')
         @u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002', name: 'user 2')
         @admin2 = @sub_account.account_users.create(user: @u1)
-        @admin2.sis_batch_id=@sis.id
+        @admin2.sis_batch_id = @sis.id
         @admin2.save!
         @role1 = custom_account_role('role1', account: @account)
         @admin3 = @account.account_users.create(user: @u2, role: @role1)
-        @admin3.sis_batch_id=@sis.id
+        @admin3.sis_batch_id = @sis.id
         @admin3.save!
       end
 
-      it 'should run sis' do
+      it 'runs sis' do
         parameters = {}
         parameters['admins'] = true
         parameters['include_deleted'] = true
-        parsed = read_report('sis_export_csv', {params: parameters, order: 3, header: true})
+        parsed = read_report('sis_export_csv', { params: parameters, order: 3, header: true })
         expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status'],
                                        ['U001', 'sub1', admin_role(root_account_id: @account.id).id.to_s, 'AccountAdmin', 'active'],
                                        ['U002', nil, @role1.id.to_s, 'role1', 'active']]
       end
 
-      it 'should run provisioning' do
+      it 'runs provisioning' do
         parameters = {}
         parameters['admins'] = true
         parameters['include_deleted'] = true
         @admin.pseudonyms.create!(account: @account, unique_id: 'deleted').destroy
-        parsed = read_report('provisioning_csv', {params: parameters, order: [1, 5], header: true})
+        parsed = read_report('provisioning_csv', { params: parameters, order: [1, 5], header: true })
         expect(parsed).to match_array [['admin_user_name', 'canvas_user_id', 'user_id', 'canvas_account_id',
                                         'account_id', 'role_id', 'role', 'status', 'created_by_sis'],
                                        ['user 1', @u1.id.to_s, 'U001', @sub_account.id.to_s, 'sub1',
@@ -1490,7 +1489,7 @@ describe "Default Account Reports" do
       describe 'sharding' do
         specs_require_sharding
 
-        it 'should run with cross shard pseudonyms' do
+        it 'runs with cross shard pseudonyms' do
           @shard1.activate do
             @root = Account.create
             @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
@@ -1499,12 +1498,12 @@ describe "Default Account Reports" do
           allow(@account).to receive(:trusted_account_ids).and_return([@account.id, @root.id])
           allow(@account).to receive(:trust_exists?).and_return(true)
           @admin4 = @account.account_users.create(user: @user)
-          @admin4.sis_batch_id=@sis.id
+          @admin4.sis_batch_id = @sis.id
           @admin4.save!
 
           parameters = {}
           parameters['admins'] = true
-          parsed = read_report('sis_export_csv', {params: parameters, order: [3, 0], header: true})
+          parsed = read_report('sis_export_csv', { params: parameters, order: [3, 0], header: true })
 
           expect(parsed).to match_array [['user_id', 'account_id', 'role_id', 'role', 'status', 'root_account'],
                                          ['U001', 'sub1', admin_role(root_account_id: @account.id).id.to_s, 'AccountAdmin',
@@ -1517,7 +1516,7 @@ describe "Default Account Reports" do
       end
     end
 
-    it "should run multiple SIS Export reports" do
+    it "runs multiple SIS Export reports" do
       create_some_users_with_pseudonyms
       create_some_accounts
 
@@ -1526,19 +1525,19 @@ describe "Default Account Reports" do
       parameters["accounts"] = true
       parameters["users"] = true
       parameters["courses"] = true
-      parsed = read_report("sis_export_csv", {params: parameters, header: true, order: 'skip'})
+      parsed = read_report("sis_export_csv", { params: parameters, header: true, order: 'skip' })
 
-      accounts_report = parsed["accounts.csv"][1..-1].sort_by {|r| r[0]}
+      accounts_report = parsed["accounts.csv"][1..-1].sort_by { |r| r[0] }
       expect(accounts_report[0]).to eq ["sub1", nil, "English", "active"]
       expect(accounts_report[1]).to eq ["sub3", nil, "math", "active"]
       expect(accounts_report[2]).to eq ["subsub1", "sub1", "sESL", "active"]
 
-      users_report = parsed["users.csv"][1..-1].sort_by {|r| r[0]}
+      users_report = parsed["users.csv"][1..-1].sort_by { |r| r[0] }
       expect(users_report.length).to eq 4
       expect(users_report).to eq [@user1, @user2, @user3, @user4].map { |u| expected_user(u) }
     end
 
-    it "should run the SIS Export reports with no data" do
+    it "runs the SIS Export reports with no data" do
       parameters = {}
       parameters["accounts"] = true
       parameters["users"] = true
@@ -1551,7 +1550,7 @@ describe "Default Account Reports" do
       parameters["group_membership"] = true
       parameters["xlist"] = true
       expect(AccountReports).to receive(:message_recipient).once
-      parsed = read_report("sis_export_csv", {params: parameters, header: true})
+      parsed = read_report("sis_export_csv", { params: parameters, header: true })
 
       expect(parsed["accounts.csv"]).to eq [["account_id", "parent_account_id", "name", "status"]]
       expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]
@@ -1569,7 +1568,7 @@ describe "Default Account Reports" do
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
 
-    it "should not return reports passed as false" do
+    it "does not return reports passed as false" do
       parameters = {}
       parameters["accounts"] = 0
       parameters["users"] = 1
@@ -1580,7 +1579,7 @@ describe "Default Account Reports" do
       parameters["groups"] = true
       parameters["group_membership"] = true
       parameters["xlist"] = true
-      parsed = read_report("sis_export_csv", {params: parameters, header: true})
+      parsed = read_report("sis_export_csv", { params: parameters, header: true })
 
       expect(parsed["accounts.csv"]).to eq nil
       expect(parsed["terms.csv"]).to eq [["term_id", "name", "status", "start_date", "end_date"]]

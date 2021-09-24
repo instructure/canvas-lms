@@ -19,7 +19,7 @@
 class AddIndexOnActiveUsersId < ActiveRecord::Migration[6.0]
   tag :predeploy
   disable_ddl_transaction!
-  
+
   def change
     add_index :users, :id, {
       where: "workflow_state <> 'deleted'",

@@ -8,7 +8,7 @@ module LtiAdvantage::Claims
   class Context
     include ActiveModel::Model
     attr_accessor :id, :label, :title, :type
-    validates_presence_of :id
 
+    validates_presence_of :id
   end
 end

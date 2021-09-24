@@ -55,20 +55,21 @@ class CourseProgress
 
   def module_progressions
     @_module_progressions ||= if @preloaded_progressions
-      module_ids = modules.pluck(:id)
-      @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } ||
-        ContextModuleProgression.none
-    else
-      course.context_module_progressions.
-        where(user_id: user, context_module_id: modules)
-    end
+                                module_ids = modules.pluck(:id)
+                                @preloaded_progressions[course.id]&.select { |cmp| module_ids.include?(cmp.context_module_id) } ||
+                                  ContextModuleProgression.none
+                              else
+                                course.context_module_progressions
+                                      .where(user_id: user, context_module_id: modules)
+                              end
   end
 
   def current_position
     return unless in_progress?
+
     if read_only
       @current_positions ||= begin
-        prog = module_progressions.detect{|p| p.context_module_id == current_module.id}
+        prog = module_progressions.detect { |p| p.context_module_id == current_module.id }
         prog && prog.current_position
       end
     else
@@ -78,11 +79,12 @@ class CourseProgress
 
   def current_content_tag
     return unless in_progress?
+
     @current_content_tag ||= begin
-      tags = current_module.content_tags.select{|ct| ct.position == current_position}
+      tags = current_module.content_tags.select { |ct| ct.position == current_position }
       if tags.any?
         opts = current_module.visibility_for_user(user)
-        tags.detect{|tag| tag.visible_to_user?(user, opts)}
+        tags.detect { |tag| tag.visible_to_user?(user, opts) }
       else
         nil
       end
@@ -114,9 +116,10 @@ class CourseProgress
 
   def current_requirement_url
     return unless in_progress? && current_content_tag
+
     course_context_modules_item_redirect_url(:course_id => course.id,
-      :id => current_content_tag.id,
-      :host => HostUrl.context_host(course))
+                                             :id => current_content_tag.id,
+                                             :host => HostUrl.context_host(course))
   end
 
   def in_progress?
@@ -129,6 +132,7 @@ class CourseProgress
 
   def most_recent_module_completed_at
     return unless module_progressions
+
     if module_progressions.is_a? Array
       module_progressions.map(&:completed_at).compact.max
     else
@@ -138,6 +142,7 @@ class CourseProgress
 
   def completed_at
     return unless completed?
+
     most_recent_module_completed_at&.utc&.iso8601
   end
 
@@ -151,8 +156,7 @@ class CourseProgress
       }
     else
       { error:
-        { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' }
-      }
+        { message: 'no progress available because this course is not module based (has modules and module completion requirements) or the user is not enrolled as a student in this course' } }
     end
   end
 
@@ -192,5 +196,4 @@ class CourseProgress
   def module_completed?(progression)
     module_requirements_completed(progression).count >= module_reqs_to_complete_count(progression.context_module)
   end
-
 end

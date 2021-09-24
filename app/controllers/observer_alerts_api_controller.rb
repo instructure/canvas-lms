@@ -26,12 +26,12 @@ class ObserverAlertsApiController < ApplicationController
   before_action :require_user
 
   def alerts_by_student
-    all_alerts = @current_user.
-      as_observer_observer_alerts.
-      active.
-      where(student: params[:student_id]).
-      order(id: :desc).
-      preload(:context)
+    all_alerts = @current_user
+                 .as_observer_observer_alerts
+                 .active
+                 .where(student: params[:student_id])
+                 .order(id: :desc)
+                 .preload(:context)
 
     # avoid n+1, all alerts are for the same student, we don't need to check each one.
     all_alerts = [] unless all_alerts.first&.users_are_still_linked?

@@ -19,7 +19,7 @@
 
 class MockNotifier
   attr_reader :messages
-  
+
   def initialize
     @messages = []
   end

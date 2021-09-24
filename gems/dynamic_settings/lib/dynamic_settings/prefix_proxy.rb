@@ -39,16 +39,16 @@ module DynamicSettings
     # @param data_center [String] Which regional datacenter to address for queries
     # @param query_logging [Boolean] when enabled (true), will output query logs and timing for each request
     def initialize(prefix = nil,
-                    tree: :config,
-                    service: :canvas,
-                    environment: nil,
-                    cluster: nil,
-                    default_ttl: DEFAULT_TTL,
-                    data_center: nil,
-                    query_logging: true,
-                    retry_limit: nil,
-                    retry_base: nil,
-                    circuit_breaker: nil)
+                   tree: :config,
+                   service: :canvas,
+                   environment: nil,
+                   cluster: nil,
+                   default_ttl: DEFAULT_TTL,
+                   data_center: nil,
+                   query_logging: true,
+                   retry_limit: nil,
+                   retry_base: nil,
+                   circuit_breaker: nil)
       @prefix = prefix
       @tree = tree
       @service = service
@@ -168,7 +168,7 @@ module DynamicSettings
           # retries are all successful.
           DynamicSettings.on_retry(e)
 
-          backoff_interval = retry_base ** retry_count
+          backoff_interval = retry_base**retry_count
           retry_count += 1
           DynamicSettings.logger.warn("[DYNAMIC_SETTINGS] Consul error; retrying in #{backoff_interval} seconds...")
           sleep(backoff_interval)
@@ -247,6 +247,7 @@ module DynamicSettings
       DynamicSettings.logger.debug("  #{timing} get (#{full_key}) -> status:#{status}") if @query_logging
       return nil if status == 'NOT_FOUND'
       raise error if error
+
       result
     end
 

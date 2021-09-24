@@ -21,9 +21,8 @@
 module SIS
   module CSV
     class SectionImporter < CSVBaseImporter
-
       def self.section_csv?(row)
-        #This matcher works because an enrollment doesn't have name
+        # This matcher works because an enrollment doesn't have name
         row.include?('section_id') && row.include?('name')
       end
 
@@ -33,7 +32,7 @@ module SIS
 
       # expected columns
       # section_id,course_id,name,status,start_date,end_date
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::SectionImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             start_date = nil

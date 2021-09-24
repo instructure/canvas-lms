@@ -32,10 +32,8 @@ describe 'Viewing differentiated assignments' do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
-
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
-
           # quizzes
           quizzes.quiz_for_sections_a_and_b.title,
         )
@@ -43,9 +41,7 @@ describe 'Viewing differentiated assignments' do
         # hides the rest
         expect(list_of_assignments.text).not_to include(
           assignments.assignment_for_second_and_third_students.title,
-
           discussions.discussion_for_second_and_third_students.title,
-
           quizzes.quiz_for_second_and_third_students.title
         )
       end
@@ -62,10 +58,8 @@ describe 'Viewing differentiated assignments' do
         expect(list_of_assignments.text).to include(
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
-
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
-
           # quizzes
           quizzes.quiz_for_sections_a_and_b.title
         )
@@ -80,7 +74,6 @@ describe 'Viewing differentiated assignments' do
     end
   end
 
-
   context 'as the second student' do
     before(:each) { login_as(users.second_student) }
 
@@ -92,11 +85,9 @@ describe 'Viewing differentiated assignments' do
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
           assignments.assignment_for_second_and_third_students.title,
-
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
           discussions.discussion_for_second_and_third_students.title,
-
           # quizzes
           quizzes.quiz_for_sections_a_and_b.title,
           quizzes.quiz_for_second_and_third_students.title
@@ -116,11 +107,9 @@ describe 'Viewing differentiated assignments' do
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
           assignments.assignment_for_second_and_third_students.title,
-
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
           discussions.discussion_for_second_and_third_students.title,
-
           # quizzes
           quizzes.quiz_for_sections_a_and_b.title,
           quizzes.quiz_for_second_and_third_students.title
@@ -140,11 +129,9 @@ describe 'Viewing differentiated assignments' do
           # assignments
           assignments.assignment_for_sections_a_and_b.title,
           assignments.assignment_for_second_and_third_students.title,
-
           # discussions
           discussions.discussion_for_sections_a_and_b.title,
           discussions.discussion_for_second_and_third_students.title,
-
           # quizzes
           quizzes.quiz_for_sections_a_and_b.title,
           quizzes.quiz_for_second_and_third_students.title

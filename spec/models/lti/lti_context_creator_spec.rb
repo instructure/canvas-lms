@@ -38,7 +38,6 @@ describe Lti::LtiContextCreator do
   end
 
   describe "#convert" do
-
     describe "consumer instance" do
       let(:canvas_user) { user_factory(name: 'Shorty McLongishname') }
       let(:lti_context_creator) { Lti::LtiContextCreator.new(canvas_user, canvas_tool) }

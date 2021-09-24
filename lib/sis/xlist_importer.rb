@@ -20,7 +20,6 @@
 
 module SIS
   class XlistImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       Course.suspend_callbacks(:update_enrollments_later) do

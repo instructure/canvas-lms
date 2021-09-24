@@ -39,8 +39,7 @@ describe Polling::PollSessionsController, type: :request do
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
                   { controller: 'polling/poll_sessions', action: 'index', format: 'json',
-                    poll_id: @poll.id.to_s
-                  }, data, header)
+                    poll_id: @poll.id.to_s }, data, header)
     end
 
     it "returns all existing poll sessions" do
@@ -75,7 +74,7 @@ describe Polling::PollSessionsController, type: :request do
 
   describe 'GET show' do
     def create_submission(choice)
-      student = student_in_course(active_user:true).user
+      student = student_in_course(active_user: true).user
       @poll_session.poll_submissions.create!(
         poll: @poll,
         user: student,
@@ -95,8 +94,7 @@ describe Polling::PollSessionsController, type: :request do
                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
                   { controller: 'polling/poll_sessions', action: 'show', format: 'json',
                     poll_id: @poll.id.to_s,
-                    id: @poll_session.id.to_s
-                  }, data)
+                    id: @poll_session.id.to_s }, data)
     end
 
     it "retrieves the poll session specified" do
@@ -183,7 +181,7 @@ describe Polling::PollSessionsController, type: :request do
         2.times { create_submission(choice1) }
         1.times { create_submission(choice2) }
 
-        @user = student_in_course(active_user:true).user
+        @user = student_in_course(active_user: true).user
 
         json = get_show['poll_sessions'].first
 
@@ -193,7 +191,7 @@ describe Polling::PollSessionsController, type: :request do
 
       it "does embed the student's own submission" do
         choice = @poll.poll_choices.create!(text: 'Choice A', is_correct: true)
-        @user = student_in_course(active_user:true).user
+        @user = student_in_course(active_user: true).user
 
         @poll_session.poll_submissions.create!(
           poll: @poll,
@@ -214,7 +212,7 @@ describe Polling::PollSessionsController, type: :request do
           3.times { create_submission(choice1) }
           2.times { create_submission(choice2) }
 
-          student = student_in_course(active_user:true).user
+          student = student_in_course(active_user: true).user
 
           @user = student
           json = get_show
@@ -234,7 +232,7 @@ describe Polling::PollSessionsController, type: :request do
           3.times { create_submission(choice1) }
           2.times { create_submission(choice2) }
 
-          student = student_in_course(active_user:true).user
+          student = student_in_course(active_user: true).user
 
           @user = student
           json = get_show
@@ -251,13 +249,12 @@ describe Polling::PollSessionsController, type: :request do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
     end
 
-    def post_create(params, raw=false)
+    def post_create(params, raw = false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_sessions",
                   { controller: 'polling/poll_sessions', action: 'create', format: 'json',
-                    poll_id: @poll.id.to_s
-                  },
+                    poll_id: @poll.id.to_s },
                   { poll_sessions: [params] }, {}, {})
     end
 
@@ -277,7 +274,7 @@ describe Polling::PollSessionsController, type: :request do
       end
 
       it "returns an error if the supplied course section is invalid" do
-        post_create({course_section_id: @section.id + 666, course_id: @course.id}, true)
+        post_create({ course_section_id: @section.id + 666, course_id: @course.id }, true)
 
         expect(response.code).to eq "404"
         expect(response.body).to match /The specified resource does not exist/
@@ -291,16 +288,15 @@ describe Polling::PollSessionsController, type: :request do
       @poll_session = @poll.poll_sessions.create!(course: @course, course_section: @section)
     end
 
-    def put_update(params, raw=false)
+    def put_update(params, raw = false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
-               "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
-               { controller: 'polling/poll_sessions', action: 'update', format: 'json',
-                 poll_id: @poll.id.to_s,
-                 id: @poll_session.id.to_s
-               },
-               { poll_sessions: [params] }, {}, {})
+                  "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}",
+                  { controller: 'polling/poll_sessions', action: 'update', format: 'json',
+                    poll_id: @poll.id.to_s,
+                    id: @poll_session.id.to_s },
+                  { poll_sessions: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -333,7 +329,7 @@ describe Polling::PollSessionsController, type: :request do
         section = @course.course_sections.create!(name: 'Another Section')
         original_id = @poll_session.course_section.id
 
-        put_update({course_section_id: section.id}, true)
+        put_update({ course_section_id: section.id }, true)
 
         @poll_session.reload
         expect(response.code).to eq '401'
@@ -351,12 +347,11 @@ describe Polling::PollSessionsController, type: :request do
 
     def get_open
       raw_api_call(:get,
-               "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/open",
-               { controller: 'polling/poll_sessions', action: 'open', format: 'json',
-                 poll_id: @poll.id.to_s,
-                 id: @poll_session.id.to_s
-               },
-               {}, {}, {})
+                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/open",
+                   { controller: 'polling/poll_sessions', action: 'open', format: 'json',
+                     poll_id: @poll.id.to_s,
+                     id: @poll_session.id.to_s },
+                   {}, {}, {})
     end
 
     context "as a teacher" do
@@ -412,12 +407,11 @@ describe Polling::PollSessionsController, type: :request do
 
     def get_close
       raw_api_call(:get,
-               "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/close",
-               { controller: 'polling/poll_sessions', action: 'close', format: 'json',
-                 poll_id: @poll.id.to_s,
-                 id: @poll_session.id.to_s
-               },
-               {}, {}, {})
+                   "/api/v1/polls/#{@poll.id}/poll_sessions/#{@poll_session.id}/close",
+                   { controller: 'polling/poll_sessions', action: 'close', format: 'json',
+                     poll_id: @poll.id.to_s,
+                     id: @poll_session.id.to_s },
+                   {}, {}, {})
     end
 
     context "as a teacher" do

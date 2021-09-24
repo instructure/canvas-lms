@@ -49,14 +49,14 @@ describe SubmissionSearch do
   end
 
   it 'finds all submissions' do
-    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{field: 'username'}]).search
+    results = SubmissionSearch.new(assignment, teacher, nil, order_by: [{ field: 'username' }]).search
     expect(results.preload(:user).map(&:user)).to eq students
   end
 
   it 'finds submissions with user name search' do
     results = SubmissionSearch.new(assignment, teacher, nil,
-      user_search: 'man',
-      order_by: [{field: 'username', direction: 'descending'}]).search
+                                   user_search: 'man',
+                                   order_by: [{ field: 'username', direction: 'descending' }]).search
     expect(results).to eq [
       Submission.find_by(user: mandy),
       Submission.find_by(user: amanda),
@@ -75,7 +75,6 @@ describe SubmissionSearch do
     results = SubmissionSearch.new(assignment, teacher, nil, section_ids: [section.id]).search
     expect(results).to eq [Submission.find_by(user: amanda)]
   end
-
 
   it 'filters by the enrollment type' do
     fake_student = assignment.course.student_view_student
@@ -151,7 +150,7 @@ describe SubmissionSearch do
     assignment.grade_student(peter, score: 1, grader: teacher)
     assignment.grade_student(amanda, score: 2, grader: teacher)
     assignment.grade_student(james, score: 3, grader: teacher)
-    results = SubmissionSearch.new(assignment, teacher, nil, scored_more_than: 0, order_by: [{field: 'score'}]).search
+    results = SubmissionSearch.new(assignment, teacher, nil, scored_more_than: 0, order_by: [{ field: 'score' }]).search
     expect(results.preload(:user).map(&:user)).to eq [peter, amanda, james]
   end
 
@@ -159,7 +158,7 @@ describe SubmissionSearch do
     Timecop.freeze do
       assignment.submit_homework(peter, submission_type: 'online_text_entry', body: 'homework', submitted_at: Time.zone.now)
       assignment.submit_homework(amanda, submission_type: 'online_text_entry', body: 'homework', submitted_at: Time.zone.now + 1.hour)
-      results = SubmissionSearch.new(assignment, teacher, nil, states: 'submitted', order_by: [{field: 'submitted_at'}]).search
+      results = SubmissionSearch.new(assignment, teacher, nil, states: 'submitted', order_by: [{ field: 'submitted_at' }]).search
       expect(results.preload(:user).map(&:user)).to eq [peter, amanda]
     end
   end
@@ -169,12 +168,11 @@ describe SubmissionSearch do
     assignment.grade_student(amanda, score: 1, grader: teacher)
     assignment.grade_student(james, score: 3, grader: teacher)
     results = SubmissionSearch.new(assignment, teacher, nil,
-      scored_more_than: 0,
-      order_by: [
-        {field: 'score', direction: 'descending'},
-        {field: 'username', direction: 'ascending'}
-      ]
-    ).search
+                                   scored_more_than: 0,
+                                   order_by: [
+                                     { field: 'score', direction: 'descending' },
+                                     { field: 'username', direction: 'ascending' }
+                                   ]).search
     expect(results.preload(:user).map(&:user)).to eq [james, amanda, peter]
   end
 

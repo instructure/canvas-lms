@@ -45,103 +45,103 @@ RSpec.describe 'Outcomes Service - POST Content Import', :pact do
       }
     end
     let(:import_post_request_body) do
-    {
-      "format": "canvas",
-      "alignments": [
-        {
-          "artifact": {
-            "$canvas_wiki_page_id": "100"
-          },
-          "outcomes": [
-            {
-              "$canvas_learning_outcome_id": "1"
+      {
+        "format": "canvas",
+        "alignments": [
+          {
+            "artifact": {
+              "$canvas_wiki_page_id": "100"
             },
-            {
-              "$canvas_learning_outcome_id": "2"
-            }
-          ]
-        }
-      ],
-      "outcomes": [
-        {
-          "$canvas_learning_outcome_id": "1000",
-          "title": "outcome_title",
-          "description": "outcome_description",
-          "rubric_criterion": {
-            "description": "scoring method description",
-            "ratings": [
+            "outcomes": [
               {
-                "description": "Exceeds Expectations",
-                "points": 5
+                "$canvas_learning_outcome_id": "1"
               },
               {
-                "description": "Does Not Meet Expectations",
-                "points": 0
+                "$canvas_learning_outcome_id": "2"
               }
-            ],
-            "mastery_points": 1,
-            "points_possible": 5
+            ]
           }
-        }
-      ],
-      "context_type": "course",
-      "context_id": 100,
-      "groups": [
-        {
-          "$canvas_learning_outcome_group_id": "1001",
-          "title": "outcome_group_title",
-          "description": "outcome_group_description"
-        }
-      ],
-      "edges": [
-        {
-          "$canvas_learning_outcome_link_id": "1002",
-          "$canvas_learning_outcome_id": "1000",
-          "$canvas_learning_outcome_group_id": "1001"
-        }
-      ]
-    }
+        ],
+        "outcomes": [
+          {
+            "$canvas_learning_outcome_id": "1000",
+            "title": "outcome_title",
+            "description": "outcome_description",
+            "rubric_criterion": {
+              "description": "scoring method description",
+              "ratings": [
+                {
+                  "description": "Exceeds Expectations",
+                  "points": 5
+                },
+                {
+                  "description": "Does Not Meet Expectations",
+                  "points": 0
+                }
+              ],
+              "mastery_points": 1,
+              "points_possible": 5
+            }
+          }
+        ],
+        "context_type": "course",
+        "context_id": 100,
+        "groups": [
+          {
+            "$canvas_learning_outcome_group_id": "1001",
+            "title": "outcome_group_title",
+            "description": "outcome_group_description"
+          }
+        ],
+        "edges": [
+          {
+            "$canvas_learning_outcome_link_id": "1002",
+            "$canvas_learning_outcome_id": "1000",
+            "$canvas_learning_outcome_group_id": "1001"
+          }
+        ]
+      }
     end
     let(:expected_import_post_response_body) do
-    {
-      "id": Pact.like(1),
-      "context_type": "course",
-      "context_id": Pact.like("100"),
-      "state": "created"
-    }
+      {
+        "id": Pact.like(1),
+        "context_type": "course",
+        "context_id": Pact.like("100"),
+        "state": "created"
+      }
     end
-    let!(:course) {course_factory(active_course: true)}
-    let(:wiki_page) {wiki_page_model(course: course)}
+    let!(:course) { course_factory(active_course: true) }
+    let(:wiki_page) { wiki_page_model(course: course) }
     let!(:content_migration) { ContentMigration.new }
     let(:imported_content) do
-    {
-      "format"=>"canvas",
-      "alignments"=>[
-        {
-          "artifact"=>{"$canvas_wiki_page_id"=>3},
-          "outcomes"=>[
-            {"$canvas_learning_outcome_id"=>40},
-            {"$canvas_learning_outcome_id"=>47}
-          ]
-        }
-      ]
-    }
+      {
+        "format" => "canvas",
+        "alignments" => [
+          {
+            "artifact" => { "$canvas_wiki_page_id" => 3 },
+            "outcomes" => [
+              { "$canvas_learning_outcome_id" => 40 },
+              { "$canvas_learning_outcome_id" => 47 }
+            ]
+          }
+        ]
+      }
     end
 
     before do
-      outcomes.given('a provisioned outcomes service account with existing outcomes').
-        upon_receiving('a request to create content imports').
-        with(
-          method: :post,
-          path: "/api/content_imports",
-          headers: import_post_headers,
-          body: import_post_request_body
-        ).
-        will_respond_with(
-          status: 201,
-          headers: { 'Content-Type' => 'application/json; charset=utf-8' },
-          body: expected_import_post_response_body
-        )
+      outcomes.given('a provisioned outcomes service account with existing outcomes')
+              .upon_receiving('a request to create content imports')
+              .with(
+                method: :post,
+                path: "/api/content_imports",
+                headers: import_post_headers,
+                body: import_post_request_body
+              )
+              .will_respond_with(
+                status: 201,
+                headers: { 'Content-Type' => 'application/json; charset=utf-8' },
+                body: expected_import_post_response_body
+              )
     end
 
     it 'imports content' do

@@ -39,7 +39,6 @@
 # "id" field in the question records are updated to point to the newly created
 # question object(s).
 class Quizzes::QuizSubmission::QuestionReferenceDataFixer
-
   # This method is re-entrant. If QuizSubmission#question_references_fixed is
   # true, the fix won't be re-applied.
   #
@@ -62,9 +61,9 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
             modified = true
 
             Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<~SQL
-            quiz_data = '#{connection.quote_string(quiz_submission.quiz_data.to_yaml)}',
-            submission_data = '#{connection.quote_string(quiz_submission.submission_data.to_yaml)}',
-            question_references_fixed = TRUE
+              quiz_data = '#{connection.quote_string(quiz_submission.quiz_data.to_yaml)}',
+              submission_data = '#{connection.quote_string(quiz_submission.submission_data.to_yaml)}',
+              question_references_fixed = TRUE
             SQL
           else
             quiz_submission.update_column('question_references_fixed', true)
@@ -79,7 +78,6 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
               version.update_column("yaml", model.attributes.to_yaml)
             end
           end
-
         end # QuizQuestion#transaction
       end # QuizSubmission#transaction
     end
@@ -113,13 +111,13 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     return false if erratic_ids.empty?
 
     assessment_questions = AssessmentQuestion.where({
-      id: erratic_ids
-    }).select([ :id, :question_data ])
+                                                      id: erratic_ids
+                                                    }).select([:id, :question_data])
 
     quiz_questions = Quizzes::QuizQuestion.where({
-      quiz_id: quiz_id,
-      assessment_question_id: assessment_questions.map(&:id)
-    }).select([ :id, :quiz_id, :assessment_question_id ]).to_a
+                                                   quiz_id: quiz_id,
+                                                   assessment_question_id: assessment_questions.map(&:id)
+                                                 }).select([:id, :quiz_id, :assessment_question_id]).to_a
 
     quiz_data.each do |question_data|
       # 1. the "id" must point to the assessment question's:
@@ -201,10 +199,10 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
       if mapped_last_question_id = id_map[last_question_id.to_i]
         # don't change the type.. if it was a string, keep it that way
         submission_data["last_question_id"] = if last_question_id.is_a?(String)
-          "#{mapped_last_question_id}"
-        else
-          mapped_last_question_id
-        end
+                                                "#{mapped_last_question_id}"
+                                              else
+                                                mapped_last_question_id
+                                              end
       end
     end
   end

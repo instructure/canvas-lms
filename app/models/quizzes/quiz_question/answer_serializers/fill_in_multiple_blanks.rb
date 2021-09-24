@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Quizzes::QuizQuestion::AnswerSerializers
-
   # @internal
   # :nodoc:
   #
@@ -107,7 +106,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #     "color": null,
     #     "size": "XL"
     #   }
-    def deserialize(submission_data, full=false)
+    def deserialize(submission_data, full = false)
       answers.each_with_object({}) do |answer_record, out|
         blank = answer_record[:blank_id]
         blank_key = answer_blank_key(blank)
@@ -152,7 +151,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
     # something like: "question_5_1813d2a7223184cf43e19db6622df40b"
     def answer_blank_key(blank)
-      [ question_key, Util.blank_id(blank) ].join('_')
+      [question_key, Util.blank_id(blank)].join('_')
     end
   end
 end

@@ -29,9 +29,13 @@ module DataFixup::CopyBuiltInRolesByRootAccount
       root_account_ids -= existing_root_ids # some root accounts might have already had their own copies made if they were created postdeploy
       return unless root_account_ids.any?
 
-      new_role_data = root_account_ids.flat_map{|id| Role::BASE_TYPES.map{|type| {
-        :name => type, :base_role_type => type, :root_account_id => id, :workflow_state => "built_in", :created_at => Time.now.utc, :updated_at => Time.now.utc
-      }}}
+      new_role_data = root_account_ids.flat_map { |id|
+        Role::BASE_TYPES.map { |type|
+          {
+            :name => type, :base_role_type => type, :root_account_id => id, :workflow_state => "built_in", :created_at => Time.now.utc, :updated_at => Time.now.utc
+          }
+        }
+      }
       Role.bulk_insert(new_role_data)
 
       # and datafixup references to the old built in roles
@@ -39,24 +43,24 @@ module DataFixup::CopyBuiltInRolesByRootAccount
 
       [AccountUser, RoleOverride].each do |klass|
         klass.find_ids_in_ranges do |min_id, max_id|
-          klass.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
-            joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
-              INNER JOIN #{Role.quoted_table_name} AS new_roles
-              ON new_roles.base_role_type=roles.base_role_type
-              AND new_roles.workflow_state='built_in'
-              AND new_roles.root_account_id=#{klass.table_name}.root_account_id
-            JOIN_SQL
+          klass.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role)
+               .joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+                 INNER JOIN #{Role.quoted_table_name} AS new_roles
+                 ON new_roles.base_role_type=roles.base_role_type
+                 AND new_roles.workflow_state='built_in'
+                 AND new_roles.root_account_id=#{klass.table_name}.root_account_id
+               JOIN_SQL
         end
       end
 
       AccountNotificationRole.find_ids_in_ranges do |min_id, max_id|
-        AccountNotificationRole.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
-          joins(:account_notification => :account).joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
-            INNER JOIN #{Role.quoted_table_name} AS new_roles
-            ON new_roles.base_role_type=roles.base_role_type
-            AND new_roles.workflow_state='built_in'
-            AND new_roles.root_account_id=#{Account.resolved_root_account_id_sql}
-          JOIN_SQL
+        AccountNotificationRole.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role)
+                               .joins(:account_notification => :account).joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+                                 INNER JOIN #{Role.quoted_table_name} AS new_roles
+                                 ON new_roles.base_role_type=roles.base_role_type
+                                 AND new_roles.workflow_state='built_in'
+                                 AND new_roles.root_account_id=#{Account.resolved_root_account_id_sql}
+                               JOIN_SQL
       end
 
       Enrollment.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
@@ -68,13 +72,13 @@ module DataFixup::CopyBuiltInRolesByRootAccount
 
   def self.move_roles_for_enrollments(old_role_ids, start_at, end_at)
     Enrollment.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
-      Enrollment.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
-        joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
-              INNER JOIN #{Role.quoted_table_name} AS new_roles
-              ON new_roles.base_role_type=roles.base_role_type
-              AND new_roles.workflow_state='built_in'
-              AND new_roles.root_account_id=enrollments.root_account_id
-      JOIN_SQL
+      Enrollment.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role)
+                .joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+                  INNER JOIN #{Role.quoted_table_name} AS new_roles
+                  ON new_roles.base_role_type=roles.base_role_type
+                  AND new_roles.workflow_state='built_in'
+                  AND new_roles.root_account_id=enrollments.root_account_id
+                JOIN_SQL
     end
   end
 end

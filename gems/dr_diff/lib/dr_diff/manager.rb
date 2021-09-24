@@ -30,16 +30,20 @@ module DrDiff
     attr_reader :campsite
     private :campsite
 
+    attr_reader :heavy
+    private :heavy
+
     attr_reader :base_dir
     private :base_dir
 
     # all levels: %w(error warn info)
     SEVERE_LEVELS = %w(error warn).freeze
 
-    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, base_dir: nil)
+    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, heavy: false, base_dir: nil)
       @git_dir = git_dir
       @git = git || GitProxy.new(git_dir: git_dir, sha: sha)
       @campsite = campsite
+      @heavy = heavy
       @base_dir = base_dir || ""
     end
 
@@ -70,7 +74,7 @@ module DrDiff
       command_comments.each do |comment|
         path = comment[:path]
         path = path[git_dir.length..-1] if git_dir
-        if diff.relevant?(path, comment[:position], severe?(comment[:severity], severe_levels))
+        if heavy || diff.relevant?(path, comment[:position], severe?(comment[:severity], severe_levels))
           comment[:path] = path unless include_git_dir_in_output
           result << comment
         end

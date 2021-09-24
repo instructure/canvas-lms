@@ -42,7 +42,7 @@ class CanvadocSessionsController < ApplicationController
 
     if is_draft && submission.attempts_left == 0
       error_message = "There are no more attempts available for this submission"
-      return render json: {error: error_message}, status: :bad_request
+      return render json: { error: error_message }, status: :bad_request
     end
 
     annotation_context = if is_draft
@@ -52,7 +52,7 @@ class CanvadocSessionsController < ApplicationController
                          end
 
     if annotation_context.nil?
-      return render json: {error: "No annotations associated with that submission_attempt"}, status: :bad_request
+      return render json: { error: "No annotations associated with that submission_attempt" }, status: :bad_request
     end
 
     render json: {
@@ -91,6 +91,7 @@ class CanvadocSessionsController < ApplicationController
         opts[:disable_annotation_notifications] = blob["disable_annotation_notifications"] || false
         # If we STILL don't have a role, something went way wrong so let's be unauthorized.
         return render(plain: 'unauthorized', status: :unauthorized) if opts[:enrollment_type].blank?
+
         assignment = submission.assignment
         # If we're doing annotations, DocViewer needs additional information to send notifications
         opts[:canvas_base_url] = assignment.course.root_account.domain
@@ -133,7 +134,6 @@ class CanvadocSessionsController < ApplicationController
     else
       render :plain => "Not found", :status => :not_found
     end
-
   rescue HmacHelper::Error => e
     Canvas::Errors.capture_exception(:canvadocs, e, :info)
     render :plain => 'unauthorized', :status => :unauthorized

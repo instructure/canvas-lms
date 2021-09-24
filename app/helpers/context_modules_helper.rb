@@ -39,7 +39,7 @@ module ContextModulesHelper
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
       cache_key_items = ['context_module_render_21_', context_module.cache_key, editable, is_student, can_view_unpublished,
-        true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
+                         true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
       cache_key = add_mastery_paths_to_cache_key(cache_key, context, user)
@@ -71,10 +71,10 @@ module ContextModulesHelper
 
   def preload_can_unpublish(context, modules)
     items = modules.map(&:content_tags).flatten.map(&:content)
-    asmnts = items.select{|item| item.is_a?(Assignment)}
-    topics = items.select{|item| item.is_a?(DiscussionTopic)}
-    quizzes = items.select{|item| item.is_a?(Quizzes::Quiz)}
-    wiki_pages = items.select{|item| item.is_a?(WikiPage)}
+    asmnts = items.select { |item| item.is_a?(Assignment) }
+    topics = items.select { |item| item.is_a?(DiscussionTopic) }
+    quizzes = items.select { |item| item.is_a?(Quizzes::Quiz) }
+    wiki_pages = items.select { |item| item.is_a?(WikiPage) }
 
     assmnt_ids_with_subs = Assignment.assignment_ids_with_submissions(context.assignments.pluck(:id))
     Assignment.preload_can_unpublish(asmnts, assmnt_ids_with_subs)
@@ -95,15 +95,17 @@ module ContextModulesHelper
 
   def module_item_publishable?(item)
     return true if item.nil? || !item.content || !item.content.respond_to?(:can_publish?)
+
     item.content.can_publish?
   end
 
   def prerequisite_list(prerequisites)
-    prerequisites.map {|p| p[:name]}.join(', ')
+    prerequisites.map { |p| p[:name] }.join(', ')
   end
 
   def module_item_unpublishable?(item)
     return true if item.nil? || !item.content || !item.content.respond_to?(:can_unpublish?)
+
     item.content.can_unpublish?
   end
 
@@ -146,11 +148,12 @@ module ContextModulesHelper
     return module_data
   end
 
-  def module_item_translated_content_type(item, is_student=false)
+  def module_item_translated_content_type(item, is_student = false)
     return '' unless item
     if item.content_type_class == 'lti-quiz'
       return is_student ? I18n.t('Quiz') : I18n.t('New Quiz')
     end
+
     TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
   end
 

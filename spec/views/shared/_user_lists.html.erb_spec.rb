@@ -22,22 +22,22 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_user_lists" do
-  it "should render as a course" do
+  it "renders as a course" do
     assign(:context, course_factory)
     render :partial => "shared/user_lists"
   end
 
-  it "should render as a root account" do
+  it "renders as a root account" do
     assign(:context, Account.default)
     render :partial => "shared/user_lists"
   end
 
-  it "should render as a sub account" do
+  it "renders as a sub account" do
     assign(:context, Account.default.sub_accounts.create!)
     render :partial => "shared/user_lists"
   end
 
-  it "should render as a root account with customized login handle" do
+  it "renders as a root account with customized login handle" do
     Account.default.login_handle_name = 'Login'
     Account.default.save!
     assign(:context, Account.default)

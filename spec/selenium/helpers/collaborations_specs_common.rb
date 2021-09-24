@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module CollaborationsSpecsCommon
-
   def ensure_plugin(type)
     type = 'google_drive' if type == 'google_docs'
     PluginSetting.create!(:name => type, :settings => {})
@@ -145,7 +144,6 @@ module CollaborationsSpecsCommon
     expect(f('.title')).to include_text(collaboration_name)
   end
 
-
   def no_edit_with_no_access
     create_collaboration!('google_docs', 'Google Docs')
     validate_collaborations(%W{/courses/#{@course.id}/collaborations}, false)
@@ -170,13 +168,13 @@ module CollaborationsSpecsCommon
   def display_new_form_if_none_exist(type)
     ensure_plugin(type)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations
-              /courses/#{@course.id}/collaborations#add_collaboration}, true)
+                               /courses/#{@course.id}/collaborations#add_collaboration}, true)
   end
 
   def hide_new_form_if_exists(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations
-              /courses/#{@course.id}/collaborations#add_collaboration}, false)
+                               /courses/#{@course.id}/collaborations#add_collaboration}, false)
   end
 
   def open_form_if_last_was_deleted(type, title)
@@ -191,12 +189,12 @@ module CollaborationsSpecsCommon
 
     @collaboration1 = Collaboration.typed_collaboration_instance(title)
     @collaboration1.context = @course
-    @collaboration1.attributes = {:title => "My Collab 1"}
+    @collaboration1.attributes = { :title => "My Collab 1" }
     @collaboration1.user = @user
     @collaboration1.save!
     @collaboration2 = Collaboration.typed_collaboration_instance(title)
     @collaboration2.context = @course
-    @collaboration2.attributes = {:title => "My Collab 2"}
+    @collaboration2.attributes = { :title => "My Collab 2" }
     @collaboration2.user = @user
     @collaboration2.save!
 
@@ -210,7 +208,7 @@ module CollaborationsSpecsCommon
   def leave_new_form_open_when_last_is_deleted(type, title)
     create_collaboration!(type, title)
     validate_collaborations(%W{/courses/#{@course.id}/collaborations
-                                       /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
+                               /courses/#{@course.id}/collaborations#add_collaboration}, false, true)
     f('.add_collaboration_link').click
     delete_collaboration(@collaboration, type)
     expect_form_to_be_visible

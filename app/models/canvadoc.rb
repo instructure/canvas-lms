@@ -52,9 +52,9 @@ class Canvadoc < ActiveRecord::Base
   end
 
   def submissions
-    self.canvadocs_submissions.
-      preload(submission: :assignment).
-      map &:submission
+    self.canvadocs_submissions
+        .preload(submission: :assignment)
+        .map &:submission
   end
 
   def available?
@@ -120,6 +120,7 @@ class Canvadoc < ActiveRecord::Base
 
   def self.canvadocs_api
     raise "Canvadocs isn't enabled" unless Canvadocs.enabled?
+
     Canvadocs::API.new(token: Canvadocs.config['api_key'],
                        base_url: Canvadocs.config['base_url'])
   end

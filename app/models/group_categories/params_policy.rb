@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GroupCategories
-
   class ParamsPolicy
     attr_reader :group_category, :context
 
@@ -27,7 +26,7 @@ module GroupCategories
       @context = category_context
     end
 
-    def populate_with(args, populate_opts={})
+    def populate_with(args, populate_opts = {})
       params = Params.new(args, populate_opts)
       group_category.name = (params.name || group_category.name)
       group_category.self_signup = params.self_signup
@@ -43,7 +42,5 @@ module GroupCategories
       end
       group_category
     end
-
   end
-
 end

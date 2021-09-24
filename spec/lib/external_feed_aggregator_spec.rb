@@ -27,7 +27,7 @@ describe ExternalFeedAggregator do
       @feed = external_feed_model
     end
 
-    it "should work correctly" do
+    it "works correctly" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(rss_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
@@ -36,7 +36,7 @@ describe ExternalFeedAggregator do
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
-    it "should set failure counts and refresh_at on failure" do
+    it "sets failure counts and refresh_at on failure" do
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_raise(CanvasHttp::Error)
       ExternalFeedAggregator.new.process_feed(@feed)
       expect(@feed.failures).to eq 1
@@ -44,7 +44,7 @@ describe ExternalFeedAggregator do
       expect(@feed.refresh_at).to be > 20.minutes.from_now
     end
 
-    it "should work correctly with atom" do
+    it "works correctly with atom" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(atom_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
@@ -53,18 +53,17 @@ describe ExternalFeedAggregator do
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
-    it "should set the LiveEvents context" do
+    it "sets the LiveEvents context" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(rss_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
       expect(LiveEvents).to receive(:set_context).once
       ExternalFeedAggregator.new.process_feed(@feed)
     end
-
   end
 
-def rss_example
-%{<?xml version="1.0"?>
+  def rss_example
+    %{<?xml version="1.0"?>
 <rss version="2.0">
   <channel>
     <title>Lift Off News</title>
@@ -90,9 +89,9 @@ def rss_example
     </item>
   </channel>
 </rss>}
-end
+  end
 
-def atom_example
+  def atom_example
     %{<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
@@ -116,5 +115,5 @@ def atom_example
  </entry>
 
 </feed>}
-end
+  end
 end

@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def pace_plan_model(opts={})
+  def pace_plan_model(opts = {})
     course = opts.delete(:course) || opts[:context] || course_model(reusable: true)
     @pace_plan = factory_with_protected_attributes(course.pace_plans, valid_pace_plan_attributes.merge(opts))
   end

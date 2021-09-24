@@ -34,29 +34,29 @@ class UnreadCommentCountLoader < GraphQL::Batch::Loader
   def perform(submission_ids_and_attempts)
     submission_ids = submission_ids_and_attempts.map(&:first)
 
-    unread_count_hash = Submission.
-      where(id: submission_ids).
-      joins(:submission_comments).
-      where(
-        'NOT EXISTS (?)',
-        ViewedSubmissionComment.
-          where('viewed_submission_comments.submission_comment_id=submission_comments.id').
-          where(:user_id => @current_user)
-      ).
-      group(:submission_id, 'submission_comments.attempt').
-      count
+    unread_count_hash = Submission
+                        .where(id: submission_ids)
+                        .joins(:submission_comments)
+                        .where(
+                          'NOT EXISTS (?)',
+                          ViewedSubmissionComment
+                            .where('viewed_submission_comments.submission_comment_id=submission_comments.id')
+                            .where(:user_id => @current_user)
+                        )
+                        .group(:submission_id, 'submission_comments.attempt')
+                        .count
 
     submission_ids_and_attempts.each do |submission_id, attempt|
       relative_submission_id = Shard.relative_id_for(submission_id, Shard.current, Shard.current)
 
       # Group attempts nil, zero, and one together as one set of unread counts
       count = if (attempt || 0) <= 1
-        (unread_count_hash[[relative_submission_id, nil]] || 0) +
-        (unread_count_hash[[relative_submission_id, 0]] || 0) +
-        (unread_count_hash[[relative_submission_id, 1]] || 0)
-      else
-        unread_count_hash[[relative_submission_id, attempt]] || 0
-      end
+                (unread_count_hash[[relative_submission_id, nil]] || 0) +
+                  (unread_count_hash[[relative_submission_id, 0]] || 0) +
+                  (unread_count_hash[[relative_submission_id, 1]] || 0)
+              else
+                unread_count_hash[[relative_submission_id, attempt]] || 0
+              end
 
       fulfill([submission_id, attempt], count)
     end
@@ -112,10 +112,11 @@ module Interfaces::SubmissionInterface
   field :unread_comment_count, Integer, null: false
   def unread_comment_count
     Promise.all([
-      load_association(:content_participations),
-      load_association(:assignment)
-    ]).then do
+                  load_association(:content_participations),
+                  load_association(:assignment)
+                ]).then do
       next 0 if object.read?(current_user)
+
       UnreadCommentCountLoader.for(current_user).load(object)
     end
   end
@@ -161,29 +162,29 @@ module Interfaces::SubmissionInterface
   end
 
   field :entered_score, Float,
-    'the submission score *before* late policy deductions were applied',
-    null: true
+        'the submission score *before* late policy deductions were applied',
+        null: true
   def entered_score
     protect_submission_grades(:entered_score)
   end
 
   field :entered_grade, String,
-    'the submission grade *before* late policy deductions were applied',
-    null: true
+        'the submission grade *before* late policy deductions were applied',
+        null: true
   def entered_grade
     protect_submission_grades(:entered_grade)
   end
 
   field :deducted_points, Float,
-    'how many points are being deducted due to late policy',
-    null: true
+        'how many points are being deducted due to late policy',
+        null: true
   def deducted_points
     protect_submission_grades(:points_deducted)
   end
 
   field :excused, Boolean,
-    'excused assignments are ignored when calculating grades',
-    method: :excused?, null: true
+        'excused assignments are ignored when calculating grades',
+        method: :excused?, null: true
 
   field :submitted_at, Types::DateTimeType, null: true
   field :graded_at, Types::DateTimeType, null: true
@@ -199,9 +200,9 @@ module Interfaces::SubmissionInterface
   field :submission_status, String, null: true
   def submission_status
     if submission.submission_type == 'online_quiz'
-      Loaders::AssociationLoader.for(Submission, :quiz_submission).
-        load(submission).
-        then { submission.submission_status }
+      Loaders::AssociationLoader.for(Submission, :quiz_submission)
+                                .load(submission)
+                                .then { submission.submission_status }
     else
       submission.submission_status
     end
@@ -212,9 +213,8 @@ module Interfaces::SubmissionInterface
   field :late, Boolean, method: :late?, null: true
   field :missing, Boolean, method: :missing?, null: true
   field :grade_matches_current_submission, Boolean,
-    'was the grade given on the current submission (resubmission)', null: true
+        'was the grade given on the current submission (resubmission)', null: true
   field :submission_type, Types::AssignmentSubmissionType, null: true
-
 
   field :attachment, Types::FileType, null: true
   def attachment
@@ -257,9 +257,9 @@ module Interfaces::SubmissionInterface
   def turnitin_data
     return nil if object.turnitin_data.empty?
 
-    promises = object.turnitin_data.keys.
-      reject { |key| key == :last_processed_attempt }.
-      map do |asset_string|
+    promises = object.turnitin_data.keys
+                     .reject { |key| key == :last_processed_attempt }
+                     .map do |asset_string|
       Loaders::AssetStringLoader.load(asset_string).then do |turnitin_context|
         next if turnitin_context.nil?
 
@@ -291,9 +291,9 @@ module Interfaces::SubmissionInterface
     target_attempt = filter[:for_attempt] || object.attempt
 
     Promise.all([
-      load_association(:assignment),
-      load_association(:rubric_assessments)
-    ]).then do
+                  load_association(:assignment),
+                  load_association(:rubric_assessments)
+                ]).then do
       assessments_needing_versions_loaded = submission.rubric_assessments.reject do |ra|
         ra.artifact_attempt == target_attempt
       end
@@ -302,16 +302,16 @@ module Interfaces::SubmissionInterface
         if assessments_needing_versions_loaded.empty?
           Promise.resolve(nil)
         else
-          Loaders::AssociationLoader.for(RubricAssessment, :versions).
-            load_many(assessments_needing_versions_loaded)
+          Loaders::AssociationLoader.for(RubricAssessment, :versions)
+                                    .load_many(assessments_needing_versions_loaded)
         end
 
       Promise.all([
-        versionable_loader_promise,
-        Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
-        Loaders::AssociationLoader.for(RubricAssessment, :rubric_association).
-          load_many(submission.rubric_assessments)
-      ]).then do
+                    versionable_loader_promise,
+                    Loaders::AssociationLoader.for(Assignment, :rubric_association).load(submission.assignment),
+                    Loaders::AssociationLoader.for(RubricAssessment, :rubric_association)
+                      .load_many(submission.rubric_assessments)
+                  ]).then do
         submission.visible_rubric_assessments_for(current_user, attempt: target_attempt)
       end
     end

@@ -32,8 +32,8 @@ module Canvas
     # and connections to remote redis nodes
     def self.disconnect!
       if Rails.cache &&
-        defined?(ActiveSupport::Cache::RedisCacheStore) &&
-        Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
+         defined?(ActiveSupport::Cache::RedisCacheStore) &&
+         Rails.cache.is_a?(ActiveSupport::Cache::RedisCacheStore)
         ::CanvasCache::Redis.handle_redis_failure(nil, "none") do
           redis = Rails.cache.redis
           if redis.respond_to?(:nodes)
@@ -69,9 +69,9 @@ module Canvas
       if (Time.now.utc - @last_clear_time) > clear_frequency
         @last_clear_time = Time.now.utc
         # gather all the redises we can find
-        redises = Switchman.config[:cache_map].values.
-          map { |cache| cache.try(:redis) }.compact.uniq.
-          map { |redis| redis.try(:ring)&.nodes || [redis] }.inject([], &:concat).uniq
+        redises = Switchman.config[:cache_map].values
+                           .map { |cache| cache.try(:redis) }.compact.uniq
+                           .map { |redis| redis.try(:ring)&.nodes || [redis] }.inject([], &:concat).uniq
         redises.each { |r| r._client.disconnect_if_idle(@last_clear_time - clear_timeout) }
       end
     end

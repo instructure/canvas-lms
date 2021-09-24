@@ -127,7 +127,7 @@ class Login::CanvasController < ApplicationController
     # If the user is registered and logged in, redirect them to their dashboard page
     if found && (user = pseudonym.login_assertions_for_user)
       # Call for some cleanups that should be run when a user logs in
-      
+
       ap = pseudonym.authentication_provider
 
       session[:login_aac] ||= ap.id
@@ -153,8 +153,9 @@ class Login::CanvasController < ApplicationController
 
   def unsuccessful_login(message)
     if request.format.json?
-      return render :json => {:errors => [message]}, :status => :bad_request
+      return render :json => { :errors => [message] }, :status => :bad_request
     end
+
     if mobile_device?
       flash[:error] = message
     else

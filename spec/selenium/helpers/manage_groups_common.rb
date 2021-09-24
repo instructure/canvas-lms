@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../common')
 
 module ManageGroupsCommon
-  def add_category(course, name, opts={})
+  def add_category(course, name, opts = {})
     f(".add_category_link").click
     wait_for_ajaximations
     form = f("#add_category_form")
@@ -55,10 +55,10 @@ module ManageGroupsCommon
     category
   end
 
-  def groups_student_enrollment(student_count=3, opts={})
+  def groups_student_enrollment(student_count = 3, opts = {})
     students = []
     student_count.times do |i|
-      count = i+1
+      count = i + 1
       student = user_model :name => "student #{count}"
       students.push student
       if (!opts[count.to_s].nil?)
@@ -74,7 +74,7 @@ module ManageGroupsCommon
     category_groups.each_with_index { |cg, i| context.groups.create(:name => "Group #{i}", :group_category => cg) }
   end
 
-  def create_categories(context, i=3)
+  def create_categories(context, i = 3)
     categories = []
     i.times { |j| categories.push context.group_categories.create(:name => "Group Category #{j}") }
     categories
@@ -90,7 +90,7 @@ module ManageGroupsCommon
     context.groups.where(name: name).first
   end
 
-  def add_groups_in_category (category, i=3)
+  def add_groups_in_category(category, i = 3)
     groups = []
     i.times { |j| groups.push category.context.groups.create(:name => "group #{j}", :group_category => category) }
     groups
@@ -110,6 +110,7 @@ module ManageGroupsCommon
   def expand_group(group_id)
     group_selector = (group_id == "unassigned" ? ".unassigned-students" : ".group[data-id=\"#{group_id}\"]")
     return if group_selector == ".unassigned-students" || f(group_selector).attribute(:class) =~ /group-expanded/
+
     fj("#{group_selector} .toggle-group").click
     wait_for_ajax_requests
   end

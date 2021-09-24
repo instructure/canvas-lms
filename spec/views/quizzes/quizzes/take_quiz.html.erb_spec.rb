@@ -22,39 +22,39 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe '/quizzes/quizzes/take_quiz' do
-  it 'should render' do
+  it 'renders' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
     sub = assign(:submission, quiz.generate_submission(@user))
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css('#quiz-instructions').first.content.strip).to eq 'Hello'
     expect(response).not_to be_nil
   end
 
-  it 'should render preview alert for unpublished quiz' do
+  it 'renders preview alert for unpublished quiz' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!)
     sub = assign(:submission, quiz.generate_submission(@user))
     sub.update_attribute(:workflow_state, 'preview')
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
 
     expect(response).to include 'preview of the draft version'
   end
 
-  it 'should render preview alert for published quiz' do
+  it 'renders preview alert for published quiz' do
     course_with_student
     view_context
     quiz = @course.quizzes.create!
@@ -63,25 +63,25 @@ describe '/quizzes/quizzes/take_quiz' do
     sub = assign(:submission, quiz.generate_submission(@user))
     sub.update_attribute(:workflow_state, 'preview')
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
 
     expect(response).to include 'preview of the published version'
   end
 
-  it 'should render timer_autosubmit_disabled value in template' do
+  it 'renders timer_autosubmit_disabled value in template' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
     sub = assign(:submission, quiz.generate_submission(@user))
     assign(:quiz_presenter, Quizzes::TakeQuizPresenter.new(
-      quiz,
-      sub,
-      params
-    ))
+                              quiz,
+                              sub,
+                              params
+                            ))
     render 'quizzes/quizzes/take_quiz'
     doc = Nokogiri::HTML5(response.body)
     expect(doc.css('.timer_autosubmit_disabled').first.content.strip).not_to be_nil

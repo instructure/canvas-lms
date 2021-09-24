@@ -46,10 +46,12 @@ describe('Conference', () => {
   }
 
   const bbbConferenceType = {
+    type: '',
     name: 'BigBlueButton'
   }
 
   const msTeamsConferenceType = {
+    type: '',
     name: 'MS Teams'
   }
 

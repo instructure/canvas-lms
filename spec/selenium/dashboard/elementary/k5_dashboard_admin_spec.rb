@@ -129,7 +129,7 @@ describe "admin k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
     end
 
-    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout:30 do
+    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout: 30 do
       second_homeroom_course_name = "Second homeroom course"
 
       new_course = course_with_teacher(

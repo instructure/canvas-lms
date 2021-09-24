@@ -26,7 +26,7 @@ class PopulateRootAccountIdOnModels < ActiveRecord::Migration[5.2]
 
   def up
     DataFixup::PopulateRootAccountIdOnModels.delay_if_production(priority: Delayed::LOWER_PRIORITY,
-      singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
+                                                                 singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
   end
 
   def down

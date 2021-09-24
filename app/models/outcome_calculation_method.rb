@@ -57,7 +57,7 @@ class OutcomeCalculationMethod < ApplicationRecord
 
   after_save :clear_cached_methods
 
-  def as_json(options={})
+  def as_json(options = {})
     super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
   end
 

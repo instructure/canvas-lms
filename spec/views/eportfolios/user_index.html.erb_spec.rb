@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/eportfolios/index" do
-  it "should render" do
+  it "renders" do
     eportfolio_with_user
     view_portfolio
     assign(:portfolios, [@portfolio])
@@ -30,4 +30,3 @@ describe "/eportfolios/index" do
     expect(response).not_to be_nil
   end
 end
-

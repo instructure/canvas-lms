@@ -19,7 +19,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     # Account_Admin ID: 2 || Name: Admin1
     # Account ID: 2
     # Notification IDs: 1, 2, 3.

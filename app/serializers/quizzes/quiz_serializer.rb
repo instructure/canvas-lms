@@ -44,20 +44,20 @@ module Quizzes
                :has_access_code, :post_to_sis, :anonymous_submissions, :migration_id
 
     def_delegators :@controller,
-      # :api_v1_course_assignment_group_url,
-      :speed_grader_course_gradebook_url,
-      :api_v1_course_quiz_submission_url,
-      :api_v1_course_quiz_submissions_url,
-      :api_v1_course_quiz_reports_url,
-      :api_v1_course_quiz_statistics_url,
-      :course_quiz_submission_html_url,
-      :api_v1_course_quiz_submission_users_url,
-      :api_v1_course_quiz_submission_users_message_url,
-      :api_v1_course_quiz_extensions_create_url,
-      :course_quiz_moderate_url,
-      :course_quiz_take_url,
-      :course_quiz_quiz_submissions_url,
-      :course_quiz_submission_versions_url
+                   # :api_v1_course_assignment_group_url,
+                   :speed_grader_course_gradebook_url,
+                   :api_v1_course_quiz_submission_url,
+                   :api_v1_course_quiz_submissions_url,
+                   :api_v1_course_quiz_reports_url,
+                   :api_v1_course_quiz_statistics_url,
+                   :course_quiz_submission_html_url,
+                   :api_v1_course_quiz_submission_users_url,
+                   :api_v1_course_quiz_submission_users_message_url,
+                   :api_v1_course_quiz_extensions_create_url,
+                   :course_quiz_moderate_url,
+                   :course_quiz_take_url,
+                   :course_quiz_quiz_submissions_url,
+                   :course_quiz_submission_versions_url
 
     def context
       quiz.context
@@ -129,6 +129,7 @@ module Quizzes
 
     def speed_grader_url
       return nil unless show_speedgrader?
+
       speed_grader_course_gradebook_url(context, assignment_id: quiz.assignment.id)
     end
 
@@ -146,6 +147,7 @@ module Quizzes
 
     def description
       return '' if hide_locked_description?
+
       if @serializer_options[:description_formatter]
         @serializer_options[:description_formatter].call(quiz.description)
       else
@@ -272,7 +274,7 @@ module Quizzes
       quiz.lockdown_browser_monitor_data
     end
 
-    def serializable_object(options={})
+    def serializable_object(options = {})
       hash = super(options)
       # legacy v1 api
       unless accepts_jsonapi?
@@ -350,7 +352,7 @@ module Quizzes
     # @param [:due_at|:lock_at|:unlock_at] domain
     def overridden_date(domain)
       !serializer_option(:skip_date_overrides) &&
-      context.user_has_been_student?(current_user) && due_dates.any? ?
+        context.user_has_been_student?(current_user) && due_dates.any? ?
         due_dates[0][domain] :
         quiz.send(domain)
     end

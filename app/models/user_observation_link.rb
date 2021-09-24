@@ -36,7 +36,7 @@ class UserObservationLink < ActiveRecord::Base
 
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
-  scope :for_root_accounts, lambda {|root_accounts|
+  scope :for_root_accounts, lambda { |root_accounts|
     root_accounts = Array(root_accounts)
     root_accounts << nil # TODO: remove after root_account_id is populated and is not-nulled
     where(:root_account_id => root_accounts)
@@ -47,8 +47,9 @@ class UserObservationLink < ActiveRecord::Base
   MISSING_ROOT_ACCOUNT_ID = -1
 
   # cross_shard_record param is private
-  def self.create_or_restore(student: , observer: , root_account: , cross_shard_record: false)
+  def self.create_or_restore(student:, observer:, root_account:, cross_shard_record: false)
     raise ArgumentError, 'student, observer and root_account are required' unless student && observer && root_account
+
     shard = cross_shard_record ? observer.shard : student.shard
     result = shard.activate do
       self.unique_constraint_retry do
@@ -97,7 +98,7 @@ class UserObservationLink < ActiveRecord::Base
 
   def filter_enrollment_scope(user, scope)
     account_ids = [self.root_account.id] + self.root_account.trusted_account_ids
-    shards = account_ids.map{|id| Shard.shard_for(id)}.uniq & user.associated_shards
+    shards = account_ids.map { |id| Shard.shard_for(id) }.uniq & user.associated_shards
     scope.shard(shards).where(root_account_id: account_ids)
   end
 
@@ -105,7 +106,7 @@ class UserObservationLink < ActiveRecord::Base
     self.class.connection.after_transaction_commit do
       User.skip_updating_account_associations do
         scope = filter_enrollment_scope(student,
-          student.student_enrollments.all_active_or_pending.order(:course_id))
+                                        student.student_enrollments.all_active_or_pending.order(:course_id))
 
         scope.each do |enrollment|
           next unless enrollment.valid?
@@ -120,7 +121,7 @@ class UserObservationLink < ActiveRecord::Base
 
   def remove_linked_enrollments
     scope = filter_enrollment_scope(observer,
-      observer.observer_enrollments.where(associated_user_id: student))
+                                    observer.observer_enrollments.where(associated_user_id: student))
 
     scope.find_each do |enrollment|
       enrollment.workflow_state = 'deleted'

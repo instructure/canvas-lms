@@ -25,7 +25,6 @@ require 'json/jwt'
 module Lti
   module Ims
     describe AuthorizationController, type: :request do
-
       let(:account) { Account.create! }
 
       let(:developer_key) { DeveloperKey.create!(redirect_uri: 'http://example.com/redirect') }
@@ -47,7 +46,7 @@ module Lti
           product_family: product_family,
           product_version: '1',
           workflow_state: 'active',
-          raw_data: {'enabled_capability' => ['Security.splitSecret']},
+          raw_data: { 'enabled_capability' => ['Security.splitSecret'] },
           lti_version: '1'
         )
       end
@@ -77,7 +76,6 @@ module Lti
       end
 
       describe "POST 'authorize'" do
-
         it 'responds with 200' do
           post auth_endpoint, params: params
           expect(response.code).to eq '200'
@@ -117,7 +115,7 @@ module Lti
         it "renders a the correct json if the grant_type is invalid" do
           params[:assertion] = '12ad3.4fgs56'
           post auth_endpoint, params: params
-          expect(response.body).to eq({error: 'invalid_grant'}.to_json)
+          expect(response.body).to eq({ error: 'invalid_grant' }.to_json)
         end
 
         it "adds the file_host and the request host to the aud" do
@@ -163,7 +161,6 @@ module Lti
         end
 
         context "reg_key" do
-
           let(:reg_key) { SecureRandom.uuid }
 
           let(:reg_password) { SecureRandom.uuid }
@@ -204,7 +201,6 @@ module Lti
         end
 
         context "developer credentials" do
-
           let(:raw_jwt) do
             raw_jwt = JSON::JWT.new(
               {
@@ -239,10 +235,7 @@ module Lti
             post auth_endpoint, params: params
             expect(response.code).to eq '200'
           end
-
-
         end
-
       end
     end
   end

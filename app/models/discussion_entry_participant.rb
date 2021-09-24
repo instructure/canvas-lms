@@ -37,18 +37,18 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   end
 
   def self.read_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read').
-      pluck(:discussion_entry_id)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :workflow_state => 'read')
+        .pluck(:discussion_entry_id)
   end
 
   def self.forced_read_state_entry_ids(entry_ids, user)
-    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true).
-      pluck(:discussion_entry_id)
+    self.where(:user_id => user, :discussion_entry_id => entry_ids, :forced_read_state => true)
+        .pluck(:discussion_entry_id)
   end
 
   def self.entry_ratings(entry_ids, user)
     ratings = self.where(:user_id => user, :discussion_entry_id => entry_ids).where('rating IS NOT NULL')
-    Hash[ratings.map{|x| [x.discussion_entry_id, x.rating]}]
+    Hash[ratings.map { |x| [x.discussion_entry_id, x.rating] }]
   end
 
   def self.not_null_column_object(column: nil, entry: nil, user: nil)
@@ -72,7 +72,6 @@ class DiscussionEntryParticipant < ActiveRecord::Base
   def self.upsert_for_entries(entry_or_topic, user, batch: nil, new_state: nil, forced: nil, rating: nil)
     batch ||= [entry_or_topic]
     entry_or_topic.shard.activate do
-
       raise(ArgumentError) if batch.count > 1_000
       return not_null_column_object(column: :entry, entry: entry_or_topic, user: user) unless entry_or_topic
       return not_null_column_object(column: :user, entry: entry_or_topic, user: user) unless user
@@ -135,12 +134,12 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
       # actual sql query combined into a statement.
       upsert_sql = <<~SQL.squish
-        INSERT INTO #{quoted_table_name}
-                    (#{insert_columns.join(',')})
-             VALUES #{insert_rows.join(',')}
-        ON CONFLICT (discussion_entry_id,user_id)
-      DO UPDATE SET #{update_statement}
-              WHERE #{where_clause}
+          INSERT INTO #{quoted_table_name}
+                      (#{insert_columns.join(',')})
+               VALUES #{insert_rows.join(',')}
+          ON CONFLICT (discussion_entry_id,user_id)
+        DO UPDATE SET #{update_statement}
+                WHERE #{where_clause}
       SQL
 
       # run the query.
@@ -159,8 +158,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   def self.upsert_for_root_entry_and_descendants(root_entry, user, new_state: nil, forced: nil, rating: nil)
     DiscussionEntry.where(root_entry: root_entry)
-      .or(DiscussionEntry.where(id: root_entry))
-      .active.find_ids_in_batches do |batch|
+                   .or(DiscussionEntry.where(id: root_entry))
+                   .active.find_ids_in_batches do |batch|
       upsert_for_entries(root_entry, user, batch: batch, new_state: new_state, forced: forced, rating: rating)
     end
   end
@@ -178,8 +177,8 @@ class DiscussionEntryParticipant < ActiveRecord::Base
 
   scope :read, -> { where(:workflow_state => 'read') }
   scope :existing_participants, ->(user, entry_id) {
-    select([:id, :discussion_entry_id]).
-      where(user_id: user, discussion_entry_id: entry_id)
+    select([:id, :discussion_entry_id])
+      .where(user_id: user, discussion_entry_id: entry_id)
   }
 
   def set_root_account_id

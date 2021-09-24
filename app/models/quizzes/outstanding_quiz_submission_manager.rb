@@ -28,29 +28,28 @@
 #
 module Quizzes
   class OutstandingQuizSubmissionManager
-
     def initialize(quiz)
       @quiz = quiz
     end
 
     def self.grade_by_course(course)
       Quizzes::QuizSubmission.where('quizzes.context_id =?', course.id)
-        .where(user: course.gradable_students)
-        .eager_load(:quiz)
-        .needs_grading
-        .each do |quiz_submission|
-          Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-            finished_at: quiz_submission.finished_at_fallback
-          })
-        end
+                             .where(user: course.gradable_students)
+                             .eager_load(:quiz)
+                             .needs_grading
+                             .each do |quiz_submission|
+        Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
+                                                                          finished_at: quiz_submission.finished_at_fallback
+                                                                        })
+      end
     end
 
     def grade_by_ids(quiz_submission_ids)
       quiz_submissions = @quiz.quiz_submissions.where(id: quiz_submission_ids)
       quiz_submissions.select(&:needs_grading?).each do |quiz_submission|
         Quizzes::SubmissionGrader.new(quiz_submission).grade_submission({
-          finished_at: quiz_submission.finished_at_fallback
-        })
+                                                                          finished_at: quiz_submission.finished_at_fallback
+                                                                        })
       end
     end
 

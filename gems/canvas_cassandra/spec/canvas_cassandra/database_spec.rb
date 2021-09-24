@@ -163,7 +163,7 @@ describe CanvasCassandra do
   end
 
   describe "#build_where_conditions" do
-    it "should build a where clause given a hash" do
+    it "builds a where clause given a hash" do
       expect(db.build_where_conditions(name: "test1")).to eq ["name = ?", ["test1"]]
       expect(db.build_where_conditions(state: "ut", name: "test1")).to eq ["name = ? AND state = ?", ["test1", "ut"]]
     end
@@ -172,60 +172,60 @@ describe CanvasCassandra do
   describe "#update_record" do
     it "does nothing if there are no updates or deletes" do
       expect(db).to_not receive(:execute)
-      db.update_record("test_table", {:id => 5}, {})
+      db.update_record("test_table", { :id => 5 }, {})
     end
 
     it "does lone updates" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => "test"})
+      db.update_record("test_table", { :id => 5 }, { :name => "test" })
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => [nil, "test"]})
+      db.update_record("test_table", { :id => 5 }, { :name => [nil, "test"] })
     end
 
     it "passes consistency params" do
-      expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {consistency: 'LOCAL_QUORUM'})
-      db.update_record("test_table", {:id => 5}, {:name => "test"}, execute_options: {consistency: 'LOCAL_QUORUM'})
+      expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, { consistency: 'LOCAL_QUORUM' })
+      db.update_record("test_table", { :id => 5 }, { :name => "test" }, execute_options: { consistency: 'LOCAL_QUORUM' })
     end
 
     it "does multi-updates" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ?, nick = ? WHERE id = ?", "test", "new", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => "test", :nick => ["old", "new"]})
+      db.update_record("test_table", { :id => 5 }, { :name => "test", :nick => ["old", "new"] })
     end
 
     it "does lone deletes" do
       expect(db).to receive(:execute).with("DELETE name FROM test_table WHERE id = ?", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => nil})
+      db.update_record("test_table", { :id => 5 }, { :name => nil })
       expect(db).to receive(:execute).with("DELETE name FROM test_table WHERE id = ?", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => ["old", nil]})
+      db.update_record("test_table", { :id => 5 }, { :name => ["old", nil] })
     end
 
     it "does multi-deletes" do
       expect(db).to receive(:execute).with("DELETE name, nick FROM test_table WHERE id = ?", 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => nil, :nick => ["old", nil]})
+      db.update_record("test_table", { :id => 5 }, { :name => nil, :nick => ["old", nil] })
     end
 
     it "does combined updates and deletes" do
       expect(db).to receive(:execute).with("BEGIN BATCH UPDATE test_table SET name = ? WHERE id = ? DELETE nick FROM test_table WHERE id = ? APPLY BATCH", "test", 5, 5, {})
-      db.update_record("test_table", {:id => 5}, {:name => "test", :nick => nil})
+      db.update_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
     end
 
     it "works when already in a batch" do
       expect(db).to receive(:execute).with("BEGIN BATCH UPDATE ? UPDATE test_table SET name = ? WHERE id = ? DELETE nick FROM test_table WHERE id = ? UPDATE ? APPLY BATCH", 1, "test", 5, 5, 2, {})
       db.batch do
         db.update("UPDATE ?", 1)
-        db.update_record("test_table", {:id => 5}, {:name => "test", :nick => nil})
+        db.update_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
         db.update("UPDATE ?", 2)
       end
     end
 
     it "handles compound primary keys" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ? AND sub_id = ?", "test", 5, "sub!", {})
-      db.update_record("test_table", {:id => 5, :sub_id => "sub!"}, {:name => "test", :id => 5, :sub_id => [nil, "sub!"]})
+      db.update_record("test_table", { :id => 5, :sub_id => "sub!" }, { :name => "test", :id => 5, :sub_id => [nil, "sub!"] })
     end
 
     it "does not allow changing a primary key component" do
       expect {
-        db.update_record("test_table", {:id => 5, :sub_id => "sub!"}, {:name => "test", :id => 5, :sub_id => ["old", "sub!"]}, {})
+        db.update_record("test_table", { :id => 5, :sub_id => "sub!" }, { :name => "test", :id => 5, :sub_id => ["old", "sub!"] }, {})
       }.to raise_error(ArgumentError)
     end
   end
@@ -233,22 +233,22 @@ describe CanvasCassandra do
   describe "#insert_record" do
     it "constructs correct queries when the params are strings" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.insert_record("test_table", {'id' => 5}, {'name' => "test"})
+      db.insert_record("test_table", { 'id' => 5 }, { 'name' => "test" })
     end
 
     it "constructs correct queries when the params are symbols" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.insert_record("test_table", {:id => 5}, {:name => "test"})
+      db.insert_record("test_table", { :id => 5 }, { :name => "test" })
     end
 
-    it "should not update given nil values in an AR#attributes style hash" do
+    it "does not update given nil values in an AR#attributes style hash" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.insert_record("test_table", {:id => 5}, {:name => "test", :nick => nil})
+      db.insert_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
     end
 
-    it "should not update given nil values in an AR#changes style hash" do
+    it "does not update given nil values in an AR#changes style hash" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
-      db.insert_record("test_table", {:id => 5}, {:name => [nil, "test"], :nick => [nil, nil]})
+      db.insert_record("test_table", { :id => 5 }, { :name => [nil, "test"], :nick => [nil, nil] })
     end
   end
 
@@ -285,7 +285,7 @@ describe CanvasCassandra do
     end
   end
 
-  it "should map consistency level names to values" do
+  it "maps consistency level names to values" do
     expect(CanvasCassandra.consistency_level("LOCAL_QUORUM")).to eq CassandraCQL::Thrift::ConsistencyLevel::LOCAL_QUORUM
     expect { CanvasCassandra.consistency_level("XXX") }.to raise_error(NameError)
   end

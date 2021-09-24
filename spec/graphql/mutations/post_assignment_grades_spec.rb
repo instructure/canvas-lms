@@ -86,7 +86,7 @@ describe Mutations::PostAssignmentGrades do
     end
 
     describe "posting the grades" do
-      let(:post_submissions_job) { Delayed::Job.where(tag:"Assignment#post_submissions").order(:id).last }
+      let(:post_submissions_job) { Delayed::Job.where(tag: "Assignment#post_submissions").order(:id).last }
 
       before(:each) do
         @student_submission = assignment.submissions.find_by(user: student)

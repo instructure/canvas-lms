@@ -159,8 +159,8 @@ describe('SubmissionManager', () => {
       beforeEach(() => {
         window.ENV = {
           CONFETTI_ENABLED: enabled,
-          ASSIGNMENT_ID: 1,
-          COURSE_ID: 1
+          ASSIGNMENT_ID: '1',
+          COURSE_ID: '1'
         }
       })
 
@@ -323,7 +323,9 @@ describe('SubmissionManager', () => {
 
       const successfulResponse = {
         data: {
-          setModuleItemCompletion: {}
+          setModuleItemCompletion: {
+            __typename: ''
+          }
         },
         errors: null
       }
@@ -829,7 +831,7 @@ describe('SubmissionManager', () => {
     beforeAll(async () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
-      const {unmount} = render(<TextEntry submission={{state: 'unsubmitted'}} />)
+      const {unmount} = render(<TextEntry submission={{id: '1', _id: '1', state: 'unsubmitted'}} />)
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
       })

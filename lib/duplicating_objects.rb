@@ -39,7 +39,7 @@ module DuplicatingObjects
   # For the purposes of matching, conflicts are case-insensitive and also
   # treats hyphens and spaces as the same thing.
   def get_copy_title(entity, copy_suffix, entity_title)
-    is_multiple_copy = !(normalize_title(entity_title)=~
+    is_multiple_copy = !(normalize_title(entity_title) =~
       /#{Regexp.quote(copy_suffix.downcase)}-[0-9]*$/).nil?
     normalized_suffix = normalize_title(copy_suffix)
     if normalize_title(entity_title).end_with?(normalized_suffix) || is_multiple_copy
@@ -52,10 +52,11 @@ module DuplicatingObjects
     end
     title_base = !is_multiple_copy ? potential_title + " " : potential_title.gsub(/\d+$/, '')
     title_search_term = title_base[0...-1]
-    conflicting_titles = entity.get_potentially_conflicting_titles(title_search_term).map {
-      |x| normalize_title(x)
+    conflicting_titles = entity.get_potentially_conflicting_titles(title_search_term).map { |x|
+      normalize_title(x)
     }
     return potential_title unless conflicting_titles.include?(normalize_title(potential_title))
+
     loop do
       title_attempt = "#{title_base}#{num_to_try}"
       num_to_try = num_to_try.succ

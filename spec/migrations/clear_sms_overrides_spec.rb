@@ -36,9 +36,9 @@ describe ClearSmsOverrides do
 
   it "queues sms settings to be cleared" do
     expect(DataFixup::ClearAccountSettings).to receive(:run).with([
-      "allowed_sms_notification_categories",
-      "allowed_sms_notification_types"
-    ])
+                                                                    "allowed_sms_notification_categories",
+                                                                    "allowed_sms_notification_types"
+                                                                  ])
 
     migration.change
   end

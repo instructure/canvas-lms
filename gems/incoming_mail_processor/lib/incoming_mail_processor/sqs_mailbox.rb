@@ -30,7 +30,7 @@ module IncomingMailProcessor
 
     POLL_PARAMS = %i{idle_timeout wait_time_seconds visibility_timeout}.freeze
 
-    def initialize(opts={})
+    def initialize(opts = {})
       @config = opts
       wrap_with_timeout(self, [:connect, :move_message])
     end
@@ -47,7 +47,7 @@ module IncomingMailProcessor
     def disconnect
     end
 
-    def each_message(opts={})
+    def each_message(opts = {})
       start_time = Time.now
       iteration_high_water = config[:iteration_high_water] || 300
       @incoming_mail_queue.before_request do |_stats|
@@ -80,8 +80,8 @@ module IncomingMailProcessor
     def unprocessed_message_count
       connect
       @sqs.get_queue_attributes(attribute_names: ["ApproximateNumberOfMessages"],
-                                queue_url: @queue_url).
-          attributes["ApproximateNumberOfMessages"].to_i
+                                queue_url: @queue_url)
+          .attributes["ApproximateNumberOfMessages"].to_i
     end
 
     private
@@ -91,7 +91,7 @@ module IncomingMailProcessor
       sns_body = JSON.parse(sqs_body['Message'])
       key = sns_body['mail']['messageId']
       s3 = Aws::S3::Resource.new(access_key_id: config[:access_key_id], secret_access_key: config[:secret_access_key],
-        region: config[:region] || 'us-east-1')
+                                 region: config[:region] || 'us-east-1')
       obj = s3.bucket(config[:incoming_mail_bucket]).object(key)
       obj.get.body.read
     end

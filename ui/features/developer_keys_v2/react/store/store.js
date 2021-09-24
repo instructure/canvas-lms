@@ -31,7 +31,10 @@ const middleware = [
   ReduxThunk,
 
   // this is so redux-logger is not included in the production webpack bundle
-  process.env.NODE_ENV !== 'production' && require('redux-logger').logger
+  process.env.NODE_ENV !== 'production' &&
+    // this is so redux-logger is not included in the test output
+    process.env.NODE_ENV !== 'test' &&
+    require('redux-logger').logger
 ].filter(Boolean)
 
 const createStoreWithMiddleware = applyMiddleware(...middleware)(createStore)

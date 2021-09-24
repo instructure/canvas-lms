@@ -26,9 +26,9 @@ describe "sub account basic settings" do
   let(:admin_tab_url) { "/accounts/#{account.id}/settings#tab-users" }
   include_examples "settings basic tests", :sub_account
 
-  it "should disable inherited settings if locked by a parent account", priority: "1", test_id: 250007 do
+  it "disables inherited settings if locked by a parent account", priority: "1", test_id: 250007 do
     parent = Account.default
-    parent.settings[:restrict_student_future_view] = {locked: true, value: true}
+    parent.settings[:restrict_student_future_view] = { locked: true, value: true }
     parent.save!
 
     get account_settings_url

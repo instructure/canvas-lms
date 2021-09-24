@@ -29,7 +29,7 @@ describe MediaObjectsController do
       )
     end
 
-    it 'should create a MediaObject if necessary on request' do
+    it 'creates a MediaObject if necessary on request' do
       # this test is purposely run with no user logged in to make sure it works in public courses
 
       missing_media_id = '0_12345678'
@@ -56,7 +56,7 @@ describe MediaObjectsController do
       expect(MediaObject.by_media_id(missing_media_id).first.media_id).to eq missing_media_id
     end
 
-    it "should retrieve info about a 'deleted' MediaObject" do
+    it "retrieves info about a 'deleted' MediaObject" do
       deleted_media_id = '0_deadbeef'
       course_factory
       mo = media_object = course_factory.media_objects.build media_id: deleted_media_id
@@ -95,7 +95,7 @@ describe MediaObjectsController do
       )
     end
 
-    it "should retrieve all MediaObjects user in the user's context" do
+    it "retrieves all MediaObjects user in the user's context" do
       user_factory
       user_session(@user)
       mo1 =

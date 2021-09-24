@@ -19,7 +19,7 @@
 
 module Account::Settings
   module ClassMethods
-    def add_setting(setting, opts=nil)
+    def add_setting(setting, opts = nil)
       if opts && opts[:inheritable]
         opts[:hash] = true
         opts[:values] = [:value, :locked]
@@ -40,7 +40,7 @@ module Account::Settings
     end
 
     def inheritable_settings
-      self.account_settings_options.select{|k, v| v[:inheritable]}.keys
+      self.account_settings_options.select { |k, v| v[:inheritable] }.keys
     end
   end
 
@@ -63,13 +63,13 @@ module Account::Settings
   # should continue down the account chain until it reaches a locked value
   # otherwise use the last explicitly set value
   def calculate_inherited_setting(setting)
-    inherited_hash = {:locked => false, :value => self.class.account_settings_options[setting][:default]}
+    inherited_hash = { :locked => false, :value => self.class.account_settings_options[setting][:default] }
     self.account_chain.reverse_each do |acc|
       current_hash = acc.settings[setting]
       next if current_hash.nil?
 
       if !current_hash.is_a?(Hash)
-        current_hash = {:locked => false, :value => current_hash}
+        current_hash = { :locked => false, :value => current_hash }
       end
       current_hash[:inherited] = true if (self != acc)
 

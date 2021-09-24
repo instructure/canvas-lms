@@ -55,6 +55,7 @@ class ExternalFeedAggregator
       require 'rss/2.0'
       rss = RSS::Parser.parse(body, false)
       raise "Invalid rss feed" unless rss
+
       feed.title = rss.channel.title
       feed.save
       @logger.info("#{rss.items.length} rss items found")
@@ -96,12 +97,12 @@ class ExternalFeedAggregator
         handle_failure(feed)
       end
     rescue CanvasHttp::Error,
-      CanvasHttp::RelativeUriError,
-      CanvasHttp::InsecureUriError,
-      Timeout::Error,
-      SocketError,
-      SystemCallError,
-      OpenSSL::SSL::SSLError => e
+           CanvasHttp::RelativeUriError,
+           CanvasHttp::InsecureUriError,
+           Timeout::Error,
+           SocketError,
+           SystemCallError,
+           OpenSSL::SSL::SSLError => e
       Canvas::Errors.capture_exception(:external_feed, e, :info)
       handle_failure(feed)
     end

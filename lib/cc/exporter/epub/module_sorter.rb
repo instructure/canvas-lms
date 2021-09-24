@@ -30,9 +30,10 @@ module CC::Exporter::Epub
     end
 
     def filter_content_to_module(module_id)
-      current_mod = cartridge_json[:modules].find{|mod| mod[:identifier] == module_id}
+      current_mod = cartridge_json[:modules].find { |mod| mod[:identifier] == module_id }
       current_mod[:items].each do |item|
         next unless item
+
         merge_with_original_item_data!(item)
 
         if current_mod[:locked]
@@ -46,8 +47,9 @@ module CC::Exporter::Epub
     end
 
     private
+
     def module_ids
-      cartridge_json[:modules].map{|mod| mod[:identifier]}
+      cartridge_json[:modules].map { |mod| mod[:identifier] }
     end
 
     def module_item_ids
@@ -64,7 +66,7 @@ module CC::Exporter::Epub
       original_item_data = get_item(resource_type, identifier)
 
       module_item.reverse_merge!(original_item_data)
-      update_item(resource_type, identifier, {href: module_item[:href]})
+      update_item(resource_type, identifier, { href: module_item[:href] })
     end
   end
 end

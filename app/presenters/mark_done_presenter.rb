@@ -48,19 +48,23 @@ class MarkDonePresenter
   def has_requirement?
     return false unless @module
     return false unless @context.grants_any_right?(@user, @ctrl.session, :participate_as_student)
+
     requirements = @module.completion_requirements
-    requirement = requirements.find {|i| i[:id] == @item.id}
+    requirement = requirements.find { |i| i[:id] == @item.id }
     return false unless requirement
+
     requirement[:type] == 'must_mark_done'
   end
 
   def checked?
     return false unless has_requirement?
+
     progression = @module.context_module_progressions.loaded? ?
-      @module.context_module_progressions.find{|p| p[:user_id] == @user.id} :
+      @module.context_module_progressions.find { |p| p[:user_id] == @user.id } :
       @module.context_module_progressions.where(:user_id => @user.id).first
     return false unless progression
-    !!progression.requirements_met.find {|r| r[:id] == @item.id && r[:type] == "must_mark_done" }
+
+    !!progression.requirements_met.find { |r| r[:id] == @item.id && r[:type] == "must_mark_done" }
   end
 
   def api_url

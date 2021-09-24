@@ -24,9 +24,9 @@ module DataFixup::ReassociateGradingPeriodGroups
       account_subquery = Account.root_accounts.where(id: groups.map(&:account_id))
       term_ids = EnrollmentTerm.active.where(root_account_id: account_subquery).pluck(:id)
       groups.each do |group|
-        EnrollmentTerm.
-          where(id: term_ids, root_account_id: group.account_id).
-          update_all(grading_period_group_id: group.id)
+        EnrollmentTerm
+          .where(id: term_ids, root_account_id: group.account_id)
+          .update_all(grading_period_group_id: group.id)
       end
     end
   end

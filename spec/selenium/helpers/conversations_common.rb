@@ -161,6 +161,7 @@ module ConversationsCommon
     message_recipients_input.send_keys(to)
     fj(".ac-result:contains('#{to}')").click
     return unless synthetic
+
     fj(".ac-result:contains('All in #{to}')").click
   end
 
@@ -189,12 +190,12 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
-  def compose(options={})
+  def compose(options = {})
     f('#compose-btn').click
     wait_for_ajaximations
     select_message_course(options[:course]) if options[:course]
 
-    (options[:to] || []).each {|recipient| add_message_recipient recipient}
+    (options[:to] || []).each { |recipient| add_message_recipient recipient }
     write_message_subject(options[:subject]) if options[:subject]
     write_message_body(options[:body]) if options[:body]
     click_faculty_journal if options[:journal]
@@ -203,6 +204,7 @@ module ConversationsCommon
 
   def run_progress_job
     return unless progress = Progress.where(tag: 'conversation_batch_update').first
+
     job = Delayed::Job.find(progress.delayed_job_id)
     job.invoke_job
   end
@@ -226,7 +228,7 @@ module ConversationsCommon
   end
 
   # Allows you to select between
-  def click_more_options(opts,message = 0)
+  def click_more_options(opts, message = 0)
     case
     # First case is for clicking on message gear menu
     when opts[:message]
@@ -256,7 +258,7 @@ module ConversationsCommon
   def add_students(count)
     @s = []
     count.times do |n|
-      @s << User.create!(:name => "Test Student #{n+1}")
+      @s << User.create!(:name => "Test Student #{n + 1}")
       @course.enroll_student(@s.last).update_attribute(:workflow_state, 'active')
     end
   end
@@ -278,7 +280,7 @@ module ConversationsCommon
     wait_for_ajaximations
   end
 
-  def click_star_icon(msg,star_btn = nil)
+  def click_star_icon(msg, star_btn = nil)
     if star_btn.nil?
       star_btn = f('.star-btn', msg)
     end

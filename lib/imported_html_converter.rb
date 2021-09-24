@@ -36,7 +36,7 @@ class ImportedHtmlConverter
     @link_replacer = Importers::LinkReplacer.new(migration)
   end
 
-  def convert(html, item_type, mig_id, field, opts={})
+  def convert(html, item_type, mig_id, field, opts = {})
     mig_id = mig_id.to_s
     doc = Nokogiri::HTML5(html || "")
     doc.search("*").each do |node|
@@ -47,9 +47,11 @@ class ImportedHtmlConverter
 
     node = doc.at_css('body')
     return "" unless node
+
     if opts[:remove_outer_nodes_if_one_child]
       while node.children.size == 1 && node.child.child
         break unless CONTAINER_TYPES.member?(node.child.name) && node.child.attributes.blank?
+
         node = node.child
       end
     end
@@ -79,5 +81,4 @@ class ImportedHtmlConverter
     Rails.logger.warn "attempting to translate invalid url: #{url}"
     false
   end
-
 end

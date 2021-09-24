@@ -46,13 +46,15 @@ class DiscussionTopicSectionVisibility < ActiveRecord::Base
 
   def discussion_topic_is_section_specific
     return true if self.deleted? || self.discussion_topic.is_section_specific
+
     self.errors.add(:discussion_topic_id, t("Cannot add section to a non-section-specific discussion"))
   end
 
   def course_and_topic_share_context
     return true if self.deleted? || self.discussion_topic.context_id == self.course_section.course_id
+
     self.errors.add(:course_section_id,
-      t("Section does not belong to course for this discussion topic"))
+                    t("Section does not belong to course for this discussion topic"))
   end
 
   def new_discussion_topic?

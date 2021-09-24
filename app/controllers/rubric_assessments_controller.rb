@@ -168,9 +168,9 @@ class RubricAssessmentsController < ApplicationController
           end
 
           if @asset.is_a?(ModeratedGrading::ProvisionalGrade)
-            json[:artifact] = @asset.submission.
-              as_json(Submission.json_serialization_full_parameters(include_root: false)).
-              merge(@asset.grade_attributes)
+            json[:artifact] = @asset.submission
+                                    .as_json(Submission.json_serialization_full_parameters(include_root: false))
+                                    .merge(@asset.grade_attributes)
 
             if @association_object.moderated_grading? && !@association_object.can_view_other_grader_identities?(@current_user)
               current_user_moderation_grader = @association_object.moderation_graders.find_by(user: @current_user)
@@ -181,7 +181,7 @@ class RubricAssessmentsController < ApplicationController
           render json: json
         end
       rescue Assignment::GradeError => error
-        json = {errors: {base: error.to_s, error_code: error.error_code}}
+        json = { errors: { base: error.to_s, error_code: error.error_code } }
         render json: json, status: error.status_code || :bad_request
       end
     end
@@ -206,6 +206,7 @@ class RubricAssessmentsController < ApplicationController
   end
 
   private
+
   def resolve_user_id
     user_id = params[:rubric_assessment][:user_id]
     if user_id

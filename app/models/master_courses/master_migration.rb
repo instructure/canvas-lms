@@ -69,13 +69,13 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       if master_template.active_migration_running?
         if opts[:retry_later]
           delay(singleton: "retry_start_master_migration_#{master_template.global_id}",
-              run_at: 10.minutes.from_now).
-              start_new_migration!(master_template, user, opts)
+                run_at: 10.minutes.from_now)
+            .start_new_migration!(master_template, user, opts)
         else
           raise MigrationRunningError.new("cannot start new migration while another one is running")
         end
       else
-        new_migration = master_template.master_migrations.create!({:user => user}.merge(opts.except(:retry_later)))
+        new_migration = master_template.master_migrations.create!({ :user => user }.merge(opts.except(:retry_later)))
         master_template.active_migration = new_migration
         master_template.save!
         new_migration.queue_export_job
@@ -142,7 +142,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     self.save!
 
     subs = self.master_template.child_subscriptions.active.preload(:child_course).to_a
-    subs.reject!{|s| s.child_course.deleted?}
+    subs.reject! { |s| s.child_course.deleted? }
     if subs.empty?
       self.workflow_state = 'completed'
       self.export_results[:message] = "No child courses to export to"
@@ -183,7 +183,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     export = self.create_export(type, export_is_primary, :deletions => @deletions)
 
     if export.exported_for_course_copy?
-      self.export_results[type] = {:subscriptions => subscriptions.map(&:id), :content_export_id => export.id}
+      self.export_results[type] = { :subscriptions => subscriptions.map(&:id), :content_export_id => export.id }
       if type == :selective
         self.export_results[type][:deleted] = @deletions
         self.export_results[type][:created] = @creations
@@ -225,10 +225,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def selected_content(type)
     {}.tap do |h|
       h[:all_course_settings] = if migration_settings.has_key?(:copy_settings)
-        migration_settings[:copy_settings]
-      else
-        type == :full
-      end
+                                  migration_settings[:copy_settings]
+                                else
+                                  type == :full
+                                end
       h[:syllabus_body] = type == :full || master_template.course.syllabus_updated_at&.>(last_export_at || master_template.created_at)
     end
   end
@@ -240,6 +240,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def export_object?(obj)
     return false unless obj
     return true if last_export_at.nil?
+
     if obj.is_a?(LearningOutcome) && obj.context_type == "Account"
       link = self.master_template.course.learning_outcome_links.where(content: obj).first
       obj = link if link # export the outcome if it's a new link
@@ -264,8 +265,10 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   def add_exported_asset(asset)
     return unless @export_type == :selective
+
     @export_count += 1
     return if @export_count > Setting.get('master_courses_history_count', '150').to_i
+
     set = (last_export_at.nil? || asset.created_at >= last_export_at) ? @creations : @updates
     set[asset.class.name] ||= []
     set[asset.class.name] << master_template.content_tag_for(asset).migration_id
@@ -273,7 +276,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
 
   class MigrationPluginStub # so we can (ab)use queue_migration
     def self.settings
-      {:skip_initial_progress => true, :import_immediately => true}
+      { :skip_initial_progress => true, :import_immediately => true }
     end
   end
 
@@ -350,5 +353,4 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id = self.master_template.root_account_id
   end
-
 end

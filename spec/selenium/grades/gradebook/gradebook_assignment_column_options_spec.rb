@@ -33,7 +33,7 @@ describe "Gradebook - Assignment Column" do
 
     # enroll three students
     3.times do |i|
-      student = User.create!(name: "Student #{i+1}")
+      student = User.create!(name: "Student #{i + 1}")
       student.register!
       @course.enroll_student(student).update!(workflow_state: 'active')
     end
@@ -127,7 +127,7 @@ describe "Gradebook - Assignment Column" do
 
     it "replace EX with Excused in Gradebook Cells", priority: "2", test_id: 3424906 do
       # excuse the student by entering 'EX' in the cell
-      Gradebook::Cells.edit_grade(@course.students[2],@assignment, 'EX')
+      Gradebook::Cells.edit_grade(@course.students[2], @assignment, 'EX')
 
       expect { Gradebook::Cells.get_grade(@course.students[2], @assignment) }.to become 'Excused'
     end

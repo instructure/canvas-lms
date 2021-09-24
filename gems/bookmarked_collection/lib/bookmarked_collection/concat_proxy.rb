@@ -47,6 +47,7 @@ class BookmarkedCollection::ConcatProxy < BookmarkedCollection::CompositeProxy
 
         # nothing here to copy over
         break if subpager.empty?
+
         subbookmark = subpager.next_bookmark
 
         # add each item to the pager

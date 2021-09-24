@@ -161,7 +161,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when security claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:security]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:security] }) }
 
       it 'does not set the "aud" claim' do
         expect(decoded_jwt).not_to include 'aud'
@@ -201,7 +201,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when i18n claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:i18n]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:i18n] }) }
 
       it 'does not set the "locale" claim' do
         expect(decoded_jwt).not_to include 'locale'
@@ -231,7 +231,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when context claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:context]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:context] }) }
 
       it 'does not set the context claim' do
         expect(message_context).to be_nil
@@ -259,7 +259,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when platform claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:tool_platform]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:tool_platform] }) }
 
       it 'does not set the platform claim' do
         expect(message_platform).to be_nil
@@ -293,7 +293,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when launch presentation claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:launch_presentation]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:launch_presentation] }) }
 
       it 'does not set the launch presentation claim' do
         expect(message_launch_presentation).to be_nil
@@ -370,7 +370,6 @@ describe Lti::Messages::JwtMessage do
       )
     end
     let(:lti_advantage_service_claim) { raise 'Set in example' }
-
   end
 
   shared_context 'with lti advantage group context' do
@@ -389,13 +388,13 @@ describe Lti::Messages::JwtMessage do
   end
 
   shared_examples 'lti advantage service claim group disabled check' do
-    let(:opts) { super().merge({claim_group_blacklist: [lti_advantage_service_claim_group]}) }
+    let(:opts) { super().merge({ claim_group_blacklist: [lti_advantage_service_claim_group] }) }
 
     it_behaves_like 'absent lti advantage service claim check'
   end
 
   shared_examples 'lti advantage scopes missing from developer key' do
-    let(:lti_advantage_developer_key_scopes) { [ TokenScopes::USER_INFO_SCOPE[:scope] ] }
+    let(:lti_advantage_developer_key_scopes) { [TokenScopes::USER_INFO_SCOPE[:scope]] }
 
     it_behaves_like 'absent lti advantage service claim check'
   end
@@ -457,7 +456,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when custom parameters claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:custom_params]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:custom_params] }) }
 
       it 'does not set the custom parameters claim' do
         expect(message_custom).to be_nil
@@ -484,23 +483,22 @@ describe Lti::Messages::JwtMessage do
     it_behaves_like 'sets roles claim'
 
     context 'when roles claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:roles]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:roles] }) }
 
       it_behaves_like 'skips roles claim'
     end
 
     describe 'when Canvas roles extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:roles]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:roles] }) }
 
       it_behaves_like 'sets roles claim'
     end
 
     describe 'when Canvas enrollment state extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:canvas_enrollment_state]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:canvas_enrollment_state] }) }
 
       it_behaves_like 'sets roles claim'
     end
-
   end
 
   describe 'include name claims' do
@@ -565,7 +563,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when name claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:name]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:name] }) }
 
       it_behaves_like 'does not set name claim group'
     end
@@ -592,7 +590,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when email claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:email]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:email] }) }
 
       it_behaves_like 'does not set email claims'
     end
@@ -645,7 +643,7 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when public claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:public]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:public] }) }
 
       it_behaves_like 'does not set public claims group'
     end
@@ -657,31 +655,31 @@ describe Lti::Messages::JwtMessage do
     end
 
     context 'when canvas course id extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:canvas_course_id]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:canvas_course_id] }) }
 
       it_behaves_like 'sets picture'
     end
 
     context 'when canvas workflow state extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:canvas_workflow_state]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:canvas_workflow_state] }) }
 
       it_behaves_like 'sets picture'
     end
 
     context 'when course section sourcedId extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:lis_course_offering_sourcedid]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:lis_course_offering_sourcedid] }) }
 
       it_behaves_like 'sets picture'
     end
 
     context 'when canvas account id extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:canvas_account_id]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:canvas_account_id] }) }
 
       it_behaves_like 'sets picture'
     end
 
     context 'when canvas account sis id extension disabled' do
-      let(:opts) { super().merge({extension_blacklist: [:canvas_account_sis_id]}) }
+      let(:opts) { super().merge({ extension_blacklist: [:canvas_account_sis_id] }) }
 
       it_behaves_like 'sets picture'
     end
@@ -716,7 +714,7 @@ describe Lti::Messages::JwtMessage do
     it_behaves_like 'sets role scope mentor'
 
     context 'when mentorship claim group disabled' do
-      let(:opts) { super().merge({claim_group_blacklist: [:mentorship]}) }
+      let(:opts) { super().merge({ claim_group_blacklist: [:mentorship] }) }
 
       it_behaves_like 'skips role scope mentor'
     end

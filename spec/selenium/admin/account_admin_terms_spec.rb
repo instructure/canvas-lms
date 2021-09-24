@@ -32,7 +32,7 @@ describe "account admin terms" do
     expect(term_header).to include_text("#{course_count} Course")
 
     # TODO: pend until a better solution is found to calculate user counts
-    #expect(term_header).to include_text("#{user_count} User")
+    # expect(term_header).to include_text("#{user_count} User")
   end
 
   before do
@@ -45,11 +45,11 @@ describe "account admin terms" do
       @default_term = ff('.term')[0]
     end
 
-    it "should validate default term" do
+    it "validates default term" do
       validate_term_display
     end
 
-    it "should cancel editing" do
+    it "cancels editing" do
       click_term_action_link(@default_term, '.edit_term_link')
       f('.cancel_button').click
       wait_for_animations
@@ -57,7 +57,7 @@ describe "account admin terms" do
       check_element_has_focus f(".edit_term_link", @default_term)
     end
 
-    it "should validate that you cannot delete a term with courses in it" do
+    it "validates that you cannot delete a term with courses in it" do
       expect {
         click_term_action_link(@default_term, '.cant_delete_term_link')
         alert = driver.switch_to.alert
@@ -69,8 +69,7 @@ describe "account admin terms" do
   end
 
   context "not default term" do
-
-    it "should add a new term" do
+    it "adds a new term" do
       new_term_name = 'New Term'
       get "/accounts/#{Account.default.id}/terms"
 
@@ -86,7 +85,7 @@ describe "account admin terms" do
       check_element_has_focus f("#term_#{EnrollmentTerm.last.id} .edit_term_link")
     end
 
-    it "should delete a term" do
+    it "deletes a term" do
       term_name = "delete term"
       term = @course.root_account.enrollment_terms.create!(:name => term_name)
       get "/accounts/#{Account.default.id}/terms"
@@ -100,7 +99,7 @@ describe "account admin terms" do
       check_element_has_focus f(".cant_delete_term_link", @default_term)
     end
 
-    it "should cancel term creation and validate nothing was created" do
+    it "cancels term creation and validate nothing was created" do
       get "/accounts/#{Account.default.id}/terms"
 
       expect {
@@ -125,10 +124,10 @@ describe "account admin terms" do
       let(:group) { Factories::GradingPeriodGroupHelper.new.create_for_account(account) }
 
       before do
-        group.enrollment_terms = [ term ]
+        group.enrollment_terms = [term]
       end
 
-      it "should display link to grading standards page", test_id: 2528663, priority: "1" do
+      it "displays link to grading standards page", test_id: 2528663, priority: "1" do
         get "/accounts/#{account.id}/terms"
         standards_url = "/accounts/#{account.id}/grading_standards"
         expect(fln(group.title).attribute('href')).to include(standards_url)

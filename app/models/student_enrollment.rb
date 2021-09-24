@@ -20,12 +20,12 @@
 
 class StudentEnrollment < Enrollment
   belongs_to :student, :foreign_key => :user_id, :class_name => 'User'
-  after_save :evaluate_modules, if: Proc.new{ |e|
+  after_save :evaluate_modules, if: Proc.new { |e|
     # if enrollment switches sections or is created
     e.saved_change_to_course_section_id? || e.saved_change_to_course_id? ||
-    # or if an enrollment is deleted and they are in another section of the course
-    (e.saved_change_to_workflow_state? && e.workflow_state == 'deleted' &&
-     e.user.enrollments.where('id != ?',e.id).active.where(course_id: e.course_id).exists?)
+      # or if an enrollment is deleted and they are in another section of the course
+      (e.saved_change_to_workflow_state? && e.workflow_state == 'deleted' &&
+       e.user.enrollments.where('id != ?', e.id).active.where(course_id: e.course_id).exists?)
   }
   after_save :restore_submissions_and_scores
 
@@ -34,17 +34,17 @@ class StudentEnrollment < Enrollment
   end
 
   def evaluate_modules
-    ContextModuleProgression.for_user(self.user_id).
-      joins(:context_module).
-      readonly(false).
-      where(:context_modules => { :context_type => 'Course', :context_id => self.course_id}).
-      each do |prog|
-        prog.mark_as_outdated!
-      end
+    ContextModuleProgression.for_user(self.user_id)
+                            .joins(:context_module)
+                            .readonly(false)
+                            .where(:context_modules => { :context_type => 'Course', :context_id => self.course_id })
+                            .each do |prog|
+      prog.mark_as_outdated!
+    end
   end
 
   def update_override_score(override_score:, grading_period_id: nil, updating_user:, record_grade_change: true)
-    score_params = {grading_period_id: grading_period_id} if grading_period_id.present?
+    score_params = { grading_period_id: grading_period_id } if grading_period_id.present?
     score = find_score(score_params)
 
     raise ActiveRecord::RecordNotFound if score.blank?
@@ -103,7 +103,7 @@ class StudentEnrollment < Enrollment
         ).or(
           Score.where(grading_period: grading_periods)
         ).where(enrollment_id: students.map(&:id), workflow_state: "deleted")
-          .update_all(workflow_state: "active")
+             .update_all(workflow_state: "active")
       end
     end
   end
@@ -116,7 +116,7 @@ class StudentEnrollment < Enrollment
     # running in an n_strand to handle situations where a SIS import could
     # update a ton of enrollments from "deleted" to "completed".
     delay_if_production(n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
-        priority: Delayed::LOW_PRIORITY)
+                        priority: Delayed::LOW_PRIORITY)
       .restore_submissions_and_scores_now
   end
 

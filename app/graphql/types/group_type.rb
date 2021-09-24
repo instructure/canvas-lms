@@ -42,14 +42,14 @@ module Types
 
     field :member, GroupMembershipType, null: true do
       argument :user_id, ID,
-        prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User"),
-        required: true
+               prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("User"),
+               required: true
     end
     def member(user_id:)
       if group.grants_right?(current_user, :read_roster)
         members_scope.then do |m|
-          Loaders::ForeignKeyLoader.for(m, :user_id).load(user_id).
-            then { |memberships| memberships&.first }
+          Loaders::ForeignKeyLoader.for(m, :user_id).load(user_id)
+                                   .then { |memberships| memberships&.first }
         end
       end
     end

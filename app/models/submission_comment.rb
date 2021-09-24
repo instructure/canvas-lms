@@ -61,7 +61,7 @@ class SubmissionComment < ActiveRecord::Base
       record.errors.add(attr, 'attempt must not be larger than number of submission attempts')
     end
   end
-  validates :workflow_state, inclusion: {in: ["active"]}, allow_nil: true
+  validates :workflow_state, inclusion: { in: ["active"] }, allow_nil: true
 
   before_save :infer_details
   before_save :set_root_account_id
@@ -101,6 +101,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def publish_other_comments_in_this_group
     return unless saved_change_to_draft?
+
     update_other_comments_in_this_group do |comment|
       comment.update(draft: draft)
     end
@@ -113,10 +114,10 @@ class SubmissionComment < ActiveRecord::Base
     # readonly attributes/objects are marked as readonly and
     # therefore cannot be destroyed
     comment_ids = SubmissionComment
-      .for_assignment_id(submission.assignment_id)
-      .where(group_comment_id: group_comment_id)
-      .where.not(id: id)
-      .pluck(:id)
+                  .for_assignment_id(submission.assignment_id)
+                  .where(group_comment_id: group_comment_id)
+                  .where.not(id: id)
+                  .pluck(:id)
 
     SubmissionComment.find(comment_ids).each do |comment|
       comment.skip_group_callbacks!
@@ -156,9 +157,8 @@ class SubmissionComment < ActiveRecord::Base
   def check_for_media_object
     if self.media_comment? && self.saved_change_to_media_comment_id?
       MediaObject.ensure_media_object(self.media_comment_id,
-        user: self.author,
-        context: self.author
-      )
+                                      user: self.author,
+                                      context: self.author)
     end
   end
 
@@ -177,14 +177,14 @@ class SubmissionComment < ActiveRecord::Base
     given { |user, session| can_view_comment?(user, session) }
     can :read
 
-    given {|user| self.author == user}
+    given { |user| self.author == user }
     can :read and can :delete and can :update
 
     given { |user, session| submission.grants_right?(user, session, :grade) }
     can :delete
 
     given { |user, session|
-        self.can_read_author?(user, session)
+      self.can_read_author?(user, session)
     }
     can :read_author
   end
@@ -202,25 +202,25 @@ class SubmissionComment < ActiveRecord::Base
         ([submission.user] + User.observing_students_in_course(submission.user, submission.assignment.context)) - [author]
       end
     end
-    p.whenever {|record|
+    p.whenever { |record|
       # allows broadcasting when this record is initially saved (assuming draft == false) and also when it gets updated
       # from draft to final
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
-      record.provisional_grade_id.nil? &&
-      record.submission.assignment &&
-      record.submission.assignment.context.available? &&
-      record.submission.posted? &&
-      record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
-      (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
+        record.provisional_grade_id.nil? &&
+        record.submission.assignment &&
+        record.submission.assignment.context.available? &&
+        record.submission.posted? &&
+        record.submission.assignment.context.grants_right?(record.submission.user, :read) &&
+        (!record.submission.assignment.context.instructors.include?(author) || record.submission.assignment.published?)
     }
     p.data { course_broadcast_data }
 
     p.dispatch :submission_comment_for_teacher
     p.to { submission.assignment.context.instructors_in_charge_of(author_id) - [author] }
-    p.whenever {|record|
+    p.whenever { |record|
       (!record.draft? && (record.just_created || record.saved_change_to_draft?)) &&
-      record.provisional_grade_id.nil? &&
-      record.submission.user_id == record.author_id
+        record.provisional_grade_id.nil? &&
+        record.submission.user_id == record.author_id
     }
     p.data { course_broadcast_data }
   end
@@ -242,6 +242,7 @@ class SubmissionComment < ActiveRecord::Base
     # Students on the receiving end of an assessment can view assessors' comments
     if assessment_request.present?
       return true if assessment_request.user_id == user.id
+
       # Peer-review comments that belong to a group should be viewable by the
       # rest of the group.
       if group_comment_id.present?
@@ -291,6 +292,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def reply_from(opts)
     raise IncomingMail::Errors::UnknownAddress if self.context.root_account.deleted?
+
     user = opts[:user]
     message = opts[:text].strip
     user = nil unless user && self.submission.grants_right?(user, :comment)
@@ -330,13 +332,13 @@ class SubmissionComment < ActiveRecord::Base
       old_ids.include?(a.id) ||
       a.recently_created ||
       a.ok_for_submission_comment
-    }.map{|a| a.id}.join(","))
+    }.map { |a| a.id }.join(","))
   end
 
   def infer_details
     self.anonymous = self.submission.assignment.anonymous_peer_reviews
     self.author_name ||= self.author.short_name rescue t(:unknown_author, "Someone")
-    self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
+    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
     self.context = self.read_attribute(:context) || self.submission.assignment.context rescue nil
 
     self.workflow_state ||= "active"
@@ -347,12 +349,13 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   def force_reload_cached_attachments
-    self.cached_attachments = self.attachments.map{|a| OpenObject.build('attachment', a.attributes) }
+    self.cached_attachments = self.attachments.map { |a| OpenObject.build('attachment', a.attributes) }
     self.save
   end
 
   def attachments
     return Attachment.none unless attachment_ids.present?
+
     ids = parse_attachment_ids
     attachments = submission.assignment.attachments.where(id: ids)
   end
@@ -366,20 +369,21 @@ class SubmissionComment < ActiveRecord::Base
   def update_submission
     return nil if hidden? || provisional_grade_id.present?
 
-    relevant_comments = SubmissionComment.published.
-      where(submission_id: submission_id).
-      where(hidden: false).
-      where(provisional_grade_id: provisional_grade_id)
+    relevant_comments = SubmissionComment.published
+                                         .where(submission_id: submission_id)
+                                         .where(hidden: false)
+                                         .where(provisional_grade_id: provisional_grade_id)
 
     comments_count = relevant_comments.count
     Submission.where(id: submission_id).update_all(submission_comments_count: comments_count)
   end
 
-  def formatted_body(truncate=nil)
+  def formatted_body(truncate = nil)
     # stream items pre-serialize the return value of this method
     if formatted_body = read_attribute(:formatted_body)
       return formatted_body
     end
+
     res = format_message(comment).first
     res = truncate_html(res, :max_length => truncate, :words => true) if truncate
     res
@@ -414,10 +418,10 @@ class SubmissionComment < ActiveRecord::Base
         submission.user.clear_cache_key(:submissions)
 
         ContentParticipation.create_or_update({
-          :content => submission,
-          :user => submission.user,
-          :workflow_state => "unread",
-        })
+                                                :content => submission,
+                                                :user => submission.user,
+                                                :workflow_state => "unread",
+                                              })
       end
     end
   end
@@ -435,11 +439,13 @@ class SubmissionComment < ActiveRecord::Base
   end
 
   protected
+
   def skip_group_callbacks!
     @skip_group_callbacks = true
   end
 
   private
+
   def updating_user_present?
     # For newly-created comments, the updating user is always the commenter
     updating_user = saved_change_to_id? ? author : @updating_user
@@ -467,7 +473,7 @@ class SubmissionComment < ActiveRecord::Base
       submission: submission,
       user: updating_user,
       event_type: event_type,
-      payload: changes_to_save.merge({id: id})
+      payload: changes_to_save.merge({ id: id })
     )
   end
 
@@ -499,7 +505,7 @@ class SubmissionComment < ActiveRecord::Base
       submission: submission,
       user: @updating_user,
       event_type: :submission_comment_deleted,
-      payload: {id: id}
+      payload: { id: id }
     )
   end
 end

@@ -24,13 +24,12 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   include WikiAndTinyCommon
 
   context "as a teacher" do
-
     before(:each) do
       course_with_teacher_logged_in
     end
 
     ['Only teachers', 'Teachers and students', 'Anyone'].each_with_index do |permission, i|
-      it "should validate correct permissions for #{permission}" do
+      it "validates correct permissions for #{permission}" do
         title = "test_page"
         unpublished = false
         edit_roles = "public"
@@ -42,7 +41,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
         expect(f("form.edit-form .edit-content")).to be_displayed
 
         click_option("select[name=\"editing_roles\"]", permission)
-        #form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
+        # form id is set like this because the id iterator is in the form but im not sure how to grab it directly before committed to the DB with the save
         wait_for_new_page_load(f('form.edit-form button.submit').click)
 
         p.reload
@@ -50,13 +49,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       end
     end
 
-    it "should take user to page history" do
+    it "takes user to page history" do
       title = "test_page"
       unpublished = false
       edit_roles = "public"
 
       p = create_wiki_page(title, unpublished, edit_roles)
-      #sets body
+      # sets body
       p.update(:body => "test")
 
       get "/courses/#{@course.id}/pages/#{p.title}"
@@ -69,14 +68,14 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(ff('.revision').length).to eq 2
     end
 
-    it "should load the previous version of the page and roll-back page" do
+    it "loads the previous version of the page and roll-back page" do
       title = "test_page"
       unpublished = false
       edit_roles = "public"
       body = "test"
 
       p = create_wiki_page(title, unpublished, edit_roles)
-      #sets body and then resets it for history verification
+      # sets body and then resets it for history verification
       p.update(:body => body)
       p.update(:body => "sample")
 

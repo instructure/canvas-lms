@@ -58,7 +58,6 @@ describe 'ToDoListPresenter' do
     let(:grader) { user_with_multiple_enrollments('TeacherEnrollment') }
     let(:final_grader) { user_with_multiple_enrollments('TeacherEnrollment') }
 
-
     def user_with_multiple_enrollments(enrollment_type)
       result = course_with_user(enrollment_type, course: course1, active_all: true).user
       course_with_user(enrollment_type, user: result, course: course2, active_all: true).user
@@ -124,12 +123,12 @@ describe 'ToDoListPresenter' do
     before :each do
       course1.offer!
       assignment = Assignment.create({
-        context: course1,
-        title: 'assignment3',
-        submission_types: 'online_text_entry',
-        due_at: 1.day.from_now,
-        peer_reviews: true
-      })
+                                       context: course1,
+                                       title: 'assignment3',
+                                       submission_types: 'online_text_entry',
+                                       due_at: 1.day.from_now,
+                                       peer_reviews: true
+                                     })
       assignment.publish
       assessment = assignment.assign_peer_review(reviewer, reviewee)
       assignment.submit_homework(reviewee, body: 'you say potato...')
@@ -145,14 +144,14 @@ describe 'ToDoListPresenter' do
       view_stub = double('view')
       allow(view_stub).to receive(:course_assignment_submission_path).and_return('path/to/submission')
 
-      course1.assignments.last.update({anonymous_peer_reviews: false})
+      course1.assignments.last.update({ anonymous_peer_reviews: false })
       presenter = ToDoListPresenter.new(view_stub, reviewer, [course1])
 
       expect(presenter.needs_reviewing.last.submission_path).to eq 'path/to/submission'
     end
 
     it "returns the correct submission_path for anonymous peer reviews" do
-      course1.assignments.last.update({anonymous_peer_reviews: true})
+      course1.assignments.last.update({ anonymous_peer_reviews: true })
       presenter = ToDoListPresenter.new(nil, reviewer, [course1])
 
       expect(presenter.needs_reviewing.last.submission_path).to include('anonymous_submissions')

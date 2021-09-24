@@ -24,6 +24,7 @@ describe PseudonymSession do
   before(:each) do
     fake_controller_cls = Class.new do
       attr_reader :request
+
       def initialize
         request_cls = Class.new do
           def ip

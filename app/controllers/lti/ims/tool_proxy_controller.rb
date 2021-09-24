@@ -58,7 +58,7 @@ module Lti
         if tool_proxy && oauth_authenticated_request?(tool_proxy.shared_secret)
           render json: tool_proxy.raw_data, content_type: 'application/vnd.ims.lti.v2.toolproxy+json'
         else
-          render json: {error: 'unauthorized'}, status: :unauthorized
+          render json: { error: 'unauthorized' }, status: :unauthorized
         end
       end
 
@@ -72,7 +72,8 @@ module Lti
               context: context,
               tool_proxy_guid: reg_key,
               dev_key: developer_key,
-              registration_url: reg_info[:registration_url]) and return if reg_info.present?
+              registration_url: reg_info[:registration_url]
+            ) and return if reg_info.present?
           rescue Lti::Oauth2::InvalidTokenError
             render_unauthorized and return
           end
@@ -108,10 +109,10 @@ module Lti
         end
 
         json = {
-            "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
-            "@type" => "ToolProxy",
-            "@id" => tp.raw_data["@id"],
-            "tool_proxy_guid" => tp.guid
+          "@context" => "http://purl.imsglobal.org/ctx/lti/v2/ToolProxyId",
+          "@type" => "ToolProxy",
+          "@id" => tp.raw_data["@id"],
+          "tool_proxy_guid" => tp.guid
         }
 
         tps = ToolProxyService.new
@@ -130,7 +131,7 @@ module Lti
         tp.save
         render json: json, status: :created, content_type: 'application/vnd.ims.lti.v2.toolproxy.id+json'
       rescue JSON::ParserError
-        render json: {error: 'Invalid request'}, status: 400
+        render json: { error: 'Invalid request' }, status: 400
       end
 
       private
@@ -161,7 +162,7 @@ module Lti
         )
       end
 
-      def tp_validator(tcp_uuid:nil)
+      def tp_validator(tcp_uuid: nil)
         tcp_path = [@context, :tool_consumer_profile]
         tcp_url = tcp_uuid ? polymorphic_url(tcp_path, tool_consumer_profile_id: tcp_uuid) : polymorphic_url(tcp_path)
         profile = Lti::ToolConsumerProfileCreator.new(

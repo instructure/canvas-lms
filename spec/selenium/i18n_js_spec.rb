@@ -30,7 +30,7 @@ describe "i18n js" do
   end
 
   context "strftime" do
-    it "should format just like ruby" do
+    it "formats just like ruby" do
       # everything except %N %6N %9N %U %V %W %Z
       format = "%a %A %b %B %d %-d %D %e %F %h %H %I %j %k %l %L %m %M %n %3N %p %P %r %R %s %S %t %T %u %v %w %y %Y %z %%"
       date = Time.now
@@ -42,7 +42,7 @@ describe "i18n js" do
   end
 
   context "locales" do
-    it "should pull in core translations for all locales" do
+    it "pulls in core translations for all locales" do
       skip("Rails 6.0 specific") unless CANVAS_RAILS6_0
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
@@ -68,7 +68,7 @@ describe "i18n js" do
   end
 
   context "scoped" do
-    it "should use the scoped translations" do
+    it "uses the scoped translations" do
       skip('USE_OPTIMIZED_JS=true') unless ENV['USE_OPTIMIZED_JS']
       skip('RAILS_LOAD_ALL_LOCALES=true') unless ENV['RAILS_LOAD_ALL_LOCALES']
 

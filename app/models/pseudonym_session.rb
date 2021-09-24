@@ -51,6 +51,7 @@ class PseudonymSession < Authlogic::Session::Base
   # see the SessionPersistenceToken class for details
   def save_cookie
     return unless remember_me?
+
     token = SessionPersistenceToken.generate(record)
     controller.cookies[cookie_key] = {
       :value => token.pseudonym_credentials,
@@ -84,6 +85,7 @@ class PseudonymSession < Authlogic::Session::Base
   def destroy_cookie
     cookie = controller.cookies.delete cookie_key, :domain => controller.cookie_domain
     return true unless cookie
+
     token = SessionPersistenceToken.find_by_pseudonym_credentials(cookie)
     token.try(:destroy)
     true
@@ -128,7 +130,7 @@ class PseudonymSession < Authlogic::Session::Base
         Rails.logger.info "[AUTH] Approved Authlogic session"
         return sess
       end
-      sess.errors.full_messages.each {|msg| Rails.logger.warn "[AUTH] Authlogic Validation Error: #{msg}" }
+      sess.errors.full_messages.each { |msg| Rails.logger.warn "[AUTH] Authlogic Validation Error: #{msg}" }
       Rails.logger.warn "[AUTH] Authlogic Failed Find" if sess.attempted_record.nil?
       # established AuthLogic behavior is to return false if the session is not valid
       false
@@ -137,6 +139,7 @@ class PseudonymSession < Authlogic::Session::Base
 
   def persist_by_session_search(persistence_token, record_id)
     return super unless record_id
+
     Shard.shard_for(record_id).activate do
       Rails.cache.fetch(["pseudonym_session", record_id].cache_key, expires_in: Setting.get("pseudonym_session_cache_ttl", 5).to_f.seconds) do
         super
@@ -170,4 +173,3 @@ class PseudonymSession < Authlogic::Session::Base
     end
   end
 end
-

@@ -23,7 +23,6 @@ import datePickerFormat from '../datePickerFormat'
 import {isRTL} from '@canvas/i18n/rtlHelper'
 
 import moment from 'moment'
-import './index'
 import '@canvas/rails-flash-notifications'
 
 const datepickerDefaults = {

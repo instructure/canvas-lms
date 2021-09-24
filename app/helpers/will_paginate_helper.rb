@@ -25,7 +25,6 @@ require 'will_paginate/view_helpers/link_renderer_base'
 
 module WillPaginateHelper
   class AccessibleLinkRenderer < WillPaginate::ActionView::LinkRenderer
-
     protected
 
     def page_number(page)
@@ -39,18 +38,19 @@ module WillPaginateHelper
     def previous_or_next_page(page, text, classname)
       title = page_title(page, classname)
       if page
-        link(text, page, :class=> classname, 'aria-label': title)
+        link(text, page, :class => classname, 'aria-label': title)
       else
-        tag(:span, text, :class=> classname + ' disabled', 'aria-label': title)
+        tag(:span, text, :class => classname + ' disabled', 'aria-label': title)
       end
     end
 
     private
 
-    def page_title(page, classname=nil)
+    def page_title(page, classname = nil)
       return I18n.t('Previous Page') if classname == 'previous_page'
       return I18n.t('Next Page') if classname == 'next_page'
-      I18n.t('Page %{pageNum}', :pageNum=>page.to_s)
+
+      I18n.t('Page %{pageNum}', :pageNum => page.to_s)
     end
   end
 end

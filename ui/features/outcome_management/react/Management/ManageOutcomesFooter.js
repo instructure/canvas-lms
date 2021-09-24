@@ -63,7 +63,7 @@ const ManageOutcomesFooter = ({
       <View
         as="div"
         padding={isMobileView ? 'small' : '0'}
-        background={isMobileView ? 'secondary' : ''}
+        background={isMobileView ? 'secondary' : undefined}
       >
         <Flex
           justifyItems="space-between"

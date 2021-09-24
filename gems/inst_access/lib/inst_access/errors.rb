@@ -22,6 +22,8 @@ module InstAccess
   class Error < StandardError; end
 
   class ConfigError < Error; end
+
   class InvalidToken < Error; end
+
   class TokenExpired < Error; end
 end

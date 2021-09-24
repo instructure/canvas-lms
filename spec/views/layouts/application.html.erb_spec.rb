@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe "layouts/application" do
-  it "should render" do
+  it "renders" do
     assign(:domain_root_account, Account.default)
     render "layouts/application"
   end

@@ -44,7 +44,7 @@ module CanvasCache
   # In this instance, it's expected that canvas is going to inject
   # the Setting class, but we want to break depednencies that directly
   # point to canvas.
-  def self.settings_store(safe_invoke=false)
+  def self.settings_store(safe_invoke = false)
     return @@settings_store if @@settings_store
     return nil if safe_invoke
 

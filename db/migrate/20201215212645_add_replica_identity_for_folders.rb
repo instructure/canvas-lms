@@ -32,4 +32,3 @@ class AddReplicaIdentityForFolders < ActiveRecord::Migration[5.2]
     change_column_null :folders, :root_account_id, true
   end
 end
-

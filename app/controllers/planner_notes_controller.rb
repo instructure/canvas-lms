@@ -165,7 +165,7 @@ class PlannerNotesController < ApplicationController
 
     render :json => planner_notes_json(notes, @current_user, session)
   rescue InvalidDates => e
-    render json: {errors: e.message.as_json}, status: :bad_request
+    render json: { errors: e.message.as_json }, status: :bad_request
   end
 
   # @API Show a planner note
@@ -202,9 +202,11 @@ class PlannerNotesController < ApplicationController
       if note.linked_object_id.present? && note.course_id != course_id
         return render json: { message: 'course_id cannot be changed for linked planner notes' }, status: :bad_request
       end
+
       if course_id.present?
         course = Course.find(course_id)
         return unless authorized_action(course, @current_user, :read)
+
         update_params[:course] = course
       else
         update_params[:course] = nil
@@ -246,6 +248,7 @@ class PlannerNotesController < ApplicationController
     if (course_id = create_params.delete(:course_id))
       course = Course.find(course_id)
       return unless authorized_action(course, @current_user, :read)
+
       create_params[:course] = course
     end
 
@@ -253,10 +256,13 @@ class PlannerNotesController < ApplicationController
     asset_type = create_params.delete(:linked_object_type)
     if asset_id.present? && asset_type.present?
       return render(json: { message: 'must specify course_id' }, status: :bad_request) unless course_id
+
       asset_klass = LINKED_OBJECT_TYPES[asset_type]&.constantize
       return render(json: { message: 'invalid linked_object_type' }, status: :bad_request) unless asset_klass
+
       asset = asset_klass.find_by!(id: asset_id, context_id: course_id, context_type: 'Course')
       return unless authorized_action(asset, @current_user, :read)
+
       create_params[:linked_object] = asset
       create_params[:title] ||= Context.asset_name(asset)
     end

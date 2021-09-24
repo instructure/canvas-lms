@@ -30,6 +30,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
 
   def create
     return render json: { error: "must specify a guid to import" } unless params[:guid]
+
     begin
       err_msg = "Invalid parameters"
       options = valid_options(params)
@@ -108,7 +109,8 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
     options[:points_possible] = parse_int hash[:points_possible] if hash.key? :points_possible
     unless hash[:ratings].nil?
       raise "ratings expected to be an array" unless hash[:ratings].is_a?(Array)
-      options[:ratings] = hash[:ratings].map {|r| parse_rating(r)}
+
+      options[:ratings] = hash[:ratings].map { |r| parse_rating(r) }
     end
     options
   end
@@ -117,6 +119,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
     unless LearningOutcome.valid_calculation_method?(value)
       raise "invalid calculation_method: #{value}"
     end
+
     value
   end
 
@@ -125,6 +128,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
     unless LearningOutcome.valid_calculation_int?(int, calc_method)
       raise "invalid calculation_int: #{value}"
     end
+
     int
   end
 
@@ -135,6 +139,7 @@ class OutcomesAcademicBenchmarkImportApiController < ApplicationController
     if rating[:description].nil? || !rating[:description].is_a?(String)
       raise "invalid description value: #{rating[:description]}"
     end
+
     { :description => rating[:description], :points => parse_int(rating[:points]) }
   end
 end

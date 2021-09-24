@@ -51,7 +51,6 @@ describe "Gradebook with grading periods" do
         Gradebook::Cells.edit_grade(@student, assign, "10")
         expect { Gradebook::Cells.get_grade(@student, assign) }.to become "10"
 
-
         Gradebook.select_grading_period(@gp_ended.title)
         Gradebook::Cells.edit_grade(@student, assign, "8")
         expect { Gradebook::Cells.get_grade(@student, assign) }.to become "8"

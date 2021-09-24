@@ -45,7 +45,7 @@ module Lti
       if body_hash = OAuth::Helper.parse_header(request.authorization)['oauth_body_hash']
         request.body.rewind
         generated_hash = Digest::SHA1.base64digest(request.body.read)
-        request.body.rewind #Be Kind Rewind
+        request.body.rewind # Be Kind Rewind
         generated_hash == body_hash
       else
         true
@@ -53,11 +53,9 @@ module Lti
     end
 
     def render_unauthorized_api
-      render json: {:status => I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
-                       :errors => [{:message => I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request')}]
-                             },
+      render json: { :status => I18n.t('lib.auth.lti.api.status_unauthorized', 'unauthorized'),
+                     :errors => [{ :message => I18n.t('lib.auth.lti.api.not_unauthorized', 'unauthorized request') }] },
              :status => :unauthorized
     end
-
   end
 end

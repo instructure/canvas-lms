@@ -602,6 +602,18 @@ describe('DiscussionTopicContainer', () => {
     expect(container.getByText('Due Apr 5 1:40pm')).toBeTruthy()
   })
 
+  it('should show availability window for ungraded discussions', () => {
+    const container = setup({
+      discussionTopic: Discussion.mock({
+        assignment: null,
+        delayedPostAt: '2021-03-21T00:00:00-06:00',
+        lockAt: '2021-09-03T23:59:59-06:00'
+      })
+    })
+
+    expect(container.getByText('Available from Mar 21 6am until Sep 4 5:59am')).toBeTruthy()
+  })
+
   it('Renders an alert if initialPostRequiredForCurrentUser is true', () => {
     const props = {discussionTopic: Discussion.mock({initialPostRequiredForCurrentUser: true})}
     const container = setup(props)

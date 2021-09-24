@@ -32,9 +32,8 @@ describe CC::BasicLTILinks do
   end
 
   describe "#create_blti_link" do
-
     let(:lti_doc) { Builder::XmlMarkup.new(target: xml, indent: 2) }
-    #this is the target for Builder::XmlMarkup. this is how you access the generated XML
+    # this is the target for Builder::XmlMarkup. this is how you access the generated XML
     let(:xml) { +'' }
 
     it "sets the encoding to 'UTF-8'" do
@@ -122,7 +121,6 @@ describe CC::BasicLTILinks do
     end
 
     context "extensions" do
-
       it "creates an extensions node" do
         subject.create_blti_link(tool, lti_doc)
         xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
@@ -172,7 +170,7 @@ describe CC::BasicLTILinks do
       end
 
       it "doesn't add non placement extensions if their value is a collection" do
-        tool.settings[:my_list] = [1,2,3]
+        tool.settings[:my_list] = [1, 2, 3]
         subject.create_blti_link(tool, lti_doc)
         xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
         expect(xml_doc.at_xpath('//blti:extensions/lticm:property[@name="my_list"]')).to be_nil
@@ -238,7 +236,7 @@ describe CC::BasicLTILinks do
         end
 
         it "adds settings for placements" do
-          tool.settings[:course_navigation] = {custom_setting: "foo"}
+          tool.settings[:course_navigation] = { custom_setting: "foo" }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/lticm:property[@name="custom_setting"]'
@@ -246,8 +244,8 @@ describe CC::BasicLTILinks do
         end
 
         it "adds labels correctly" do
-          labels = {en_US: "My Label"}
-          tool.settings[:course_navigation] = {labels: labels}
+          labels = { en_US: "My Label" }
+          tool.settings[:course_navigation] = { labels: labels }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/lticm:options[@name="labels"]/lticm:property[@name="en_US"]'
@@ -259,7 +257,7 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:course_navigation] = {custom_fields: custom_fields}
+          tool.settings[:course_navigation] = { custom_fields: custom_fields }
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions/lticm:options[@name="course_navigation"]/blti:custom/lticm:property'
@@ -270,7 +268,7 @@ describe CC::BasicLTILinks do
 
       context "vendor extensions" do
         it "adds vendor extensions" do
-          tool.settings[:vendor_extensions] = [{platform: "my vendor platform", custom_fields:{}}]
+          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: {} }]
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           expect(xml_doc.at_xpath('//blti:extensions[@platform="my vendor platform"]/@platform').text).to eq "my vendor platform"
@@ -281,14 +279,13 @@ describe CC::BasicLTILinks do
             "custom_key_name_1" => "custom_key_1",
             "custom_key_name_2" => "custom_key_2"
           }
-          tool.settings[:vendor_extensions] = [{platform: "my vendor platform", custom_fields:custom_fields}]
+          tool.settings[:vendor_extensions] = [{ platform: "my vendor platform", custom_fields: custom_fields }]
           subject.create_blti_link(tool, lti_doc)
           xml_doc = Nokogiri::XML(xml) { |c| c.nonet.strict }
           xpath = '//blti:extensions[@platform="my vendor platform"]/lticm:property'
           parsed_custom_fields = xml_doc.xpath(xpath).each_with_object({}) { |x, h| h[x.attribute("name").text] = x.text }
           expect(parsed_custom_fields).to eq custom_fields
         end
-
       end
 
       context "content migrations" do

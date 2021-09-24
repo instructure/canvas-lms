@@ -20,7 +20,6 @@
 
 module SIS
   class UserObserverImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
 
@@ -87,6 +86,7 @@ module SIS
           end
         end
         raise ImportError, "Failed to return user observer for observer: #{observer_id}, student: #{student_id}" unless user_observer
+
         @users_to_update_account_associations.add observer.id
         @user_observers_to_update_sis_batch_ids << user_observer.id
         @success_count += 1

@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 require File.expand_path(File.dirname(__FILE__) + '../../../lti2_course_spec_helper')
 
 describe Importers::ToolProfileImporter do
-
   describe '#process_migration' do
     context 'no tool profiles' do
       let(:data) { {} }

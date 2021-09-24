@@ -32,6 +32,7 @@ describe('Violation Tray', () => {
   })
 
   it('displays a spinner when loading data', async () => {
+    fetch.mockResponse(JSON.stringify([]))
     const {findByText} = render(<ViolationTray {...getProps()} />)
     // Even though there isn't an expect here... it's functionally the same,
     // if it doesn't find it... the test will fail :)

@@ -34,8 +34,8 @@ module CC::Exporter::Epub
       files.each do |file_data|
         File.open(file_data[:path_to_file]) do |file|
           epub.add_item(file_data[:local_path], file, file_data[:identifier], {
-            'media-type' => file_data[:media_type]
-          })
+                          'media-type' => file_data[:media_type]
+                        })
         end
       end
     end
@@ -43,9 +43,9 @@ module CC::Exporter::Epub
     def build
       add_files
       content.each do |key, template|
-        epub.add_ordered_item("#{key}.xhtml").
-          add_content(StringIO.new(template.parse)).
-          toc_text(template.title)
+        epub.add_ordered_item("#{key}.xhtml")
+            .add_content(StringIO.new(template.parse))
+            .toc_text(template.title)
       end
     end
 

@@ -79,7 +79,7 @@ describe LiveAssessments::Submission do
     end
 
     it "scales the score to the outcome rubric criterion if present" do
-      outcome.data = {rubric_criterion: {mastery_points: 3, points_possible: 5}}
+      outcome.data = { rubric_criterion: { mastery_points: 3, points_possible: 5 } }
       outcome.save!
       submission.create_outcome_result(alignment)
       result = alignment.learning_outcome_results.first

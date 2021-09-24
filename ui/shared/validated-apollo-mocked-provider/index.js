@@ -28,5 +28,5 @@ import ValidatedMockedProvider from 'validated-apollo/src/ValidatedMockedProvide
 const modifiedCanvasSchemaString = `directive @client on FIELD\n\n${canvasSchemaString}`
 
 export default function CanvasValidatedMockedProvider(props) {
-  return <ValidatedMockedProvider schema={modifiedCanvasSchemaString} {...props} />
+  return <ValidatedMockedProvider schema={modifiedCanvasSchemaString} resolvers={[]} {...props} />
 }

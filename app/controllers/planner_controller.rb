@@ -135,7 +135,7 @@ class PlannerController < ApplicationController
           items = collection_for_filter(params[:filter])
           items = Api.paginate(items, self, params.key?(:user_id) ? api_v1_user_planner_items_url : api_v1_planner_items_url)
           {
-            json: planner_items_json(items, @user, session, {due_after: start_date, due_before: end_date}),
+            json: planner_items_json(items, @user, session, { due_after: start_date, due_before: end_date }),
             link: response.headers["Link"].to_s,
           }
         end
@@ -219,18 +219,19 @@ class PlannerController < ApplicationController
     #
     # grading = @user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@user, :manage_grades)
     # moderation = @user.assignments_needing_moderation(default_opts)
-    viewing = @user.assignments_for_student('viewing', **default_opts).
-      preload(:quiz, :discussion_topic, :wiki_page)
-    scopes = {viewing: viewing}
+    viewing = @user.assignments_for_student('viewing', **default_opts)
+                   .preload(:quiz, :discussion_topic, :wiki_page)
+    scopes = { viewing: viewing }
     # TODO: Add when ready (see above comment)
     # scopes[:grading] = grading if grading
     # scopes[:moderation] = moderation if moderation
     collections = []
     scopes.each do |scope_name, scope|
       next unless scope
+
       collections << item_collection(scope_name.to_s,
-        scope,
-        Assignment, [:user_due_date, :due_at, :created_at], :id)
+                                     scope,
+                                     Assignment, [:user_due_date, :due_at, :created_at], :id)
     end
     collections
   end
@@ -251,14 +252,14 @@ class PlannerController < ApplicationController
   def unread_assignment_collection
     assign_scope = Assignment.active.where(context_type: "Course", context_id: @local_course_ids)
     disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids)
-      .where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
+                                     .where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
     # we can assume content participations because they're automatically created when comments
     # are made - see SubmissionComment#update_participation
     scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted")
-      .joins(submissions: :content_participations)
-      .where(content_participations: {user_id: @user, workflow_state: 'unread'}).union(
-        assign_scope.where(id: disc_assign_ids)
-      ).due_between_for_user(start_date, end_date, @user)
+                        .joins(submissions: :content_participations)
+                        .where(content_participations: { user_id: @user, workflow_state: 'unread' }).union(
+                          assign_scope.where(id: disc_assign_ids)
+                        ).due_between_for_user(start_date, end_date, @user)
     item_collection('unread_assignment_submissions',
                     scope,
                     Assignment, [:user_due_date, :due_at, :created_at], :id)
@@ -267,7 +268,7 @@ class PlannerController < ApplicationController
   def planner_note_collection
     user = @local_user_ids.presence || @user
     shard = @local_user_ids.present? ? Shard.shard_for(@local_user_ids.first) : @user.shard # TODO: fix to span multiple shards if needed
-    course_ids = @course_ids.map{|id| Shard.relative_id_for(id, @user.shard, shard)}
+    course_ids = @course_ids.map { |id| Shard.relative_id_for(id, @user.shard, shard) }
     course_ids += [nil] if @user_ids.present?
     item_collection('planner_notes',
                     shard.activate { PlannerNote.active.where(user: user, todo_date: @start_date..@end_date, course_id: course_ids) },
@@ -276,26 +277,26 @@ class PlannerController < ApplicationController
 
   def page_collection
     item_collection('pages', @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
-      WikiPage, [:todo_date, :created_at], :id)
+                    WikiPage, [:todo_date, :created_at], :id)
   end
 
   def ungraded_discussion_collection
     item_collection('ungraded_discussions', @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
-      DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
+                    DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
   end
 
   def calendar_events_collection
     item_collection('calendar_events',
-      CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes).
-         between(@start_date, @end_date),
-      CalendarEvent, [:start_at, :created_at], :id)
+                    CalendarEvent.active.not_hidden.for_user_and_context_codes(@user, @context_codes)
+                       .between(@start_date, @end_date),
+                    CalendarEvent, [:start_at, :created_at], :id)
   end
 
   def peer_reviews_collection
     item_collection('peer_reviews',
-      @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
-      AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
-                          {assessor_asset: :cached_due_date}, :created_at], :id)
+                    @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
+                    AssessmentRequest, [{ submission: { assignment: :peer_reviews_due_at } },
+                                        { assessor_asset: :cached_due_date }, :created_at], :id)
   end
 
   def item_collection(label, scope, base_model, *order_by)
@@ -306,18 +307,18 @@ class PlannerController < ApplicationController
 
   def set_date_range
     @start_date, @end_date = if [params[:start_date], params[:end_date]].all?(&:blank?)
-      [2.weeks.ago.beginning_of_day,
-       2.weeks.from_now.beginning_of_day]
-    else
-      [params[:start_date], params[:end_date]]
-    end
+                               [2.weeks.ago.beginning_of_day,
+                                2.weeks.from_now.beginning_of_day]
+                             else
+                               [params[:start_date], params[:end_date]]
+                             end
     # Since a range is needed, set values that weren't passed to a date
     # in the far past/future as to get all values before or after whichever
     # date was passed
     @start_date = formatted_planner_date('start_date', @start_date, 10.years.ago.beginning_of_day)
     @end_date = formatted_planner_date('end_date', @end_date, 10.years.from_now.beginning_of_day)
   rescue InvalidDates => e
-    render json: {errors: e.message.as_json}, status: :bad_request
+    render json: { errors: e.message.as_json }, status: :bad_request
   end
 
   def set_params
@@ -337,7 +338,7 @@ class PlannerController < ApplicationController
       # objects
       @contexts = Context.find_all_by_asset_string(context_ids) if public_access?
     end
- 
+
     # make IDs relative to the user's shard
     @course_ids, @group_ids, @user_ids = transpose_ids(Shard.current, @user.shard) if @user
 
@@ -373,7 +374,7 @@ class PlannerController < ApplicationController
                 when Course then @course_ids
                 when Group then @group_ids
                 when User then @user_ids
-        end
+                end
         array << context.id
       end
     end

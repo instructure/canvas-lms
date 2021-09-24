@@ -25,14 +25,14 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
   require File.expand_path(File.dirname(__FILE__) + '/../../../quiz_spec_helper.rb')
 
   describe 'POST /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [create]' do
-    def api_create(options={}, data={})
+    def api_create(options = {}, data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/events"
       params = { controller: 'quizzes/quiz_submission_events_api',
                  action: 'create',
                  format: 'json',
                  course_id: @course.id.to_s,
                  quiz_id: @quiz.id.to_s,
-                 id: @quiz_submission.id.to_s}
+                 id: @quiz_submission.id.to_s }
       headers = { 'Accept' => 'application/vnd.api+json' }
 
       if options[:raw]
@@ -45,45 +45,45 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
     events_data = [{
       "client_timestamp" => Time.zone.now.iso8601,
       "event_type" => "question_answered",
-      "event_data" => {"question_id"=>1, "answer"=>"1"}
+      "event_data" => { "question_id" => 1, "answer" => "1" }
     }, {
       "client_timestamp" => Time.zone.now.iso8601,
       "event_type" => "question_flagged",
-      "event_data" => {"question_id"=>2, "flagged"=>true}
+      "event_data" => { "question_id" => 2, "flagged" => true }
     }]
 
     before :once do
       course_with_teacher :active_all => true
 
       simple_quiz_with_submissions %w{T T T}, %w{T T T}, %w{T F F}, %w{T F T},
-        :user => @user,
-        :course => @course
+                                   :user => @user,
+                                   :course => @course
 
       @user = @teacher
     end
 
-    it 'should deny unauthorized access' do
+    it 'denies unauthorized access' do
       student_in_course
       @user = @teacher
       @quiz_submission = @quiz.quiz_submissions.last
-      api_create({raw: true}, {})
+      api_create({ raw: true }, {})
       assert_status(401)
     end
 
-    it "should respond with no_content success" do
+    it "responds with no_content success" do
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
-      expect(api_create({raw:true}, {"quiz_submission_events" => events_data })).to eq 204
+      expect(api_create({ raw: true }, { "quiz_submission_events" => events_data })).to eq 204
     end
 
-    it 'should store the passed values into the DB table' do
+    it 'stores the passed values into the DB table' do
       scope = Quizzes::QuizSubmissionEvent
 
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
       expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
-      api_create({raw:true}, {"quiz_submission_events" => events_data })
+      api_create({ raw: true }, { "quiz_submission_events" => events_data })
       expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
 
       scope.where(event_type: 'question_answered').first.tap do |event|
@@ -95,14 +95,14 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
     end
 
-    it "should store both client_timestamp and created_at" do
+    it "stores both client_timestamp and created_at" do
       scope = Quizzes::QuizSubmissionEvent
 
       @quiz_submission = @quiz.quiz_submissions.last
       @user = User.find @quiz_submission.user_id
 
       expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 0
-      api_create({raw:true}, {"quiz_submission_events" => events_data })
+      api_create({ raw: true }, { "quiz_submission_events" => events_data })
       expect(scope.where(event_type: ['question_answered', 'question_flagged']).count).to eq 2
 
       scope.where(event_type: 'question_answered').first.tap do |event|
@@ -112,10 +112,10 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       end
     end
 
-    it 'should not succeed when the QS is `settings_only`' do
+    it 'does not succeed when the QS is `settings_only`' do
       student_in_course
       @quiz_submission = @quiz.quiz_submissions.create!(user: @user, workflow_state: 'settings_only')
-      expect(api_create({raw: true}, {'quiz_submission_events' => events_data})).to eq 404
+      expect(api_create({ raw: true }, { 'quiz_submission_events' => events_data })).to eq 404
     end
 
     context 'for an ungraded quiz in a public course' do
@@ -127,25 +127,25 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz.save!
       end
 
-      it 'should respond with no_content success' do
+      it 'responds with no_content success' do
         student_in_course
         @user = @teacher
         @quiz_submission = @quiz.quiz_submissions.last
-        api_create({raw: true}, {})
+        api_create({ raw: true }, {})
         assert_status(204)
       end
     end
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [index]' do
-    def api_index(data={})
+    def api_index(data = {})
       url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@quiz_submission.id}/events"
       params = { controller: 'quizzes/quiz_submission_events_api',
                  action: 'index',
                  format: 'json',
                  course_id: @course.id.to_s,
                  quiz_id: @quiz.id.to_s,
-                 id: @quiz_submission.id.to_s}
+                 id: @quiz_submission.id.to_s }
       headers = { 'Accept' => 'application/vnd.api+json' }
 
       if data.delete(:raw)
@@ -165,9 +165,9 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         student_in_course(course: @course)
       end
 
-      it 'should not let me in' do
+      it 'does not let me in' do
         @quiz_submission = @quiz.generate_submission(@student)
-        api_index({raw: true})
+        api_index({ raw: true })
         assert_status(401)
       end
     end
@@ -178,7 +178,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'should let me in' do
+      it 'lets me in' do
         expect(api_index()).to have_key('quiz_submission_events')
       end
 
@@ -196,12 +196,11 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
           teacher_in_course(course: @course)
         end
 
-        it 'should work' do
+        it 'works' do
           api_index({ attempt: 1 })['quiz_submission_events'].tap do |events|
             expect(events.count).to eq(2)
             expect(events[0]['event_type']).to eq('submission_created')
             expect(events[1]['event_type']).to eq('a')
-
           end
 
           api_index({ attempt: 2 })['quiz_submission_events'].tap do |events|
@@ -215,14 +214,14 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         before(:once) do
           @quiz_submission = @quiz.generate_submission(@student)
           @quiz_submission.events.create!({
-            event_type: 'something',
-            event_data: [ 'test' ],
-            attempt: 1
-          })
+                                            event_type: 'something',
+                                            event_data: ['test'],
+                                            attempt: 1
+                                          })
         end
 
         describe 'JSON-API compliance' do
-          it 'should conform to the JSON-API spec when returning the object' do
+          it 'conforms to the JSON-API spec when returning the object' do
             json = api_index
             assert_jsonapi_compliance(json, 'quiz_submission_events')
           end
@@ -238,7 +237,7 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it 'should not let me in' do
+      it 'does not let me in' do
         api_index(raw: true)
         assert_status(401)
       end

@@ -42,7 +42,7 @@ class Wiki < ActiveRecord::Base
   # some hacked up stuff similar to what's in MasterCourses::Restrictor
   def load_tag_for_master_course_import!(child_subscription_id)
     @child_tag_for_import = MasterCourses::ChildContentTag.where(content: self).first ||
-      MasterCourses::ChildContentTag.create(:content => self, :child_subscription_id => child_subscription_id)
+                            MasterCourses::ChildContentTag.create(:content => self, :child_subscription_id => child_subscription_id)
   end
 
   def can_update_front_page_for_master_courses?
@@ -68,13 +68,14 @@ class Wiki < ActiveRecord::Base
       entry.title     = self.title
       entry.updated   = self.updated_at
       entry.published = self.created_at
-      entry.links    << Atom::Link.new(:rel => 'alternate',
+      entry.links << Atom::Link.new(:rel => 'alternate',
                                     :href => "/wikis/#{self.id}")
     end
   end
 
   def update_default_wiki_page_roles(new_roles, old_roles)
     return if new_roles == old_roles
+
     self.wiki_pages.each do |p|
       if p.editing_roles == old_roles
         p.editing_roles = new_roles
@@ -147,13 +148,13 @@ class Wiki < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.context.grants_right?(user, session, :read)}
+    given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
 
-    given {|user, session| self.context.grants_right?(user, session, :view_unpublished_items)}
+    given { |user, session| self.context.grants_right?(user, session, :view_unpublished_items) }
     can :view_unpublished_items
 
-    given {|user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits}
+    given { |user, session| self.context.grants_right?(user, session, :participate_as_student) && self.context.respond_to?(:allow_student_wiki_edits) && self.context.allow_student_wiki_edits }
     can :read and can :create_page and can :update_page
 
     given do |user, session|
@@ -185,12 +186,13 @@ class Wiki < ActiveRecord::Base
         context.save! if context.changed?
         context.lock!
         return context.wiki if context.wiki_id
+
         # TODO i18n
         t :default_course_wiki_name, "%{course_name} Wiki", :course_name => nil
         t :default_group_wiki_name, "%{group_name} Wiki", :group_name => nil
 
         self.extend TextHelper
-        name = CanvasTextHelper.truncate_text(context.name, {:max_length => 200, :ellipsis => ''})
+        name = CanvasTextHelper.truncate_text(context.name, { :max_length => 200, :ellipsis => '' })
 
         context.wiki = wiki = Wiki.create!(:title => "#{name} Wiki", :root_account_id => context.root_account_id)
         context.save!
@@ -199,7 +201,7 @@ class Wiki < ActiveRecord::Base
     end
   end
 
-  def build_wiki_page(user, opts={})
+  def build_wiki_page(user, opts = {})
     if (opts.include?(:url) || opts.include?(:title)) && (!opts.include?(:url) || !opts.include?(:title))
       opts[:title] = opts[:url].to_s.titleize if opts.include?(:url)
       opts[:url] = opts[:title].to_s.to_url if opts.include?(:title)
@@ -219,6 +221,7 @@ class Wiki < ActiveRecord::Base
     if (match = param.match(/\Apage_id:(\d+)\z/))
       return self.wiki_pages.where(id: match[1].to_i).first
     end
+
     scope = include_deleted ?
       self.wiki_pages.order(Arel.sql("CASE WHEN workflow_state <> 'deleted' THEN 0 ELSE 1 END")) :
       self.wiki_pages.not_deleted
@@ -229,5 +232,4 @@ class Wiki < ActiveRecord::Base
     # was a shim for draft state, can be removed
     'pages'
   end
-
 end

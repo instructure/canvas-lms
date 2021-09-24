@@ -48,7 +48,7 @@ module SIS
             zip.add(csv[:file], csv[:fullpath])
           end
         end
-        {:file_io => File.open(output_path, 'rb'), :row_count => row_count}
+        { :file_io => File.open(output_path, 'rb'), :row_count => row_count }
       end
 
       VALID_ENROLLMENT_DROP_STATUS = %w(deleted inactive completed deleted_last_completed).freeze
@@ -112,4 +112,3 @@ module SIS
     end
   end
 end
-

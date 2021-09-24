@@ -41,7 +41,7 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
     end
 
-    it "should show to sis admin" do
+    it "shows to sis admin" do
       admin = account_admin_user
       view_context(@account, admin)
       assign(:current_user, admin)
@@ -49,8 +49,8 @@ describe "accounts/settings.html.erb" do
       expect(response).to have_tag("input#account_sis_source_id")
     end
 
-    it "should not show to non-sis admin" do
-      admin = account_admin_user_with_role_changes(:role_changes => {'manage_sis' => false})
+    it "does not show to non-sis admin" do
+      admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
       view_context(@account, admin)
       assign(:current_user, admin)
       render
@@ -71,13 +71,13 @@ describe "accounts/settings.html.erb" do
       view_context(@account, admin)
     end
 
-    it "should show by default" do
+    it "shows by default" do
       render
       expect(response).to have_tag("input#account_settings_open_registration")
       expect(response).not_to have_tag("div#open_registration_delegated_warning_dialog")
     end
 
-    it "should show warning dialog when a delegated auth config is around" do
+    it "shows warning dialog when a delegated auth config is around" do
       @account.authentication_providers.create!(:auth_type => 'cas')
       @account.authentication_providers.first.move_to_bottom
       render
@@ -96,7 +96,7 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
     end
 
-    it "should show settings that can only be managed by site admins" do
+    it "shows settings that can only be managed by site admins" do
       admin = site_admin_user
       view_context(@account, admin)
       render
@@ -105,7 +105,7 @@ describe "accounts/settings.html.erb" do
       expect(response).to have_tag("input#account_settings_enable_profiles")
     end
 
-    it "it should not show settings to regular admin user" do
+    it "does not show settings to regular admin user" do
       admin = account_admin_user
       view_context(@account, admin)
       render
@@ -121,7 +121,6 @@ describe "accounts/settings.html.erb" do
         assign(:account_users, [])
         assign(:associated_courses_count, 0)
         assign(:announcements, AccountNotification.none.paginate)
-
 
         @account = account
         assign(:account, @account)
@@ -158,9 +157,9 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
     end
 
-    def do_render(user,account=nil)
+    def do_render(user, account = nil)
       account = @account unless account
-      view_context(account,user)
+      view_context(account, user)
       render
     end
 
@@ -265,11 +264,11 @@ describe "accounts/settings.html.erb" do
 
           context "for root account" do
             before do
-              allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true})
+              allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: true })
               do_render(current_user)
             end
 
-            it "should enable all controls under SIS syncing" do
+            it "enables all controls under SIS syncing" do
               expect(response).not_to have_tag("#{sis_syncing}[disabled]")
               expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
               expect(response).not_to have_tag("#{default_grade_export}[disabled]")
@@ -283,11 +282,11 @@ describe "accounts/settings.html.erb" do
             context "locked" do
               before do
                 @account.enable_feature!(:post_grades)
-                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: true, inherited: true })
+                allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: true, inherited: true })
                 do_render(current_user, @account)
               end
 
-              it "should disable all controls under SIS syncing" do
+              it "disables all controls under SIS syncing" do
                 expect(response).to have_tag("#{sis_syncing}[disabled]")
                 expect(response).to have_tag("#{sis_syncing_locked}[disabled]")
                 expect(response).to have_tag("#{default_grade_export}[disabled]")
@@ -298,11 +297,11 @@ describe "accounts/settings.html.erb" do
 
             context "not locked" do
               before do
-                allow(@account).to receive(:sis_syncing).and_return({value: true, locked: false, inherited: true })
+                allow(@account).to receive(:sis_syncing).and_return({ value: true, locked: false, inherited: true })
                 do_render(current_user)
               end
 
-              it "should enable all controls under SIS syncing" do
+              it "enables all controls under SIS syncing" do
                 expect(response).not_to have_tag("#{sis_syncing}[disabled]")
                 expect(response).not_to have_tag("#{sis_syncing_locked}[disabled]")
                 expect(response).not_to have_tag("#{default_grade_export}[disabled]")
@@ -333,7 +332,7 @@ describe "accounts/settings.html.erb" do
         assign(:current_user, admin)
       end
 
-      it "should show quota options" do
+      it "shows quota options" do
         render
         expect(@controller.js_env).to include :ACCOUNT
         expect(@controller.js_env[:ACCOUNT]).to include 'default_storage_quota_mb'
@@ -344,12 +343,12 @@ describe "accounts/settings.html.erb" do
 
     context "without :manage_storage_quotas" do
       before do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'manage_storage_quotas' => false})
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'manage_storage_quotas' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
       end
 
-      it "should not show quota options" do
+      it "does not show quota options" do
         render
         expect(@controller.js_env).to include :ACCOUNT
         expect(@controller.js_env[:ACCOUNT]).not_to include 'default_storage_quota_mb'
@@ -370,7 +369,7 @@ describe "accounts/settings.html.erb" do
     end
 
     context "with :read_reports" do
-      it "should show reports tab link" do
+      it "shows reports tab link" do
         admin = account_admin_user
         view_context(@account, admin)
         assign(:current_user, admin)
@@ -380,8 +379,8 @@ describe "accounts/settings.html.erb" do
     end
 
     context "without :read_reports" do
-      it "should not show reports tab link" do
-        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => {'read_reports' => false})
+      it "does not show reports tab link" do
+        admin = account_admin_user_with_role_changes(:account => @account, :role_changes => { 'read_reports' => false })
         view_context(@account, admin)
         assign(:current_user, admin)
         render
@@ -391,12 +390,13 @@ describe "accounts/settings.html.erb" do
   end
 
   context "admins" do
-    it "should not show add admin button if don't have permission to any roles" do
+    it "does not show add admin button if don't have permission to any roles" do
       role = custom_account_role('CustomAdmin', :account => Account.site_admin)
       account_admin_user_with_role_changes(
         :account => Account.site_admin,
         :role => role,
-        :role_changes => {manage_account_memberships: true})
+        :role_changes => { manage_account_memberships: true }
+      )
       view_context(Account.default, @user)
       assign(:account, Account.default)
       assign(:announcements, AccountNotification.none.paginate)
@@ -415,7 +415,7 @@ describe "accounts/settings.html.erb" do
       assign(:announcements, AccountNotification.none.paginate)
     end
 
-    it "should show sub account theme editor option for non siteadmin admins" do
+    it "shows sub account theme editor option for non siteadmin admins" do
       admin = account_admin_user
       view_context(@account, admin)
       assign(:current_user, admin)
@@ -447,7 +447,7 @@ describe "accounts/settings.html.erb" do
       )
     end
 
-    it "should show a threshold control" do
+    it "shows a threshold control" do
       account.enable_feature!(:smart_alerts)
 
       render

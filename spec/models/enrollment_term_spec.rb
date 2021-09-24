@@ -85,7 +85,7 @@ describe EnrollmentTerm do
     end
   end
 
-  it "should handle the translated Default Term names correctly" do
+  it "handles the translated Default Term names correctly" do
     account_model
     term = @account.default_enrollment_term
 
@@ -116,13 +116,13 @@ describe EnrollmentTerm do
       @term = @account.enrollment_terms.create!
     end
 
-    it "should return the dates for a single enrollment" do
+    it "returns the dates for a single enrollment" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       enrollment = student_in_course
       expect(@term.overridden_term_dates([enrollment])).to eq([Date.parse('2014-12-01'), Date.parse('2014-12-31')])
     end
 
-    it "should return the most favorable dates given multiple enrollments" do
+    it "returns the most favorable dates given multiple enrollments" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: '2015-01-31' },
                                     'ObserverEnrollment' => { start_at: '2014-11-01', end_at: '2014-12-31' })
       student_enrollment = student_in_course
@@ -130,7 +130,7 @@ describe EnrollmentTerm do
       expect(@term.overridden_term_dates([student_enrollment, observer_enrollment])).to eq([Date.parse('2014-11-01'), Date.parse('2015-01-31')])
     end
 
-    it "should prioritize nil (unrestricted) dates if present" do
+    it "prioritizes nil (unrestricted) dates if present" do
       @term.set_overrides(@account, 'StudentEnrollment' => { start_at: '2014-12-01', end_at: nil },
                                     'TaEnrollment' => { start_at: nil, end_at: '2014-12-31' })
       student_enrollment = student_in_course
@@ -144,11 +144,11 @@ describe EnrollmentTerm do
       @account = account_model
     end
 
-    it "should not be able to delete a default term" do
+    it "is not able to delete a default term" do
       expect { @account.default_enrollment_term.destroy }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "should not be able to delete an enrollment term with active courses" do
+    it "is not able to delete an enrollment term with active courses" do
       @term = @account.enrollment_terms.create!
       course_factory account: @account
       @course.enrollment_term = @term
@@ -202,49 +202,49 @@ describe EnrollmentTerm do
         name: :active,
         criteria: {}
       },
-      {
-        name: :not_default,
-        criteria: {}
-      },
-      {
-        name: :ended,
-        criteria: {
-          end_at: 10.days.ago
-        }
-      },
-      {
-        name: :started_1,
-        criteria: {
-          start_at: 10.days.ago
-        }
-      },
-      {
-        name: :started_2,
-        criteria: {
-          start_at: nil
-        }
-      },
-      {
-        name: :not_ended_1,
-        criteria: {
-          end_at: 10.days.from_now
-        }
-      },
-      {
-        name: :not_ended_2,
-        criteria: {
-          end_at: nil
-        }
-      },
-      {
-        name: :not_started,
-        criteria: {
-          start_at: 10.days.from_now
-        }
-      }]
+                {
+                  name: :not_default,
+                  criteria: {}
+                },
+                {
+                  name: :ended,
+                  criteria: {
+                    end_at: 10.days.ago
+                  }
+                },
+                {
+                  name: :started_1,
+                  criteria: {
+                    start_at: 10.days.ago
+                  }
+                },
+                {
+                  name: :started_2,
+                  criteria: {
+                    start_at: nil
+                  }
+                },
+                {
+                  name: :not_ended_1,
+                  criteria: {
+                    end_at: 10.days.from_now
+                  }
+                },
+                {
+                  name: :not_ended_2,
+                  criteria: {
+                    end_at: nil
+                  }
+                },
+                {
+                  name: :not_started,
+                  criteria: {
+                    start_at: 10.days.from_now
+                  }
+                }]
 
       scopes.each do |scope|
-        @terms[scope[:name]] = @root_account.enrollment_terms.create!({name: scope[:name].to_s}.merge(scope[:criteria]))
+        @terms[scope[:name]] = @root_account.enrollment_terms.create!({ name: scope[:name].to_s }.merge(scope[:criteria]))
         course_with_teacher(active_course: true, active_enrollment: true)
         @course.enrollment_term_id = @terms[scope[:name]].id
         @course.save!
@@ -252,10 +252,10 @@ describe EnrollmentTerm do
     end
 
     def term_ids_for_scope(scope)
-      Array.wrap(@root_account.
-        enrollment_terms.
-        send(scope).
-        pluck(:id)).sort
+      Array.wrap(@root_account
+        .enrollment_terms
+        .send(scope)
+        .pluck(:id)).sort
     end
 
     def validate_scope(scope, expected_scopes = nil, include_default: false)
@@ -269,27 +269,27 @@ describe EnrollmentTerm do
       expect(expected_ids).to eq(actual_ids)
     end
 
-    it "should limit by active terms" do
+    it "limits by active terms" do
       validate_scope(:active, @terms.keys, include_default: true)
     end
 
-    it "should limit by ended terms" do
+    it "limits by ended terms" do
       validate_scope(:ended)
     end
 
-    it "should limit by started terms" do
+    it "limits by started terms" do
       validate_scope(:started, @terms.except(:not_started).keys, include_default: true)
     end
 
-    it "should limit by not ended terms" do
+    it "limits by not ended terms" do
       validate_scope(:not_ended, @terms.except(:ended).keys, include_default: true)
     end
 
-    it "should limit by not started terms" do
+    it "limits by not started terms" do
       validate_scope(:not_started)
     end
 
-    it "should limit by non-default terms" do
+    it "limits by non-default terms" do
       validate_scope(:not_default, @terms.keys)
     end
   end
@@ -392,8 +392,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.to change {
@@ -408,8 +408,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.not_to change {
@@ -422,8 +422,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.to change {
@@ -438,8 +438,8 @@ describe EnrollmentTerm do
       new_due_date = 2.weeks.from_now(@now)
       # update_all to avoid triggering DueDateCacher#recompute
       # rubocop:disable Rails/SkipsModelValidations
-      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment]).
-        update_all(due_at: new_due_date)
+      Assignment.where(id: [@first_course_assignment, @second_course_assignment, @not_in_term_assignment])
+                .update_all(due_at: new_due_date)
       # rubocop:enable Rails/SkipsModelValidations
 
       expect { @term.recompute_course_scores_later }.not_to change {

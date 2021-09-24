@@ -21,7 +21,7 @@ module CC::Importer::Canvas
   module QuizConverter
     include CC::Importer
     include QuizMetadataConverter
-    
+
     def convert_quizzes
       assessments = []
       qti_folder = @package_root.item_path(ASSESSMENT_NON_CC_FOLDER)
@@ -32,10 +32,10 @@ module CC::Importer::Canvas
       @course[:assessment_questions] = convert_questions
       @course[:assessments] = convert_assessments
       post_process_assessments
-      
+
       assessments
     end
-    
+
     def run_qti_converter(qti_folder)
       # convert to 2.1
       @dest_dir_2_1 = File.join(qti_folder, "qti_2_1")
@@ -50,13 +50,14 @@ module CC::Importer::Canvas
       else
         make_export_dir
         qti_error_file = File.join(@base_export_dir, "qti_conversion_error.log")
-        File.open(qti_error_file, 'w') {|f|f << python_std_out}
+        File.open(qti_error_file, 'w') { |f| f << python_std_out }
         raise "Couldn't convert QTI 1.2 to 2.1, see error log: #{qti_error_file}"
       end
     end
 
     def convert_questions
       raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
+
       questions = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
@@ -69,6 +70,7 @@ module CC::Importer::Canvas
 
     def convert_assessments
       raise "The QTI must be converted to 2.1 before converting to JSON" unless @converted
+
       quizzes = {}
       begin
         manifest_file = File.join(@dest_dir_2_1, Qti::Converter::MANIFEST_FILE)
@@ -78,6 +80,5 @@ module CC::Importer::Canvas
       end
       quizzes
     end
-    
   end
 end

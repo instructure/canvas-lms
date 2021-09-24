@@ -32,7 +32,7 @@ describe Lti::AccountLookupController do
     it_behaves_like 'lti services' do
       let(:action) { :show }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_lookup/scope/show"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_lookup/scope/show" }
       let(:params_overrides) do
         { account_id: Account.root_accounts.first.id }
       end
@@ -106,5 +106,4 @@ describe Lti::AccountLookupController do
       end
     end
   end
-
 end

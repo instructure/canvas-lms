@@ -18,14 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module GroupCategories
-
   class Params < Struct.new(:name, :group_limit)
-
     attr_reader :raw_params
 
-    def initialize(args, opts={})
+    def initialize(args, opts = {})
       super(args[:name], args[:group_limit])
-      @boolean_translator = opts.fetch(:boolean_translator){ Canvas::Plugin }
+      @boolean_translator = opts.fetch(:boolean_translator) { Canvas::Plugin }
       @raw_params = args
     end
 
@@ -33,6 +31,7 @@ module GroupCategories
       return _self_signup if _self_signup
       return nil if !enable_self_signup
       return 'restricted' if restrict_self_signup
+
       'enabled'
     end
 
@@ -40,6 +39,7 @@ module GroupCategories
       return nil if !enable_auto_leader.nil? && !enable_auto_leader
       return _auto_leader unless enable_auto_leader
       return auto_leader_type if ['first', 'random'].include?(auto_leader_type)
+
       raise(ArgumentError, "Invalid AutoLeader Type #{auto_leader_type}")
     end
 
@@ -47,12 +47,14 @@ module GroupCategories
       return _create_group_count if self_signup
       return nil unless split_group_enabled?
       return nil if split_by_member_count_enabled?
+
       split_group_count
     end
 
     def create_group_member_count
       return nil if self_signup || split_by_group_count_enabled?
       return nil unless split_group_enabled?
+
       raw_params[:create_group_member_count].to_i
     end
 
@@ -110,6 +112,7 @@ module GroupCategories
     def _self_signup
       raw_value = raw_params[:self_signup]
       return nil unless raw_value
+
       raw_value = raw_value.to_s.downcase
       %w(enabled restricted).include?(raw_value) ? raw_value : nil
     end
@@ -117,6 +120,7 @@ module GroupCategories
     def _auto_leader
       raw_value = raw_params[:auto_leader]
       return nil unless raw_value
+
       raw_value = raw_value.to_s.downcase
       %w(random first).include?(raw_value) ? raw_value : nil
     end
@@ -135,9 +139,8 @@ module GroupCategories
 
     def enable_auto_leader
       return nil if raw_params[:enable_auto_leader].nil?
+
       value_to_boolean raw_params[:enable_auto_leader]
     end
-
   end
-
 end

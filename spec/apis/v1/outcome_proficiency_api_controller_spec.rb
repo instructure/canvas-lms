@@ -49,8 +49,8 @@ describe OutcomeProficiencyApiController, type: :request do
 
       context 'maintain same number of ratings' do
         let(:updated_ratings) do
-          [ { description: '2', points: 2, mastery: true, color: '00ff00' },
-            { description: '1', points: 1, mastery: false, color: 'ff0000' } ]
+          [{ description: '2', points: 2, mastery: true, color: '00ff00' },
+           { description: '1', points: 1, mastery: false, color: 'ff0000' }]
         end
 
         include_examples 'update ratings'
@@ -58,9 +58,9 @@ describe OutcomeProficiencyApiController, type: :request do
 
       context 'increase number of ratings' do
         let(:updated_ratings) do
-          [ { description: '2', points: 2, mastery: true, color: '00ff00' },
-            { description: '1', points: 1, mastery: false, color: '0000ff' },
-            { description: '0', points: 0, mastery: false, color: 'ff0000' } ]
+          [{ description: '2', points: 2, mastery: true, color: '00ff00' },
+           { description: '1', points: 1, mastery: false, color: '0000ff' },
+           { description: '0', points: 0, mastery: false, color: 'ff0000' }]
         end
 
         include_examples 'update ratings'
@@ -68,7 +68,7 @@ describe OutcomeProficiencyApiController, type: :request do
 
       context 'decrease number of ratings' do
         let(:updated_ratings) do
-          [ { description: '2', points: 2, mastery: true, color: '000000' } ]
+          [{ description: '2', points: 2, mastery: true, color: '000000' }]
         end
 
         include_examples 'update ratings'
@@ -76,7 +76,7 @@ describe OutcomeProficiencyApiController, type: :request do
 
       context 'remove top rating' do
         let(:updated_ratings) do
-          [ { description: '0', points: 0, mastery: true, color: 'ff0000' } ]
+          [{ description: '0', points: 0, mastery: true, color: 'ff0000' }]
         end
 
         include_examples 'update ratings'
@@ -139,8 +139,8 @@ describe OutcomeProficiencyApiController, type: :request do
 
       context 'two mastery ratings' do
         let(:ratings) do
-          [ { description: '1', points: 1, mastery: true, color: 'ff0000' },
-            { description: '2', points: 2, mastery: true, color: '00ff00' } ]
+          [{ description: '1', points: 1, mastery: true, color: 'ff0000' },
+           { description: '2', points: 2, mastery: true, color: '00ff00' }]
         end
 
         include_examples 'bad mastery ratings'

@@ -52,7 +52,7 @@ class Auditors::GradeChange
                :grading_period_id
     attr_accessor :grade_current
 
-    def self.generate(submission, event_type=nil)
+    def self.generate(submission, event_type = nil)
       new(
         'submission' => submission,
         'event_type' => event_type
@@ -93,16 +93,19 @@ class Auditors::GradeChange
 
     def version
       return nil if override_grade?
+
       @submission.version.get(version_number)
     end
 
     def submission
       return nil if override_grade?
+
       @submission ||= Submission.active.find(submission_id)
     end
 
     def previous_submission
       return nil if override_grade?
+
       @previous_submission ||= submission.versions.previous.try(:model)
     end
 
@@ -111,6 +114,7 @@ class Auditors::GradeChange
     # been versioned along with the submission.
     def previous_assignment
       return nil if override_grade?
+
       @previous_assignment ||= begin
         if submission.assignment_changed_not_sub
           model = submission.assignment.versions.previous.try(:model)
@@ -234,15 +238,15 @@ class Auditors::GradeChange
 
     add_index :assignment do
       table :grade_changes_by_assignment
-      entry_proc lambda{ |record| record.assignment }
-      key_proc lambda{ |assignment| assignment.global_id }
+      entry_proc lambda { |record| record.assignment }
+      key_proc lambda { |assignment| assignment.global_id }
       ar_scope_proc lambda { |assignment| grades_ar_type.where(assignment_id: assignment.id) }
     end
 
     add_index :course do
       table :grade_changes_by_course
-      entry_proc lambda{ |record| record.course }
-      key_proc lambda{ |course| course.global_id }
+      entry_proc lambda { |record| record.course }
+      key_proc lambda { |course| course.global_id }
       ar_scope_proc lambda { |course|
         scope = grades_ar_type.where(context_id: course.id, context_type: 'Course')
         Auditors::GradeChange.filter_by_assignment(scope)
@@ -253,8 +257,8 @@ class Auditors::GradeChange
       table :grade_changes_by_root_account_grader
       # We don't want to index events for nil graders and currently we are not
       # indexing events for auto grader in cassandra.
-      entry_proc lambda{ |record| [record.root_account, record.grader] if record.grader && !record.autograded? }
-      key_proc lambda{ |root_account, grader| [root_account.global_id, grader.global_id] }
+      entry_proc lambda { |record| [record.root_account, record.grader] if record.grader && !record.autograded? }
+      key_proc lambda { |root_account, grader| [root_account.global_id, grader.global_id] }
       ar_scope_proc lambda { |root_account, grader|
         scope = grades_ar_type.where(root_account_id: root_account.id, grader_id: grader.id)
         Auditors::GradeChange.filter_by_assignment(scope)
@@ -263,8 +267,8 @@ class Auditors::GradeChange
 
     add_index :root_account_student do
       table :grade_changes_by_root_account_student
-      entry_proc lambda{ |record| [record.root_account, record.student] }
-      key_proc lambda{ |root_account, student| [root_account.global_id, student.global_id] }
+      entry_proc lambda { |record| [record.root_account, record.student] }
+      key_proc lambda { |root_account, student| [root_account.global_id, student.global_id] }
       ar_scope_proc lambda { |root_account, student|
         scope = grades_ar_type.where(root_account_id: root_account.id, student_id: student.id)
         Auditors::GradeChange.filter_by_assignment(scope)
@@ -376,30 +380,30 @@ class Auditors::GradeChange
   end
 
   def self.insert_record(event_record)
-    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
-    Auditors::GradeChange::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
+    Auditors::GradeChange::Stream.insert(event_record, { backend_strategy: :cassandra }) if Audits.write_to_cassandra?
+    Auditors::GradeChange::Stream.insert(event_record, { backend_strategy: :active_record }) if Audits.write_to_postgres?
   end
   private_class_method :insert_record
 
-  def self.for_root_account_student(account, student, options={})
+  def self.for_root_account_student(account, student, options = {})
     account.shard.activate do
       Auditors::GradeChange::Stream.for_root_account_student(account, student, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_course(course, options={})
+  def self.for_course(course, options = {})
     course.shard.activate do
       Auditors::GradeChange::Stream.for_course(course, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_root_account_grader(account, grader, options={})
+  def self.for_root_account_grader(account, grader, options = {})
     account.shard.activate do
       Auditors::GradeChange::Stream.for_root_account_grader(account, grader, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_assignment(assignment, options={})
+  def self.for_assignment(assignment, options = {})
     assignment.shard.activate do
       Auditors::GradeChange::Stream.for_assignment(assignment, Audits.read_stream_options(options))
     end
@@ -413,27 +417,27 @@ class Auditors::GradeChange
   # course grader
   # course grader student
   # course student
-  def self.for_course_and_other_arguments(course, arguments, options={})
+  def self.for_course_and_other_arguments(course, arguments, options = {})
     options = Audits.read_stream_options(options)
     course.shard.activate do
       if arguments[:assignment] && arguments[:grader] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_assignment_grader_student(course,
-          arguments[:assignment], arguments[:grader], arguments[:student], options)
+                                                                           arguments[:assignment], arguments[:grader], arguments[:student], options)
 
       elsif arguments[:assignment] && arguments[:grader]
         Auditors::GradeChange::Stream.for_course_assignment_grader(course, arguments[:assignment],
-          arguments[:grader], options)
+                                                                   arguments[:grader], options)
 
       elsif arguments[:assignment] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_assignment_student(course, arguments[:assignment],
-          arguments[:student], options)
+                                                                    arguments[:student], options)
 
       elsif arguments[:assignment]
         Auditors::GradeChange::Stream.for_course_assignment(course, arguments[:assignment], options)
 
       elsif arguments[:grader] && arguments[:student]
         Auditors::GradeChange::Stream.for_course_grader_student(course, arguments[:grader], arguments[:student],
-          options)
+                                                                options)
 
       elsif arguments[:grader]
         Auditors::GradeChange::Stream.for_course_grader(course, arguments[:grader], options)

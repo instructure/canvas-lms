@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 # This needs to run any time someone changes either app/stylesheets/brandable_variables.json
 # or one of the images it references. There has to be a predeploy AND a postdeploy migration
 # to handle case of anyone saving a new theme in theme editor between when we run predeploys

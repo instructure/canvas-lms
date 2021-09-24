@@ -25,8 +25,9 @@ module Api::V1::Tab
 
   def tabs_available_json(context, user, session, includes = [], precalculated_permissions: nil)
     json = context_tabs(context, user, session: session, precalculated_permissions: precalculated_permissions).map { |tab|
-      tab_json(tab.with_indifferent_access, context, user, session) }
-    json.sort!{|x,y| x['position'] <=> y['position']}
+      tab_json(tab.with_indifferent_access, context, user, session)
+    }
+    json.sort! { |x, y| x['position'] <=> y['position'] }
   end
 
   def tab_json(tab, context, user, session)
@@ -47,10 +48,10 @@ module Api::V1::Tab
     api_json(hash, user, session)
   end
 
-  def html_url(tab, context, full_url=false)
+  def html_url(tab, context, full_url = false)
     if full_url
       method = tab[:href].to_s.sub(/_path$/, '_url').to_sym
-      opts = {:host => HostUrl.context_host(context, request.try(:host_with_port))}
+      opts = { :host => HostUrl.context_host(context, request.try(:host_with_port)) }
     else
       method = tab[:href]
       opts = {}
@@ -78,7 +79,7 @@ module Api::V1::Tab
   def visibility(tab, hash)
     if hash[:type] == 'external' && hash[:hidden]
       'none'
-    elsif hash[:id] =='settings' || hash[:unused] || hash[:hidden]
+    elsif hash[:id] == 'settings' || hash[:unused] || hash[:hidden]
       'admins'
     else
       tab[:visibility] || 'public'
@@ -128,5 +129,4 @@ module Api::V1::Tab
     end
     tabs
   end
-
 end

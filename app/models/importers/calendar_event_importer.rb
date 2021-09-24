@@ -22,11 +22,10 @@ require_dependency 'importers'
 
 module Importers
   class CalendarEventImporter < Importer
-
     self.item_class = CalendarEvent
 
     def self.process_migration(data, migration)
-      events = data['calendar_events'] ? data['calendar_events']: []
+      events = data['calendar_events'] ? data['calendar_events'] : []
       events.each do |event|
         if migration.import_object?("calendar_events", event['migration_id']) || migration.import_object?("events", event['migration_id'])
           begin
@@ -38,9 +37,10 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration, item = nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:events_to_import] && !hash[:events_to_import][hash[:migration_id]]
+
       item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, id: hash[:id]).first
       item ||= CalendarEvent.where(context_type: context.class.to_s, context_id: context, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= context.calendar_events.temp_record
@@ -75,47 +75,57 @@ module Importers
       suffix || ""
     end
 
-
     def self.external_url_attachment_description(hash, context)
       return unless url = hash[:attachment_value]
+
       import_migration_attachment_link(url, ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link")))
     end
 
     def self.assignment_attachment_description(hash, context)
       return unless assignment = context.assignments.where(migration_id: hash[:attachment_value]).first
+
       import_migration_attachment_link(
         attachment_url(context, assignment),
-        ERB::Util.h(t('#calendar_event.see_assignment', "See %{assignment_name}", :assignment_name => assignment.title)))
+        ERB::Util.h(t('#calendar_event.see_assignment', "See %{assignment_name}", :assignment_name => assignment.title))
+      )
     end
 
     def self.assessment_attachment_description(hash, context)
       return unless quiz = context.quizzes.where(migration_id: hash[:attachment_value]).first
+
       import_migration_attachment_link(
         attachment_url(context, quiz),
-        ERB::Util.h(t('#calendar_event.see_quiz', "See %{quiz_name}", :quiz_name => quiz.title)))
+        ERB::Util.h(t('#calendar_event.see_quiz', "See %{quiz_name}", :quiz_name => quiz.title))
+      )
     end
 
     def self.file_attachment_description(hash, context)
       return unless file = context.attachments.where(migration_id: hash[:attachment_value]).first
+
       import_migration_attachment_link(
         attachment_url(context, file),
-        ERB::Util.h(t('#calendar_event.see_file', "See %{file_name}", :file_name => file.display_name)))
+        ERB::Util.h(t('#calendar_event.see_file', "See %{file_name}", :file_name => file.display_name))
+      )
     end
 
     def self.web_link_attachment_description(hash, context)
       link = context.external_url_hash[hash[:attachment_value]]
-      link ||= context.full_migration_hash['web_link_categories'].map{|c| c['links'] }.flatten.select{|l| l['link_id'] == hash[:attachment_value] } rescue nil
+      link ||= context.full_migration_hash['web_link_categories'].map { |c| c['links'] }.flatten.select { |l| l['link_id'] == hash[:attachment_value] } rescue nil
       return unless link
+
       import_migration_attachment_link(
         link['url'],
-        link['name'] || ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link")))
+        link['name'] || ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link"))
+      )
     end
 
     def self.topic_attachment_description(hash, context)
       return unless topic = context.discussion_topics.where(migration_id: hash[:attachment_value]).first
+
       import_migration_attachment_link(
         attachment_url(context, topic),
-        ERB::Util.h(t('#calendar_event.see_discussion_topic', "See %{discussion_topic_name}", :discussion_topic_name => topic.title)))
+        ERB::Util.h(t('#calendar_event.see_discussion_topic', "See %{discussion_topic_name}", :discussion_topic_name => topic.title))
+      )
     end
 
     def self.import_migration_attachment_link(href, body)
@@ -134,6 +144,5 @@ module Importers
       else "#{object.class.to_s.demodulize.underscore.pluralize}/#{object.id}"
       end
     end
-
   end
 end

@@ -100,12 +100,12 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   #  Note that this is NOT an id, but an actual instance of a User model.
   def question_data=(in_data)
     data = if in_data.is_a?(String)
-      ActiveSupport::JSON.decode(in_data)
-    elsif in_data.is_a?(Hash)
-      in_data.with_indifferent_access
-    else
-      in_data
-    end
+             ActiveSupport::JSON.decode(in_data)
+           elsif in_data.is_a?(Hash)
+             in_data.with_indifferent_access
+           else
+             in_data
+           end
 
     if valid_regrade_option?(data[:regrade_option])
       update_question_regrade(data[:regrade_option], data[:regrade_user])
@@ -179,6 +179,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   def validate_blank_questions
     return if self.question_data && !(self.question_data.is_type?(:fill_in_multiple_blanks) || self.question_data.is_type?(:short_answer))
+
     qd = self.question_data
     qd.answers = qd.answers.select { |answer| !answer['text'].empty? }
     self.question_data = qd
@@ -186,7 +187,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
     true
   end
 
-  def clone_for(quiz, dup=nil, options={})
+  def clone_for(quiz, dup = nil, options = {})
     dup ||= Quizzes::QuizQuestion.new
     self.attributes.delete_if { |k, v| [:id, :quiz_id, :quiz_group_id, :question_data].include?(k.to_sym) }.each do |key, val|
       dup.send("#{key}=", val)
@@ -217,7 +218,7 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
 
   # All questions will be assigned to the given quiz_group, and will be
   # assigned as part of the root quiz if no group is given
-  def self.update_all_positions!(questions, quiz_group=nil)
+  def self.update_all_positions!(questions, quiz_group = nil)
     return unless questions.size > 0
 
     group_id = quiz_group ? quiz_group.id : 'NULL'

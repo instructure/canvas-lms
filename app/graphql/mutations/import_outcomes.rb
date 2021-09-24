@@ -177,22 +177,21 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
       # from the source context, excluding the current group being imported,
       # and then get their source group ids.
       group_ids_from_source_in_target = target_group
-        .child_outcome_groups
-        .active
-        .where(
-          source_outcome_group_id: LearningOutcomeGroup
-            .active
-            .where(context: source_context)
-            .where.not(id: group_ids)
-        )
-        .pluck(:source_outcome_group_id)
+                                        .child_outcome_groups
+                                        .active
+                                        .where(
+                                          source_outcome_group_id: LearningOutcomeGroup
+                                            .active
+                                            .where(context: source_context)
+                                            .where.not(id: group_ids)
+                                        )
+                                        .pluck(:source_outcome_group_id)
 
       ancestors_map = get_group_ancestors(group_ids + group_ids_from_source_in_target)
 
       # now push to group_ids only groups that has the same ancestor as the
       # group that we're importing
       group_ids_from_source_in_target.each do |group_id_from_source_in_target|
-
         # if the first ancestor matches, they belong to the same ancestor
         if ancestors_map[group_id_from_source_in_target].first == ancestors_map[group.id].first
           group_ids << group_id_from_source_in_target
@@ -203,14 +202,14 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
 
       # If only one group must be imported
       common_ancestors = if group_ids.size == 1
-        # duplicating here because we'll pop common_ancestors later and we don't want
-        # to pop in the ancestors_to_be_imported_map
-        ancestors_to_be_imported_map.values.first.dup
-      else
-        ancestors_to_be_imported_map.values.inject do |p1, p2|
-          p1 & p2
-        end
-      end
+                           # duplicating here because we'll pop common_ancestors later and we don't want
+                           # to pop in the ancestors_to_be_imported_map
+                           ancestors_to_be_imported_map.values.first.dup
+                         else
+                           ancestors_to_be_imported_map.values.inject do |p1, p2|
+                             p1 & p2
+                           end
+                         end
 
       # the first common ancestor must be imported
       common_ancestors.pop
@@ -364,11 +363,9 @@ class Mutations::ImportOutcomes < Mutations::BaseMutation
         target_group
       )
 
-      {progress: progress}
+      { progress: progress }
     else
       raise GraphQL::ExecutionError, I18n.t("Error importing outcomes")
     end
   end
 end
-
-

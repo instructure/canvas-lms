@@ -54,8 +54,8 @@ describe MicrosoftSync::UsersUluvsFinder do
         before do
           (1..3).each do |i|
             communication_channel_model(workflow_state: :active,
-              path: "email_#{i}@example.com",
-              user_id: communication_channel.user_id)
+                                        path: "email_#{i}@example.com",
+                                        user_id: communication_channel.user_id)
           end
 
           root_account.settings[:microsoft_sync_login_attribute] = 'email'
@@ -74,7 +74,7 @@ describe MicrosoftSync::UsersUluvsFinder do
           let(:second_channel) do
             communication_channel_model(workflow_state: :inactive, path: "a_email@example.com", user_id: second_user.id)
           end
-          let(:user_ids) { [communication_channel.user_id, second_user.id]}
+          let(:user_ids) { [communication_channel.user_id, second_user.id] }
 
           it 'only returns the confirmed email address uluv' do
             users_uluvs = subject.to_h

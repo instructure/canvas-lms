@@ -23,7 +23,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require 'nokogiri'
 
 describe CanvasConnect::MeetingArchive do
-
   class MockClient
     def sco_contents(*args)
       Nokogiri::XML('<?xml version="1.0" encoding="utf-8"?>
@@ -74,5 +73,4 @@ describe CanvasConnect::MeetingArchive do
   it "returns the date modified" do
     expect(subject.date_modified).to eq '2013-09-05T12:13:29.727-06:00'
   end
-
 end

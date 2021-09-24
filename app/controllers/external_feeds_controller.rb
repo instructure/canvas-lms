@@ -142,5 +142,4 @@ class ExternalFeedsController < ApplicationController
       end
     end
   end
-
 end

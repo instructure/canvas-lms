@@ -32,8 +32,8 @@ describe MicrosoftSync::MembershipDiff do
   let(:additions) do
     [].tap { |results| subject.additions_in_slices_of(slice_size) { |slice| results << slice } }
   end
-  let(:additions_all_owners) { additions.map{|addition| addition[:owners] || []}.flatten.sort }
-  let(:additions_all_members) { additions.map{|addition| addition[:members] || []}.flatten.sort }
+  let(:additions_all_owners) { additions.map { |addition| addition[:owners] || [] }.flatten.sort }
+  let(:additions_all_members) { additions.map { |addition| addition[:members] || [] }.flatten.sort }
 
   # e.g. set_local_members('student', [1,2,3], 'StudentEnrollment') ->
   #   creates 'student1', 'student2', 'student3'
@@ -51,11 +51,11 @@ describe MicrosoftSync::MembershipDiff do
 
     describe '#additions_in_slices_of' do
       it "does not indicate #{enrollment_type} users to be added as owners" do
-        expect(additions_all_owners.select{|user| user.start_with?('student')}).to eq([])
+        expect(additions_all_owners.select { |user| user.start_with?('student') }).to eq([])
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select{|user| user.start_with?('student')}).to \
+        expect(additions_all_members.select { |user| user.start_with?('student') }).to \
           eq(%w[student3 student4])
       end
     end
@@ -69,12 +69,12 @@ describe MicrosoftSync::MembershipDiff do
 
     describe '#additions_in_slices_of' do
       it "indicates #{enrollment_type} users to be added as owners" do
-        expect(additions_all_owners.select{|user| user.start_with?('teacher')}).to \
+        expect(additions_all_owners.select { |user| user.start_with?('teacher') }).to \
           eq(%w[teacher5])
       end
 
       it "indicates #{enrollment_type} users to be added as members" do
-        expect(additions_all_members.select{|user| user.start_with?('teacher')}).to \
+        expect(additions_all_members.select { |user| user.start_with?('teacher') }).to \
           eq(%w[teacher5])
       end
     end
@@ -138,8 +138,8 @@ describe MicrosoftSync::MembershipDiff do
     let(:removals) do
       [].tap { |results| subject.removals_in_slices_of(slice_size) { |slice| results << slice } }
     end
-    let(:removals_all_owners) { removals.map{|removal| removal[:owners] || []}.flatten.sort }
-    let(:removals_all_members) { removals.map{|removal| removal[:members] || []}.flatten.sort }
+    let(:removals_all_owners) { removals.map { |removal| removal[:owners] || [] }.flatten.sort }
+    let(:removals_all_members) { removals.map { |removal| removal[:members] || [] }.flatten.sort }
 
     let(:remote_members) { %w[student1 student2 teacher1 teacher4 teacher5] }
     let(:remote_owners) { %w[teacher1 teacher2 teacher3 teacher5] }
@@ -210,7 +210,7 @@ describe MicrosoftSync::MembershipDiff do
   end
 
   describe 'max_enrollment_members_reached?' do
-    let(:half) { max/2 }
+    let(:half) { max / 2 }
     let(:max) { MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS }
     let(:min) { 1 }
 

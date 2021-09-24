@@ -30,12 +30,12 @@ class PlannerOverride < ActiveRecord::Base
      quiz: 'Quizzes::Quiz']
   belongs_to :user
   validates :plannable_id, :plannable_type, :workflow_state, :user_id, presence: true
-  validates :plannable_id, uniqueness: {scope: [:user_id, :plannable_type]}
+  validates :plannable_id, uniqueness: { scope: [:user_id, :plannable_type] }
 
   scope :active, -> { where workflow_state: 'active' }
   scope :deleted, -> { where workflow_state: 'deleted' }
   scope :not_deleted, -> { where.not deleted }
-  scope :for_user, -> (user) { where user: user }
+  scope :for_user, ->(user) { where user: user }
 
   workflow do
     state :active do
@@ -51,12 +51,14 @@ class PlannerOverride < ActiveRecord::Base
 
   def link_to_parent_topic
     return unless self.plannable_type == 'DiscussionTopic'
+
     plannable = DiscussionTopic.find(self.plannable_id)
     self.plannable_id = plannable.root_topic_id if plannable.root_topic_id
   end
 
   def link_to_submittable
     return unless self.plannable_type == 'Assignment'
+
     plannable = Assignment.find_by(id: self.plannable_id)
     if plannable&.quiz?
       self.plannable_type = PlannerHelper::PLANNABLE_TYPES['quiz']
@@ -72,6 +74,7 @@ class PlannerOverride < ActiveRecord::Base
 
   def associated_assignment_id
     return self.plannable_id if self.plannable_type == 'Assignment'
+
     self.plannable.assignment_id if self.plannable.respond_to? :assignment_id
   end
 

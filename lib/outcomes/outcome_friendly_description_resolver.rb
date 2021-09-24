@@ -25,13 +25,13 @@ module Outcomes
 
       if course
         queries << OutcomeFriendlyDescription.sanitize_sql([
-          "context_type = 'Course' AND context_id = ?", course.id
-        ])
+                                                             "context_type = 'Course' AND context_id = ?", course.id
+                                                           ])
       end
 
       queries << OutcomeFriendlyDescription.sanitize_sql([
-        "context_type = 'Account' AND context_id IN (?)", account.account_chain_ids
-      ])
+                                                           "context_type = 'Account' AND context_id IN (?)", account.account_chain_ids
+                                                         ])
 
       '(' + queries.join(') OR (') + ')'
     end

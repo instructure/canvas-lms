@@ -109,8 +109,34 @@ const DiscussionTopicManager = props => {
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-and-network'
   })
+
+  const updateDraftCache = (cache, result) => {
+    try {
+      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
+      const options = {
+        query: DISCUSSION_QUERY,
+        variables: {...variables, page: btoa(lastPage * PER_PAGE)}
+      }
+      const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
+      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      if (currentDiscussion && newDiscussionEntryDraft) {
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
+          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
+            draft => draft.id != newDiscussionEntryDraft.id
+          )
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.push(
+          newDiscussionEntryDraft
+        )
+
+        cache.writeQuery({...options, data: currentDiscussion})
+      }
+    } catch (e) {
+      discussionTopicQuery.refetch(variables)
+    }
+  }
 
   const updateCache = (cache, result) => {
     try {
@@ -124,6 +150,12 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
+          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
+            draft =>
+              draft.rootEntryId != newDiscussionEntry.rootEntryId &&
+              draft.discussionTopicID != newDiscussionEntry.discussionTopicID
+          )
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
@@ -169,6 +201,7 @@ const DiscussionTopicManager = props => {
     <SearchContext.Provider value={searchContext}>
       <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
+        updateDraftCache={updateDraftCache}
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {
           createDiscussionEntry({
@@ -187,6 +220,7 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
+          updateDraftCache={updateDraftCache}
           onOpenIsolatedView={(
             discussionEntryId,
             isolatedEntryId,
@@ -204,6 +238,7 @@ const DiscussionTopicManager = props => {
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
           relativeEntryId={relativeEntryId}
+          updateDraftCache={updateDraftCache}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
           replyFromId={replyFromId}

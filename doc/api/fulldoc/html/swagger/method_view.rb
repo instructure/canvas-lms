@@ -45,11 +45,11 @@ class MethodView < HashView
   end
 
   def nickname
-    summary.downcase.
-      gsub(/ the /, ' ').
-      gsub(/ an? /, ' ').
-      gsub(/[^a-z]+/, '_').
-      gsub(/^_+|_+$/, '')
+    summary.downcase
+           .gsub(/ the /, ' ')
+           .gsub(/ an? /, ' ')
+           .gsub(/[^a-z]+/, '_')
+           .gsub(/^_+|_+$/, '')
   end
 
   def desc
@@ -115,7 +115,7 @@ class MethodView < HashView
       "name" => name,
       "summary" => summary,
       "desc" => desc,
-      "arguments" => arguments.map{ |a| a.to_hash },
+      "arguments" => arguments.map { |a| a.to_hash },
       "returns" => returns.to_hash,
       "route" => route.to_hash,
     }
@@ -135,6 +135,7 @@ class MethodView < HashView
   end
 
   protected
+
   def select_tags(tag_names)
     names = Array.wrap(tag_names)
     @method.tags.select do |tag|
@@ -167,41 +168,41 @@ class MethodView < HashView
   #   distinguish the current method invocation.
   # The nickname_suffix contains a cached map of nickname suffixes
   def calculate_unique_nicknames(url_list, idx, prefix, nickname_suffix)
-      segments = {}
-      # Check the given segment for each URL, and save all possible values in the
-      # segments map.
-      url_list.each do |url|
-        if url.size == idx
-          # This URL terminates before the selected segment. Store a null value.
-          segments[:none] = [url]
-        end
-        if url.size > idx
-          # Associate this URL with an entry in the segments map.
-          segments[url[idx]] = [] unless segments[url[idx]]
-          segments[url[idx]] << url
-        end
+    segments = {}
+    # Check the given segment for each URL, and save all possible values in the
+    # segments map.
+    url_list.each do |url|
+      if url.size == idx
+        # This URL terminates before the selected segment. Store a null value.
+        segments[:none] = [url]
       end
+      if url.size > idx
+        # Associate this URL with an entry in the segments map.
+        segments[url[idx]] = [] unless segments[url[idx]]
+        segments[url[idx]] << url
+      end
+    end
 
-      # Do the recursive call based on whether the current segment matches or
-      # differs across all URLs.
-      if segments.size == 1
-        # There is only one option (ie, the segments match). Call this method on the
-        # next segment.
-        calculate_unique_nicknames url_list, idx + 1, prefix, nickname_suffix
-      end
-      if segments.size > 1
-        # There are at least two possible values for this segment. Handle each option.
-        segments.each do |option, urls|
-          # The path option forms part of the unique prefix, so add it to the prefix list.
-          p = option == :none ? prefix : prefix + [option.gsub(/\{|\}|\*/i, '')]
-          if urls.length == 1
-            # If there was only one URL with this value, we've found that URL's unique nickname.
-            nickname_suffix[urls.join("/")] = p.join("_")
-          else
-            # Otherwise recurse on the method with all URLs that have this prefix.
-            calculate_unique_nicknames urls, idx + 1, p, nickname_suffix
-          end
+    # Do the recursive call based on whether the current segment matches or
+    # differs across all URLs.
+    if segments.size == 1
+      # There is only one option (ie, the segments match). Call this method on the
+      # next segment.
+      calculate_unique_nicknames url_list, idx + 1, prefix, nickname_suffix
+    end
+    if segments.size > 1
+      # There are at least two possible values for this segment. Handle each option.
+      segments.each do |option, urls|
+        # The path option forms part of the unique prefix, so add it to the prefix list.
+        p = option == :none ? prefix : prefix + [option.gsub(/\{|\}|\*/i, '')]
+        if urls.length == 1
+          # If there was only one URL with this value, we've found that URL's unique nickname.
+          nickname_suffix[urls.join("/")] = p.join("_")
+        else
+          # Otherwise recurse on the method with all URLs that have this prefix.
+          calculate_unique_nicknames urls, idx + 1, p, nickname_suffix
         end
       end
+    end
   end
 end

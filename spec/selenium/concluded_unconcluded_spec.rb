@@ -44,7 +44,7 @@ describe "concluded/unconcluded" do
     create_session(u.pseudonym)
   end
 
-  it "should let the teacher edit the gradebook by default" do
+  it "lets the teacher edit the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
     wait_for_ajax_requests
 
@@ -53,7 +53,7 @@ describe "concluded/unconcluded" do
     expect(cell).to have_class('editable')
   end
 
-  it "should not let the teacher edit the gradebook when concluded" do
+  it "does not let the teacher edit the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 
@@ -62,7 +62,7 @@ describe "concluded/unconcluded" do
     expect(cell).not_to have_class('editable')
   end
 
-  it "should let the teacher add comments to the gradebook by default" do
+  it "lets the teacher add comments to the gradebook by default" do
     get "/courses/#{@course.id}/gradebook"
 
     Gradebook::Cells.open_tray(@student, @assignment)
@@ -70,7 +70,7 @@ describe "concluded/unconcluded" do
     expect(Gradebook::GradeDetailTray.new_comment_input).to be_displayed
   end
 
-  it "should not let the teacher add comments to the gradebook when concluded" do
+  it "does not let the teacher add comments to the gradebook when concluded" do
     @e.conclude
     get "/courses/#{@course.id}/gradebook"
 

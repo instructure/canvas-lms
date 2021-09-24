@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Quizzes::QuizRegradeRun do
-
   it "validates presence of quiz_regrade_id" do
     expect(Quizzes::QuizRegradeRun.new(quiz_regrade_id: 1)).to be_valid
     expect(Quizzes::QuizRegradeRun.new(quiz_regrade_id: nil)).not_to be_valid

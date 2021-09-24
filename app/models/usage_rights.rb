@@ -32,13 +32,13 @@ class UsageRights < ActiveRecord::Base
   def infer_license
     if license.blank?
       self.license = case use_justification
-        when 'public_domain'
-          'public_domain'
-        when 'creative_commons'
-          'cc_by_nc_nd' # assume the most restrictive CC license unless told otherwise
-        else
-          'private'     # default to private (copyrighted)
-      end
+                     when 'public_domain'
+                       'public_domain'
+                     when 'creative_commons'
+                       'cc_by_nc_nd' # assume the most restrictive CC license unless told otherwise
+                     else
+                       'private'     # default to private (copyrighted)
+                     end
     end
   end
 
@@ -49,5 +49,4 @@ class UsageRights < ActiveRecord::Base
   def license_url
     self.class.licenses[license || 'private'][:license_url]
   end
-
 end

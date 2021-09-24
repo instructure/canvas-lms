@@ -106,6 +106,7 @@ module Lti::Concerns
       end
 
       return module_item_link(options[:module_item], session_token) if options[:module_item].present?
+
       course_or_account_launch_link(context, tool, session_token, options[:launch_url])
     end
 

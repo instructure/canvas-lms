@@ -24,15 +24,15 @@ module Canvas
     describe Info do
       let(:request) do
         double(env: {}, remote_ip: "", query_parameters: {},
-             request_parameters: {}, path_parameters: {}, url: '',
-             request_method_symbol: '', format: 'HTML', headers: {}, authorization: nil)
+               request_parameters: {}, path_parameters: {}, url: '',
+               request_method_symbol: '', format: 'HTML', headers: {}, authorization: nil)
       end
 
-      let(:request_context_id){ 'abcdefg1234567'}
-      let(:auth_header){ "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
-      let(:account){ double(global_id: 1122334455) }
-      let(:user) { double(global_id: 5544332211)}
-      let(:opts) { { request_context_id: request_context_id, type: 'core_meltdown' }}
+      let(:request_context_id) { 'abcdefg1234567' }
+      let(:auth_header) { "OAuth oauth_body_hash=\"2jmj7l5rSw0yVb%2FvlWAYkK%2FYBwk%3D\", oauth_consumer_key=\"test_key\", oauth_nonce=\"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8\", oauth_signature=\"QUfER7WBKsq0nzIjJ8Y7iTcDaq0%3D\", oauth_signature_method=\"HMAC-SHA1\", oauth_timestamp=\"1445980405\", oauth_version=\"1.0\"" }
+      let(:account) { double(global_id: 1122334455) }
+      let(:user) { double(global_id: 5544332211) }
+      let(:opts) { { request_context_id: request_context_id, type: 'core_meltdown' } }
 
       describe 'initialization' do
         it "grabs the request context id if not provided" do
@@ -71,7 +71,7 @@ module Canvas
         end
 
         it 'passes important headers' do
-          allow(request).to receive(:headers).and_return({'User-Agent'=>'the-agent'})
+          allow(request).to receive(:headers).and_return({ 'User-Agent' => 'the-agent' })
           expect(output[:extra][:user_agent]).to eq('the-agent')
         end
 
@@ -90,7 +90,7 @@ module Canvas
               (+"somehost.com").force_encoding(Encoding::ASCII_8BIT).freeze,
           }
           req = double(env: dangerous_hash, remote_ip: "", url: "",
-                     path_parameters: {}, query_parameters: {}, request_parameters: {})
+                       path_parameters: {}, query_parameters: {}, request_parameters: {})
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect do
             Utf8Cleaner.recursively_strip_invalid_utf8!(env_stuff, true)
@@ -99,7 +99,7 @@ module Canvas
 
         it "has a max limit on the request_parameters data size" do
           req = double(env: {}, remote_ip: "", url: "",
-                     path_parameters: {}, query_parameters: {}, request_parameters: {"body" => ("a"*(described_class::MAX_DATA_SIZE*2))})
+                       path_parameters: {}, query_parameters: {}, request_parameters: { "body" => ("a" * (described_class::MAX_DATA_SIZE * 2)) })
           env_stuff = described_class.useful_http_env_stuff_from_request(req)
           expect(env_stuff['request_parameters'].size).to eq(described_class::MAX_DATA_SIZE)
         end
@@ -113,7 +113,7 @@ module Canvas
         end
 
         it "returns user agent" do
-          req = double(headers: {'User-Agent'=>'the-agent'}, authorization: nil)
+          req = double(headers: { 'User-Agent' => 'the-agent' }, authorization: nil)
           output = described_class.useful_http_headers(req)
 
           expect(output[:user_agent]).to eq('the-agent')
@@ -122,13 +122,13 @@ module Canvas
 
       def check_oauth(oauth_info)
         expected_info = {
-          "oauth_body_hash"=>"2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
-          "oauth_consumer_key"=>"test_key",
-          "oauth_nonce"=>"QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8",
-          "oauth_signature"=>"QUfER7WBKsq0nzIjJ8Y7iTcDaq0=",
-          "oauth_signature_method"=>"HMAC-SHA1",
-          "oauth_timestamp"=>"1445980405",
-          "oauth_version"=>"1.0"
+          "oauth_body_hash" => "2jmj7l5rSw0yVb/vlWAYkK/YBwk=",
+          "oauth_consumer_key" => "test_key",
+          "oauth_nonce" => "QFOhAwKHz0UATQSdycHdNkMZYpkhkzU1lYpwvIF3Q8",
+          "oauth_signature" => "QUfER7WBKsq0nzIjJ8Y7iTcDaq0=",
+          "oauth_signature_method" => "HMAC-SHA1",
+          "oauth_timestamp" => "1445980405",
+          "oauth_version" => "1.0"
         }
         assert_hash_contains(oauth_info, expected_info)
       end

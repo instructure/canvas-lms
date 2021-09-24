@@ -19,11 +19,11 @@
 #
 
 class MessageableUser < User
-  COLUMNS = ['id', 'updated_at', 'pronouns', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map{ |col| "users.#{col}" }
+  COLUMNS = ['id', 'updated_at', 'pronouns', 'short_name', 'name', 'avatar_image_url', 'avatar_image_source'].map { |col| "users.#{col}" }
   SELECT = COLUMNS.join(", ")
   AVAILABLE_CONDITIONS = "users.workflow_state IN ('registered', 'pre_registered')"
 
-  def self.build_select(options={})
+  def self.build_select(options = {})
     options = {
       :common_course_column => nil,
       :common_group_column => nil,
@@ -35,8 +35,9 @@ class MessageableUser < User
     common_course_sql =
       if options[:common_role_column]
         raise ArgumentError unless options[:common_course_column]
+
         connection.func(:group_concat,
-          :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text")
+                        :"#{options[:common_course_column]}::text || ':' || #{options[:common_role_column]}::text")
       else
         'NULL::text'
       end
@@ -53,7 +54,7 @@ class MessageableUser < User
     "#{SELECT}, #{bookmark_sql} AS bookmark, #{common_course_sql} AS common_courses, #{common_group_sql} AS common_groups"
   end
 
-  def self.prepped(options={})
+  def self.prepped(options = {})
     options = {
       :strict_checks => true,
       :include_deleted => false
@@ -72,10 +73,10 @@ class MessageableUser < User
       columns.unshift(head)
     end
 
-    scope = self.
-      select(MessageableUser.build_select(options)).
-      group(MessageableUser.connection.group_by(*columns)).
-      order(User.sortable_name_order_by_clause).order(Arel.sql("users.id"))
+    scope = self
+            .select(MessageableUser.build_select(options))
+            .group(MessageableUser.connection.group_by(*columns))
+            .order(User.sortable_name_order_by_clause).order(Arel.sql("users.id"))
 
     if options[:strict_checks]
       scope.where(AVAILABLE_CONDITIONS)
@@ -86,11 +87,11 @@ class MessageableUser < User
     end
   end
 
-  def self.unfiltered(options={})
+  def self.unfiltered(options = {})
     prepped(options.merge(:strict_checks => false))
   end
 
-  def self.available(options={})
+  def self.available(options = {})
     prepped(options.merge(:strict_checks => true))
   end
 
@@ -99,9 +100,9 @@ class MessageableUser < User
   end
 
   def self.individual_recipients(recipients)
-    recipients.select{ |id|
+    recipients.select { |id|
       !id.is_a?(String) ||
-      id =~ Calculator::INDIVIDUAL_RECIPIENT
+        id =~ Calculator::INDIVIDUAL_RECIPIENT
     }.map(&:to_i)
   end
 
@@ -153,7 +154,7 @@ class MessageableUser < User
     combine_common_contexts(self.global_common_groups, other.global_common_groups)
   end
 
-  def serializable_hash(options={})
+  def serializable_hash(options = {})
     options[:except] ||= []
     options[:except] << :bookmark
     super(options)
@@ -165,6 +166,7 @@ class MessageableUser < User
     local_common_contexts = {}
     target_shard = Shard.current
     return local_common_contexts if common_contexts.empty?
+
     Shard.partition_by_shard(common_contexts.keys) do |sharded_ids|
       sharded_ids.each do |id|
         # a context id of 0 indicates admin visibility without an actual shared
@@ -178,7 +180,7 @@ class MessageableUser < User
   end
 
   def combine_common_contexts(left, right)
-    right.each{ |key,values| (left[key] ||= []).concat(values) }
+    right.each { |key, values| (left[key] ||= []).concat(values) }
   end
 
   # both bookmark_for and restrict_scope should always be executed on the
@@ -192,9 +194,9 @@ class MessageableUser < User
 
     def self.validate(bookmark)
       bookmark.is_a?(Array) &&
-      bookmark.size == 2 &&
-      bookmark[0].is_a?(String) &&
-      bookmark[1].is_a?(Integer)
+        bookmark.size == 2 &&
+        bookmark[0].is_a?(String) &&
+        bookmark[1].is_a?(Integer)
     end
 
     # ordering is already guaranteed

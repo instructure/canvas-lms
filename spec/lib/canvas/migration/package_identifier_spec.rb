@@ -25,6 +25,6 @@ describe Canvas::Migration::PackageIdentifier do
     archive = double(path: "archive.zip", find_entry: true)
     allow(Canvas::Plugin).to receive(:all_for_tag).with(:export_system).and_return([])
     identifier = Canvas::Migration::PackageIdentifier.new(archive)
-    expect{ identifier.get_converter }.to raise_error(Canvas::Migration::UnsupportedPackage)
+    expect { identifier.get_converter }.to raise_error(Canvas::Migration::UnsupportedPackage)
   end
 end

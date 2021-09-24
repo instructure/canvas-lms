@@ -27,7 +27,9 @@ describe Mutable do
       # effects/return values from these methods for specific tests, we'll double
       # them
       def muted?; end
+
       def update_attribute(*args); end
+
       def save!; end
 
       include Mutable

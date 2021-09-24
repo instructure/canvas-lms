@@ -27,7 +27,7 @@ class InitAccountIndexForCourseAuditLog < ActiveRecord::Migration[5.2]
 
   def self.up
     DataFixup::InitAccountIndexForCourseAuditLog.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "init_account_index_for_course_audit_log:#{Shard.current.database_server.id}").run
+                                                                     strand: "init_account_index_for_course_audit_log:#{Shard.current.database_server.id}").run
   end
 
   def self.down

@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class AdminImporter < CSVBaseImporter
-
       def self.admin_csv?(row)
         row.include?('account_id') && row.include?('user_id')
       end
@@ -32,7 +31,7 @@ module SIS
 
       # possible columns:
       # user_id, account_id, role_id, role
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         messages = []
         count = SIS::AdminImporter.new(@root_account, importer_opts).process do |i|
           csv_rows(csv, index, count) do |row|

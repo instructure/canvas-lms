@@ -20,7 +20,6 @@
 
 module SIS
   class AccountImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       Account.suspend_callbacks(:update_account_associations_if_changed) do
@@ -58,6 +57,7 @@ module SIS
           parent = @accounts_cache[parent_account_id]
           parent ||= @root_account.all_accounts.where(sis_source_id: parent_account_id).take
           raise ImportError, "Parent account didn't exist for #{account_id}" unless parent
+
           @accounts_cache[parent.sis_source_id] = parent
         end
 
@@ -87,6 +87,7 @@ module SIS
           elsif status =~ /deleted/i
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active sub accounts." if account.sub_accounts.active.exists?
             raise ImportError, "Cannot delete the sub_account with ID: #{account_id} because it has active courses." if account.courses.active.exists?
+
             account.workflow_state = 'deleted'
           end
         end

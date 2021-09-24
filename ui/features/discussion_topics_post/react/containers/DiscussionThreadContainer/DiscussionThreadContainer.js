@@ -345,6 +345,8 @@ export const DiscussionThreadContainer = props => {
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
+                    discussionTopic={props.discussionTopic}
+                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
                       !props.discussionEntry.deleted ? (
@@ -403,6 +405,7 @@ export const DiscussionThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    updateDraftCache={props.updateDraftCache}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
@@ -482,7 +485,8 @@ DiscussionThreadContainer.propTypes = {
   parentRefCurrent: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  highlightEntryId: PropTypes.string
+  highlightEntryId: PropTypes.string,
+  updateDraftCache: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -521,6 +525,7 @@ const DiscussionSubentries = props => {
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
       parentRefCurrent={props.parentRefCurrent}
+      updateDraftCache={props.updateDraftCache}
     />
   ))
 }
@@ -530,5 +535,6 @@ DiscussionSubentries.propTypes = {
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRefCurrent: PropTypes.object
+  parentRefCurrent: PropTypes.object,
+  updateDraftCache: PropTypes.func
 }

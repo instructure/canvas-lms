@@ -44,9 +44,9 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     @progress = progress
     progress.start
     csv = begin
-            file = attachment.open
-            { fullpath: file.path, :file => attachment.display_name, attachment: attachment }
-          end
+      file = attachment.open
+      { fullpath: file.path, :file => attachment.display_name, attachment: attachment }
+    end
     validate_file(csv)
     return unless progress.reload.running?
 

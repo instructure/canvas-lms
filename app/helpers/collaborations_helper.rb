@@ -19,12 +19,11 @@
 #
 
 module CollaborationsHelper
-
   def collaboration(collab, user, google_drive_enabled)
     if collab.is_a?(GoogleDocsCollaboration) && !google_drive_enabled
       render 'collaborations/auth_google_drive', collaboration: collab
     else
-      data_attrs = {id: collab.id}
+      data_attrs = { id: collab.id }
       if collab.is_a?(ExternalToolCollaboration)
         url = polymorphic_url(
           [:retrieve, @context, :external_tools],
@@ -56,6 +55,4 @@ module CollaborationsHelper
   def delete_button(collab, user)
     render 'collaborations/delete_button', collaboration: collab if can_do(collab, user, :delete)
   end
-
-
 end

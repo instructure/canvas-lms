@@ -27,31 +27,31 @@ describe AdheresToPolicy::ClassMethods do
     end
   end
 
-  it "should filter policy_block through a block filter with set_policy" do
+  it "filters policy_block through a block filter with set_policy" do
     expect(@some_class).to respond_to(:set_policy)
     expect { @some_class.set_policy(1) }.to raise_error(ArgumentError)
     b = lambda { 1 }
     expect { @some_class.set_policy(&b) }.not_to raise_error
   end
 
-  it "should use set_permissions as set_policy" do
+  it "uses set_permissions as set_policy" do
     expect(@some_class).to respond_to(:set_permissions)
     expect { @some_class.set_permissions(1) }.to raise_error(ArgumentError)
     b = lambda { 1 }
     expect { @some_class.set_permissions(&b) }.not_to raise_error
   end
 
-  it "should provide a Policy instance through policy" do
+  it "provides a Policy instance through policy" do
     @some_class.set_policy { 1 }
     expect(@some_class.policy).to be_is_a(AdheresToPolicy::Policy)
   end
 
-  it "should continue to use the same Policy instance (an important check, since this is also a constructor)" do
+  it "continues to use the same Policy instance (an important check, since this is also a constructor)" do
     @some_class.set_policy { 1 }
     expect(@some_class.policy).to eql(@some_class.policy)
   end
 
-  it "should apply all given policy blocks to the Policy instance" do
+  it "applies all given policy blocks to the Policy instance" do
     @some_class.set_policy do
       given { |_| true }
       can :read

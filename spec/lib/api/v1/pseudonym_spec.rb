@@ -25,7 +25,7 @@ describe "Api::V1::Pseudonym" do
   end
 
   describe "#pseudonym_json" do
-    let(:pseudonym){ Pseudonym.new(account: Account.default) }
+    let(:pseudonym) { Pseudonym.new(account: Account.default) }
     let(:session) { {} }
     let(:user) { User.new }
     let(:api) { Harness.new }

@@ -23,6 +23,7 @@ class CreateAccountReportRows < ActiveRecord::Migration[5.1]
 
   def change
     return if table_exists? :account_report_rows
+
     create_table :account_report_rows do |t|
       t.integer :account_report_id, null: false, limit: 8
       t.integer :account_report_runner_id, null: false, limit: 8

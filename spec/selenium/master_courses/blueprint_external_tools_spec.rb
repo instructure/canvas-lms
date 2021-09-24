@@ -25,8 +25,8 @@ describe "master courses - child courses - external tool locking" do
   before :once do
     @copy_from = course_factory(active_all: true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
-    attributes = {name: "new tool", consumer_key: "key",
-      shared_secret: "secret", custom_fields: {'a' => '1', 'b' => '2'}, url: "http://www.example.com"}
+    attributes = { name: "new tool", consumer_key: "key",
+                   shared_secret: "secret", custom_fields: { 'a' => '1', 'b' => '2' }, url: "http://www.example.com" }
     @original_tool = @copy_from.context_external_tools.create!(attributes)
     @tag = @template.create_content_tag_for!(@original_tool)
 
@@ -42,8 +42,8 @@ describe "master courses - child courses - external tool locking" do
     user_session(@teacher)
   end
 
-  it "should not show the cog-menu options on the index when locked" do
-    @tag.update(restrictions: {all: true})
+  it "does not show the cog-menu options on the index when locked" do
+    @tag.update(restrictions: { all: true })
 
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
@@ -52,7 +52,7 @@ describe "master courses - child courses - external tool locking" do
     expect(f('.ExternalToolsTableRow')).not_to contain_css('.al-trigger')
   end
 
-  it "should show the cog-menu options on the index when not locked" do
+  it "shows the cog-menu options on the index when not locked" do
     get "/courses/#{@copy_to.id}/settings#tab-tools"
 
     expect(f('.master-course-cell')).to contain_css('.icon-blueprint')

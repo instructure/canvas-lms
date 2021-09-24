@@ -62,7 +62,7 @@ class Mutations::OutcomeProficiencyBase < Mutations::BaseMutation
       record = OutcomeProficiency.new(context: context, **attrs(input.to_h))
     end
     if record.save
-      {outcome_proficiency: record}
+      { outcome_proficiency: record }
     elsif existing_record.nil? && context_taken?(record)
       upsert(input, context: context)
     else

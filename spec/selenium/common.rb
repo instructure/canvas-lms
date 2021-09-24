@@ -30,7 +30,7 @@ require_relative 'test_setup/selenium_extensions'
 if ENV["TESTRAIL_RUN_ID"]
   require 'testrailtagging'
   RSpec.configure do |config|
-    TestRailRSpecIntegration.register_rspec_integration(config,:canvas, add_formatter: false)
+    TestRailRSpecIntegration.register_rspec_integration(config, :canvas, add_formatter: false)
   end
 elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
   require "testrailtagging"
@@ -39,7 +39,7 @@ elsif ENV["TESTRAIL_ENTRY_RUN_ID"]
   end
 end
 
-Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each {|file| require file }
+Dir[File.dirname(__FILE__) + '/test_setup/common_helper_methods/*.rb'].each { |file| require file }
 
 RSpec.configure do |config|
   config.before :suite do
@@ -198,8 +198,8 @@ shared_context "in-process server selenium tests" do
     # log INSTUI deprecation warnings
     if browser_logs.present?
       spec_file = example.file_path.sub(/.*spec\/selenium\//, '')
-      deprecations =  browser_logs.select {|l| l.message =~ /\[.*deprecated./}.map do |l|
-        ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, 'Warning') }"
+      deprecations = browser_logs.select { |l| l.message =~ /\[.*deprecated./ }.map do |l|
+        ">>> #{spec_file}: \"#{example.description}\": #{driver.current_url}: #{l.message.gsub(/.*Warning/, 'Warning')}"
       end
       puts "\n", deprecations.uniq
     end
@@ -252,7 +252,7 @@ shared_context "in-process server selenium tests" do
       javascript_errors = browser_logs.select do |e|
         e.level == "SEVERE" &&
           e.message.present? &&
-          browser_errors_we_dont_care_about.none? {|s| e.message.include?(s)}
+          browser_errors_we_dont_care_about.none? { |s| e.message.include?(s) }
       end
 
       if javascript_errors.present?

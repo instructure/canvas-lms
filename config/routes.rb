@@ -112,12 +112,12 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#react_files', format: false, defaults: {format: 'html'}
-        get "search" => 'files#react_files', format: false, defaults: {format: 'html'}
+        get "folder#{full_path_glob}" => 'files#react_files', format: false, defaults: { format: 'html' }
+        get "search" => 'files#react_files', format: false, defaults: { format: 'html' }
         get :quota
         post :reorder
       end
-      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ #needs to stay below react_files route
+      get ':file_path' => 'files#show_relative', as: :relative_path, file_path: /.+/ # needs to stay below react_files route
     end
   end
 
@@ -262,26 +262,26 @@ CanvasRails::Application.routes.draw do
       get 'moderate' => 'assignments#show_moderate'
 
       get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_previews#show',
-        constraints: ->(request) do
-          request.query_parameters.key?(:preview) && request.format == :html
-        end
+                                                 constraints: ->(request) do
+                                                                request.query_parameters.key?(:preview) && request.format == :html
+                                                              end
 
       get 'anonymous_submissions/:anonymous_id', to: 'submissions/anonymous_downloads#show',
-        constraints: ->(request) do
-          request.query_parameters.key?(:download)
-        end
+                                                 constraints: ->(request) do
+                                                                request.query_parameters.key?(:download)
+                                                              end
 
       get 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#show', as: :anonymous_submission
 
       get 'submissions/:id', to: 'submissions/previews#show',
-        constraints: ->(request) do
-          request.query_parameters.key?(:preview) && request.format == :html
-        end
+                             constraints: ->(request) do
+                                            request.query_parameters.key?(:preview) && request.format == :html
+                                          end
 
       get 'submissions/:id', to: 'submissions/downloads#show',
-        constraints: ->(request) do
-          request.query_parameters.key?(:download)
-        end
+                             constraints: ->(request) do
+                                            request.query_parameters.key?(:download)
+                                          end
 
       put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
       put 'anonymous_submissions/:anonymous_id/reassign', to: 'anonymous_submissions#redo_submission'
@@ -296,20 +296,20 @@ CanvasRails::Application.routes.draw do
       end
 
       get 'anonymous_submissions/:anonymous_id/originality_report/:asset_string',
-        to: 'anonymous_submissions#originality_report',
-        as: :anonymous_submission_originality_report
+          to: 'anonymous_submissions#originality_report',
+          as: :anonymous_submission_originality_report
       post 'anonymous_submissions/:anonymous_id/turnitin/resubmit',
-        to: 'anonymous_submissions#resubmit_to_turnitin',
-        as: :anonymous_submission_resubmit_to_turnitin
+           to: 'anonymous_submissions#resubmit_to_turnitin',
+           as: :anonymous_submission_resubmit_to_turnitin
       get 'anonymous_submissions/:anonymous_id/turnitin/:asset_string',
-        to: 'anonymous_submissions#turnitin_report',
-        as: :anonymous_submission_turnitin_report
+          to: 'anonymous_submissions#turnitin_report',
+          as: :anonymous_submission_turnitin_report
       post 'anonymous_submissions/:anonymous_id/vericite/resubmit',
-        to: 'anonymous_submissions#resubmit_to_vericite',
-        as: :anonymous_submission_resubmit_to_vericite
+           to: 'anonymous_submissions#resubmit_to_vericite',
+           as: :anonymous_submission_resubmit_to_vericite
       get 'anonymous_submissions/:anonymous_id/vericite/:asset_string',
-        to: 'anonymous_submissions#vericite_report',
-        as: :anonymous_submission_vericite_report
+          to: 'anonymous_submissions#vericite_report',
+          as: :anonymous_submission_vericite_report
 
       get :rubric
       resource :rubric_association, path: :rubric do
@@ -333,7 +333,7 @@ CanvasRails::Application.routes.draw do
       end
 
       get 'lti/resource/:resource_link_id', controller: 'lti/message',
-          action: 'resource', as: :resource_link_id
+                                            action: 'resource', as: :resource_link_id
     end
 
     resources :grading_standards, only: [:index, :create, :update, :destroy]
@@ -356,14 +356,14 @@ CanvasRails::Application.routes.draw do
     end
 
     get 'lti/resource/:resource_link_id', controller: 'lti/message',
-        action: 'resource', as: :resource_link_id
+                                          action: 'resource', as: :resource_link_id
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
-        action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+                                                            action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     post 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
-        as: :tool_proxy_reregistration
+                                                        as: :tool_proxy_reregistration
     get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
-        as: :registration_return
+                                   as: :registration_return
 
     resources :submissions
     resources :calendar_events
@@ -684,14 +684,14 @@ CanvasRails::Application.routes.draw do
     end
 
     get 'lti/resource/:resource_link_id', controller: 'lti/message',
-        action: 'resource', as: :resource_link_id
+                                          action: 'resource', as: :resource_link_id
     get 'lti/basic_lti_launch_request/:message_handler_id', controller: 'lti/message',
-        action: 'basic_lti_launch_request', as: :basic_lti_launch_request
+                                                            action: 'basic_lti_launch_request', as: :basic_lti_launch_request
     post 'lti/tool_proxy_registration', controller: 'lti/message', action: 'registration', as: :tool_proxy_registration
     get 'lti/tool_proxy_reregistration/:tool_proxy_id', controller: 'lti/message', action: 'reregistration',
-        as: :tool_proxy_reregistration
+                                                        as: :tool_proxy_reregistration
     get 'lti/registration_return', controller: 'lti/message', action: 'registration_return',
-        as: :registration_return
+                                   as: :registration_return
 
     get 'outcomes/users/:user_id' => 'outcomes#user_outcome_results', as: :user_outcomes_results
     resources :outcomes do
@@ -917,8 +917,8 @@ CanvasRails::Application.routes.draw do
   get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
-  get "files/search", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false, defaults: { format: 'html' }
+  get "files/search", controller: 'files', action: 'react_files', format: false, defaults: { format: 'html' }
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
@@ -1208,18 +1208,18 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :anonymous_provisional_grades) do
       get "courses/:course_id/assignments/:assignment_id/anonymous_provisional_grades/status",
-        action: :status, as: "course_assignment_anonymous_provisional_status"
+          action: :status, as: "course_assignment_anonymous_provisional_status"
     end
 
     scope(controller: :provisional_grades) do
       put "courses/:course_id/assignments/:assignment_id/provisional_grades/bulk_select",
-        action: :bulk_select, as: 'bulk_select_provisional_grades'
+          action: :bulk_select, as: 'bulk_select_provisional_grades'
       get "courses/:course_id/assignments/:assignment_id/provisional_grades/status",
-        action: :status, as: "course_assignment_provisional_status"
+          action: :status, as: "course_assignment_provisional_status"
       post "courses/:course_id/assignments/:assignment_id/provisional_grades/publish",
-        action: :publish, as: 'publish_provisional_grades'
+           action: :publish, as: 'publish_provisional_grades'
       put "courses/:course_id/assignments/:assignment_id/provisional_grades/:provisional_grade_id/select",
-        action: :select, as: 'select_provisional_grade'
+          action: :select, as: 'select_provisional_grade'
     end
 
     scope(controller: :submission_comments_api) do
@@ -1346,17 +1346,17 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'lti/tool_proxy') do
       %w(course account).each do |context|
         delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :destroy,
-               as: "#{context}_delete_tool_proxy"
+                                                                         as: "#{context}_delete_tool_proxy"
         put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id", action: :update,
-            as: "#{context}_update_tool_proxy"
+                                                                      as: "#{context}_update_tool_proxy"
 
         delete "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :dismiss_update,
-               as: "#{context}_dismiss_update_tool_proxy"
+                                                                                as: "#{context}_dismiss_update_tool_proxy"
         put "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/update", action: :accept_update,
-            as: "#{context}_accept_update_tool_proxy"
+                                                                             as: "#{context}_accept_update_tool_proxy"
 
         get "#{context}s/:#{context}_id/tool_proxies/:tool_proxy_id/recreate_subscriptions", action: :recreate_subscriptions,
-            as: "#{context}_recreate_subscriptions_tool_proxy"
+                                                                                             as: "#{context}_recreate_subscriptions_tool_proxy"
       end
     end
 
@@ -1670,7 +1670,7 @@ CanvasRails::Application.routes.draw do
         resources :users, path: "groups/:group_id/users", name_prefix: "group_", controller: :group_memberships, except: [:index, :create]
       end
 
-      get  'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
+      get 'groups/:group_id/files', controller: :files, action: :api_index, as: 'group_files'
       get 'groups/:group_id/folders', controller: :folders, action: :list_all_folders, as: 'group_folders'
       post 'groups/:group_id/folders', controller: :folders, action: :create
       get 'groups/:group_id/folders/by_path/*full_path', controller: :folders, action: :resolve_path
@@ -1715,7 +1715,6 @@ CanvasRails::Application.routes.draw do
       get 'files/:id/create_success', action: :api_create_success
       match '/api/v1/files/:id/create_success', via: [:options], action: :api_create_success_cors
       post 'files/capture', action: :api_capture, as: 'files_capture'
-
 
       # 'attachment' (rather than 'file') is used below so modules API can use polymorphic_url to generate an item API link
       get 'files/:id', action: :api_show, as: 'attachment'
@@ -2361,17 +2360,17 @@ CanvasRails::Application.routes.draw do
     end
   end
 
-    # this is not a "normal" api endpoint in the sense that it is not documented or
-    # generally available to hosted customers. it also does not respect the normal
-    # pagination options; however, jobs_controller already accepts `limit` and `offset`
-    # paramaters and defines a sane default limit
-    ApiRouteSet::V1.draw(self) do
-      scope(controller: :jobs) do
-        get 'jobs', action: :index
-        get 'jobs/:id', action: :show
-        post 'jobs/batch_update', action: :batch_update
-      end
+  # this is not a "normal" api endpoint in the sense that it is not documented or
+  # generally available to hosted customers. it also does not respect the normal
+  # pagination options; however, jobs_controller already accepts `limit` and `offset`
+  # paramaters and defines a sane default limit
+  ApiRouteSet::V1.draw(self) do
+    scope(controller: :jobs) do
+      get 'jobs', action: :index
+      get 'jobs/:id', action: :show
+      post 'jobs/batch_update', action: :batch_update
     end
+  end
 
   # this is not a "normal" api endpoint in the sense that it is not documented
   # or called directly, it's used as the redirect in the file upload process
@@ -2397,7 +2396,6 @@ CanvasRails::Application.routes.draw do
   end
 
   ApiRouteSet.draw(self, "/api/lti") do
-
     scope(controller: 'lti/tool_configurations_api') do
       put 'developer_keys/:developer_key_id/tool_configuration', action: :update
       post 'accounts/:account_id/developer_keys/tool_configuration', action: :create
@@ -2436,25 +2434,25 @@ CanvasRails::Application.routes.draw do
 
       post "#{prefix}/authorize", controller: 'lti/ims/authorization', action: :authorize, as: "#{context}_lti_oauth2_authorize"
       get  "#{prefix}/tool_consumer_profile(/:tool_consumer_profile_id)", controller: 'lti/ims/tool_consumer_profile',
-           action: 'show', as: "#{context}_tool_consumer_profile"
+                                                                          action: 'show', as: "#{context}_tool_consumer_profile"
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :re_reg,
-           as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new
+                                   as: "re_reg_#{context}_lti_tool_proxy", constraints: Lti::ReRegConstraint.new
       post "#{prefix}/tool_proxy", controller: 'lti/ims/tool_proxy', action: :create,
-           as: "create_#{context}_lti_tool_proxy"
+                                   as: "create_#{context}_lti_tool_proxy"
       get "#{prefix}/jwt_token", controller: 'external_tools', action: :jwt_token
       get "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_tool_setting"
       get "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: "show_#{context}_resource_link_id_tool_setting"
       put "tool_proxy/:tool_proxy_guid/#{prefix}/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_tool_setting"
       put "tool_proxy/:tool_proxy_guid/#{prefix}/resource_link_id/:resource_link_id/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: "update_#{context}_update_resource_link_id_tool_setting"
     end
-    #Tool Setting Services
-    get "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :show, as: :show_lti_tool_settings
+    # Tool Setting Services
+    get "tool_settings/:tool_setting_id", controller: 'lti/ims/tool_setting', action: :show, as: :show_lti_tool_settings
     get "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :show, as: :show_tool_proxy_lti_tool_settings
-    put "tool_settings/:tool_setting_id",  controller: 'lti/ims/tool_setting', action: :update, as: :update_lti_tool_settings
+    put "tool_settings/:tool_setting_id", controller: 'lti/ims/tool_setting', action: :update, as: :update_lti_tool_settings
     put "tool_proxy/:tool_proxy_guid/tool_setting", controller: 'lti/ims/tool_setting', action: :update, as: :update_tool_proxy_lti_tool_settings
 
-    #Tool Proxy Services
-    get  "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
+    # Tool Proxy Services
+    get "tool_proxy/:tool_proxy_guid", controller: 'lti/ims/tool_proxy', action: :show, as: "show_lti_tool_proxy"
 
     # Membership Service
     get "courses/:course_id/membership_service", controller: "lti/membership_service", action: :course_index, as: :course_membership_service

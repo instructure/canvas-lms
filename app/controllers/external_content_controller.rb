@@ -47,7 +47,7 @@ class ExternalContentController < ApplicationController
         end
       end
     elsif params[:return_type] == 'oembed'
-      js_env(oembed: {endpoint: params[:endpoint], url: params[:url]})
+      js_env(oembed: { endpoint: params[:endpoint], url: params[:url] })
       @oembed_token = params[:oembed_token]
     elsif params[:service] == 'external_tool_dialog'
       get_context
@@ -78,23 +78,22 @@ class ExternalContentController < ApplicationController
     @headers = false
 
     js_env({
-      retrieved_data: (@retrieved_data || {}),
-      lti_response_messages: lti_response_messages,
-      service: params[:service],
-      service_id: params[:id],
-      message: param_if_set(:lti_msg),
-      log: param_if_set(:lti_log),
-      error_message: param_if_set(:lti_errormsg),
-      error_log: param_if_set(:lti_errorlog)
-    })
+             retrieved_data: (@retrieved_data || {}),
+             lti_response_messages: lti_response_messages,
+             service: params[:service],
+             service_id: params[:id],
+             message: param_if_set(:lti_msg),
+             log: param_if_set(:lti_log),
+             error_message: param_if_set(:lti_errormsg),
+             error_log: param_if_set(:lti_errorlog)
+           })
   end
 
   def normalize_deprecated_data!
     params[:return_type] = params[:embed_type] if !params.key?(:return_type) && params.key?(:embed_type)
 
-    return_types = {'basic_lti' => 'lti_launch_url', 'link' => 'url', 'image' => 'image_url'}
+    return_types = { 'basic_lti' => 'lti_launch_url', 'link' => 'url', 'image' => 'image_url' }
     params[:return_type] = return_types[params[:return_type]] if return_types.key? params[:return_type]
-
   end
 
   def oembed_retrieve
@@ -133,9 +132,9 @@ class ExternalContentController < ApplicationController
       item.placement_advice ||= default_placement_advice
       if item.type == IMS::LTI::Models::ContentItems::LtiLinkItem::TYPE
         launch_url = item.url || json_data[:default_launch_url]
-        url_gen_params = {url: launch_url}
+        url_gen_params = { url: launch_url }
 
-        displays = {'iframe' => 'borderless', 'window' => 'borderless'}
+        displays = { 'iframe' => 'borderless', 'window' => 'borderless' }
         url_gen_params[:display] =
           displays[item.placement_advice.presentation_document_target]
 
@@ -146,6 +145,7 @@ class ExternalContentController < ApplicationController
   end
 
   private
+
   def content_item_selection
     if params[:lti_message_type]
       message = IMS::LTI::Models::Messages::Message.generate(request.GET && request.POST)
@@ -162,8 +162,8 @@ class ExternalContentController < ApplicationController
 
       lti_msg = param_if_set "lti_msg"
       lti_log = param_if_set "lti_log"
-      lti_errormsg = param_if_set("lti_errormsg") {|error_msg| logger.warn error_msg}
-      lti_errorlog = param_if_set("lti_errorlog") {|error_log| logger.warn error_log}
+      lti_errormsg = param_if_set("lti_errormsg") { |error_msg| logger.warn error_msg }
+      lti_errorlog = param_if_set("lti_errorlog") { |error_log| logger.warn error_log }
 
       response_messages[:lti_msg] = lti_msg if lti_msg
       response_messages[:lti_log] = lti_log if lti_log
@@ -184,14 +184,13 @@ class ExternalContentController < ApplicationController
 
   def default_placement_advice
     IMS::LTI::Models::ContentItemPlacement.new(
-        presentation_document_target: 'default',
-        display_height: 600,
-        display_width: 800
+      presentation_document_target: 'default',
+      display_height: 600,
+      display_width: 800
     )
   end
 
   def json_data
     @json_data ||= ((params[:data] && Canvas::Security.decode_jwt(params[:data])) || {}).with_indifferent_access
   end
-
 end

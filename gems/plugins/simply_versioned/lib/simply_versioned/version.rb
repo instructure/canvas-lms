@@ -31,7 +31,7 @@
 # these call +model+ which will return an instantiated model of the original
 # class with those attributes.
 #
-class Version < ActiveRecord::Base #:nodoc:
+class Version < ActiveRecord::Base # :nodoc:
   belongs_to :versionable, :polymorphic => true
 
   validates_presence_of :versionable_id, :versionable_type
@@ -43,7 +43,7 @@ class Version < ActiveRecord::Base #:nodoc:
   def model
     @model ||= begin
       obj = versionable_type.constantize.new
-      YAML::load( self.yaml ).each do |var_name,var_value|
+      YAML::load(self.yaml).each do |var_name, var_value|
         # INSTRUCTURE:  added if... so that if a column is removed in a migration after this was versioned it doesen't die with NoMethodError: undefined method `some_column_name=' for ...
         obj.write_attribute(var_name, var_value) if obj.class.columns_hash[var_name]
       end
@@ -65,12 +65,12 @@ class Version < ActiveRecord::Base #:nodoc:
 
   # Return the next higher numbered version, or nil if this is the last version
   def next
-    versionable.versions.next_version( self.number )
+    versionable.versions.next_version(self.number)
   end
 
   # Return the next lower numbered version, or nil if this is the first version
   def previous
-    versionable.versions.previous_version( self.number )
+    versionable.versions.previous_version(self.number)
   end
 
   # If the model has new columns that it didn't have before just return nil
@@ -85,10 +85,11 @@ class Version < ActiveRecord::Base #:nodoc:
   def self.preload_version_number(versionables)
     versionables = Array(versionables).select(&:persisted?)
     return unless versionables.any?
+
     GuardRail.activate(:secondary) do
       Shard.partition_by_shard(versionables) do |shard_objs|
         shard_objs.each_slice(100) do |sliced_objs|
-          values = sliced_objs.map{|o| "(#{o.id}, '#{o.class.base_class.name}')"}.join(",")
+          values = sliced_objs.map { |o| "(#{o.id}, '#{o.class.base_class.name}')" }.join(",")
           query = "SELECT (SELECT max (vo.number) FROM #{Version.quoted_table_name} vo WHERE vo.versionable_id = v.versionable_id AND vo.versionable_type = v.versionable_type)
             AS maximum_number, v.versionable_type, v.versionable_id FROM (VALUES #{values}) AS v (versionable_id, versionable_type)"
 
@@ -107,8 +108,8 @@ class Version < ActiveRecord::Base #:nodoc:
   end
 
   protected
-  def initialize_number
-    self.number = (versionable.versions.maximum( :number ) || 0) + 1
-  end
 
+  def initialize_number
+    self.number = (versionable.versions.maximum(:number) || 0) + 1
+  end
 end

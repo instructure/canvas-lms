@@ -45,7 +45,7 @@ describe CanvasErrors do
     described_class.instance_variable_set(:@registry, @old_registry)
   end
 
-  let(:error){double("Some Error") }
+  let(:error) { double("Some Error") }
 
   describe '.capture_exception' do
     it 'tags with the exception type and default level' do
@@ -67,11 +67,12 @@ describe CanvasErrors do
     it "attaches current job context to error hashes" do
       fake_job_class = Class.new do
         def perform; end
+
         def tag; "#perform"; end
       end
       job = fake_job_class.new
       allow(Delayed::Worker).to receive(:current_job).and_return(job)
-      CanvasErrors.capture(RuntimeError.new, { my_tag: "my_value"}, :warn)
+      CanvasErrors.capture(RuntimeError.new, { my_tag: "my_value" }, :warn)
       expect(@error_harness.details[:extra][:my_tag]).to eq("my_value")
       expect(@error_harness.details[:tags][:job_tag]).to match('#perform')
       expect(@error_harness.level).to eq(:warn)
@@ -82,7 +83,7 @@ describe CanvasErrors do
         request_id: '1234request1234',
         session_id: '1234session1234'
       }
-      CanvasErrors.capture(RuntimeError.new, { my_tag: "custom_value"}, :info)
+      CanvasErrors.capture(RuntimeError.new, { my_tag: "custom_value" }, :info)
       expect(@error_harness.details[:extra][:my_tag]).to eq("custom_value")
       expect(@error_harness.details[:extra][:request_id]).to eq("1234request1234")
       expect(@error_harness.details[:extra][:session_id]).to match('1234session1234')
@@ -96,7 +97,7 @@ describe CanvasErrors do
   end
 
   it "passes through extra information if available wrapped in extra" do
-    CanvasErrors.capture(double(), {detail1: 'blah'})
+    CanvasErrors.capture(double(), { detail1: 'blah' })
     expect(@error_harness.details[:extra][:detail1]).to eq('blah')
   end
 

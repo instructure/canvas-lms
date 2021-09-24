@@ -22,7 +22,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require_relative "../graphql_spec_helper"
 
 describe Types::LearningOutcomeGroupType do
-
   before(:once) do
     account_admin_user
     @account_user = Account.default.account_users.first
@@ -64,14 +63,14 @@ describe Types::LearningOutcomeGroupType do
 
   it "gets outcomes ordered by title" do
     expect(outcome_group_type.resolve("outcomes { nodes { ... on LearningOutcome { _id } } }")).to match_array([
-      @outcome2.id.to_s, @outcome1.id.to_s
-    ])
+                                                                                                                 @outcome2.id.to_s, @outcome1.id.to_s
+                                                                                                               ])
   end
 
   it "accepts search_query in outcomes" do
     expect(outcome_group_type.resolve("outcomes(searchQuery: \"BBBB\") { nodes { ... on LearningOutcome { _id } } }")).to match_array([
-      @outcome1.id.to_s
-    ])
+                                                                                                                                        @outcome1.id.to_s
+                                                                                                                                      ])
   end
 
   it "returns isImported for a given context" do
@@ -89,14 +88,14 @@ describe Types::LearningOutcomeGroupType do
     GQL
 
     expect(outcome_group_type.resolve(query)).to match_array([
-      false, false
-    ])
+                                                               false, false
+                                                             ])
 
     root_group.add_outcome(@outcome2)
 
     expect(outcome_group_type.resolve(query)).to match_array([
-      true, false
-    ])
+                                                               true, false
+                                                             ])
   end
 
   context "when doesn't have edit permission" do
@@ -110,8 +109,8 @@ describe Types::LearningOutcomeGroupType do
 
     it "returns false for canUnlink on the outcome edge" do
       expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
-        false, false
-      ])
+                                                                                              false, false
+                                                                                            ])
     end
   end
 
@@ -180,8 +179,8 @@ describe Types::LearningOutcomeGroupType do
       ]
       @rubric.save!
       expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
-        true, false
-      ])
+                                                                                              true, false
+                                                                                            ])
     end
   end
 
@@ -197,14 +196,14 @@ describe Types::LearningOutcomeGroupType do
       before do
         account_admin_user_with_role_changes(
           account: Account.site_admin,
-          role_changes: {manage_global_outcomes: false}
+          role_changes: { manage_global_outcomes: false }
         )
       end
 
       it "canUnlink returns false" do
         expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
-          false
-        ])
+                                                                                                false
+                                                                                              ])
       end
     end
 
@@ -212,14 +211,14 @@ describe Types::LearningOutcomeGroupType do
       before do
         account_admin_user_with_role_changes(
           account: Account.site_admin,
-          role_changes: {manage_global_outcomes: true}
+          role_changes: { manage_global_outcomes: true }
         )
       end
 
       it "canUnlink returns true" do
         expect(outcome_group_type.resolve("outcomes { edges { canUnlink } }")).to match_array([
-          true
-        ])
+                                                                                                true
+                                                                                              ])
       end
     end
   end
@@ -227,8 +226,8 @@ describe Types::LearningOutcomeGroupType do
   describe 'group' do
     it 'returns parent group of an outcome' do
       expect(outcome_group_type.resolve("outcomes { edges { group { _id } } }")).to match_array([
-        @outcome_group.id.to_s, @outcome_group.id.to_s
-      ])
+                                                                                                  @outcome_group.id.to_s, @outcome_group.id.to_s
+                                                                                                ])
     end
   end
 end

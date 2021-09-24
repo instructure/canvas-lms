@@ -29,7 +29,7 @@ environment_configuration(defined?(config) && config) do |config|
   config.action_controller.perform_caching = true
 
   # run rake js:build to build the optimized JS if set to true
-  ENV['USE_OPTIMIZED_JS']                              = "true"
+  ENV['USE_OPTIMIZED_JS'] = "true"
 
   # Specifies the header that your web server uses for directly sending files
   # If you have mod_xsendfile enabled in apache:
