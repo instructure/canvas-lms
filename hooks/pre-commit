@@ -8,6 +8,6 @@ else
   echo 'You should run `yarn` locally or check to make sure docker is running.'
 fi
 
-script/rlint ${RLINT_ARGUMENTS:---heavy --auto-correct}
+script/rlint ${RLINT_ARGUMENTS:- --auto-correct}
 
 exit 0

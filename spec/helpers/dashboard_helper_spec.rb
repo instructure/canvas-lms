@@ -24,13 +24,13 @@ describe DashboardHelper do
   include DashboardHelper
 
   context "show_welcome_message?" do
-    it "should be true if the user has no current enrollments" do
+    it "is true if the user has no current enrollments" do
       user_model
       @current_user = @user
       expect(show_welcome_message?()).to be_truthy
     end
 
-    it "should be false otherwise" do
+    it "is false otherwise" do
       course_with_student(:active_all => true)
       @current_user = @student
       expect(show_welcome_message?()).to be_falsey
@@ -43,7 +43,7 @@ describe DashboardHelper do
       @current_user = @student
     end
 
-    it "should use the account's default dashboard view setting if the user has not selected one" do
+    it "uses the account's default dashboard view setting if the user has not selected one" do
       @current_user.dashboard_view = nil
       @current_user.save!
       @course.account.default_dashboard_view = 'activity'
@@ -51,19 +51,19 @@ describe DashboardHelper do
       expect(user_dashboard_view).to eq 'activity'
     end
 
-    it "should return 'planner' if set" do
+    it "returns 'planner' if set" do
       @current_user.dashboard_view = 'planner'
       @current_user.save!
       expect(user_dashboard_view).to eq 'planner'
     end
 
-    it "should be backwards compatible with the deprecated 'show_recent_activity' preference" do
+    it "is backwards compatible with the deprecated 'show_recent_activity' preference" do
       @current_user.preferences[:recent_activity_dashboard] = true
       @current_user.save!
       expect(user_dashboard_view).to eq 'activity'
     end
 
-    it "should return the correct value based on the user's setting" do
+    it "returns the correct value based on the user's setting" do
       @current_user.dashboard_view = 'cards'
       @current_user.save!
       expect(user_dashboard_view).to eq 'cards'

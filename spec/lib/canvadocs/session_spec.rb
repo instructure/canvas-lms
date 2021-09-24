@@ -26,7 +26,7 @@ describe Canvadocs::Session do
     [@submission]
   end
   describe ".observing?" do
-    it "should return true if the user is acting as an observer" do
+    it "returns true if the user is acting as an observer" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
       observer = user_factory(active_all: true, active_state: 'active')
@@ -43,7 +43,7 @@ describe Canvadocs::Session do
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(observing?(observer)).to eq true
     end
-    it "should return false if the user is not an observer" do
+    it "returns false if the user is not an observer" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
       not_observer = user_factory(active_all: true, active_state: 'active')
@@ -62,7 +62,7 @@ describe Canvadocs::Session do
   end
 
   describe ".managing?" do
-    it "should return true if the user has TeacherEnrollment" do
+    it "returns true if the user has TeacherEnrollment" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
       teacher = user_factory(active_all: true, active_state: 'active')
@@ -78,7 +78,7 @@ describe Canvadocs::Session do
       @submission = submission_model(user: student, course: course, assignment: assignment)
       expect(managing?(teacher)).to eq true
     end
-    it "should return false if the user does not have a TeacherEnrollment" do
+    it "returns false if the user does not have a TeacherEnrollment" do
       course = course_factory(active_all: true)
       student = user_factory(active_all: true, active_state: 'active')
       not_teacher = user_factory(active_all: true, active_state: 'active')
@@ -104,7 +104,7 @@ describe Canvadocs::Session do
       @submission = submission_model(user: @student, course: @course, assignment: @assignment)
     end
 
-    it "should return read permissions for observers" do
+    it "returns read permissions for observers" do
       observer = user_factory(active_all: true, active_state: 'active')
       section = @course.course_sections.create!(name: 'Section A')
       observer_enrollment = @course.enroll_user(
@@ -118,12 +118,12 @@ describe Canvadocs::Session do
       expect(permissions[:permissions]).to eq "read"
     end
 
-    it "should return readwrite permissions for owner" do
+    it "returns readwrite permissions for owner" do
       permissions = canvadoc_permissions_for_user(@student, true)
       expect(permissions[:permissions]).to eq "readwrite"
     end
 
-    it "should return readwritemanage permissions for teacher" do
+    it "returns readwritemanage permissions for teacher" do
       teacher = user_factory(active_all: true, active_state: 'active')
       section = @course.course_sections.create!(name: 'Section A')
       @course.enroll_user(

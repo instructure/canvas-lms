@@ -28,7 +28,7 @@ describe 'session token', type: :request do
 
   let(:access_token) { @user.access_tokens.create!(:purpose => "test").full_token }
 
-  it "should work" do
+  it "works" do
     get 'https://www.example.com/login/session_token?return_to=https://www.example.com/courses',
         params: { access_token: access_token }
     expect(response).to be_successful
@@ -43,7 +43,7 @@ describe 'session token', type: :request do
     expect(response).to be_successful
   end
 
-  it "should set used_remember_me_token" do
+  it "sets used_remember_me_token" do
     Account.site_admin.account_users.create!(user: @user)
     @pseudonym = @user.find_or_initialize_pseudonym_for_account(Account.site_admin)
     @pseudonym.save!
@@ -55,7 +55,7 @@ describe 'session token', type: :request do
     expect(session[:used_remember_me_token]).to eq true
   end
 
-  it "should reject bad tokens" do
+  it "rejects bad tokens" do
     get 'http://test1.instructure.com/?session_token=garbage'
     expect(response).to be_redirect
     expect(response.location).to eq 'http://test1.instructure.com/login'
@@ -74,7 +74,7 @@ describe 'session token', type: :request do
     expect(response.location).to eq 'http://test1.instructure.com/login'
   end
 
-  it "should remove the token from the url when already logged in" do
+  it "removes the token from the url when already logged in" do
     Account.site_admin.account_users.create!(user: @user)
 
     # login

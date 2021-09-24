@@ -46,25 +46,25 @@ describe "better_file_browsing" do
         end
       end
 
-      it "should search for a file", priority: "1", test_id: 220355 do
+      it "searches for a file", priority: "1", test_id: 220355 do
         get "/courses/#{@course.id}/files"
         f("input[type='search']").send_keys "b_fi", :return
         expect(all_files_folders).to have_size 1
       end
 
-      it "should not return unpublished files in search results", priority: "1", test_id: 238870 do
+      it "does not return unpublished files in search results", priority: "1", test_id: 238870 do
         @files[0].update_attribute(:locked, true)
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("a_fi")
       end
 
-      it "should not return hidden files in search results", priority: "1", test_id: 238871 do
+      it "does not return hidden files in search results", priority: "1", test_id: 238871 do
         @files[0].update_attribute(:hidden, true)
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("a_fi")
       end
 
-      it "should not see upload file, add folder buttons and cloud icon", priority: "1", test_id: 327118 do
+      it "does not see upload file, add folder buttons and cloud icon", priority: "1", test_id: 327118 do
         get "/courses/#{@course.id}/files"
         content = f("#content")
         expect(content).not_to contain_css('.btn-upload')
@@ -72,7 +72,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css('.btn-link.published-status')
       end
 
-      it "should only see Download option on cog icon", priority: "1", test_id: 133105 do
+      it "onlies see Download option on cog icon", priority: "1", test_id: 133105 do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         content = f("#content")
@@ -83,7 +83,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_link("Delete")
       end
 
-      it "should only see View and Download options on toolbar menu", priority: "1", test_id: 133109 do
+      it "onlies see View and Download options on toolbar menu", priority: "1", test_id: 133109 do
         get "/courses/#{@course.id}/files"
         content = f("#content")
         f('.ef-item-row').click
@@ -94,7 +94,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css('.btn-delete')
       end
 
-      it "should see calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
+      it "sees calendar icon on restricted files within a given timeframe", priority: "1", test_id: 133108 do
         @files[0].update unlock_at: Time.zone.now - 1.week,
                          lock_at: Time.zone.now + 1.week
         get "/courses/#{@course.id}/files"
@@ -112,19 +112,19 @@ describe "better_file_browsing" do
                          @course, "example.pdf", @folder)
       end
 
-      it "should not return files from hidden folders in search results", priority: "1", test_id: 171774 do
+      it "does not return files from hidden folders in search results", priority: "1", test_id: 171774 do
         @folder.update_attribute :hidden, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
-      it "should not return files from unpublished folders in search results", priority: "1", test_id: 171774 do
+      it "does not return files from unpublished folders in search results", priority: "1", test_id: 171774 do
         @folder.update_attribute :locked, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
-      it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
+      it "lets student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
         @folder.update_attribute :hidden, true
 
         get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"

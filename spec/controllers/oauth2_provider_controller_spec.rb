@@ -90,7 +90,7 @@ describe Oauth2ProviderController do
       expect(response).to redirect_to(login_url(:canvas_login => 1))
     end
 
-    it 'should pass pseudonym_session[unique_id] to login to populate username textbox' do
+    it 'passes pseudonym_session[unique_id] to login to populate username textbox' do
       get :auth, params: { :client_id => key.id, :redirect_uri => Canvas::Oauth::Provider::OAUTH2_OOB_URI,
                            "unique_id" => "test", force_login: true, response_type: 'code' }
       expect(response).to redirect_to(login_url + '?force_login=true&pseudonym_session%5Bunique_id%5D=test')
@@ -133,7 +133,7 @@ describe Oauth2ProviderController do
         allow(Canvas).to receive_messages(:redis => redis)
       end
 
-      it 'should redirect to the confirm url if the user has no token' do
+      it 'redirects to the confirm url if the user has no token' do
         get :auth,
             params: { client_id: key.id,
                       redirect_uri: Canvas::Oauth::Provider::OAUTH2_OOB_URI,
@@ -150,13 +150,13 @@ describe Oauth2ProviderController do
         expect(response).to redirect_to(login_url(:force_login => 1))
       end
 
-      it 'should redirect to login_url when oauth2 session is nil' do
+      it 'redirects to login_url when oauth2 session is nil' do
         get :confirm
         expect(flash[:error]).to eq "Must submit new OAuth2 request"
         expect(response).to redirect_to(login_url)
       end
 
-      it 'should redirect to the redirect uri if the user already has remember-me token' do
+      it 'redirects to the redirect uri if the user already has remember-me token' do
         @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth,
             params: { client_id: key.id,
@@ -167,7 +167,7 @@ describe Oauth2ProviderController do
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
-      it 'it accepts the deprecated name of scopes for scope param' do
+      it 'accepts the deprecated name of scopes for scope param' do
         @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth,
             params: { client_id: key.id,
@@ -178,7 +178,7 @@ describe Oauth2ProviderController do
         expect(response.location).to match(/https:\/\/example.com/)
       end
 
-      it 'should not reuse userinfo tokens for other scopes' do
+      it 'does not reuse userinfo tokens for other scopes' do
         @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
         get :auth, params: { client_id: key.id,
                              redirect_uri: 'https://example.com',
@@ -186,7 +186,7 @@ describe Oauth2ProviderController do
         expect(response).to redirect_to(oauth2_auth_confirm_url)
       end
 
-      it 'should redirect to the redirect uri if the developer key is trusted' do
+      it 'redirects to the redirect uri if the developer key is trusted' do
         key.trusted = true
         key.save!
         get :auth, params: { client_id: key.id,
@@ -208,14 +208,14 @@ describe Oauth2ProviderController do
           }
         }
 
-        it 'should redirect to the redirect uri if the user already has remember-me token' do
+        it 'redirects to the redirect uri if the user already has remember-me token' do
           @user.access_tokens.create!({ :developer_key => key, :remember_access => true, :scopes => ['/auth/userinfo'], :purpose => nil })
           get :auth, params: params
           expect(response).to be_redirect
           expect(response.location).to match(/https:\/\/example.com/)
         end
 
-        it 'should redirect to the redirect uri if the developer key is trusted' do
+        it 'redirects to the redirect uri if the developer key is trusted' do
           key.trusted = true
           key.save!
           get :auth, params: params
@@ -223,7 +223,7 @@ describe Oauth2ProviderController do
           expect(response.location).to match(/https:\/\/example.com/)
         end
 
-        it 'should redirect with "interaction_required" if the current session cannot be used without a prompt' do
+        it 'redirects with "interaction_required" if the current session cannot be used without a prompt' do
           get :auth, params: params
           expect(response).to be_redirect
           expect(response.location).to match(/https:\/\/example.com/)
@@ -236,13 +236,13 @@ describe Oauth2ProviderController do
         let(:account_developer_key) { raise 'set in examples' }
         let(:account) { account_developer_key.account || Account.site_admin }
 
-        it 'should redirect with "unauthorized_client" if binding does not exist for the account' do
+        it 'redirects with "unauthorized_client" if binding does not exist for the account' do
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
           redirect_query_params = Rack::Utils.parse_query(URI.parse(response.location).query)
           expect(redirect_query_params['error']).to eq 'unauthorized_client'
         end
 
-        it 'should redirect with "unauthorized_client" if binding for the account is set to "allow"' do
+        it 'redirects with "unauthorized_client" if binding for the account is set to "allow"' do
           binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
           binding.update!(workflow_state: 'allow')
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
@@ -250,7 +250,7 @@ describe Oauth2ProviderController do
           expect(redirect_query_params['error']).to eq 'unauthorized_client'
         end
 
-        it 'should redirect with "unauthorized_client" if binding for the account is set to "off"' do
+        it 'redirects with "unauthorized_client" if binding for the account is set to "off"' do
           binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
           binding.update!(workflow_state: 'off')
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
@@ -258,7 +258,7 @@ describe Oauth2ProviderController do
           expect(redirect_query_params['error']).to eq 'unauthorized_client'
         end
 
-        it 'should redirect to confirmation page when the binding for the account is set to "on"' do
+        it 'redirects to confirmation page when the binding for the account is set to "on"' do
           binding = account_developer_key.developer_key_account_bindings.find_or_create_by(account: account)
           binding.update!(workflow_state: 'on')
           get :auth, params: { client_id: account_developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
@@ -282,56 +282,56 @@ describe Oauth2ProviderController do
             developer_key.developer_key_account_bindings.create!(account: root_account)
           end
 
-          it 'should redirect with "unauthorized_client" if binding for SA is "off" and root account binding is "on"' do
+          it 'redirects with "unauthorized_client" if binding for SA is "off" and root account binding is "on"' do
             root_account_binding.update!(workflow_state: 'on')
             sa_account_binding.update!(workflow_state: 'off')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "allow"' do
+          it 'redirects with "unauthorized_client" if binding for SA is "allow" and binding for root account is "allow"' do
             root_account_binding.update!(workflow_state: 'allow')
             sa_account_binding.update!(workflow_state: 'allow')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect with "unauthorized_client" if binding for SA is "allow" and binding for root account is "off"' do
+          it 'redirects with "unauthorized_client" if binding for SA is "allow" and binding for root account is "off"' do
             root_account_binding.update!(workflow_state: 'off')
             sa_account_binding.update!(workflow_state: 'allow')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect with "unauthorized_client" if binding for SA is "off" and binding for root account is "off"' do
+          it 'redirects with "unauthorized_client" if binding for SA is "off" and binding for root account is "off"' do
             root_account_binding.update!(workflow_state: 'off')
             sa_account_binding.update!(workflow_state: 'off')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(redirect_query_params['error']).to eq 'unauthorized_client'
           end
 
-          it 'should redirect to confirmation page if binding for SA is "allow" and binding for root account is "on"' do
+          it 'redirects to confirmation page if binding for SA is "allow" and binding for root account is "on"' do
             root_account_binding.update!(workflow_state: 'on')
             sa_account_binding.update!(workflow_state: 'allow')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
           end
 
-          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "off"' do
+          it 'redirects to confirmation page if binding for SA is "on" and binding for root account is "off"' do
             root_account_binding.update!(workflow_state: 'off')
             sa_account_binding.update!(workflow_state: 'on')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
           end
 
-          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "allow"' do
+          it 'redirects to confirmation page if binding for SA is "on" and binding for root account is "allow"' do
             root_account_binding.update!(workflow_state: 'allow')
             sa_account_binding.update!(workflow_state: 'on')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
             expect(response.location).to eq 'http://test.host/login/oauth2/confirm'
           end
 
-          it 'should redirect to confirmation page if binding for SA is "on" and binding for root account is "on"' do
+          it 'redirects to confirmation page if binding for SA is "on" and binding for root account is "on"' do
             root_account_binding.update!(workflow_state: 'on')
             sa_account_binding.update!(workflow_state: 'on')
             get :auth, params: { client_id: developer_key.id, redirect_uri: 'https://example.com', response_type: 'code' }
@@ -540,12 +540,12 @@ describe Oauth2ProviderController do
         let(:success_token_keys) { %w(access_token user expires_in token_type) }
       end
 
-      it 'should not generate a new access_token with an invalid refresh_token' do
+      it 'does not generate a new access_token with an invalid refresh_token' do
         post :token, params: base_params.merge(refresh_token: refresh_token + 'ASDF')
         assert_status(302)
       end
 
-      it 'should generate a new access_token' do
+      it 'generates a new access_token' do
         post :token, params: base_params.merge(refresh_token: refresh_token)
         json = JSON.parse(response.body)
         expect(json['access_token']).to_not eq old_token.full_token
@@ -557,7 +557,7 @@ describe Oauth2ProviderController do
         expect(response.body).to include 'invalid_grant'
       end
 
-      it 'should be able to regenerate access_token multiple times' do
+      it 'is able to regenerate access_token multiple times' do
         post :token, params: base_params.merge(refresh_token: refresh_token)
         expect(response).to be_successful
         json = JSON.parse(response.body)

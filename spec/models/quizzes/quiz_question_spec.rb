@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion do
-  it "should deserialize its json data" do
+  it "deserializes its json data" do
     answers = [{ 'id' => 1 }, { 'id' => 2 }]
     qd = { 'name' => 'test question', 'question_type' => 'multiple_choice_question', 'answers' => answers }
     course_factory
@@ -52,7 +52,7 @@ describe Quizzes::QuizQuestion do
                              :answers => answers }
       @question = @quiz.quiz_questions.create(:question_data => @short_answer_data)
     end
-    it "should clear blanks before saving" do
+    it "clears blanks before saving" do
       expect(@question.question_data.answers.size).to eq 1
       expect(@question.question_data.answers.first['text']).to eq @short_answer_data[:answers].first["answer_text"]
     end
@@ -75,7 +75,7 @@ describe Quizzes::QuizQuestion do
       @question = @quiz.quiz_questions.create(:question_data => @data)
     end
 
-    it "should save regrade if passed in regrade option in data hash" do
+    it "saves regrade if passed in regrade option in data hash" do
       expect(Quizzes::QuizQuestionRegrade.first).to be_nil
 
       Quizzes::QuizRegrade.create(quiz_id: @quiz.id, user_id: @user.id, quiz_version: @quiz.version_number)
@@ -141,7 +141,7 @@ describe Quizzes::QuizQuestion do
       @question3 = @quiz.quiz_questions.create!(:question_data => { 'name' => 'test question 3', 'answers' => [{ 'id' => 5 }, { 'id' => 6 }] })
     end
 
-    it "should noop if list of items is empty" do
+    it "noops if list of items is empty" do
       group = @quiz.quiz_groups.create(:name => "question group")
       group.quiz_questions = [@question1, @question2, @question3]
       before = question_positions(group)
@@ -150,7 +150,7 @@ describe Quizzes::QuizQuestion do
       expect(before).to eq question_positions(group)
     end
 
-    it "should update positions for quiz questions within a group" do
+    it "updates positions for quiz questions within a group" do
       group = @quiz.quiz_groups.create(:name => "question group")
       group.quiz_questions = [@question1, @question2, @question3]
 
@@ -162,7 +162,7 @@ describe Quizzes::QuizQuestion do
       expect(question_positions(group)).to eq [@question3.id, @question1.id, @question2.id]
     end
 
-    it "should update positions for quiz questions outside a group" do
+    it "updates positions for quiz questions outside a group" do
       group = @quiz.quiz_groups.create(:name => "question group")
       group.quiz_questions = [@question1, @question2]
 
@@ -174,7 +174,7 @@ describe Quizzes::QuizQuestion do
       expect(question_positions(group)).to eq [@question3.id, @question1.id, @question2.id]
     end
 
-    it "should update positions for quiz without a group" do
+    it "updates positions for quiz without a group" do
       @question3.position = 1
       @question1.position = 2
       @question2.position = 3

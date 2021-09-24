@@ -57,13 +57,13 @@ describe "course syllabus" do
       wait_for_ajaximations
     end
 
-    it "should confirm existing assignments and dates are correct", priority: "1", test_id: 237016 do
+    it "confirms existing assignments and dates are correct", priority: "1", test_id: 237016 do
       assignment_details = ff('.name')
       expect(assignment_details[0].text.strip).to eq "Assignment\n" + @assignment_1.title
       expect(assignment_details[1].text.strip).to eq "Assignment\n" + @assignment_2.title
     end
 
-    it "should edit the description", priority: "1", test_id: 237017 do
+    it "edits the description", priority: "1", test_id: 237017 do
       skip('weird issue where text does not show up on submit')
       # skip_if_firefox('known issue with firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1335085')
 
@@ -78,7 +78,7 @@ describe "course syllabus" do
       expect(f('#course_syllabus').text).to eq new_description
     end
 
-    it "should insert a file using RCE in the syllabus", priority: "1", test_id: 126672, custom_timeout: 30 do
+    it "inserts a file using RCE in the syllabus", priority: "1", test_id: 126672, custom_timeout: 30 do
       file = @course.attachments.create!(display_name: 'text_file.txt', uploaded_data: default_uploaded_data)
       file.context = @course
       file.save!
@@ -90,14 +90,14 @@ describe "course syllabus" do
       expect(fln("text_file.txt")).to be_displayed
     end
 
-    it "should validate Jump to Today works on the mini calendar", priority: "1", test_id: 237017 do
+    it "validates Jump to Today works on the mini calendar", priority: "1", test_id: 237017 do
       2.times { f('.next_month_link').click }
       f('.jump_to_today_link').click
       expect(f('.mini_month .today')).to have_attribute('id', "mini_day_#{Time.zone.now.strftime('%Y_%m_%d')}")
     end
 
     describe "Accessibility" do
-      it "should set focus to the Jump to Today link after clicking Edit the Description", priority: "2", test_id: 237019 do
+      it "sets focus to the Jump to Today link after clicking Edit the Description", priority: "2", test_id: 237019 do
         skip('see CNVS-39931')
         f('.edit_syllabus_link').click
         check_element_has_focus(f('.jump_to_today_link'))
@@ -108,7 +108,7 @@ describe "course syllabus" do
   context "when a public course is accessed" do
     include_context "public course as a logged out user"
 
-    it "should display course syllabus", priority: "1", test_id: 270034 do
+    it "displays course syllabus", priority: "1", test_id: 270034 do
       get "/courses/#{public_course.id}/assignments/syllabus"
       expect(f('#course_syllabus')).to be_displayed
     end

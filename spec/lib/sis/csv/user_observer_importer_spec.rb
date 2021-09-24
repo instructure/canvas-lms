@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::UserObserverImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     before_count = UserObservationLink.active.count
@@ -49,7 +49,7 @@ describe SIS::CSV::UserObserverImporter do
                           "Can't delete a non-existent observer for observer: U001, student: U002"]
   end
 
-  it "should add and remove user_observers" do
+  it "adds and remove user_observers" do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     before_count = UserObservationLink.active.count
@@ -66,7 +66,7 @@ describe SIS::CSV::UserObserverImporter do
     expect(UserObservationLink.active.count).to eq before_count
   end
 
-  it "should be able to disable notifications by default for observers" do
+  it "is able to disable notifications by default for observers" do
     @account.settings[:default_notifications_disabled_for_observers] = true
     @account.save!
     observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')

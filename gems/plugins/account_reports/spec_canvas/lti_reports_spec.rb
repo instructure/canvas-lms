@@ -65,7 +65,7 @@ describe 'lti report' do
     end
   end
 
-  it 'should run on a root account' do
+  it 'runs on a root account' do
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 3
     expect(parsed[0]).to eq([
@@ -82,7 +82,7 @@ describe 'lti report' do
                             ])
   end
 
-  it 'should run on a sub account' do
+  it 'runs on a sub account' do
     parsed = read_report(@type, { order: 4, account: @sub_account })
     expect(parsed.length).to eq 1
     expect(parsed[0]).to eq([
@@ -99,19 +99,19 @@ describe 'lti report' do
                             ])
   end
 
-  it 'should not include tools from deleted courses' do
+  it 'does not include tools from deleted courses' do
     @course.destroy
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
-  it 'should not include tools from courses in deleted accounts' do
+  it 'does not include tools from courses in deleted accounts' do
     Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
     parsed = read_report(@type, { order: 4 })
     expect(parsed.length).to eq 2
   end
 
-  it 'should include tools from deleted courses for include deleted objects' do
+  it 'includes tools from deleted courses for include deleted objects' do
     Account.where(id: @sub_account2).update_all(workflow_state: 'deleted')
     @course.destroy
     parsed = read_report(@type, { params: { "include_deleted" => true }, order: 4 })

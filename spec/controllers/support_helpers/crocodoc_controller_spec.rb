@@ -21,19 +21,19 @@ require 'spec_helper'
 
 describe SupportHelpers::CrocodocController do
   describe 'require_site_admin' do
-    it 'should redirect to root url if current user is not a site admin' do
+    it 'redirects to root url if current user is not a site admin' do
       account_admin_user
       user_session(@user)
       get :shard
       assert_unauthorized
     end
 
-    it 'should redirect to login if current user is not logged in' do
+    it 'redirects to login if current user is not logged in' do
       get :shard
       assert_unauthorized
     end
 
-    it 'should render 200 if current user is a site admin' do
+    it 'renders 200 if current user is a site admin' do
       site_admin_user
       user_session(@user)
       get :shard
@@ -48,7 +48,7 @@ describe SupportHelpers::CrocodocController do
     end
 
     context 'shard' do
-      it "should create a new ShardFixer" do
+      it "creates a new ShardFixer" do
         fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email)
         expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new).with(@user.email, nil).and_return(fixer)
         expect(fixer).to receive(:monitor_and_fix)
@@ -56,7 +56,7 @@ describe SupportHelpers::CrocodocController do
         expect(response.body).to eq("Enqueued Crocodoc ShardFixer ##{fixer.job_id}...")
       end
 
-      it "should create a new ShardFixer with after_time" do
+      it "creates a new ShardFixer with after_time" do
         fixer = SupportHelpers::Crocodoc::ShardFixer.new(@user.email, '2016-05-01')
         expect(SupportHelpers::Crocodoc::ShardFixer).to receive(:new)
           .with(@user.email, Time.zone.parse('2016-05-01')).and_return(fixer)
@@ -67,7 +67,7 @@ describe SupportHelpers::CrocodocController do
     end
 
     context 'submission' do
-      it "should create a new SubmissionFixer" do
+      it "creates a new SubmissionFixer" do
         fixer = SupportHelpers::Crocodoc::SubmissionFixer.new(@user.email, nil, 1234, 5678)
         expect(SupportHelpers::Crocodoc::SubmissionFixer).to receive(:new)
           .with(@user.email, nil, 1234, 5678).and_return(fixer)

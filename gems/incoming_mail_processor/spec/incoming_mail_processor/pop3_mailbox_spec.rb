@@ -45,7 +45,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
   end
 
   describe "#initialize" do
-    it "should accept existing mailman pop3 configuration" do
+    it "accepts existing mailman pop3 configuration" do
       @mailbox = IncomingMailProcessor::Pop3Mailbox.new({
                                                           :server => "pop3.server.com",
                                                           :port => 1234,
@@ -67,7 +67,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
       mock_net_pop
     end
 
-    it "should connect to the server" do
+    it "connects to the server" do
       config = default_config.merge(:ssl => false, :port => 110)
       expect(Net::POP3).to receive(:new).with(config[:server], config[:port]).and_return(@pop_mock)
       expect(@pop_mock).to receive(:start).with(config[:username], config[:password])
@@ -76,7 +76,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
       @mailbox.connect
     end
 
-    it "should use ssl if configured" do
+    it "uses ssl if configured" do
       config = default_config.merge(:ssl => true, :port => 995)
 
       expect(Net::POP3).to receive(:new).with(config[:server], config[:port]).and_return(@pop_mock)
@@ -89,7 +89,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
   end
 
   describe "#disconnect" do
-    it "should disconnect" do
+    it "disconnects" do
       mock_net_pop
       expect(@pop_mock).to receive(:finish)
 
@@ -100,7 +100,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
   end
 
   describe '#unprocessed_message_count' do
-    it "should return nil" do
+    it "returns nil" do
       expect(IncomingMailProcessor::Pop3Mailbox.new(default_config).unprocessed_message_count).to be_nil
     end
   end
@@ -112,7 +112,7 @@ describe IncomingMailProcessor::Pop3Mailbox do
       @mailbox.connect
     end
 
-    it "should retrieve and yield messages" do
+    it "retrieves and yield messages" do
       foo = double(pop: "foo body")
       bar = double(pop: "bar body")
       baz = double(pop: "baz body")
@@ -153,14 +153,14 @@ describe IncomingMailProcessor::Pop3Mailbox do
         expect(@pop_mock).to receive(:mails).and_return([@foo])
       end
 
-      it "should delete when asked" do
+      it "deletes when asked" do
         expect(@foo).to receive(:delete)
         @mailbox.each_message do |message_id, body|
           @mailbox.delete_message(message_id)
         end
       end
 
-      it "should delete when asked to move" do
+      it "deletes when asked to move" do
         expect(@foo).to receive(:delete)
         @mailbox.each_message do |message_id, body|
           @mailbox.move_message(message_id, "anything")

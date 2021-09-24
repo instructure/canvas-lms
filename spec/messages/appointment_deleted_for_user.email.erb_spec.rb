@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_deleted_for_user.email' do
   include MessagesCommon
 
-  it "should render" do
+  it "renders" do
     user = user_model(:name => 'bob')
     appointment_participant_model(:participant => user)
 
@@ -41,7 +41,7 @@ describe 'appointment_deleted_for_user.email' do
     expect(@message.body).to include("/appointment_groups/#{@appointment_group.id}")
   end
 
-  it "should render for groups" do
+  it "renders for groups" do
     user = user_model(:name => 'bob')
     @course = course_model
     cat = group_category
@@ -64,7 +64,7 @@ describe 'appointment_deleted_for_user.email' do
     expect(@message.body).to include("/appointment_groups/#{@appointment_group.id}")
   end
 
-  it "should exclude reschedule instructions if appointment group isn't active" do
+  it "excludes reschedule instructions if appointment group isn't active" do
     user = user_model(:name => 'bob')
     appointment_participant_model(:participant => user)
     @appointment_group.destroy(@teacher)

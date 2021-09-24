@@ -51,7 +51,7 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   describe "#initialize" do
-    it "should accept existing mailman imap configuration" do
+    it "accepts existing mailman imap configuration" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new({
                                                           :server => "imap.server.com",
                                                           :port => 1234,
@@ -69,12 +69,12 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(@mailbox.password).to eql "secret-user-password"
     end
 
-    it "should accept non-array filter" do
+    it "accepts non-array filter" do
       @mailbox = IncomingMailProcessor::ImapMailbox.new(:filter => "BLAH")
       expect(@mailbox.filter).to eql ["BLAH"]
     end
 
-    it "should accept folder parameter" do
+    it "accepts folder parameter" do
       # this isn't necessary for gmail, but just in case
       @mailbox = IncomingMailProcessor::ImapMailbox.new(:folder => "inbox")
       expect(@mailbox.folder).to eql "inbox"
@@ -82,7 +82,7 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   describe "connect" do
-    it "should connect to the server" do
+    it "connects to the server" do
       expect(@imap_mock).to receive(:login).with("user", "password").once
       @mailbox.connect
     end
@@ -111,7 +111,7 @@ describe IncomingMailProcessor::ImapMailbox do
       [result]
     end
 
-    it "should retrieve and yield messages" do
+    it "retrieves and yield messages" do
       @mailbox.folder = "message_folder"
       expect(@imap_mock).to receive(:select).with("message_folder").once
       expect(@imap_mock).to receive(:search).with(["ALL"]).once.and_return([1, 2, 3])
@@ -151,7 +151,7 @@ describe IncomingMailProcessor::ImapMailbox do
       expect(yielded_values).to eql [[1, "foo"], [3, "baz"]]
     end
 
-    it "should delete a retrieved message" do
+    it "deletes a retrieved message" do
       expect(@imap_mock).to receive(:search).and_return([42])
       expect(@imap_mock).to receive(:fetch).and_return(mock_fetch_response("body"))
       expect(@imap_mock).to receive(:store).with(42, "+FLAGS", Net::IMAP::DELETED)
@@ -160,7 +160,7 @@ describe IncomingMailProcessor::ImapMailbox do
       end
     end
 
-    it "should move a retrieved message" do
+    it "moves a retrieved message" do
       expect(@imap_mock).to receive(:search).and_return([42])
       expect(@imap_mock).to receive(:fetch).and_return(mock_fetch_response("body"))
       expect(@imap_mock).to receive(:list).and_return([double.as_null_object])
@@ -171,7 +171,7 @@ describe IncomingMailProcessor::ImapMailbox do
       end
     end
 
-    it "should create the folder if necessary when moving a message (imap list returns empty)" do
+    it "creates the folder if necessary when moving a message (imap list returns empty)" do
       expect(@imap_mock).to receive(:search).and_return([42])
       expect(@imap_mock).to receive(:fetch).and_return(mock_fetch_response("body"))
       expect(@imap_mock).to receive(:list).with("", "other_folder").and_return([])
@@ -183,7 +183,7 @@ describe IncomingMailProcessor::ImapMailbox do
       end
     end
 
-    it "should create the folder if necessary when moving a message (imap list returns nil)" do
+    it "creates the folder if necessary when moving a message (imap list returns nil)" do
       expect(@imap_mock).to receive(:search).and_return([42])
       expect(@imap_mock).to receive(:fetch).and_return(mock_fetch_response("body"))
       expect(@imap_mock).to receive(:list).with("", "other_folder").and_return(nil)
@@ -197,7 +197,7 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   describe "#disconnect" do
-    it "should disconnect" do
+    it "disconnects" do
       @mailbox.connect
       expect(@imap_mock).to receive(:logout)
       expect(@imap_mock).to receive(:disconnect)
@@ -206,14 +206,14 @@ describe IncomingMailProcessor::ImapMailbox do
   end
 
   describe "timeouts" do
-    it "should use timeout method on connect call" do
+    it "uses timeout method on connect call" do
       @mailbox.set_timeout_method { raise Timeout::Error }
       expect { @mailbox.connect }.to raise_error(Timeout::Error)
     end
     # if these work, others are likely wrapped with timeouts as well because of wrap_with_timeout
 
     # disconnect is allowed to swallow timeout errors
-    it "should use timeout method on disconnect call" do
+    it "uses timeout method on disconnect call" do
       @mailbox.connect
       @mailbox.set_timeout_method { raise Timeout::Error }
       @mailbox.disconnect # .should_not raise_error

@@ -39,14 +39,14 @@ describe "courses/settings.html.erb" do
   end
 
   describe "Hide sections on course users page checkbox" do
-    it "should not display checkbox for teacher when there is one section" do
+    it "does not display checkbox for teacher when there is one section" do
       view_context(@course, @user)
       assign(:current_user, @user)
       render
       expect(response).to_not have_tag("input#course_hide_sections_on_course_users_page")
     end
 
-    it "should display checkbox for teacher when there is more than one section" do
+    it "displays checkbox for teacher when there is more than one section" do
       @course.course_sections.create!
       view_context(@course, @user)
       assign(:current_user, @user)
@@ -56,7 +56,7 @@ describe "courses/settings.html.erb" do
   end
 
   describe "sis_source_id edit box" do
-    it "should not show to teacher" do
+    it "does not show to teacher" do
       view_context(@course, @user)
       assign(:current_user, @user)
       render
@@ -64,7 +64,7 @@ describe "courses/settings.html.erb" do
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
-    it "should show to sis admin" do
+    it "shows to sis admin" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
@@ -72,7 +72,7 @@ describe "courses/settings.html.erb" do
       expect(response).to have_tag("input#course_sis_source_id")
     end
 
-    it "should not show to non-sis admin" do
+    it "does not show to non-sis admin" do
       role = custom_account_role('NoSissy', :account => @course.root_account)
       admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false }, :role => role)
       view_context(@course, admin)
@@ -81,7 +81,7 @@ describe "courses/settings.html.erb" do
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
-    it "should not show to subaccount admin" do
+    it "does not show to subaccount admin" do
       role = custom_account_role('CustomAdmin', :account => @course.root_account)
       admin = account_admin_user_with_role_changes(:account => @subaccount, :role_changes => { 'manage_sis' => true, 'manage_courses' => true }, :role => role)
       view_context(@course, admin)
@@ -90,7 +90,7 @@ describe "courses/settings.html.erb" do
       expect(response).not_to have_tag("input#course_sis_source_id")
     end
 
-    it "should show grade export when enabled" do
+    it "shows grade export when enabled" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
@@ -100,7 +100,7 @@ describe "courses/settings.html.erb" do
       expect(response.body).to match /<div id="tab-grade-publishing">/
     end
 
-    it "should not show grade export when disabled" do
+    it "does not show grade export when disabled" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
@@ -119,7 +119,7 @@ describe "courses/settings.html.erb" do
         assign(:current_user, admin)
       end
 
-      it "should show quota input box" do
+      it "shows quota input box" do
         render
         expect(response).to have_tag "input#course_storage_quota_mb"
       end
@@ -132,7 +132,7 @@ describe "courses/settings.html.erb" do
         @user = @teacher
       end
 
-      it "should not show quota input box" do
+      it "does not show quota input box" do
         render
         expect(response).not_to have_tag "input#course_storage_quota_mb"
       end
@@ -185,7 +185,7 @@ describe "courses/settings.html.erb" do
   end
 
   context "account_id selection" do
-    it "should let sub-account admins see other accounts within their sub-account as options" do
+    it "lets sub-account admins see other accounts within their sub-account as options" do
       Account.default.disable_feature!(:granular_permissions_manage_courses)
       @user = account_admin_user(:account => @subaccount, :active_user => true)
       expect(Account.default.grants_right?(@user, :manage_courses)).to be_falsey
@@ -201,7 +201,7 @@ describe "courses/settings.html.erb" do
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
-    it 'should let sub-account admins see other accounts within their sub-account as options (granular permissions)' do
+    it 'lets sub-account admins see other accounts within their sub-account as options (granular permissions)' do
       Account.default.enable_feature!(:granular_permissions_manage_courses)
       @user = account_admin_user(account: @subaccount, active_user: true)
       expect(Account.default.grants_right?(@user, :manage_courses_admin)).to be_falsey
@@ -225,7 +225,7 @@ describe "courses/settings.html.erb" do
       expect(option_ids.sort).to eq [@subaccount.id, @sub_subaccount1.id, @sub_subaccount2.id].sort
     end
 
-    it "should let site admins see all accounts within their root account as options" do
+    it "lets site admins see all accounts within their root account as options" do
       @user = site_admin_user
       view_context(@course, @user)
 

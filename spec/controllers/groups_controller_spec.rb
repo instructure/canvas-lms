@@ -47,7 +47,7 @@ describe GroupsController do
       end
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       user_session(user_factory) # logged in user_factory without course access
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
@@ -58,7 +58,7 @@ describe GroupsController do
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@teacher)
       category1 = @course.group_categories.create(:name => "category 1")
       category2 = @course.group_categories.create(:name => "category 2")
@@ -73,7 +73,7 @@ describe GroupsController do
       expect(assigns[:categories].length).to eql(2)
     end
 
-    it "should return groups in sorted by group category name, then group name for student view" do
+    it "returns groups in sorted by group category name, then group name for student view" do
       skip_unless_pg_collkey_present
       user_session(@student)
       category1 = @course.group_categories.create(:name => "1")
@@ -142,7 +142,7 @@ describe GroupsController do
   end
 
   describe "GET index" do
-    it 'should split up current and previous groups' do
+    it 'splits up current and previous groups' do
       course1 = @course
       group_with_user(group_context: course1, user: @student, active_all: true)
       group1 = @group
@@ -164,7 +164,7 @@ describe GroupsController do
       expect(assigns[:previous_groups]).to eq([group2])
     end
 
-    it 'should not show restricted previous groups' do
+    it 'does not show restricted previous groups' do
       group_with_user(group_context: @course, user: @student, active_all: true)
 
       @course.soft_conclude!
@@ -178,7 +178,7 @@ describe GroupsController do
       expect(assigns[:previous_groups]).to eq([])
     end
 
-    it 'should put groups in courses in terms concluded for students in "previous groups"' do
+    it 'puts groups in courses in terms concluded for students in "previous groups"' do
       @course.enrollment_term.set_overrides(@course.account, 'StudentEnrollment' => { end_at: 1.week.ago })
       group_with_user(group_context: @course, user: @student, active_all: true)
       user_session(@student)
@@ -197,13 +197,13 @@ describe GroupsController do
         user_session(@student)
       end
 
-      it "should not paginate non-json" do
+      it "does not paginate non-json" do
         get 'index', params: { :per_page => 1 }
         expect(assigns[:current_groups]).to eq @student.current_groups.by_name
         expect(response.headers['Link']).to be_nil
       end
 
-      it "should paginate json" do
+      it "paginates json" do
         get 'index', params: { :per_page => 1 }, format: 'json'
         expect(assigns[:groups]).to eq [@student.current_groups.by_name.first]
         expect(response.headers['Link']).not_to be_nil
@@ -212,14 +212,14 @@ describe GroupsController do
   end
 
   describe "GET show" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = Account.default.groups.create!(:name => "some group")
       get 'show', params: { :id => @group.id }
       expect(assigns[:group]).to eql(@group)
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       @group = Account.default.groups.create!(:name => "some group")
       @user = user_model
       user_session(@user)
@@ -231,7 +231,7 @@ describe GroupsController do
       expect(assigns[:stream_items]).to eql([])
     end
 
-    it "should allow user to join self-signup groups" do
+    it "allows user to join self-signup groups" do
       user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1")
       category1.configure_self_signup(true, false)
@@ -243,7 +243,7 @@ describe GroupsController do
       expect(g1.users.map(&:id)).to include @student.id
     end
 
-    it "should allow user to leave self-signup groups" do
+    it "allows user to leave self-signup groups" do
       user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1")
       category1.configure_self_signup(true, false)
@@ -256,7 +256,7 @@ describe GroupsController do
       expect(g1.users.map(&:id)).not_to include @student.id
     end
 
-    it "should allow user to join student organized groups" do
+    it "allows user to join student organized groups" do
       user_session(@student)
       category1 = GroupCategory.student_organized_for(@course)
       g1 = @course.groups.create!(:name => "some group", :group_category => category1, :join_level => "parent_context_auto_join")
@@ -266,7 +266,7 @@ describe GroupsController do
       expect(g1.users.map(&:id)).to include @student.id
     end
 
-    it "should allow user to leave student organized groups" do
+    it "allows user to leave student organized groups" do
       user_session(@student)
       category1 = @course.group_categories.create!(:name => "category 1", :role => "student_organized")
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
@@ -277,7 +277,7 @@ describe GroupsController do
       expect(g1.users.map(&:id)).not_to include @student.id
     end
 
-    it "should allow teachers to view after conclusion" do
+    it "allows teachers to view after conclusion" do
       @teacher.enrollments.first.conclude
       user_session(@teacher)
       category = @course.group_categories.create(:name => "category")
@@ -291,7 +291,7 @@ describe GroupsController do
   end
 
   describe "GET new" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = @course.groups.create!(:name => "some group")
       get 'new', params: { :course_id => @course.id }
       assert_unauthorized
@@ -299,13 +299,13 @@ describe GroupsController do
   end
 
   describe "POST add_user" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = Account.default.groups.create!(:name => "some group")
       post 'add_user', params: { :group_id => @group.id }
       assert_unauthorized
     end
 
-    it "should add user" do
+    it "adds user" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @user = user_factory(active_all: true)
@@ -315,7 +315,7 @@ describe GroupsController do
       expect(assigns[:membership].user).to eql(@user)
     end
 
-    it "should check user section in restricted self-signup category" do
+    it "checks user section in restricted self-signup category" do
       user_session(@teacher)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
@@ -336,7 +336,7 @@ describe GroupsController do
   end
 
   describe "DELETE remove_user" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = Account.default.groups.create!(:name => "some group")
       @user = user_factory(active_all: true)
       @group.add_user(@user)
@@ -344,7 +344,7 @@ describe GroupsController do
       assert_unauthorized
     end
 
-    it "should remove user" do
+    it "removes user" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "PG 1", :group_category => @category)
       @group.add_user(@user)
@@ -356,12 +356,12 @@ describe GroupsController do
   end
 
   describe "POST create" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       assert_unauthorized
     end
 
-    it "should create new group" do
+    it "creates new group" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
       expect(response).to be_redirect
@@ -369,7 +369,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("some group")
     end
 
-    it "should create new group (granular permissions)" do
+    it "creates new group (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group" } }
@@ -378,7 +378,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("some group")
     end
 
-    it "should not create new group if :manage_groups_add is not enabled (granular permissions)" do
+    it "does not create new group if :manage_groups_add is not enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_add',
@@ -390,7 +390,7 @@ describe GroupsController do
       assert_unauthorized
     end
 
-    it "should honor group[group_category_id] when permitted" do
+    it "honors group[group_category_id] when permitted" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => group_category.id } }
@@ -399,7 +399,7 @@ describe GroupsController do
       expect(assigns[:group].group_category).to eq group_category
     end
 
-    it "should not honor group[group_category_id] when not permitted" do
+    it "does not honor group[group_category_id] when not permitted" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => group_category.id } }
@@ -408,7 +408,7 @@ describe GroupsController do
       expect(assigns[:group].group_category).to eq GroupCategory.student_organized_for(@course)
     end
 
-    it "should fail when group[group_category_id] would be honored but doesn't exist" do
+    it "fails when group[group_category_id] would be honored but doesn't exist" do
       user_session(@student)
       group_category = @course.group_categories.create(:name => 'some category')
       post 'create', params: { :course_id => @course.id, :group => { :name => "some group", :group_category_id => 11235 } }
@@ -425,7 +425,7 @@ describe GroupsController do
           user_session(@teacher)
         end
 
-        it "should ignore the storage_quota_mb parameter" do
+        it "ignores the storage_quota_mb parameter" do
           post 'create', params: { :course_id => @course.id, :group => { :name => "a group", :storage_quota_mb => 22 } }
           expect(assigns[:group].storage_quota_mb).to eq 11
         end
@@ -437,7 +437,7 @@ describe GroupsController do
           user_session(@admin)
         end
 
-        it "should set the storage_quota_mb parameter" do
+        it "sets the storage_quota_mb parameter" do
           post 'create', params: { :course_id => @course.id, :group => { :name => "a group", :storage_quota_mb => 22 } }
           expect(assigns[:group].storage_quota_mb).to eq 22
         end
@@ -446,13 +446,13 @@ describe GroupsController do
   end
 
   describe "PUT update" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = @course.groups.create!(:name => "some group")
       put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
       assert_unauthorized
     end
 
-    it "should update group" do
+    it "updates group" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => "new name" } }
@@ -461,7 +461,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("new name")
     end
 
-    it "should update group (granular permissions)" do
+    it "updates group (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
@@ -471,7 +471,7 @@ describe GroupsController do
       expect(assigns[:group].name).to eql("new name")
     end
 
-    it "should not update group if :manage_groups_manage is not enabled (granular permissions)" do
+    it "does not update group if :manage_groups_manage is not enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_manage',
@@ -484,7 +484,7 @@ describe GroupsController do
       assert_unauthorized
     end
 
-    it "should honor group[group_category_id]" do
+    it "honors group[group_category_id]" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group")
@@ -494,7 +494,7 @@ describe GroupsController do
       expect(assigns[:group].group_category).to eq group_category
     end
 
-    it "should fail when group[group_category_id] doesn't exist" do
+    it "fails when group[group_category_id] doesn't exist" do
       user_session(@teacher)
       group_category = @course.group_categories.create(:name => 'some category')
       @group = @course.groups.create!(:name => "some group", :group_category => group_category)
@@ -502,7 +502,7 @@ describe GroupsController do
       expect(response).not_to be_successful
     end
 
-    it "should be able to unset a leader" do
+    it "is able to unset a leader" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       @group.add_user(@student1)
@@ -523,7 +523,7 @@ describe GroupsController do
           user_session(@teacher)
         end
 
-        it "should ignore the quota parameter" do
+        it "ignores the quota parameter" do
           put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => 'the group', :storage_quota_mb => 22 } }
           @group.reload
           expect(@group.name).to eq 'the group'
@@ -537,7 +537,7 @@ describe GroupsController do
           user_session(@admin)
         end
 
-        it "should update group quota" do
+        it "updates group quota" do
           put 'update', params: { :course_id => @course.id, :id => @group.id, :group => { :name => 'the group', :storage_quota_mb => 22 } }
           @group.reload
           expect(@group.name).to eq 'the group'
@@ -548,13 +548,13 @@ describe GroupsController do
   end
 
   describe "DELETE destroy" do
-    it "should require authorization" do
+    it "requires authorization" do
       @group = @course.groups.create!(:name => "some group")
       delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
       assert_unauthorized
     end
 
-    it "should delete group" do
+    it "deletes group" do
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
       delete 'destroy', params: { :course_id => @course.id, :id => @group.id }
@@ -565,7 +565,7 @@ describe GroupsController do
       expect(@course.groups.active).not_to be_include(@group)
     end
 
-    it "should delete group (granular permissions)" do
+    it "deletes group (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       user_session(@teacher)
       @group = @course.groups.create!(:name => "some group")
@@ -577,7 +577,7 @@ describe GroupsController do
       expect(@course.groups.active).not_to be_include(@group)
     end
 
-    it "should not delete group if :manage_groups_delete is not enabled (granular permissions)" do
+    it "does not delete group if :manage_groups_delete is not enabled (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
       @course.account.role_overrides.create!(
         permission: 'manage_groups_delete',
@@ -592,7 +592,7 @@ describe GroupsController do
   end
 
   describe "GET 'unassigned_members'" do
-    it "should include all users if the category is student organized" do
+    it "includes all users if the category is student organized" do
       user_session(@teacher)
       u1 = @student1
       u2 = @student2
@@ -610,7 +610,7 @@ describe GroupsController do
         .to eq [u1, u2, u3].map { |u| u.id }.sort
     end
 
-    it "should include only users not in a group in the category otherwise" do
+    it "includes only users not in a group in the category otherwise" do
       user_session(@teacher)
       u1 = @student1
       u2 = @student2
@@ -650,7 +650,7 @@ describe GroupsController do
       expect(data['users'].map { |u| u['user_id'] }).to eq [u1.id]
     end
 
-    it "should include the users' sections when available" do
+    it "includes the users' sections when available" do
       user_session(@teacher)
       u1 = @student1
       u2 = @student2
@@ -666,7 +666,7 @@ describe GroupsController do
   end
 
   describe "GET 'context_group_members'" do
-    it "should include the users' sections when available" do
+    it "includes the users' sections when available" do
       user_session(@teacher)
       u1 = @student1
       group = @course.groups.create(:name => "Group 1", :group_category => GroupCategory.student_organized_for(@course))
@@ -678,7 +678,7 @@ describe GroupsController do
       expect(data.first['sections'].first['section_code']).to eq @course.default_section.section_code
     end
 
-    it "should require :read_roster permission" do
+    it "requires :read_roster permission" do
       u1 = @student1
       u2 = @student2
       group = @course.groups.create(:name => "Group 1")
@@ -706,12 +706,12 @@ describe GroupsController do
       @wp = @group.wiki_pages.create! title: 'a page'
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       get 'public_feed', params: { :feed_code => @group.feed_code + 'x' }, format: 'atom'
       expect(assigns[:problem]).to match /The verification code is invalid/
     end
 
-    it "should include absolute path for rel='self' link" do
+    it "includes absolute path for rel='self' link" do
       get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
@@ -719,7 +719,7 @@ describe GroupsController do
       expect(feed.links.first.href).to match(/http:\/\//)
     end
 
-    it "should include an author for each entry" do
+    it "includes an author for each entry" do
       get 'public_feed', params: { :feed_code => @group.feed_code }, format: 'atom'
       feed = Atom::Feed.load_feed(response.body) rescue nil
       expect(feed).not_to be_nil
@@ -753,14 +753,14 @@ describe GroupsController do
       user_session(@user)
     end
 
-    it "should successfully create invitations" do
+    it "successfullies create invitations" do
       get 'accept_invitation', params: { :group_id => @group.id, :uuid => @membership.uuid }
       @group.reload
       expect(@group.has_member?(@user)).to be_truthy
       expect(@group.group_memberships.where(:workflow_state => "invited").count).to eq 0
     end
 
-    it "should reject an invalid invitation uuid" do
+    it "rejects an invalid invitation uuid" do
       get 'accept_invitation', params: { :group_id => @group.id, :uuid => @membership.uuid + "x" }
       @group.reload
       expect(@group.has_member?(@user)).to be_falsey
@@ -782,7 +782,7 @@ describe GroupsController do
       @sub = assignment.submit_homework(@student, attachments: [file], submission_type: "online_upload")
     end
 
-    it "should include group submissions if param is present" do
+    it "includes group submissions if param is present" do
       user_session(@teacher)
       get 'users', params: { :group_id => @group.id, include: ['group_submissions'] }
       json = json_parse(response.body)
@@ -792,7 +792,7 @@ describe GroupsController do
       expect(json[0]["group_submissions"][0]).to be_equal @sub.id
     end
 
-    it "should not include group submissions if param is absent" do
+    it "does not include group submissions if param is absent" do
       user_session(@teacher)
       get 'users', params: { :group_id => @group.id }
       json = json_parse(response.body)

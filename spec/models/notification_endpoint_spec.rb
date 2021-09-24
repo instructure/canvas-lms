@@ -102,7 +102,7 @@ describe NotificationEndpoint do
     end
   end
 
-  it "should be soft-deleteable" do
+  it "is soft-deleteable" do
     allow(@sns_client).to receive(:create_platform_endpoint).and_return(endpoint_arn: 'arn')
     ne = @at.notification_endpoints.create!(token: 'token')
 

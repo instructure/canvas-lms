@@ -49,7 +49,7 @@ describe "users/_logins.html.erb" do
       assign(:contexts, [])
     end
 
-    it "should show to sis admin" do
+    it "shows to sis admin" do
       admin = account_admin_user
       view_context(@account, admin)
       assign(:current_user, admin)
@@ -61,7 +61,7 @@ describe "users/_logins.html.erb" do
       expect(page.css(".login .delete_pseudonym_link").first['style']).to eq ''
     end
 
-    it "should not show to non-sis admin" do
+    it "does not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false }, :account => @account)
       view_context(@account, admin)
       assign(:current_user, admin)
@@ -79,7 +79,7 @@ describe "users/_logins.html.erb" do
     let(:sally) { account_admin_user(account: account) }
     let(:bob) { student_in_course(account: account).user }
 
-    it "should display when user has permission to create pseudonym" do
+    it "displays when user has permission to create pseudonym" do
       assign(:domain_root_account, account)
       assign(:current_user, sally)
       assign(:user, bob)
@@ -87,7 +87,7 @@ describe "users/_logins.html.erb" do
       expect(response).to have_tag("a.add_pseudonym_link")
     end
 
-    it "should not display when user lacks permission to create pseudonym" do
+    it "does not display when user lacks permission to create pseudonym" do
       assign(:domain_root_account, account)
       assign(:current_user, bob)
       assign(:user, sally)
@@ -101,7 +101,7 @@ describe "users/_logins.html.erb" do
     let(:sally) { account_admin_user(account: account) }
     let(:bob) { student_in_course(account: account).user }
 
-    it "should display when user has permission to reset MFA" do
+    it "displays when user has permission to reset MFA" do
       pseudonym(bob, account: account)
       bob.otp_secret_key = 'secret'
 
@@ -112,7 +112,7 @@ describe "users/_logins.html.erb" do
       expect(response).to have_tag("a.reset_mfa_link")
     end
 
-    it "should not display when user lacks permission to reset MFA" do
+    it "does not display when user lacks permission to reset MFA" do
       pseudonym(sally, account: account)
       sally.otp_secret_key = 'secret'
 
@@ -129,7 +129,7 @@ describe "users/_logins.html.erb" do
     let(:sally) { account_admin_user(account: account) }
     let(:bob) { student_in_course(account: account).user }
 
-    it "should display when user can only reset MFA" do
+    it "displays when user can only reset MFA" do
       pseudonym(bob, account: account)
       bob.otp_secret_key = 'secret'
 
@@ -140,7 +140,7 @@ describe "users/_logins.html.erb" do
       expect(response).to have_tag(".add_holder")
     end
 
-    it "should display when user can only add pseudonym" do
+    it "displays when user can only add pseudonym" do
       pseudonym(sally, account: account)
       sally.otp_secret_key = 'secret'
       account.settings[:mfa_settings] = :required
@@ -153,7 +153,7 @@ describe "users/_logins.html.erb" do
       expect(response).to have_tag(".add_holder")
     end
 
-    it "should not display when user lacks permission to do either" do
+    it "does not display when user lacks permission to do either" do
       pseudonym(bob, account: account)
       bob.otp_secret_key = 'secret'
       account.settings[:mfa_settings] = :required

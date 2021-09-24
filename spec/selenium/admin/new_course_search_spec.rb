@@ -41,14 +41,14 @@ describe "new account course search" do
     @account.root_account.disable_feature!(:granular_permissions_manage_users)
   end
 
-  it "should not show the courses tab without permission" do
+  it "does not show the courses tab without permission" do
     @account.role_overrides.create! :role => admin_role, :permission => 'read_course_list', :enabled => false
 
     visit_courses(@account)
     expect(left_navigation).not_to include_text("Courses")
   end
 
-  it "should hide courses without enrollments if checked", test_id: 3454769, priority: 1 do
+  it "hides courses without enrollments if checked", test_id: 3454769, priority: 1 do
     empty_course = course_factory(:account => @account, :course_name => "no enrollments")
     not_empty_course = course_factory(:account => @account, :course_name => "yess enrollments", :active_all => true)
     student_in_course(:course => not_empty_course, :active_all => true)
@@ -65,7 +65,7 @@ describe "new account course search" do
     expect(rows[0]).not_to include_text(empty_course.name)
   end
 
-  it "should paginate", test_id: 3454771, priority: 1 do
+  it "paginates", test_id: 3454771, priority: 1 do
     16.times { |i| @account.courses.create!(:name => "course #{i + 1}") }
 
     visit_courses(@account)
@@ -82,7 +82,7 @@ describe "new account course search" do
     expect(rows.first).to include_text("course 16")
   end
 
-  it "should search by term", test_id: 3454772, priority: 1 do
+  it "searches by term", test_id: 3454772, priority: 1 do
     term = @account.enrollment_terms.create!(:name => "some term")
     term_course = course_factory(:account => @account, :course_name => "term course_factory")
     term_course.enrollment_term = term
@@ -97,7 +97,7 @@ describe "new account course search" do
     expect(rows.first).to include_text(term_course.name)
   end
 
-  it "should filter terms by search string" do
+  it "filters terms by search string" do
     %w[Summer Fall Winter Spring].each do |term|
       enrollment_term = @account.enrollment_terms.create!(name: term)
       course = course_factory(account: @account, course_name: "#{term} Course")
@@ -117,7 +117,7 @@ describe "new account course search" do
     expect(rows.first).to include_text(term.name)
   end
 
-  it "should search by name" do
+  it "searches by name" do
     match_course = course_factory(:account => @account, :course_name => "course_factory with a search term")
     course_factory(:account => @account, :course_name => "diffrient cuorse")
 
@@ -128,7 +128,7 @@ describe "new account course search" do
     expect(rows.first).to include_text(match_course.name)
   end
 
-  it "should bring up course page when clicking name", priority: "1", test_id: 3415212 do
+  it "brings up course page when clicking name", priority: "1", test_id: 3415212 do
     named_course = course_factory(:account => @account, :course_name => "named_course")
     named_course.default_view = 'feed'
     named_course.save
@@ -138,7 +138,7 @@ describe "new account course search" do
     expect(course_header).to include_text named_course.name
   end
 
-  it "should search but not find bogus course", priority: "1", test_id: 3415214 do
+  it "searches but not find bogus course", priority: "1", test_id: 3415214 do
     bogus = 'jtsdumbthing'
     visit_courses(@account)
 
@@ -146,7 +146,7 @@ describe "new account course search" do
     expect(results_body).not_to contain_css(results_list_css)
   end
 
-  it "should show teachers" do
+  it "shows teachers" do
     course_factory(:account => @account)
     teacher = user_factory(:name => "some teacher")
     teacher_in_course(:course => @course, :user => teacher)
@@ -155,7 +155,7 @@ describe "new account course search" do
     expect(course_teacher_link(teacher)).to include_text(teacher.name)
   end
 
-  it "should show manageable roles in new enrollment dialog" do
+  it "shows manageable roles in new enrollment dialog" do
     custom_name = 'Custom Student role'
     custom_student_role(custom_name, :account => @account)
 
@@ -169,7 +169,7 @@ describe "new account course search" do
     expect(role_options).to match_array(["Student", "Observer", custom_name])
   end
 
-  it "should load sections in new enrollment dialog" do
+  it "loads sections in new enrollment dialog" do
     course = course_factory(:account => @account)
     visit_courses(@account)
 
@@ -181,7 +181,7 @@ describe "new account course search" do
     expect(section_options).to eq(sections.map(&:name))
   end
 
-  it "should create a new course from the 'Add a New Course' dialog", test_id: 3454775, priority: 1 do
+  it "creates a new course from the 'Add a New Course' dialog", test_id: 3454775, priority: 1 do
     @account.enrollment_terms.create!(:name => "Test Enrollment Term")
     subaccount = @account.sub_accounts.create!(name: "Test Sub Account")
 
@@ -208,7 +208,7 @@ describe "new account course search" do
     expect(rows.first).to include_text('Test Course Name')
   end
 
-  it "should list course name at top of add user modal", priority: "1", test_id: 3391719 do
+  it "lists course name at top of add user modal", priority: "1", test_id: 3391719 do
     named_course = course_factory(:account => @account, :course_name => "course factory with name")
 
     visit_courses(@account)
@@ -221,7 +221,7 @@ describe "new account course search" do
       @account.root_account.enable_feature!(:granular_permissions_manage_users)
     end
 
-    it "should only show non-admin manageable roles in new enrollment dialog" do
+    it "onlies show non-admin manageable roles in new enrollment dialog" do
       custom_name = 'Custom Student role'
       custom_student_role(custom_name, account: @account)
 
@@ -238,7 +238,7 @@ describe "new account course search" do
       expect(role_options).to match_array(["Student", "Observer", custom_name])
     end
 
-    it "should show all admin manageable roles in new enrollment dialog" do
+    it "shows all admin manageable roles in new enrollment dialog" do
       custom_name = 'Custom Student role'
       custom_student_role(custom_name, account: @account)
 

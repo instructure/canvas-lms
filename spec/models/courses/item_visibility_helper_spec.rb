@@ -25,7 +25,7 @@ describe Courses::ItemVisibilityHelper do
     course_factory
   end
 
-  it "should load (and cache) visibilities for each model" do
+  it "loads (and cache) visibilities for each model" do
     expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).and_return({}).once
     expect(DiscussionTopic).to receive(:visible_ids_by_user).and_return({}).once
     expect(WikiPage).to receive(:visible_ids_by_user).and_return({}).once
@@ -38,7 +38,7 @@ describe Courses::ItemVisibilityHelper do
     end
   end
 
-  it "should preload visibilities if desired" do
+  it "preloads visibilities if desired" do
     assignment_model(course: @course, submission_types: "online_url", workflow_state: "published", only_visible_to_overrides: false)
 
     enrolls = []

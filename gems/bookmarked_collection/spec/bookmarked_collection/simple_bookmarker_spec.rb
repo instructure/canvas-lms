@@ -43,17 +43,17 @@ describe BookmarkedCollection::SimpleBookmarker do
   end
 
   context "#bookmark_for" do
-    it "should be comparable" do
+    it "is comparable" do
       expect(@bookmarker.bookmark_for(@bob)).to be_respond_to(:<=>)
     end
 
-    it "should match the columns, in order" do
+    it "matches the columns, in order" do
       expect(@bookmarker.bookmark_for(@bob)).to eq([@bob.name, @bob.id])
     end
   end
 
   context "#validate" do
-    it "should validate the bookmark and its contents" do
+    it "validates the bookmark and its contents" do
       expect(@bookmarker.validate({ name: "bob", id: 1 })).to be_falsey
       expect(@bookmarker.validate(["bob"])).to be_falsey
       expect(@bookmarker.validate(["bob", "1"])).to be_falsey
@@ -72,21 +72,21 @@ describe BookmarkedCollection::SimpleBookmarker do
   end
 
   context "#restrict_scope" do
-    it "should order correctly" do
+    it "orders correctly" do
       pager = double(current_bookmark: nil)
       expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bill, @bob, @bob2, @bobby, @joe]
       )
     end
 
-    it "should order with nullable columns, having non-null values first" do
+    it "orders with nullable columns, having non-null values first" do
       pager = double(current_bookmark: nil)
       expect(@date_bookmarker.restrict_scope(@example_class, pager)).to eq(
         [@bob2, @bob, @joe, @bobby, @bill]
       )
     end
 
-    it "should start after the bookmark" do
+    it "starts after the bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: false)
       expect(@bookmarker.restrict_scope(@example_class, pager)).to eq(
@@ -94,7 +94,7 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
-    it "should start after the bookmark when nullable columns exist" do
+    it "starts after the bookmark when nullable columns exist" do
       bookmark = @date_bookmarker.bookmark_for(@joe)
       pager = double(current_bookmark: bookmark, include_bookmark: false)
       expect(@date_bookmarker.restrict_scope(@example_class, pager)).to eq(
@@ -102,7 +102,7 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
-    it "should include the bookmark if and only if include_bookmark" do
+    it "includes the bookmark if and only if include_bookmark" do
       bookmark = @bookmarker.bookmark_for(@bob2)
       pager = double(current_bookmark: bookmark, include_bookmark: true)
       expect(BookmarkedCollection).to receive(:best_unicode_collation_key).at_least(:once).and_call_original
@@ -111,7 +111,7 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
-    it "should skip collation if specified" do
+    it "skips collation if specified" do
       @non_collated_bookmarker = BookmarkedCollection::SimpleBookmarker.new(@example_class,
                                                                             { :name => { :skip_collation => true } }, :id)
       pager = double(current_bookmark: nil)
@@ -121,7 +121,7 @@ describe BookmarkedCollection::SimpleBookmarker do
       )
     end
 
-    it "should work with custom columns" do
+    it "works with custom columns" do
       pager = double(current_bookmark: nil)
       scope = @example_class.select("examples.*, replace(examples.name, 'bob', 'robert') AS unbobbed_name")
       result = @custom_bookmarker.restrict_scope(scope, pager).to_a

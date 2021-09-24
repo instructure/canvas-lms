@@ -62,7 +62,7 @@ describe "/quizzes/quizzes/_quiz_submission" do
   end
 
   context 'as a teacher' do
-    it "should render Respondus lockdown submission for soft concluded course" do
+    it "renders Respondus lockdown submission for soft concluded course" do
       course_with_student course: @course, active_all: true
       course_with_teacher course: @course, active_all: true
       view_context

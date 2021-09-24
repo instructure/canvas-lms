@@ -29,12 +29,12 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     @dk = DeveloperKey.create!(account: @account1, user: user_model)
   end
 
-  it 'should delete developer keys that have no associated access tokens' do
+  it 'deletes developer keys that have no associated access tokens' do
     DataFixup::CleanupCrossShardDeveloperKeys.run
     expect { @dk.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
-  it 'should delete developer keys that have associated access tokens with deleted users' do
+  it 'deletes developer keys that have associated access tokens with deleted users' do
     user_model.update(workflow_state: 'deleted')
     AccessToken.create!(user: @user, developer_key: @dk)
 
@@ -42,7 +42,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     expect { @dk.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
-  it 'should delete developer keys that have associated access tokens with cross-shard (shadow) users only' do
+  it 'deletes developer keys that have associated access tokens with cross-shard (shadow) users only' do
     @shard1.activate do
       @user1 = user_model
     end
@@ -53,7 +53,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     expect { @dk.reload }.to raise_error(ActiveRecord::RecordNotFound)
   end
 
-  it "should delete all of the developer key's associated objects" do
+  it "deletes all of the developer key's associated objects" do
     user_model.update(workflow_state: 'deleted')
     at = AccessToken.create!(user: @user, developer_key: @dk)
     dkab = DeveloperKeyAccountBinding.create!(developer_key: @dk, account: account_model)

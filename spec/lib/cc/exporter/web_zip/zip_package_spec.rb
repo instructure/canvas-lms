@@ -46,7 +46,7 @@ describe "ZipPackage" do
   end
 
   context "parse_module_data" do
-    it "should map context module data from Canvas" do
+    it "maps context module data from Canvas" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_data = zip_package.parse_module_data
       expect(module_data).to eq [{ id: @module.id, name: 'first_module', status: 'completed',
@@ -54,7 +54,7 @@ describe "ZipPackage" do
                                    exportId: create_key(@module), items: [] }]
     end
 
-    it "should show modules locked by prerequisites with status of locked" do
+    it "shows modules locked by prerequisites with status of locked" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
       @module.completion_requirements = [{ id: assign_item.id, type: 'must_submit' }]
@@ -72,7 +72,7 @@ describe "ZipPackage" do
       expect(module2_data[:prereqs]).to eq [@module.id]
     end
 
-    it "should show modules locked by date with status of locked" do
+    it "shows modules locked by date with status of locked" do
       lock_date = 1.day.from_now.iso8601
       @module.unlock_at = lock_date
       @module.save!
@@ -83,7 +83,7 @@ describe "ZipPackage" do
       expect(module_data[:unlockDate]).to eq lock_date
     end
 
-    it "should not export module lock dates that are in the past" do
+    it "does not export module lock dates that are in the past" do
       lock_date = 5.minutes.ago.iso8601
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
@@ -97,7 +97,7 @@ describe "ZipPackage" do
       expect(module_data[:unlockDate]).to be_nil
     end
 
-    it "should not show module status as locked if it only has require sequential progress set to true" do
+    it "does not show module status as locked if it only has require sequential progress set to true" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
       @module.completion_requirements = [{ id: assign_item.id, type: 'must_submit' }]
@@ -111,13 +111,13 @@ describe "ZipPackage" do
       expect(module_data[:sequential]).to be true
     end
 
-    it "should show module status as completed if there are no further module items to complete" do
+    it "shows module status as completed if there are no further module items to complete" do
       zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
       module_data = zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'completed'
     end
 
-    it "should show module status of started if only some items are completed" do
+    it "shows module status of started if only some items are completed" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
       quiz = @course.quizzes.create!(title: 'Quiz 1')
@@ -132,7 +132,7 @@ describe "ZipPackage" do
       expect(module_data[:status]).to eq 'started'
     end
 
-    it "should not export unpublished context modules" do
+    it "does not export unpublished context modules" do
       module2 = @course.context_modules.create!(name: 'second_module')
       module2.workflow_state = 'unpublished'
       module2.save!
@@ -152,7 +152,7 @@ describe "ZipPackage" do
       expect(data[0][:prereqs]).to eq []
     end
 
-    it "should parse module completion requirements settings" do
+    it "parses module completion requirements settings" do
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = @module.content_tags.create!(content: assign, context: @course)
       @module.completion_requirements = [{ id: assign_item.id, type: 'must_submit' }]
@@ -179,18 +179,18 @@ describe "ZipPackage" do
       @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, @cache_key)
     end
 
-    it "should use cached module status" do
+    it "uses cached module status" do
       module_data = @zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'started'
     end
 
-    it "should not show module as locked if it is not locked at time of export" do
+    it "does not show module as locked if it is not locked at time of export" do
       Rails.cache.write(@cache_key, { @module.id => { status: 'locked' } }, expires_in: 30.minutes)
       module_data = @zip_package.parse_module_data.first
       expect(module_data[:status]).to eq 'started'
     end
 
-    it "should show module as locked if it is locked at time of export" do
+    it "shows module as locked if it is locked at time of export" do
       module2 = @course.context_modules.create!(name: 'second_module')
       module2.unlock_at = 1.day.from_now
       module2.save!
@@ -201,7 +201,7 @@ describe "ZipPackage" do
       expect(module_data[:status]).to eq 'locked'
     end
 
-    it "should use cached module item data" do
+    it "uses cached module item data" do
       url_item = @module.content_tags.create!(content_type: 'ExternalUrl', context: @course,
                                               title: 'url', url: 'https://www.google.com')
       @module.completion_requirements = [{ id: url_item.id, type: 'must_view' }]
@@ -212,7 +212,7 @@ describe "ZipPackage" do
       expect(module_item_data[:completed]).to be true
     end
 
-    it "should calculate module state for modules created after current_progress" do
+    it "calculates module state for modules created after current_progress" do
       module2 = @course.context_modules.create!(name: 'second_module')
       url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
                                               title: 'url', url: 'https://www.google.com')
@@ -224,7 +224,7 @@ describe "ZipPackage" do
       expect(module_data[:status]).to eq 'unlocked'
     end
 
-    it "should calculate module item state as false for module items created after current_progress" do
+    it "calculates module item state as false for module items created after current_progress" do
       module2 = @course.context_modules.create!(name: 'second_module')
       url_item = module2.content_tags.create!(content_type: 'ExternalUrl', context: @course,
                                               title: 'url', url: 'https://www.google.com')
@@ -238,7 +238,7 @@ describe "ZipPackage" do
   end
 
   context "parse_module_item_data" do
-    it "should parse id, type, title and indent for items in the module" do
+    it "parses id, type, title and indent for items in the module" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Hi</p>")
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 3)
       @module.completion_requirements = [{ id: assign_item.id, type: 'must_submit' }]
@@ -252,7 +252,7 @@ describe "ZipPackage" do
       expect(module_item_data[:indent]).to eq 3
     end
 
-    it "should parse external tool items" do
+    it "parses external tool items" do
       tool = @course.context_external_tools.create!(url: "https://example.com", shared_secret: "secret",
                                                     consumer_key: "key", name: "tool")
       @module.content_tags.create!(content: tool, context: @course)
@@ -263,7 +263,7 @@ describe "ZipPackage" do
       expect(module_item_data[:type]).to eq 'ContextExternalTool'
     end
 
-    it "should parse locked and completed status" do
+    it "parses locked and completed status" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Hi</p>")
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 3)
       @module.completion_requirements = [{ id: assign_item.id, type: 'must_submit' }]
@@ -276,7 +276,7 @@ describe "ZipPackage" do
       expect(module_item_data[:completed]).to be true
     end
 
-    it "should parse points possible for assignments, quizzes and graded discussions" do
+    it "parses points possible for assignments, quizzes and graded discussions" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
       @module.content_tags.create!(content: assign, context: @course)
       graded_discussion = @course.assignments.create!(title: 'Disc 2', points_possible: 3,
@@ -292,7 +292,7 @@ describe "ZipPackage" do
       expect(module_item_data[2][:pointsPossible]).to eq 0.0
     end
 
-    it "should parse graded status for assignments, quizzes and graded discussions" do
+    it "parses graded status for assignments, quizzes and graded discussions" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
       @module.content_tags.create!(content: assign, context: @course)
       graded_discussion = @course.assignments.create!(title: 'Disc 2', points_possible: 3,
@@ -308,7 +308,7 @@ describe "ZipPackage" do
       expect(module_item_data[2][:graded]).to be true
     end
 
-    it "should parse assignmentExportId for quizzes and graded discussions" do
+    it "parses assignmentExportId for quizzes and graded discussions" do
       graded_discussion = @course.discussion_topics.build(title: 'Disc 2')
       graded_discussion_assignment = @course.assignments.build({
                                                                  submission_types: 'discussion_topic',
@@ -328,7 +328,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:assignmentExportId]).to eq create_key(quiz.assignment)
     end
 
-    it "should parse graded status for not graded assignments, quizzes and discussions" do
+    it "parses graded status for not graded assignments, quizzes and discussions" do
       assign = @course.assignments.create!(title: 'Assignment 1', grading_type: 'not_graded')
       @module.content_tags.create!(content: assign, context: @course)
       discussion = @course.discussion_topics.create!(title: 'Disc 2')
@@ -343,7 +343,7 @@ describe "ZipPackage" do
       expect(module_item_data[2][:graded]).to be false
     end
 
-    it "should parse due dates for assignments, quizzes and graded discussions" do
+    it "parses due dates for assignments, quizzes and graded discussions" do
       due = 1.day.from_now
       unlock = 1.day.ago
       lock = 2.days.from_now
@@ -358,7 +358,7 @@ describe "ZipPackage" do
       expect(module_item_data[:lockAt]).to eq lock.iso8601
     end
 
-    it "should parse lock dates for ungraded discussions" do
+    it "parses lock dates for ungraded discussions" do
       unlock = 1.day.ago
       lock = 2.days.from_now
       dt = @course.discussion_topics.create!(title: 'DT', lock_at: lock, unlock_at: unlock)
@@ -370,7 +370,7 @@ describe "ZipPackage" do
       expect(module_item_data[:lockAt]).to eq lock.iso8601
     end
 
-    it "should parse submission types for assignments" do
+    it "parses submission types for assignments" do
       assign = @course.assignments.create!(title: 'Assignment 1',
                                            submission_types: 'online_text_entry,online_upload')
       @module.content_tags.create!(content: assign, context: @course)
@@ -380,7 +380,7 @@ describe "ZipPackage" do
       expect(module_item_data[:submissionTypes]).to eq 'a text entry box or a file upload'
     end
 
-    it "should parse question count, time limit and allowed attempts for quizzes" do
+    it "parses question count, time limit and allowed attempts for quizzes" do
       quiz = @course.quizzes.create!(title: 'Quiz 1', time_limit: 5, allowed_attempts: 2)
       @module.content_tags.create!(content: quiz, context: @course, indent: 1)
 
@@ -391,7 +391,7 @@ describe "ZipPackage" do
       expect(module_item_data[:attempts]).to eq 2
     end
 
-    it "should parse module item requirements" do
+    it "parses module item requirements" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
       @module.content_tags.create!(content: assign, context: @course)
@@ -406,7 +406,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:requirement]).to be_nil
     end
 
-    it "should parse required points if module item requirement is min_score" do
+    it "parses required points if module item requirement is min_score" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
       @module.content_tags.create!(content: assign, context: @course)
@@ -418,7 +418,7 @@ describe "ZipPackage" do
       expect(module_item_data[:requiredPoints]).to eq 7
     end
 
-    it "should parse export id for assignments, quizzes, discussions and wiki pages" do
+    it "parses export id for assignments, quizzes, discussions and wiki pages" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10)
       @module.content_tags.create!(content: assign, context: @course)
       wiki = @course.wiki_pages.create!(title: 'Wiki Page 1', url: 'wiki-page-1', wiki: @course.wiki)
@@ -430,7 +430,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:exportId]).to eq 'wiki-page-1'
     end
 
-    it "should parse content for assignments and quizzes" do
+    it "parses content for assignments and quizzes" do
       assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Assignment</p>')
       @module.content_tags.create!(content: assign, context: @course)
       quiz = @course.quizzes.create!(title: 'Quiz 1', description: '<p>Quiz</p>')
@@ -442,7 +442,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:content]).to eq '<p>Quiz</p>'
     end
 
-    it "should parse content for discussions" do
+    it "parses content for discussions" do
       discussion = @course.discussion_topics.create!(title: 'Discussion 1', message: "<h1>Discussion</h1>")
       graded_discussion = @course.assignments.create!(title: 'Disc 2', description: '<p>Graded Discussion</p>',
                                                       submission_types: 'discussion_topic')
@@ -455,7 +455,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:content]).to eq '<p>Graded Discussion</p>'
     end
 
-    it "should parse content for wiki pages" do
+    it "parses content for wiki pages" do
       wiki = @course.wiki_pages.create!(title: 'Wiki Page 1', body: "<h2>Wiki Page</h2>", wiki: @course.wiki)
       @module.content_tags.create!(content: wiki, context: @course)
 
@@ -464,7 +464,7 @@ describe "ZipPackage" do
       expect(module_item_data[0][:content]).to eq '<h2>Wiki Page</h2>'
     end
 
-    it "should parse URL for url items" do
+    it "parses URL for url items" do
       @module.content_tags.create!(content_type: 'ExternalUrl', context: @course,
                                    title: 'url', url: 'https://www.google.com')
 
@@ -473,7 +473,7 @@ describe "ZipPackage" do
       expect(module_item_data[0][:content]).to eq 'https://www.google.com'
     end
 
-    it "should parse file data for attachments" do
+    it "parses file data for attachments" do
       file = attachment_model(context: @course, display_name: 'file1.jpg', filename: '1234__file1.jpg')
       @module.content_tags.create!(content: file, context: @course)
 
@@ -482,7 +482,7 @@ describe "ZipPackage" do
       expect(file_data[:content]).to eq "viewer/files/file1.jpg"
     end
 
-    it "should not export item content for items in locked modules" do
+    it "does not export item content for items in locked modules" do
       assign1 = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: "<p>Yo</p>")
       assign_item1 = @module.content_tags.create!(content: assign1, context: @course, indent: 0)
       @module.completion_requirements = [{ id: assign_item1.id, type: 'must_submit' }]
@@ -498,7 +498,7 @@ describe "ZipPackage" do
       expect(module_item_data.first.values.include?('<p>Hi</p>')).to be false
     end
 
-    it "should not export item content for items locked by prerequisites" do
+    it "does not export item content for items locked by prerequisites" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
       @module.content_tags.create!(content: assign, context: @course, indent: 0)
@@ -515,7 +515,7 @@ describe "ZipPackage" do
       expect(module_item_data.last.values.include?('<p>Yo</p>')).to be false
     end
 
-    it "should not export items contents for items locked by content dates" do
+    it "does not export items contents for items locked by content dates" do
       assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Hi</p>', lock_at: 1.day.ago)
       @module.content_tags.create!(content: assign, context: @course, indent: 0)
       @module.content_tags.create!(content: assign, context: @course, indent: 0)
@@ -530,7 +530,7 @@ describe "ZipPackage" do
       expect(module_item_data[1][:locked]).to be true
     end
 
-    it "should not export unpublished module items" do
+    it "does not export unpublished module items" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       assign_item = @module.content_tags.create!(content: assign, context: @course, indent: 0)
       assign_item.workflow_state = 'unpublished'
@@ -541,7 +541,7 @@ describe "ZipPackage" do
       expect(module_item_data.length).to eq 0
     end
 
-    it "should not export items not visible to the user" do
+    it "does not export items not visible to the user" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       create_adhoc_override_for_assignment(assign, [@student])
       student_in_course(active_all: true, user_name: '2-student')
@@ -554,7 +554,7 @@ describe "ZipPackage" do
       expect(module_item_data.length).to eq 0
     end
 
-    it "should export correct dates for assignments with due date overrides" do
+    it "exports correct dates for assignments with due date overrides" do
       due = 1.hour.from_now
       lock = 2.hours.from_now
       unlock = 1.hour.ago
@@ -601,7 +601,7 @@ describe "ZipPackage" do
         ]
       end
 
-      it "should parse non-module assignments" do
+      it "parses non-module assignments" do
         due = 1.day.from_now
         lock = 2.days.from_now
         unlock = 1.day.ago
@@ -619,7 +619,7 @@ describe "ZipPackage" do
         }]
       end
 
-      it "should parse non-module discussions" do
+      it "parses non-module discussions" do
         disc = @course.discussion_topics.create!(title: 'Discussion 1', message: "<h1>Discussion</h1>")
         zip_package = create_zip_package
         disc_data = zip_package.parse_non_module_items(:discussion_topics)
@@ -629,7 +629,7 @@ describe "ZipPackage" do
         }]
       end
 
-      it "should parse non-module quizzes" do
+      it "parses non-module quizzes" do
         quiz = @course.quizzes.create!(title: 'Quiz 1', time_limit: 5, allowed_attempts: 2)
         quiz.publish!
         zip_package = create_zip_package
@@ -641,14 +641,14 @@ describe "ZipPackage" do
         }]
       end
 
-      it "should parse non-module wiki pages" do
+      it "parses non-module wiki pages" do
         @course.wiki_pages.create!(title: 'Page 1', url: 'page-1', wiki: @course.wiki)
         zip_package = create_zip_package
         wiki_data = zip_package.parse_non_module_items(:wiki_pages)
         expect(wiki_data).to eq [{ exportId: 'page-1', title: 'Page 1', type: 'WikiPage', content: '', frontPage: false }]
       end
 
-      it "should parse front page" do
+      it "parses front page" do
         wiki_page = @course.wiki_pages.create!(title: 'Page 1', url: 'page-1', wiki: @course.wiki)
         @course.wiki.set_front_page_url!(wiki_page.url)
         zip_package = create_zip_package
@@ -656,7 +656,7 @@ describe "ZipPackage" do
         expect(wiki_data).to eq [{ exportId: 'page-1', title: 'Page 1', type: 'WikiPage', content: '', frontPage: true }]
       end
 
-      it "should not fail on missing items" do
+      it "does not fail on missing items" do
         wiki = @course.wiki_pages.create!(title: 'Page 1', url: 'page-1', wiki: @course.wiki, body: '<p>Hi</p>')
         zip_package = create_zip_package
         wiki.title = 'Wiki Page 2'
@@ -666,7 +666,7 @@ describe "ZipPackage" do
                                    frontPage: false }]
       end
 
-      it "should export files" do
+      it "exports files" do
         add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         zip_package = create_zip_package
         course_data = zip_package.parse_course_data
@@ -685,7 +685,7 @@ describe "ZipPackage" do
         ]
       end
 
-      it "should not export items not linked elsewhere" do
+      it "does not export items not linked elsewhere" do
         @course.assignments.create!(title: 'Assignment 1')
         add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         file = add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, "cn_image.jpg")
@@ -696,7 +696,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }]
       end
 
-      it "should export items that are module items" do
+      it "exports items that are module items" do
         assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Hi</p>')
         file = add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         @module.content_tags.create!(content: assign, context: @course, indent: 0)
@@ -711,7 +711,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{ type: "file", name: "amazing_file.txt", size: 26, files: nil }]
       end
 
-      it "should export assignments linked from module items" do
+      it "exports assignments linked from module items" do
         assign = @course.assignments.create!(title: 'Assignment 1', description: '<p>Hi</p>')
         quiz_body = "<a href=\"/courses/#{@course.id}/assignments/#{assign.id}\">Link</a>"
         quiz = @course.quizzes.create!(title: 'Quiz 1', description: quiz_body)
@@ -726,7 +726,7 @@ describe "ZipPackage" do
         expect(course_data[:quizzes][0][:assignmentExportId]).to eq create_key(quiz.assignment)
       end
 
-      it "should export quizzes linked from module items" do
+      it "exports quizzes linked from module items" do
         quiz = @course.quizzes.create!(title: 'Quiz 1', description: "<p>Hi</p>")
         quiz.publish!
         assign = @course.assignments.create!(title: 'Assignment 1',
@@ -742,7 +742,7 @@ describe "ZipPackage" do
         expect(course_data[:quizzes][0][:assignmentExportId]).to eq create_key(quiz.assignment)
       end
 
-      it "should export pages linked from module items" do
+      it "exports pages linked from module items" do
         page = @course.wiki_pages.create!(title: 'Page 1', body: "<p>Hi</p>", wiki: @course.wiki)
         assign = @course.assignments.create!(title: 'Assignment 1',
                                              description: "<a href=\"/courses/#{@course.id}/pages/#{page.id}\">Link</a>")
@@ -755,7 +755,7 @@ describe "ZipPackage" do
         expect(course_data[:pages].length).to eq 1
       end
 
-      it "should export discussion topics linked from module items" do
+      it "exports discussion topics linked from module items" do
         discussion = @course.discussion_topics.create!(title: 'Discussion 1', message: "<p>Hi</p>")
         assign = @course.assignments.create!(title: 'Assignment 1',
                                              description: "<a href=\"/courses/#{@course.id}/discussion_topics/#{discussion.id}\">Link</a>")
@@ -769,7 +769,7 @@ describe "ZipPackage" do
         expect(course_data[:discussion_topics].length).to eq 1
       end
 
-      it "should export files linked from module items" do
+      it "exports files linked from module items" do
         file = add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         assign = @course.assignments.create!(title: 'Assignment 1',
                                              description: "<a href=\"/courses/#{@course.id}/files/#{file.id}/download?wrap=1\">Link</a>")
@@ -782,7 +782,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{ type: "file", name: "amazing_file.txt", size: 26, files: nil }]
       end
 
-      it "should export items linked from other linked items" do
+      it "exports items linked from other linked items" do
         file = add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         assign = @course.assignments.create!(title: 'Assignment 1',
                                              description: "<a href=\"/courses/#{@course.id}/files/#{file.id}\">Link</a>")
@@ -800,7 +800,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{ type: "file", name: "amazing_file.txt", size: 26, files: nil }]
       end
 
-      it 'should export media files linked from other linked items' do
+      it 'exports media files linked from other linked items' do
         media = add_file(fixture_file_upload('files/292.mp3', 'audio/mpeg'), @course, '292.mp3')
         image =
           add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, 'cn_image.jpg')
@@ -828,7 +828,7 @@ describe "ZipPackage" do
         )
       end
 
-      it 'should not blow up when exporting linked recorded media files' do
+      it 'does not blow up when exporting linked recorded media files' do
         media_id = "m_media-id"
         file_data = { type: 'file', name: 'video.mp4', size: 172780, files: nil }
         att = Attachment.create!(
@@ -856,7 +856,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to include(file_data)
       end
 
-      it "should handle circle-linked items" do
+      it "handles circle-linked items" do
         assign = @course.assignments.create!(title: 'Assignment 1',
                                              description: "<a href=\"/courses/#{@course.id}/pages/page-1\">Link</a>")
         page = @course.wiki_pages.create!(title: 'Page 1', wiki: @course.wiki,
@@ -872,7 +872,7 @@ describe "ZipPackage" do
                                              content: "<a href=\"assignments/#{create_key(assign)}\">Link</a>", frontPage: false }]
       end
 
-      it "should export items linked as images" do
+      it "exports items linked as images" do
         due_at = 1.day.ago
         file = add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, "cn_image.jpg")
         survey = @course.quizzes.create!(title: 'Survey 1', due_at: due_at, quiz_type: 'survey',
@@ -889,7 +889,7 @@ describe "ZipPackage" do
         expect(course_data[:files]).to eq [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }]
       end
 
-      it "should export quizzes and discussions that are linked as assignments" do
+      it "exports quizzes and discussions that are linked as assignments" do
         quiz = @course.quizzes.create!(title: 'Quiz 1')
         quiz.publish!
         assign = @course.assignments.create!(title: 'Assignment 1',
@@ -908,7 +908,7 @@ describe "ZipPackage" do
         }]
       end
 
-      it "should not export quizzes when locked by date" do
+      it "does not export quizzes when locked by date" do
         quiz = @course.quizzes.create!(title: 'Quiz 1', description: "stuff",
                                        workflow_state: "available", unlock_at: 3.days.from_now)
         @module.content_tags.create!(content: quiz, context: @course, indent: 0)
@@ -916,7 +916,7 @@ describe "ZipPackage" do
         expect(course_data[:quizzes]).to be_empty
       end
 
-      it "should export linked file items in sub-folders" do
+      it "exports linked file items in sub-folders" do
         folder = @course.folders.create!(name: 'folder#1', parent_folder: Folder.root_folders(@course).first)
         file = add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, "cn_image.jpg", folder)
         disc = @course.discussion_topics.create!(title: 'Discussion 1',
@@ -932,7 +932,7 @@ describe "ZipPackage" do
           [{ type: "file", name: "cn_image.jpg", size: 30339, files: nil }] }]
       end
 
-      it "should not crash on index links" do
+      it "does not crash on index links" do
         page = @course.wiki_pages.create!(title: 'Page 1', wiki: @course.wiki,
                                           body: "<a href=\"/courses/#{@course.id}/announcements\">Link</a>" \
           "<a href=\"/courses/#{@course.id}/wiki\">Link</a>")
@@ -942,7 +942,7 @@ describe "ZipPackage" do
                                              content: "<a href=\"announcements\">Link</a><a href=\"wiki/\">Link</a>", frontPage: false }]
       end
 
-      it "should not mark locked items as exported" do
+      it "does not mark locked items as exported" do
         file = add_file(fixture_file_upload('files/amazing_file.txt', 'plain/txt'), @course, "amazing_file.txt")
         file2 = add_file(fixture_file_upload('files/cn_image.jpg', 'image/jpg'), @course, "cn_image.jpg")
         page = @course.wiki_pages.create!(title: 'Page 1', wiki: @course.wiki,
@@ -970,7 +970,7 @@ describe "ZipPackage" do
         ]
       end
 
-      it "should export linked graded quizzes/discussions if item tab is hidden but assignments tab is available" do
+      it "exports linked graded quizzes/discussions if item tab is hidden but assignments tab is available" do
         survey = @course.quizzes.create!(title: 'Survey 1', quiz_type: 'survey')
         survey.publish!
         quiz = @course.quizzes.create!(title: 'Quiz 1')
@@ -991,7 +991,7 @@ describe "ZipPackage" do
       @zip_package = CC::Exporter::WebZip::ZipPackage.new(@exporter, @course, @student, 'key')
     end
 
-    it "should export html file links as local file links" do
+    it "exports html file links as local file links" do
       attachment_model(context: @course, display_name: 'file1.jpg', filename: 'file1.jpg')
       html = %(<a href="/courses/#{@course.id}/files/#{@attachment.id}/download") +
              %( data-api-returntype="File">file1.jpg</a>)
@@ -1001,7 +1001,7 @@ describe "ZipPackage" do
       expect(converted_html).to eq expected_html
     end
 
-    it "should export html content links as local content links" do
+    it "exports html content links as local content links" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10, description: '<p>Hi</p>')
       html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +
              %( data-api-returntype="Assignment">Assignment 1</a>)
@@ -1011,7 +1011,7 @@ describe "ZipPackage" do
       expect(converted_html).to eq expected_html
     end
 
-    it "should convert html content links that are locked" do
+    it "converts html content links that are locked" do
       assign = @course.assignments.create!(title: 'Assignment 1', points_possible: 10,
                                            description: '<p>Hi</p>', unlock_at: 5.days.from_now)
       html = %(<a title="Assignment 1" href="/courses/#{@course.id}/assignments/#{assign.id}") +

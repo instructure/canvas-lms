@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 shared_examples_for 'QuizReportSerializer Associations' do
-  it 'should embed its attachment as :file when present' do
+  it 'embeds its attachment as :file when present' do
     statistics.generate_csv
     statistics.reload
 
@@ -36,7 +36,7 @@ shared_examples_for 'QuizReportSerializer Associations' do
     expect(json['file']['id']).to be_present
   end
 
-  it 'should embed its progress when present' do
+  it 'embeds its progress when present' do
     statistics.generate_csv_in_background
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
@@ -103,11 +103,11 @@ describe Quizzes::QuizReportSerializer do
       end
     end
 
-    it 'should expose whether the report is generatable' do
+    it 'exposes whether the report is generatable' do
       expect(json['generatable']).to eq statistics.report.generatable?
     end
 
-    it 'should link to itself' do
+    it 'links to itself' do
       expect(json['url']).to eq(
         "http://example.com/api/v1/courses/1/quizzes/2/reports/#{statistics.id}"
       )
@@ -126,7 +126,7 @@ describe Quizzes::QuizReportSerializer do
     context 'associations' do
       include_examples 'QuizReportSerializer Associations'
 
-      it 'should link to the quiz' do
+      it 'links to the quiz' do
         expect(json['links']).to be_present
         expect(json['links']['quiz']).to eq 'http://example.com/api/v1/courses/1/quizzes/2'
       end
@@ -142,11 +142,11 @@ describe Quizzes::QuizReportSerializer do
       expect(json['id']).to eq statistics.id
     end
 
-    it 'should include quiz_id' do
+    it 'includes quiz_id' do
       expect(json['quiz_id']).to eq quiz.id
     end
 
-    it 'should include the progress_url' do
+    it 'includes the progress_url' do
       statistics.generate_csv_in_background
 
       expect(json['progress_url']).to eq(

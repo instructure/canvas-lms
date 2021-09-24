@@ -34,7 +34,7 @@ describe ProgressController, type: :request do
       @params = { :controller => 'progress', :action => 'show', :id => @progress.id.to_s, :format => 'json' }
     end
 
-    it "should show Progress" do
+    it "shows Progress" do
       json = api_call(:get, @path, @params)
       expect(json['completion']).to eq 55.0
       expect(json['context_id']).to eq @account.id
@@ -47,13 +47,13 @@ describe ProgressController, type: :request do
       expect(json['url']).to eq "http://www.example.com/api/v1/progress/#{@progress.id}"
     end
 
-    it "should 401 if the caller does not have permission to view the context" do
+    it "401S if the caller does not have permission to view the context" do
       other_account = account_model
       account_admin_user :account => other_account
       api_call(:get, @path, @params, {}, {}, { :expected_status => 401 })
     end
 
-    it "should 404 if the object doesn't exist" do
+    it "404S if the object doesn't exist" do
       @progress.destroy
       api_call(:get, @path, @params, {}, {}, { :expected_status => 404 })
     end

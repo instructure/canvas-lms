@@ -47,7 +47,7 @@ describe 'submissions' do
       validate_and_submit_form
     end
 
-    it 'Should be able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
+    it 'is able to create a new student group category from the assignment edit page', priority: "1", test_id: 56752 do
       original_number_of_assignment = Assignment.count
       original_number_of_group = Group.count
       create_assignment_preparation

@@ -53,7 +53,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @formatter = Canvas::Migration::Helpers::SelectiveContentFormatter.new(@migration, "https://example.com", global_identifiers: true)
     end
 
-    it "should list top-level items" do
+    it "lists top-level items" do
       expect(@formatter.get_content_list).to eq [{ :type => "course_settings", :property => "copy[all_course_settings]", :title => "Course Settings" },
                                                  { :type => "syllabus_body", :property => "copy[all_syllabus_body]", :title => "Syllabus Body" },
                                                  { :type => "context_modules", :property => "copy[all_context_modules]", :title => "Modules", :count => 1, :sub_items_url => "https://example.com?type=context_modules" },
@@ -66,7 +66,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                  { :type => "attachments", :property => "copy[all_attachments]", :title => "Files", :count => 1, :sub_items_url => "https://example.com?type=attachments" }]
     end
 
-    it "should rename deprecated hash keys" do
+    it "renames deprecated hash keys" do
       expect(@formatter.get_content_list('quizzes').length).to eq 1
       expect(@formatter.get_content_list('context_modules').length).to eq 1
       expect(@formatter.get_content_list('wiki_pages').length).to eq 1
@@ -95,7 +95,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
           allow(@migration).to receive(:read).and_return(@overview.to_json)
         end
 
-        it 'should arrange an outcome hiearchy' do
+        it 'arranges an outcome hiearchy' do
           expect(@formatter.get_content_list('learning_outcomes')).to eq [
             {
               type: 'learning_outcome_groups',
@@ -113,12 +113,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         end
       end
 
-      it 'should return standard outcomes without learning_outcome_groups course data' do
+      it 'returns standard outcomes without learning_outcome_groups course data' do
         expect(@formatter.get_content_list('learning_outcomes').length).to eq 1
       end
     end
 
-    it "should group assignments into assignment groups" do
+    it "groups assignments into assignment groups" do
       expect(@formatter.get_content_list('assignments')).to eq [
         { :type => "assignment_groups", :property => "copy[assignment_groups][id_a1]", :title => "a1", :migration_id => "a1",
           "sub_items" => [{ :type => "assignments", :property => "copy[assignments][id_a2]", :title => "a2", :migration_id => "a2" }] },
@@ -126,7 +126,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       ]
     end
 
-    it "should group attachments by folder" do
+    it "groups attachments by folder" do
       allow(@migration).to receive(:read).and_return({
         'file_map' => {
           'a1' => { 'path_name' => 'a/a1.html', 'file_name' => 'a1.html', 'migration_id' => 'a1' },
@@ -178,7 +178,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
                                                                   :path => "a5.html" }]
     end
 
-    it "should show announcements separate from discussion topics" do
+    it "shows announcements separate from discussion topics" do
       allow(@migration).to receive(:read).and_return({
         'discussion_topics' => [
           { 'title' => 'a1', 'migration_id' => 'a1' },
@@ -191,7 +191,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       expect(@formatter.get_content_list('announcements').first[:title]).to eq 'a2'
     end
 
-    it "should link resources for quizzes and submittables" do
+    it "links resources for quizzes and submittables" do
       allow(@migration).to receive(:read).and_return(@overview.merge({
                                                                        'assessments' => [{ 'title' => 'q1', 'migration_id' => 'q1', 'assignment_migration_id' => 'a5' }],
                                                                        'wikis' => [{ 'title' => 'w1', 'migration_id' => 'w1', 'assignment_migration_id' => 'a3' }],
@@ -258,7 +258,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       @out_group2 = outcome_group_model(title: 'beta')
     end
 
-    it "should list individual types" do
+    it "lists individual types" do
       expect(formatter.get_content_list('wiki_pages').length).to eq 1
       expect(formatter.get_content_list('context_modules').length).to eq 1
       expect(formatter.get_content_list('attachments').length).to eq 1
@@ -271,12 +271,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "should list top-level items" do
+      it "lists top-level items" do
         # groups should not show up even though there are some
         expect(formatter.get_content_list).to match_array top_level_items
       end
 
-      it "should list learning outcomes" do
+      it "lists learning outcomes" do
         outcomes = formatter.get_content_list('learning_outcomes')
         expect(outcomes.map { |o| o[:title] }).to match_array(
           [
@@ -294,14 +294,14 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.root_account.enable_feature!(:selectable_outcomes_in_course_copy)
       end
 
-      it "should list top-level items" do
+      it "lists top-level items" do
         # groups should not show up even though there are some
         copy = top_level_items.clone
         copy.find { |item| item[:type] == 'learning_outcomes' }[:sub_items_url] = "https://example.com?type=learning_outcomes"
         expect(formatter.get_content_list).to match_array copy
       end
 
-      it "should list individual types in expected order" do
+      it "lists individual types in expected order" do
         outcomes = formatter.get_content_list('learning_outcomes')
         expect(outcomes.map { |o| o[:title] }).to eq [
           'beta',
@@ -311,7 +311,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         ]
       end
 
-      it "should list outcomes in outcome group" do
+      it "lists outcomes in outcome group" do
         outcomes = formatter.get_content_list("learning_outcome_groups_#{@out_group1.id}")
         expect(outcomes.map { |o| o[:title] }).to eq [
           'moonshine',
@@ -320,7 +320,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       end
     end
 
-    it "should link resources for quizzes and submittables" do
+    it "links resources for quizzes and submittables" do
       wiki_page_assignment_model(course: @course, title: 'sekrit page')
       assignment_model(course: @course, submission_types: 'discussion_topic', title: 'graded discussion')
       assignment_quiz([], course: @course, name: "blah").assignment
@@ -360,12 +360,12 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
         @course.rubrics.create!.destroy
       end
 
-      it "should ignore in top-level list" do
+      it "ignores in top-level list" do
         expect(formatter.get_content_list).to eq [{ :type => "course_settings", :property => "copy[all_course_settings]", :title => "Course Settings" },
                                                   { :type => "syllabus_body", :property => "copy[all_syllabus_body]", :title => "Syllabus Body" }]
       end
 
-      it "should ignore in specific item request" do
+      it "ignores in specific item request" do
         expect(formatter.get_content_list('wiki_pages').length).to eq 0
         expect(formatter.get_content_list('context_modules').length).to eq 0
         expect(formatter.get_content_list('attachments').length).to eq 0
@@ -381,7 +381,7 @@ describe Canvas::Migration::Helpers::SelectiveContentFormatter do
       end
     end
 
-    it "should group files by folders" do
+    it "groups files by folders" do
       root = Folder.root_folders(@course).first
       a = Folder.create!(:name => 'a', :parent_folder => root, :context => @course)
       ab = Folder.create!(:name => 'b', :parent_folder => a, :context => @course)

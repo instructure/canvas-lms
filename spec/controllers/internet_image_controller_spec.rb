@@ -28,12 +28,12 @@ describe InternetImageController do
     WebMock.enable_net_connect!
   end
 
-  it 'should require a user be logged in' do
+  it 'requires a user be logged in' do
     get 'image_search', params: { query: 'cats' }
     assert_unauthorized
   end
 
-  it 'should require the plugin be configured' do
+  it 'requires the plugin be configured' do
     user_model
     user_session(@user)
     get 'image_search', params: { query: 'cats' }
@@ -52,7 +52,7 @@ describe InternetImageController do
       user_session(@user)
     end
 
-    it 'should update link headers to point to Canvas' do
+    it 'updates link headers to point to Canvas' do
       stub_request(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats").to_return(
         status: 200,
         body: '',
@@ -65,7 +65,7 @@ describe InternetImageController do
       expect(response.headers['Link']).to eq "<#{local_url}/api/v1/image_search?content_filter=high&page=1&query=cats>; rel=\"first\", <#{local_url}/api/v1/image_search?content_filter=high&page=1&query=cats>; rel=\"prev\", <#{local_url}/api/v1/image_search?content_filter=high&page=3&query=cats>; rel=\"last\", <#{local_url}/api/v1/image_search?content_filter=high&page=3&query=cats>; rel=\"next\""
     end
 
-    it 'should return only the data we specify' do
+    it 'returns only the data we specify' do
       stub_request(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats")
         .to_return(status: 200, body: file_fixture("unsplash.json").read, headers: { 'Content-Type' => 'application/json' })
       get 'image_search', params: { query: 'cats' }
@@ -82,14 +82,14 @@ describe InternetImageController do
       expect(download_url).to eq "https://api.unsplash.com/photos/bPxGLgJiMI/download"
     end
 
-    it 'should send the app key as a client id header' do
+    it 'sends the app key as a client id header' do
       stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").with(headers: { 'Authorization': 'Client-ID key' })
       get 'image_search', params: { query: 'cats' }
       expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats")
         .with(headers: { 'Authorization': 'Client-ID key' }).once
     end
 
-    it 'should read params back correctly' do
+    it 'reads params back correctly' do
       begin
         WebMock::Config.instance.query_values_notation = :flat_array
         stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: { 'Authorization': 'Client-ID key' })
@@ -114,7 +114,7 @@ describe InternetImageController do
       user_session(@user)
     end
 
-    it 'should show success message if successful' do
+    it 'shows success message if successful' do
       stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { 'Authorization': 'Client-ID key' })
                                                                                 .to_return(status: 200, headers: { 'Content-Type' => 'application/json' })
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
@@ -123,7 +123,7 @@ describe InternetImageController do
       expect(JSON.parse(response.body)).to eq({ "message" => 'Confirmation success. Thank you.' })
     end
 
-    it 'should show Unsplash message if Unsplash gives a 404' do
+    it 'shows Unsplash message if Unsplash gives a 404' do
       stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { 'Authorization': 'Client-ID key' })
                                                                                 .to_return(status: 404, body: "{\"errors\": [\"Couldn't find Photo\"]}", headers: { 'Content-Type' => 'application/json' })
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
@@ -132,12 +132,12 @@ describe InternetImageController do
       expect(JSON.parse(response.body)).to eq({ "message" => "Couldn't find Photo" })
     end
 
-    it 'should show an id error if it fails to parse the id' do
+    it 'shows an id error if it fails to parse the id' do
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lr~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
       expect(JSON.parse(response.body)).to eq({ "message" => 'Could not find image.  Please check the id and try again' })
     end
 
-    it 'should show 500 error if another error happens' do
+    it 'shows 500 error if another error happens' do
       stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI").with(headers: { 'Authorization': 'Client-ID key' })
                                                                        .to_return(status: 400)
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }

@@ -29,7 +29,7 @@ describe SIS::CSV::GroupCategoryImporter do
     )
   end
 
-  it "should skip bad content" do
+  it "skips bad content" do
     before_count = GroupCategory.count
     importer = process_csv_data(
       "group_category_id,account_id,category_name,status,course_id",
@@ -49,7 +49,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(GroupCategory.count).to eq before_count + 1
   end
 
-  it "should ensure group_category_id is unique" do
+  it "ensures group_category_id is unique" do
     importer = process_csv_data(
       "group_category_id,category_name,status",
       "gc1,Some Category,active",
@@ -58,7 +58,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(GroupCategory.all.length).to eq(1)
   end
 
-  it "should create group categories" do
+  it "creates group categories" do
     sub = Account.where(sis_source_id: 'A001').take
     process_csv_data_cleanly(
       "group_category_id,account_id,course_id,category_name,status",
@@ -74,7 +74,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(group_category2.context_id).to eq sub.id
   end
 
-  it "should allow moving group categories" do
+  it "allows moving group categories" do
     sub = Account.where(sis_source_id: 'A001').take
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
@@ -95,7 +95,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(group_category2.reload.context_id).to eq @account.id
   end
 
-  it "should fail model validations" do
+  it "fails model validations" do
     importer = process_csv_data(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
@@ -104,7 +104,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(importer.errors.map(&:last)).to eq(["A group category did not pass validation (group category: Gc002, error: Name Group Cat 1 is already in use.)"])
   end
 
-  it "should create in a course." do
+  it "creates in a course." do
     course = course_factory(account: @account, sis_source_id: 'c01')
     process_csv_data_cleanly(
       "group_category_id,course_id,category_name,status",
@@ -113,7 +113,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(GroupCategory.where(sis_source_id: 'Gc001').take.context).to eq course
   end
 
-  it "should not allow moving a group category with groups" do
+  it "does not allow moving a group category with groups" do
     gc = @account.group_categories.create(name: 'gc1', sis_source_id: 'Gc001')
     gc.groups.create!(root_account: @account, context: @account)
     course_factory(account: @account, sis_source_id: 'c01')
@@ -124,7 +124,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(importer.errors.last.last).to eq("Cannot move group category Gc001 because it has groups in it.")
   end
 
-  it "should delete and restore group categories" do
+  it "deletes and restore group categories" do
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc001,,Group Cat 1,active",
@@ -144,7 +144,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(group_category2.reload.deleted_at).to be_nil
   end
 
-  it "should not fail on refactored importer" do
+  it "does not fail on refactored importer" do
     importer = process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",
       "Gc002,A001,Group Cat 2,deleted"
@@ -152,7 +152,7 @@ describe SIS::CSV::GroupCategoryImporter do
     expect(importer.errors).to eq []
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_category_id,account_id,category_name,status",

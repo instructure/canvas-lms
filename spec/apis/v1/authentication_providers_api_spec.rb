@@ -52,7 +52,7 @@ describe "AuthenticationProviders API", type: :request do
                {}, {}, :expected_status => status)
     end
 
-    it "should return all aacs in position order" do
+    it "returns all aacs in position order" do
       @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "a"))
       @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "d"))
       config3 = @account.authentication_providers.create!(@saml_hash.merge(:idp_entity_id => "r"))
@@ -64,7 +64,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(res.map { |c| c['idp_entity_id'] }.join).to eq 'rad'
     end
 
-    it "should return unauthorized error" do
+    it "returns unauthorized error" do
       course_with_student(:course => @course)
       call_index(401)
     end
@@ -81,7 +81,7 @@ describe "AuthenticationProviders API", type: :request do
       json
     end
 
-    it "should create a saml aac" do
+    it "creates a saml aac" do
       json = call_create(@saml_hash)
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
@@ -109,14 +109,14 @@ describe "AuthenticationProviders API", type: :request do
       expect(ap).not_to be_mfa_required
     end
 
-    it "should work with rails form style params" do
+    it "works with rails form style params" do
       call_create({ :authentication_provider => @saml_hash })
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'saml'
       expect(aac.idp_entity_id).to eq 'http://example.com/saml1'
     end
 
-    it "should create multiple saml aacs" do
+    it "creates multiple saml aacs" do
       call_create(@saml_hash)
       call_create(@saml_hash.merge('idp_entity_id' => "secondeh"))
 
@@ -129,7 +129,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac2.position).to eq 2
     end
 
-    it "should create an ldap aac" do
+    it "creates an ldap aac" do
       call_create(@ldap_hash)
       aac = @account.authentication_providers.first
       expect(aac.auth_type).to eq 'ldap'
@@ -139,7 +139,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.auth_decrypted_password).to eq 'password1'
       expect(aac.position).to eq 1
     end
-    it "should create multiple ldap aacs" do
+    it "creates multiple ldap aacs" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2'))
       aac = @account.authentication_providers.first
@@ -149,12 +149,12 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac2.auth_host).to eq '127.0.0.2'
       expect(aac2.position).to eq 2
     end
-    it "should default ldap auth_over_tls to 'start_tls'" do
+    it "defaults ldap auth_over_tls to 'start_tls'" do
       call_create(@ldap_hash)
       expect(@account.authentication_providers.first.auth_over_tls).to eq 'start_tls'
     end
 
-    it "should create a cas aac" do
+    it "creates a cas aac" do
       call_create(@cas_hash)
 
       aac = @account.authentication_providers.first
@@ -168,7 +168,7 @@ describe "AuthenticationProviders API", type: :request do
       call_create(@saml_hash, 200)
     end
 
-    it "should update positions" do
+    it "updates positions" do
       call_create(@ldap_hash)
       call_create(@ldap_hash.merge('auth_host' => '127.0.0.2', 'position' => 1))
 
@@ -181,7 +181,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(@account.authentication_providers[2].auth_host).to eq '127.0.0.1'
     end
 
-    it "should error if empty post params sent" do
+    it "errors if empty post params sent" do
       json = call_create({}, 400)
       expect(json['errors'].first).to eq(
         {
@@ -193,7 +193,7 @@ describe "AuthenticationProviders API", type: :request do
       )
     end
 
-    it 'should return bad request for invalid auth type' do
+    it 'returns bad request for invalid auth type' do
       json = call_create({ auth_type: 'invalid' }, 400)
       expect(json['errors'].first).to eq(
         {
@@ -205,19 +205,19 @@ describe "AuthenticationProviders API", type: :request do
       )
     end
 
-    it "should return unauthorized error" do
+    it "returns unauthorized error" do
       course_with_student(:course => @course)
       call_create({}, 401)
     end
 
-    it "should disable open registration when setting delegated auth" do
+    it "disables open registration when setting delegated auth" do
       @account.settings = { open_registration: true }
       @account.save!
       call_create(@cas_hash)
       expect(@account.open_registration?).to be_falsey
     end
 
-    it "should not allow creation of duplicate singleton providers" do
+    it "does not allow creation of duplicate singleton providers" do
       call_create({ auth_type: 'facebook' })
       call_create({ auth_type: 'facebook' }, 422)
     end
@@ -228,7 +228,7 @@ describe "AuthenticationProviders API", type: :request do
       @aac = @account.authentication_providers.create!(@saml_hash)
     end
 
-    it "should allow updating without auth type" do
+    it "allows updating without auth type" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
                       { controller: 'authentication_providers',
                         action: 'update',
@@ -239,7 +239,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(json['log_in_url']).to eq 'http://example.com/updated_cool_log_in'
     end
 
-    it "should error when changing the type" do
+    it "errors when changing the type" do
       json = api_call(:put, "/api/v1/accounts/#{@account.id}/authentication_providers/#{@aac.id}",
                       { controller: 'authentication_providers',
                         action: 'update',
@@ -260,7 +260,7 @@ describe "AuthenticationProviders API", type: :request do
                {}, {}, :expected_status => status)
     end
 
-    it "should return saml aac" do
+    it "returns saml aac" do
       aac = @account.authentication_providers.create!(@saml_hash)
       json = call_show(aac.id)
 
@@ -279,7 +279,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(json).to eq @saml_hash
     end
 
-    it "should return ldap aac" do
+    it "returns ldap aac" do
       aac = @account.authentication_providers.create!(@ldap_hash)
       json = call_show(aac.id)
 
@@ -294,7 +294,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(json).to eq @ldap_hash
     end
 
-    it "should return cas aac" do
+    it "returns cas aac" do
       aac = @account.authentication_providers.create!(@cas_hash)
       json = call_show(aac.id)
 
@@ -307,16 +307,16 @@ describe "AuthenticationProviders API", type: :request do
       expect(json).to eq @cas_hash
     end
 
-    it "should 404" do
+    it "404S" do
       call_show(0, 404)
     end
 
-    it "should return unauthorized error" do
+    it "returns unauthorized error" do
       course_with_student(:course => @course)
       call_show(0, 401)
     end
 
-    it "should allow seeing the canvas auth type for any authenticated user" do
+    it "allows seeing the canvas auth type for any authenticated user" do
       @account.authentication_providers.create!(auth_type: 'canvas')
       course_with_student(:course => @course)
       call_show('canvas')
@@ -332,7 +332,7 @@ describe "AuthenticationProviders API", type: :request do
       json
     end
 
-    it "should update a saml aac" do
+    it "updates a saml aac" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
       call_update(aac.id, @saml_hash)
@@ -341,7 +341,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
-    it "should return error when it fails to update" do
+    it "returns error when it fails to update" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['metadata_uri'] = 'hahahaha_super_invalid'
       json = call_update(aac.id, @saml_hash, 422)
@@ -359,7 +359,7 @@ describe "AuthenticationProviders API", type: :request do
                                                                    'provisioning_only' => false })
     end
 
-    it "should work with rails form style params" do
+    it "works with rails form style params" do
       aac = @account.authentication_providers.create!(@saml_hash)
       @saml_hash['idp_entity_id'] = 'hahahaha'
       call_update(aac.id, { :authentication_provider => @saml_hash })
@@ -368,7 +368,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.idp_entity_id).to eq 'hahahaha'
     end
 
-    it "should update an ldap aac" do
+    it "updates an ldap aac" do
       aac = @account.authentication_providers.create!(@ldap_hash)
       @ldap_hash['auth_host'] = '192.168.0.1'
       call_update(aac.id, @ldap_hash)
@@ -377,7 +377,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.auth_host).to eq '192.168.0.1'
     end
 
-    it "should update a cas aac" do
+    it "updates a cas aac" do
       aac = @account.authentication_providers.create!(@cas_hash)
       @cas_hash['auth_base'] = '192.168.0.1'
       call_update(aac.id, @cas_hash)
@@ -386,13 +386,13 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac.auth_base).to eq '192.168.0.1'
     end
 
-    it "should error when mixing auth_types" do
+    it "errors when mixing auth_types" do
       aac = @account.authentication_providers.create!(@saml_hash)
       json = call_update(aac.id, @cas_hash, 400)
       expect(json['message']).to eq 'Can not change type of authorization config, please delete and create new config.'
     end
 
-    it "should update positions" do
+    it "updates positions" do
       @account.authentication_providers.create!(@ldap_hash)
       @ldap_hash['auth_host'] = '192.168.0.1'
       aac2 = @account.authentication_providers.create!(@ldap_hash)
@@ -402,11 +402,11 @@ describe "AuthenticationProviders API", type: :request do
       expect(@account.authentication_providers.first.id).to eq aac2.id
     end
 
-    it "should 404" do
+    it "404S" do
       call_update(0, {}, 404)
     end
 
-    it "should return unauthorized error" do
+    it "returns unauthorized error" do
       course_with_student(:course => @course)
       call_update(0, {}, 401)
     end
@@ -434,14 +434,14 @@ describe "AuthenticationProviders API", type: :request do
       json
     end
 
-    it "should delete" do
+    it "deletes" do
       aac = @account.authentication_providers.create!(@saml_hash)
       call_destroy(aac.id)
 
       expect(@account.non_canvas_auth_configured?).to be_falsey
     end
 
-    it "should reposition correctly" do
+    it "repositions correctly" do
       aac = @account.authentication_providers.create!(@saml_hash)
       aac2 = @account.authentication_providers.create!(@saml_hash)
       aac3 = @account.authentication_providers.create!(@saml_hash)
@@ -466,11 +466,11 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac4.position).to eq 2
     end
 
-    it "should 404" do
+    it "404S" do
       call_destroy(0, 404)
     end
 
-    it "should return unauthorized error" do
+    it "returns unauthorized error" do
       course_with_student(:course => @course)
       call_destroy(0, 401)
     end

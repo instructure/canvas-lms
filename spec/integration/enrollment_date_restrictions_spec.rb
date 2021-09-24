@@ -27,7 +27,7 @@ describe "enrollment_date_restrictions" do
     Account.default.tap { |a| a.settings[:restrict_student_future_view] = { :value => true } }.save!
   end
 
-  it "should not list inactive enrollments in the course list" do
+  it "does not list inactive enrollments in the course list" do
     @student = user_with_pseudonym
     @enrollment1 = course_factory(:course_name => "Course 1", :active_all => 1)
     e1 = student_in_course(:user => @student, :active_all => 1)
@@ -53,7 +53,7 @@ describe "enrollment_date_restrictions" do
     expect(page.css(".past_enrollments tr")).to be_empty
   end
 
-  it "should not show deleted enrollments in past enrollments when course is completed" do
+  it "does not show deleted enrollments in past enrollments when course is completed" do
     @student = user_with_pseudonym
     e1 = student_in_course(:user => @student, :active_all => 1)
 
@@ -70,7 +70,7 @@ describe "enrollment_date_restrictions" do
     expect(page.css(".past_enrollments tr")).to be_empty
   end
 
-  it "should not show date inactive/completed courses in grades" do
+  it "does not show date inactive/completed courses in grades" do
     @course1 = course_factory(active_all: true)
     @course2 = course_factory(active_all: true)
     @course3 = course_factory(active_all: true)
@@ -104,7 +104,7 @@ describe "enrollment_date_restrictions" do
     expect(response.body).to match /Active/
   end
 
-  it "should not included date-inactive courses when searching for pertinent contexts" do
+  it "does not included date-inactive courses when searching for pertinent contexts" do
     course_with_teacher(:active_all => 1)
     student_in_course(:active_all => 1)
     user_session(@student)

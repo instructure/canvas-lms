@@ -35,14 +35,14 @@ describe PlannerOverride do
                                                         marked_complete: false)
   end
 
-  it 'should link the planner override to the parent topic for a group discussion if given a child topic id' do
+  it 'links the planner override to the parent topic for a group discussion if given a child topic id' do
     group_assignment_discussion(course: @course)
     override1 = PlannerOverride.create!(user: @student, plannable: @topic)
     expect(override1.plannable_type).to eq 'DiscussionTopic'
     expect(override1.plannable_id).to eq @topic.root_topic_id
   end
 
-  it "should link the planner override to its submittable object instead of assignment if it has one" do
+  it "links the planner override to its submittable object instead of assignment if it has one" do
     assignment_model(course: @course, submission_types: 'discussion_topic')
     override1 = PlannerOverride.create!(user: @student, plannable: @assignment)
     expect(override1.plannable_type).to eq 'DiscussionTopic'
@@ -133,7 +133,7 @@ describe PlannerOverride do
   end
 
   describe "#for_user" do
-    it "should return all PlannerOverrides for specified user" do
+    it "returns all PlannerOverrides for specified user" do
       student_overrides = PlannerOverride.for_user(@student)
       expect(student_overrides.count).to eq 1
       expect(student_overrides.first.user_id).to eq @student.id
@@ -145,7 +145,7 @@ describe PlannerOverride do
   end
 
   describe "#update_for" do
-    it "should update the PlannerOverride for the given object" do
+    it "updates the PlannerOverride for the given object" do
       overrides = PlannerOverride.where(plannable_id: @assignment.id)
       expect(overrides.all? { |o| o.workflow_state == 'active' }).to be_truthy
 

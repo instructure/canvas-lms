@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 shared_examples_for "Canvas::DraftStateValidations" do
   describe ":validate_draft_state_change" do
-    it "should work" do
+    it "works" do
       subject.workflow_state = 'unpublished'
       allow(subject).to receive_messages(has_student_submissions?: true)
       allow(subject).to receive_messages(workflow_state_changed?: true)

@@ -25,7 +25,7 @@ describe BookmarkService do
     bookmark_service_model
   end
 
-  it "should include Delicious" do
+  it "includes Delicious" do
     expect(BookmarkService.included_modules).to be_include(Delicious)
   end
 
@@ -36,7 +36,7 @@ describe BookmarkService do
       allow(@bookmark_service).to receive(:diigo_post_bookmark).and_return(true)
     end
 
-    it "should be able to post a bookmark for diigo" do
+    it "is able to post a bookmark for diigo" do
       expect(@bookmark_service.service).to eql('diigo')
 
       expect(Diigo::Connection).to receive(:diigo_post_bookmark).with(
@@ -55,7 +55,7 @@ describe BookmarkService do
       )
     end
 
-    it "should be able to post a bookmark for delicious" do
+    it "is able to post a bookmark for delicious" do
       bookmark_service_model(:service => 'delicious')
 
       expect(@bookmark_service.service).to eql('delicious')
@@ -76,7 +76,7 @@ describe BookmarkService do
       )
     end
 
-    it "should rescue silently if something happens during the process" do
+    it "rescues silently if something happens during the process" do
       def @bookmark_service.diigo_post_bookmark(*args)
         raise ArgumentError
       end

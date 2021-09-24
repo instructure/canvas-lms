@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'db/migrate/20150709205405_create_k12_theme.rb'
 
 describe BrandConfig do
-  it "should create an instance with a parent_md5" do
+  it "creates an instance with a parent_md5" do
     @bc = BrandConfig.create(variables: { "ic-brand-primary" => "#321" }, parent_md5: "123")
     expect(@bc.valid?).to be_truthy
   end
@@ -50,7 +50,7 @@ describe BrandConfig do
       setup_subaccount_with_config
     end
 
-    it "should inherit effective_variables from its parent" do
+    it "inherits effective_variables from its parent" do
       expect(@subaccount_bc.variables.keys.include?("ic-brand-global-nav-bgd")).to be_truthy
       expect(@subaccount_bc.variables.keys.include?("ic-brand-primary")).to be_falsey
 
@@ -58,7 +58,7 @@ describe BrandConfig do
       expect(@subaccount_bc.effective_variables["ic-brand-primary"]).to eq "#321"
     end
 
-    it "should overwrite parent variables if explicitly stated" do
+    it "overwrites parent variables if explicitly stated" do
       @new_sub_bc = BrandConfig.for(
         variables: { "ic-brand-global-nav-bgd" => "#123", "ic-brand-primary" => "red" },
         parent_md5: @parent_config.md5,
@@ -79,7 +79,7 @@ describe BrandConfig do
       setup_subaccount_with_config
     end
 
-    it "should properly find ancestors" do
+    it "properlies find ancestors" do
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@parent_config)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@subaccount_bc)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.length).to eq 2

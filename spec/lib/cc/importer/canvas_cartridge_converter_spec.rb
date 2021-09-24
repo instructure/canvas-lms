@@ -41,7 +41,7 @@ describe "Canvas Cartridge importing" do
     @migration.save
   end
 
-  it "should import assignment groups" do
+  it "imports assignment groups" do
     ag1 = @copy_from.assignment_groups.new
     ag1.name = "Boring assignments"
     ag1.position = 1
@@ -124,7 +124,7 @@ describe "Canvas Cartridge importing" do
     expect(ag2_2.rules).to eq "drop_lowest:2\ndrop_highest:5\nnever_drop:%s\n" % a_2.id
   end
 
-  it "should import external tools" do
+  it "imports external tools" do
     tool1 = @copy_from.context_external_tools.new
     tool1.url = 'http://instructure.com'
     tool1.name = 'instructure'
@@ -236,7 +236,7 @@ describe "Canvas Cartridge importing" do
     expect(t2.settings[:custom_fields]).to eq({})
   end
 
-  it "should import multiple module links to same external tool" do
+  it "imports multiple module links to same external tool" do
     tool_from = @copy_from.context_external_tools.create!(:url => "http://example.com.ims/lti", :name => "test", :consumer_key => "key", :shared_secret => "secret")
     tool_mig_id = CC::CCHelper.create_key(tool_from)
     tool_to = @copy_to.context_external_tools.create(:url => "http://example.com.ims/lti", :name => "test", :consumer_key => "key", :shared_secret => "secret")
@@ -276,7 +276,7 @@ describe "Canvas Cartridge importing" do
     expect(tag.url).to eq "http://example.com.ims/lti"
   end
 
-  it "should import external feeds" do
+  it "imports external feeds" do
     ef = @copy_from.external_feeds.new
     ef.url = "http://search.twitter.com/search.atom?q=instructure"
     ef.title = "Instructure on Twitter"
@@ -301,7 +301,7 @@ describe "Canvas Cartridge importing" do
     expect(ef_2.header_match).to eq ef.header_match
   end
 
-  it "should import grading standards" do
+  it "imports grading standards" do
     gs = @copy_from.grading_standards.new
     gs.title = "Standard eh"
     gs.data = [["A", 0.93], ["A-", 0.89], ["B+", 0.85], ["B", 0.83], ["B!-", 0.80], ["C+", 0.77], ["C", 0.74], ["C-", 0.70], ["D+", 0.67], ["D", 0.64], ["D-", 0.61], ["F", 0]]
@@ -322,7 +322,7 @@ describe "Canvas Cartridge importing" do
     expect(gs_2.data).to eq gs.data
   end
 
-  it "should import v1 grading standards" do
+  it "imports v1 grading standards" do
     doc = Nokogiri::XML(%{
 <?xml version="1.0" encoding="UTF-8"?>
 <gradingStandards xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://canvas.instructure.com/xsd/cccv1p0" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
@@ -369,7 +369,7 @@ describe "Canvas Cartridge importing" do
     @copy_to.save!
   end
 
-  it "should import learning outcomes" do
+  it "imports learning outcomes" do
     lo = create_learning_outcome
 
     lo_g = @copy_from.learning_outcome_groups.new
@@ -418,7 +418,7 @@ describe "Canvas Cartridge importing" do
     expect(lo_g2_2.child_outcome_links.length).to eq 0
   end
 
-  it "should import rubrics" do
+  it "imports rubrics" do
     # create an outcome to reference
     lo = create_learning_outcome
     import_learning_outcomes
@@ -629,7 +629,7 @@ describe "Canvas Cartridge importing" do
     end
   end
 
-  it "should translate attachment links on import" do
+  it "translates attachment links on import" do
     attachment = Attachment.create!(:filename => 'ohai there.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
     attachment_import = factory_with_protected_attributes(Attachment, :filename => 'ohai there.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_to), :context => @copy_to, :migration_id => 'ohai')
     body_with_link = %{<p>Watup? <strong>eh?</strong>
@@ -659,7 +659,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.body).to eq body_with_link % ([@copy_to.id, attachment_import.id] * 4)
   end
 
-  it "should translate media file links on import" do
+  it "translates media file links on import" do
     media_id = 'm_mystiry'
     att = Attachment.create!(:filename => 'video.mp4',
                              :uploaded_data => StringIO.new('stuff'),
@@ -724,7 +724,7 @@ describe "Canvas Cartridge importing" do
     expect(frame['src']).to eq "/media_objects_iframe/#{media_id}?type=video"
   end
 
-  it "should import wiki pages" do
+  it "imports wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
     @copy_from.wiki_pages.create!(:title => "assignments", :body => "ohai")
     @copy_to.wiki_pages.create!(:title => "assignments", :body => "ohai")
@@ -786,7 +786,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.unpublished?).to eq true
   end
 
-  it "should import migrate inline external tool URLs in wiki pages" do
+  it "imports migrate inline external tool URLs in wiki pages" do
     # make sure that the wiki page we're linking to in the test below exists
     page = @copy_from.wiki_pages.create!(:title => "blti-link", :body => "<a href='/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape('http://www.example.com')}'>link</a>")
     @copy_from.save!
@@ -807,7 +807,7 @@ describe "Canvas Cartridge importing" do
     expect(page_2.body).to match(/\/courses\/#{@copy_to.id}\/external_tools\/retrieve/)
   end
 
-  it "should import assignments" do
+  it "imports assignments" do
     allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "lock_at" => "yes",
                                                                        "assignment_group" => "yes",
                                                                        "title" => "yes",
@@ -877,7 +877,7 @@ describe "Canvas Cartridge importing" do
     expect(asmnt_2.copied).to eq true
   end
 
-  it "should import external tool assignments" do
+  it "imports external tool assignments" do
     course_with_teacher
     assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
     tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
@@ -907,7 +907,7 @@ describe "Canvas Cartridge importing" do
     expect(tag_to.new_tab).to eq tag_from.new_tab
   end
 
-  it "should add error for invalid external tool urls" do
+  it "adds error for invalid external tool urls" do
     xml = <<~XML
       <assignment identifier="ia24c092694901d2a5529c142accdaf0b">
         <title>assignment title</title>
@@ -934,7 +934,7 @@ describe "Canvas Cartridge importing" do
     expect(@migration.warnings).to eq ["The url for the external tool assignment \"assignment title\" wasn't valid."]
   end
 
-  it "should import announcements (discussion topics)" do
+  it "imports announcements (discussion topics)" do
     body_with_link = "<p>Watup? <strong>eh?</strong><a href=\"/courses/%s/assignments\">Assignments</a></p>"
     dt = @copy_from.announcements.new
     dt.title = "Topic"
@@ -965,7 +965,7 @@ describe "Canvas Cartridge importing" do
     expect(dt_2.type).to eq dt.type
   end
 
-  it "should import assignment discussion topic" do
+  it "imports assignment discussion topic" do
     body_with_link = "<p>What do you think about the <a href=\"/courses/%s/grades\">grades?</a>?</p>"
     dt = @copy_from.discussion_topics.new
     dt.title = "Topic"
@@ -1019,7 +1019,7 @@ describe "Canvas Cartridge importing" do
     expect(a.assignment_group.id).to eq ag1.id
   end
 
-  it "should not fail when importing discussion topic when both group_id and assignment are specified" do
+  it "does not fail when importing discussion topic when both group_id and assignment are specified" do
     body = "<p>What do you think about the stuff?</p>"
     group = @copy_from.groups.create!(:name => "group")
     dt = group.discussion_topics.new
@@ -1067,7 +1067,7 @@ describe "Canvas Cartridge importing" do
     expect(dt_2.type).to eq dt.type
   end
 
-  it "should import quizzes into correct assignment group" do
+  it "imports quizzes into correct assignment group" do
     quiz_hash = { "lock_at" => nil,
                   "questions" => [],
                   "title" => "Assignment Quiz",
@@ -1120,7 +1120,7 @@ describe "Canvas Cartridge importing" do
     expect(q.assignment_group_id).to eq ag.id
   end
 
-  it "should import quizzes' assignment from a migration id" do
+  it "imports quizzes' assignment from a migration id" do
     assignment = @copy_from.assignments.build
     assignment.title = "Don't care"
     assignment.points_possible = 13.37
@@ -1180,7 +1180,7 @@ describe "Canvas Cartridge importing" do
     expect(a.submission_types).to eq "online_quiz"
   end
 
-  it "should convert media tracks" do
+  it "converts media tracks" do
     doc = Nokogiri::XML(<<-XML)
       <?xml version="1.0" encoding="UTF-8"?>
       <media_tracks xmlns="http://canvas.instructure.com/xsd/cccv1p0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://canvas.instructure.com/xsd/cccv1p0 http://canvas.instructure.com/xsd/cccv1p0.xsd">
@@ -1196,7 +1196,7 @@ describe "Canvas Cartridge importing" do
                                                         })
   end
 
-  it "should import media tracks" do
+  it "imports media tracks" do
     media_objects_folder = Folder.create! context: @copy_to, name: CC::CCHelper::MEDIA_OBJECTS_FOLDER, parent_folder: Folder::root_folders(@course).first
     media_file = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv', uploaded_data: StringIO.new('pretend this is a media file'))
     media_file.migration_id = 'xyz'
@@ -1263,7 +1263,7 @@ describe "Canvas Cartridge importing" do
   end
 
   context "warnings for missing links in imported html" do
-    it "should add warnings for assessment questions" do
+    it "adds warnings for assessment questions" do
       data = {
         "assessment_questions" => {
           "assessment_questions" => [{
@@ -1295,7 +1295,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.error_message).to include("question_text")
     end
 
-    it "should add warnings for assignments" do
+    it "adds warnings for assignments" do
       data = {
         "assignments" => [{
           "position" => 2,
@@ -1329,7 +1329,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.error_message).to include("description")
     end
 
-    it "should add warnings for calendar events" do
+    it "adds warnings for calendar events" do
       data = {
         "calendar_events" => [{
           "migration_id" => "id4bebe19c7b729e22543bed8a5a02dcb",
@@ -1362,7 +1362,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/calendar_events/#{event.id}"
     end
 
-    it "should add warnings for course syllabus" do
+    it "adds warnings for course syllabus" do
       data = {
         "course" => {
           "syllabus_body" => "<a href='%24CANVAS_COURSE_REFERENCE%24/modules/items/9001'>moar bad links? nooo</a>"
@@ -1380,7 +1380,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/assignments/syllabus"
     end
 
-    it "should add warnings for discussion topics" do
+    it "adds warnings for discussion topics" do
       data = {
         "discussion_topics" => [{
           "description" => "<a href='%24WIKI_REFERENCE%24/nope'>yet another bad link</a>",
@@ -1423,7 +1423,7 @@ describe "Canvas Cartridge importing" do
       expect(warning2.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}"
     end
 
-    it "should add warnings for quizzes" do
+    it "adds warnings for quizzes" do
       data = {
         "assessments" => {
           "assessments" => [{
@@ -1466,7 +1466,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}"
     end
 
-    it "should add warnings for quiz questions" do
+    it "adds warnings for quiz questions" do
       data = {
         "assessments" => {
           "assessments" => [{
@@ -1517,7 +1517,7 @@ describe "Canvas Cartridge importing" do
       expect(warning.fix_issue_html_url).to eq "/courses/#{@copy_to.id}/quizzes/#{quiz.id}/edit"
     end
 
-    it "should add warnings for wiki pages" do
+    it "adds warnings for wiki pages" do
       data = {
         "wikis" => [{
           "title" => "Credit Options",
@@ -1560,7 +1560,7 @@ describe "cc assignment extensions" do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
-  it "should parse canvas data from cc extension" do
+  it "parses canvas data from cc extension" do
     expect(@migration.migration_issues.count).to eq 0
 
     att = @course.attachments.where(migration_id: 'ieee173de6109d169c627d07bedae0595').first
@@ -1603,7 +1603,7 @@ describe "matching question reordering" do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
   end
 
-  it "should reorder matching question answers with images if possible (and warn otherwise)" do
+  it "reorders matching question answers with images if possible (and warn otherwise)" do
     expect(@migration.migration_issues.count).to eq 2
     expect(@course.assessment_questions.count).to eq 3
 
@@ -1644,12 +1644,12 @@ describe "matching question reordering" do
       @migration.migration_type = "canvas_cartridge_importer"
     end
 
-    it "should separate the announcements into a separate array in the course hash" do
+    it "separates the announcements into a separate array in the course hash" do
       expect(@course_data[:announcements].count).to eq 1
       expect(@course_data[:discussion_topics].count).to eq 1
     end
 
-    it "should not import announcements with discussion topics" do
+    it "does not import announcements with discussion topics" do
       @migration.migration_settings[:migration_ids_to_import] = { :copy => { :all_discussion_topics => "1" } }
       enable_cache do
         Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)
@@ -1659,7 +1659,7 @@ describe "matching question reordering" do
       expect(@course.discussion_topics.only_discussion_topics.count).to eq 1
     end
 
-    it "should not import discussion topics with announcements" do
+    it "does not import discussion topics with announcements" do
       @migration.migration_settings[:migration_ids_to_import] = { :copy => { :all_announcements => "1" } }
       enable_cache do
         Importers::CourseContentImporter.import_content(@course, @course_data, nil, @migration)

@@ -39,7 +39,7 @@ describe UserPreferenceValue do
     u
   }
 
-  it "should create a new row when setting a new value" do
+  it "creates a new row when setting a new value" do
     u = User.create!
     expect(u.user_preference_values.count).to eq 0
     u.set_preference(regular_key, "data")
@@ -49,7 +49,7 @@ describe UserPreferenceValue do
     expect(u.get_preference(subbed_key, "subkey")).to eq "more data"
   end
 
-  it "should update an existing row when setting a new value" do
+  it "updates an existing row when setting a new value" do
     regular_row = migrated_user.user_preference_values.where(:key => regular_key).first
     migrated_user.set_preference(regular_key, "new data")
     expect(regular_row.reload.value).to eq "new data"
@@ -61,12 +61,12 @@ describe UserPreferenceValue do
     expect(migrated_user.get_preference(subbed_key, :a)).to eq "more new data"
   end
 
-  it "should use the existing data if the user's preferences hasn't been migrated yet" do
+  it "uses the existing data if the user's preferences hasn't been migrated yet" do
     expect(preexisting_user.preferences[regular_key]).to eq sample_preferences[regular_key]
     expect(preexisting_user.preferences[subbed_key]).to eq sample_preferences[subbed_key]
   end
 
-  it "should not migrate all existing preferences automatically on save unless to a migrated preference" do
+  it "does not migrate all existing preferences automatically on save unless to a migrated preference" do
     expect(preexisting_user.needs_preference_migration?).to eq true
     preexisting_user.save!
 
@@ -85,20 +85,20 @@ describe UserPreferenceValue do
     )
   end
 
-  it "should not query for preferences when saving an unrelated attribute on an already migrated user" do
+  it "does not query for preferences when saving an unrelated attribute on an already migrated user" do
     expect(migrated_user).to_not receive(:user_preference_values)
     migrated_user.update_attribute(:name, "name1")
     User.find(migrated_user.id).update_attribute(:name, "name2")
   end
 
-  it "shouldn't have to query to load preferences if the values are empty" do
+  it "does not have to query to load preferences if the values are empty" do
     migrated_user.set_preference(regular_key, [])
     reloaded_user = User.find(migrated_user.id)
     expect(reloaded_user).to_not receive(:user_preference_values)
     expect(reloaded_user.get_preference(regular_key)).to eq []
   end
 
-  it "shouldn't have to query to load preferences if the values are empty for a sub key" do
+  it "does not have to query to load preferences if the values are empty for a sub key" do
     migrated_user.clear_all_preferences_for(subbed_key)
     expect(migrated_user.user_preference_values.where(:key => subbed_key).distinct.pluck(:value)).to eq [nil]
     expect(migrated_user.preferences[subbed_key]).to eq({})
@@ -132,7 +132,7 @@ describe UserPreferenceValue do
       }
     }
 
-    it "should split the old gradebook column size preference by course" do
+    it "splits the old gradebook column size preference by course" do
       u = User.create!
       User.where(:id => u).update_all(:preferences => { :gradebook_column_size => old_format })
       u.reload
@@ -147,7 +147,7 @@ describe UserPreferenceValue do
       )
     end
 
-    it "should not attempt to re-migrate when a new non-migrated preference value appears" do
+    it "does not attempt to re-migrate when a new non-migrated preference value appears" do
       u = User.create!
       User.where(:id => u).update_all(:preferences => { :closed_notifications => [], :gradebook_column_size => old_format })
       u.reload
@@ -159,7 +159,7 @@ describe UserPreferenceValue do
       expect(u.user_preference_values.where(key: 'closed_notifications').take.value).to eq [123]
     end
 
-    it "should work even if the objects are from a different shard than the user" do
+    it "works even if the objects are from a different shard than the user" do
       old_format # instantiate on default shard
       @shard1.activate do
         u = User.create!

@@ -29,7 +29,7 @@ describe "course statistics" do
     @student3 = student_in_course(:active_all => true, :name => "Howard Wolowitz").user
   end
 
-  it "should show most recent logged in users" do
+  it "shows most recent logged in users" do
     pseudonym(@student1) # no login info
     pseudonym(@student2).tap { |p| p.current_login_at = 1.days.ago; p.save! }
     pseudonym(@student3).tap { |p| p.current_login_at = 2.days.ago; p.save! }
@@ -52,7 +52,7 @@ describe "course statistics" do
     expect(links[2]['href'].end_with?("/courses/#{@course.id}/users/#{@student1.id}")).to eq true
   end
 
-  it "should show a deduped count" do
+  it "shows a deduped count" do
     section2 = @course.course_sections.create!
     student_in_course(:active_all => true, :user => @student1, :section => section2, :allow_multiple_enrollments => true)
     invited_student = user_factory(:active_all => true)

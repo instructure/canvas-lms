@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "User Content" do
   describe "ContextController#object_snippet" do
-    it "should reject object_snippet on non-safefiles domain" do
+    it "rejects object_snippet on non-safefiles domain" do
       allow(HostUrl).to receive(:is_file_host?).with("files.example.com").and_return(true)
       allow(HostUrl).to receive(:is_file_host?).with("canvas.example.com").and_return(false)
       allow(HostUrl).to receive(:has_file_host?).and_return(true)
@@ -39,7 +39,7 @@ describe "User Content" do
       expect(response.body).to be_blank
     end
 
-    it "should allow object_snippet if there is no safefiles domain configured" do
+    it "allows object_snippet if there is no safefiles domain configured" do
       allow(HostUrl).to receive(:default_host).and_return("canvas.example.com")
       allow(HostUrl).to receive(:file_host).and_return("canvas.example.com")
 

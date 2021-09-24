@@ -126,14 +126,14 @@ describe Quizzes::QuizReportsController, type: :request do
       @user = @me
     end
 
-    it "should create a new report" do
+    it "creates a new report" do
       expect(Quizzes::QuizStatistics.count).to eq 0
       json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
       expect(Quizzes::QuizStatistics.count).to eq 1
       expect(json['id']).to eq Quizzes::QuizStatistics.first.id
     end
 
-    it "should reuse an existing report" do
+    it "reuses an existing report" do
       @quiz.statistics_csv('item_analysis')
       expect(Quizzes::QuizStatistics.count).to eq 1
       json = api_create({ :quiz_report => { :report_type => "item_analysis" } })
@@ -142,7 +142,7 @@ describe Quizzes::QuizReportsController, type: :request do
     end
 
     context 'JSON-API' do
-      it "should create a new report" do
+      it "creates a new report" do
         expect(Quizzes::QuizStatistics.count).to eq 0
 
         json = api_create({
@@ -162,7 +162,7 @@ describe Quizzes::QuizReportsController, type: :request do
       JOB_TAG = Quizzes::QuizStatistics.csv_job_tag
       let(:report_type) { 'student_analysis' }
 
-      it "should work when a job had failed previously" do
+      it "works when a job had failed previously" do
         stats, original_job = *begin
           allow_any_instance_of(Quizzes::QuizStatistics::StudentAnalysis).to receive(:to_csv) {
             throw 'simulated failure'
@@ -194,7 +194,7 @@ describe Quizzes::QuizReportsController, type: :request do
         expect(original_job.id).not_to eq new_job.id
       end
 
-      it "should return 409 when report is being/already generated" do
+      it "returns 409 when report is being/already generated" do
         stats = @quiz.current_statistics_for(report_type, includes_sis_ids: true)
         stats.generate_csv_in_background
 

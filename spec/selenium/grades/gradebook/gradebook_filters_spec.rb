@@ -44,7 +44,7 @@ describe "Filter" do
       user_session(@teacher)
     end
 
-    it "should allow showing only one module", test_id: 3253290, priority: "1" do
+    it "allows showing only one module", test_id: 3253290, priority: "1" do
       Gradebook.visit(@course)
       Gradebook.module_dropdown_item_click(@modules[0].name)
 
@@ -66,7 +66,7 @@ describe "Filter" do
       show_grading_periods_filter(@teacher)
     end
 
-    it "should allow showing only one grading period", test_id: 3253292, priority: "1" do
+    it "allows showing only one grading period", test_id: 3253292, priority: "1" do
       assign1 = @course.assignments.create! title: "Assign1", due_at: 1.week.from_now
       assign2 = @course.assignments.create! title: "Assign2", due_at: 1.week.ago
 
@@ -86,7 +86,7 @@ describe "Filter" do
 
     before(:each) { user_session(@teacher) }
 
-    it "should handle multiple enrollments correctly" do
+    it "handles multiple enrollments correctly" do
       @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
       Gradebook.visit(@course)
@@ -104,7 +104,7 @@ describe "Filter" do
       expect(meta_cells[0]).to include_text @student_name_1
     end
 
-    it "should allow showing only a certain section", priority: "1", test_id: 3253291 do
+    it "allows showing only a certain section", priority: "1", test_id: 3253291 do
       Gradebook.visit(@course)
       Gradebook.select_section("All Sections")
 
@@ -133,7 +133,7 @@ describe "Filter" do
 
     before(:each) { user_session(@teacher) }
 
-    it "should allow showing only a specific student group", priority: "1" do
+    it "allows showing only a specific student group", priority: "1" do
       Gradebook.visit(@course)
       Gradebook.select_student_group("All Student Groups")
 

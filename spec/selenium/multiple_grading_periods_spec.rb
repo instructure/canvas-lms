@@ -50,7 +50,7 @@ describe "interaction with grading periods" do
       clear_local_storage
     end
 
-    it "should display the correct grading period based on the GET param" do
+    it "displays the correct grading period based on the GET param" do
       future_period = @course.grading_periods.detect { |gp| gp.start_date.future? }
       get "/courses/#{@course.id}/gradebook?grading_period_id=#{future_period.id}"
       Gradebook.select_view_dropdown
@@ -59,7 +59,7 @@ describe "interaction with grading periods" do
       expect(Gradebook.grading_period_dropdown).to have_value(future_period.title)
     end
 
-    it "should display All Grading Periods when grading period id is set to 0" do
+    it "displays All Grading Periods when grading period id is set to 0" do
       get "/courses/#{@course.id}/gradebook?grading_period_id=0"
       Gradebook.select_view_dropdown
       Gradebook.select_filters
@@ -67,7 +67,7 @@ describe "interaction with grading periods" do
       expect(Gradebook.grading_period_dropdown).to have_value("All Grading Periods")
     end
 
-    it "should display the current grading period without a GET param" do
+    it "displays the current grading period without a GET param" do
       current_period = @course.grading_periods.detect { |gp| gp.start_date.past? && gp.end_date.future? }
       get "/courses/#{@course.id}/gradebook"
       Gradebook.select_view_dropdown
@@ -77,7 +77,7 @@ describe "interaction with grading periods" do
     end
 
     context "using grading period dropdown" do
-      it 'should display current grading period on load', test_id: 2528634, priority: "2" do
+      it 'displays current grading period on load', test_id: 2528634, priority: "2" do
         get_gradebook
         element = ff('.slick-header-column a').select { |a| a.text == 'assignment three' }
         expect(element.first).to be_displayed
@@ -113,7 +113,7 @@ describe "interaction with grading periods" do
     let(:admin) { account_admin_user(:account => account) }
     let(:test_course) { account.courses.create!(name: 'New Course') }
 
-    it 'should disable adding during edit mode on course page', priority: "1", test_id: 545585 do
+    it 'disables adding during edit mode on course page', priority: "1", test_id: 545585 do
       user_session(admin)
       get "/courses/#{test_course.id}/grading_standards"
       f('button.add_standard_button').click
@@ -121,7 +121,7 @@ describe "interaction with grading periods" do
       expect(f('button.add_standard_button')).to have_class('disabled')
     end
 
-    it 'should disable adding during edit mode on account page', priority: "1" do
+    it 'disables adding during edit mode on account page', priority: "1" do
       user_session(admin)
       get "/accounts/#{account.id}/grading_standards"
       f('#react_grading_tabs a[href="#grading-standards-tab"]').click
@@ -158,13 +158,13 @@ describe "interaction with grading periods" do
         )
       end
 
-      it 'should list an assignment from a previous grading period', priority: "2", test_course: 381145 do
+      it 'lists an assignment from a previous grading period', priority: "2", test_course: 381145 do
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
         expect(f("#assignment_#{assignment.id} a.ig-title")).to include_text('Assignment 1')
       end
 
-      it 'should list an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
+      it 'lists an assignment from a current grading period when due date is updated', priority: "2", test_course: 576764 do
         assignment.update(due_at: 3.days.from_now(now))
         user_session(teacher)
         get "/courses/#{test_course.id}/assignments"
@@ -205,18 +205,18 @@ describe "interaction with grading periods" do
       get "/courses/#{test_course.id}/grades"
     end
 
-    it 'should display the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
+    it 'displays the current grading period and assignments in grades page', priority: "1", test_id: 202326 do
       expect(f("#grading_period_select_menu").attribute('value')).to eq "Course Grading Period 1"
       expect(f("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')
     end
 
-    it 'should update assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
+    it 'updates assignments when a different period is selected in grades page', priority: "1", test_id: 562596 do
       click_option('#grading_period_select_menu', 'Course Grading Period 2')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment2.id} th a")).to include_text('Assignment 2')
     end
 
-    it 'should update assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
+    it 'updates assignments when a all periods are selected in grades page', priority: "1", test_id: 571756 do
       click_option("#grading_period_select_menu", 'All Grading Periods')
       expect_new_page_load { f('#apply_select_menus').click }
       expect(fj("#submission_#{assignment1.id} th a")).to include_text('Assignment 1')

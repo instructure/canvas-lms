@@ -46,7 +46,7 @@ describe "conversations new" do
       site_admin_logged_in
     end
 
-    it "should allow a site admin to enable faculty journal", priority: "2", test_id: 75005 do
+    it "allows a site admin to enable faculty journal", priority: "2", test_id: 75005 do
       get account_settings_url
       f('#account_enable_user_notes').click
       f('.Button.Button--primary[type="submit"]').click
@@ -61,7 +61,7 @@ describe "conversations new" do
       @course.account.update_attribute(:enable_user_notes, true)
     end
 
-    it "should check the Journal messages for correct time and sender", priority: "1", test_id: 75701 do
+    it "checks the Journal messages for correct time and sender", priority: "1", test_id: 75701 do
       user_session(@teacher)
       conversations
       compose course: @course, subject: 'Christmas', to: [@s1], body: 'The Fat Man cometh.', journal: true, send: true
@@ -73,7 +73,7 @@ describe "conversations new" do
       expect(f('.creator_name')).to include_text(time)
     end
 
-    it "should allow an admin to delete a Journal message", priority: "1", test_id: 75703 do
+    it "allows an admin to delete a Journal message", priority: "1", test_id: 75703 do
       skip_if_safari(:alert)
       user_session(@teacher)
       conversations
@@ -87,7 +87,7 @@ describe "conversations new" do
       expect(f('.title.subject').text).to eq('')
     end
 
-    it "should allow a new entry by an admin", priority: "1", test_id: 75702 do
+    it "allows a new entry by an admin", priority: "1", test_id: 75702 do
       get student_user_notes_url
       f('#new_user_note_button').click
       wait_for_ajaximations # wait for the form to `.slideDown()`
@@ -112,12 +112,12 @@ describe "conversations new" do
       conversations
     end
 
-    it "should go to the user_notes page", priority: "1", test_id: 133090 do
+    it "goes to the user_notes page", priority: "1", test_id: 133090 do
       get user_notes_url
       expect(f('#breadcrumbs')).to include_text('Faculty Journal')
     end
 
-    it "should be allowed on new private conversations with students", priority: "1", test_id: 207094 do
+    it "is allowed on new private conversations with students", priority: "1", test_id: 207094 do
       compose course: @course, to: [@s1, @s2], body: 'hallo!', send: false
       checkbox = f('.user_note')
       expect(checkbox).to be_displayed
@@ -129,7 +129,7 @@ describe "conversations new" do
       expect(@s2.user_notes.reload.count).to eq count2 + 1
     end
 
-    it "should be allowed with student groups", priority: "1", test_id: 207093 do
+    it "is allowed with student groups", priority: "1", test_id: 207093 do
       compose course: @course, to: [@group], body: 'hallo!', send: false
       checkbox = f('.user_note')
       expect(checkbox).to be_displayed
@@ -139,26 +139,26 @@ describe "conversations new" do
       expect(@s1.user_notes.reload.count).to eq count1 + 1
     end
 
-    it "should not be allowed if disabled", priority: "1", test_id: 207092 do
+    it "is not allowed if disabled", priority: "1", test_id: 207092 do
       @course.account.update_attribute(:enable_user_notes, false)
       conversations
       compose course: @course, to: [@s1], body: 'hallo!', send: false
       expect(f('.user_note')).not_to be_displayed
     end
 
-    it "should not be allowed for students", priority: "1", test_id: 138686 do
+    it "is not allowed for students", priority: "1", test_id: 138686 do
       user_session(@s1)
       conversations
       compose course: @course, to: [@s2], body: 'hallo!', send: false
       expect(f('.user_note')).not_to be_displayed
     end
 
-    it "should not be allowed with non-student recipient", priority: "1", test_id: 138687 do
+    it "is not allowed with non-student recipient", priority: "1", test_id: 138687 do
       compose course: @course, to: [@teacher], body: 'hallo!', send: false
       expect(f('.user_note')).not_to be_displayed
     end
 
-    it "should have the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
+    it "has the Journal entry checkbox come back unchecked", priority: "1", test_id: 523385 do
       f('#compose-btn').click
       wait_for_ajaximations
       expect(f('.user_note')).not_to be_displayed
@@ -179,7 +179,7 @@ describe "conversations new" do
       expect(is_checked('.user_note')).not_to be_present
     end
 
-    it "should have the Journal entry checkbox visible", priority: "1", test_id: 75008 do
+    it "has the Journal entry checkbox visible", priority: "1", test_id: 75008 do
       f('#compose-btn').click
       wait_for_ajaximations
       expect(f('.user_note')).not_to be_displayed
@@ -192,7 +192,7 @@ describe "conversations new" do
       expect(f('.user_note')).to be_displayed
     end
 
-    it "should send a message with faculty journal checked", priority: "1", test_id: 75433 do
+    it "sends a message with faculty journal checked", priority: "1", test_id: 75433 do
       conversations
       # First verify teacher can send a message with faculty journal entry checked to one student
       compose course: @course, to: [@s1], body: 'hallo!', journal: true, send: true

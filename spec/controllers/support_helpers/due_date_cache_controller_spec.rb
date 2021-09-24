@@ -22,19 +22,19 @@ require 'spec_helper'
 
 describe SupportHelpers::DueDateCacheController do
   describe 'require_site_admin' do
-    it 'should redirect to root url if current user is not a site admin' do
+    it 'redirects to root url if current user is not a site admin' do
       account_admin_user
       user_session(@user)
       get :course
       assert_unauthorized
     end
 
-    it 'should redirect to login if current user is not logged in' do
+    it 'redirects to login if current user is not logged in' do
       get :course
       assert_unauthorized
     end
 
-    it 'should render 400 if current user is a site admin and there is no course_id' do
+    it 'renders 400 if current user is a site admin and there is no course_id' do
       site_admin_user
       user_session(@user)
       get :course
@@ -48,7 +48,7 @@ describe SupportHelpers::DueDateCacheController do
       end
 
       context 'course' do
-        it "should create a new CourseFixer" do
+        it "creates a new CourseFixer" do
           fixer = SupportHelpers::DueDateCache::CourseFixer.new(@user.email, nil, 1234, @user.id)
           expect(SupportHelpers::DueDateCache::CourseFixer).to receive(:new)
             .with(@user.email, nil, 1234, @user.id).and_return(fixer)

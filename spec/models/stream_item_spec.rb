@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe StreamItem do
-  it "should not infer a user_id for DiscussionTopic" do
+  it "does not infer a user_id for DiscussionTopic" do
     user_factory
     context = Course.create!
     dt = DiscussionTopic.create!(:context => context)
@@ -33,7 +33,7 @@ describe StreamItem do
     expect(data.user_id).to be_nil
   end
 
-  it "should prefer a Context for Message stream item context" do
+  it "prefers a Context for Message stream item context" do
     notification_model(:name => 'Assignment Created')
     course_with_student(:active_all => true)
     assignment_model(:course => @course)
@@ -74,7 +74,7 @@ describe StreamItem do
   end
 
   describe "destroy_stream_items_using_setting" do
-    it "should have a default ttl" do
+    it "has a default ttl" do
       si1 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
       si2 = StreamItem.create! { |si| si.asset_type = 'Message'; si.data = { notification_id: nil } }
       StreamItem.where(:id => si2).update_all(:updated_at => 1.year.ago)
@@ -89,7 +89,7 @@ describe StreamItem do
   context "across shards" do
     specs_require_sharding
 
-    it "should delete instances on all associated shards" do
+    it "deletes instances on all associated shards" do
       course_with_teacher(:active_all => 1)
       @user2 = @shard1.activate { user_model }
       @course.enroll_student(@user2).accept!
@@ -101,7 +101,7 @@ describe StreamItem do
       expect(@user2.recent_stream_items).to eq []
     end
 
-    it "should not find stream items for courses from the wrong shard" do
+    it "does not find stream items for courses from the wrong shard" do
       course_with_teacher(:active_all => 1)
       @shard1.activate do
         @user2 = user_model
@@ -121,7 +121,7 @@ describe StreamItem do
       end
     end
 
-    it "should always cache stream items on the user's shard" do
+    it "alwayses cache stream items on the user's shard" do
       course_with_teacher(:active_all => 1)
       @user2 = @shard1.activate { user_model }
       @course.enroll_student(@user2).accept!
@@ -145,7 +145,7 @@ describe StreamItem do
     end
   end
 
-  it "should return a title for a Conversation" do
+  it "returns a title for a Conversation" do
     user_factory
     convo = Conversation.create!(:subject => "meow")
     convo.generate_stream_items([@user])
@@ -155,7 +155,7 @@ describe StreamItem do
     expect(data.title).to eql("meow")
   end
 
-  it "should not unhide stream item instances when someone 'deletes' a message" do
+  it "does not unhide stream item instances when someone 'deletes' a message" do
     users = (0..2).map { |x| user_factory }
     user1, user2, user3 = users
     convo = Conversation.initiate(users, false)
@@ -170,7 +170,7 @@ describe StreamItem do
     expect(StreamItem.find(si.id).data(user2.id).latest_messages_from_stream_item).to be_empty
   end
 
-  it "should return a description for a Collaboration" do
+  it "returns a description for a Collaboration" do
     user_factory
     context = Course.create!
     collab = Collaboration.create!(:context => context, :description => "meow", :title => "kitty")

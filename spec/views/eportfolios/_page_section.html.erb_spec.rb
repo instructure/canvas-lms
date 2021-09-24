@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/eportfolios/_page_section" do
-  it "should render" do
+  it "renders" do
     eportfolio_with_user
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
@@ -34,7 +34,7 @@ describe "/eportfolios/_page_section" do
   context 'sharding' do
     specs_require_sharding
 
-    it 'should render cross-shard attachments' do
+    it 'renders cross-shard attachments' do
       @shard2.activate do
         eportfolio_with_user
         category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))

@@ -80,7 +80,7 @@ shared_examples_for "file uploads api" do
     json
   end
 
-  it "should upload (local files)" do
+  it "uploads (local files)" do
     filename = "my_essay.doc"
     content = "this is a test doc"
 
@@ -147,7 +147,7 @@ shared_examples_for "file uploads api" do
     attachment
   end
 
-  it "should upload (s3 files)" do
+  it "uploads (s3 files)" do
     filename = "my_essay.doc"
     content = "this is a test doc"
 
@@ -182,7 +182,7 @@ shared_examples_for "file uploads api" do
     attachment
   end
 
-  it "should allow uploading files from a url" do
+  it "allows uploading files from a url" do
     filename = "delete.png"
 
     local_storage!
@@ -213,7 +213,7 @@ shared_examples_for "file uploads api" do
     expect(attachment.user.id).to eq @user.id
   end
 
-  it "should fail gracefully with a malformed url" do
+  it "fails gracefully with a malformed url" do
     filename = "delete.png"
 
     local_storage!
@@ -232,7 +232,7 @@ shared_examples_for "file uploads api" do
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
-  it "should fail gracefully with a relative url" do
+  it "fails gracefully with a relative url" do
     filename = "delete.png"
 
     local_storage!
@@ -251,7 +251,7 @@ shared_examples_for "file uploads api" do
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
-  it "should fail gracefully with a non-200 and non-300 status return" do
+  it "fails gracefully with a non-200 and non-300 status return" do
     filename = "delete.png"
     url = 'http://www.example.com/images/delete.png'
 
@@ -272,7 +272,7 @@ shared_examples_for "file uploads api" do
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
-  it "should fail gracefully with a GET request timeout" do
+  it "fails gracefully with a GET request timeout" do
     filename = "delete.png"
     url = 'http://www.example.com/images/delete.png'
 
@@ -293,7 +293,7 @@ shared_examples_for "file uploads api" do
     expect(attachment.reload.file_state).to eq 'errored'
   end
 
-  it "should fail gracefully with too many redirects" do
+  it "fails gracefully with too many redirects" do
     filename = "delete.png"
     url = 'http://www.example.com/images/delete.png'
 
@@ -324,19 +324,19 @@ end
 shared_examples_for "file uploads api with folders" do
   include_examples "file uploads api"
 
-  it "should allow specifying a folder with deprecated argument name" do
+  it "allows specifying a folder with deprecated argument name" do
     preflight({ :name => "with_path.txt", :folder => "files/a/b/c/mypath" })
     attachment = Attachment.order(:id).last
     expect(attachment.folder).to eq Folder.assert_path("/files/a/b/c/mypath", context)
   end
 
-  it "should allow specifying a folder" do
+  it "allows specifying a folder" do
     preflight({ :name => "with_path.txt", :parent_folder_path => "files/a/b/c/mypath" })
     attachment = Attachment.order(:id).last
     expect(attachment.folder).to eq Folder.assert_path("/files/a/b/c/mypath", context)
   end
 
-  it "should allow specifying a parent folder by id" do
+  it "allows specifying a parent folder by id" do
     root = Folder.root_folders(context).first
     sub = root.sub_folders.create!(:name => "folder1", :context => context)
     preflight({ :name => "with_path.txt", :parent_folder_id => sub.id.to_param })
@@ -344,7 +344,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.folder_id).to eq sub.id
   end
 
-  it "should upload to an existing folder" do
+  it "uploads to an existing folder" do
     @folder = Folder.assert_path("/files/a/b/c/mypath", context)
     expect(@folder).to be_present
     expect(@folder).to be_visible
@@ -353,7 +353,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.folder).to eq @folder
   end
 
-  it "should overwrite duplicate files by default" do
+  it "overwrites duplicate files by default" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
@@ -374,7 +374,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.open.read).to eq "second"
   end
 
-  it "should overwrite duplicate files by default for URL uploads" do
+  it "overwrites duplicate files by default for URL uploads" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
@@ -390,7 +390,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.open.read).to eq "second"
   end
 
-  it "should allow renaming instead of overwriting duplicate files (local storage)" do
+  it "allows renaming instead of overwriting duplicate files (local storage)" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
@@ -411,7 +411,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.folder).to eq @folder
   end
 
-  it "should allow renaming instead of overwriting duplicate files for URL uploads" do
+  it "allows renaming instead of overwriting duplicate files for URL uploads" do
     local_storage!
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
@@ -427,7 +427,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.folder).to eq @folder
   end
 
-  it "should allow renaming instead of overwriting duplicate files (s3 storage)" do
+  it "allows renaming instead of overwriting duplicate files (s3 storage)" do
     @folder = Folder.assert_path("test", context)
     a1 = Attachment.create!(:folder => @folder, :context => context, :filename => "test.txt", :uploaded_data => StringIO.new("first"))
     s3_storage!
@@ -447,7 +447,7 @@ shared_examples_for "file uploads api with folders" do
     expect(attachment.display_name).to eq "test-1.txt"
   end
 
-  it "should reject other duplicate file handling params" do
+  it "rejects other duplicate file handling params" do
     json = preflight({ :name => "test.txt", :folder => "test", :on_duplicate => 'killall' }, { expected_status: 400 })
     expect(json['message']).to eq "invalid on_duplicate option"
   end
@@ -458,7 +458,7 @@ shared_examples_for "file uploads api with quotas" do
     local_storage!
   end
 
-  it "should return successful preflight for files within quota limits" do
+  it "returns successful preflight for files within quota limits" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     json = preflight({ :name => "test.txt", :size => 3.megabytes })
@@ -467,14 +467,14 @@ shared_examples_for "file uploads api with quotas" do
     expect(attachment.filename).to eq 'test.txt'
   end
 
-  it "should return unsuccessful preflight for files exceeding quota limits" do
+  it "returns unsuccessful preflight for files exceeding quota limits" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     json = preflight({ :name => "test.txt", :size => 10.megabytes }, expected_status: 400)
     expect(json['message']).to eq "file size exceeds quota"
   end
 
-  it "should return unsuccessful preflight for files exceeding quota limits (URL uploads)" do
+  it "returns unsuccessful preflight for files exceeding quota limits (URL uploads)" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     json = preflight({ :name => "test.txt", :size => 10.megabytes, :url => "http://www.example.com/test" },
@@ -482,7 +482,7 @@ shared_examples_for "file uploads api with quotas" do
     expect(json['message']).to eq "file size exceeds quota"
   end
 
-  it "should return successful create_success for files within quota" do
+  it "returns successful create_success for files within quota" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     attachment = @context.attachments.new
@@ -498,7 +498,7 @@ shared_examples_for "file uploads api with quotas" do
     expect(attachment.file_state).to eq 'available'
   end
 
-  it "should return unsuccessful create_success for files exceeding quota limits" do
+  it "returns unsuccessful create_success for files exceeding quota limits" do
     @context.write_attribute(:storage_quota, 5.megabytes)
     @context.save!
     attachment = @context.attachments.new
@@ -518,7 +518,7 @@ shared_examples_for "file uploads api with quotas" do
     expect(attachment.file_state).to eq 'deleted'
   end
 
-  it "should fail URL uploads for files exceeding quota limits" do
+  it "fails URL uploads for files exceeding quota limits" do
     @context.write_attribute(:storage_quota, 1.megabyte)
     @context.save!
     json = preflight({ :name => "test.txt", :url => "http://www.example.com/test" })
@@ -536,7 +536,7 @@ shared_examples_for "file uploads api with quotas" do
 end
 
 shared_examples_for "file uploads api without quotas" do
-  it "should ignore context-related quotas in preflight" do
+  it "ignores context-related quotas in preflight" do
     local_storage!
 
     @context.write_attribute(:storage_quota, 0)
@@ -545,7 +545,7 @@ shared_examples_for "file uploads api without quotas" do
     attachment = Attachment.order(:id).last
     expect(json['upload_url']).to match(/#{attachment.quota_exemption_key}/)
   end
-  it "should ignore context-related quotas in preflight" do
+  it "ignores context-related quotas in preflight" do
     s3_storage!
     @context.write_attribute(:storage_quota, 0)
     @context.save!

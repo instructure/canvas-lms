@@ -40,11 +40,11 @@ describe ContextExternalToolsHelper do
       expect(@parsed_html.children.count).to eq 3
     end
 
-    it "should have one .icon-course_home_sub_navigation icon" do
+    it "has one .icon-course_home_sub_navigation icon" do
       expect(@parsed_html.css(".icon-course_home_sub_navigation").count).to eq 2
     end
 
-    it "should have one launch-image icon" do
+    it "has one launch-image icon" do
       expect(@parsed_html.css("img[src='http://example.dev/icon.png']").count).to eq 1
     end
   end

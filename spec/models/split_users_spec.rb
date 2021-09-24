@@ -30,7 +30,7 @@ describe SplitUsers do
     let(:account1) { Account.default }
     let(:sub_account) { account1.sub_accounts.create! }
 
-    it 'should restore terms_of use one way' do
+    it 'restores terms_of use one way' do
       source_user.accept_terms
       source_user.save!
       UserMerge.from(restored_user).into(source_user)
@@ -39,7 +39,7 @@ describe SplitUsers do
       expect(source_user.reload.preferences[:accepted_terms]).to_not be_nil
     end
 
-    it 'should restore terms_of use other way' do
+    it 'restores terms_of use other way' do
       restored_user.accept_terms
       restored_user.save!
       UserMerge.from(restored_user).into(source_user)
@@ -49,7 +49,7 @@ describe SplitUsers do
       expect(source_user.reload.preferences[:accepted_terms]).to be_nil
     end
 
-    it 'should restore terms_of use no way' do
+    it 'restores terms_of use no way' do
       UserMerge.from(restored_user).into(source_user)
       source_user.accept_terms
       source_user.save!
@@ -58,7 +58,7 @@ describe SplitUsers do
       expect(restored_user.reload.preferences[:accepted_terms]).to be_nil
     end
 
-    it 'should restore terms_of use both ways' do
+    it 'restores terms_of use both ways' do
       restored_user.accept_terms
       restored_user.save!
       source_user.accept_terms
@@ -69,7 +69,7 @@ describe SplitUsers do
       expect(restored_user.reload.preferences[:accepted_terms]).to_not be_nil
     end
 
-    it 'should restore names' do
+    it 'restores names' do
       restored_user.name = "jimmy one"
       restored_user.save!
       source_user.name = "jenny one"
@@ -82,7 +82,7 @@ describe SplitUsers do
       expect(source_user.reload.name).to eq "jenny one"
     end
 
-    it 'should restore pseudonyms to the original user' do
+    it 'restores pseudonyms to the original user' do
       pseudonym1 = source_user.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = account1.pseudonyms.create!(user: restored_user, unique_id: 'sam2@example.com')
       pseudonym3 = account1.pseudonyms.create!(user: restored_user, unique_id: 'sam3@example.com')
@@ -96,7 +96,7 @@ describe SplitUsers do
       expect(pseudonym3.user).to eq restored_user
     end
 
-    it 'should not split if the data is too old' do
+    it 'does not split if the data is too old' do
       pseudonym1 = source_user.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = account1.pseudonyms.create!(user: restored_user, unique_id: 'sam2@example.com')
       Timecop.travel(183.days.ago) do
@@ -110,7 +110,7 @@ describe SplitUsers do
       expect(pseudonym2.reload.user).to eq source_user
     end
 
-    it 'should use the setting for split time.' do
+    it 'uses the setting for split time.' do
       pseudonym1 = source_user.pseudonyms.create!(unique_id: 'sam1@example.com')
       pseudonym2 = account1.pseudonyms.create!(user: restored_user, unique_id: 'sam2@example.com')
       Setting.set('user_merge_to_split_time', '12')
@@ -128,7 +128,7 @@ describe SplitUsers do
     end
 
     describe 'with merge data' do
-      it 'should restore users without merge data items' do
+      it 'restores users without merge data items' do
         UserMerge.from(restored_user).into(source_user)
         UserMergeDataItem.where(user_id: restored_user).find_each(&:destroy)
         SplitUsers.split_db_users(source_user)
@@ -137,7 +137,7 @@ describe SplitUsers do
         expect(source_user.reload).not_to be_deleted
       end
 
-      it "should move lti_id to the new user" do
+      it "moves lti_id to the new user" do
         course1.enroll_user(source_user)
         course2.enroll_user(restored_user)
         UserMerge.from(restored_user).into(source_user)
@@ -147,7 +147,7 @@ describe SplitUsers do
         expect(source_user.reload.past_lti_ids.count).to eq 1
       end
 
-      it 'should split multiple users if no merge_data is specified' do
+      it 'splits multiple users if no merge_data is specified' do
         enrollment1 = course1.enroll_student(restored_user, enrollment_state: 'active')
         enrollment2 = course1.enroll_student(source_user, enrollment_state: 'active')
         enrollment3 = course2.enroll_student(restored_user, enrollment_state: 'active')
@@ -171,7 +171,7 @@ describe SplitUsers do
         expect(enrollment5.reload.user).to eq user3
       end
 
-      it 'should handle conflicting enrollments' do
+      it 'handles conflicting enrollments' do
         enrollment1 = course1.enroll_student(restored_user, enrollment_state: 'active')
         UserMerge.from(restored_user).into(source_user)
         enrollment2 = course1.enroll_student(restored_user, enrollment_state: 'active')
@@ -185,7 +185,7 @@ describe SplitUsers do
         expect(enrollment2.reload.user).to eq restored_user
       end
 
-      it 'should handle user_observers' do
+      it 'handles user_observers' do
         observer1 = user_model
         observer2 = user_model
         add_linked_observer(restored_user, observer1)
@@ -198,7 +198,7 @@ describe SplitUsers do
         expect(source_user.linked_observers).to eq [observer2]
       end
 
-      it 'should handle access tokens' do
+      it 'handles access tokens' do
         at = AccessToken.create!(user: restored_user, :developer_key => DeveloperKey.default)
         UserMerge.from(restored_user).into(source_user)
         expect(at.reload.user_id).to eq source_user.id
@@ -206,7 +206,7 @@ describe SplitUsers do
         expect(at.reload.user_id).to eq restored_user.id
       end
 
-      it 'should handle polls' do
+      it 'handles polls' do
         poll = Polling::Poll.create!(user: restored_user, question: 'A Test Poll', description: 'A test description.')
         UserMerge.from(restored_user).into(source_user)
         expect(poll.reload.user_id).to eq source_user.id
@@ -214,7 +214,7 @@ describe SplitUsers do
         expect(poll.reload.user_id).to eq restored_user.id
       end
 
-      it 'should handle favorites' do
+      it 'handles favorites' do
         course1.enroll_user(restored_user)
         fav = Favorite.create!(user: restored_user, context: course1)
         UserMerge.from(restored_user).into(source_user)
@@ -223,7 +223,7 @@ describe SplitUsers do
         expect(fav.reload.user_id).to eq restored_user.id
       end
 
-      it 'should handle ignores' do
+      it 'handles ignores' do
         course1.enroll_user(restored_user)
         assignment2 = assignment_model(course: course1)
         ignore = Ignore.create!(asset: assignment2, user: restored_user, purpose: 'submitting')
@@ -233,7 +233,7 @@ describe SplitUsers do
         expect(ignore.reload.user_id).to eq restored_user.id
       end
 
-      it 'should handle conversations' do
+      it 'handles conversations' do
         sender = restored_user
         recipient = user3
         convo = sender.initiate_conversation([recipient])
@@ -243,7 +243,7 @@ describe SplitUsers do
         expect(convo.reload.user_id).to eq restored_user.id
       end
 
-      it 'should handle attachments' do
+      it 'handles attachments' do
         attachment1 = Attachment.create!(user: restored_user,
                                          context: restored_user,
                                          filename: "test.txt",
@@ -264,7 +264,7 @@ describe SplitUsers do
         expect(source_user.reload.attachments).to eq [attachment2]
       end
 
-      it 'should handle when observing merged user' do
+      it 'handles when observing merged user' do
         link = add_linked_observer(source_user, restored_user)
         UserMerge.from(restored_user).into(source_user)
 
@@ -274,7 +274,7 @@ describe SplitUsers do
         expect(source_user.reload.as_student_observation_links.to_a).to eq [link]
       end
 
-      it 'should handle as_observer_observation_links' do
+      it 'handles as_observer_observation_links' do
         observee1 = user_model
         observee2 = user_model
         add_linked_observer(observee1, restored_user)
@@ -287,7 +287,7 @@ describe SplitUsers do
         expect(source_user.as_observer_observation_links).to eq observee2.as_student_observation_links
       end
 
-      it 'should handle duplicate user_observers' do
+      it 'handles duplicate user_observers' do
         observer1 = user_model
         observee1 = user_model
         add_linked_observer(observee1, restored_user)
@@ -308,7 +308,7 @@ describe SplitUsers do
         expect(source_user.as_student_observation_links.first.workflow_state).to eq 'active'
       end
 
-      it 'should only split users from merge_data when specified' do
+      it 'onlies split users from merge_data when specified' do
         enrollment1 = course1.enroll_user(restored_user)
         enrollment2 = course1.enroll_student(source_user, enrollment_state: 'active')
         enrollment3 = course2.enroll_student(restored_user, enrollment_state: 'active')
@@ -332,7 +332,7 @@ describe SplitUsers do
         expect(enrollment5.reload.user).to eq source_user
       end
 
-      it "should move ccs to the new user (but only if they don't already exist)" do
+      it "moves ccs to the new user (but only if they don't already exist)" do
         notification = Notification.where(name: "Report Generated").first_or_create
         # unconfirmed: active conflict
         communication_channel(restored_user, { username: 'a@instructure.com' })
@@ -412,7 +412,7 @@ describe SplitUsers do
       end
     end
 
-    it 'should restore submissions' do
+    it 'restores submissions' do
       course1.enroll_student(restored_user, enrollment_state: 'active')
       assignment = course1.assignments.new(title: "some assignment")
       assignment.workflow_state = "published"
@@ -431,7 +431,7 @@ describe SplitUsers do
       expect(submission.reload.user).to eq restored_user
     end
 
-    it 'should handle conflicting submissions' do
+    it 'handles conflicting submissions' do
       course1.enroll_student(restored_user, enrollment_state: 'active')
       course1.enroll_student(source_user, enrollment_state: 'active')
       assignment = course1.assignments.new(title: "some assignment")
@@ -456,7 +456,7 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq source_user
     end
 
-    it 'should handle conflicting submissions other way too' do
+    it 'handles conflicting submissions other way too' do
       course1.enroll_student(restored_user, enrollment_state: 'active')
       course1.enroll_student(source_user, enrollment_state: 'active')
       assignment = course1.assignments.new(title: "some assignment")
@@ -479,14 +479,14 @@ describe SplitUsers do
       expect(submission2.reload.user).to eq source_user
     end
 
-    it 'should not blow up on deleted courses' do
+    it 'does not blow up on deleted courses' do
       course1.enroll_student(restored_user, enrollment_state: 'active')
       UserMerge.from(restored_user).into(source_user)
       course1.destroy
       expect { SplitUsers.split_db_users(source_user) }.not_to raise_error
     end
 
-    it 'should restore admins to the original state' do
+    it 'restores admins to the original state' do
       admin = account1.account_users.create(user: restored_user)
       admin2 = sub_account.account_users.create(user: restored_user)
       admin3 = sub_account.account_users.create(user: source_user)
@@ -506,7 +506,7 @@ describe SplitUsers do
       let!(:shard1_account) { @shard1.activate { Account.create! } }
       let!(:shard1_course) { shard1_account.courses.create! }
 
-      it 'should handle access tokens' do
+      it 'handles access tokens' do
         at = AccessToken.create!(user: restored_user, :developer_key => DeveloperKey.default)
         UserMerge.from(restored_user).into(shard1_source_user)
         expect(at.reload.user_id).to eq shard1_source_user.id
@@ -514,7 +514,7 @@ describe SplitUsers do
         expect(at.reload.user_id).to eq restored_user.id
       end
 
-      it 'should move submissions from new courses post merge when appropriate' do
+      it 'moves submissions from new courses post merge when appropriate' do
         pseudonym1 = restored_user.pseudonyms.create!(unique_id: 'sam1@example.com')
         UserMerge.from(restored_user).into(shard1_source_user)
         e = course1.enroll_student(shard1_source_user, enrollment_state: 'active')
@@ -533,7 +533,7 @@ describe SplitUsers do
         expect(submission.reload.user).to eq restored_user
       end
 
-      it 'should handle user_observers cross shard' do
+      it 'handles user_observers cross shard' do
         observer1 = user_model
         observer2 = user_model
         add_linked_observer(restored_user, observer1)
@@ -546,7 +546,7 @@ describe SplitUsers do
         expect(shard1_source_user.reload.linked_observers).to eq [observer2]
       end
 
-      it 'should handle user_observees cross shard' do
+      it 'handles user_observees cross shard' do
         observee1 = user_model
         observee2 = user_model
         add_linked_observer(observee1, restored_user)
@@ -559,7 +559,7 @@ describe SplitUsers do
         expect(shard1_source_user.reload.as_observer_observation_links.map(&:user)).to eq [observee2]
       end
 
-      it 'should handle user_observers cross shard from target shard' do
+      it 'handles user_observers cross shard from target shard' do
         observer1 = user_model
         add_linked_observer(restored_user, observer1)
         @shard1.activate do
@@ -571,7 +571,7 @@ describe SplitUsers do
         expect(restored_user.reload.linked_observers).to eq [observer1]
       end
 
-      it 'should handle conflicting submissions for cross shard users' do
+      it 'handles conflicting submissions for cross shard users' do
         course1.enroll_student(restored_user, enrollment_state: 'active')
         course1.enroll_student(shard1_source_user, enrollment_state: 'active')
         assignment = course1.assignments.new(title: "some assignment")
@@ -594,7 +594,7 @@ describe SplitUsers do
         expect(submission2.reload.user).to eq shard1_source_user
       end
 
-      it 'should restore admins to the original state' do
+      it 'restores admins to the original state' do
         admin = account1.account_users.create(user: restored_user)
         shard1_source_user.associate_with_shard(sub_account.shard)
         admin2 = sub_account.account_users.create(user: shard1_source_user)
@@ -607,7 +607,7 @@ describe SplitUsers do
         expect(admin2.reload.user).to eq shard1_source_user
       end
 
-      it 'should merge a user across shards' do
+      it 'merges a user across shards' do
         pseudonym1 = restored_user.pseudonyms.create!(unique_id: 'sam1@example.com')
         @shard1.activate do
           account = Account.create!
@@ -624,7 +624,7 @@ describe SplitUsers do
         expect(shard1_source_user.all_pseudonyms).to eq [@pseudonym2]
       end
 
-      it "should split a user across shards with ccs" do
+      it "splits a user across shards with ccs" do
         communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
         restored_user_ccs = restored_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
         source_user_ccs = shard1_source_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort
@@ -643,7 +643,7 @@ describe SplitUsers do
         expect(shard1_source_user.communication_channels.map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
 
-      it 'should handle enrollments across shards' do
+      it 'handles enrollments across shards' do
         e = course1.enroll_user(restored_user)
         @shard1.activate do
           @e = shard1_course.enroll_user(shard1_source_user)
@@ -655,7 +655,7 @@ describe SplitUsers do
         expect(@e.reload.user).to eq shard1_source_user
       end
 
-      it "should work with cross-shard submissions" do
+      it "works with cross-shard submissions" do
         shard1_course.enroll_student(restored_user, enrollment_state: 'active')
         assignment = shard1_course.assignments.create!(title: "some assignment", workflow_state: 'published', submission_types: "online_text_entry")
         submission = assignment.submit_homework(restored_user, submission_type: 'online_text_entry', body: 'fooey')
@@ -665,7 +665,7 @@ describe SplitUsers do
         expect(submission.reload.user).to eq restored_user
       end
 
-      it "should copy notification policies" do
+      it "copies notification policies" do
         og_cc = communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
 
         n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')
@@ -681,7 +681,7 @@ describe SplitUsers do
         expect(shard1_source_user.communication_channels.count).to eq 0
       end
 
-      it "should copy notification policies on conflict" do
+      it "copies notification policies on conflict" do
         og_cc = communication_channel(restored_user, { username: 'a@example.com', active_cc: true })
 
         n = Notification.create!(name: 'Assignment', subject: 'Tests', category: 'TestNevers')

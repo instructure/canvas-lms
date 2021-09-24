@@ -362,17 +362,17 @@ describe "Default Account Reports" do
         @report = AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
       end
 
-      it 'should evaluate to true when enabled' do
+      it 'evaluates to true when enabled' do
         expect(@report.should_add_pronouns?).to eq(true)
       end
 
-      it 'should evaluate to false when not enabled' do
+      it 'evaluates to false when not enabled' do
         @account.settings[:can_add_pronouns] = false
         @account.save!
         expect(@report.should_add_pronouns?).to eq(false)
       end
 
-      it 'should evaluate to false when disabled for just report' do
+      it 'evaluates to false when disabled for just report' do
         @account.settings[:enable_sis_export_pronouns] = false
         @account.save!
         expect(@report.should_add_pronouns?).to eq(false)
@@ -384,7 +384,7 @@ describe "Default Account Reports" do
         create_some_users_with_pseudonyms
       end
 
-      it "should run sis report with term parameter and include deleted users" do
+      it "runs sis report with term parameter and include deleted users" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
         # term does not impact user report
@@ -398,7 +398,7 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user1, @user2, @user3, @user5].map { |u| expected_user(u) })
       end
 
-      it "should run sis report" do
+      it "runs sis report" do
         parameters = {}
         parameters["users"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0 })
@@ -407,7 +407,7 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
       end
 
-      it "should not add pronouns if not enabled for the account" do
+      it "does not add pronouns if not enabled for the account" do
         @account.settings[:can_add_pronouns] = false
         @account.save!
         parameters = {}
@@ -416,7 +416,7 @@ describe "Default Account Reports" do
         expect(parsed.first.last).to eq('active')
       end
 
-      it "should add pronouns if enabled for the account" do
+      it "adds pronouns if enabled for the account" do
         @account.settings[:can_add_pronouns] = true
         @account.save!
         parameters = {}
@@ -427,7 +427,7 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user3, @user4].map { |u| expected_user(u) })
       end
 
-      it "should run sis report on a sub_account" do
+      it "runs sis report on a sub_account" do
         create_an_account
         @course1 = Course.new(:name => 'English 101', :course_code => 'ENG101')
         @course1.account_id = @sub_account.id
@@ -442,7 +442,7 @@ describe "Default Account Reports" do
         expect(parsed).to match_array([expected_user(@user1)])
       end
 
-      it "should run provisioning report" do
+      it "runs provisioning report" do
         parameters = {}
         parameters["users"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: [1, 2], header: true })
@@ -453,7 +453,7 @@ describe "Default Account Reports" do
         expect(parsed).to eq([@user6, @user7, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') })
       end
 
-      it "should run provisioning report including deleted users for course" do
+      it "runs provisioning report including deleted users for course" do
         c = Course.create(:name => 'course1')
         c.student_view_student
         parameters = {}
@@ -472,7 +472,7 @@ describe "Default Account Reports" do
         create_some_accounts
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = @default_term.id
         parameters["accounts"] = true
@@ -484,7 +484,7 @@ describe "Default Account Reports" do
                                        ["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the SIS report on a sub account" do
+      it "runs the SIS report on a sub account" do
         parameters = {}
         parameters["accounts"] = true
         parsed = read_report("sis_export_csv", { params: parameters, account: @sub_account })
@@ -493,7 +493,7 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the SIS report including deleted accounts" do
+      it "runs the SIS report including deleted accounts" do
         parameters = {}
         parameters["accounts"] = true
         parameters["include_deleted"] = true
@@ -506,7 +506,7 @@ describe "Default Account Reports" do
                                        ["subsub1", "sub1", "sESL", "active"]]
       end
 
-      it "should run the provisioning report including deleted accounts" do
+      it "runs the provisioning report including deleted accounts" do
         parameters = {}
         parameters["accounts"] = true
         parameters["enrollment_term"] = ''
@@ -532,7 +532,7 @@ describe "Default Account Reports" do
         create_some_terms
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = @term3.id
         parameters["include_deleted"] = true
@@ -546,7 +546,7 @@ describe "Default Account Reports" do
                                         @term2.end_at.iso8601]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["terms"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 2 })
@@ -559,7 +559,7 @@ describe "Default Account Reports" do
                                         @term3.start_at.iso8601, @term3.end_at.iso8601, "false"]]
       end
 
-      it "should run the provisioning report with deleted terms" do
+      it "runs the provisioning report with deleted terms" do
         parameters = {}
         parameters["terms"] = true
         parameters["include_deleted"] = true
@@ -581,7 +581,7 @@ describe "Default Account Reports" do
         create_some_courses
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollment_term"] = ''
         parameters["courses"] = true
@@ -596,7 +596,7 @@ describe "Default Account Reports" do
                                        ["SIS_COURSE_ID_3", nil, "SCI101", "Science 101", nil, nil, "active", nil, nil, nil, nil]]
       end
 
-      it "should run the SIS report with sis term and deleted courses" do
+      it "runs the SIS report with sis term and deleted courses" do
         @course1.complete
         parameters = {}
         parameters["enrollment_term_id"] = "sis_term_id:fall12"
@@ -612,7 +612,7 @@ describe "Default Account Reports" do
                                         "fall12", "deleted", nil, nil, nil, nil]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         @course6.destroy
         @course4.destroy
         Course.where(id: @course6.id).update_all(updated_at: 122.days.ago)
@@ -645,7 +645,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 5
       end
 
-      it "should run the sis report on a sub account" do
+      it "runs the sis report on a sub account" do
         parameters = {}
         parameters["courses"] = true
         # all I care about is that it didn't throw a database error due to ambiguous columns
@@ -654,7 +654,7 @@ describe "Default Account Reports" do
         }.not_to raise_error
       end
 
-      it "should run the provisioning report on a sub account" do
+      it "runs the provisioning report on a sub account" do
         parameters = {}
         parameters["courses"] = true
         parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 3 })
@@ -668,7 +668,7 @@ describe "Default Account Reports" do
                                         @course1.conclude_at.iso8601, @course1.course_format, nil, "true"]]
       end
 
-      it "should run the sis report with the default term" do
+      it "runs the sis report with the default term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["courses"] = true
@@ -680,7 +680,7 @@ describe "Default Account Reports" do
                                        ["SIS_COURSE_ID_3", nil, "SCI101", "Science 101", nil, nil, "active", nil, nil, nil, nil]]
       end
 
-      it "should export blueprint course stuff for sis export" do
+      it "exports blueprint course stuff for sis export" do
         create_some_blueprint_course_stuff
         parsed = read_report("sis_export_csv",
                              { params: { "enrollment_term_id" => @default_term.id, "courses" => true }, order: 0, parse_header: true })
@@ -689,7 +689,7 @@ describe "Default Account Reports" do
         expect(parsed.detect { |r| r["course_id"] == @ac2.sis_source_id }["blueprint_course_id"]).to eq @bc2.sis_source_id
       end
 
-      it "should export blueprint course stuff for provisioning csv" do
+      it "exports blueprint course stuff for provisioning csv" do
         create_some_blueprint_course_stuff
         parsed = read_report("provisioning_csv",
                              { params: { "enrollment_term_id" => @default_term.id, "courses" => true }, order: 0, parse_header: true })
@@ -704,7 +704,7 @@ describe "Default Account Reports" do
         create_some_courses_and_sections
       end
 
-      it "should run the SIS report for a term" do
+      it "runs the SIS report for a term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["sections"] = true
@@ -716,7 +716,7 @@ describe "Default Account Reports" do
                                         @course2.conclude_at.iso8601]]
       end
 
-      it "should not include sections from deleted courses" do
+      it "does not include sections from deleted courses" do
         @course2.destroy
         parameters = {}
         parameters["sections"] = true
@@ -732,7 +732,7 @@ describe "Default Account Reports" do
                                         @course1.conclude_at.iso8601]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         @section1.crosslist_to_course(@course2)
         parameters = {}
         parameters["sections"] = true
@@ -760,7 +760,7 @@ describe "Default Account Reports" do
                                         @sub_account.id.to_s, "sub1", "true"]]
       end
 
-      it "should run the provisioning report with deleted sections" do
+      it "runs the provisioning report with deleted sections" do
         @section1.destroy
         parameters = {}
         parameters["sections"] = true
@@ -788,7 +788,7 @@ describe "Default Account Reports" do
                                         @sub_account.id.to_s, "sub1", "true"]]
       end
 
-      it "should run the provisioning report with deleted sections on a sub account" do
+      it "runs the provisioning report with deleted sections on a sub account" do
         @section2.destroy
 
         parameters = {}
@@ -818,7 +818,7 @@ describe "Default Account Reports" do
         create_some_enrolled_users
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         parameters = {}
         parameters["enrollments"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: [1, 0] })
@@ -850,7 +850,7 @@ describe "Default Account Reports" do
                                         @role.id.to_s, nil, "active", nil, "false"]]
       end
 
-      it "should run sis report for a term" do
+      it "runs sis report for a term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["enrollments"] = true
@@ -872,7 +872,7 @@ describe "Default Account Reports" do
                                         @role.id.to_s, nil, "active", nil, "false"]]
       end
 
-      it "should run the provisioning report with deleted enrollments" do
+      it "runs the provisioning report with deleted enrollments" do
         c = Course.create(:name => 'course1')
         c.student_view_student
         Course.where(id: @course2.id).update_all(workflow_state: 'deleted')
@@ -932,7 +932,7 @@ describe "Default Account Reports" do
                                         'TeacherEnrollment', 'false', @enrollment8.id.to_s]]
       end
 
-      it "should run the provisioning report on a term and sub account with deleted enrollments" do
+      it "runs the provisioning report on a term and sub account with deleted enrollments" do
         @course2.account = @sub_account
         @course2.save
         parameters = {}
@@ -969,7 +969,7 @@ describe "Default Account Reports" do
                                         @enrollment6.id.to_s]]
       end
 
-      it "should run the provisioning report and return active teachers and ta's" do
+      it "runs the provisioning report and return active teachers and ta's" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_filter"] = 'TeacherEnrollment,TaEnrollment'
@@ -988,7 +988,7 @@ describe "Default Account Reports" do
                                         'TeacherEnrollment', 'false', @enrollment9.id.to_s]]
       end
 
-      it "should run the provisioning report with active enrollments" do
+      it "runs the provisioning report with active enrollments" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_states"] = 'active'
@@ -1031,7 +1031,7 @@ describe "Default Account Reports" do
                                         @enrollment11.id.to_s]]
       end
 
-      it "should run the provisioning report and return only ta's" do
+      it "runs the provisioning report and return only ta's" do
         parameters = {}
         parameters["enrollments"] = true
         parameters["enrollment_filter"] = 'TaEnrollment'
@@ -1045,7 +1045,7 @@ describe "Default Account Reports" do
                                         @enrollment3.id.to_s]]
       end
 
-      it 'should handle cross listed enrollments' do
+      it 'handles cross listed enrollments' do
         sub = @account.sub_accounts.create!
         course = sub.courses.create!(name: 'the course', sis_source_id: 'sis1')
         @section1.crosslist_to_course(course)
@@ -1059,7 +1059,7 @@ describe "Default Account Reports" do
       describe "sharding" do
         specs_require_sharding
 
-        it "should run with cross shard pseudonyms" do
+        it "runs with cross shard pseudonyms" do
           @shard1.activate do
             @root = Account.create
             @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
@@ -1091,7 +1091,7 @@ describe "Default Account Reports" do
         create_some_groups
       end
 
-      it "should run the SIS report" do
+      it "runs the SIS report" do
         GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
         parameters = {}
@@ -1104,7 +1104,7 @@ describe "Default Account Reports" do
                                        ["group5sis", nil, nil, "SIS_COURSE_ID_1", "group5name", "available"]]
       end
 
-      it "should run the SIS report with deleted groups" do
+      it "runs the SIS report with deleted groups" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["groups"] = true
@@ -1116,7 +1116,7 @@ describe "Default Account Reports" do
                                        ["group5sis", nil, nil, "SIS_COURSE_ID_1", "group5name", "available"]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 4 })
@@ -1136,7 +1136,7 @@ describe "Default Account Reports" do
                                         @course1.id.to_s, 'Course', nil]]
       end
 
-      it "should run the provisioning report on a sub account" do
+      it "runs the provisioning report on a sub account" do
         parameters = {}
         parameters["groups"] = true
         parsed = read_report("provisioning_csv", { params: parameters, account: @sub_account, order: 4 })
@@ -1179,7 +1179,7 @@ describe "Default Account Reports" do
         @student_category = GroupCategory.where(name: "Student Groups").first
       end
 
-      it 'should run the provisioning report' do
+      it 'runs the provisioning report' do
         parameters = {}
         parameters["group_categories"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 5 })
@@ -1190,7 +1190,7 @@ describe "Default Account Reports" do
                                        [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it 'should run the sis report' do
+      it 'runs the sis report' do
         GroupCategory.where(id: @group_category1).update_all(sis_source_id: 'gc101', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category2).update_all(sis_source_id: 'gc102', sis_batch_id: @sis.id)
         GroupCategory.where(id: @group_category4).update_all(sis_source_id: 'gc104', sis_batch_id: @sis.id)
@@ -1204,7 +1204,7 @@ describe "Default Account Reports" do
                                        ['gc104', nil, "SIS_COURSE_ID_3", "Test Group Category Course", 'active']]
       end
 
-      it 'should run the provisioning report for a sub account' do
+      it 'runs the provisioning report for a sub account' do
         parameters = {}
         parameters["group_categories"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 4, account: @sub_account })
@@ -1212,7 +1212,7 @@ describe "Default Account Reports" do
         expect(parsed).to match_array [[@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it 'should run the report for deleted categories' do
+      it 'runs the report for deleted categories' do
         parameters = {}
         parameters["group_categories"] = true
         parameters["include_deleted"] = true
@@ -1225,7 +1225,7 @@ describe "Default Account Reports" do
                                        [@student_category.id.to_s, nil, @course1.id.to_s, "Course", "Student Groups", "student_organized", nil, nil, nil, 'active']]
       end
 
-      it "should include account_id column even if there isn't one for any rows" do
+      it "includes account_id column even if there isn't one for any rows" do
         process_csv_data_cleanly(
           "course_id,short_name,long_name,status",
           "C1,COUR,SIS Import Course,active"
@@ -1247,7 +1247,7 @@ describe "Default Account Reports" do
         create_some_group_memberships_n_stuff
       end
 
-      it "should run the sis report" do
+      it "runs the sis report" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["group_membership"] = true
@@ -1257,7 +1257,7 @@ describe "Default Account Reports" do
                                        [@group2.sis_source_id, "user_sis_id_02", "accepted"]]
       end
 
-      it "should run the sis report with deleted group memberships" do
+      it "runs the sis report with deleted group memberships" do
         parameters = {}
         parameters["group_membership"] = true
         parameters["include_deleted"] = true
@@ -1268,7 +1268,7 @@ describe "Default Account Reports" do
                                        [@group2.sis_source_id, "user_sis_id_03", "deleted"]]
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["group_membership"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: "skip" })
@@ -1282,7 +1282,7 @@ describe "Default Account Reports" do
                                       ])
       end
 
-      it "should run the provisioning report for a subaccount" do
+      it "runs the provisioning report for a subaccount" do
         @gm5 = GroupMembership.create(:group => @group5, :user => @user3, :workflow_state => "accepted")
         parameters = {}
         parameters["group_membership"] = true
@@ -1305,7 +1305,7 @@ describe "Default Account Reports" do
         @section5.crosslist_to_course(@course6)
       end
 
-      it "should run the sis report with the default term" do
+      it "runs the sis report with the default term" do
         parameters = {}
         parameters["enrollment_term_id"] = @default_term.id
         parameters["xlist"] = true
@@ -1320,7 +1320,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 1
       end
 
-      it "should run sis report with deleted sections" do
+      it "runs sis report with deleted sections" do
         @section3.destroy
         parameters = {}
         parameters["xlist"] = true
@@ -1333,7 +1333,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 2
       end
 
-      it "should run sis report with deleted sections on a sub account" do
+      it "runs sis report with deleted sections on a sub account" do
         @section3.destroy
         parameters = {}
         parameters["xlist"] = true
@@ -1346,7 +1346,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 1
       end
 
-      it "should run the provisioning report" do
+      it "runs the provisioning report" do
         parameters = {}
         parameters["xlist"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 1 })
@@ -1359,7 +1359,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 2
       end
 
-      it "should run the provisioning report with deleted sections" do
+      it "runs the provisioning report with deleted sections" do
         parameters = {}
         parameters["include_deleted"] = true
         parameters["xlist"] = true
@@ -1384,7 +1384,7 @@ describe "Default Account Reports" do
         UserObservationLink.where(id: [@uo1.id, uo2.id]).update_all(sis_batch_id: @sis.id)
       end
 
-      it 'should run user_observer provisioning report' do
+      it 'runs user_observer provisioning report' do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("provisioning_csv", { params: parameters, order: 0, header: true })
@@ -1399,7 +1399,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 4
       end
 
-      it 'should run user_observer sis_export report' do
+      it 'runs user_observer sis_export report' do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { params: parameters, order: 0, header: true })
@@ -1409,7 +1409,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 3
       end
 
-      it 'should exclude deleted observers by default' do
+      it 'excludes deleted observers by default' do
         @uo1.destroy
         parameters = {}
         parameters["user_observers"] = true
@@ -1418,7 +1418,7 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 1
       end
 
-      it 'should include deleted observers by when param is present' do
+      it 'includes deleted observers by when param is present' do
         @uo1.destroy
         parameters = {}
         parameters["user_observers"] = true
@@ -1429,14 +1429,14 @@ describe "Default Account Reports" do
         expect(parsed.length).to eq 2
       end
 
-      it 'should not include unassociated observers when running from a sub-account' do
+      it 'does not include unassociated observers when running from a sub-account' do
         parameters = {}
         parameters["user_observers"] = true
         parsed = read_report("sis_export_csv", { account: @sub_account, params: parameters, order: 0, header: true })
         expect(parsed).to match_array [['observer_id', 'student_id', 'status']]
       end
 
-      it "should include associated observers when running from a sub-account" do
+      it "includes associated observers when running from a sub-account" do
         course_with_student(:account => @sub_account, :user => @user1)
         parameters = {}
         parameters["user_observers"] = true
@@ -1460,7 +1460,7 @@ describe "Default Account Reports" do
         @admin3.save!
       end
 
-      it 'should run sis' do
+      it 'runs sis' do
         parameters = {}
         parameters['admins'] = true
         parameters['include_deleted'] = true
@@ -1470,7 +1470,7 @@ describe "Default Account Reports" do
                                        ['U002', nil, @role1.id.to_s, 'role1', 'active']]
       end
 
-      it 'should run provisioning' do
+      it 'runs provisioning' do
         parameters = {}
         parameters['admins'] = true
         parameters['include_deleted'] = true
@@ -1489,7 +1489,7 @@ describe "Default Account Reports" do
       describe 'sharding' do
         specs_require_sharding
 
-        it 'should run with cross shard pseudonyms' do
+        it 'runs with cross shard pseudonyms' do
           @shard1.activate do
             @root = Account.create
             @user = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',
@@ -1516,7 +1516,7 @@ describe "Default Account Reports" do
       end
     end
 
-    it "should run multiple SIS Export reports" do
+    it "runs multiple SIS Export reports" do
       create_some_users_with_pseudonyms
       create_some_accounts
 
@@ -1537,7 +1537,7 @@ describe "Default Account Reports" do
       expect(users_report).to eq [@user1, @user2, @user3, @user4].map { |u| expected_user(u) }
     end
 
-    it "should run the SIS Export reports with no data" do
+    it "runs the SIS Export reports with no data" do
       parameters = {}
       parameters["accounts"] = true
       parameters["users"] = true
@@ -1568,7 +1568,7 @@ describe "Default Account Reports" do
       expect(parsed["xlist.csv"]).to eq [["xlist_course_id", "section_id", "status"]]
     end
 
-    it "should not return reports passed as false" do
+    it "does not return reports passed as false" do
       parameters = {}
       parameters["accounts"] = 0
       parameters["users"] = 1

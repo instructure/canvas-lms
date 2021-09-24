@@ -40,7 +40,7 @@ describe "courses" do
         @course.save
       end
 
-      it "should allow unpublishing of the course if submissions have no score or grade" do
+      it "allows unpublishing of the course if submissions have no score or grade" do
         visit_course(@course)
         unpublish_btn.click
 
@@ -50,7 +50,7 @@ describe "courses" do
         expect(unpublish_btn).to have_class('disabled')
       end
 
-      it "should load the users page using ajax", custom_timeout: 30 do
+      it "loads the users page using ajax", custom_timeout: 30 do
         # Set up the course with > 50 users (to test scrolling)
         create_users_in_course @course, 60
         @course.enroll_user(user_factory, 'TaEnrollment')
@@ -71,7 +71,7 @@ describe "courses" do
       user_session(@student)
     end
 
-    it "should auto-accept the course invitation if previews are not allowed", custom_timeout: 20 do
+    it "auto-accepts the course invitation if previews are not allowed", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = false
       Account.default.save!
       visit_course(@course)
@@ -81,7 +81,7 @@ describe "courses" do
       expect(course_page_content).not_to contain_css(accept_enrollment_alert_selector)
     end
 
-    it "should accept the course invitation", custom_timeout: 20 do
+    it "accepts the course invitation", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = true
       Account.default.save!
       visit_course(@course)
@@ -91,7 +91,7 @@ describe "courses" do
       assert_flash_notice_message "Invitation accepted!"
     end
 
-    it "should reject a course invitation", custom_timeout: 20 do
+    it "rejects a course invitation", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = true
       Account.default.save!
       visit_course(@course)

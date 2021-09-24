@@ -24,7 +24,7 @@ describe AuthenticationProvider do
   let(:account) { Account.default }
 
   context "password" do
-    it "should decrypt the password to the original value" do
+    it "decrypts the password to the original value" do
       c = AuthenticationProvider.new
       c.auth_password = "asdf"
       expect(c.auth_decrypted_password).to eql("asdf")
@@ -53,7 +53,7 @@ describe AuthenticationProvider do
     end
   end
 
-  it "should disable open registration when created" do
+  it "disables open registration when created" do
     account.settings[:open_registration] = true
     account.save!
     account.authentication_providers.create!(auth_type: 'cas')

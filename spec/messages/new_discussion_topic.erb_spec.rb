@@ -31,7 +31,7 @@ describe 'new_discussion_topic' do
 
   include_examples "a message"
   context "locked discussions" do
-    it "should send locked notification if availibility date is locked for email" do
+    it "sends locked notification if availibility date is locked for email" do
       @topic.update(
         unlock_at: Time.zone.now + 3.days,
         lock_at: Time.zone.now + 6.days,
@@ -42,7 +42,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
-    it "should send locked notification if module is locked for email" do
+    it "sends locked notification if module is locked for email" do
       @module = @course.context_modules.create!(:unlock_at => 2.days.from_now)
       @module.add_item(:id => @topic.id, :type => 'discussion_topic')
       @topic.reload
@@ -51,7 +51,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
-    it "should send discussion notification with discussions content when unlocked for email" do
+    it "sends discussion notification with discussions content when unlocked for email" do
       @topic.update(
         unlock_at: nil,
         lock_at: nil,
@@ -62,7 +62,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("the content here of the discussion body")
     end
 
-    it "should send locked notification if availibility date is locked for sms" do
+    it "sends locked notification if availibility date is locked for sms" do
       @topic.update(
         unlock_at: Time.zone.now + 3.days,
         lock_at: Time.zone.now + 6.days,
@@ -73,7 +73,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("Content not available")
     end
 
-    it "should send discussion notification with discussions content when unlocked sms" do
+    it "sends discussion notification with discussions content when unlocked sms" do
       @topic.update(
         unlock_at: nil,
         lock_at: nil,
@@ -84,7 +84,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("the content here of the discussion body")
     end
 
-    it "should send locked notification if availibility date is locked for summary" do
+    it "sends locked notification if availibility date is locked for summary" do
       @topic.update(
         unlock_at: Time.zone.now + 3.days,
         lock_at: Time.zone.now + 6.days,
@@ -95,7 +95,7 @@ describe 'new_discussion_topic' do
       expect(message.body).to include("Discussion content is locked or not yet available")
     end
 
-    it "should send discussion notification with discussions content when unlocked summary" do
+    it "sends discussion notification with discussions content when unlocked summary" do
       @topic.update(
         unlock_at: nil,
         lock_at: nil,

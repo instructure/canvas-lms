@@ -36,16 +36,16 @@ describe "syllabus" do
     expect(page.at_css('#syllabusContainer')).not_to be_nil
   end
 
-  it "should allow access to public courses" do
+  it "allows access to public courses" do
     anonymous_syllabus_access_allowed :is_public
   end
 
-  it "should allow access to a public syllabus" do
+  it "allows access to a public syllabus" do
     anonymous_syllabus_access_allowed :public_syllabus
   end
 
   shared_examples_for "public syllabus file verifiers" do
-    it "should allow viewing available files in a public syllabus" do
+    it "allows viewing available files in a public syllabus" do
       course_factory(active_all: true)
       attachment_model
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
@@ -61,7 +61,7 @@ describe "syllabus" do
       expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
     end
 
-    it "should not allow viewing locked files in a public syllabus" do
+    it "does not allow viewing locked files in a public syllabus" do
       course_factory(active_all: true)
       attachment_model
       @attachment.locked = true
@@ -82,7 +82,7 @@ describe "syllabus" do
   end
 
   shared_examples_for "public syllabus for authenticated file verifiers" do
-    it "should allow viewing available files in a public to authenticated syllabus" do
+    it "allows viewing available files in a public to authenticated syllabus" do
       course_factory(active_all: true)
       attachment_model
       @course.syllabus_body = "<a href=\"/courses/#{@course.id}/files/#{@attachment.id}/download\">linky</a>"
@@ -99,7 +99,7 @@ describe "syllabus" do
       expect(link.attributes['href'].value).to include("verifier=#{@attachment.uuid}")
     end
 
-    it "should not allow viewing locked files in a public to authenticated syllabus" do
+    it "does not allow viewing locked files in a public to authenticated syllabus" do
       course_factory(active_all: true)
       attachment_model
       @attachment.locked = true
@@ -150,7 +150,7 @@ describe "syllabus" do
     user_session(@user)
   end
 
-  it "should display syllabus description on syllabus course home pages" do
+  it "displays syllabus description on syllabus course home pages" do
     course_with_teacher_logged_in(:active_all => true)
     syllabus_body = "test syllabus body"
     @course.syllabus_body = syllabus_body

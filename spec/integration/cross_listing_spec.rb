@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "cross listing" do
   describe "user course associations" do
-    it "should not be kept when a user is not enrolled in that course anymore" do
+    it "is not kept when a user is not enrolled in that course anymore" do
       process_csv_data_cleanly(
         "user_id,login_id,password,first_name,last_name,email,status",
         "U1,User1,,U,1,u1@example.com,active"

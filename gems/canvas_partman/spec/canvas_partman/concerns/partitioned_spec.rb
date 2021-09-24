@@ -22,7 +22,7 @@ describe CanvasPartman::Concerns::Partitioned do
     subject { CanvasPartman::PartitionManager.create(Animal) }
 
     describe 'creating records' do
-      it 'should fail if the target partition does not exist' do
+      it 'fails if the target partition does not exist' do
         expect {
           Animal.create!
         }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/
@@ -53,7 +53,7 @@ describe CanvasPartman::Concerns::Partitioned do
           Time.zone = @original_tz
         end
 
-        it 'should locate the correct partition table' do
+        it 'locates the correct partition table' do
           subject.create_partition(Time.new(2014, 12))
           subject.create_partition(Time.new(2015, 1))
 
@@ -182,7 +182,7 @@ describe CanvasPartman::Concerns::Partitioned do
     let(:zoo) { Zoo.create! }
 
     describe 'creating records' do
-      it 'should fail if the target partition does not exist' do
+      it 'fails if the target partition does not exist' do
         expect {
           Trail.create!(zoo: zoo)
         }.to raise_error ActiveRecord::StatementInvalid, /PG::UndefinedTable/

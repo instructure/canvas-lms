@@ -36,7 +36,7 @@ describe 'new_account_user' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "should use the custom From: setting" do
+    it "uses the custom From: setting" do
       msg = generate_message(notification_name, path_type, asset)
       msg.save
       expect(msg.from_name).to eq "Custom From"

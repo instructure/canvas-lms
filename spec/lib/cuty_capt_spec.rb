@@ -31,7 +31,7 @@ describe CutyCapt do
   end
 
   context "configuration" do
-    it "should correctly look up parameters specified by string keys in the config" do
+    it "correctlies look up parameters specified by string keys in the config" do
       ConfigFile.stub('cutycapt', { "path" => 'not used', 'timeout' => 1000 })
       expect(CutyCapt.config[:path]).to eq "not used"
       expect(CutyCapt.config[:timeout]).to eq 1000
@@ -39,14 +39,14 @@ describe CutyCapt do
   end
 
   context "url validation" do
-    it "should check for an http scheme" do
+    it "checks for an http scheme" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
       expect(CutyCapt.verify_url("ftp://example.com/")).to be_falsey
       expect(CutyCapt.verify_url("http://example.com/")).to be_truthy
       expect(CutyCapt.verify_url("https://example.com/")).to be_truthy
     end
 
-    it "should check for blacklisted domains" do
+    it "checks for blacklisted domains" do
       ConfigFile.stub('cutycapt', { :path => 'not used', :domain_blacklist => ['example.com'] })
 
       expect(CutyCapt.verify_url("http://example.com/blah")).to be_falsey
@@ -55,7 +55,7 @@ describe CutyCapt do
       expect(CutyCapt.verify_url("http://google.com/blah")).to be_truthy
     end
 
-    it "should check for blacklisted ip blocks" do
+    it "checks for blacklisted ip blocks" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
 
       expect(CutyCapt.verify_url("http://10.0.1.1/blah")).to be_falsey
@@ -66,14 +66,14 @@ describe CutyCapt do
       expect(CutyCapt.verify_url("http://workingexample.com/blah")).to be_falsey
     end
 
-    it "should check that the url resolves to something" do
+    it "checks that the url resolves to something" do
       ConfigFile.stub('cutycapt', { :path => 'not used' })
       expect(CutyCapt.verify_url("http://successfull")).to be_falsey
     end
   end
 
   context "execution" do
-    it "should time out cuty processes" do
+    it "times out cuty processes" do
       ConfigFile.stub('cutycapt', { :path => '/bin/sleep', :timeout => '1000' })
 
       allow(CutyCapt).to receive(:cuty_arguments).and_return(["/bin/sleep", "60"])
@@ -84,7 +84,7 @@ describe CutyCapt do
   end
 
   describe ".snapshot_attachment_for_url" do
-    it "should return an attachment" do
+    it "returns an attachment" do
       path = File.join(self.class.fixture_path, "files/instructure.png")
       expect(CutyCapt).to receive(:snapshot_url).and_yield(path)
       attachment = CutyCapt.snapshot_attachment_for_url("blah")

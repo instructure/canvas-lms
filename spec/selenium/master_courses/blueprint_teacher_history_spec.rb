@@ -42,7 +42,7 @@ describe "master courses - child courses - sync history for teacher" do
     user_session(@teacher)
   end
 
-  it "should show import history to a teacher", priority: "1", test_id: 3208649 do
+  it "shows import history to a teacher", priority: "1", test_id: 3208649 do
     assmt = @copy_from.assignments.create!(title: "assmt", due_at: 2.days.from_now)
     @template.create_content_tag_for!(assmt, { restrictions: { content: true } })
     topic = @copy_from.discussion_topics.create!(title: "something")

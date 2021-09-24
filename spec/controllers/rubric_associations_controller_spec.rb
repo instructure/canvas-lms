@@ -22,13 +22,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe RubricAssociationsController do
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       post 'create', params: { :course_id => @course.id, :rubric_association => { :rubric_id => @rubric.id } }
       assert_unauthorized
     end
-    it "should assign variables" do
+    it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       post 'create', params: { :course_id => @course.id,
@@ -41,7 +41,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
-    it "should create without manager_rubrics permission" do
+    it "creates without manager_rubrics permission" do
       course_with_teacher_logged_in(:active_all => true)
       @course.account.role_overrides.create! :role => teacher_role, :permission => 'manage_rubrics', :enabled => false
       rubric_association_model(:user => @user, :context => @course)
@@ -106,7 +106,7 @@ describe RubricAssociationsController do
           course_with_teacher_logged_in(active_all: true, course: @course2)
         end
 
-        it "should duplicate the associated rubric" do
+        it "duplicates the associated rubric" do
           expect {
             post 'create', params: { course_id: @course2.id, rubric_association: { rubric_id: @rubric.id } }
           }.to change {
@@ -123,7 +123,7 @@ describe RubricAssociationsController do
               @proficiency = outcome_proficiency_model(@course2)
             end
 
-            it "should use the new course mastery scales for learning outcome criterion" do
+            it "uses the new course mastery scales for learning outcome criterion" do
               post 'create', params: { course_id: @course2.id, rubric_association: { rubric_id: @rubric.id } }
               outcome_criterion = assigns[:rubric].data[0]
               expect(outcome_criterion[:ratings].length).to eq 2
@@ -139,7 +139,7 @@ describe RubricAssociationsController do
               @proficiency = outcome_proficiency_model(@course2)
             end
 
-            it "should not change the existing criterions" do
+            it "does not change the existing criterions" do
               post 'create', params: { course_id: @course2.id, rubric_association: { rubric_id: @rubric.id } }
               expect(assigns[:rubric].data).to eq @rubric.data
             end
@@ -154,7 +154,7 @@ describe RubricAssociationsController do
           course_with_teacher_logged_in(active_all: true, course: @course)
         end
 
-        it "should not duplicate the rubric" do
+        it "does not duplicate the rubric" do
           expect {
             post 'create', params: { course_id: @course.id, rubric_association: { rubric_id: @rubric.id } }
           }.to change {
@@ -167,13 +167,13 @@ describe RubricAssociationsController do
   end
 
   describe "PUT 'update'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       put 'update', params: { :course_id => @course.id, :id => @rubric_association.id }
       assert_unauthorized
     end
-    it "should assign variables" do
+    it "assigns variables" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       put 'update', params: { :course_id => @course.id, :id => @rubric_association.id, :rubric_association => { :title => "some association" } }
@@ -181,7 +181,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
-    it "should update the rubric if updateable" do
+    it "updates the rubric if updateable" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       put 'update', params: { :course_id => @course.id, :id => @rubric_association.id, :rubric => { :title => "new title" }, :rubric_association => { :title => "some association" } }
@@ -191,7 +191,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
-    it "should not update the rubric if not updateable (should make a new one instead)" do
+    it "does not update the rubric if not updateable (should make a new one instead)" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :purpose => 'grading')
       @rubric.associate_with(@course, @course, :purpose => 'grading')
@@ -202,7 +202,7 @@ describe RubricAssociationsController do
       expect(assigns[:association].title).to eql("some association")
       expect(response).to be_successful
     end
-    it "should update the association" do
+    it "updates the association" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       put 'update', params: { :course_id => @course.id, :id => @rubric_association.id, :rubric_association => { :title => "some association" } }
@@ -273,14 +273,14 @@ describe RubricAssociationsController do
   end
 
   describe "DELETE 'destroy'" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_teacher(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       delete 'destroy', params: { :course_id => @course.id, :id => @rubric_association.id }
       assert_unauthorized
     end
 
-    it "should delete the rubric if deletable" do
+    it "deletes the rubric if deletable" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       delete 'destroy', params: { :course_id => @course.id, :id => @rubric_association.id }
@@ -304,7 +304,7 @@ describe RubricAssociationsController do
       expect(assigns[:association]).to be_deleted
     end
 
-    it "should delete only the association if the rubric is not deletable" do
+    it "deletes only the association if the rubric is not deletable" do
       rubric_association_model
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course, :rubric => @rubric, :purpose => 'grading')
@@ -319,7 +319,7 @@ describe RubricAssociationsController do
       expect(assigns[:association]).to be_deleted
     end
 
-    it "should remove aligments links" do
+    it "removes aligments links" do
       course_with_teacher_logged_in(:active_all => true)
       outcome_with_rubric
       rubric_association_model(:user => @user, :context => @course, :rubric => @rubric)

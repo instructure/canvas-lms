@@ -32,7 +32,7 @@ describe MasterCourses::MasterMigration do
   end
 
   describe "start_new_migration!" do
-    it "should queue a migration" do
+    it "queues a migration" do
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:queue_export_job).once
       mig = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
       expect(mig.root_account).to eq @course.root_account
@@ -42,7 +42,7 @@ describe MasterCourses::MasterMigration do
       expect(@template.active_migration).to eq mig
     end
 
-    it "should raise an error if there's already a migration running" do
+    it "raises an error if there's already a migration running" do
       running = @template.master_migrations.create!(:workflow_state => "exporting")
       @template.active_migration = running
       @template.save!
@@ -53,7 +53,7 @@ describe MasterCourses::MasterMigration do
       }.to raise_error("cannot start new migration while another one is running")
     end
 
-    it "should still allow if the 'active' migration has been running for a while (and is probably ded)" do
+    it "stills allow if the 'active' migration has been running for a while (and is probably ded)" do
       running = @template.master_migrations.create!(:workflow_state => "exporting")
       @template.active_migration = running
       @template.save!
@@ -64,7 +64,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should queue a job" do
+    it "queues a job" do
       expect { MasterCourses::MasterMigration.start_new_migration!(@template, @user) }.to change(Delayed::Job, :count).by(1)
       expect_any_instance_of(MasterCourses::MasterMigration).to receive(:perform_exports).once
       run_jobs
@@ -76,7 +76,7 @@ describe MasterCourses::MasterMigration do
       @migration = @template.master_migrations.create!
     end
 
-    it "shouldn't do anything if there aren't any child courses to push to" do
+    it "does not do anything if there aren't any child courses to push to" do
       expect(@migration).to receive(:create_export).never
       @migration.perform_exports
       @migration.reload
@@ -84,7 +84,7 @@ describe MasterCourses::MasterMigration do
       expect(@migration.export_results[:message]).to eq "No child courses to export to"
     end
 
-    it "shouldn't count deleted subscriptions" do
+    it "does not count deleted subscriptions" do
       other_course = course_factory
       sub = @template.add_child_course!(other_course)
       sub.destroy!
@@ -93,7 +93,7 @@ describe MasterCourses::MasterMigration do
       @migration.perform_exports
     end
 
-    it "should record errors" do
+    it "records errors" do
       other_course = course_factory
       @template.add_child_course!(other_course)
       allow(@migration).to receive(:create_export).and_raise "oh neos"
@@ -104,7 +104,7 @@ describe MasterCourses::MasterMigration do
       expect(ErrorReport.find(@migration.export_results[:error_report_id]).message).to eq "oh neos"
     end
 
-    it "should do a full export by default" do
+    it "does a full export by default" do
       new_course = course_factory
       new_sub = @template.add_child_course!(new_course)
 
@@ -112,7 +112,7 @@ describe MasterCourses::MasterMigration do
       @migration.perform_exports
     end
 
-    it "should do a selective export based on subscriptions" do
+    it "does a selective export based on subscriptions" do
       old_course = course_factory
       sel_sub = @template.add_child_course!(old_course)
       sel_sub.update_attribute(:use_selective_copy, true)
@@ -121,7 +121,7 @@ describe MasterCourses::MasterMigration do
       @migration.perform_exports
     end
 
-    it "should do two exports if needed" do
+    it "does two exports if needed" do
       new_course = course_factory
       new_sub = @template.add_child_course!(new_course)
       old_course = course_factory
@@ -149,7 +149,7 @@ describe MasterCourses::MasterMigration do
       @migration.reload
     end
 
-    it "should create an export once and import in each child course" do
+    it "creates an export once and import in each child course" do
       @copy_to1 = course_factory
       @sub1 = @template.add_child_course!(@copy_to1)
       @copy_to2 = course_factory
@@ -179,7 +179,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should copy selectively on second time" do
+    it "copies selectively on second time" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -361,7 +361,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should sync deleted quiz questions (unless changed downstream)" do
+    it "syncs deleted quiz questions (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -397,7 +397,7 @@ describe MasterCourses::MasterMigration do
       expect(qq3_to.reload).to_not be_deleted
     end
 
-    it "should not restore quiz questions deleted downstream (unless locked)" do
+    it "does not restore quiz questions deleted downstream (unless locked)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -424,7 +424,7 @@ describe MasterCourses::MasterMigration do
       expect(qq_to.reload).to be_deleted # original doesn't get restored because it just made a new question instead /shrug
     end
 
-    it "should sync deleted quiz groups (unless changed downstream)" do
+    it "syncs deleted quiz groups (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -455,7 +455,7 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_groups.to_a).to eq [qgroup2_to]
     end
 
-    it 'should sync deleted quiz groups linked to question banks after the quiz has been published and submitted' do
+    it 'syncs deleted quiz groups linked to question banks after the quiz has been published and submitted' do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       student = user_factory(active_all: true)
@@ -487,7 +487,7 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_groups.to_a).to eq []
     end
 
-    it 'should sync deleted quiz groups with quiz questions after the quiz has been published and submitted' do
+    it 'syncs deleted quiz groups with quiz questions after the quiz has been published and submitted' do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       student = user_factory(active_all: true)
@@ -518,7 +518,7 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_groups.to_a).to eq []
     end
 
-    it "should sync deleted assessment bank questions (unless changed downstream)" do
+    it "syncs deleted assessment bank questions (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -551,7 +551,7 @@ describe MasterCourses::MasterMigration do
       expect(aq4_to.reload).to_not be_deleted # should have been left alone
     end
 
-    it "should preserve all answer ids on re-copy" do
+    it "preserves all answer ids on re-copy" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -586,7 +586,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should sync quiz group attributes (unless changed downstream)" do
+    it "syncs quiz group attributes (unless changed downstream)" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -617,7 +617,7 @@ describe MasterCourses::MasterMigration do
       expect(quiz_to.reload.quiz_questions.where(:migration_id => mig_id(@new_qq)).first).to_not be_nil
     end
 
-    it "should create submissions for assignments without due dates on initial sync" do
+    it "creates submissions for assignments without due dates on initial sync" do
       course_with_student(:active_all => true)
       @copy_to = @course
       sub = @template.add_child_course!(@copy_to)
@@ -629,7 +629,7 @@ describe MasterCourses::MasterMigration do
       expect(assmt_to.submissions.where(:user_id => @student)).to be_exists
     end
 
-    it "shouldn't delete an assignment group if it's not empty downstream" do
+    it "does not delete an assignment group if it's not empty downstream" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -666,7 +666,7 @@ describe MasterCourses::MasterMigration do
       expect(@new_assmt.reload).to_not be_deleted
     end
 
-    it "should delete an assignment group when all assignments are moved out in the same sync" do
+    it "deletes an assignment group when all assignments are moved out in the same sync" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -693,7 +693,7 @@ describe MasterCourses::MasterMigration do
       expect(a2_to).to be_active
     end
 
-    it "shouldn't import into a deleted downstream assignment group" do
+    it "does not import into a deleted downstream assignment group" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -715,7 +715,7 @@ describe MasterCourses::MasterMigration do
       expect(a2_to.assignment_group).to be_available
     end
 
-    it "shouldn't change assignment group weights and rules if changed downstream" do
+    it "does not change assignment group weights and rules if changed downstream" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -769,7 +769,7 @@ describe MasterCourses::MasterMigration do
       expect(a1_to).to be
     end
 
-    it "should sync unpublished quiz points possible" do
+    it "syncs unpublished quiz points possible" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1082,7 +1082,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should create two exports (one selective and one full) if needed" do
+    it "creates two exports (one selective and one full) if needed" do
       @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)
 
@@ -1110,7 +1110,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.wiki_pages.where(:migration_id => mig_id(page)).first).to be_present
     end
 
-    it "should skip master course restriction validations on import" do
+    it "skips master course restriction validations on import" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
@@ -1186,7 +1186,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_tool.reload.name).to eq plain_text
     end
 
-    it "should not overwrite downstream changes in child course unless locked" do
+    it "does not overwrite downstream changes in child course unless locked" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1337,7 +1337,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.active_context_modules.where(:name => "module 2 B").first!.content_tags.active.map { |tag| tag.content.id }).to eq [to_assignment_2.id]
     end
 
-    it "should not restore content tags in a deleted module" do
+    it "does not restore content tags in a deleted module" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1424,7 +1424,7 @@ describe MasterCourses::MasterMigration do
       expect(assmt_to.unlock_at).to be_nil
     end
 
-    it "should count downstream changes to quiz/assessment questions as changes in quiz/bank content" do
+    it "counts downstream changes to quiz/assessment questions as changes in quiz/bank content" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1487,7 +1487,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_qq.reload.question_data['question_text']).to eq new_master_text
     end
 
-    it "should use current version of quiz after import if quiz was published on the copy_to" do
+    it "uses current version of quiz after import if quiz was published on the copy_to" do
       @copy_to = course_factory
       @copy_to.enroll_student(User.create!, enrollment_state: 'active')
       @template.add_child_course!(@copy_to)
@@ -1513,7 +1513,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_quiz.reload.quiz_data).to include(hash_including("question_text" => new_master_text))
     end
 
-    it "should handle graded quizzes/discussions/etc better" do
+    it "handles graded quizzes/discussions/etc better" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1582,7 +1582,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_topic_assmt.reload.due_at.to_i).to eq new_master_due_at.to_i
     end
 
-    it "should not copy only_visible_to_overrides for quizzes by default" do
+    it "does not copy only_visible_to_overrides for quizzes by default" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1651,7 +1651,7 @@ describe MasterCourses::MasterMigration do
       expect(topic_to.assignment).to_not be_deleted
     end
 
-    it "should ignore course settings on selective export unless requested" do
+    it "ignores course settings on selective export unless requested" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -1696,7 +1696,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.conclude_at).to be_nil
     end
 
-    it "should be able to disable grading standard" do
+    it "is able to disable grading standard" do
       gs = @copy_from.grading_standards.create!(:title => "Standard eh", :data => [["Eh", 0.93], ["Eff", 0]])
       @copy_from.update(:grading_standard_enabled => true, :grading_standard => gs)
 
@@ -1715,7 +1715,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.grading_standard_enabled).to eq false
     end
 
-    it "should copy front wiki pages" do
+    it "copies front wiki pages" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -1748,7 +1748,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.wiki.reload.front_page).to be_nil
     end
 
-    it "should leave front wiki setting alone on downstream change to front page url" do
+    it "leaves front wiki setting alone on downstream change to front page url" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -1771,7 +1771,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.default_view).to eq 'wiki'
     end
 
-    it "should change front wiki pages unless it gets changed downstream" do
+    it "changes front wiki pages unless it gets changed downstream" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -1803,7 +1803,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.wiki.reload.front_page_url).to be nil # should leave alone
     end
 
-    it "shouldn't overwrite syllabus body if already present or changed" do
+    it "does not overwrite syllabus body if already present or changed" do
       @copy_to1 = course_factory
       @template.add_child_course!(@copy_to1)
 
@@ -1836,7 +1836,7 @@ describe MasterCourses::MasterMigration do
       end
     end
 
-    it "should trigger folder locking data cache invalidation" do
+    it "triggers folder locking data cache invalidation" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -1938,7 +1938,7 @@ describe MasterCourses::MasterMigration do
       expect(copied_att.reload.full_path).to eq "course files/B/C/file.txt"
     end
 
-    it "should baleet assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
+    it "baleets assignment overrides when an admin pulls a bait-n-switch with date restrictions" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -1979,7 +1979,7 @@ describe MasterCourses::MasterMigration do
       [topic_override, normal_override].each { |ao| expect(ao.reload).to be_deleted }
     end
 
-    it "should work with a single full export for a new association" do
+    it "works with a single full export for a new association" do
       @copy_to1 = course_factory
       sub1 = @template.add_child_course!(@copy_to1)
       topic = @copy_from.discussion_topics.create!(:title => "some title")
@@ -1994,7 +1994,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.discussion_topics.first).to be_present
     end
 
-    it "should be able to unset group discussions (unless posted to already)" do
+    it "is able to unset group discussions (unless posted to already)" do
       @copy_to1 = course_factory
       @copy_to2 = course_factory(:active_all => true)
       sub1 = @template.add_child_course!(@copy_to1)
@@ -2027,7 +2027,7 @@ describe MasterCourses::MasterMigration do
       expect(result2.skipped_items).to eq [mig_id(topic)]
     end
 
-    it "should link assignment rubrics on update" do
+    it "links assignment rubrics on update" do
       Timecop.freeze(10.minutes.ago) do
         @copy_to = course_factory
         @template.add_child_course!(@copy_to)
@@ -2065,7 +2065,7 @@ describe MasterCourses::MasterMigration do
       expect(assignment_to.reload.rubric).to eq other_rubric
     end
 
-    it "should link assignment rubrics when association is pointed to a new rubric" do
+    it "links assignment rubrics when association is pointed to a new rubric" do
       Timecop.freeze(10.minutes.ago) do
         @copy_to = course_factory
         @template.add_child_course!(@copy_to)
@@ -2092,7 +2092,7 @@ describe MasterCourses::MasterMigration do
       expect(assignment_to.reload.rubric).to eq second_rubric_to
     end
 
-    it "shouldn't delete module items in associated courses" do
+    it "does not delete module items in associated courses" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
@@ -2109,7 +2109,7 @@ describe MasterCourses::MasterMigration do
       expect(tag.reload).to_not be_deleted
     end
 
-    it "should sync module item positions properly" do
+    it "syncs module item positions properly" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
@@ -2133,7 +2133,7 @@ describe MasterCourses::MasterMigration do
       expect(tag2_to.reload.position).to eq 1
     end
 
-    it "should try to properly append on the end even if the destination module item positions are lying" do
+    it "tries to properly append on the end even if the destination module item positions are lying" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
@@ -2152,7 +2152,7 @@ describe MasterCourses::MasterMigration do
       expect(tag3_to.reload.position).to eq 3
     end
 
-    it "should be able to delete modules" do
+    it "is able to delete modules" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
       mod = @copy_from.context_modules.create!(:name => "module")
@@ -2169,7 +2169,7 @@ describe MasterCourses::MasterMigration do
       expect(mod_to.reload).to be_deleted
     end
 
-    it "should copy outcomes in selective copies" do
+    it "copies outcomes in selective copies" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -2193,7 +2193,7 @@ describe MasterCourses::MasterMigration do
       expect(lo_to).to be_present
     end
 
-    it "should copy a question bank alignment even if the outcome and bank have already been synced" do
+    it "copies a question bank alignment even if the outcome and bank have already been synced" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -2223,7 +2223,7 @@ describe MasterCourses::MasterMigration do
       expect(@bank_to.learning_outcome_alignments.first.learning_outcome).to eq @lo_to
     end
 
-    it "should copy a question bank alignment even if the outcome and bank have already been synced and the outcome is nested in another group" do
+    it "copies a question bank alignment even if the outcome and bank have already been synced and the outcome is nested in another group" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -2361,7 +2361,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to.reload.tab_configuration).to eq @copy_from.tab_configuration
     end
 
-    it "should not break trying to match existing attachments on cloned_item_id" do
+    it "does not break trying to match existing attachments on cloned_item_id" do
       # this was 'fun' to debug - i'm still not quite sure how it came about
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
@@ -2389,7 +2389,7 @@ describe MasterCourses::MasterMigration do
       expect(att2_to).to be_present
     end
 
-    it "should link to existing outcomes even when some weird migration_id thing happens" do
+    it "links to existing outcomes even when some weird migration_id thing happens" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
 
@@ -2422,7 +2422,7 @@ describe MasterCourses::MasterMigration do
       expect(rub_to.learning_outcome_alignments.first.learning_outcome_id).to eq lo_to.id
     end
 
-    it "should sync workflow states more betterisher" do
+    it "syncs workflow states more betterisher" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -2550,7 +2550,7 @@ describe MasterCourses::MasterMigration do
       expect(mod1_to.reload.completion_requirements).to eq([])
     end
 
-    it "should copy the lack of a module unlock date" do
+    it "copies the lack of a module unlock date" do
       @copy_to = course_factory
       @template.add_child_course!(@copy_to)
 
@@ -2565,7 +2565,7 @@ describe MasterCourses::MasterMigration do
       expect(mod_to.reload.unlock_at).to be_nil
     end
 
-    it "should work with links to files copied in previous sync" do
+    it "works with links to files copied in previous sync" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -2586,7 +2586,7 @@ describe MasterCourses::MasterMigration do
       expect(@topic_copy.message).to include("/courses/#{@copy_to.id}/files/#{@att_copy.id}/download?wrap=1")
     end
 
-    it "should replace module item contents when file is replaced" do
+    it "replaces module item contents when file is replaced" do
       @copy_to = course_factory
       @sub = @template.add_child_course!(@copy_to)
 
@@ -2612,7 +2612,7 @@ describe MasterCourses::MasterMigration do
       expect(@tag_copy.reload.content).to eq @new_att_copy
     end
 
-    it "should export account-level linked outcomes in a selective migration" do
+    it "exports account-level linked outcomes in a selective migration" do
       Timecop.freeze(1.minute.ago) do
         @acc_outcome = @copy_from.account.created_learning_outcomes.create!(:short_description => "womp")
       end
@@ -2692,7 +2692,7 @@ describe MasterCourses::MasterMigration do
       expect(@copy_to2.reload).to be_available
     end
 
-    it "should update quiz assignment cached due dates" do
+    it "updates quiz assignment cached due dates" do
       course_with_student(:active_all => true)
       @copy_to = @course
       @sub = @template.add_child_course!(@copy_to)
@@ -2757,7 +2757,7 @@ describe MasterCourses::MasterMigration do
         worker.perform(@cm)
       end
 
-      it "should not overwrite blueprint attachment migration ids from other course copies" do
+      it "does not overwrite blueprint attachment migration ids from other course copies" do
         att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
 
         @copy_to = course_factory(:active_all => true)
@@ -2793,7 +2793,7 @@ describe MasterCourses::MasterMigration do
         run_jobs
       end
 
-      it "should not overwrite blueprint attachment migration ids from other canvas package imports" do
+      it "does not overwrite blueprint attachment migration ids from other canvas package imports" do
         import_package(@copy_from)
         att = @copy_from.attachments.first
 
@@ -2852,7 +2852,7 @@ describe MasterCourses::MasterMigration do
     context "sharding" do
       specs_require_sharding
 
-      it "should translate links to content with module item id" do
+      it "translates links to content with module item id" do
         mod1 = @copy_from.context_modules.create!(:name => "some module")
         asmnt = @copy_from.assignments.create!(:title => "some assignment")
         assmt_tag = mod1.add_item({ :id => asmnt.id, :type => 'assignment', :indent => 1 })
@@ -2906,7 +2906,7 @@ describe MasterCourses::MasterMigration do
         allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => TestExternalContentService })
       end
 
-      it "should work" do
+      it "works" do
         @copy_to = course_factory
         @template.add_child_course!(@copy_to)
 

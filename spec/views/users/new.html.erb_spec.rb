@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/new" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     terms_of_service_content = TermsOfServiceContent.create!(content: "default content")

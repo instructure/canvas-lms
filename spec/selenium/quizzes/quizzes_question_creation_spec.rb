@@ -333,7 +333,7 @@ describe 'quizzes question creation' do
       expect(f("#question_#{quiz.quiz_questions[0].id}")).to be_displayed
     end
 
-    it "should change example value on clicking the 'recompute' button when creating formula questions", priority: "2", test_id: 324919 do
+    it "changes example value on clicking the 'recompute' button when creating formula questions", priority: "2", test_id: 324919 do
       skip('Fails with webpack enabled')
       start_quiz_question
       click_option('.question_form:visible .question_type', 'Formula Question')
@@ -406,7 +406,7 @@ describe 'quizzes question creation' do
       assert_error_box(".question_form:visible input[name='question_points']")
     end
 
-    it "should show an error when the quiz question exceeds character limit", priority: "2", test_id: 140672 do
+    it "shows an error when the quiz question exceeds character limit", priority: "2", test_id: 140672 do
       start_quiz_question
       chars = [*('a'..'z')]
       value = (0..16385).map { chars.sample }.join

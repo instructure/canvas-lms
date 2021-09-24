@@ -29,7 +29,7 @@ end
 
 describe "CanvasUnzip" do
   shared_examples_for 'it extracts archives with extension' do |extension|
-    it "should extract an archive" do
+    it "extracts an archive" do
       Dir.mktmpdir do |tmpdir|
         warnings = CanvasUnzip.extract_archive(fixture_filename("test.#{extension}"), tmpdir)
         expect(warnings).to eq({})
@@ -40,7 +40,7 @@ describe "CanvasUnzip" do
       end
     end
 
-    it "should skip files that already exist by default" do
+    it "skips files that already exist by default" do
       Dir.mktmpdir do |tmpdir|
         File.open(File.join(tmpdir, 'file1.txt'), 'w') { |f| f.puts "OOGA" }
         warnings = CanvasUnzip.extract_archive(fixture_filename("test.#{extension}"), tmpdir)
@@ -50,7 +50,7 @@ describe "CanvasUnzip" do
       end
     end
 
-    it "should skip unsafe entries" do
+    it "skips unsafe entries" do
       Dir.mktmpdir do |tmpdir|
         subdir = File.join(tmpdir, 'sub_dir')
         Dir.mkdir(subdir)
@@ -62,7 +62,7 @@ describe "CanvasUnzip" do
       end
     end
 
-    it "should deal with empty archives" do
+    it "deals with empty archives" do
       Dir.mktmpdir do |tmpdir|
         subdir = File.join(tmpdir, 'sub_dir')
         Dir.mkdir(subdir)
@@ -70,7 +70,7 @@ describe "CanvasUnzip" do
       end
     end
 
-    it "should enumerate entries" do
+    it "enumerates entries" do
       indices = []
       entries = []
       warnings = CanvasUnzip.extract_archive(fixture_filename("evil.#{extension}")) do |entry, index|
@@ -84,12 +84,12 @@ describe "CanvasUnzip" do
   end
 
   describe "Limits" do
-    it "should compute reasonable default limits" do
+    it "computes reasonable default limits" do
       expect(CanvasUnzip.default_limits(100).maximum_bytes).to eq 10_000
       expect(CanvasUnzip.default_limits(1_000_000_000).maximum_bytes).to eq CanvasUnzip::DEFAULT_BYTE_LIMIT
     end
 
-    it "should raise an error if the file limit is exceeded" do
+    it "raises an error if the file limit is exceeded" do
       expect {
         limits = CanvasUnzip::Limits.new(CanvasUnzip::DEFAULT_BYTE_LIMIT, 2)
         Dir.mktmpdir do |tmpdir|
@@ -98,7 +98,7 @@ describe "CanvasUnzip" do
       }.to raise_error(CanvasUnzip::FileLimitExceeded)
     end
 
-    it "should raise an error if the byte limit is exceeded" do
+    it "raises an error if the byte limit is exceeded" do
       expect {
         limits = CanvasUnzip::Limits.new(10, 100)
         Dir.mktmpdir do |tmpdir|

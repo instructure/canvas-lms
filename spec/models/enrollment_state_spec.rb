@@ -21,7 +21,7 @@ require_relative "../spec_helper"
 
 describe EnrollmentState do
   describe "#enrollments_needing_calculation" do
-    it "should find enrollments that need calculation" do
+    it "finds enrollments that need calculation" do
       course_factory
       normal_enroll = student_in_course(:course => @course)
 
@@ -33,7 +33,7 @@ describe EnrollmentState do
       expect(EnrollmentState.enrollments_needing_calculation.to_a).to match_array([invalidated_enroll1, invalidated_enroll2])
     end
 
-    it "should be able to use a scope" do
+    it "is able to use a scope" do
       course_factory
       enroll = student_in_course(:course => @course)
       EnrollmentState.where(:enrollment_id => enroll).update_all(:state_is_current => false)
@@ -49,7 +49,7 @@ describe EnrollmentState do
       @enrollment = student_in_course(:course => @course)
     end
 
-    it "should reprocess invalidated states" do
+    it "reprocesses invalidated states" do
       EnrollmentState.where(:enrollment_id => @enrollment).update_all(:state_is_current => false, :state => "somethingelse")
 
       @enrollment.reload
@@ -60,7 +60,7 @@ describe EnrollmentState do
       expect(@enrollment.enrollment_state.state).to eq 'invited'
     end
 
-    it "should reprocess invalidated accesses" do
+    it "reprocesses invalidated accesses" do
       EnrollmentState.where(:enrollment_id => @enrollment).update_all(:access_is_current => false, :restricted_access => true)
 
       @enrollment.reload
@@ -73,7 +73,7 @@ describe EnrollmentState do
   end
 
   describe "state invalidation" do
-    it "should invalidate enrollments after enrollment term date change" do
+    it "invalidates enrollments after enrollment term date change" do
       course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
 
@@ -102,7 +102,7 @@ describe EnrollmentState do
       expect(state.state_started_at).to eq end_at
     end
 
-    it "should invalidate enrollments after enrollment term role-specific date change" do
+    it "invalidates enrollments after enrollment term role-specific date change" do
       term = Account.default.enrollment_terms.create!
       course_factory(active_all: true)
       @course.enrollment_term = term
@@ -129,7 +129,7 @@ describe EnrollmentState do
       expect(state.state_valid_until).to eq start_at
     end
 
-    it "should invalidate enrollments after course date changes" do
+    it "invalidates enrollments after course date changes" do
       course_factory(active_all: true)
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -151,7 +151,7 @@ describe EnrollmentState do
       expect(enroll_state.state_started_at).to eq ended_at
     end
 
-    it "should invalidate enrollments after changing course setting overriding term dates" do
+    it "invalidates enrollments after changing course setting overriding term dates" do
       course_factory(active_all: true)
       enroll = student_in_course(:course => @course)
       enroll_state = enroll.enrollment_state
@@ -177,7 +177,7 @@ describe EnrollmentState do
       expect(enroll_state.state_started_at).to eq ended_at
     end
 
-    it "should invalidate enrollments after changing course section dates" do
+    it "invalidates enrollments after changing course section dates" do
       course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
 
@@ -211,7 +211,7 @@ describe EnrollmentState do
       account.save!
     end
 
-    it "should invalidate access for future students when account future access settings are changed" do
+    it "invalidates access for future students when account future access settings are changed" do
       course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
       other_state = other_enroll.enrollment_state
@@ -242,7 +242,7 @@ describe EnrollmentState do
       expect(future_enroll).to be_inactive
     end
 
-    it "should invalidate access for past students when past access settings are changed" do
+    it "invalidates access for past students when past access settings are changed" do
       course_factory(active_all: true)
       other_enroll = student_in_course(:course => @course)
       other_state = other_enroll.enrollment_state
@@ -274,7 +274,7 @@ describe EnrollmentState do
       expect(past_enroll).to be_inactive
     end
 
-    it "should invalidate access when course access settings change" do
+    it "invalidates access when course access settings change" do
       course_factory(active_all: true)
       @course.start_at = 3.days.from_now
       @course.conclude_at = 4.days.from_now
@@ -298,7 +298,7 @@ describe EnrollmentState do
       expect(enroll).to be_inactive
     end
 
-    it "should invalidate access properly if dates and access settings are changed simultaneously" do
+    it "invalidates access properly if dates and access settings are changed simultaneously" do
       course_factory(active_all: true)
       @course.start_at = 3.days.from_now
       @course.conclude_at = 4.days.from_now
@@ -324,7 +324,7 @@ describe EnrollmentState do
   end
 
   describe "#recalculate_expired_states" do
-    it "should recalculate expired states" do
+    it "recalculates expired states" do
       course_factory(active_all: true)
       @course.start_at = 3.days.from_now
       end_at = 5.days.from_now
@@ -350,7 +350,7 @@ describe EnrollmentState do
     end
   end
 
-  it "shouldn't cache the wrong state when setting to 'invited'" do
+  it "does not cache the wrong state when setting to 'invited'" do
     course_factory(:active_all => true)
     e = student_in_course(:course => @course)
     e.reject!

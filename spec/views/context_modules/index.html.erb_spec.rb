@@ -30,7 +30,7 @@ describe "/context_modules/index" do
     assign(:collapsed_modules, [])
   end
 
-  it "should render" do
+  it "renders" do
     course_factory
     view_context(@course, @user)
     assign(:modules, @course.context_modules.active)
@@ -38,7 +38,7 @@ describe "/context_modules/index" do
     expect(response).not_to be_nil
   end
 
-  it "should show content_tags" do
+  it "shows content_tags" do
     course_factory
     context_module = @course.context_modules.create!
     module_item = context_module.add_item :type => 'context_module_sub_header'
@@ -51,7 +51,7 @@ describe "/context_modules/index" do
     expect(page.css("#context_module_item_#{module_item.id}").length).to eq 1
   end
 
-  it "should show unpublished content_tags" do
+  it "shows unpublished content_tags" do
     course_with_teacher(:active_all => true)
     wiki_page = wiki_page_model(:course => @course)
     wiki_page.workflow_state = 'unpublished'
@@ -70,7 +70,7 @@ describe "/context_modules/index" do
     expect(page.css("#context_module_item_#{module_item.id}").length).to eq 1
   end
 
-  it "should not show deleted content_tags" do
+  it "does not show deleted content_tags" do
     course_factory
     context_module = @course.context_modules.create!
     module_item = context_module.add_item :type => 'context_module_sub_header'

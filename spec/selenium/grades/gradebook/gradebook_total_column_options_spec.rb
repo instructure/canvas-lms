@@ -67,14 +67,14 @@ describe "Gradebook - total column menu options" do
       should_show_percentages
     end
 
-    it "should warn the teacher that studens will see a change" do
+    it "warns the teacher that studens will see a change" do
       Gradebook.visit(@course)
       Gradebook.open_display_dialog
       dialog = fj('.ui-dialog:visible')
       expect(dialog).to include_text("Warning")
     end
 
-    it 'should allow toggling display by points or percent', priority: "1", test_id: 164012 do
+    it 'allows toggling display by points or percent', priority: "1", test_id: 164012 do
       should_show_percentages
       Gradebook.toggle_grade_display
 
@@ -86,7 +86,7 @@ describe "Gradebook - total column menu options" do
       should_show_percentages
     end
 
-    it 'should change the text on the toggle option when toggling' do
+    it 'changes the text on the toggle option when toggling' do
       dropdown_text = []
 
       Gradebook.select_total_column_option()
@@ -106,7 +106,7 @@ describe "Gradebook - total column menu options" do
       expect(dropdown_text).to eq ['Display as Points', 'Display as Percentage', 'Display as Points']
     end
 
-    it 'should not show the warning once dont show is checked' do
+    it 'does not show the warning once dont show is checked' do
       Gradebook.open_display_dialog
       Gradebook.close_dialog_and_dont_show_again
 

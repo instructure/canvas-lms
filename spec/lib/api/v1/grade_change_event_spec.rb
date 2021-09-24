@@ -93,7 +93,7 @@ describe Api::V1::GradeChangeEvent do
     @events << @event
   end
 
-  it "should be formatted as a grade change event hash" do
+  it "is formatted as a grade change event hash" do
     event = subject.grade_change_event_json(@event, @student, @session)
 
     expect(event[:id]).to eq @event.id
@@ -143,11 +143,11 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:excused_after]).to eq false
   end
 
-  it "should be formatted as an array of grade change event hashes" do
+  it "is formatted as an array of grade change event hashes" do
     expect(subject.grade_change_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
-  it "should be formatted as an array of compound grade change event hashes" do
+  it "is formatted as an array of compound grade change event hashes" do
     json_hash = subject.grade_change_events_compound_json(@events, @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]
@@ -170,7 +170,7 @@ describe Api::V1::GradeChangeEvent do
     expect(linked[:page_views].size).to eql(1)
   end
 
-  it "should handle an empty result set" do
+  it "handles an empty result set" do
     json_hash = subject.grade_change_events_compound_json([], @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]

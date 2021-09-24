@@ -79,7 +79,7 @@ describe ExternalToolsController do
       'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
     }
 
-    it "should not update tool if user lacks update_manually" do
+    it "does not update tool if user lacks update_manually" do
       user_session(@student)
       tool = new_valid_tool(@course)
       put(
@@ -90,7 +90,7 @@ describe ExternalToolsController do
       assert_status(401)
     end
 
-    it "should update tool if user is granted update_manually" do
+    it "updates tool if user is granted update_manually" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       put(

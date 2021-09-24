@@ -22,7 +22,7 @@ require 'nokogiri'
 
 describe CC::CCHelper do
   context 'map_linked_objects' do
-    it 'should find linked canvas items in exported html content' do
+    it 'finds linked canvas items in exported html content' do
       content = '<a href="$CANVAS_OBJECT_REFERENCE$/assignments/123456789">Link</a>' \
                 '<img src="$IMS-CC-FILEBASE$/media/folder%201/file.jpg" />'
       linked_objects = CC::CCHelper.map_linked_objects(content)
@@ -30,7 +30,7 @@ describe CC::CCHelper do
       expect(linked_objects[1]).to eq({ local_path: '/media/folder 1/file.jpg', type: 'Attachment' })
     end
 
-    it 'should find linked canvas items in exported html content with old escapes' do
+    it 'finds linked canvas items in exported html content with old escapes' do
       content = '<a href="%24CANVAS_OBJECT_REFERENCE%24/assignments/123456789">Link</a>' \
                 '<img src="%24IMS-CC-FILEBASE%24/media/folder%201/file.jpg" />'
       linked_objects = CC::CCHelper.map_linked_objects(content)
@@ -73,7 +73,7 @@ describe CC::CCHelper do
       allow(@kaltura).to receive(:flavorAssetGetOriginalAsset).and_return(@kaltura.flavorAssetGetByEntryId('abcde').first)
     end
 
-    it "should translate media links using the original flavor" do
+    it "translates media links using the original flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
@@ -82,7 +82,7 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
     end
 
-    it "should not touch media links on course copy" do
+    it "does not touch media links on course copy" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       orig = <<-HTML
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
@@ -91,7 +91,7 @@ describe CC::CCHelper do
       expect(translated).to eq orig
     end
 
-    it "should not touch links to deleted media objects" do
+    it "does not touch links to deleted media objects" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       @obj.destroy
       orig = <<-HTML
@@ -102,7 +102,7 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id]).to be_nil
     end
 
-    it "should translate media links using an alternate flavor" do
+    it "translates media links using an alternate flavor" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
       translated = @exporter.html_content(<<-HTML)
       <p><a id='media_comment_abcde' class='instructure_inline_media_comment'>this is a media comment</a></p>
@@ -111,7 +111,7 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'two'
     end
 
-    it "should ignore media links with no media comment id" do
+    it "ignores media links with no media comment id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :media_object_flavor => 'flash video')
       html = %{<a class="youtubed instructure_inline_media_comment" href="http://www.youtube.com/watch?v=dCIP3x5mFmw">McDerp Enterprises</a>}
       translated = @exporter.html_content(html)
@@ -160,7 +160,7 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos).to be_empty
     end
 
-    it "should find media objects outside the context (because course copy)" do
+    it "finds media objects outside the context (because course copy)" do
       other_course = course_factory
       @exporter = CC::CCHelper::HtmlContentExporter.new(other_course, @user)
       @exporter.html_content(<<-HTML)
@@ -169,7 +169,7 @@ describe CC::CCHelper do
       expect(@exporter.used_media_objects.map(&:media_id)).to eql(['abcde'])
     end
 
-    it "should export html with a utf-8 charset" do
+    it "exports html with a utf-8 charset" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %{<div>My Title\u0278</div>}
       exported = @exporter.html_page(html, "my title page")
@@ -194,7 +194,7 @@ describe CC::CCHelper do
       expect(doc.at_css('script')).to be_nil
     end
 
-    it "should only translate course when trying to translate /cousers/x/users/y type links" do
+    it "onlies translate course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       orig = <<-HTML
       <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
@@ -203,21 +203,21 @@ describe CC::CCHelper do
       expect(translated).to match /users\/#{@teacher.id}/
     end
 
-    it "should interpret links to the files page as normal course pages" do
+    it "interprets links to the files page as normal course pages" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       html = %{<a href="/courses/#{@course.id}/files">File page index</a>}
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/files}
     end
 
-    it "should interpret links to the home page as normal course pages" do
+    it "interprets links to the home page as normal course pages" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       html = %{<a href="/courses/#{@course.id}">Home page index</a>}
       translated = @exporter.html_content(html)
       expect(translated).to match %r{\$CANVAS_COURSE_REFERENCE\$/}
     end
 
-    it "should prepend the domain to links outside the course" do
+    it "prepends the domain to links outside the course" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
@@ -232,7 +232,7 @@ describe CC::CCHelper do
       expect(urls[1]).to eq "http://www.example.com:8080/courses/#{@othercourse.id}/wiki/front-page"
     end
 
-    it "should copy pages correctly when the title starts with a number" do
+    it "copies pages correctly when the title starts with a number" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)
@@ -245,7 +245,7 @@ describe CC::CCHelper do
       expect(urls[0]).to eq "$WIKI_REFERENCE$/wiki/#{page.url}"
     end
 
-    it "should copy pages correctly when the title consists only of a number" do
+    it "copies pages correctly when the title consists only of a number" do
       allow(HostUrl).to receive(:protocol).and_return('http')
       allow(HostUrl).to receive(:context_host).and_return('www.example.com:8080')
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => false)

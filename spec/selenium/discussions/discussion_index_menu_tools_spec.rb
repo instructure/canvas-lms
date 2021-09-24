@@ -32,7 +32,7 @@ describe 'discussion index menu tool placement' do
     Account.default.enable_feature!(:commons_favorites)
   end
 
-  it "should be able to launch the index menu tool via the tray", custom_timeout: 60 do
+  it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
     DiscussionsIndex.visit(@course)
     DiscussionsIndex.discussion_menu_button.click
 

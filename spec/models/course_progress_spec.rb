@@ -41,13 +41,13 @@ describe CourseProgress do
     assignment.submit_homework(user, submission_type: 'online_text_entry', body: '42')
   end
 
-  it "should return nil for non module_based courses" do
+  it "returns nil for non module_based courses" do
     user = student_in_course(:active_all => true)
     progress = CourseProgress.new(@course, user).to_json
     expect(progress).to eq progress_error
   end
 
-  it "should return nil for non student users" do
+  it "returns nil for non student users" do
     user = user_model
     allow(@course).to receive(:module_based?).and_return(true)
     progress = CourseProgress.new(@course, user).to_json
@@ -89,7 +89,7 @@ describe CourseProgress do
       student_in_course(:active_all => true)
     end
 
-    it "should return correct progress for newly enrolled student" do
+    it "returns correct progress for newly enrolled student" do
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress).to eq({
                                requirement_count: 5,
@@ -99,13 +99,13 @@ describe CourseProgress do
                              })
     end
 
-    it "should only run item visibility methods once" do
+    it "onlies run item visibility methods once" do
       expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress[:requirement_count]).to eq 5
     end
 
-    it "should return correct progress for student who has completed some requirements" do
+    it "returns correct progress for student who has completed some requirements" do
       # turn in first two assignments (module 1)
       submit_homework(@assignment)
       submit_homework(@assignment2)
@@ -118,7 +118,7 @@ describe CourseProgress do
                              })
     end
 
-    it "should return correct progress for student in read-only mode" do
+    it "returns correct progress for student in read-only mode" do
       # turn in first two assignments (module 1)
       submit_homework(@assignment)
       submit_homework(@assignment2)
@@ -137,7 +137,7 @@ describe CourseProgress do
                              })
     end
 
-    it "should return correct progress for student who has completed all requirements" do
+    it "returns correct progress for student who has completed all requirements" do
       # turn in all assignments
       submit_homework(@assignment)
       submit_homework(@assignment2)
@@ -272,7 +272,7 @@ describe CourseProgress do
   end
 
   context "module that requires only one item completed" do
-    it 'should return the correct course progress when completing one of the requirements' do
+    it 'returns the correct course progress when completing one of the requirements' do
       @module1 = @course.context_modules.create!(:name => "module 01", :requirement_count => nil)
       @module2 = @course.context_modules.create!(:name => "module 02", :requirement_count => 1)
 
@@ -321,7 +321,7 @@ describe CourseProgress do
                              })
     end
 
-    it 'should still count as complete if the module has no requirements to speak of' do
+    it 'stills count as complete if the module has no requirements to speak of' do
       @module1 = @course.context_modules.create!(:name => "module 01", :requirement_count => 1)
       @module2 = @course.context_modules.create!(:name => "module 02", :requirement_count => nil)
 
@@ -349,7 +349,7 @@ describe CourseProgress do
                              })
     end
 
-    it 'should not be complete if not each module complete' do
+    it 'is not complete if not each module complete' do
       @module1 = @course.context_modules.create!(:name => "module 01", :requirement_count => 1)
       @module2 = @course.context_modules.create!(:name => "module 02", :requirement_count => 1)
       @module3 = @course.context_modules.create!(:name => "module 03", :requirement_count => 1)

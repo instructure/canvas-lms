@@ -38,17 +38,17 @@ describe DiscussionTopic::MaterializedView do
   end
 
   describe ".materialized_view_for" do
-    it "should build the intial empty view synchronously" do
+    it "builds the intial empty view synchronously" do
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to eq ["[]", [], [], []]
     end
 
-    it "should return nil and schedule a job if no view" do
+    it "returns nil and schedule a job if no view" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to eq nil
       expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
-    it "should return the view if it exists but is out of date" do
+    it "returns the view if it exists but is out of date" do
       @view.update_materialized_view(synchronous: true)
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
@@ -66,7 +66,7 @@ describe DiscussionTopic::MaterializedView do
     end
   end
 
-  it "should requeue the job if replication times out" do
+  it "requeues the job if replication times out" do
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view
     allow(DiscussionTopic::MaterializedView).to receive(:wait_for_replication).and_return(false)
@@ -81,7 +81,7 @@ describe DiscussionTopic::MaterializedView do
     expect(view.reload.entry_ids_array).to match_array(@topic.discussion_entries.map(&:id))
   end
 
-  it "should build a materialized view of the structure, participants and entry ids" do
+  it "builds a materialized view of the structure, participants and entry ids" do
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
     view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
@@ -122,7 +122,7 @@ describe DiscussionTopic::MaterializedView do
     ]
   end
 
-  it "should work with media track tags" do
+  it "works with media track tags" do
     obj = @course.media_objects.create! media_id: '0_deadbeef'
     track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
 

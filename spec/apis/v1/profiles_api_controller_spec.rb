@@ -31,7 +31,7 @@ end
 describe 'ProfileController', type: :request do
   context "setting permissions" do
     context "admin" do
-      it "should show all profiles" do
+      it "shows all profiles" do
         admin = account_admin_user
         user = user_with_pseudonym
 
@@ -41,7 +41,7 @@ describe 'ProfileController', type: :request do
     end
 
     context "teacher" do
-      it "should show profiles for their students" do
+      it "shows profiles for their students" do
         course_with_teacher(:active_all => true)
         e = course_with_user("StudentEnrollment", course: @course, active_all: true)
         user = e.user
@@ -49,7 +49,7 @@ describe 'ProfileController', type: :request do
         json = call_setting(as_user: @teacher, for_user: user)
         expect(json["short_name"]).to eq("User")
       end
-      it "should return unauthorized profiles for other students" do
+      it "returns unauthorized profiles for other students" do
         course_with_teacher(:active_all => true)
         user = user_with_pseudonym
 
@@ -58,13 +58,13 @@ describe 'ProfileController', type: :request do
     end
 
     context "student" do
-      it "should show a profile if it is theirs" do
+      it "shows a profile if it is theirs" do
         user = user_with_pseudonym(:active_user => true)
 
         json = call_setting(as_user: user, for_user: user)
         expect(json["short_name"]).to eq("User")
       end
-      it "should return unauthorized when attempting to access another students profile" do
+      it "returns unauthorized when attempting to access another students profile" do
         user_one = user_with_pseudonym(:active_user => true)
         user_two = user_with_pseudonym(:active_user => true, :user => user_factory)
 

@@ -51,14 +51,14 @@ describe "profile communication settings" do
     end
 
     context "with notification_settings_course_selector feature flag enabled" do
-      it "should render the generalized notification settings page" do
+      it "renders the generalized notification settings page" do
         Account.site_admin.enable_feature! :notification_settings_course_selector
         get "/profile/communication"
         expect(f("h1").text).to eq "Notification Settings"
       end
     end
 
-    it "should render" do
+    it "renders" do
       get "/profile/communication"
       expect(f('#breadcrumbs')).to include_text('Notification Settings')
       expect(f("h1").text).to eq "Account Notification Settings"
@@ -68,13 +68,13 @@ describe "profile communication settings" do
       expect(fj("thead span:contains('Conversations')")).to be_present
     end
 
-    it "should display the users email address as channel" do
+    it "displays the users email address as channel" do
       get "/profile/communication"
       expect(fj("th[scope='col'] span:contains('email')")).to be
       expect(fj("th[scope='col'] span:contains('nobody@example.com')")).to be
     end
 
-    it "shouldn't display a SMS number as channel" do
+    it "does not display a SMS number as channel" do
       communication_channel(@user, { username: '8011235555@vtext.com', path_type: 'sms', active_cc: true })
 
       get "/profile/communication"
@@ -82,7 +82,7 @@ describe "profile communication settings" do
       expect(f("thead")).not_to contain_jqcss("span:contains('8011235555@vtext.com')")
     end
 
-    it "should save a user-pref checkbox change" do
+    it "saves a user-pref checkbox change" do
       Account.default.settings[:allow_sending_scores_in_emails] = true
       Account.default.save!
       # set the user's initial user preference and verify checked or unchecked
@@ -97,7 +97,7 @@ describe "profile communication settings" do
       expect(@user.preferences[:send_scores_in_emails]).to eq true
     end
 
-    it "should only display immediately and off for sns channels" do
+    it "onlies display immediately and off for sns channels" do
       sns_channel
       get "/profile/communication"
       focus_button = ff("tr[data-testid='grading'] button")[1]
@@ -109,7 +109,7 @@ describe "profile communication settings" do
       expect(menu[1].text).to eq "Notifications off"
     end
 
-    it "should load an existing frequency setting and save a change" do
+    it "loads an existing frequency setting and save a change" do
       channel = communication_channel(@user, { username: '8011235555@vtext.com', active_cc: true })
       # Create a notification policy entry as an existing setting.
       policy = NotificationPolicy.new(:communication_channel_id => channel.id, :notification_id => @sub_comment.id)
@@ -128,7 +128,7 @@ describe "profile communication settings" do
       expect(policy.frequency).to eq Notification::FREQ_IMMEDIATELY
     end
 
-    it "should remove Conversations category when opted out" do
+    it "removes Conversations category when opted out" do
       Account.site_admin.enable_feature! :allow_opt_out_of_inbox
       @user.preferences[:disable_inbox] = true
       @user.save!
@@ -139,7 +139,7 @@ describe "profile communication settings" do
     end
   end
 
-  it "should render for a user with no enrollments" do
+  it "renders for a user with no enrollments" do
     user_logged_in(:username => 'somebody@example.com')
     get "/profile/communication"
     expect(fj("th[scope='col'] span:contains('email')")).to be

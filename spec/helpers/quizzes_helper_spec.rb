@@ -82,7 +82,7 @@ describe QuizzesHelper do
   end
 
   context 'render_number' do
-    it 'should render numbers' do
+    it 'renders numbers' do
       expect(render_number(1)).to eq '1'
       expect(render_number(100)).to eq '100'
       expect(render_number(1.123)).to eq '1.123'
@@ -92,88 +92,88 @@ describe QuizzesHelper do
       expect(render_number('1.43')).to eq '1.43'
     end
 
-    it 'should remove trailing zeros' do
+    it 'removes trailing zeros' do
       expect(render_number(1.20000000)).to eq '1.2'
       expect(render_number(0.10340000)).to eq '0.1034'
     end
 
-    it 'should remove trailing zeros and decimal point' do
+    it 'removes trailing zeros and decimal point' do
       expect(render_number(0.00000000)).to eq '0'
       expect(render_number(1.00000000)).to eq '1'
       expect(render_number(100.0)).to eq '100'
     end
 
-    it 'should render percentages' do
+    it 'renders percentages' do
       expect(render_number('1234.456%')).to eq '1,234.456%'
     end
   end
 
   context 'render_score' do
-    it 'should render nil scores' do
+    it 'renders nil scores' do
       expect(render_score(nil)).to eq '_'
     end
 
-    it 'should render with default precision' do
+    it 'renders with default precision' do
       expect(render_score(1000.45966)).to eq '1,000.46'
       expect(render_score('12.3456')).to eq '12.35'
     end
 
-    it 'should support higher precision' do
+    it 'supports higher precision' do
       expect(render_score(1234.4567, 3)).to eq '1,234.457'
       expect(render_score(0.12345000, 4)).to eq '0.1235'
     end
   end
 
   context 'render_quiz_type' do
-    it 'should render a humanized quiz type string' do
+    it 'renders a humanized quiz type string' do
       expect(render_quiz_type('practice_quiz')).to eq "Practice Quiz"
       expect(render_quiz_type('assignment')).to eq "Graded Quiz"
       expect(render_quiz_type('graded_survey')).to eq "Graded Survey"
       expect(render_quiz_type('survey')).to eq "Ungraded Survey"
     end
 
-    it 'should return nil for an unrecognized quiz_type' do
+    it 'returns nil for an unrecognized quiz_type' do
       expect(render_quiz_type(nil)).to be_nil
       expect(render_quiz_type('made_up_quiz_type')).to be_nil
     end
   end
 
   context 'render_score_to_keep' do
-    it 'should render which score to keep when passed in a scoring_policy option' do
+    it 'renders which score to keep when passed in a scoring_policy option' do
       expect(render_score_to_keep('keep_highest')).to eq "Highest"
       expect(render_score_to_keep('keep_latest')).to eq "Latest"
     end
 
-    it 'should return nil for an unrecognized scoring_policy' do
+    it 'returns nil for an unrecognized scoring_policy' do
       expect(render_score_to_keep(nil)).to be_nil
       expect(render_score_to_keep('made_up_scoring_policy')).to be_nil
     end
   end
 
   context 'render_show_responses' do
-    it "should answer 'Let Students See Quiz Responses?' when passed a hide_results option" do
+    it "answers 'Let Students See Quiz Responses?' when passed a hide_results option" do
       expect(render_show_responses('always')).to eq "No"
       expect(render_show_responses('until_after_last_attempt')).to eq "After Last Attempt"
       expect(render_show_responses(nil)).to eq "Always"
     end
 
-    it "should return nil for an unrecognized hide_results value" do
+    it "returns nil for an unrecognized hide_results value" do
       expect(render_show_responses('made_up_hide_results')).to be_nil
     end
   end
 
   context 'score_out_of_points_possible' do
-    it 'should show single digit scores' do
+    it 'shows single digit scores' do
       expect(score_out_of_points_possible(1, 5)).to eq "1 out of 5"
       expect(score_out_of_points_possible(0, 9)).to eq "0 out of 9"
     end
 
-    it 'should show 2-decimal precision if necessary' do
+    it 'shows 2-decimal precision if necessary' do
       expect(score_out_of_points_possible(0.66666666666, 1)).to eq "0.67 out of 1"
       expect(score_out_of_points_possible(5.23333333333, 10.0)).to eq "5.23 out of 10"
     end
 
-    it 'should be wrapped by a span when a CSS class, id, or style is given' do
+    it 'is wrapped by a span when a CSS class, id, or style is given' do
       expect(score_out_of_points_possible(1.5, 3, :class => "score_value")).to eq( \
         '<span class="score_value">1.5</span> out of 3'
       )
@@ -195,7 +195,7 @@ describe QuizzesHelper do
       def user_content(stuff); stuff; end # double #user_content
     end
 
-    it 'should extract the answers by blank' do
+    it 'extracts the answers by blank' do
       @answer_list = [{ blank_id: 'color', answer: 'red' }]
 
       html = fill_in_multiple_blanks_question(
@@ -207,7 +207,7 @@ describe QuizzesHelper do
       expect(html).to eq %q|<input name="question_1_1813d2a7223184cf43e19db6622df40b" 'value=red' readonly="readonly" aria-label='Fill in the blank, read surrounding text' />|
     end
 
-    it 'should sanitize user input' do
+    it 'sanitizes user input' do
       malicious_answer_list = [{
         blank_id: 'color',
         answer: %q|><script>alert()</script><img|
@@ -223,7 +223,7 @@ describe QuizzesHelper do
       expect(html).to be_html_safe
     end
 
-    it 'should add an appropriate label' do
+    it 'adds an appropriate label' do
       html = fill_in_multiple_blanks_question(
         :question => { :question_text => @question_text },
         :answer_list => @answer_list,
@@ -233,7 +233,7 @@ describe QuizzesHelper do
       expect(html).to match /aria\-label/
       expect(html).to match /Fill in the blank/
     end
-    it 'should handle equation img tags in the question text' do
+    it 'handles equation img tags in the question text' do
       broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
       @answer_list = [
         { blank_id: 'kindof', answer: 'protein' },
@@ -248,7 +248,7 @@ describe QuizzesHelper do
       expect(html).to match /value='fixing'/
       expect(html).to match /value='protein'/
     end
-    it "should sanitize the answer blocks in the noisy question data" do
+    it "sanitizes the answer blocks in the noisy question data" do
       broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_01731fa53c4cf2f32e893d5c3dbae9c1'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
       html = fill_in_multiple_blanks_question(
         question: { question_text: ActiveSupport::SafeBuffer.new(broken_question_text) },
@@ -266,7 +266,7 @@ describe QuizzesHelper do
       def user_content(stuff); stuff; end # double #user_content
     end
 
-    it "should select the user's answer" do
+    it "selects the user's answer" do
       html = multiple_dropdowns_question({
                                            question: {
                                              question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
@@ -278,7 +278,7 @@ describe QuizzesHelper do
       expect(html).to be_html_safe
     end
 
-    it "should not blow up if the user's answer isn't there" do
+    it "does not blow up if the user's answer isn't there" do
       html = multiple_dropdowns_question({
                                            question: {
                                              question_text: 'some <select class="question_input" name="question_4"><option value="other_val">val</option></select>'
@@ -290,7 +290,7 @@ describe QuizzesHelper do
       expect(html).to be_html_safe
     end
 
-    it "should disable select boxes that are not editable" do
+    it "disables select boxes that are not editable" do
       html_string = multiple_dropdowns_question({
                                                   question: {
                                                     question_text: 'some <select class="question_input" name="question_4"><option value="val">val</option></select>'
@@ -430,7 +430,7 @@ describe QuizzesHelper do
   end
 
   describe '#render_correct_answer_protection' do
-    it 'should provide a useful message when "last attempt"' do
+    it 'provides a useful message when "last attempt"' do
       quiz = double({
                       show_correct_answers_last_attempt: true,
                     })
@@ -439,7 +439,7 @@ describe QuizzesHelper do
       message = render_correct_answer_protection(quiz, quiz_submission)
       expect(message).to match /last attempt/
     end
-    it 'should provide a useful message when "no"' do
+    it 'provides a useful message when "no"' do
       quiz = double({
                       show_correct_answers_last_attempt: nil,
                       show_correct_answers: false,
@@ -452,7 +452,7 @@ describe QuizzesHelper do
       expect(message).to match /are hidden/
     end
 
-    it 'should provide nothing when "yes"' do
+    it 'provides nothing when "yes"' do
       quiz = double({
                       show_correct_answers_last_attempt: nil,
                       show_correct_answers: true,
@@ -465,7 +465,7 @@ describe QuizzesHelper do
       expect(message).to eq nil
     end
 
-    it 'should provide a useful message, and an availability date, when "show at" is set' do
+    it 'provides a useful message, and an availability date, when "show at" is set' do
       quiz = double({
                       show_correct_answers_last_attempt: nil,
                       show_correct_answers: true,
@@ -478,7 +478,7 @@ describe QuizzesHelper do
       expect(message).to match /will be available/
     end
 
-    it 'should provide a useful message, and a date, when "hide at" is set' do
+    it 'provides a useful message, and a date, when "hide at" is set' do
       quiz = double({
                       show_correct_answers_last_attempt: nil,
                       show_correct_answers: true,

@@ -27,7 +27,7 @@ describe Wiki do
   end
 
   context "unset_front_page!" do
-    it "should unset front page" do
+    it "unsets front page" do
       @course.default_view = "wiki"
       @wiki.unset_front_page!
 
@@ -38,7 +38,7 @@ describe Wiki do
   end
 
   context "set_front_page_url!" do
-    it "should set front_page_url" do
+    it "sets front_page_url" do
       @wiki.unset_front_page!
       new_url = "ponies4ever"
       expect(@wiki.set_front_page_url!(new_url)).to eq true
@@ -49,7 +49,7 @@ describe Wiki do
   end
 
   context "front_page" do
-    it "should build a custom front page if not found" do
+    it "builds a custom front page if not found" do
       new_url = "whyyyyy"
       @wiki.set_front_page_url!(new_url)
 
@@ -58,14 +58,14 @@ describe Wiki do
       expect(page.url).to eq new_url
     end
 
-    it "should find front_page by url" do
+    it "finds front_page by url" do
       page = @course.wiki_pages.create!(:title => "stuff and stuff")
 
       @wiki.set_front_page_url!(page.url)
       expect(page).to eq @wiki.front_page
     end
 
-    it "should find front_page by default url (legacy support)" do
+    it "finds front_page by default url (legacy support)" do
       page = @course.wiki_pages.create!(:title => "front page")
       page.update_attribute(:url, Wiki::DEFAULT_FRONT_PAGE_URL)
       @wiki.update_attribute(:has_no_front_page, false)
@@ -80,13 +80,13 @@ describe Wiki do
       user_factory :active_all => true
     end
 
-    it 'should give read rights to public courses' do
+    it 'gives read rights to public courses' do
       @course.is_public = true
       @course.save!
       expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
     end
 
-    it 'should not give read rights to unpublished public courses' do
+    it 'does not give read rights to unpublished public courses' do
       @course.workflow_state = 'claimed'
       @course.is_public = true
       @course.save!
@@ -95,24 +95,24 @@ describe Wiki do
 
     context 'default permissions' do
       [:update, :create_page, :delete_page, :update_page, :view_unpublished_items].each do |perm|
-        it "should give #{perm} rights to teachers" do
+        it "gives #{perm} rights to teachers" do
           course_with_teacher
           expect(@course.wiki.grants_right?(@teacher, perm)).to be_truthy
         end
 
-        it "should give #{perm} rights to admins" do
+        it "gives #{perm} rights to admins" do
           account_admin_user
           expect(@course.wiki.grants_right?(@admin, perm)).to be_truthy
         end
       end
     end
 
-    it 'should give publish page rights to admins' do
+    it 'gives publish page rights to admins' do
       account_admin_user
       expect(@course.wiki.grants_right?(@admin, :publish_page)).to be_truthy
     end
 
-    it 'should not give publish page rights to admins when the context is a group' do
+    it 'does not give publish page rights to admins when the context is a group' do
       account_admin_user
       group
       expect(@group.wiki.grants_right?(@admin, :publish_page)).to be_falsey
@@ -125,36 +125,36 @@ describe Wiki do
         @course.save!
       end
 
-      it 'should not give manage rights to students' do
+      it 'does not give manage rights to students' do
         expect(@course.wiki.grants_right?(@user, :manage)).to be_falsey
       end
 
-      it 'should not give update rights to students' do
+      it 'does not give update rights to students' do
         expect(@course.wiki.grants_right?(@user, :update)).to be_falsey
       end
 
-      it 'should give read rights to students' do
+      it 'gives read rights to students' do
         expect(@course.wiki.grants_right?(@user, :read)).to be_truthy
       end
 
-      it 'should give create_page rights to students' do
+      it 'gives create_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :create_page)).to be_truthy
       end
 
-      it 'should not give publish page rights to students' do
+      it 'does not give publish page rights to students' do
         expect(@course.wiki.grants_right?(@user, :publish_page)).to be_falsey
       end
 
-      it 'should not give publish page rights to students when the context is a group' do
+      it 'does not give publish page rights to students when the context is a group' do
         group
         expect(@group.wiki.grants_right?(@user, :publish_page)).to be_falsey
       end
 
-      it 'should not give delete_page rights to students' do
+      it 'does not give delete_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :delete_page)).to be_falsey
       end
 
-      it 'should give update_page rights to students' do
+      it 'gives update_page rights to students' do
         expect(@course.wiki.grants_right?(@user, :update_page)).to be_truthy
       end
     end
@@ -193,7 +193,7 @@ describe Wiki do
   context "sharding" do
     specs_require_sharding
 
-    it "should find the wiki's context from another shard" do
+    it "finds the wiki's context from another shard" do
       @shard1.activate do
         expect(@wiki.context).to eq @course
       end

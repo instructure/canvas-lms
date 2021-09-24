@@ -29,7 +29,7 @@ describe CanvasPandaPub::AsyncWorker do
   end
 
   describe "push" do
-    it "should execute stuff pushed on the queue" do
+    it "executes stuff pushed on the queue" do
       fired = false
 
       @worker.push "foo", -> { fired = true }
@@ -40,14 +40,14 @@ describe CanvasPandaPub::AsyncWorker do
       expect(fired).to be true
     end
 
-    it "should reject items when queue is full" do
+    it "rejects items when queue is full" do
       CanvasPandaPub.max_queue_size = -> { 5 }
       5.times { expect(@worker.push "foo", -> {}).to be_truthy }
 
       expect(@worker.push "full", -> {}).to be false
     end
 
-    it "should only run the last item pushed for a tag" do
+    it "onlies run the last item pushed for a tag" do
       a_count = b_count = 0
       @worker.push "a", -> { a_count += 1 }
       @worker.push "b", -> { b_count += 1 }

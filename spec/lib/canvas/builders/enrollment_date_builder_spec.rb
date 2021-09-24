@@ -135,7 +135,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
   end
 
   describe ".preload" do
-    it "should work" do
+    it "works" do
       course_with_teacher(:active_all => true)
       @enrollment.reload
       loaded_course = @enrollment.association(:course).loaded?
@@ -153,7 +153,7 @@ describe Canvas::Builders::EnrollmentDateBuilder do
       @enrollment.enrollment_dates
     end
 
-    it "should not have to load stuff if already in cache" do
+    it "does not have to load stuff if already in cache" do
       enable_cache do
         course_with_teacher(:active_all => true)
         # prime the cache

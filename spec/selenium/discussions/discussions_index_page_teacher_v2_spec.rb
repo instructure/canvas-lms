@@ -216,7 +216,7 @@ describe "discussions index" do
       expect(DiscussionsIndex.discussion_unread_pill(discussion1_title)).to eq "2"
     end
 
-    it 'should allow teachers to edit discussions settings' do
+    it 'allows teachers to edit discussions settings' do
       login_and_visit_course(@teacher, @course)
       DiscussionsIndex.click_discussion_settings_button
       DiscussionsIndex.click_create_discussions_checkbox

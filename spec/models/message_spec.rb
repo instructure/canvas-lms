@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../messages/messages_helper'
 
 describe Message do
   describe "#get_template" do
-    it "should get the template with an existing file path" do
+    it "gets the template with an existing file path" do
       allow(HostUrl).to receive(:protocol).and_return("https")
       au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, au)
@@ -33,7 +33,7 @@ describe Message do
   end
 
   describe '#populate body' do
-    it 'should save an html body if a template exists' do
+    it 'saves an html body if a template exists' do
       expect_any_instance_of(Message).to receive(:apply_html_template).and_return('template')
       user         = user_factory(:active_all => true)
       account_user = AccountUser.create!(:account => account_model, :user => user)
@@ -42,7 +42,7 @@ describe Message do
       expect(message.html_body).to eq 'template'
     end
 
-    it 'should sanitize html' do
+    it 'sanitizes html' do
       expect_any_instance_of(Message).to receive(:load_html_template).and_return [<<-ZOMGXSS, 'template.html.erb']
         <b>Your content</b>: <%= "<script>alert()</script>" %>
       ZOMGXSS
@@ -56,7 +56,7 @@ describe Message do
   end
 
   describe "parse!" do
-    it "should use https when the domain is configured as ssl" do
+    it "uses https when the domain is configured as ssl" do
       allow(HostUrl).to receive(:protocol).and_return("https")
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
@@ -64,14 +64,14 @@ describe Message do
       expect(msg.html_body).to include('Account Admin')
     end
 
-    it "should have a sane body" do
+    it "has a sane body" do
       @au = AccountUser.create(:account => account_model)
       msg = generate_message(:account_user_notification, :email, @au)
       expect(msg.html_body.scan(/<html dir="ltr" lang="en">/).length).to eq 1
       expect(msg.html_body.index('<!DOCTYPE')).to eq 0
     end
 
-    it "should use slack template if present" do
+    it "uses slack template if present" do
       @au = AccountUser.create(:account => account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
@@ -85,7 +85,7 @@ describe Message do
       expect(msg.body).to eq mock_template
     end
 
-    it "should sms template if no slack template present" do
+    it "smses template if no slack template present" do
       @au = AccountUser.create(:account => account_model)
       course_with_student
       alert = @course.alerts.create!(recipients: [:student],
@@ -100,19 +100,19 @@ describe Message do
       expect(msg.body).to eq mock_template
     end
 
-    it "should not html escape the subject" do
+    it "does not html escape the subject" do
       assignment_model(:title => "hey i have weird&<stuff> in my name but that's okay")
       msg = generate_message(:assignment_created, :email, @assignment)
       expect(msg.subject).to include(@assignment.title)
     end
 
-    it "should allow over 255 char in the subject" do
+    it "allows over 255 char in the subject" do
       assignment_model(title: 'this is crazy ridiculous ' * 10)
       msg = generate_message(:assignment_created, :email, @assignment)
       expect(msg.subject.length).to be > 255
     end
 
-    it "should truncate the body if it exceeds the maximum text length" do
+    it "truncates the body if it exceeds the maximum text length" do
       allow(ActiveRecord::Base).to receive(:maximum_text_length).and_return(3)
       assignment_model(title: 'this is a message')
       msg = generate_message(:assignment_created, :email, @assignment)
@@ -123,7 +123,7 @@ describe Message do
       expect(msg.html_body).to eq 'message preview unavailable'
     end
 
-    it "should default to the account time zone if the user has no time zone" do
+    it "defaults to the account time zone if the user has no time zone" do
       original_time_zone = Time.zone
       Time.zone = 'UTC'
       course_with_teacher
@@ -142,7 +142,7 @@ describe Message do
       Time.zone = original_time_zone
     end
 
-    it "should not html escape the user_name" do
+    it "does not html escape the user_name" do
       course_with_teacher
       @teacher.name = "For some reason my parent's gave me a name with an apostrophe"
       @teacher.save!
@@ -198,13 +198,13 @@ describe Message do
     end
   end
 
-  it "should raise an error when trying to re-save an existing message" do
+  it "raises an error when trying to re-save an existing message" do
     message_model
     @message.body = "something else"
     expect(@message.save).to be_falsey
   end
 
-  it "should still set new attributes defined in workflow transitions" do
+  it "stills set new attributes defined in workflow transitions" do
     message_model(:workflow_state => "sending", :user => user_factory)
     @message.complete_dispatch
     expect(@message.reload.workflow_state).to eq "sent"
@@ -212,7 +212,7 @@ describe Message do
   end
 
   context "named scopes" do
-    it "should be able to get messages in any state" do
+    it "is able to get messages in any state" do
       m1 = message_model(:workflow_state => 'bounced', :user => user_factory)
       m2 = message_model(:workflow_state => 'sent', :user => user_factory)
       m3 = message_model(:workflow_state => 'sending', :user => user_factory)
@@ -221,35 +221,35 @@ describe Message do
       expect(Message.in_state([:bounced, :sent])).not_to be_include(m3)
     end
 
-    it "should be able to search on its context" do
+    it "is able to search on its context" do
       user_model
       message_model(:context => @user)
       expect(Message.for(@user)).to eq [@message]
     end
 
-    it "should have a list of messages to dispatch" do
+    it "has a list of messages to dispatch" do
       message_model(:dispatch_at => Time.now - 1, :workflow_state => 'staged', :to => 'somebody', :user => user_factory)
       expect(Message.to_dispatch).to eq [@message]
     end
 
-    it "should not have a message to dispatch if the message's delay moves it to the future" do
+    it "does not have a message to dispatch if the message's delay moves it to the future" do
       message_model(:dispatch_at => Time.now - 1, :to => 'somebody')
       @message.stage
       expect(Message.to_dispatch).to eq []
     end
 
-    it "should filter on notification name" do
+    it "filters on notification name" do
       notification_model(:name => 'Some Name')
       message_model(:notification_id => @notification.id)
       expect(Message.by_name('Some Name')).to eq [@message]
     end
 
-    it "should offer staged messages (waiting to be dispatched)" do
+    it "offers staged messages (waiting to be dispatched)" do
       message_model(:dispatch_at => Time.now + 100, :user => user_factory)
       expect(Message.staged).to eq [@message]
     end
 
-    it "should have a list of messages that can be cancelled" do
+    it "has a list of messages that can be cancelled" do
       allow_any_instance_of(Message).to receive(:stage_message)
       Message.workflow_spec.states.each do |state_symbol, state|
         Message.destroy_all
@@ -263,7 +263,7 @@ describe Message do
     end
   end
 
-  it "should go back to the staged state if sending fails" do
+  it "goes back to the staged state if sending fails" do
     message_model(:dispatch_at => Time.now - 1, :workflow_state => 'sending', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory)
     @message.errored_dispatch
     expect(@message.workflow_state).to eq 'staged'
@@ -271,7 +271,7 @@ describe Message do
   end
 
   describe "#deliver" do
-    it "should not deliver if canceled" do
+    it "does not deliver if canceled" do
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       @message.cancel
       expect(@message).to receive(:deliver_via_email).never
@@ -280,7 +280,7 @@ describe Message do
       expect(@message.reload.state).to eq :cancelled
     end
 
-    it "should log errors and raise based on error type" do
+    it "logs errors and raise based on error type" do
       message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :user => user_factory, :path_type => 'email')
       expect(Mailer).to receive(:create_message).and_raise("something went wrong")
       expect(ErrorReport).to receive(:log_exception)
@@ -483,21 +483,21 @@ describe Message do
     end
 
     describe "infer_defaults" do
-      it "should not break if there is no context" do
+      it "does not break if there is no context" do
         message = message_model
         expect(message.root_account_id).to be_nil
         expect(message.root_account).to be_nil
         expect(message.reply_to_name).to be_nil
       end
 
-      it "should not break if the context does not have an account" do
+      it "does not break if the context does not have an account" do
         user_model
         message = message_model(:context => @user)
         expect(message.root_account_id).to be_nil
         expect(message.reply_to_name).to be_nil
       end
 
-      it "should populate root_account_id if the context can chain back to a root account" do
+      it "populates root_account_id if the context can chain back to a root account" do
         message = message_model(:context => course_model)
         expect(message.root_account).to eq Account.default
       end
@@ -569,14 +569,14 @@ describe Message do
     end
 
     describe "#translate" do
-      it "should work with an explicit key" do
+      it "works with an explicit key" do
         message = message_model
         message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
         message = message.translate(:key, "value %{link}", link: 'hi')
         expect(message).to eq "value hi"
       end
 
-      it "should work with an implicit key" do
+      it "works with an implicit key" do
         message = message_model
         message.get_template("new_discussion_entry.email.erb") # populate @i18n_scope
         message = message.translate("value %{link}", link: 'hi')
@@ -587,7 +587,7 @@ describe Message do
     describe "cross-shard urls" do
       specs_require_sharding
 
-      it 'should use relative ids in links of message body' do
+      it 'uses relative ids in links of message body' do
         @shard2.activate do
           @c = Course.create!(account: Account.create!)
           @a = @c.assignments.create!

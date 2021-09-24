@@ -36,7 +36,7 @@ describe 'course wizard' do
     course_with_teacher_logged_in
   end
 
-  it "should open up the choose home page dialog from the wizard" do
+  it "opens up the choose home page dialog from the wizard" do
     skip('ADMIN-3018')
 
     go_to_checklist
@@ -47,7 +47,7 @@ describe 'course wizard' do
     expect(modal).to be_displayed
   end
 
-  it "should have the correct initial state" do
+  it "has the correct initial state" do
     skip('ADMIN-3018')
 
     go_to_checklist
@@ -71,14 +71,14 @@ describe 'course wizard' do
     expect(f("#content")).not_to contain_css(completed_checklist_item_selector('add_tas'))
   end
 
-  it "should complete 'Add Course Assignments' checklist item" do
+  it "completes 'Add Course Assignments' checklist item" do
     skip('ADMIN-3018')
     @course.assignments.create({ name: "Test Assignment" })
     go_to_checklist
     expect(completed_checklist_item('add_assignments')).to be_displayed
   end
 
-  it "should complete 'Add Students to the Course' checklist item" do
+  it "completes 'Add Students to the Course' checklist item" do
     skip('ADMIN-3018')
     student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
     student_in_course(:user => student, :active_all => 1)
@@ -86,7 +86,7 @@ describe 'course wizard' do
     expect(completed_checklist_item('add_students')).to be_displayed
   end
 
-  it "should complete 'Select Navigation Links' checklist item" do
+  it "completes 'Select Navigation Links' checklist item" do
     skip('ADMIN-3018')
     # Navigate to Navigation tab
     go_to_checklist
@@ -103,7 +103,7 @@ describe 'course wizard' do
     expect(completed_checklist_item('select_navigation')).to be_displayed
   end
 
-  it "should complete 'Add Course Calendar Events' checklist item" do
+  it "completes 'Add Course Calendar Events' checklist item" do
     skip('ADMIN-3018')
 
     # Navigate to Calendar tab
@@ -122,7 +122,7 @@ describe 'course wizard' do
     expect(completed_checklist_item('course_calendar')).to be_displayed
   end
 
-  it "should complete 'Publish the Course' checklist item" do
+  it "completes 'Publish the Course' checklist item" do
     skip('ADMIN-3018')
 
     # Publish from Checklist

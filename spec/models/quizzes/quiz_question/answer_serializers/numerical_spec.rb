@@ -39,12 +39,12 @@ describe Quizzes::QuizQuestion::AnswerSerializers::Numerical do
 
     include_examples 'Answer Serializers'
 
-    it 'should return nil when un-answered' do
+    it 'returns nil when un-answered' do
       expect(subject.deserialize({})).to eq nil
     end
 
     context 'validations' do
-      it 'should turn garbage into 0.0' do
+      it 'turns garbage into 0.0' do
         ['foobar', nil, { foo: 'bar' }, "25 00012"].each do |garbage|
           rc = subject.serialize(garbage)
           expect(rc.error).to be_nil

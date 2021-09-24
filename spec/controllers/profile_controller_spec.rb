@@ -27,21 +27,21 @@ describe ProfileController do
   end
 
   describe "show" do
-    it "should not require an id for yourself" do
+    it "does not require an id for yourself" do
       user_session(@user)
 
       get 'show'
       expect(response).to render_template('profile')
     end
 
-    it "should chain to settings when it's the same user" do
+    it "chains to settings when it's the same user" do
       user_session(@user)
 
       get 'show', params: { :user_id => @user.id }
       expect(response).to render_template('profile')
     end
 
-    it "should require a password session when chaining to settings" do
+    it "requires a password session when chaining to settings" do
       user_session(@user)
       session[:used_remember_me_token] = true
 
@@ -55,7 +55,7 @@ describe ProfileController do
         allow(@controller).to receive(:api_request?).and_return(true)
       end
 
-      it "should include common contexts in @user_data" do
+      it "includes common contexts in @user_data" do
         user_session(@teacher)
 
         # teacher and user have a group and course in common
@@ -75,7 +75,7 @@ describe ProfileController do
   end
 
   describe "update" do
-    it "should allow changing the default e-mail address and nothing else" do
+    it "allows changing the default e-mail address and nothing else" do
       user_session(@user, @pseudonym)
       cc = @cc
       expect(cc.position).to eq 1
@@ -87,7 +87,7 @@ describe ProfileController do
       expect(cc.reload.position).to eq 2
     end
 
-    it "should clear email cache" do
+    it "clears email cache" do
       enable_cache do
         @user.email # prime cache
         user_session(@user, @pseudonym)
@@ -104,7 +104,7 @@ describe ProfileController do
         @user.account.save!
       end
 
-      it "should allow changing pronouns" do
+      it "allows changing pronouns" do
         user_session(@user, @pseudonym)
         expect(@user.pronouns).to eq nil
         put 'update', params: { :user => { :pronouns => "  He/Him " } }, format: 'json'
@@ -114,7 +114,7 @@ describe ProfileController do
         expect(@user.pronouns).to eq "He/Him"
       end
 
-      it "should allow unsetting pronouns" do
+      it "allows unsetting pronouns" do
         user_session(@user, @pseudonym)
         @user.pronouns = " Dude/Guy  "
         @user.save!
@@ -125,7 +125,7 @@ describe ProfileController do
         expect(@user.pronouns).to eq nil
       end
 
-      it "should not allow setting pronouns not on the approved list" do
+      it "does not allow setting pronouns not on the approved list" do
         user_session(@user, @pseudonym)
         expect(@user.pronouns).to eq nil
         put 'update', params: { :user => { :pronouns => "Pro/Noun" } }, format: 'json'
@@ -134,7 +134,7 @@ describe ProfileController do
         expect(@user.pronouns).to eq nil
       end
 
-      it 'should not allow setting pronouns if the setting is disabled' do
+      it 'does not allow setting pronouns if the setting is disabled' do
         @user.account.settings[:can_change_pronouns] = false
         @user.account.save!
         user_session(@user, @pseudonym)
@@ -145,7 +145,7 @@ describe ProfileController do
       end
     end
 
-    it "should allow changing the default e-mail address and nothing else (name changing disabled)" do
+    it "allows changing the default e-mail address and nothing else (name changing disabled)" do
       @account = Account.default
       @account.settings = { :users_can_edit_name => false }
       @account.save!
@@ -160,7 +160,7 @@ describe ProfileController do
       expect(cc.reload.position).to eq 2
     end
 
-    it "should not let an unconfirmed e-mail address be set as default" do
+    it "does not let an unconfirmed e-mail address be set as default" do
       user_session(@user, @pseudonym)
       cc = @cc
       cc2 = communication_channel(@user, { username: 'email2@example.com', cc_state: 'unconfirmed' })
@@ -168,7 +168,7 @@ describe ProfileController do
       expect(@user.email).to eq cc.path
     end
 
-    it "should not allow a student view student profile to be edited" do
+    it "does not allow a student view student profile to be edited" do
       user_session(@teacher)
       @fake_student = @course.student_view_student
       session[:become_user_id] = @fake_student.id
@@ -189,7 +189,7 @@ describe ProfileController do
       user_session(@user, @pseudonym.reload)
     end
 
-    it "should let you change your short_name and profile information" do
+    it "lets you change your short_name and profile information" do
       put 'update_profile',
           params: { :user => { :short_name => 'Monsturd', :name => 'Jenkins' },
                     :user_profile => { :bio => '...', :title => '!!!' } },
@@ -203,7 +203,7 @@ describe ProfileController do
       expect(@user.profile.title).to eql '!!!'
     end
 
-    it "should not let you change your short_name information if you are not allowed" do
+    it "does not let you change your short_name information if you are not allowed" do
       account = Account.default
       account.settings = { :users_can_edit_name => false }
       account.save!
@@ -223,7 +223,7 @@ describe ProfileController do
       expect(@user.profile.title).to eql old_title
     end
 
-    it "should let you set visibility on user_services" do
+    it "lets you set visibility on user_services" do
       @user.user_services.create! :service => 'skype', :service_user_name => 'user', :service_user_id => 'user', :visible => true
       @user.user_services.create! :service => 'twitter', :service_user_name => 'user', :service_user_id => 'user', :visible => false
 
@@ -238,7 +238,7 @@ describe ProfileController do
       expect(@user.user_services.where(service: 'twitter').first.visible?).to be_truthy
     end
 
-    it "should let you set your profile links" do
+    it "lets you set your profile links" do
       put 'update_profile',
           params: { :user_profile => { :bio => '...' },
                     :link_urls => ['example.com', 'foo.com', '', '///////invalid'],
@@ -253,7 +253,7 @@ describe ProfileController do
       ]
     end
 
-    it "should let you remove set pronouns" do
+    it "lets you remove set pronouns" do
       @user.update(pronouns: 'he_him')
       expect {
         put 'update_profile', params: { :pronouns => nil }, format: 'json'
@@ -270,7 +270,7 @@ describe ProfileController do
       student_in_course(:active_all => true)
     end
 
-    it "should show if user has any non-student enrollments" do
+    it "shows if user has any non-student enrollments" do
       allow(Canvas::DynamicSettings).to receive(:find).and_return({ 'base_url' => 'the_ccv_url' })
       user_session(@teacher)
       get 'content_shares', params: { user_id: @teacher.id }
@@ -278,13 +278,13 @@ describe ProfileController do
       expect(assigns.dig(:js_env, :COMMON_CARTRIDGE_VIEWER_URL)).to eq('the_ccv_url')
     end
 
-    it "should show if the user has an account membership" do
+    it "shows if the user has an account membership" do
       user_session(account_admin_user)
       get 'content_shares', params: { user_id: @admin.id }
       expect(response).to render_template('content_shares')
     end
 
-    it "should 404 if user has only student enrollments" do
+    it "404S if user has only student enrollments" do
       user_session(@student)
       get 'content_shares', params: { user_id: @student.id }
       expect(response).to be_not_found
@@ -298,19 +298,19 @@ describe ProfileController do
         Account.default.save
       end
 
-      it "should render empty html layout" do
+      it "renders empty html layout" do
         user_session(@user)
         get "qr_mobile_login"
         expect(response).to render_template "layouts/application"
         expect(response.body).to eq ""
       end
 
-      it "should redirect to login if no active session" do
+      it "redirects to login if no active session" do
         get "qr_mobile_login"
         expect(response).to redirect_to "/login"
       end
 
-      it "should 404 if IMP is missing" do
+      it "404S if IMP is missing" do
         allow_any_instance_of(ProfileController).to receive(:instructure_misc_plugin_available?).and_return(false)
         user_session(@user)
         get "qr_mobile_login"
@@ -324,7 +324,7 @@ describe ProfileController do
         Account.default.save
       end
 
-      it "should 404" do
+      it "404S" do
         user_session(@user)
         get "qr_mobile_login"
         expect(response).to be_not_found

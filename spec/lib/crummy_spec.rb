@@ -59,7 +59,7 @@ describe "CrummyController" do
       add_crumb(name_run_proc, "http://")
     end
 
-    it "should reevaluate the proc on each run" do
+    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = CrummyNameController.new
       a.run_filter_blocks
@@ -89,7 +89,7 @@ describe "CrummyController" do
       add_crumb("Name", &url_run_proc)
     end
 
-    it "should reevaluate the proc on each run" do
+    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = CrummyUrlController.new
       a.run_filter_blocks

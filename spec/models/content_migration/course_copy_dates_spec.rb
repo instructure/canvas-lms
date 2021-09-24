@@ -70,7 +70,7 @@ describe ContentMigration do
         cm2.save!
       end
 
-      it "should shift dates" do
+      it "shifts dates" do
         skip unless Qti.qti_enabled?
         options = {
           everything: true,
@@ -168,7 +168,7 @@ describe ContentMigration do
         expect(new_asmnt.peer_reviews_due_at.to_i).to eq (@new_start + 4.day).to_i
       end
 
-      it "should remove dates" do
+      it "removes dates" do
         skip unless Qti.qti_enabled?
         options = {
           everything: true,
@@ -219,7 +219,7 @@ describe ContentMigration do
         expect(newer_mod.unlock_at).to be_nil
       end
 
-      it "should not create broken assignments from unpublished quizzes" do
+      it "does not create broken assignments from unpublished quizzes" do
         options = {
           everything: true,
           remove_dates: true,
@@ -390,7 +390,7 @@ describe ContentMigration do
       end
     end
 
-    it "should perform day substitutions" do
+    it "performs day substitutions" do
       skip unless Qti.qti_enabled?
       @copy_from.require_assignment_group
       today = Time.now.utc
@@ -414,7 +414,7 @@ describe ContentMigration do
       expect((new_assignment.due_at.to_i - (today + 1.day).to_i).abs).to be < 60
     end
 
-    it "should correctly copy all day dates for assignments and events" do
+    it "correctlies copy all day dates for assignments and events" do
       date = "Jun 21 2012 11:59pm"
       date2 = "Jun 21 2012 00:00am"
       asmnt = @copy_from.assignments.create!(:title => 'all day', :due_at => date)
@@ -441,7 +441,7 @@ describe ContentMigration do
       expect(cal_2.start_at.utc).to eq cal.start_at.utc
     end
 
-    it "should not clear destination course dates" do
+    it "does not clear destination course dates" do
       start_at = 1.day.ago
       conclude_at = 2.days.from_now
       @copy_to.start_at = start_at
@@ -461,7 +461,7 @@ describe ContentMigration do
       expect(@copy_to.conclude_at).to eq conclude_at
     end
 
-    it "should not break link resolution in quiz_data" do
+    it "does not break link resolution in quiz_data" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       topic = @copy_from.discussion_topics.create!(title: "some topic", message: "<p>some text</p>")
@@ -499,7 +499,7 @@ describe ContentMigration do
       expect(data).to include("courses/#{@copy_to.id}/discussion_topics/#{topic_to.id}")
     end
 
-    it "should work on all_day calendar events" do
+    it "works on all_day calendar events" do
       @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
       @new_start = Time.zone.parse("05 Aug 2012 06:00:00 UTC +00:00")
 
@@ -528,7 +528,7 @@ describe ContentMigration do
       expect(new_event.all_day_date).to eq (@new_start + 4.days).to_date
     end
 
-    it "should remove dates for all-day events" do
+    it "removes dates for all-day events" do
       @old_start = Time.zone.parse("01 Jul 2012 06:00:00 UTC +00:00")
 
       all_day_event = @copy_from.calendar_events.create!(title: "an event",
@@ -548,7 +548,7 @@ describe ContentMigration do
       expect(new_event.all_day_date).to be_nil
     end
 
-    it "should trigger cached_due_date changes" do
+    it "triggers cached_due_date changes" do
       assmt = @copy_from.assignments.create!(title: "an event", :due_at => 1.day.from_now)
 
       run_course_copy

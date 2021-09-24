@@ -35,7 +35,7 @@ describe "add_people" do
     # this is one giant test because it has to walk through the panels of a
     # modal dialog, and "it" tests throw an exception if they don't include
     # a get(url) call, which would break the flow of the test.
-    it "should add a couple users" do
+    it "adds a couple users" do
       get "/courses/#{@course.id}/users"
 
       # get the number of people in the class when we start, so we know
@@ -80,7 +80,7 @@ describe "add_people" do
       expect(ff("tbody.collectionViewItems tr")).to have_size(enrollee_count + 2)
     end
 
-    it "should tell our user when not adding any users to the course" do
+    it "tells our user when not adding any users to the course" do
       get "/courses/#{@course.id}/users"
 
       # open the dialog
@@ -111,7 +111,7 @@ describe "add_people" do
       expect(msg).to be_displayed
     end
 
-    it "should include only manageable roles (non-granular)" do
+    it "includes only manageable roles (non-granular)" do
       @course.root_account.disable_feature!(:granular_permissions_manage_users)
       @course.account.role_overrides.create! :role => teacher_role,
                                              :permission => :manage_students,
@@ -121,7 +121,7 @@ describe "add_people" do
       expect(INSTUI_Select_options('#peoplesearch_select_role').map(&:text)).not_to include 'Student'
     end
 
-    it "should include only manageable roles (granular)" do
+    it "includes only manageable roles (granular)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_users)
       @course.account.role_overrides.create! :role => teacher_role,
                                              :permission => :add_student_to_course,
@@ -132,7 +132,7 @@ describe "add_people" do
     end
 
     # CNVS-34781
-    it "should have a working checkbox after cancelling and reopening" do
+    it "has a working checkbox after cancelling and reopening" do
       skip('fragile after upgrading modal to inst-ui 5')
       get "/courses/#{@course.id}/users"
 
@@ -159,7 +159,7 @@ describe "add_people" do
 
     # tests that INSTUI fixed a bug in Select that would close the Modal
     # when the user uses 'esc' to close the options dropdown
-    it "should not close the modal on 'escape'ing from role Select options" do
+    it "does not close the modal on 'escape'ing from role Select options" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
@@ -186,7 +186,7 @@ describe "add_people" do
     end
 
     # CNVS-35149
-    it "should include select all for missing users" do
+    it "includes select all for missing users" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog
@@ -232,7 +232,7 @@ describe "add_people" do
       end
     end
 
-    it "should include invite users without names" do
+    it "includes invite users without names" do
       get "/courses/#{@course.id}/users"
 
       # open the add people modal dialog

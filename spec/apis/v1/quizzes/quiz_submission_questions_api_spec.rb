@@ -171,12 +171,12 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @quiz_submission = @quiz.generate_submission(@student)
     end
 
-    it 'should be authorized for student' do
+    it 'is authorized for student' do
       json = api_index({}, { raw: true })
       assert_status(200)
     end
 
-    it 'should return an empty list' do
+    it 'returns an empty list' do
       json = api_index
       expect(json.has_key?('quiz_submission_questions')).to be_truthy
       expect(json['quiz_submission_questions'].size).to eq 0
@@ -187,13 +187,13 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         create_question_set
       end
 
-      it 'should list all items' do
+      it 'lists all items' do
         allow_any_instance_of(Quizzes::QuizSubmission).to receive(:quiz_questions).and_return([@qq1, @qq2])
         json = api_index
         expect(json['quiz_submission_questions'].size).to eq 2
       end
 
-      it "should return questions for a previous version of the quiz" do
+      it "returns questions for a previous version of the quiz" do
         @quiz.generate_quiz_data
         @quiz.save!
         @quiz_submission = @quiz.generate_submission(@student)
@@ -206,7 +206,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(json['quiz_submission_questions'].map { |q| q['correct'] }.all?).to be_truthy
       end
 
-      it "should return unauthorized when results are hidden in quiz settings" do
+      it "returns unauthorized when results are hidden in quiz settings" do
         @quiz = @course.quizzes.create!({
                                           title: 'test quiz',
                                           hide_results: 'always'
@@ -221,7 +221,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
     end
 
-    it "should be authorized when results are hidden in quiz settings and isn't complete" do
+    it "is authorized when results are hidden in quiz settings and isn't complete" do
       @quiz = @course.quizzes.create!({
                                         title: 'test quiz',
                                         hide_results: 'always'
@@ -233,7 +233,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       assert_status(200)
     end
 
-    it "should deny student access when quiz is OQAAT" do
+    it "denies student access when quiz is OQAAT" do
       @quiz = @course.quizzes.create!({
                                         title: "oqaat quiz",
                                         one_question_at_a_time: true
@@ -243,12 +243,12 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       assert_status(401)
     end
 
-    it "should allow teacher access even if quiz is OQAAT" do
+    it "allows teacher access even if quiz is OQAAT" do
       api_index({}, { raw: true })
       assert_status(200)
     end
 
-    it "should deny access to another student" do
+    it "denies access to another student" do
       student_in_course
       api_index({}, { raw: true })
       assert_status(401)
@@ -265,20 +265,20 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @question = @qq1
     end
 
-    it 'should be unauthorized' do
+    it 'is unauthorized' do
       skip
       json = api_show({}, { raw: true })
       assert_status(401)
     end
 
-    it 'should grant access to its student' do
+    it 'grants access to its student' do
       skip
       json = api_show
       expect(json.has_key?('quiz_submission_questions')).to be_truthy
       expect(json['quiz_submission_questions'].length).to eq 1
     end
 
-    it 'should deny access by other students' do
+    it 'denies access by other students' do
       skip
       student_in_course
       api_show({}, { raw: true })
@@ -286,7 +286,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     context 'Output' do
-      it 'should include the quiz question id' do
+      it 'includes the quiz question id' do
         skip
         json = api_show
         expect(json.has_key?('quiz_submission_questions')).to be_truthy
@@ -295,7 +295,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         )
       end
 
-      it 'should include the flagged status' do
+      it 'includes the flagged status' do
         skip
         json = api_show
         expect(json.has_key?('quiz_submission_questions')).to be_truthy
@@ -305,7 +305,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     context 'Links' do
-      it 'should include its linked quiz_question' do
+      it 'includes its linked quiz_question' do
         skip
         json = api_show({
                           :include => %w[quiz_question]
@@ -323,13 +323,13 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     context 'JSON-API compliance' do
-      it 'should conform to the JSON-API spec when returning the object' do
+      it 'conforms to the JSON-API spec when returning the object' do
         skip
         json = api_show
         assert_jsonapi_compliance(json, 'quiz_submission_questions')
       end
 
-      it 'should conform to the JSON-API spec when returning linked objects' do
+      it 'conforms to the JSON-API spec when returning linked objects' do
         skip
         includables = Api::V1::QuizSubmissionQuestion::Includables
 
@@ -351,20 +351,20 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @quiz_submission = @quiz.generate_submission(@student)
     end
 
-    it 'should return unprocessable_entity if the answer param is not provided' do
+    it 'returns unprocessable_entity if the answer param is not provided' do
       json = api_formatted_answer(question)
 
       expect(json['status']).to eq "unprocessable_entity"
     end
 
-    it 'should return an unchanged string when the given answer param is not a number' do
+    it 'returns an unchanged string when the given answer param is not a number' do
       json = api_formatted_answer(question, { answer: "abcd" })
 
       expect(json['formatted_answer']).to be_present
       expect(json['formatted_answer']).to eq "abcd"
     end
 
-    it 'should return a number without trailing zeros' do
+    it 'returns a number without trailing zeros' do
       json = api_formatted_answer(question, { answer: "99.9000000" })
 
       expect(json['formatted_answer']).to be_present
@@ -372,7 +372,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     end
 
     describe 'when the question has precision answers' do
-      it 'should return a number with 16 significant digits' do
+      it 'returns a number with 16 significant digits' do
         json = api_formatted_answer(question, { answer: "12.34567890123456789" })
 
         expect(json['formatted_answer']).to be_present
@@ -383,7 +383,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
     describe 'when the question does not have precision answers' do
       let(:question_without_precision) { create_question 'numerical_without_precision' }
 
-      it 'should return a number with 4 decimal places' do
+      it 'returns a number with 4 decimal places' do
         json = api_formatted_answer(question_without_precision, { answer: "12.34567890123456789" })
 
         expect(json['formatted_answer']).to be_present
@@ -394,7 +394,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
 
   describe 'POST /quiz_submissions/:quiz_submission_id/questions [answer]' do
     context 'access policy' do
-      it 'should grant access to the teacher' do
+      it 'grants access to the teacher' do
         course_with_teacher_logged_in(:active_all => true)
         @quiz = quiz_model(course: @course)
         @quiz_submission = @quiz.generate_submission(@teacher)
@@ -404,7 +404,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(json['quiz_submission_questions'].length).to eq 0
       end
 
-      it 'should grant access to its student' do
+      it 'grants access to its student' do
         course_with_student_logged_in(:active_all => true)
         @quiz = quiz_model(course: @course)
         @quiz_submission = @quiz.generate_submission(@student)
@@ -426,7 +426,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         @quiz_submission = @quiz.generate_submission(@student)
       end
 
-      it "shouldn't give any answers information" do
+      it "does not give any answers information" do
         mc = create_question 'multiple_choice'
         formula = create_question 'numerical'
         generate_submission
@@ -446,7 +446,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       end
 
       context 'answering questions' do
-        it 'should answer a MultipleChoice question' do
+        it 'answers a MultipleChoice question' do
           question = create_question 'multiple_choice'
           generate_submission
 
@@ -462,7 +462,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'][0]['answer']).to eq '1658'
         end
 
-        it 'should answer a TrueFalse question' do
+        it 'answers a TrueFalse question' do
           question = create_question 'true_false'
           generate_submission
 
@@ -478,7 +478,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'][0]['answer']).to eq '8403'
         end
 
-        it 'should answer a ShortAnswer question' do
+        it 'answers a ShortAnswer question' do
           question = create_question 'short_answer'
           generate_submission
 
@@ -494,7 +494,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'][0]['answer']).to eq 'hello world!'
         end
 
-        it 'should answer a FillInMultipleBlanks question' do
+        it 'answers a FillInMultipleBlanks question' do
           question = create_question 'fill_in_multiple_blanks'
           generate_submission
 
@@ -521,7 +521,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           }.with_indifferent_access)
         end
 
-        it 'should answer a MultipleAnswers question and allow deseleciton' do
+        it 'answers a MultipleAnswers question and allow deseleciton' do
           question = create_question 'multiple_answers', {
             answer_parser_compatibility: true
           }
@@ -550,7 +550,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(second_json['quiz_submission_questions'][0]['answer'].include?('5194')).to be_falsey
         end
 
-        it 'should answer an Essay question' do
+        it 'answers an Essay question' do
           question = create_question 'essay'
           generate_submission
 
@@ -565,7 +565,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'][0]['answer']).to eq 'Foobar'
         end
 
-        it 'should answer a MultipleDropdowns question' do
+        it 'answers a MultipleDropdowns question' do
           question = create_question 'multiple_dropdowns'
           generate_submission
 
@@ -593,7 +593,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           }.with_indifferent_access)
         end
 
-        it 'should answer a Matching question' do
+        it 'answers a Matching question' do
           question = create_question 'matching', {
             answer_parser_compatibility: true
           }
@@ -621,7 +621,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
             .to be_truthy
         end
 
-        it 'should answer a Numerical question' do
+        it 'answers a Numerical question' do
           question = create_question 'numerical'
           generate_submission
 
@@ -636,7 +636,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
           expect(json['quiz_submission_questions'][0]['answer']).to eq 0.0025
         end
 
-        it 'should answer a Calculated question' do
+        it 'answers a Calculated question' do
           question = create_question 'calculated'
           generate_submission
 
@@ -652,7 +652,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         end
       end
 
-      it 'should update an answer' do
+      it 'updates an answer' do
         question = create_question 'multiple_choice'
         generate_submission
 
@@ -679,7 +679,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(json['quiz_submission_questions'][0]['answer']).to eq '2405'
       end
 
-      it 'should answer according to the state of the question saved in the quiz session' do
+      it 'answers according to the state of the question saved in the quiz session' do
         question = create_question 'multiple_choice'
         generate_submission
 
@@ -712,7 +712,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(response.body).to match(/unknown answer '1659'/i)
       end
 
-      it 'should present errors' do
+      it 'presents errors' do
         question = create_question 'multiple_choice'
         generate_submission
 
@@ -731,7 +731,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       # moved into a Controller Filter spec once CNVS-10071 is in.
       #
       # [Transient:CNVS-10071]
-      it 'should respect the quiz LDB requirement' do
+      it 'respects the quiz LDB requirement' do
         question = create_question 'multiple_choice'
         @quiz.require_lockdown_browser = true
         @quiz.save
@@ -757,7 +757,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
         expect(response.body).to match(/requires the lockdown browser/i)
       end
 
-      it 'should support answering multiple questions at the same time' do
+      it 'supports answering multiple questions at the same time' do
         question1 = create_question 'multiple_choice'
         question2 = create_question 'numerical'
         generate_submission
@@ -792,7 +792,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @quiz_submission = @quiz.generate_submission(@student)
     end
 
-    it 'should flag the question' do
+    it 'flags the question' do
       @question = create_question('multiple_choice')
 
       json = api_flag
@@ -802,7 +802,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       expect(json['quiz_submission_questions'][0]['flagged']).to eq true
     end
 
-    it "should prevent unauthorized flagging" do
+    it "prevents unauthorized flagging" do
       @question = create_question('multiple_choice')
       student_in_course
       api_flag({}, { raw: true })
@@ -817,7 +817,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       @quiz_submission = @quiz.generate_submission(@student)
     end
 
-    it 'should unflag the question' do
+    it 'unflags the question' do
       @question = create_question('multiple_choice')
 
       json = api_unflag
@@ -827,7 +827,7 @@ describe Quizzes::QuizSubmissionQuestionsController, :type => :request do
       expect(json['quiz_submission_questions'][0]['flagged']).to eq false
     end
 
-    it "should prevent unauthorized unflagging" do
+    it "prevents unauthorized unflagging" do
       @question = create_question('multiple_choice')
       student_in_course
       api_unflag({}, { raw: true })

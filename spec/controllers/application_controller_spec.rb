@@ -112,14 +112,14 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:api_request?).and_return(false)
     end
 
-    it "should set items" do
+    it "sets items" do
       expect(HostUrl).to receive(:file_host).with(Account.default, "www.example.com").and_return("files.example.com")
       controller.js_env :FOO => 'bar'
       expect(controller.js_env[:FOO]).to eq 'bar'
       expect(controller.js_env[:files_domain]).to eq 'files.example.com'
     end
 
-    it "should auto-set timezone and locale" do
+    it "auto-sets timezone and locale" do
       I18n.locale = :fr
       Time.zone = 'Alaska'
       expect(@controller.js_env[:LOCALE]).to eq 'fr'
@@ -192,18 +192,18 @@ RSpec.describe ApplicationController do
       expect(controller.js_env[:CONTEXT_TIMEZONE]).to eq 'America/Denver'
     end
 
-    it "should allow multiple items" do
+    it "allows multiple items" do
       controller.js_env :A => 'a', :B => 'b'
       expect(controller.js_env[:A]).to eq 'a'
       expect(controller.js_env[:B]).to eq 'b'
     end
 
-    it "should not allow overwriting a key" do
+    it "does not allow overwriting a key" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       expect { controller.js_env(:REAL_SLIM_SHADY => 'poser') }.to raise_error("js_env key REAL_SLIM_SHADY is already taken")
     end
 
-    it "should overwrite a key if told explicitly to do so" do
+    it "overwrites a key if told explicitly to do so" do
       controller.js_env :REAL_SLIM_SHADY => 'please stand up'
       controller.js_env({ :REAL_SLIM_SHADY => 'poser' }, true)
       expect(controller.js_env[:REAL_SLIM_SHADY]).to eq 'poser'
@@ -232,7 +232,7 @@ RSpec.describe ApplicationController do
           controller.instance_variable_set(:@context, @course)
         end
 
-        it 'should populate js_env with elementary theme setting' do
+        it 'populates js_env with elementary theme setting' do
           expect(controller.js_env[:FEATURES]).to include(:canvas_k6_theme)
         end
       end
@@ -319,7 +319,7 @@ RSpec.describe ApplicationController do
       require_relative '../sharding_spec_helper'
       specs_require_sharding
 
-      it "should set the global id for the domain_root_account" do
+      it "sets the global id for the domain_root_account" do
         controller.instance_variable_set(:@domain_root_account, Account.default)
         expect(controller.js_env[:DOMAIN_ROOT_ACCOUNT_ID]).to eq Account.default.global_id
       end
@@ -435,16 +435,16 @@ RSpec.describe ApplicationController do
       allow(controller).to receive(:request).and_return(req)
     end
 
-    it "should build from a simple path" do
+    it "builds from a simple path" do
       expect(controller.send(:clean_return_to, "/calendar")).to eq "https://canvas.example.com/calendar"
     end
 
-    it "should build from a full url" do
+    it "builds from a full url" do
       # ... but always use the request host/protocol, not the given
       expect(controller.send(:clean_return_to, "http://example.org/a/b?a=1&b=2#test")).to eq "https://canvas.example.com/a/b?a=1&b=2#test"
     end
 
-    it "should reject disallowed paths" do
+    it "rejects disallowed paths" do
       expect(controller.send(:clean_return_to, "ftp://example.com/javascript:hai")).to be_nil
     end
 
@@ -508,7 +508,7 @@ RSpec.describe ApplicationController do
       @common_params = { :only_path => true }
     end
 
-    it "should include inline=1 in url by default" do
+    it "includes inline=1 in url by default" do
       expect(controller).to receive(:file_download_url)
         .with(@attachment, @common_params.merge(:inline => 1))
         .and_return('')
@@ -518,21 +518,21 @@ RSpec.describe ApplicationController do
       expect(url).to match /myfiles/
     end
 
-    it "should include :download=>1 in inline urls for relative contexts" do
+    it "includes :download=>1 in inline urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment)
       expect(url).to match(/[\?&]download=1(&|$)/)
     end
 
-    it "should not include :download=>1 in download urls for relative contexts" do
+    it "does not include :download=>1 in download urls for relative contexts" do
       controller.instance_variable_set(:@context, @attachment.context)
       allow(controller).to receive(:named_context_url).and_return('')
       url = controller.send(:safe_domain_file_url, @attachment, download: true)
       expect(url).not_to match(/[\?&]download=1(&|$)/)
     end
 
-    it "should include download_frd=1 and not include inline=1 in url when specified as for download" do
+    it "includes download_frd=1 and not include inline=1 in url when specified as for download" do
       expect(controller).to receive(:file_download_url)
         .with(@attachment, @common_params.merge(:download_frd => 1))
         .and_return('')
@@ -554,7 +554,7 @@ RSpec.describe ApplicationController do
       I18n.localizer = nil
     end
 
-    it "should find user with api_find for api requests" do
+    it "finds user with api_find for api requests" do
       user_with_pseudonym
       @pseudonym.update_attribute(:sis_user_id, 'test1')
       controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -565,7 +565,7 @@ RSpec.describe ApplicationController do
       expect(controller.instance_variable_get(:@context)).to eq @user
     end
 
-    it "should find course section with api_find for api requests" do
+    it "finds course section with api_find for api requests" do
       course_model
       @section = @course.course_sections.first
       @section.update_attribute(:sis_source_id, 'test1')
@@ -580,7 +580,7 @@ RSpec.describe ApplicationController do
     # this test is supposed to represent calling I18n.t before a context is set
     # and still having later localizations that depend on the locale of the
     # context work.
-    it "should reset the localizer" do
+    it "resets the localizer" do
       # emulate all the locale related work done before/around a request
       acct = Account.default
       acct.default_locale = "es"
@@ -660,7 +660,7 @@ RSpec.describe ApplicationController do
       attachment_model(context: @course)
     end
 
-    it "should find file's context instead of user" do
+    it "finds file's context instead of user" do
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.instance_variable_set(:@context, @student)
       controller.instance_variable_set(:@accessed_asset, { level: 'participate', code: @attachment.asset_string, category: 'files' })
@@ -671,7 +671,7 @@ RSpec.describe ApplicationController do
       expect(AssetUserAccess.where(user: @student, asset_code: @attachment.asset_string).take.context).to eq @course
     end
 
-    it 'should not error on non-standard context for file' do
+    it 'does not error on non-standard context for file' do
       controller.instance_variable_set(:@domain_root_account, Account.default)
       controller.instance_variable_set(:@context, @student)
       controller.instance_variable_set(:@accessed_asset, { level: 'participate', code: @attachment.asset_string, category: 'files' })
@@ -713,7 +713,7 @@ RSpec.describe ApplicationController do
       student_in_course
     end
 
-    it 'should update for HTTP PUT requests that are not generated by hand' do
+    it 'updates for HTTP PUT requests that are not generated by hand' do
       allow(controller.request).to receive(:xhr?).and_return(0)
       allow(controller.request).to receive(:put?).and_return(true)
       allow(RequestContextGenerator).to receive(:store_interaction_seconds_update).and_return(true)
@@ -734,7 +734,7 @@ RSpec.describe ApplicationController do
         end
       end
 
-      it 'should log error reports to the domain_root_accounts shard' do
+      it 'logs error reports to the domain_root_accounts shard' do
         report = ErrorReport.new
         allow(ErrorReport).to receive(:log_exception).and_return(report)
         allow(ErrorReport).to receive(:find).and_return(report)
@@ -1519,23 +1519,23 @@ RSpec.describe ApplicationController do
       controller.request.headers['X-CSRF-Token'] = "bogus"
     end
 
-    it "should raise InvalidAuthenticityToken with invalid tokens" do
+    it "raises InvalidAuthenticityToken with invalid tokens" do
       allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect { controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
-    it "should not raise with valid token" do
+    it "does not raise with valid token" do
       controller.request.headers['X-CSRF-Token'] = controller.form_authenticity_token
       expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
     end
 
-    it "should still raise on session-authenticated api request with invalid tokens" do
+    it "stills raise on session-authenticated api request with invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
       allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect { controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)
     end
 
-    it "should not raise on token-authenticated api request despite invalid tokens" do
+    it "does not raise on token-authenticated api request despite invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
       controller.instance_variable_set(:@pseudonym_session, nil)
       expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
@@ -1547,7 +1547,7 @@ describe ApplicationController do
   include K5Common
 
   describe "flash_notices" do
-    it 'should return notice text for each type' do
+    it 'returns notice text for each type' do
       [:error, :warning, :info, :notice].each do |type|
         flash[type] = type.to_s
       end
@@ -1559,7 +1559,7 @@ describe ApplicationController do
                                                              ])
     end
 
-    it 'should wrap html notification text in an object' do
+    it 'wraps html notification text in an object' do
       flash[:html_notice] = '<p>hello</p>'
       expect(controller.send(:flash_notices)).to match_array([
                                                                { type: 'success', content: { html: '<p>hello</p>' }, icon: 'check' }
@@ -1608,7 +1608,7 @@ describe ApplicationController do
       require_relative '../sharding_spec_helper'
       specs_require_sharding
 
-      it "should not asplode with cross-shard groups" do
+      it "does not asplode with cross-shard groups" do
         user_factory(active_all: true)
         controller.instance_variable_set(:@context, @user)
 
@@ -1623,7 +1623,7 @@ describe ApplicationController do
         expect(controller.instance_variable_get(:@contexts).select { |c| c.is_a?(Group) }).to eq [@group]
       end
 
-      it "should not include groups in courses the user doesn't have the ability to view yet" do
+      it "does not include groups in courses the user doesn't have the ability to view yet" do
         user_factory(active_all: true)
         controller.instance_variable_set(:@context, @user)
 
@@ -1983,26 +1983,26 @@ describe ApplicationController do
         controller.instance_variable_set(:@current_user, @user)
       end
 
-      it "should return true on course home page" do
+      it "returns true on course home page" do
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_truthy
       end
 
-      it "should return true on modules page" do
+      it "returns true on modules page" do
         controller.params[:controller] = 'context_modules'
         controller.params[:action] = 'index'
         expect(controller.send(:show_student_view_button?)).to be_truthy
       end
 
-      it "should return false if context is not set" do
+      it "returns false if context is not set" do
         controller.instance_variable_set(:@context, nil)
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
-      it "should return false for pages index if pages tab is disabled" do
+      it "returns false for pages index if pages tab is disabled" do
         @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_PAGES, 'hidden' => true }])
         controller.instance_variable_set(:@context, @course)
         controller.params[:controller] = 'wiki_pages'
@@ -2010,7 +2010,7 @@ describe ApplicationController do
         expect(controller.send(:show_student_view_button?)).to be_falsey
       end
 
-      it "should return true for pages page even if pages tab is disabled" do
+      it "returns true for pages page even if pages tab is disabled" do
         @course.update_attribute(:tab_configuration, [{ 'id' => Course::TAB_PAGES, 'hidden' => true }])
         controller.instance_variable_set(:@context, @course)
         controller.params[:controller] = 'wiki_pages'
@@ -2030,7 +2030,7 @@ describe ApplicationController do
         controller.instance_variable_set(:@current_user, @user)
       end
 
-      it "should return false regardless of page" do
+      it "returns false regardless of page" do
         controller.params[:controller] = 'courses'
         controller.params[:action] = 'show'
         expect(controller.send(:show_student_view_button?)).to be_falsey
@@ -2155,20 +2155,20 @@ describe ApplicationController do
       controller.instance_variable_set(:@domain_root_account, root_account)
     end
 
-    it "should put false in ENV when disabled at site_admin" do
+    it "puts false in ENV when disabled at site_admin" do
       Account.site_admin.disable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_falsey
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
     end
 
-    it "should put false in ENV when enabled at site_admin but disabled at the root account" do
+    it "puts false in ENV when enabled at site_admin but disabled at the root account" do
       Account.site_admin.enable_feature!(:new_math_equation_handling)
       root_account.disable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_falsey
       expect(@controller.js_env[:FEATURES][:new_math_equation_handling]).to be_falsey
     end
 
-    it "should put true in ENV when enabled at site_admin and the root account" do
+    it "puts true in ENV when enabled at site_admin and the root account" do
       Account.site_admin.enable_feature!(:new_math_equation_handling)
       root_account.enable_feature!(:new_math_equation_handling)
       expect(@controller.use_new_math_equation_handling?).to be_truthy
@@ -2343,7 +2343,7 @@ end
 
 describe WikiPagesController do
   describe "set_js_rights" do
-    it "should populate js_env with policy rights" do
+    it "populates js_env with policy rights" do
       allow(controller).to receive(:default_url_options).and_return({})
 
       course_with_teacher_logged_in :active_all => true
@@ -2369,13 +2369,13 @@ describe CoursesController do
       @course.save!
     end
 
-    it "should populate js_env with course_home setting" do
+    it "populates js_env with course_home setting" do
       controller.instance_variable_set(:@context, @course)
       get 'show', params: { id: @course.id }
       expect(controller.js_env).to include(:COURSE_HOME)
     end
 
-    it "should populate js_env with setting for show_announcements flag" do
+    it "populates js_env with setting for show_announcements flag" do
       controller.instance_variable_set(:@context, @course)
       get 'show', params: { id: @course.id }
       expect(controller.js_env).to include(:SHOW_ANNOUNCEMENTS, :ANNOUNCEMENT_LIMIT)
@@ -2401,14 +2401,14 @@ describe CoursesController do
       @child_page = @child_course.wiki_pages.create!(:title => "bloo", :body => "bloo", :migration_id => @tag.migration_id)
     end
 
-    it "should populate master-side data (unrestricted)" do
+    it "populates master-side data (unrestricted)" do
       controller.set_master_course_js_env_data(@master_page, @master_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_master_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_falsey
     end
 
-    it "should populate master-side data (restricted)" do
+    it "populates master-side data (restricted)" do
       @tag.update_attribute(:restrictions, { :content => true })
 
       controller.set_master_course_js_env_data(@master_page, @master_course)
@@ -2418,14 +2418,14 @@ describe CoursesController do
       expect(data['master_course_restrictions']).to eq({ :content => true })
     end
 
-    it "should populate child-side data (unrestricted)" do
+    it "populates child-side data (unrestricted)" do
       controller.set_master_course_js_env_data(@child_page, @child_course)
       data = controller.js_env[:MASTER_COURSE_DATA]
       expect(data['is_master_course_child_content']).to be_truthy
       expect(data['restricted_by_master_course']).to be_falsey
     end
 
-    it "should populate child-side data (restricted)" do
+    it "populates child-side data (restricted)" do
       @tag.update_attribute(:restrictions, { :content => true })
 
       controller.set_master_course_js_env_data(@child_page, @child_course)

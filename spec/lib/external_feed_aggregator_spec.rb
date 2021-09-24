@@ -27,7 +27,7 @@ describe ExternalFeedAggregator do
       @feed = external_feed_model
     end
 
-    it "should work correctly" do
+    it "works correctly" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(rss_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
@@ -36,7 +36,7 @@ describe ExternalFeedAggregator do
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
-    it "should set failure counts and refresh_at on failure" do
+    it "sets failure counts and refresh_at on failure" do
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_raise(CanvasHttp::Error)
       ExternalFeedAggregator.new.process_feed(@feed)
       expect(@feed.failures).to eq 1
@@ -44,7 +44,7 @@ describe ExternalFeedAggregator do
       expect(@feed.refresh_at).to be > 20.minutes.from_now
     end
 
-    it "should work correctly with atom" do
+    it "works correctly with atom" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(atom_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)
@@ -53,7 +53,7 @@ describe ExternalFeedAggregator do
       expect(@feed.external_feed_entries.length).to eq 1
     end
 
-    it "should set the LiveEvents context" do
+    it "sets the LiveEvents context" do
       response = Net::HTTPSuccess.new(1.1, 200, "OK")
       expect(response).to receive(:body).and_return(rss_example)
       expect(CanvasHttp).to receive(:get).with(@feed.url).and_return(response)

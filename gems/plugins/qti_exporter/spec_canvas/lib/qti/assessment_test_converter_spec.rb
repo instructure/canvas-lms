@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 
 describe Qti::AssessmentTestConverter do
-  it "should interpret duration strings that include units" do
+  it "interprets duration strings that include units" do
     assess = Qti::AssessmentTestConverter
 
     minutes_in_hour = 60

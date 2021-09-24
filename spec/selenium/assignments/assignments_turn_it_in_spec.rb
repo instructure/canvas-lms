@@ -74,7 +74,7 @@ describe "assignments turn it in" do
     }
   end
 
-  it "should create turnitin settings" do
+  it "creates turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     expect {
       get "/courses/#{@course.id}/assignments/new"
@@ -86,7 +86,7 @@ describe "assignments turn it in" do
     expect(Assignment.last.turnitin_settings).to eq expected_settings
   end
 
-  it "should edit turnitin settings" do
+  it "edits turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     assignment = @course.assignments.create!(
       :name => 'test assignment',

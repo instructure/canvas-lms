@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 describe Bookmarks::BookmarksController do
   context "when user is not logged in" do
-    it "should fail" do
+    it "fails" do
       get 'index', format: 'json'
       assert_status(401)
     end
@@ -36,14 +36,14 @@ describe Bookmarks::BookmarksController do
     end
 
     describe "GET 'index'" do
-      it "should succeed" do
+      it "succeeds" do
         get 'index', format: 'json'
         expect(response).to be_successful
       end
     end
 
     describe "GET 'show'" do
-      it "should succeed" do
+      it "succeeds" do
         get 'show', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end
@@ -66,50 +66,50 @@ describe Bookmarks::BookmarksController do
     describe "POST 'create'" do
       let(:params) { { name: 'chem 101', url: '/courses/2' } }
 
-      it "should succeed" do
+      it "succeeds" do
         post 'create', params: params, format: 'json'
         expect(response).to be_successful
       end
 
-      it "should create a bookmark" do
+      it "creates a bookmark" do
         expect { post 'create', params: params, format: 'json' }.to change { Bookmarks::Bookmark.count }.by(1)
       end
 
-      it "should set user" do
+      it "sets user" do
         post 'create', params: params, format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last.user_id).to eq(u.id)
       end
 
-      it "should set data" do
+      it "sets data" do
         post 'create', params: params.merge(data: { foo: "bar" }), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last.data["foo"]).to eq("bar")
       end
 
-      it "should append by default" do
+      it "appends by default" do
         post 'create', params: params, format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to be_last
       end
 
-      it "should set position" do
+      it "sets position" do
         post 'create', params: params.merge(position: 1), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
       end
 
-      it "should handle position strings" do
+      it "handles position strings" do
         post 'create', params: params.merge(position: "1"), format: 'json'
         expect(Bookmarks::Bookmark.order(:id).last).to_not be_last
       end
     end
 
     describe "PUT 'update'" do
-      it "should succeed" do
+      it "succeeds" do
         put 'update', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end
     end
 
     describe "DELETE 'delete'" do
-      it "should succeed" do
+      it "succeeds" do
         delete 'destroy', params: { id: bookmark.id }, format: 'json'
         expect(response).to be_successful
       end

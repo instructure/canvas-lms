@@ -33,7 +33,7 @@ describe ContentMigration do
       original_assignments.map { |a| @copy_to.assignments.where(:migration_id => mig_id(a)).take }
     end
 
-    it "should copy everything by default" do
+    it "copies everything by default" do
       run_course_copy
 
       rule_to = @copy_to.conditional_release_rules.first
@@ -48,7 +48,7 @@ describe ContentMigration do
       expect(set3b.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set3b_assmt)
     end
 
-    it "should be able to selectively copy rules via trigger assignments" do
+    it "is able to selectively copy rules via trigger assignments" do
       other_trigger = @copy_from.assignments.create!
       other_rule = @copy_from.conditional_release_rules.create!(:trigger_assignment => other_trigger)
       range = other_rule.scoring_ranges.create!(:lower_bound => 0.0, :upper_bound => 0.5)
@@ -68,7 +68,7 @@ describe ContentMigration do
       expect(rule_to.assignment_set_associations.first.assignment.migration_id).to eq mig_id(@set1_assmt1)
     end
 
-    it "should wipe and rewrite existing rule data on re-copy (for now)" do
+    it "wipes and rewrite existing rule data on re-copy (for now)" do
       run_course_copy
 
       rule_to = @copy_to.conditional_release_rules.first
@@ -84,7 +84,7 @@ describe ContentMigration do
       expect(set1_to.assignment_set_associations.map(&:assignment)).to eq migrated_assignments(@set1_assmt1, new_set1_assmt)
     end
 
-    it "should handle an export from the old service format into a natively enabled course" do
+    it "handles an export from the old service format into a natively enabled course" do
       old_account = Account.create!
       @copy_from.update(:account => old_account, :root_account => old_account)
 

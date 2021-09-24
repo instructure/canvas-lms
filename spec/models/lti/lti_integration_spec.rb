@@ -165,7 +165,7 @@ describe "LTI integration tests" do
                                                      :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool')
     end
 
-    it "should generate correct parameters" do
+    it "generates correct parameters" do
       @user = user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
       course_with_teacher(:active_all => true, :user => @user, :account => @account)
       @course.sis_source_id = 'coursesis'
@@ -206,7 +206,7 @@ describe "LTI integration tests" do
       expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
-    it "should set the locale if I18n.localizer exists" do
+    it "sets the locale if I18n.localizer exists" do
       I18n.localizer = lambda { :es }
 
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
@@ -217,7 +217,7 @@ describe "LTI integration tests" do
       I18n.localizer = lambda { :en }
     end
 
-    it "should add account info in launch data for account navigation" do
+    it "adds account info in launch data for account navigation" do
       @user = user_with_managed_pseudonym
       sub_account = Account.create(:parent_account => @account)
       sub_account.sis_source_id = 'accountsis'
@@ -235,7 +235,7 @@ describe "LTI integration tests" do
       expect(hash['custom_variable_canvas_membership_concluded_roles']).to eq "$Canvas.membership.concludedRoles"
     end
 
-    it "should add account and user info in launch data for user profile launch" do
+    it "adds account and user info in launch data for user profile launch" do
       @user = user_with_managed_pseudonym(:sis_user_id => 'testfun')
       sub_account = Account.create(:parent_account => @account)
       sub_account.sis_source_id = 'accountsis'
@@ -254,7 +254,7 @@ describe "LTI integration tests" do
       expect(hash['tool_consumer_instance_guid']).to eq sub_account.root_account.lti_guid
     end
 
-    it "should include URI query parameters" do
+    it "includes URI query parameters" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?a=1&b=2', link_code: '123456')
@@ -264,7 +264,7 @@ describe "LTI integration tests" do
       expect(hash['b']).to eq '2'
     end
 
-    it "should not allow overwriting other parameters from the URI query string" do
+    it "does not allow overwriting other parameters from the URI query string" do
       adapter = Lti::LtiOutboundAdapter.new(@tool, @user, @course)
       variable_expander = Lti::VariableExpander.new(root_account, canvas_course, controller)
       adapter.prepare_tool_launch('http://www.google.com', variable_expander, launch_url: 'http://www.yahoo.com?user_id=123&oauth_callback=1234', link_code: '123456')
@@ -274,7 +274,7 @@ describe "LTI integration tests" do
       expect(hash['oauth_callback']).to eq 'about:blank'
     end
 
-    it "should include custom fields" do
+    it "includes custom fields" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :custom_fields => { 'custom_bob' => 'bob', 'custom_fred' => 'fred', 'john' => 'john', '@$TAA$#$#' => 123 }, :name => 'tool')
 
@@ -292,7 +292,7 @@ describe "LTI integration tests" do
       expect(hash['john']).to be_nil
     end
 
-    it "should not include name and email if anonymous" do
+    it "does not include name and email if anonymous" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'anonymous', :name => 'tool')
       expect(@tool.include_name?).to eql(false)
@@ -309,7 +309,7 @@ describe "LTI integration tests" do
       expect(hash['lis_person_contact_email_primary']).to be_nil
     end
 
-    it "should include name if name_only" do
+    it "includes name if name_only" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'name_only', :name => 'tool')
       expect(@tool.include_name?).to eql(true)
@@ -326,7 +326,7 @@ describe "LTI integration tests" do
       expect(hash['lis_person_contact_email_primary']).to be_nil
     end
 
-    it "should include email if email_only" do
+    it "includes email if email_only" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'email_only', :name => 'tool')
       expect(@tool.include_name?).to eql(false)
@@ -343,7 +343,7 @@ describe "LTI integration tests" do
       hash['lis_person_contact_email_primary'] = @user.email
     end
 
-    it "should include email if public" do
+    it "includes email if public" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
       expect(@tool.include_name?).to eql(true)
@@ -360,7 +360,7 @@ describe "LTI integration tests" do
       hash['lis_person_contact_email_primary'] = @user.email
     end
 
-    it "should provide a custom_canvas_user_login_id without an sis id" do
+    it "provides a custom_canvas_user_login_id without an sis id" do
       user = user_with_pseudonym(:name => "A Name")
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :name => 'tool', :privacy_level => 'public')
@@ -373,7 +373,7 @@ describe "LTI integration tests" do
       expect(hash['custom_canvas_user_login_id']).to eq '$Canvas.user.loginId'
     end
 
-    it "should include text if set" do
+    it "includes text if set" do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.create!(:domain => 'yahoo.com', :consumer_key => '12345', :shared_secret => 'secret', :privacy_level => 'public', :name => 'tool')
 
@@ -409,7 +409,7 @@ describe "LTI integration tests" do
       adapter.generate_post_payload_for_assignment(@assignment, "/my/test/url", "/my/other/test/url", "another/test/url")
     end
 
-    it "should include assignment outcome service params for student" do
+    it "includes assignment outcome service params for student" do
       allow(CanvasSecurity).to receive(:create_encrypted_jwt) { 'an.encrypted.jwt' }
       allow_any_instance_of(Account).to receive(:feature_enabled?) { false }
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:encrypted_sourcedids).and_return(true)
@@ -424,7 +424,7 @@ describe "LTI integration tests" do
       expect(hash['custom_canvas_assignment_id']).to eq @assignment.id.to_s
     end
 
-    it "should include assignment outcome service params for teacher" do
+    it "includes assignment outcome service params for teacher" do
       hash = tool_setup(false)
       expect(hash['lis_result_sourcedid']).to be_nil
       expect(hash['lis_outcome_service_url']).to eq "/my/test/url"
@@ -457,7 +457,7 @@ describe "LTI integration tests" do
     specs_require_sharding
 
     # TODO: Replace this once we have LTIInbound
-    it "should roundtrip source ids from mixed shards", skip: true do
+    it "roundtrips source ids from mixed shards", skip: true do
       @shard1.activate do
         @account = Account.create!
         course_with_teacher(:active_all => true, :account => @account)
@@ -480,7 +480,7 @@ describe "LTI integration tests" do
       expect(user).to eq @user
     end
 
-    it "should provide different user ids for users with the same local id from different shards" do
+    it "provides different user ids for users with the same local id from different shards" do
       user1 = @shard1.activate do
         user_with_managed_pseudonym(:sis_user_id => 'testfun', :name => "A Name")
       end

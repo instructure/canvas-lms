@@ -32,7 +32,7 @@ describe Collaborator do
   end
 
   context 'broadcast policy' do
-    it 'should notify collaborating users', priority: "1", test_id: 193152 do
+    it 'notifies collaborating users', priority: "1", test_id: 193152 do
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user, :enrollment_state => 'active')
       NotificationPolicy.create(:notification => @notification,
@@ -43,7 +43,7 @@ describe Collaborator do
         .messages_sent.keys).to eq ['Collaboration Invitation']
     end
 
-    it 'should not notify the author' do
+    it 'does not notify the author' do
       NotificationPolicy.create(:notification => @notification,
                                 :communication_channel => @author.communication_channel,
                                 :frequency => 'immediately')
@@ -52,7 +52,7 @@ describe Collaborator do
         .messages_sent.keys).to be_empty
     end
 
-    it 'should notify all members of a group' do
+    it 'notifies all members of a group' do
       group = group_model(:name => 'Test group', :context => @course)
       users = (1..2).map { user_with_pseudonym(:active_all => true) }
       users.each do |u|
@@ -64,7 +64,7 @@ describe Collaborator do
         .messages_sent.keys).to include 'Collaboration Invitation'
     end
 
-    it 'should not notify members of a group that have not accepted the course enrollemnt' do
+    it 'does not notify members of a group that have not accepted the course enrollemnt' do
       group = group_model(:name => 'Test group', :context => @course)
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user)
@@ -74,7 +74,7 @@ describe Collaborator do
         .messages_sent.keys).to be_empty
     end
 
-    it 'should not notify members of a group in an unpublished course' do
+    it 'does not notify members of a group in an unpublished course' do
       group = group_model(:name => 'Test group', :context => @course)
       user = user_with_pseudonym(:active_all => true)
       @course.enroll_student(user)

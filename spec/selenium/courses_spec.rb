@@ -46,7 +46,7 @@ describe "courses" do
         expect(action_button.text).to eq validation_text
       end
 
-      it "should allow publishing of the course through the course status actions" do
+      it "allows publishing of the course through the course status actions" do
         @course.workflow_state = 'claimed'
         @course.lock_all_announcements = true
         @course.save!
@@ -63,7 +63,7 @@ describe "courses" do
         expect(@course.lock_all_announcements).to be_truthy
       end
 
-      it "should display a creative commons license when set", priority: "1", test_id: 272274 do
+      it "displays a creative commons license when set", priority: "1", test_id: 272274 do
         @course.license =  'cc_by_sa'
         @course.save!
         get "/courses/#{@course.id}"
@@ -71,7 +71,7 @@ describe "courses" do
         expect(f('.public-license-text').text).to include('This course content is offered under a')
       end
 
-      it "should allow unpublishing of a course through the course status actions" do
+      it "allows unpublishing of a course through the course status actions" do
         get "/courses/#{@course.id}"
         course_status_buttons = ff('#course_status_actions button')
         expect(course_status_buttons.first).not_to have_class('disabled')
@@ -82,7 +82,7 @@ describe "courses" do
         validate_action_button(:first, 'Unpublished')
       end
 
-      it "should allow publishing even if graded submissions exist" do
+      it "allows publishing even if graded submissions exist" do
         course_with_student_submissions({ submission_points: true, unpublished: true })
         @course.default_view = 'feed'
         @course.save
@@ -97,7 +97,7 @@ describe "courses" do
         expect(@course).to be_available
       end
 
-      it "should not show course status if published and graded submissions exist" do
+      it "does not show course status if published and graded submissions exist" do
         course_with_student_submissions({ submission_points: true })
         @course.default_view = 'feed'
         @course.save
@@ -105,7 +105,7 @@ describe "courses" do
         expect(f("#content")).not_to contain_css('#course_status')
       end
 
-      it "should allow publishing/unpublishing with only change_course_state permission" do
+      it "allows publishing/unpublishing with only change_course_state permission" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(:permission => :manage_course_content, :role => teacher_role, :enabled => false)
         @course.account.role_overrides.create!(:permission => :manage_courses, :role => teacher_role, :enabled => false)
@@ -117,7 +117,7 @@ describe "courses" do
         validate_action_button(:last, 'Published')
       end
 
-      it "should allow publishing/unpublishing with only manage_courses_publish permission (granular permissions)" do
+      it "allows publishing/unpublishing with only manage_courses_publish permission (granular permissions)" do
         @course.root_account.enable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(
           permission: :manage_course_content,
@@ -137,7 +137,7 @@ describe "courses" do
         validate_action_button(:last, 'Published')
       end
 
-      it "should not allow publishing/unpublishing without change_course_state permission" do
+      it "does not allow publishing/unpublishing without change_course_state permission" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(:permission => :change_course_state, :role => teacher_role, :enabled => false)
 
@@ -145,7 +145,7 @@ describe "courses" do
         expect(f("#content")).not_to contain_css('#course_status_actions')
       end
 
-      it "should not allow publishing/unpublishing without manage_courses_publish permission (granular permissions)" do
+      it "does not allow publishing/unpublishing without manage_courses_publish permission (granular permissions)" do
         @course.root_account.disable_feature!(:granular_permissions_manage_courses)
         @course.account.role_overrides.create!(
           permission: :manage_courses_publish,
@@ -158,7 +158,7 @@ describe "courses" do
       end
     end
 
-    it "should correctly update the course quota" do
+    it "correctlies update the course quota" do
       course_with_admin_logged_in
 
       # first try setting the quota explicitly
@@ -173,7 +173,7 @@ describe "courses" do
       expect(value).to eq "10"
     end
 
-    it "should save quota when not changed" do
+    it "saves quota when not changed" do
       # then try just saving it (without resetting it)
       course_with_admin_logged_in
       @course.update!(storage_quota: 10.megabytes)
@@ -184,7 +184,7 @@ describe "courses" do
       expect(value).to eq 10.megabytes
     end
 
-    it "should redirect to the gradebook when switching courses when viewing a students grades" do
+    it "redirects to the gradebook when switching courses when viewing a students grades" do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
 
@@ -207,7 +207,7 @@ describe "courses" do
       expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)
     end
 
-    it "should only show users that a user has permissions to view" do
+    it "onlies show users that a user has permissions to view" do
       # Set up the test
       course_factory(active_course: true)
       %w[One Two].each do |name|
@@ -226,7 +226,7 @@ describe "courses" do
       expect(ff('.roster .rosterUser').length).to eq 2
     end
 
-    it "should display users section name" do
+    it "displays users section name" do
       course_with_teacher_logged_in(:active_all => true)
       user1, user2 = [user_factory, user_factory]
       section1 = @course.course_sections.create!(:name => 'One')
@@ -258,7 +258,7 @@ describe "courses" do
         @course.context_external_tools.create!(defaults.merge(options))
       end
 
-      it "should display course_home_sub_navigation lti apps", priority: "1", test_id: 2624910 do
+      it "displays course_home_sub_navigation lti apps", priority: "1", test_id: 2624910 do
         course_with_teacher_logged_in(active_all: true)
         num_tools = 2
         num_tools.times { |index| create_course_home_sub_navigation_tool(name: "external tool #{index}") }
@@ -266,14 +266,14 @@ describe "courses" do
         expect(ff(".course-home-sub-navigation-lti").size).to eq num_tools
       end
 
-      it "should include launch type parameter", priority: "1", test_id: 2624911 do
+      it "includes launch type parameter", priority: "1", test_id: 2624911 do
         course_with_teacher_logged_in(active_all: true)
         create_course_home_sub_navigation_tool
         get "/courses/#{@course.id}"
         expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
-      it "should only display active tools", priority: "1", test_id: 2624912 do
+      it "onlies display active tools", priority: "1", test_id: 2624912 do
         course_with_teacher_logged_in(active_all: true)
         tool = create_course_home_sub_navigation_tool
         tool.workflow_state = 'deleted'
@@ -282,7 +282,7 @@ describe "courses" do
         expect(f("#content")).not_to contain_css(".course-home-sub-navigation-lti")
       end
 
-      it "should not display admin tools to students", priority: "1", test_id: 2624913 do
+      it "does not display admin tools to students", priority: "1", test_id: 2624913 do
         course_with_teacher_logged_in(active_all: true)
         tool = create_course_home_sub_navigation_tool
         tool.course_home_sub_navigation['visibility'] = 'admins'
@@ -313,7 +313,7 @@ describe "courses" do
       Account.default.save!
     end
 
-    it "should display user groups on courses page" do
+    it "displays user groups on courses page" do
       group = Group.create!(:name => "group1", :context => @course)
       group.add_user(@student)
       enroll_student(@student, true)
@@ -326,7 +326,7 @@ describe "courses" do
       expect(content).to include_text('group1')
     end
 
-    it "should reset cached permissions when enrollment is activated by date" do
+    it "resets cached permissions when enrollment is activated by date" do
       enable_cache do
         enroll_student(@student, true)
 
@@ -355,7 +355,7 @@ describe "courses" do
     end
   end
 
-  it "shouldn't cache unauth permissions for semi-public courses from sessionless permission checks" do
+  it "does not cache unauth permissions for semi-public courses from sessionless permission checks" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public_to_auth_users, true)
 
@@ -393,7 +393,7 @@ describe "courses" do
       user_session @teacher
     end
 
-    it "should be displayed if enabled and is wiki" do
+    it "is displayed if enabled and is wiki" do
       get "/courses/#{@course.id}"
 
       expect(f('#announcements_on_home_page')).to be_displayed
@@ -401,7 +401,7 @@ describe "courses" do
       expect(f('#announcements_on_home_page')).to_not include_text(@html)
     end
 
-    it "should not show on k5 subject even with setting on" do
+    it "does not show on k5 subject even with setting on" do
       toggle_k5_setting(@course.account)
       get "/courses/#{@course.id}"
 
@@ -409,7 +409,7 @@ describe "courses" do
     end
   end
 
-  it "should properly apply visible sections to announcement limit" do
+  it "properlies apply visible sections to announcement limit" do
     course_with_teacher(active_course: true)
     @course.show_announcements_on_home_page = true
     @course.home_page_announcement_limit = 2

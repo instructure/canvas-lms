@@ -29,7 +29,7 @@ describe ContextModule do
   end
 
   describe "index" do
-    it "should require manage_content permission before showing add controls" do
+    it "requires manage_content permission before showing add controls" do
       course_with_teacher_logged_in active_all: true
       get "/courses/#{@course.id}/modules"
       doc = Nokogiri::HTML5(response.body)
@@ -44,7 +44,7 @@ describe ContextModule do
     end
   end
 
-  it "should clear the page cache on individual tag change" do
+  it "clears the page cache on individual tag change" do
     enable_cache do
       course_with_teacher_logged_in(:active_all => true)
       context_module = @course.context_modules.create!
@@ -82,7 +82,7 @@ describe ContextModule do
       expect(@progression.current_position).to eql(@tag.position)
     end
 
-    it "should progress for discussions" do
+    it "progresses for discussions" do
       @discussion = @course.discussion_topics.create!(:title => "talk")
       @tag = @module.add_item(:type => 'discussion_topic', :id => @discussion.id)
       before_after do
@@ -91,7 +91,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress for wiki pages" do
+    it "progresses for wiki pages" do
       @page = @course.wiki_pages.create!(:title => "talk page", :body => 'ohai', :editing_roles => 'teachers,students')
       @tag = @module.add_item(:type => 'wiki_page', :id => @page.id)
       before_after do
@@ -99,7 +99,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress for assignment discussions" do
+    it "progresses for assignment discussions" do
       @assignment = @course.assignments.create!(:title => 'talk assn', :submission_types => 'discussion_topic')
       @tag = @module.add_item(:type => 'assignment', :id => @assignment.id)
       before_after do
@@ -185,7 +185,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to assignment" do
+    it "progresses to assignment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           asmnt = @course.assignments.create!(:title => 'assignment', :description => content)
@@ -196,7 +196,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to discussion topic" do
+    it "progresses to discussion topic" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           discussion = @course.discussion_topics.create!(:title => "topic", :message => content)
@@ -207,7 +207,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to a quiz" do
+    it "progresses to a quiz" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           quiz = @course.quizzes.create!(:title => "quiz", :description => content)
@@ -219,7 +219,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to a wiki page" do
+    it "progresses to a wiki page" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           page = @course.wiki_pages.create!(:title => "wiki", :body => content)
@@ -231,7 +231,7 @@ describe ContextModule do
       end
     end
 
-    it "should progress to an attachment" do
+    it "progresses to an attachment" do
       [true, false].each do |progress_type|
         progression_testing(progress_type) do |content|
           @is_attachment = true
@@ -245,7 +245,7 @@ describe ContextModule do
   end
 
   describe "caching" do
-    it "should cache the view separately for each time zone" do
+    it "caches the view separately for each time zone" do
       enable_cache do
         course_factory active_all: true
 

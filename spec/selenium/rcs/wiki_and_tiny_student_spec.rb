@@ -31,7 +31,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       stub_rcs_config
     end
 
-    it "should not allow access to page when marked as hide from student" do
+    it "does not allow access to page when marked as hide from student" do
       expected_error = "Access Denied"
       title = "test_page"
       hfs = true
@@ -44,7 +44,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f('#unauthorized_message')).to include_text(expected_error)
     end
 
-    it "should not allow students to edit if marked for only teachers can edit" do
+    it "does not allow students to edit if marked for only teachers can edit" do
       # vars for the create_wiki_page method which seeds the used page
       title = "test_page"
       hfs = false
@@ -57,7 +57,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f("#content")).not_to contain_css('a.edit-wiki')
     end
 
-    it "should allow students to edit wiki if any option but teachers is selected" do
+    it "allows students to edit wiki if any option but teachers is selected" do
       title = "test_page"
       hfs = false
       edit_roles = "public"
@@ -81,7 +81,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f('a.edit-wiki')).to be_displayed
     end
 
-    it "should allow students to create new pages if enabled" do
+    it "allows students to create new pages if enabled" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
 
@@ -96,7 +96,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(new_page).to be_published
     end
 
-    it "should not allow students to add links to new pages" do
+    it "does not allow students to add links to new pages" do
       skip("With new RCE you CAN select pages in this scenario")
       create_wiki_page("test_page", false, "public")
       title = 'test_page'
@@ -117,7 +117,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
     end
 
-    it "should allow students to add links to pages if they can create them" do
+    it "allows students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
       title = 'test_page'

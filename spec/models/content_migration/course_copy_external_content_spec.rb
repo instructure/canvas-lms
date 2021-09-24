@@ -36,7 +36,7 @@ describe ContentMigration do
       allow(Canvas::Migration::ExternalContent::Migrator).to receive(:registered_services).and_return({ 'test_service' => TestExternalContentService })
     end
 
-    it "should skip everything if #applies_to_course? returns false" do
+    it "skips everything if #applies_to_course? returns false" do
       allow(TestExternalContentService).to receive(:applies_to_course?).and_return(false)
       expect(TestExternalContentService).to receive(:begin_export).never
       expect(TestExternalContentService).to receive(:export_completed?).never
@@ -46,7 +46,7 @@ describe ContentMigration do
       run_course_copy
     end
 
-    it "should send the data from begin_export back later to retrieve_export" do
+    it "sends the data from begin_export back later to retrieve_export" do
       expect(TestExternalContentService).to receive(:applies_to_course?).with(@copy_from).and_return(true)
 
       test_data = { :sometestdata => "something" }
@@ -57,7 +57,7 @@ describe ContentMigration do
       run_course_copy
     end
 
-    it "should translate ids for copied course content" do
+    it "translates ids for copied course content" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       assmt = @copy_from.assignments.create!
@@ -111,7 +111,7 @@ describe ContentMigration do
       expect(TestExternalContentService.imported_content).to eq expected_data
     end
 
-    it "should specify if the ids aren't able to be copied" do
+    it "specifies if the ids aren't able to be copied" do
       assmt = @copy_from.assignments.create!
       topic = @copy_from.discussion_topics.create!
 
@@ -135,7 +135,7 @@ describe ContentMigration do
       expect(TestExternalContentService.imported_content).to eq expected_data
     end
 
-    it "should send a list of exported assets to the external service when selectively exporting" do
+    it "sends a list of exported assets to the external service when selectively exporting" do
       assmt = @copy_from.assignments.create!
       other_assmt = @copy_from.assignments.create!
       graded_quiz = @copy_from.quizzes.create!
@@ -161,7 +161,7 @@ describe ContentMigration do
       run_course_copy
     end
 
-    it "should only check a few times for the export to finish before timing out" do
+    it "onlies check a few times for the export to finish before timing out" do
       allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
       allow(TestExternalContentService).to receive(:begin_export).and_return(true)
       expect(Canvas::Migration::ExternalContent::Migrator).to receive(:retry_delay).at_least(:once).and_return(0) # so we're not actually sleeping for 30s a pop

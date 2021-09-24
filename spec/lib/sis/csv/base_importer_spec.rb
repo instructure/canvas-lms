@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::CSVBaseImporter do
-  it 'should read file from index' do
+  it 'reads file from index' do
     sis = double
     allow(sis).to receive(:batch).and_return nil
     allow(sis).to receive(:root_account).and_return nil

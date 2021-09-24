@@ -26,7 +26,7 @@ class MyTestError < StandardError
 end
 
 describe Canvas::Errors::Reporter do
-  it "Should be able to catch a composed exception" do
+  it "is able to catch a composed exception" do
     new_class = error_instance
     exception_handled = false
     begin
@@ -37,7 +37,7 @@ describe Canvas::Errors::Reporter do
     expect(exception_handled).to be true
   end
 
-  it "Should have extra info" do
+  it "has extra info" do
     new_class = error_instance
     expect(new_class.respond_to?(:canvas_error_info)).to be true
     expect(new_class.canvas_error_info[:princess_mode]).to be false
@@ -45,12 +45,12 @@ describe Canvas::Errors::Reporter do
     expect(new_class.canvas_error_info[:garbage]).to eq "%%jksdh38912398732987lkhjsadfkjhdfslk"
   end
 
-  it "Should have correct backtrace" do
+  it "has correct backtrace" do
     new_class = error_instance
     expect(new_class.backtrace[0]).to match /typical_usage/
   end
 
-  it "Shouldn't mess with existing classes" do
+  it "does not mess with existing classes" do
     new_class = error_instance
     old_class = MyTestError.new("i am a message")
 
@@ -58,7 +58,7 @@ describe Canvas::Errors::Reporter do
     expect(old_class.respond_to?(:canvas_error_info)).to be false
   end
 
-  it "Should inherrit from existing class" do
+  it "inherrits from existing class" do
     new_class = error_instance
 
     expect(new_class.response_status).to be 401

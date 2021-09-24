@@ -43,7 +43,7 @@ describe Feature do
   end
 
   describe "applies_to_object" do
-    it "should work for SiteAdmin features" do
+    it "works for SiteAdmin features" do
       feature = Feature.definitions['SA']
       expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_falsey
@@ -52,7 +52,7 @@ describe Feature do
       expect(feature.applies_to_object(t_user)).to be_falsey
     end
 
-    it "should work for RootAccount features" do
+    it "works for RootAccount features" do
       feature = Feature.definitions['RA']
       expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
@@ -61,7 +61,7 @@ describe Feature do
       expect(feature.applies_to_object(t_user)).to be_falsey
     end
 
-    it "should work for Account features" do
+    it "works for Account features" do
       feature = Feature.definitions['A']
       expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
@@ -70,7 +70,7 @@ describe Feature do
       expect(feature.applies_to_object(t_user)).to be_falsey
     end
 
-    it "should work for Course features" do
+    it "works for Course features" do
       feature = Feature.definitions['C']
       expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_truthy
@@ -79,7 +79,7 @@ describe Feature do
       expect(feature.applies_to_object(t_user)).to be_falsey
     end
 
-    it "should work for User features" do
+    it "works for User features" do
       feature = Feature.definitions['U']
       expect(feature.applies_to_object(t_site_admin)).to be_truthy
       expect(feature.applies_to_object(t_root_account)).to be_falsey
@@ -90,36 +90,36 @@ describe Feature do
   end
 
   describe "applicable_features" do
-    it "should work for Site Admin" do
+    it "works for Site Admin" do
       expect(Feature.applicable_features(t_site_admin).map(&:feature).sort).to eql %w(A C RA SA U)
     end
 
-    it "should work for RootAccounts" do
+    it "works for RootAccounts" do
       expect(Feature.applicable_features(t_root_account).map(&:feature).sort).to eql %w(A C RA)
     end
 
-    it "should work for Accounts" do
+    it "works for Accounts" do
       expect(Feature.applicable_features(t_sub_account).map(&:feature).sort).to eql %w(A C)
     end
 
-    it "should work for Courses" do
+    it "works for Courses" do
       expect(Feature.applicable_features(t_course).map(&:feature)).to eql %w(C)
     end
 
-    it "should work for Users" do
+    it "works for Users" do
       expect(Feature.applicable_features(t_user).map(&:feature)).to eql %w(U)
     end
   end
 
   describe "locked?" do
-    it "should return true if context is nil" do
+    it "returns true if context is nil" do
       expect(Feature.definitions['RA'].locked?(nil)).to be_truthy
       expect(Feature.definitions['A'].locked?(nil)).to be_truthy
       expect(Feature.definitions['C'].locked?(nil)).to be_truthy
       expect(Feature.definitions['U'].locked?(nil)).to be_truthy
     end
 
-    it "should return true in a lower context if the definition disallows override" do
+    it "returns true in a lower context if the definition disallows override" do
       expect(Feature.definitions['RA'].locked?(t_site_admin)).to be_falsey
       expect(Feature.definitions['A'].locked?(t_site_admin)).to be_truthy
       expect(Feature.definitions['C'].locked?(t_site_admin)).to be_truthy
@@ -128,13 +128,13 @@ describe Feature do
   end
 
   describe "RootAccount feature" do
-    it "should imply root_opt_in" do
+    it "implies root_opt_in" do
       expect(Feature.definitions['RA'].root_opt_in).to be_truthy
     end
   end
 
   describe "default_transitions" do
-    it "should enumerate SiteAdmin transitions" do
+    it "enumerates SiteAdmin transitions" do
       fd = Feature.definitions['SA']
       expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => true } })
       expect(fd.default_transitions(t_site_admin, 'allowed_on')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed' => { 'locked' => true } })
@@ -142,7 +142,7 @@ describe Feature do
       expect(fd.default_transitions(t_site_admin, 'off')).to eql({ "allowed" => { "locked" => true }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => true } })
     end
 
-    it "should enumerate RootAccount transitions" do
+    it "enumerates RootAccount transitions" do
       fd = Feature.definitions['RA']
       expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => false } })
       expect(fd.default_transitions(t_site_admin, 'allowed_on')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed' => { 'locked' => false } })
@@ -154,7 +154,7 @@ describe Feature do
       expect(fd.default_transitions(t_root_account, 'off')).to eql({ 'allowed' => { 'locked' => true }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => true } })
     end
 
-    it "should enumerate Account transitions" do
+    it "enumerates Account transitions" do
       fd = Feature.definitions['A']
       expect(fd.default_transitions(t_root_account, 'allowed')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => false } })
       expect(fd.default_transitions(t_root_account, 'allowed_on')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed' => { 'locked' => false } })
@@ -166,14 +166,14 @@ describe Feature do
       expect(fd.default_transitions(t_sub_account, 'off')).to eql({ 'allowed' => { 'locked' => false }, 'on' => { 'locked' => false }, 'allowed_on' => { 'locked' => false } })
     end
 
-    it "should enumerate Course transitions" do
+    it "enumerates Course transitions" do
       fd = Feature.definitions['C']
       expect(fd.default_transitions(t_course, 'allowed')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false } })
       expect(fd.default_transitions(t_course, 'on')).to eql({ 'off' => { 'locked' => false } })
       expect(fd.default_transitions(t_course, 'off')).to eql({ 'on' => { 'locked' => false } })
     end
 
-    it "should enumerate User transitions" do
+    it "enumerates User transitions" do
       fd = Feature.definitions['U']
       expect(fd.default_transitions(t_user, 'allowed')).to eql({ 'off' => { 'locked' => false }, 'on' => { 'locked' => false } })
       expect(fd.default_transitions(t_user, 'on')).to eql({ 'off' => { 'locked' => false } })
@@ -224,26 +224,26 @@ describe "Feature.register" do
     t_feature_hash.merge(environments: { production: { state: 'disabled' } })
   end
 
-  it "should register a feature" do
+  it "registers a feature" do
     Feature.register({ some_feature: t_feature_hash })
     expect(Feature.definitions).to be_frozen
     expect(Feature.definitions['some_feature'].display_name.call).to eql('some feature or other')
   end
 
   describe "development" do
-    it "should register in a test environment" do
+    it "registers in a test environment" do
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions['dev_feature']).not_to be_nil
     end
 
-    it "should register in a dev environment" do
+    it "registers in a dev environment" do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:development?).and_return(true)
       Feature.register({ dev_feature: t_dev_feature_hash })
       expect(Feature.definitions['dev_feature']).not_to be_nil
     end
 
-    it "should register in a production test cluster" do
+    it "registers in a production test cluster" do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:production?).and_return(true)
       allow(ApplicationController).to receive(:test_cluster?).and_return(true)
@@ -251,7 +251,7 @@ describe "Feature.register" do
       expect(Feature.definitions['dev_feature']).not_to be_nil
     end
 
-    it "should not register in production" do
+    it "does not register in production" do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:production?).and_return(true)
       Feature.register({ dev_feature: t_dev_feature_hash })
@@ -264,12 +264,12 @@ describe "Feature.register" do
   end
 
   describe 'hidden_in_prod' do
-    it "should register as 'allowed' in a test environment" do
+    it "registers as 'allowed' in a test environment" do
       Feature.register({ dev_feature: t_hidden_in_prod_feature_hash })
       expect(Feature.definitions['dev_feature']).to be_can_override
     end
 
-    it "should register as 'hidden' in production" do
+    it "registers as 'hidden' in production" do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:production?).and_return(true)
       Feature.register({ dev_feature: t_hidden_in_prod_feature_hash })

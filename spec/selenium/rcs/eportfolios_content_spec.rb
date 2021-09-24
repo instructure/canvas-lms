@@ -36,12 +36,12 @@ describe "add content box" do
     wait_for_ajaximations
   end
 
-  it "should click on the How Do I..? button" do
+  it "clicks on the How Do I..? button" do
     f(".wizard_popup_link").click
     expect(f("#wizard_box .wizard_options_list")).to be_displayed
   end
 
-  it "should preview rich text content" do
+  it "previews rich text content" do
     skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello preview"
@@ -49,7 +49,7 @@ describe "add content box" do
     expect(f(".preview_content.preview_section")).to include_text("hello preview")
   end
 
-  it "should add rich text content" do
+  it "adds rich text content" do
     skip("eportfolio still using old RCE, LS-1805")
     f(".add_rich_content_link").click
     type_in_tiny "textarea", "hello student"
@@ -59,7 +59,7 @@ describe "add content box" do
     expect(f("#page_content .section_content")).to include_text("hello student")
   end
 
-  it "should add a user file" do
+  it "adds a user file" do
     skip('this only worked with the legacy editor. make it work w/ canvas-rce CORE-2714')
     expect(f('.add_file_link')).to be_displayed
     f('.add_file_link').click
@@ -113,17 +113,17 @@ describe "add content box" do
       expect(@eportfolio_entry.page_comments[0].message).to eq "hi student"
     end
 
-    it "should verify that the html is there" do
+    it "verifies that the html is there" do
       add_html
       expect(f(".section_content strong").text).to eq "student"
       entry_verifier({ :section_type => "html", :content => @html_content })
     end
 
-    it "should put comment in html" do
+    it "puts comment in html" do
       put_comment_in_html
     end
 
-    it "should delete the html content" do
+    it "deletes the html content" do
       add_html
       entry_verifier({ :section_type => "html", :content => @html_content })
       f("#right-side .edit_content_link").click
@@ -136,7 +136,7 @@ describe "add content box" do
       expect(f("#content")).not_to contain_css("#edit_page_section_0")
     end
 
-    it "should delete html comment" do
+    it "deletes html comment" do
       put_comment_in_html
       expect(PageComment.count).to be > 0
       f(".delete_comment_link").click

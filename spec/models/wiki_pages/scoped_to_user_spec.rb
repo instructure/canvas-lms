@@ -41,7 +41,7 @@ describe WikiPages::ScopedToUser do
   end
 
   describe '#scope' do
-    it 'should return all pages if user can :view_unpublished_items' do
+    it 'returns all pages if user can :view_unpublished_items' do
       expect(@course.grants_right?(@teacher, :view_unpublished_items)).to be_truthy, 'precondition'
       expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
       expect(published.workflow_state).to eq('active'), 'precondition'
@@ -50,7 +50,7 @@ describe WikiPages::ScopedToUser do
       expect(scope_filter.scope).to include(unpublished, published)
     end
 
-    it 'should return only published pages if user cannot :view_unpublished_items' do
+    it 'returns only published pages if user cannot :view_unpublished_items' do
       expect(@course.grants_right?(@student, :view_unpublished_items)).to be_falsey, 'precondition'
       expect(unpublished.workflow_state).to eq('unpublished'), 'precondition'
       expect(published.workflow_state).to eq('active'), 'precondition'

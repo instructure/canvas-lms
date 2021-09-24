@@ -65,7 +65,7 @@ describe "speed grader" do
   end
 
   context "alerts" do
-    it "should alert the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+    it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
       student_in_course(active_user: true).user
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       comment_textarea = f("#speed_grader_comment_textarea")
@@ -334,7 +334,7 @@ describe "speed grader" do
       expect(f("#section-menu .ui-menu")).to include_text("Show All Sections")
     end
 
-    it "should list all course sections", priority: "2", test_id: "588914" do
+    it "lists all course sections", priority: "2", test_id: "588914" do
       f("#students_selectmenu-button").click
       hover(f("#section-menu-link"))
       expect(f("#section-menu .ui-menu")).to include_text(@section0.name)
@@ -384,7 +384,7 @@ describe "speed grader" do
 
     let_once(:quiz) { seed_quiz_with_submission }
 
-    it 'should let you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
+    it 'lets you enter in a float for a quiz question point value', priority: "1", test_id: 369250 do
       user_session(@teacher)
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{quiz.assignment_id}"
       # In the left panel modify the grade to 0.5
@@ -429,7 +429,7 @@ describe "speed grader" do
       )
     end
 
-    it 'should display a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
+    it 'displays a flash warning banner when viewed in Firefox', priority: "2", test_id: 571755 do
       skip_if_chrome('This test applies to Firefox')
       skip_if_ie('This test applies to Firefox')
       # sometimes google docs is slow to load, which causes the flash

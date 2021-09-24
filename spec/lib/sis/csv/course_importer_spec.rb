@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::CourseImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     before_count = Course.count
     importer = process_csv_data(
       "course_id,short_name,long_name,term_id,status",
@@ -42,7 +42,7 @@ describe SIS::CSV::CourseImporter do
                           "No long_name given for course C005"]
   end
 
-  it "should create new courses" do
+  it "creates new courses" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -53,7 +53,7 @@ describe SIS::CSV::CourseImporter do
     expect(course.associated_accounts.map(&:id).sort).to eq [@account.id]
   end
 
-  it "should throw an error when account is not found" do
+  it "throws an error when account is not found" do
     importer = process_csv_data(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
@@ -62,7 +62,7 @@ describe SIS::CSV::CourseImporter do
     expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 
-  it "should support term stickiness" do
+  it "supports term stickiness" do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,",
@@ -95,7 +95,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it "should support account stickiness" do
+  it "supports account stickiness" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active",
@@ -128,7 +128,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it "should support term stickiness from abstract courses" do
+  it "supports term stickiness from abstract courses" do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,",
@@ -173,7 +173,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it "shouldn't blow away the account id if it's already set" do
+  it "does not blow away the account id if it's already set" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active"
@@ -203,7 +203,7 @@ describe SIS::CSV::CourseImporter do
     expect(course.associated_accounts.map(&:id).sort).to eq [account.id, @account.id].sort
   end
 
-  it "should support falling back to a fallback account if the primary one doesn't exist" do
+  it "supports falling back to a fallback account if the primary one doesn't exist" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,Humanities,active"
@@ -217,7 +217,7 @@ describe SIS::CSV::CourseImporter do
     expect(course.account).to eq account
   end
 
-  it "should rename courses that have not had their name manually changed" do
+  it "renames courses that have not had their name manually changed" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active",
@@ -244,7 +244,7 @@ describe SIS::CSV::CourseImporter do
     expect(course.name).to eql("Testing & Breaking 102")
   end
 
-  it "should not rename courses that have had their names manually changed" do
+  it "does not rename courses that have had their names manually changed" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -266,7 +266,7 @@ describe SIS::CSV::CourseImporter do
     expect(course.name).to eql("Haha my course lol")
   end
 
-  it 'should override term dates if the start or end dates are set' do
+  it 'overrides term dates if the start or end dates are set' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test1,TC 101,Test Course 1,,,active,,",
@@ -280,7 +280,7 @@ describe SIS::CSV::CourseImporter do
     expect(@account.courses.where(sis_source_id: "test4").first.restrict_enrollments_to_course_dates).to be_truthy
   end
 
-  it 'should remove dates with <delete>' do
+  it 'removes dates with <delete>' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
@@ -293,7 +293,7 @@ describe SIS::CSV::CourseImporter do
     expect(@account.courses.where(sis_source_id: "test4").first.restrict_enrollments_to_course_dates).to be_falsey
   end
 
-  it 'should support start/end date and restriction stickiness' do
+  it 'supports start/end date and restriction stickiness' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test4,TC 104,Test Course 4,,,active,2011-04-14 00:00:00,2011-05-14 00:00:00"
@@ -341,7 +341,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it 'should not change templated course names or course codes if the course has those fields marked as sticky' do
+  it 'does not change templated course names or course codes if the course has those fields marked as sticky' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,",
@@ -439,7 +439,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it 'should not change templated course names or course codes if the templated course has those fields marked as sticky' do
+  it 'does not change templated course names or course codes if the templated course has those fields marked as sticky' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter13,active,,",
@@ -537,7 +537,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it "should use the default term if none given" do
+  it "uses the default term if none given" do
     @default_term = @account.default_enrollment_term
     expect(@default_term).to be_present
     @nil_id_term = @account.enrollment_terms.create!(:name => "nil")
@@ -561,7 +561,7 @@ describe SIS::CSV::CourseImporter do
       )
     end
 
-    it 'should change course account associations when a course account changes' do
+    it 'changes course account associations when a course account changes' do
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status",
         "test_1,TC 101,Test Course 101,,,active"
@@ -590,7 +590,7 @@ describe SIS::CSV::CourseImporter do
     end
   end
 
-  it "should make workflow_state sticky" do
+  it "makes workflow_state sticky" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -608,7 +608,7 @@ describe SIS::CSV::CourseImporter do
     expect(course).to be_completed
   end
 
-  it "should allow publishing a course" do
+  it "allows publishing a course" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,published"
@@ -617,7 +617,7 @@ describe SIS::CSV::CourseImporter do
     expect(course).to be_available
   end
 
-  it "should allow publishing an existing course" do
+  it "allows publishing an existing course" do
     course = @account.courses.create!(sis_source_id: 'test_1', workflow_state: 'claimed')
     Course.where(id: course).update_all(stuck_sis_fields: Set.new)
     process_csv_data_cleanly(
@@ -663,7 +663,7 @@ describe SIS::CSV::CourseImporter do
     expect(importer.errors.map(&:last)).to include "Invalid course_format \"FAT32\" for course test_1"
   end
 
-  it 'should allow unpublished to be passed for active' do
+  it 'allows unpublished to be passed for active' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "c1,TC 101,Test Course 1,,T001,unpublished"
@@ -671,7 +671,7 @@ describe SIS::CSV::CourseImporter do
     expect(Course.active.where(sis_source_id: 'c1').take).to be_present
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     sis_user = user_model
     batch1 = @account.sis_batches.create! do |sb|
       sb.data = {}
@@ -719,7 +719,7 @@ describe SIS::CSV::CourseImporter do
       @template = MasterCourses::MasterTemplate.set_as_master_course(@mc)
     end
 
-    it "should give a warning when trying to associate an existing blueprint course" do
+    it "gives a warning when trying to associate an existing blueprint course" do
       mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
       template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
       importer = process_csv_data(
@@ -729,7 +729,7 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{mc2.sis_source_id}\" - is a blueprint course")
     end
 
-    it "should give a warning when trying to associate an already associated course" do
+    it "gives a warning when trying to associate an already associated course" do
       mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
       template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
@@ -741,7 +741,7 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is associated to another blueprint course")
     end
 
-    it "should give a warning when trying to associate to a course not in the account chain" do
+    it "gives a warning when trying to associate to a course not in the account chain" do
       sub_account = @account.sub_accounts.create!
       mc2 = sub_account.courses.create!(:sis_source_id => "otheraccountmastercourse")
       template2 = MasterCourses::MasterTemplate.set_as_master_course(mc2)
@@ -755,7 +755,7 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to include("Cannot associate course \"#{ac.sis_source_id}\" - is not in the same or lower account as the blueprint course")
     end
 
-    it "shouldn't fail if a course is already associated to the target" do
+    it "does not fail if a course is already associated to the target" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       @template.add_child_course!(ac)
       expect {
@@ -766,7 +766,7 @@ describe SIS::CSV::CourseImporter do
       }.not_to raise_error
     end
 
-    it "should allow destroying" do
+    it "allows destroying" do
       ac = @account.courses.create!(:sis_source_id => "anassociatedcourse")
       child = @template.add_child_course!(ac)
       process_csv_data_cleanly(
@@ -776,7 +776,7 @@ describe SIS::CSV::CourseImporter do
       expect(child.reload.workflow_state).to eq 'deleted'
     end
 
-    it "should be able to associate courses in bulk" do
+    it "is able to associate courses in bulk" do
       c1 = @account.courses.create!(:sis_source_id => "acourse1")
       c2 = @account.courses.create!(:sis_source_id => "acourse2")
       mc2 = @account.courses.create!(:sis_source_id => "anothermastercourse")
@@ -792,7 +792,7 @@ describe SIS::CSV::CourseImporter do
       expect(template2.child_subscriptions.active.pluck(:child_course_id)).to eq([c3.id])
     end
 
-    it "should give one warning per row" do
+    it "gives one warning per row" do
       courses = (1..3).map { |x| @account.courses.create!(:sis_source_id => "acourse#{x}") }
       rows = ["course_id,short_name,long_name,status,blueprint_course_id"] +
              courses.map { |c| "#{c.sis_source_id},shortname,long name,active,missingid" }
@@ -801,7 +801,7 @@ describe SIS::CSV::CourseImporter do
       expect(importer.errors.map(&:last)).to match_array(expected)
     end
 
-    it "should try to queue a migration afterwards" do
+    it "tries to queue a migration afterwards" do
       account_admin_user(:active_all => true)
       c1 = @account.courses.create!(:sis_source_id => "acourse1")
       process_csv_data_cleanly(
@@ -813,7 +813,7 @@ describe SIS::CSV::CourseImporter do
       expect(mm).to be_completed # jobs should have kept running now
     end
 
-    it "should try to queue the migration in another job if one is already running" do
+    it "tries to queue the migration in another job if one is already running" do
       other_mm = @template.master_migrations.create!(:user => @admin)
       @template.active_migration = other_mm
       @template.save!

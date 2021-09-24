@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/api_spec_helper')
 
 describe "API", type: :request do
   describe "Api::V1::Json" do
-    it "should merge user options with the default api behavior" do
+    it "merges user options with the default api behavior" do
       obj = Object.new
       obj.extend Api::V1::Json
       course_with_teacher
@@ -33,13 +33,13 @@ describe "API", type: :request do
   end
 
   describe "as_json extensions" do
-    it "should skip attribute filtering if obj doesn't respond" do
+    it "skips attribute filtering if obj doesn't respond" do
       course_with_teacher
       expect(@course.respond_to?(:filter_attributes_for_user)).to be_truthy
       expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name permissions sis_source_id)
     end
 
-    it "should do attribute filtering if obj responds" do
+    it "does attribute filtering if obj responds" do
       course_with_teacher
       @course.send(:extend, RSpec::Matchers)
       def @course.filter_attributes_for_user(hash, user, session)
@@ -50,12 +50,12 @@ describe "API", type: :request do
       expect(@course.as_json(:include_root => false, :permissions => { :user => @user }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name permissions)
     end
 
-    it "should not return the permissions list if include_permissions is false" do
+    it "does not return the permissions list if include_permissions is false" do
       course_with_teacher
       expect(@course.as_json(:include_root => false, :permissions => { :user => @user, :include_permissions => false }, :only => %w(name sis_source_id)).keys.sort).to eq %w(name sis_source_id)
     end
 
-    it "should serialize permissions if obj responds" do
+    it "serializes permissions if obj responds" do
       course_with_teacher
       expect(@course).to receive(:serialize_permissions).once.with(anything, @teacher, nil)
       json = @course.as_json(:include_root => false, :permissions => { :user => @user, :session => nil, :include_permissions => true, :policies => ["update"] }, :only => %w(name))
@@ -70,7 +70,7 @@ describe "API", type: :request do
       @token = @user.access_tokens.create!(:purpose => "specs")
     end
 
-    it "should use html form encoding by default" do
+    it "uses html form encoding by default" do
       html_request = "assignment[name]=test+assignment&assignment[points_possible]=15"
       # no content-type header is sent
       post "/api/v1/courses/#{@course.id}/assignments", params: html_request, headers: { "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
@@ -82,7 +82,7 @@ describe "API", type: :request do
       expect(@assignment.points_possible).to eq 15
     end
 
-    it "should support json POST request bodies" do
+    it "supports json POST request bodies" do
       json_request = { "assignment" => { "name" => "test assignment", "points_possible" => 15 } }
       post "/api/v1/courses/#{@course.id}/assignments", params: json_request.to_json, headers: { "CONTENT_TYPE" => "application/json", "HTTP_AUTHORIZATION" => "Bearer #{@token.full_token}" }
       expect(response).to be_successful
@@ -93,7 +93,7 @@ describe "API", type: :request do
       expect(@assignment.points_possible).to eq 15
     end
 
-    it "should use array params without the [] on the key" do
+    it "uses array params without the [] on the key" do
       assignment_model(:course => @course, :submission_types => 'online_upload')
       @user = user_with_pseudonym
       course_with_student(:course => @course, :user => @user, :active_all => true)
@@ -121,7 +121,7 @@ describe "API", type: :request do
   end
 
   describe "application/json+canvas-string-ids" do
-    it "should stringify fields with Accept header" do
+    it "stringifies fields with Accept header" do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",
@@ -131,7 +131,7 @@ describe "API", type: :request do
       expect(json['root_account_id']).to eq Account.default.id.to_s
     end
 
-    it "should not stringify fields without Accept header" do
+    it "does not stringify fields without Accept header" do
       account = Account.default.sub_accounts.create!
       account_admin_user(active_all: true, account: account)
       json = api_call(:get, "/api/v1/accounts/#{account.id}",

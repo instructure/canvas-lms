@@ -130,12 +130,12 @@ describe "grades" do
         GlobalGrades.visit
       end
 
-      it "should validate courses display", priority: "1", test_id: 222510 do
+      it "validates courses display", priority: "1", test_id: 222510 do
         4.times { |c| expect(GlobalGrades.course_details).to include_text(@course_names[c].name) }
       end
     end
 
-    it "should show the student outcomes report if enabled", priority: "1", test_id: 229447 do
+    it "shows the student outcomes report if enabled", priority: "1", test_id: 229447 do
       @outcome_group ||= @course.root_outcome_group
       @outcome = @course.created_learning_outcomes.create!(title: 'outcome')
       @outcome_group.add_outcome(@outcome)
@@ -151,7 +151,7 @@ describe "grades" do
     end
 
     context 'student view' do
-      it "should be available to student view student", priority: "1", test_id: 229448 do
+      it "is available to student view student", priority: "1", test_id: 229448 do
         @fake_student = @course.student_view_student
         @fake_submission = @first_assignment.submit_homework(@fake_student, body: 'fake student submission')
         @first_assignment.grade_student(@fake_student, grade: 8, grader: @teacher)
@@ -169,14 +169,14 @@ describe "grades" do
       user_session(@student_1)
     end
 
-    it "should not send PII to google analytics" do
+    it "does not send PII to google analytics" do
       Setting.set('google_analytics_key', 'testing123')
       StudentGradesPage.visit_as_student(@course)
       analytics_snippet_script = ff('script').find { |s| s.attribute('innerHTML').include? "ga('create', \"testing123\", 'auto');" }
       expect(analytics_snippet_script.attribute('innerHTML')).to include("ga('set', 'title', \"Grades for Student\");")
     end
 
-    it "should display tooltip on focus", priority: "1", test_id: 229659 do
+    it "displays tooltip on focus", priority: "1", test_id: 229659 do
       StudentGradesPage.visit_as_student(@course)
 
       expect(driver.execute_script(
@@ -196,7 +196,7 @@ describe "grades" do
              )).to eq('visible')
     end
 
-    it "should allow student to test modifying grades", priority: "1", test_id: 229660 do
+    it "allows student to test modifying grades", priority: "1", test_id: 229660 do
       skip_if_chrome('issue with blur')
       StudentGradesPage.visit_as_student(@course)
 
@@ -231,7 +231,7 @@ describe "grades" do
       driver.execute_script '$("#grade_entry").focus()'
     end
 
-    it "should display rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
+    it "displays rubric on assignment and properly highlight levels", priority: "1", test_id: 229661 do
       zero_assignment = assignment_model({ title: 'zero assignment', course: @course })
       zero_association = @rubric.associate_with(zero_assignment, @course, purpose: 'grading')
       zero_submission = zero_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
@@ -287,7 +287,7 @@ describe "grades" do
         @rubric.save!
       end
 
-      it "should not highlight scores between ranges when range rating is disabled" do
+      it "does not highlight scores between ranges when range rating is disabled" do
         StudentGradesPage.visit_as_student(@course)
 
         # open rubric
@@ -299,7 +299,7 @@ describe "grades" do
     end
 
     context "rubric criterion ranges enabled" do
-      it "should highlight scores between ranges when range rating is enabled" do
+      it "highlights scores between ranges when range rating is enabled" do
         @course.account.root_account.enable_feature!(:rubric_criterion_range)
         StudentGradesPage.visit_as_student(@course)
 
@@ -321,7 +321,7 @@ describe "grades" do
       expect(assessments_link).to be_present
     end
 
-    it "should not display rubric on muted assignment", priority: "1", test_id: 229662 do
+    it "does not display rubric on muted assignment", priority: "1", test_id: 229662 do
       StudentGradesPage.visit_as_student(@course)
 
       @first_assignment.mute!
@@ -330,7 +330,7 @@ describe "grades" do
       expect(f("#submission_#{@first_assignment.id} .toggle_rubric_assessments_link")).not_to be_displayed
     end
 
-    it "should not display letter grade score on muted assignment", priority: "1", test_id: 229663 do
+    it "does not display letter grade score on muted assignment", priority: "1", test_id: 229663 do
       StudentGradesPage.visit_as_student(@course)
 
       @another_assignment = assignment_model({
@@ -350,7 +350,7 @@ describe "grades" do
       expect(f('.score_value').text).to eq ''
     end
 
-    it "should display assignment statistics", priority: "1", test_id: 229664 do
+    it "displays assignment statistics", priority: "1", test_id: 229664 do
       5.times do |count|
         @s = course_with_student(course: @course, name: "Student #{count}", active_all: true).user
         @first_assignment.grade_student(@s, grade: 4, grader: @teacher)
@@ -367,13 +367,13 @@ describe "grades" do
       expect(score_row).to include_text('Low: 3')
     end
 
-    it "should not show assignment statistics on assignments with less than 5 submissions",
+    it "does not show assignment statistics on assignments with less than 5 submissions",
        priority: "1", test_id: 229667 do
       StudentGradesPage.visit_as_student(@course)
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
-    it "should not show assignment statistics on assignments when it is disabled on the course",
+    it "does not show assignment statistics on assignments when it is disabled on the course",
        priority: "1", test_id: 229668 do
       # get up to a point where statistics can be shown
       5.times do |count|
@@ -387,7 +387,7 @@ describe "grades" do
       expect(f("#content")).not_to contain_css("#grade_info_#{@first_assignment.id} .tooltip")
     end
 
-    it "should display teacher comments", priority: "1", test_id: 229665 do
+    it "displays teacher comments", priority: "1", test_id: 229665 do
       StudentGradesPage.visit_as_student(@course)
 
       # check comment
@@ -396,7 +396,7 @@ describe "grades" do
       expect(comment_row).to include_text('submission comment')
     end
 
-    it 'should not display name of anonymous reviewer', priority: "1", test_id: 229666 do
+    it 'does not display name of anonymous reviewer', priority: "1", test_id: 229666 do
       StudentGradesPage.visit_as_student(@course)
 
       f('.toggle_comments_link').click
@@ -404,7 +404,7 @@ describe "grades" do
       expect(comment_row).to include_text('Anonymous User')
     end
 
-    it "should show rubric even if there are no comments", priority: "1", test_id: 229669 do
+    it "shows rubric even if there are no comments", priority: "1", test_id: 229669 do
       @third_association = @rubric.associate_with(@third_assignment, @course, purpose: 'grading')
       @third_submission = @third_assignment.submissions.find_by!(user: @student_1) # unsubmitted submission :/
 
@@ -441,7 +441,7 @@ describe "grades" do
         @outcome_group.add_outcome(@outcome)
       end
 
-      it "should show the outcome gradebook", priority: "1", test_id: 229670 do
+      it "shows the outcome gradebook", priority: "1", test_id: 229670 do
         StudentGradesPage.visit_as_student(@course)
         expect(f('#navpills')).not_to be_nil
         f('a[href="#outcomes"]').click
@@ -452,7 +452,7 @@ describe "grades" do
         expect(ff("span[data-selenium='outcome']").count).to eq @course.learning_outcome_links.count
       end
 
-      it "should show the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
+      it "shows the outcome gradebook if the student is in multiple sections", priority: "1", test_id: 229671 do
         @other_section = @course.course_sections.create(name: "the other section")
         @course.enroll_student(@student_1, section: @other_section, allow_multiple_enrollments: true)
 
@@ -469,7 +469,7 @@ describe "grades" do
   end
 
   context "as an observer" do
-    it "should allow observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
+    it "allows observers to see grades of all enrollment associations", priority: "1", test_id: 229883 do
       @obs = user_model(name: "Observer")
       e1 = @course.observer_enrollments.create(user: @obs, workflow_state: "active")
       e1.associated_user = @student_1

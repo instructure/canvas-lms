@@ -52,15 +52,15 @@ describe "BookmarkedCollection::MergeProxy" do
       @proxy = BookmarkedCollection::MergeProxy.new([['label', @collection]])
     end
 
-    it "should require per_page parameter" do
+    it "requires per_page parameter" do
       expect { @proxy.paginate() }.to raise_error(ArgumentError)
     end
 
-    it "should ignore total_entries parameter" do
+    it "ignores total_entries parameter" do
       expect(@proxy.paginate(:per_page => 5, :total_entries => 10).total_entries).to be_nil
     end
 
-    it "should require a bookmark-style page parameter" do
+    it "requires a bookmark-style page parameter" do
       value1 = 'bookmark'
       value2 = ['label', 0]
       bookmark1 = 1
@@ -73,20 +73,20 @@ describe "BookmarkedCollection::MergeProxy" do
       expect(@proxy.paginate(:page => bookmark4, :per_page => 5).current_bookmark).to eq(value2)
     end
 
-    it "should produce an appropriate collection type" do
+    it "produces an appropriate collection type" do
       expect(@proxy.paginate(:per_page => 1)).to be_a(BookmarkedCollection::CompositeCollection)
     end
 
-    it "should include the results" do
+    it "includes the results" do
       expect(@proxy.paginate(:per_page => 1)).to eq([@scope.first])
       expect(@proxy.paginate(:per_page => @scope.count)).to eq(@scope.to_a)
     end
 
-    it "should set next_bookmark if the page wasn't the last" do
+    it "sets next_bookmark if the page wasn't the last" do
       expect(@proxy.paginate(:per_page => 1).next_bookmark).to eq(['label', MyBookmarker.bookmark_for(@scope.first)])
     end
 
-    it "should not set next_bookmark if the page was the last" do
+    it "does not set next_bookmark if the page was the last" do
       expect(@proxy.paginate(:per_page => @scope.count).next_bookmark).to be_nil
     end
 
@@ -114,16 +114,16 @@ describe "BookmarkedCollection::MergeProxy" do
                                                       ])
       end
 
-      it "should interleave" do
+      it "interleaves" do
         expect(@proxy.paginate(:per_page => 5)).to eq(@courses[0, 5])
       end
 
-      it "should start each collection after the bookmark" do
+      it "starts each collection after the bookmark" do
         page = @proxy.paginate(:per_page => 3)
         expect(@proxy.paginate(:page => page.next_page, :per_page => 3)).to eq(@courses[3, 3])
       end
 
-      it "should handle inclusive bookmarks" do
+      it "handles inclusive bookmarks" do
         page = @proxy.paginate(:per_page => 3)
         expect(@proxy.paginate(:page => page.next_page, :per_page => 3)).to eq(@courses[3, 3])
 
@@ -139,11 +139,11 @@ describe "BookmarkedCollection::MergeProxy" do
           @next_page = @proxy.paginate(:per_page => 3).next_page
         end
 
-        it "should have next_page with more than a page left" do
+        it "has next_page with more than a page left" do
           expect(@proxy.paginate(:page => @next_page, :per_page => 4).next_page).not_to be_nil
         end
 
-        it "should not have next_page with exactly a page left" do
+        it "does not have next_page with exactly a page left" do
           expect(@proxy.paginate(:page => @next_page, :per_page => 5).next_page).to be_nil
         end
       end
@@ -153,11 +153,11 @@ describe "BookmarkedCollection::MergeProxy" do
           @next_page = @proxy.paginate(:per_page => 5).next_page
         end
 
-        it "should have next_page with more than a page left" do
+        it "has next_page with more than a page left" do
           expect(@proxy.paginate(:page => @next_page, :per_page => 2).next_page).not_to be_nil
         end
 
-        it "should not have next_page with exactly a page left" do
+        it "does not have next_page with exactly a page left" do
           expect(@proxy.paginate(:page => @next_page, :per_page => 3).next_page).to be_nil
         end
       end
@@ -193,29 +193,29 @@ describe "BookmarkedCollection::MergeProxy" do
         end
       end
 
-      it "should yield each pair of duplicates" do
+      it "yields each pair of duplicates" do
         expect(@yield).to receive(:tally).once.with(@scope1.all[2], @scope2.all[0])
         expect(@yield).to receive(:tally).once.with(@scope1.all[3], @scope2.all[1])
         @proxy.paginate(:per_page => 6)
       end
 
-      it "should yield duplicates of the last element" do
+      it "yields duplicates of the last element" do
         expect(@yield).to receive(:tally).once.with(@scope1.all[2], @scope2.first)
         @proxy.paginate(:per_page => 3)
       end
 
-      it "should keep the first of each pair of duplicates" do
+      it "keeps the first of each pair of duplicates" do
         results = @proxy.paginate(:per_page => 6)
         expect(results).to eq(@courses)
         expect(results.map(&:scope)).to eq(['1', '1', '1', '1', '2', '2'])
       end
 
-      it "should indicate the first collection to provide the last value in the bookmark" do
+      it "indicates the first collection to provide the last value in the bookmark" do
         results = @proxy.paginate(:per_page => 3)
         expect(results.next_bookmark).to eq(['1', @courses[2].id])
       end
 
-      it "should not repeat elements from prior pages regardless of duplicates" do
+      it "does not repeat elements from prior pages regardless of duplicates" do
         @next_page = @proxy.paginate(:per_page => 3).next_page
         results = @proxy.paginate(:page => @next_page, :per_page => 3)
         expect(results.first).to eq(@courses[3])

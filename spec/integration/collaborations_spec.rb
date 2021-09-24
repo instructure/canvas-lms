@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe CollaborationsController, type: :request do
-  it 'should properly link to the user who posted the collaboration' do
+  it 'properlies link to the user who posted the collaboration' do
     PluginSetting.create!(:name => 'etherpad', :settings => {})
     course_with_teacher_logged_in :active_all => true, :name => "teacher 1"
 

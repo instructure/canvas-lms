@@ -44,7 +44,7 @@ describe "oauth2 flow" do
         course_with_student_logged_in(:active_all => true)
       end
 
-      it "should show the confirmation dialog without requiring login" do
+      it "shows the confirmation dialog without requiring login" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
         expect_new_page_load { f('#modal-box .Button--primary').click() }
@@ -59,7 +59,7 @@ describe "oauth2 flow" do
         course_with_student(:active_all => true, :user => user_with_pseudonym)
       end
 
-      it "should show the terms of use and then confirmation dialog after logging in" do
+      it "shows the terms of use and then confirmation dialog after logging in" do
         get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
         oauth_login_fill_out_form
         form = f('.reaccept_terms')
@@ -83,13 +83,13 @@ describe "oauth2 flow" do
       course_with_student_logged_in(:active_all => true)
     end
 
-    it "should show no icon if icon_url is not set on the developer key" do
+    it "shows no icon if icon_url is not set on the developer key" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
       expect(f('#modal-box').text).to match(%r{Specs is requesting access to your account})
       expect(f("#content")).not_to contain_css('.icon_url')
     end
 
-    it "should show the developer keys icon if icon_url is set" do
+    it "shows the developer keys icon if icon_url is set" do
       @key.icon_url = "/images/delete.png"
       @key.save!
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=urn:ietf:wg:oauth:2.0:oob"
@@ -97,22 +97,22 @@ describe "oauth2 flow" do
       expect(f('.ic-Login-confirmation__auth-icon')).to be_displayed
     end
 
-    it "should show remember authorization checkbox only for 'auth/userinfo' scoped token requests" do
+    it "shows remember authorization checkbox only for 'auth/userinfo' scoped token requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=%2Fauth%2Fuserinfo"
       expect(f('#remember_access')).to be_displayed
     end
 
-    it "should not show remember authorization checkbox for unscoped requests" do
+    it "does not show remember authorization checkbox for unscoped requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com"
       expect(f("#content")).not_to contain_css('#remember_access')
     end
 
-    it "should not show remember authorization checkbox for other scope requests" do
+    it "does not show remember authorization checkbox for other scope requests" do
       get "/login/oauth2/auth?response_type=code&client_id=#{@client_id}&redirect_uri=http%3A%2F%2Fwww.example.com&scopes=url%3AGET%7C%2Fapi%2Fv1%2Faccounts"
       expect(f("#content")).not_to contain_css('#remember_access')
     end
 
-    it "should not let developer keys expire if remember me was checked" do
+    it "does not let developer keys expire if remember me was checked" do
       skip('Fails in RSpecQ') if ENV['RSPECQ_ENABLED'] == '1'
       expiring_key = DeveloperKey.create!(
         name: 'IExpire',

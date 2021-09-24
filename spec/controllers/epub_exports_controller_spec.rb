@@ -29,7 +29,7 @@ describe EpubExportsController do
 
   describe "GET index, format html" do
     context "without user" do
-      it "should require user to be logged in to access the page" do
+      it "requires user to be logged in to access the page" do
         get 'index'
         assert_unauthorized
       end
@@ -52,7 +52,7 @@ describe EpubExportsController do
         user_session(@student)
       end
 
-      it "should assign collection of courses and render" do
+      it "assigns collection of courses and render" do
         get :index
 
         expect(response).to render_template(:index)
@@ -75,7 +75,7 @@ describe EpubExportsController do
       )
     end
 
-    it "should return course epub exports" do
+    it "returns course epub exports" do
       json = api_call_as_user(@student, :get, "/api/v1/epub_exports", {
                                 controller: :epub_exports,
                                 action: :index,
@@ -93,7 +93,7 @@ describe EpubExportsController do
                                   })
     end
 
-    it "should be success" do
+    it "is success" do
       json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/epub_exports/#{epub_export.id}", {
                                 controller: :epub_exports,
                                 action: :show,
@@ -113,7 +113,7 @@ describe EpubExportsController do
     end
 
     context "when epub_export doesn't exist" do
-      it "should return json with newly created epub_export" do
+      it "returns json with newly created epub_export" do
         json = api_call_as_user(@student, :post, url, {
                                   action: :create,
                                   controller: :epub_exports,
@@ -124,7 +124,7 @@ describe EpubExportsController do
         expect(json['epub_export']['workflow_state']).to eq('created')
       end
 
-      it "should create one epub_export" do
+      it "creates one epub_export" do
         expect {
           api_call_as_user(@student, :post, url, {
                              action: :create,
@@ -143,7 +143,7 @@ describe EpubExportsController do
                                     })
       end
 
-      it "should not create one epub_export" do
+      it "does not create one epub_export" do
         expect {
           api_call_as_user(@student, :post, url, {
                              action: :create,
@@ -162,14 +162,14 @@ describe EpubExportsController do
     before(:each) do
       user_session(@student)
     end
-    it "should return 404 with the feature disabled" do
+    it "returns 404 with the feature disabled" do
       account = Account.default
       account.disable_feature!(:epub_export)
       get :index
       expect(response.code).to eq '404'
     end
 
-    it "should return 404 with the feature enabled and offline web enabled" do
+    it "returns 404 with the feature enabled and offline web enabled" do
       account = Account.default
       account.enable_feature!(:epub_export)
       account.settings[:enable_offline_web_export] = true

@@ -51,19 +51,19 @@ describe 'RequestThrottle' do
       ActionDispatch::Request.new(hash).tap { |req| req.fullpath }
     end
 
-    it "should use access token" do
+    it "uses access token" do
       expect(throttler.client_identifier(req request_header_token)).to eq "token:#{AccessToken.hashed_token(token2.full_token)}"
     end
 
-    it "should use user id" do
+    it "uses user id" do
       expect(throttler.client_identifier(req request_user_2)).to eq "user:2"
     end
 
-    it "should use session id" do
+    it "uses session id" do
       expect(throttler.client_identifier(req request_logged_out)).to eq 'session:sess1'
     end
 
-    it "should fall back to ip" do
+    it "falls back to ip" do
       expect(throttler.client_identifier(req(request_no_session))).to eq "ip:#{request_no_session['REMOTE_ADDR']}"
     end
 
@@ -103,13 +103,13 @@ describe 'RequestThrottle' do
       RequestThrottle.reload!
     end
 
-    it "should pass on other requests" do
+    it "passes on other requests" do
       allow(throttler).to receive(:approved?).and_return(false)
       allow(throttler).to receive(:blocked?).and_return(false)
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
-    it "should have headers even when disabled including cost tracking" do
+    it "has headers even when disabled including cost tracking" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
       allow(throttler).to receive(:calculate_cost).and_return(30)
 
@@ -124,7 +124,7 @@ describe 'RequestThrottle' do
       expect(remaining < 580.0).to be_truthy
     end
 
-    it "should block based on ip" do
+    it "blocks based on ip" do
       set_blocklist('ip:1.2.3.4')
       expect(throttler.call(request_user_1)).to eq rate_limit_exceeded
       expect(strip_variable_headers(throttler.call(request_user_2))).to eq response
@@ -132,7 +132,7 @@ describe 'RequestThrottle' do
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
-    it "should block based on user id" do
+    it "blocks based on user id" do
       set_blocklist('user:2')
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
@@ -146,7 +146,7 @@ describe 'RequestThrottle' do
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
-    it "should block based on access token" do
+    it "blocks based on access token" do
       set_blocklist("token:#{AccessToken.hashed_token(token2.full_token)}")
       expect(strip_variable_headers(throttler.call(request_query_token))).to eq response
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
@@ -162,7 +162,7 @@ describe 'RequestThrottle' do
   end
 
   describe ".list_from_setting" do
-    it "should split the string and create a set" do
+    it "splits the string and create a set" do
       Setting.set('list_test', 'a:x,b:y ,  z ')
       expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
     end
@@ -215,7 +215,7 @@ describe 'RequestThrottle' do
       allow(throttler).to receive(:blocked?).and_return(false)
     end
 
-    it "should skip without redis enabled" do
+    it "skips without redis enabled" do
       if Canvas.redis_enabled?
         allow(Canvas).to receive(:redis_enabled?).and_return(false)
         expect_any_instance_of(Redis::Scripting::Module).to receive(:run).never
@@ -224,7 +224,7 @@ describe 'RequestThrottle' do
     end
 
     if Canvas.redis_enabled?
-      it "should not skip if no client_identifier found" do
+      it "does not skip if no client_identifier found" do
         expect(strip_variable_headers(throttler.call(request_no_session))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("ip:#{request_no_session['REMOTE_ADDR']}")
         count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
@@ -243,7 +243,7 @@ describe 'RequestThrottle' do
       bucket
     end
 
-    it "should throttle if bucket is full" do
+    it "throttles if bucket is full" do
       bucket = throttled_request
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req['PATH_INFO']).and_return(1)
       expect(bucket).to receive(:remaining).and_return(-2)
@@ -252,7 +252,7 @@ describe 'RequestThrottle' do
       expect(throttler.call(request_user_1)).to eq expected
     end
 
-    it "should not throttle if disabled" do
+    it "does not throttle if disabled" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
@@ -267,7 +267,7 @@ describe 'RequestThrottle' do
       expect(throttler.call(request_user_1)).to eq expected
     end
 
-    it "should not throttle, but update, if bucket is not full" do
+    it "does not throttle, but update, if bucket is not full" do
       bucket = double('Bucket')
       expect(RequestThrottle::LeakyBucket).to receive(:new).with("user:1").and_return(bucket)
       expect(bucket).to receive(:get_up_front_cost_for_path).with(base_req['PATH_INFO']).and_return(1)
@@ -282,7 +282,7 @@ describe 'RequestThrottle' do
     end
 
     if Canvas.redis_enabled?
-      it "should increment the bucket" do
+      it "increments the bucket" do
         expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
         bucket = RequestThrottle::LeakyBucket.new("user:1")
         count, last_touched = bucket.redis.hmget(bucket.cache_key, 'count', 'last_touched')
@@ -303,7 +303,7 @@ describe 'RequestThrottle' do
       end
 
       describe "#full?" do
-        it "should compare to the hwm setting" do
+        it "compares to the hwm setting" do
           bucket = RequestThrottle::LeakyBucket.new("test", 5.0)
           Setting.set('request_throttle.hwm', '6.0')
           expect(bucket.full?).to eq false
@@ -327,7 +327,7 @@ describe 'RequestThrottle' do
       end
 
       describe "redis interaction" do
-        it "should use defaults if no redis data" do
+        it "uses defaults if no redis data" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0)
             expect(@bucket.count).to eq 0
@@ -335,7 +335,7 @@ describe 'RequestThrottle' do
           end
         end
 
-        it "should load data from redis" do
+        it "loads data from redis" do
           ts = Time.parse('2012-01-29 12:00:00 UTC')
           @bucket.redis.hmset(@bucket.cache_key, 'count', '15', 'last_touched', ts.to_f)
           @bucket.increment(0, 0, ts)
@@ -343,7 +343,7 @@ describe 'RequestThrottle' do
           expect(@bucket.last_touched).to be_within(0.1).of(ts.to_f)
         end
 
-        it "should update redis via the lua script" do
+        it "updates redis via the lua script" do
           @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
           @cost = 20.5
           @bucket.increment(@cost, 0, @current_time)
@@ -353,7 +353,7 @@ describe 'RequestThrottle' do
           expect(@bucket.redis.hget(@bucket.cache_key, 'last_touched').to_f).to be_within(0.1).of(@current_time)
         end
 
-        it "should leak when incrementing" do
+        it "leaks when incrementing" do
           @bucket.redis.hmset(@bucket.cache_key, 'count', @bucket.count, 'last_touched', @bucket.last_touched)
           @bucket.increment(0, 0, Time.at(@current_time))
           expect(@bucket.count).to be_within(0.1).of(@expected)
@@ -371,7 +371,7 @@ describe 'RequestThrottle' do
       end
 
       describe "#reserve_capacity" do
-        it "should increment at the beginning then decrement at the end" do
+        it "increments at the beginning then decrement at the end" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
             @bucket.reserve_capacity(20) do
@@ -392,7 +392,7 @@ describe 'RequestThrottle' do
           end
         end
 
-        it "should still decrement when an error is thrown" do
+        it "stills decrement when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
             expect {

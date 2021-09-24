@@ -36,7 +36,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "An authorized user with a valid query" do
-      it "should return a list of pseudonyms" do
+      it "returns a list of pseudonyms" do
         json = api_call(:get, @account_path, @account_path_options, {
                           :user => { :id => @student.id }
                         })
@@ -53,7 +53,7 @@ describe PseudonymsController, type: :request do
         end)
       end
 
-      it "should return multiple pseudonyms if they exist" do
+      it "returns multiple pseudonyms if they exist" do
         %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
         json = api_call(:get, @account_path, @account_path_options, {
                           :user => { :id => @student.id }
@@ -61,7 +61,7 @@ describe PseudonymsController, type: :request do
         expect(json.count).to eql 2
       end
 
-      it "should paginate results" do
+      it "paginates results" do
         %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
         json = api_call(:get, "#{@account_path}?per_page=1", @account_path_options.merge({ :per_page => '1' }), {
                           :user => { :id => @student.id }
@@ -74,7 +74,7 @@ describe PseudonymsController, type: :request do
         expect(headers[3]).to match /page=2&per_page=1/ # last page
       end
 
-      it "should return all pseudonyms for a user" do
+      it "returns all pseudonyms for a user" do
         new_account = Account.create!(:name => 'Extra Account')
         @student.pseudonyms.create!(:unique_id => 'one@example.com', :account => Account.default)
         @student.pseudonyms.create!(:unique_id => 'two@example.com', :account => new_account)
@@ -83,7 +83,7 @@ describe PseudonymsController, type: :request do
         expect(json.count).to eql 2
       end
 
-      it "should not included deleted pseudonyms" do
+      it "does not included deleted pseudonyms" do
         %w{one@example.com two@example.com}.each { |id| @student.pseudonyms.create!(:unique_id => id) }
         to_delete = @student.pseudonyms.create!(:unique_id => "to-delete@example.com")
         to_delete.destroy
@@ -105,7 +105,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "An authorized user with an empty query" do
-      it "should return an empty array" do
+      it "returns an empty array" do
         json = api_call(:get, @account_path, @account_path_options, {
                           :user => { :id => @student.id }
                         })
@@ -118,14 +118,14 @@ describe PseudonymsController, type: :request do
         @user = user_with_pseudonym
       end
 
-      it "should return 401 unauthorized when listing account pseudonyms" do
+      it "returns 401 unauthorized when listing account pseudonyms" do
         raw_api_call(:get, @account_path, @account_path_options, {
                        :user => { :id => @student.id }
                      })
         expect(response.code).to eql '401'
       end
 
-      it "should return 401 unauthorized when listing user pseudonyms" do
+      it "returns 401 unauthorized when listing user pseudonyms" do
         raw_api_call(:get, @user_path, @user_path_options)
         expect(response.code).to eql '401'
       end
@@ -139,7 +139,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an authorized user" do
-      it "should create a new pseudonym" do
+      it "creates a new pseudonym" do
         json = api_call(:post, @path, @path_options, {
                           :user => { :id => @student.id },
                           :login => {
@@ -161,7 +161,7 @@ describe PseudonymsController, type: :request do
                            })
       end
 
-      it "should return 400 if account_id is not a root account" do
+      it "returns 400 if account_id is not a root account" do
         @subaccount = Account.create!(:parent_account => @account)
         @path = "/api/v1/accounts/#{@subaccount.id}/logins"
         @path_options = { :controller => 'pseudonyms', :action => 'create', :format => 'json', :account_id => @subaccount.id.to_param }
@@ -176,7 +176,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '400'
       end
 
-      it "should return 400 on duplicate pseudonyms" do
+      it "returns 400 on duplicate pseudonyms" do
         @student.pseudonyms.create(:unique_id => 'duplicate@example.com')
         raw_api_call(:post, @path, @path_options, {
                        :user => { :id => @student.id },
@@ -189,7 +189,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '400'
       end
 
-      it "should return 400 when nothing is passed" do
+      it "returns 400 when nothing is passed" do
         raw_api_call(:post, @path, @path_options)
         expect(response.code).to eql '400'
       end
@@ -209,7 +209,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "should return 401" do
+      it "returns 401" do
         @user = @student
         raw_api_call(:post, @path, @path_options, {
                        :user => { :id => @admin.id },
@@ -223,7 +223,7 @@ describe PseudonymsController, type: :request do
       end
     end
 
-    it "should not allow user to add their own pseudonym to an arbitrary account" do
+    it "does not allow user to add their own pseudonym to an arbitrary account" do
       user_with_pseudonym(active_all: true)
       raw_api_call(:post, "/api/v1/accounts/#{Account.site_admin.id}/logins",
                    { account_id: Account.site_admin.id.to_param, controller: 'pseudonyms',
@@ -254,7 +254,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an authorized user" do
-      it "should be able to update a pseudonym" do
+      it "is able to update a pseudonym" do
         json = api_call(:put, @path, @path_options, {
                           :login => {
                             :unique_id => 'student+new@example.com',
@@ -292,7 +292,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '400'
       end
 
-      it "should return 400 if the unique_id already exists" do
+      it "returns 400 if the unique_id already exists" do
         raw_api_call(:put, @path, @path_options, {
                        :login => {
                          :unique_id => 'teacher@example.com'
@@ -306,7 +306,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '400'
       end
 
-      it "should return 200 if a user's sis id is updated to its current value" do
+      it "returns 200 if a user's sis id is updated to its current value" do
         @student.pseudonym.update_attribute(:sis_user_id, 'old-12345')
         json = api_call(:put, @path, @path_options, {
                           :login => { :sis_user_id => 'old-12345' }
@@ -314,14 +314,14 @@ describe PseudonymsController, type: :request do
         expect(json['sis_user_id']).to eql 'old-12345'
       end
 
-      it "should return 200 if changing only sis id" do
+      it "returns 200 if changing only sis id" do
         json = api_call(:put, @path, @path_options, {
                           :login => { :sis_user_id => 'old-12345' }
                         })
         expect(json['sis_user_id']).to eql 'old-12345'
       end
 
-      it "should allow changing sis id even if password setting is disabled" do
+      it "allows changing sis id even if password setting is disabled" do
         a = Account.find(Account.default.id)
         a.settings[:admins_can_change_passwords] = true
         a.save!
@@ -331,7 +331,7 @@ describe PseudonymsController, type: :request do
         expect(json['sis_user_id']).to eql 'old-12345'
       end
 
-      it "should allow updating an auth provider by ID" do
+      it "allows updating an auth provider by ID" do
         auth_provider =
           @account.authentication_providers.active.where(auth_type: 'canvas').first
 
@@ -342,7 +342,7 @@ describe PseudonymsController, type: :request do
         expect(json['authentication_provider_type']).to eql auth_provider.auth_type
       end
 
-      it "should allow updating an auth provider by type" do
+      it "allows updating an auth provider by type" do
         auth_provider =
           @account.authentication_providers.active.where(auth_type: 'saml').first
 
@@ -353,7 +353,7 @@ describe PseudonymsController, type: :request do
         expect(json['authentication_provider_type']).to eql auth_provider.auth_type
       end
 
-      it "should not allow updating an auth provider from another account by ID" do
+      it "does not allow updating an auth provider from another account by ID" do
         unpermitted_account = account_with_cas
         auth_provider =
           unpermitted_account.authentication_providers.active.where(auth_type: 'cas').first
@@ -364,7 +364,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '404'
       end
 
-      it "should not allow updating an auth provider from another account by type" do
+      it "does not allow updating an auth provider from another account by type" do
         unpermitted_account = account_with_cas
         auth_provider =
           unpermitted_account.authentication_providers.active.where(auth_type: 'cas').first
@@ -375,7 +375,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '404'
       end
 
-      it "should not allow updating a deleted pseudonym" do
+      it "does not allow updating a deleted pseudonym" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(:unique_id => 'other@example.com')
         to_delete.destroy
@@ -390,7 +390,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "should return 401" do
+      it "returns 401" do
         @path = "/api/v1/accounts/#{@account.id}/logins/#{@teacher.pseudonym.id}"
         @user = @student
         raw_api_call(:put, @path, @path_options.merge({ :id => @teacher.pseudonym.id.to_param }), {
@@ -399,7 +399,7 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '401'
       end
 
-      it "should not be able to update an authentication provider" do
+      it "is not able to update an authentication provider" do
         @path = "/api/v1/accounts/#{@account.id}/logins/#{@student.pseudonym.id}"
         @user = @teacher
         auth_provider = Account.default.authentication_providers.create!(
@@ -424,7 +424,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an authorized user" do
-      it "should be able to delete a pseudonym" do
+      it "is able to delete a pseudonym" do
         pseudonym = @student.pseudonym
         @student.pseudonyms.create!(:unique_id => 'student1@example.com')
         json = api_call(:delete, @path, @path_options)
@@ -442,7 +442,7 @@ describe PseudonymsController, type: :request do
                            })
       end
 
-      it "should receive an error when trying to delete the user's last pseudonym" do
+      it "receives an error when trying to delete the user's last pseudonym" do
         raw_api_call(:delete, @path, @path_options)
         expect(response.code).to eql '400'
         expect(JSON.parse(response.body)).to eq({
@@ -454,7 +454,7 @@ describe PseudonymsController, type: :request do
                                                 })
       end
 
-      it "should not allow re-deleting a login that has already been deleted" do
+      it "does not allow re-deleting a login that has already been deleted" do
         to_delete = @student.pseudonyms.first
         @student.pseudonyms.create!(:unique_id => 'other@example.com')
         to_delete.destroy
@@ -465,7 +465,7 @@ describe PseudonymsController, type: :request do
     end
 
     context "an unauthorized user" do
-      it "should return 401" do
+      it "returns 401" do
         user_with_pseudonym
         raw_api_call(:delete, @path, @path_options)
         expect(response.code).to eql '401'

@@ -30,7 +30,7 @@ describe "Alerts" do
     admin_logged_in
   end
 
-  it "should be able to create, then update, then delete" do
+  it "is able to create, then update, then delete" do
     get "/accounts/#{@context.id}/settings"
     expect(@alerts.length).to eq 0
 
@@ -93,7 +93,7 @@ describe "Alerts" do
     end
   end
 
-  it "should delete alerts" do
+  it "deletes alerts" do
     alert = @alerts.create!(:recipients => [:student], :criteria => [:criterion_type => 'Interaction', :threshold => 7])
     get "/accounts/#{@context.id}/settings"
 
@@ -106,7 +106,7 @@ describe "Alerts" do
     expect(@alerts).to be_empty
   end
 
-  it "should remove non-created alerts by clicking delete link" do
+  it "removes non-created alerts by clicking delete link" do
     get "/accounts/#{@context.id}/settings"
 
     find('#tab-alerts-link').click
@@ -120,7 +120,7 @@ describe "Alerts" do
     expect(@alerts).to be_empty
   end
 
-  it "should remove non-created alerts by clicking cancel button" do
+  it "removes non-created alerts by clicking cancel button" do
     get "/accounts/#{@context.id}/settings"
 
     find('#tab-alerts-link').click
@@ -132,7 +132,7 @@ describe "Alerts" do
     expect(@alerts).to be_empty
   end
 
-  it "should validate the form" do
+  it "validates the form" do
     get "/accounts/#{@context.id}/settings"
     find('#tab-alerts-link').click
     wait_for_ajaximations
@@ -162,7 +162,7 @@ describe "Alerts" do
   end
 
   context "recipients" do
-    it "should hide the add link when all recipients are added" do
+    it "hides the add link when all recipients are added" do
       get "/accounts/#{@context.id}/settings"
 
       find('#tab-alerts-link').click
@@ -180,7 +180,7 @@ describe "Alerts" do
       expect(f('.add_recipients_line')).not_to contain_link('Recipient')
     end
 
-    it "should not show the add link when all recipients are already there" do
+    it "does not show the add link when all recipients are already there" do
       alert = @alerts.create!(:recipients => [:student, :teachers, { :role_id => admin_role.id }], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
       get "/accounts/#{@context.id}/settings"
 
@@ -209,7 +209,7 @@ describe "Alerts" do
       expect(alertElement.find_all('.recipients li').length).to eq 3
     end
 
-    it "should work with custom roles" do
+    it "works with custom roles" do
       role1 = custom_account_role('these rolls are delicious', :account => @context)
       role2 = custom_account_role('your just jelly', :account => @context)
 

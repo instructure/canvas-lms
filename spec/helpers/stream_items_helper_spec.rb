@@ -46,7 +46,7 @@ describe StreamItemsHelper do
   end
 
   context "categorize_stream_items" do
-    it "should categorize different types correctly" do
+    it "categorizes different types correctly" do
       @items = @teacher.recent_stream_items
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
@@ -58,7 +58,7 @@ describe StreamItemsHelper do
       expect(@categorized["AssessmentRequest"].size).to eq 1
     end
 
-    it "should normalize output into common fields" do
+    it "normalizes output into common fields" do
       @items = @teacher.recent_stream_items
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
@@ -72,7 +72,7 @@ describe StreamItemsHelper do
       end
     end
 
-    it "should skip items that are not visible to the current user" do
+    it "skips items that are not visible to the current user" do
       # this discussion topic will not be shown since it is a graded discussion with a
       # future unlock at date
       @group_assignment_discussion = group_assignment_discussion({ :course => @course })
@@ -87,7 +87,7 @@ describe StreamItemsHelper do
       expect(@teacher.recent_stream_items).not_to include @group_assignment_discussion
     end
 
-    it "should skip assessment requests the user doesn't have permission to read" do
+    it "skips assessment requests the user doesn't have permission to read" do
       @items = @reviewer_student.recent_stream_items
       @categorized = helper.categorize_stream_items(@items, @reviewer_student)
       expect(@categorized["AssessmentRequest"].size).to eq 1
@@ -149,7 +149,7 @@ describe StreamItemsHelper do
   end
 
   context "extract_path" do
-    it "should link to correct place" do
+    it "links to correct place" do
       @items = @teacher.recent_stream_items
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
@@ -163,7 +163,7 @@ describe StreamItemsHelper do
   end
 
   context "extract_context" do
-    it "should find the correct context" do
+    it "finds the correct context" do
       @items = @teacher.recent_stream_items
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
@@ -177,7 +177,7 @@ describe StreamItemsHelper do
   end
 
   context "extract_updated_at" do
-    it "should find the correct updated_at time for a conversation participant" do
+    it "finds the correct updated_at time for a conversation participant" do
       @conversation.updated_at = 1.hour.ago
       @conversation.save!
 
@@ -191,7 +191,7 @@ describe StreamItemsHelper do
   end
 
   context "extract_summary" do
-    it "should find the right content" do
+    it "finds the right content" do
       @items = @teacher.recent_stream_items
       expect(@items.size).to eq 7 # 1 for each type, 1 hidden conversation
       @categorized = helper.categorize_stream_items(@items, @teacher)
@@ -203,7 +203,7 @@ describe StreamItemsHelper do
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)
     end
 
-    it 'should handle anonymous review for AssessmentRequests' do
+    it 'handles anonymous review for AssessmentRequests' do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])
@@ -221,7 +221,7 @@ describe StreamItemsHelper do
       expect(@categorized["AssessmentRequest"].first.summary).to include('Anonymous User')
     end
 
-    it 'should anonymize path for anonymous AssessmentRequests' do
+    it 'anonymizes path for anonymous AssessmentRequests' do
       @assignment.update_attribute(:anonymous_peer_reviews, true)
       student = @student
       create_enrollments(@course, [@other_user])

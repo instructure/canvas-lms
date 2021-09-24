@@ -23,7 +23,7 @@ describe ContentMigration do
   context "course copy unpublished items" do
     include_examples "course copy"
 
-    it "should copy unpublished modules" do
+    it "copies unpublished modules" do
       cm = @copy_from.context_modules.create!(:name => "some module")
       cm.publish
       cm2 = @copy_from.context_modules.create!(:name => "another module")
@@ -38,7 +38,7 @@ describe ContentMigration do
       expect(cm2_2.workflow_state).to eq 'unpublished'
     end
 
-    it "should preserve published state of contentless module items" do
+    it "preserves published state of contentless module items" do
       cm = @copy_from.context_modules.create!(name: "eh module")
       pu = cm.add_item(type: 'external_url', title: 'published', url: 'http://published.example.com')
       pu.publish!
@@ -53,7 +53,7 @@ describe ContentMigration do
       expect(uu2).to be_unpublished
     end
 
-    it "should copy links to unpublished items in modules" do
+    it "copies links to unpublished items in modules" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       page = @copy_from.wiki_pages.create(:title => "some page")
       page.workflow_state = :unpublished
@@ -76,7 +76,7 @@ describe ContentMigration do
       end
     end
 
-    it "should copy unpublished discussion topics" do
+    it "copies unpublished discussion topics" do
       dt1 = @copy_from.discussion_topics.create!(:message => "hideeho", :title => "Blah")
       dt1.workflow_state = :unpublished
       dt1.save!
@@ -92,7 +92,7 @@ describe ContentMigration do
       expect(dt2_copy.workflow_state).to eq 'active'
     end
 
-    it "should copy unpublished wiki pages" do
+    it "copies unpublished wiki pages" do
       wiki = @copy_from.wiki_pages.create(:title => "wiki", :body => "ohai")
       wiki.workflow_state = :unpublished
       wiki.save!
@@ -103,7 +103,7 @@ describe ContentMigration do
       expect(wiki2.workflow_state).to eq 'unpublished'
     end
 
-    it "should copy unpublished quiz assignments" do
+    it "copies unpublished quiz assignments" do
       skip unless Qti.qti_enabled?
       @quiz = @copy_from.quizzes.create!
       @quiz.did_edit
@@ -126,7 +126,7 @@ describe ContentMigration do
       expect(quiz_to.assignment.migration_id).to eq mig_id(@quiz.assignment)
     end
 
-    it "should not re-unpublish module items on re-copy" do
+    it "does not re-unpublish module items on re-copy" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       mod = @copy_from.context_modules.create!(:name => "some module")

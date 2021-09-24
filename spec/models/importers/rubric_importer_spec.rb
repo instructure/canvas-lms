@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 describe "Importing Rubrics" do
   SYSTEMS.each do |system|
     if import_data_exists? system, 'rubric'
-      it "should import from #{system}" do
+      it "imports from #{system}" do
         data = get_import_data(system, 'rubric')
         context = get_import_context(system)
         migration = double()

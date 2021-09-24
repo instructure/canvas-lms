@@ -158,7 +158,7 @@ describe FilesController do
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
-      it "should not inline the file if passed download_frd param" do
+      it "does not inline the file if passed download_frd param" do
         allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
         expect(response).to be_redirect
@@ -168,7 +168,7 @@ describe FilesController do
     end
   end
 
-  it "should use relative urls for safefiles in course context" do
+  it "uses relative urls for safefiles in course context" do
     course_with_teacher_logged_in(:active_all => true, :user => @user)
     host!("test.host")
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
@@ -237,7 +237,7 @@ describe FilesController do
     expect(access.asset).to eq a1
   end
 
-  it "should be able to use verifier in course context" do
+  it "is able to use verifier in course context" do
     course_with_teacher(:active_all => true, :user => @user)
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
@@ -259,7 +259,7 @@ describe FilesController do
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
 
-  it "should be able to directly download in course context preview links with verifier" do
+  it "is able to directly download in course context preview links with verifier" do
     course_with_teacher(:active_all => true, :user => @user)
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
     allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
@@ -281,7 +281,7 @@ describe FilesController do
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
 
-  it "should update module progressions for html safefiles iframe" do
+  it "updates module progressions for html safefiles iframe" do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
     course_with_student_logged_in(:active_all => true, :user => @user)
     host!("test.host")
@@ -371,7 +371,7 @@ describe FilesController do
     end
   end
 
-  it "should allow access to non-logged-in user agent if it has the right :verifier (lets google docs preview submissions in speedGrader)" do
+  it "allows access to non-logged-in user agent if it has the right :verifier (lets google docs preview submissions in speedGrader)" do
     submission_model
     @submission.attachment = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png')
     @submission.save!
@@ -394,12 +394,12 @@ describe FilesController do
     expect(controller.instance_variable_get(:@context)).to be_nil
   end
 
-  it "shouldn't use relative urls for safefiles in other contexts" do
+  it "does not use relative urls for safefiles in other contexts" do
     course_with_teacher_logged_in(:active_all => true)
     a1 = attachment_model(:uploaded_data => stub_png_data, :content_type => 'image/png', :context => @course)
   end
 
-  it "should return the dynamically generated thumbnail of the size given" do
+  it "returns the dynamically generated thumbnail of the size given" do
     attachment_model(:uploaded_data => stub_png_data)
     sz = "640x>"
     expect_any_instantiation_of(@attachment).to receive(:create_or_update_thumbnail)
@@ -409,7 +409,7 @@ describe FilesController do
     expect(response).to redirect_to(thumb.authenticated_s3_url)
   end
 
-  it "should reorder files" do
+  it "reorders files" do
     course_with_teacher_logged_in(:active_all => true, :user => @user)
     att1 = attachment_model(:uploaded_data => stub_png_data, :context => @course)
     att2 = attachment_model(:uploaded_data => stub_png_data("file2.png"), :context => @course)
@@ -420,7 +420,7 @@ describe FilesController do
     expect(@folder.file_attachments.by_position_then_display_name).to eq [att2, att1]
   end
 
-  it "should allow file previews for public-to-auth courses" do
+  it "allows file previews for public-to-auth courses" do
     course_factory(active_all: true)
     @course.update_attribute(:is_public_to_auth_users, true)
 
@@ -438,7 +438,7 @@ describe FilesController do
     expect(response.body).to include("/courses/#{@course.id}/files/#{att.id}")
   end
 
-  it "should allow downloads from assignments without context" do
+  it "allows downloads from assignments without context" do
     host!("test.host")
     allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
     course_with_teacher_logged_in(:active_all => true, :user => @user)
@@ -453,7 +453,7 @@ describe FilesController do
     expect(response).to be_successful
   end
 
-  it "shouldn't expose arbitary context names" do
+  it "does not expose arbitary context names" do
     allow(HostUrl).to receive(:file_host_with_shard).and_return(['files-test.host', Shard.default])
 
     some_course = Course.create!

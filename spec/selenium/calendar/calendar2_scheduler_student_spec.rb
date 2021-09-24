@@ -107,7 +107,7 @@ describe "scheduler" do
         AppointmentGroup.last.appointments.first.reserve_for(@student, @teacher)
       end
 
-      it "should let me do so from the month view", priority: "1", test_id: 140200 do
+      it "lets me do so from the month view", priority: "1", test_id: 140200 do
         load_month_view
 
         scheduler_event.click
@@ -118,7 +118,7 @@ describe "scheduler" do
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
-      it "should let me do so from the week view", priority: "1", test_id: 502483 do
+      it "lets me do so from the week view", priority: "1", test_id: 502483 do
         # the setup creates an event 30 minutes from now, so if we're on Saturday
         # and next Sunday is in 30 minutes, this test will fail
         skip("too close to week rollover") if Time.now.saturday? && earliest_appointment_time.sunday?
@@ -133,7 +133,7 @@ describe "scheduler" do
         expect(f("#content")).not_to contain_css('.fc-event.scheduler-event')
       end
 
-      it "should let me do so from the agenda view", priority: "1", test_id: 502484 do
+      it "lets me do so from the agenda view", priority: "1", test_id: 502484 do
         load_agenda_view
 
         agenda_item.click

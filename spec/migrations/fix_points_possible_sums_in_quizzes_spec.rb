@@ -50,13 +50,13 @@ describe 'FixPointsPossibleSumsInQuizzes' do
       allow(Quizzes::Quiz).to receive(:count_points_possible).and_call_original
     end
 
-    it "should repair quiz points_possible from questions" do
+    it "repairs quiz points_possible from questions" do
       expect(@quiz.points_possible).to be > question_sum
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       expect(@quiz.reload.points_possible).to eq question_sum
     end
 
-    it "should not require regrade for repaired quizzes" do
+    it "does not require regrade for repaired quizzes" do
       broken_version = @quiz.versions.current.number
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       @quiz.reload
@@ -64,7 +64,7 @@ describe 'FixPointsPossibleSumsInQuizzes' do
       expect(@quiz.versions.current.number).to eq(broken_version + 1)
     end
 
-    it "should only select quizzes that appear to have rounding error" do
+    it "onlies select quizzes that appear to have rounding error" do
       healthy_quiz = @course.quizzes.create!(title: 'decimal quiz')
       a = Assignment.new
       a.course = @course
@@ -88,13 +88,13 @@ describe 'FixPointsPossibleSumsInQuizzes' do
       allow(Quizzes::Quiz).to receive(:count_points_possible).and_call_original
     end
 
-    it "should repair quiz points_possible from questions" do
+    it "repairs quiz points_possible from questions" do
       expect(@quiz.points_possible).to be > question_sum
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       expect(@quiz.reload.points_possible).to eq question_sum
     end
 
-    it "should not require regrade for repaired quizzes" do
+    it "does not require regrade for repaired quizzes" do
       broken_version = @quiz.versions.current.number
       DataFixup::FixPointsPossibleSumsInQuizzes.run
       @quiz.reload

@@ -51,11 +51,11 @@ shared_examples_for "settings basic tests" do |account_type|
       f("#tab-users-link").click
     end
 
-    it "should add an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249780, root_account: 251030) do
+    it "adds an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249780, root_account: 251030) do
       add_account_admin
     end
 
-    it "should delete an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249781, root_account: 251031) do
+    it "deletes an account admin", priority: "1", test_id: pick_test_id(account_type, sub_account: 249781, root_account: 251031) do
       skip_if_safari(:alert)
       admin_id = add_account_admin
       scroll_page_to_top # to get the flash alert out of the way
@@ -79,7 +79,7 @@ shared_examples_for "settings basic tests" do |account_type|
       wait_for_ajaximations
     end
 
-    it "should change the account name", priority: "1", test_id: pick_test_id(account_type, sub_account: 249782, root_account: 251032) do
+    it "changes the account name", priority: "1", test_id: pick_test_id(account_type, sub_account: 249782, root_account: 251032) do
       new_account_name = 'new default account name'
       replace_content(f("#account_name"), new_account_name)
       click_submit
@@ -88,7 +88,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(f("#account_name")).to have_value(new_account_name)
     end
 
-    it "should change the default quotas", priority: "1", test_id: pick_test_id(account_type, sub_account: 250003, root_account: 251033) do
+    it "changes the default quotas", priority: "1", test_id: pick_test_id(account_type, sub_account: 250003, root_account: 251033) do
       f('#tab-quotas-link').click
 
       # update the quotas
@@ -121,7 +121,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(fj('[name="default_group_storage_quota_mb"]')).to have_value(group_quota.to_s) # fj to avoid selenium caching
     end
 
-    it "should manually change a course quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250004, root_account: 251034) do
+    it "manuallies change a course quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250004, root_account: 251034) do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -148,7 +148,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(@course.storage_quota_mb).to eq 42
     end
 
-    it "should manually change a group quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250005, root_account: 251035) do
+    it "manuallies change a group quota", priority: "1", test_id: pick_test_id(account_type, sub_account: 250005, root_account: 251035) do
       f('#tab-quotas-link').click
 
       # find the course by id
@@ -175,7 +175,7 @@ shared_examples_for "settings basic tests" do |account_type|
       expect(@group.storage_quota_mb).to eq 42
     end
 
-    it "should change the default language to spanish", priority: "1", test_id: pick_test_id(account_type, sub_account: 250006, root_account: 251036) do
+    it "changes the default language to spanish", priority: "1", test_id: pick_test_id(account_type, sub_account: 250006, root_account: 251036) do
       f("#account_default_locale option[value='es']").click
       click_submit
       account.reload

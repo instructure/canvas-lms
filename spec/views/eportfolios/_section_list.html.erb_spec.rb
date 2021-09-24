@@ -26,7 +26,7 @@ describe "/eportfolios/_section_list" do
     eportfolio_with_user
   end
 
-  it "should render" do
+  it "renders" do
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "some category"))
     assign(:categories, [category])
@@ -35,7 +35,7 @@ describe "/eportfolios/_section_list" do
     expect(response).to have_tag("ul#section_list")
   end
 
-  it "should render even with a blank category slug" do
+  it "renders even with a blank category slug" do
     view_portfolio
     category = assign(:category, @portfolio.eportfolio_categories.create!(:name => "+++"))
     assign(:categories, [category])

@@ -28,12 +28,12 @@ describe SelfEnrollmentsController do
       @course.update_attribute(:self_enrollment, true)
     end
 
-    it "should render if the course is open for enrollment" do
+    it "renders if the course is open for enrollment" do
       get 'new', params: { :self_enrollment_code => @course.self_enrollment_code }
       expect(response).to be_successful
     end
 
-    it "should do the delegated auth dance" do
+    it "does the delegated auth dance" do
       account = account_with_cas({ :account => Account.default })
 
       get 'new', params: { :self_enrollment_code => @course.self_enrollment_code }
@@ -70,13 +70,13 @@ describe SelfEnrollmentsController do
       expect(response).to be_successful
     end
 
-    it "should not render for an incorrect code" do
+    it "does not render for an incorrect code" do
       assert_page_not_found do
         get 'new', params: { :self_enrollment_code => 'abc' }
       end
     end
 
-    it "should render even if self_enrollment is disabled" do
+    it "renders even if self_enrollment is disabled" do
       code = @course.self_enrollment_code
       @course.update_attribute(:self_enrollment, false)
 
@@ -84,12 +84,12 @@ describe SelfEnrollmentsController do
       expect(response).to be_successful
     end
 
-    it "should default assign login_label_name to 'email'" do
+    it "defaults assign login_label_name to 'email'" do
       get 'new', params: { :self_enrollment_code => @course.self_enrollment_code }
       expect(assigns(:login_label_name)).to eq("Email")
     end
 
-    it "should change login_label_name when set on domain_root_account" do
+    it "changes login_label_name when set on domain_root_account" do
       custom_label = "batman is the best"
       allow_any_instance_of(Account).to receive(:login_handle_name).and_return(custom_label)
 

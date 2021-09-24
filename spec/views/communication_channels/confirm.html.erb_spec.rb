@@ -33,7 +33,7 @@ describe "communication_channels/confirm.html.erb" do
   end
 
   shared_examples_for "user registration" do
-    it "should only show the registration form if no merge opportunities" do
+    it "onlies show the registration form if no merge opportunities" do
       assign(:merge_opportunities, [])
       render
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
@@ -50,7 +50,7 @@ describe "communication_channels/confirm.html.erb" do
       end
     end
 
-    it "should follow the simple path for not logged in" do
+    it "follows the simple path for not logged in" do
       user_with_pseudonym(:active_all => 1)
       assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
       render
@@ -66,7 +66,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(page.css('#back.btn').first).not_to be_nil
     end
 
-    it "should follow the simple path for logged in as a matching user" do
+    it "follows the simple path for logged in as a matching user" do
       user_with_pseudonym(:active_all => 1)
       communication_channel(@user, { username: 'johndoe@example.com', active_cc: true })
       assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
@@ -85,7 +85,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(page.css('#back.btn').first).not_to be_nil
     end
 
-    it "should follow the simple path for logged in as a non-matching user" do
+    it "follows the simple path for logged in as a non-matching user" do
       user_with_pseudonym(:active_all => 1)
       assign(:merge_opportunities, [[@user, [@user.pseudonym]]])
       assign(:current_user, @user)
@@ -103,7 +103,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(page.css('#back.btn').first).not_to be_nil
     end
 
-    it "should follow the mostly-simple-path for not-logged in with multiple pseudonyms" do
+    it "follows the mostly-simple-path for not-logged in with multiple pseudonyms" do
       user_with_pseudonym(:active_all => 1)
       account2 = Account.create!
       assign(:merge_opportunities, [[@user, [@user.pseudonym, @user.pseudonyms.create!(:unique_id => 'johndoe', :account => account2)]]])
@@ -120,7 +120,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(page.css('#back.btn').first).not_to be_nil
     end
 
-    it "should render for multiple merge opportunities" do
+    it "renders for multiple merge opportunities" do
       @user1 = user_with_pseudonym(:active_all => 1)
       @user2 = user_with_pseudonym(:active_all => 1, :username => 'janedoe@example.com')
       @user3 = user_with_pseudonym(:active_all => 1, :username => 'freddoe@example.com')
@@ -155,7 +155,7 @@ describe "communication_channels/confirm.html.erb" do
       @enrollment = assign(:enrollment, @course.enroll_user(@user))
     end
 
-    it "should render transfer enrollment form" do
+    it "renders transfer enrollment form" do
       assign(:merge_opportunities, [])
       @user.register
       @pseudonym1 = @user.pseudonyms.create!(:unique_id => 'jt@instructure.com')
@@ -187,7 +187,7 @@ describe "communication_channels/confirm.html.erb" do
       @user.register
     end
 
-    it "should render to merge with the current user" do
+    it "renders to merge with the current user" do
       user_with_pseudonym(:active_all => 1)
       assign(:current_user, @user)
       assign(:merge_opportunities, [[@user, [@pseudonym]]])
@@ -202,7 +202,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
     end
 
-    it "should render to merge with the current user that doesn't have a pseudonym in the default account" do
+    it "renders to merge with the current user that doesn't have a pseudonym in the default account" do
       account = Account.create!
       user_with_pseudonym(:active_all => 1, :account => account)
       assign(:current_user, @user)
@@ -218,7 +218,7 @@ describe "communication_channels/confirm.html.erb" do
       expect(merge_button['href']).to eq registration_confirmation_path(@communication_channel.confirmation_code, :confirm => 1, :enrollment => nil)
     end
 
-    it "should render to merge multiple users" do
+    it "renders to merge multiple users" do
       user_with_pseudonym(:active_all => 1)
       @user1 = @user
       @pseudonym1 = @pseudonym

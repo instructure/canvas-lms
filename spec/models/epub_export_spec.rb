@@ -27,7 +27,7 @@ describe EpubExport do
   end
 
   describe "after_create" do
-    it "should create one job progress" do
+    it "creates one job progress" do
       expect { @course.epub_exports.create(user: @student) }.to change { Progress.count }.from(0).to(1)
     end
   end
@@ -40,16 +40,16 @@ describe EpubExport do
     end
 
     context "method is successful" do
-      it "should create one content_export" do
+      it "creates one content_export" do
         expect { epub_export.export(synchronous: true) }.to change { ContentExport.count }.from(0).to(1)
       end
 
-      it "should set state to 'exporting'" do
+      it "sets state to 'exporting'" do
         epub_export.export(synchronous: true)
         expect(epub_export.workflow_state).to eq 'exporting'
       end
 
-      it "should start job_progress" do
+      it "starts job_progress" do
         epub_export.export(synchronous: true)
         expect(epub_export.job_progress.reload.running?).to be_truthy
       end
@@ -80,7 +80,7 @@ describe EpubExport do
                                   })
     end
 
-    it "should be stored in instfs if instfs is enabled" do
+    it "is stored in instfs if instfs is enabled" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
@@ -108,17 +108,17 @@ describe EpubExport do
         epub_export.mark_exported(synchronous: true)
       end
 
-      it "should change the workflow state of epub_export to exported" do
+      it "changes the workflow state of epub_export to exported" do
         expect(epub_export.workflow_state).to eq 'exported'
       end
 
-      it "should update job_progress completion" do
+      it "updates job_progress completion" do
         expect(epub_export.job_progress.completion).to eq EpubExport::PERCENTAGE_COMPLETE[:exported]
       end
     end
 
     context "when content export is failed" do
-      it "should change the workflow state of epub_export to failed" do
+      it "changes the workflow state of epub_export to failed" do
         epub_export.content_export.update_attribute(:workflow_state, 'failed')
         epub_export.mark_exported(synchronous: true)
         expect(epub_export.workflow_state).to eq 'failed'
@@ -135,12 +135,12 @@ describe EpubExport do
       end
     end
 
-    it "should update job_progress completion" do
+    it "updates job_progress completion" do
       epub_export.generate(synchronous: true)
       expect(epub_export.job_progress.completion).to eq EpubExport::PERCENTAGE_COMPLETE[:generating]
     end
 
-    it "should set state to generating" do
+    it "sets state to generating" do
       epub_export.generate(synchronous: true)
       expect(epub_export.generating?).to be_truthy
     end
@@ -170,7 +170,7 @@ describe EpubExport do
                                   })
     end
 
-    it 'should create and associate an attachment' do
+    it 'creates and associate an attachment' do
       expect(epub_export.epub_attachment).to be_nil, 'precondition'
       expect(epub_export.zip_attachment).to be_nil, 'precondition'
 
@@ -185,21 +185,21 @@ describe EpubExport do
   describe "permissions" do
     describe ":create" do
       context "when user can :read_as_admin" do
-        it "should be able to :create an epub export instance" do
+        it "is able to :create an epub export instance" do
           expect(@course.grants_right?(@teacher, :read_as_admin)).to be_truthy, 'precondition'
           expect(EpubExport.new(course: @course).grants_right?(@teacher, :create)).to be_truthy
         end
       end
 
       context "when user can :participate_as_student" do
-        it "should be able to :create an epub export instance" do
+        it "is able to :create an epub export instance" do
           expect(@course.grants_right?(@student, :participate_as_student)).to be_truthy, 'precondition'
           expect(EpubExport.new(course: @course).grants_right?(@student, :create)).to be_truthy
         end
       end
 
       context "when user cannot :participate_as_student" do
-        it "should not be able to :create an epub export" do
+        it "is not able to :create an epub export" do
           student_in_course
           expect(@course.grants_right?(@student, :participate_as_student)).to be_falsey, 'precondition'
           expect(EpubExport.new(course: @course).grants_right?(@student, :create)).to be_falsey
@@ -214,7 +214,7 @@ describe EpubExport do
 
       ["generated", "failed"].each do |state|
         context "when state is #{state}" do
-          it "should allow regeneration" do
+          it "allows regeneration" do
             epub_export.update_attribute(:workflow_state, state)
             expect(epub_export.grants_right?(@student, :regenerate)).to be_truthy
           end
@@ -232,14 +232,14 @@ describe EpubExport do
 
     context "running" do
       ['created', 'exporting', 'exported', 'generating'].each do |state|
-        it "should return epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
+        it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 1
         end
       end
 
       ['generated', 'failed', 'deleted'].each do |state|
-        it "should return epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
+        it "returns epub export when workflow_state is #{state}" do # rubocop:disable RSpec/RepeatedDescription
           epub_export.update_attribute(:workflow_state, state)
           expect(EpubExport.running.count).to eq 0
         end
@@ -247,11 +247,11 @@ describe EpubExport do
     end
 
     context "visible_to" do
-      it "should be visible to the user who created the epub export" do
+      it "is visible to the user who created the epub export" do
         expect(EpubExport.visible_to(@student.id).count).to eq 1
       end
 
-      it "should not be visible to the user who didn't create the epub export" do
+      it "is not visible to the user who didn't create the epub export" do
         expect(EpubExport.visible_to(@teacher.id).count).to eq 0
       end
     end
@@ -317,7 +317,7 @@ describe EpubExport do
       Notification.create!(:name => 'Content Export Failed', :category => 'Migration')
     end
 
-    it "should send notifications immediately" do
+    it "sends notifications immediately" do
       communication_channel_model.confirm!
 
       @epub.workflow_state = 'generated'
@@ -329,7 +329,7 @@ describe EpubExport do
       expect(@epub.messages_sent['Content Export Failed']).not_to be_blank
     end
 
-    it "should not send emails for epub or webzip exports when content export has exported" do
+    it "does not send emails for epub or webzip exports when content export has exported" do
       @ce.workflow_state = 'exported'
       expect { @ce.save! }.to change(DelayedMessage, :count).by 0
       expect(@ce.messages_sent['Content Export Finished']).to be_blank
@@ -340,7 +340,7 @@ describe EpubExport do
     end
   end
 
-  it "should escape html characters in titles" do
+  it "escapes html characters in titles" do
     course_with_student(active_all: true)
     assignment = @course.assignments.create!({
                                                title: 'here you go </html> lol',

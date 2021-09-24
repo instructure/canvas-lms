@@ -42,21 +42,21 @@ describe ImportedHtmlConverter do
       html
     end
 
-    it "should convert a wiki reference" do
+    it "converts a wiki reference" do
       test_string = %{<a href="%24WIKI_REFERENCE%24/wiki/test-wiki-page?query=blah">Test Wiki Page</a>}
       @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
 
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>}
     end
 
-    it "should convert a wiki reference without $ escaped" do
+    it "converts a wiki reference without $ escaped" do
       test_string = %{<a href="$WIKI_REFERENCE$/wiki/test-wiki-page?query=blah">Test Wiki Page</a>}
       @course.wiki_pages.create!(:title => "Test Wiki Page", :body => "stuff")
 
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page?query=blah">Test Wiki Page</a>}
     end
 
-    it "should convert a wiki reference by migration id" do
+    it "converts a wiki reference by migration id" do
       test_string = %{<a href="wiki_page_migration_id=123456677788">Test Wiki Page</a>}
       wiki = @course.wiki_pages.create(:title => "Test Wiki Page", :body => "stuff")
       wiki.migration_id = "123456677788"
@@ -65,7 +65,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}pages/test-wiki-page">Test Wiki Page</a>}
     end
 
-    it "should convert a discussion reference by migration id" do
+    it "converts a discussion reference by migration id" do
       test_string = %{<a href="discussion_topic_migration_id=123456677788">Test topic</a>}
       topic = @course.discussion_topics.create(:title => "Test discussion")
       topic.migration_id = "123456677788"
@@ -81,14 +81,14 @@ describe ImportedHtmlConverter do
       att
     end
 
-    it "should find an attachment by migration id" do
+    it "finds an attachment by migration id" do
       att = make_test_att()
 
       test_string = %{<p>This is an image: <br /><img src="%24CANVAS_OBJECT_REFERENCE%24/attachments/1768525836051" alt=":(" /></p>}
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}files/#{att.id}/preview" alt=":("></p>}
     end
 
-    it "should find an attachment by path" do
+    it "finds an attachment by path" do
       att = make_test_att()
 
       test_string = %{<p>This is an image: <br /><img src="%24IMS_CC_FILEBASE%24/test.png" alt=":(" /></p>}
@@ -100,7 +100,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<p>This is an image: <br><img src="#{@path}files/#{att.id}/preview" alt=":("></p>}
     end
 
-    it "should find an attachment by a path with a space" do
+    it "finds an attachment by a path with a space" do
       att = make_test_att()
       @migration.attachment_path_id_lookup = { "subfolder/with a space/test.png" => att.migration_id }
 
@@ -111,7 +111,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
 
-    it "should find an attachment even if the link has an extraneous folder" do
+    it "finds an attachment even if the link has an extraneous folder" do
       att = make_test_att()
       @migration.attachment_path_id_lookup = { "subfolder/test.png" => att.migration_id }
 
@@ -119,7 +119,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
 
-    it "should find an attachment by path if capitalization is different" do
+    it "finds an attachment by path if capitalization is different" do
       att = make_test_att()
       @migration.attachment_path_id_lookup = { "subfolder/withCapital/test.png" => "wrong!" }
       @migration.attachment_path_id_lookup_lower = { "subfolder/withcapital/test.png" => att.migration_id }
@@ -128,7 +128,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
 
-    it "should find an attachment with query params" do
+    it "finds an attachment with query params" do
       att = make_test_att()
       @migration.attachment_path_id_lookup = { "test.png" => att.migration_id }
 
@@ -142,30 +142,30 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<img src="#{@path}files/#{att.id}/preview" alt="nope">}
     end
 
-    it "should convert course section urls" do
+    it "converts course section urls" do
       test_string = %{<a href="%24CANVAS_COURSE_REFERENCE%24/discussion_topics">discussions</a>}
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}discussion_topics">discussions</a>}
     end
 
-    it "should leave invalid and absolute urls alone" do
+    it "leaves invalid and absolute urls alone" do
       test_string = %{<a href="stupid &^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
       expect(convert_and_replace(test_string)).to eq %{<a href="stupid &amp;^%$ url">Linkage</a><br><a href="http://www.example.com/poop">Linkage</a>}
     end
 
-    it "should leave invalid mailto addresses alone" do
+    it "leaves invalid mailto addresses alone" do
       test_string = %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
       expect(convert_and_replace(test_string)).to eq(
         %{<a href="mailto:.">Bad mailto</a><br><a href="mailto:test@example.com">Good mailto</a>}
       )
     end
 
-    it "should recognize and relative-ize absolute links outside the course but in one of the course's domains" do
+    it "recognizes and relative-ize absolute links outside the course but in one of the course's domains" do
       allow(HostUrl).to receive(:context_hosts).with(@course.root_account).and_return(['my-canvas.example.com', 'vanity.my-canvas.edu'])
       test_string = %{<a href="https://my-canvas.example.com/courses/123">Mine</a><br><a href="https://vanity.my-canvas.edu/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>}
       expect(convert_and_replace(test_string)).to eq %{<a href="/courses/123">Mine</a><br><a href="/courses/456">Vain</a><br><a href="http://other-canvas.example.com/">Other Instance</a>}
     end
 
-    it "should prepend course files for unrecognized relative urls" do
+    it "prepends course files for unrecognized relative urls" do
       test_string = %{<a href="/relative/path/to/file">Linkage</a>}
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}file_contents/course%20files/relative/path/to/file">Linkage</a>}
       test_string = %{<a href="relative/path/to/file">Linkage</a>}
@@ -174,7 +174,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq %{<a href="#{@path}file_contents/course%20files/relative/path/to/file%20with%20space.html">Linkage</a>}
     end
 
-    it "should preserve media comment links" do
+    it "preserves media comment links" do
       test_string = <<-HTML.strip
       <p>
         with media object url: <a id="media_comment_0_l4l5n0wt" class="instructure_inline_media_comment video_comment" href="/media_objects/0_l4l5n0wt">this is a media comment</a>
@@ -185,24 +185,24 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
-    it "should handle and repair half broken media links" do
+    it "handles and repair half broken media links" do
       test_string = %{<p><a href="/courses/#{@course.id}/file_contents/%24IMS_CC_FILEBASE%24/#" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
 
       expect(convert_and_replace(test_string)).to eq %{<p><a href="/media_objects/0_l4l5n0wt" class="instructure_inline_media_comment video_comment" id="media_comment_0_l4l5n0wt">this is a media comment</a><br><br></p>}
     end
 
-    it "should preserve new RCE media iframes" do
+    it "preserves new RCE media iframes" do
       test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/0_l4l5n0wt?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="0_l4l5n0wt"></iframe>}
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
-    it "should handle and repair half broken new RCE media iframes" do
+    it "handles and repair half broken new RCE media iframes" do
       test_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="%24IMS_CC_FILEBASE%24/#" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
       repaired_string = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="/media_objects_iframe/m-abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="m-abcde"></iframe>}
       expect(convert_and_replace(test_string)).to eq repaired_string
     end
 
-    it "should only convert url params" do
+    it "onlies convert url params" do
       test_string = <<~HTML
         <object>
         <param name="controls" value="CONSOLE" />
@@ -226,12 +226,12 @@ describe ImportedHtmlConverter do
       HTML
     end
 
-    it "should leave an anchor tag alone" do
+    it "leaves an anchor tag alone" do
       test_string = '<p><a href="#anchor_ref">ref</a></p>'
       expect(convert_and_replace(test_string)).to eq test_string
     end
 
-    it "should convert base64 images to file links" do
+    it "converts base64 images to file links" do
       base64 = "R0lGODlhCQAJAIAAAICAgP///yH5BAEAAAEALAAAAAAJAAkAAAIQTGCZgGrc\nFIxvSuhwpsuFAgA7\n"
       test_string = "<p><img src=\"data:image/gif;base64,#{base64}\"></p>"
       new_string = convert_and_replace(test_string)
@@ -243,18 +243,18 @@ describe ImportedHtmlConverter do
   end
 
   context ".relative_url?" do
-    it "should recognize an absolute url" do
+    it "recognizes an absolute url" do
       expect(ImportedHtmlConverter.relative_url?("http://example.com")).to eq false
     end
 
-    it "should recognize relative urls" do
+    it "recognizes relative urls" do
       expect(ImportedHtmlConverter.relative_url?("/relative/eh")).to eq true
       expect(ImportedHtmlConverter.relative_url?("also/relative")).to eq true
       expect(ImportedHtmlConverter.relative_url?("watup/nothing.html#anchoritbaby")).to eq true
       expect(ImportedHtmlConverter.relative_url?("watup/nothing?absolutely=1")).to eq true
     end
 
-    it "should not error on invalid urls" do
+    it "does not error on invalid urls" do
       expect(ImportedHtmlConverter.relative_url?("stupid &^%$ url")).to be_falsey
       expect(ImportedHtmlConverter.relative_url?("mailto:jfarnsworth@instructure.com,")).to be_falsey
     end

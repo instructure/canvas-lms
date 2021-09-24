@@ -35,7 +35,7 @@ describe 'dashcards' do
       course_with_student_logged_in(active_all: true)
     end
 
-    it 'should show the trigger button for dashboard options menu in new UI', priority: "1", test_id: 222506 do
+    it 'shows the trigger button for dashboard options menu in new UI', priority: "1", test_id: 222506 do
       get '/'
       # verify features of new UI
       expect(f('#application.ic-app')).to be_present
@@ -44,7 +44,7 @@ describe 'dashcards' do
       expect(f('#DashboardOptionsMenu_Container button')).to be_present
     end
 
-    it 'should toggle dashboard based on the selected menu view', priority: "1", test_id: 222507 do
+    it 'toggles dashboard based on the selected menu view', priority: "1", test_id: 222507 do
       get '/'
       # verify dashboard card view and trigger button for menu
       expect(f('.ic-DashboardCard__link')).to be_displayed
@@ -56,7 +56,7 @@ describe 'dashcards' do
       expect(f('#dashboard-activity')).to include_text('Recent Activity')
     end
 
-    it 'should redirect to announcements index', priority: "1", test_id: 222509 do
+    it 'redirects to announcements index', priority: "1", test_id: 222509 do
       # Icon will not display unless there is an announcement.
       create_announcement
       get '/'
@@ -65,7 +65,7 @@ describe 'dashcards' do
       expect(driver.current_url).to include("/courses/#{@course.id}/announcements")
     end
 
-    it 'should redirect to assignments index', priority: "1", test_id: 238637 do
+    it 'redirects to assignments index', priority: "1", test_id: 238637 do
       # Icon will not display unless there is an assignment.
       @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
       get '/'
@@ -74,7 +74,7 @@ describe 'dashcards' do
       expect(driver.current_url).to include("/courses/#{@course.id}/assignments")
     end
 
-    it 'should redirect to discussions index', priority: "1", test_id: 238638 do
+    it 'redirects to discussions index', priority: "1", test_id: 238638 do
       # Icon will not display unless there is a discussion.
       @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
       get '/'
@@ -83,7 +83,7 @@ describe 'dashcards' do
       expect(driver.current_url).to include("/courses/#{@course.id}/discussion_topics")
     end
 
-    it 'should redirect to files index', priority: "1", test_id: 238639 do
+    it 'redirects to files index', priority: "1", test_id: 238639 do
       # Icon will not display unless there is a file.
       add_file(fixture_file_upload('files/example.pdf', 'application/pdf'), @course, 'example.pdf')
       get '/'
@@ -92,13 +92,13 @@ describe 'dashcards' do
       expect(driver.current_url).to include("/courses/#{@course.id}/files")
     end
 
-    it 'should display color picker', priority: "1", test_id: 249122 do
+    it 'displays color picker', priority: "1", test_id: 249122 do
       get '/'
       f('.ic-DashboardCard__header-button').click
       expect(f('.ColorPicker__Container')).to be_displayed
     end
 
-    it 'should display dashcard icons for course contents', priority: "1", test_id: 222508 do
+    it 'displays dashcard icons for course contents', priority: "1", test_id: 222508 do
       # create discussion, announcement, discussion and files as these 4 icons need to be displayed
       @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
       @course.assignments.create!(title: 'assignment 1', name: 'assignment 1')
@@ -112,13 +112,13 @@ describe 'dashcards' do
       expect(f('a.files')).to be_present
     end
 
-    it 'should show announcement created notifications in dashcard', priority: "1", test_id: 238411 do
+    it 'shows announcement created notifications in dashcard', priority: "1", test_id: 238411 do
       create_announcement('New Announcement')
       get '/'
       expect(f('a.announcements .unread_count').text).to include('1')
     end
 
-    it "should not show hidden tab icons on dashcard", priority: "1", test_id: 3907593 do
+    it "does not show hidden tab icons on dashcard", priority: "1", test_id: 3907593 do
       # setup
       @course.tab_configuration = [{ "id" => Course::TAB_DISCUSSIONS, "hidden" => true }]
       @course.save!
@@ -127,7 +127,7 @@ describe 'dashcards' do
       expect(f("#content")).not_to contain_css(".ic-DashboardCard__action-container .discussions")
     end
 
-    it 'should not show unread notification in dashcard after reading announcements', priority: "1", test_id: 3906968 do
+    it 'does not show unread notification in dashcard after reading announcements', priority: "1", test_id: 3906968 do
       # Create and have the announcement read by the user.
       topic = create_announcement('New Announcement')
       topic.change_read_state('read', @user)
@@ -137,13 +137,13 @@ describe 'dashcards' do
       expect(f("#content")).not_to contain_css('a.announcements .unread_count')
     end
 
-    it 'should show discussions created notifications in dashcard', priority: "1", test_id: 240009 do
+    it 'shows discussions created notifications in dashcard', priority: "1", test_id: 240009 do
       @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
       get '/'
       expect(f('a.discussions .unread_count').text).to include('1')
     end
 
-    it 'should not show unread notification in dashcard after reading discussions', priority: "1", test_id: 3906971 do
+    it 'does not show unread notification in dashcard after reading discussions', priority: "1", test_id: 3906971 do
       # Create and have the discussion read by the user.
       topic = @course.discussion_topics.create!(title: 'discussion 1', message: 'This is a message.')
       topic.change_read_state('read', @user)
@@ -167,14 +167,14 @@ describe 'dashcards' do
         enrollment.accept!
       end
 
-      it 'should display special characters in a course title', priority: "1", test_id: 238192 do
+      it 'displays special characters in a course title', priority: "1", test_id: 238192 do
         @course1.name = '(/*-+_@&$#%)"Course 1"æøåñó?äçíì[{c}]<strong>stuff</strong> )'
         @course1.save!
         get '/'
         expect(f('.ic-DashboardCard__header-title').text).to eq(@course1.name)
       end
 
-      it 'should display special characters in course code', priority: "1", test_id: 240008 do
+      it 'displays special characters in course code', priority: "1", test_id: 240008 do
         # code is not displayed if the course name is too long
         @course1.name = 'test'
         @course1.course_code = '(/*-+_@&$#%)"Course 1"[{c}]<strong>stuff</strong> )'
@@ -196,7 +196,7 @@ describe 'dashcards' do
         enrollment.accept!
       end
 
-      it 'should initially match color to the dashcard', priority: "1", test_id: 268713 do
+      it 'initiallies match color to the dashcard', priority: "1", test_id: 268713 do
         get '/calendar'
         calendar_color = f(".context-list-toggle-box.group_course_#{@course1.id}").style('background-color')
         get '/'
@@ -204,7 +204,7 @@ describe 'dashcards' do
         expect(hero).to eq(calendar_color)
       end
 
-      it 'should customize color by selecting from color palette on the calendar page', priority: "1", test_id: 239994 do
+      it 'customizes color by selecting from color palette on the calendar page', priority: "1", test_id: 239994 do
         select_color_palette_from_calendar_page
 
         # pick a random color from the default 15 colors
@@ -229,7 +229,7 @@ describe 'dashcards' do
         wait_for_ajaximations
       end
 
-      it 'should customize dashcard color by selecting from color palette', priority: "1", test_id: 238196 do
+      it 'customizes dashcard color by selecting from color palette', priority: "1", test_id: 238196 do
         # Gets the default background color
         old_color = @user.reload.custom_colors.fetch("course_#{@course.id}")
 
@@ -256,7 +256,7 @@ describe 'dashcards' do
         end
       end
 
-      it 'should customize dashcard color', priority: "1", test_id: 239991 do
+      it 'customizes dashcard color', priority: "1", test_id: 239991 do
         hex = random_hex_color
         expect(f('.ColorPicker__Container')).to be_displayed
         replace_content(f("#ColorPickerCustomInput-#{@course.asset_string}"), hex)

@@ -67,7 +67,7 @@ describe ContentMigration do
       @export = run_export
     end
 
-    it "should retain external references when importing into the same root account" do
+    it "retains external references when importing into the same root account" do
       skip unless Qti.qti_enabled?
 
       run_import(@export.attachment_id)
@@ -83,7 +83,7 @@ describe ContentMigration do
       expect(@copy_to.quizzes.first.quiz_groups.first.assessment_question_bank).to eq @bank
     end
 
-    it "should discard external references when importing into a different root account" do
+    it "discards external references when importing into a different root account" do
       skip unless Qti.qti_enabled?
 
       @copy_to.root_account.update_attribute(:uuid, 'more_different_uuid')

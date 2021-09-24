@@ -41,7 +41,7 @@ describe "speed grader" do
   end
 
   context "alerts" do
-    it "should alert the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
+    it "alerts the teacher before leaving the page if comments are not saved", priority: "1", test_id: 283736 do
       student_in_course(active_user: true).user
       Speedgrader.visit(@course.id, @assignment.id)
       replace_content(Speedgrader.new_comment_text_area, "oh no i forgot to save this comment!")
@@ -326,7 +326,7 @@ describe "speed grader" do
         Speedgrader.clear_new_comment
       end
 
-      it 'should increase the number of published comments', test_id: 1407013, priority: "1" do
+      it 'increases the number of published comments', test_id: 1407013, priority: "1" do
         skip_if_safari(:alert)
 
         expect {
@@ -459,7 +459,7 @@ describe "speed grader" do
       Speedgrader.visit(@course.id, @assignment.id)
     end
 
-    it 'should not allow non-group comments to be seen by group', priority: "1", test_id: 728596 do
+    it 'does not allow non-group comments to be seen by group', priority: "1", test_id: 728596 do
       Speedgrader.select_student(@student_1)
       expect(Speedgrader.comment_list).to include(@private_comment_1)
       expect(Speedgrader.comment_list).not_to include(@private_comment_2)
@@ -468,7 +468,7 @@ describe "speed grader" do
       expect(Speedgrader.comment_list).to include(@private_comment_2)
     end
 
-    it 'should allow group-comments to be seen by whole group', priority: "1", test_id: 728611 do
+    it 'allows group-comments to be seen by whole group', priority: "1", test_id: 728611 do
       Speedgrader.select_student(@student_1)
       expect(Speedgrader.comment_list).to include(@group_comment_1)
       expect(Speedgrader.comment_list).to include(@group_comment_2)

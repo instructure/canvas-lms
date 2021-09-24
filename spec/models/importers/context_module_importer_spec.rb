@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 describe "Importing modules" do
   SYSTEMS.each do |system|
     if import_data_exists? system, 'module'
-      it "should import from #{system}" do
+      it "imports from #{system}" do
         data = get_import_data(system, 'module')
         context = get_import_context(system)
         migration = context.content_migrations.create!
@@ -43,7 +43,7 @@ describe "Importing modules" do
     end
   end
 
-  it "should import bb8 subitems" do
+  it "imports bb8 subitems" do
     data = get_import_data('bb8', 'sub_items')
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
@@ -51,7 +51,7 @@ describe "Importing modules" do
     expect(context.context_module_tags.find_by_migration_id('res00796')).not_to be_deleted
   end
 
-  it "should link to url objects" do
+  it "links to url objects" do
     data = get_import_data('vista', 'module')
     context = get_import_context('vista')
     migration = context.content_migrations.create!
@@ -61,7 +61,7 @@ describe "Importing modules" do
     expect(topic.content_tags.count).to eq 2
   end
 
-  it "should link to objects on the second pass" do
+  it "links to objects on the second pass" do
     data = get_import_data('bb8', 'module')
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
@@ -78,7 +78,7 @@ describe "Importing modules" do
     expect(topic.content_tags.count).to eq 1
   end
 
-  it "should link to translated external tool urls" do
+  it "links to translated external tool urls" do
     data = { :migration_id => "1", :title => "derp",
              :items => [{
                :migration_id => 'mig1',
@@ -119,7 +119,7 @@ describe "Importing modules" do
     expect(tag2.content).to eq tool2
   end
 
-  it "should not create a blank tag if the content is not found" do
+  it "does not create a blank tag if the content is not found" do
     data = { :migration_id => "1", :title => "derp",
              :items => [{
                :migration_id => 'mig1',
@@ -145,7 +145,7 @@ describe "Importing modules" do
     expect(mod.content_tags.count).to eq 1
   end
 
-  it "should select module items for import" do
+  it "selects module items for import" do
     data = get_import_data('', 'module-item-select')
     context = get_import_context
     migration = @course.content_migrations.create!

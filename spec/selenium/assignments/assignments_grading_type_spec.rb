@@ -43,28 +43,28 @@ describe "assignments" do
       )
     end
 
-    it "should validate points for percentage grading (!= '')", priority: '2', test_id: 209980 do
+    it "validates points for percentage grading (!= '')", priority: '2', test_id: 209980 do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Percentage'
         AssignmentCreateEditPage.enter_points_possible ''
       end
     end
 
-    it 'should validate points for percentage grading (digits only)', priority: '2', test_id: 209984 do
+    it 'validates points for percentage grading (digits only)', priority: '2', test_id: 209984 do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Percentage'
         AssignmentCreateEditPage.enter_points_possible 'taco'
       end
     end
 
-    it "should validate points for letter grading (!= '')", priority: '2', test_id: 209985 do
+    it "validates points for letter grading (!= '')", priority: '2', test_id: 209985 do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Letter Grade'
         AssignmentCreateEditPage.enter_points_possible ''
       end
     end
 
-    it 'should validate points for letter grading (digits only)', priority: '2', test_id: 209986 do
+    it 'validates points for letter grading (digits only)', priority: '2', test_id: 209986 do
       points_validation(@assignment) do
         AssignmentCreateEditPage.select_grading_type 'Letter Grade'
         AssignmentCreateEditPage.enter_points_possible 'taco'

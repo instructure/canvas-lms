@@ -377,26 +377,26 @@ describe "MustViewModuleProgressor" do
       @module, @assignment = module_with_item_return_all(:assignment, 'must_contribute')
     end
 
-    it "should export module status into a hash" do
+    it "exports module status into a hash" do
       progress = MustViewModuleProgressor.new(@student, @course).current_progress
       expect(progress[@module.id][:status]).to eq 'unlocked'
       expect(progress[@module.id][:items].keys.length).to eq 1
     end
 
-    it "should export module item completion into a hash" do
+    it "exports module item completion into a hash" do
       assign_item = @module.content_tags.find_by(content: @assignment)
       progress = MustViewModuleProgressor.new(@student, @course).current_progress
       expect(progress[@module.id][:items][assign_item.id]).to be false
     end
 
-    it "should not create progressions for non-enrolled admins and allow view if appropriate" do
+    it "does not create progressions for non-enrolled admins and allow view if appropriate" do
       account_admin_user
       progress = MustViewModuleProgressor.new(@admin, @course).current_progress
       expect(progress[@module.id][:status]).to eq 'unlocked'
       expect(ContextModuleProgression.where(user: @admin, context_module: @module).count).to eq 0
     end
 
-    it "should not create progressions for non-enrolled non-admins" do
+    it "does not create progressions for non-enrolled non-admins" do
       course_factory(is_public: true, active_all: true)
       user_factory(active_all: true)
       modul = module_with_item(:assignment, 'must_contribute')

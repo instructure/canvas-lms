@@ -163,7 +163,7 @@ describe CanvasCassandra do
   end
 
   describe "#build_where_conditions" do
-    it "should build a where clause given a hash" do
+    it "builds a where clause given a hash" do
       expect(db.build_where_conditions(name: "test1")).to eq ["name = ?", ["test1"]]
       expect(db.build_where_conditions(state: "ut", name: "test1")).to eq ["name = ? AND state = ?", ["test1", "ut"]]
     end
@@ -241,12 +241,12 @@ describe CanvasCassandra do
       db.insert_record("test_table", { :id => 5 }, { :name => "test" })
     end
 
-    it "should not update given nil values in an AR#attributes style hash" do
+    it "does not update given nil values in an AR#attributes style hash" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
       db.insert_record("test_table", { :id => 5 }, { :name => "test", :nick => nil })
     end
 
-    it "should not update given nil values in an AR#changes style hash" do
+    it "does not update given nil values in an AR#changes style hash" do
       expect(db).to receive(:execute).with("UPDATE test_table SET name = ? WHERE id = ?", "test", 5, {})
       db.insert_record("test_table", { :id => 5 }, { :name => [nil, "test"], :nick => [nil, nil] })
     end
@@ -285,7 +285,7 @@ describe CanvasCassandra do
     end
   end
 
-  it "should map consistency level names to values" do
+  it "maps consistency level names to values" do
     expect(CanvasCassandra.consistency_level("LOCAL_QUORUM")).to eq CassandraCQL::Thrift::ConsistencyLevel::LOCAL_QUORUM
     expect { CanvasCassandra.consistency_level("XXX") }.to raise_error(NameError)
   end

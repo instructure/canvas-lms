@@ -44,7 +44,7 @@ describe 'assignments index menu tool placement' do
     Account.default.enable_feature!(:commons_favorites)
   end
 
-  it "should be able to launch the index menu tool via the tray", custom_timeout: 30 do
+  it "is able to launch the index menu tool via the tray", custom_timeout: 30 do
     visit_assignments_index_page(@course.id)
     course_assignments_settings_button.click
     menu_item = course_assignments_settings_menu_items.find { |item| item.text == "Import Stuff" }
@@ -66,7 +66,7 @@ describe 'assignments index menu tool placement' do
     ] # will replace with the groups on the variable expansion
   end
 
-  it "should be able to launch the group menu tool via the tray", custom_timeout: 30 do
+  it "is able to launch the group menu tool via the tray", custom_timeout: 30 do
     visit_assignments_index_page(@course.id)
     manage_assignment_group_menu(@agroup2.id).click
     expect(assignment_group_menu_tool_link(@agroup2.id)).to include_text('Import Stuff Here')
@@ -86,7 +86,7 @@ describe 'assignments index menu tool placement' do
     expect(query_params["com_instructure_course_available_canvas_resources"].values).to match_array(group_data)
   end
 
-  it "should handle having more than one tool in the menu" do
+  it "handles having more than one tool in the menu" do
     user_session(@teacher)
     visit_assignments_index_page(@course.id)
 

@@ -23,13 +23,13 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
   let(:question_data) { QuestionHelpers.fixture('multiple_dropdowns_question') }
   subject { described_class.new(question_data) }
 
-  it 'should not blow up when no responses are provided' do
+  it 'does not blow up when no responses are provided' do
     expect { subject.run([]) }.to_not raise_error
   end
 
   describe '[:answer_sets]' do
     describe '[][:answers][:responses]' do
-      it 'should count those who filled in a correct answer' do
+      it 'counts those who filled in a correct answer' do
         stats = subject.run([
                               {
                                 answer_id_for_organ: '3208'
@@ -41,7 +41,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should stringify ids' do
+      it 'stringifies ids' do
         stats = subject.run([
                               {
                                 answer_id_for_organ: 3208
@@ -53,7 +53,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should count those who filled in an unknown answer' do
+      it 'counts those who filled in an unknown answer' do
         stats = subject.run([
                               {
                                 answer_id_for_organ: '1234'
@@ -66,7 +66,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should count those who did not fill in any answer' do
+      it 'counts those who did not fill in any answer' do
         stats = subject.run([
                               {
                                 answer_id_for_organ: nil
@@ -79,7 +79,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
         expect(answer[:responses]).to eq(1)
       end
 
-      it 'should not generate the unknown or missing answers unless needed' do
+      it 'does not generate the unknown or missing answers unless needed' do
         stats = subject.run([
                               { answer_id_for_organ: "3208" }
                             ])
@@ -105,7 +105,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
   end
 
   describe '[:correct]' do
-    it 'should count all fully correct responses' do
+    it 'counts all fully correct responses' do
       stats = subject.run([
                             { correct: "true" },
                             { correct: true }
@@ -116,7 +116,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
   end
 
   describe '[:partial]' do
-    it 'should count all partially correct responses' do
+    it 'counts all partially correct responses' do
       stats = subject.run([
                             { correct: "true" },
                             { correct: "partial" }
@@ -127,7 +127,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
   end
 
   describe '[:incorrect]' do
-    it 'should count all incorrect responses' do
+    it 'counts all incorrect responses' do
       stats = subject.run([
                             { correct: nil },
                             { correct: false }
@@ -138,7 +138,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
   end
 
   describe '[:responses]' do
-    it 'should count all students who have filled any blank' do
+    it 'counts all students who have filled any blank' do
       stats = subject.run([
                             {
                               answer_id_for_organ: '3208'
@@ -148,13 +148,13 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
       expect(stats[:responses]).to eq(1)
     end
 
-    it 'should not count students who didnt' do
+    it 'does not count students who didnt' do
       expect(subject.run([{}])[:responses]).to eq(0)
     end
   end
 
   describe '[:answered]' do
-    it 'should count students who have filled every blank' do
+    it 'counts students who have filled every blank' do
       stats = subject.run([
                             {
                               answer_id_for_organ: "3208",
@@ -165,7 +165,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'should count students who have filled every blank, even if incorrectly' do
+    it 'counts students who have filled every blank, even if incorrectly' do
       stats = subject.run([
                             {
                               answer_id_for_organ: '8331',
@@ -176,7 +176,7 @@ describe CanvasQuizStatistics::Analyzers::MultipleDropdowns do
       expect(stats[:answered]).to eq(1)
     end
 
-    it 'should not count a student who has left any blank' do
+    it 'does not count a student who has left any blank' do
       stats = subject.run([
                             {
                               answer_for_color: '1381'

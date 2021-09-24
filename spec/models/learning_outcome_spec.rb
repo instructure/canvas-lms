@@ -143,7 +143,7 @@ describe LearningOutcome do
       expect(InstStatsd::Statsd).to have_received(:increment).with("feature_flag_check", any_args).at_least(:once)
     end
 
-    it "should allow learning outcome rows in the rubric" do
+    it "allows learning outcome rows in the rubric" do
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -174,7 +174,7 @@ describe LearningOutcome do
       expect(@rubric.learning_outcome_alignments.first.learning_outcome_id).to eql(@outcome.id)
     end
 
-    it "should delete learning outcome alignments when they no longer exist" do
+    it "deletes learning outcome alignments when they no longer exist" do
       @rubric = Rubric.new(:context => @course)
       @rubric.data = [
         {
@@ -227,7 +227,7 @@ describe LearningOutcome do
       expect(@rubric.learning_outcome_alignments.active).to be_empty
     end
 
-    it "should create learning outcome associations for multiple outcome rows" do
+    it "creates learning outcome associations for multiple outcome rows" do
       @outcome2 = @course.created_learning_outcomes.create!(:title => 'outcome2')
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
@@ -279,7 +279,7 @@ describe LearningOutcome do
       expect(@rubric.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eql([@outcome.id, @outcome2.id].sort)
     end
 
-    it "should create outcome results when outcome-aligned rubrics are assessed" do
+    it "creates outcome results when outcome-aligned rubrics are assessed" do
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -358,7 +358,7 @@ describe LearningOutcome do
       expect(@result.mastery).to eql(true)
     end
 
-    it "should override non-rubric-based alignments with rubric-based alignments for the same assignment" do
+    it "overrides non-rubric-based alignments with rubric-based alignments for the same assignment" do
       @alignment = @outcome.align(@assignment, @course, :mastery_type => "points")
       expect(@alignment).not_to be_nil
       expect(@alignment.content).to eql(@assignment)
@@ -430,7 +430,7 @@ describe LearningOutcome do
       n = @result.version_number
     end
 
-    it "should not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
+    it "does not override rubric-based alignments with non-rubric-based alignments for the same assignment" do
       @rubric = Rubric.create!(:context => @course)
       @rubric.data = [
         {
@@ -494,7 +494,7 @@ describe LearningOutcome do
       expect(@result.mastery).to eql(false)
     end
 
-    it "should not let you set the calculation_method to nil if it has been set to something else" do
+    it "does not let you set the calculation_method to nil if it has been set to something else" do
       @outcome.calculation_method = 'latest'
       @outcome.save!
       expect(@outcome.calculation_method).to eq('latest')
@@ -521,7 +521,7 @@ describe LearningOutcome do
 
       calc_method.each do |method|
         invalid_values[method].each do |invalid_value|
-          it "should not let you set calculation_int to #{invalid_value} if calculation_method is #{method}" do
+          it "does not let you set calculation_int to #{invalid_value} if calculation_method is #{method}" do
             @outcome.calculation_method = method
             @outcome.calculation_int = 4
             @outcome.save!
@@ -550,7 +550,7 @@ describe LearningOutcome do
       }
 
       method_to_int.each do |method, set|
-        it "should set calculation_int to #{set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
+        it "sets calculation_int to #{set[:default]} if the calculation_method is changed to #{method} and calculation_int isn't set" do
           @outcome.calculation_method = set[:altmeth]
           @outcome.calculation_int = set[:testval]
           @outcome.save!
@@ -565,7 +565,7 @@ describe LearningOutcome do
       end
     end
 
-    it "should destroy provided alignment" do
+    it "destroys provided alignment" do
       @alignment = ContentTag.create({
                                        content: @outcome,
                                        context: @outcome.context,
@@ -609,7 +609,7 @@ describe LearningOutcome do
       }.to change { @outcome.rubric_criterion }.to(@outcome.rubric_criterion.merge(mpoints))
     end
 
-    it "should update aligned rubrics after save" do
+    it "updates aligned rubrics after save" do
       rubric = Rubric.create!(:context => @course)
       rubric.data = [
         {
@@ -652,7 +652,7 @@ describe LearningOutcome do
       assignment_model
     end
 
-    it "should reject creation of a learning outcome with an illegal calculation_method" do
+    it "rejects creation of a learning outcome with an illegal calculation_method" do
       @outcome = @course.created_learning_outcomes.create(
         :title => 'outcome',
         :calculation_method => 'foo bar baz qux'
@@ -685,7 +685,7 @@ describe LearningOutcome do
           invalid_value_error = 'not a valid value for this calculation method'
           unused_value_error = 'A calculation value is not used with this calculation method'
 
-          it "should reject creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
+          it "rejects creation of a learning outcome with an illegal calculation_int for calculation_method of '#{method}'" do
             @outcome = @course.created_learning_outcomes.create(
               :title => 'outcome',
               :calculation_method => method,
@@ -725,15 +725,15 @@ describe LearningOutcome do
         @outcome = LearningOutcome.create!(:title => 'global outcome')
       end
 
-      it "should grant :read to any user" do
+      it "grants :read to any user" do
         expect(@outcome.grants_right?(User.new, :read)).to be_truthy
       end
 
-      it "should not grant :read without a user" do
+      it "does not grant :read without a user" do
         expect(@outcome.grants_right?(nil, :read)).to be_falsey
       end
 
-      it "should grant :update iff the site admin grants :manage_global_outcomes" do
+      it "grants :update iff the site admin grants :manage_global_outcomes" do
         @admin = double
 
         expect(Account.site_admin).to receive(:grants_right?).with(@admin, nil, :manage_global_outcomes).and_return(true)
@@ -751,21 +751,21 @@ describe LearningOutcome do
         @outcome = @course.created_learning_outcomes.create!(:title => 'non-global outcome')
       end
 
-      it "should grant :read to users with :read_outcomes on the context" do
+      it "grants :read to users with :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
         expect(@outcome.grants_right?(@user, :read)).to be_truthy
       end
 
-      it "should not grant :read to users without :read_outcomes on the context" do
+      it "does not grant :read to users without :read_outcomes on the context" do
         expect(@outcome.grants_right?(User.new, :read)).to be_falsey
       end
 
-      it "should grant :update to users with :manage_outcomes on the context" do
+      it "grants :update to users with :manage_outcomes on the context" do
         teacher_in_course(:active_enrollment => 1)
         expect(@outcome.grants_right?(@user, :update)).to be_truthy
       end
 
-      it "should not grant :update to users without :read_outcomes on the context" do
+      it "does not grant :update to users without :read_outcomes on the context" do
         student_in_course(:active_enrollment => 1)
         expect(@outcome.grants_right?(User.new, :update)).to be_falsey
       end
@@ -785,7 +785,7 @@ describe LearningOutcome do
       it { is_expected.to respond_to(:calculation_method) }
       it { is_expected.to respond_to(:calculation_int) }
 
-      it "should allow setting a calculation_method" do
+      it "allows setting a calculation_method" do
         expect(@outcome.calculation_method).not_to eq('n_mastery')
         @outcome.calculation_method = 'n_mastery'
         @outcome.calculation_int = 5
@@ -802,7 +802,7 @@ describe LearningOutcome do
         }
 
         method_to_int.each do |method, int|
-          it "should allow setting a calculation_int for #{method}" do
+          it "allows setting a calculation_int for #{method}" do
             expect(@outcome.calculation_int).not_to eq(85)
             @outcome.calculation_method = method
             @outcome.calculation_int = int
@@ -815,7 +815,7 @@ describe LearningOutcome do
         end
       end
 
-      it "should allow updating the calculation_int and calculation_method together" do
+      it "allows updating the calculation_int and calculation_method together" do
         @outcome.calculation_method = 'decaying_average'
         @outcome.calculation_int = 59
         @outcome.save
@@ -842,7 +842,7 @@ describe LearningOutcome do
         )
       end
 
-      it "should reject an illegal calculation_method" do
+      it "rejects an illegal calculation_method" do
         expect(@outcome.calculation_method).not_to eq('foo bar baz qux')
         expect(@outcome.calculation_method).to eq('highest')
         @outcome.calculation_method = 'foo bar baz qux'
@@ -855,7 +855,7 @@ describe LearningOutcome do
         expect(@outcome.calculation_method).to eq('highest')
       end
 
-      it "should not let the calculation_method be set to nil" do
+      it "does not let the calculation_method be set to nil" do
         expect(@outcome.calculation_method).to eq('highest')
         expect(@outcome).to have(:no).errors
         @outcome.calculation_method = nil
@@ -876,7 +876,7 @@ describe LearningOutcome do
         }
 
         method_to_int.each do |method, int|
-          it "should reject an illegal calculation_int for #{method}" do
+          it "rejects an illegal calculation_int for #{method}" do
             @outcome.calculation_method = method
             @outcome.calculation_int = int
             @outcome.save
@@ -902,23 +902,23 @@ describe LearningOutcome do
     end
 
     context "default values" do
-      it 'should default mastery points to 3' do
+      it 'defaults mastery points to 3' do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         expect(@outcome.mastery_points).to be 3
       end
 
-      it 'should default points possible to 5' do
+      it 'defaults points possible to 5' do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         expect(@outcome.points_possible).to be 5
       end
 
-      it "should default calculation_method to decaying_average" do
+      it "defaults calculation_method to decaying_average" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         expect(@outcome.calculation_method).to eql('decaying_average')
         expect(@outcome.calculation_int).to be 65
       end
 
-      it "should default calculation_int to nil for highest" do
+      it "defaults calculation_int to nil for highest" do
         @outcome = LearningOutcome.create!(
           :title => 'outcome',
           :calculation_method => 'highest'
@@ -927,7 +927,7 @@ describe LearningOutcome do
         expect(@outcome.calculation_int).to be_nil
       end
 
-      it "should default calculation_int to nil for latest" do
+      it "defaults calculation_int to nil for latest" do
         @outcome = LearningOutcome.create!(
           :title => 'outcome',
           :calculation_method => 'latest'
@@ -938,7 +938,7 @@ describe LearningOutcome do
 
       # This is to prevent changing behavior of existing outcomes made before we added the
       # ability to set a calculation_method
-      it "should set calculation_method to decaying_average if the record is pre-existing and nil" do
+      it "sets calculation_method to decaying_average if the record is pre-existing and nil" do
         @outcome = LearningOutcome.create!(:title => 'outcome')
         @outcome.update_column(:calculation_method, nil)
         @outcome.reload
@@ -1158,7 +1158,7 @@ describe LearningOutcome do
       end
     end
 
-    it 'should de-dup outcomes linked multiple times' do
+    it 'de-dups outcomes linked multiple times' do
       account = Account.default
       course_factory
       lo = LearningOutcome.create!(context: @course, title: "outcome",

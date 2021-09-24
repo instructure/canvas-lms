@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "Converting Angel QTI" do
-    it "should convert multiple_choice" do
+    it "converts multiple_choice" do
       qti_data = file_as_string(angel_question_dir, 'p_multiple_choice.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'multiple_choice_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -28,7 +28,7 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::MULTIPLE_CHOICE
     end
 
-    it "should convert multiple answer" do
+    it "converts multiple answer" do
       qti_data = file_as_string(angel_question_dir, 'p_multiple_answers.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'multiple_answers_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -36,7 +36,7 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::MULTIPLE_ANSWER
     end
 
-    it "should convert true false" do
+    it "converts true false" do
       qti_data = file_as_string(angel_question_dir, 'p_true_false.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'true_false_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -44,14 +44,14 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::TRUE_FALSE
     end
 
-    it "should convert essay" do
+    it "converts essay" do
       qti_data = file_as_string(angel_question_dir, 'p_essay.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'essay_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
       expect(hash).to eq AngelPropExpected::ESSAY
     end
 
-    it "should convert short answer" do
+    it "converts short answer" do
       qti_data = file_as_string(angel_question_dir, 'p_short_answer.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'short_answer_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -59,14 +59,14 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::SHORT_ANSWER
     end
 
-    it "should convert short answer with no correct answers into essay" do
+    it "converts short answer with no correct answers into essay" do
       qti_data = file_as_string(angel_question_dir, 'p_short_answer_as_essay.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'short_answer_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
       expect(hash).to eq AngelPropExpected::SHORT_ANSWER_AS_ESSAY
     end
 
-    it "should convert matching questions" do
+    it "converts matching questions" do
       qti_data = file_as_string(angel_question_dir, 'p_matching.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'matching_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -83,7 +83,7 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::MATCHING
     end
 
-    it "should convert ordering questions into matching questions" do
+    it "converts ordering questions into matching questions" do
       qti_data = file_as_string(angel_question_dir, 'p_ordering.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'ordering_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -98,14 +98,14 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::ORDER
     end
 
-    it "should convert file response questions" do
+    it "converts file response questions" do
       qti_data = file_as_string(angel_question_dir, 'p_offline.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'file_upload_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
       expect(hash).to eq AngelPropExpected::FILE_RESPONSE
     end
 
-    it "should convert fill in the blank questions" do
+    it "converts fill in the blank questions" do
       qti_data = file_as_string(angel_question_dir, 'p_fib.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'fill_in_multiple_blanks_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)
@@ -113,7 +113,7 @@ if Qti.migration_executable
       expect(hash).to eq AngelPropExpected::FIB
     end
 
-    it "should convert likert scale" do
+    it "converts likert scale" do
       qti_data = file_as_string(angel_question_dir, 'p_likert_scale.xml')
       hash = Qti::AssessmentItemConverter.create_instructure_question(:qti_data => qti_data,
                                                                       :interaction_type => 'stupid_likert_scale_question', :custom_type => 'angel', :flavor => Qti::Flavors::ANGEL)

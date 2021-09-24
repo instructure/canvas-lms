@@ -33,7 +33,7 @@ describe 'quiz index menu tool placement' do
     Account.default.enable_feature!(:commons_favorites)
   end
 
-  it "should be able to launch the index menu tool via the tray", custom_timeout: 60 do
+  it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
     visit_quizzes_index_page(@course.id)
     quiz_index_settings_button.click
     expect(quiz_index_settings_menu_items).to include_text("Import Stuff")

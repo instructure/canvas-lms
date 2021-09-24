@@ -78,7 +78,7 @@ describe GradebookUploadsController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id }
       assert_unauthorized
     end
@@ -86,7 +86,7 @@ describe GradebookUploadsController do
     context "with authorized teacher" do
       before(:each) { user_session(@teacher) }
 
-      it "should accept a valid csv upload" do
+      it "accepts a valid csv upload" do
         check_create_response
       end
 
@@ -103,11 +103,11 @@ describe GradebookUploadsController do
           @course.save!
         end
 
-        it "should accept a valid csv upload with a final grade column" do
+        it "accepts a valid csv upload with a final grade column" do
           check_create_response
         end
 
-        it "should accept a valid csv upload with sis id columns" do
+        it "accepts a valid csv upload with sis id columns" do
           check_create_response(true)
         end
       end

@@ -26,7 +26,7 @@ describe 'ExternalFeedsController', type: :request do
       @url_params = { :controller => "external_feeds", :action => "index", :format => "json" }
     end
 
-    it "should not allow access to unauthorized users" do
+    it "does not allow access to unauthorized users" do
       api_call_as_user(@denied_user, :get, @url_base, @url_params, {}, {}, :expected_status => 401)
       api_call_as_user(@denied_user, :post, @url_base, @url_params.merge(:action => "create"), { :url => "http://www.example.com/feed" }, {}, :expected_status => 401)
       @feed = external_feed_model(:context => @context)
@@ -45,7 +45,7 @@ describe 'ExternalFeedsController', type: :request do
       }
     end
 
-    it "should allow listing feeds" do
+    it "allows listing feeds" do
       @feeds = (0...3).map { |i| external_feed_model(:url => "http://www.example.com/feed#{i}", :context => @context, :user => @allowed_user) }
       @feeds[1].external_feed_entries.create!(user: @allowed_user)
       external_feed_model(:context => Course.create!)
@@ -53,7 +53,7 @@ describe 'ExternalFeedsController', type: :request do
       expect(json).to eq @feeds[0, 2].map { |f| feed_json(f) }
     end
 
-    it "should allow creating feeds" do
+    it "allows creating feeds" do
       json = api_call_as_user(@allowed_user, :post, @url_base, @url_params.merge(:action => "create"),
                               { :url => "http://www.example.com/feed" })
       feed = @context.external_feeds.find(json['id'])
@@ -99,7 +99,7 @@ describe 'ExternalFeedsController', type: :request do
       expect(json).to eq feed_json(feed)
     end
 
-    it "should allow deleting a feed" do
+    it "allows deleting a feed" do
       feed = external_feed_model(:url => "http://www.example.com/feed", :context => @context, :user => @allowed_user)
       json = api_call_as_user(@allowed_user, :delete, @url_base + "/#{feed.id}", @url_params.merge(:action => "destroy", :external_feed_id => feed.to_param))
       expect(json).to eq feed_json(feed)

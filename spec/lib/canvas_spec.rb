@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe Canvas do
   describe ".timeout_protection" do
-    it "should wrap the block in a timeout" do
+    it "wraps the block in a timeout" do
       Setting.set("service_generic_timeout", "2")
       expect(Timeout).to receive(:timeout).with(2).and_yield
       ran = false
@@ -37,24 +37,24 @@ describe Canvas do
       expect(ran).to eq true
     end
 
-    it "should raise on timeout if raise_on_timeout option is specified" do
+    it "raises on timeout if raise_on_timeout option is specified" do
       expect(Timeout).to receive(:timeout).and_raise(Timeout::Error)
       expect { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }.to raise_error(Timeout::Error)
     end
 
-    it "should use the timeout argument over the generic default" do
+    it "uses the timeout argument over the generic default" do
       expect(Timeout).to receive(:timeout).with(23)
       Canvas.timeout_protection("foo", fallback_timeout_length: 23)
     end
 
-    it "should use the settings timeout over the timeout argument" do
+    it "uses the settings timeout over the timeout argument" do
       Setting.set("service_foo_timeout", "1")
       expect(Timeout).to receive(:timeout).with(1)
       Canvas.timeout_protection("foo", fallback_timeout_length: 23)
     end
 
     if Canvas.redis_enabled?
-      it "should skip calling the block after X failures" do
+      it "skips calling the block after X failures" do
         Setting.set("service_spec_cutoff", "2")
         expect(Timeout).to receive(:timeout).with(15).twice.and_raise(Timeout::Error)
         Canvas.timeout_protection("spec") {}
@@ -74,7 +74,7 @@ describe Canvas do
         expect(ran).to eq true
       end
 
-      it "should raise on cutoff if raise_on_timeout option is specified" do
+      it "raises on cutoff if raise_on_timeout option is specified" do
         key = "service:timeouts:spec:error_count"
         Canvas.redis.set(key, 42)
         expect { Canvas.timeout_protection("spec", raise_on_timeout: true) {} }
@@ -100,14 +100,14 @@ describe Canvas do
     end
 
     describe ".short_circuit_timeout" do
-      it "should wrap the block in a timeout" do
+      it "wraps the block in a timeout" do
         expect(Timeout).to receive(:timeout).with(15).and_yield
         ran = false
         Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) { ran = true }
         expect(ran).to eq true
       end
 
-      it "should skip calling the block after X failures" do
+      it "skips calling the block after X failures" do
         Setting.set("service_spec_cutoff", "2")
         expect(Timeout).to receive(:timeout).with(15).twice.and_raise(Timeout::Error)
         expect { Canvas.short_circuit_timeout(Canvas.redis, "spec", 15) {} }
@@ -130,7 +130,7 @@ describe Canvas do
         expect(ran).to eq true
       end
 
-      it "should raise TimeoutCutoff when the cutoff is reached" do
+      it "raises TimeoutCutoff when the cutoff is reached" do
         Setting.set("service_spec_cutoff", "2")
         key = "service:timeouts:spec:error_count"
         Canvas.redis.set(key, 42)
@@ -141,7 +141,7 @@ describe Canvas do
     end
 
     describe ".percent_short_circuit_timeout" do
-      it "should raise TimeoutCutoff when the protection key is present" do
+      it "raises TimeoutCutoff when the protection key is present" do
         Canvas.redis.set("service:timeouts:spec:percent_counter:protection_activated", "true")
         Canvas.redis.expire("service:timeouts:spec:percent_counter:protection_activated", 1)
         expect { Canvas.percent_short_circuit_timeout(Canvas.redis, "spec", 15) {} }

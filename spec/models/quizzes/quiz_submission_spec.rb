@@ -27,35 +27,35 @@ describe Quizzes::QuizSubmission do
     end
 
     context "saving a quiz submission" do
-      it "should validate numericality of extra time" do
+      it "validates numericality of extra time" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = 'asdf'
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:extra_time])).to eq ["is not a number"]
       end
 
-      it "should validate extra time is not too long" do
+      it "validates extra time is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_time = 10081
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:extra_time])).to eq ["must be less than or equal to 10,080"]
       end
 
-      it "should validate numericality of extra attempts" do
+      it "validates numericality of extra attempts" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = 'asdf'
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:extra_attempts])).to eq ["is not a number"]
       end
 
-      it "should validate extra attempts is not too long" do
+      it "validates extra attempts is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.extra_attempts = 1001
         expect(qs.valid?).to eq false
         expect(Array(qs.errors[:extra_attempts])).to eq ["must be less than or equal to 1,000"]
       end
 
-      it "should validate quiz points possible is not too long" do
+      it "validates quiz points possible is not too long" do
         qs = Quizzes::QuizSubmission.new
         qs.quiz = Quizzes::Quiz.new(:points_possible => 2000000001)
         expect(qs.valid?).to eq false
@@ -64,7 +64,7 @@ describe Quizzes::QuizSubmission do
     end
 
     describe '#finished_at' do
-      it 'should rectify small amounts of drift (could be caused by JS stalling)' do
+      it 'rectifies small amounts of drift (could be caused by JS stalling)' do
         anchor = Time.now
 
         subject.started_at = anchor
@@ -74,7 +74,7 @@ describe Quizzes::QuizSubmission do
         expect(subject.finished_at).to eq subject.end_at
       end
 
-      it "should not rectify drift for a submission finished before the end at date" do
+      it "does not rectify drift for a submission finished before the end at date" do
         anchor = Time.now
 
         subject.started_at = anchor
@@ -86,7 +86,7 @@ describe Quizzes::QuizSubmission do
     end
 
     describe '#finished_at_fallback' do
-      it "should select the earlier time" do
+      it "selects the earlier time" do
         Timecop.freeze(5.minutes.ago) do
           now = Time.zone.now
           later = now + 5.minutes
@@ -99,7 +99,7 @@ describe Quizzes::QuizSubmission do
           expect(subject.finished_at_fallback).to eq(now)
         end
       end
-      it "should work with no end_at time" do
+      it "works with no end_at time" do
         Timecop.freeze(5.minutes.ago) do
           now = Time.zone.now
           subject.end_at = nil
@@ -108,7 +108,7 @@ describe Quizzes::QuizSubmission do
       end
     end
 
-    it "should copy the quiz's points_possible whenever it's saved" do
+    it "copies the quiz's points_possible whenever it's saved" do
       Quizzes::Quiz.where(:id => @quiz).update_all(:points_possible => 1.1)
       @quiz.reload
       q = @quiz.quiz_submissions.create!
@@ -121,7 +121,7 @@ describe Quizzes::QuizSubmission do
       expect(q.reload.quiz_points_possible).to eql 1.9
     end
 
-    it "should not lose time" do
+    it "does not lose time" do
       @quiz.update_attribute(:time_limit, 10)
       q = @quiz.quiz_submissions.create!
       q.update_attribute(:started_at, Time.now)
@@ -144,7 +144,7 @@ describe Quizzes::QuizSubmission do
         @quiz.save!
       end
 
-      it "should update scores for a completed submission" do
+      it "updates scores for a completed submission" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "1658" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -165,7 +165,7 @@ describe Quizzes::QuizSubmission do
       end
 
       context 'on a graded_survey' do
-        it "should award all points for a graded_survey" do
+        it "awards all points for a graded_survey" do
           @quiz.update(points_possible: 42, quiz_type: 'graded_survey')
 
           qs = @quiz.generate_submission(@student)
@@ -187,13 +187,13 @@ describe Quizzes::QuizSubmission do
         end
       end
 
-      it "should not allow updating scores on an uncompleted submission" do
+      it "does not allow updating scores on an uncompleted submission" do
         qs = @quiz.generate_submission(@student)
         expect(qs).to be_untaken
         expect { qs.update_scores({}) }.to raise_error("Can't update submission scores unless it's completed")
       end
 
-      it "should update scores for a previous submission" do
+      it "updates scores for a previous submission" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -214,7 +214,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.versions.current.model.score).to eq 0
       end
 
-      it "should allow updating scores on a completed version of a submission while the current version is in progress" do
+      it "allows updating scores on a completed version of a submission while the current version is in progress" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -235,7 +235,7 @@ describe Quizzes::QuizSubmission do
         expect(v.fudge_points).to eq 1
       end
 
-      it "should keep kept_score up-to-date when score changes while quiz is being re-taken" do
+      it "keeps kept_score up-to-date when score changes while quiz is being re-taken" do
         qs = @quiz.generate_submission(@user)
         qs.submission_data = { "question_1" => "2405" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -255,7 +255,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.kept_score).to eq 3
       end
 
-      it "should assign a grader for a submission update" do
+      it "assigns a grader for a submission update" do
         qs = @quiz.generate_submission(@student)
         qs.submission_data = { "question_1" => "2405" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -269,7 +269,7 @@ describe Quizzes::QuizSubmission do
         expect(qs.submission.reload.grader_id).to eq @user.id
       end
 
-      it "should save a new version of submission" do
+      it "saves a new version of submission" do
         qs = @quiz.generate_submission(@user)
         qs.submission_data = { "question_1" => "1658" }
         Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -341,7 +341,7 @@ describe Quizzes::QuizSubmission do
       end
     end
 
-    it "should not allowed grading on an already-graded submission" do
+    it "does not allowed grading on an already-graded submission" do
       q = @quiz.quiz_submissions.create!
       q.workflow_state = "complete"
       q.save!
@@ -380,7 +380,7 @@ describe Quizzes::QuizSubmission do
         @submission = @quiz_sub.submission
       end
 
-      it "it should adjust the fudge points" do
+      it "adjusts the fudge points" do
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
 
         @quiz_sub.reload
@@ -394,7 +394,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.grade).to eq "3"
       end
 
-      it "should use the explicit grade even if it isn't the highest score" do
+      it "uses the explicit grade even if it isn't the highest score" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
@@ -418,7 +418,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.grade).to eq "3"
       end
 
-      it "should not have manually_scored set when updated normally" do
+      it "does not have manually_scored set when updated normally" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
@@ -437,7 +437,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.grade).to eq "5"
       end
 
-      it "should add a version to the submission" do
+      it "adds a version to the submission" do
         @assignment.grade_student(@user, grade: 3, grader: @teacher)
         @submission.reload
         expect(@submission.versions.count).to eq 2
@@ -448,7 +448,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.score).to eq 6
       end
 
-      it "should only update the last completed quiz submission" do
+      it "onlies update the last completed quiz submission" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)
@@ -465,7 +465,7 @@ describe Quizzes::QuizSubmission do
       end
     end
 
-    it "should know if it is extendable" do
+    it "knows if it is extendable" do
       @quiz.update_attribute(:time_limit, 10)
       now = Time.now.utc
       q = @quiz.quiz_submissions.new
@@ -480,7 +480,7 @@ describe Quizzes::QuizSubmission do
       expect(q.extendable?).to be_falsey
     end
 
-    it "should calculate score based on quiz scoring policy" do
+    it "calculates score based on quiz scoring policy" do
       q = @course.quizzes.create!(:scoring_policy => "keep_latest")
       s = q.quiz_submissions.new
       s.workflow_state = "complete"
@@ -513,7 +513,7 @@ describe Quizzes::QuizSubmission do
       expect(s.kept_score).to eql(6.0)
     end
 
-    it "should calculate average score to a precision of 2" do
+    it "calculates average score to a precision of 2" do
       q = @course.quizzes.create!(scoring_policy: "keep_average")
       s = q.quiz_submissions.new
       s.workflow_state = "complete"
@@ -549,7 +549,7 @@ describe Quizzes::QuizSubmission do
       expect(s.kept_score).to eql(5.33)
     end
 
-    it "should calculate highest score based on most recent version of an attempt" do
+    it "calculates highest score based on most recent version of an attempt" do
       q = @course.quizzes.create!(:scoring_policy => "keep_highest")
       s = q.quiz_submissions.new
 
@@ -593,7 +593,7 @@ describe Quizzes::QuizSubmission do
         end
       end
 
-      it "should leave a submission in pending_review state if there are essay questions" do
+      it "leaves a submission in pending_review state if there are essay questions" do
         expect(@quiz_submission.submission.workflow_state).to eql 'pending_review'
       end
 
@@ -607,7 +607,7 @@ describe Quizzes::QuizSubmission do
                                        })
       end
 
-      it "should mark a submission as complete once an essay question has been graded" do
+      it "marks a submission as complete once an essay question has been graded" do
         grade_question(1)
         expect(@quiz_submission.submission.workflow_state).to eql 'graded'
       end
@@ -620,11 +620,11 @@ describe Quizzes::QuizSubmission do
         expect(enrollment.computed_current_score).to eq 0
       end
 
-      it "should increment the assignment needs_grading_count for pending_review state" do
+      it "increments the assignment needs_grading_count for pending_review state" do
         expect(@quiz.assignment.reload.needs_grading_count).to eq 1
       end
 
-      it "should not increment the assignment needs_grading_count if graded when a second attempt starts" do
+      it "does not increment the assignment needs_grading_count if graded when a second attempt starts" do
         @quiz_submission.update_scores({
                                          'context_id' => @course.id,
                                          'override_scores' => true,
@@ -639,7 +639,7 @@ describe Quizzes::QuizSubmission do
         expect(@quiz.assignment.reload.needs_grading_count).to eq 0
       end
 
-      it "should not decrement the assignment needs_grading_count if pending_review when a second attempt starts" do
+      it "does not decrement the assignment needs_grading_count if pending_review when a second attempt starts" do
         expect(@quiz.assignment.reload.needs_grading_count).to eq 1
         @quiz.generate_submission(@user)
         expect(@quiz_submission.reload).to be_untaken
@@ -675,7 +675,7 @@ describe Quizzes::QuizSubmission do
         end
       end
 
-      it "should not mark a submission complete if there are essay questions without grades" do
+      it "does not mark a submission complete if there are essay questions without grades" do
         @quiz_submission.update_scores({
                                          'context_id' => @course.id,
                                          'override_scores' => true,
@@ -687,7 +687,7 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission.workflow_state).to eql 'pending_review'
       end
 
-      it "should mark a submission complete if all essay questions have been graded" do
+      it "marks a submission complete if all essay questions have been graded" do
         @quiz_submission.update_scores({
                                          'context_id' => @course.id,
                                          'override_scores' => true,
@@ -699,7 +699,7 @@ describe Quizzes::QuizSubmission do
         expect(@quiz_submission.submission.workflow_state).to eql 'graded'
       end
 
-      it "should mark a submission complete if all essay questions have been graded, even if a text_only_question is present" do
+      it "marks a submission complete if all essay questions have been graded, even if a text_only_question is present" do
         quiz_with_graded_submission([{ :question_data => { :name => 'question 1', :points_possible => 1, 'question_type' => 'essay_question' } },
                                      { :question_data => { :name => 'question 2', :points_possible => 1, 'question_type' => 'text_only_question' } }]) do
           {
@@ -753,12 +753,12 @@ describe Quizzes::QuizSubmission do
         student_in_course
       end
 
-      it "should sync the score" do
+      it "syncs the score" do
         save_quiz_submission
         expect(submission.score).to be 5.0
       end
 
-      it "should not set graded_at to be in the future" do
+      it "does not set graded_at to be in the future" do
         save_quiz_submission
         expect(submission.graded_at.to_i).to be <= Time.zone.now.to_i
       end
@@ -799,19 +799,19 @@ describe Quizzes::QuizSubmission do
           @quiz.save!
         end
 
-        it "should be nil during first in-progress submission" do
+        it "is nil during first in-progress submission" do
           qs = @quiz.generate_submission(@student)
           expect(qs.score_to_keep).to be_nil
         end
 
-        it "should be the submission score for one complete submission" do
+        it "is the submission score for one complete submission" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
           expect(qs.score_to_keep).to eq @quiz.points_possible
         end
 
-        it "should be correct for multiple complete versions" do
+        it "is correct for multiple complete versions" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -821,7 +821,7 @@ describe Quizzes::QuizSubmission do
           expect(qs.score_to_keep).to eq @quiz.points_possible
         end
 
-        it "should be correct for multiple versions, current version in progress" do
+        it "is correct for multiple versions, current version in progress" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -839,19 +839,19 @@ describe Quizzes::QuizSubmission do
           @quiz.save!
         end
 
-        it "should be nil during first in-progress submission" do
+        it "is nil during first in-progress submission" do
           qs = @quiz.generate_submission(@student)
           expect(qs.score_to_keep).to be_nil
         end
 
-        it "should be the submission score for one complete submission" do
+        it "is the submission score for one complete submission" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
           expect(qs.score_to_keep).to eq @quiz.points_possible
         end
 
-        it "should be correct for multiple complete versions" do
+        it "is correct for multiple complete versions" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -861,7 +861,7 @@ describe Quizzes::QuizSubmission do
           expect(qs.score_to_keep).to eq 0
         end
 
-        it "should be correct for multiple versions, current version in progress" do
+        it "is correct for multiple versions, current version in progress" do
           qs = @quiz.generate_submission(@student)
           qs.submission_data = { "question_1" => "1658" }
           Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -875,7 +875,7 @@ describe Quizzes::QuizSubmission do
     end
 
     context "permissions" do
-      it "should allow read to observers" do
+      it "allows read to observers" do
         course_with_student(:active_all => true)
         @observer = user_factory
         oe = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
@@ -1211,7 +1211,7 @@ describe Quizzes::QuizSubmission do
         Quizzes::SubmissionGrader.new(submission).grade_submission
       end
 
-      it "should find regrade versions for a submission" do
+      it "finds regrade versions for a submission" do
         expect(submission.submitted_attempts.length).to eq 1
       end
     end
@@ -1220,7 +1220,7 @@ describe Quizzes::QuizSubmission do
       let(:quiz)       { @course.quizzes.create! }
       let(:submission) { quiz.quiz_submissions.new }
 
-      it "should find attempt versions for a submission" do
+      it "finds attempt versions for a submission" do
         submission.workflow_state = "complete"
         submission.score = 5.0
         submission.attempt = 1
@@ -1253,23 +1253,23 @@ describe Quizzes::QuizSubmission do
     end
 
     describe "#has_regrade?" do
-      it "should be true if score before regrade is present" do
+      it "is true if score before regrade is present" do
         expect(Quizzes::QuizSubmission.new(:score_before_regrade => 10).has_regrade?).to be_truthy
       end
 
-      it "should be false if score before regrade is absent" do
+      it "is false if score before regrade is absent" do
         expect(Quizzes::QuizSubmission.new.has_regrade?).to be_falsey
       end
     end
 
     describe "#score_affected_by_regrade?" do
-      it "should be true if score before regrade differs from current score" do
+      it "is true if score before regrade differs from current score" do
         submission = Quizzes::QuizSubmission.new(:score_before_regrade => 10)
         submission.kept_score = 5
         expect(submission.score_affected_by_regrade?).to be_truthy
       end
 
-      it "should be false if score before regrade is the same as current score" do
+      it "is false if score before regrade is the same as current score" do
         submission = Quizzes::QuizSubmission.new(:score_before_regrade => 10)
         submission.kept_score = 10
         expect(submission.score_affected_by_regrade?).to be_falsey
@@ -1401,7 +1401,7 @@ describe Quizzes::QuizSubmission do
         @submission.save
       end
 
-      it "should pass the date from the first version of the most recent attempt to quiz#questions_regraded_since" do
+      it "passes the date from the first version of the most recent attempt to quiz#questions_regraded_since" do
         expect(@submission.quiz).to receive(:questions_regraded_since)
         @submission.questions_regraded_since_last_attempt
       end
@@ -1545,19 +1545,19 @@ describe Quizzes::QuizSubmission do
         student_in_course(course: @course)
       end
 
-      it 'should create quiz submission event on new quiz submission' do
+      it 'creates quiz submission event on new quiz submission' do
         quiz_submission = @quiz.generate_submission(@student)
         event = quiz_submission.events.last
         expect(event.event_type).to eq('submission_created')
       end
 
-      it 'should not create quiz submission event on preview quiz submission' do
+      it 'does not create quiz submission event on preview quiz submission' do
         quiz_submission = @quiz.generate_submission(@student, true)
         event = quiz_submission.events.last
         expect(event).to be_nil
       end
 
-      it 'should be able to record quiz submission creation event' do
+      it 'is able to record quiz submission creation event' do
         quiz_submission = @quiz.quiz_submissions.create!
         quiz_submission.attempt = 1
         quiz_submission.quiz_version = 1
@@ -1628,13 +1628,13 @@ describe Quizzes::QuizSubmission do
         @ignore = Ignore.create!(user: @student, asset: @quiz, purpose: 'submitting')
       end
 
-      it 'should delete ignores when the user completes the submission' do
+      it 'deletes ignores when the user completes the submission' do
         qs = @quiz.generate_submission(@student)
         qs.complete!
         expect { @ignore.reload }.to raise_error ActiveRecord::RecordNotFound
       end
 
-      it 'should not delete ignores when the quiz submission is updated, but not completed' do
+      it 'does not delete ignores when the quiz submission is updated, but not completed' do
         @quiz.generate_submission(@student)
         expect(@ignore.reload).to eq @ignore
       end
@@ -1669,12 +1669,12 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#time_spent" do
-    it "should return nil if there's no finished_at" do
+    it "returns nil if there's no finished_at" do
       subject.finished_at = nil
       expect(subject.time_spent).to be_nil
     end
 
-    it "should return the correct time spent in seconds" do
+    it "returns the correct time spent in seconds" do
       anchor = Time.now
 
       subject.started_at = anchor
@@ -1682,7 +1682,7 @@ describe Quizzes::QuizSubmission do
       expect(subject.time_spent).to eql(1.hour.to_i)
     end
 
-    it "should account for extra time" do
+    it "accounts for extra time" do
       anchor = Time.now
 
       subject.started_at = anchor
@@ -1694,12 +1694,12 @@ describe Quizzes::QuizSubmission do
   end
 
   describe "#time_left" do
-    it "should return nil if there's no end_at" do
+    it "returns nil if there's no end_at" do
       subject.end_at = nil
       expect(subject.time_left).to be_nil
     end
 
-    it "should return the correct time left in seconds" do
+    it "returns the correct time left in seconds" do
       subject.end_at = 1.hour.from_now
       expect(subject.time_left).to eql(60 * 60)
     end
@@ -1712,12 +1712,12 @@ describe Quizzes::QuizSubmission do
         allow(subject).to receive(:end_at_without_time_limit).and_return(2.hours.from_now)
       end
 
-      it "should return the correct soft (when the Attempt will timeout) time left" do
+      it "returns the correct soft (when the Attempt will timeout) time left" do
         expect(subject.quiz).to_not receive(:timer_autosubmit_disabled?)
         expect(subject.time_left).to eql(60 * 60)
       end
 
-      it "should return the correct hard (when the Quiz is due) time left" do
+      it "returns the correct hard (when the Quiz is due) time left" do
         expect(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
         expect(subject.time_left(hard: true)).to eql(120 * 60)
       end
@@ -1732,17 +1732,17 @@ describe Quizzes::QuizSubmission do
       allow(subject).to receive(:untaken?).and_return(true)
     end
 
-    it "should return true if strictly overdue?" do
+    it "returns true if strictly overdue?" do
       expect(subject).to receive(:overdue?).with(true).and_return(true)
       expect(subject.overdue_and_needs_submission?(true)).to be(true)
     end
 
-    it "should return false if untaken" do
+    it "returns false if untaken" do
       expect(subject).to receive(:untaken?).and_return(false)
       expect(subject.overdue_and_needs_submission?).to be(false)
     end
 
-    it "should return true if untaken and end_at is past" do
+    it "returns true if untaken and end_at is past" do
       expect(subject.overdue_and_needs_submission?).to be(true)
     end
 
@@ -1751,12 +1751,12 @@ describe Quizzes::QuizSubmission do
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
 
-      it "should return false when date is future" do
+      it "returns false when date is future" do
         allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.from_now)
         expect(subject.overdue_and_needs_submission?).to be(false)
       end
 
-      it "should return true when date is past" do
+      it "returns true when date is past" do
         allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.ago)
         expect(subject.overdue_and_needs_submission?).to be(true)
       end
@@ -1769,7 +1769,7 @@ describe Quizzes::QuizSubmission do
       subject.quiz = @course.quizzes.create!
     end
 
-    it "should allow a 1 minute grace if strict" do
+    it "allows a 1 minute grace if strict" do
       subject.end_at = 50.seconds.ago
       expect(subject.overdue?(true)).to be(false)
 
@@ -1780,7 +1780,7 @@ describe Quizzes::QuizSubmission do
       expect(subject.overdue?(true)).to be(true)
     end
 
-    it "should allow a 5 minute grace if not strict" do
+    it "allows a 5 minute grace if not strict" do
       subject.end_at = 3.minutes.ago
       expect(subject.overdue?).to be(false)
 
@@ -1788,7 +1788,7 @@ describe Quizzes::QuizSubmission do
       expect(subject.overdue?).to be(true)
     end
 
-    it "should use end_at by default" do
+    it "uses end_at by default" do
       expect(subject).to_not receive(:end_at_without_time_limit)
 
       subject.end_at = 3.minutes.ago
@@ -1804,12 +1804,12 @@ describe Quizzes::QuizSubmission do
         allow(subject.quiz).to receive(:timer_autosubmit_disabled?).and_return(true)
       end
 
-      it "should return false when date is future" do
+      it "returns false when date is future" do
         allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.from_now)
         expect(subject.overdue?).to be(false)
       end
 
-      it "should return true when date is past" do
+      it "returns true when date is past" do
         allow(subject).to receive(:end_at_without_time_limit).and_return(1.hour.ago)
         expect(subject.overdue?).to be(true)
       end
@@ -1817,33 +1817,33 @@ describe Quizzes::QuizSubmission do
   end
 
   describe '#retriable?' do
-    it 'should not be retriable by default' do
+    it 'is not retriable by default' do
       allow(subject).to receive(:attempts_left).and_return 0
       expect(subject.retriable?).to be_falsey
     end
 
-    it 'should not be retriable unless it is complete' do
+    it 'is not retriable unless it is complete' do
       allow(subject).to receive(:attempts_left).and_return 3
       expect(subject.retriable?).to be_falsey
     end
 
-    it 'should be retriable if it is a preview QS' do
+    it 'is retriable if it is a preview QS' do
       subject.workflow_state = 'preview'
       expect(subject.retriable?).to be_truthy
     end
 
-    it 'should be retriable if it is a settings only QS' do
+    it 'is retriable if it is a settings only QS' do
       subject.workflow_state = 'settings_only'
       expect(subject.retriable?).to be_truthy
     end
 
-    it 'should be retriable if it is complete and has attempts left to spare' do
+    it 'is retriable if it is complete and has attempts left to spare' do
       subject.workflow_state = 'complete'
       allow(subject).to receive(:attempts_left).and_return 3
       expect(subject.retriable?).to be_truthy
     end
 
-    it 'should be retriable if it is complete and the quiz has unlimited attempts' do
+    it 'is retriable if it is complete and the quiz has unlimited attempts' do
       subject.workflow_state = 'complete'
       allow(subject).to receive(:attempts_left).and_return 0
       subject.quiz = Quizzes::Quiz.new
@@ -1858,7 +1858,7 @@ describe Quizzes::QuizSubmission do
       subject.attempt = 1
     end
 
-    it 'should generate a snapshot' do
+    it 'generates a snapshot' do
       snapshot_data = { 'question_5_marked' => true }
 
       expect(Quizzes::QuizSubmissionSnapshot).to receive(:create).with({
@@ -1870,7 +1870,7 @@ describe Quizzes::QuizSubmission do
       subject.snapshot! snapshot_data
     end
 
-    it 'should generate a full snapshot' do
+    it 'generates a full snapshot' do
       allow(subject).to receive(:submission_data).and_return({
                                                                'question_5' => 100
                                                              })
@@ -1888,7 +1888,7 @@ describe Quizzes::QuizSubmission do
   end
 
   describe '#points_possible_at_submission_time' do
-    it 'should work' do
+    it 'works' do
       quiz_with_graded_submission([
                                     {
                                       question_data: {
@@ -1919,11 +1919,11 @@ describe Quizzes::QuizSubmission do
     let(:quiz_submission) do
       Quizzes::QuizSubmission.new
     end
-    it 'should return submission.excused?' do
+    it 'returns submission.excused?' do
       quiz_submission.submission = submission
       expect(quiz_submission.excused?).to eq submission.excused?
     end
-    it 'should function without valid submission' do
+    it 'functions without valid submission' do
       expect(quiz_submission.excused?).to eq nil
     end
   end

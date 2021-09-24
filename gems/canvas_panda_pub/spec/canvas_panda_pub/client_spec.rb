@@ -50,7 +50,7 @@ describe CanvasPandaPub::Client do
   end
 
   describe "push" do
-    it "should fire an HTTP request to post a message" do
+    it "fires an HTTP request to post a message" do
       stub = stub_request(:post, "http://pandapub.example.com/channel/qwerty/foo")
              .with(basic_auth: ['key', 'secret'], body: '{"a":1}')
 
@@ -63,7 +63,7 @@ describe CanvasPandaPub::Client do
   end
 
   describe "generate_token" do
-    it "should generate a token" do
+    it "generates a token" do
       expires = Time.now + 60
       token = @client.generate_token "/foo", true, true, expires
       payload, _ = JSON::JWT.decode(token, "secret")

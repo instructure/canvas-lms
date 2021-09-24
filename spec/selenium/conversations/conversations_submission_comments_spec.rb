@@ -131,7 +131,7 @@ describe "conversations new" do
           expect(f('#submission-reply-btn')).to be_present
         end
 
-        it 'should show replies in the submission comments', priority: "2", test_id: pick_test_id(context, student: "2642301", teacher: "2642303") do
+        it 'shows replies in the submission comments', priority: "2", test_id: pick_test_id(context, student: "2642301", teacher: "2642303") do
           reply_to_submission_comment
           expect(ffj('.message-item-view').length).to eq (3)
           expect(@submission.submission_comments.count).to eq(3)

@@ -29,7 +29,7 @@ describe 'Global Navigation' do
       course_with_teacher_logged_in
     end
 
-    it 'should minimize and expand the global nav when clicked' do
+    it 'minimizes and expand the global nav when clicked' do
       get "/"
       primary_nav_toggle = f('#primaryNavToggle')
       primary_nav_toggle.click
@@ -41,7 +41,7 @@ describe 'Global Navigation' do
     end
 
     describe 'Profile Link' do
-      it 'should show the profile tray upon clicking' do
+      it 'shows the profile tray upon clicking' do
         get "/"
         # Profile links are hardcoded, so check that something is appearing for
         # the display_name in the tray header using the displayed_username helper
@@ -51,14 +51,14 @@ describe 'Global Navigation' do
     end
 
     describe 'Courses Link' do
-      it 'should show the courses tray upon clicking' do
+      it 'shows the courses tray upon clicking' do
         get "/"
         f('#global_nav_courses_link').click
         wait_for_ajaximations
         expect(f("[aria-label='Courses tray']")).to be_displayed
       end
 
-      it 'should populate the courses tray when using the keyboard to open it' do
+      it 'populates the courses tray when using the keyboard to open it' do
         get "/"
         driver.execute_script('$("#global_nav_courses_link").focus()')
         f('#global_nav_courses_link').send_keys(:enter)
@@ -92,7 +92,7 @@ describe 'Global Navigation' do
     end
 
     describe 'LTI Tools' do
-      it 'should show a custom logo/link for LTI tools' do
+      it 'shows a custom logo/link for LTI tools' do
         @tool = Account.default.context_external_tools.new({
                                                              :name => "Commons",
                                                              :domain => "canvaslms.com",
@@ -125,14 +125,14 @@ describe 'Global Navigation' do
                       asset_code: @quiz.asset_string
       end
 
-      it 'should show the Recent History tray upon clicking' do
+      it 'shows the Recent History tray upon clicking' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
         expect(f("[aria-label='Recent History tray']")).to be_displayed
       end
 
-      it 'should show recent history items on Recent History tray' do
+      it 'shows recent history items on Recent History tray' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
@@ -141,7 +141,7 @@ describe 'Global Navigation' do
         expect(navigation_element_list[1].attribute('aria-label')).to eq('another assessment, Assignment')
       end
 
-      it 'should include recent history assignment link' do
+      it 'includes recent history assignment link' do
         get "/"
         f("#global_nav_history_link").click
         wait_for_ajaximations
@@ -151,13 +151,13 @@ describe 'Global Navigation' do
     end
 
     describe 'dashboard and courses links' do
-      it 'should be called dashboard and courses with k5 off' do
+      it 'is called dashboard and courses with k5 off' do
         get "/courses/#{@course.id}"
         expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Dashboard'
         expect(f('#global_nav_courses_link .menu-item__text').text).to eq 'Courses'
       end
 
-      it 'should be called homeroom and subjects with k5 on' do
+      it 'is called homeroom and subjects with k5 on' do
         toggle_k5_setting(@course.account)
         get "/courses/#{@course.id}"
         expect(f('#global_nav_dashboard_link .menu-item__text').text).to eq 'Home'

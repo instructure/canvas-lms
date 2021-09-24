@@ -72,35 +72,35 @@ RSpec.shared_examples "course_files" do
       user
     end
 
-    it "should verify that the profile picture is submitted " do
+    it "verifies that the profile picture is submitted" do
       user = create_avatar_state
       verify_avatar_state(user)
     end
 
-    it "should verify that the profile picture is reported " do
+    it "verifies that the profile picture is reported" do
       user = create_avatar_state("reported")
       opts = { "#reported_profile" => "Reported 1" }
       verify_avatar_state(user, opts)
     end
 
-    it "should verify that the profile picture is approved, re-reported " do
+    it "verifies that the profile picture is approved, re-reported" do
       user = create_avatar_state("re_reported")
       opts = { "#re_reported_profile" => "Re-Reported 1" }
       verify_avatar_state(user, opts)
     end
 
-    it "should verify that all profile pictures are displayed " do
+    it "verifies that all profile pictures are displayed" do
       user = create_avatar_state
       opts = { "#any_profile" => "All 1" }
       verify_avatar_state(user, opts)
     end
 
-    it "should lock the avatar state " do
+    it "locks the avatar state" do
       user = create_avatar_state
       lock_avatar(user, f("#any_profile"))
     end
 
-    it "should unlock the avatar state " do
+    it "unlocks the avatar state" do
       user = create_avatar_state
       user = lock_avatar(user, f("#any_profile"))
       f(".links .unlock_avatar_link").click
@@ -110,7 +110,7 @@ RSpec.shared_examples "course_files" do
       expect(f(".links .lock_avatar_link")).to be_displayed
     end
 
-    it "should approve un-approved avatar" do
+    it "approves un-approved avatar" do
       user = create_avatar_state
       expect(user.avatar_state).to eq :submitted
       f(".links .approve_avatar_link").click
@@ -119,7 +119,7 @@ RSpec.shared_examples "course_files" do
       expect(user.avatar_state).to eq :approved
       expect(f(".links .approve_avatar_link")).not_to be_displayed
     end
-    it "should delete the avatar" do
+    it "deletes the avatar" do
       user = create_avatar_state
       f("#any_profile").click
       f(".links .reject_avatar_link").click
@@ -141,7 +141,7 @@ RSpec.shared_examples "course_files" do
         Gradebook::Cells.student_cell_name_link(@student).click
       end
 
-      it "should display student avatar in tray", priority: "1", test_id: 3299466 do
+      it "displays student avatar in tray", priority: "1", test_id: 3299466 do
         wait_for_student_tray
 
         expect(student_avatar_link).to be_displayed

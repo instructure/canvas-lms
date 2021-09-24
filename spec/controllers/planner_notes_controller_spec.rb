@@ -33,7 +33,7 @@ describe PlannerNotesController do
   end
 
   context "unauthenticated" do
-    it "should return unauthorized" do
+    it "returns unauthorized" do
       get :index
       assert_unauthorized
 
@@ -103,14 +103,14 @@ describe PlannerNotesController do
           expect(all_notes.pluck("id").sort).to eq [@student_note.id, @course_1_note.id, @course_2_note.id].sort
         end
 
-        it 'should 400 for bad start dates' do
+        it '400S for bad start dates' do
           get :index, params: { start_date: '123-456-7890' }
           expect(response.code).to eq '400'
           json = json_parse(response.body)
           expect(json['errors']).to eq 'Invalid date or datetime for start_date'
         end
 
-        it 'should 400 for bad end dates' do
+        it '400S for bad end dates' do
           get :index, params: { end_date: '5678-90' }
           expect(response.code).to eq '400'
           json = json_parse(response.body)

@@ -302,7 +302,7 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].params['resource_link_id']).to eq opaque_id(@course)
       end
 
-      it "should remove query params when post_only is set" do
+      it "removes query params when post_only is set" do
         user_session(@teacher)
         tool = @tool
         tool.settings['post_only'] = 'true'
@@ -312,7 +312,7 @@ describe ExternalToolsController do
         expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
       end
 
-      it "should not remove query params when post_only is not set" do
+      it "does not remove query params when post_only is not set" do
         user_session(@teacher)
         tool = @tool
         tool.url = "http://www.example.com/basic_lti?first=john&last=smith"
@@ -871,14 +871,14 @@ describe ExternalToolsController do
       end
     end
 
-    it "should require authentication" do
+    it "requires authentication" do
       user_model
       user_session(@user)
       get 'retrieve', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should find tools matching by exact url" do
+    it "finds tools matching by exact url" do
       user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
       tool.url = "http://www.example.com/basic_lti"
@@ -889,7 +889,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params).not_to be_nil
     end
 
-    it "should find tools matching by domain" do
+    it "finds tools matching by domain" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com/basic_lti" }
@@ -898,14 +898,14 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params).not_to be_nil
     end
 
-    it "should redirect if no matching tools are found" do
+    it "redirects if no matching tools are found" do
       user_session(@teacher)
       get 'retrieve', params: { :course_id => @course.id, :url => "http://www.example.com" }
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Couldn't find valid settings for this link"
     end
 
-    it "should return a variable expansion for a collaboration" do
+    it "returns a variable expansion for a collaboration" do
       user_session(@teacher)
       collab = ExternalToolCollaboration.new(
         title: "my collab",
@@ -931,7 +931,7 @@ describe ExternalToolsController do
       expect(response).to be_unauthorized
     end
 
-    it "should remove query params when post_only is set" do
+    it "removes query params when post_only is set" do
       u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
@@ -942,7 +942,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].resource_url).to eq 'http://www.example.com/basic_lti'
     end
 
-    it "should not remove query params when post_only is not set" do
+    it "does not remove query params when post_only is not set" do
       u = user_factory(active_all: true)
       account.account_users.create!(user: u)
       user_session(@user)
@@ -1182,21 +1182,21 @@ describe ExternalToolsController do
   end
 
   describe "GET 'resource_selection'" do
-    it "should require authentication" do
+    it "requires authentication" do
       user_model
       user_session(@user)
       get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => 0 }
       assert_unauthorized
     end
 
-    it "should be accessible by students" do
+    it "is accessible by students" do
       user_session(@student)
       tool = new_valid_tool(@course)
       get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
       expect(response).to be_successful
     end
 
-    it "should redirect if no matching tools are found" do
+    it "redirects if no matching tools are found" do
       user_session(@teacher)
       tool = @course.context_external_tools.new(:name => "bob", :consumer_key => "bob", :shared_secret => "bob")
       tool.url = "http://www.example.com/basic_lti"
@@ -1207,7 +1207,7 @@ describe ExternalToolsController do
       expect(flash[:error]).to eq "Couldn't find valid settings for this tool"
     end
 
-    it "should find a valid tool if one exists" do
+    it "finds a valid tool if one exists" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       get 'resource_selection', params: { :course_id => @course.id, :external_tool_id => tool.id }
@@ -1216,7 +1216,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'active'
     end
 
-    it "should set html selection if specified" do
+    it "sets html selection if specified" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       html = "<img src='/blank.png'/>"
@@ -1226,7 +1226,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['text']).to eq CGI::escape(html)
     end
 
-    it "should find account-level tools" do
+    it "finds account-level tools" do
       @user = account_admin_user
       user_session(@user)
 
@@ -1236,7 +1236,7 @@ describe ExternalToolsController do
       expect(assigns[:tool]).to eq tool
     end
 
-    it "should be accessible even after course is soft-concluded" do
+    it "is accessible even after course is soft-concluded" do
       user_session(@student)
       @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
@@ -1250,7 +1250,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
 
-    it "should be accessible even after course is hard-concluded" do
+    it "is accessible even after course is hard-concluded" do
       user_session(@student)
       @course.complete
 
@@ -1261,7 +1261,7 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_canvas_enrollment_state']).to eq 'inactive'
     end
 
-    it "should be accessible even after enrollment is concluded and include a parameter indicating inactive state" do
+    it "is accessible even after enrollment is concluded and include a parameter indicating inactive state" do
       user_session(@student)
       e = @student.enrollments.first
       e.conclude
@@ -1459,24 +1459,24 @@ describe ExternalToolsController do
       end
     end
 
-    it "should require authentication" do
+    it "requires authentication" do
       post 'create', params: { :course_id => @course.id }, :format => "json"
       assert_status(401)
     end
 
-    it "should not create tool if user lacks create_tool_manually" do
+    it "does not create tool if user lacks create_tool_manually" do
       user_session(@student)
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       assert_status(401)
     end
 
-    it "should create tool if user is granted create_tool_manually" do
+    it "creates tool if user is granted create_tool_manually" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       assert_status(200)
     end
 
-    it "should accept basic configurations" do
+    it "accepts basic configurations" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :external_tool => { :name => "tool name", :url => "http://example.com", :consumer_key => "key", :shared_secret => "secret" } }, :format => "json"
       expect(response).to be_successful
@@ -1515,7 +1515,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].settings[:oauth_compliant]).to equal true
     end
 
-    it "should fail on basic xml with no url or domain set" do
+    it "fails on basic xml with no url or domain set" do
       user_session(@teacher)
       xml = <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1541,7 +1541,7 @@ describe ExternalToolsController do
       expect(response).not_to be_successful
     end
 
-    it "should handle advanced xml configurations" do
+    it "handles advanced xml configurations" do
       user_session(@teacher)
       xml = <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1589,7 +1589,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].settings[:oauth_compliant]).to be_truthy
     end
 
-    it "should handle advanced xml configurations with no url or domain set" do
+    it "handles advanced xml configurations with no url or domain set" do
       user_session(@teacher)
       xml = <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1631,7 +1631,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
     end
 
-    it "should handle advanced xml configurations by URL retrieval" do
+    it "handles advanced xml configurations by URL retrieval" do
       user_session(@teacher)
       xml = <<~XML
         <?xml version="1.0" encoding="UTF-8"?>
@@ -1676,7 +1676,7 @@ describe ExternalToolsController do
       expect(assigns[:tool].has_placement?(:editor_button)).to be_truthy
     end
 
-    it "should fail gracefully on invalid URL retrieval or timeouts" do
+    it "fails gracefully on invalid URL retrieval or timeouts" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       user_session(@teacher)
       xml = "bob"
@@ -1687,7 +1687,7 @@ describe ExternalToolsController do
       expect(json['errors']['config_url'][0]['message']).to eq I18n.t(:retrieve_timeout, 'could not retrieve configuration, the server response timed out')
     end
 
-    it "should fail gracefully trying to retrieve from localhost" do
+    it "fails gracefully trying to retrieve from localhost" do
       expect(CanvasHttp).to receive(:insecure_host?).with("localhost").and_return(true)
       user_session(@teacher)
       xml = "bob"
@@ -1701,7 +1701,7 @@ describe ExternalToolsController do
     end
 
     context "navigation tabs caching" do
-      it "shouldn't clear the navigation tabs cache for non navigtaion tools" do
+      it "does not clear the navigation tabs cache for non navigtaion tools" do
         enable_cache do
           user_session(@teacher)
           nav_cache = Lti::NavigationCache.new(@course.root_account)
@@ -1732,7 +1732,7 @@ describe ExternalToolsController do
         end
       end
 
-      it 'should clear the navigation tabs cache for course nav' do
+      it 'clears the navigation tabs cache for course nav' do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
@@ -1766,7 +1766,7 @@ describe ExternalToolsController do
         end
       end
 
-      it 'should clear the navigation tabs cache for account nav' do
+      it 'clears the navigation tabs cache for account nav' do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key
@@ -1800,7 +1800,7 @@ describe ExternalToolsController do
         end
       end
 
-      it 'should clear the navigation tabs cache for user nav' do
+      it 'clears the navigation tabs cache for user nav' do
         enable_cache do
           user_session(@teacher)
           cache_key = Lti::NavigationCache.new(@course.root_account).cache_key

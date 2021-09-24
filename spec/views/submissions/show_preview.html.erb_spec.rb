@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/submissions/show_preview" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment")
@@ -32,7 +32,7 @@ describe "/submissions/show_preview" do
     expect(response).not_to be_nil
   end
 
-  it "should load an lti launch" do
+  it "loads an lti launch" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "external assignment", :submission_types => 'basic_lti_launch')
@@ -43,7 +43,7 @@ describe "/submissions/show_preview" do
     expect(response.body).to match(/.*www\.example\.com.*/)
   end
 
-  it "should give a user-friendly explanation why there's no preview" do
+  it "gives a user-friendly explanation why there's no preview" do
     course_with_student
     view_context
     a = @course.assignments.create!(:title => "some assignment", :submission_types => 'on_paper')

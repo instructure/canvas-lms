@@ -35,7 +35,7 @@ describe "authentication_providers/index" do
     @presenter = assign(:presenter, AuthenticationProvidersPresenter.new(account))
   end
 
-  it "should list the auth ips" do
+  it "lists the auth ips" do
     Setting.set('account_authorization_config_ip_addresses', "192.168.0.1,192.168.0.2")
     account.authentication_providers.scope.delete_all
     account.authentication_providers = [
@@ -46,7 +46,7 @@ describe "authentication_providers/index" do
     expect(response.body).to match("192.168.0.1\n192.168.0.2")
   end
 
-  it "should display the last_timeout_failure" do
+  it "displays the last_timeout_failure" do
     account.authentication_providers.scope.delete_all
     timed_out_aac = account.authentication_providers.create!(auth_type: 'ldap')
     account.authentication_providers = [
@@ -61,7 +61,7 @@ describe "authentication_providers/index" do
     expect(doc.css('.last_timeout_failure').length).to eq 1
   end
 
-  it "should display more than 2 LDAP configs" do
+  it "displays more than 2 LDAP configs" do
     account.authentication_providers.scope.delete_all
     4.times do
       account.authentication_providers.create!(auth_type: 'ldap')

@@ -46,7 +46,7 @@ describe ModeratedGrading::NullProvisionalGrade do
     end
   end
 
-  it "should return the original submission's submission comments" do
+  it "returns the original submission's submission comments" do
     sub = double
     comments = double
     expect(sub).to receive(:submission_comments).and_return(comments)

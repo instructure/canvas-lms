@@ -55,7 +55,7 @@ describe LtiApiController, type: :request do
          headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
-  it "should generate a logout service URL with token" do
+  it "generates a logout service URL with token" do
     p = pseudonym(@student)
     user_session(@student, p)
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
@@ -69,13 +69,13 @@ describe LtiApiController, type: :request do
     expect(token.pseudonym).to eql(p)
   end
 
-  it "should reject an invalid secret" do
+  it "rejects an invalid secret" do
     make_call('secret' => 'not secret')
     expect(response.status).to eql 401
     expect(response.body).to match /Invalid authorization header/
   end
 
-  it "should reject an invalid token" do
+  it "rejects an invalid token" do
     token_parts = Lti::LogoutService.create_token(@tool, @pseudonym).split('-')
     # falsify the pseudonym to try and get notified when somebody else logs out
     token_parts[1] = (token_parts[1].to_i + 1).to_s
@@ -84,7 +84,7 @@ describe LtiApiController, type: :request do
     expect(response.body).to match /Invalid logout service token/
   end
 
-  it "should reject an expired token" do
+  it "rejects an expired token" do
     token = Timecop.freeze(15.minutes.ago) do
       Lti::LogoutService.create_token(@tool, @pseudonym)
     end
@@ -93,7 +93,7 @@ describe LtiApiController, type: :request do
     expect(response.body).to match /Logout service token has expired/
   end
 
-  it "should register callbacks" do
+  it "registers callbacks" do
     enable_cache do
       token1 = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token1, 'http://logout.notify.example.com/123'))
@@ -106,7 +106,7 @@ describe LtiApiController, type: :request do
     end
   end
 
-  it "should reject reused tokens" do
+  it "rejects reused tokens" do
     enable_cache do
       token = Lti::LogoutService.create_token(@tool, @pseudonym)
       make_call('path' => api_path(token, 'http://logout.notify.example.com/123'))
@@ -117,7 +117,7 @@ describe LtiApiController, type: :request do
     end
   end
 
-  it "should call registered callbacks when the user logs out" do
+  it "calls registered callbacks when the user logs out" do
     enable_cache do
       login_as 'parajsa', 'password1'
       token = Lti::LogoutService::Token.create(@tool, @pseudonym)

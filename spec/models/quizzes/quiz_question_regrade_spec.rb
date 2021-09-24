@@ -38,7 +38,7 @@ describe Quizzes::QuizQuestionRegrade do
   end
 
   describe "#question_data" do
-    it "should delegate to quiz question" do
+    it "delegates to quiz question" do
       question = Quizzes::QuizQuestion.new
       allow(question).to receive_messages(:question_data => "foo")
 

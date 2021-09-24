@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe ConversationParticipant do
-  it "should correctly set up conversations" do
+  it "correctlies set up conversations" do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
@@ -33,7 +33,7 @@ describe ConversationParticipant do
     expect(convo.messages.size).to eq 1
   end
 
-  it "should not decrement unread_conversations_count to a negative number" do
+  it "does not decrement unread_conversations_count to a negative number" do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
@@ -48,7 +48,7 @@ describe ConversationParticipant do
     expect(recipient.unread_conversations_count).to eq 0
   end
 
-  it "should correctly manage messages" do
+  it "correctlies manage messages" do
     sender = user_factory
     recipient = user_factory
     convo = sender.initiate_conversation([recipient])
@@ -80,7 +80,7 @@ describe ConversationParticipant do
     expect(rconvo.all_messages.size).to eq 1
   end
 
-  it "should update the updated_at stamp of its user on workflow_state change" do
+  it "updates the updated_at stamp of its user on workflow_state change" do
     sender       = user_factory
     recipient    = user_factory
     updated_at   = sender.updated_at
@@ -89,7 +89,7 @@ describe ConversationParticipant do
     expect(sender.reload.updated_at).not_to eql updated_at
   end
 
-  it "should support starred/starred=" do
+  it "supports starred/starred=" do
     sender       = user_factory
     recipient    = user_factory
     conversation = sender.initiate_conversation([recipient])
@@ -105,7 +105,7 @@ describe ConversationParticipant do
     expect(conversation.starred).to be_falsey
   end
 
-  it "should support :starred in update" do
+  it "supports :starred in update" do
     sender       = user_factory
     recipient    = user_factory
     conversation = sender.initiate_conversation([recipient])
@@ -144,46 +144,46 @@ describe ConversationParticipant do
       @c8 = conversation_for("course_1", @u1, user_factory)
     end
 
-    it "should return conversations that match the given course" do
+    it "returns conversations that match the given course" do
       expect(@me.conversations.tagged("course_1").sort_by(&:id)).to eql [@c1, @c2, @c8]
     end
 
-    it "should return conversations that match any of the given courses" do
+    it "returns conversations that match any of the given courses" do
       expect(@me.conversations.tagged("course_1", "course_2").sort_by(&:id)).to eql [@c1, @c2, @c3, @c8]
     end
 
-    it "should return conversations that match all of the given courses" do
+    it "returns conversations that match all of the given courses" do
       expect(@me.conversations.tagged("course_1", "course_2", :mode => :and).sort_by(&:id)).to eql [@c2]
     end
 
-    it "should return conversations that match the given group" do
+    it "returns conversations that match the given group" do
       expect(@me.conversations.tagged("group_1").sort_by(&:id)).to eql [@c4]
     end
 
-    it "should return conversations that match the given user" do
+    it "returns conversations that match the given user" do
       expect(@me.conversations.tagged(@u1.asset_string).sort_by(&:id)).to eql [@c5, @c7, @c8]
     end
 
-    it "should return conversations that match any of the given users" do
+    it "returns conversations that match any of the given users" do
       expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string).sort_by(&:id)).to eql [@c5, @c6, @c7, @c8]
     end
 
-    it "should return conversations that match all of the given users" do
+    it "returns conversations that match all of the given users" do
       expect(@me.conversations.tagged(@u1.asset_string, @u2.asset_string, :mode => :and).sort_by(&:id)).to eql [@c7]
     end
 
-    it "should return conversations that match either the given course or user" do
+    it "returns conversations that match either the given course or user" do
       expect(@me.conversations.tagged(@u1.asset_string, "course_1").sort_by(&:id)).to eql [@c1, @c2, @c5, @c7, @c8]
     end
 
-    it "should return conversations that match both the given course and user" do
+    it "returns conversations that match both the given course and user" do
       expect(@me.conversations.tagged(@u1.asset_string, "course_1", :mode => :and).sort_by(&:id)).to eql [@c8]
     end
 
     context "sharding" do
       specs_require_sharding
 
-      it "should find conversations for users on different shards" do
+      it "finds conversations for users on different shards" do
         @shard1.activate do
           @u3 = user_factory
           @c9 = conversation_for(@u3)
@@ -218,7 +218,7 @@ describe ConversationParticipant do
       @c4.add_message("sekrit", :root_account_id => @a3.id)
     end
 
-    it "should let site admins see everything" do
+    it "lets site admins see everything" do
       Account.site_admin.account_users.create!(user: @admin_user)
       allow(Account.site_admin).to receive(:grants_right?).with(@admin_user, :become_user).and_return(false)
       convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
@@ -226,7 +226,7 @@ describe ConversationParticipant do
       expect(convos).to eq @target_user.conversations.to_a
     end
 
-    it "should limit others to their associated root accounts" do
+    it "limits others to their associated root accounts" do
       convos = @target_user.conversations.for_masquerading_user(@admin_user, @target_user)
       expect(convos.size).to eql 2
       expect(convos.sort_by(&:id)).to eql [@c1, @c2]
@@ -255,7 +255,7 @@ describe ConversationParticipant do
       end
     end
 
-    it "should not include shared contexts by default" do
+    it "does not include shared contexts by default" do
       users = @convo.reload.participants
       users.each do |user|
         next if user == @me
@@ -264,12 +264,12 @@ describe ConversationParticipant do
       end
     end
 
-    it "should not include forwarded participants by default" do
+    it "does not include forwarded participants by default" do
       users = @convo.reload.participants
       expect(users).to have_same_ids [@me, @u1, @u2, @u3]
     end
 
-    it "should include shared contexts if requested" do
+    it "includes shared contexts if requested" do
       users = @convo.reload.participants(:include_participant_contexts => true)
       address_book = @me.address_book
       users.each do |user|
@@ -285,12 +285,12 @@ describe ConversationParticipant do
       end
     end
 
-    it "should include include forwarded participants if requested" do
+    it "includes include forwarded participants if requested" do
       users = @convo.reload.participants(:include_indirect_participants => true)
       expect(users).to have_same_ids [@me, @u1, @u2, @u3, @u4]
     end
 
-    it "should cache participants per conversation" do
+    it "caches participants per conversation" do
       allow(Rails.cache).to receive(:fetch) do |key, &block|
         expect(key).to eq([@convo.conversation, 'participants'].cache_key)
         expect(block.call).to have_same_ids([@me, @u1, @u2, @u3])
@@ -298,7 +298,7 @@ describe ConversationParticipant do
       @convo.participants
     end
 
-    it "should cache indirect participants per conversation and user" do
+    it "caches indirect participants per conversation and user" do
       expect(Rails.cache).to receive(:fetch).with([@convo.conversation, @convo.user, 'indirect_participants'].cache_key)
       allow(Rails.cache).to receive(:fetch) do |key, &block; users|
         users = block.call
@@ -317,7 +317,7 @@ describe ConversationParticipant do
       @user2 = user_model
     end
 
-    it "should move a group conversation to the new user" do
+    it "moves a group conversation to the new user" do
       enable_cache do
         c = @user1.initiate_conversation([user_factory, user_factory])
         c.add_message("hello")
@@ -335,7 +335,7 @@ describe ConversationParticipant do
       end
     end
 
-    it "should clean up group conversations having both users" do
+    it "cleans up group conversations having both users" do
       c = @user1.initiate_conversation([@user2, user_factory, user_factory])
       c.add_message("hello")
       c.update_attribute(:workflow_state, 'unread')
@@ -354,7 +354,7 @@ describe ConversationParticipant do
       expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
-    it "should move a private conversation to the new user" do
+    it "moves a private conversation to the new user" do
       c = @user1.initiate_conversation([user_factory])
       c.add_message("hello")
       c.update_attribute(:workflow_state, 'unread')
@@ -371,7 +371,7 @@ describe ConversationParticipant do
       expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
-    it "should merge a private conversation into the existing private conversation" do
+    it "merges a private conversation into the existing private conversation" do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
@@ -394,7 +394,7 @@ describe ConversationParticipant do
       expect(other_guy.reload.unread_conversations_count).to eql 1
     end
 
-    it "should change a private conversation between the two users into a monologue" do
+    it "changes a private conversation between the two users into a monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
       c.update_attribute(:workflow_state, 'unread')
@@ -412,7 +412,7 @@ describe ConversationParticipant do
       expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
-    it "should merge a private conversations between the two users into the existing monologue" do
+    it "merges a private conversations between the two users into the existing monologue" do
       c = @user1.initiate_conversation([@user2])
       c.add_message("hello self")
       c.update_attribute(:workflow_state, 'unread')
@@ -434,7 +434,7 @@ describe ConversationParticipant do
       expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
-    it "should merge a monologue into the existing monologue" do
+    it "merges a monologue into the existing monologue" do
       c = @user1.initiate_conversation([@user1])
       c.add_message("monologue 1")
       c.update_attribute(:workflow_state, 'unread')
@@ -455,7 +455,7 @@ describe ConversationParticipant do
       expect(@user2.reload.unread_conversations_count).to eql 1
     end
 
-    it "should not be adversely affected by an outer scope" do
+    it "is not adversely affected by an outer scope" do
       other_guy = user_factory
       c = @user1.initiate_conversation([other_guy])
       c.add_message("hello")
@@ -484,7 +484,7 @@ describe ConversationParticipant do
     context "sharding" do
       specs_require_sharding
 
-      it "should be able to move to a user on a different shard" do
+      it "is able to move to a user on a different shard" do
         u1 = User.create!
         cp = u1.initiate_conversation([u1])
         @shard1.activate do

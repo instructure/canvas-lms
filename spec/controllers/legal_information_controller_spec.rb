@@ -22,19 +22,19 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe LegalInformationController do
   describe "GET 'terms_of_use'" do
-    it "should redirect to terms_of_use_url, no authorization required" do
+    it "redirects to terms_of_use_url, no authorization required" do
       get 'terms_of_use'
       expect(response).to redirect_to controller.terms_of_use_url
     end
 
-    it "should work with authorization" do
+    it "works with authorization" do
       user_factory
       user_session @user
       get 'terms_of_use'
       expect(response).to redirect_to controller.terms_of_use_url
     end
 
-    it "should not require acceptance of terms" do
+    it "does not require acceptance of terms" do
       user_factory
       user_session @user
       session[:require_terms] = true
@@ -44,19 +44,19 @@ describe LegalInformationController do
   end
 
   describe "GET 'privacy_policy'" do
-    it "should redirect to privacy_policy_url, no authorization required" do
+    it "redirects to privacy_policy_url, no authorization required" do
       get 'privacy_policy'
       expect(response).to redirect_to controller.privacy_policy_url
     end
 
-    it "should work with authorization" do
+    it "works with authorization" do
       user_factory
       user_session @user
       get 'privacy_policy'
       expect(response).to redirect_to controller.privacy_policy_url
     end
 
-    it "should not require acceptance of terms" do
+    it "does not require acceptance of terms" do
       user_factory
       user_session @user
       session[:require_terms] = true

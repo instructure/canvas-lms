@@ -23,7 +23,7 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
   let(:question_data) { QuestionHelpers.fixture('numerical_question') }
   subject { described_class.new(question_data) }
 
-  it 'should not blow up when no responses are provided' do
+  it 'does not blow up when no responses are provided' do
     expect {
       expect(subject.run([])).to be_present
     }.to_not raise_error
@@ -55,31 +55,31 @@ describe CanvasQuizStatistics::Analyzers::Numerical do
 
   describe '[:answers][]' do
     describe '[:id]' do
-      it 'should stringify the answer id' do
+      it 'stringifies the answer id' do
         expect(subject.run([])[:answers].detect { |a| a[:id] == '4343' }).to be_present
       end
     end
 
     describe '[:text]' do
-      it 'should read 12.00 for an exact answer with no margin' do
+      it 'reads 12.00 for an exact answer with no margin' do
         expect(subject.run([])[:answers][0][:text]).to eq('12.00')
       end
 
-      it 'should read [3.00..6.00] for a range answer' do
+      it 'reads [3.00..6.00] for a range answer' do
         expect(subject.run([])[:answers][1][:text]).to eq('[3.00..6.00]')
       end
 
-      it 'should read 1.50 for an exact answer with margin' do
+      it 'reads 1.50 for an exact answer with margin' do
         expect(subject.run([])[:answers][3][:text]).to eq('1.50')
       end
 
-      it 'should read "1.1 (with precision: 2)" for a precision answer' do
+      it 'reads "1.1 (with precision: 2)" for a precision answer' do
         expect(subject.run([])[:answers][4][:text]).to eq("1.1 (with precision: 1)")
       end
     end
 
     describe '[:responses]' do
-      it 'should count the number of students who got it right' do
+      it 'counts the number of students who got it right' do
         stats = subject.run([{ answer_id: 4343 }])
         answer = stats[:answers].detect { |answer| answer[:id] == '4343' }
         expect(answer[:responses]).to eq(1)

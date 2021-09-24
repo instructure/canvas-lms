@@ -311,7 +311,7 @@ describe Quizzes::TakeQuizPresenter do
   end
 
   describe 'building the answer set' do
-    it 'should discard irrelevant entries' do
+    it 'discards irrelevant entries' do
       allow(submission).to receive(:submission_data).and_return({
                                                                   'foo' => 'bar',
                                                                   "question_#{question1[:id]}_marked" => true

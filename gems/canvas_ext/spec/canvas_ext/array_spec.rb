@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe "Array#cache_key" do
-  it "should work with frozen arrays" do
+  it "works with frozen arrays" do
     array = [1, 2, 3]
     array.freeze
     expect(array.cache_key).to eq '1/2/3'

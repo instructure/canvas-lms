@@ -27,20 +27,20 @@ describe Group do
   end
 
   context "validation" do
-    it "should create a new instance given valid attributes" do
+    it "creates a new instance given valid attributes" do
       group_model
     end
   end
 
-  it "should have a wiki" do
+  it "has a wiki" do
     expect(@group.wiki).not_to be_nil
   end
 
-  it "should be private by default" do
+  it "is private by default" do
     expect(@group.is_public).to be_falsey
   end
 
-  it "should allow a private group to be made public" do
+  it "allows a private group to be made public" do
     @communities = GroupCategory.communities_for(Account.default)
     group_model(:group_category => @communities, :is_public => false)
     @group.is_public = true
@@ -48,7 +48,7 @@ describe Group do
     expect(@group.reload.is_public).to be_truthy
   end
 
-  it "should not allow a public group to be made private" do
+  it "does not allow a public group to be made private" do
     @communities = GroupCategory.communities_for(Account.default)
     group_model(:group_category => @communities, :is_public => true)
     @group.is_public = false
@@ -62,14 +62,14 @@ describe Group do
     expect(@group.time_zone.to_s).to match /Mountain Time/
   end
 
-  it "should correctly identify group as active" do
+  it "correctlies identify group as active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
 
-  it "should correctly identify destroyed course as not active" do
+  it "correctlies identify destroyed course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -78,7 +78,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "should correctly identify concluded course as not active" do
+  it "correctlies identify concluded course as not active" do
     course_with_student(:active_all => true)
     group_model(:group_category => @communities, :is_public => true)
     group.add_user(@student)
@@ -87,7 +87,7 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "should correctly identify account group as not active" do
+  it "correctlies identify account group as not active" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
@@ -95,14 +95,14 @@ describe Group do
     expect(@group.inactive?).to eq true
   end
 
-  it "should correctly identify account group as active" do
+  it "correctlies identify account group as active" do
     @account = account_model
     group_model(:group_category => @communities, :is_public => true, :context => @account)
     group.add_user(@student)
     expect(@group.inactive?).to eq false
   end
 
-  it "should set the root_account_id for GroupMemberships when bulk adding users" do
+  it "sets the root_account_id for GroupMemberships when bulk adding users" do
     @account = account_model
     group_model(group_category: @communities, is_public: true, context: @account)
     @group.bulk_add_users_to_group([@user])
@@ -133,7 +133,7 @@ describe Group do
   end
 
   context "#peer_groups" do
-    it "should find all peer groups" do
+    it "finds all peer groups" do
       context = course_model
       group_category = context.group_categories.create(:name => "worldCup")
       other_category = context.group_categories.create(:name => "other category")
@@ -148,7 +148,7 @@ describe Group do
       expect(group1.peer_groups).not_to be_include(group4)
     end
 
-    it "should not find peer groups for student organized groups" do
+    it "does not find peer groups for student organized groups" do
       context = course_model
       group_category = GroupCategory.student_organized_for(context)
       group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
@@ -158,26 +158,26 @@ describe Group do
   end
 
   context "atom" do
-    it "should have an atom name as it's own name" do
+    it "has an atom name as it's own name" do
       group_model(:name => 'some unique name')
       expect(@group.to_atom.title).to eql('some unique name')
     end
 
-    it "should have a link to itself" do
+    it "has a link to itself" do
       link = @group.to_atom.links.first.to_s
       expect(link).to eql("/groups/#{@group.id}")
     end
   end
 
   context "add_user" do
-    it "should be able to add a person to the group" do
+    it "is able to add a person to the group" do
       user_model
       pseudonym_model(:user_id => @user.id)
       @group.add_user(@user)
       expect(@group.users).to be_include(@user)
     end
 
-    it "shouldn't be able to add a person to the group twice" do
+    it "is not able to add a person to the group twice" do
       user_model
       pseudonym_model(:user_id => @user.id)
       @group.add_user(@user)
@@ -189,7 +189,7 @@ describe Group do
       expect(@group.users.count).to eq 1
     end
 
-    it "should remove that user from peer groups" do
+    it "removes that user from peer groups" do
       context = course_model
       group_category = context.group_categories.create!(:name => "worldCup")
       group1 = Group.create!(:name => "group1", :group_category => group_category, :context => context)
@@ -205,7 +205,7 @@ describe Group do
       expect(group1.users).not_to be_include(@user)
     end
 
-    it "should add a user at the right workflow_state by default" do
+    it "adds a user at the right workflow_state by default" do
       @communities = GroupCategory.communities_for(Account.default)
       user_model
       {
@@ -219,7 +219,7 @@ describe Group do
       end
     end
 
-    it "should allow specifying a workflow_state" do
+    it "allows specifying a workflow_state" do
       @communities = GroupCategory.communities_for(Account.default)
       @group.group_category = @communities
       @group.save!
@@ -231,13 +231,13 @@ describe Group do
       end
     end
 
-    it "should allow specifying that the user should be a moderator" do
+    it "allows specifying that the user should be a moderator" do
       user_model
       @membership = @group.add_user(@user, 'accepted', true)
       expect(@membership.moderator).to eq true
     end
 
-    it "should change the workflow_state of an already active user" do
+    it "changes the workflow_state of an already active user" do
       @communities = GroupCategory.communities_for(Account.default)
       @group.group_category = @communities
       @group.save!
@@ -248,7 +248,7 @@ describe Group do
     end
   end
 
-  it "should grant manage permissions for associated objects to group managers" do
+  it "grants manage permissions for associated objects to group managers" do
     e = course_with_teacher(active_course: true)
     course = e.context
     course.root_account.disable_feature!(:granular_permissions_manage_groups)
@@ -271,7 +271,7 @@ describe Group do
       @course.root_account.enable_feature!(:granular_permissions_manage_groups)
     end
 
-    it "should grant manage permissions for associated objects to group managers" do
+    it "grants manage permissions for associated objects to group managers" do
       e = course_with_teacher(active_course: true)
       course = e.context
       teacher = e.user
@@ -291,7 +291,7 @@ describe Group do
     end
   end
 
-  it "should not allow a concluded student to participate" do
+  it "does not allow a concluded student to participate" do
     course_with_student(:active_all => true)
     group = @course.groups.create
     group.add_user(@student)
@@ -300,7 +300,7 @@ describe Group do
     expect(group.grants_right?(@student, :participate)).to be_falsey
   end
 
-  it "should only allow me to moderate_forum if I can moderate_forum of group's context" do
+  it "onlies allow me to moderate_forum if I can moderate_forum of group's context" do
     course_with_teacher(active_course: true)
     student_in_course
     group = @course.groups.create
@@ -309,7 +309,7 @@ describe Group do
     expect(group.grants_right?(@student, :moderate_forum)).to be_falsey
   end
 
-  it "should grant messaging rights to students if messaging permissions are enabled" do
+  it "grants messaging rights to students if messaging permissions are enabled" do
     course_with_teacher(active_course: true)
     student_in_course(:course => @course)
     group = @course.groups.create
@@ -320,7 +320,7 @@ describe Group do
     expect(group.grants_right?(@student, :send_messages_all)).to be_truthy
   end
 
-  it "should not grant messaging rights to students if messaging permissions are disabled" do
+  it "does not grant messaging rights to students if messaging permissions are disabled" do
     course_with_teacher(active_course: true)
     student_in_course(:course => @course)
     group = @course.groups.create
@@ -332,7 +332,7 @@ describe Group do
     expect(group.grants_right?(@student, :send_messages_all)).to be_falsey
   end
 
-  it "should grant read_roster permissions to students that can freely join or request an invitation to the group" do
+  it "grants read_roster permissions to students that can freely join or request an invitation to the group" do
     course_with_teacher(active_course: true)
     student_in_course.accept!
 
@@ -353,7 +353,7 @@ describe Group do
   end
 
   describe "root account" do
-    it "should get the root account assigned" do
+    it "gets the root account assigned" do
       e = course_with_teacher
       group = @course.groups.create!
       expect(group.account).to eq Account.default
@@ -369,7 +369,7 @@ describe Group do
   end
 
   context "auto_accept?" do
-    it "should be false unless join level is 'parent_context_auto_join'" do
+    it "is false unless join level is 'parent_context_auto_join'" do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -379,7 +379,7 @@ describe Group do
       expect([group1, group2, group3].map { |g| g.auto_accept? }).to eq [true, false, false]
     end
 
-    it "should be false unless the group is student organized or a community" do
+    it "is false unless the group is student organized or a community" do
       course_with_student
       @account = @course.root_account
 
@@ -392,7 +392,7 @@ describe Group do
   end
 
   context "allow_join_request?" do
-    it "should be false unless join level is 'parent_context_auto_join' or 'parent_context_request'" do
+    it "is false unless join level is 'parent_context_auto_join' or 'parent_context_request'" do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -402,7 +402,7 @@ describe Group do
       expect([group1, group2, group3].map { |g| g.allow_join_request? }).to eq [true, true, false]
     end
 
-    it "should be false unless the group is student organized or a community" do
+    it "is false unless the group is student organized or a community" do
       course_with_student
       @account = @course.root_account
 
@@ -415,7 +415,7 @@ describe Group do
   end
 
   context "allow_self_signup?" do
-    it "should follow the group category self signup option" do
+    it "follows the group category self signup option" do
       course_with_student
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -435,7 +435,7 @@ describe Group do
       expect(group3.allow_self_signup?(@student)).to be_falsey
     end
 
-    it "should correctly handle restricted course sections" do
+    it "correctlies handle restricted course sections" do
       course_with_student
       @other_section = @course.course_sections.create!(:name => "Other Section")
       @other_student = @course.enroll_student(user_model, { :section => @other_section }).user
@@ -487,7 +487,7 @@ describe Group do
   end
 
   context "has_member?" do
-    it "should be true for accepted memberships, regardless of moderator flag" do
+    it "is true for accepted memberships, regardless of moderator flag" do
       @user1 = user_model
       @user2 = user_model
       @user3 = user_model
@@ -510,7 +510,7 @@ describe Group do
   end
 
   context "has_moderator?" do
-    it "should be true for accepted memberships, with moderator flag" do
+    it "is true for accepted memberships, with moderator flag" do
       @user1 = user_model
       @user2 = user_model
       @user3 = user_model
@@ -548,7 +548,7 @@ describe Group do
   end
 
   context "invite_user" do
-    it "should auto accept invitations" do
+    it "autoes accept invitations" do
       course_with_student(:active_all => true)
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -560,7 +560,7 @@ describe Group do
   end
 
   context "request_user" do
-    it "should auto accept invitations" do
+    it "autoes accept invitations" do
       course_with_student(:active_all => true)
 
       group_category = GroupCategory.student_organized_for(@course)
@@ -571,7 +571,7 @@ describe Group do
     end
   end
 
-  it "should default group_category to student organized category on save" do
+  it "defaults group_category to student organized category on save" do
     course_with_teacher
     group = @course.groups.create
     expect(group.group_category).to eq GroupCategory.student_organized_for(@course)
@@ -589,7 +589,7 @@ describe Group do
     expect(hash["group"]["group_category"]).to eq "Something"
   end
 
-  it "should maintain the deprecated category attribute" do
+  it "maintains the deprecated category attribute" do
     course = course_model
     group = course.groups.create
     default_category = GroupCategory.student_organized_for(course)
@@ -605,13 +605,13 @@ describe Group do
   end
 
   context "has_common_section?" do
-    it "should be false for accounts" do
+    it "is false for accounts" do
       account = Account.default
       group = account.groups.create
       expect(group).not_to have_common_section
     end
 
-    it "should not be true if two members don't share a section" do
+    it "is not true if two members don't share a section" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
@@ -623,7 +623,7 @@ describe Group do
       expect(group).not_to have_common_section
     end
 
-    it "should be true if all members group have a section in common" do
+    it "is true if all members group have a section in common" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -636,13 +636,13 @@ describe Group do
   end
 
   context "has_common_section_with_user?" do
-    it "should be false for accounts" do
+    it "is false for accounts" do
       account = Account.default
       group = account.groups.create
       expect(group).not_to have_common_section_with_user(user_model)
     end
 
-    it "should not be true if the new member does't share a section with an existing member" do
+    it "is not true if the new member does't share a section with an existing member" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
@@ -653,7 +653,7 @@ describe Group do
       expect(group).not_to have_common_section_with_user(user2)
     end
 
-    it "should be true if all members group have a section in common with the new user" do
+    it "is true if all members group have a section in common with the new user" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -663,7 +663,7 @@ describe Group do
       expect(group).to have_common_section_with_user(user2)
     end
 
-    it "should be true if one member is inactive" do
+    it "is true if one member is inactive" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -676,7 +676,7 @@ describe Group do
       expect(group).to have_common_section_with_user(user2)
     end
 
-    it "should be true if one member is completed" do
+    it "is true if one member is completed" do
       course_with_teacher(:active_all => true)
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -723,7 +723,7 @@ describe Group do
       end
     end
 
-    it "should let members see everything" do
+    it "lets members see everything" do
       expect(@group.tabs_available(@student).map { |t| t[:id] }).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
@@ -737,7 +737,7 @@ describe Group do
       ]
     end
 
-    it "should let admins see everything" do
+    it "lets admins see everything" do
       expect(@group.tabs_available(@teacher).map { |t| t[:id] }).to eql [
         Group::TAB_HOME,
         Group::TAB_ANNOUNCEMENTS,
@@ -751,17 +751,17 @@ describe Group do
       ]
     end
 
-    it "should not let nobodies see conferences" do
+    it "does not let nobodies see conferences" do
       expect(@group.tabs_available(nil).map { |t| t[:id] }).not_to include Group::TAB_CONFERENCES
     end
   end
 
   describe "quota" do
-    it "should default to Group.default_storage_quota" do
+    it "defaults to Group.default_storage_quota" do
       expect(@group.quota).to eq Group.default_storage_quota
     end
 
-    it "should be overridden by the account's default_group_storage_quota" do
+    it "is overridden by the account's default_group_storage_quota" do
       a = @group.account
       a.default_group_storage_quota = 10.megabytes
       a.save!
@@ -770,7 +770,7 @@ describe Group do
       expect(@group.quota).to eq 10.megabytes
     end
 
-    it "should inherit from a parent account's default_group_storage_quota" do
+    it "inherits from a parent account's default_group_storage_quota" do
       enable_cache do
         account = account_model
         subaccount = account.sub_accounts.create!
@@ -794,14 +794,14 @@ describe Group do
   end
 
   describe "#update_max_membership_from_group_category" do
-    it "should set max_membership if there is a group category" do
+    it "sets max_membership if there is a group category" do
       @group.group_category = @course.group_categories.build(:name => 'foo')
       @group.group_category.group_limit = 1
       @group.update_max_membership_from_group_category
       expect(@group.max_membership).to eq 1
     end
 
-    it "should do nothing if there is no group category" do
+    it "does nothing if there is no group category" do
       expect(@group.max_membership).to be_nil
       @group.update_max_membership_from_group_category
       expect(@group.max_membership).to be_nil
@@ -814,13 +814,13 @@ describe Group do
       @group = @gc.groups.create! name: "group1", context: @course
     end
 
-    it "should soft delete" do
+    it "softs delete" do
       expect(@group.deleted_at).to be_nil
       @group.destroy
       expect(@group.deleted_at).not_to be_nil
     end
 
-    it "should not delete memberships" do
+    it "does not delete memberships" do
       student_in_course active_all: true
       @group.users << @student
       @group.save!
@@ -867,11 +867,11 @@ describe Group do
       @user.save
     end
 
-    it "should return true if a user has a course set as a favorite" do
+    it "returns true if a user has a course set as a favorite" do
       expect(@group_fave.favorite_for_user?(@user)).to eql(true)
     end
 
-    it "should return false if a user has not set a group to be a favorite" do
+    it "returns false if a user has not set a group to be a favorite" do
       expect(@group_not_fave.favorite_for_user?(@user)).to eql(false)
     end
   end

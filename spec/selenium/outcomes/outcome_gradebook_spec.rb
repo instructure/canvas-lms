@@ -69,7 +69,7 @@ describe "outcome gradebook" do
       ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
     end
 
-    it "should not be visible by default" do
+    it "is not visible by default" do
       Gradebook.visit(@course)
       f('.assignment-gradebook-container .gradebook-menus button').click
       expect(f("#content")).not_to contain_css('span[data-menu-item-id="learning-mastery"]')
@@ -80,7 +80,7 @@ describe "outcome gradebook" do
         Account.default.set_feature_flag!('outcome_gradebook', 'on')
       end
 
-      it "should be visible" do
+      it "is visible" do
         Gradebook.visit(@course)
         Gradebook.gradebook_menu_element.click
         expect(f('span[data-menu-item-id="learning-mastery"]')).not_to be_nil
@@ -478,7 +478,7 @@ describe "outcome gradebook" do
         expect(ff('.outcome-student-cell-content')).to have_size 3
       end
 
-      it "should handle multiple enrollments correctly" do
+      it "handles multiple enrollments correctly" do
         @course.enroll_student(@student_1, :section => @other_section, :allow_multiple_enrollments => true)
 
         Gradebook.visit(@course)

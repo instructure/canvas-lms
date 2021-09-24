@@ -34,7 +34,7 @@ describe "courses/_settings_sidebar.html.erb" do
   end
 
   describe "End this course button" do
-    it "should not display if the course or term end date has passed" do
+    it "does not display if the course or term end date has passed" do
       allow(@course).to receive(:soft_concluded?).and_return(true)
       view_context(@course, @user)
       assign(:current_user, @user)
@@ -42,7 +42,7 @@ describe "courses/_settings_sidebar.html.erb" do
       expect(response.body).not_to match(/Conclude this Course/)
     end
 
-    it "should display if the course and its term haven't ended" do
+    it "displays if the course and its term haven't ended" do
       allow(@course).to receive(:soft_concluded?).and_return(false)
       view_context(@course, @user)
       assign(:current_user, @user)
@@ -52,7 +52,7 @@ describe "courses/_settings_sidebar.html.erb" do
   end
 
   describe "Reset course content" do
-    it "should not display the dialog contents under the button" do
+    it "does not display the dialog contents under the button" do
       @course.account.disable_feature!(:granular_permissions_manage_courses)
       view_context(@course, @user)
       assign(:current_user, @user)
@@ -61,7 +61,7 @@ describe "courses/_settings_sidebar.html.erb" do
       expect(doc.at_css('#reset_course_content_dialog')['style']).to eq 'display:none;'
     end
 
-    it 'should not display the dialog contents under the button (granular permissions)' do
+    it 'does not display the dialog contents under the button (granular permissions)' do
       @course.account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
         permission: 'manage_courses_reset',
@@ -95,7 +95,7 @@ describe "courses/_settings_sidebar.html.erb" do
         @course.context_external_tools.create!(defaults.merge(options))
       end
 
-      it "should display all configured tools" do
+      it "displays all configured tools" do
         num_tools = 3
         (1..num_tools).each do |n|
           create_course_settings_sub_navigation_tool(name: "tool #{n}")
@@ -106,7 +106,7 @@ describe "courses/_settings_sidebar.html.erb" do
         expect(doc.css('.course-settings-sub-navigation-lti').size).to eq num_tools
       end
 
-      it "should include the launch type parameter" do
+      it "includes the launch type parameter" do
         create_course_settings_sub_navigation_tool
         assign(:course_settings_sub_navigation_tools, @course.context_external_tools.to_a)
         render

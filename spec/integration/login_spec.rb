@@ -56,7 +56,7 @@ describe 'login' do
 
     let(:cas_redirect_url) { Regexp.new(Regexp.escape(@cas_client.add_service_to_login_url(''))) }
 
-    it "should log in and log out a user CAS has validated" do
+    it "logs in and log out a user CAS has validated" do
       user = user_with_pseudonym({ :active_all => true })
 
       stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
@@ -74,7 +74,7 @@ describe 'login' do
       expect(response.location).to match(%r{/cas/logout\?url=.*service=})
     end
 
-    it "should inform the user CAS validation denied" do
+    it "informs the user CAS validation denied" do
       stubby("no\n\n")
 
       get login_url
@@ -85,7 +85,7 @@ describe 'login' do
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
 
-    it "should inform the user CAS validation failed" do
+    it "informs the user CAS validation failed" do
       stubby('')
       def @cas_client.validate_service_ticket(_)
         raise "Nope"
@@ -99,7 +99,7 @@ describe 'login' do
       expect(flash[:delegated_message]).to match(/There was a problem logging in/)
     end
 
-    it "should inform the user that CAS account doesn't exist" do
+    it "informs the user that CAS account doesn't exist" do
       stubby("yes\nnonexistentuser\n")
 
       get login_url
@@ -111,7 +111,7 @@ describe 'login' do
       expect(flash[:delegated_message]).to match(/Canvas doesn't have an account for user/)
     end
 
-    it "should redirect to a custom url if the user CAS account doesn't exist" do
+    it "redirects to a custom url if the user CAS account doesn't exist" do
       redirect_url = 'http://google.com/'
       Account.default.unknown_user_url = redirect_url
       Account.default.save!
@@ -125,7 +125,7 @@ describe 'login' do
       expect(response).to redirect_to(redirect_url)
     end
 
-    it "should login case insensitively" do
+    it "logins case insensitively" do
       user = user_with_pseudonym({ :active_all => true })
 
       stubby("yes\n#{user.pseudonyms.first.unique_id.capitalize}\n")
@@ -143,7 +143,7 @@ describe 'login' do
         skip "needs redis" unless Canvas.redis_enabled?
       end
 
-      it "should do a single sign out" do
+      it "does a single sign out" do
         user = user_with_pseudonym({ :active_all => true })
 
         stubby("yes\n#{user.pseudonyms.first.unique_id}\n")
@@ -188,7 +188,7 @@ describe 'login' do
     end
   end
 
-  it "should redirect back for jobs controller" do
+  it "redirects back for jobs controller" do
     user_with_pseudonym(:password => 'qwertyuiop', :active_all => 1)
     Account.site_admin.account_users.create!(user: @user)
 

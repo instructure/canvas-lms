@@ -27,12 +27,12 @@ describe ContextModulesController do
       student_in_course(active_all: true)
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{ 'id' => 10, 'hidden' => true }])
       get 'index', params: { :course_id => @course.id }
@@ -40,7 +40,7 @@ describe ContextModulesController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@teacher)
       get 'index', params: { :course_id => @course.id }
       expect(response).to be_successful
@@ -87,7 +87,7 @@ describe ContextModulesController do
       expect(combined_active_quizzes_includes_both_types).to eq false
     end
 
-    it "should touch modules if necessary" do
+    it "touches modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do
         @mod1 = @course.context_modules.create!(:unlock_at => 1.day.from_now)
@@ -109,13 +109,13 @@ describe ContextModulesController do
         @m2 = @course.context_modules.create!(:name => "published hey")
       end
 
-      it "should show all modules for teachers" do
+      it "shows all modules for teachers" do
         user_session(@teacher)
         get 'index', params: { :course_id => @course.id }
         expect(assigns[:modules]).to eq [@m1, @m2]
       end
 
-      it "should not show unpublished for students" do
+      it "does not show unpublished for students" do
         user_session(@student)
         get 'index', params: { :course_id => @course.id }
         expect(assigns[:modules]).to eq [@m2]
@@ -165,19 +165,19 @@ describe ContextModulesController do
       user_session(@teacher)
     end
 
-    it "should publish modules" do
+    it "publishes modules" do
       put 'update', params: { :course_id => @course.id, :id => @m1.id, :publish => '1' }
       @m1.reload
       expect(@m1.active?).to eq true
     end
 
-    it "should unpublish modules" do
+    it "unpublishes modules" do
       put 'update', params: { :course_id => @course.id, :id => @m2.id, :unpublish => '1' }
       @m2.reload
       expect(@m2.unpublished?).to eq true
     end
 
-    it "should update the name" do
+    it "updates the name" do
       put 'update', params: { :course_id => @course.id, :id => @m1.id, :context_module => { :name => "new name" } }
       @m1.reload
       expect(@m1.name).to eq "new name"
@@ -185,7 +185,7 @@ describe ContextModulesController do
   end
 
   describe "GET 'module_redirect'" do
-    it "should skip leading and trailing sub-headers" do
+    it "skips leading and trailing sub-headers" do
       course_with_student_logged_in(:active_all => true)
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
@@ -220,7 +220,7 @@ describe ContextModulesController do
       student_in_course(active_all: true)
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       @module = @course.context_modules.create!
       ag = @course.assignment_groups.create!
       assignment1 = ag.assignments.create!(:context => @course)
@@ -231,7 +231,7 @@ describe ContextModulesController do
       assert_unauthorized
     end
 
-    it "should still redirect for unpublished modules if teacher" do
+    it "stills redirect for unpublished modules if teacher" do
       user_session(@teacher)
 
       @module = @course.context_modules.create!
@@ -247,7 +247,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
 
-    it "should still redirect for unpublished modules if teacher and course is concluded" do
+    it "stills redirect for unpublished modules if teacher and course is concluded" do
       user_session(@teacher)
 
       @module = @course.context_modules.create!
@@ -264,7 +264,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
 
-    it "should not redirect for unpublished modules if student" do
+    it "does not redirect for unpublished modules if student" do
       user_session(@student)
 
       @module = @course.context_modules.create!
@@ -280,7 +280,7 @@ describe ContextModulesController do
     end
 
     context 'ContextExternalTool' do
-      it "should find a matching tool" do
+      it "finds a matching tool" do
         user_session(@student)
 
         @module = @course.context_modules.create!
@@ -321,7 +321,7 @@ describe ContextModulesController do
         expect(lti_launch.params['custom_canvas_module_item_id']).to eq tag.id.to_s
       end
 
-      it "should fail if there is no matching tool" do
+      it "fails if there is no matching tool" do
         user_session(@student)
 
         @module = @course.context_modules.create!
@@ -337,7 +337,7 @@ describe ContextModulesController do
       end
     end
 
-    it "should redirect to an assignment page" do
+    it "redirects to an assignment page" do
       user_session(@student)
 
       @module = @course.context_modules.create!
@@ -351,7 +351,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
 
-    it "should redirect to a discussion page" do
+    it "redirects to a discussion page" do
       user_session(@student)
 
       @module = @course.context_modules.create!
@@ -364,7 +364,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_discussion_topic_url(@course, topic, :module_item_id => topicTag.id)
     end
 
-    it "should redirect to a wiki page" do
+    it "redirects to a wiki page" do
       user_session(@student)
 
       @module = @course.context_modules.create!
@@ -377,7 +377,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_wiki_page_url(@course, page, :module_item_id => page_tag.id)
     end
 
-    it "should redirect to a quiz page" do
+    it "redirects to a quiz page" do
       user_session(@student)
 
       @module = @course.context_modules.create!
@@ -392,7 +392,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_quiz_url(@course, quiz, :module_item_id => tag.id)
     end
 
-    it "should mark an external url item read" do
+    it "marks an external url item read" do
       user_session(@student)
       @module = @course.context_modules.create!
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
@@ -406,7 +406,7 @@ describe ContextModulesController do
       expect(requirements_met[0][:id]).to eq tag.id
     end
 
-    it "should not mark a locked external url item read" do
+    it "does not mark a locked external url item read" do
       user_session(@student)
       @module = @course.context_modules.create! :unlock_at => 1.week.from_now
       tag = @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
@@ -417,7 +417,7 @@ describe ContextModulesController do
       expect(@module.evaluate_for(@user).requirements_met).to be_blank
     end
 
-    it "should not mark an unpublished external url item read" do
+    it "does not mark an unpublished external url item read" do
       user_session(@student)
       @module = @course.context_modules.create!
       @module.unpublish
@@ -431,7 +431,7 @@ describe ContextModulesController do
   end
 
   describe "POST 'reorder'" do
-    it "should work" do
+    it "works" do
       course_with_teacher_logged_in(active_all: true)
       m1 = @course.context_modules.create!
       m2 = @course.context_modules.create!
@@ -446,7 +446,7 @@ describe ContextModulesController do
       expect(m2.updated_at > time).to be_truthy
     end
 
-    it "should fire the module_updated live event for any module with changed positions" do
+    it "fires the module_updated live event for any module with changed positions" do
       course_with_teacher_logged_in(active_all: true)
       m1 = @course.context_modules.create!(position: 1)
       m2 = @course.context_modules.create!(position: 2)
@@ -475,7 +475,7 @@ describe ContextModulesController do
       ct
     end
 
-    it "should reorder items" do
+    it "reorders items" do
       course_with_teacher_logged_in(:active_all => true)
 
       ag = @course.assignment_groups.create!
@@ -496,7 +496,7 @@ describe ContextModulesController do
       expect(ct1.context_module).to eq m1
     end
 
-    it "should reorder unpublished items" do
+    it "reorders unpublished items" do
       course_with_teacher_logged_in(active_all: true)
       pageA = @course.wiki_pages.create title: "pageA"
       pageA.workflow_state = 'unpublished'
@@ -514,7 +514,7 @@ describe ContextModulesController do
       expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end
 
-    it "should only touch module once on reorder" do
+    it "onlies touch module once on reorder" do
       course_with_teacher_logged_in(:active_all => true)
       assign_group = @course.assignment_groups.create!
       mod = @course.context_modules.create!
@@ -538,7 +538,7 @@ describe ContextModulesController do
       @module = @course.context_modules.create!
     end
 
-    it "should set position" do
+    it "sets position" do
       user_session @teacher
       @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 1)
       post 'add_item', params: { :course_id => @course.id, :context_module_id => @module.id, :item =>
@@ -546,7 +546,7 @@ describe ContextModulesController do
       expect(@module.content_tags.map { |tag| [tag.title, tag.position] }).to match_array([['foo!', 1], ['bar!', 3]])
     end
 
-    it "shouldn't duplicate an existing position" do
+    it "does not duplicate an existing position" do
       user_session @teacher
       @module.add_item({ :type => 'context_module_sub_header', :title => 'foo!' }, nil, position: 3)
       post 'add_item', params: { :course_id => @course.id, :context_module_id => @module.id, :item =>
@@ -569,34 +569,34 @@ describe ContextModulesController do
       user_session(@teacher)
     end
 
-    it "should update the tag title" do
+    it "updates the tag title" do
       put 'update_item', params: { :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :title => 'New Title' } }
       expect(@assignment_item.reload.title).to eq 'New Title'
     end
 
-    it "should update the asset title" do
+    it "updates the asset title" do
       put 'update_item', params: { :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :title => 'New Title' } }
       expect(@assignment.reload.title).to eq 'New Title'
     end
 
-    it "should update indent" do
+    it "updates indent" do
       put 'update_item', params: { :course_id => @course.id, :id => @external_url_item.id, :content_tag => { :indent => 2 } }
       expect(@external_url_item.reload.indent).to eq 2
     end
 
-    it "should update the url for an external url item" do
+    it "updates the url for an external url item" do
       new_url = 'http://example.org/new_url'
       put 'update_item', params: { :course_id => @course.id, :id => @external_url_item.id, :content_tag => { :url => new_url } }
       expect(@external_url_item.reload.url).to eq new_url
     end
 
-    it "should update the url for an external tool item" do
+    it "updates the url for an external tool item" do
       new_url = 'http://example.org/new_tool'
       put 'update_item', params: { :course_id => @course.id, :id => @external_tool_item.id, :content_tag => { :url => new_url } }
       expect(@external_tool_item.reload.url).to eq new_url
     end
 
-    it "should ignore the url for a non-applicable type" do
+    it "ignores the url for a non-applicable type" do
       put 'update_item', params: { :course_id => @course.id, :id => @assignment_item.id, :content_tag => { :url => 'http://example.org/new_tool' } }
       expect(@assignment_item.reload.url).to be_nil
     end
@@ -618,21 +618,21 @@ describe ContextModulesController do
       @topicTag = @m1.add_item :type => 'discussion_topic', :id => @topic.id
     end
 
-    it "should show unpublished modules for teachers" do
+    it "shows unpublished modules for teachers" do
       user_session(@teacher)
       get 'item_details', params: { :course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}" }
       json = json_parse(response.body)
       expect(json["next_module"]["context_module"]["id"]).to eq @m2.id
     end
 
-    it "should skip unpublished modules for students" do
+    it "skips unpublished modules for students" do
       user_session(@student)
       get 'item_details', params: { :course_id => @course.id, :module_item_id => @topicTag.id, :id => "discussion_topic_#{@topic.id}" }
       json = json_parse(response.body)
       expect(json["next_module"]["context_module"]["id"]).to eq @m3.id
     end
 
-    it "should parse namespaced quiz as id" do
+    it "parses namespaced quiz as id" do
       user_session(@teacher)
       quiz = @course.quizzes.create!
       quiz.publish!
@@ -671,7 +671,7 @@ describe ContextModulesController do
         )
       end
 
-      it "should not error on public course" do
+      it "does not error on public course" do
         assignment = @course.assignments.create!(title: 'hello')
         @mod1.add_item(type: 'assignment', id: assignment.id)
         get 'content_tag_assignment_data', params: { course_id: @course.id }, format: 'json'
@@ -694,14 +694,14 @@ describe ContextModulesController do
       @progression = @module.update_for(@student, :read, @tag)
     end
 
-    it "should return all student progressions to teacher" do
+    it "returns all student progressions to teacher" do
       user_session(@teacher)
       get 'progressions', params: { :course_id => @course.id }, :format => "json"
       json = json_parse(response.body)
       expect(json.length).to eq 1
     end
 
-    it "should return a single student progression" do
+    it "returns a single student progression" do
       user_session(@student)
       get 'progressions', params: { :course_id => @course.id }, :format => "json"
       json = json_parse(response.body)
@@ -714,14 +714,14 @@ describe ContextModulesController do
         @course.save!
       end
 
-      it "should return a single student progression" do
+      it "returns a single student progression" do
         user_session(@student)
         get 'progressions', params: { :course_id => @course.id }, :format => "json"
         json = json_parse(response.body)
         expect(json.length).to eq 1
       end
 
-      it "should not return any student progressions to teacher" do
+      it "does not return any student progressions to teacher" do
         user_session(@teacher)
         get 'progressions', params: { :course_id => @course.id }, :format => "json"
         json = json_parse(response.body)
@@ -731,7 +731,7 @@ describe ContextModulesController do
   end
 
   describe "GET assignment_info" do
-    it "should return updated due dates/points possible" do
+    it "returns updated due dates/points possible" do
       Timecop.freeze(1.minute.ago) do
         course_with_student_logged_in active_all: true
         @mod = @course.context_modules.create!
@@ -748,7 +748,7 @@ describe ContextModulesController do
       end
     end
 
-    it "should return due dates for Differentiated Assignments" do
+    it "returns due dates for Differentiated Assignments" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @assign = @course.assignments.create! title: "Differentiated Assignment", points_possible: 100, only_visible_to_overrides: true
@@ -795,7 +795,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["due_date"].to_date).to eq new_due_date.to_date
     end
 
-    it "should return too_many_overrides if applicable for assignments" do
+    it "returns too_many_overrides if applicable for assignments" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @assign = @course.assignments.create! title: "WHAT", points_possible: 123
@@ -817,7 +817,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
 
-    it "should return too_many_overrides if applicable for graded topics" do
+    it "returns too_many_overrides if applicable for graded topics" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @assign = assignment_model(:course => @course, :submission_types => 'discussion_topic', :title => 'discuss')
@@ -839,7 +839,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
 
-    it "should not cache 'past_due'" do
+    it "does not cache 'past_due'" do
       course_with_student_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @assign = @course.assignments.create!(:title => "sad", :due_at => 1.week.from_now, :submission_types => 'online_text_entry')
@@ -858,7 +858,7 @@ describe ContextModulesController do
       end
     end
 
-    it "should return multiple due date info for survey quizzes" do
+    it "returns multiple due date info for survey quizzes" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.from_now, :quiz_type => "survey")
@@ -876,7 +876,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["vdd_tooltip"]["due_dates"].count).to eq 2
     end
 
-    it "should return too_many_overrides if applicable for survey quizzes" do
+    it "returns too_many_overrides if applicable for survey quizzes" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.from_now, :quiz_type => "survey")
@@ -896,7 +896,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["has_many_overrides"]).to be_truthy
     end
 
-    it "should return past_due if survey quiz is past due" do
+    it "returns past_due if survey quiz is past due" do
       course_with_student_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
@@ -908,7 +908,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["past_due"]).to be_present
     end
 
-    it "should not return past_due if survey quiz is completed" do
+    it "does not return past_due if survey quiz is completed" do
       course_with_student_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       @quiz = @course.quizzes.create!(:title => "sad", :due_at => 1.week.ago, :quiz_type => "survey")
@@ -922,7 +922,7 @@ describe ContextModulesController do
       expect(json[@tag.id.to_s]["past_due"]).to be_blank
     end
 
-    it "should return a todo date for an ungraded page with a todo_date" do
+    it "returns a todo date for an ungraded page with a todo_date" do
       course_with_teacher_logged_in(:active_all => true)
       @mod = @course.context_modules.create!
       wiki_date = 1.day.from_now
@@ -937,7 +937,7 @@ describe ContextModulesController do
       expect(Time.zone.parse(json[@tag.id.to_s]["todo_date"]).to_i).to eq wiki_date.to_i
     end
 
-    it "should return external urls properly" do
+    it "returns external urls properly" do
       course_with_teacher_logged_in(:active_all => true)
       @module = @course.context_modules.create!
       @module.add_item :type => 'external_url', :url => 'http://lolcats', :title => 'lol'
@@ -945,7 +945,7 @@ describe ContextModulesController do
       expect(response).to be_successful
     end
 
-    it "should return mastery connect objectives correctly" do
+    it "returns mastery connect objectives correctly" do
       ext_data = {
         key: "https://canvas.instructure.com/lti/mastery_connect_assessment",
         points: 10,
@@ -976,14 +976,14 @@ describe ContextModulesController do
       course_with_teacher(active_all: true)
     end
 
-    it "should redirect to the module on the index page" do
+    it "redirects to the module on the index page" do
       @m2 = @course.context_modules.create!(:name => "published hey")
       user_session(@teacher)
       get 'show', params: { course_id: @course.id, id: @m2.id }
       expect(response).to redirect_to course_context_modules_url(course_id: @course.id, anchor: "module_#{@m2.id}")
     end
 
-    it "should unauthorized for students and unpublished modules" do
+    it "unauthorizeds for students and unpublished modules" do
       @m1 = @course.context_modules.create(:name => "unpublished oi")
       @m1.workflow_state = 'unpublished'
       @m1.save!
@@ -1011,7 +1011,7 @@ describe ContextModulesController do
       user_session @student
     end
 
-    it "should return 404 if no rule matches item assignment" do
+    it "returns 404 if no rule matches item assignment" do
       user_session(@student)
 
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([])
@@ -1020,7 +1020,7 @@ describe ContextModulesController do
       assert_response(:missing)
     end
 
-    it "should return 404 if matching rule is unlocked but has one selected assignment set" do
+    it "returns 404 if matching rule is unlocked but has one selected assignment set" do
       user_session(@student)
 
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
@@ -1036,7 +1036,7 @@ describe ContextModulesController do
       assert_response(:missing)
     end
 
-    it "should redirect to context modules page with warning if matching rule is locked" do
+    it "redirects to context modules page with warning if matching rule is locked" do
       user_session(@student)
 
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
@@ -1052,7 +1052,7 @@ describe ContextModulesController do
       assert_redirected_to(controller: 'context_modules', action: 'index')
     end
 
-    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets" do
+    it "shows choose page if matches a rule that is unlocked and has more than two assignment sets" do
       user_session(@student)
       assg1, assg2 = create_assignments(@course.id, 2).map { |id| Assignment.find(id) }
 
@@ -1082,7 +1082,7 @@ describe ContextModulesController do
       expect(options[1][:setId]).to eq 2
     end
 
-    it "should show choose page if matching rule is unlocked and has one unselected assignment set" do
+    it "shows choose page if matching rule is unlocked and has one unselected assignment set" do
       user_session(@student)
 
       allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
@@ -1102,7 +1102,7 @@ describe ContextModulesController do
       expect(mastery_path_data[:options].length).to eq 1
     end
 
-    it "should show choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
+    it "shows choose page if matches a rule that is unlocked and has more than two assignment sets even if multiple rules are present" do
       user_session(@student)
       assg1, assg2 = create_assignments(@course.id, 2).map { |id| Assignment.find(id) }
 
@@ -1140,7 +1140,7 @@ describe ContextModulesController do
       @mod = @course.context_modules.create!
     end
 
-    it "should redirect to assignment edit mastery paths page" do
+    it "redirects to assignment edit mastery paths page" do
       ag = @course.assignment_groups.create!
       assg = ag.assignments.create! context: @course
       item = @mod.add_item type: 'assignment', id: assg.id
@@ -1149,7 +1149,7 @@ describe ContextModulesController do
       assert_redirected_to controller: 'assignments', action: 'edit', id: assg.id, anchor: 'mastery-paths-editor'
     end
 
-    it "should redirect to quiz edit mastery paths page" do
+    it "redirects to quiz edit mastery paths page" do
       quiz = @course.quizzes.create!
       item = @mod.add_item type: 'quiz', id: quiz.id
 
@@ -1157,7 +1157,7 @@ describe ContextModulesController do
       assert_redirected_to controller: 'quizzes/quizzes', action: 'edit', id: quiz.id, anchor: 'mastery-paths-editor'
     end
 
-    it "should redirect to discussion edit mastery paths page" do
+    it "redirects to discussion edit mastery paths page" do
       topic = @course.discussion_topics.create!
       item = @mod.add_item type: 'discussion_topic', id: topic.id
 
@@ -1165,7 +1165,7 @@ describe ContextModulesController do
       assert_redirected_to controller: 'discussion_topics', action: 'edit', id: topic.id, anchor: 'mastery-paths-editor'
     end
 
-    it "should redirect to the assignment edit mastery paths page for new quizzes" do
+    it "redirects to the assignment edit mastery paths page for new quizzes" do
       tool = @course.context_external_tools.create! tool_id: ContextExternalTool::QUIZ_LTI, name: 'Q.N',
                                                     consumer_key: '1', shared_secret: '1', domain: 'quizzes.example.com'
       assignment = @course.assignments.create!
@@ -1177,7 +1177,7 @@ describe ContextModulesController do
       assert_redirected_to controller: 'assignments', action: 'edit', id: assignment.id, anchor: 'mastery-paths-editor'
     end
 
-    it "should 404 if module item is not a graded type" do
+    it "404S if module item is not a graded type" do
       page = @course.wiki_pages.create title: "test"
       item = @mod.add_item type: 'page', id: page.id
 
@@ -1187,7 +1187,7 @@ describe ContextModulesController do
   end
 
   describe "POST 'toggle_collapse_all'" do
-    it "should collapse all modules as teacher when passed collapse=1" do
+    it "collapses all modules as teacher when passed collapse=1" do
       course_with_teacher_logged_in(active_all: true)
       page1 = @course.wiki_pages.create title: "test 1"
       page2 = @course.wiki_pages.create title: "test 2"
@@ -1204,7 +1204,7 @@ describe ContextModulesController do
       expect(progression2.collapsed).to be_truthy
     end
 
-    it "should expand all modules as student when passed collapse=0" do
+    it "expands all modules as student when passed collapse=0" do
       course_with_student_logged_in(active_all: true)
       page1 = @course.wiki_pages.create title: "test 1"
       page2 = @course.wiki_pages.create title: "test 2"
@@ -1221,7 +1221,7 @@ describe ContextModulesController do
       expect(progression2.collapsed).to be_falsey
     end
 
-    it "should work multiple times in a row as a student" do
+    it "works multiple times in a row as a student" do
       course_with_student_logged_in(active_all: true)
       page1 = @course.wiki_pages.create title: "test 1"
       module1 = @course.context_modules.create!

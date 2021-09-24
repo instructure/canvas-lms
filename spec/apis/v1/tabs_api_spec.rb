@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe TabsController, type: :request do
   describe 'index' do
-    it "should require read permissions on the context" do
+    it "requires read permissions on the context" do
       course_factory(active_all: true)
       user_factory(active_all: true)
       api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
@@ -32,7 +32,7 @@ describe TabsController, type: :request do
                { :expected_status => 401 })
     end
 
-    it 'should list navigation tabs for a course' do
+    it 'lists navigation tabs for a course' do
       course_with_teacher(:active_all => true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json' },
@@ -184,7 +184,7 @@ describe TabsController, type: :request do
       expect(json.map { |tab| tab['id'] }).to include 'home'
     end
 
-    it 'should include external tools' do
+    it 'includes external tools' do
       course_with_teacher(:active_all => true)
       @tool = @course.context_external_tools.new({
                                                    :name => 'Example',
@@ -248,7 +248,7 @@ describe TabsController, type: :request do
       expect(json.map { |el| el['id'] }).to include 'conferences'
     end
 
-    it 'should list navigation tabs for a group' do
+    it 'lists navigation tabs for a group' do
       group_with_user(:active_all => true)
       json = api_call(:get, "/api/v1/groups/#{@group.id}/tabs",
                       { :controller => 'tabs', :action => 'index', :group_id => @group.to_param, :format => 'json' })
@@ -310,7 +310,7 @@ describe TabsController, type: :request do
       ]
     end
 
-    it 'should list navigation tabs for an account' do
+    it 'lists navigation tabs for an account' do
       account_admin_user(:active_all => true)
       @account = @user.account
       json = api_call(:get, "/api/v1/accounts/#{@account.id}/tabs",
@@ -512,7 +512,7 @@ describe TabsController, type: :request do
         @course.account.enable_as_k5_account!
       end
 
-      it 'should list a select subset of tabs if it is an elementary course and has the include[]=course_subject_tabs param' do
+      it 'lists a select subset of tabs if it is an elementary course and has the include[]=course_subject_tabs param' do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                         { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json' },
                         { :include => ['course_subject_tabs'] })
@@ -565,7 +565,7 @@ describe TabsController, type: :request do
         ]
       end
 
-      it 'should list navigation tabs without home for an elementary course' do
+      it 'lists navigation tabs without home for an elementary course' do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs",
                         { :controller => 'tabs', :action => 'index', :course_id => @course.to_param, :format => 'json' })
         expect(json).to eq [
@@ -708,7 +708,7 @@ describe TabsController, type: :request do
         end
       end
 
-      it 'should have the correct position' do
+      it 'has the correct position' do
         tab_order = [0, 1, 3, 8, 5, 6, 14, 2, 11, 15, 18, 4, 10, 13]
         @course.tab_configuration = tab_order.map { |n| { 'id' => n } }
         @course.save
@@ -717,7 +717,7 @@ describe TabsController, type: :request do
         json.each { |t| expect(t['position']).to eq tab_order.find_index(@tab_lookup[t['id']]) + 1 }
       end
 
-      it 'should correctly label navigation items as unused' do
+      it 'correctlies label navigation items as unused' do
         unused_tabs = %w{announcements assignments pages files outcomes quizzes modules}
         json = api_call(:get, "/api/v1/courses/#{@course.id}/tabs", { :controller => 'tabs', :action => 'index',
                                                                       :course_id => @course.to_param, :format => 'json' })
@@ -730,7 +730,7 @@ describe TabsController, type: :request do
         end
       end
 
-      it 'should label hidden items correctly' do
+      it 'labels hidden items correctly' do
         hidden_tabs = [3, 8, 5]
         @course.tab_configuration = @tab_ids.map do |n|
           hash = { 'id' => n }
@@ -795,7 +795,7 @@ describe TabsController, type: :request do
                                                    })
       }
 
-      it 'should include external tools' do
+      it 'includes external tools' do
         tool.settings[:user_navigation] = {
           :enabled => 'true',
           :url => 'http://www.example.com',

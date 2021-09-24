@@ -37,46 +37,46 @@ describe 'Eportfolio Reports' do
     Eportfolio.create!(user: user_with_pseudonym1, name: 'Root Account 2 ePortfolio')
   end
 
-  it 'should be scoped to proper root account' do
+  it 'is scoped to proper root account' do
     parsed = read_report(@type, { order: 1, account: @account2 })
     expect(parsed.length).to eq 1
   end
 
-  it 'should include login info' do
+  it 'includes login info' do
     parsed = read_report(@type, { order: 1, account: @account2 })
     expect(parsed.first).to include('user1_eportfolio_sis_id')
   end
 
-  it 'should not raise error when login is deleted' do
+  it 'does not raise error when login is deleted' do
     Pseudonym.where(sis_user_id: 'user1_eportfolio_sis_id').update_all(workflow_state: 'deleted')
     parsed = read_report(@type, { order: 1, account: @account2 })
     expect(parsed.first).to include('user1_eportfolio_sis_id')
   end
 
-  it 'should run on a sub account' do
+  it 'runs on a sub account' do
     parsed = read_report(@type, { order: 2, account: @sub_account })
     expect(parsed.length).to eq 2
   end
 
-  it 'should default to reporting all active eportfolios for specified root account' do
+  it 'defaults to reporting all active eportfolios for specified root account' do
     parsed = read_report(@type, { order: 2, account: @account1 })
     expect(parsed.length).to eq 2
   end
 
-  it 'should only include deleted eportfolios' do
+  it 'onlies include deleted eportfolios' do
     @eportfolio.destroy
     parsed =
       read_report(@type, { params: { 'include_deleted' => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'should only include eportfolios from users with no enrollments' do
+  it 'onlies include eportfolios from users with no enrollments' do
     parsed =
       read_report(@type, { params: { 'no_enrollments' => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'should only include deleted eportfolios from users with no enrollments' do
+  it 'onlies include deleted eportfolios from users with no enrollments' do
     @eportfolio.destroy
     parsed =
       read_report(

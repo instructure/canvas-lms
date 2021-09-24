@@ -100,7 +100,7 @@ describe AssignmentGroupsController do
           }
         end
 
-        it 'should return an empty hash when created without integration data' do
+        it 'returns an empty hash when created without integration data' do
           user_session(@admin)
           course_group
           @assignment = @course.assignments.create!(
@@ -114,7 +114,7 @@ describe AssignmentGroupsController do
           expect(assignment_group_response['integration_data']).to eq({})
         end
 
-        it 'should return the assignment group with integration data when it was created with it' do
+        it 'returns the assignment group with integration data when it was created with it' do
           user_session(@admin)
           group_with_integration_data = course_group_with_integration_data
           @assignment = @course.assignments.create!(
@@ -149,7 +149,7 @@ describe AssignmentGroupsController do
           expect(assignments_ids).to_not include assignment.id
         end
 
-        it 'it should include an assignment if any of its overrides fall within the given grading period' do
+        it 'includes an assignment if any of its overrides fall within the given grading period' do
           user_session(student)
           get :index, params: index_params.merge(grading_period_id: jan_grading_period.id), format: :json
           expect(assignments_ids).to include assignment_with_override.id
@@ -198,7 +198,7 @@ describe AssignmentGroupsController do
         )
       end
 
-      it 'should filter assignments by the submission_type' do
+      it 'filters assignments by the submission_type' do
         user_session(@teacher)
         get :index, {
           params: {

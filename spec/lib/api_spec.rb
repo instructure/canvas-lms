@@ -43,15 +43,15 @@ describe Api do
       @api = TestApiInstance.new Account.default, nil
     end
 
-    it 'should find a simple record' do
+    it 'finds a simple record' do
       expect(@user).to eq @api.api_find(User, @user.id)
     end
 
-    it 'should not find a missing record' do
+    it 'does not find a missing record' do
       expect(lambda { @api.api_find(User, (User.all.map(&:id).max + 1)) }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it 'should find an existing sis_id record' do
+    it 'finds an existing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com")).to eq @user
     end
@@ -67,13 +67,13 @@ describe Api do
       expect(@api.api_find(User, "sis_login_id:user 'a'")).to eq user
     end
 
-    it 'should not find record from other account' do
+    it 'does not find record from other account' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
       expect(lambda { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it 'should find record from other root account explicitly' do
+    it 'finds record from other root account explicitly' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
       expect(Api).to receive(:sis_parse_id).with("root_account:school:sis_login_id:sis_user_1@example.com", anything, anything, anything)
@@ -81,75 +81,75 @@ describe Api do
       expect(@api.api_find(User, "root_account:school:sis_login_id:sis_user_1@example.com")).to eq @user
     end
 
-    it 'should allow passing account param and find record' do
+    it 'allows passing account param and find record' do
       account = Account.create(name: 'new')
       @user = user_with_pseudonym username: "sis_user_1@example.com", account: account
       expect(@api.api_find(User, "sis_login_id:sis_user_1@example.com", account: account)).to eq @user
     end
 
-    it 'should not find a missing sis_id record' do
+    it 'does not find a missing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       expect(lambda { @api.api_find(User, "sis_login_id:sis_user_2@example.com") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it 'should find user id "self" when a current user is provided' do
+    it 'finds user id "self" when a current user is provided' do
       expect(@user).to eq TestApiInstance.new(Account.default, @user).api_find(User, 'self')
     end
 
-    it 'should not find user id "self" when a current user is not provided' do
+    it 'does not find user id "self" when a current user is not provided' do
       expect(lambda { TestApiInstance.new(Account.default, nil).api_find(User, "self") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it 'should find account id "self"' do
+    it 'finds account id "self"' do
       account = Account.create!
       expect(account).to eq TestApiInstance.new(account, nil).api_find(Account, 'self')
     end
 
-    it 'should find account id "default"' do
+    it 'finds account id "default"' do
       account = Account.create!
       expect(Account.default).to eq TestApiInstance.new(account, nil).api_find(Account, 'default')
     end
 
-    it 'should find account id "site_admin"' do
+    it 'finds account id "site_admin"' do
       account = Account.create!
       expect(Account.site_admin).to eq TestApiInstance.new(account, nil).api_find(Account, 'site_admin')
     end
 
-    it 'should find group_category with sis_id' do
+    it 'finds group_category with sis_id' do
       account = Account.create!
       gc = GroupCategory.create(sis_source_id: 'gc_sis', account: account, name: 'gc')
       expect(gc).to eq TestApiInstance.new(account, nil).api_find(GroupCategory, 'sis_group_category_id:gc_sis')
     end
 
-    it 'should find term id "default"' do
+    it 'finds term id "default"' do
       account = Account.create!
       expect(TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'default')).to eq account.default_enrollment_term
     end
 
-    it 'should find term id "current"' do
+    it 'finds term id "current"' do
       account = Account.create!
       term = account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
       expect(TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current')).to eq term
     end
 
-    it 'should not find a "current" term if there is more than one candidate' do
+    it 'does not find a "current" term if there is more than one candidate' do
       account = Account.create!
       account.enrollment_terms.create!(start_at: 1.week.ago, end_at: 1.week.from_now)
       account.enrollment_terms.create!(start_at: 2.weeks.ago, end_at: 2.weeks.from_now)
       expect(TestApiInstance.new(account, nil).api_find_all(account.enrollment_terms, ['current'])).to eq []
     end
 
-    it 'should find an open ended "current" term' do
+    it 'finds an open ended "current" term' do
       account = Account.create!
       term = account.enrollment_terms.create!(start_at: 1.week.ago)
       expect(TestApiInstance.new(account, nil).api_find(account.enrollment_terms, 'current')).to eq term
     end
 
-    it 'should not find a user with an invalid AR id' do
+    it 'does not find a user with an invalid AR id' do
       expect(lambda { @api.api_find(User, "a1") }).to raise_error(ActiveRecord::RecordNotFound)
     end
 
-    it "should not find sis ids in other accounts" do
+    it "does not find sis ids in other accounts" do
       account1 = account_model
       account2 = account_model
       api1 = TestApiInstance.new account1, nil
@@ -171,36 +171,36 @@ describe Api do
       end
     end
 
-    it "should find user by lti_context_id" do
+    it "finds user by lti_context_id" do
       @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
       @user.save!
       expect(@api.api_find(User, "lti_context_id:#{@user.lti_context_id}")).to eq @user
     end
 
-    it "should find user by lti_context_id, aliased to lti_user_id" do
+    it "finds user by lti_context_id, aliased to lti_user_id" do
       @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
       @user.save!
       expect(@api.api_find(User, "lti_user_id:#{@user.lti_context_id}")).to eq @user
     end
 
-    it "should find user by lti_context_id, aliased to lti_1_1_id" do
+    it "finds user by lti_context_id, aliased to lti_1_1_id" do
       @user.lti_context_id = Canvas::Security.hmac_sha1(@user.asset_string.to_s, 'key')
       @user.save!
       expect(@api.api_find(User, "lti_1_1_id:#{@user.lti_context_id}")).to eq @user
     end
 
-    it "should find user by lti_1_3_id" do
+    it "finds user by lti_1_3_id" do
       expect(@api.api_find(User, "lti_1_3_id:#{@user.lti_id}")).to eq @user
     end
 
-    it "should find course by lti_context_id" do
+    it "finds course by lti_context_id" do
       lti_course = course_factory
       lti_course.lti_context_id = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
       lti_course.save!
       expect(@api.api_find(Course, "lti_context_id:#{lti_course.lti_context_id}")).to eq lti_course
     end
 
-    it "should find account by lti_context_id" do
+    it "finds account by lti_context_id" do
       account = Account.create!(name: 'account')
       account.lti_context_id = Canvas::Security.hmac_sha1(account.asset_string.to_s, 'key')
       account.save!
@@ -212,28 +212,28 @@ describe Api do
       expect(@api.api_find(Account, "uuid:#{account.uuid}")).to eq account
     end
 
-    it "should find user by uuid" do
+    it "finds user by uuid" do
       expect(@api.api_find(User, "uuid:#{@user.uuid}")).to eq @user
     end
 
-    it "should find course by uuid" do
+    it "finds course by uuid" do
       lti_course = course_factory
       lti_course.uuid = Canvas::Security.hmac_sha1(lti_course.asset_string.to_s, 'key')
       lti_course.save!
       expect(@api.api_find(Course, "uuid:#{lti_course.uuid}")).to eq lti_course
     end
 
-    it "should find assignment by id" do
+    it "finds assignment by id" do
       assignment = assignment_model()
       expect(@api.api_find(Assignment, "#{assignment.id}")).to eq assignment
     end
 
-    it "should find assignment by sis_assignment_id" do
+    it "finds assignment by sis_assignment_id" do
       assignment = assignment_model(sis_assignment_id: 'LTI_CTX_ID1')
       expect(@api.api_find(Assignment, "sis_assignment_id:#{assignment.sis_assignment_id}")).to eq assignment
     end
 
-    it "should find assignment by lti_context_id" do
+    it "finds assignment by lti_context_id" do
       assignment = assignment_model(lti_context_id: 'LTI_CTX_ID1')
       expect(@api.api_find(Assignment, "lti_context_id:#{assignment.lti_context_id}")).to eq assignment
     end
@@ -245,28 +245,28 @@ describe Api do
       @api = TestApiInstance.new Account.default, nil
     end
 
-    it 'should find no records' do
+    it 'finds no records' do
       expect(@api.api_find_all(User, [])).to eq []
     end
 
-    it 'should find a simple record' do
+    it 'finds a simple record' do
       expect(@api.api_find_all(User, [@user.id])).to eq [@user]
     end
 
-    it 'should find a simple record with uuid' do
+    it 'finds a simple record with uuid' do
       expect(@api.api_find_all(User, ["uuid:#{@user.uuid}"])).to eq [@user]
     end
 
-    it 'should not find a missing record' do
+    it 'does not find a missing record' do
       expect(@api.api_find_all(User, [(User.all.map(&:id).max + 1)])).to eq []
     end
 
-    it 'should find an existing sis_id record' do
+    it 'finds an existing sis_id record' do
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       expect(@api.api_find_all(User, ["sis_login_id:sis_user_1@example.com"])).to eq [@user]
     end
 
-    it 'should find existing records with different lookup strategies' do
+    it 'finds existing records with different lookup strategies' do
       @user1 = user_factory
       @user2 = user_with_pseudonym :username => "sis_user_1@example.com"
       @user3 = user_with_pseudonym
@@ -276,25 +276,25 @@ describe Api do
       expect(@api.api_find_all(User, [@user1.id.to_s, "sis_login_id:sis_user_1@example.com", (User.all.map(&:id).max + 1), "sis_user_id:sis_user_2", "sis_login_id:nonexistent@example.com", "sis_login_id:sis_user_3@example.com", "sis_invalid_column:4", "a1"]).sort_by(&:id)).to eq [@user1, @user2, @user3, @user4].sort_by(&:id)
     end
 
-    it 'should filter out duplicates' do
+    it 'filters out duplicates' do
       @other_user = user_factory
       @user = user_with_pseudonym :username => "sis_user_1@example.com"
       expect(@api.api_find_all(User, [@user.id, "sis_login_id:sis_user_1@example.com", @other_user.id, @user.id]).sort_by(&:id)).to eq [@user, @other_user].sort_by(&:id)
     end
 
-    it "should find user id 'self' when a current user is provided" do
+    it "finds user id 'self' when a current user is provided" do
       @current_user = user_factory
       @other_user = user_factory
       expect(TestApiInstance.new(Account.default, @current_user).api_find_all(User, [@other_user.id, 'self']).sort_by(&:id)).to eq [@current_user, @other_user].sort_by(&:id)
     end
 
-    it 'should not find user id "self" when a current user is not provided' do
+    it 'does not find user id "self" when a current user is not provided' do
       @current_user = user_factory
       @other_user = user_factory
       expect(TestApiInstance.new(Account.default, nil).api_find_all(User, ["self", @other_user.id])).to eq [@other_user]
     end
 
-    it "should not find sis ids in other accounts" do
+    it "does not find sis ids in other accounts" do
       account1 = account_model
       account2 = account_model
       api1 = TestApiInstance.new account1, nil
@@ -309,7 +309,7 @@ describe Api do
       expect(api2.api_find_all(User, ["sis_login_id:sis_user_1@example.com", "sis_login_id:sis_user_2@example.com", "sis_login_id:sis_user_3@example.com", user5.id, user6.id]).sort_by(&:id)).to eq [user2, user4, user5, user6].sort_by(&:id)
     end
 
-    it "should not hit the database if no valid conditions were found" do
+    it "does not hit the database if no valid conditions were found" do
       collection = double()
       allow(collection).to receive(:table_name).and_return("courses")
       expect(collection).to receive(:none).once
@@ -320,7 +320,7 @@ describe Api do
     context "sharding" do
       specs_require_sharding
 
-      it "should find users from other shards" do
+      it "finds users from other shards" do
         @shard1.activate { @user2 = User.create! }
         @shard2.activate { @user3 = User.create! }
 
@@ -347,23 +347,23 @@ describe Api do
   end
 
   context 'map_ids' do
-    it 'should map an empty list' do
+    it 'maps an empty list' do
       expect(Api.map_ids([], User, Account.default)).to eq []
     end
 
-    it 'should map a list of AR ids' do
+    it 'maps a list of AR ids' do
       expect(Api.map_ids([1, 2, '3', '4'], User, Account.default).sort).to eq [1, 2, 3, 4]
     end
 
-    it "should bail on ids it can't figure out" do
+    it "bails on ids it can't figure out" do
       expect(Api.map_ids(["nonexistentcolumn:5", "sis_nonexistentcolumn:6", 7], User, Account.default)).to eq [7]
     end
 
-    it "should filter out sis ids that don't exist, but not filter out AR ids" do
+    it "filters out sis ids that don't exist, but not filter out AR ids" do
       expect(Api.map_ids(["sis_user_id:1", "2"], User, Account.default)).to eq [2]
     end
 
-    it "should find sis ids that exist" do
+    it "finds sis ids that exist" do
       user_with_pseudonym
       @pseudonym.sis_user_id = "sisuser1"
       @pseudonym.save!
@@ -379,7 +379,7 @@ describe Api do
                           ].sort
     end
 
-    it 'should work when only provided sis_ids' do
+    it 'works when only provided sis_ids' do
       user_with_pseudonym
       @pseudonym.sis_user_id = "sisuser1"
       @pseudonym.save!
@@ -394,7 +394,7 @@ describe Api do
                           ].sort
     end
 
-    it "should not find sis ids in other accounts" do
+    it "does not find sis ids in other accounts" do
       account1 = account_model
       account2 = account_model
       user1 = user_with_pseudonym :username => "sisuser1@example.com", :account => account1
@@ -406,7 +406,7 @@ describe Api do
       expect(Api.map_ids(["sis_login_id:sisuser1@example.com", "sis_login_id:sisuser2@example.com", "sis_login_id:sisuser3@example.com", user5.id, user6.id], User, account1).sort).to eq [user1.id, user3.id, user5.id, user6.id].sort
     end
 
-    it 'should try and make params when non-ar_id columns have returned with ar_id columns' do
+    it 'tries and make params when non-ar_id columns have returned with ar_id columns' do
       collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
@@ -417,7 +417,7 @@ describe Api do
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2", "thing3"]
     end
 
-    it 'should try and make params when non-ar_id columns have returned without ar_id columns' do
+    it 'tries and make params when non-ar_id columns have returned without ar_id columns' do
       collection = double()
       pluck_result = ["thing2", "thing3"]
       relation_result = double(eager_load_values: nil, pluck: pluck_result)
@@ -428,7 +428,7 @@ describe Api do
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing2", "thing3"]
     end
 
-    it 'should not try and make params when no non-ar_id columns have returned with ar_id columns' do
+    it 'does not try and make params when no non-ar_id columns have returned with ar_id columns' do
       collection = double()
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(collection).and_return({ :lookups => { "id" => "test-lookup" } })
       expect(Api).to receive(:sis_parse_ids).with("test-ids", { "id" => "test-lookup" }, anything, root_account: "test-root-account")
@@ -437,7 +437,7 @@ describe Api do
       expect(Api.map_ids("test-ids", collection, "test-root-account")).to eq ["thing1", "thing2"]
     end
 
-    it 'should not try and make params when no non-ar_id columns have returned without ar_id columns' do
+    it 'does not try and make params when no non-ar_id columns have returned without ar_id columns' do
       collection = double()
       object1 = double()
       object2 = double()
@@ -454,55 +454,55 @@ describe Api do
       @lookups = Api::SIS_MAPPINGS['users'][:lookups]
     end
 
-    it 'should handle numeric ids' do
+    it 'handles numeric ids' do
       expect(Api.sis_parse_id(1, @lookups)).to eq ["users.id", 1]
       expect(Api.sis_parse_id(10, @lookups)).to eq ["users.id", 10]
     end
 
-    it 'should handle numeric ids as strings' do
+    it 'handles numeric ids as strings' do
       expect(Api.sis_parse_id("1", @lookups)).to eq ["users.id", 1]
       expect(Api.sis_parse_id("10", @lookups)).to eq ["users.id", 10]
     end
 
-    it 'should handle hex_encoded sis_fields' do
+    it 'handles hex_encoded sis_fields' do
       expect(Api.sis_parse_id("hex:sis_login_id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d706c652e636f6d", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4@example.com"]
     end
 
-    it 'should not handle invalid hex fields' do
+    it 'does not handle invalid hex fields' do
       expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616g706c652e636f6d", @lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("hex:sis_user_id:7369737573657234406578616d06c652e636f6d", @lookups)).to eq [nil, nil]
     end
 
-    it 'should not handle hex_encoded non-sis fields' do
+    it 'does not handle hex_encoded non-sis fields' do
       expect(Api.sis_parse_id("hex:id:7369737573657233406578616d706c652e636f6d", @lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("hex:1234", @lookups)).to eq [nil, nil]
     end
 
-    it 'should handle plain sis_fields' do
+    it 'handles plain sis_fields' do
       expect(Api.sis_parse_id("sis_login_id:sisuser3@example.com", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("sis_user_id:sisuser4", @lookups)).to eq ["pseudonyms.sis_user_id", "sisuser4"]
     end
 
-    it "should not handle plain sis_fields that don't exist" do
+    it "does not handle plain sis_fields that don't exist" do
       expect(Api.sis_parse_id("sis_nonexistent_column:1", @lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("sis_nonexistent:a", @lookups)).to eq [nil, nil]
     end
 
-    it 'should not handle other things' do
+    it 'does not handle other things' do
       expect(Api.sis_parse_id("id:1", @lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("a1", @lookups)).to eq [nil, nil]
       expect(Api.sis_parse_id("\t10\n11 ", @lookups)).to eq [nil, nil]
     end
 
-    it 'should handle surrounding whitespace' do
+    it 'handles surrounding whitespace' do
       expect(Api.sis_parse_id("\t10  ", @lookups)).to eq ["users.id", 10]
       expect(Api.sis_parse_id("\t10\n", @lookups)).to eq ["users.id", 10]
       expect(Api.sis_parse_id("  hex:sis_login_id:7369737573657233406578616d706c652e636f6d     ", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
       expect(Api.sis_parse_id("  sis_login_id:sisuser3@example.com\t", @lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('sisuser3@example.com')"]
     end
 
-    it 'should handle user uuid' do
+    it 'handles user uuid' do
       expect(Api.sis_parse_id("uuid:tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0", @lookups)).to \
         eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
     end
@@ -513,40 +513,40 @@ describe Api do
       @lookups = Api::SIS_MAPPINGS['users'][:lookups]
     end
 
-    it 'should handle a list of ar_ids' do
+    it 'handles a list of ar_ids' do
       expect(Api.sis_parse_ids([1, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
       expect(Api.sis_parse_ids(["1", "2", "3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
 
-    it 'should handle a list of sis ids' do
+    it 'handles a list of sis ids' do
       expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
-    it 'should remove duplicates' do
+    it 'removes duplicates' do
       expect(Api.sis_parse_ids([1, 2, 3, 2], @lookups)).to eq({ "users.id" => [1, 2, 3] })
       expect(Api.sis_parse_ids([1, 2, 2, 3], @lookups)).to eq({ "users.id" => [1, 2, 3] })
       expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U2", "sis_user_id:U3"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
       expect(Api.sis_parse_ids(["sis_user_id:U1", "sis_user_id:U2", "sis_user_id:U3", "sis_user_id:U2"], @lookups)).to eq({ "pseudonyms.sis_user_id" => ["U1", "U2", "U3"] })
     end
 
-    it 'should work with mixed sis id types' do
+    it 'works with mixed sis id types' do
       expect(Api.sis_parse_ids([1, 2, "sis_user_id:U1", 3, "sis_user_id:U2", "sis_user_id:U3", "sis_login_id:A1"], @lookups)).to eq({ "users.id" => [1, 2, 3], "pseudonyms.sis_user_id" => ["U1", "U2", "U3"], "LOWER(pseudonyms.unique_id)" => ["LOWER('A1')"] })
     end
 
-    it 'should skip invalid things' do
+    it 'skips invalid things' do
       expect(Api.sis_parse_ids([1, 2, 3, "a1", "invalid", "sis_nonexistent:3"], @lookups)).to eq({ "users.id" => [1, 2, 3] })
     end
   end
 
   context 'sis_find_sis_mapping_for_collection' do
-    it 'should find the appropriate sis mapping' do
+    it 'finds the appropriate sis mapping' do
       [Course, EnrollmentTerm, User, Account, CourseSection].each do |collection|
         expect(Api.sis_find_sis_mapping_for_collection(collection)).to eq Api::SIS_MAPPINGS[collection.table_name]
         expect(Api::SIS_MAPPINGS[collection.table_name].is_a?(Hash)).to be_truthy
       end
     end
 
-    it 'should raise an error otherwise' do
+    it 'raises an error otherwise' do
       [StreamItem, PluginSetting].each do |collection|
         expect(lambda { Api.sis_find_sis_mapping_for_collection(collection) }).to raise_error("need to add support for table name: #{collection.table_name}")
       end
@@ -554,7 +554,7 @@ describe Api do
   end
 
   context 'sis_relation_for_collection' do
-    it 'should pass along the sis_mapping to sis_find_params_for_sis_mapping' do
+    it 'passes along the sis_mapping to sis_find_params_for_sis_mapping' do
       root_account = account_model
       expect(Api).to receive(:relation_for_sis_mapping).with(User, Api::SIS_MAPPINGS['users'], [1, 2, 3], root_account, anything).and_return(1234)
       expect(Api).to receive(:sis_find_sis_mapping_for_collection).with(User).and_return(Api::SIS_MAPPINGS['users'])
@@ -563,7 +563,7 @@ describe Api do
   end
 
   context 'relation_for_sis_mapping' do
-    it 'should pass along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
+    it 'passes along the parsed ids to sis_make_params_for_sis_mapping_and_columns' do
       root_account = account_model
       expect(Api).to receive(:sis_parse_ids).with([1, 2, 3], "lookups", anything, root_account: root_account).and_return({ "users.id" => [4, 5, 6] })
       expect(Api).to receive(:relation_for_sis_mapping_and_columns).with(User, { "users.id" => [4, 5, 6] }, { :lookups => "lookups" }, root_account).and_return("params")
@@ -572,38 +572,38 @@ describe Api do
   end
 
   context 'relation_for_sis_mapping_and_columns' do
-    it 'should fail when not given a root account' do
+    it 'fails when not given a root account' do
       expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
       expect(lambda { Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory) }).to raise_error("sis_root_account required for lookups")
     end
 
-    it 'should properly generate an escaped arg string' do
+    it 'properlies generate an escaped arg string' do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
-    it 'should work with no columns' do
+    it 'works with no columns' do
       expect(Api.relation_for_sis_mapping_and_columns(User, {}, {}, Account.default)).to eq User.none
     end
 
-    it 'should add in joins if the sis_mapping has some with columns' do
+    it 'adds in joins if the sis_mapping has some with columns' do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope", :joins => 'some joins' }, Account.default).eager_load_values).to eq ['some joins']
     end
 
-    it 'should work with a few different column types and account scopings' do
+    it 'works with a few different column types and account scopings' do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id1" => [1, 2, 3], "id2" => ["a", "b", "c"], "id3" => ["s1", "s2", "s3"] }, { :scope => "some_scope", :is_not_scoped_to_account => ['id3'].to_set }, Account.default).to_sql).to match(/\(\(some_scope = #{Account.default.id} AND id1 IN \(1,2,3\)\) OR \(some_scope = #{Account.default.id} AND id2 IN \('a','b','c'\)\) OR id3 IN \('s1','s2','s3'\)\)/)
     end
 
-    it "should scope to accounts by default if :is_not_scoped_to_account doesn't exist" do
+    it "scopes to accounts by default if :is_not_scoped_to_account doesn't exist" do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 
-    it "should fail if we're scoping to an account and the scope isn't provided" do
+    it "fails if we're scoping to an account and the scope isn't provided" do
       expect(lambda { Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, {}, Account.default) }).to raise_error("missing scope for collection")
     end
   end
 
   context 'sis_mappings' do
-    it 'should correctly capture course lookups' do
+    it 'correctlies capture course lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(Course)[:lookups]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq [nil, nil]
@@ -614,7 +614,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'should correctly capture enrollment_term lookups' do
+    it 'correctlies capture enrollment_term lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)[:lookups]
       expect(Api.sis_parse_id("sis_term_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -625,7 +625,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'should correctly capture user lookups' do
+    it 'correctlies capture user lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(User)[:lookups]
       expect(Api.sis_parse_id("sis_user_id:1", lookups)).to eq ["pseudonyms.sis_user_id", "1"]
       expect(Api.sis_parse_id("sis_login_id:1", lookups)).to eq ["LOWER(pseudonyms.unique_id)", "LOWER('1')"]
@@ -638,7 +638,7 @@ describe Api do
         eq ["users.uuid", "tExtjERcuxGKFLO6XxwIBCeXZvZXLdXzs8LV0gK0"]
     end
 
-    it 'should correctly capture account lookups' do
+    it 'correctlies capture account lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(Account)[:lookups]
       expect(Api.sis_parse_id("sis_account_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -649,7 +649,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'should correctly capture course_section lookups' do
+    it 'correctlies capture course_section lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(CourseSection)[:lookups]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_course_id:1", lookups)).to eq [nil, nil]
@@ -660,7 +660,7 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'should correctly capture group_categories lookups' do
+    it 'correctlies capture group_categories lookups' do
       lookups = Api.sis_find_sis_mapping_for_collection(GroupCategory)[:lookups]
       expect(Api.sis_parse_id("sis_group_category_id:1", lookups)).to eq ["sis_source_id", "1"]
       expect(Api.sis_parse_id("sis_section_id:1", lookups)).to eq [nil, nil]
@@ -672,68 +672,68 @@ describe Api do
       expect(Api.sis_parse_id("1", lookups)).to eq ["id", 1]
     end
 
-    it 'should correctly query the course table' do
+    it 'correctlies query the course table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Course)
       expect(Api.relation_for_sis_mapping_and_columns(Course, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'should correctly query the enrollment_term table' do
+    it 'correctlies query the enrollment_term table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(EnrollmentTerm)
       expect(Api.relation_for_sis_mapping_and_columns(EnrollmentTerm, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'should correctly query the user table' do
+    it 'correctlies query the user table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(User)
       expect(Api.relation_for_sis_mapping_and_columns(User, { "pseudonyms.sis_user_id" => ["1"], "pseudonyms.unique_id" => ["1"], "users.id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/\(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.sis_user_id IN \('1'\)\) OR \(pseudonyms.account_id = #{Account.default.id} AND pseudonyms.unique_id IN \('1'\)\) OR users.id IN \('1'\)/)
     end
 
-    it 'should correctly query the account table' do
+    it 'correctlies query the account table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(Account)
       expect(Api.relation_for_sis_mapping_and_columns(Account, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
 
-    it 'should correctly query the course_section table' do
+    it 'correctlies query the course_section table' do
       sis_mapping = Api.sis_find_sis_mapping_for_collection(CourseSection)
       expect(Api.relation_for_sis_mapping_and_columns(CourseSection, { "sis_source_id" => ["1"], "id" => ["1"] }, sis_mapping, Account.default).to_sql).to match(/id IN \('1'\) OR \(root_account_id = #{Account.default.id} AND sis_source_id IN \('1'\)\)/)
     end
   end
 
   context "map_non_sis_ids" do
-    it 'should return an array of numeric ids' do
+    it 'returns an array of numeric ids' do
       expect(Api.map_non_sis_ids([1, 2, 3, 4])).to eq [1, 2, 3, 4]
     end
 
-    it 'should convert string ids to numeric' do
+    it 'converts string ids to numeric' do
       expect(Api.map_non_sis_ids(%w{5 4 3 2})).to eq [5, 4, 3, 2]
     end
 
-    it "should exclude things that don't look like ids" do
+    it "excludes things that don't look like ids" do
       expect(Api.map_non_sis_ids(%w{1 2 lolrus 4chan 5 6!})).to eq [1, 2, 5]
     end
 
-    it "should strip whitespace" do
+    it "strips whitespace" do
       expect(Api.map_non_sis_ids(["  1", "2  ", " 3 ", "4\n"])).to eq [1, 2, 3, 4]
     end
   end
 
   context 'ISO8601 regex' do
-    it 'should not allow invalid dates' do
+    it 'does not allow invalid dates' do
       expect('10/01/2014').to_not match Api::ISO8601_REGEX
     end
 
-    it 'should not allow non ISO8601 dates' do
+    it 'does not allow non ISO8601 dates' do
       expect('2014-10-01').to_not match Api::ISO8601_REGEX
     end
 
-    it 'should not allow garbage dates' do
+    it 'does not allow garbage dates' do
       expect('bad_data').to_not match Api::ISO8601_REGEX
     end
 
-    it 'should allow valid dates' do
+    it 'allows valid dates' do
       expect('2014-10-01T00:00:00-06:00').to match Api::ISO8601_REGEX
     end
 
-    it 'should not allow valid dates BC' do
+    it 'does not allow valid dates BC' do
       expect('-2014-10-01T00:00:00-06:00').to_not match Api::ISO8601_REGEX
     end
   end
@@ -745,7 +745,7 @@ describe Api do
       end
     end
 
-    it "should ignore non-kaltura instructure_inline_media_comment links" do
+    it "ignores non-kaltura instructure_inline_media_comment links" do
       student_in_course
       html = %{<div>This is an awesome youtube:
 <a href="http://www.example.com/" class="instructure_inline_media_comment">here</a>
@@ -827,7 +827,7 @@ describe Api do
       end
     end
 
-    it "should add context to files and remove verifier parameters" do
+    it "adds context to files and remove verifier parameters" do
       course_factory
       attachment_model(:context => @course)
 
@@ -873,7 +873,7 @@ describe Api do
     let(:controller) { double('controller', request: request, response: response, params: {}) }
 
     describe "#ordered_colection" do
-      it 'should order a relation' do
+      it 'orders a relation' do
         ordered = Api.ordered_collection(Course.all)
         expect(ordered.to_sql).to include('ORDER BY "courses"."id"')
       end
@@ -882,18 +882,18 @@ describe Api do
     describe "ordinal collection" do
       let(:collection) { [1, 2, 3] }
 
-      it "should not raise Folio::InvalidPage for pages past the end" do
+      it "does not raise Folio::InvalidPage for pages past the end" do
         controller = double('controller', request: request, response: response, params: { per_page: 1 })
         expect(Api.paginate(collection, controller, 'example.com', page: collection.size + 1))
           .to eq []
       end
 
-      it "should not raise Folio::InvalidPage for integer-equivalent non-Integer pages" do
+      it "does not raise Folio::InvalidPage for integer-equivalent non-Integer pages" do
         expect(Api.paginate(collection, controller, 'example.com', page: '1'))
           .to eq collection
       end
 
-      it "should raise Folio::InvalidPage for pages <= 0" do
+      it "raises Folio::InvalidPage for pages <= 0" do
         expect { Api.paginate(collection, controller, 'example.com', page: 0) }
           .to raise_error(Folio::InvalidPage)
 
@@ -901,7 +901,7 @@ describe Api do
           .to raise_error(Folio::InvalidPage)
       end
 
-      it "should raise Folio::InvalidPage for non-integer pages" do
+      it "raises Folio::InvalidPage for non-integer pages" do
         expect { Api.paginate(collection, controller, 'example.com', page: 'abc') }
           .to raise_error(Folio::InvalidPage)
       end
@@ -911,7 +911,7 @@ describe Api do
       let(:collection) { (1..101).to_a }
 
       context "with no max_per_page argument" do
-        it "should limit to the default max_per_page" do
+        it "limits to the default max_per_page" do
           controller = double('controller', request: request, response: response, params: { per_page: Api.max_per_page + 5 })
           expect(Api.paginate(collection, controller, 'example.com').size)
             .to eq Api.max_per_page
@@ -919,7 +919,7 @@ describe Api do
       end
 
       context "with no per_page parameter" do
-        it "should limit to the default per_page" do
+        it "limits to the default per_page" do
           controller = double('controller', request: request, response: response, params: {})
           expect(Api.paginate(collection, controller, 'example.com').size)
             .to eq Api.per_page
@@ -928,7 +928,7 @@ describe Api do
 
       context "with per_page parameter > max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 100 }) }
-        it "should take the smaller of the max_per_page arugment and the per_page param" do
+        it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 75 }).size)
             .to eq 75
         end
@@ -936,7 +936,7 @@ describe Api do
 
       context "with per_page parameter < max_per_page argument" do
         let(:controller) { double('controller', request: request, response: response, params: { per_page: 75 }) }
-        it "should take the smaller of the max_per_page arugment and the per_page param" do
+        it "takes the smaller of the max_per_page arugment and the per_page param" do
           expect(Api.paginate(collection, controller, 'example.com', { max_per_page: 100 }).size)
             .to eq 75
         end
@@ -950,7 +950,7 @@ describe Api do
     let(:controller) { double('controller', request: request, response: response, params: {}) }
     let(:collection) { [1, 2, 3] }
 
-    it "should return the links in the headers" do
+    it "returns the links in the headers" do
       Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
       link = controller.response.headers['Link']
       expect(link).not_to be_empty
@@ -960,7 +960,7 @@ describe Api do
       expect(link).to include(',<example.com?page=3&per_page=1>; rel="last"')
     end
 
-    it "should return the links in the meta" do
+    it "returns the links in the meta" do
       (data, meta) = Api.jsonapi_paginate(collection, controller, 'example.com', page: 1, per_page: 1)
       expect(meta).not_to be_empty
       expect(meta[:pagination][:current]).to eq('example.com?page=1&per_page=1')
@@ -971,11 +971,11 @@ describe Api do
   end
 
   context ".build_links" do
-    it "should not build links if not pagination is provided" do
+    it "does not build links if not pagination is provided" do
       expect(Api.build_links("www.example.com")).to be_empty
     end
 
-    it "should not build links for empty pages" do
+    it "does not build links for empty pages" do
       expect(Api.build_links("www.example.com/", {
                                :per_page => 10,
                                :current => "",
@@ -986,7 +986,7 @@ describe Api do
                              })).to be_empty
     end
 
-    it "should build current, next, prev, first, and last links if provided" do
+    it "builds current, next, prev, first, and last links if provided" do
       links = Api.build_links("www.example.com/", {
                                 :per_page => 10,
                                 :current => 8,
@@ -1003,7 +1003,7 @@ describe Api do
       expect(links.find { |l| l.match(/rel="last"/) }).to match /page=10&per_page=10>/
     end
 
-    it "should maintain query parameters" do
+    it "maintains query parameters" do
       links = Api.build_links("www.example.com/", {
                                 :query_parameters => { :search => "hihi" },
                                 :per_page => 10,
@@ -1012,7 +1012,7 @@ describe Api do
       expect(links.first).to eq "<www.example.com/?search=hihi&page=2&per_page=10>; rel=\"next\""
     end
 
-    it "should maintain array query parameters" do
+    it "maintains array query parameters" do
       links = Api.build_links("www.example.com/", {
                                 :query_parameters => { :include => ["enrollments"] },
                                 :per_page => 10,
@@ -1022,7 +1022,7 @@ describe Api do
       expect(links.first).to eq "<www.example.com/?#{qs}&page=2&per_page=10>; rel=\"next\""
     end
 
-    it "should not include certain sensitive params in the link headers" do
+    it "does not include certain sensitive params in the link headers" do
       links = Api.build_links("www.example.com/", {
                                 :query_parameters => { :access_token => "blah", :api_key => "xxx", :page => 3, :per_page => 10 },
                                 :per_page => 10,
@@ -1091,22 +1091,22 @@ describe Api do
       @api = TestApiInstance.new Account.default, nil
     end
 
-    it "should return url with a single item" do
+    it "returns url with a single item" do
       url = @api.templated_url(:account_url, "{courses.account}")
       expect(url).to eq "http://www.example.com/accounts/{courses.account}"
     end
 
-    it "should return url with multiple items" do
+    it "returns url with multiple items" do
       url = @api.templated_url(:course_assignment_url, "{courses.id}", "{courses.assignment}")
       expect(url).to eq "http://www.example.com/courses/{courses.id}/assignments/{courses.assignment}"
     end
 
-    it "should return url with no template items" do
+    it "returns url with no template items" do
       url = @api.templated_url(:account_url, "1}")
       expect(url).to eq "http://www.example.com/accounts/1%7D"
     end
 
-    it "should return url with a combination of items" do
+    it "returns url with a combination of items" do
       url = @api.templated_url(:course_assignment_url, "{courses.id}", "1}")
       expect(url).to eq "http://www.example.com/courses/{courses.id}/assignments/1%7D"
     end

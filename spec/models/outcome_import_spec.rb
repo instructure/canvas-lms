@@ -36,7 +36,7 @@ describe OutcomeImport, type: :model do
     OutcomeImport.create_with_attachment(@account, 'instructure_csv', stub_file_data('test.csv', 'abc', 'text'), user_factory)
   end
 
-  it "should keep the import in initializing state during create_with_attachment" do
+  it "keeps the import in initializing state during create_with_attachment" do
     import = create_import do |imp|
       expect(imp.attachment).not_to be_new_record
       expect(imp.workflow_state).to eq 'initializing'
@@ -47,7 +47,7 @@ describe OutcomeImport, type: :model do
     expect(import).not_to be_changed
   end
 
-  it "should use instfs for attachment during create_with_attachment if instfs is enabled" do
+  it "uses instfs for attachment during create_with_attachment if instfs is enabled" do
     allow(InstFS).to receive(:enabled?).and_return(true)
     uuid = "1234-abcd"
     allow(InstFS).to receive(:direct_upload).and_return(uuid)
@@ -55,14 +55,14 @@ describe OutcomeImport, type: :model do
     expect(import.attachment.instfs_uuid).to eq uuid
   end
 
-  it "should save as latest outcome import" do
+  it "saves as latest outcome import" do
     import = create_import
     expect(@account.latest_outcome_import).to be_nil
     import.job_started
     expect(@account.latest_outcome_import).to eq import
   end
 
-  it 'should generate expected json' do
+  it 'generates expected json' do
     import = create_import
     import.outcome_import_errors.create(message: 'Fail!', row: 100)
     json = import.as_json
@@ -76,7 +76,7 @@ describe OutcomeImport, type: :model do
     expect(json["processing_errors"]).to eq [[100, 'Fail!']]
   end
 
-  it 'should limit to 25 processing errors' do
+  it 'limits to 25 processing errors' do
     import = create_import
     100.times do
       import.outcome_import_errors.create(message: 'Fail!')

@@ -118,32 +118,32 @@ RSpec.describe SubmissionComment do
       expect(@observer.email_channel.messages.length).to eq 1
     end
 
-    it "should not send notifications to users in concluded sections" do
+    it "does not send notifications to users in concluded sections" do
       @submission_ended = @assignment.submit_homework(@student_ended)
       @comment = @submission_ended.add_comment(:author => @teacher, :comment => "some comment")
       expect(@comment.messages_sent.keys).not_to be_include('Submission Comment')
     end
 
-    it "should not dispatch notification on create if course is unpublished" do
+    it "does not dispatch notification on create if course is unpublished" do
       @course.complete
       @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
       expect(@course).to_not be_available
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 
-    it "should not dispatch notification on create if student is inactive" do
+    it "does not dispatch notification on create if student is inactive" do
       @student.enrollments.first.deactivate
 
       @comment = @submission.add_comment(:author => @teacher, :comment => "some comment")
       expect(@comment.messages_sent.keys).to_not be_include('Submission Comment')
     end
 
-    it "should not dispatch notification on create for provisional comments" do
+    it "does not dispatch notification on create for provisional comments" do
       @comment = @submission.add_comment(:author => @teacher, :comment => "huttah!", :provisional => true)
       expect(@comment.messages_sent).to be_empty
     end
 
-    it "should dispatch notification on create to teachers even if submission not submitted yet" do
+    it "dispatches notification on create to teachers even if submission not submitted yet" do
       student_in_course(active_all: true)
       @submission = @assignment.find_or_create_submission(@student)
       @comment = @submission.add_comment(:author => @student, :comment => "some comment")
@@ -177,7 +177,7 @@ RSpec.describe SubmissionComment do
     end
   end
 
-  it "should allow valid attachments" do
+  it "allows valid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     @comment = @submission.submission_comments.create!(valid_attributes)
     expect(a.recently_created).to eql(true)
@@ -186,7 +186,7 @@ RSpec.describe SubmissionComment do
     expect(@comment.attachment_ids).to eql(a.id.to_s)
   end
 
-  it "should reject invalid attachments" do
+  it "rejects invalid attachments" do
     a = Attachment.create!(:context => @assignment, :uploaded_data => default_uploaded_data)
     a.recently_created = false
     @comment = @submission.submission_comments.create!(valid_attributes)
@@ -194,7 +194,7 @@ RSpec.describe SubmissionComment do
     expect(@comment.attachment_ids).to eql("")
   end
 
-  it "should render formatted_body correctly" do
+  it "renders formatted_body correctly" do
     @comment = @submission.submission_comments.create!(valid_attributes)
     @comment.comment = %{
 This text has a http://www.google.com link in it...
@@ -221,7 +221,7 @@ This text has a http://www.google.com link in it...
     @submission.save
   end
 
-  it "should send the submission to the stream" do
+  it "sends the submission to the stream" do
     prepare_test_submission
     @comment = @submission.add_comment(:author => @se.user, :comment => "some comment")
     @item = StreamItem.last
@@ -233,7 +233,7 @@ This text has a http://www.google.com link in it...
     expect(@item.stream_item_instances.first.read?).to be_truthy
   end
 
-  it "should mark last_comment_at on the submission" do
+  it "marks last_comment_at on the submission" do
     prepare_test_submission
     student_comment = @submission.add_comment(:author => @submission.user, :comment => "some comment")
     expect(@submission.reload.last_comment_at).to be_nil
@@ -251,14 +251,14 @@ This text has a http://www.google.com link in it...
     expect(@submission.reload.last_comment_at.to_i).to eq frd_comment.created_at.to_i
   end
 
-  it "should not create a stream item for a provisional comment" do
+  it "does not create a stream item for a provisional comment" do
     prepare_test_submission
     expect {
       @submission.add_comment(:author => @teacher, :comment => "some comment", :provisional => true)
     }.to change(StreamItem, :count).by(0)
   end
 
-  it "should ensure the media object exists" do
+  it "ensures the media object exists" do
     assignment_model
     se = @course.enroll_student(user_factory)
     @submission = @assignment.submit_homework(se.user, :body => 'some message')
@@ -278,7 +278,7 @@ This text has a http://www.google.com link in it...
       @assignment.assign_peer_review(@student3, @student1)
     end
 
-    it "should prevent peer reviewer from seeing other comments" do
+    it "prevents peer reviewer from seeing other comments" do
       @teacher_comment = @submission.add_comment(:author => @teacher, :comment => "some comment from teacher")
       @reviewer_comment = @submission.add_comment(:author => @student2, :comment => "some comment from peer reviewer")
       @my_comment = @submission.add_comment(:author => @student3, :comment => "some comment from me")
@@ -306,26 +306,26 @@ This text has a http://www.google.com link in it...
                                                    })
       end
 
-      it "should mark submission comment as anonymous" do
+      it "marks submission comment as anonymous" do
         expect(@reviewer_comment.anonymous?).to be_truthy
       end
 
-      it "should prevent reviewed from seeing reviewer name" do
+      it "prevents reviewed from seeing reviewer name" do
         expect(@reviewer_comment.grants_right?(@student1, :read_author)).to be_falsey
       end
 
-      it "should allow teacher to see reviewer name" do
+      it "allows teacher to see reviewer name" do
         expect(@reviewer_comment.grants_right?(@teacher, :read_author)).to be_truthy
       end
 
-      it "should allow reviewed to see a teacher comment" do
+      it "allows reviewed to see a teacher comment" do
         expect(@teacher_comment.grants_right?(@student1, :read_author)).to be_truthy
       end
     end
   end
 
   describe "reply_from" do
-    it "should ignore replies on deleted accounts" do
+    it "ignores replies on deleted accounts" do
       comment = @submission.add_comment(:user => @teacher, :comment => "some comment")
       Account.default.destroy
       comment.reload
@@ -334,20 +334,20 @@ This text has a http://www.google.com link in it...
       }.to raise_error(IncomingMail::Errors::UnknownAddress)
     end
 
-    it "should create reply" do
+    it "creates reply" do
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
       reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
       expect(reply.provisional_grade).to be_nil
     end
 
-    it "should not create reply for observers" do
+    it "does not create reply for observers" do
       comment = @submission.add_comment(:user => @teacher, :comment => "blah")
       expect {
         comment.reply_from(:user => @observer, :text => "some reply")
       }.to raise_error(IncomingMail::Errors::InvalidParticipant)
     end
 
-    it "should create reply in the same provisional grade" do
+    it "creates reply in the same provisional grade" do
       comment = @submission.add_comment(:user => @teacher, :comment => "blah", :provisional => true)
       reply = comment.reply_from(:user => @teacher, :text => "oops I meant blah")
       expect(reply.provisional_grade).to eq(comment.provisional_grade)
@@ -367,7 +367,7 @@ This text has a http://www.google.com link in it...
   end
 
   describe "read/unread state" do
-    it "should be unread after submission is commented on by teacher" do
+    it "is unread after submission is commented on by teacher" do
       expect {
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @teacher }))
       }.to change(ContentParticipation, :count).by(1)
@@ -375,14 +375,14 @@ This text has a http://www.google.com link in it...
       expect(@submission.unread?(@student)).to be_truthy
     end
 
-    it "should be read after submission is commented on by self" do
+    it "is read after submission is commented on by self" do
       expect {
         @comment = @submission.submission_comments.create!(valid_attributes.merge({ author: @student }))
       }.to change(ContentParticipation, :count).by(0)
       expect(@submission.read?(@student)).to be_truthy
     end
 
-    it "should not set unread state when a provisional comment is made" do
+    it "does not set unread state when a provisional comment is made" do
       expect {
         @submission.add_comment(:author => @teacher, :comment => 'wat', :provisional => true)
       }.to change(ContentParticipation, :count).by(0)

@@ -26,11 +26,11 @@ describe Folder do
     course_factory
   end
 
-  it "should create a new instance given valid attributes" do
+  it "creates a new instance given valid attributes" do
     expect(folder_model).to be_present
   end
 
-  it "should infer its full name if it has a parent folder" do
+  it "infers its full name if it has a parent folder" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
     child = f.active_sub_folders.build(:name => "child")
@@ -55,7 +55,7 @@ describe Folder do
     expect(great_grandchild.full_name).to eql("course files/grandchild/great_grandchild")
   end
 
-  it "should trim trailing whitespaces from folder names" do
+  it "trims trailing whitespaces from folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
     child = f.active_sub_folders.build(:name => "space cadet            ")
@@ -65,7 +65,7 @@ describe Folder do
     expect(child.full_name).to eql("course files/space cadet")
   end
 
-  it "should add an iterator to duplicate folder names" do
+  it "adds an iterator to duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
     child = f.active_sub_folders.build(:name => "child")
@@ -80,7 +80,7 @@ describe Folder do
     expect(child2.full_name).to eql("course files/child 2")
   end
 
-  it "should allow the iterator to increase beyond 10 for duplicate folder names" do
+  it "allows the iterator to increase beyond 10 for duplicate folder names" do
     f = Folder.root_folders(@course).first
     expect(f.full_name).to eql("course files")
     child = f.active_sub_folders.build(:name => "child")
@@ -98,7 +98,7 @@ describe Folder do
     end
   end
 
-  it "should not allow recursive folder structures" do
+  it "does not allow recursive folder structures" do
     f1 = @course.folders.create!(:name => "f1")
     f2 = f1.sub_folders.create!(:name => "f2", :context => @course)
     f3 = f2.sub_folders.create!(:name => "f3", :context => @course)
@@ -107,7 +107,7 @@ describe Folder do
     expect(f1.errors.detect { |e| e.first.to_s == 'parent_folder_id' }).to be_present
   end
 
-  it "should not allow root folders to have their names changed" do
+  it "does not allow root folders to have their names changed" do
     f1 = Folder.root_folders(@course).first
     f1.reload
     f1.update(:name => "something")
@@ -142,7 +142,7 @@ describe Folder do
       expect(folder.root_account_id).to eq @course.root_account_id
     end
 
-    it "shouldn't happen when context is user" do
+    it "does not happen when context is user" do
       folder = @user.folders.create!
       expect(folder.root_account_id).to eq 0
     end
@@ -160,7 +160,7 @@ describe Folder do
     expect(f.active_file_attachments).to be_include(a)
     # f.active_file_attachments.should be_include(nil_a)
   end
-  it "should assign unfiled files to the 'unfiled' folder" do
+  it "assigns unfiled files to the 'unfiled' folder" do
     f = Folder.unfiled_folder(@course)
     a = f.file_attachments.build
     a.context = @course
@@ -172,7 +172,7 @@ describe Folder do
     expect(f.active_file_attachments).to be_include(nil_a)
   end
 
-  it "should not return files without a folder_id if it's not the 'unfiled' folder" do
+  it "does not return files without a folder_id if it's not the 'unfiled' folder" do
     f = @course.folders.create!(:name => "not_unfiled")
     a = f.active_file_attachments.build
     a.context = @course
@@ -183,7 +183,7 @@ describe Folder do
     expect(f.active_file_attachments).not_to be_include(nil_a)
   end
 
-  it "should implement the not_locked scope correctly" do
+  it "implements the not_locked scope correctly" do
     not_locked = [
       Folder.root_folders(@course).first,
       @course.folders.create!(:name => "not locked 1", :locked => false),
@@ -199,7 +199,7 @@ describe Folder do
     expect(@course.folders.not_locked.map(&:id).sort).to eq (not_locked).map(&:id).sort
   end
 
-  it "should not create multiple root folders for a course" do
+  it "does not create multiple root folders for a course" do
     skip('spec requires postgres index') unless Folder.connection.adapter_name == 'PostgreSQL'
 
     @course.folders.create!(:name => Folder::ROOT_FOLDER_NAME, :full_name => Folder::ROOT_FOLDER_NAME, :workflow_state => 'visible')
@@ -212,7 +212,7 @@ describe Folder do
   describe ".assert_path" do
     specs_require_sharding
 
-    it "should not get confused by the same context on multiple shards" do
+    it "does not get confused by the same context on multiple shards" do
       user1 = User.create!
       f1 = Folder.assert_path('myfolder', user1)
       @shard1.activate do
@@ -230,39 +230,39 @@ describe Folder do
       @root_folder = Folder.root_folders(@course).first
     end
 
-    it "should return a sequence of Folders" do
+    it "returns a sequence of Folders" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       bar = @course.folders.create! name: 'bar', parent_folder: foo
       expect(Folder.resolve_path(@course, "foo/bar")).to eql [@root_folder, foo, bar]
     end
 
-    it "should ignore trailing slashes" do
+    it "ignores trailing slashes" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/")).to eql [@root_folder, foo]
     end
 
-    it "should find the root folder given an empty path" do
+    it "finds the root folder given an empty path" do
       expect(Folder.resolve_path(@course, '')).to eql [@root_folder]
     end
 
-    it "should find the root folder given '/'" do
+    it "finds the root folder given '/'" do
       expect(Folder.resolve_path(@course, '/')).to eql [@root_folder]
     end
 
-    it "should find the root folder given a nil path" do
+    it "finds the root folder given a nil path" do
       expect(Folder.resolve_path(@course, nil)).to eql [@root_folder]
     end
 
-    it "should find the root folder given an empty array" do
+    it "finds the root folder given an empty array" do
       expect(Folder.resolve_path(@course, [])).to eql [@root_folder]
     end
 
-    it "should return nil on incomplete match" do
+    it "returns nil on incomplete match" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       expect(Folder.resolve_path(@course, "foo/bar")).to be_nil
     end
 
-    it "should exclude hidden if specified" do
+    it "excludes hidden if specified" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       foo.update_attribute(:workflow_state, 'hidden')
       bar = @course.folders.create! name: 'bar', parent_folder: foo
@@ -270,14 +270,14 @@ describe Folder do
       expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
     end
 
-    it "should exclude locked if specified" do
+    it "excludes locked if specified" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder, locked: true
       bar = @course.folders.create! name: 'bar', parent_folder: foo
       expect(Folder.resolve_path(@course, "foo/bar", true)).to eql [@root_folder, foo, bar]
       expect(Folder.resolve_path(@course, "foo/bar", false)).to be_nil
     end
 
-    it "should accept an array" do
+    it "accepts an array" do
       foo = @course.folders.create! name: 'foo', parent_folder: @root_folder
       bar = @course.folders.create! name: 'bar', parent_folder: foo
       expect(Folder.resolve_path(@course, ['foo', 'bar'])).to eql [@root_folder, foo, bar]
@@ -294,12 +294,12 @@ describe Folder do
       attachment_model context: @course, display_name: 'date_restricted_locked.txt', folder: @root_folder, uploaded_data: default_uploaded_data, lock_at: 1.day.ago, unlock_at: 1.year.from_now
     end
 
-    it "should include all files for teachers" do
+    it "includes all files for teachers" do
       teacher_in_course active_all: true
       expect(@root_folder.file_attachments_visible_to(@teacher).map(&:name)).to match_array %w(normal.txt hidden.txt locked.txt date_restricted_unlocked.txt date_restricted_locked.txt)
     end
 
-    it "should exclude locked and hidden files for students" do
+    it "excludes locked and hidden files for students" do
       student_in_course active_all: true
       expect(@root_folder.file_attachments_visible_to(@student).map(&:name)).to match_array %w(normal.txt date_restricted_unlocked.txt)
     end
@@ -316,7 +316,7 @@ describe Folder do
       @locked_sub2 = @locked_sub1.active_sub_folders.create!(:context => @course, :name => "locked_sub2")
     end
 
-    it "should exclude all descendants of locked folders" do
+    it "excludes all descendants of locked folders" do
       expect(Folder.all_visible_folder_ids(@course)).to match_array([@root_folder, @normal_folder, @normal_sub1, @normal_sub2].map(&:id))
     end
   end
@@ -329,7 +329,7 @@ describe Folder do
       teacher_in_course(:course => @course, :active_all => true)
     end
 
-    it "should grant right to students and teachers" do
+    it "grants right to students and teachers" do
       expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
       expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
     end
@@ -341,12 +341,12 @@ describe Folder do
         @root_folder.reload
       end
 
-      it "should grant right to teachers but not students" do
+      it "grants right to teachers but not students" do
         expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
         expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
       end
 
-      it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+      it "stills grant rights to teachers even if the teacher enrollment is concluded" do
         @teacher.enrollments.where(:course_id => @course).first.complete!
         expect(@course.grants_right?(@teacher, :manage_files_add)).to be_falsey
         expect(@course.grants_right?(@teacher, :manage_files_edit)).to be_falsey
@@ -362,7 +362,7 @@ describe Folder do
       expect(Folder.from_context_or_id(@course, nil)).to eq(folder)
     end
 
-    it "should find by id when context is not provided and id is" do
+    it "finds by id when context is not provided and id is" do
       Folder.root_folders(@course).first
       account_model
       folder_model(context: @account)
@@ -371,7 +371,7 @@ describe Folder do
       expect(Folder.from_context_or_id(nil, @folder.id)).to eq(@folder)
     end
 
-    it "should raise ActiveRecord::RecordNotFound when no record is found" do
+    it "raises ActiveRecord::RecordNotFound when no record is found" do
       expect(Folder.where(id: 1)).to be_empty, 'precondition'
       expect {
         Folder.from_context_or_id(nil, 1)

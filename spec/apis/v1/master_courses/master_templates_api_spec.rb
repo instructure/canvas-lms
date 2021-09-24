@@ -37,7 +37,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @account = Account.default
     end
 
-    it 'should require authorization' do
+    it 'requires authorization' do
       @account.disable_feature!(:granular_permissions_manage_courses)
       @account.role_overrides.create!(
         role: admin_role,
@@ -47,7 +47,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
     end
 
-    it 'should require authorization (granular permissions)' do
+    it 'requires authorization (granular permissions)' do
       @account.enable_feature!(:granular_permissions_manage_courses)
       @account.role_overrides.create!(
         role: admin_role,
@@ -57,18 +57,18 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call(:get, @url, @params, {}, {}, { expected_status: 401 })
     end
 
-    it "should let teachers in the master course view details" do
+    it "lets teachers in the master course view details" do
       course_with_teacher(:course => @course, :active_all => true)
       json = api_call(:get, @url, @params)
       expect(json['id']).to eq @template.id
     end
 
-    it "should require am active template" do
+    it "requires am active template" do
       @template.destroy!
       api_call(:get, @url, @params, {}, {}, { :expected_status => 404 })
     end
 
-    it "should return stuff" do
+    it "returns stuff" do
       time = 2.days.ago
       @template.add_child_course!(Course.create!)
       mig = @template.master_migrations.create!(:imports_completed_at => time, :workflow_state => 'completed')
@@ -90,7 +90,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @params = @base_params.merge(:action => 'associated_courses')
     end
 
-    it "should get some data for associated courses" do
+    it "gets some data for associated courses" do
       term = Account.default.enrollment_terms.create!(:name => "termname")
       child_course1 = course_factory(:course_name => "immachildcourse1", :active_all => true)
       @teacher.update_attribute(:short_name, "displayname")
@@ -117,7 +117,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @params = @base_params.merge(:action => 'update_associations')
     end
 
-    it "should only add courses in the blueprint courses' account (or sub-accounts)" do
+    it "onlies add courses in the blueprint courses' account (or sub-accounts)" do
       sub1 = Account.default.sub_accounts.create!
       sub2 = Account.default.sub_accounts.create!
       @course.update_attribute(:account, sub1)
@@ -128,17 +128,17 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(json['message']).to include("invalid courses")
     end
 
-    it "should require account-level authorization" do
+    it "requires account-level authorization" do
       course_with_teacher(:course => @course, :active_all => true)
       json = api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
     end
 
-    it "should require account-level blueprint permissions" do
+    it "requires account-level blueprint permissions" do
       Account.default.role_overrides.create!(:role => admin_role, :permission => "manage_master_courses", :enabled => false)
       json = api_call(:put, @url, @params, {}, {}, { :expected_status => 401 })
     end
 
-    it "should not try to add other blueprint courses" do
+    it "does not try to add other blueprint courses" do
       other_course = course_factory
       MasterCourses::MasterTemplate.set_as_master_course(other_course)
 
@@ -146,7 +146,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(json['message']).to include("invalid courses")
     end
 
-    it "should not try to add other blueprint-associated courses" do
+    it "does not try to add other blueprint-associated courses" do
       other_master_course = course_factory
       other_template = MasterCourses::MasterTemplate.set_as_master_course(other_master_course)
       other_course = course_factory
@@ -156,7 +156,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(json['message']).to include("cannot add courses already associated")
     end
 
-    it "should skip existing associations" do
+    it "skips existing associations" do
       other_course = course_factory
       @template.add_child_course!(other_course)
 
@@ -164,7 +164,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       api_call(:put, @url, @params, { :course_ids_to_add => [other_course.id] })
     end
 
-    it "should be able to add and remove courses" do
+    it "is able to add and remove courses" do
       existing_child = course_factory
       existing_sub = @template.add_child_course!(existing_child)
 
@@ -179,7 +179,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(@template.child_subscriptions.active.pluck(:child_course_id)).to match_array([c1.id, c2.id])
     end
 
-    it "should be able to add and remove courses by sis_source_id" do
+    it "is able to add and remove courses by sis_source_id" do
       existing_child = course_factory(:sis_source_id => "bleep")
       existing_sub = @template.add_child_course!(existing_child)
 
@@ -205,20 +205,20 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @sub = @template.add_child_course!(@child_course)
     end
 
-    it "should require some associated courses" do
+    it "requires some associated courses" do
       @sub.destroy! # deleted ones shouldn't count
       json = api_call(:post, @url, @params, {}, {}, { :expected_status => 400 })
       expect(json['message']).to include("No associated courses")
     end
 
-    it "should not allow double-queueing" do
+    it "does not allow double-queueing" do
       MasterCourses::MasterMigration.start_new_migration!(@template, @user)
 
       json = api_call(:post, @url, @params, {}, {}, { :expected_status => 400 })
       expect(json['message']).to include("currently running")
     end
 
-    it "should queue a master migration" do
+    it "queues a master migration" do
       json = api_call(:post, @url, @params.merge(:comment => 'seriously', :copy_settings => '1'))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
@@ -227,7 +227,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(migration.send_notification).to eq false
     end
 
-    it "should accept the send_notification option" do
+    it "accepts the send_notification option" do
       json = api_call(:post, @url, @params.merge(:send_notification => true))
       migration = @template.master_migrations.find(json['id'])
       expect(migration).to be_queued
@@ -244,7 +244,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
     end
 
     describe "blueprint side" do
-      it "should show a migration" do
+      it "shows a migration" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
                         @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
         expect(json['workflow_state']).to eq 'queued'
@@ -252,7 +252,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         expect(json['comment']).to eq 'Hark!'
       end
 
-      it "should show migrations" do
+      it "shows migrations" do
         run_jobs
         expect(@migration.reload).to be_completed
         migration2 = MasterCourses::MasterMigration.start_new_migration!(@template, @user)
@@ -263,7 +263,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         expect(pairs).to eq [[migration2.id, 'queued'], [@migration.id, 'completed']]
       end
 
-      it "should resolve an expired job if necessary" do
+      it "resolves an expired job if necessary" do
         MasterCourses::MasterMigration.where(:id => @migration.id).update_all(:created_at => 3.days.ago)
         json = api_call(:get, "/api/v1/courses/#{@course.id}/blueprint_templates/default/migrations/#{@migration.id}",
                         @base_params.merge(:action => 'migrations_show', :id => @migration.to_param))
@@ -278,7 +278,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         teacher_in_course(:course => @child_course, :active_all => true)
       end
 
-      it "should show a migration" do
+      it "shows a migration" do
         json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/#{@sub.id}/migrations/#{@minion_migration.id}",
                                 @base_params.merge(:subscription_id => @sub.to_param, :course_id => @child_course.to_param, :action => 'imports_show', :id => @minion_migration.to_param))
         expect(json['workflow_state']).to eq 'completed'
@@ -287,7 +287,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         expect(json['comment']).to eq 'Hark!'
       end
 
-      it "should show migrations" do
+      it "shows migrations" do
         json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@child_course.id}/blueprint_subscriptions/default/migrations",
                                 @base_params.merge(:subscription_id => 'default', :course_id => @child_course.to_param, :action => 'imports_index'))
         expect(json.size).to eq 1
@@ -327,19 +327,19 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @params = @base_params.merge(:action => 'restrict_item')
     end
 
-    it "should validate content type" do
+    it "validates content type" do
       json = api_call(:put, @url, @params, { :content_type => 'passignment', :content_id => "2", :restricted => '1' }, {}, { :expected_status => 400 })
       expect(json['message']).to include("Must be a valid content type")
     end
 
-    it "should give a useful error when content is missing" do
+    it "gives a useful error when content is missing" do
       other_course = Course.create!
       other_assmt = other_course.assignments.create!
       json = api_call(:put, @url, @params, { :content_type => 'assignment', :content_id => other_assmt.id, :restricted => '1' }, {}, { :expected_status => 404 })
       expect(json['message']).to include("Could not find content")
     end
 
-    it "should be able to find all the (currently) supported types" do
+    it "is able to find all the (currently) supported types" do
       expect(@template.default_restrictions[:content]).to be_truthy
 
       assmt = @course.assignments.create!
@@ -360,7 +360,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       end
     end
 
-    it "should be able to set custom restrictions" do
+    it "is able to set custom restrictions" do
       assmt = @course.assignments.create!
       api_call(:put, @url, @params, { :content_type => 'assignment', :content_id => assmt.id,
                                       :restricted => '1', :restrictions => { 'content' => '1', 'points' => '1' } }, {}, { :expected_status => 200 })
@@ -370,13 +370,13 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(mc_tag.use_default_restrictions).to be_falsey
     end
 
-    it "should validate custom restrictions" do
+    it "validates custom restrictions" do
       assmt = @course.assignments.create!
       api_call(:put, @url, @params, { :content_type => 'assignment', :content_id => assmt.id,
                                       :restricted => '1', :restrictions => { 'content' => '1', 'not_a_real_thing' => '1' } }, {}, { :expected_status => 400 })
     end
 
-    it "should be able to unset restrictions" do
+    it "is able to unset restrictions" do
       assmt = @course.assignments.create!
       mc_tag = @template.content_tag_for(assmt, { :restrictions => @template.default_restrictions, :use_default_restrictions => true })
       api_call(:put, @url, @params, { :content_type => 'assignment', :content_id => assmt.id,
@@ -386,7 +386,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(mc_tag.use_default_restrictions).to be_falsey
     end
 
-    it "should use default restrictions by object type if enabled" do
+    it "uses default restrictions by object type if enabled" do
       assmt = @course.assignments.create!
       assmt_tag = @template.content_tag_for(assmt)
       page = @course.wiki_pages.create!(:title => "blah")
@@ -404,7 +404,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       expect(page_tag.reload.restrictions).to eq page_restricts
     end
 
-    it "should use quiz object type restrictions if the quiz assignment is locked" do
+    it "uses quiz object type restrictions if the quiz assignment is locked" do
       quiz_assmt = @course.assignments.create!(:submission_types => 'online_quiz').reload
       quiz = quiz_assmt.quiz
       quiz_tag = @template.content_tag_for(quiz)

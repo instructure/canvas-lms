@@ -88,7 +88,7 @@ describe UsersController, type: :request do
     @a2.reload
   end
 
-  it "should check for auth" do
+  it "checks for auth" do
     get("/api/v1/users/self/todo")
     assert_status(401)
 
@@ -98,7 +98,7 @@ describe UsersController, type: :request do
     assert_status(401)
   end
 
-  it "should return a global user todo list" do
+  it "returns a global user todo list" do
     json = api_call(:get, "/api/v1/users/self/todo",
                     :controller => "users", :action => "todo_items", :format => "json")
     update_assignment_json
@@ -126,7 +126,7 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json)).to eq strip_secure_params(@a2_json)
   end
 
-  it "should return a list for users who are both teachers and students" do
+  it "returns a list for users who are both teachers and students" do
     @student_course.enroll_teacher(@user)
     @teacher_course.enroll_student(@user)
     json = api_call(:get, "/api/v1/users/self/todo",
@@ -138,14 +138,14 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.second)).to eq strip_secure_params(@a2_json)
   end
 
-  it 'should not crash when mixing items with/without due dates (users controller)' do
+  it 'does not crash when mixing items with/without due dates (users controller)' do
     @a2.update(due_at: nil)
     api_call(:get, "/api/v1/users/self/todo",
              controller: "users", action: "todo_items", format: "json")
     expect(response).to be_successful
   end
 
-  it 'should not crash when mixing items with/without due dates (courses controller)' do
+  it 'does not crash when mixing items with/without due dates (courses controller)' do
     @teacher_course.enroll_student(@teacher).accept!
     @a2.update(due_at: nil)
     Assignment.create!(context: @teacher_course, due_at: 1.day.from_now, title: 'text', submission_types: 'online_text_entry', points_possible: 15)
@@ -156,7 +156,7 @@ describe UsersController, type: :request do
     expect(response).to be_successful
   end
 
-  it "should ignore a todo item permanently" do
+  it "ignores a todo item permanently" do
     api_call(:delete, @a2_json['ignore_permanently'],
              :controller => "users", :action => "ignore_item",
              :format => "json", :purpose => "grading",
@@ -175,7 +175,7 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
-  it "should ignore a todo item until the next change" do
+  it "ignores a todo item until the next change" do
     api_call(:delete, @a2_json['ignore'],
              :controller => "users", :action => "ignore_item", :format => "json", :purpose => "grading", :asset_string => "assignment_#{@a2.id}", :permanent => "0")
     expect(response).to be_successful
@@ -194,7 +194,7 @@ describe UsersController, type: :request do
     expect(strip_secure_params(json.first)).to eq strip_secure_params(@a2_json)
   end
 
-  it "should ignore excused assignments for students" do
+  it "ignores excused assignments for students" do
     @student_course.enroll_teacher(@teacher)
     @a1.grade_student(@me, excuse: true, grader: @teacher)
 
@@ -205,7 +205,7 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
-  it "should include future assignments that don't expect an online submission (courses endpoint)" do
+  it "includes future assignments that don't expect an online submission (courses endpoint)" do
     past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
     ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     due_overridden = @student_course.assignments.create! workflow_state: 'published', submission_types: 'not_graded'
@@ -216,7 +216,7 @@ describe UsersController, type: :request do
     expect(json.map { |e| e['assignment']['id'] }).not_to include past_ungraded.id
   end
 
-  it "should include future assignments that don't expect an online submission (users endpoint)" do
+  it "includes future assignments that don't expect an online submission (users endpoint)" do
     past_ungraded = @student_course.assignments.create! due_at: 2.days.ago, workflow_state: 'published', submission_types: 'not_graded'
     ungraded = @student_course.assignments.create! due_at: 2.days.from_now, workflow_state: 'published', submission_types: 'not_graded'
     due_overridden = @student_course.assignments.create! workflow_state: 'published', submission_types: 'not_graded'
@@ -226,7 +226,7 @@ describe UsersController, type: :request do
     expect(json.map { |e| e['assignment']['id'] }).not_to include past_ungraded.id
   end
 
-  it "should respect grading permissions (users endpoint)" do
+  it "respects grading permissions (users endpoint)" do
     course_with_ta(course: @teacher_course, active_all: true)
     @ta = @user
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
@@ -241,7 +241,7 @@ describe UsersController, type: :request do
     expect(json.length).to eq 0
   end
 
-  it "should not include items from courses concluded by terms dates if the user is also an admin" do
+  it "does not include items from courses concluded by terms dates if the user is also an admin" do
     account_admin_user(account: @teacher_course.root_account, user: @user)
     json = api_call :get, "/api/v1/users/self/todo", controller: "users", action: "todo_items", format: "json"
     expect(json.map { |e| e['assignment']['id'] }).to include @a2.id
@@ -522,7 +522,7 @@ describe UsersController, type: :request do
       @user.ignore_item!(assignment, 'grading', true)
     end
 
-    it "should check for auth" do
+    it "checks for auth" do
       get("/api/v1/users/self/todo_item_count")
       assert_status(401)
     end

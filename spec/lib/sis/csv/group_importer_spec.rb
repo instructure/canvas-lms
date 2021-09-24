@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::GroupImporter do
   before { account_model }
 
-  it "should skip bad content" do
+  it "skips bad content" do
     process_csv_data_cleanly(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"
@@ -51,7 +51,7 @@ describe SIS::CSV::GroupImporter do
     expect(Group.count).to eq before_count + 1
   end
 
-  it "should create groups" do
+  it "creates groups" do
     account_model
     sub = @account.all_accounts.create!(name: 'sub')
     sub.update_attribute('sis_source_id', 'A002')
@@ -67,7 +67,7 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:workflow_state)).to eq %w(available deleted)
   end
 
-  it "should create groups with no account id column" do
+  it "creates groups with no account id column" do
     account_model
     process_csv_data_cleanly(
       "group_id,name,status",
@@ -80,7 +80,7 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:workflow_state)).to eq %w(available)
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,name,status",
@@ -109,7 +109,7 @@ describe SIS::CSV::GroupImporter do
     expect(@account.all_groups.where(sis_source_id: 'G001').take.workflow_state).to eq 'available'
   end
 
-  it "should update group attributes" do
+  it "updates group attributes" do
     sub = @account.sub_accounts.create!(name: 'sub')
     sub.update_attribute('sis_source_id', 'A002')
     process_csv_data_cleanly(
@@ -132,7 +132,7 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:account)).to eq [@account, sub]
   end
 
-  it "should use group_category_id and set sis_id" do
+  it "uses group_category_id and set sis_id" do
     sub = @account.sub_accounts.create!(name: 'sub')
     sub.update_attribute('sis_source_id', 'A002')
     process_csv_data_cleanly(
@@ -152,7 +152,7 @@ describe SIS::CSV::GroupImporter do
     expect(groups.map(&:group_category)).to eq GroupCategory.order(:id).to_a
   end
 
-  it "should use course_id" do
+  it "uses course_id" do
     course = course_factory(account: @account, sis_source_id: 'c001')
     process_csv_data_cleanly(
       "group_id,course_id,name,status",
@@ -161,7 +161,7 @@ describe SIS::CSV::GroupImporter do
     expect(Group.where(sis_source_id: 'G001').take.context).to eq course
   end
 
-  it "should not allow changing course_id with group_memberships" do
+  it "does not allow changing course_id with group_memberships" do
     course1 = course_factory(account: @account, sis_source_id: 'c001')
     course_factory(account: @account, sis_source_id: 'c002')
     group = group_model(context: course1, sis_source_id: "G001")

@@ -79,19 +79,19 @@ describe GradeCalculator do
       check_grades(nil, final, check_current: false, check_final: true)
     end
 
-    it "should work without assignments or submissions" do
+    it "works without assignments or submissions" do
       @group.assignments.clear
       check_grades(nil, nil)
     end
 
-    it "should work without submissions" do
+    it "works without submissions" do
       @course.assignments.create! :title => 'asdf',
                                   :points_possible => 1,
                                   :assignment_group => @group
       check_grades(nil, 0.0)
     end
 
-    it "should work with submissions that have 0 points possible" do
+    it "works with submissions that have 0 points possible" do
       set_grades [[10, 0], [10, 10], [10, 10], [nil, 10]]
       check_grades(150.0, 100.0)
 
@@ -172,18 +172,18 @@ describe GradeCalculator do
       check_final_grade(40.0)
     end
 
-    it 'should "work" when no submissions have points possible' do
+    it '"work"s when no submissions have points possible' do
       set_grades [[10, 0], [5, 0], [20, 0], [0, 0]]
       @group.update_attribute(:rules, 'drop_lowest:1')
       check_grades(nil, nil)
     end
 
-    it "should work with no drop rules" do
+    it "works with no drop rules" do
       set_default_grades
       check_grades(55.99, 12.38)
     end
 
-    it "should support drop_lowest" do
+    it "supports drop_lowest" do
       set_default_grades
       @group.update_attribute(:rules, 'drop_lowest:1')
       check_grades(63.41, 55.99)
@@ -192,7 +192,7 @@ describe GradeCalculator do
       check_grades(74.64, 63.41)
     end
 
-    it "should really support drop_lowest" do
+    it "reallies support drop_lowest" do
       set_grades [[30, nil], [30, nil], [30, nil], [31, 31], [21, 21],
                   [30, 30], [30, 30], [30, 30], [30, 30], [30, 30], [30, 30],
                   [30, 30], [30, 30], [30, 30], [30, 30], [29.3, 30], [30, 30],
@@ -201,7 +201,7 @@ describe GradeCalculator do
       check_grades(132.12, 132.12)
     end
 
-    it "should support drop_highest" do
+    it "supports drop_highest" do
       set_default_grades
       @group.update_attribute(:rules, 'drop_highest:1')
       check_grades(32.07, 4.98)
@@ -213,7 +213,7 @@ describe GradeCalculator do
       check_grades(7.89, 0.29)
     end
 
-    it "should really support drop_highest" do
+    it "reallies support drop_highest" do
       grades = [[0, 10], [10, 20], [28, 50], [91, 100]]
       set_grades(grades)
 
@@ -227,13 +227,13 @@ describe GradeCalculator do
       check_grades(0.0, 0.0)
     end
 
-    it "should work with unreasonable drop rules" do
+    it "works with unreasonable drop rules" do
       set_grades([[10, 10], [9, 10], [8, 10]])
       @group.update_attribute :rules, "drop_lowest:1000\ndrop_highest:1000"
       check_grades(100.0, 100.0)
     end
 
-    it "should work with drop rules that result in only unpointed assignments going to the drop lowest phase" do
+    it "works with drop rules that result in only unpointed assignments going to the drop lowest phase" do
       set_grades([[9, 0], [10, 0], [2, 2]])
       @group.update_attribute :rules, "drop_lowest:1\ndrop_highest:1"
       check_grades(nil, nil)
@@ -369,7 +369,7 @@ describe GradeCalculator do
         before :each do
           set_up_course_for_differentiated_assignments
         end
-        it "should calculate scores based on visible assignments only" do
+        it "calculates scores based on visible assignments only" do
           # Non-overridden assignments are not visible to this student at all even though she's been graded on them
           # because the assignment is only visible to overrides. Therefore only the (first three) overridden assignments
           # ever count towards her final grade in all these specs
@@ -377,21 +377,21 @@ describe GradeCalculator do
           expect(final_grade_info(@user, @course)[:total]).to equal 30.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 60.0
         end
-        it "should drop the lowest visible when that rule is in place" do
+        it "drops the lowest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_lowest:1') # rubocop:disable Rails/SkipsModelValidations
           # 5 + 15 + 10 - 5
           expect(final_grade_info(@user, @course)[:total]).to equal 25.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_lowest)]
         end
-        it "should drop the highest visible when that rule is in place" do
+        it "drops the highest visible when that rule is in place" do
           @group.update_attribute(:rules, 'drop_highest:1') # rubocop:disable Rails/SkipsModelValidations
           # 5 + 15 + 10 - 15
           expect(final_grade_info(@user, @course)[:total]).to equal 15.0
           expect(final_grade_info(@user, @course)[:possible]).to equal 40.0
           expect(final_grade_info(@user, @course)[:dropped]).to eq [find_submission(@overridden_highest)]
         end
-        it "should not count an invisible assignment with never drop on" do
+        it "does not count an invisible assignment with never drop on" do
           # rubocop:disable Rails/SkipsModelValidations
           @group.update_attribute(:rules, "drop_lowest:2\nnever_drop:#{@overridden_lowest.id}")
           # rubocop:enable Rails/SkipsModelValidations

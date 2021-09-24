@@ -33,7 +33,7 @@ describe "files page with tools" do
       Account.default.enable_feature!(:commons_favorites)
     end
 
-    it "should be able to launch the index menu tool via the tray", custom_timeout: 60 do
+    it "is able to launch the index menu tool via the tray", custom_timeout: 60 do
       get "/courses/#{@course.id}/files"
 
       gear = f("#file_menu_link")

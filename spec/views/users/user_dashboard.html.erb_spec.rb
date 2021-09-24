@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/user_dashboard" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:courses, [@course])
@@ -36,7 +36,7 @@ describe "/users/user_dashboard" do
     expect(response).not_to be_nil
   end
 
-  it "should show announcements to users with no enrollments" do
+  it "shows announcements to users with no enrollments" do
     user_factory
     view_context
     assign(:courses, [])
@@ -53,7 +53,7 @@ describe "/users/user_dashboard" do
     expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Default\sAccount)/)
   end
 
-  it "should show announcements (site_admin) to users with no enrollments" do
+  it "shows announcements (site_admin) to users with no enrollments" do
     user_factory
     view_context
     assign(:courses, [])

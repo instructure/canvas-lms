@@ -53,11 +53,11 @@ describe Stats do
                                 eql(histogram)
     end
 
-    it "should be able to initialize with an array" do
+    it "is able to initialize with an array" do
       expect { Stats::Counter.new([1, 2, 4, 6, 9]) }.not_to raise_error
     end
 
-    it "should return some basic statistics" do
+    it "returns some basic statistics" do
       c = Stats::Counter.new([1, 2, 4, 9])
       check_stats(c, 4, 9, 1, 16, 4.0, 9.5, { :bin_width => 1.0, :bin_base => 0.0, :data => { 1.0 => 1, 2.0 => 1, 4.0 => 1, 9.0 => 1 } })
       c << 6
@@ -70,7 +70,7 @@ describe Stats do
       check_stats(c, 8, 21, -1, 45, 5.625, 41.984375, { :bin_width => 1.0, :bin_base => 0.0, :data => { 1.0 => 1, 2.0 => 1, 4.0 => 1, 9.0 => 1, 6.0 => 1, -1.0 => 1, 3.0 => 1, 21.0 => 1 } })
     end
 
-    it "should determine standard deviation" do
+    it "determines standard deviation" do
       c = Stats::Counter.new([9, 2, 5, 4, 12, 7, 8, 11, 9, 3, 7, 4, 12, 5, 4, 10, 9, 6, 9, 4])
       stddev = c.stddev
       expect('%.2f' % stddev).to eq '2.98'
@@ -89,7 +89,7 @@ describe Stats do
       expect(c.stddev).to be_nil
     end
 
-    it "should return the right things with no values" do
+    it "returns the right things with no values" do
       c = Stats::Counter.new
       check_stats_with_matchers c,
                                 be_truthy,
@@ -108,7 +108,7 @@ describe Stats do
       check_stats(c, 2, 5, -5, 0, 0.0, 25.0, { :bin_width => 1.0, :bin_base => 0.0, :data => { -5.0 => 1, 5.0 => 1 } })
     end
 
-    it "should support .each, .<<, and .push" do
+    it "supports .each, .<<, and .push" do
       c = Stats::Counter.new([1, 2, 3])
       test = []
       c.each { |item| test << item }
@@ -118,49 +118,49 @@ describe Stats do
       expect(test).to eq [1, 2, 3, 1, 2, 3, 4, 5]
     end
 
-    it "should put negative numbers in the proper bin in histograms" do
+    it "puts negative numbers in the proper bin in histograms" do
       c = Stats::Counter.new([-1, -0.5, 0, 0.5, 1])
       h = c.histogram
       expect(h).to eq({ :bin_width => 1.0, :bin_base => 0.0, :data => { -1.0 => 2, 0.0 => 2, 1.0 => 1 } })
     end
 
-    it "should work with strange bin widths in histogram" do
+    it "works with strange bin widths in histogram" do
       c = Stats::Counter.new([-7, -3, 0, 1, 2, 3, 4, 5, 6])
       h = c.histogram(bin_width = 2.5, bin_base = 0.0)
       expect(h).to eq({ :bin_width => 2.5, :bin_base => 0.0, :data => { 0.0 => 3, -5.0 => 1, 5.0 => 2, -7.5 => 1, 2.5 => 2 } })
     end
 
-    it "should work with strange bin bases in histogram" do
+    it "works with strange bin bases in histogram" do
       c = Stats::Counter.new([-7, -3, 0, 1, 2, 3, 4, 5, 6])
       h = c.histogram(bin_width = 2.5, bin_base = 1.5)
       expect(h).to eq({ :bin_width => 2.5, :bin_base => 1.5, :data => { 1.5 => 2, 4.0 => 3, -3.5 => 1, -8.5 => 1, -1.0 => 2 } })
     end
 
-    it "should return quarties properly" do
+    it "returns quarties properly" do
       c = Stats::Counter.new([6, 4, 2, -7, 0, 1, 3, 5, -3, 20])
       q = c.quartiles
       expect(q).to eq [-0.75, 2.5, 5.25]
     end
 
-    it "should return nils for quartiles when there is no data" do
+    it "returns nils for quartiles when there is no data" do
       c = Stats::Counter.new([])
       q = c.quartiles
       expect(q).to eq [nil, nil, nil]
     end
 
-    it "should return a single number for quartiles if that is the only thing in the data" do
+    it "returns a single number for quartiles if that is the only thing in the data" do
       c = Stats::Counter.new([5])
       q = c.quartiles
       expect(q).to eq [5, 5, 5]
     end
 
-    it "should return properly for a dataset of length 3" do
+    it "returns properly for a dataset of length 3" do
       c = Stats::Counter.new([1, 2, 10])
       q = c.quartiles
       expect(q).to eq [1, 2, 10]
     end
 
-    it "should return properly for a dataset of length 2" do
+    it "returns properly for a dataset of length 2" do
       c = Stats::Counter.new([1, 10])
       q = c.quartiles
       expect(q).to eq [1, 5.5, 10]

@@ -70,19 +70,19 @@ describe BrandConfigHelpers do
       setup_account_family_with_configs
     end
 
-    it "should return nill without a parent" do
+    it "returns nill without a parent" do
       expect(@parent_account.first_parent_brand_config).to be_nil
     end
 
-    it "should work when parent is a root account" do
+    it "works when parent is a root account" do
       expect(@child_account.first_parent_brand_config).to eq @parent_config
     end
 
-    it "should work when parent is a not root account" do
+    it "works when parent is a not root account" do
       expect(@grand_child_account.first_parent_brand_config).to eq @child_config
     end
 
-    it "should work with site_admin" do
+    it "works with site_admin" do
       site_admin_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" })
       site_admin_config.save!
       BrandConfigRegenerator.process(Account.site_admin, user_factory, site_admin_config)

@@ -35,7 +35,7 @@ describe "user outcome results page as a teacher" do
     get outcome_url
   end
 
-  it "should toggle show all artifacts after clicking button" do
+  it "toggles show all artifacts after clicking button" do
     btn = f('#show_all_artifacts_link')
     expect(btn.text).to eq "Show All Artifacts"
     btn.click

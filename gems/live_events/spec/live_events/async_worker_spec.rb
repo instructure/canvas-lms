@@ -72,7 +72,7 @@ describe LiveEvents::AsyncWorker do
   end
 
   describe "push" do
-    it "should execute stuff pushed on the queue" do
+    it "executes stuff pushed on the queue" do
       results_double = double
       results = OpenStruct.new(records: results_double)
       expect(results_double).to receive(:each_with_index).and_return([])
@@ -84,7 +84,7 @@ describe LiveEvents::AsyncWorker do
       @worker.stop!
     end
 
-    it "should batch write" do
+    it "batches write" do
       results_double = double
       results = OpenStruct.new(records: results_double)
       expect(results_double).to receive(:each_with_index).and_return([])
@@ -96,7 +96,7 @@ describe LiveEvents::AsyncWorker do
       @worker.stop!
     end
 
-    it "should time batch write" do
+    it "times batch write" do
       results_double = double
       results = OpenStruct.new(records: results_double)
       allow(results_double).to receive(:each_with_index).and_return([])
@@ -113,7 +113,7 @@ describe LiveEvents::AsyncWorker do
       @worker.stop!
     end
 
-    it "should reject items when queue is full" do
+    it "rejects items when queue is full" do
       LiveEvents.max_queue_size = -> { 5 }
       5.times { expect(@worker.push(event, partition_key)).to be_truthy }
 
@@ -121,7 +121,7 @@ describe LiveEvents::AsyncWorker do
     end
 
     context 'with error putting to kinesis' do
-      it "should write errors to logger" do
+      it "writes errors to logger" do
         results = OpenStruct.new(records: [
                                    OpenStruct.new(error_code: 'failure', error_message: 'failure message')
                                  ])
@@ -140,7 +140,7 @@ describe LiveEvents::AsyncWorker do
   end
 
   describe "exit handling" do
-    it "should drain the queue" do
+    it "drains the queue" do
       skip("flaky spec needs fixed in PLAT-5106")
       @worker.push(event, partition_key)
       expect(@worker).to receive(:at_exit).and_yield

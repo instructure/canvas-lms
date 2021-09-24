@@ -39,7 +39,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
     end
 
     context "as a student" do
-      it "should be unauthorized" do
+      it "is unauthorized" do
         quiz_extension_params = [
           { user_id: @student.id, extra_attempts: 2 },
         ]
@@ -59,7 +59,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
         @teacher  = teacher_in_course(course: @course, active_all: true).user
       end
 
-      it "should extend attempts for a existing submission" do
+      it "extends attempts for a existing submission" do
         quiz_submission = @quiz.generate_submission(@student1)
         quiz_submission.grants_right?(@teacher, :add_attempts)
 
@@ -70,7 +70,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
         expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
-      it "should extend attempts for a new submission" do
+      it "extends attempts for a new submission" do
         quiz_extension_params = [
           { user_id: @student1.id, extra_attempts: 2 }
         ]
@@ -78,7 +78,7 @@ describe Quizzes::QuizExtensionsController, type: :request do
         expect(res['quiz_extensions'][0]['extra_attempts']).to eq 2
       end
 
-      it "should extend attempts for multiple students" do
+      it "extends attempts for multiple students" do
         quiz_extension_params = [
           { user_id: @student1.id, extra_attempts: 2 },
           { user_id: @student2.id, extra_attempts: 3 }

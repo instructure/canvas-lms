@@ -191,7 +191,7 @@ describe 'as a student' do
         end
       end
 
-      it 'should be able to be saved as a draft', custom_timeout: 30 do
+      it 'is able to be saved as a draft', custom_timeout: 30 do
         StudentAssignmentPageV2.create_text_entry_draft("Hello")
         wait_for_tiny(StudentAssignmentPageV2.text_entry_area)
 

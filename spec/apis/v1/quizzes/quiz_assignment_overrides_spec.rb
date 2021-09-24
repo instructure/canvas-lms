@@ -31,7 +31,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       @quiz.reload
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       user_factory(active_all: true) # not enrolled
 
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/assignment_overrides",
@@ -41,7 +41,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       expect(response.code).to eq '401'
     end
 
-    it "should include visible overrides" do
+    it "includes visible overrides" do
       due_at = 5.minutes.ago
 
       assignment_override_model({
@@ -73,7 +73,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       end
     end
 
-    it "should include visible overrides if user can :read_as_admin" do
+    it "includes visible overrides if user can :read_as_admin" do
       due_at = 5.minutes.ago
 
       @course.account.role_overrides.create!({
@@ -127,7 +127,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       @quiz.save!
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       user_factory(active_all: true) # not enrolled
 
       raw_api_call(:get, "/api/v1/courses/#{@course.id}/new_quizzes/assignment_overrides",
@@ -137,7 +137,7 @@ describe Quizzes::QuizAssignmentOverridesController, type: :request do
       expect(response.code).to eq '401'
     end
 
-    it "should include visible overrides" do
+    it "includes visible overrides" do
       due_at = 5.minutes.ago
 
       assignment_override_model({

@@ -29,7 +29,7 @@ module Assignments
     end
 
     describe "#count" do
-      it "should only count submissions in the user's visible section(s)" do
+      it "onlies count submissions in the user's visible section(s)" do
         @section = @course.course_sections.create!(:name => 'section 2')
         @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
         @section.enroll_user(@user2, 'StudentEnrollment', 'active')
@@ -91,7 +91,7 @@ module Assignments
         end
       end
 
-      it "should not count submissions multiple times" do
+      it "does not count submissions multiple times" do
         @section1 = @course.course_sections.create!(:name => 'section 1')
         @section2 = @course.course_sections.create!(:name => 'section 2')
         @user = user_with_pseudonym(:active_all => true, :name => 'Student1', :username => 'student1@instructure.com')
@@ -163,7 +163,7 @@ module Assignments
           @ta2 = ta_in_course(:course => @course, :active_all => true).user
         end
 
-        it "should only include students with no marks when unmoderated" do
+        it "onlies include students with no marks when unmoderated" do
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
@@ -177,7 +177,7 @@ module Assignments
           expect(querier.count).to eq 2
         end
 
-        it "should only include students without two marks when moderated" do
+        it "onlies include students without two marks when moderated" do
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
@@ -199,7 +199,7 @@ module Assignments
         @section2 = @course.course_sections.create!(name: 'section 2')
       end
 
-      it "should count submissions in all section(s)" do
+      it "counts submissions in all section(s)" do
         @user1 = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
         @user2 = user_with_pseudonym(active_all: true, name: 'Student2', username: 'student2@instructure.com')
         @section2.enroll_user(@user2, 'StudentEnrollment', 'active')
@@ -220,7 +220,7 @@ module Assignments
         expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
       end
 
-      it "should not count submissions multiple times" do
+      it "does not count submissions multiple times" do
         @user = user_with_pseudonym(active_all: true, name: 'Student1', username: 'student1@instructure.com')
         @section1 = @course.course_sections.create!(name: 'section 1')
         @section1.enroll_user(@user, 'StudentEnrollment', 'active')
@@ -237,14 +237,14 @@ module Assignments
           @assignment.submit_homework(@user, submission_type: 'online_text_entry', body: 'blah')
         end
 
-        it "should count ungraded submissions" do
+        it "counts ungraded submissions" do
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
           @assignment.grade_student(@user, grade: "0", grader: @teacher)
           @assignment.reload
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
         end
 
-        it "should not count non-student submissions" do
+        it "does not count non-student submissions" do
           assignment_model(course: @course)
           s = @assignment.find_or_create_submission(@teacher)
           s.submission_type = 'online_quiz'
@@ -257,7 +257,7 @@ module Assignments
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(0)
         end
 
-        it "should count only enrolled student submissions" do
+        it "counts only enrolled student submissions" do
           expect(NeedsGradingCountQuery.new(@assignment).manual_count).to be(1)
           @course.enrollments.where(user_id: @user.id).first.destroy
           @assignment.reload

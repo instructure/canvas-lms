@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Importers::ContextExternalToolImporter do
-  it "should work for course-level tools" do
+  it "works for course-level tools" do
     course_model
     migration = @course.content_migrations.create!
     tool = Importers::ContextExternalToolImporter.import_from_migration({ :title => 'tool', :url => 'http://example.com' }, @course, migration)
@@ -28,7 +28,7 @@ describe Importers::ContextExternalToolImporter do
     expect(tool.context).to eq @course
   end
 
-  it 'should not create a new record if "persist" is falsey' do
+  it 'does not create a new record if "persist" is falsey' do
     course_model
     migration = @course.content_migrations.create!
     expect do
@@ -36,7 +36,7 @@ describe Importers::ContextExternalToolImporter do
     end.not_to change { ContextExternalTool.count }
   end
 
-  it "should work for account-level tools" do
+  it "works for account-level tools" do
     course_model
     migration = @course.account.content_migrations.create!
     tool = Importers::ContextExternalToolImporter.import_from_migration({ :title => 'tool', :url => 'http://example.com' }, @course.account, migration)
@@ -81,7 +81,7 @@ describe Importers::ContextExternalToolImporter do
       @migration = ContentMigration.new(:migration_type => "common_cartridge_importer")
     end
 
-    it "should not combine if not common cartridge" do
+    it "does not combine if not common cartridge" do
       @migration.migration_type = "canvas_cartridge_importer"
       data = [
         { :migration_id => '1', :title => 'tool', :url => 'http://example.com/page' },
@@ -95,7 +95,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '2']
     end
 
-    it "should combine an external tool with a url and one with a domain" do
+    it "combines an external tool with a url and one with a domain" do
       data = [
         { :migration_id => '1', :title => 'tool', :url => 'http://example.com/page' },
         { :migration_id => '2', :title => 'tool', :domain => 'example.com' },
@@ -115,7 +115,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
-    it "should combine two external tools with urls (if they're on the same domain)" do
+    it "combines two external tools with urls (if they're on the same domain)" do
       data = [
         { :migration_id => '1', :title => 'tool', :url => 'http://example.com/page' },
         { :migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage' },
@@ -136,7 +136,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
-    it "should include the custom fields in translation (if they're on the same domain)" do
+    it "includes the custom fields in translation (if they're on the same domain)" do
       data = [
         { :migration_id => '1', :title => 'tool', :url => 'http://example.com/page?query=present', :custom_fields => { 'ihasacustomfield' => 'blah' } },
         { :migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage', :custom_fields => { 'bloop' => 'so do i' } },
@@ -157,7 +157,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
-    it "should not combine external tools with extremely long custom fields" do
+    it "does not combine external tools with extremely long custom fields" do
       data = [
         { :migration_id => '1', :title => 'tool', :domain => 'example.com' },
         { :migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage' },
@@ -178,7 +178,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('3')).to be_nil
     end
 
-    it "should combine external tools with the same settings" do
+    it "combines external tools with the same settings" do
       data = [
         { :migration_id => '1', :title => 'tool', :domain => 'example.com', :settings => { :not_null => :same, :vendor_extensions => { 'oi' => 'hoyt' } } },
         { :migration_id => '2', :title => 'tool', :url => 'http://example.com/otherpage', :settings => { :not_null => :same, :vendor_extensions => { 'oi' => 'heyhey' } } },
@@ -217,7 +217,7 @@ describe Importers::ContextExternalToolImporter do
       ]
     end
 
-    it "should not search if setting not enabled" do
+    it "does not search if setting not enabled" do
       @data.each do |hash|
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
       end
@@ -225,7 +225,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['1', '2', '3', '4']
     end
 
-    it "should search for existing tools if setting enabled" do
+    it "searches for existing tools if setting enabled" do
       @migration.migration_settings[:prefer_existing_tools] = true
       @data.each do |hash|
         Importers::ContextExternalToolImporter.import_from_migration(hash, @course, @migration)
@@ -238,7 +238,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@migration.find_external_tool_translation('4')).to eq [@tool2.id, nil]
     end
 
-    it "should not use an existing tool if the names don't match" do
+    it "does not use an existing tool if the names don't match" do
       @migration.migration_settings[:prefer_existing_tools] = true
       @data.each do |hash|
         if hash[:migration_id] == "4"
@@ -250,7 +250,7 @@ describe Importers::ContextExternalToolImporter do
       expect(@course.context_external_tools.map(&:migration_id).sort).to eq ['3', '4'] # brings in tool 4 now
     end
 
-    it "should use an existing tool even if the names don't match if we're doing regular cc import" do
+    it "uses an existing tool even if the names don't match if we're doing regular cc import" do
       # because tool compaction changes the name
       @migration.migration_settings[:prefer_existing_tools] = true
       @migration.migration_type = "common_cartridge_importer"

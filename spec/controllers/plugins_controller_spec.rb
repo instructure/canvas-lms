@@ -34,7 +34,7 @@ describe PluginsController do
       expect(ps).to be_enabled
     end
 
-    it 'it trims posted params' do
+    it 'trims posted params' do
       ps = PluginSetting.new(name: 'big_blue_button')
       ps.settings = {}.with_indifferent_access
       ps.disabled = false

@@ -30,7 +30,7 @@ describe "GradeChangeAudit API", type: :request do
       @user.account_users.create(account: Account.default)
     end
 
-    it "should 404" do
+    it "404S" do
       raw_api_call(:get, "/api/v1/audit/grade_change/students/#{@user.id}", controller: :grade_change_audit_api, action: :for_student, student_id: @user.id.to_s, format: :json)
       assert_status(404)
     end
@@ -203,7 +203,7 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     context "nominal cases" do
-      it "should include events at context endpoint" do
+      it "includes events at context endpoint" do
         expect_event_for_context(@assignment, @event)
         expect_event_for_context(@course, @event)
         expect_event_for_context(@student, @event, type: "student")
@@ -339,12 +339,12 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "should 404 for inactive assignments" do
+      it "404S for inactive assignments" do
         @assignment.destroy
         fetch_for_context(@assignment, expected_status: 404)
       end
 
-      it "should allow inactive assignments when used with a course" do
+      it "allows inactive assignments when used with a course" do
         @assignment.destroy
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
@@ -359,7 +359,7 @@ describe "GradeChangeAudit API", type: :request do
         fetcher.call(contexts)
       end
 
-      it "should allow inactive courses" do
+      it "allows inactive courses" do
         @course.destroy
         fetch_for_context(@course, expected_status: 200)
         test_course_and_contexts do |contexts|
@@ -367,12 +367,12 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "should 404 for inactive students" do
+      it "404S for inactive students" do
         @student.destroy
         fetch_for_context(@student, expected_status: 404, type: "student")
       end
 
-      it "should allow inactive students when used with a course" do
+      it "allows inactive students when used with a course" do
         @student.destroy
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
@@ -387,12 +387,12 @@ describe "GradeChangeAudit API", type: :request do
         fetcher.call(contexts)
       end
 
-      it "should 404 for inactive grader" do
+      it "404S for inactive grader" do
         @teacher.destroy
         fetch_for_context(@teacher, expected_status: 404, type: "grader")
       end
 
-      it "should allow inactive graders when used with a course" do
+      it "allows inactive graders when used with a course" do
         @teacher.destroy
         fetcher = lambda do |contexts|
           fetch_for_course_and_other_contexts(contexts, expected_status: 200)
@@ -465,7 +465,7 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     describe "permissions" do
-      it "should not authorize the endpoints with no permissions" do
+      it "does not authorize the endpoints with no permissions" do
         @user, @viewing_user = @user, user_model
 
         fetch_for_context(@course, expected_status: 401)
@@ -477,7 +477,7 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "should not authorize the endpoints with :view_all_grades, :view_grade_changes and :manage_grades revoked" do
+      it "does not authorize the endpoints with :view_all_grades, :view_grade_changes and :manage_grades revoked" do
         RoleOverride.manage_role_override(@account_user.account, @account_user.role,
                                           :view_grade_changes.to_s, override: false)
         RoleOverride.manage_role_override(@account_user.account, @account_user.role,
@@ -494,7 +494,7 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "should not allow other account models" do
+      it "does not allow other account models" do
         new_root_account = Account.create!(name: 'New Account')
         allow(LoadAccount).to receive(:default_domain_root_account).and_return(new_root_account)
         @viewing_user = user_with_pseudonym(account: new_root_account)
@@ -561,17 +561,17 @@ describe "GradeChangeAudit API", type: :request do
           @viewing_user = user_with_pseudonym(account: @new_root_account)
         end
 
-        it "should 404 if nothing matches the type" do
+        it "404S if nothing matches the type" do
           fetch_for_context(@student, expected_status: 404, type: "student")
           fetch_for_context(@teacher, expected_status: 404, type: "grader")
         end
 
-        it "should work for teachers" do
+        it "works for teachers" do
           course_with_teacher(account: @new_root_account, user: @teacher)
           fetch_for_context(@teacher, expected_status: 200, type: "grader")
         end
 
-        it "should work for students" do
+        it "works for students" do
           course_with_student(account: @new_root_account, user: @student)
           fetch_for_context(@student, expected_status: 200, type: "student")
         end
@@ -585,11 +585,11 @@ describe "GradeChangeAudit API", type: :request do
         @json = fetch_for_context(@student, per_page: 2, type: "student")
       end
 
-      it "should only return one page of results" do
+      it "onlies return one page of results" do
         expect(@json['events'].size).to eq 2
       end
 
-      it "should have pagination headers" do
+      it "has pagination headers" do
         expect(response.headers['Link']).to match(/rel="next"/)
       end
     end

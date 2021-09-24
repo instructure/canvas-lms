@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../sharding_spec_helpe
 describe Auditors::ActiveRecord::GradeChangeRecord do
   let(:request_id) { 'abcde-12345' }
 
-  it "it appropriately connected to a table" do
+  it "appropriately connected to a table" do
     expect(Auditors::ActiveRecord::GradeChangeRecord.count).to eq(0)
   end
 

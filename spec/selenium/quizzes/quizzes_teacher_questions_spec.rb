@@ -35,7 +35,7 @@ describe "quizzes questions" do
   end
 
   context "as a teacher" do
-    it "should edit a quiz question", priority: "1", test_id: 209946 do
+    it "edits a quiz question", priority: "1", test_id: 209946 do
       @context = @course
       q = quiz_model
       quest1 = q.quiz_questions.create!(:question_data => { :name => "first question" })
@@ -71,7 +71,7 @@ describe "quizzes questions" do
       expect(question.find_elements(:css, '.answers .answer').length).to eq 3
     end
 
-    it "should sanitize any html added to the quiz question description", priority: "1", test_id: 209947 do
+    it "sanitizes any html added to the quiz question description", priority: "1", test_id: 209947 do
       bad_html = '<div id="question_16740547_question_text" class="question_text user_content enhanced">
                     <p>For Mead, what is the "essence" of the self?</p>
                   </div>
@@ -94,7 +94,7 @@ describe "quizzes questions" do
       expect(ffj(".question_form:visible .form_answers .answer").size).to eq 2
     end
 
-    it "should not show Missing Word option in question types dropdown", priority: "1", test_id: 209948 do
+    it "does not show Missing Word option in question types dropdown", priority: "1", test_id: 209948 do
       get "/courses/#{@course.id}/quizzes"
       click_new_quiz_button
 
@@ -105,7 +105,7 @@ describe "quizzes questions" do
       expect(f("#questions")).not_to contain_css(".question_holder option.missing_word")
     end
 
-    it "should not show the display details for text questions", priority: "1", test_id: 209951 do
+    it "does not show the display details for text questions", priority: "1", test_id: 209951 do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
@@ -119,7 +119,7 @@ describe "quizzes questions" do
       expect(show_el).not_to be_displayed
     end
 
-    it "should not show the display details for essay questions", priority: "1", test_id: 209950 do
+    it "does not show the display details for essay questions", priority: "1", test_id: 209950 do
       quiz = start_quiz_question
 
       question = fj(".question_form:visible")
@@ -133,7 +133,7 @@ describe "quizzes questions" do
       expect(show_el).not_to be_displayed
     end
 
-    it "should show the display details when questions other than text or essay questions exist", priority: "1", test_id: 209952 do
+    it "shows the display details when questions other than text or essay questions exist", priority: "1", test_id: 209952 do
       quiz = start_quiz_question
       show_el = f('#show_question_details')
       question = fj(".question_form:visible")
@@ -148,7 +148,7 @@ describe "quizzes questions" do
       expect(show_el).to be_displayed
     end
 
-    it "should calculate correct quiz question points total", priority: "1", test_id: 209953 do
+    it "calculates correct quiz question points total", priority: "1", test_id: 209953 do
       quiz = quiz_model(course: @course)
       quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       open_quiz_edit_form
@@ -160,7 +160,7 @@ describe "quizzes questions" do
 
     it "should round published quiz points correctly on main quiz page", priority: "2", test_id: 209954
 
-    it "should round numeric questions when creating a quiz", priority: "1", test_id: 209955 do
+    it "rounds numeric questions when creating a quiz", priority: "1", test_id: 209955 do
       start_quiz_question
       question = fj(".question_form:visible")
       click_option('.question_form:visible .question_type', 'Numerical Answer')
@@ -172,7 +172,7 @@ describe "quizzes questions" do
       expect(answer_exact).to have_value('0.0007')
     end
 
-    it "should allow points with various delimiters", priority: "1", test_id: 209956 do
+    it "allows points with various delimiters", priority: "1", test_id: 209956 do
       quiz = quiz_model(course: @course)
       quiz.quiz_questions.create!(question_data: multiple_choice_question_data)
       open_quiz_edit_form

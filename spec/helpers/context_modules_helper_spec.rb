@@ -27,23 +27,23 @@ describe ContextModulesHelper do
   let_once(:t_module) { t_course.context_modules.create! name: "test module" }
 
   describe "module_item_unpublishable?" do
-    it "should return true for a nil item" do
+    it "returns true for a nil item" do
       expect(module_item_unpublishable?(nil)).to be_truthy
     end
 
-    it "should return true for an itemless item like a subheader" do
+    it "returns true for an itemless item like a subheader" do
       item = t_module.add_item(type: 'context_module_sub_header')
       expect(module_item_unpublishable?(item)).to be_truthy
     end
 
-    it "should return true for an item that doesn't respond to can_unpublish?" do
+    it "returns true for an item that doesn't respond to can_unpublish?" do
       tag = t_module.content_tags.build
       tag.tag_type = 'context_module'
       tag.content = Thumbnail.new
       expect(module_item_unpublishable?(tag)).to be_truthy
     end
 
-    it "should return the content's can_unpublish?" do
+    it "returns the content's can_unpublish?" do
       topic = t_course.discussion_topics.create
       topic.workflow_state = 'active'
       topic.save!
@@ -57,7 +57,7 @@ describe ContextModulesHelper do
   end
 
   describe "module_item_publishable?" do
-    it "should return true for an itemless item like a subheader" do
+    it "returns true for an itemless item like a subheader" do
       item = t_module.add_item(type: 'context_module_sub_header')
       expect(module_item_publishable?(item)).to be_truthy
     end
@@ -157,7 +157,7 @@ describe ContextModulesHelper do
                                                                            ])
     end
 
-    it "should not set mastery_paths if cyoe is disabled" do
+    it "does not set mastery_paths if cyoe is disabled" do
       allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(false)
       expect(ConditionalRelease::Service).to receive(:rules_for).never
       module_data = process_module_data(t_module, true, @student, @session)
@@ -170,20 +170,20 @@ describe ContextModulesHelper do
         allow(ConditionalRelease::Service).to receive(:enabled_in_context?).and_return(true)
       end
 
-      it "should set mastery_paths for a cyoe trigger assignment module item" do
+      it "sets mastery_paths for a cyoe trigger assignment module item" do
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:mastery_paths][:locked]).to eq false
         expect(item_data[:mastery_paths][:assignment_sets]).to eq [{}, {}]
       end
 
-      it "should return the correct choose_url for a cyoe trigger assignment module item" do
+      it "returns the correct choose_url for a cyoe trigger assignment module item" do
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:choose_url]).to eq context_url(t_course, :context_url) + '/modules/items/' + item.id.to_s + '/choose'
       end
 
-      it "should be true if no set has been selected and the rule is locked" do
+      it "is true if no set has been selected and the rule is locked" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
                                                                                {
                                                                                  trigger_assignment: assg.id,
@@ -196,13 +196,13 @@ describe ContextModulesHelper do
         expect(item_data[:show_cyoe_placeholder]).to eq true
       end
 
-      it "should be true if no set has been selected and sets are available" do
+      it "is true if no set has been selected and sets are available" do
         module_data = process_module_data(t_module, true, @student, @session)
         item_data = module_data[:items_data][item.id]
         expect(item_data[:show_cyoe_placeholder]).to eq true
       end
 
-      it "should be true if still processing results" do
+      it "is true if still processing results" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
                                                                                {
                                                                                  trigger_assignment: assg.id,
@@ -216,7 +216,7 @@ describe ContextModulesHelper do
         expect(item_data[:show_cyoe_placeholder]).to eq false
       end
 
-      it "should be false if no set has been selected and no sets are available" do
+      it "is false if no set has been selected and no sets are available" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
                                                                                {
                                                                                  trigger_assignment: assg.id,
@@ -229,7 +229,7 @@ describe ContextModulesHelper do
         expect(item_data[:show_cyoe_placeholder]).to eq false
       end
 
-      it "should be false if set has been selected for a cyoe trigger assignment module item" do
+      it "is false if set has been selected for a cyoe trigger assignment module item" do
         allow(ConditionalRelease::Service).to receive(:rules_for).and_return([
                                                                                {
                                                                                  selected_set_id: 1,
@@ -302,7 +302,7 @@ describe ContextModulesHelper do
       @mod = @course.context_modules.create!
     end
 
-    it "should return true for a graded assignment module item" do
+    it "returns true for a graded assignment module item" do
       ag = @course.assignment_groups.create!
       assg = ag.assignments.create! context: @course, submission_types: 'online_text_entry'
       item = @mod.add_item type: 'assignment', id: assg.id
@@ -310,7 +310,7 @@ describe ContextModulesHelper do
       expect(cyoe_able?(item)).to eq true
     end
 
-    it "should return false for a ungraded assignment module item" do
+    it "returns false for a ungraded assignment module item" do
       ag = @course.assignment_groups.create!
       assg = ag.assignments.create! context: @course, submission_types: 'not_graded'
       item = @mod.add_item type: 'assignment', id: assg.id
@@ -318,21 +318,21 @@ describe ContextModulesHelper do
       expect(cyoe_able?(item)).to eq false
     end
 
-    it "should return true for a assignment quiz module item" do
+    it "returns true for a assignment quiz module item" do
       quiz = @course.quizzes.create! quiz_type: 'assignment'
       item = @mod.add_item type: 'quiz', id: quiz.id
 
       expect(cyoe_able?(item)).to eq true
     end
 
-    it "should return false for a non-assignment quiz module item" do
+    it "returns false for a non-assignment quiz module item" do
       quiz = @course.quizzes.create! quiz_type: 'survey'
       item = @mod.add_item type: 'quiz', id: quiz.id
 
       expect(cyoe_able?(item)).to eq false
     end
 
-    it "should return true for a graded discussion module item" do
+    it "returns true for a graded discussion module item" do
       ag = @course.assignment_groups.create!
       assg = ag.assignments.create! context: @course, submission_types: 'discussion_topic'
       topic = @course.discussion_topics.create! assignment: assg
@@ -341,7 +341,7 @@ describe ContextModulesHelper do
       expect(cyoe_able?(item)).to eq true
     end
 
-    it "should return false for a non-graded discussion module item" do
+    it "returns false for a non-graded discussion module item" do
       topic = @course.discussion_topics.create!
       item = @mod.add_item type: 'discussion_topic', id: topic.id
 

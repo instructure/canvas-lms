@@ -43,7 +43,7 @@ describe PlannerOverridesController do
   end
 
   context "unauthenticated" do
-    it "should return unauthorized" do
+    it "returns unauthorized" do
       get :index
       assert_unauthorized
 
@@ -100,7 +100,7 @@ describe PlannerOverridesController do
         post :create, params: { plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true }
       end
 
-      it "should save announcement overrides with a plannable_type of announcement" do
+      it "saves announcement overrides with a plannable_type of announcement" do
         announcement_model(context: @course)
         post :create, params: { plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true }
         json = json_parse(response.body)

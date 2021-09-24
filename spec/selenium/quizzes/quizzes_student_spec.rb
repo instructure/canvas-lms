@@ -194,12 +194,12 @@ describe 'quizzes' do
       @quiz.save!
     end
 
-    it "should not show correct answers on first attempt", priority: "1", test_id: 474288 do
+    it "does not show correct answers on first attempt", priority: "1", test_id: 474288 do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('.correct_answer')
     end
 
-    it "should show correct answers on last attempt", priority: "1", test_id: 474288 do
+    it "shows correct answers on last attempt", priority: "1", test_id: 474288 do
       @qsub.update_attribute :attempt, 2
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(ff('.correct_answer').length).to be > 0
@@ -226,7 +226,7 @@ describe 'quizzes' do
     end
   end
 
-  it "should show badge counts after completion", priority: "1", test_id: 474289 do
+  it "shows badge counts after completion", priority: "1", test_id: 474289 do
     quiz_with_submission
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
 

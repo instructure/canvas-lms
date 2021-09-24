@@ -22,7 +22,7 @@ require 'spec_helper'
 
 describe SubAccountsController do
   describe "POST 'create'" do
-    it "should create sub-accounts with the right root account when inside the root account" do
+    it "creates sub-accounts with the right root account when inside the root account" do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
@@ -39,7 +39,7 @@ describe SubAccountsController do
       expect(sub_sub_account_1.root_account).to eq root_account
     end
 
-    it "should create sub-accounts with the right root account when inside a sub account" do
+    it "creates sub-accounts with the right root account when inside a sub account" do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
@@ -54,7 +54,7 @@ describe SubAccountsController do
       expect(sub_sub_account_2.root_account).to eq root_account
     end
 
-    it 'should report errors encountered while creating a sub account' do
+    it 'reports errors encountered while creating a sub account' do
       root_account = Account.default
       account_admin_user(:active_all => true)
       user_session(@user)
@@ -67,7 +67,7 @@ describe SubAccountsController do
   end
 
   describe "GET 'index'" do
-    it "should preload all necessary information" do
+    it "preloads all necessary information" do
       root_account = Account.create(name: 'new account')
       account_admin_user(active_all: true, account: root_account)
       user_session(@user)
@@ -134,7 +134,7 @@ describe SubAccountsController do
       expect(@accounts[sub_account_2.id][:sub_account_ids]).to eq []
     end
 
-    it "should include a root account when searching if requested" do
+    it "includes a root account when searching if requested" do
       root_account = Account.create(name: 'account')
       sub_account = root_account.sub_accounts.create!(name: 'sub account')
       account_admin_user(active_all: true, account: root_account)
@@ -203,14 +203,14 @@ describe SubAccountsController do
       expect(response.status).to eq 401
     end
 
-    it "should delete a sub-account" do
+    it "deletes a sub-account" do
       user_session(@user)
       delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
       expect(response.status).to eq(200)
       expect(@sub_account.reload).to be_deleted
     end
 
-    it "should delete a sub-account that contains a deleted course" do
+    it "deletes a sub-account that contains a deleted course" do
       @sub_account.courses.create!
       @sub_account.courses.first.destroy
       user_session(@user)
@@ -219,7 +219,7 @@ describe SubAccountsController do
       expect(@sub_account.reload).to be_deleted
     end
 
-    it "should not delete a sub-account that contains a course" do
+    it "does not delete a sub-account that contains a course" do
       @sub_account.courses.create!
       user_session(@user)
       delete 'destroy', params: { :account_id => @root_account, :id => @sub_account }
@@ -227,7 +227,7 @@ describe SubAccountsController do
       expect(@sub_account.reload).not_to be_deleted
     end
 
-    it "should not delete a sub-account that contains a sub-account that contains a course" do
+    it "does not delete a sub-account that contains a sub-account that contains a course" do
       @sub_sub_account = @sub_account.sub_accounts.create!
       @sub_sub_account.courses.create!
       user_session(@user)
@@ -236,7 +236,7 @@ describe SubAccountsController do
       expect(@sub_account.reload).not_to be_deleted
     end
 
-    it "should not delete a sub-account that contains a sub-account" do
+    it "does not delete a sub-account that contains a sub-account" do
       @sub_sub_account = @sub_account.sub_accounts.create!
       user_session(@user)
       delete 'destroy', params: { account_id: @root_account, id: @sub_account }
@@ -256,7 +256,7 @@ describe SubAccountsController do
       user_session @user
     end
 
-    it 'should get sub-accounts in alphabetical order' do
+    it 'gets sub-accounts in alphabetical order' do
       names = ["script", "bank", "cow", "program", "means"]
       names.each { |name| Account.create!(name: name, parent_account: @sub_account) }
       get 'show', params: { account_id: @root_account, id: @sub_account }

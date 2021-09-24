@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ExternalFeed do
-  it "should add rss entries" do
+  it "adds rss entries" do
     @feed = external_feed_model
     require 'rss/1.0'
     require 'rss/2.0'
@@ -103,7 +103,7 @@ describe ExternalFeed do
     expect(@feed.inactive?).to be(true)
   end
 
-  it "should add rss entries as course announcements" do
+  it "adds rss entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'rss/1.0'
@@ -120,7 +120,7 @@ describe ExternalFeed do
     expect(@course.announcements.count).to eql(4)
   end
 
-  it "should add atom entries" do
+  it "adds atom entries" do
     @feed = external_feed_model
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
@@ -131,7 +131,7 @@ describe ExternalFeed do
     expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
   end
 
-  it "should add atom entries as course announcements" do
+  it "adds atom entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'atom'
@@ -144,7 +144,7 @@ describe ExternalFeed do
     expect(res[0].asset).to eql(@course.announcements.first)
   end
 
-  it "should allow deleting" do
+  it "allows deleting" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'rss/1.0'

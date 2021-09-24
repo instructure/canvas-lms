@@ -100,7 +100,7 @@ describe 'course wiki pages' do
       visit_course_wiki_index_page(@course.id)
     end
 
-    it "should be able to launch index menu tool via the tray" do
+    it "is able to launch index menu tool via the tray" do
       page_index_menu_link.click
       wait_for_ajaximations
       page_index_menu_item_link("Commons Fav").click

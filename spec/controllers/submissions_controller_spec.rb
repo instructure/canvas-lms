@@ -25,7 +25,7 @@ describe SubmissionsController do
   it_behaves_like 'a submission redo_submission action', :submissions
 
   describe "POST create" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_student(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -33,7 +33,7 @@ describe SubmissionsController do
       assert_unauthorized
     end
 
-    it "should allow submitting homework" do
+    it "allows submitting homework" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -46,7 +46,7 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://url")
     end
 
-    it 'should only emit one live event' do
+    it 'onlies emit one live event' do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       expect(Canvas::LiveEvents).not_to receive(:submission_updated)
       course_with_student_logged_in(:active_all => true)
@@ -55,7 +55,7 @@ describe SubmissionsController do
       post 'create', params: { :course_id => @course.id, :assignment_id => @assignment.id, :submission => { :submission_type => "online_url", :url => "url" } }
     end
 
-    it "should not double-send notifications to a teacher" do
+    it "does not double-send notifications to a teacher" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @teacher = user_with_pseudonym(username: 'teacher@example.com', active_all: 1)
@@ -69,7 +69,7 @@ describe SubmissionsController do
       expect(@teacher.messages.first.notification).to eq n
     end
 
-    it "should allow submitting homework as attachments" do
+    it "allows submitting homework as attachments" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
@@ -163,7 +163,7 @@ describe SubmissionsController do
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_url')
       end
 
-      it "should display an error when lti resource link is not found" do
+      it "displays an error when lti resource link is not found" do
         params[:submission][:resource_link_lookup_uuid] = 'FOO&BAR'
 
         post 'create', params: params
@@ -174,7 +174,7 @@ describe SubmissionsController do
         expect(flash[:error]).to match(/Resource link not found for given `resource_link_lookup_uuid`/)
       end
 
-      it "should create the submission when lti resource link is found" do
+      it "creates the submission when lti resource link is found" do
         params[:submission][:resource_link_lookup_uuid] = resource_link.lookup_uuid
 
         post 'create', params: params
@@ -185,7 +185,7 @@ describe SubmissionsController do
       end
     end
 
-    it "should copy attachments to the submissions folder if that feature is enabled" do
+    it "copies attachments to the submissions folder if that feature is enabled" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
@@ -200,7 +200,7 @@ describe SubmissionsController do
       expect(att_copy).to be_associated_with_submission
     end
 
-    it "should reject illegal file extensions from submission" do
+    it "rejects illegal file extensions from submission" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "an additional assignment", :submission_types => "online_upload", :allowed_extensions => ['txt'])
@@ -212,7 +212,7 @@ describe SubmissionsController do
       expect(flash[:error]).to match(/Invalid file type/)
     end
 
-    it "should use the appropriate group based on the assignment's category and the current user" do
+    it "uses the appropriate group based on the assignment's category and the current user" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(:name => "Category")
@@ -226,7 +226,7 @@ describe SubmissionsController do
       expect(assigns[:group].id).to eql(@group.id)
     end
 
-    it "should not use a group if the assignment has no category" do
+    it "does not use a group if the assignment has no category" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       group_category = @course.group_categories.create(:name => "Category")
@@ -239,7 +239,7 @@ describe SubmissionsController do
       expect(assigns[:group]).to be_nil
     end
 
-    it "should allow attaching multiple files to the submission" do
+    it "allows attaching multiple files to the submission" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url,online_upload")
@@ -259,7 +259,7 @@ describe SubmissionsController do
       expect(assigns[:submission].attachments.map { |a| a.display_name }).to be_include("txt.txt")
     end
 
-    it "should fail but not raise when the submission is invalid" do
+    it "fails but not raise when the submission is invalid" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
@@ -269,7 +269,7 @@ describe SubmissionsController do
       expect(assigns[:submission]).to be_nil
     end
 
-    it "should strip leading/trailing whitespace off url submissions" do
+    it "strips leading/trailing whitespace off url submissions" do
       course_with_student_logged_in(:active_all => true)
       @course.account.enable_service(:avatars)
       @assignment = @course.assignments.create!(:title => "some assignment", :submission_types => "online_url")
@@ -349,7 +349,7 @@ describe SubmissionsController do
       expect(assigns[:submission].turnitin_data[:eula_agreement_timestamp]).to eq timestamp
     end
 
-    it "should redirect to the assignment when locked in submit-at-deadline situation" do
+    it "redirects to the assignment when locked in submit-at-deadline situation" do
       enable_cache do
         now = Time.now.utc
         Timecop.freeze(now) do
@@ -395,7 +395,7 @@ describe SubmissionsController do
         Setting.set('enable_page_views', 'false')
       end
 
-      it 'should redirect me to the course assignment' do
+      it 'redirects me to the course assignment' do
         expect(response).to be_redirect
       end
 
@@ -499,7 +499,7 @@ describe SubmissionsController do
         @group.users << @user
       end
 
-      it "should not send a comment to the entire group by default" do
+      it "does not send a comment to the entire group by default" do
         post(
           'create',
           params: { :course_id => @course.id,
@@ -516,7 +516,7 @@ describe SubmissionsController do
         expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
       end
 
-      it "should not send a comment to the entire group when false" do
+      it "does not send a comment to the entire group when false" do
         post(
           'create',
           params: { :course_id => @course.id,
@@ -534,7 +534,7 @@ describe SubmissionsController do
         expect(subs.to_a.sum { |s| s.submission_comments.size }).to eql 1
       end
 
-      it "should send a comment to the entire group if requested" do
+      it "sends a comment to the entire group if requested" do
         post(
           'create',
           params: { :course_id => @course.id,
@@ -582,7 +582,7 @@ describe SubmissionsController do
         @assignment = @course.assignments.create!(title: 'some assignment', submission_types: 'online_upload')
       end
 
-      it "should not save if domain restriction prevents it" do
+      it "does not save if domain restriction prevents it" do
         allow(@student).to receive(:gmail).and_return('student@does-not-match.com')
         account = Account.default
         flag    = FeatureFlag.new
@@ -606,7 +606,7 @@ describe SubmissionsController do
         expect(response).to be_redirect
       end
 
-      it "should use instfs to save google doc if instfs is enabled" do
+      it "uses instfs to save google doc if instfs is enabled" do
         allow(InstFS).to receive(:enabled?).and_return(true)
         uuid = "1234-abcd"
         allow(InstFS).to receive(:direct_upload).and_return(uuid)
@@ -780,7 +780,7 @@ describe SubmissionsController do
   end
 
   describe "GET zip" do
-    it "should zip and download" do
+    it "zips and download" do
       local_storage!
       course_with_student_and_submitted_homework
       @course.account.enable_service(:avatars)
@@ -1025,13 +1025,13 @@ describe SubmissionsController do
         expect(flash[:error]).not_to be_nil
       end
 
-      it "should redirect to context assignment url" do
+      it "redirects to context assignment url" do
         get :show, params: { course_id: @context.id, assignment_id: @assignment.id, id: @student.id }
         expect(response).to redirect_to(course_assignment_url(@context, @assignment))
       end
     end
 
-    it "should show rubric assessments to peer reviewers" do
+    it "shows rubric assessments to peer reviewers" do
       course_with_student(active_all: true)
       @course.account.enable_service(:avatars)
       @assessor = @student

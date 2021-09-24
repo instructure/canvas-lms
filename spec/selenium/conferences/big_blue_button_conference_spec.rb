@@ -61,7 +61,7 @@ describe 'BigBlueButton conferences' do
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
-      it 'should not include list with recordings', priority: '2' do
+      it 'does not include list with recordings', priority: '2' do
         verify_conference_does_not_include_recordings
       end
     end
@@ -74,7 +74,7 @@ describe 'BigBlueButton conferences' do
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
-      it 'should include list with recordings', priority: '2' do
+      it 'includes list with recordings', priority: '2' do
         verify_conference_includes_recordings
       end
     end
@@ -90,7 +90,7 @@ describe 'BigBlueButton conferences' do
         @conference = create_big_blue_button_conference(bbb_fixtures[:get_recordings]['meetingID'])
       end
 
-      it 'should remove recording from the list', priority: '2' do
+      it 'removes recording from the list', priority: '2' do
         show_recordings_in_first_conference_in_list
         delete_first_recording_in_first_conference_in_list
         verify_conference_does_not_include_recordings

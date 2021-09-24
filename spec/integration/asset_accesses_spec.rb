@@ -46,7 +46,7 @@ describe "user asset accesses" do
 
   include ApplicationHelper
 
-  it "should record and show user asset accesses" do
+  it "records and show user asset accesses" do
     now = Time.now.utc
     allow(Time).to receive(:now).and_return(now)
 
@@ -89,7 +89,7 @@ describe "user asset accesses" do
     expect(AssetUserAccess.where(:user_id => @student).first.last_access.to_i).to eq now2.to_i
   end
 
-  it "should record user names when viewing profiles" do
+  it "records user names when viewing profiles" do
     user_session(@student)
     get "/courses/#{@course.id}/users/#{@teacher.id}"
     expect(AssetUserAccess.where(:user_id => @student).first.display_name).to eq @teacher.name

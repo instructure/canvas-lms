@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::SectionImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     before_count = CourseSection.count
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -48,7 +48,7 @@ describe SIS::CSV::SectionImporter do
                           "Section S005 references course C001 which doesn't exist"]
   end
 
-  it 'should not die when a course is deleted' do
+  it 'does not die when a course is deleted' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -77,7 +77,7 @@ describe SIS::CSV::SectionImporter do
     expect(importer.errors).to eq []
   end
 
-  it 'should not require a name when section is being deleted' do
+  it 'does not require a name when section is being deleted' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -98,7 +98,7 @@ describe SIS::CSV::SectionImporter do
     expect(CourseSection.where(sis_source_id: 'section').take.workflow_state).to eq 'deleted'
   end
 
-  it 'should still require a name for new deleted sections' do
+  it 'stills require a name for new deleted sections' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -110,7 +110,7 @@ describe SIS::CSV::SectionImporter do
     expect(importer.errors).to eq []
   end
 
-  it 'should not error trying to restore a deleted default_section' do
+  it 'does not error trying to restore a deleted default_section' do
     course = @account.courses.create!(:sis_source_id => "C001")
     section = course.default_section
     section.update(:sis_source_id => "S001", :workflow_state => "deleted")
@@ -124,7 +124,7 @@ describe SIS::CSV::SectionImporter do
     expect(section.default_section).to eq false
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -156,7 +156,7 @@ describe SIS::CSV::SectionImporter do
     expect(@account.course_sections.where(sis_source_id: '1B').active.count).to eq 1
   end
 
-  it 'should ignore unsupported column account_id' do
+  it 'ignores unsupported column account_id' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -170,7 +170,7 @@ describe SIS::CSV::SectionImporter do
     expect(CourseSection.last.name).to eq "Sec1"
   end
 
-  it 'should support stickiness' do
+  it 'supports stickiness' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -200,7 +200,7 @@ describe SIS::CSV::SectionImporter do
     expect(CourseSection.last.name).to eq "Sec3"
   end
 
-  it 'should create sections' do
+  it 'creates sections' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -232,7 +232,7 @@ describe SIS::CSV::SectionImporter do
                                                       "Section S003 references course C002 which doesn't exist"]
   end
 
-  it 'should override term dates if the start or end dates are set' do
+  it 'overrides term dates if the start or end dates are set' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test1,TC 101,Test Course 1,,,active,,"
@@ -251,7 +251,7 @@ describe SIS::CSV::SectionImporter do
     expect(course.course_sections.where(sis_source_id: "sec4").first.restrict_enrollments_to_section_dates).to be_truthy
   end
 
-  it 'should support start/end date and restriction stickiness' do
+  it 'supports start/end date and restriction stickiness' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
       "test1,TC 101,Test Course 1,,,active,,"
@@ -281,7 +281,7 @@ describe SIS::CSV::SectionImporter do
     end
   end
 
-  it 'should verify xlist files' do
+  it 'verifies xlist files' do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
       ",S001,active",
@@ -296,7 +296,7 @@ describe SIS::CSV::SectionImporter do
     expect(@account.courses.size).to eq 0
   end
 
-  it 'should work with xlists with no xlist course' do
+  it 'works with xlists with no xlist course' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -353,7 +353,7 @@ describe SIS::CSV::SectionImporter do
     expect(xlist_course.workflow_state).to eq "claimed"
   end
 
-  it 'should preserve data into copied xlist courses' do
+  it 'preserves data into copied xlist courses' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -406,7 +406,7 @@ describe SIS::CSV::SectionImporter do
     expect(@account.courses.where(sis_source_id: "X002").first.deleted?).to be_falsey
   end
 
-  it 'should work with xlists with an xlist course defined' do
+  it 'works with xlists with an xlist course defined' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "X001,TC 102,Test Course 102,,,active",
@@ -454,7 +454,7 @@ describe SIS::CSV::SectionImporter do
     expect(xlist_course.name).to eq "Test Course 102"
   end
 
-  it 'should work with xlist courses in crazy orders' do
+  it 'works with xlist courses in crazy orders' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -485,7 +485,7 @@ describe SIS::CSV::SectionImporter do
     expect(xlist_course_1.course_sections.where(sis_source_id: "S005").first).not_to be_nil
   end
 
-  it 'should be idempotent with active xlists' do
+  it 'is idempotent with active xlists' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -508,7 +508,7 @@ describe SIS::CSV::SectionImporter do
     end
   end
 
-  it 'should be idempotent with deleted xlists' do
+  it 'is idempotent with deleted xlists' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -541,7 +541,7 @@ describe SIS::CSV::SectionImporter do
     end
   end
 
-  it 'should be able to move around a section and then uncrosslist back to the original' do
+  it 'is able to move around a section and then uncrosslist back to the original' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -577,7 +577,7 @@ describe SIS::CSV::SectionImporter do
     expect(s1.crosslisted?).to be_falsey
   end
 
-  it 'should be able to handle additional section updates and not screw up the crosslisting' do
+  it 'is able to handle additional section updates and not screw up the crosslisting' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"
@@ -612,7 +612,7 @@ describe SIS::CSV::SectionImporter do
     expect(s1.name).to eq "Sec2"
   end
 
-  it 'should be able to move a non-crosslisted section between courses' do
+  it 'is able to move a non-crosslisted section between courses' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -636,7 +636,7 @@ describe SIS::CSV::SectionImporter do
     expect(s1.course).to eql(course2)
   end
 
-  it 'should uncrosslist a section if it is getting moved from the original course' do
+  it 'uncrosslists a section if it is getting moved from the original course' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -668,7 +668,7 @@ describe SIS::CSV::SectionImporter do
     expect(s1.crosslisted?).to be_falsey
   end
 
-  it 'should uncrosslist a section if the course has been deleted' do
+  it 'uncrosslists a section if the course has been deleted' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -700,7 +700,7 @@ describe SIS::CSV::SectionImporter do
     expect(s1.crosslisted?).to be_falsey
   end
 
-  it 'should leave a section alone if a section has been crosslisted manually' do
+  it 'leaves a section alone if a section has been crosslisted manually' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -773,7 +773,7 @@ describe SIS::CSV::SectionImporter do
     check_section_not_crosslisted
   end
 
-  it 'should leave a section alone if a section has been decrosslisted manually' do
+  it 'leaves a section alone if a section has been decrosslisted manually' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -846,7 +846,7 @@ describe SIS::CSV::SectionImporter do
       )
     end
 
-    it 'should change course account associations when a section is not crosslisted and the original section\'s course changes via sis' do
+    it "changes course account associations when a section is not crosslisted and the original section's course changes via sis" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C003,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"
@@ -863,7 +863,7 @@ describe SIS::CSV::SectionImporter do
       expect(CourseSection.where(sis_source_id: "S001").first.course_account_associations.map(&:account_id).sort).to eq [Account.where(sis_source_id: 'A001').first.id, @account.id].sort
     end
 
-    it 'should change course account associations when a section is crosslisted and the original section\'s course changes via sis' do
+    it "changes course account associations when a section is crosslisted and the original section's course changes via sis" do
       process_csv_data_cleanly(
         "section_id,course_id,name,start_date,end_date,status",
         "S001,C002,Sec1,2011-1-05 00:00:00,2011-4-14 00:00:00,active"

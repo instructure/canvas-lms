@@ -110,7 +110,7 @@ module SIS
         allow(Setting).to receive(:get).and_return(1)
       end
 
-      it "should save without broadcasting if notify is blank" do
+      it "saves without broadcasting if notify is blank" do
         expect(enrollment).to receive(:save_without_broadcasting!).once
 
         EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|
@@ -125,7 +125,7 @@ module SIS
         end
       end
 
-      it "should save with broadcasting if notify is set" do
+      it "saves with broadcasting if notify is set" do
         expect(enrollment).to receive(:save_without_broadcasting!).never
 
         EnrollmentImporter.new(Account.default, { batch: Account.default.sis_batches.create! }).process(messages) do |importer|

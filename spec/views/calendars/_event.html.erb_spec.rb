@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/calendars/_event" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context(@course, @user)
     render :partial => 'calendars/event', :object => @course.calendar_events.create!(:title => "some event")

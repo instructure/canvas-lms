@@ -36,7 +36,7 @@ describe SIS::CSV::GroupMembershipImporter do
     @user3.pseudonym.update_attribute(:account, @account)
   end
 
-  it "should skip bad content" do
+  it "skips bad content" do
     importer = process_csv_data(
       "group_id,user_id,status",
       ",U001,accepted",
@@ -51,7 +51,7 @@ describe SIS::CSV::GroupMembershipImporter do
     )
   end
 
-  it "should add users to groups" do
+  it "adds users to groups" do
     process_csv_data_cleanly(
       "group_id,user_id,status",
       "G001,U001,accepted",
@@ -73,7 +73,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(ms.map(&:workflow_state)).to eq %w(deleted deleted)
   end
 
-  it "should add users to groups that the user cannot access" do
+  it "adds users to groups that the user cannot access" do
     course = course_factory(account: @account, sis_source_id: 'c001')
     group_model(context: course, sis_source_id: "G002")
     importer = process_csv_data(
@@ -83,7 +83,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(importer.errors.last.last).to eq "User U001 doesn't have an enrollment in the course of group G002."
   end
 
-  it "should find active gm first" do
+  it "finds active gm first" do
     g = group_model(context: @account, sis_source_id: "G002")
     g.group_memberships.create!(user: @user1, workflow_state: 'accepted')
     g.group_memberships.create!(user: @user1, workflow_state: 'deleted')
@@ -94,7 +94,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(importer.errors).to eq []
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,user_id,status",
@@ -113,7 +113,7 @@ describe SIS::CSV::GroupMembershipImporter do
     expect(@account.all_groups.where(sis_source_id: 'G001').take.group_memberships.take.workflow_state).to eq 'accepted'
   end
 
-  it 'should handle unique constraint errors rolling back data' do
+  it 'handles unique constraint errors rolling back data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "group_id,user_id,status",

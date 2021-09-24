@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 describe 'appointment_canceled_by_user.email' do
   include MessagesCommon
 
-  it "should render" do
+  it "renders" do
     user = user_model
     course_with_student(course: @course, active_enrollment: true)
     appointment_participant_model(:participant => user, :updating_user => @user)
@@ -40,7 +40,7 @@ describe 'appointment_canceled_by_user.email' do
     expect(@message.body).to include("/appointment_groups/#{@appointment_group.id}")
   end
 
-  it "should render for groups" do
+  it "renders for groups" do
     user = user_model
     @course = course_model
     cat = group_category

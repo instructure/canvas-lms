@@ -29,7 +29,7 @@ describe "Services API", type: :request do
     stub_kaltura
   end
 
-  it "should check for auth" do
+  it "checks for auth" do
     get("/api/v1/services/kaltura")
     assert_status(401)
   end
@@ -40,7 +40,7 @@ describe "Services API", type: :request do
     expect(response.body).to include("must be logged in to use Kaltura")
   end
 
-  it "should return the config information for kaltura" do
+  it "returns the config information for kaltura" do
     json = api_call(:get, "/api/v1/services/kaltura",
                     :controller => "services_api", :action => "show_kaltura_config", :format => "json")
     expect(json).to eq({
@@ -52,7 +52,7 @@ describe "Services API", type: :request do
                        })
   end
 
-  it "should degrade gracefully if kaltura is disabled or not configured" do
+  it "degrades gracefully if kaltura is disabled or not configured" do
     allow(CanvasKaltura::ClientV3).to receive(:config).and_return(nil)
     json = api_call(:get, "/api/v1/services/kaltura",
                     :controller => "services_api", :action => "show_kaltura_config", :format => "json")
@@ -61,7 +61,7 @@ describe "Services API", type: :request do
                        })
   end
 
-  it "should return a new kaltura session" do
+  it "returns a new kaltura session" do
     kal = double('CanvasKaltura::ClientV3')
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
@@ -75,7 +75,7 @@ describe "Services API", type: :request do
                                                                     })
   end
 
-  it "should return a new kaltura session with upload config if param provided" do
+  it "returns a new kaltura session with upload config if param provided" do
     kal = double('CanvasKaltura::ClientV3')
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)

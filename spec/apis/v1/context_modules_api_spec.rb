@@ -124,7 +124,7 @@ describe "Modules API", type: :request do
     end
 
     describe "index" do
-      it "should list published and unpublished modules" do
+      it "lists published and unpublished modules" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}")
@@ -168,14 +168,14 @@ describe "Modules API", type: :request do
         ]
       end
 
-      it "should include items if requested" do
+      it "includes items if requested" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         :controller => "context_modules_api", :action => "index", :format => "json",
                         :course_id => "#{@course.id}", :include => %w(items))
         expect(json.map { |mod| mod['items'].size }).to eq [5, 2, 0]
       end
 
-      it "should only fetch visibility information once" do
+      it "onlies fetch visibility information once" do
         student_in_course(:course => @course)
         @user = @student
 
@@ -200,25 +200,25 @@ describe "Modules API", type: :request do
         let(:wiki_page_details) { json.find { |mod| mod['id'] == @module2.id }['items'].find { |item| item['id'] == @wiki_page_tag.id }['content_details'] }
         let(:attachment_details) { json.find { |mod| mod['id'] == @module2.id }['items'].find { |item| item['id'] == @attachment_tag.id }['content_details'] }
 
-        it 'should include user specific details' do
+        it 'includes user specific details' do
           expect(assignment_details).to include(
             'points_possible' => @assignment.points_possible,
           )
         end
 
-        it 'should include thumbnail_url' do
+        it 'includes thumbnail_url' do
           expect(attachment_details).to include(
             'thumbnail_url' => @attachment.thumbnail_url
           )
         end
 
-        it 'should include usage_rights information' do
+        it 'includes usage_rights information' do
           expect(attachment_details).to include(
             'usage_rights' => @attachment.usage_rights.as_json
           )
         end
 
-        it 'should include lock information' do
+        it 'includes lock information' do
           expect(assignment_details).to include(
             'locked_for_user' => false,
           )
@@ -229,7 +229,7 @@ describe "Modules API", type: :request do
         end
       end
 
-      it "should skip items for modules that have too many" do
+      it "skips items for modules that have too many" do
         Setting.set('api_max_per_page', '3')
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                         :controller => "context_modules_api", :action => "index", :format => "json",
@@ -237,7 +237,7 @@ describe "Modules API", type: :request do
         expect(json.map { |mod| mod['items'].try(:size) }).to eq [nil, 2, 0]
       end
 
-      it "should paginate the module list" do
+      it "paginates the module list" do
         # 3 modules already exist
         2.times { |i| @course.context_modules.create!(:name => "spurious module #{i}") }
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?per_page=3",
@@ -256,7 +256,7 @@ describe "Modules API", type: :request do
         expect(ids).to eq @course.context_modules.not_deleted.sort_by(&:position).collect(&:id)
       end
 
-      it "should search for modules by name" do
+      it "searches for modules by name" do
         mods = []
         2.times { |i| mods << @course.context_modules.create!(:name => "spurious module #{i}") }
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?search_term=spur",
@@ -266,7 +266,7 @@ describe "Modules API", type: :request do
         expect(json.map { |mod| mod['id'] }.sort).to eq mods.map(&:id).sort
       end
 
-      it "should search for modules and items by name" do
+      it "searches for modules and items by name" do
         matching_mods = []
         nonmatching_mods = []
         # modules to include because their name matches
@@ -299,7 +299,7 @@ describe "Modules API", type: :request do
     end
 
     describe "show" do
-      it "should show a single module" do
+      it "shows a single module" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => "#{@module2.id}")
@@ -331,7 +331,7 @@ describe "Modules API", type: :request do
         let(:assignment_details) { module1_json['items'].find { |item| item['id'] == @assignment_tag.id }['content_details'] }
         let(:wiki_page_details) { module2_json['items'].find { |item| item['id'] == @wiki_page_tag.id }['content_details'] }
 
-        it 'should include user specific details' do
+        it 'includes user specific details' do
           expect(assignment_details).to include(
             'points_possible' => @assignment.points_possible,
           )
@@ -348,7 +348,7 @@ describe "Modules API", type: :request do
         end
       end
 
-      it "should show a single unpublished module" do
+      it "shows a single unpublished module" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module3.id.to_param)
@@ -366,14 +366,14 @@ describe "Modules API", type: :request do
                            })
       end
 
-      it "should include items if requested" do
+      it "includes items if requested" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module1.id.to_param, :include => %w(items))
         expect(json['items'].map { |item| item['type'] }).to eq %w(Assignment Quiz Discussion SubHeader ExternalUrl)
       end
 
-      it "should not include items if there are too many" do
+      it "does not include items if there are too many" do
         Setting.set('api_max_per_page', '3')
         json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}?include[]=items",
                         :controller => "context_modules_api", :action => "show", :format => "json",
@@ -398,7 +398,7 @@ describe "Modules API", type: :request do
         @ids_to_update = @modules_to_update.map(&:id)
       end
 
-      it "should publish modules (and their tags)" do
+      it "publishes modules (and their tags)" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         expect(json['completed'].sort).to eq @ids_to_update
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active active unpublished active)
@@ -409,31 +409,31 @@ describe "Modules API", type: :request do
         expect(@wiki_page.active?).to eq true
       end
 
-      it "should unpublish modules" do
+      it "unpublishes modules" do
         json = api_call(:put, @path, @path_opts, { :event => 'unpublish', :module_ids => @ids_to_update })
         expect(json['completed'].sort).to eq @ids_to_update
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active unpublished unpublished unpublished)
       end
 
-      it "should delete modules" do
+      it "deletes modules" do
         json = api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update })
         expect(json['completed'].sort).to eq @ids_to_update
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active deleted unpublished deleted)
       end
 
-      it "should convert module ids to integer and ignore non-numeric ones" do
+      it "converts module ids to integer and ignore non-numeric ones" do
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => %w(lolcats abc123) + @ids_to_update.map(&:to_s) })
         expect(json['completed'].sort).to eq @ids_to_update
         expect(@test_modules.map { |tm| tm.reload.workflow_state }).to eq %w(active active unpublished active)
       end
 
-      it "should not update soft-deleted modules" do
+      it "does not update soft-deleted modules" do
         @modules_to_update.each { |m| m.destroy }
         api_call(:put, @path, @path_opts, { :event => 'delete', :module_ids => @ids_to_update },
                  {}, { :expected_status => 404 })
       end
 
-      it "should 404 if no modules exist with the given ids" do
+      it "404S if no modules exist with the given ids" do
         @modules_to_update.each do |m|
           m.content_tags.scope.delete_all
           m.destroy_permanently!
@@ -442,32 +442,32 @@ describe "Modules API", type: :request do
                  {}, { :expected_status => 404 })
       end
 
-      it "should 404 if only non-numeric ids are given" do
+      it "404S if only non-numeric ids are given" do
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update.map { |id| id.to_s + "abc" } },
                  {}, { :expected_status => 404 })
       end
 
-      it "should succeed if only some ids don't exist" do
+      it "succeeds if only some ids don't exist" do
         @modules_to_update.first.destroy_permanently!
         json = api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update })
         expect(json['completed']).to eq [@modules_to_update.last.id]
         expect(@modules_to_update.last.reload).to be_active
       end
 
-      it "should 400 if :module_ids is missing" do
+      it "400S if :module_ids is missing" do
         api_call(:put, @path, @path_opts, { :event => 'publish' }, {}, { :expected_status => 400 })
       end
 
-      it "should 400 if :event is missing" do
+      it "400S if :event is missing" do
         api_call(:put, @path, @path_opts, { :module_ids => @ids_to_update }, {}, { :expected_status => 400 })
       end
 
-      it "should 400 if :event is invalid" do
+      it "400S if :event is invalid" do
         api_call(:put, @path, @path_opts, { :event => 'burninate', :module_ids => @ids_to_update },
                  {}, { :expected_status => 400 })
       end
 
-      it "should scope to the course" do
+      it "scopes to the course" do
         other_course = Course.create! :name => "Other Course"
         other_module = other_course.context_modules.create! :name => "Other Module"
 
@@ -495,7 +495,7 @@ describe "Modules API", type: :request do
         @module2 = @course.context_modules.create!(:name => "published")
       end
 
-      it "should update the attributes" do
+      it "updates the attributes" do
         unlock_at = 1.day.from_now
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                         { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -514,7 +514,7 @@ describe "Modules API", type: :request do
         expect(@module1.require_sequential_progress).to eq true
       end
 
-      it "should update the position" do
+      it "updates the position" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                         { :controller => "context_modules_api", :action => "update", :format => "json",
                           :course_id => "#{@course.id}", :id => "#{@module1.id}" },
@@ -538,7 +538,7 @@ describe "Modules API", type: :request do
         expect(@module2.position).to eq 2
       end
 
-      it "should publish modules (and their tags)" do
+      it "publishes modules (and their tags)" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                         { :controller => "context_modules_api", :action => "update", :format => "json",
                           :course_id => "#{@course.id}", :id => "#{@module1.id}" },
@@ -553,7 +553,7 @@ describe "Modules API", type: :request do
         expect(@wiki_page.active?).to eq true
       end
 
-      it "should publish module tag items even if the tag itself is already published" do
+      it "publishes module tag items even if the tag itself is already published" do
         # surreptitiously set up a terrible pre-DS => post-DS transition state
         ContentTag.where(:id => @wiki_page_tag.id).update_all(:workflow_state => 'active')
 
@@ -566,7 +566,7 @@ describe "Modules API", type: :request do
         expect(@wiki_page.active?).to eq true
       end
 
-      it "should unpublish modules" do
+      it "unpublishes modules" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                         { :controller => "context_modules_api", :action => "update", :format => "json",
                           :course_id => "#{@course.id}", :id => "#{@module2.id}" },
@@ -576,7 +576,7 @@ describe "Modules API", type: :request do
         expect(@module2.unpublished?).to eq true
       end
 
-      it "should set prerequisites" do
+      it "sets prerequisites" do
         new_module = @course.context_modules.create!(:name => "published")
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{new_module.id}",
@@ -589,7 +589,7 @@ describe "Modules API", type: :request do
         expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
       end
 
-      it "should only reset prerequisites if parameter is included and is blank" do
+      it "onlies reset prerequisites if parameter is included and is blank" do
         new_module = @course.context_modules.create!(:name => "published")
         new_module.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
         new_module.save!
@@ -620,7 +620,7 @@ describe "Modules API", type: :request do
         course_with_teacher(:active_all => true)
       end
 
-      it "should create a module with attributes" do
+      it "creates a module with attributes" do
         unlock_at = 1.day.from_now
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules",
                         { :controller => "context_modules_api", :action => "create", :format => "json",
@@ -640,7 +640,7 @@ describe "Modules API", type: :request do
         expect(new_module.require_sequential_progress).to eq true
       end
 
-      it "should require a name" do
+      it "requires a name" do
         json = api_call(:post, "/api/v1/courses/#{@course.id}/modules",
                         { :controller => "context_modules_api", :action => "create", :format => "json",
                           :course_id => "#{@course.id}" },
@@ -649,7 +649,7 @@ describe "Modules API", type: :request do
         expect(@course.context_modules.count).to eq 0
       end
 
-      it "should insert new module into specified position" do
+      it "inserts new module into specified position" do
         deleted_mod = @course.context_modules.create(:name => "deleted")
         deleted_mod.destroy
         module1 = @course.context_modules.create(:name => "unpublished")
@@ -673,7 +673,7 @@ describe "Modules API", type: :request do
         expect(module2.position).to eq 3
       end
 
-      it "should set prerequisites" do
+      it "sets prerequisites" do
         module1 = @course.context_modules.create(:name => "unpublished")
         module2 = @course.context_modules.create!(:name => "published")
 
@@ -691,7 +691,7 @@ describe "Modules API", type: :request do
       end
     end
 
-    it "should delete a module" do
+    it "deletes a module" do
       json = api_call(:delete, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                       { :controller => "context_modules_api", :action => "destroy", :format => "json",
                         :course_id => "#{@course.id}", :id => "#{@module1.id}" },
@@ -701,7 +701,7 @@ describe "Modules API", type: :request do
       expect(@module1.workflow_state).to eq 'deleted'
     end
 
-    it "should show module progress for a student" do
+    it "shows module progress for a student" do
       student = User.create!
       @course.enroll_student(student).accept!
 
@@ -732,7 +732,7 @@ describe "Modules API", type: :request do
       course_with_student(:course => @course, :active_all => true)
     end
 
-    it "should show locked state" do
+    it "shows locked state" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module2.id}",
                       :controller => "context_modules_api", :action => "show", :format => "json",
                       :course_id => "#{@course.id}", :id => "#{@module2.id}")
@@ -748,7 +748,7 @@ describe "Modules API", type: :request do
                { :expected_status => 401 })
     end
 
-    it "should show module progress" do
+    it "shows module progress" do
       # to simplify things, eliminate the requirements on the quiz and discussion topic for this test
       @module1.completion_requirements.reject! { |r| [@quiz_tag.id, @topic_tag.id].include? r[:id] }
       @module1.save!
@@ -773,7 +773,7 @@ describe "Modules API", type: :request do
       expect(json['completed_at']).not_to be_nil
     end
 
-    it "should consider scores that are close enough as complete" do
+    it "considers scores that are close enough as complete" do
       teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
       @module1.completion_requirements = {
         @assignment_tag.id => { :type => 'min_score', :min_score => 1 },
@@ -808,7 +808,7 @@ describe "Modules API", type: :request do
       let(:assignment_details) { module1_json['items'].find { |item| item['id'] == @assignment_tag.id }['content_details'] }
       let(:wiki_page_details) { module2_json['items'].find { |item| item['id'] == @wiki_page_tag.id }['content_details'] }
 
-      it 'should include user specific details' do
+      it 'includes user specific details' do
         expect(assignment_details).to include(
           'points_possible' => @assignment.points_possible,
         )
@@ -831,7 +831,7 @@ describe "Modules API", type: :request do
       end
     end
 
-    it "should not list unpublished modules" do
+    it "does not list unpublished modules" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                       :controller => "context_modules_api", :action => "index", :format => "json",
                       :course_id => "#{@course.id}")
@@ -839,28 +839,28 @@ describe "Modules API", type: :request do
       json.each { |cm| expect(@course.context_modules.find(cm['id']).workflow_state).to eq 'active' }
     end
 
-    it "should not show a single unpublished module" do
+    it "does not show a single unpublished module" do
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module3.id}",
                       { :controller => "context_modules_api", :action => "show", :format => "json",
                         :course_id => "#{@course.id}", :id => @module3.id.to_param }, {}, {}, { :expected_status => 404 })
     end
 
     describe "batch update" do
-      it "should disallow deleting" do
+      it "disallows deleting" do
         api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=delete&module_ids[]=#{@module1.id}",
                  { :controller => "context_modules_api", :action => "batch_update", :event => 'delete',
                    :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}" },
                  {}, {}, { :expected_status => 401 })
       end
 
-      it "should disallow publishing" do
+      it "disallows publishing" do
         api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=publish&module_ids[]=#{@module1.id}",
                  { :controller => "context_modules_api", :action => "batch_update", :event => 'publish',
                    :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}" },
                  {}, {}, { :expected_status => 401 })
       end
 
-      it "should disallow unpublishing" do
+      it "disallows unpublishing" do
         api_call(:put, "/api/v1/courses/#{@course.id}/modules?event=unpublish&module_ids[]=#{@module1.id}",
                  { :controller => "context_modules_api", :action => "batch_update", :event => 'unpublish',
                    :module_ids => [@module1.to_param], :format => "json", :course_id => "#{@course.id}" },
@@ -868,7 +868,7 @@ describe "Modules API", type: :request do
       end
     end
 
-    it "should disallow update" do
+    it "disallows update" do
       @module1 = @course.context_modules.create(:name => "module")
       api_call(:put, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                { :controller => "context_modules_api", :action => "update", :format => "json",
@@ -877,7 +877,7 @@ describe "Modules API", type: :request do
                { :expected_status => 401 })
     end
 
-    it "should disallow create" do
+    it "disallows create" do
       api_call(:post, "/api/v1/courses/#{@course.id}/modules",
                { :controller => "context_modules_api", :action => "create", :format => "json",
                  :course_id => "#{@course.id}" },
@@ -885,7 +885,7 @@ describe "Modules API", type: :request do
                { :expected_status => 401 })
     end
 
-    it "should disallow destroy" do
+    it "disallows destroy" do
       api_call(:delete, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}",
                { :controller => "context_modules_api", :action => "destroy", :format => "json",
                  :course_id => "#{@course.id}", :id => "#{@module1.id}" },
@@ -893,7 +893,7 @@ describe "Modules API", type: :request do
                { :expected_status => 401 })
     end
 
-    it "should not show progress for other students" do
+    it "does not show progress for other students" do
       student = User.create!
       @course.enroll_student(student).accept!
 
@@ -918,7 +918,7 @@ describe "Modules API", type: :request do
       create_section_override_for_assignment(@assignment, { course_section: @other_section })
     end
 
-    it "should exclude unassigned assignments" do
+    it "excludes unassigned assignments" do
       student_in_course(:active_all => true)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                       { :controller => "context_modules_api", :action => "index", :format => "json",
@@ -927,7 +927,7 @@ describe "Modules API", type: :request do
       expect(mod1_items).not_to include(@assignment_tag.id)
     end
 
-    it "should include override assignments" do
+    it "includes override assignments" do
       student_in_course(:active_all => true, :section => @other_section)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
                       { :controller => "context_modules_api", :action => "index", :format => "json",
@@ -936,7 +936,7 @@ describe "Modules API", type: :request do
       expect(mod1_items).to include(@assignment_tag.id)
     end
 
-    it "should include observed students' assigned assignment items" do
+    it "includes observed students' assigned assignment items" do
       student_in_course(:active_all => true, :section => @other_section)
       course_with_observer(:course => @course, :associated_user_id => @student.id)
       json = api_call(:get, "/api/v1/courses/#{@course.id}/modules?include[]=items",
@@ -952,7 +952,7 @@ describe "Modules API", type: :request do
       user_factory
     end
 
-    it "should check permissions" do
+    it "checks permissions" do
       api_call(:get, "/api/v1/courses/#{@course.id}/modules",
                { :controller => "context_modules_api", :action => "index", :format => "json",
                  :course_id => "#{@course.id}" }, {}, {}, { :expected_status => 401 })

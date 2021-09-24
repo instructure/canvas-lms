@@ -27,7 +27,7 @@ describe AuthenticationProvider::SAML do
     @file_that_exists = File.expand_path(__FILE__)
   end
 
-  it "should set the entity_id with the current domain" do
+  it "sets the entity_id with the current domain" do
     allow(HostUrl).to receive(:default_host).and_return('bob.cody.instructure.com')
     @aac = @account.authentication_providers.create!(:auth_type => "saml")
     expect(@aac.entity_id).to eq "http://bob.cody.instructure.com/saml2"
@@ -59,12 +59,12 @@ describe AuthenticationProvider::SAML do
     expect(@account.settings[:saml_entity_id]).to eq 'my_entity'
   end
 
-  it "should set requested_authn_context to nil if empty string" do
+  it "sets requested_authn_context to nil if empty string" do
     @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "")
     expect(@aac.requested_authn_context).to eq nil
   end
 
-  it "should allow requested_authn_context to be set to anything" do
+  it "allows requested_authn_context to be set to anything" do
     @aac = @account.authentication_providers.create!(:auth_type => "saml", :requested_authn_context => "anything")
     expect(@aac.requested_authn_context).to eq "anything"
   end

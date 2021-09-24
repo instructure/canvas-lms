@@ -24,7 +24,7 @@ require 'nokogiri'
 
 describe "security" do
   describe "session fixation" do
-    it "should change the cookie session id after logging in" do
+    it "changes the cookie session id after logging in" do
       u = user_with_pseudonym :active_user => true,
                               :username => "nobody@example.com",
                               :password => "asdfasdf"
@@ -53,7 +53,7 @@ describe "security" do
   end
 
   describe 'session cookies' do
-    it "should always set the primary cookie to session expiration" do
+    it "alwayses set the primary cookie to session expiration" do
       # whether they select "stay logged in" or not, the actual session cookie
       # should go away with the user agent session. the secondary
       # pseudonym_credentials cookie will stick around and authenticate them
@@ -79,7 +79,7 @@ describe "security" do
       expect(c).not_to match(/expires=/)
     end
 
-    it "should not return pseudonym_credentials when not remember_me" do
+    it "does not return pseudonym_credentials when not remember_me" do
       u = user_with_pseudonym :active_user => true,
                               :username => "nobody@example.com",
                               :password => "asdfasdf"
@@ -105,7 +105,7 @@ describe "security" do
       https!
     end
 
-    it "should not remember me when the wrong token is given" do
+    it "does not remember me when the wrong token is given" do
       # plain persistence_token no longer works
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{@p.persistence_token}" }
       expect(response).to redirect_to("https://www.example.com/login")
@@ -118,7 +118,7 @@ describe "security" do
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
-    it "should login via persistence token when no session exists" do
+    it "logins via persistence token when no session exists" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
@@ -138,7 +138,7 @@ describe "security" do
       expect(response).to be_successful
     end
 
-    it "should not allow login via the same valid token twice" do
+    it "does not allow login via the same valid token twice" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
@@ -149,7 +149,7 @@ describe "security" do
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
-    it "should generate a new valid token when a token is used" do
+    it "generates a new valid token when a token is used" do
       token = SessionPersistenceToken.generate(@p)
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
@@ -171,7 +171,7 @@ describe "security" do
       expect(s2).not_to eq s1
     end
 
-    it "should generate and return a token when remember_me is checked" do
+    it "generates and return a token when remember_me is checked" do
       post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                       "pseudonym_session[password]" => "asdfasdf",
                                       "pseudonym_session[remember_me]" => "1" }
@@ -188,7 +188,7 @@ describe "security" do
       expect(cookies['pseudonym_credentials']).to eq cookie
     end
 
-    it "should destroy the token both user agent and server side on logout" do
+    it "destroys the token both user agent and server side on logout" do
       expect {
         post "/login/canvas", params: { "pseudonym_session[unique_id]" => "nobody@example.com",
                                         "pseudonym_session[password]" => "asdfasdf",
@@ -204,7 +204,7 @@ describe "security" do
       expect(SessionPersistenceToken.find_by_pseudonym_credentials(CGI.unescape(c))).to be_nil
     end
 
-    it "should allow multiple remember_me tokens for the same user" do
+    it "allows multiple remember_me tokens for the same user" do
       s1 = open_session
       s1.https!
       s2 = open_session
@@ -231,14 +231,14 @@ describe "security" do
       expect(s4.response).to be_successful
     end
 
-    it "should not login if the pseudonym is deleted" do
+    it "does not login if the pseudonym is deleted" do
       token = SessionPersistenceToken.generate(@p)
       @p.destroy
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to redirect_to("https://www.example.com/login")
     end
 
-    it "should not login if the pseudonym.persistence_token gets changed (pw change)" do
+    it "does not login if the pseudonym.persistence_token gets changed (pw change)" do
       token = SessionPersistenceToken.generate(@p)
       creds = token.pseudonym_credentials
       pers1 = @p.persistence_token
@@ -253,7 +253,7 @@ describe "security" do
     context "sharding" do
       specs_require_sharding
 
-      it "should work for an out-of-shard user" do
+      it "works for an out-of-shard user" do
         @shard1.activate do
           account = Account.create!
           user_with_pseudonym(:account => account)
@@ -285,7 +285,7 @@ describe "security" do
         follow_redirect! while response.redirect?
       end
 
-      it "should be limited for the same ip" do
+      it "is limited for the same ip" do
         skip('Fails in RSpecQ') if ENV['RSPECQ_ENABLED'] == '1'
         bad_login("5.5.5.5")
         expect(response.body).to match(/Invalid username/)
@@ -299,7 +299,7 @@ describe "security" do
         expect(response.body).to match(/Too many failed login attempts/)
       end
 
-      it "should have a higher limit for other ips" do
+      it "has a higher limit for other ips" do
         skip('Fails in RSpecQ') if ENV['RSPECQ_ENABLED'] == '1'
         bad_login("5.5.5.5")
         expect(response.body).to match(/Invalid username/)
@@ -315,7 +315,7 @@ describe "security" do
         expect(response.body).to match(/Too many failed login attempts/)
       end
 
-      it "should not block other users with the same ip" do
+      it "does not block other users with the same ip" do
         bad_login("5.5.5.5")
         expect(response.body).to match(/Invalid username/)
 
@@ -329,7 +329,7 @@ describe "security" do
         expect(request.fullpath).to eql("/?login_success=1")
       end
 
-      it "should apply limitations correctly for cross-account logins" do
+      it "applies limitations correctly for cross-account logins" do
         skip('Fails in RSpecQ') if ENV['RSPECQ_ENABLED'] == '1'
         account = Account.create!
         allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
@@ -351,7 +351,7 @@ describe "security" do
     end
   end
 
-  it "should only allow user list username resolution if the current user has appropriate rights" do
+  it "onlies allow user list username resolution if the current user has appropriate rights" do
     u = User.create!(:name => 'test user')
     u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)
     @course = Account.default.courses.create!
@@ -397,7 +397,7 @@ describe "security" do
       user_with_pseudonym :user => @admin, :username => 'admin@example.com', :password => 'password'
     end
 
-    it "should require confirmation for becoming a user" do
+    it "requires confirmation for becoming a user" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?become_user_id=#{@student.id}"
@@ -427,7 +427,7 @@ describe "security" do
       expect(assigns['real_current_user'].id).to eq @admin.id
     end
 
-    it "should not allow as_user_id for normal requests" do
+    it "does not allow as_user_id for normal requests" do
       user_session(@admin, @admin.pseudonyms.first)
 
       get "/?as_user_id=#{@student.id}"
@@ -437,7 +437,7 @@ describe "security" do
       expect(assigns['real_current_user']).to be_nil
     end
 
-    it "should not allow non-admins to become other people" do
+    it "does not allow non-admins to become other people" do
       user_session(@student, @student.pseudonyms.first)
 
       get "/?become_user_id=#{@teacher.id}"
@@ -452,7 +452,7 @@ describe "security" do
       expect(session[:become_user_id]).to be_nil
     end
 
-    it "should record real user in page_views" do
+    it "records real user in page_views" do
       Setting.set('enable_page_views', 'db')
       user_session(@admin, @admin.pseudonyms.first)
 
@@ -488,7 +488,7 @@ describe "security" do
       expect(pv2.real_user_id).to eq @admin.id
     end
 
-    it "should remember the destination with an intervening auth" do
+    it "remembers the destination with an intervening auth" do
       token = SessionPersistenceToken.generate(@admin.pseudonyms.first)
       get "/", headers: { "HTTP_COOKIE" => "pseudonym_credentials=#{token.pseudonym_credentials}" }
       expect(response).to be_successful
@@ -516,7 +516,7 @@ describe "security" do
     end
   end
 
-  it "should not allow logins to safefiles domains" do
+  it "does not allow logins to safefiles domains" do
     allow(HostUrl).to receive(:is_file_host?).and_return(true)
     allow(HostUrl).to receive(:default_host).and_return('test.host')
     get "http://files-test.host/login"

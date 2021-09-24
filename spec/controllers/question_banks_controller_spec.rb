@@ -49,7 +49,7 @@ describe QuestionBanksController do
     before(:once) { create_course_with_two_question_banks! }
     before(:each) { user_session(@teacher) }
 
-    it "should copy questions" do
+    it "copies questions" do
       post 'move_questions', params: { :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :questions => { @question1.id => 1, @question2.id => 1 } }
       expect(response).to be_successful
 
@@ -58,7 +58,7 @@ describe QuestionBanksController do
       expect(@bank2.assessment_questions.count).to eq 2
     end
 
-    it "should move questions" do
+    it "moves questions" do
       post 'move_questions', params: { :course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1', :questions => { @question1.id => 1, @question2.id => 1 } }
       expect(response).to be_successful
 

@@ -55,7 +55,7 @@ describe TermsOfService do
       TermsOfService.skip_automatic_terms_creation = false
     end
 
-    it "should create a default terms_of_service on root account creation" do
+    it "creates a default terms_of_service on root account creation" do
       ac2 = account_model
       expect(ac2.terms_of_service.terms_type).to eq TermsOfService.term_options_for_account(ac2)[:terms_type]
       sub = ac2.sub_accounts.create!

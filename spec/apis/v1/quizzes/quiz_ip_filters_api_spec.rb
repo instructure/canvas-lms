@@ -42,13 +42,13 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       end
     end
 
-    it 'should return an empty list' do
+    it 'returns an empty list' do
       json = get_index
       expect(json.has_key?('quiz_ip_filters')).to be_truthy
       expect(json['quiz_ip_filters'].size).to eq 0
     end
 
-    it 'should list the active IP filter' do
+    it 'lists the active IP filter' do
       @quiz.ip_filter = '192.168.1.101'
       @quiz.save
 
@@ -56,7 +56,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       expect(json['quiz_ip_filters'].size).to eq 1
     end
 
-    it 'should list available IP filters' do
+    it 'lists available IP filters' do
       @quiz.ip_filter = '192.168.1.101'
       @quiz.save
 
@@ -69,7 +69,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       expect(json['quiz_ip_filters'].size).to eq 2
     end
 
-    it 'should restrict access to itself' do
+    it 'restricts access to itself' do
       student_in_course
 
       json = get_index(true)
@@ -77,7 +77,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
     end
 
     context 'Pagination' do
-      it 'should paginate' do
+      it 'paginates' do
         account_filters = {}
 
         for i in 1..40 do
@@ -94,19 +94,19 @@ describe Quizzes::QuizIpFiltersController, type: :request do
         expect(page1['quiz_ip_filters'].size).to eq 15
       end
 
-      it 'should return an empty array with a cursor past the end' do
+      it 'returns an empty array with a cursor past the end' do
         page = get_index false, { page: 2 }
         expect(page['quiz_ip_filters']).to eq []
       end
 
-      it 'should bail out on an invalid cursor' do
+      it 'bails out on an invalid cursor' do
         get_index true, { page: 'invalid' }
         assert_status(404)
       end
     end
 
     context 'Rendering IP Filter objects' do
-      it 'should render' do
+      it 'renders' do
         @quiz.ip_filter = '192.168.1.101'
         @quiz.save
 
@@ -118,7 +118,7 @@ describe Quizzes::QuizIpFiltersController, type: :request do
       end
 
       context 'JSON-API compliance' do
-        it 'should render as JSON-API' do
+        it 'renders as JSON-API' do
           skip 'CNVS-8978: JSON-API compliance API spec helper'
 
           json = get_index

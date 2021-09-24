@@ -36,7 +36,7 @@ describe "assignments" do
       @assignment = @course.assignments.create!(:title => 'default assignment', :name => 'default assignment', :due_at => @due_date)
     end
 
-    it "should order undated assignments by title and dated assignments by first due" do
+    it "orders undated assignments by title and dated assignments by first due" do
       @second_assignment = @course.assignments.create!(:title => 'assignment 2', :name => 'assignment 2', :due_at => nil)
       @third_assignment = @course.assignments.create!(:title => 'assignment 3', :name => 'assignment 3', :due_at => nil)
       @fourth_assignment = @course.assignments.create!(:title => 'assignment 4', :name => 'assignment 4', :due_at => @due_date - 1.day)
@@ -51,7 +51,7 @@ describe "assignments" do
       expect(titles[3].text).to eq @third_assignment.title
     end
 
-    it "should highlight mini-calendar dates where stuff is due" do
+    it "highlights mini-calendar dates where stuff is due" do
       @course.assignments.create!(:title => 'test assignment', :name => 'test assignment', :due_at => @due_date)
 
       get "/courses/#{@course.id}/assignments/syllabus"
@@ -59,7 +59,7 @@ describe "assignments" do
       expect(f(".mini_calendar_day.date_#{@due_date.strftime("%m_%d_%Y")}")).to have_class('has_event')
     end
 
-    it "should not show submission data when muted" do
+    it "does not show submission data when muted" do
       assignment = @course.assignments.create!(:title => 'test assignment', :name => 'test assignment')
 
       assignment.update(:submission_types => "online_url,online_upload", muted: false)
@@ -80,7 +80,7 @@ describe "assignments" do
       expect(details).not_to include_text('comment after muting')
     end
 
-    it "should have group comment radio buttons for individually graded group assignments" do
+    it "has group comment radio buttons for individually graded group assignments" do
       u1 = @user
       student_in_course(:course => @course)
       u2 = @user
@@ -98,7 +98,7 @@ describe "assignments" do
       end
     end
 
-    it "should have hidden group comment input for group graded group assignments" do
+    it "has hidden group comment input for group graded group assignments" do
       u1 = @user
       student_in_course(:course => @course)
       u2 = @user
@@ -121,7 +121,7 @@ describe "assignments" do
       end
     end
 
-    it "should not show assignments in an unpublished course" do
+    it "does not show assignments in an unpublished course" do
       new_course = Course.create!(:name => 'unpublished course')
       assignment = new_course.assignments.create!(:title => "some assignment")
       new_course.enroll_user(@user, 'StudentEnrollment')
@@ -131,7 +131,7 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css('#assignment_show')
     end
 
-    it "should verify lock until date is enforced" do
+    it "verifies lock until date is enforced" do
       assignment_name = 'locked assignment'
       unlock_time = 1.day.from_now
       locked_assignment = @course.assignments.create!(:name => assignment_name, :unlock_at => unlock_time)
@@ -143,7 +143,7 @@ describe "assignments" do
       expect(f('#content')).not_to include_text('This assignment is locked until')
     end
 
-    it "should verify due date is enforced" do
+    it "verifies due date is enforced" do
       due_date_assignment = @course.assignments.create!(:name => 'due date assignment', :due_at => 5.days.ago)
       get "/courses/#{@course.id}/assignments"
       wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
@@ -154,7 +154,7 @@ describe "assignments" do
       expect(f("#assignment_group_upcoming #assignment_#{due_date_assignment.id}")).to be_displayed
     end
 
-    it "should show assignment data if locked by due date or lock date" do
+    it "shows assignment data if locked by due date or lock date" do
       assignment = @course.assignments.create!(:name => 'locked assignment',
                                                :due_at => 5.days.ago,
                                                :lock_at => 3.days.ago)
@@ -164,7 +164,7 @@ describe "assignments" do
       expect(f(".student-assignment-overview")).to be_displayed
     end
 
-    it "should still not show assignment data if locked by unlock date" do
+    it "stills not show assignment data if locked by unlock date" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
                                                :unlock_at => 3.days.from_now)
@@ -179,7 +179,7 @@ describe "assignments" do
         @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
       end
 
-      it "should show overridden lock dates for student" do
+      it "shows overridden lock dates for student" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
@@ -187,7 +187,7 @@ describe "assignments" do
         expect(f('#content')).to include_text "locked until #{expected_unlock}."
       end
 
-      it "should allow submission when within override locks" do
+      it "allows submission when within override locks" do
         @assignment.update(:submission_types => 'online_text_entry')
         # Change unlock dates to be valid for submission
         @override.unlock_at = Time.now.utc - 1.days # available now
@@ -216,7 +216,7 @@ describe "assignments" do
         click_away_accept_alert
       end
 
-      it "should expand the comments box on click" do
+      it "expands the comments box on click" do
         @assignment.update(:submission_types => 'online_upload')
 
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -229,7 +229,7 @@ describe "assignments" do
         expect(driver.execute_script("return $('#submission_comment').height()")).to eq 72
       end
 
-      it "should validate file upload restrictions" do
+      it "validates file upload restrictions" do
         filename_txt, fullpath_txt, data_txt, tempfile_txt = get_file("testfile4.txt")
         filename_zip, fullpath_zip, data_zip, tempfile_zip = get_file("testfile5.zip")
         @assignment.update(:submission_types => 'online_upload', :allowed_extensions => '.txt')
@@ -259,7 +259,7 @@ describe "assignments" do
         click_away_accept_alert
       end
 
-      it "should have a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
+      it "has a google doc tab if google docs is enabled", priority: "1", test_id: 161884 do
         @assignment.update(:submission_types => 'online_upload')
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         f('.submit_assignment_link').click
@@ -290,13 +290,13 @@ describe "assignments" do
           wait_for_animations
         end
 
-        it "should select a file from google drive", priority: "1", test_id: 161886 do
+        it "selects a file from google drive", priority: "1", test_id: 161886 do
           # find file in list
           # the file we are looking for is created as the second file in the list
           expect(ff(".filename")[1]).to include_text("test.mydoc")
         end
 
-        it "should select a file in a folder from google drive", priority: "1", test_id: 161885 do
+        it "selects a file in a folder from google drive", priority: "1", test_id: 161885 do
           # open folder
           f(".folder").click
           wait_for_animations
@@ -325,7 +325,7 @@ describe "assignments" do
       end
     end
 
-    it "should list the assignments" do
+    it "lists the assignments" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
@@ -338,7 +338,7 @@ describe "assignments" do
       expect(ag_el.text).to match @assignment.name
     end
 
-    it "should not show add/edit/delete buttons" do
+    it "does not show add/edit/delete buttons" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
@@ -352,7 +352,7 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css("ag_#{ag.id}_manage_link")
     end
 
-    it "should default to grouping by date" do
+    it "defaults to grouping by date" do
       @course.assignments.create!(:title => 'undated assignment', :name => 'undated assignment')
 
       get "/courses/#{@course.id}/assignments"
@@ -366,7 +366,7 @@ describe "assignments" do
       expect(f('#assignment_group_undated')).not_to be_nil
     end
 
-    it "should allowing grouping by assignment group (and remember)" do
+    it "allowings grouping by assignment group (and remember)" do
       ag = @course.assignment_groups.first
 
       get "/courses/#{@course.id}/assignments"
@@ -383,7 +383,7 @@ describe "assignments" do
       expect(is_checked('#show_by_type')).to be_truthy
     end
 
-    it "should not show empty groups" do
+    it "does not show empty groups" do
       # assuming two undated and two future assignments created above
       empty_ag = @course.assignment_groups.create!(:name => "Empty")
 
@@ -398,7 +398,7 @@ describe "assignments" do
       expect(f("#content")).not_to contain_css("#assignment_group_#{empty_ag.id}")
     end
 
-    it "should show empty assignment groups if they have a weight" do
+    it "shows empty assignment groups if they have a weight" do
       @course.group_weighting_scheme = "percent"
       @course.save!
 
@@ -416,7 +416,7 @@ describe "assignments" do
       expect(f("#assignment_group_#{empty_ag.id}")).not_to be_nil
     end
 
-    it "should correctly categorize assignments by date" do
+    it "correctlies categorize assignments by date" do
       # assuming two undated and two future assignments created above
       undated, upcoming = @course.assignments.partition { |a| a.due_date.nil? }
 
@@ -451,7 +451,7 @@ describe "assignments" do
         course_with_student_logged_in(course: @course)
       end
 
-      it "should exhaust all pagination of assignment groups" do
+      it "exhausts all pagination of assignment groups" do
         get "/courses/#{@course.id}/assignments"
         wait_for_no_such_element { f('[data-view="assignmentGroups"] .loadingIndicator') }
         wait_for_ajaximations

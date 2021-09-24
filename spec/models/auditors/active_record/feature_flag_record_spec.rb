@@ -31,7 +31,7 @@ describe Auditors::ActiveRecord::FeatureFlagRecord do
                                                        })
   end
 
-  it "it appropriately connected to a table" do
+  it "appropriately connected to a table" do
     Auditors::ActiveRecord::FeatureFlagRecord.delete_all
     expect(Auditors::ActiveRecord::FeatureFlagRecord.count).to eq(0)
   end

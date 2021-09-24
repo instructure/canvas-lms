@@ -20,7 +20,7 @@ require_relative "../spec_helper"
 
 describe Switchman::Shard do
   describe "in_region" do
-    it "should not include shards referencing non-extant database servers" do
+    it "does not include shards referencing non-extant database servers" do
       # this one isn't actually in the config
       allow(Shard).to receive(:non_existent_database_servers).and_return(["jobs4"])
 

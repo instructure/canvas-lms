@@ -23,18 +23,18 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 describe TokensController do
   describe "developer keys" do
     context "not logged in" do
-      it "should require being logged in to create an access token" do
+      it "requires being logged in to create an access token" do
         post 'create', params: { :access_token => { :purpose => "test" } }
         expect(response).to be_redirect
         expect(assigns[:token]).to be_nil
       end
 
-      it "should require being logged in to delete an access token" do
+      it "requires being logged in to delete an access token" do
         delete 'destroy', params: { :id => 5 }
         expect(response).to be_redirect
       end
 
-      it "should require being logged in to retrieve an access token" do
+      it "requires being logged in to retrieve an access token" do
         get 'show', params: { :id => 5 }
         expect(response).to be_redirect
       end
@@ -49,7 +49,7 @@ describe TokensController do
         user_session(@user)
       end
 
-      it "should allow creating an access token" do
+      it "allows creating an access token" do
         post 'create', params: { :access_token => { :purpose => "test", :permanent_expires_at => "jun 1 2011" } }
         expect(response).to be_successful
         expect(assigns[:token]).not_to be_nil
@@ -58,7 +58,7 @@ describe TokensController do
         expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
-      it "should not allow creating an access token while masquerading" do
+      it "does not allow creating an access token while masquerading" do
         Account.site_admin.account_users.create!(user: @user)
         session[:become_user_id] = user_with_pseudonym.id
 
@@ -66,7 +66,7 @@ describe TokensController do
         assert_status(401)
       end
 
-      it "should not allow explicitly setting the token value" do
+      it "does not allow explicitly setting the token value" do
         post 'create', params: { :access_token => { :purpose => "test", :permanent_expires_at => "jun 1 2011", :token => "mytoken" } }
         expect(response).to be_successful
         expect(response.body).not_to match(/mytoken/)
@@ -78,7 +78,7 @@ describe TokensController do
         expect(assigns[:token].permanent_expires_at.to_date).to eq Time.zone.parse("jun 1 2011").to_date
       end
 
-      it "should allow deleting an access token" do
+      it "allows deleting an access token" do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
         delete 'destroy', params: { :id => token.id }
@@ -86,7 +86,7 @@ describe TokensController do
         expect(assigns[:token]).to be_deleted
       end
 
-      it "should not allow deleting an access token while masquerading" do
+      it "does not allow deleting an access token while masquerading" do
         token = @user.access_tokens.create!
         expect(token.user_id).to eq @user.id
         Account.site_admin.account_users.create!(user: @user)
@@ -96,7 +96,7 @@ describe TokensController do
         assert_status(401)
       end
 
-      it "should not allow deleting someone else's access token" do
+      it "does not allow deleting someone else's access token" do
         user2 = User.create!
         token = user2.access_tokens.create!
         expect(token.user_id).to eq user2.id
@@ -104,7 +104,7 @@ describe TokensController do
         assert_status(404)
       end
 
-      it "should allow retrieving an access token, but not give the full token string" do
+      it "allows retrieving an access token, but not give the full token string" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
         token.save!
@@ -116,7 +116,7 @@ describe TokensController do
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should not include token for non-manually-generated tokens" do
+      it "does not include token for non-manually-generated tokens" do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
@@ -127,7 +127,7 @@ describe TokensController do
         expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should not allow retrieving someone else's access token" do
+      it "does not allow retrieving someone else's access token" do
         user2 = User.create!
         token = user2.access_tokens.create!
         expect(token.user_id).to eq user2.id
@@ -135,7 +135,7 @@ describe TokensController do
         assert_status(404)
       end
 
-      it "should allow updating a token" do
+      it "allows updating a token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
         token.save!
@@ -148,7 +148,7 @@ describe TokensController do
         expect(response.body).to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should allow regenerating a manually generated token" do
+      it "allows regenerating a manually generated token" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
         token.save!
@@ -161,7 +161,7 @@ describe TokensController do
         expect(response.body).to match(/#{assigns[:token].full_token}/)
       end
 
-      it "should not allow regenerating a token while masquerading" do
+      it "does not allow regenerating a token while masquerading" do
         token = @user.access_tokens.new
         token.developer_key = DeveloperKey.default
         token.save!
@@ -173,7 +173,7 @@ describe TokensController do
         assert_status(401)
       end
 
-      it "should not allow regenerating a non-manually-generated token" do
+      it "does not allow regenerating a non-manually-generated token" do
         key = DeveloperKey.create!
         token = @user.access_tokens.create!(developer_key: key)
         expect(token.user_id).to eq @user.id
@@ -185,7 +185,7 @@ describe TokensController do
         expect(response.body).not_to match(/#{assigns[:token].token_hint}/)
       end
 
-      it "should not allow updating someone else's token" do
+      it "does not allow updating someone else's token" do
         user2 = User.create!
         token = user2.access_tokens.create!
         expect(token.user_id).to eq user2.id

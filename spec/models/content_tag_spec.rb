@@ -158,14 +158,14 @@ describe ContentTag do
     end
   end
 
-  it "should allow setting a valid content_asset_string" do
+  it "allows setting a valid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'discussion_topic_5'
     expect(tag.content_type).to eql('DiscussionTopic')
     expect(tag.content_id).to eql(5)
   end
 
-  it "should not allow setting an invalid content_asset_string" do
+  it "does not allow setting an invalid content_asset_string" do
     tag = ContentTag.new
     tag.content_asset_string = 'bad_class_41'
     expect(tag.content_type).to eql(nil)
@@ -180,26 +180,26 @@ describe ContentTag do
     expect(tag.content_id).to eql(nil)
   end
 
-  it "should return content for a assignment" do
+  it "returns content for a assignment" do
     course_factory
     assignment = course_factory.assignments.create!
     tag = ContentTag.new(:content => assignment, :context => @course)
     expect(tag.assignment).to eq assignment
   end
 
-  it "should return associated assignment for a quiz" do
+  it "returns associated assignment for a quiz" do
     course_factory
     quiz = course_factory.quizzes.create!
     tag = ContentTag.new(:content => quiz, :context => @course)
     expect(tag.assignment).to eq quiz.assignment
   end
 
-  it "should return nil assignment for something else" do
+  it "returns nil assignment for something else" do
     tag = ContentTag.new
     expect(tag.assignment).to be_nil
   end
 
-  it "should include tags from a course in the for_context named scope" do
+  it "includes tags from a course in the for_context named scope" do
     course_factory
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
@@ -208,7 +208,7 @@ describe ContentTag do
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
   end
 
-  it "should include tags from an account in the for_context named scope" do
+  it "includes tags from an account in the for_context named scope" do
     account = Account.default
     outcome = account.created_learning_outcomes.create!(:title => 'outcome', :description => '<p>This is <b>awesome</b>.</p>')
     tag = ContentTag.create!(:content => outcome, :context => account)
@@ -217,7 +217,7 @@ describe ContentTag do
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
   end
 
-  it "should include tags from courses under an account in the for_context named scope" do
+  it "includes tags from courses under an account in the for_context named scope" do
     course_factory
     quiz = @course.quizzes.create!
     tag = ContentTag.create!(:content => quiz, :context => @course)
@@ -226,7 +226,7 @@ describe ContentTag do
     expect(tags.any? { |t| t.id == tag.id }).to be_truthy
   end
 
-  it "should not rename the linked external tool if the tag is renamed" do
+  it "does not rename the linked external tool if the tag is renamed" do
     course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => { 'a' => '1', 'b' => '2' })
     @module = @course.context_modules.create!(:name => "module")
@@ -243,7 +243,7 @@ describe ContentTag do
     expect(@tag.title).to eq "Example"
   end
 
-  it "should not rename the tag if the linked external tool is renamed" do
+  it "does not rename the tag if the linked external tool is renamed" do
     course_factory
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key", :shared_secret => "secret", :domain => 'example.com', :custom_fields => { 'a' => '1', 'b' => '2' })
     @module = @course.context_modules.create!(:name => "module")
@@ -260,7 +260,7 @@ describe ContentTag do
     expect(@tag.title).to eq "Example"
   end
 
-  it "should rename the linked assignment if the tag is renamed" do
+  it "renames the linked assignment if the tag is renamed" do
     course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
@@ -276,7 +276,7 @@ describe ContentTag do
     expect(@assignment.title).to eq 'some assignment (renamed)'
   end
 
-  it "should rename the tag if the linked assignment is renamed" do
+  it "renames the tag if the linked assignment is renamed" do
     course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
@@ -298,7 +298,7 @@ describe ContentTag do
     expect(@assignment.title).to eq 'some assignment (renamed)'
   end
 
-  it "should associate the tag with an external tool matching the url" do
+  it "associates the tag with an external tool matching the url" do
     course_factory
     url = 'http://quiz-lti.docker/lti/launch'
     tool = @course.context_external_tools.create!({
@@ -380,7 +380,7 @@ describe ContentTag do
     end
   end
 
-  it "should not attempt to update asset name attribute if it's over the db limit" do
+  it "does not attempt to update asset name attribute if it's over the db limit" do
     course_factory
     @page = @course.wiki_pages.create!(:title => "some page")
     @module = @course.context_modules.create!(:name => "module")
@@ -392,7 +392,7 @@ describe ContentTag do
     expect(@tag.title[0, 250]).to eq @page.title[0, 250]
   end
 
-  it "should properly trim asset name for assignments" do
+  it "properlies trim asset name for assignments" do
     course_factory
     @assign = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
@@ -404,7 +404,7 @@ describe ContentTag do
     expect(@tag.title[0, 250]).to eq @assign.title[0, 250]
   end
 
-  it "should publish/unpublish the tag if the linked wiki page is published/unpublished" do
+  it "publish/unpublishes the tag if the linked wiki page is published/unpublished" do
     course_factory
     @page = @course.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -426,7 +426,7 @@ describe ContentTag do
     expect(@tag.workflow_state).to eq 'unpublished'
   end
 
-  it "should publish/unpublish the linked wiki page (and its tags) if the tag is published/unpublished" do
+  it "publish/unpublishes the linked wiki page (and its tags) if the tag is published/unpublished" do
     course_factory
     @page = @course.wiki_pages.create!(:title => "some page")
     @page.workflow_state = 'unpublished'
@@ -465,7 +465,7 @@ describe ContentTag do
     expect(file.reload).to be_published
   end
 
-  it "should publish content via publish!" do
+  it "publishes content via publish!" do
     assignment_model
     @assignment.unpublish!
     @module = @course.context_modules.create!
@@ -476,7 +476,7 @@ describe ContentTag do
     @tag.update_asset_workflow_state!
   end
 
-  it "should unpublish content via unpublish!" do
+  it "unpublishes content via unpublish!" do
     quiz_model
     @module = @course.context_modules.create!
     @tag = @module.add_item(type: 'Quiz', id: @quiz.id)
@@ -486,7 +486,7 @@ describe ContentTag do
     @tag.update_asset_workflow_state!
   end
 
-  it "should not rename tag if linked attachment is renamed" do
+  it "does not rename tag if linked attachment is renamed" do
     course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
 
@@ -500,7 +500,7 @@ describe ContentTag do
     expect(tag.title).to eq 'important title.txt'
   end
 
-  it "should not rename attachment if linked tag is renamed" do
+  it "does not rename attachment if linked tag is renamed" do
     course_factory
     att = Attachment.create!(:filename => 'important title.txt', :display_name => "important title.txt", :uploaded_data => StringIO.new("It's what's on the inside of the file that doesn't matter.'"), :folder => Folder.unfiled_folder(@course), :context => @course)
 
@@ -513,12 +513,12 @@ describe ContentTag do
   end
 
   include_examples "url validation tests"
-  it "should check url validity" do
+  it "checks url validity" do
     quiz = course_factory.quizzes.create!
     test_url_validation(ContentTag.create!(:content => quiz, :context => @course))
   end
 
-  it "should touch the module after committing the save" do
+  it "touches the module after committing the save" do
     course_factory
     mod = @course.context_modules.create!
     yesterday = 1.day.ago
@@ -530,7 +530,7 @@ describe ContentTag do
     expect(mod.reload.updated_at).to be > 5.seconds.ago
   end
 
-  it 'should not touch modules that have been recently touched on save' do
+  it 'does not touch modules that have been recently touched on save' do
     Setting.set('touch_personal_space', '10')
     course_factory
     mod = @course.context_modules.create!
@@ -544,7 +544,7 @@ describe ContentTag do
     end
   end
 
-  it "should allow skipping touches on save" do
+  it "allows skipping touches on save" do
     course_factory
     @assignment = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")
@@ -565,7 +565,7 @@ describe ContentTag do
     expect(@module.reload.updated_at.to_i).to eq yesterday.to_i
   end
 
-  it "should update outcome root account ids after save" do
+  it "updates outcome root account ids after save" do
     outcome = LearningOutcome.create! title: 'foo', context: nil
     course = course_factory
     expect(outcome.root_account_ids).to eq []
@@ -646,7 +646,7 @@ describe ContentTag do
       end
     end
     context "other" do
-      it "it properly returns wiki pages" do
+      it "properly returns wiki pages" do
         @page = @course.wiki_pages.create!(:title => "some page")
         @module = @course.context_modules.create!(:name => "module")
         @tag = @module.add_item({ :type => 'WikiPage', :title => 'oh noes!' * 35, :id => @page.id })
@@ -766,7 +766,7 @@ describe ContentTag do
     end
   end
 
-  it "should sync tag published state with attachment locked state" do
+  it "syncs tag published state with attachment locked state" do
     course_factory
     att = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new("blah"),
                              :folder => Folder.unfiled_folder(@course), :context => @course)
@@ -790,33 +790,33 @@ describe ContentTag do
 
   describe 'after_save' do
     describe 'set_root_account' do
-      it 'should set root_account when context is Account' do
+      it 'sets root_account when context is Account' do
         account = Account.default
         tag = ContentTag.create!(context: account)
         expect(tag.root_account).to eq account.root_account
       end
 
-      it 'should set root_account when context is Assignment' do
+      it 'sets root_account when context is Assignment' do
         course_factory
         assignment = @course.assignments.create!(title: "test")
         tag = ContentTag.create!(context: assignment)
         expect(tag.root_account).to eq assignment.root_account
       end
 
-      it 'should set root_account when context is Course' do
+      it 'sets root_account when context is Course' do
         course_factory
         tag = ContentTag.create!(context: @course)
         expect(tag.root_account).to eq @course.root_account
       end
 
-      it 'should set root_account when context is LearningOutcomeGroup' do
+      it 'sets root_account when context is LearningOutcomeGroup' do
         account = Account.default
         group = LearningOutcomeGroup.create!(title: "test", context: account)
         tag = ContentTag.create!(context: group)
         expect(tag.root_account).to eq account.root_account
       end
 
-      it 'should set root_account when context is Quiz' do
+      it 'sets root_account when context is Quiz' do
         course_factory
         quiz = @course.quizzes.create!
         tag = ContentTag.create!(context: quiz)

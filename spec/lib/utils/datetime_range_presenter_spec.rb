@@ -87,7 +87,7 @@ module Utils
         expect(presenter.as_string).to eq("Jan 1 from 12pm to  1pm")
       end
 
-      it "should include the year if the current year isn't the same" do
+      it "includes the year if the current year isn't the same" do
         Timecop.travel(Time.utc(2014, 10, 1, 9, 30)) do
           nextyear = Time.zone.now.advance(years: 1)
           presenter = DatetimeRangePresenter.new(nextyear)

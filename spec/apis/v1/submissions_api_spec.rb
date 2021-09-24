@@ -116,7 +116,7 @@ describe 'Submissions API', type: :request do
     end
 
     shared_examples_for 'enrollment_state' do
-      it 'should scope call to enrollment_state' do
+      it 'scopes call to enrollment_state' do
         e = @section.enrollments.where(user_id: @student1.id).take
         json = api_call(:get,
                         '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
@@ -207,7 +207,7 @@ describe 'Submissions API', type: :request do
       end
     end
 
-    it 'should raise on invalid enrollment_state' do
+    it 'raises on invalid enrollment_state' do
       json = api_call(:get,
                       '/api/v1/sections/sis_section_id:my-section-sis-id/students/submissions',
                       { controller: 'submissions_api', action: 'for_students',
@@ -295,7 +295,7 @@ describe 'Submissions API', type: :request do
       expect(json.size).to eq 0
     end
 
-    it 'should scope call to enrollment_state with post_to_sis' do
+    it 'scopes call to enrollment_state with post_to_sis' do
       @a1.post_to_sis = true
       @a1.save!
       batch = @course.root_account.sis_batches.create
@@ -395,7 +395,7 @@ describe 'Submissions API', type: :request do
       expect(json["all_submissions"][0]["assignment_visible"]).to eq true
     end
 
-    it "should be able to handle an update without visibility when DA is on" do
+    it "is able to handle an update without visibility when DA is on" do
       json = api_call(:put,
                       "/api/v1/sections/#{@section.id}/assignments/#{@a1.id}/submissions/#{@student1.id}",
                       { :controller => 'submissions_api', :action => 'update',
@@ -1065,7 +1065,7 @@ describe 'Submissions API', type: :request do
     expect(json["score"]).to eq 15
   end
 
-  it "should api translate online_text_entry submissions" do
+  it "apis translate online_text_entry submissions" do
     student1 = user_factory(active_all: true)
     course_with_teacher(:active_all => true)
     @course.enroll_student(student1).accept!
@@ -4508,14 +4508,14 @@ describe 'Submissions API', type: :request do
           expect(json_response['progress']).to include progress_json
         end
 
-        it 'should enqueue the submit job' do
+        it 'enqueues the submit job' do
           json_response
           job = Delayed::Job.order(:id).last
           expect(job.handler).to include Services::SubmitHomeworkService::SubmitWorker.name
           expect(job.handler).to include 'hello comment'
         end
 
-        it 'should enqueue the copy job when the submit_assignment parameter is false' do
+        it 'enqueues the copy job when the submit_assignment parameter is false' do
           preflight(url: 'http://example.com/test', filename: 'test.txt', submit_assignment: false)
           JSON.parse(response.body)
           job = Delayed::Job.order(:id).last

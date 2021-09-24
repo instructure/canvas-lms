@@ -82,7 +82,7 @@ describe LiveEvents::Client do
   describe ".aws_config" do
     before { prep_client_and_worker }
 
-    it "should correctly parse the endpoint" do
+    it "correctlies parse the endpoint" do
       res = LiveEvents::Client.aws_config({
                                             "aws_endpoint" => "http://example.com:6543/"
                                           })
@@ -91,7 +91,7 @@ describe LiveEvents::Client do
       LiveEvents.worker.stop!
     end
 
-    it "should ignore invalid endpoints" do
+    it "ignores invalid endpoints" do
       res = LiveEvents::Client.aws_config({
                                             "aws_endpoint" => "example.com:6543/"
                                           })
@@ -100,7 +100,7 @@ describe LiveEvents::Client do
       LiveEvents.worker.stop!
     end
 
-    it "should load custom creds" do
+    it "loads custom creds" do
       LiveEvents.aws_credentials = ->(settings) {
         settings['value_to_return']
       }
@@ -164,7 +164,7 @@ describe LiveEvents::Client do
   describe "post_event" do
     before { prep_client_and_worker }
 
-    it "should call put_records on the kinesis stream" do
+    it "calls put_records on the kinesis stream" do
       now = Time.now
 
       @client.post_event('event', {}, now, {}, "123")
@@ -181,7 +181,7 @@ describe LiveEvents::Client do
                          }])
     end
 
-    it "should include attributes when supplied via ctx" do
+    it "includes attributes when supplied via ctx" do
       now = Time.now
 
       @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
@@ -202,7 +202,7 @@ describe LiveEvents::Client do
                          }])
     end
 
-    it "should not send blacklisted conxted attributes" do
+    it "does not send blacklisted conxted attributes" do
       now = Time.now
       @client.post_event(
         'event',
@@ -232,7 +232,7 @@ describe LiveEvents::Client do
   describe "LiveEvents helper" do
     before { prep_client_and_worker }
 
-    it "should set context info via set_context and send it with events" do
+    it "sets context info via set_context and send it with events" do
       LiveEvents.set_context({ user_id: 123 })
 
       now = Time.now
@@ -257,7 +257,7 @@ describe LiveEvents::Client do
                          }])
     end
 
-    it "should clear context on clear_context!" do
+    it "clears context on clear_context!" do
       LiveEvents.set_context({ user_id: 123 })
       LiveEvents.clear_context!
 
@@ -289,7 +289,7 @@ describe LiveEvents::Client do
     context do
       let(:test_stream_name) { 'custom_stream_name' }
 
-      it "should use custom stream client when defined" do
+      it "uses custom stream client when defined" do
         fake_stream_client = FakeStreamClient.new test_stream_name
         LiveEvents.stream_client = fake_stream_client
 

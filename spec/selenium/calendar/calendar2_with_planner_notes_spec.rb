@@ -39,7 +39,7 @@ describe "calendar2" do
       user_session(@student1)
     end
 
-    it "should show the student calendar todo" do
+    it "shows the student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
       wait_for_ajax_requests
@@ -50,7 +50,7 @@ describe "calendar2" do
       expect(note).to include_text('Student To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should create a new student calendar todo" do
+    it "creates a new student calendar todo" do
       title = "new todo title"
       get '/calendar2'
       wait_for_ajax_requests
@@ -68,7 +68,7 @@ describe "calendar2" do
       expect(note).to include_text(title)
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should delete a student calendar todo" do
+    it "deletes a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       get '/calendar2'
       wait_for_ajax_requests
@@ -78,7 +78,7 @@ describe "calendar2" do
       f('.btn-primary').click       # delete button in the confirmation dialog
       expect(f('.fc-view-container')).not_to contain_css('a.fc-event')
     end
-    it "should edit a student calendar todo" do
+    it "edits a student calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Student To Do")
       new_title = "new todo title"
       get '/calendar2'
@@ -91,7 +91,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
-    it "should show course calendar todo" do
+    it "shows course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
       wait_for_ajax_requests
@@ -102,7 +102,7 @@ describe "calendar2" do
       expect(note).to include_text('Course To Do')
       expect(note).to contain_css('i.icon-note-light')
     end
-    it "should edit a course calendar todo" do
+    it "edits a course calendar todo" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       new_title = "new course todo title"
       get '/calendar2'
@@ -115,7 +115,7 @@ describe "calendar2" do
       note = f('a.fc-event')
       expect(note).to include_text(new_title)
     end
-    it "should move a course calendar todo to the student calendar" do
+    it "moves a course calendar todo to the student calendar" do
       @student1.planner_notes.create!(todo_date: 0.days.from_now, title: "Course To Do", course_id: @course.id)
       get '/calendar2'
       wait_for_ajax_requests

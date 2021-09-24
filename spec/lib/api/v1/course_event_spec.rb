@@ -72,7 +72,7 @@ describe Api::V1::CourseEvent do
     end
   end
 
-  it "should be formatted as a course content event hash" do
+  it "is formatted as a course content event hash" do
     event = course_event_json(@event, @student, @session)
 
     expect(event[:id]).to eq @event.id
@@ -88,11 +88,11 @@ describe Api::V1::CourseEvent do
     expect(event[:links][:user]).to eq Shard.relative_id_for(@teacher, Shard.current, Shard.current)
   end
 
-  it "should be formatted as an array of course content event hashes" do
+  it "is formatted as an array of course content event hashes" do
     expect(course_events_json(@events, @student, @session).size).to eql(@events.size)
   end
 
-  it "should be formatted as an array of compound course content event hashes" do
+  it "is formatted as an array of compound course content event hashes" do
     json_hash = course_events_compound_json(@events, @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]
@@ -112,7 +112,7 @@ describe Api::V1::CourseEvent do
     expect(linked[:page_views].size).to eql(1)
   end
 
-  it "should handle an empty result set" do
+  it "handles an empty result set" do
     json_hash = course_events_compound_json([], @user, @session)
 
     expect(json_hash.keys.sort).to eq [:events, :linked, :links]

@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe SubmissionList do
-  it "should initialize with a course" do
+  it "initializes with a course" do
     course_model
     expect { @sl = SubmissionList.new(@course) }.not_to raise_error
     expect(@sl).to be_is_a(SubmissionList)
@@ -30,17 +30,17 @@ describe SubmissionList do
     expect { @sl = SubmissionList.new(-1) }.to raise_error(ArgumentError, "Must provide a course.")
   end
 
-  it "should provide a dictionary in 'list'" do
+  it "provides a dictionary in 'list'" do
     course_model
     expect(SubmissionList.new(@course).list).to be_is_a(Hashery::Dictionary)
   end
 
-  it "should create keys in the data when versions of submissions existed" do
+  it "creates keys in the data when versions of submissions existed" do
     interesting_submission_list
     expect(@sl.list.keys).to eql([Date.parse(Time.now.utc.to_s)])
   end
 
-  it "should take the time zone into account when dividing grading history into days" do
+  it "takes the time zone into account when dividing grading history into days" do
     Timecop.travel(Time.utc(2011, 12, 31, 23, 0)) do
       Auditors::ActiveRecord::Partitioner.process
     end
@@ -89,7 +89,7 @@ describe SubmissionList do
       interesting_submission_data
     end
 
-    it "should be able to loop on days" do
+    it "is able to loop on days" do
       available_keys = [:graders, :date]
       SubmissionList.days(@course).each do |day|
         expect(day).to be_is_a(OpenStruct)
@@ -100,7 +100,7 @@ describe SubmissionList do
       end
     end
 
-    it "should be able to loop on graders" do
+    it "is able to loop on graders" do
       available_keys = [:grader_id, :assignments, :name]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
@@ -116,7 +116,7 @@ describe SubmissionList do
       end
     end
 
-    it "should only keep one diff per grader per day" do
+    it "onlies keep one diff per grader per day" do
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.assignments.each do |assignment|
@@ -126,7 +126,7 @@ describe SubmissionList do
       end
     end
 
-    it "should be able to loop on assignments" do
+    it "is able to loop on assignments" do
       available_keys = [:submission_count, :name, :submissions, :assignment_id]
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
@@ -145,7 +145,7 @@ describe SubmissionList do
     end
 
     context "submissions" do
-      it "should be able to loop on submissions" do
+      it "is able to loop on submissions" do
         available_keys = [
           :assignment_id, :assignment_name, :attachment_id, :attachment_ids,
           :body, :course_id, :created_at, :current_grade, :current_graded_at,
@@ -182,7 +182,7 @@ describe SubmissionList do
   end
 
   context "regrading" do
-    it 'should include regrade events in the final data' do
+    it 'includes regrade events in the final data' do
       # Figure out how to manually regrade a test piece of data
       interesting_submission_data
       @assignment = @course.assignments.create!(title: 'some_assignment')

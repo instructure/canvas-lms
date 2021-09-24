@@ -29,7 +29,7 @@ describe UsersController, type: :request do
     course_with_student(:active_all => true)
   end
 
-  it "should check for auth" do
+  it "checks for auth" do
     get("/api/v1/users/self/activity_stream")
     assert_status(401)
 
@@ -39,7 +39,7 @@ describe UsersController, type: :request do
     assert_status(401)
   end
 
-  it "should return the activity stream" do
+  it "returns the activity stream" do
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
     expect(json.size).to eq 0
@@ -53,7 +53,7 @@ describe UsersController, type: :request do
     expect(json.size).to eq 1
   end
 
-  it "should return the activity stream summary" do
+  it "returns the activity stream summary" do
     @context = @course
     discussion_topic_model
     discussion_topic_model(:user => @user)
@@ -76,7 +76,7 @@ describe UsersController, type: :request do
 
   context "cross-shard activity stream" do
     specs_require_sharding
-    it "should return the activity stream summary with cross-shard items" do
+    it "returns the activity stream summary with cross-shard items" do
       @student = user_factory(active_all: true)
       @shard1.activate do
         @account = Account.create!
@@ -104,7 +104,7 @@ describe UsersController, type: :request do
       ]
     end
 
-    it "should filter the activity stream to currently active courses if requested" do
+    it "filters the activity stream to currently active courses if requested" do
       @student = user_factory(active_all: true)
       @shard1.activate do
         @account = Account.create!
@@ -125,7 +125,7 @@ describe UsersController, type: :request do
       expect(json.map { |r| r["discussion_topic_id"] }).to eq([@dt1.id])
     end
 
-    it "should find cross-shard submission comments" do
+    it "finds cross-shard submission comments" do
       @student = user_factory(active_all: true)
       course_factory(active_all: true)
       @course.enroll_student(@student).accept!
@@ -154,7 +154,7 @@ describe UsersController, type: :request do
     end
   end
 
-  it "should format DiscussionTopic" do
+  it "formats DiscussionTopic" do
     @context = @course
     discussion_topic_model
     @topic.require_initial_post = true
@@ -187,7 +187,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should not return discussion entries if user has not posted" do
+  it "does not return discussion entries if user has not posted" do
     @context = @course
     course_with_teacher(:course => @context, :active_all => true)
     discussion_topic_model
@@ -202,7 +202,7 @@ describe UsersController, type: :request do
     expect(json.first['root_discussion_entries']).to eq []
   end
 
-  it "should return discussion entries to admin without posting " do
+  it "returns discussion entries to admin without posting" do
     @context = @course
     course_with_teacher(:course => @context, :name => "Teach", :active_all => true)
     discussion_topic_model
@@ -221,7 +221,7 @@ describe UsersController, type: :request do
     ]
   end
 
-  it "should translate user content in discussion topic" do
+  it "translates user content in discussion topic" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
       discussion_topic_model(:message => user_content)
@@ -231,7 +231,7 @@ describe UsersController, type: :request do
     end
   end
 
-  it "should translate user content in discussion entry" do
+  it "translates user content in discussion entry" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
       discussion_topic_model
@@ -242,7 +242,7 @@ describe UsersController, type: :request do
     end
   end
 
-  it "should format Announcement" do
+  it "formats Announcement" do
     @context = @course
     announcement_model
     @a.reply_from(:user => @user, :text => 'hai')
@@ -273,7 +273,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should translate user content in announcement messages" do
+  it "translates user content in announcement messages" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
       announcement_model(:message => user_content)
@@ -283,7 +283,7 @@ describe UsersController, type: :request do
     end
   end
 
-  it "should translate user content in announcement discussion entries" do
+  it "translates user content in announcement discussion entries" do
     should_translate_user_content(@course) do |user_content|
       @context = @course
       announcement_model
@@ -294,7 +294,7 @@ describe UsersController, type: :request do
     end
   end
 
-  it "should format Conversation" do
+  it "formats Conversation" do
     @sender = User.create!(:name => 'sender')
     @conversation = Conversation.initiate([@user, @sender], false)
     @message = @conversation.add_message(@sender, "hello")
@@ -327,7 +327,7 @@ describe UsersController, type: :request do
     expect(json["latest_messages"]).to be_blank
   end
 
-  it "should format Message" do
+  it "formats Message" do
     message_model(:user => @user, :to => 'dashboard', :notification => notification_model)
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -347,7 +347,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format graded Submission with comments" do
+  it "formats graded Submission with comments" do
     # set @domain_root_account
     @domain_root_account = Account.default
     @domain_root_account.update(:default_time_zone => 'America/Denver')
@@ -482,7 +482,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format ungraded Submission with comments" do
+  it "formats ungraded Submission with comments" do
     @domain_root_account = Account.default
     @domain_root_account.update(:default_time_zone => 'America/Denver')
 
@@ -616,7 +616,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format graded Submission without comments" do
+  it "formats graded Submission without comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -632,7 +632,7 @@ describe UsersController, type: :request do
     expect(json[0]['submission_comments']).to eq []
   end
 
-  it "should not format ungraded Submission without comments" do
+  it "does not format ungraded Submission without comments" do
     @assignment = @course.assignments.create!(:title => 'assignment 1', :description => 'hai', :points_possible => '14.2', :submission_types => 'online_text_entry')
     @teacher = User.create!(:name => 'teacher')
     @course.enroll_teacher(@teacher)
@@ -644,7 +644,7 @@ describe UsersController, type: :request do
     expect(json).to eq []
   end
 
-  it "should format Collaboration" do
+  it "formats Collaboration" do
     google_docs_collaboration_model(:user_id => @user.id, :title => 'hey')
     json = api_call(:get, "/api/v1/users/activity_stream.json",
                     { :controller => "users", :action => "activity_stream", :format => 'json' })
@@ -663,7 +663,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format WebConference" do
+  it "formats WebConference" do
     allow(WebConference).to receive(:plugins).and_return(
       [OpenObject.new(:id => "big_blue_button", :settings => { :domain => "bbb.instructure.com", :secret_dec => "secret" }, :valid_settings? => true, :enabled? => true),]
     )
@@ -685,7 +685,7 @@ describe UsersController, type: :request do
     }]
   end
 
-  it "should format AssessmentRequest" do
+  it "formats AssessmentRequest" do
     assignment = assignment_model(:course => @course)
     submission = submission_model(assignment: assignment, user: @student)
     assessor_submission = submission_model(assignment: assignment, user: @user)
@@ -709,7 +709,7 @@ describe UsersController, type: :request do
     expect(json[0]['updated_at']).to eq StreamItem.last.updated_at.as_json
   end
 
-  it "should return the course-specific activity stream" do
+  it "returns the course-specific activity stream" do
     @course1 = @course
     @course2 = course_with_student(:user => @user, :active_all => true).course
     @context = @course1
@@ -733,7 +733,7 @@ describe UsersController, type: :request do
     expect(response.headers['Link']).to be_present
   end
 
-  it "should return the group-specific activity stream" do
+  it "returns the group-specific activity stream" do
     group_with_user
     @group1 = @group
     group_with_user(:user => @user)
@@ -757,7 +757,7 @@ describe UsersController, type: :request do
   end
 
   context "stream items" do
-    it "should hide the specified stream_item" do
+    it "hides the specified stream_item" do
       discussion_topic_model
       expect(@user.stream_item_instances.where(:hidden => false).count).to eq 1
 
@@ -769,7 +769,7 @@ describe UsersController, type: :request do
       expect(json).to eq({ 'hidden' => true })
     end
 
-    it "should hide all of the stream items" do
+    it "hides all of the stream items" do
       3.times do |n|
         dt = discussion_topic_model title: "Test #{n}"
         dt.discussion_subentries.create! :message => "test", :user => @user

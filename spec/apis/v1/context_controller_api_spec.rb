@@ -31,11 +31,11 @@ describe ContextController, type: :request do
       user_session(user)
     end
 
-    it "should match the create_media_object api route" do
+    it "matches the create_media_object api route" do
       assert_recognizes({ :controller => 'context', :action => 'create_media_object', 'format' => 'json' }, { :path => 'api/v1/media_objects', :method => :post })
     end
 
-    it "should create the object if it doesn't already exist" do
+    it "creates the object if it doesn't already exist" do
       @original_count = @user.media_objects.count
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return("stub")
 

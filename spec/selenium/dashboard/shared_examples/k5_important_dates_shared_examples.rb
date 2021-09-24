@@ -206,13 +206,13 @@ shared_examples_for 'k5 important dates calendar picker' do |context|
     end
   end
 
-  it 'should show the gear if there are more subjects than the limit' do
+  it 'shows the gear if there are more subjects than the limit' do
     get "/"
 
     expect(calendar_picker_gear).to be_displayed
   end
 
-  it 'should bring up calendar selection modal when gear is selected' do
+  it 'brings up calendar selection modal when gear is selected' do
     get "/"
     click_calendar_picker_gear
 

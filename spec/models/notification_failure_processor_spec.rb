@@ -171,7 +171,7 @@ describe NotificationFailureProcessor do
     context 'shards' do
       specs_require_sharding
 
-      it 'should find the message on another shard' do
+      it 'finds the message on another shard' do
         message = generate_message(:account_user_notification, :email, @au, user: @user)
         message.save!
         failure_queue = mock_queue([

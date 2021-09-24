@@ -98,7 +98,7 @@ describe "course people" do
       wait_for_ajaximations
     end
 
-    it "should remove a user from the course" do
+    it "removes a user from the course" do
       username = "user@example.com"
       student_in_course(:name => username, :role => @custom_student_role)
       add_section('Section1')
@@ -133,7 +133,7 @@ describe "course people" do
       @student.enrollments.each { |e| expect(e.workflow_state).to eq enrollment_state }
     end
 
-    it "should add a user without custom role to another section" do
+    it "adds a user without custom role to another section" do
       add_user_to_second_section
     end
 
@@ -141,7 +141,7 @@ describe "course people" do
       add_user_to_second_section(nil, 'active')
     end
 
-    it "should add a user to a second (active) section in a concluded course" do
+    it "adds a user to a second (active) section in a concluded course" do
       @course.start_at = 2.days.ago
       @course.conclude_at = 1.day.ago
       @course.restrict_enrollments_to_course_dates = true
@@ -170,7 +170,7 @@ describe "course people" do
       expect(@student.enrollments.where(course_section: @course_section)).to be_exists
     end
 
-    it "should view the users enrollment details" do
+    it "views the users enrollment details" do
       username = "user@example.com"
       # add_section 'foo'
       student_in_course(:name => username, :active_all => true)
@@ -189,7 +189,7 @@ describe "course people" do
       expect(driver.current_url).to include(href)
     end
 
-    it "should be able to deactivate and reactivate users" do
+    it "is able to deactivate and reactivate users" do
       username = "user@example.com"
       student_in_course(:name => username, :active_all => true)
 
@@ -233,7 +233,7 @@ describe "course people" do
       wait_for_ajaximations
     end
 
-    it "should deal with observers linked to multiple students" do
+    it "deals with observers linked to multiple students" do
       students = []
       obs = user_with_pseudonym(:name => "The Observer")
       2.times do |i|
@@ -266,7 +266,7 @@ describe "course people" do
       expect(obs.reload.not_ended_enrollments.map(&:associated_user_id).sort).to include(students[2].id)
     end
 
-    it "should handle deleted observee enrollments" do
+    it "handles deleted observee enrollments" do
       custom_observer_role = custom_observer_role("obob")
 
       obs = user_model(:name => "The Observer")
@@ -301,7 +301,7 @@ describe "course people" do
     end
 
     %w[ta designer].each do |et|
-      it "should not let #{et}s remove admins from the course" do
+      it "does not let #{et}s remove admins from the course" do
         send "custom_#{et}_role", "custom"
         send "course_with_#{et}", :course => @course, :active_all => true, :custom_role => 'custom'
         user_session @user
@@ -317,7 +317,7 @@ describe "course people" do
       end
     end
 
-    it "should not show the student view student" do
+    it "does not show the student view student" do
       @fake_student = @course.student_view_student
       go_to_people_page
       expect(f("#content")).not_to contain_css(".student_enrollments #user_#{@fake_student.id}")
@@ -328,7 +328,7 @@ describe "course people" do
         @account.root_account.enable_feature!(:granular_permissions_manage_users)
       end
 
-      it "should remove a user from the course" do
+      it "removes a user from the course" do
         username = "user@example.com"
         student_in_course(:name => username, :role => @custom_student_role)
         add_section('Section1')
@@ -342,13 +342,13 @@ describe "course people" do
         expect(f('.roster')).not_to include_text(username)
       end
 
-      it "should add a user without custom role to another section" do
+      it "adds a user without custom role to another section" do
         add_user_to_second_section
       end
     end
 
     context "multiple enrollments" do
-      it "should link an observer enrollment when other enrollment types exist" do
+      it "links an observer enrollment when other enrollment types exist" do
         course_with_student :course => @course, :active_all => true, :name => 'teh student'
         course_with_ta :user => user_with_pseudonym, :course => @course, :active_all => true
         course_with_observer :course => @course, :active_all => true, :user => @ta
@@ -364,7 +364,7 @@ describe "course people" do
     end
 
     context "custom roles" do
-      it "should create new observer enrollments as custom type when adding observees" do
+      it "creates new observer enrollments as custom type when adding observees" do
         role = custom_observer_role("custom observer")
         student_in_course :course => @course
         course_with_observer(:course => @course, :role => role)
@@ -379,7 +379,7 @@ describe "course people" do
         @observer.enrollments.each { |e| expect(e.role_id).to eq role.id }
       end
 
-      it "should create new enrollments as custom type when adding sections" do
+      it "creates new enrollments as custom type when adding sections" do
         add_user_to_second_section(@custom_student_role)
       end
 
@@ -392,7 +392,7 @@ describe "course people" do
       end
 
       %w[student teacher ta designer observer].each do |base_type|
-        it "should allow adding custom #{base_type} enrollments" do
+        it "allows adding custom #{base_type} enrollments" do
           user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
           send "custom_#{base_type}_role", "custom"
           add_user(user.name, "custom")
@@ -406,7 +406,7 @@ describe "course people" do
         end
 
         %w[student teacher ta designer observer].each do |base_type|
-          it "should allow adding custom #{base_type} enrollments" do
+          it "allows adding custom #{base_type} enrollments" do
             user = user_with_pseudonym(:active_all => true, :username => "#{base_type}@example.com", :name => "#{base_type}@example.com")
             send "custom_#{base_type}_role", "custom"
             add_user(user.name, "custom")
@@ -416,7 +416,7 @@ describe "course people" do
       end
     end
 
-    it "should not remove a base enrollment when adding a custom enrollment of the same base type" do
+    it "does not remove a base enrollment when adding a custom enrollment of the same base type" do
       @role = custom_teacher_role "Mentor"
       add_user(@teacher.name, "Mentor")
       teacher_row = f("#user_#{@teacher.id}")

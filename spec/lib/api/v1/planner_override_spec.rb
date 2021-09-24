@@ -33,7 +33,7 @@ describe Api::V1::PlannerOverride do
     let(:api) { PlannerOverrideHarness.new }
     let(:session) { double }
 
-    it 'should show plannable_type as a string' do
+    it 'shows plannable_type as a string' do
       assignment_model
       po = PlannerOverride.create!(plannable_id: @assignment.id, plannable_type: Assignment, user_id: @student.id)
       json = api.planner_override_json(po, @student, session)

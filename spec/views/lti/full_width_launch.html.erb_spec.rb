@@ -38,7 +38,7 @@ describe "lti full width launch view" do
       enrollment.save!
     end
 
-    it "should warn about a quiz in an expired course" do
+    it "warns about a quiz in an expired course" do
       pending("wait for INTEROP-6784 to be merged")
       ctrl.send(:content_tag_redirect, Account.default, tag, nil)
       expect(ctrl.response.body).to have_text('no longer available')
@@ -46,7 +46,7 @@ describe "lti full width launch view" do
   end
 
   context "with an active course" do
-    it "should not warn about the quiz being unavailable" do
+    it "does not warn about the quiz being unavailable" do
       ctrl.send(:content_tag_redirect, Account.default, tag, nil)
       expect(ctrl.response.body).not_to have_text('no longer available')
     end

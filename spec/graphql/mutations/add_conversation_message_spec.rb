@@ -100,7 +100,7 @@ RSpec.describe Mutations::AddConversationMessage do
     result.to_h.with_indifferent_access
   end
 
-  it 'should add a message' do
+  it 'adds a message' do
     conversation
     result = run_mutation(conversation_id: @conversation.conversation_id, body: 'This is a neat message', recipients: [@teacher.id.to_s])
 
@@ -114,7 +114,7 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(cm.conversation_id).to eq @conversation.conversation_id
   end
 
-  it 'should require permissions' do
+  it 'requires permissions' do
     conversation
     @course.account.role_overrides.create!(permission: :send_messages, role: student_role, enabled: false)
 
@@ -126,7 +126,7 @@ RSpec.describe Mutations::AddConversationMessage do
     ).to eq 'Unauthorized, unable to add messages to conversation'
   end
 
-  it 'should queue a job if needed' do
+  it 'queues a job if needed' do
     # rubocop:disable RSpec/AnyInstance
     allow_any_instance_of(ConversationParticipant).to receive(:should_process_immediately?).and_return(false)
     # rubocop:enable RSpec/AnyInstance
@@ -141,7 +141,7 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(@conversation.reload.messages.count(:all)).to eq 2
   end
 
-  it 'should generate a user note when requested' do
+  it 'generates a user note when requested' do
     Account.default.update_attribute(:enable_user_notes, true)
     conversation(users: [@teacher])
 
@@ -158,7 +158,7 @@ RSpec.describe Mutations::AddConversationMessage do
     expect(student.user_notes.size).to eq 1
   end
 
-  it 'should not allow new messages in concluded courses for students' do
+  it 'does not allow new messages in concluded courses for students' do
     conversation
     @course.update!(workflow_state: 'completed')
 
@@ -170,7 +170,7 @@ RSpec.describe Mutations::AddConversationMessage do
     ).to eq 'Course concluded, unable to send messages'
   end
 
-  it 'should allow new messages in concluded courses for teachers' do
+  it 'allows new messages in concluded courses for teachers' do
     conversation(users: [@teacher])
     @course.update!(workflow_state: 'completed')
 

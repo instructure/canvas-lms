@@ -20,7 +20,7 @@
 
 RSpec.shared_examples 'a submission update action' do |controller|
   describe "PUT update" do
-    it "should require authorization" do
+    it "requires authorization" do
       course_with_student(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
@@ -30,7 +30,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       assert_unauthorized
     end
 
-    it "should require the right student" do
+    it "requires the right student" do
       course_with_student_logged_in(active_all: true)
       @user2 = User.create!(name: "some user")
       @course.enroll_user(@user2)
@@ -53,7 +53,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         course.enroll_teacher(teacher)
       end
 
-      it "should allow updating homework to add comments" do
+      it "allows updating homework to add comments" do
         submission = assignment.submit_homework(student)
         resource_pair = controller == :anonymous_submissions ? { anonymous_id: submission.anonymous_id } : { id: student.id }
         params = { course_id: course.id, assignment_id: assignment.id, submission: { comment: "some comment" } }.merge(resource_pair)
@@ -224,7 +224,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       end
     end
 
-    it "should allow a non-enrolled admin to add comments" do
+    it "allows a non-enrolled admin to add comments" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
@@ -240,7 +240,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       expect(assigns[:submission].submission_comments.first).not_to be_hidden
     end
 
-    it "should allow a non-enrolled admin to add comments on an unposted submission" do
+    it "allows a non-enrolled admin to add comments on an unposted submission" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @assignment.ensure_post_policy(post_manually: true)
@@ -258,7 +258,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       expect(assigns[:submission].submission_comments.first).to be_hidden
     end
 
-    it "should comment as the current user for all submissions in the group" do
+    it "comments as the current user for all submissions in the group" do
       course_with_student_logged_in(active_all: true)
       @u1 = @user
       student_in_course(course: @course)
@@ -284,7 +284,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       end
     end
 
-    it "should allow attaching files to the comment" do
+    it "allows attaching files to the comment" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_url,online_upload")
       @submission = @assignment.submit_homework(@user)
@@ -308,7 +308,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       expect(assigns[:submission].submission_comments.first.attachments.map(&:display_name)).to be_include("txt.txt")
     end
 
-    it "should store comment files in instfs if instfs is enabled" do
+    it "stores comment files in instfs if instfs is enabled" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
@@ -576,7 +576,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       end
     end
 
-    it "should allow setting 'student_entered_grade'" do
+    it "allows setting 'student_entered_grade'" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment",
                                                 submission_types: "online_url,online_upload")
@@ -587,7 +587,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
       expect(@submission.reload.student_entered_score).to eq 2.0
     end
 
-    it "should round 'student_entered_grade'" do
+    it "rounds 'student_entered_grade'" do
       course_with_student_logged_in(active_all: true)
       @assignment = @course.assignments.create!(title: "some assignment",
                                                 submission_types: "online_url,online_upload")
@@ -619,7 +619,7 @@ RSpec.shared_examples 'a submission update action' do |controller|
         @submission = @assignment.submit_homework(@user)
       end
 
-      it "should create a provisional comment" do
+      it "creates a provisional comment" do
         @resource_pair = controller == :anonymous_submissions ? { anonymous_id: @submission.anonymous_id } : { id: @user.id }
         @params = { course_id: @course.id, assignment_id: @assignment.id, submission: { comment: "provisional!", provisional: true } }.merge(@resource_pair)
         user_session(@teacher)

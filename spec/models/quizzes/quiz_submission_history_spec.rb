@@ -44,13 +44,13 @@ describe Quizzes::QuizSubmissionHistory do
     end
 
     describe "#initialize" do
-      it "should group list of attempts for the quiz submission" do
+      it "groups list of attempts for the quiz submission" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
         expect(attempts.first).to be_a(Quizzes::QuizSubmissionAttempt)
       end
 
-      it "should sort attempts sequentially" do
+      it "sorts attempts sequentially" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
         expect(attempts.map { |attempt| attempt.number }).to eq [1, 2]
@@ -58,7 +58,7 @@ describe Quizzes::QuizSubmissionHistory do
     end
 
     describe "#last_versions" do
-      it "should return last versions for each attempt" do
+      it "returns last versions for each attempt" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
 
@@ -69,7 +69,7 @@ describe Quizzes::QuizSubmissionHistory do
     end
 
     describe "#version_models" do
-      it "should return models for the latest versions" do
+      it "returns models for the latest versions" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
 
@@ -78,7 +78,7 @@ describe Quizzes::QuizSubmissionHistory do
         expect(models.first).to be_a(Quizzes::QuizSubmission)
       end
 
-      it "should return the submission itself as the latest attempt" do
+      it "returns the submission itself as the latest attempt" do
         @submission.extra_attempts = 1
         @submission.save! # doesn't add a new version
 
@@ -90,7 +90,7 @@ describe Quizzes::QuizSubmissionHistory do
     end
 
     describe "#kept" do
-      it "should return the version of the submission that was kept" do
+      it "returns the version of the submission that was kept" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
 
@@ -102,7 +102,7 @@ describe Quizzes::QuizSubmissionHistory do
     end
 
     describe "#model_for" do
-      it "should return model for the current attempt" do
+      it "returns model for the current attempt" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
 
@@ -111,7 +111,7 @@ describe Quizzes::QuizSubmissionHistory do
         expect(qs).to be_a(Quizzes::QuizSubmission)
       end
 
-      it "should return model for previous attempts" do
+      it "returns model for previous attempts" do
         attempts = Quizzes::QuizSubmissionHistory.new(@submission)
         expect(attempts.length).to eq 2
 

@@ -52,11 +52,11 @@ describe ContentZipper do
       user_session(@teacher)
     end
 
-    it "should schedule a job on the first request, and then respond with progress updates" do
+    it "schedules a job on the first request, and then respond with progress updates" do
       grab_zip { get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1" }
     end
 
-    it "should recreate the submission zip if the anonymous grading setting changes" do
+    it "recreates the submission zip if the anonymous grading setting changes" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
       att0 = json_parse['attachment']['id']
 
@@ -67,7 +67,7 @@ describe ContentZipper do
       expect(att0).not_to eq(att1)
     end
 
-    it "should recreate the submission zip if the previous one is too old" do
+    it "recreates the submission zip if the previous one is too old" do
       att0 = nil
       Timecop.travel(1.day.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
@@ -80,7 +80,7 @@ describe ContentZipper do
       expect(att0).not_to eq(att1)
     end
 
-    it "should recreate the submission zip if a submission has been made since its creation" do
+    it "recreates the submission zip if a submission has been made since its creation" do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
@@ -94,7 +94,7 @@ describe ContentZipper do
       expect(att0).not_to eq(att1)
     end
 
-    it "should not recreate the submission zip if nothing has changed" do
+    it "does not recreate the submission zip if nothing has changed" do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
@@ -107,7 +107,7 @@ describe ContentZipper do
       expect(att0).to eq(att1)
     end
 
-    it "should recreate the submission zip if the user's enrollments have been changed" do
+    it "recreates the submission zip if the user's enrollments have been changed" do
       att0 = nil
       Timecop.travel(1.minute.ago) do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions.json?zip=1&compile=1"
@@ -125,7 +125,7 @@ describe ContentZipper do
   end
 
   context "eportfolio zips" do
-    it "should schedule a job on the first request, and then respond with progress updates" do
+    it "schedules a job on the first request, and then respond with progress updates" do
       eportfolio_model
       user_session(@user)
       grab_zip { get "/eportfolios/#{@eportfolio.id}/export.json?compile=1" }

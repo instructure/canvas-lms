@@ -608,7 +608,7 @@ describe BasicLTI::BasicOutcomes do
       specs_require_sharding
       let(:source_id) { gen_source_id(u: @user1) }
 
-      it 'should succeed with cross-sharded users' do
+      it 'succeeds with cross-sharded users' do
         @shard1.activate do
           @root = Account.create
           @user1 = user_with_managed_pseudonym(active_all: true, account: @root, name: 'Jimmy John',

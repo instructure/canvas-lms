@@ -31,7 +31,7 @@ describe EportfolioCategoriesController do
   end
 
   describe "GET 'index'" do
-    it "should redirect" do
+    it "redirects" do
       get 'index', params: { :eportfolio_id => @portfolio.id }
       expect(response).to be_redirect
     end
@@ -39,12 +39,12 @@ describe EportfolioCategoriesController do
 
   describe "GET 'show'" do
     before(:once) { eportfolio_category }
-    it "should require authorization" do
+    it "requires authorization" do
       get 'show', params: { :eportfolio_id => @portfolio.id, :id => 1 }
       assert_unauthorized
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@user)
       get 'show', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       expect(response).to be_successful
@@ -54,7 +54,7 @@ describe EportfolioCategoriesController do
       expect(assigns[:category]).to eql(@category)
     end
 
-    it "should responsd to named category request" do
+    it "responsds to named category request" do
       user_session(@user)
       get 'show', params: { :eportfolio_id => @portfolio.id, :category_name => @category.slug }
       expect(response).to be_successful
@@ -130,12 +130,12 @@ describe EportfolioCategoriesController do
   end
 
   describe "POST 'create'" do
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_category => { :name => "some portfolio" } }
       assert_unauthorized
     end
 
-    it "should create eportfolio category" do
+    it "creates eportfolio category" do
       user_session(@user)
       post 'create', params: { :eportfolio_id => @portfolio.id, :eportfolio_category => { :name => "some category" } }
       expect(response).to be_redirect
@@ -146,12 +146,12 @@ describe EportfolioCategoriesController do
 
   describe "PUT 'update'" do
     before(:once) { eportfolio_category }
-    it "should require authorization" do
+    it "requires authorization" do
       put 'update', params: { :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => { :name => "new name" } }
       assert_unauthorized
     end
 
-    it "should update eportfolio category" do
+    it "updates eportfolio category" do
       user_session(@user)
       put 'update', params: { :eportfolio_id => @portfolio.id, :id => @category.id, :eportfolio_category => { :name => "new name" } }
       expect(assigns[:category]).not_to be_nil
@@ -161,12 +161,12 @@ describe EportfolioCategoriesController do
 
   describe "DELETE 'destroy'" do
     before(:once) { eportfolio_category }
-    it "should require authorization" do
+    it "requires authorization" do
       delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       assert_unauthorized
     end
 
-    it "should delete eportfolio category" do
+    it "deletes eportfolio category" do
       user_session(@user)
       delete 'destroy', params: { :eportfolio_id => @portfolio.id, :id => @category.id }
       expect(assigns[:category]).to be_frozen

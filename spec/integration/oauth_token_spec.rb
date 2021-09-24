@@ -40,14 +40,14 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
       get "/oauth?service=#{integration.underscore}"
     end
 
-    it "should error if the service isn't enabled" do
+    it "errors if the service isn't enabled" do
       expect_any_instance_of(UsersController).to receive(:feature_and_service_enabled?).with(integration.underscore).and_return(false)
       get "/oauth?service=#{integration.underscore}"
       expect(response).to redirect_to(user_profile_url(@user))
       expect(flash[:error]).to be_present
     end
 
-    it "should redirect to the service for auth" do
+    it "redirects to the service for auth" do
       oauth_start(integration)
       expect(response).to redirect_to("http://oauth.example.com/start")
 
@@ -72,25 +72,25 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
                              })
       end
 
-      it "should fail without a valid token" do
+      it "fails without a valid token" do
         get "/oauth_success?service=#{integration.underscore}&oauth_token=wrong&oauth_verifier=test_verifier"
         expect(response).to redirect_to(user_profile_url(@user))
         expect(flash[:error]).to be_present
       end
 
-      it "should fail with the wrong user" do
+      it "fails with the wrong user" do
         OauthRequest.last.update_attribute(:user, User.create!)
         get "/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
         expect(response).to redirect_to(user_profile_url(@user))
         expect(flash[:error]).to be_present
       end
 
-      it "should redirect to the original host if a different host is returned to" do
+      it "redirects to the original host if a different host is returned to" do
         get "http://otherschool.example.com/oauth_success?service=#{integration.underscore}&oauth_token=test_token&oauth_verifier=test_verifier"
         expect(response).to redirect_to("http://www.example.com/oauth_success?oauth_token=test_token&oauth_verifier=test_verifier&service=#{integration.underscore}")
       end
 
-      it "should create the UserService on successful auth" do
+      it "creates the UserService on successful auth" do
         oauth_start(integration)
 
         if integration == "Twitter"
@@ -112,7 +112,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
         expect(us.secret).to eq "test_secret"
       end
 
-      it "should fail creating the UserService if getting the initial user info fails" do
+      it "fails creating the UserService if getting the initial user info fails" do
         oauth_start(integration)
 
         # pretend that somehow we think we got a valid auth token, but we actually didn't

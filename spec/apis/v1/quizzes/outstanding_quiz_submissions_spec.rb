@@ -112,12 +112,12 @@ describe Quizzes::OutstandingQuizSubmissionsController, type: :request do
         teacher_in_course(:active_all => true)
       end
 
-      it "should grade all outstanding quiz submissions" do
+      it "grades all outstanding quiz submissions" do
         api_grade({ raw: true }, { quiz_submission_ids: [@submission.id] })
         assert_status 204
       end
 
-      it 'should continue w/o error when given already graded ids' do
+      it 'continues w/o error when given already graded ids' do
         Quizzes::SubmissionGrader.new(@submission).grade_submission
         expect(@submission.needs_grading?).to eq false
         api_grade({ raw: true }, { quiz_submission_ids: [@submission.id, @submission2.id] })

@@ -69,12 +69,12 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         )
       end
 
-      it "should return list of old quizzes" do
+      it "returns list of old quizzes" do
         quiz_collection = subject.collect.reject { |quiz| quiz['quiz_type'] == 'quizzes.next' }
         expect(quiz_collection.map { |q| q['id'] }).to eq quizzes.map(&:id)
       end
 
-      it "should return list of assignments (new quizzes)" do
+      it "returns list of assignments (new quizzes)" do
         quiz_collection = subject.collect.select { |quiz| quiz['quiz_type'] == 'quizzes.next' }
         expect(quiz_collection.map { |q| q['id'] }).to eq new_quizzes.map(&:id)
       end
@@ -97,7 +97,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
 
-        it "should search for quizzes by title" do
+        it "searches for quizzes by title" do
           response = api_call(
             :get,
             "/api/v1/courses/#{@course.id}/all_quizzes?search_term=#{search_term}",
@@ -132,7 +132,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
 
-        it "should deterministically order quizzes for pagination" do
+        it "deterministicallies order quizzes for pagination" do
           found_quiz_ids = []
           (quiz_count * 2).times do |i|
             page_num = i + 1
@@ -201,7 +201,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           @course.save!
         end
 
-        it "should return unauthorized" do
+        it "returns unauthorized" do
           raw_api_call(
             :get,
             "/api/v1/courses/#{@course.id}/all_quizzes",

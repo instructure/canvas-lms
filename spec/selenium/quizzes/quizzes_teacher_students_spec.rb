@@ -43,7 +43,7 @@ describe 'quizzes students' do
       @quiz.save
     end
 
-    it "should not show 'take quiz' button after the allowed attempts are over", priority: "1", test_id: 333736 do
+    it "does not show 'take quiz' button after the allowed attempts are over", priority: "1", test_id: 333736 do
       student = student_in_course(course: @course, name: 'student', active_all: true).user
       @quiz.allowed_attempts = 2
       @quiz.save

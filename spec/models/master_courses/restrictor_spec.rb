@@ -34,31 +34,31 @@ describe MasterCourses::Restrictor do
   end
 
   describe "column locking validations" do
-    it "should not prevent changes if there are no restrictions" do
+    it "does not prevent changes if there are no restrictions" do
       @page_copy.body = "something else"
       @page_copy.save!
     end
 
-    it "should not prevent changes to settings columns on content-locked objects" do
+    it "does not prevent changes to settings columns on content-locked objects" do
       @tag.update_attribute(:restrictions, { :content => true })
       @page_copy.editing_roles = "teachers,students"
       @page_copy.save!
     end
 
-    it "should not prevent changes to content columns on settings-locked objects" do
+    it "does not prevent changes to content columns on settings-locked objects" do
       @tag.update_attribute(:restrictions, { :settings => true })
       @page_copy.body = "another something else"
       @page_copy.save!
     end
 
-    it "should prevent changes to content columns on content-locked objects" do
+    it "prevents changes to content columns on content-locked objects" do
       @tag.update_attribute(:restrictions, { :content => true })
       @page_copy.body = "something else"
       expect(@page_copy.save).to be_falsey
       expect(@page_copy.errors[:base].first.to_s).to include("locked by Master Course")
     end
 
-    it "should prevent changes to settings columns on settings-locked objects" do
+    it "prevents changes to settings columns on settings-locked objects" do
       @tag.update_attribute(:restrictions, { :settings => true })
       @page_copy.editing_roles = "teachers,students"
       expect(@page_copy.save).to be_falsey
@@ -67,7 +67,7 @@ describe MasterCourses::Restrictor do
   end
 
   describe "editing_restricted?" do
-    it "should return false by default" do
+    it "returns false by default" do
       expect(@page_copy.editing_restricted?(:any)).to be_falsey
       expect(@page_copy.editing_restricted?(:content)).to be_falsey
       expect(@page_copy.editing_restricted?(:settings)).to be_falsey
@@ -77,7 +77,7 @@ describe MasterCourses::Restrictor do
       expect(@page_copy.editing_restricted?(:all)).to be_falsey
     end
 
-    it "should return what you would expect" do
+    it "returns what you would expect" do
       @tag.update_attribute(:restrictions, { :content => true })
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_falsey
@@ -88,7 +88,7 @@ describe MasterCourses::Restrictor do
       expect(@page_copy.editing_restricted?(:all)).to be_falsey
     end
 
-    it "should return true if fully/individually locked" do
+    it "returns true if fully/individually locked" do
       @tag.update_attribute(:restrictions, { :content => true, :settings => true, :points => true, :availability_dates => true, :due_dates => true, :state => true })
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_truthy
@@ -99,7 +99,7 @@ describe MasterCourses::Restrictor do
       expect(@page_copy.editing_restricted?(:all)).to be_truthy
     end
 
-    it "should return true if locked via :all" do
+    it "returns true if locked via :all" do
       @tag.update_attribute(:restrictions, { :all => true })
       expect(@page_copy.editing_restricted?(:content)).to be_truthy
       expect(@page_copy.editing_restricted?(:settings)).to be_truthy
@@ -112,7 +112,7 @@ describe MasterCourses::Restrictor do
   end
 
   describe "preload_child_restrictions" do
-    it "should bulk preload restrictions in a single query" do
+    it "bulks preload restrictions in a single query" do
       page2 = @copy_from.wiki_pages.create!(:title => "blah2")
       tag2 = @template.create_content_tag_for!(page2, { :restrictions => { :content => true } })
 
@@ -129,7 +129,7 @@ describe MasterCourses::Restrictor do
   end
 
   describe "preload_default_template_restrictions" do
-    it "should bulk preload master-side restrictions in a single query" do
+    it "bulks preload master-side restrictions in a single query" do
       page2 = @copy_from.wiki_pages.create!(:title => "blah2")
       tag2 = @template.create_content_tag_for!(page2, { :restrictions => { :content => true } })
 
@@ -180,7 +180,7 @@ describe MasterCourses::Restrictor do
     end
   end
 
-  it "should prevent updating a title on a module item for restricted content" do
+  it "prevents updating a title on a module item for restricted content" do
     mod = @copy_to.context_modules.create!
     item = mod.add_item(:id => @page_copy.id, :type => 'wiki_page')
     item.update_attribute(:title, "new title") # should work
@@ -191,7 +191,7 @@ describe MasterCourses::Restrictor do
     expect(item.errors[:title].first.to_s).to include("locked by Master Course")
   end
 
-  it "should prevent updating assignment points via rubric" do
+  it "prevents updating assignment points via rubric" do
     original_assmt = @copy_from.assignments.create!
     assmt_tag = @template.create_content_tag_for!(original_assmt, { :restrictions => { :content => true, :points => true } })
 

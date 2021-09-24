@@ -40,7 +40,7 @@ module Alerts
         student_in_course(:active_all => 1)
       end
 
-      it 'should validate the length of title' do
+      it 'validates the length of title' do
         @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm
                         qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm

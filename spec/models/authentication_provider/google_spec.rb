@@ -83,7 +83,7 @@ describe AuthenticationProvider::Google do
     expect(ap.unique_id(token)).to eq '123'
   end
 
-  it "it sets hosted domain to nil if empty string" do
+  it "sets hosted domain to nil if empty string" do
     ap = AuthenticationProvider::Google.new
     ap.hosted_domain = ''
     expect(ap.hosted_domain).to be_nil

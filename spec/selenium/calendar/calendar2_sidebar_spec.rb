@@ -42,7 +42,7 @@ describe "calendar2" do
 
     describe "sidebar" do
       describe "mini calendar" do
-        it "should add the event class to days with events" do
+        it "adds the event class to days with events" do
           c = make_event
           get "/calendar2"
 
@@ -51,7 +51,7 @@ describe "calendar2" do
           expect(Time.zone.parse(events.first['data-date']).day).to eq(c.start_at.day)
         end
 
-        it "should change the main calendars month on click", priority: "1", test_id: 140224 do
+        it "changes the main calendars month on click", priority: "1", test_id: 140224 do
           title_selector = ".navigation_title"
           get "/calendar2"
 
@@ -70,7 +70,7 @@ describe "calendar2" do
         end
       end
 
-      it "should show the event in the mini calendar", priority: "1", test_id: 138849 do
+      it "shows the event in the mini calendar", priority: "1", test_id: 138849 do
         # lock to a particular day (the 13th because why not)
         # otherwise it turns out this spec will break on almost every 31st
         date = Date.new(Time.now.year, Time.now.month, 13) - 1.month
@@ -92,7 +92,7 @@ describe "calendar2" do
       end
 
       describe "contexts list" do
-        it "should toggle event display when context is clicked" do
+        it "toggles event display when context is clicked" do
           make_event :context => @course, :start => Time.now
           get "/calendar2"
 
@@ -106,7 +106,7 @@ describe "calendar2" do
           expect(f("#content")).not_to contain_css('.fc_event')
         end
 
-        it "should constrain context selection to 10 by default" do
+        it "constrains context selection to 10 by default" do
           create_courses 11, enroll_user: @user
 
           get "/calendar2"
@@ -114,7 +114,7 @@ describe "calendar2" do
           expect(ff('.context_list_context.checked').count).to eq 10
         end
 
-        it "should adjust context selection limit based on account setting" do
+        it "adjusts context selection limit based on account setting" do
           Account.default.tap do |a|
             a.settings[:calendar_contexts_limit] = 15
             a.save!
@@ -127,14 +127,14 @@ describe "calendar2" do
           expect(ff('.context_list_context.checked').count).to eq 15
         end
 
-        it "should validate calendar feed display" do
+        it "validates calendar feed display" do
           get "/calendar2"
 
           f('#calendar-feed button').click
           expect(f('#calendar_feed_box')).to be_displayed
         end
 
-        it "should remove calendar item if calendar is unselected", priority: "1", test_id: 138861 do
+        it "removes calendar item if calendar is unselected", priority: "1", test_id: 138861 do
           title = "blarg"
           make_event :context => @course, :start => Time.now, :title => title
           load_month_view
@@ -153,7 +153,7 @@ describe "calendar2" do
       end
 
       describe "undated calendar items" do
-        it "should show undated events after clicking link", priority: "1", test_id: 138847 do
+        it "shows undated events after clicking link", priority: "1", test_id: 138847 do
           e = make_event :start => nil, :title => "pizza party"
           get "/calendar2"
 
@@ -164,7 +164,7 @@ describe "calendar2" do
           expect(undated_events.first.text).to match /#{e.title}/
         end
 
-        it "should truncate very long undated event titles" do
+        it "truncates very long undated event titles" do
           make_event :start => nil, :title => "asdfjkasldfjklasdjfklasdjfklasjfkljasdklfjasklfjkalsdjsadkfljasdfkljfsdalkjsfdlksadjklsadjsadklasdf"
           get "/calendar2"
 

@@ -35,13 +35,13 @@ describe Quizzes::QuizSubmissionsController do
       @quiz.save!
     end
 
-    it "should allow previewing" do
+    it "allows previewing" do
       user_session(@teacher)
       post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :preview => 1 }
       expect(response).to be_redirect
     end
 
-    it "should allow previewing a quiz with an access code" do
+    it "allows previewing a quiz with an access code" do
       user_session(@teacher)
       @quiz.access_code = "12345"
       @quiz.save!
@@ -49,7 +49,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(response).to be_redirect
     end
 
-    it "should not break trying to sanitize parameters of an already submitted quiz" do
+    it "does not break trying to sanitize parameters of an already submitted quiz" do
       user_session(@student)
       @quiz.one_question_at_a_time = true
       @quiz.cant_go_back = true
@@ -71,7 +71,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(session[:quiz_access_code]).to be_empty
     end
 
-    it "should reject a submission when the validation token does not match" do
+    it "rejects a submission when the validation token does not match" do
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       post 'create', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :question_123 => 'hi', :validation_token => "xxx" }
@@ -79,7 +79,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(flash[:error]).not_to be_blank
     end
 
-    it "should build a new QuizSubmissionEvent" do
+    it "builds a new QuizSubmissionEvent" do
       user_session(@student)
       @submission = Quizzes::SubmissionManager.new(@quiz).find_or_create_submission(@student)
       @submission.submission_data = {}
@@ -99,12 +99,12 @@ describe Quizzes::QuizSubmissionsController do
     context 'quiz with submission' do
       before(:once) { quiz_with_submission }
 
-      it "should require authentication" do
+      it "requires authentication" do
         put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
         assert_unauthorized
       end
 
-      it "should allow updating scores if the teacher is logged in" do
+      it "allows updating scores if the teacher is logged in" do
         user_session(@teacher)
         put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
         expect(response).to be_redirect
@@ -112,13 +112,13 @@ describe Quizzes::QuizSubmissionsController do
         expect(assigns[:submission].submission_data[0][:points]).to eq 2
       end
 
-      it "should not allow updating if the course is concluded" do
+      it "does not allow updating if the course is concluded" do
         @teacher_enrollment.conclude
         put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
         assert_unauthorized
       end
 
-      it "should not allow updating if the student is not assigned the quiz" do
+      it "does not allow updating if the student is not assigned the quiz" do
         user_session(@teacher)
         allow_any_instance_of(Quizzes::Quiz).to receive(:visible_to_user?).and_return(false)
         put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id }
@@ -129,7 +129,7 @@ describe Quizzes::QuizSubmissionsController do
     context 'practice quiz with submission' do
       before(:once) { practice_quiz_with_submission }
 
-      it "should allow updating scores for a practice quiz" do
+      it "allows updating scores for a practice quiz" do
         user_session(@teacher)
         put 'update', params: { :course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2" }
         expect(response).to be_redirect
@@ -145,7 +145,7 @@ describe Quizzes::QuizSubmissionsController do
       @qs = @quiz.generate_submission(@student, false)
     end
 
-    it "should require authentication" do
+    it "requires authentication" do
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
       put 'backup', params: { :quiz_id => @quiz.id, :course_id => @course.id, :a => 'test', :validation_token => @qs.validation_token }
@@ -154,7 +154,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(@qs.reload.submission_data[:a]).to be_nil
     end
 
-    it "should backup to the user's quiz submission" do
+    it "backups to the user's quiz submission" do
       user_session(@student)
       Quizzes::QuizSubmission.where(:id => @qs).update_all(:updated_at => 1.hour.ago)
 
@@ -164,7 +164,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(@qs.reload.submission_data[:a]).to eq 'test'
     end
 
-    it "should return the time left to finish a quiz" do
+    it "returns the time left to finish a quiz" do
       user_session(@student)
       submission = @qs
       submission.update_attribute(:end_at, Time.now + 1.hour)
@@ -180,7 +180,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(json).to have_key('hard_time_left')
     end
 
-    it "should not backup if no submission can be found" do
+    it "does not backup if no submission can be found" do
       user_session(@teacher)
       put 'backup', params: { quiz_id: @quiz.id, course_id: @course.id, a: 'test', preview: 1 }
       json = JSON.parse(response.body)
@@ -196,14 +196,14 @@ describe Quizzes::QuizSubmissionsController do
       @quiz.update_attribute(:one_question_at_a_time, true)
     end
 
-    it "should require authentication" do
+    it "requires authentication" do
       post 'record_answer', params: { :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test' }
       assert_unauthorized
 
       expect(@qsub.reload.submission_data[:a]).to be_nil
     end
 
-    it "should record the user's submission" do
+    it "records the user's submission" do
       # TODO: FIXME, this test doesn't appear to match its description
       user_session(@student)
 
@@ -213,7 +213,7 @@ describe Quizzes::QuizSubmissionsController do
       expect(@qsub.reload.submission_data[:a]).to be_nil
     end
 
-    it "should redirect back to quiz after login if unauthorized" do
+    it "redirects back to quiz after login if unauthorized" do
       controller.request.env['HTTP_REFERER'] = 'http://test.host/'
       post 'record_answer', params: { :quiz_id => @quiz.id, :course_id => @course.id, :id => @qsub.id, :a => 'test' }
       assert_unauthorized
@@ -250,7 +250,7 @@ describe Quizzes::QuizSubmissionsController do
   describe "POST / (#extension)" do
     context "as a teacher in course" do
       let_once(:quiz) { course_quiz !!:active }
-      it "should be able to extend own extra attempts" do
+      it "is able to extend own extra attempts" do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, extra_attempts: 1 }
@@ -260,7 +260,7 @@ describe Quizzes::QuizSubmissionsController do
         expect(json['extra_attempts']).to eq 1
       end
 
-      it "should be able to reset the result lockdown flag" do
+      it "is able to reset the result lockdown flag" do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: @teacher.id, reset_has_seen_results: 1 }
@@ -270,14 +270,14 @@ describe Quizzes::QuizSubmissionsController do
         expect(json['has_seen_results']).to eq false
       end
 
-      it "should require a valid user id" do
+      it "requires a valid user id" do
         user_session(@teacher)
         request.accept = "application/json"
         post 'extensions', params: { quiz_id: quiz.id, course_id: @course, user_id: 'foo', extra_attempts: 12 }
         expect(response).to be_not_found
       end
 
-      it "should allow updating inactive students" do
+      it "allows updating inactive students" do
         user_session(@teacher)
         @student.enrollments.last.deactivate
         request.accept = "application/json"

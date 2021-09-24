@@ -34,7 +34,7 @@ describe "terms/_term.html.erb" do
       assign(:course_counts_by_term, EnrollmentTerm.course_counts([@term]))
     end
 
-    it "should show to sis admin" do
+    it "shows to sis admin" do
       admin = account_admin_user
       view_context(@account, admin)
       assign(:current_user, admin)
@@ -42,7 +42,7 @@ describe "terms/_term.html.erb" do
       expect(response).to have_tag("input#enrollment_term_sis_source_id_#{@term.id}")
     end
 
-    it "should not show to non-sis admin" do
+    it "does not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:role_changes => { 'manage_sis' => false })
       view_context(@account, admin)
       assign(:current_user, admin)

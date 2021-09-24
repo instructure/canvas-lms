@@ -91,15 +91,15 @@ describe PeerReviewsApiController, type: :request do
         account_admin_user()
       end
 
-      it 'should delete peer review' do
+      it 'deletes peer review' do
         delete_peer_review(@admin, @resource_path, @resource_params)
       end
 
-      it 'should delete peer review for course section' do
+      it 'deletes peer review for course section' do
         delete_peer_review(@admin, @section_resource_path, @resource_params)
       end
 
-      it 'should render bad request' do
+      it 'renders bad request' do
         student3 = student_in_course(active_all: true).user
         @user = @admin
         api_call(:delete, @resource_path, @resource_params, { user_id: student3.id },
@@ -108,7 +108,7 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context 'with teacher context' do
-      it 'should delete peer review' do
+      it 'deletes peer review' do
         delete_peer_review(@teacher, @resource_path, @resource_params)
       end
     end
@@ -144,21 +144,21 @@ describe PeerReviewsApiController, type: :request do
         account_admin_user()
       end
 
-      it 'should create peer review' do
+      it 'creates peer review' do
         create_peer_review(@admin, @resource_path, @resource_params)
       end
 
-      it 'should create peer review for course section' do
+      it 'creates peer review for course section' do
         create_peer_review(@admin, @section_resource_path, @resource_params)
       end
 
-      it 'should not create peer review where the reviewer and student are same' do
+      it 'does not create peer review where the reviewer and student are same' do
         api_call(:post, @resource_path, @resource_params, { user_id: @student1.id }, {}, { :expected_status => 400 })
       end
     end
 
     context 'with teacher context' do
-      it 'should create peer review' do
+      it 'creates peer review' do
         create_peer_review(@teacher, @resource_path, @resource_params)
       end
     end
@@ -247,39 +247,39 @@ describe PeerReviewsApiController, type: :request do
         account_admin_user()
       end
 
-      it 'should return all peer reviews' do
+      it 'returns all peer reviews' do
         list_peer_review(@admin, @resource_path, @resource_params)
       end
 
-      it 'should return all peer reviews in a section' do
+      it 'returns all peer reviews in a section' do
         list_peer_review(@admin, @section_resource_path, @resource_params)
       end
 
-      it 'should return all peer reviews when anonymous peer reviews enabled' do
+      it 'returns all peer reviews when anonymous peer reviews enabled' do
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         list_peer_review(@admin, @resource_path, @resource_params)
       end
 
-      it 'should include user information' do
+      it 'includes user information' do
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(user) })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(@assessment_with_user)
       end
 
-      it 'should include submission comments' do
+      it 'includes submission comments' do
         @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(submission_comments) })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
 
-      it 'should return peer reviews for a specific submission' do
+      it 'returns peer reviews for a specific submission' do
         submission2 = @assignment1.find_or_create_submission(@student2)
         assessment_request(submission2, @teacher, @submission)
         list_peer_review(@admin, @submission_resource_path, @submission_resource_params)
       end
 
-      it 'should return peer reviews for a specific submission in a section' do
+      it 'returns peer reviews for a specific submission in a section' do
         submission2 = @assignment1.find_or_create_submission(@student2)
         assessment_request(submission2, @teacher, @submission)
         list_peer_review(@admin, @submission_section_resource_path, @submission_resource_params)
@@ -287,23 +287,23 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context 'with teacher_context' do
-      it 'should return all peer reviews' do
+      it 'returns all peer reviews' do
         list_peer_review(@teacher, @resource_path, @resource_params)
       end
 
-      it 'should return all peer reviews when anonymous peer reviews enabled' do
+      it 'returns all peer reviews when anonymous peer reviews enabled' do
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         list_peer_review(@teacher, @resource_path, @resource_params)
       end
 
-      it 'should include user information' do
+      it 'includes user information' do
         @user = @teacher
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(user) })
         expect(json.count).to eq(1)
         expect(json[0]).to eq(@assessment_with_user)
       end
 
-      it 'should include submission comments' do
+      it 'includes submission comments' do
         @user = @teacher
         @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(submission_comments) })
@@ -311,7 +311,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
 
-      it 'should return peer reviews for a specific submission' do
+      it 'returns peer reviews for a specific submission' do
         submission2 = @assignment1.find_or_create_submission(@student2)
         assessment_request(submission2, @teacher, @submission)
         list_peer_review(@teacher, @submission_resource_path, @submission_resource_params)
@@ -319,11 +319,11 @@ describe PeerReviewsApiController, type: :request do
     end
 
     context 'with student_context' do
-      it 'should return peer reviews for user' do
+      it 'returns peer reviews for user' do
         list_peer_review(@student1, @resource_path, @resource_params)
       end
 
-      it 'should not return assessor if anonymous peer reviews enabled' do
+      it 'does not return assessor if anonymous peer reviews enabled' do
         @user = @student1
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         json = api_call(:get, @resource_path, @resource_params)
@@ -335,13 +335,13 @@ describe PeerReviewsApiController, type: :request do
                                 "workflow_state" => @assessment_request.workflow_state })
       end
 
-      it 'should not return peer reviews for assessor' do
+      it 'does not return peer reviews for assessor' do
         @user = @student2
         json = api_call(:get, @resource_path, @resource_params)
         expect(json.count).to eq(0)
       end
 
-      it 'should include user information' do
+      it 'includes user information' do
         @assignment1.update_attribute(:anonymous_peer_reviews, false)
         @user = @student1
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(user) })
@@ -349,7 +349,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json[0]).to eq(@assessment_with_user)
       end
 
-      it 'should not include assessor information when peer reviews are enabled' do
+      it 'does not include assessor information when peer reviews are enabled' do
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         @user = @student1
         json = api_call(:get, @resource_path, @resource_params, { :include => %w(user) })
@@ -366,7 +366,7 @@ describe PeerReviewsApiController, type: :request do
                                 "workflow_state" => @assessment_request.workflow_state })
       end
 
-      it 'should include submission comments' do
+      it 'includes submission comments' do
         @assignment1.update_attribute(:anonymous_peer_reviews, false)
         @comment = @submission.add_comment(:author => @student2, :comment => "student2 comment")
         @user = @student1
@@ -375,7 +375,7 @@ describe PeerReviewsApiController, type: :request do
         expect(json[0]).to eq(assessment_with_comments(@comment))
       end
 
-      it 'should not include submission comments user information when anonymous peer reviews' do
+      it 'does not include submission comments user information when anonymous peer reviews' do
         @course.root_account.tap { |a| a.enable_service(:avatars) }.save!
         @assignment1.update_attribute(:anonymous_peer_reviews, true)
         @comment = @submission.add_comment(:author => @student2, :comment => "review comment")
@@ -405,7 +405,7 @@ describe PeerReviewsApiController, type: :request do
         )
       end
 
-      it 'should return peer reviews for a specific submission' do
+      it 'returns peer reviews for a specific submission' do
         @user = @student1
         submission2 = @assignment1.find_or_create_submission(@student2)
         assessment_request(submission2, @teacher, @submission)
@@ -419,7 +419,7 @@ describe PeerReviewsApiController, type: :request do
                                 "workflow_state" => @assessment_request.workflow_state })
       end
 
-      it 'should return no peer reviews for invalid submission' do
+      it 'returns no peer reviews for invalid submission' do
         @assignment2 = assignment_model(course: @course)
         @submission_resource_path = "/api/v1/courses/#{@course.id}/assignments/#{@assignment2.id}/submissions/#{@submission.id}/peer_reviews"
         @submission_resource_params = { controller: 'peer_reviews_api', action: 'index', format: 'json',

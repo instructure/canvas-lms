@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 describe "Importing Assignment Groups" do
   SYSTEMS.each do |system|
     if import_data_exists? system, 'assignment_group'
-      it "should import from #{system}" do
+      it "imports from #{system}" do
         data = get_import_data(system, 'assignment_group')
         context = get_import_context(system)
         migration = context.content_migrations.create!
@@ -45,7 +45,7 @@ describe "Importing Assignment Groups" do
     end
   end
 
-  it "should reuse existing empty assignment groups with the same name" do
+  it "reuses existing empty assignment groups with the same name" do
     course_model
     migration = @course.content_migrations.create!
     assignment_group = @course.assignment_groups.create! name: 'teh group'
@@ -55,7 +55,7 @@ describe "Importing Assignment Groups" do
     expect(@course.assignment_groups.count).to eq 1
   end
 
-  it "should not match assignment groups with migration ids by name" do
+  it "does not match assignment groups with migration ids by name" do
     course_model
     migration = @course.content_migrations.create!
     assignment_group = @course.assignment_groups.create name: 'teh group'
@@ -67,7 +67,7 @@ describe "Importing Assignment Groups" do
     expect(@course.assignment_groups.count).to eq 2
   end
 
-  it "should get attached to an assignment" do
+  it "gets attached to an assignment" do
     data = get_import_data('bb8', 'assignment_group')
     context = get_import_context('bb8')
     migration = context.content_migrations.create!

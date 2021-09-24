@@ -31,7 +31,7 @@ describe "Importing Learning Outcomes" do
     Importers::LearningOutcomeImporter.process_migration(@data, @migration)
   end
 
-  it "should import" do
+  it "imports" do
     lo1 = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     expect(lo1.description).to eq "Outcome 1: Read stuff"
     lo2 = LearningOutcome.where(migration_id: "fa67b467-37c7-4fb9-aef4-21a33a06d0be").first
@@ -52,7 +52,7 @@ describe "Importing Learning Outcomes" do
       @context.root_account.disable_feature!(:selectable_outcomes_in_course_copy)
     end
 
-    it "should import group" do
+    it "imports group" do
       migration = ContentMigration.create!(:context => @context)
       migration.migration_ids_to_import = { :copy => {} }
       data = [{ type: 'learning_outcome_group', title: 'hey', migration_id: 'x' }.with_indifferent_access]
@@ -63,7 +63,7 @@ describe "Importing Learning Outcomes" do
     end
   end
 
-  it "should not fail when passing an outcome that already exists" do
+  it "does not fail when passing an outcome that already exists" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
@@ -71,7 +71,7 @@ describe "Importing Learning Outcomes" do
     expect(@context.learning_outcomes.count).to eq 2
   end
 
-  it "should not generate a new outcome when one already exists with the same guid" do
+  it "does not generate a new outcome when one already exists with the same guid" do
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
     lo_data = @data["learning_outcomes"].find { |lo| lo["migration_id"] == identifier }
@@ -82,7 +82,7 @@ describe "Importing Learning Outcomes" do
     expect(@context.learning_outcomes.count).to eq 2
   end
 
-  it "should create an OutcomeFriendlyDescription if the outcome has a friendly description" do
+  it "creates an OutcomeFriendlyDescription if the outcome has a friendly description" do
     Account.site_admin.enable_feature! :outcomes_friendly_description
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     identifier = existing_outcome.migration_id
@@ -93,7 +93,7 @@ describe "Importing Learning Outcomes" do
     expect(OutcomeFriendlyDescription.find_by(context_id: @context.id).description).to eq friendly_description
   end
 
-  it "should create a new OutcomeFriendlyDescription if the outcome is being imported to a new context" do
+  it "creates a new OutcomeFriendlyDescription if the outcome is being imported to a new context" do
     context2 = course_model
     outcome = context2.created_learning_outcomes.create!({ :title => 'new outcome' })
     friendly_description = "a friendly description"
@@ -112,7 +112,7 @@ describe "Importing Learning Outcomes" do
     expect(OutcomeFriendlyDescription.find_by(context_id: @context.id).description).to eq friendly_description
   end
 
-  it "should update an OutcomeFriendlyDescription if there is a friendly description in the database" do
+  it "updates an OutcomeFriendlyDescription if there is a friendly description in the database" do
     Account.site_admin.enable_feature! :outcomes_friendly_description
     existing_outcome = LearningOutcome.where(migration_id: "bdf6dc13-5d8f-43a8-b426-03380c9b6781").first
     OutcomeFriendlyDescription.create!({
@@ -238,7 +238,7 @@ describe "Importing Learning Outcomes" do
         account_outcome.update(vendor_guid: 'vendor-guid-2', context: @context.root_account)
       end
 
-      it "should include non-imported outcomes as imported items" do
+      it "includes non-imported outcomes as imported items" do
         @data["learning_outcomes"].find { |lo| lo["migration_id"] == global_outcome.migration_id }.tap do |data|
           data[:vendor_guid] = "vendor-guid-1"
           data[:external_identifier] = global_outcome.id.to_s

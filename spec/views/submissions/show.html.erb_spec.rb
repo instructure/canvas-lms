@@ -29,7 +29,7 @@ describe "/submissions/show" do
     course_with_student(active_all: true)
   end
 
-  it "should render" do
+  it "renders" do
     view_context
     a = @course.assignments.create!(:title => "some assignment")
     assign(:assignment, a)

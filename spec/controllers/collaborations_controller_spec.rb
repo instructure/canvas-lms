@@ -31,12 +31,12 @@ describe CollaborationsController do
   end
 
   describe "GET 'index'" do
-    it "should require authorization" do
+    it "requires authorization" do
       get 'index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(:tab_configuration, [{ 'id' => 16, 'hidden' => true }])
       get 'index', params: { :course_id => @course.id }
@@ -44,7 +44,7 @@ describe CollaborationsController do
       expect(flash[:notice]).to match(/That page has been disabled/)
     end
 
-    it "should assign variables" do
+    it "assigns variables" do
       user_session(@student)
       allow(controller).to receive(:google_drive_connection).and_return(double(authorized?: true))
 
@@ -54,7 +54,7 @@ describe CollaborationsController do
       expect(assigns(:user_has_google_drive)).to eq true
     end
 
-    it "should handle users without google authorized" do
+    it "handles users without google authorized" do
       user_session(@student)
       allow(controller).to receive(:google_drive_connection).and_return(double(authorized?: false))
 
@@ -76,7 +76,7 @@ describe CollaborationsController do
       expect(assigns(:user_has_google_drive)).to be false
     end
 
-    it "should not allow the student view student to access collaborations" do
+    it "does not allow the student view student to access collaborations" do
       course_with_teacher_logged_in(:active_user => true)
       expect(@course).not_to be_available
       @fake_student = @course.student_view_student
@@ -86,7 +86,7 @@ describe CollaborationsController do
       assert_unauthorized
     end
 
-    it "should work with groups" do
+    it "works with groups" do
       user_session(@student)
       gc = group_category
       group = gc.groups.create!(:context => @course)
@@ -126,7 +126,7 @@ describe CollaborationsController do
       @collab.reload
     end
 
-    it "should require authorization" do
+    it "requires authorization" do
       get 'members', params: { id: @collab.id }
       assert_unauthorized
     end
@@ -140,7 +140,7 @@ describe CollaborationsController do
         @request.headers['Authorization'] = "Bearer #{token}"
       end
 
-      it "should return back collaboration members" do
+      it "returns back collaboration members" do
         get 'members', params: { id: @collab.id }
         hash = JSON.parse(@response.body).first
 
@@ -150,7 +150,7 @@ describe CollaborationsController do
         expect(hash['collaborator_id']).to eq @student.id
       end
 
-      it "should include collaborator_lti_id" do
+      it "includes collaborator_lti_id" do
         get 'members', params: { id: @collab.id, include: ['collaborator_lti_id'] }
         @student.reload
         hash = JSON.parse(@response.body).first
@@ -158,7 +158,7 @@ describe CollaborationsController do
         expect(hash['collaborator_lti_id']).to eq @student.lti_context_id
       end
 
-      it "should include collaborator old_lti_id" do
+      it "includes collaborator old_lti_id" do
         Lti::Asset.opaque_identifier_for(@student)
         UserPastLtiId.create!(user: @student, context: @collab.context, user_lti_id: @student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
         get 'members', params: { id: @collab.id, include: ['collaborator_lti_id'] }
@@ -168,7 +168,7 @@ describe CollaborationsController do
         expect(hash['collaborator_lti_id']).to eq 'old_lti_id'
       end
 
-      it "should include avatar_image_url" do
+      it "includes avatar_image_url" do
         @student.avatar_image_url = 'https://www.example.com/awesome-avatar.png'
         @student.save!
         get 'members', params: { id: @collab.id, include: ['avatar_image_url'] }
@@ -180,12 +180,12 @@ describe CollaborationsController do
   end
 
   describe "GET 'lti_index'" do
-    it "should require authorization for the course" do
+    it "requires authorization for the course" do
       get 'lti_index', params: { :course_id => @course.id }
       assert_unauthorized
     end
 
-    it "should require authorization for the group" do
+    it "requires authorization for the group" do
       get 'lti_index', params: { :group_id => @group.id }
       assert_unauthorized
     end
@@ -282,18 +282,18 @@ describe CollaborationsController do
   describe "POST 'create'" do
     before(:once) { course_with_teacher(active_all: true) }
 
-    it "should require authorization" do
+    it "requires authorization" do
       post 'create', params: { :course_id => @course.id, :collaboration => {} }
       assert_unauthorized
     end
 
-    it "should fail with invalid collaboration type" do
+    it "fails with invalid collaboration type" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :collaboration => { :title => "My Collab" } }
       assert_status(400)
     end
 
-    it "should create collaboration" do
+    it "creates collaboration" do
       user_session(@teacher)
       post 'create', params: { :course_id => @course.id, :collaboration => { :collaboration_type => 'EtherPad', :title => "My Collab" } }
       expect(response).to be_redirect
@@ -383,7 +383,7 @@ describe CollaborationsController do
         end
       end
 
-      it "should create a collaboration using content-item" do
+      it "creates a collaboration using content-item" do
         user_session(@teacher)
 
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
@@ -403,7 +403,7 @@ describe CollaborationsController do
         expect(collaboration.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
       end
 
-      it "should callback on success" do
+      it "callbacks on success" do
         user_session(@teacher)
         content_item_util_stub = double('ContentItemUtil')
         expect(content_item_util_stub).to receive(:success_callback)
@@ -411,7 +411,7 @@ describe CollaborationsController do
         post 'create', params: { :course_id => @course.id, :contentItems => content_items.to_json }
       end
 
-      it "should callback on failure" do
+      it "callbacks on failure" do
         user_session(@teacher)
         expect_any_instance_of(Collaboration).to receive(:save).and_return(false)
         content_item_util_stub = double('ContentItemUtil')
@@ -481,7 +481,7 @@ describe CollaborationsController do
         end
       end
 
-      it "should update a collaboration using content-item" do
+      it "updates a collaboration using content-item" do
         user_session(@teacher)
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
         collaboration = Collaboration.find(assigns[:collaboration].id)
@@ -500,7 +500,7 @@ describe CollaborationsController do
         expect(c.data["confirmUrl"]).to eq 'http://example.com/confirm/343'
       end
 
-      it "should callback on success" do
+      it "callbacks on success" do
         user_session(@teacher)
         content_item_util_stub = double('ContentItemUtil')
         expect(content_item_util_stub).to receive(:success_callback)
@@ -508,7 +508,7 @@ describe CollaborationsController do
         put 'update', params: { id: collaboration.id, :course_id => @course.id, :contentItems => content_items.to_json }
       end
 
-      it "should callback on failure" do
+      it "callbacks on failure" do
         user_session(@teacher)
         allow_any_instance_of(Collaboration).to receive(:save).and_return(false)
         content_item_util_stub = double('ContentItemUtil')

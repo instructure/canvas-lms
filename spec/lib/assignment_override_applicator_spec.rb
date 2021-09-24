@@ -68,7 +68,7 @@ describe AssignmentOverrideApplicator do
       @assignment = create_assignment(:course => @course)
     end
 
-    it "should note the user id for whom overrides were applied" do
+    it "notes the user id for whom overrides were applied" do
       @adhoc_override = assignment_override_model(:assignment => @assignment)
       @override_student = @adhoc_override.assignment_override_students.build
       @override_student.user = @student
@@ -79,12 +79,12 @@ describe AssignmentOverrideApplicator do
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
     end
 
-    it "should note the user id for whom overrides were not found" do
+    it "notes the user id for whom overrides were not found" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
     end
 
-    it "should apply new overrides if an overridden assignment is overridden for a new user" do
+    it "applies new overrides if an overridden assignment is overridden for a new user" do
       @student1 = @student
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student1)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student1.id
@@ -94,7 +94,7 @@ describe AssignmentOverrideApplicator do
       @reoverridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@overridden_assignment, @student2)
     end
 
-    it "should not attempt to apply overrides if an overridden assignment is overridden for the same user" do
+    it "does not attempt to apply overrides if an overridden assignment is overridden for the same user" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
       expect(AssignmentOverrideApplicator).to receive(:overrides_for_assignment_and_user).never
@@ -179,12 +179,12 @@ describe AssignmentOverrideApplicator do
     end
 
     context 'it works' do
-      it "should be serializable" do
+      it "is serializable" do
         override = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
         expect { Marshal.dump(override) }.not_to raise_error
       end
 
-      it "should cache by assignment and user" do
+      it "caches by assignment and user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(Rails.cache).to receive(:write_entry).never
@@ -192,7 +192,7 @@ describe AssignmentOverrideApplicator do
         end
       end
 
-      it "should distinguish cache by assignment" do
+      it "distinguishes cache by assignment" do
         enable_cache do
           overrides1 = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           assignment = create_assignment
@@ -201,7 +201,7 @@ describe AssignmentOverrideApplicator do
         end
       end
 
-      it "should distinguish cache by assignment version" do
+      it "distinguishes cache by assignment version" do
         Timecop.travel Time.now + 1.hour do
           @assignment.due_at = 7.days.from_now
           @assignment.save!
@@ -214,7 +214,7 @@ describe AssignmentOverrideApplicator do
         end
       end
 
-      it "should distinguish cache by user" do
+      it "distinguishes cache by user" do
         enable_cache do
           AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           user = user_model
@@ -223,7 +223,7 @@ describe AssignmentOverrideApplicator do
         end
       end
 
-      it "should order adhoc override before group override" do
+      it "orders adhoc override before group override" do
         @category = group_category
         @group = @category.groups.create!(:context => @course)
         @membership = @group.add_user(@student)
@@ -245,7 +245,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.last).to eq @group_override
       end
 
-      it "should order group override before section overrides" do
+      it "orders group override before section overrides" do
         @category = group_category
         @group = @category.groups.create!(:context => @course)
         @membership = @group.add_user(@student)
@@ -271,7 +271,7 @@ describe AssignmentOverrideApplicator do
       context "sharding" do
         specs_require_sharding
 
-        it "should not break when running for a teacher on a different shard" do
+        it "does not break when running for a teacher on a different shard" do
           @shard1.activate do
             @teacher = User.create!
           end
@@ -297,12 +297,12 @@ describe AssignmentOverrideApplicator do
       end
 
       describe 'for students' do
-        it "should include adhoc override for the user" do
+        it "includes adhoc override for the user" do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to eq [@override]
         end
 
-        it "should not include adhoc overrides that don't include the user" do
+        it "does not include adhoc overrides that don't include the user" do
           new_student = student_in_course
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, new_student.user)
           expect(overrides).to be_empty
@@ -327,7 +327,7 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to eq [@override]
         end
 
-        it "should not duplicate adhoc overrides" do
+        it "does not duplicate adhoc overrides" do
           @override_student = @override.assignment_override_students.create(user: student_in_course.user)
 
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)
@@ -370,26 +370,26 @@ describe AssignmentOverrideApplicator do
           expect(result).to eq [@override]
         end
 
-        it "should not include group override for groups other than the user's" do
+        it "does not include group override for groups other than the user's" do
           @override.set = @category.groups.create!(context: @course)
           @override.save!
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
         end
 
-        it "should not include group override for deleted groups" do
+        it "does not include group override for deleted groups" do
           @group.destroy
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
         end
 
-        it "should not include group override for deleted group memberships" do
+        it "does not include group override for deleted group memberships" do
           @membership.destroy
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
         end
 
-        it "should still return something when there are old deleted group overrides" do
+        it "stills return something when there are old deleted group overrides" do
           @override.destroy!
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
@@ -404,7 +404,7 @@ describe AssignmentOverrideApplicator do
         context "sharding" do
           specs_require_sharding
 
-          it "should determine cross-shard user groups correctly" do
+          it "determines cross-shard user groups correctly" do
             cs_user = @shard1.activate { User.create! }
             student_in_course(:course => @course, :user => cs_user)
             @group.add_user(cs_user)
@@ -461,7 +461,7 @@ describe AssignmentOverrideApplicator do
           expect(result.length).to eq 1
         end
 
-        it "should enforce lenient date" do
+        it "enforces lenient date" do
           adhoc_due_at = 10.days.from_now
 
           ao = AssignmentOverride.new()
@@ -481,24 +481,24 @@ describe AssignmentOverrideApplicator do
           expect(students_assignment.due_at.to_i).to eq adhoc_due_at.to_i
         end
 
-        it "should include section overrides for sections with an active student enrollment" do
+        it "includes section overrides for sections with an active student enrollment" do
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to eq [@override2]
         end
 
-        it "should not include section overrides for sections with deleted enrollments" do
+        it "does not include section overrides for sections with deleted enrollments" do
           @student2.student_enrollments.first.destroy
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to be_empty
         end
 
-        it "should not include section overrides for sections with concluded enrollments" do
+        it "does not include section overrides for sections with concluded enrollments" do
           @student2.student_enrollments.first.conclude
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to be_empty
         end
 
-        it "should include all relevant section overrides" do
+        it "includes all relevant section overrides" do
           @course.enroll_student(@student, :section => @override2.set, :allow_multiple_enrollments => true)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides.size).to eq 2
@@ -506,14 +506,14 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to include(@override2)
         end
 
-        it "should work even if :read_roster is disabled" do
+        it "works even if :read_roster is disabled" do
           RoleOverride.create!(:context => @course.root_account, :permission => 'read_roster',
                                :role => student_role, :enabled => false)
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student2)
           expect(overrides).to eq [@override2]
         end
 
-        it "should only use the latest due_date for student_view_student" do
+        it "onlies use the latest due_date for student_view_student" do
           due_at = 3.days.from_now
           a = create_assignment(:course => @course)
           cs1 = @course.course_sections.create!
@@ -534,7 +534,7 @@ describe AssignmentOverrideApplicator do
           expect(AssignmentOverrideApplicator.collapsed_overrides(a, overrides)[:due_at].to_i).to eq due_at.to_i
         end
 
-        it "should not include section overrides for sections without an enrollment" do
+        it "does not include section overrides for sections without an enrollment" do
           assignment = create_assignment(:course => @course, :due_at => 5.days.from_now)
           override = assignment_override_model(:assignment => assignment)
           override.set = @course.course_sections.create!
@@ -617,7 +617,7 @@ describe AssignmentOverrideApplicator do
     end
 
     context "versioning" do
-      it "should use the appropriate version of an override" do
+      it "uses the appropriate version of an override" do
         @override = assignment_override_model(:assignment => @assignment)
         @override_student = @override.assignment_override_students.build
         @override_student.user = @student
@@ -638,7 +638,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.first.version_number).to eq original_override_version_number
       end
 
-      it "should use the most-recent override version for the given assignment version" do
+      it "uses the most-recent override version for the given assignment version" do
         @override = assignment_override_model(:assignment => @assignment)
         @override_student = @override.assignment_override_students.build
         @override_student.user = @student
@@ -656,7 +656,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.first.version_number).to eq second_version
       end
 
-      it "should exclude overrides that weren't created until a later assignment version" do
+      it "excludes overrides that weren't created until a later assignment version" do
         @assignment.due_at = 3.days.from_now
         @assignment.save!
 
@@ -669,7 +669,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides).to be_empty
       end
 
-      it "should exclude overrides that were deleted as of the assignment version" do
+      it "excludes overrides that were deleted as of the assignment version" do
         @override = assignment_override_model(:assignment => @assignment)
         @override_student = @override.assignment_override_students.build
         @override_student.user = @student
@@ -681,7 +681,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides).to be_empty
       end
 
-      it "should include now-deleted overrides that weren't deleted yet as of the assignment version" do
+      it "includes now-deleted overrides that weren't deleted yet as of the assignment version" do
         @override = assignment_override_model(:assignment => @assignment)
         @override.set = @course.default_section
         @override.save!
@@ -696,7 +696,7 @@ describe AssignmentOverrideApplicator do
         expect(overrides.first).not_to be_deleted
       end
 
-      it "should include now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses permission)" do
+      it "includes now-deleted overrides that weren't deleted yet as of the assignment version (with manage_courses permission)" do
         account_admin_user
 
         @override = assignment_override_model(:assignment => @assignment)
@@ -794,16 +794,16 @@ describe AssignmentOverrideApplicator do
       @overridden = AssignmentOverrideApplicator.assignment_with_overrides(@assignment, [@override])
     end
 
-    it "should return a new assignment object" do
+    it "returns a new assignment object" do
       expect(@overridden.class).to eq @assignment.class
       expect(@overridden.object_id).not_to eq @assignment.object_id
     end
 
-    it "should preserve assignment id" do
+    it "preserves assignment id" do
       expect(@overridden.id).to eq @assignment.id
     end
 
-    it "should be new_record? iff the original assignment is" do
+    it "is new_record? iff the original assignment is" do
       expect(@overridden).not_to be_new_record
 
       @assignment = Assignment.new
@@ -811,40 +811,40 @@ describe AssignmentOverrideApplicator do
       expect(@overridden).to be_new_record
     end
 
-    it "should apply overrides to the returned assignment object" do
+    it "applies overrides to the returned assignment object" do
       expect(@overridden.due_at).to eq @override.due_at
     end
 
-    it "should not change the original assignment object" do
+    it "does not change the original assignment object" do
       expect(@assignment.due_at).not_to eq @overridden.due_at
     end
 
-    it "should inherit other values from the original assignment object" do
+    it "inherits other values from the original assignment object" do
       expect(@overridden.title).to eq @assignment.title
     end
 
-    it "should return a readonly assignment object" do
+    it "returns a readonly assignment object" do
       expect(@overridden).to be_readonly
       expect { @overridden.save!(validate: false) }.to raise_exception ActiveRecord::ReadOnlyRecord
     end
 
-    it "should cast datetimes to the active time zone" do
+    it "casts datetimes to the active time zone" do
       expect(@overridden.due_at.time_zone).to eq Time.zone
       expect(@overridden.unlock_at.time_zone).to eq Time.zone
       expect(@overridden.lock_at.time_zone).to eq Time.zone
     end
 
-    it "should not cast dates to zoned datetimes" do
+    it "does not cast dates to zoned datetimes" do
       expect(@overridden.all_day_date.class).to eq Date
     end
 
-    it "should copy pre-loaded associations" do
+    it "copies pre-loaded associations" do
       expect(@overridden.association(:context).loaded?).to eq @assignment.association(:context).loaded?
       expect(@overridden.association(:rubric).loaded?).to eq @assignment.association(:rubric).loaded?
       @overridden.learning_outcome_alignments.loaded? == @assignment.learning_outcome_alignments.loaded?
     end
 
-    it "should be locked in between overrides" do
+    it "is locked in between overrides" do
       past_override = assignment_override_model(assignment: @assignment,
                                                 unlock_at: 2.months.ago,
                                                 lock_at: 1.month.ago)
@@ -855,7 +855,7 @@ describe AssignmentOverrideApplicator do
       expect(overridden.locked_for?(@student)).to be_truthy
     end
 
-    it "should not be locked when in an override" do
+    it "is not locked when in an override" do
       override = assignment_override_model(assignment: @assignment,
                                            unlock_at: 2.months.ago,
                                            lock_at: 2.months.from_now)
@@ -865,7 +865,7 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "collapsed_overrides" do
-    it "should cache by assignment and overrides" do
+    it "caches by assignment and overrides" do
       @assignment = create_assignment
       @override = assignment_override_model(:assignment => @assignment)
       enable_cache do
@@ -877,7 +877,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    it "should distinguish cache by assignment" do
+    it "distinguishes cache by assignment" do
       @assignment1 = create_assignment
       @assignment2 = create_assignment
       @override = assignment_override_model(:assignment => @assignment1)
@@ -888,7 +888,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    it "should distinguish cache by assignment updated_at" do
+    it "distinguishes cache by assignment updated_at" do
       @assignment = create_assignment
       Timecop.travel Time.now + 1.hour do
         @assignment.due_at = 5.days.from_now
@@ -904,7 +904,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    it "should distinguish cache by overrides" do
+    it "distinguishes cache by overrides" do
       @assignment = create_assignment
       @override1 = assignment_override_model(:assignment => @assignment)
       @override2 = assignment_override_model(:assignment => @assignment)
@@ -915,7 +915,7 @@ describe AssignmentOverrideApplicator do
       end
     end
 
-    it "should have a collapsed value for each recognized field" do
+    it "has a collapsed value for each recognized field" do
       @assignment = create_assignment
       @override = assignment_override_model(:assignment => @assignment)
       overrides = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [@override])
@@ -923,7 +923,7 @@ describe AssignmentOverrideApplicator do
       expect(overrides.keys.to_set).to eq [:due_at, :all_day, :all_day_date, :unlock_at, :lock_at].to_set
     end
 
-    it "should use raw UTC time for datetime fields" do
+    it "uses raw UTC time for datetime fields" do
       Time.zone = 'Alaska'
       @assignment = create_assignment(due_at: 5.days.from_now, unlock_at: 4.days.from_now, lock_at: 7.days.from_now)
       collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
@@ -935,7 +935,7 @@ describe AssignmentOverrideApplicator do
       expect(collapsed[:lock_at]).to eq @assignment.lock_at.utc
     end
 
-    it "should not use raw UTC time for date fields" do
+    it "does not use raw UTC time for date fields" do
       Time.zone = 'Alaska'
       @assignment = create_assignment(:due_at => 5.days.from_now)
       collapsed = AssignmentOverrideApplicator.collapsed_overrides(@assignment, [])
@@ -945,14 +945,14 @@ describe AssignmentOverrideApplicator do
   end
 
   describe "overrides_hash" do
-    it "should be consistent for the same overrides" do
+    it "is consistent for the same overrides" do
       overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides)
       expect(hash1).to eq hash2
     end
 
-    it "should be unique for different overrides" do
+    it "is unique for different overrides" do
       overrides1 = 5.times.map { assignment_override_model }
       overrides2 = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides1)
@@ -960,7 +960,7 @@ describe AssignmentOverrideApplicator do
       expect(hash1).not_to eq hash2
     end
 
-    it "should be unique for different versions of the same overrides" do
+    it "is unique for different versions of the same overrides" do
       overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       overrides.first.override_due_at(5.days.from_now)
@@ -969,7 +969,7 @@ describe AssignmentOverrideApplicator do
       expect(hash1).not_to eq hash2
     end
 
-    it "should be unique for different orders of the same overrides" do
+    it "is unique for different orders of the same overrides" do
       overrides = 5.times.map { assignment_override_model }
       hash1 = AssignmentOverrideApplicator.overrides_hash(overrides)
       hash2 = AssignmentOverrideApplicator.overrides_hash(overrides.reverse)
@@ -991,20 +991,20 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
     end
 
-    it "should use overrides that override due_at" do
+    it "uses overrides that override due_at" do
       @override.override_due_at(7.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
       expect(due_at).to eq @override.due_at
     end
 
-    it "should skip overrides that don't override due_at" do
+    it "skips overrides that don't override due_at" do
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_due_at(7.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override, @override2])
       expect(due_at).to eq @override2.due_at
     end
 
-    it "should prefer most lenient override" do
+    it "prefers most lenient override" do
       @override.override_due_at(6.days.from_now)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_due_at(7.days.from_now)
@@ -1012,7 +1012,7 @@ describe AssignmentOverrideApplicator do
       expect(due_at).to eq @override2.due_at
     end
 
-    it "should consider no due date as most lenient" do
+    it "considers no due date as most lenient" do
       @override.override_due_at(nil)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_due_at(7.days.from_now)
@@ -1020,7 +1020,7 @@ describe AssignmentOverrideApplicator do
       expect(due_at).to eq @override.due_at
     end
 
-    it "should not consider empty original due date as more lenient than an override due date" do
+    it "does not consider empty original due date as more lenient than an override due date" do
       @assignment.due_at = nil
       @override.override_due_at(6.days.from_now)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
@@ -1035,12 +1035,12 @@ describe AssignmentOverrideApplicator do
       expect(due_at).to eq earlier
     end
 
-    it "should fallback on the assignment's due_at" do
+    it "fallbacks on the assignment's due_at" do
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
       expect(due_at).to eq @assignment.due_at
     end
 
-    it "should recognize overrides with overridden-but-nil due_at" do
+    it "recognizes overrides with overridden-but-nil due_at" do
       @override.override_due_at(nil)
       due_at = AssignmentOverrideApplicator.overridden_due_at(@assignment, [@override])
       expect(due_at).to eq @override.due_at
@@ -1056,20 +1056,20 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
     end
 
-    it "should use overrides that override unlock_at" do
+    it "uses overrides that override unlock_at" do
       @override.override_unlock_at(7.days.from_now)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
       expect(unlock_at).to eq @override.unlock_at
     end
 
-    it "should skip overrides that don't override unlock_at" do
+    it "skips overrides that don't override unlock_at" do
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_unlock_at(7.days.from_now)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override, @override2])
       expect(unlock_at).to eq @override2.unlock_at
     end
 
-    it "should prefer most lenient override" do
+    it "prefers most lenient override" do
       @override.override_unlock_at(7.days.from_now)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_unlock_at(6.days.from_now)
@@ -1077,7 +1077,7 @@ describe AssignmentOverrideApplicator do
       expect(unlock_at).to eq @override2.unlock_at
     end
 
-    it "should consider no unlock date as most lenient" do
+    it "considers no unlock date as most lenient" do
       @override.override_unlock_at(nil)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_unlock_at(7.days.from_now)
@@ -1085,7 +1085,7 @@ describe AssignmentOverrideApplicator do
       expect(unlock_at).to eq @override.unlock_at
     end
 
-    it "should not consider empty original unlock date as more lenient than an override unlock date" do
+    it "does not consider empty original unlock date as more lenient than an override unlock date" do
       @assignment.unlock_at = nil
       @override.override_unlock_at(6.days.from_now)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
@@ -1100,18 +1100,18 @@ describe AssignmentOverrideApplicator do
       expect(unlock_at).to eq later
     end
 
-    it "should fallback on the assignment's unlock_at" do
+    it "fallbacks on the assignment's unlock_at" do
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
       expect(unlock_at).to eq @assignment.unlock_at
     end
 
-    it "should recognize overrides with overridden-but-nil unlock_at" do
+    it "recognizes overrides with overridden-but-nil unlock_at" do
       @override.override_unlock_at(nil)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
       expect(unlock_at).to eq @override.unlock_at
     end
 
-    it "should not include unlock_at for previous overrides that have already been locked" do
+    it "does not include unlock_at for previous overrides that have already been locked" do
       @override.override_unlock_at(10.days.ago)
       @override.override_lock_at(5.days.ago)
       unlock_at = AssignmentOverrideApplicator.overridden_unlock_at(@assignment, [@override])
@@ -1125,20 +1125,20 @@ describe AssignmentOverrideApplicator do
       @override = assignment_override_model(:assignment => @assignment)
     end
 
-    it "should use overrides that override lock_at" do
+    it "uses overrides that override lock_at" do
       @override.override_lock_at(7.days.from_now)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
       expect(lock_at).to eq @override.lock_at
     end
 
-    it "should skip overrides that don't override lock_at" do
+    it "skips overrides that don't override lock_at" do
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_lock_at(7.days.from_now)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override, @override2])
       expect(lock_at).to eq @override2.lock_at
     end
 
-    it "should prefer most lenient override" do
+    it "prefers most lenient override" do
       @override.override_lock_at(6.days.from_now)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_lock_at(7.days.from_now)
@@ -1146,7 +1146,7 @@ describe AssignmentOverrideApplicator do
       expect(lock_at).to eq @override2.lock_at
     end
 
-    it "should consider no lock date as most lenient" do
+    it "considers no lock date as most lenient" do
       @override.override_lock_at(nil)
       @override2 = assignment_override_model(:assignment => @assignment)
       @override2.override_lock_at(7.days.from_now)
@@ -1154,7 +1154,7 @@ describe AssignmentOverrideApplicator do
       expect(lock_at).to eq @override.lock_at
     end
 
-    it "should not consider empty original lock date as more lenient than an override lock date" do
+    it "does not consider empty original lock date as more lenient than an override lock date" do
       @assignment.lock_at = nil
       @override.override_lock_at(6.days.from_now)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
@@ -1169,12 +1169,12 @@ describe AssignmentOverrideApplicator do
       expect(lock_at).to eq earlier
     end
 
-    it "should fallback on the assignment's lock_at" do
+    it "fallbacks on the assignment's lock_at" do
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
       expect(lock_at).to eq @assignment.lock_at
     end
 
-    it "should recognize overrides with overridden-but-nil lock_at" do
+    it "recognizes overrides with overridden-but-nil lock_at" do
       @override.override_lock_at(nil)
       lock_at = AssignmentOverrideApplicator.overridden_lock_at(@assignment, [@override])
       expect(lock_at).to eq @override.lock_at
@@ -1208,7 +1208,7 @@ describe AssignmentOverrideApplicator do
       @assignment = create_assignment(:course => @course)
     end
 
-    it "should return an unoverridden copy of an overridden assignment" do
+    it "returns an unoverridden copy of an overridden assignment" do
       @overridden_assignment = AssignmentOverrideApplicator.assignment_overridden_for(@assignment, @student)
       expect(@overridden_assignment.overridden_for_user.id).to eq @student.id
       @unoverridden_assignment = @overridden_assignment.without_overrides
@@ -1216,7 +1216,7 @@ describe AssignmentOverrideApplicator do
     end
   end
 
-  it "should use the full stack" do
+  it "uses the full stack" do
     student_in_course
     original_due_at = 3.days.from_now
     @assignment = create_assignment(:course => @course)
@@ -1248,7 +1248,7 @@ describe AssignmentOverrideApplicator do
     expect(@overridden_assignment.due_at).to eq @section_override.due_at
   end
 
-  it "should not cache incorrect overrides through due_between_with_overrides" do
+  it "does not cache incorrect overrides through due_between_with_overrides" do
     course_with_student(:active_all => true)
     @assignment = create_assignment(:course => @course, :submission_types => "online_upload")
 

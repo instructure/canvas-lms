@@ -33,11 +33,11 @@ describe AssignmentGroup do
     @course.update_attribute(:group_weighting_scheme, 'percent')
   end
 
-  it "should act as list" do
+  it "acts as list" do
     expect(AssignmentGroup).to be_respond_to(:acts_as_list)
   end
 
-  it "should convert NaN group weight values to 0 on save" do
+  it "converts NaN group weight values to 0 on save" do
     ag = @course.assignment_groups.create!(@valid_attributes)
     ag.group_weight = 0 / 0.0
     ag.save!
@@ -127,7 +127,7 @@ describe AssignmentGroup do
     end
 
     context "with differentiated assignments and draft state on" do
-      it "should return only active assignments with overrides or grades for the user" do
+      it "returns only active assignments with overrides or grades for the user" do
         expect(@ag.active_assignments.count).to eq 3
         # one with override, one with grade
         expect(@ag.visible_assignments(@student).count).to eq 2
@@ -136,7 +136,7 @@ describe AssignmentGroup do
     end
 
     context "logged out users" do
-      it "should return published assignments for logged out users so that invited users can see them before accepting a course invite" do
+      it "returns published assignments for logged out users so that invited users can see them before accepting a course invite" do
         @course.active_assignments.first.unpublish
         expect(@ag.visible_assignments(nil).count).to eq 2
         expect(AssignmentGroup.visible_assignments(nil, @course, [@ag]).count).to eq 2
@@ -164,12 +164,12 @@ describe AssignmentGroup do
     end
   end
 
-  it "should have a state machine" do
+  it "has a state machine" do
     assignment_group_model
     expect(@ag.state).to eql(:available)
   end
 
-  it "should return never_drop list as ints" do
+  it "returns never_drop list as ints" do
     expected = [9, 22, 16, 4]
     rules = "drop_lowest:2\n"
     expected.each do |val|
@@ -180,7 +180,7 @@ describe AssignmentGroup do
     expect(result['never_drop']).to eql(expected)
   end
 
-  it "should return never_drop list as strings if `stringify_json_ids` is true" do
+  it "returns never_drop list as strings if `stringify_json_ids` is true" do
     expected = ['9', '22', '16', '4']
     rules = "drop_highest:25\n"
     expected.each do |val|
@@ -192,14 +192,14 @@ describe AssignmentGroup do
     expect(result['never_drop']).to eql(expected)
   end
 
-  it "should return rules that aren't never_drops as ints" do
+  it "returns rules that aren't never_drops as ints" do
     rules = "drop_highest:25\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash()
     expect(result['drop_highest']).to eql(25)
   end
 
-  it "should return rules that aren't never_drops as ints when `strigify_json_ids` is true" do
+  it "returns rules that aren't never_drops as ints when `strigify_json_ids` is true" do
     rules = "drop_lowest:2\n"
     assignment_group_model :rules => rules
     result = @ag.rules_hash({ stringify_json_ids: true })

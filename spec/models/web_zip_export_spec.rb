@@ -33,17 +33,17 @@ describe WebZipExport do
       end
     end
 
-    it "should update job_progress completion" do
+    it "updates job_progress completion" do
       web_zip_export.generate(synchronous: true)
       expect(web_zip_export.job_progress.completion).to eq WebZipExport::PERCENTAGE_COMPLETE[:generating]
     end
 
-    it "should set state to generating" do
+    it "sets state to generating" do
       web_zip_export.generate(synchronous: true)
       expect(web_zip_export.generating?).to be_truthy
     end
 
-    it 'should create and associate an attachment' do
+    it 'creates and associate an attachment' do
       web_zip_export.export(synchronous: true)
       web_zip_export.content_export.export(synchronous: true)
       expect(web_zip_export.zip_attachment).to be_nil, 'precondition'
@@ -67,7 +67,7 @@ describe WebZipExport do
       @web_zip_export = @course.web_zip_exports.create(user: @student, workflow_state: 'created')
     end
 
-    it "should cache user module progress" do
+    it "caches user module progress" do
       modul = @course.context_modules.create!(name: 'first_module')
       assign = @course.assignments.create!(title: 'Assignment 1')
       assign_item = modul.content_tags.create!(content: assign, context: @course)

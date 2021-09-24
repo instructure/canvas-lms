@@ -28,7 +28,7 @@ describe Alert do
 
   context "Alerts" do
     context "mass assignment" do
-      it "should accept mass assignment of criteria" do
+      it "accepts mass assignment of criteria" do
         alert = Alert.new(:context => Account.default, :recipients => [:student])
         alert.criteria = [{ :criterion_type => 'Interaction', :threshold => 1 }]
         expect(alert.criteria.length).to eq 1
@@ -52,17 +52,17 @@ describe Alert do
     end
 
     context "validation" do
-      it "should require a context" do
+      it "requires a context" do
         alert = Alert.new(:recipients => [:student], :criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
         expect(alert.save).to be_falsey
       end
 
-      it "should require recipients" do
+      it "requires recipients" do
         alert = Account.default.alerts.build(:criteria => [{ :criterion_type => 'Interaction', :threshold => 7 }])
         expect(alert.save).to be_falsey
       end
 
-      it "should require criteria" do
+      it "requires criteria" do
         alert = Account.default.alerts.build(:recipients => [:student])
         expect(alert.save).to be_falsey
       end

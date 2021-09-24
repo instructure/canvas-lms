@@ -204,7 +204,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       context "api content translation" do
-        it "should translate question text" do
+        it "translates question text" do
           should_translate_user_content(@course) do |content|
             @question = @quiz.quiz_questions.create!(:question_data => {
                                                        "question_name" => "Example Question",
@@ -222,7 +222,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
           end
         end
 
-        it "should translate answer html" do
+        it "translates answer html" do
           should_translate_user_content(@course) do |content|
             plain_answer_txt = "plz don't & escape me"
             @question = @quiz.quiz_questions.create!(:question_data => {
@@ -244,7 +244,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       context "non-existent question" do
-        it "should return a not found error message" do
+        it "returns a not found error message" do
           json = api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/9034831",
                           { :controller => "quizzes/quiz_questions", :action => "show", :format => "json", :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s, :id => "9034831" },
                           {}, {}, { :expected_status => 404 })
@@ -266,7 +266,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
     context 'whom has not started the quiz' do
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
-        it "should be unauthorized" do
+        it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
@@ -275,7 +275,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show) ' do
-        it "should be unauthorized" do
+        it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",
@@ -292,14 +292,14 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions (index)' do
-        it "should be unauthorized" do
+        it "is unauthorized" do
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions",
                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
                        :course_id => @course.id.to_s, :quiz_id => @quiz.id.to_s)
           assert_status(401)
         end
 
-        it 'should be authorized with quiz_submission_id & attempt' do
+        it 'is authorized with quiz_submission_id & attempt' do
           url = "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions?quiz_submission_id=#{@submission.id}&quiz_submission_attempt=1"
           raw_api_call(:get, url,
                        :controller => "quizzes/quiz_questions", :action => "index", :format => "json",
@@ -310,7 +310,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
       end
 
       describe 'GET /courses/:course_id/quizzes/:quiz_id/questions/:id (show)' do
-        it "should be unauthorized" do
+        it "is unauthorized" do
           @question = @quiz.quiz_questions.create!(:question_data => multiple_choice_question_data)
 
           raw_api_call(:get, "/api/v1/courses/#{@course.id}/quizzes/#{@quiz.id}/questions/#{@question.id}",

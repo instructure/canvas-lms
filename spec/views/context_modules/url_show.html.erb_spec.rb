@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/context_modules/url_show" do
-  it "should render" do
+  it "renders" do
     course_factory
     view_context(@course, @user)
     @module = @course.context_modules.create!(:name => 'teh module')

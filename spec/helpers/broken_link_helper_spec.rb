@@ -30,49 +30,49 @@ describe BrokenLinkHelper, type: :controller do
     assignment_model(course: @course, description: "<a href='/test_error'>bad link</a>")
   end
 
-  it 'should return false if no referrer' do
+  it 'returns false if no referrer' do
     allow(request).to receive(:referer).and_return nil
     expect(send_broken_content!).to be false
   end
 
-  it 'should return false if no course found' do
+  it 'returns false if no course found' do
     allow(request).to receive(:referer).and_return '/hi'
     expect(send_broken_content!).to be false
   end
 
-  it 'should return false if no object with a body found' do
+  it 'returns false if no object with a body found' do
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/assignments"
     expect(send_broken_content!).to be false
   end
 
-  it 'should return false if the location is not found in the referrer body' do
+  it 'returns false if the location is not found in the referrer body' do
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/assignments/#{@assignment.id}"
     allow(request).to receive(:path).and_return '/bad_link'
     @assignment.update(description: 'stuff')
     expect(send_broken_content!).to be false
   end
 
-  it 'should return true for bad links in assignments with local 404 errors' do
+  it 'returns true for bad links in assignments with local 404 errors' do
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/assignments/#{@assignment.id}"
     allow(request).to receive(:path).and_return "/test_error"
     expect(send_broken_content!).to be true
   end
 
-  it 'should return true for bad links in quizzes' do
+  it 'returns true for bad links in quizzes' do
     quiz_model(course: @course, description: "<a href='/test_error'>bad link</a>")
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     allow(request).to receive(:path).and_return "/test_error"
     expect(send_broken_content!).to be true
   end
 
-  it 'should return true for bad links in discussion topics' do
+  it 'returns true for bad links in discussion topics' do
     discussion_topic_model(context: @course, message: "<a href='/test_error'>bad link</a>")
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
     allow(request).to receive(:path).and_return "/test_error"
     expect(send_broken_content!).to be true
   end
 
-  it 'should return false for bad links in discussion topic entries' do
+  it 'returns false for bad links in discussion topic entries' do
     discussion_topic_model(context: @course, message: "<a href='/good_page'>bad link</a>")
     @topic.reply_from(user: @student, html: "<a href='/test_error'>bad link</a>")
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/discussion_topics/#{@topic.id}"
@@ -80,14 +80,14 @@ describe BrokenLinkHelper, type: :controller do
     expect(send_broken_content!).to be false
   end
 
-  it 'should return true for bad links in wiki pages' do
+  it 'returns true for bad links in wiki pages' do
     wiki_page_model(context: @course, body: "<a href='/test_error'>bad link</a>")
     allow(request).to receive(:referer).and_return "/courses/#{@course.id}/pages/#{@page.url}"
     allow(request).to receive(:path).and_return "/test_error"
     expect(send_broken_content!).to be true
   end
 
-  it 'should work with wiki pages set to the front page' do
+  it 'works with wiki pages set to the front page' do
     wiki_page_model(context: @course, body: "<a href='/test_error'>bad link</a>")
     @page.set_as_front_page!
     @course.update_attribute(:default_view, 'wiki')
@@ -96,7 +96,7 @@ describe BrokenLinkHelper, type: :controller do
     expect(send_broken_content!).to be true
   end
 
-  it 'should return true for unpublished content' do
+  it 'returns true for unpublished content' do
     linked_assignment = @assignment
     assignment_model(course: @course).update(workflow_state: 'unpublished')
     linked_assignment.update(description: "<a href='/courses/#{@course.id}/assignments/#{@assignment.id}'>Unpublished Assignment</a>")
@@ -106,21 +106,21 @@ describe BrokenLinkHelper, type: :controller do
   end
 
   context '#error_type' do
-    it "should return :missing_item if the link doesn't point to course content" do
+    it "returns :missing_item if the link doesn't point to course content" do
       expect(error_type(@course, "/test_error")).to eq :missing_item
     end
 
-    it "should return :missing_item if the link doesn't match a Canvas route" do
+    it "returns :missing_item if the link doesn't match a Canvas route" do
       expect(error_type(@course, "/courses/#{@course.id}/quizes/1")).to eq :missing_item
     end
 
-    it 'should return :course_mismatch if the link comes from a different course' do
+    it 'returns :course_mismatch if the link comes from a different course' do
       assignment_model(course: @course)
       course_model
       expect(error_type(@course, "/courses/#{@assignment.context_id}/assignments/#{@assignment.id}")).to eq :course_mismatch
     end
 
-    it 'should return :unpublished_item for unpublished content' do
+    it 'returns :unpublished_item for unpublished content' do
       @assignment.update(workflow_state: 'unpublished')
       expect(error_type(@course, "/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :unpublished_item
 
@@ -131,7 +131,7 @@ describe BrokenLinkHelper, type: :controller do
       expect(error_type(@course, "/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :unpublished_item
     end
 
-    it 'should return :deleted for deleted content' do
+    it 'returns :deleted for deleted content' do
       @assignment.update(workflow_state: 'deleted')
       expect(error_type(@course, "/courses/#{@course.id}/assignments/#{@assignment.id}")).to eq :deleted
 
@@ -142,7 +142,7 @@ describe BrokenLinkHelper, type: :controller do
       expect(error_type(@course, "/courses/#{@course.id}/files/#{@attachment.id}/download")).to eq :deleted
     end
 
-    it "should return :inaccessible for group links the user doesn't have access to" do
+    it "returns :inaccessible for group links the user doesn't have access to" do
       group_category(context: @course)
       group(group_category: @group_category, context: @course)
       wiki_page_model(context: @group)
@@ -152,7 +152,7 @@ describe BrokenLinkHelper, type: :controller do
       expect(error_type(@course, "/groups/#{@group.id}/pages/#{@page.url}")).to eq :inaccessible
     end
 
-    it "should return :missing_item when the user got a 404 and the URL is valid in Canvas" do
+    it "returns :missing_item when the user got a 404 and the URL is valid in Canvas" do
       group_category(context: @course)
       group(group_category: @group_category, context: @course)
       wiki_page_model(context: @group)
@@ -160,7 +160,7 @@ describe BrokenLinkHelper, type: :controller do
       expect(error_type(@course, "/groups/#{@group.id}/pages/#{@page.url}")).to eq :missing_item
     end
 
-    it "should return :missing_item when the user got to a route that doesn't exist in Canvas" do
+    it "returns :missing_item when the user got to a route that doesn't exist in Canvas" do
       expect(error_type(@course, "/yo")).to eq :missing_item
     end
   end

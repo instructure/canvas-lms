@@ -37,7 +37,7 @@ describe "content security policy" do
 
     before(:each) { create_session(@csp_pseudonym) }
 
-    it "should display a flash alert for non-whitelisted iframe", ignore_js_errors: true do
+    it "displays a flash alert for non-whitelisted iframe", ignore_js_errors: true do
       @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
       "src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\
       "allow=\"accelerometer; autoplay; encrypted-media; gyroscope;"\
@@ -48,7 +48,7 @@ describe "content security policy" do
       expect_instui_flash_message "Content on this page violates the security policy, contact your admin for assistance."
     end
 
-    it "should NOT display a flash alert for whitelisted iframe" do
+    it "does not display a flash alert for whitelisted iframe" do
       @csp_account.add_domain!('www.youtube.com')
       @csp_course.wiki_pages.create!(title: 'Page1', body: "<iframe width=\"560\" height=\"315\""\
       " src=\"https://www.youtube.com/embed/dQw4w9WgXcQ\" frameborder=\"0\""\

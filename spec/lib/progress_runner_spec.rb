@@ -35,7 +35,7 @@ describe ProgressRunner do
     end
   end
 
-  it "should perform normal processing and update progress" do
+  it "performs normal processing and update progress" do
     expect(@progress).to receive(:start!).once
     expect(@progress).to receive(:calculate_completion!).exactly(3).times
     expect(@progress).to receive(:complete!).once
@@ -63,7 +63,7 @@ describe ProgressRunner do
     expect(error_callback_called).to be_falsey
   end
 
-  it "should rescue exceptions and record messages as errors" do
+  it "rescues exceptions and record messages as errors" do
     @progress.extend(ProgressMessages)
     expect(@progress).to receive(:complete!).once
     expect(@progress).to receive(:completion=).with(100.0)
@@ -93,7 +93,7 @@ describe ProgressRunner do
     expect(message_lines).to eql ["abra", "error processing 2: 2", "error processing 3: 3"]
   end
 
-  it "should have default completion and error messages" do
+  it "has default completion and error messages" do
     @progress.extend(ProgressMessages)
 
     progress_runner = ProgressRunner.new(@progress)
@@ -107,7 +107,7 @@ describe ProgressRunner do
   # it "should accumulate like errors into a single mesage line"
   # it "should complete progress if only some records fail"
 
-  it "should fail progress if all records fail" do
+  it "fails progress if all records fail" do
     @progress.extend(ProgressMessages)
     expect(@progress).to receive(:completion=).with(100.0)
     expect(@progress).to receive(:fail!).once

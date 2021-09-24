@@ -35,7 +35,7 @@ describe "context modules" do
       course_with_teacher_logged_in(:course => @course, :active_enrollment => true)
     end
 
-    it 'should add an unpublished page to a module', priority: "1", test_id: 126709 do
+    it 'adds an unpublished page to a module', priority: "1", test_id: 126709 do
       @unpub_page = @course.wiki_pages.create!(title: 'Unpublished Page')
       @unpub_page.workflow_state = 'unpublished'
       @unpub_page.save!
@@ -45,7 +45,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'should add a published page to a module', priority: "1", test_id: 126710 do
+    it 'adds a published page to a module', priority: "1", test_id: 126710 do
       @pub_page = @course.wiki_pages.create!(title: 'Published Page')
       @mod.add_item(type: 'wiki_page', id: @pub_page.id)
       go_to_modules
@@ -53,7 +53,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'should add an unpublished quiz to a module', priority: "1", test_id: 126720 do
+    it 'adds an unpublished quiz to a module', priority: "1", test_id: 126720 do
       @unpub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Unpublished Quiz')
       @unpub_quiz.workflow_state = 'unpublished'
       @unpub_quiz.save!
@@ -63,7 +63,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'should add a published quiz to a module', priority: "1", test_id: 126721 do
+    it 'adds a published quiz to a module', priority: "1", test_id: 126721 do
       @pub_quiz = Quizzes::Quiz.create!(context: @course, title: 'Published Quiz')
       @mod.add_item(type: 'quiz', id: @pub_quiz.id)
       go_to_modules
@@ -78,7 +78,7 @@ describe "context modules" do
       expect(f('.due_date_display').text).to eq date_string(@pub_quiz.due_at, :no_words)
     end
 
-    it 'should add an unpublished assignment to a module', priority: "1", test_id: 126724 do
+    it 'adds an unpublished assignment to a module', priority: "1", test_id: 126724 do
       @unpub_assignment = Assignment.create!(context: @course, title: 'Unpublished Assignment')
       @unpub_assignment.workflow_state = 'unpublished'
       @unpub_assignment.save!
@@ -88,7 +88,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'should add a published assignment to a module', priority: "1", test_id: 126725 do
+    it 'adds a published assignment to a module', priority: "1", test_id: 126725 do
       @pub_assignment = Assignment.create!(context: @course, title: 'Published Assignment')
       @mod.add_item(type: 'assignment', id: @pub_assignment.id)
       go_to_modules
@@ -96,7 +96,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'should add an non-graded unpublished discussion to a module', priority: "1", test_id: 126712 do
+    it 'adds an non-graded unpublished discussion to a module', priority: "1", test_id: 126712 do
       @unpub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Unpublished Discussion')
       @unpub_ungraded_discussion.workflow_state = 'unpublished'
       @unpub_ungraded_discussion.save!
@@ -106,7 +106,7 @@ describe "context modules" do
       expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
     end
 
-    it 'should add a non-graded published discussion to a module', priority: "1", test_id: 126713 do
+    it 'adds a non-graded published discussion to a module', priority: "1", test_id: 126713 do
       @pub_ungraded_discussion = @course.discussion_topics.create!(title: 'Non-graded Published Discussion')
       @mod.add_item(type: 'discussion_topic', id: @pub_ungraded_discussion.id)
       go_to_modules
@@ -114,7 +114,7 @@ describe "context modules" do
       expect(f('span.publish-icon.published.publish-icon-published')).to be_displayed
     end
 
-    it 'should add an graded unpublished discussion to a module', priority: "1", test_id: 126714 do
+    it 'adds an graded unpublished discussion to a module', priority: "1", test_id: 126714 do
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
       @unpub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Unpublished Discussion')
       @unpub_graded_discussion.workflow_state = 'unpublished'
@@ -126,7 +126,7 @@ describe "context modules" do
       expect(f('.points_possible_display')).to include_text "10 pts"
     end
 
-    it 'should add a graded published discussion to a module', priority: "1", test_id: 126715 do
+    it 'adds a graded published discussion to a module', priority: "1", test_id: 126715 do
       a = @course.assignments.create!(title: 'some assignment', points_possible: 10)
       @pub_graded_discussion = @course.discussion_topics.build(assignment: a, title: 'Graded Published Discussion')
       @pub_graded_discussion.save!
@@ -184,7 +184,7 @@ describe "context modules" do
       expect(f('.context_module_item')).not_to include_text(available_from.to_s)
     end
 
-    it 'should publish assignment on publish module', priority: "2", test_id: 126719 do
+    it 'publishes assignment on publish module', priority: "2", test_id: 126719 do
       @unpub_assignment = Assignment.create!(context: @course, title: 'some assignment in a module')
       @unpub_assignment.workflow_state = 'unpublished'
       @unpub_assignment.save!
@@ -339,14 +339,14 @@ describe "context modules" do
         expect(find_with_jquery('.module_dnd input[type="file"]')).to be nil
       end
 
-      it "should add multiple file items to a module" do
+      it "adds multiple file items to a module" do
         file_names = [FILE_NAME, "another.txt"]
         get "/courses/#{@course.id}/modules"
         add_existing_module_file_items('#attachments_select', file_names)
         file_names.each { |item_name| expect(fj(".context_module_item:contains(#{item_name.inspect})")).to be_displayed }
       end
 
-      it "should upload mutiple files to add items to a module" do
+      it "uploads mutiple files to add items to a module" do
         get "/courses/#{@course.id}/modules"
 
         filename, fullpath, _data = get_file("testfile1.txt")
@@ -357,7 +357,7 @@ describe "context modules" do
         expect(fj(".context_module_item:contains(#{filename})")).to be_displayed
       end
 
-      it "should replace an existing module item with a replacement uploaded file" do
+      it "replaces an existing module item with a replacement uploaded file" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
@@ -423,7 +423,7 @@ describe "context modules" do
         expect(f('body')).not_to contain_jqcss(".context_module_item:contains(#{filename}):visible")
       end
 
-      it "should not ask to rename upload after folder change" do
+      it "does not ask to rename upload after folder change" do
         filename, fullpath, _data = get_file("a_file.txt")
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
         file.context = @course
@@ -452,7 +452,7 @@ describe "context modules" do
         expect(ffj(".context_module_item:contains(#{filename})").length).to eq(1)
       end
 
-      it "should create a module item with a replacement uploaded file if in a different module" do
+      it "creates a module item with a replacement uploaded file if in a different module" do
         # create the existing module item
         filename, fullpath, _data = get_file("a_file.txt")
         file = @course.attachments.create!(:display_name => filename, :uploaded_data => fixture_file_upload("files/a_file.txt", "text/plain"))
@@ -467,7 +467,7 @@ describe "context modules" do
         expect(ffj(".context_module_item:contains(#{filename})").length).to eq(2)
       end
 
-      it 'should upload file via module drag and drop ' do
+      it 'uploads file via module drag and drop' do
         get "/courses/#{@course.id}/modules"
         wait_for_ajaximations
 
@@ -502,12 +502,12 @@ describe "context modules" do
       end
     end
 
-    it "should add a file item to a module", priority: "1", test_id: 126728 do
+    it "adds a file item to a module", priority: "1", test_id: 126728 do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
     end
 
-    it "should not remove the file link in a module when file is overwritten" do
+    it "does not remove the file link in a module when file is overwritten" do
       course_module
       @module.add_item({ :id => @file.id, :type => 'attachment' })
       get "/courses/#{@course.id}/modules"
@@ -521,7 +521,7 @@ describe "context modules" do
       expect(f('.context_module_item')).to include_text(FILE_NAME)
     end
 
-    it "should set usage rights on a file in a module", priority: "1", test_id: 369251 do
+    it "sets usage rights on a file in a module", priority: "1", test_id: 369251 do
       get "/courses/#{@course.id}/modules"
       add_existing_module_item('#attachments_select', 'File', FILE_NAME)
       ff('.icon-publish')[0].click
@@ -563,7 +563,7 @@ describe "context modules" do
   context "when a public course is accessed" do
     include_context "public course as a logged out user"
 
-    it "should display modules list", priority: "1", test_id: 269812 do
+    it "displays modules list", priority: "1", test_id: 269812 do
       @module = public_course.context_modules.create!(:name => "module 1")
       @assignment = public_course.assignments.create!(:name => 'assignment 1', :assignment_group => @assignment_group)
       @module.add_item :type => 'assignment', :id => @assignment.id

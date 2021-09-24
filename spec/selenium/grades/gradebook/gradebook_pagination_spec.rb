@@ -42,11 +42,11 @@ describe "Gradebook" do
     expect(f('.student-name')).to include_text "user #{n}"
   end
 
-  it "should work for 2 pages" do
+  it "works for 2 pages" do
     test_n_students @page_size + 1
   end
 
-  it "should work for >2 pages" do
+  it "works for >2 pages" do
     test_n_students @page_size * 2 + 1
   end
 end

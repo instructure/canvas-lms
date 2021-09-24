@@ -33,7 +33,7 @@ describe 'assignment_changed' do
 
   context ".email" do
     let(:path_type) { :email }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to match(/Quiz 1/)
       expect(msg.body).to match(/Quiz 1/)
@@ -45,7 +45,7 @@ describe 'assignment_changed' do
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body).to match(/Quiz 1/)
       expect(msg.body).to match(Regexp.new(@course.name))
@@ -54,7 +54,7 @@ describe 'assignment_changed' do
 
   context ".summary" do
     let(:path_type) { :summary }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to match(/Quiz 1/)
       expect(msg.subject).to match(Regexp.new(@course.name))

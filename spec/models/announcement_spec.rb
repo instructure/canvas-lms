@@ -23,13 +23,13 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require 'nokogiri'
 
 describe Announcement do
-  it "should create a new instance given valid attributes" do
+  it "creates a new instance given valid attributes" do
     @context = Course.create
     @context.announcements.create!(valid_announcement_attributes)
   end
 
   describe "locking" do
-    it "should lock if its course has the lock_all_announcements setting" do
+    it "locks if its course has the lock_all_announcements setting" do
       course_with_student(:active_all => true)
 
       @course.lock_all_announcements = true
@@ -43,7 +43,7 @@ describe Announcement do
       expect(announcement.grants_right?(@student, :reply)).to be_falsey
     end
 
-    it "should not lock if its course does not have the lock_all_announcements setting" do
+    it "does not lock if its course does not have the lock_all_announcements setting" do
       course_with_student(:active_all => true)
 
       announcement = @course.announcements.create!(valid_announcement_attributes)
@@ -52,7 +52,7 @@ describe Announcement do
       expect(announcement.grants_right?(@student, :reply)).to be_truthy
     end
 
-    it "should not automatically lock if it is a delayed post" do
+    it "does not automatically lock if it is a delayed post" do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
@@ -63,7 +63,7 @@ describe Announcement do
       expect(announcement).to be_post_delayed
     end
 
-    it "should create a single job for delayed posting even though we do a double-save" do
+    it "creates a single job for delayed posting even though we do a double-save" do
       course = Course.new
       course.lock_all_announcements = true
       course.save!
@@ -72,7 +72,7 @@ describe Announcement do
       }.to change(Delayed::Job, :count).by(1)
     end
 
-    it "should unlock the attachment when the job runs" do
+    it "unlocks the attachment when the job runs" do
       course_factory(:active_all => true)
       att = attachment_model(context: @course)
       announcement = @course.announcements.create!(valid_announcement_attributes
@@ -104,33 +104,33 @@ describe Announcement do
       student_in_section(@section, user: @student1)
     end
 
-    it "should be visible to students in specific section" do
+    it "is visible to students in specific section" do
       expect(@announcement.visible_for?(@student1)).to be_truthy
     end
 
-    it "should be visible to section-limited students in specific section" do
+    it "is visible to section-limited students in specific section" do
       @student1.enrollments.where(course_section_id: @section).update_all(limit_privileges_to_course_section: true)
       expect(@announcement.visible_for?(@student1)).to be_truthy
     end
 
-    it "should not be visible to students not in specific section" do
+    it "is not visible to students not in specific section" do
       expect(@announcement.visible_for?(@student2)).to be_falsey
     end
   end
 
   context "permissions" do
-    it "should not allow announcements on a course" do
+    it "does not allow announcements on a course" do
       course_with_student(:active_user => 1)
       expect(Announcement.context_allows_user_to_create?(@course, @user, {})).to be_falsey
     end
 
-    it "should not allow announcements creation by students on a group" do
+    it "does not allow announcements creation by students on a group" do
       course_with_student
       group_with_user(is_public: true, :active_user => 1, :context => @course)
       expect(Announcement.context_allows_user_to_create?(@group, @student, {})).to be_falsey
     end
 
-    it "should allow announcements creation by teacher on a group" do
+    it "allows announcements creation by teacher on a group" do
       course_with_teacher(:active_all => true)
       group_with_user(is_public: true, :active_user => 1, :context => @course)
       expect(Announcement.context_allows_user_to_create?(@group, @teacher, {})).to be_truthy
@@ -178,13 +178,13 @@ describe Announcement do
         announcement_model
       end
 
-      it "should sanitize message" do
+      it "sanitizes message" do
         @a.message = "<a href='#' onclick='alert(12);'>only this should stay</a>"
         @a.save!
         expect(@a.message).to eql("<a href=\"#\">only this should stay</a>")
       end
 
-      it "should sanitize objects in a message" do
+      it "sanitizes objects in a message" do
         @a.message = "<object data=\"http://www.youtuube.com/test\" othertag=\"bob\"></object>"
         @a.save!
         dom = Nokogiri(@a.message)
@@ -194,7 +194,7 @@ describe Announcement do
       end
     end
 
-    it "should broadcast to students and observers" do
+    it "broadcasts to students and observers" do
       course_with_student(:active_all => true)
       course_with_observer(:course => @course, :active_all => true)
 
@@ -217,7 +217,7 @@ describe Announcement do
       expect(@a.messages_sent["Announcement Created By You"].map(&:user)).to include(@teacher)
     end
 
-    it "should not broadcast if read_announcements is diabled" do
+    it "does not broadcast if read_announcements is diabled" do
       Account.default.role_overrides.create!(:role => student_role, :permission => 'read_announcements', :enabled => false)
       course_with_student(:active_all => true)
       notification_name = "New Announcement"
@@ -230,7 +230,7 @@ describe Announcement do
       expect(@a.messages_sent[notification_name]).to be_blank
     end
 
-    it "should not broadcast if student's section is soft-concluded" do
+    it "does not broadcast if student's section is soft-concluded" do
       course_with_student(:active_all => true)
       section2 = @course.course_sections.create!
       other_student = user_factory(:active_all => true)

@@ -29,7 +29,7 @@ describe AttachmentHelper do
     @att = attachment_model(:context => @user)
   end
 
-  it "should return a valid crocodoc session url" do
+  it "returns a valid crocodoc session url" do
     @current_user = @student
     allow(@att).to receive(:crocodoc_available?).and_return(true)
     attrs = doc_preview_attributes(@att)
@@ -38,7 +38,7 @@ describe AttachmentHelper do
     expect(attrs).to match /#{@att.id}/
   end
 
-  it "should return a valid canvadoc session url" do
+  it "returns a valid canvadoc session url" do
     @current_user = @student
     allow(@att).to receive(:canvadocable?).and_return(true)
     attrs = doc_preview_attributes(@att)
@@ -70,7 +70,7 @@ describe AttachmentHelper do
   end
 
   describe "set_cache_header" do
-    it "should not allow caching of instfs redirects" do
+    it "does not allow caching of instfs redirects" do
       allow(@att).to receive(:instfs_hosted?).and_return(true)
       expect(self).to receive(:cancel_cache_buster).never
       set_cache_header(@att, false)

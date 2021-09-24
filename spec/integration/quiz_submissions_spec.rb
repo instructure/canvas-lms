@@ -75,20 +75,20 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   describe "record_answer / backup" do
-    it "shouldn't allow overwriting answers for cant_go_back" do
+    it "does not allow overwriting answers for cant_go_back" do
       @quiz.update_attribute :cant_go_back, true
       record_answer_1
       backup_answer_1
       expect(@qs.reload.submission_data[:question_1]).to eq 'blah'
     end
 
-    it "should allow overwriting answers otherwise" do
+    it "allows overwriting answers otherwise" do
       record_answer_1
       backup_answer_1
       expect(@qs.reload.submission_data[:question_1]).to eq 'blah_overridden'
     end
 
-    it "should redirect back to take quiz if the user loses connection" do
+    it "redirects back to take quiz if the user loses connection" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/submissions/#{@qs.id}/record_answer",
           params: { :question_1 => 'blah', :last_question_id => 1, :validation_token => @qs.validation_token }
       expect(response).to be_redirect
@@ -122,7 +122,7 @@ describe Quizzes::QuizSubmissionsController do
     end
 
     context "with a symbol in an answer" do
-      it "should mark the answer as correct" do
+      it "marks the answer as correct" do
         record_answer_2
         submit_quiz
 

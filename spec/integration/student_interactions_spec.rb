@@ -58,14 +58,14 @@ describe "student interactions links" do
       user_session(@ta)
     end
 
-    it "should not show the student link on the student's page" do
+    it "does not show the student link on the student's page" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
       expect(response.body).not_to match(/Interactions Report/)
       expect(response.body).not_to match(/Student Interactions Report/)
     end
 
-    it "should not show the teacher link on the teacher's page" do
+    it "does not show the teacher link on the teacher's page" do
       get "/courses/#{@course.id}/users/#{@teacher.id}"
       expect(response).to be_successful
       expect(response.body).not_to match(/Student Interactions Report/)
@@ -77,27 +77,27 @@ describe "student interactions links" do
       user_session(@teacher)
     end
 
-    it "should only show the student link on the student's page" do
+    it "onlies show the student link on the student's page" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
       expect(response.body).to match(/Interactions Report/)
       expect(response.body).not_to match(/Student Interactions Report/)
     end
 
-    it "should show the teacher link on the teacher's page" do
+    it "shows the teacher link on the teacher's page" do
       get "/courses/#{@course.id}/users/#{@teacher.id}"
       expect(response).to be_successful
       expect(response.body).to match(/Student Interactions Report/)
     end
 
-    it "should show mail link for teachers" do
+    it "shows mail link for teachers" do
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
       expect(response).to be_successful
       html = Nokogiri::HTML5(response.body)
       expect(html.css('.message_student_link')).not_to be_nil
     end
 
-    it "should not show mail link for admins" do
+    it "does not show mail link for admins" do
       user_model
       Account.site_admin.account_users.create!(user: @user)
       user_session(@user)

@@ -39,7 +39,7 @@ describe 'simply_versioned' do
 
   describe "explicit versions" do
     let(:woozel) { Woozel.create!(:name => 'Eeyore') }
-    it "should create the first version on save" do
+    it "creates the first version on save" do
       woozel = Woozel.new(:name => 'Eeyore')
       expect(woozel).not_to be_versioned
       woozel.save!
@@ -48,7 +48,7 @@ describe 'simply_versioned' do
       expect(woozel.versions.current.model.name).to eql('Eeyore')
     end
 
-    it "should keep the last version up to date for each save" do
+    it "keeps the last version up to date for each save" do
       expect(woozel).to be_versioned
       expect(woozel.versions.length).to eql(1)
       expect(woozel.versions.current.model.name).to eql('Eeyore')
@@ -58,7 +58,7 @@ describe 'simply_versioned' do
       expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
-    it "should create a new version when asked to" do
+    it "creates a new version when asked to" do
       woozel.name = 'Piglet'
       woozel.with_versioning(:explicit => true, &:save!)
       expect(woozel.versions.length).to eql(2)
@@ -66,21 +66,21 @@ describe 'simply_versioned' do
       expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
-    it 'should not create a new version when not explicitly asked to' do
+    it 'does not create a new version when not explicitly asked to' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       expect(woozel.versions.length).to eql(1)
       expect(woozel.versions.current.model.name).to eql('Piglet')
     end
 
-    it 'should not update the last version when not versioning' do
+    it 'does not update the last version when not versioning' do
       woozel.name = 'Piglet'
       woozel.without_versioning(&:save!)
       expect(woozel.versions.length).to eql(1)
       expect(woozel.versions.current.model.name).to eql('Eeyore')
     end
 
-    it 'should not reload one versionable association from the database' do
+    it 'does not reload one versionable association from the database' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
@@ -89,7 +89,7 @@ describe 'simply_versioned' do
       expect(first.versionable).to eq woozel
     end
 
-    it 'should not reload any versionable associations from the database' do
+    it 'does not reload any versionable associations from the database' do
       woozel.name = 'Piglet'
       woozel.with_versioning(&:save!)
       expect(woozel.versions.loaded?).to eq false
@@ -104,7 +104,7 @@ describe 'simply_versioned' do
   describe "#model=" do
     let(:woozel) { Woozel.create!(:name => 'Eeyore') }
 
-    it "should assign the model for the version" do
+    it "assigns the model for the version" do
       expect(woozel.versions.length).to eql(1)
       expect(woozel.versions.current.model.name).to eql('Eeyore')
 
@@ -132,7 +132,7 @@ describe 'simply_versioned' do
       @woozel.with_versioning(explicit: true, &:save!)
     end
 
-    it "should always be true for models loaded directly from AR" do
+    it "alwayses be true for models loaded directly from AR" do
       expect(@woozel).to be_current_version
       @woozel = Woozel.find(@woozel.id)
       expect(@woozel).to be_current_version
@@ -141,7 +141,7 @@ describe 'simply_versioned' do
       expect(Woozel.new(name: 'test2')).to be_current_version
     end
 
-    it "should be false for the #model of any version" do
+    it "is false for the #model of any version" do
       expect(@woozel.versions.current.model).not_to be_current_version
       expect(@woozel.versions.map { |v| v.model.current_version? }).to eq [false, false]
     end
@@ -152,14 +152,14 @@ describe 'simply_versioned' do
       @woozel = Woozel.new name: 'test'
     end
 
-    it "should return nil when no current version is available" do
+    it "returns nil when no current version is available" do
       expect(@woozel.versions.current_version).to be_nil
 
       @woozel.with_versioning(explicit: true, &:save!)
       expect(@woozel.versions.current_version).not_to be_nil
     end
 
-    it "should return the latest version" do
+    it "returns the latest version" do
       @woozel.with_versioning(explicit: true, &:save!)
       @woozel.name = 'testier'
       @woozel.with_versioning(explicit: true, &:save!)
@@ -172,7 +172,7 @@ describe 'simply_versioned' do
       @woozel = Woozel.new name: 'test'
     end
 
-    it "should return nil when no previous version is available" do
+    it "returns nil when no previous version is available" do
       expect(@woozel.versions.previous_version).to be_nil
 
       @woozel.with_versioning(explicit: true, &:save!)
@@ -191,11 +191,11 @@ describe 'simply_versioned' do
         @woozel.with_versioning(explicit: true, &:save!)
       end
 
-      it "should return the previous version" do
+      it "returns the previous version" do
         expect(@woozel.versions.previous_version.model.name).to eq 'testier'
       end
 
-      it "should return the previous version for a specific number" do
+      it "returns the previous version for a specific number" do
         expect(@woozel.versions.previous_version(1)).to be_nil
         expect(@woozel.versions.previous_version(2).model.name).to eq 'test'
       end

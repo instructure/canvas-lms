@@ -34,7 +34,7 @@ describe "conversations new" do
       Account.default.set_feature_flag! :react_inbox, 'off'
     end
 
-    it "should have correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
+    it "has correct elements on the page when composing a new message", priority: "2", test_id: 86604 do
       skip_if_chrome('fragile in chrome')
       # For testing media comments button, we need to double Kaltura
       stub_kaltura
@@ -73,7 +73,7 @@ describe "conversations new" do
       expect(fj('.btn-primary.send-message:visible')).to be_displayed
     end
 
-    it "should not show an XSS alert when XSS script is typed into a new conversation's message subject and body", priority: "1", test_id: 201426 do
+    it "does not show an XSS alert when XSS script is typed into a new conversation's message subject and body", priority: "1", test_id: 201426 do
       skip_if_chrome('fragile in chrome')
       conversations
       script = "<IMG SRC=j&#X41vascript:alert('test2')> or <script>alert('xss');</script>"
@@ -92,7 +92,7 @@ describe "conversations new" do
         conversations
       end
 
-      it "should have a courses dropdown", priority: "1", test_id: 117960 do
+      it "has a courses dropdown", priority: "1", test_id: 117960 do
         f("[data-id = 'course-filter']").click
         wait_for_ajaximations
 
@@ -107,7 +107,7 @@ describe "conversations new" do
         expect(f('.dropdown-menu .inner [role="group"] .text')).to include_text(@course.name)
       end
 
-      it "should have a type dropdown", priority: "1", test_id: 446594 do
+      it "has a type dropdown", priority: "1", test_id: 446594 do
         element = view_filter
         element.click
         wait_for_ajaximations
@@ -125,7 +125,7 @@ describe "conversations new" do
         expect(options[5].text).to eq 'Submission Comments'
       end
 
-      it "should have action buttons", priority: "1", test_id: 446595 do
+      it "has action buttons", priority: "1", test_id: 446595 do
         expect(f('#conversation-actions #compose-btn')).to be
         expect(f('#conversation-actions #reply-btn')).to be
         expect(f('#conversation-actions #reply-all-btn')).to be
@@ -134,7 +134,7 @@ describe "conversations new" do
         expect(f('.inline-block')).to be
       end
 
-      it "should have a search box with address book", priority: "1", test_id: 446596 do
+      it "has a search box with address book", priority: "1", test_id: 446596 do
         # Click on the address book
         f('.recipient-finder .icon-address-book').click
         wait_for_ajaximations
@@ -149,7 +149,7 @@ describe "conversations new" do
         end
       end
 
-      it "should display a no messages image", priority: "1", test_id: 456175 do
+      it "displays a no messages image", priority: "1", test_id: 456175 do
         # Verify Text and Icon Class
         expect(f('.no-messages')).to include_text('No Conversations Selected')
         expect(f('.no-messages .icon-email')).to be
@@ -163,7 +163,7 @@ describe "conversations new" do
         @convo.update_attribute(:subject, 'test')
       end
 
-      it "should display relevant information for messages", priority: "1", test_id: 86605 do
+      it "displays relevant information for messages", priority: "1", test_id: 86605 do
         # Normalizes time zone to be safe, in case user object and browser are not matching. Must do this
         # before page renders
         @teacher.time_zone = 'America/Juneau'
@@ -184,7 +184,7 @@ describe "conversations new" do
         expect(Time.zone.parse(rendered_time).to_i).to match(@participant.last_message_at.to_i)
       end
 
-      it "should forward messages", priority: "1", test_id: 86608 do
+      it "forwards messages", priority: "1", test_id: 86608 do
         conversations
         message_count = @convo.conversation_messages.length
         click_message(0)
@@ -205,7 +205,7 @@ describe "conversations new" do
         expect(ffj('.message-item-view').length).to eq message_count + 1
       end
 
-      it "should display message count", priority: "1", test_id: 138897 do
+      it "displays message count", priority: "1", test_id: 138897 do
         conversations
         expect(f('.message-count')).to include_text('1')
 
@@ -218,7 +218,7 @@ describe "conversations new" do
         expect(f('.message-count')).to include_text('3')
       end
 
-      it "should show starred messages in the starred filter", priority: "1", test_id: 138896 do
+      it "shows starred messages in the starred filter", priority: "1", test_id: 138896 do
         conversations
         unstarred_elt = conversation_elements.first
 
@@ -230,7 +230,7 @@ describe "conversations new" do
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should show a flash message when deleting a message via Trash Button", priority: "1", test_id: 201492 do
+      it "shows a flash message when deleting a message via Trash Button", priority: "1", test_id: 201492 do
         skip_if_safari(:alert)
         conversations
 
@@ -241,7 +241,7 @@ describe "conversations new" do
         expect_flash_message :success, "Message Deleted!"
       end
 
-      it "should show a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
+      it "shows a flash message when deleting a message via cog dropdown", priority: "1", test_id: 201493 do
         skip_if_safari(:alert)
         conversations
 
@@ -253,7 +253,7 @@ describe "conversations new" do
         expect_flash_message :success, "Message Deleted!"
       end
 
-      it "should archive a message via the admin archive button", priority: "1", test_id: 201494 do
+      it "archives a message via the admin archive button", priority: "1", test_id: 201494 do
         skip_if_safari(:alert)
         conversations
 
@@ -265,7 +265,7 @@ describe "conversations new" do
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should archive a message via the cog dropdown", priority: "1", test_id: 201495 do
+      it "archives a message via the cog dropdown", priority: "1", test_id: 201495 do
         skip_if_safari(:alert)
         conversations
 
@@ -279,7 +279,7 @@ describe "conversations new" do
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should not be able to archive a sent message via the admin archive button" do
+      it "is not able to archive a sent message via the admin archive button" do
         conversations
 
         select_view('sent')
@@ -287,7 +287,7 @@ describe "conversations new" do
         expect(f('#archive-btn')).to be_disabled
       end
 
-      it "should not be able to archive a sent message via the cog dropdown" do
+      it "is not able to archive a sent message via the cog dropdown" do
         conversations
 
         select_view('sent')
@@ -306,7 +306,7 @@ describe "conversations new" do
           click_message(0)
         end
 
-        it "should unarchive a message via the admin unarchive button", priority: "1", test_id: 201496 do
+        it "unarchives a message via the admin unarchive button", priority: "1", test_id: 201496 do
           skip_if_safari(:alert)
           click_archive_button
           # Unarchiving messages requires jobs to run to complete
@@ -315,7 +315,7 @@ describe "conversations new" do
           expect(conversation_elements.size).to eq 1
         end
 
-        it "should unarchive a message via the cog dropdown", priority: "1", test_id: 201497 do
+        it "unarchives a message via the cog dropdown", priority: "1", test_id: 201497 do
           skip_if_safari(:alert)
           # Clicks the title-level more options gear menu
           click_more_options(convo: true)
@@ -326,7 +326,7 @@ describe "conversations new" do
           expect(conversation_elements.size).to eq 1
         end
 
-        it "should unarchive multiple messages via the admin unarchive button", priority: "1", test_id: 201498 do
+        it "unarchives multiple messages via the admin unarchive button", priority: "1", test_id: 201498 do
           # Selects both messages using the shift key. First was selected in before loop
           driver.action.key_down(:shift).perform
           click_message(1)
@@ -349,47 +349,47 @@ describe "conversations new" do
         conversation(@teacher, @s[0], @s[1], workflow_state: 'archived', starred: true)
       end
 
-      it "should default to inbox view", priority: "1", test_id: 86601 do
+      it "defaults to inbox view", priority: "1", test_id: 86601 do
         conversations
         expect(selected_view_filter).to eq 'inbox'
         expect(conversation_elements.size).to eq 2
       end
 
-      it "should have an unread view", priority: "1", test_id: 197523 do
+      it "has an unread view", priority: "1", test_id: 197523 do
         conversations
         select_view('unread')
         expect(selected_view_filter).to eq 'unread'
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should have an starred view", priority: "1", test_id: 197524 do
+      it "has an starred view", priority: "1", test_id: 197524 do
         conversations
         select_view('starred')
         expect(selected_view_filter).to eq 'starred'
         expect(conversation_elements.size).to eq 2
       end
 
-      it "should have an sent view", priority: "1", test_id: 197525 do
+      it "has an sent view", priority: "1", test_id: 197525 do
         conversations
         select_view('sent')
         expect(selected_view_filter).to eq 'sent'
         expect(conversation_elements.size).to eq 3
       end
 
-      it "should have an archived view", priority: "1", test_id: 197526 do
+      it "has an archived view", priority: "1", test_id: 197526 do
         conversations
         select_view('archived')
         expect(selected_view_filter).to eq 'archived'
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should default to all courses context", priority: "1", test_id: 197527 do
+      it "defaults to all courses context", priority: "1", test_id: 197527 do
         conversations
         expect(bootstrap_select_value(course_filter)).to eq ''
         expect(conversation_elements.size).to eq 2
       end
 
-      it "should truncate long course names", priority: "2", test_id: 197528 do
+      it "truncates long course names", priority: "2", test_id: 197528 do
         @course.name = "this is a very long course name that will be truncated"
         @course.save!
         conversations
@@ -400,20 +400,20 @@ describe "conversations new" do
         expect(button_text[-5..-1]).to eq @course.name[-5..-1]
       end
 
-      it "should filter by course", priority: "1", test_id: 197529 do
+      it "filters by course", priority: "1", test_id: 197529 do
         conversations
         select_course(@course.id)
         expect(conversation_elements.size).to eq 2
       end
 
-      it "should filter by course plus view", priority: "1", test_id: 197530 do
+      it "filters by course plus view", priority: "1", test_id: 197530 do
         conversations
         select_course(@course.id)
         select_view('unread')
         expect(conversation_elements.size).to eq 1
       end
 
-      it "should hide the spinner after deleting the last conversation", priority: "1", test_id: 207164 do
+      it "hides the spinner after deleting the last conversation", priority: "1", test_id: 207164 do
         skip_if_safari(:alert)
         conversations
         select_view('archived')
@@ -436,7 +436,7 @@ describe "conversations new" do
         @conv_starred.save!
       end
 
-      it "should star via star icon", priority: "1", test_id: 197532 do
+      it "stars via star icon", priority: "1", test_id: 197532 do
         conversations
         unstarred_elt = conversation_elements[1]
         # make star button visible via mouse over
@@ -451,7 +451,7 @@ describe "conversations new" do
         expect(@conv_unstarred.reload.starred).to be_truthy
       end
 
-      it "should unstar via star icon", priority: "1", test_id: 197533 do
+      it "unstars via star icon", priority: "1", test_id: 197533 do
         conversations
         starred_elt = conversation_elements[0]
         star_btn = f('.star-btn', starred_elt)
@@ -464,7 +464,7 @@ describe "conversations new" do
         expect(@conv_starred.reload.starred).to be_falsey
       end
 
-      it "should star via gear menu", priority: "1", test_id: 197534 do
+      it "stars via gear menu", priority: "1", test_id: 197534 do
         conversations
         unstarred_elt = conversation_elements[1]
         unstarred_elt.click
@@ -476,7 +476,7 @@ describe "conversations new" do
         expect(@conv_unstarred.reload.starred).to be_truthy
       end
 
-      it "should unstar via gear menu", priority: "1", test_id: 197535 do
+      it "unstars via gear menu", priority: "1", test_id: 197535 do
         conversations
         starred_elt = conversation_elements[0]
         starred_elt.click

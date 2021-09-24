@@ -130,7 +130,7 @@ describe "ActsAsUrl" do
     expect('stable-as-stone').to eq @blank.url
   end
 
-  it "should override only_when_blank only for instance (not class level)" do
+  it "overrides only_when_blank only for instance (not class level)" do
     @blank = Blankument.new(:title => "something Something", :url => @original_url)
     @original_url = 'the-url-of-concrete'
     @blank.only_when_blank = false

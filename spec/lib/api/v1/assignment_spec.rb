@@ -510,7 +510,7 @@ describe "Api::V1::Assignment" do
     end
 
     context 'when the assignment does not have student submissions' do
-      it 'should allow updating the submission_types field' do
+      it 'allows updating the submission_types field' do
         expect(assignment.submissions.having_submission.count).to eq 0
         expect(assignment.submission_types).to eq 'none'
 
@@ -526,7 +526,7 @@ describe "Api::V1::Assignment" do
         assignment.submit_homework(student, :body => "my homework")
       end
 
-      it 'should allow updating the submission_types field' do
+      it 'allows updating the submission_types field' do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
@@ -549,7 +549,7 @@ describe "Api::V1::Assignment" do
         )
       end
 
-      it 'should allow updating the submission entry options' do
+      it 'allows updating the submission entry options' do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
@@ -565,7 +565,7 @@ describe "Api::V1::Assignment" do
         assignment.submit_homework(student, :body => "my homework")
       end
 
-      it 'should not allow updating the submission_types field' do
+      it 'does not allow updating the submission_types field' do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)
@@ -574,7 +574,7 @@ describe "Api::V1::Assignment" do
         expect(assignment.submission_types).to eq 'online_quiz'
       end
 
-      it 'should allow updating other fields' do
+      it 'allows updating other fields' do
         expect(assignment.submissions.having_submission.count).to eq 1
 
         response = api.update_api_assignment(assignment, assignment_update_params, user)

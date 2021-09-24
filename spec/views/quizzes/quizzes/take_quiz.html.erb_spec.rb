@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe '/quizzes/quizzes/take_quiz' do
-  it 'should render' do
+  it 'renders' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))
@@ -38,7 +38,7 @@ describe '/quizzes/quizzes/take_quiz' do
     expect(response).not_to be_nil
   end
 
-  it 'should render preview alert for unpublished quiz' do
+  it 'renders preview alert for unpublished quiz' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!)
@@ -54,7 +54,7 @@ describe '/quizzes/quizzes/take_quiz' do
     expect(response).to include 'preview of the draft version'
   end
 
-  it 'should render preview alert for published quiz' do
+  it 'renders preview alert for published quiz' do
     course_with_student
     view_context
     quiz = @course.quizzes.create!
@@ -72,7 +72,7 @@ describe '/quizzes/quizzes/take_quiz' do
     expect(response).to include 'preview of the published version'
   end
 
-  it 'should render timer_autosubmit_disabled value in template' do
+  it 'renders timer_autosubmit_disabled value in template' do
     course_with_student
     view_context
     quiz = assign(:quiz, @course.quizzes.create!(description: 'Hello'))

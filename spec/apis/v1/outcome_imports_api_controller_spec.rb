@@ -37,7 +37,7 @@ describe OutcomeImportsApiController, type: :request do
     json
   end
 
-  it "should return 404 when no latest import is available" do
+  it "returns 404 when no latest import is available" do
     raw_api_call(:get,
                  "/api/v1/accounts/#{@account.id}/outcome_imports/latest",
                  { :controller => 'outcome_imports_api', :action => 'show',
@@ -45,7 +45,7 @@ describe OutcomeImportsApiController, type: :request do
     assert_status(404)
   end
 
-  it 'should kick off an outcome import via multipart attachment' do
+  it 'kicks off an outcome import via multipart attachment' do
     json = nil
     strand = "OutcomeImport::run::#{@account.root_account.global_id}"
     expect do
@@ -89,7 +89,7 @@ describe OutcomeImportsApiController, type: :request do
                                  })
   end
 
-  it "should allow raw post without content-type" do
+  it "allows raw post without content-type" do
     # In the current API docs, we specify that you need to send a content-type to make raw
     # post work. However, long ago we added code to make it work even without the header,
     # so we are going to maintain that behavior.
@@ -101,7 +101,7 @@ describe OutcomeImportsApiController, type: :request do
     expect(import.attachment.size).to eq 7
   end
 
-  it "should allow raw post without charset" do
+  it "allows raw post without charset" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
              { :controller => 'outcome_imports_api', :action => 'create',
@@ -114,7 +114,7 @@ describe OutcomeImportsApiController, type: :request do
     expect(import.attachment.content_type).to eq "text/csv"
   end
 
-  it "should handle raw post content-types with attributes" do
+  it "handles raw post content-types with attributes" do
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
              { :controller => 'outcome_imports_api', :action => 'create',
@@ -127,7 +127,7 @@ describe OutcomeImportsApiController, type: :request do
     expect(import.attachment.content_type).to eq "text/csv"
   end
 
-  it "should reject non-utf-8 encodings on content-type" do
+  it "rejects non-utf-8 encodings on content-type" do
     raw_api_call(:post,
                  "/api/v1/accounts/#{@account.id}/outcome_imports?import_type=instructure_csv",
                  { :controller => 'outcome_imports_api', :action => 'create',
@@ -139,7 +139,7 @@ describe OutcomeImportsApiController, type: :request do
     expect(OutcomeImport.count).to eq 0
   end
 
-  it "should error on user with no outcomes permissions" do
+  it "errors on user with no outcomes permissions" do
     account_admin_user_with_role_changes(account: @account, role_changes: { manage_outcomes: true, import_outcomes: false })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
@@ -151,7 +151,7 @@ describe OutcomeImportsApiController, type: :request do
              expected_status: 401)
   end
 
-  it "should work with import permissions" do
+  it "works with import permissions" do
     account_admin_user_with_role_changes(user: @user, role_changes: { manage_outcomes: false, import_outcomes: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/outcome_imports",
@@ -163,7 +163,7 @@ describe OutcomeImportsApiController, type: :request do
              expected_status: 200)
   end
 
-  it "should include processing_errors when there are errors" do
+  it "includes processing_errors when there are errors" do
     import = @account.outcome_imports.create!
     3.times do |i|
       import.outcome_import_errors.create(message: "some error #{i}")

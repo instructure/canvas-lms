@@ -40,14 +40,14 @@ describe AssessmentQuestionBank do
       Timecop.return
     end
 
-    it "should return the desired count of questions" do
+    it "returns the desired count of questions" do
       expect(@bank.select_for_submission(@quiz.id, nil, 0).length).to eq 0
       expect(@bank.select_for_submission(@quiz.id, nil, 2).length).to eq 2
       expect(@bank.select_for_submission(@quiz.id, nil, 4).length).to eq 4
       expect(@bank.select_for_submission(@quiz.id, nil, 11).length).to eq 10
     end
 
-    it "should exclude specified questions" do
+    it "excludes specified questions" do
       selected_ids = @bank.select_for_submission(@quiz.id, nil, 10, [@q1.id, @q10.id]).map(&:assessment_question_id)
 
       expect(selected_ids.include?(@q1.id)).to be_falsey
@@ -56,7 +56,7 @@ describe AssessmentQuestionBank do
       expect(selected_ids.include?(@q9.id)).to be_truthy
     end
 
-    it "should return the questions in a random order" do
+    it "returns the questions in a random order" do
       original = [@q1.id, @q2.id, @q3.id, @q4.id, @q5.id, @q6.id, @q7.id, @q8.id, @q9.id, @q10.id]
 
       selected1 = @bank.select_for_submission(@quiz.id, nil, 10).map(&:id)
@@ -70,7 +70,7 @@ describe AssessmentQuestionBank do
       expect(is_shuffled1 || is_shuffled2).to be_truthy
     end
 
-    it "should pick randomly quiz group questions in the db" do
+    it "picks randomly quiz group questions in the db" do
       aq_ids = []
       20.times do
         aq_ids << @bank.select_for_submission(@quiz.id, nil, 1).first.assessment_question_id
@@ -89,14 +89,14 @@ describe AssessmentQuestionBank do
     end
   end
 
-  it "should allow user read access through question bank users" do
+  it "allows user read access through question bank users" do
     user_factory
     @bank.assessment_question_bank_users.create!(:user => user_factory)
     expect(@course.grants_right?(@user, :manage_assignments)).to be_falsey
     expect(@bank.grants_right?(@user, :read)).to be_truthy
   end
 
-  it "should remove outcome alignments when deleted" do
+  it "removes outcome alignments when deleted" do
     outcome_model(:context => @course)
     @bank.alignments = { @outcome.id => 0.5 }
 

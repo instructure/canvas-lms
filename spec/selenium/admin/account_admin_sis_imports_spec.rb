@@ -28,7 +28,7 @@ describe "sis imports ui" do
     user_session(@admin)
   end
 
-  it 'should properly show sis stickiness options' do
+  it 'properlies show sis stickiness options' do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"
@@ -128,7 +128,7 @@ describe "sis imports ui" do
     expect(is_checked('#override_sis_stickiness')).to be_falsey
   end
 
-  it 'should pass options along to the batch' do
+  it 'passes options along to the batch' do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"

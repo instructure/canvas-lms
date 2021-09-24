@@ -128,23 +128,23 @@ describe "people" do
       user_session @teacher
     end
 
-    it "should have tabs" do
+    it "has tabs" do
       get "/courses/#{@course.id}/users"
       expect(f('.collectionViewItems>li:first-child').text).to match "Everyone"
     end
 
-    it "should display a dropdown menu when item cog is clicked" do
+    it "displays a dropdown menu when item cog is clicked" do
       get "/courses/#{@course.id}/users"
       open_dropdown_menu
     end
 
-    it "should display the option to remove a student from a course if manually enrolled" do
+    it "displays the option to remove a student from a course if manually enrolled" do
       get "/courses/#{@course.id}/users"
       open_dropdown_menu("tr[id=user_#{@student_1.id}]")
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_1.id}]")).to be true
     end
 
-    it "should display the option to remove a student from a course has a SIS ID", priority: "1", test_id: 336018 do
+    it "displays the option to remove a student from a course has a SIS ID", priority: "1", test_id: 336018 do
       @course.sis_source_id = 'xyz'
       @course.save
       enroll_student(@student_2)
@@ -160,7 +160,7 @@ describe "people" do
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_2.id}]")).to be true
     end
 
-    it "should display remove option for student with/without SIS id", priority: "1", test_id: 332576 do
+    it "displays remove option for student with/without SIS id", priority: "1", test_id: 332576 do
       enroll_student(@student_2)
       @student = user_with_managed_pseudonym
       @course.enroll_student(@student)
@@ -175,26 +175,26 @@ describe "people" do
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@student_2.id}]")).to be true
     end
 
-    it "should display the option to remove a ta from the course" do
+    it "displays the option to remove a ta from the course" do
       get "/courses/#{@course.id}/users"
       open_dropdown_menu("tr[id=user_#{@test_ta.id}]")
       expect(dropdown_item_visible?('removeFromCourse', "tr[id=user_#{@test_ta.id}]")).to be true
     end
 
-    it "should display activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
+    it "displays activity report on clicking Student Interaction button", priority: "1", test_id: 244446 do
       get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       fln("Student Interactions Report").click
       expect(f("h1").text).to eq "Teacher Activity Report for #{@user.name}"
     end
 
-    it "should not display Student Interaction button for a student", priority: "1", test_id: 244450 do
+    it "does not display Student Interaction button for a student", priority: "1", test_id: 244450 do
       user_session(@student_1)
       get "/courses/#{@course.id}/users"
       expect(f("#content")).not_to contain_link("Student Interactions Report")
     end
 
-    it "should focus on the + Group Set button after the tabs" do
+    it "focuses on the + Group Set button after the tabs" do
       get "/courses/#{@course.id}/users"
       driver.execute_script("$('.collectionViewItems > li:last a').focus()")
       active = driver.execute_script("return document.activeElement")
@@ -202,14 +202,14 @@ describe "people" do
       check_element_has_focus(f('.group-categories-actions .btn-primary'))
     end
 
-    it "should validate the main page" do
+    it "validates the main page" do
       get "/courses/#{@course.id}/users"
       users = ff('.roster_user_name')
       expect(users[1].text).to match @student_1.name
       expect(users[0].text).to match @teacher.name
     end
 
-    it "should navigate to registered services on profile page" do
+    it "navigates to registered services on profile page" do
       get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       fln('View Registered Services').click
@@ -217,12 +217,12 @@ describe "people" do
       expect(f('#unregistered_services')).to be_displayed
     end
 
-    it "should make a new set of student groups" do
+    it "makes a new set of student groups" do
       get "/courses/#{@course.id}/users"
       create_student_group
     end
 
-    it "should test self sign up functionality" do
+    it "tests self sign up functionality" do
       get "/courses/#{@course.id}/users"
       f("#people-options .Button").click
       expect_new_page_load { fln('View User Groups').click }
@@ -232,7 +232,7 @@ describe "people" do
       expect(dialog).to include_text("groups now")
     end
 
-    it "should test self sign up / group structure functionality" do
+    it "tests self sign up / group structure functionality" do
       get "/courses/#{@course.id}/users"
       group_count = "4"
       expect_new_page_load do
@@ -249,7 +249,7 @@ describe "people" do
       expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
     end
 
-    it "should test group structure functionality" do
+    it "tests group structure functionality" do
       get "/courses/#{@course.id}/users"
       enroll_more_students
 
@@ -271,7 +271,7 @@ describe "people" do
       expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
     end
 
-    it "should auto-create groups based on # of students" do
+    it "auto-creates groups based on # of students" do
       enroll_more_students
       get "/courses/#{@course.id}/groups#new"
       f("#new_category_name").send_keys("Groups of 2")
@@ -286,7 +286,7 @@ describe "people" do
       expect(ff("li.group").size).to eq 3
     end
 
-    it "should edit a student group" do
+    it "edits a student group" do
       get "/courses/#{@course.id}/users"
       new_group_name = "new group edit name"
       create_student_group
@@ -299,7 +299,7 @@ describe "people" do
       expect(f(".collectionViewItems")).to include_text(new_group_name)
     end
 
-    it "should delete a student group" do
+    it "deletes a student group" do
       group_category = GroupCategory.create(:name => "new student group", :context => @course)
 
       get "/courses/#{@course.id}/groups#tab-#{group_category.id}"
@@ -310,7 +310,7 @@ describe "people" do
       expect(f('.empty-groupset-instructions')).to be_displayed
     end
 
-    it "should test prior enrollment functionality" do
+    it "tests prior enrollment functionality" do
       @course.complete
       get "/courses/#{@course.id}/users"
       expect_new_page_load do
@@ -320,7 +320,7 @@ describe "people" do
       expect(f('#users')).to include_text(@student_1.name)
     end
 
-    it "should deal with observers linked to multiple students" do
+    it "deals with observers linked to multiple students" do
       @students = []
       @obs = user_model(:name => "The Observer")
       2.times do |i|
@@ -382,7 +382,7 @@ describe "people" do
       user_session @ta
     end
 
-    it "should validate that the TA cannot delete / conclude or reset course" do
+    it "validates that the TA cannot delete / conclude or reset course" do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       get "/courses/#{@course.id}/settings"
       expect(f("#content")).not_to contain_css('.delete_course_link')
@@ -391,7 +391,7 @@ describe "people" do
       expect(f('#unauthorized_message')).to include_text('Access Denied')
     end
 
-    it "should validate that the TA cannot delete or reset course (granular permissions)" do
+    it "validates that the TA cannot delete or reset course (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       get "/courses/#{@course.id}/settings"
       expect(f("#content")).not_to contain_css('.delete_course_link')
@@ -466,7 +466,7 @@ describe "people" do
       user_session @student
     end
 
-    it "should not link avatars to a user's profile page if profiles are disabled" do
+    it "does not link avatars to a user's profile page if profiles are disabled" do
       @course.account.settings[:enable_profiles] = false
       @course.account.enable_service(:avatars)
       @course.account.save!
@@ -485,7 +485,7 @@ describe "people" do
       user_session @teacher
     end
 
-    it "should save add people form data" do
+    it "saves add people form data" do
       get "/courses/#{@course.id}/users"
 
       f('#addUsers').click
@@ -509,7 +509,7 @@ describe "people" do
       expect(f('#peoplesearch_select_section').attribute('value')).to eq 'Unnamed Course'
     end
 
-    it "should add a student to a section", priority: "1", test_id: 296460 do
+    it "adds a student to a section", priority: "1", test_id: 296460 do
       student = create_user("student@example.com")
       enroll_student(student)
       get "/courses/#{@course.id}/users"
@@ -525,7 +525,7 @@ describe "people" do
       expect(ff(".StudentEnrollment")[0]).to include_text("section2")
     end
 
-    it "should remove a student from a section", priority: "1", test_id: 296461 do
+    it "removes a student from a section", priority: "1", test_id: 296461 do
       @student = user_factory
       @course.enroll_student(@student, allow_multiple_enrollments: true)
       @course.enroll_student(@student, section: @section2, allow_multiple_enrollments: true)
@@ -538,7 +538,7 @@ describe "people" do
       expect(ff(".StudentEnrollment")[0]).not_to include_text("section2")
     end
 
-    it "should edit a designer's sections" do
+    it "edits a designer's sections" do
       designer = create_user("student@example.com")
       @course.enroll_designer(designer, :enrollment_state => "active")
       get "/courses/#{@course.id}/users"
@@ -570,7 +570,7 @@ describe "people" do
       expect(@observer.enrollments.not_deleted.map(&:associated_user_id)).to include @student2.id
     end
 
-    it "should gray out sections the user doesn't have permission to remove" do
+    it "grays out sections the user doesn't have permission to remove" do
       @student = user_with_managed_pseudonym
       e = @course.enroll_student(@student, allow_multiple_enrollments: true)
       sis = @course.root_account.sis_batches.create
@@ -598,7 +598,7 @@ describe "people" do
     end
   end
 
-  it "should get the max total activity time" do
+  it "gets the max total activity time" do
     course_with_admin_logged_in
     sec1 = @course.course_sections.create!(name: "section1")
     sec2 = @course.course_sections.create!(name: "section2")
@@ -611,7 +611,7 @@ describe "people" do
     expect(f("#user_#{@student.id} td:nth-child(8)").text.strip).to eq "15:00"
   end
 
-  it "should filter by role ids" do
+  it "filters by role ids" do
     account_model
     course_with_teacher_logged_in(:account => @account)
     old_role = custom_student_role("Role")
@@ -643,7 +643,7 @@ describe "people" do
       admin_logged_in
     end
 
-    it "should let observers have their roles changed if they don't have associated users" do
+    it "lets observers have their roles changed if they don't have associated users" do
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true)
 
       get "/courses/#{@course.id}/users"
@@ -652,7 +652,7 @@ describe "people" do
       expect_dropdown_item('editRoles', "#user_#{@teacher.id}")
     end
 
-    it "should not let observers with associated users have their roles changed" do
+    it "does not let observers with associated users have their roles changed" do
       student = user_factory
       @course.enroll_student(student)
       @course.enroll_user(@teacher, "ObserverEnrollment", :allow_multiple_enrollments => true, :associated_user_id => student.id)
@@ -668,7 +668,7 @@ describe "people" do
       f("#user_#{user.id} .admin-links a[data-event='editRoles']").click
     end
 
-    it "should let users change to an observer role" do
+    it "lets users change to an observer role" do
       get "/courses/#{@course.id}/users"
 
       open_role_dialog(@teacher)
@@ -678,7 +678,7 @@ describe "people" do
       expect(f("#edit_roles #role_id option[value='#{observer_role.id}']")).to be_present
     end
 
-    it "should not let users change to a type they don't have permission to manage" do
+    it "does not let users change to a type they don't have permission to manage" do
       @course.root_account.role_overrides.create!(:role => admin_role, :permission => 'manage_students', :enabled => false)
 
       get "/courses/#{@course.id}/users"
@@ -688,7 +688,7 @@ describe "people" do
       expect(f("#content")).not_to contain_css("#edit_roles #role_id option[value='#{student_role.id}']")
     end
 
-    it "should retain the same enrollment state" do
+    it "retains the same enrollment state" do
       role_name = 'Custom Teacher'
       role = @course.account.roles.create(:name => role_name)
       role.base_role_type = 'TeacherEnrollment'
@@ -712,7 +712,7 @@ describe "people" do
       expect(new_enrollment.workflow_state).to eq "inactive"
     end
 
-    it "should work with enrollments in different sections" do
+    it "works with enrollments in different sections" do
       enrollment2 = @course.enroll_user(@teacher, "TeacherEnrollment", :allow_multiple_enrollments => true, :section => @section)
 
       get "/courses/#{@course.id}/users"
@@ -732,7 +732,7 @@ describe "people" do
       expect(new_enrollment2.role).to eq ta_role
     end
 
-    it "should work with preexiting enrollments in the destination role" do
+    it "works with preexiting enrollments in the destination role" do
       # should not try to overwrite this one
       enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
 
@@ -748,7 +748,7 @@ describe "people" do
       expect(enrollment2.reload).to_not be_deleted
     end
 
-    it "should work with multiple enrollments in one section" do
+    it "works with multiple enrollments in one section" do
       # shouldn't conflict with each other - should only add one enrollment for the new role
       enrollment2 = @course.enroll_user(@teacher, "TaEnrollment", :allow_multiple_enrollments => true)
 
@@ -768,7 +768,7 @@ describe "people" do
       expect(new_enrollment.role).to eq student_role
     end
 
-    it "should not show the option to edit roles for a soft-concluded course" do
+    it "does not show the option to edit roles for a soft-concluded course" do
       @course.conclude_at = 2.days.ago
       @course.restrict_enrollments_to_course_dates = true
       @course.save!
@@ -778,7 +778,7 @@ describe "people" do
       expect_no_dropdown_item('editRoles', "#user_#{@teacher.id}")
     end
 
-    it "should not show the option to edit roles for a SIS imported enrollment" do
+    it "does not show the option to edit roles for a SIS imported enrollment" do
       sis = @course.root_account.sis_batches.create
       student = user_with_pseudonym(:active_all => true)
       enrollment = @course.enroll_teacher(student)
@@ -792,7 +792,7 @@ describe "people" do
       expect_no_dropdown_item('editRoles', "#user_#{student.id}")
     end
 
-    it "should redirect to groups page " do
+    it "redirects to groups page" do
       user_session(@teacher)
 
       get "/courses/#{@course.id}/users"
@@ -818,7 +818,7 @@ describe "people" do
         expect(f('.StudentContextTray-Header')).to contain_css('i.icon-email')
       end
 
-      it "should not display the message button if the student enrollment is inactive" do
+      it "does not display the message button if the student enrollment is inactive" do
         @enrollment.deactivate
         get("/courses/#{@course.id}/users")
         f("a[data-student_id='#{@student.id}']").click
@@ -836,7 +836,7 @@ describe "people" do
           @tool.save!
         end
 
-        it "should show a link to the tool" do
+        it "shows a link to the tool" do
           get("/courses/#{@course.id}/users")
           f("a[data-student_id='#{@student.id}']").click
 
@@ -845,7 +845,7 @@ describe "people" do
           expect(link['href']).to eq course_external_tool_url(@course, @tool) + "?launch_type=student_context_card&student_id=#{@student.id}"
         end
 
-        it "should not show link if the user doesn't have the permissions specified by the tool" do
+        it "does not show link if the user doesn't have the permissions specified by the tool" do
           @course.account.role_overrides.create!(:permission => "manage_grades", :role => admin_role, :enabled => false)
           get("/courses/#{@course.id}/users")
           f("a[data-student_id='#{@student.id}']").click
@@ -857,7 +857,7 @@ describe "people" do
     end
   end
 
-  it "should not show unenroll link to admins without permissions" do
+  it "does not show unenroll link to admins without permissions" do
     account_admin_user(:active_all => true)
     user_session(@admin)
 

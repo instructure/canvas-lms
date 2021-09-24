@@ -65,7 +65,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     stats.reload_csv_attachment.open.read
   end
 
-  it 'should calculate mean/stddev as expected with no submissions' do
+  it 'calculates mean/stddev as expected with no submissions' do
     q = @course.quizzes.create!
     stats = q.statistics
     expect(stats[:submission_score_average]).to be_nil
@@ -74,7 +74,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_score_stdev]).to be_nil
   end
 
-  it 'should calculate mean/stddev as expected with a few submissions' do
+  it 'calculates mean/stddev as expected with a few submissions' do
     q = @course.quizzes.create!
     question = q.quiz_questions.create!({
                                           question_data: {
@@ -129,7 +129,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1, 67 => 1 })
   end
 
-  it 'should create quiz statistics with essay questions and anonymous submissions' do
+  it 'creates quiz statistics with essay questions and anonymous submissions' do
     @user1 = User.create! :name => "some_user 1"
     student_in_course :course => @course, :user => @user1
     quiz = @course.quizzes.create!
@@ -148,7 +148,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     end.to_not raise_error
   end
 
-  it 'should create quiz statistics with logged out users' do
+  it 'creates quiz statistics with logged out users' do
     survey_with_logged_out_submission
     expect do
       @quiz.quiz_statistics.build(report_type: 'student_analysis',
@@ -167,7 +167,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       @quiz.save!
     end
 
-    it 'should not include user data for anonymous surveys' do
+    it 'does not include user data for anonymous surveys' do
       @quiz.update_attribute :anonymous_submissions, true
       # one complete submission
       qs = @quiz.generate_submission(@student)
@@ -180,7 +180,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       stats.first.first == "section"
     end
 
-    it 'should include sis ids when requested' do
+    it 'includes sis ids when requested' do
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
 
@@ -190,7 +190,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.first).to include 'section_sis_id'
     end
 
-    it 'should not include sis ids when not requested' do
+    it 'does not include sis ids when not requested' do
       qs = @quiz.generate_submission(@student)
       Quizzes::SubmissionGrader.new(qs).grade_submission
 
@@ -200,7 +200,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.first).not_to include 'section_sis_id'
     end
 
-    it 'should succeed with logged-out user submissions' do
+    it 'succeeds with logged-out user submissions' do
       survey_with_logged_out_submission
       stats = CSV.parse(csv(:include_all_versions => true))
       expect(stats.last[0]).to eq ''
@@ -208,7 +208,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[2]).to eq ''
     end
 
-    it 'should have sections in quiz statistics_csv' do
+    it 'has sections in quiz statistics_csv' do
       # enroll user in multiple sections
       pseudonym(@student)
       @student.pseudonym.sis_user_id = "user_sis_id_01"
@@ -243,7 +243,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(section_sis_ids).to include("SISSection01")
     end
 
-    it 'should use sections in quiz statistics generate' do
+    it 'uses sections in quiz statistics generate' do
       # enroll user in multiple sections
       pseudonym(@student)
       @student.pseudonym.sis_user_id = "user_sis_id_01"
@@ -279,7 +279,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats[:questions][0][1]["answers"][0]["responses"]).to eq 1
     end
 
-    it 'should deal with incomplete fill-in-multiple-blanks questions' do
+    it 'deals with incomplete fill-in-multiple-blanks questions' do
       @quiz.quiz_questions.create!(:question_data => { :name => "test 2",
                                                        :question_type => 'fill_in_multiple_blanks_question',
                                                        :question_text => "[ans0]",
@@ -305,7 +305,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[11]).to eq ',baz'
     end
 
-    it 'should contain answers to numerical questions' do
+    it 'contains answers to numerical questions' do
       @quiz.quiz_questions.create!(:question_data => { :name => "numerical_question",
                                                        :question_type => 'numerical_question',
                                                        :question_text => "[num1]",
@@ -326,7 +326,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect(stats.last[9]).to eq '5'
     end
 
-    it 'should not error out when no answers are present in a calculated_question' do
+    it 'does not error out when no answers are present in a calculated_question' do
       @quiz.quiz_questions.create!(:question_data => { :name => "calculated_question",
                                                        :question_type => 'calculated_question',
                                                        :question_text => "[num1]" })
@@ -343,7 +343,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
     end
 
-    it 'should not error out when answers is null in a text_only_question' do
+    it 'does not error out when answers is null in a text_only_question' do
       @quiz.quiz_questions.create!(:question_data => { :name => "text_only_question",
                                                        :question_type => 'text_only_question',
                                                        :question_text => "[num1]",
@@ -361,7 +361,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
       expect { @quiz.statistics_csv('student_analysis', {}) }.not_to raise_error
     end
 
-    it 'should include primary domain if trust exists' do
+    it 'includes primary domain if trust exists' do
       account2 = Account.create!
       allow(HostUrl).to receive(:context_host).and_return('school')
       expect(HostUrl).to receive(:context_host).with(account2).and_return('school1')
@@ -413,7 +413,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.first[7]).to eq attach.display_name
   end
 
-  it 'should strip tags from html multiple-choice/multiple-answers' do
+  it 'strips tags from html multiple-choice/multiple-answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!(:title => "new quiz")
     q.update_attribute(:published_at, Time.now)
@@ -453,7 +453,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.last[9]).to eq "lolcats,lolrus"
   end
 
-  it 'should not strip things that look like tags from essay questions' do
+  it 'does not strip things that look like tags from essay questions' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.zone.now)
@@ -470,7 +470,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.last[7]).to eq "<> < > WHERE rental_duration >= 6 AND rating <> 'R' 1 < 3 > 2"
   end
 
-  it 'should strip tags from all student-provided answers' do
+  it 'strips tags from all student-provided answers' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)
@@ -503,7 +503,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats.last[15]).to match /,calculated$/
   end
 
-  it 'should not count teacher preview submissions' do
+  it 'does not count teacher preview submissions' do
     teacher_in_course(:active_all => true)
     q = @course.quizzes.create!
     q.update_attribute(:published_at, Time.now)
@@ -523,7 +523,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:unique_submission_count]).to eq 0
   end
 
-  it 'should not show student names for anonymous submissions' do
+  it 'does not show student names for anonymous submissions' do
     student_in_course(:active_all => true)
     q = @course.quizzes.create!
     q.update(:published_at => Time.zone.now, :quiz_type => 'survey', :anonymous_submissions => true)
@@ -541,7 +541,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     expect(stats[:questions].first.last[:user_ids].first).to eq nil
   end
 
-  it 'should not count student view submissions' do
+  it 'does not count student view submissions' do
     @course = course_factory(active_all: true)
     fake_student = @course.student_view_student
     q = @course.quizzes.create!
@@ -565,7 +565,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
   describe 'question statistics' do
     subject { Quizzes::QuizStatistics::StudentAnalysis.new({}) }
 
-    it 'should proxy to CanvasQuizStatistics for supported questions' do
+    it 'proxies to CanvasQuizStatistics for supported questions' do
       question_data = { question_type: 'essay_question' }
       responses = []
 
@@ -580,7 +580,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
                            })
     end
 
-    it "shouldn't proxy if the legacy flag is on" do
+    it "does not proxy if the legacy flag is on" do
       question_data = {
         question_type: 'essay_question',
         answers: []

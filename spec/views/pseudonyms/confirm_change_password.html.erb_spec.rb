@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/pseudonyms/confirm_change_password" do
-  it "should render" do
+  it "renders" do
     user_factory
     assign(:user, @user)
     assign(:current_user, @user)

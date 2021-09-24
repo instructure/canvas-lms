@@ -41,7 +41,7 @@ describe MediaTracksController do
   end
 
   describe "#create" do
-    it "should create a track" do
+    it "creates a track" do
       expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
       content = "one track mind"
       post 'create', params: { :media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => content }
@@ -51,17 +51,17 @@ describe MediaTracksController do
       expect(track.content).to eq content
     end
 
-    it "should disallow TTML" do
+    it "disallows TTML" do
       post 'create', params: { :media_object_id => @mo.media_id, :kind => 'subtitles', :locale => 'en', :content => example_ttml_susceptible_to_xss }
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it "should validate :kind" do
+    it "validates :kind" do
       post 'create', params: { :media_object_id => @mo.media_id, :kind => 'unkind', :locale => 'en', :content => '1' }
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it "should validate :locale" do
+    it "validates :locale" do
       post 'create', params: { :media_object_id => @mo.media_id, :kind => 'subtitles', :locale => '<img src="lolcats.gif">', :content => '1' }
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -78,14 +78,14 @@ describe MediaTracksController do
   end
 
   describe "#show" do
-    it "should show a track" do
+    it "shows a track" do
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       get 'show', params: { :media_object_id => @mo.media_id, :id => track.id }
       expect(response).to be_successful
       expect(response.body).to eq track.webvtt_content
     end
 
-    it "should not show tracks that are in TTML format because it is vulnerable to xss" do
+    it "does not show tracks that are in TTML format because it is vulnerable to xss" do
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "blah")
       track.update_attribute(:content, example_ttml_susceptible_to_xss)
       get 'show', params: { :media_object_id => @mo.media_id, :id => track.id }
@@ -94,7 +94,7 @@ describe MediaTracksController do
   end
 
   describe "#destroy" do
-    it "should destroy a track" do
+    it "destroys a track" do
       expect_any_instantiation_of(@mo).to receive(:media_sources).and_return(nil)
       track = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "subs")
       delete 'destroy', params: { :media_object_id => @mo.media_id, :media_track_id => track.id }
@@ -103,7 +103,7 @@ describe MediaTracksController do
   end
 
   describe "#index" do
-    it "should list tracks" do
+    it "lists tracks" do
       tracks = {}
       tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
       tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)
@@ -123,7 +123,7 @@ describe MediaTracksController do
   end
 
   describe "#update" do
-    it "should update tracks" do
+    it "updates tracks" do
       tracks = {}
       tracks["en"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'en', content: "en subs", user_id: @teacher.id)
       tracks["af"] = @mo.media_tracks.create!(kind: 'subtitles', locale: 'af', content: "af subs", user_id: @teacher.id)

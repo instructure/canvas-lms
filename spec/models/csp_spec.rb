@@ -32,11 +32,11 @@ describe Csp do
       @accounts = [@root, @sub1, @sub2]
     end
 
-    it "should not be enabled by default" do
+    it "is not enabled by default" do
       @accounts.each { |a| expect(a.csp_enabled?).to eq false }
     end
 
-    it "should inherit settings" do
+    it "inherits settings" do
       @root.enable_csp!
       @accounts.each do |a|
         expect(a.csp_enabled?).to eq true
@@ -44,13 +44,13 @@ describe Csp do
       end
     end
 
-    it "should override inherited settings if explicitly set down the chain" do
+    it "overrides inherited settings if explicitly set down the chain" do
       @root.enable_csp!
       @sub1.disable_csp!
       expect(@sub2.csp_enabled?).to eq false
     end
 
-    it "should not override inherited settings if explicitly set down the chain but locked" do
+    it "does not override inherited settings if explicitly set down the chain but locked" do
       @root.enable_csp!
       @sub1.disable_csp!
       @root.lock_csp!
@@ -60,7 +60,7 @@ describe Csp do
       end
     end
 
-    it "should cache" do
+    it "caches" do
       expect_any_instantiation_of(@sub1).to receive(:calculate_inherited_setting).once
       enable_cache do
         @sub1.csp_enabled?
@@ -68,7 +68,7 @@ describe Csp do
       end
     end
 
-    it "should invalidate caches on changes" do
+    it "invalidates caches on changes" do
       enable_cache do
         expect(@sub2.csp_enabled?).to eq false
         @root.enable_csp!
@@ -76,7 +76,7 @@ describe Csp do
       end
     end
 
-    it "should invalidate caches on lock changes" do
+    it "invalidates caches on lock changes" do
       @root.enable_csp!
       @sub1.disable_csp!
       @root.lock_csp!
@@ -95,23 +95,23 @@ describe Csp do
       @course = @sub.courses.create!
     end
 
-    it "should by disabled by default" do
+    it "bies disabled by default" do
       expect(@course.csp_enabled?).to eq false
     end
 
-    it "should inherit from account" do
+    it "inherits from account" do
       @root.enable_csp!
       expect(@course.reload.csp_enabled?).to eq true
     end
 
-    it "should be disabled if set on course" do
+    it "is disabled if set on course" do
       @root.enable_csp!
       @course.csp_disabled = true
       @course.save!
       expect(@course.reload.csp_enabled?).to eq false
     end
 
-    it "should not allow overriding if locked by account" do
+    it "does not allow overriding if locked by account" do
       @root.enable_csp!
       @course.csp_disabled = true
       @course.save!
@@ -128,7 +128,7 @@ describe Csp do
       @sub = @root.sub_accounts.create!
     end
 
-    it "should add, remove and reactivate domains" do
+    it "add,s remove and reactivate domains" do
       domain = "example.com"
 
       @root.add_domain!(domain)
@@ -143,7 +143,7 @@ describe Csp do
       expect(record.reload).to be_active
     end
 
-    it "should cache" do
+    it "caches" do
       enable_cache do
         domain = "example.com"
         expect(Csp::Domain).to receive(:domains_for_account).with(@root.global_id).and_return([domain]).once
@@ -152,7 +152,7 @@ describe Csp do
       end
     end
 
-    it "should invalidate the cache after saving" do
+    it "invalidates the cache after saving" do
       enable_cache do
         domain1 = "blah.example.com"
         domain2 = "bloo.example.com"
@@ -170,7 +170,7 @@ describe Csp do
       end
     end
 
-    it "should include the global whitelist Setting" do
+    it "includes the global whitelist Setting" do
       allow(Setting).to receive(:get).with('csp.global_whitelist', '').and_return('some-domain.com,another.net, a-third.io')
       expect(@sub.csp_whitelisted_domains(include_files: false, include_tools: false)).to match_array(['some-domain.com', 'another.net', 'a-third.io'])
     end
@@ -184,7 +184,7 @@ describe Csp do
       @sub2 = @sub1.sub_accounts.create!
     end
 
-    it "should get all tool domains in the chain" do
+    it "gets all tool domains in the chain" do
       create_tool(@root, :domain => "example1.com")
       create_tool(@sub1, :domain => "example2.com")
       create_tool(@sub2, :url => "https://example3.com/launchnstuff")
@@ -193,7 +193,7 @@ describe Csp do
       expect(@sub2.cached_tool_domains).to match_array(["example1.com", "*.example1.com", "example2.com", "*.example2.com", "example3.com", "*.example3.com"])
     end
 
-    it "should cache the tool domains" do
+    it "caches the tool domains" do
       enable_cache do
         expect(@sub2).to receive(:get_account_tool_domains).and_return(["example.com"]).once
         @sub2.csp_whitelisted_domains(include_files: false, include_tools: true)
@@ -201,7 +201,7 @@ describe Csp do
       end
     end
 
-    it "should invalidate the tool domain cache" do
+    it "invalidates the tool domain cache" do
       enable_cache do
         expect(@sub2.csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
         root_tool = create_tool(@root, :domain => "example1.com")
@@ -244,7 +244,7 @@ describe Csp do
       @course = @sub.courses.create!
     end
 
-    it "should cache course-level tools" do
+    it "caches course-level tools" do
       enable_cache do
         tool = create_tool(@course, domain: 'example.com')
         expect(Csp::Domain).to receive(:domains_for_tool).with(tool).once.and_return(['example.com'])
@@ -253,7 +253,7 @@ describe Csp do
       end
     end
 
-    it "should invalidate the cache for course-level tools" do
+    it "invalidates the cache for course-level tools" do
       enable_cache do
         create_tool(@course, :url => "https://course.example.com/blah")
         expect(@course.csp_whitelisted_domains(include_files: false, include_tools: true)).to match_array(["course.example.com", "*.course.example.com"])
@@ -265,7 +265,7 @@ describe Csp do
       end
     end
 
-    it "should tie all the domains together" do
+    it "ties all the domains together" do
       @root.add_domain!("example1.com")
       create_tool(@sub, :domain => "example2.com")
       create_tool(@course, :domain => "example3.com")

@@ -38,12 +38,12 @@ describe "API Authentication", type: :request do
   end
 
   if Canvas.redis_enabled? # eventually we're going to have to just require redis to run the specs
-    it "should require a valid client id" do
+    it "requires a valid client id" do
       get "/login/oauth2/auth", params: { :response_type => 'code', :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob' }
       expect(response).to be_client_error
     end
 
-    it "should require a valid code to get an access_token" do
+    it "requires a valid code to get an access_token" do
       post "/login/oauth2/token", params: { :client_id => @client_id, :client_secret => @client_secret, :code => 'asdf' }
       expect(response).to be_client_error
     end
@@ -60,20 +60,20 @@ describe "API Authentication", type: :request do
         post '/login/canvas', params: { 'pseudonym_session[unique_id]' => 'test1@example.com', 'pseudonym_session[password]' => 'test1234' }
       end
 
-      it "should not need developer key when we have an actual application session" do
+      it "does not need developer key when we have an actual application session" do
         expect(response).to redirect_to("http://www.example.com/?login_success=1")
         get "/api/v1/courses.json", params: {}
         expect(response).to be_successful
       end
 
-      it "should not allow post without authenticity token in application session" do
+      it "does not allow post without authenticity token in application session" do
         post "/api/v1/courses/#{@course.id}/assignments.json",
              params: { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
                        :authenticity_token => 'asdf' }
         expect(response.response_code).to eq 422
       end
 
-      it "should allow post with cookie authenticity token in application session" do
+      it "allows post with cookie authenticity token in application session" do
         get "/"
         post "/api/v1/courses/#{@course.id}/assignments.json",
              params: { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' },
@@ -82,7 +82,7 @@ describe "API Authentication", type: :request do
         expect(@course.assignments.count).to eq 1
       end
 
-      it "should not allow replacing the authenticity token with api_key without basic auth" do
+      it "does not allow replacing the authenticity token with api_key without basic auth" do
         post "/api/v1/courses/#{@course.id}/assignments.json?api_key=#{@key.api_key}",
              params: { :assignment => { :name => 'test assignment', :points_possible => '5.3', :grading_type => 'points' } }
         expect(response.response_code).to eq 422
@@ -95,7 +95,7 @@ describe "API Authentication", type: :request do
         course_with_teacher(:user => @user)
       end
 
-      it "should not allow basic auth with api key" do
+      it "does not allow basic auth with api key" do
         get "/api/v1/courses.json?api_key=#{@key.api_key}",
             headers: { 'HTTP_AUTHORIZATION' => ActionController::HttpAuthentication::Basic.encode_credentials('test1@example.com', 'test1234') }
         expect(response.response_code).to eq 401
@@ -160,7 +160,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "should not prepend the csrf protection even if the post has a session" do
+      it "does not prepend the csrf protection even if the post has a session" do
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
         post "/login/canvas", params: { :pseudonym_session => { :unique_id => 'test1@example.com', :password => 'test1234' } }
         code = SecureRandom.hex(64)
@@ -172,7 +172,7 @@ describe "API Authentication", type: :request do
         expect(AccessToken.authenticate(json['access_token'])).to eq AccessToken.last
       end
 
-      it "should execute for password/ldap login" do
+      it "executes for password/ldap login" do
         flow do
           follow_redirect!
           expect(response).to redirect_to(canvas_login_url)
@@ -181,7 +181,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "should execute for saml login" do
+      it "executes for saml login" do
         skip("requires SAML extension") unless AuthenticationProvider::SAML.enabled?
         account_with_saml(account: Account.default)
         flow do
@@ -199,7 +199,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "should execute for cas login" do
+      it "executes for cas login" do
         flow do
           account = account_with_cas(:account => Account.default)
           # it should *not* redirect to the alternate log_in_url on the config, when doing oauth
@@ -225,7 +225,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "should not require logging in again, or log out afterwards" do
+      it "does not require logging in again, or log out afterwards" do
         course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob' }
         expect(response).to be_redirect
@@ -244,7 +244,7 @@ describe "API Authentication", type: :request do
         expect(response).to be_successful
       end
 
-      it "should redirect with access_denied if the user doesn't accept" do
+      it "redirects with access_denied if the user doesn't accept" do
         course_with_student_logged_in(:active_all => true, :user => user_with_pseudonym)
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob' }
         expect(response).to be_redirect
@@ -261,7 +261,7 @@ describe "API Authentication", type: :request do
         expect(response).to be_successful
       end
 
-      it "should require the correct client secret" do
+      it "requires the correct client secret" do
         # step 1
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => 'urn:ietf:wg:oauth:2.0:oob' }
         expect(response).to redirect_to(login_url)
@@ -303,7 +303,7 @@ describe "API Authentication", type: :request do
       context "sharding" do
         specs_require_sharding
 
-        it "should create the access token on the same shard as the user" do
+        it "creates the access token on the same shard as the user" do
           user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
 
           @shard1.activate do
@@ -351,13 +351,13 @@ describe "API Authentication", type: :request do
     end
 
     describe "oauth2 web app flow" do
-      it "should require the developer key to have a redirect_uri" do
+      it "requires the developer key to have a redirect_uri" do
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response" }
         expect(response).to be_client_error
         expect(response.body).to match /redirect_uri/
       end
 
-      it "should require the redirect_uri domains to match" do
+      it "requires the redirect_uri domains to match" do
         @key.update_attribute :redirect_uri, 'http://www.example2.com/oauth2response'
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response" }
         expect(response).to be_client_error
@@ -420,15 +420,15 @@ describe "API Authentication", type: :request do
           end
         end
 
-        it "should enable the web app flow" do
+        it "enables the web app flow" do
           login_and_confirm
         end
 
-        it "should enable the web app flow if token already exists" do
+        it "enables the web app flow if token already exists" do
           login_and_confirm(true)
         end
 
-        it "Shouldn't allow an account level dev key to auth with other account's user" do
+        it "does not allow an account level dev key to auth with other account's user" do
           enable_forgery_protection do
             enable_cache do
               user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234')
@@ -485,18 +485,18 @@ describe "API Authentication", type: :request do
           end
         end
 
-        it "should give first token" do
+        it "gives first token" do
           json = trusted_exchange
           expect(json['access_token']).to_not be_nil
         end
 
-        it "should give second token if not force_token_reuse" do
+        it "gives second token if not force_token_reuse" do
           json = trusted_exchange(true)
           expect(json['access_token']).to_not be_nil
           expect(@user.access_tokens.count).to eq 2
         end
 
-        it "should not give second token if force_token_reuse" do
+        it "does not give second token if force_token_reuse" do
           @key.force_token_reuse = true
           @key.auto_expire_tokens = false
           @key.save!
@@ -508,7 +508,7 @@ describe "API Authentication", type: :request do
           expect(@user.access_tokens.count).to eq 1
         end
 
-        it "should not regenerate if force_token_reuse with userinfo" do
+        it "does not regenerate if force_token_reuse with userinfo" do
           @key.force_token_reuse = true
           @key.auto_expire_tokens = false
           @key.save!
@@ -677,7 +677,7 @@ describe "API Authentication", type: :request do
       expect(@token.reload.last_used_at).not_to be_nil
     end
 
-    it "should allow passing the access token in the query string" do
+    it "allows passing the access token in the query string" do
       check_used { get "/api/v1/courses?access_token=#{@token.full_token}" }
       expect(JSON.parse(response.body).size).to eq 1
     end
@@ -689,12 +689,12 @@ describe "API Authentication", type: :request do
       expect(response.status).to eq 401
     end
 
-    it "should allow passing the access token in the authorization header" do
+    it "allows passing the access token in the authorization header" do
       check_used { get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" } }
       expect(JSON.parse(response.body).size).to eq 1
     end
 
-    it "should allow passing the access token in the post body" do
+    it "allows passing the access token in the post body" do
       @me = @user
       Account.default.account_users.create!(user: @user)
       u2 = user_factory
@@ -709,7 +709,7 @@ describe "API Authentication", type: :request do
       expect(Account.default.reload.users).to be_include(u2)
     end
 
-    it "should error if the access token is expired or non-existent" do
+    it "errors if the access token is expired or non-existent" do
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer blahblah" }
       assert_status(401)
       expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
@@ -719,14 +719,14 @@ describe "API Authentication", type: :request do
       expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
     end
 
-    it "should error if the developer key is inactive" do
+    it "errors if the developer key is inactive" do
       @token.developer_key.deactivate!
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
       expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
     end
 
-    it "should require an active pseudonym for the access token user" do
+    it "requires an active pseudonym for the access token user" do
       @user.pseudonym.destroy
       get "/api/v1/courses", headers: { 'HTTP_AUTHORIZATION' => "Bearer #{@token.full_token}" }
       assert_status(401)
@@ -735,7 +735,7 @@ describe "API Authentication", type: :request do
       expect(json['errors'].first['message']).to eq "Invalid access token."
     end
 
-    it "should error if no access token is given and authorization is required" do
+    it "errors if no access token is given and authorization is required" do
       get "/api/v1/courses"
       assert_status(401)
       expect(response['WWW-Authenticate']).to eq %{Bearer realm="canvas-lms"}
@@ -743,7 +743,7 @@ describe "API Authentication", type: :request do
       expect(json["errors"].first["message"]).to eq "user authorization required"
     end
 
-    it "should be able to log out" do
+    it "is able to log out" do
       get "/api/v1/courses?access_token=#{@token.full_token}"
       expect(response).to be_successful
 
@@ -765,7 +765,7 @@ describe "API Authentication", type: :request do
         @key = DeveloperKey.create!(:redirect_uri => "http://example.com/a/b", account: @account)
       end
 
-      it "Should allow a token previously linked to a dev key same account to work" do
+      it "allows a token previously linked to a dev key same account to work" do
         enable_forgery_protection do
           enable_cache do
             user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234', account: @account)
@@ -781,7 +781,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "Should allow a token previously linked to a dev key allowed sub account to work" do
+      it "allows a token previously linked to a dev key allowed sub account to work" do
         enable_forgery_protection do
           enable_cache do
             user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234', account: @sub_account1)
@@ -797,7 +797,7 @@ describe "API Authentication", type: :request do
         end
       end
 
-      it "Shouldn't allow a token previously linked to a dev key on foreign account to work" do
+      it "does not allow a token previously linked to a dev key on foreign account to work" do
         enable_forgery_protection do
           enable_cache do
             user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234', account: @account)
@@ -816,7 +816,7 @@ describe "API Authentication", type: :request do
     context "sharding" do
       specs_require_sharding
 
-      it "should work for an access token from a different shard with the developer key on the default shard" do
+      it "works for an access token from a different shard with the developer key on the default shard" do
         @shard1.activate do
           @account = Account.create!
           enable_default_developer_key!
@@ -831,7 +831,7 @@ describe "API Authentication", type: :request do
         expect(JSON.parse(response.body).size).to eq 1
       end
 
-      it "shouldn't work for an access token from the default shard with the developer key on the different shard" do
+      it "does not work for an access token from the default shard with the developer key on the different shard" do
         @account = Account.create!
         user_with_pseudonym(:active_user => true, :username => 'test1@example.com', :password => 'test1234', :account => @account)
         course_with_teacher(:user => @user, :account => @account)
@@ -862,7 +862,7 @@ describe "API Authentication", type: :request do
       @course2 = @course
     end
 
-    it "should allow as_user_id" do
+    it "allows as_user_id" do
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 
@@ -936,7 +936,7 @@ describe "API Authentication", type: :request do
                          })
     end
 
-    it "should allow sis_user_id as an as_user_id" do
+    it "allows sis_user_id as an as_user_id" do
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
       @student_pseudonym.update_attribute(:sis_user_id, "1234")
@@ -964,7 +964,7 @@ describe "API Authentication", type: :request do
                          })
     end
 
-    it "should allow integration_id as an as_user_id" do
+    it "allows integration_id as an as_user_id" do
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
       @student_pseudonym.update_attribute(:integration_id, "1234")
@@ -993,7 +993,7 @@ describe "API Authentication", type: :request do
                          })
     end
 
-    it "should not be silent about an unknown as_user_id" do
+    it "is not silent about an unknown as_user_id" do
       account_admin_user(:account => Account.site_admin)
       user_with_pseudonym(:user => @user)
 
@@ -1003,7 +1003,7 @@ describe "API Authentication", type: :request do
       expect(JSON.parse(response.body)).to eq({ 'errors' => 'Invalid as_user_id' })
     end
 
-    it "should not allow non-admins to become other people" do
+    it "does not allow non-admins to become other people" do
       account_admin_user(:account => Account.site_admin)
 
       @user = @student

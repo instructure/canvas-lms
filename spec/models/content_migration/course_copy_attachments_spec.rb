@@ -23,7 +23,7 @@ describe ContentMigration do
   context "course copy attachments" do
     include_examples "course copy"
 
-    it "should assign the correct parent folder when the parent folder has already been created" do
+    it "assigns the correct parent folder when the parent folder has already been created" do
       folder = Folder.root_folders(@copy_from).first
       folder = folder.sub_folders.create!(:context => @copy_from, :name => 'folder_1')
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => folder, :context => @copy_from)
@@ -55,7 +55,7 @@ describe ContentMigration do
       expect(@copy_to.syllabus_body).to eq %{<a href="/courses/#{@copy_to.id}/files/#{new_attachment.id}/download?wrap=1">link</a>}
     end
 
-    it "should copy files into the correct folders when the folders share the same name" do
+    it "copies files into the correct folders when the folders share the same name" do
       root = Folder.root_folders(@copy_from).first
       f1 = root.sub_folders.create!(:name => "folder", :context => @copy_from)
       f2 = f1.sub_folders.create!(:name => "folder", :context => @copy_from)
@@ -72,7 +72,7 @@ describe ContentMigration do
       end
     end
 
-    it "should still copy content in unique_type folders with a name mismatch" do
+    it "stills copy content in unique_type folders with a name mismatch" do
       root = Folder.root_folders(@copy_from).first
       f1 = root.sub_folders.create!(:name => "Uploaded Media", :context => @copy_from)
       f2 = Folder.media_folder(@copy_from)
@@ -93,7 +93,7 @@ describe ContentMigration do
       expect(att2_to.folder).to eq f2_to
     end
 
-    it "should add a warning instead of failing when trying to copy an invalid file" do
+    it "adds a warning instead of failing when trying to copy an invalid file" do
       att = Attachment.create!(:filename => 'dummy.txt', :uploaded_data => StringIO.new('fakety'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       Attachment.where(:id => att).update_all(:filename => nil)
 
@@ -103,7 +103,7 @@ describe ContentMigration do
       run_course_copy(["Couldn't copy file \"dummy.txt\""])
     end
 
-    it "should include implied files for course exports" do
+    it "includes implied files for course exports" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => 'second.jpg', :uploaded_data => StringIO.new('ohais'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att3 = Attachment.create!(:filename => 'third.jpg', :uploaded_data => StringIO.new('3333'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -131,7 +131,7 @@ describe ContentMigration do
       expect(@copy_to.wiki_pages.first.body).to eq wiki_body % [@copy_to.id, att2_2.id]
     end
 
-    it "should preserve links to re-uploaded attachments" do
+    it "preserves links to re-uploaded attachments" do
       att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.destroy
       new_att = Attachment.create!(:filename => 'first.png', :uploaded_data => StringIO.new('ohai'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -149,7 +149,7 @@ describe ContentMigration do
       expect(page2.body).to include("<a href=\"/courses/#{@copy_to.id}/files/#{att2.id}/download?wrap=1\">link</a>")
     end
 
-    it "should preserve new-RCE mediahref iframes" do
+    it "preserves new-RCE mediahref iframes" do
       att = @copy_from.attachments.create!(:filename => 'videro.mov', :uploaded_data => StringIO.new('...'), :folder => Folder.root_folders(@copy_from).first)
       page = @copy_from.wiki_pages.create!(:title => "watch this y'all", :body =>
         %Q{<iframe data-media-type="video" src="/media_objects_iframe?mediahref=/courses/#{@copy_from.id}/files/#{att.id}/download" data-media-id="#{att.id}"/>})
@@ -159,7 +159,7 @@ describe ContentMigration do
       expect(page_to.body).to include %Q{src="/media_objects_iframe?mediahref=/courses/#{@copy_to.id}/files/#{att_to.id}/download"}
     end
 
-    it "should reference existing usage rights on course copy" do
+    it "references existing usage rights on course copy" do
       usage_rights = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2014 Incom Corp Ltd.'
       att1 = Attachment.create(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att1.usage_rights = usage_rights
@@ -168,7 +168,7 @@ describe ContentMigration do
       expect(@copy_to.attachments.where(migration_id: mig_id(att1)).first.usage_rights).to eq(usage_rights)
     end
 
-    it "should preserve locked date restrictions on export/import" do
+    it "preserves locked date restrictions on export/import" do
       att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.unlock_at = 2.days.from_now
       att.lock_at = 3.days.from_now
@@ -181,7 +181,7 @@ describe ContentMigration do
       expect(copy.lock_at.to_i).to eq att.lock_at.to_i
     end
 
-    it "should preserve terrible folder names on export/import" do
+    it "preserves terrible folder names on export/import" do
       root = Folder.root_folders(@copy_from).first
       sub = root.sub_folders.create!(:name => ".sadness", :context => @copy_from)
 
@@ -195,7 +195,7 @@ describe ContentMigration do
       expect(copy_sub.name).to eq ".sadness"
     end
 
-    it "should preserve module items for hidden files on course copy" do
+    it "preserves module items for hidden files on course copy" do
       att = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att.hidden = true
       att.save!
@@ -213,7 +213,7 @@ describe ContentMigration do
       expect(copy_tag.content).to eq copy_att
     end
 
-    it "should preserve usage rights on export/import" do
+    it "preserves usage rights on export/import" do
       att1 = Attachment.create!(:filename => '1.txt', :uploaded_data => StringIO.new('1'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att2 = Attachment.create!(:filename => '2.txt', :uploaded_data => StringIO.new('2'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       att3 = Attachment.create!(:filename => '3.txt', :uploaded_data => StringIO.new('3'), :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
@@ -255,11 +255,11 @@ describe ContentMigration do
         expect(@copy_to.attachments.where(migration_id: mig_id(attLU)).first).not_to be_published
       end
 
-      it "should import files as unpublished unless the cartridge provides usage rights" do
+      it "imports files as unpublished unless the cartridge provides usage rights" do
         test_usage_rights_over_migration { run_export_and_import }
       end
 
-      it "should import files as unpublished unless the course copy source provides usage rights" do
+      it "imports files as unpublished unless the course copy source provides usage rights" do
         test_usage_rights_over_migration { run_course_copy }
       end
     end

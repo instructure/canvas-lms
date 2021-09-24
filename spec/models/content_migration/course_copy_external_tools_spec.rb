@@ -29,7 +29,7 @@ describe ContentMigration do
       @tool_from.save!
     end
 
-    it "should copy external tools" do
+    it "copies external tools" do
       @copy_from.tab_configuration = [
         { "id" => 0 }, { "id" => "context_external_tool_#{@tool_from.id}" }, { "id" => 14 }
       ]
@@ -51,7 +51,7 @@ describe ContentMigration do
       expect(tool_to.shared_secret).to eq @tool_from.shared_secret
     end
 
-    it "should not duplicate external tools used in modules" do
+    it "does not duplicate external tools used in modules" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       tag = mod1.add_item({ :type => 'context_external_tool',
                             :title => 'Example URL',
@@ -69,7 +69,7 @@ describe ContentMigration do
       expect(tool_to.has_placement?(:course_navigation)).to eq true
     end
 
-    it "should copy external tool assignments" do
+    it "copies external tool assignments" do
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
       tag_from = @assignment.build_external_tool_tag(:url => "http://example.com/one", :new_tab => true)
       tag_from.content_type = 'ContextExternalTool'
@@ -90,7 +90,7 @@ describe ContentMigration do
       expect(tag_to.new_tab).to eq tag_from.new_tab
     end
 
-    it "should copy account-level external tool assignments" do
+    it "copies account-level external tool assignments" do
       account_tool = @copy_from.account.context_external_tools.build name: 'blah', url: 'https://blah.example.com', shared_secret: '123', consumer_key: '456'
       assignment_model(:course => @copy_from, :points_possible => 40, :submission_types => 'external_tool', :grading_type => 'points')
       tag_from = @assignment.create_external_tool_tag(:url => "http://blah.example.com/one", :new_tab => true, :content => account_tool)
@@ -106,7 +106,7 @@ describe ContentMigration do
       expect(asmnt_2.reload.external_tool_tag).to eq tag_to # don't recreate the tag
     end
 
-    it "should copy vendor extensions" do
+    it "copies vendor extensions" do
       @tool_from.settings[:vendor_extensions] = [{ :platform => "my.lms.com", :custom_fields => { "key" => "value" } }]
       @tool_from.save!
 
@@ -116,7 +116,7 @@ describe ContentMigration do
       expect(tool.settings[:vendor_extensions]).to eq [{ 'platform' => "my.lms.com", 'custom_fields' => { "key" => "value" } }]
     end
 
-    it "should copy canvas extensions" do
+    it "copies canvas extensions" do
       @tool_from.user_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :extra => 'extra', :custom_fields => { "key" => "value" } }
       @tool_from.course_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :default => 'disabled', :visibility => 'members', :extra => 'extra', :custom_fields => { "key" => "value" } }
       @tool_from.account_navigation = { :url => "http://www.example.com", :text => "hello", :labels => { 'en' => 'hello', 'es' => 'hola' }, :extra => 'extra', :custom_fields => { "key" => "value" } }
@@ -139,7 +139,7 @@ describe ContentMigration do
       expect(tool.user_navigation).to eq @tool_from.user_navigation
     end
 
-    it "should keep reference to ContextExternalTool by id for courses" do
+    it "keeps reference to ContextExternalTool by id for courses" do
       mod1 = @copy_from.context_modules.create!(:name => "some module")
       tag = mod1.add_item :type => 'context_external_tool', :id => @tool_from.id,
                           :url => "https://www.example.com/launch"
@@ -151,7 +151,7 @@ describe ContentMigration do
       expect(tag.content_id).to eq tool_copy.id
     end
 
-    it "should keep reference to ContextExternalTool by id for accounts" do
+    it "keeps reference to ContextExternalTool by id for accounts" do
       account = @copy_from.root_account
       @tool_from.context = account
       @tool_from.save!
@@ -165,7 +165,7 @@ describe ContentMigration do
       expect(tag.content_id).to eq @tool_from.id
     end
 
-    it "should keep tab configuration for account-level external tools" do
+    it "keeps tab configuration for account-level external tools" do
       account = @copy_from.root_account
       @tool_from.context = account
       @tool_from.save!
@@ -182,7 +182,7 @@ describe ContentMigration do
       ]
     end
 
-    it "should not double-escape retrieval urls" do
+    it "does not double-escape retrieval urls" do
       url = "http://www.example.com?url=http%3A%2F%2Fwww.anotherurl.com"
 
       @copy_from.syllabus_body = "<p><iframe src=\"/courses/#{@copy_from.id}/external_tools/retrieve?url=#{CGI.escape(url)}\" width=\"320\" height=\"240\" style=\"width: 553px; height: 335px;\"></iframe></p>"
@@ -192,7 +192,7 @@ describe ContentMigration do
       expect(@copy_to.syllabus_body).to eq @copy_from.syllabus_body.sub("/courses/#{@copy_from.id}/", "/courses/#{@copy_to.id}/")
     end
 
-    it "should copy message_type (and other fields)" do
+    it "copies message_type (and other fields)" do
       @tool_from.course_settings_sub_navigation = { :url => "http://www.example.com", :text => "hello",
                                                     :message_type => "ContentItemSelectionResponse" }
       @tool_from.settings[:selection_width] = 5000
@@ -205,7 +205,7 @@ describe ContentMigration do
       expect(tool.course_settings_sub_navigation[:message_type]).to eq "ContentItemSelectionResponse"
     end
 
-    it "should copy content_migration settings" do
+    it "copies content_migration settings" do
       @tool_from.settings[:content_migration] = {
         "export_start_url" => "https://example.com/export",
         "import_start_url" => "https://example.com/import"

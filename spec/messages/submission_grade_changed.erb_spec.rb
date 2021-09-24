@@ -34,7 +34,7 @@ describe 'submission_grade_changed' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "should only include the score if opted in (and still enabled on root account)" do
+    it "onlies include the score if opted in (and still enabled on root account)" do
       @assignment.update_attribute(:points_possible, 10)
       @submission.update_attribute(:score, 5)
       message = generate_message(:submission_grade_changed, :summary, asset)
@@ -56,7 +56,7 @@ describe 'submission_grade_changed' do
       expect(message.body).not_to match(/score:/)
     end
 
-    it "should include the submission's submitter name if receiver is not the submitter and has the setting turned on" do
+    it "includes the submission's submitter name if receiver is not the submitter and has the setting turned on" do
       observer = user_model
       message = generate_message(:submission_grade_changed, :summary, asset, user: observer)
       expect(message.body).not_to match("For #{@submission.user.name}")

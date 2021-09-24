@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 describe SIS::CSV::GradePublishingResultsImporter do
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     importer = process_csv_data(
       "enrollment_id,grade_publishing_status",
       ",published",
@@ -37,7 +37,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
                           "Improper grade_publishing_status \"asplode\" for enrollment 2"]
   end
 
-  it 'should properly update the db' do
+  it 'properlies update the db' do
     course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'
@@ -52,7 +52,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
     expect(@enrollment.grade_publishing_status).to eq 'published'
   end
 
-  it 'should properly pass in messages' do
+  it 'properlies pass in messages' do
     course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'
@@ -73,7 +73,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
     expect(@enrollment.grade_publishing_status).to eq 'published'
   end
 
-  it 'should give a proper error if you try to reference an enrollment from another root account' do
+  it 'gives a proper error if you try to reference an enrollment from another root account' do
     account = Account.create!
     course_with_student(:account => account)
 

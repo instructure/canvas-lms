@@ -35,7 +35,7 @@ describe CourseSection, "moving to new course" do
     }.from(0).to(1)
   end
 
-  it "should transfer enrollments to the new root account" do
+  it "transfers enrollments to the new root account" do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -104,14 +104,14 @@ describe CourseSection, "moving to new course" do
     expect(e.course).to eql(course1)
   end
 
-  it "should associate a section with the course's account" do
+  it "associates a section with the course's account" do
     account = Account.default.manually_created_courses_account
     course = account.courses.create!
     section = course.default_section
     expect(section.course_account_associations.map(&:account_id).sort).to eq [Account.default.id, account.id].sort
   end
 
-  it "should update user account associations for xlist between subaccounts" do
+  it "updates user account associations for xlist between subaccounts" do
     root_account = Account.create!(:name => "root")
     sub_account1 = Account.create!(:parent_account => root_account, :name => "account1")
     sub_account2 = Account.create!(:parent_account => root_account, :name => "account2")
@@ -156,7 +156,7 @@ describe CourseSection, "moving to new course" do
     expect(u.associated_accounts.map(&:id).sort).to eq [root_account.id, sub_account1.id]
   end
 
-  it "should crosslist and uncrosslist" do
+  it "crosslists and uncrosslist" do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     account3 = Account.create!(:name => "3")
@@ -243,7 +243,7 @@ describe CourseSection, "moving to new course" do
     expect(course3.workflow_state).to eq 'created'
   end
 
-  it "should preserve favorites when crosslisting" do
+  it "preserves favorites when crosslisting" do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -297,7 +297,7 @@ describe CourseSection, "moving to new course" do
     end
   end
 
-  it 'should update course account associations on save' do
+  it 'updates course account associations on save' do
     account1 = Account.create!(:name => "1")
     account2 = account1.sub_accounts.create!(:name => "2")
     course1 = account1.courses.create!
@@ -318,7 +318,7 @@ describe CourseSection, "moving to new course" do
     expect(CourseAccountAssociation.where(course_id: course2).distinct.order(:account_id).pluck(:account_id)).to eq [account1.id, account2.id].sort
   end
 
-  it 'should call DueDateCacher.recompute_users_for_course' do
+  it 'calls DueDateCacher.recompute_users_for_course' do
     account1 = Account.create!(:name => "1")
     account2 = Account.create!(:name => "2")
     course1 = account1.courses.create!
@@ -343,18 +343,18 @@ describe CourseSection, "moving to new course" do
       @long_string = 'qwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnmqwertyuiopasdfghjklzxcvbnm'
     end
 
-    it "should validate the length of attributes" do
+    it "validates the length of attributes" do
       @section.name = @long_string
       @section.sis_source_id = @long_string
       expect(lambda { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters), Name is too long (maximum is 255 characters)")
     end
 
-    it "should validate the length of sis_source_id" do
+    it "validates the length of sis_source_id" do
       @section.sis_source_id = @long_string
       expect(lambda { @section.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
     end
 
-    it "should validate the length of section name" do
+    it "validates the length of section name" do
       @section.name = @long_string
       expect(lambda { @section.save! }).to raise_error("Validation failed: Name is too long (maximum is 255 characters)")
     end
@@ -369,7 +369,7 @@ describe CourseSection, "moving to new course" do
       @section = @course.course_sections.create!
     end
 
-    it 'should soft destroy overrides when destroyed' do
+    it 'softs destroy overrides when destroyed' do
       @override = @assignment.assignment_overrides.build
       @override.set = @section
       @override.save!
@@ -379,7 +379,7 @@ describe CourseSection, "moving to new course" do
       expect(@override.workflow_state).to eq("deleted")
     end
 
-    it 'should soft destroy enrollments when destroyed' do
+    it 'softs destroy enrollments when destroyed' do
       @enrollment = @course.enroll_student(User.create, { section: @section })
       expect(@enrollment.workflow_state).to eq("creation_pending")
       @section.destroy
@@ -433,22 +433,22 @@ describe CourseSection, "moving to new course" do
       @section = @course.course_sections.create!
     end
 
-    it 'should be deletable if empty' do
+    it 'is deletable if empty' do
       expect(@section).to be_deletable
     end
 
-    it 'should not be deletable if it has real enrollments' do
+    it 'is not deletable if it has real enrollments' do
       student_in_course :section => @section
       expect(@section).not_to be_deletable
     end
 
-    it 'should be deletable if it only has a student view enrollment' do
+    it 'is deletable if it only has a student view enrollment' do
       @course.student_view_student
       expect(@section.enrollments.map(&:type)).to eql ['StudentViewEnrollment']
       expect(@section).to be_deletable
     end
 
-    it 'should be deletable if it only has rejected enrollments' do
+    it 'is deletable if it only has rejected enrollments' do
       student_in_course :section => @section
       @section.enrollments.first.update_attribute(:workflow_state, "rejected")
       expect(@section).to be_deletable
@@ -468,7 +468,7 @@ describe CourseSection, "moving to new course" do
         @other_section = @course.course_sections.create!(:name => "Other Section")
       end
 
-      it "should work with section_limited true" do
+      it "works with section_limited true" do
         @ta.enrollments.update_all(:limit_privileges_to_course_section => true)
         @ta.reload
 
@@ -481,7 +481,7 @@ describe CourseSection, "moving to new course" do
         expect(@other_section.grants_right?(@ta, :read)).to be_falsey
       end
 
-      it "should work with section_limited false" do
+      it "works with section_limited false" do
         # make sure other ways to get :read are false
         expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
@@ -500,19 +500,19 @@ describe CourseSection, "moving to new course" do
       @enrollment = @course.enroll_student(user_factory(:active_all => true), :section => @section)
     end
 
-    it "should not invalidate unless something date-related changes" do
+    it "does not invalidate unless something date-related changes" do
       expect(EnrollmentState).to receive(:update_enrollment).never
       @section.name = "durp"
       @section.save!
     end
 
-    it "should not invalidate if dates change if it isn't restricted to dates yet" do
+    it "does not invalidate if dates change if it isn't restricted to dates yet" do
       expect(EnrollmentState).to receive(:update_enrollment).never
       @section.start_at = 1.day.from_now
       @section.save!
     end
 
-    it "should invalidate if dates change and section is restricted to dates" do
+    it "invalidates if dates change and section is restricted to dates" do
       @section.restrict_enrollments_to_section_dates = true
       @section.save!
       expect(EnrollmentState).to receive(:update_enrollment).with(@enrollment).once
@@ -520,13 +520,13 @@ describe CourseSection, "moving to new course" do
       @section.save!
     end
 
-    it "should invalidate if cross-listed" do
+    it "invalidates if cross-listed" do
       other_course = course_factory(active_all: true)
       expect(EnrollmentState).to receive(:update_enrollment).with(@enrollment).once
       @section.crosslist_to_course(other_course)
     end
 
-    it "should invalidate access if section is cross-listed" do
+    it "invalidates access if section is cross-listed" do
       @course.update(:workflow_state => "available", :restrict_student_future_view => true,
                      :restrict_enrollments_to_course_dates => true, :start_at => 1.day.from_now)
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq true

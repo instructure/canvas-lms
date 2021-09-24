@@ -32,17 +32,17 @@ describe GroupCategory do
   end
 
   context "protected_name_for_context?" do
-    it "should be false for 'Student Groups' in accounts" do
+    it "is false for 'Student Groups' in accounts" do
       is_protected = GroupCategory.protected_name_for_context?('Student Groups', account)
       expect(is_protected).to be_falsey
     end
 
-    it "should be true for 'Student Groups' in courses" do
+    it "is true for 'Student Groups' in courses" do
       course = @course
       expect(GroupCategory.protected_name_for_context?('Student Groups', course)).to be_truthy
     end
 
-    it "should be true for 'Imported Groups' in both accounts and courses" do
+    it "is true for 'Imported Groups' in both accounts and courses" do
       course = @course
       expect(GroupCategory.protected_name_for_context?('Imported Groups', account)).to be_truthy
       expect(GroupCategory.protected_name_for_context?('Imported Groups', course)).to be_truthy
@@ -50,11 +50,11 @@ describe GroupCategory do
   end
 
   context "student_organized_for" do
-    it "should be nil in accounts" do
+    it "is nil in accounts" do
       expect(GroupCategory.student_organized_for(account)).to be_nil
     end
 
-    it "should be a category belonging to the course with role 'student_organized' in courses" do
+    it "is a category belonging to the course with role 'student_organized' in courses" do
       course = @course
       category = GroupCategory.student_organized_for(course)
       expect(category).not_to be_nil
@@ -62,7 +62,7 @@ describe GroupCategory do
       expect(category.context).to eql(course)
     end
 
-    it "should be the the same category every time for the same course" do
+    it "is the the same category every time for the same course" do
       course = @course
       category1 = GroupCategory.student_organized_for(course)
       category2 = GroupCategory.student_organized_for(course)
@@ -71,18 +71,18 @@ describe GroupCategory do
   end
 
   context "communities_for" do
-    it "should be nil in courses" do
+    it "is nil in courses" do
       expect(GroupCategory.communities_for(@course)).to be_nil
     end
 
-    it "should be a category belonging to the account with role 'communities'" do
+    it "is a category belonging to the account with role 'communities'" do
       category = GroupCategory.communities_for(account)
       expect(category).not_to be_nil
       expect(category.role).to eql('communities')
       expect(category.context).to eql(account)
     end
 
-    it "should be the the same category every time for the same account" do
+    it "is the the same category every time for the same account" do
       category1 = GroupCategory.communities_for(account)
       category2 = GroupCategory.communities_for(account)
       expect(category1.id).to eql(category2.id)
@@ -90,14 +90,14 @@ describe GroupCategory do
   end
 
   context "imported_for" do
-    it "should be a category belonging to the account with role 'imported' in accounts" do
+    it "is a category belonging to the account with role 'imported' in accounts" do
       category = GroupCategory.imported_for(account)
       expect(category).not_to be_nil
       expect(category.role).to eql('imported')
       expect(category.context).to eql(account)
     end
 
-    it "should be a category belonging to the course with role 'imported' in courses" do
+    it "is a category belonging to the course with role 'imported' in courses" do
       course = @course
       category = GroupCategory.imported_for(course)
       expect(category).not_to be_nil
@@ -105,7 +105,7 @@ describe GroupCategory do
       expect(category.context).to eql(course)
     end
 
-    it "should be the the same category every time for the same context" do
+    it "is the the same category every time for the same context" do
       course = @course
       category1 = GroupCategory.imported_for(course)
       category2 = GroupCategory.imported_for(course)
@@ -114,7 +114,7 @@ describe GroupCategory do
   end
 
   context 'student_organized?' do
-    it "should be true iff the role is 'student_organized', regardless of name" do
+    it "is true iff the role is 'student_organized', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_student_organized
       expect(account.group_categories.create(:name => 'Student Groups')).not_to be_student_organized
@@ -126,7 +126,7 @@ describe GroupCategory do
   end
 
   context 'communities?' do
-    it "should be true if the role is 'communities', regardless of name" do
+    it "is true if the role is 'communities', regardless of name" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).not_to be_communities
       expect(account.group_categories.create(:name => 'Communities')).not_to be_communities
@@ -138,7 +138,7 @@ describe GroupCategory do
   end
 
   context 'allows_multiple_memberships?' do
-    it "should be true iff the category is student organized or communities" do
+    it "is true iff the category is student organized or communities" do
       course = @course
       expect(GroupCategory.student_organized_for(course).allows_multiple_memberships?).to be_truthy
       expect(account.group_categories.create(:name => 'Student Groups').allows_multiple_memberships?).to be_falsey
@@ -150,7 +150,7 @@ describe GroupCategory do
   end
 
   context 'protected?' do
-    it "should be true iff the category has a role other than 'imported'" do
+    it "is true iff the category has a role other than 'imported'" do
       course = @course
       expect(GroupCategory.student_organized_for(course)).to be_protected
       expect(account.group_categories.create(:name => 'Student Groups')).not_to be_protected
@@ -161,20 +161,20 @@ describe GroupCategory do
   end
 
   context 'destroy' do
-    it "should not remove the database row" do
+    it "does not remove the database row" do
       category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
       expect { GroupCategory.find(category.id) }.not_to raise_error
     end
 
-    it "should set deleted_at upon destroy" do
+    it "sets deleted_at upon destroy" do
       category = GroupCategory.create(name: "foo", course: @course)
       category.destroy
       category.reload
       expect(category.deleted_at?).to eq true
     end
 
-    it "should destroy dependent groups" do
+    it "destroys dependent groups" do
       course = @course
       category = group_category
       group1 = category.groups.create(:context => course)
@@ -197,20 +197,20 @@ describe GroupCategory do
     expect(@category.unrestricted_self_signup?).to be_truthy
   end
 
-  it "should default to no self signup" do
+  it "defaults to no self signup" do
     category = GroupCategory.new
     expect(category.self_signup?).to be_falsey
     expect(category.unrestricted_self_signup?).to be_falsey
   end
 
   context "has_heterogenous_group?" do
-    it "should be false for accounts" do
+    it "is false for accounts" do
       category = group_category(context: account)
       group = category.groups.create(:context => account)
       expect(category).not_to have_heterogenous_group
     end
 
-    it "should be true if two students that don't share a section are in the same group" do
+    it "is true if two students that don't share a section are in the same group" do
       section1 = @course.course_sections.create
       section2 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -222,7 +222,7 @@ describe GroupCategory do
       expect(category).to have_heterogenous_group
     end
 
-    it "should be false if all students in each group have a section in common" do
+    it "is false if all students in each group have a section in common" do
       section1 = @course.course_sections.create
       user1 = section1.enroll_user(user_model, 'StudentEnrollment').user
       user2 = section1.enroll_user(user_model, 'StudentEnrollment').user
@@ -235,7 +235,7 @@ describe GroupCategory do
   end
 
   describe "max_membership_change" do
-    it "should update groups if the group limit changed" do
+    it "updates groups if the group limit changed" do
       category = group_category
       category.group_limit = 2
       category.save
@@ -253,18 +253,18 @@ describe GroupCategory do
       @category = group_category
     end
 
-    it "should return nil if no groups in category" do
+    it "returns nil if no groups in category" do
       expect(@category.group_for(@student)).to be_nil
     end
 
-    it "should return nil if no active groups in category" do
+    it "returns nil if no active groups in category" do
       group = @category.groups.create(:context => @course)
       gm = group.add_user(@student)
       group.destroy
       expect(@category.group_for(@student)).to be_nil
     end
 
-    it "should return the group the student is in" do
+    it "returns the group the student is in" do
       group1 = @category.groups.create(:context => @course)
       group2 = @category.groups.create(:context => @course)
       group2.add_user(@student)
@@ -273,7 +273,7 @@ describe GroupCategory do
   end
 
   context "#distribute_members_among_groups" do
-    it "should prefer groups with fewer users" do
+    it "prefers groups with fewer users" do
       category = @course.group_categories.create(:name => "Group Category")
       group1 = category.groups.create(:name => "Group 1", :context => @course)
       group2 = category.groups.create(:name => "Group 2", :context => @course)
@@ -310,7 +310,7 @@ describe GroupCategory do
       groups.each { |group| expect(group.reload.leader).not_to be_nil }
     end
 
-    it "should update cached due dates for affected assignments" do
+    it "updates cached due dates for affected assignments" do
       category = @course.group_categories.create(:name => "Group Category")
       assignment1 = @course.assignments.create!
       assignment2 = @course.assignments.create! group_category: category
@@ -323,7 +323,7 @@ describe GroupCategory do
   end
 
   context "#assign_unassigned_members_in_background" do
-    it "should use the progress object" do
+    it "uses the progress object" do
       category = @course.group_categories.create(:name => "Group Category")
       group1 = category.groups.create(:name => "Group 1", :context => @course)
       group2 = category.groups.create(:name => "Group 2", :context => @course)
@@ -344,7 +344,7 @@ describe GroupCategory do
       @category = @course.group_categories.create(:name => "Group Category")
     end
 
-    it "should not assign inactive users to groups" do
+    it "does not assign inactive users to groups" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       student1 = @course.enroll_student(user_model).user
       inactive_en = @course.enroll_student(user_model)
@@ -358,7 +358,7 @@ describe GroupCategory do
       expect(memberships.first.user).to eq student1
     end
 
-    it "should not assign users to inactive groups" do
+    it "does not assign users to inactive groups" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
@@ -374,7 +374,7 @@ describe GroupCategory do
       expect(memberships.first.group_id).to eq group2.id
     end
 
-    it "should not assign users already in group in the @category" do
+    it "does not assign users already in group in the @category" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
@@ -386,7 +386,7 @@ describe GroupCategory do
       expect(memberships.map { |m| m.user }).not_to include(student1)
     end
 
-    it "should otherwise assign ungrouped users to groups in the @category" do
+    it "otherwises assign ungrouped users to groups in the @category" do
       group1 = @category.groups.create(:name => "Group 1", :context => @course)
       group2 = @category.groups.create(:name => "Group 2", :context => @course)
       student1 = @course.enroll_student(user_model).user
@@ -398,14 +398,14 @@ describe GroupCategory do
       expect(memberships.map { |m| m.user }).to include(student2)
     end
 
-    it "should handle unequal group sizes" do
+    it "handles unequal group sizes" do
       initial_spread  = [0, 0, 0]
       max_memberships = [2, 3, 4]
       result_spread   = [2, 3, 4]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
     end
 
-    it "should not overassign to groups" do
+    it "does not overassign to groups" do
       groups = (2..4).map { |i| @category.groups.create(name: "Group #{i}", max_membership: i, context: @course) }
       students = (1..10).map { |i| @course.enroll_student(user_model).user }
       memberships = @category.assign_unassigned_members
@@ -423,7 +423,7 @@ describe GroupCategory do
       assert_random_group_assignment(@category, @course, initial_spread, result_spread, max_memberships: max_memberships)
     end
 
-    it "should assign unassigned users while respecting group limits in the category" do
+    it "assigns unassigned users while respecting group limits in the category" do
       initial_spread = [0, 0, 0]
       result_spread = [2, 2, 2]
       opts = { group_limit: 2,
@@ -431,31 +431,31 @@ describe GroupCategory do
       assert_random_group_assignment(@category, @course, initial_spread, result_spread, opts)
     end
 
-    it "should assign unassigned users correctly to empty groups in the category" do
+    it "assigns unassigned users correctly to empty groups in the category" do
       initial_spread = [0, 0, 0]
       result_spread = [3, 3, 3]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
     end
 
-    it "should assign unassigned users correctly to evenly sized groups in the category" do
+    it "assigns unassigned users correctly to evenly sized groups in the category" do
       initial_spread = [2, 2, 2]
       result_spread = [5, 5, 5]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
     end
 
-    it "should assign unassigned users correctly to unevenly sized groups where member_count > delta_required in the category" do
+    it "assigns unassigned users correctly to unevenly sized groups where member_count > delta_required in the category" do
       initial_spread = [1, 2, 3]
       result_spread = [5, 5, 6]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
     end
 
-    it "should assign unassigned users correctly to unevenly sized groups where member_count = delta_required in the category" do
+    it "assigns unassigned users correctly to unevenly sized groups where member_count = delta_required in the category" do
       initial_spread = [0, 1, 5]
       result_spread = [5, 5, 5]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
     end
 
-    it "should assign unassigned users correctly to unevenly sized groups where member_count < delta_required in the category" do
+    it "assigns unassigned users correctly to unevenly sized groups where member_count < delta_required in the category" do
       initial_spread = [0, 1, 7]
       result_spread = [4, 5, 7]
       assert_random_group_assignment(@category, @course, initial_spread, result_spread)
@@ -498,7 +498,7 @@ describe GroupCategory do
   end
 
   context "#current_progress" do
-    it "should return a new progress if the other progresses are completed" do
+    it "returns a new progress if the other progresses are completed" do
       category = @course.group_categories.create!(:name => "Group Category")
       # given existing completed progress
       expect(category.current_progress).to be_nil
@@ -514,7 +514,7 @@ describe GroupCategory do
   end
 
   context "#clone_groups_and_memberships" do
-    it "should not duplicate wiki ids" do
+    it "does not duplicate wiki ids" do
       category = @course.group_categories.create!(:name => "Group Category")
       group = category.groups.create!(name: "Group 1", context: @course)
       group.wiki # this creates a wiki for the group
@@ -544,33 +544,33 @@ describe GroupCategory do
         dist.sort_by { |k, v| k }.map(&:last)
       end
 
-      it "should handle small sections" do
+      it "handles small sections" do
         # it would normally try to go for 5 students per group since 20 / 4
         # but since we have small sections we'll have to increase the group sizes for the big section
         expect(test_group_distribution([2, 3, 15], 4)).to eq [[2], [3], [8, 7]]
       end
 
-      it "should try to smartishly distribute users" do
+      it "tries to smartishly distribute users" do
         # can't keep things perfectly evenly distributed, but we can try our best
         expect(test_group_distribution([2, 3, 14, 11], 10)).to eq [[2], [3], [3, 3, 3, 3, 2], [4, 4, 3]]
       end
 
-      it "should adjust based off of how many groups there are" do
+      it "adjusts based off of how many groups there are" do
         expect(test_group_distribution([2, 3, 14, 11], 8)).to eq [[2], [3], [5, 5, 4], [4, 4, 3]]
       end
 
-      it "should try to use max members when it can" do
+      it "tries to use max members when it can" do
         expect(test_group_distribution([6, 10, 12], 10)).to eq [[3, 3], [3, 3, 2, 2], [3, 3, 3, 3]]
       end
 
-      it "should not split up groups twice in a row" do
+      it "does not split up groups twice in a row" do
         # my original implementation would have made split the last section up into 5 groups
         # because it still had the largest remainder after splitting once
         expect(test_group_distribution([5, 5, 9, 11], 10)).to eq [[5], [3, 2], [3, 3, 3], [3, 3, 3, 2]]
         expect(test_group_distribution([9, 5, 5, 11], 10)).to eq [[3, 3, 3], [5], [3, 2], [3, 3, 3, 2]] # order shouldn't matter - should split the big one first
       end
 
-      it "should not split up a small section (with comparitively large group sizes) if it would be smarter to not" do
+      it "does not split up a small section (with comparitively large group sizes) if it would be smarter to not" do
         expect(test_group_distribution([8, 8, 30, 8, 8], 10)).to eq [[8], [8], [5, 5, 5, 5, 5, 5], [8], [8]] # would rather go to size 5 in the big section than size 4 in the other
       end
     end
@@ -579,7 +579,7 @@ describe GroupCategory do
       @category = @course.group_categories.create!(:name => "category")
     end
 
-    it "should require as many groups as sections" do
+    it "requires as many groups as sections" do
       section2 = @course.course_sections.create!
       student_in_course(:course => @course)
       student_in_course(:course => @course, :section => section2)
@@ -589,7 +589,7 @@ describe GroupCategory do
       expect(@category.errors.full_messages.first).to include("Must have at least as many groups as sections")
     end
 
-    it "should require empty groups" do
+    it "requires empty groups" do
       student_in_course(:course => @course)
       group = @category.groups.create!(:name => "group", :context => @course)
       group.add_user(@student)
@@ -598,7 +598,7 @@ describe GroupCategory do
       expect(@category.errors.full_messages.first).to include("Groups must be empty")
     end
 
-    it "should complain if groups have size restrictions" do
+    it "complains if groups have size restrictions" do
       group = @category.groups.create!(:name => "group", :context => @course)
       group.max_membership = 2
       group.save!
@@ -607,7 +607,7 @@ describe GroupCategory do
       expect(@category.errors.full_messages.first).to include("Groups cannot have size restrictions")
     end
 
-    it "should be able to randomly distribute members into groups" do
+    it "is able to randomly distribute members into groups" do
       section1 = @course.default_section
       section2 = @course.course_sections.create!
       section3 = @course.course_sections.create!
@@ -636,7 +636,7 @@ describe GroupCategory do
       expect(groups.map(&:users).flatten).to match_array users_to_section.keys # should have distributed everybody
     end
 
-    it "should catch errors and fail the current progress" do
+    it "catches errors and fail the current progress" do
       expect_any_instantiation_of(@category).to receive(:distribute_members_among_groups_by_section).and_raise("oh noes")
       @category.assign_unassigned_members_in_background(true)
       run_jobs
@@ -646,7 +646,7 @@ describe GroupCategory do
       expect(progress.message).to include("oh noes")
     end
 
-    it "should not explode when there are more groups than students" do
+    it "does not explode when there are more groups than students" do
       student_in_course(:course => @course)
 
       groups = []
@@ -656,7 +656,7 @@ describe GroupCategory do
       expect(groups.map(&:users).flatten).to eq [@student]
     end
 
-    it "should auto-assign leaders if necessary" do
+    it "auto-assigns leaders if necessary" do
       student_in_course(:course => @course)
 
       group = @category.groups.create(:name => "Group", :context => @course)
@@ -668,7 +668,7 @@ describe GroupCategory do
     end
   end
 
-  it 'should set root_account_id when created' do
+  it 'sets root_account_id when created' do
     group_category = GroupCategory.create!(name: 'Test', account: account)
     group_category_course = GroupCategory.create!(name: 'Test', course: @course)
 
@@ -676,7 +676,7 @@ describe GroupCategory do
     expect(group_category_course.root_account_id).to eq(account.id)
   end
 
-  it 'should require a group category to belong to an account or course' do
+  it 'requires a group category to belong to an account or course' do
     expect {
       GroupCategory.create!(name: 'Test') # don't provide an account or course; should fail
     }.to raise_error(ActiveRecord::RecordInvalid)
@@ -686,7 +686,7 @@ describe GroupCategory do
     expect(gc.errors.full_messages).to include('Context type Must belong to an account or course')
   end
 
-  it 'should make sure sis_batch_id is valid' do
+  it 'makes sure sis_batch_id is valid' do
     expect {
       GroupCategory.create!(name: 'Test', account: account, sis_batch_id: 1)
     }.to raise_error(ActiveRecord::InvalidForeignKey)
@@ -696,7 +696,7 @@ describe GroupCategory do
     expect(gc.sis_batch_id).to eq(sis_batch.id)
   end
 
-  it 'should make sure sis_source_id is unique per root_account' do
+  it 'makes sure sis_source_id is unique per root_account' do
     GroupCategory.create!(name: 'Test', account: account, sis_source_id: '1')
 
     expect {

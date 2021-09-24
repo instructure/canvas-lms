@@ -36,7 +36,7 @@ describe "sections/show.html.erb" do
       assign(:permission_classes, 'manage-permissions')
     end
 
-    it "should not show to teacher" do
+    it "does not show to teacher" do
       view_context(@course, @user)
       assign(:current_user, @user)
       render
@@ -44,7 +44,7 @@ describe "sections/show.html.erb" do
       expect(response).not_to have_tag("input#course_section_sis_source_id")
     end
 
-    it "should show to sis admin" do
+    it "shows to sis admin" do
       admin = account_admin_user(:account => @course.root_account)
       view_context(@course, admin)
       assign(:current_user, admin)
@@ -52,7 +52,7 @@ describe "sections/show.html.erb" do
       expect(response).to have_tag("input#course_section_sis_source_id")
     end
 
-    it "should not show to non-sis admin" do
+    it "does not show to non-sis admin" do
       admin = account_admin_user_with_role_changes(:account => @course.root_account, :role_changes => { 'manage_sis' => false })
       view_context(@course, admin)
       assign(:current_user, admin)

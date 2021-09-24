@@ -94,7 +94,7 @@ describe OutcomeProficiency, type: :model do
       expect(OutcomeProficiencyRating.active.count).to eq 2
     end
 
-    it 'should set workflow_state to active upon undestroying' do
+    it 'sets workflow_state to active upon undestroying' do
       expect(@proficiency.workflow_state).to eq 'active'
     end
   end

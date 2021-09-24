@@ -24,7 +24,7 @@ describe PlannerApiHelper do
   include PlannerApiHelper
 
   describe "#formatted_planner_date" do
-    it 'should create errors for bad dates' do
+    it 'creates errors for bad dates' do
       expect { formatted_planner_date('start_date', '123-456-789') }.to raise_error(PlannerApiHelper::InvalidDates)
       expect { formatted_planner_date('end_date', '9876-5-4321') }.to raise_error(PlannerApiHelper::InvalidDates)
     end

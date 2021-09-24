@@ -34,15 +34,15 @@ describe "account admin grading schemes" do
   end
 
   describe "grading schemes" do
-    it "should add a grading scheme", priority: "1", test_id: 163992 do
+    it "adds a grading scheme", priority: "1", test_id: 163992 do
       should_add_a_grading_scheme
     end
 
-    it "should edit a grading scheme", priority: "1", test_id: 210075 do
+    it "edits a grading scheme", priority: "1", test_id: 210075 do
       should_edit_a_grading_scheme(account, url)
     end
 
-    it "should delete a grading scheme", priority: "1", test_id: 210111 do
+    it "deletes a grading scheme", priority: "1", test_id: 210111 do
       skip_if_safari(:alert)
       should_delete_a_grading_scheme(account, url)
     end
@@ -53,19 +53,19 @@ describe "account admin grading schemes" do
       create_simple_standard_and_edit(account, url)
     end
 
-    it "should add a grading scheme item", priority: "1", test_id: 210113 do
+    it "adds a grading scheme item", priority: "1", test_id: 210113 do
       should_add_a_grading_scheme_item
     end
 
-    it "should edit a grading scheme item", priority: "1", test_id: 210114 do
+    it "edits a grading scheme item", priority: "1", test_id: 210114 do
       should_edit_a_grading_scheme_item
     end
 
-    it "should delete a grading scheme item", priority: "1", test_id: 210115 do
+    it "deletes a grading scheme item", priority: "1", test_id: 210115 do
       should_delete_a_grading_scheme_item
     end
 
-    it "should not update when invalid scheme input is given", priority: "1", test_id: 238161 do
+    it "does not update when invalid scheme input is given", priority: "1", test_id: 238161 do
       should_not_update_invalid_grading_scheme_input
     end
   end

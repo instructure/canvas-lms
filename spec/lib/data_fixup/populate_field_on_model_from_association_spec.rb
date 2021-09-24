@@ -21,7 +21,7 @@ require 'spec_helper'
 
 describe DataFixup::PopulateFieldOnModelFromAssociation do
   context 'models' do
-    it 'should populate the root_account_id on Attachment from AssessmentQuestion' do
+    it 'populates the root_account_id on Attachment from AssessmentQuestion' do
       aq = assessment_question_bank_with_questions.assessment_questions.take
       a = attachment_model(context: aq, namespace: nil)
       a.update_columns(root_account_id: 0)

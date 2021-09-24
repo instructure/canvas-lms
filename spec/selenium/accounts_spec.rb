@@ -34,7 +34,7 @@ describe "account" do
   end
 
   describe "term create/update" do
-    it "should be able to add a term" do
+    it "is able to add a term" do
       get "/accounts/#{Account.default.id}/terms"
       f(".add_term_link").click
       wait_for_ajaximations
@@ -126,7 +126,7 @@ describe "account" do
       Account.create(:name => name, :parent_account => parent_account)
     end
 
-    it "should be able to view user details from parent account" do
+    it "is able to view user details from parent account" do
       user_non_root = user_factory
       create_sub_account.account_users.create!(user: user_non_root)
       get "/accounts/#{Account.default.id}/users/#{user_non_root.id}"

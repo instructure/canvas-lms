@@ -36,7 +36,7 @@ describe Login::OtpController do
         session[:pending_otp] = true
       end
 
-      it "should show enrollment for unenrolled, required user" do
+      it "shows enrollment for unenrolled, required user" do
         Account.default.settings[:mfa_settings] = :required
         Account.default.save!
 
@@ -45,7 +45,7 @@ describe Login::OtpController do
         expect(session[:pending_otp_secret_key]).not_to be_nil
       end
 
-      it "should ask for verification of enrolled, optional user" do
+      it "asks for verification of enrolled, optional user" do
         Account.default.settings[:mfa_settings] = :optional
         Account.default.save!
 
@@ -57,7 +57,7 @@ describe Login::OtpController do
         expect(session[:pending_otp_secret_key]).to be_nil
       end
 
-      it "should send otp to sms channel" do
+      it "sends otp to sms channel" do
         Account.default.settings[:mfa_settings] = :required
         Account.default.save!
 
@@ -73,13 +73,13 @@ describe Login::OtpController do
     end
 
     context "enrollment" do
-      it "should generate a secret key" do
+      it "generates a secret key" do
         get :new
         expect(session[:pending_otp_secret_key]).not_to be_nil
         expect(@user.reload.otp_secret_key).to be_nil
       end
 
-      it "should generate a new secret key for re-enrollment" do
+      it "generates a new secret key for re-enrollment" do
         @user.otp_secret_key = ROTP::Base32.random
         @user.save!
 
@@ -101,7 +101,7 @@ describe Login::OtpController do
         @secret_key = session[:pending_otp_secret_key] = ROTP::Base32.random
       end
 
-      it "should save the pending key" do
+      it "saves the pending key" do
         @user.one_time_passwords.create!
         @user.otp_communication_channel_id = @user.communication_channels.sms.create!(:path => 'bob')
 
@@ -114,14 +114,14 @@ describe Login::OtpController do
         expect(session[:pending_otp_secret_key]).to be_nil
       end
 
-      it "should continue to the dashboard if part of the login flow" do
+      it "continues to the dashboard if part of the login flow" do
         session[:pending_otp] = true
         post :create, params: { :otp_login => { :verification_code => ROTP::TOTP.new(@secret_key).now } }
         expect(response).to redirect_to dashboard_url(:login_success => 1)
         expect(session[:pending_otp]).to be_nil
       end
 
-      it "should save a pending sms" do
+      it "saves a pending sms" do
         @cc = @user.communication_channels.sms.create!(:path => 'bob')
         session[:pending_otp_communication_channel_id] = @cc.id
         code = ROTP::TOTP.new(@secret_key).now
@@ -136,7 +136,7 @@ describe Login::OtpController do
         expect(session[:pending_otp_communication_channel_id]).to be_nil
       end
 
-      it "shouldn't fail if the sms is already active" do
+      it "does not fail if the sms is already active" do
         @cc = @user.communication_channels.sms.create!(:path => 'bob')
         @cc.confirm!
         session[:pending_otp_communication_channel_id] = @cc.id
@@ -166,7 +166,7 @@ describe Login::OtpController do
         session[:pending_otp] = true
       end
 
-      it "should verify a code" do
+      it "verifies a code" do
         code = ROTP::TOTP.new(@user.otp_secret_key).now
         post :create, params: { :otp_login => { :verification_code => code } }
         expect(response).to redirect_to dashboard_url(:login_success => 1)
@@ -175,7 +175,7 @@ describe Login::OtpController do
         expect(request.env.fetch('extra-request-cost').to_f >= 150).to be_truthy
       end
 
-      it "should verify a backup code" do
+      it "verifies a backup code" do
         code = @user.one_time_passwords.create!.code
         post :create, params: { :otp_login => { :verification_code => code } }
         expect(response).to redirect_to dashboard_url(:login_success => 1)
@@ -184,14 +184,14 @@ describe Login::OtpController do
         expect(request.env.fetch('extra-request-cost').to_f >= 150).to be_truthy
       end
 
-      it "should set a cookie" do
+      it "sets a cookie" do
         post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now, remember_me: '1' } }
         expect(response).to redirect_to dashboard_url(:login_success => 1)
         expect(cookies['canvas_otp_remember_me']).not_to be_nil
         expect(request.env.fetch('extra-request-cost').to_f >= 150).to be_truthy
       end
 
-      it "should add the current ip to existing ips" do
+      it "adds the current ip to existing ips" do
         cookies['canvas_otp_remember_me'] = @user.otp_secret_key_remember_me_cookie(Time.now.utc, nil, 'ip1')
         allow_any_instance_of(ActionDispatch::Request).to receive(:ip).and_return('ip2')
         post :create, params: { otp_login: { verification_code: ROTP::TOTP.new(@user.otp_secret_key).now, remember_me: '1' } }
@@ -201,17 +201,17 @@ describe Login::OtpController do
         expect(ips.sort).to eq ['ip1', 'ip2']
       end
 
-      it "should fail for an incorrect token" do
+      it "fails for an incorrect token" do
         post :create, params: { :otp_login => { :verification_code => '123456' } }
         expect(response).to redirect_to(otp_login_url)
       end
 
-      it "should allow 30 seconds of drift by default" do
+      it "allows 30 seconds of drift by default" do
         expect_any_instance_of(ROTP::TOTP).to receive(:verify).with('123456', drift_behind: 30, drift_ahead: 30).once
         post :create, params: { :otp_login => { :verification_code => '123456' } }
       end
 
-      it "should allow 5 minutes of drift for SMS" do
+      it "allows 5 minutes of drift for SMS" do
         @user.otp_communication_channel = @user.communication_channels.sms.create!(:path => 'bob')
         @user.save!
 
@@ -219,7 +219,7 @@ describe Login::OtpController do
         post :create, params: { :otp_login => { :verification_code => '123456' } }
       end
 
-      it "should not allow the same code to be used multiple times" do
+      it "does not allow the same code to be used multiple times" do
         skip "needs redis" unless Canvas.redis_enabled?
 
         Canvas.redis.set("otp_used:#{@user.global_id}:123456", '1')
@@ -246,7 +246,7 @@ describe Login::OtpController do
       user_session(@user)
     end
 
-    it "should delete self" do
+    it "deletes self" do
       delete :destroy, params: { :user_id => 'self' }
       expect(response).to be_successful
       expect(@user.reload.otp_secret_key).to be_nil
@@ -254,14 +254,14 @@ describe Login::OtpController do
       expect(@user.one_time_passwords).not_to be_exists
     end
 
-    it "should delete self as id" do
+    it "deletes self as id" do
       delete :destroy, params: { :user_id => @user.id }
       expect(response).to be_successful
       expect(@user.reload.otp_secret_key).to be_nil
       expect(@user.otp_communication_channel).to be_nil
     end
 
-    it "should not be able to delete self if required" do
+    it "is not able to delete self if required" do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
       delete :destroy, params: { :user_id => 'self' }
@@ -270,7 +270,7 @@ describe Login::OtpController do
       expect(@user.otp_communication_channel).not_to be_nil
     end
 
-    it "should not be able to delete self as id if required" do
+    it "is not able to delete self as id if required" do
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!
       delete :destroy, params: { :user_id => @user.id }
@@ -279,7 +279,7 @@ describe Login::OtpController do
       expect(@user.otp_communication_channel).not_to be_nil
     end
 
-    it "should not be able to delete another user" do
+    it "is not able to delete another user" do
       @other_user = @user
       @admin = user_with_pseudonym(:active_all => 1, :unique_id => 'user2')
       user_session(@admin)
@@ -289,7 +289,7 @@ describe Login::OtpController do
       expect(@other_user.otp_communication_channel).not_to be_nil
     end
 
-    it "should be able to delete another user with permission" do
+    it "is able to delete another user with permission" do
       @other_user = @user
       @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2')
       mfa_role = custom_account_role('mfa_role', account: Account.default)
@@ -304,7 +304,7 @@ describe Login::OtpController do
       expect(@other_user.otp_communication_channel).to be_nil
     end
 
-    it "should be able to delete another user with site_admin" do
+    it "is able to delete another user with site_admin" do
       @other_user = @user
       @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2', account: Account.site_admin)
       mfa_role = custom_account_role('mfa_role', account: Account.site_admin)
@@ -319,7 +319,7 @@ describe Login::OtpController do
       expect(@other_user.otp_communication_channel).to be_nil
     end
 
-    it "should not be able to delete another user from different account" do
+    it "is not able to delete another user from different account" do
       @other_user = @user
       account1 = Account.create!
       @admin = user_with_pseudonym(active_all: 1, unique_id: 'user2', account: account1)
@@ -335,7 +335,7 @@ describe Login::OtpController do
       expect(@other_user.otp_communication_channel).not_to be_nil
     end
 
-    it "should be able to delete another user as admin" do
+    it "is able to delete another user as admin" do
       # even if required
       Account.default.settings[:mfa_settings] = :required
       Account.default.save!

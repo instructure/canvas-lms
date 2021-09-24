@@ -27,21 +27,21 @@ describe "shared/_rubric" do
   let(:rubric_association) { rubric_association_model(context: context, rubric: rubric) }
   let(:html) { Nokogiri::HTML5.fragment(response) }
 
-  it "should render" do
+  it "renders" do
     view_context(context)
 
     render partial: "shared/rubric", locals: { rubric: rubric }
     expect(response).not_to be_nil
   end
 
-  it "should render with points showing" do
+  it "renders with points showing" do
     view_context(context)
     render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }
     expect(html.css('.rubric .toggle_for_hide_points')).not_to be_empty
     expect(html.css('.rubric .toggle_for_hide_points.hidden')).to be_empty
   end
 
-  it "should render some components hidden if hide_points is true" do
+  it "renders some components hidden if hide_points is true" do
     view_context(context)
     rubric_association.update! hide_points: true
     render partial: "shared/rubric", locals: { rubric: rubric, rubric_association: rubric_association }

@@ -94,7 +94,7 @@ describe ContentZipper do
       end
     end
 
-    it "should ignore undownloadable submissions" do
+    it "ignores undownloadable submissions" do
       course_with_student(active_all: true)
       @user.update!(sortable_name: 'some_999_, _1234_guy')
       assignment_model(course: @course)
@@ -121,7 +121,7 @@ describe ContentZipper do
       zip_file.close
     end
 
-    it "should zip up online_url submissions" do
+    it "zips up online_url submissions" do
       course_with_student(active_all: true)
       @user.update!(sortable_name: 'some_999_, _1234_guy')
       submission_model user: @user
@@ -142,7 +142,7 @@ describe ContentZipper do
       end
     end
 
-    it "should zip up online_text_entry submissions" do
+    it "zips up online_text_entry submissions" do
       course_with_student(active_all: true)
       @student.update_attribute(:name, "some student name")
       submission_model(body: "hai this is my answer")
@@ -163,7 +163,7 @@ describe ContentZipper do
       expect(content).to include(@student.name)
     end
 
-    it "should not include student name in online_text_entry submissions if anonymous" do
+    it "does not include student name in online_text_entry submissions if anonymous" do
       course_with_student(active_all: true)
       @student.update_attribute(:name, "some student name")
 
@@ -182,7 +182,7 @@ describe ContentZipper do
       expect(content).to include("Anonymous User")
     end
 
-    it "should only include submissions in the correct section " do
+    it "onlies include submissions in the correct section" do
       course_with_student(active_all: true)
       submission_model(body: "hai this is my answer")
       @section = @course.course_sections.create!
@@ -270,7 +270,7 @@ describe ContentZipper do
   end
 
   describe "assignment_zip_filename" do
-    it "should use use course and title slugs to keep filename length down" do
+    it "uses use course and title slugs to keep filename length down" do
       course_factory(active_all: true)
       @course.short_name = "a" * 31
       @course.save!
@@ -286,7 +286,7 @@ describe ContentZipper do
   end
 
   describe "hard concluded course submissions" do
-    it "should still download the content" do
+    it "stills download the content" do
       course_with_teacher
       @assignment = assignment_model(course: @course)
       submissions = 5.times.map.with_index do |i|
@@ -361,29 +361,29 @@ describe ContentZipper do
           @course.save
         end
 
-        it "should give logged in students some files" do
+        it "gives logged in students some files" do
           expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort
         end
 
-        it "should give logged in teachers all files" do
+        it "gives logged in teachers all files" do
           expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
       end
 
       context "in a private course" do
-        it "should give logged in students some files" do
+        it "gives logged in students some files" do
           expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort
         end
 
-        it "should give logged in teachers all files" do
+        it "gives logged in teachers all files" do
           expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
 
-        it "should give logged out people no files" do
+        it "gives logged out people no files" do
           expect(zipped_files_for_user(nil)).to eq []
         end
 
-        it "should give all files if check_user=false" do
+        it "gives all files if check_user=false" do
           expect(zipped_files_for_user(nil, false)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
       end
@@ -394,25 +394,25 @@ describe ContentZipper do
           @course.save!
         end
 
-        it "should give logged in students some files" do
+        it "gives logged in students some files" do
           expect(zipped_files_for_user(@user)).to eq ['visible.png', 'visible/sub-vis.png'].sort
         end
 
-        it "should give logged in teachers all files" do
+        it "gives logged in teachers all files" do
           expect(zipped_files_for_user(@teacher)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
 
-        it "should give logged out people the same thing as students" do
+        it "gives logged out people the same thing as students" do
           expect(zipped_files_for_user(nil)).to eq ['visible.png', 'visible/sub-vis.png'].sort
         end
 
-        it "should give all files if check_user=false" do
+        it "gives all files if check_user=false" do
           expect(zipped_files_for_user(nil, false)).to eq ["locked/sub-locked-vis.png", "hidden/sub-hidden.png", "hidden.png", "visible.png", "visible/sub-locked.png", "visible/sub-vis.png", "locked.png"].sort
         end
       end
     end
 
-    it "should not error on empty folders" do
+    it "does not error on empty folders" do
       course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
       attachment = Attachment.new(display_name: 'my_download.zip')
@@ -437,12 +437,12 @@ describe ContentZipper do
         @attachment.save!
       end
 
-      it "should error if no files could be added" do
+      it "errors if no files could be added" do
         ContentZipper.process_attachment(@attachment, @user)
         expect(@attachment.workflow_state).to eq 'errored'
       end
 
-      it "should skip files that couldn't be opened, without failing the download" do
+      it "skips files that couldn't be opened, without failing the download" do
         @course.attachments.create!(folder: @root, uploaded_data: StringIO.new("good"), filename: "good")
         ContentZipper.process_attachment(@attachment, @user)
         expect(@attachment.workflow_state).to eq 'zipped'
@@ -450,7 +450,7 @@ describe ContentZipper do
       end
     end
 
-    it "should use the display name" do
+    it "uses the display name" do
       course_with_student(active_all: true)
       folder = Folder.root_folders(@course).first
       attachment_model(uploaded_data: stub_png_data('hidden.png'),
@@ -556,7 +556,7 @@ describe ContentZipper do
   end
 
   describe "render_eportfolio_page_content" do
-    it "should return the text of the file contents" do
+    it "returns the text of the file contents" do
       user = User.create!
       eportfolio = user.eportfolios.create!(name: 'bestest_eportfolio_eva')
       eportfolio.ensure_defaults

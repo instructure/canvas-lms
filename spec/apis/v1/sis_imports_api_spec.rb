@@ -85,7 +85,7 @@ describe SisImportsApiController, type: :request do
     return batch.reload
   end
 
-  it 'should kick off a sis import via multipart attachment' do
+  it 'kicks off a sis import via multipart attachment' do
     json = nil
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -205,7 +205,7 @@ describe SisImportsApiController, type: :request do
     expect(json).to eq expected_data
   end
 
-  it 'should restore batch on restore_states and return progress' do
+  it 'restores batch on restore_states and return progress' do
     batch = @account.sis_batches.create
     json = api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/restore_states",
                     { controller: 'sis_imports_api', action: 'restore_states', format: 'json',
@@ -217,7 +217,7 @@ describe SisImportsApiController, type: :request do
     api_call(:get, "/api/v1/progress/#{json['id']}", params, {}, {}, expected_status: 200)
   end
 
-  it 'should show current running sis import' do
+  it 'shows current running sis import' do
     batch = @account.sis_batches.create!
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports/importing",
                     { controller: 'sis_imports_api', action: 'importing', format: 'json',
@@ -231,7 +231,7 @@ describe SisImportsApiController, type: :request do
     expect(json["sis_imports"].first['id']).to eq batch.id
   end
 
-  it 'should abort batch on abort' do
+  it 'aborts batch on abort' do
     batch = @account.sis_batches.create
     api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
              { controller: 'sis_imports_api', action: 'abort', format: 'json',
@@ -239,7 +239,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.reload.workflow_state).to eq 'aborted'
   end
 
-  it 'should allow aborting an importing batch' do
+  it 'allows aborting an importing batch' do
     batch = @account.sis_batches.create
     SisBatch.where(id: batch).update_all(workflow_state: 'importing')
     api_call(:put, "/api/v1/accounts/#{@account.id}/sis_imports/#{batch.id}/abort",
@@ -248,7 +248,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.reload.workflow_state).to eq 'aborted'
   end
 
-  it 'should not explode if there is no batch' do
+  it 'does not explode if there is no batch' do
     batch = @account.sis_batches.create
     SisBatch.where(id: batch).update_all(workflow_state: 'imported')
     raw_api_call(:put,
@@ -259,7 +259,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.reload.workflow_state).to eq 'imported'
   end
 
-  it 'should abort all pending batches on abort' do
+  it 'aborts all pending batches on abort' do
     batch1 = @account.sis_batches.create
     SisBatch.where(id: batch1).update_all(workflow_state: 'imported')
     batch2 = @account.sis_batches.create
@@ -276,7 +276,7 @@ describe SisImportsApiController, type: :request do
     expect(batch4.reload.workflow_state).to eq 'aborted'
   end
 
-  it "should skip the job for skip_sis_jobs_account_ids" do
+  it "skips the job for skip_sis_jobs_account_ids" do
     Setting.set('skip_sis_jobs_account_ids', "fake,#{@account.global_id}")
     expect {
       api_call(:post,
@@ -288,7 +288,7 @@ describe SisImportsApiController, type: :request do
     }.to change { Delayed::Job.strand_size("sis_batch:account:#{@account.id}") }.by(0)
   end
 
-  it "should enable batch mode and require selecting a valid term" do
+  it "enables batch mode and require selecting a valid term" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'create',
@@ -302,7 +302,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
   end
 
-  it "should use change threshold for batch mode" do
+  it "uses change threshold for batch mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -316,7 +316,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.change_threshold).to eq 7
   end
 
-  it "should requre change threshold for multi_term_batch_mode" do
+  it "requres change threshold for multi_term_batch_mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -327,7 +327,7 @@ describe SisImportsApiController, type: :request do
     expect(json['message']).to eq 'change_threshold is required to use multi term_batch mode.'
   end
 
-  it "should use multi_term_batch_mode" do
+  it "uses multi_term_batch_mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -342,7 +342,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:multi_term_batch_mode]).to be_truthy
   end
 
-  it "should enable batch with sis stickyness" do
+  it "enables batch with sis stickyness" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -360,7 +360,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.batch_mode_term).to eq @account.default_enrollment_term
   end
 
-  it "should enable updating SIS ID, when a pseudonym is found" do
+  it "enables updating SIS ID, when a pseudonym is found" do
     json = api_call(
       :post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -380,7 +380,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.options[:update_sis_id_if_login_claimed]).to be_truthy
   end
 
-  it "should enable diffing mode" do
+  it "enables diffing mode" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -400,7 +400,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.diff_row_count_threshold).to eq 4
   end
 
-  it "should allow for other diffing_drop_status" do
+  it "allows for other diffing_drop_status" do
     json = api_call(
       :post,
       "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -420,7 +420,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.diffing_data_set_identifier).to eq 'my-users-data'
   end
 
-  it "should error for invalid diffing_drop_status" do
+  it "errors for invalid diffing_drop_status" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { controller: 'sis_imports_api', action: 'create',
@@ -433,7 +433,7 @@ describe SisImportsApiController, type: :request do
     expect(json['message']).to eq 'Invalid diffing_drop_status'
   end
 
-  it "should error if batch mode and the term can't be found" do
+  it "errors if batch mode and the term can't be found" do
     expect {
       json = api_call(:post,
                       "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -446,7 +446,7 @@ describe SisImportsApiController, type: :request do
     }.to change(SisBatch, :count).by(0)
   end
 
-  it "should enable sis stickiness options" do
+  it "enables sis stickiness options" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'create',
@@ -529,7 +529,7 @@ describe SisImportsApiController, type: :request do
     batch.destroy
   end
 
-  it 'should support sis stickiness overriding' do
+  it 'supports sis stickiness overriding' do
     before_count = AbstractCourse.count
     post_csv(
       "term_id,name,status,start_date,end_date",
@@ -590,7 +590,7 @@ describe SisImportsApiController, type: :request do
     end
   end
 
-  it 'should allow turning on stickiness' do
+  it 'allows turning on stickiness' do
     before_count = AbstractCourse.count
     post_csv(
       "term_id,name,status,start_date,end_date",
@@ -635,7 +635,7 @@ describe SisImportsApiController, type: :request do
     end
   end
 
-  it 'should allow turning off stickiness' do
+  it 'allows turning off stickiness' do
     before_count = AbstractCourse.count
     post_csv(
       "term_id,name,status,start_date,end_date",
@@ -697,7 +697,7 @@ describe SisImportsApiController, type: :request do
     end
   end
 
-  it "should allow raw post without content-type" do
+  it "allows raw post without content-type" do
     # In the current API docs, we specify that you need to send a content-type to make raw
     # post work. However, long ago we added code to make it work even without the header,
     # so we are going to maintain that behavior.
@@ -709,7 +709,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.attachment.size).to eq 7
   end
 
-  it "should allow raw post without charset" do
+  it "allows raw post without charset" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
                     { :controller => 'sis_imports_api', :action => 'create',
@@ -722,7 +722,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.attachment.content_type).to eq "text/csv"
   end
 
-  it "should handle raw post content-types with attributes" do
+  it "handles raw post content-types with attributes" do
     json = api_call(:post,
                     "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
                     { :controller => 'sis_imports_api', :action => 'create',
@@ -735,7 +735,7 @@ describe SisImportsApiController, type: :request do
     expect(batch.attachment.content_type).to eq "text/csv"
   end
 
-  it "should reject non-utf-8 encodings on content-type" do
+  it "rejects non-utf-8 encodings on content-type" do
     json = raw_api_call(:post,
                         "/api/v1/accounts/#{@account.id}/sis_imports.json?import_type=instructure_csv",
                         { :controller => 'sis_imports_api', :action => 'create',
@@ -747,7 +747,7 @@ describe SisImportsApiController, type: :request do
     expect(SisBatch.count).to eq 0
   end
 
-  it "should list sis imports for an account" do
+  it "lists sis imports for an account" do
     batch = post_csv(
       "account_id,parent_account_id,name,status",
       "A001,,TestAccount,active"
@@ -826,7 +826,7 @@ describe SisImportsApiController, type: :request do
     expect(links.first[:uri].path).to eq api_v1_account_sis_imports_path
   end
 
-  it "should return downloadable attachments if available" do
+  it "returns downloadable attachments if available" do
     batch = post_csv(
       "user_id,password,login_id,status,ssha_password",
       "user_1,supersecurepwdude,user_1,active,hunter2"
@@ -843,7 +843,7 @@ describe SisImportsApiController, type: :request do
     expect(atts_json.first["url"]).to be_present
   end
 
-  it "should return downloadable attachments from the diff if available" do
+  it "returns downloadable attachments from the diff if available" do
     batch = @account.sis_batches.create
     att1 = Attachment.create!(:filename => 'blah.txt', :uploaded_data => StringIO.new('blah'), :context => batch)
     att2 = Attachment.create!(:filename => 'blah2.txt', :uploaded_data => StringIO.new('blah2'), :context => batch)
@@ -863,7 +863,7 @@ describe SisImportsApiController, type: :request do
     expect(diff_atts_json.first["id"]).to eq att2.id
   end
 
-  it "should filter sis imports by date if requested" do
+  it "filters sis imports by date if requested" do
     batch = @account.sis_batches.create
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
@@ -891,7 +891,7 @@ describe SisImportsApiController, type: :request do
     expect(json["sis_imports"].count).to eq 0
   end
 
-  it "should not fail when options are empty" do
+  it "does not fail when options are empty" do
     batch = @account.sis_batches.create
     expect(batch.options).to be_empty
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -900,7 +900,7 @@ describe SisImportsApiController, type: :request do
     assert_status(200)
   end
 
-  it "should error on non-root account" do
+  it "errors on non-root account" do
     subaccount = @account.sub_accounts.create!
     json = api_call(:get, "/api/v1/accounts/#{subaccount.id}/sis_imports.json",
                     { :controller => 'sis_imports_api', :action => 'index',
@@ -911,7 +911,7 @@ describe SisImportsApiController, type: :request do
     expect(json['errors'].first).to eq "SIS imports can only be executed on root accounts"
   end
 
-  it "should error on non-enabled root account" do
+  it "errors on non-enabled root account" do
     @account.allow_sis_import = false
     @account.save
     json = api_call(:get, "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -923,7 +923,7 @@ describe SisImportsApiController, type: :request do
     expect(json['errors'].first).to eq "SIS imports are not enabled for this account"
   end
 
-  it "should error on user with no sis permissions" do
+  it "errors on user with no sis permissions" do
     account_admin_user_with_role_changes(account: @account, role_changes: { manage_sis: true, import_sis: false })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -935,7 +935,7 @@ describe SisImportsApiController, type: :request do
              expected_status: 401)
   end
 
-  it "should work with import permissions" do
+  it "works with import permissions" do
     account_admin_user_with_role_changes(user: @user, role_changes: { manage_sis: false, import_sis: true })
     api_call(:post,
              "/api/v1/accounts/#{@account.id}/sis_imports.json",
@@ -947,7 +947,7 @@ describe SisImportsApiController, type: :request do
              expected_status: 200)
   end
 
-  it "should include the errors_attachment when there are errors" do
+  it "includes the errors_attachment when there are errors" do
     batch = @account.sis_batches.create!
     3.times do |i|
       batch.sis_batch_errors.create(root_account: @account, file: 'users.csv', message: "some error #{i}", row: i)

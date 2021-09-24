@@ -19,7 +19,7 @@
 
 describe CanvasPartman::PartitionManager do
   describe '.create' do
-    it 'should whine if the target class is not Partitioned' do
+    it 'whines if the target class is not Partitioned' do
       expect {
         CanvasPartman::PartitionManager.create(Object)
       }.to raise_error(ArgumentError, /can only work on models that are partitioned/i)
@@ -58,7 +58,7 @@ describe CanvasPartman::PartitionManager do
     end
 
     describe "#ensure_partitions" do
-      it "should create the proper number of partitions" do
+      it "creates the proper number of partitions" do
         expect(subject).to receive(:partition_exists?).at_least(:once).and_return(false)
         expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
         expect(subject).to receive(:create_partition).with(Time.utc(2015, 05, 01))
@@ -69,7 +69,7 @@ describe CanvasPartman::PartitionManager do
     end
 
     describe "#prune_partitions" do
-      it "should prune the proper number of partitions" do
+      it "prunes the proper number of partitions" do
         expect(Time).to receive(:now).and_return(Time.utc(2015, 05, 02))
         expect(subject).to receive(:partition_tables).and_return(%w{
                                                                    partman_animals_2014_9

@@ -21,7 +21,7 @@
 require 'spec_helper'
 
 describe AdheresToPolicy::Policy, "set_policy" do
-  it "should take a block" do
+  it "takes a block" do
     expect {
       Class.new do
         extend AdheresToPolicy::ClassMethods
@@ -30,7 +30,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
     }.not_to raise_error
   end
 
-  it "should allow multiple calls" do
+  it "allows multiple calls" do
     expect {
       Class.new do
         extend AdheresToPolicy::ClassMethods
@@ -43,7 +43,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
   end
 
   context "available_rights" do
-    it "should return all available rights" do
+    it "returns all available rights" do
       example_class = Class.new do
         extend AdheresToPolicy::ClassMethods
 
@@ -61,7 +61,7 @@ describe AdheresToPolicy::Policy, "set_policy" do
   end
 
   describe '#add_rights' do
-    it 'should add rights to parents' do
+    it 'adds rights to parents' do
       right = double
       condition = double
       parent = AdheresToPolicy::Policy.new(nil, nil)

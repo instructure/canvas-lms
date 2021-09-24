@@ -54,7 +54,7 @@ describe CustomGradebookColumnsApiController, type: :request do
       assert_status(401)
     end
 
-    it 'should return the custom columns' do
+    it 'returns the custom columns' do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns",
                       course_id: @course.to_param, action: "index",
@@ -64,7 +64,7 @@ describe CustomGradebookColumnsApiController, type: :request do
       }
     end
 
-    it 'should paginate' do
+    it 'paginates' do
       json = api_call :get,
                       "/api/v1/courses/#{@course.id}/custom_gradebook_columns?per_page=1",
                       course_id: @course.to_param, per_page: "1", action: "index",

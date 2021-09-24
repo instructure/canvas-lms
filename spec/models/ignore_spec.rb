@@ -36,7 +36,7 @@ describe Ignore do
   end
 
   describe '#cleanup' do
-    it 'should delete ignores for deleted assignments' do
+    it 'deletes ignores for deleted assignments' do
       @assignment.update!(workflow_state: 'deleted', updated_at: 2.months.ago)
       assignment2 = assignment_model(course: @course)
       ignore2 = Ignore.create!(asset: assignment2, user: @student, purpose: 'submitting')
@@ -46,7 +46,7 @@ describe Ignore do
       expect { ignore2.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should delete ignores for deleted quizzes' do
+    it 'deletes ignores for deleted quizzes' do
       @quiz.update!(workflow_state: 'deleted', updated_at: 2.months.ago)
       quiz2 = quiz_model(course: @course)
       ignore2 = Ignore.create!(asset: quiz2, user: @student, purpose: 'submitting')
@@ -56,13 +56,13 @@ describe Ignore do
       expect { ignore2.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should delete ignores for deleted assessment requests' do
+    it 'deletes ignores for deleted assessment requests' do
       @ar.delete
       Ignore.cleanup
       expect { @ignore_ar.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should not delete ignores for recently deleted (and recoverable) assets' do
+    it 'does not delete ignores for recently deleted (and recoverable) assets' do
       @assignment.destroy!
       @quiz.destroy!
       Ignore.cleanup
@@ -70,7 +70,7 @@ describe Ignore do
       expect(@ignore_quiz.reload).to eq @ignore_quiz
     end
 
-    it 'should delete ignores for users with deleted enrollments' do
+    it 'deletes ignores for users with deleted enrollments' do
       @enrollment.update!(workflow_state: 'deleted', updated_at: 2.months.ago)
       Ignore.cleanup
       expect { @ignore_assign.reload }.to raise_error ActiveRecord::RecordNotFound
@@ -78,7 +78,7 @@ describe Ignore do
       expect { @ignore_ar.reload }.to raise_error ActiveRecord::RecordNotFound
     end
 
-    it 'should not delete ignores for users with recently deleted (and recoverable) enrollments' do
+    it 'does not delete ignores for users with recently deleted (and recoverable) enrollments' do
       @enrollment.destroy!
       Ignore.cleanup
       expect(@ignore_assign.reload).to eq @ignore_assign
@@ -86,7 +86,7 @@ describe Ignore do
       expect(@ignore_ar.reload).to eq @ignore_ar
     end
 
-    it 'should not delete ignores for users with active assets and in progress enrollments' do
+    it 'does not delete ignores for users with active assets and in progress enrollments' do
       Ignore.cleanup
       expect(@ignore_assign.reload).to eq @ignore_assign
       expect(@ignore_quiz.reload).to eq @ignore_quiz
