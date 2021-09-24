@@ -25,7 +25,8 @@ const defaultProps = () => ({
   feeds: [],
   hasLoadedFeed: false,
   getExternalFeeds: () => {},
-  deleteExternalFeed: () => {}
+  deleteExternalFeed: () => {},
+  focusLastElement: () => {}
 })
 
 const defaultFeeds = () => [
