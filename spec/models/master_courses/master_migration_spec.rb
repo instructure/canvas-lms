@@ -53,7 +53,7 @@ describe MasterCourses::MasterMigration do
       }.to raise_error("cannot start new migration while another one is running")
     end
 
-    it "stills allow if the 'active' migration has been running for a while (and is probably ded)" do
+    it "still allows if the 'active' migration has been running for a while (and is probably ded)" do
       running = @template.master_migrations.create!(:workflow_state => "exporting")
       @template.active_migration = running
       @template.save!

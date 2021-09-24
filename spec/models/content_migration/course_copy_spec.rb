@@ -830,7 +830,7 @@ describe ContentMigration do
       expect(page_to.body).to eq body
     end
 
-    it "stills translate links to /course/X/files" do
+    it "still translates links to /course/X/files" do
       body = %{<p>link to course files <a href="/courses/%s/files">files</a></p>}
       page = @copy_from.wiki_pages.create!(:title => "some page", :body => body % @copy_from.id.to_s)
       run_course_copy

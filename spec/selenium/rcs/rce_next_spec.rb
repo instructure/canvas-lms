@@ -599,7 +599,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           )
         end
 
-        it 'stills allow inserting course links' do
+        it 'still allows inserting course links' do
           title = 'Discussion-Title'
           @discussion = @course.discussion_topics.create!(title: title)
 

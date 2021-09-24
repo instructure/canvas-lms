@@ -202,7 +202,7 @@ describe ImportedHtmlConverter do
       expect(convert_and_replace(test_string)).to eq repaired_string
     end
 
-    it "onlies convert url params" do
+    it "only converts url params" do
       test_string = <<~HTML
         <object>
         <param name="controls" value="CONSOLE" />

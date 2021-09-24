@@ -242,7 +242,7 @@ describe UserObserveesController, type: :request do
       observers_call(api_user: disallowed_admin, expected_status: 401)
     end
 
-    it "onlies return linked root accounts the admin has rights for" do
+    it "only returns linked root accounts the admin has rights for" do
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: Account.default)
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: external_account)
       json = raw_observers_call(:user_id => multi_student.id, :api_user => allowed_admin)
@@ -331,7 +331,7 @@ describe UserObserveesController, type: :request do
       expect(json.map { |o| o["avatar_url"] }).to eq ["http://www.example.com/relative/canvas/path"]
     end
 
-    it "onlies return linked root accounts the admin has rights for" do
+    it "only returns linked root accounts the admin has rights for" do
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: Account.default)
       UserObservationLink.create_or_restore(observer: multi_parent, student: multi_student, root_account: external_account)
       json = raw_index_call(:user_id => multi_parent.id, :api_user => allowed_admin)
@@ -562,7 +562,7 @@ describe UserObserveesController, type: :request do
         expect(multi_parent.as_observer_observation_links.pluck(:root_account_id)).to match_array([Account.default.id])
       end
 
-      it "onlies add a link to one root account if specified" do
+      it "only adds a link to one root account if specified" do
         update_call(user_id: multi_parent.id, observee_id: multi_student.id, api_user: multi_admin, root_account_id: external_account.id)
         expect(multi_parent.as_observer_observation_links.pluck(:root_account_id)).to eq([external_account.id])
       end
@@ -572,12 +572,12 @@ describe UserObserveesController, type: :request do
         expect(multi_parent.as_observer_observation_links.pluck(:root_account_id)).to match_array([Account.default.id, external_account.id])
       end
 
-      it "onlies add a link for the commonly associated root accounts" do
+      it "only adds a link for the commonly associated root accounts" do
         update_call(user_id: multi_parent.id, observee_id: student.id, api_user: multi_admin, root_account_id: "all")
         expect(multi_parent.as_observer_observation_links.pluck(:root_account_id)).to eq([Account.default.id])
       end
 
-      it "onlies add a link for the commonly associated root accounts the admin has rights for" do
+      it "only adds a link for the commonly associated root accounts the admin has rights for" do
         update_call(user_id: multi_parent.id, observee_id: multi_student.id, api_user: allowed_admin, root_account_id: "all")
         expect(multi_parent.as_observer_observation_links.pluck(:root_account_id)).to eq([Account.default.id])
       end

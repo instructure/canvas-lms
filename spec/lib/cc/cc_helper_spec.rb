@@ -194,7 +194,7 @@ describe CC::CCHelper do
       expect(doc.at_css('script')).to be_nil
     end
 
-    it "onlies translate course when trying to translate /cousers/x/users/y type links" do
+    it "only translates course when trying to translate /cousers/x/users/y type links" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user, :for_course_copy => true)
       orig = <<-HTML
       <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>

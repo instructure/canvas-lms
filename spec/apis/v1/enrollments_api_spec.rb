@@ -814,7 +814,7 @@ describe EnrollmentsApiController, type: :request do
       context "sharding" do
         specs_require_sharding
 
-        it "properlies restore an existing enrollment when self-enrolling a cross-shard user" do
+        it "properly restores an existing enrollment when self-enrolling a cross-shard user" do
           @shard1.activate { @cs_user = user_with_pseudonym(:active_all => true) }
           enrollment = @course.enroll_student(@cs_user)
           enrollment.destroy
@@ -2268,7 +2268,7 @@ describe EnrollmentsApiController, type: :request do
 
     describe "pagination" do
       shared_examples_for 'numeric pagination' do
-        it "properlies paginate" do
+        it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
           enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
             res = res + @course.send("#{type}_enrollments").preload(:user)
@@ -2331,7 +2331,7 @@ describe EnrollmentsApiController, type: :request do
       end
 
       shared_examples_for 'bookmarked pagination' do
-        it "properlies paginate" do
+        it "properly paginates" do
           json = api_call(:get, "#{@path}?page=1&per_page=1", @params.merge(:page => 1.to_param, :per_page => 1.to_param))
           enrollments = %w{observer student ta teacher}.inject([]) { |res, type|
             res = res + @course.send("#{type}_enrollments").preload(:user)
@@ -2681,7 +2681,7 @@ describe EnrollmentsApiController, type: :request do
     end
 
     describe "filters" do
-      it "properlies filter by a single enrollment type" do
+      it "properly filters by a single enrollment type" do
         json = api_call(:get, "#{@path}?type[]=StudentEnrollment", @params.merge(:type => %w{StudentEnrollment}))
         expect(json).to eql @course.student_enrollments.map { |e|
           {
@@ -2722,7 +2722,7 @@ describe EnrollmentsApiController, type: :request do
         }
       end
 
-      it "properlies filter by multiple enrollment types" do
+      it "properly filters by multiple enrollment types" do
         # set up some enrollments that shouldn't be returned by the api
         request_user = @user
         @new_user = user_with_pseudonym(:name => 'Zombo', :username => 'nobody2@example.com')

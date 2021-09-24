@@ -403,7 +403,7 @@ describe "Roles API", type: :request do
       expect(perm['enabled']).to eq false
     end
 
-    it "onlies set the parts that are specified" do
+    it "only sets the parts that are specified" do
       api_call_with_settings(:explicit => '1', :enabled => '0')
       override = @account.role_overrides.where(:permission => @permission, :role_id => @role.id).first
       expect(override).to_not be_nil
@@ -596,7 +596,7 @@ describe "Roles API", type: :request do
                                                        })
       end
 
-      it "onlies return manageable permissions" do
+      it "only returns manageable permissions" do
         # set up a subaccount and admin in subaccount
         subaccount = @account.sub_accounts.create!
 

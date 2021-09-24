@@ -204,7 +204,7 @@ describe RoleOverride do
         expect(@existing_override.locked).to be_truthy
       end
 
-      it "onlies update the parts that are specified" do
+      it "only updates the parts that are specified" do
         new_override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
         @existing_override.reload
         expect(@existing_override.locked).to be_falsey
@@ -248,7 +248,7 @@ describe RoleOverride do
         expect(override.locked).to be_truthy
       end
 
-      it "onlies set the parts that are specified" do
+      it "only sets the parts that are specified" do
         override = RoleOverride.manage_role_override(@account, @role, @permission, :override => false)
         expect(override.enabled).to eq false
         expect(override.locked).to eq false
@@ -645,7 +645,7 @@ describe RoleOverride do
   describe "caching" do
     specs_require_cache(:redis_cache_store)
 
-    it "onlies calculate role overrides once for all courses across an account" do
+    it "only calculates role overrides once for all courses across an account" do
       enrollment1 = student_in_course(:active_all => true)
       enrollment2 = student_in_course(:active_all => true)
 
@@ -655,7 +655,7 @@ describe RoleOverride do
       end
     end
 
-    it "onlies calculate role overrides once for multiple users with the same role in the same course" do
+    it "only calculates role overrides once for multiple users with the same role in the same course" do
       enrollment1 = student_in_course(:active_all => true)
       enrollment2 = student_in_course(:active_all => true, :course => enrollment1.course)
 

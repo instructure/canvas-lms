@@ -63,7 +63,7 @@ describe UsersController do
       expect(Nokogiri::HTML5(response.body).at_css('table.report tbody tr:first td:nth(2)').text).to match(/never/)
     end
 
-    it "onlies include students the teacher can view" do
+    it "only includes students the teacher can view" do
       get user_course_teacher_activity_url(@teacher, @course)
       expect(response).to be_successful
       expect(response.body).to match(/studentname1/)
@@ -272,7 +272,7 @@ describe UsersController do
   end
 
   describe "#grades" do
-    it "onlies list courses once for multiple enrollments" do
+    it "only lists courses once for multiple enrollments" do
       course_with_student_logged_in(:active_all => true)
       @first_course = @course
       add_section("other section")

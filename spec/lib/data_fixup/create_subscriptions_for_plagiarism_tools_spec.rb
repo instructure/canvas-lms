@@ -67,7 +67,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy.reload.subscription_id).to be_nil
     end
 
-    it 'onlies create one subscription if there are 2 tools with the same product code, vendor code and SubmissionEvent endpoint' do
+    it 'only creates one subscription if there are 2 tools with the same product code, vendor code and SubmissionEvent endpoint' do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],

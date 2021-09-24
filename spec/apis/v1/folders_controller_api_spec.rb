@@ -73,7 +73,7 @@ describe "Folders API", type: :request do
       end
     end
 
-    it "404S for no folder found" do
+    it "404s for no folder found" do
       raw_api_call(:get, @folders_path + "/0/folders", @folders_path_options.merge(:action => "api_index", :id => "0"), {})
 
       expect(response.code).to eq "404"
@@ -151,12 +151,12 @@ describe "Folders API", type: :request do
       expect(response.code).to eq "401"
     end
 
-    it "404S for no folder found" do
+    it "404s for no folder found" do
       raw_api_call(:get, @folders_path + "/0", @folders_path_options.merge(:action => "show", :id => "0"))
       assert_status(404)
     end
 
-    it "404S for deleted folder" do
+    it "404s for deleted folder" do
       f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
       f1.destroy
       raw_api_call(:get, @folders_path + "/#{f1.id}", @folders_path_options.merge(:action => "show", :id => f1.id.to_param))
@@ -200,7 +200,7 @@ describe "Folders API", type: :request do
         expect(json['id']).to eq @f1.id
       end
 
-      it "404S for a folder in a different context" do
+      it "404s for a folder in a different context" do
         group_model(:context => @course)
         group_root = Folder.root_folders(@group).first
         api_call(:get, "/api/v1/courses/#{@course.id}/folders/#{group_root.id}", @folders_path_options
@@ -554,7 +554,7 @@ describe "Folders API", type: :request do
       api_call(:put, @update_url, @folders_path_options, { :name => "new name" }, {}, :expected_status => 401)
     end
 
-    it "404S with invalid parent id" do
+    it "404s with invalid parent id" do
       api_call(:put, @update_url, @folders_path_options, { :name => "new name", :parent_folder_id => 0 }, {}, :expected_status => 404)
     end
 
@@ -668,7 +668,7 @@ describe "Folders API", type: :request do
           expect(json.map { |folder| folder['id'] }).to eql [@root_folder.id, @folder.id, @sub_folder.id]
         end
 
-        it "404S on an invalid path" do
+        it "404s on an invalid path" do
           teacher_in_course
           api_call(:get, @request_path + "/nonexistent", @params_hash.dup.merge(full_path: @path + "/nonexistent"),
                    {}, {}, { expected_status: 404 })

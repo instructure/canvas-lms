@@ -74,7 +74,7 @@ describe EpubExports::CourseEpubExportsPresenter do
       end
     end
 
-    it "onlies include courses that have the feature enabled" do
+    it "only includes courses that have the feature enabled" do
       expect(courses.find do |course|
         course.id == @course_with_epub.id
       end).to be_nil

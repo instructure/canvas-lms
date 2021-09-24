@@ -204,7 +204,7 @@ describe ContentExport do
       expect(@ce.selected_content).to be_empty
     end
 
-    it "onlies add data model objects" do
+    it "only adds data model objects" do
       @ce.add_item_to_export("hi")
       expect(@ce.selected_content).to be_empty
 

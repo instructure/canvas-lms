@@ -58,7 +58,7 @@ describe CourseForMenuPresenter do
                                                     ])
     end
 
-    it 'onlies show the tabs a student has access to to students' do
+    it 'only shows the tabs a student has access to to students' do
       course.enroll_student(user).accept
       course.assignments.create!
       course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')

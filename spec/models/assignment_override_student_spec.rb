@@ -34,7 +34,7 @@ describe AssignmentOverrideStudent do
       expect(@override_student).to be_valid
     end
 
-    it "alwayses make assignment match the overridden assignment" do
+    it "always makes assignment match the overridden assignment" do
       assignment = assignment_model
       @override_student.assignment = assignment
       expect(@override_student).to be_valid

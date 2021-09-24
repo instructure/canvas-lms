@@ -60,7 +60,7 @@ describe CanvasKaltura::ClientV3 do
   end
 
   describe 'thumbnail_url' do
-    it "properlies sanitize thumbnail parameters" do
+    it "properly sanitizes thumbnail parameters" do
       url = @kaltura.thumbnail_url('0_123<evil>', {
                                      :width => 'evilwidth',
                                      :height => 'evilheight',
@@ -277,7 +277,7 @@ describe CanvasKaltura::ClientV3 do
       @kaltura.mediaGet(entry_id)
     end
 
-    it "properlies create an items hash" do
+    it "properly creates an items hash" do
       media_name = "Movie on 1-31-13 at 7.27 PM.mov"
       allow(@kaltura).to receive(:getRequest) { Nokogiri::XML("<name>#{media_name}</name>") }
 

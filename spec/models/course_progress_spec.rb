@@ -99,7 +99,7 @@ describe CourseProgress do
                              })
     end
 
-    it "onlies run item visibility methods once" do
+    it "only runs item visibility methods once" do
       expect(AssignmentStudentVisibility).to receive(:visible_assignment_ids_in_course_by_user).once.and_call_original
       progress = CourseProgress.new(@course, @user).to_json
       expect(progress[:requirement_count]).to eq 5
@@ -321,7 +321,7 @@ describe CourseProgress do
                              })
     end
 
-    it 'stills count as complete if the module has no requirements to speak of' do
+    it 'still counts as complete if the module has no requirements to speak of' do
       @module1 = @course.context_modules.create!(:name => "module 01", :requirement_count => 1)
       @module2 = @course.context_modules.create!(:name => "module 02", :requirement_count => nil)
 

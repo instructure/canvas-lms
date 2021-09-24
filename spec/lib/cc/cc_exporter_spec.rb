@@ -923,7 +923,7 @@ describe "Common Cartridge exporting" do
         check_resource_node(@unpublished, CC::CCHelper::LOR, false)
       end
 
-      it "alwayses use relevant migration ids in anchor tags when exporting for ePub" do
+      it "always uses relevant migration ids in anchor tags when exporting for ePub" do
         cm1 = @course.context_modules.create!(name: "unlocked module")
         cm1.publish
         cm2 = @course.context_modules.create!({

@@ -521,7 +521,7 @@ describe "MessageableUser::Calculator" do
         Enrollment.limit_privileges_to_course_section!(@course2, @viewing_user, true)
       end
 
-      it "onlies include ids from the current shard" do
+      it "only includes ids from the current shard" do
         @shard1.activate { expect(@calculator.visible_section_ids_in_courses([@course1, @course2])).to eq [@course1.default_section.local_id] }
         @shard2.activate { expect(@calculator.visible_section_ids_in_courses([@course1, @course2])).to eq [@course2.default_section.local_id] }
       end
@@ -597,7 +597,7 @@ describe "MessageableUser::Calculator" do
         @calculator = MessageableUser::Calculator.new(@observer)
       end
 
-      it "onlies include ids from the current shard" do
+      it "only includes ids from the current shard" do
         @shard1.activate { expect(@calculator.observed_student_ids_in_courses([@course1, @course2])).to eq [@student1.local_id] }
         @shard2.activate { expect(@calculator.observed_student_ids_in_courses([@course1, @course2])).to eq [@student2.local_id] }
       end
@@ -753,7 +753,7 @@ describe "MessageableUser::Calculator" do
                                                                                           })
       end
 
-      it "onlies count courses which generate messageability as common" do
+      it "only counts courses which generate messageability as common" do
         course_with_teacher(:user => @viewing_user, :active_all => true)
         student_in_course(:active_all => true)
         course1 = @course
@@ -792,7 +792,7 @@ describe "MessageableUser::Calculator" do
                                                                                       })
       end
 
-      it "onlies count groups which generate messageability as common" do
+      it "only counts groups which generate messageability as common" do
         course_with_teacher(:user => @viewing_user, :active_all => true)
         student_in_course(:active_all => true)
         group_with_user(:user => @student, :group_context => @course)
@@ -1209,7 +1209,7 @@ describe "MessageableUser::Calculator" do
             @group.add_user(@teacher, 'accepted')
           end
 
-          it "onlies return the user once" do
+          it "only returns the user once" do
             expect(messageable_user_ids.sort).to eq [@viewing_user.id, @teacher.id]
           end
 
@@ -1249,7 +1249,7 @@ describe "MessageableUser::Calculator" do
       context "sharding" do
         specs_require_sharding
 
-        it "properlies interpret and translate exclude_ids" do
+        it "properly interprets and translate exclude_ids" do
           @shard1.activate do
             course_factory(:account => Account.create!, :active_all => true)
             student_in_course(:user => @viewing_user, :active_all => true)

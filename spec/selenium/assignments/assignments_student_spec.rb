@@ -164,7 +164,7 @@ describe "assignments" do
       expect(f(".student-assignment-overview")).to be_displayed
     end
 
-    it "stills not show assignment data if locked by unlock date" do
+    it "does not show assignment data if locked by unlock date" do
       assignment = @course.assignments.create!(:name => 'not unlocked assignment',
                                                :due_at => 5.days.from_now,
                                                :unlock_at => 3.days.from_now)

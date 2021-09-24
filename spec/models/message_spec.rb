@@ -204,7 +204,7 @@ describe Message do
     expect(@message.save).to be_falsey
   end
 
-  it "stills set new attributes defined in workflow transitions" do
+  it "still sets new attributes defined in workflow transitions" do
     message_model(:workflow_state => "sending", :user => user_factory)
     @message.complete_dispatch
     expect(@message.reload.workflow_state).to eq "sent"

@@ -132,7 +132,7 @@ describe 'simply_versioned' do
       @woozel.with_versioning(explicit: true, &:save!)
     end
 
-    it "alwayses be true for models loaded directly from AR" do
+    it "is always true for models loaded directly from AR" do
       expect(@woozel).to be_current_version
       @woozel = Woozel.find(@woozel.id)
       expect(@woozel).to be_current_version

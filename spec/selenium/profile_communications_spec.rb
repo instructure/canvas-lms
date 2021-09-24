@@ -97,7 +97,7 @@ describe "profile communication settings" do
       expect(@user.preferences[:send_scores_in_emails]).to eq true
     end
 
-    it "onlies display immediately and off for sns channels" do
+    it "only displays immediately and off for sns channels" do
       sns_channel
       get "/profile/communication"
       focus_button = ff("tr[data-testid='grading'] button")[1]

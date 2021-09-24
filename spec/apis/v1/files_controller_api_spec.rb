@@ -597,7 +597,7 @@ describe "Files API", type: :request do
       assert_status(401)
     end
 
-    it "404S for no folder found" do
+    it "404s for no folder found" do
       raw_api_call(:get, "/api/v1/folders/0/files", @files_path_options.merge(:id => "0"), {}, {})
       assert_status(404)
     end
@@ -621,7 +621,7 @@ describe "Files API", type: :request do
       expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3/
     end
 
-    it "onlies return names if requested" do
+    it "only returns names if requested" do
       json = api_call(:get, @files_path, @files_path_options, { :only => ['names'] })
       res = json.map { |f| f['display_name'] }
       expect(res).to eq %w{atest3.txt mtest2.txt ztest.txt}
@@ -997,7 +997,7 @@ describe "Files API", type: :request do
       expect(json['id']).to eq @att.id
     end
 
-    it "404S with wrong context" do
+    it "404s with wrong context" do
       course_factory
       user_session(@user)
       opts = @file_path_options.merge(:course_id => @course.id.to_param)
@@ -1013,7 +1013,7 @@ describe "Files API", type: :request do
       api_call(:get, "/api/v1/users/#{@teacher.id}/files/#{@att.id}", opts, {}, {}, expected_status: 200)
     end
 
-    it '401S with invalid verifier' do
+    it '401s with invalid verifier' do
       @att.context = @teacher
       @att.save!
       course_with_student(course: @course)
@@ -1389,7 +1389,7 @@ describe "Files API", type: :request do
       api_call(:put, @file_path, @file_path_options, { :name => "new name" }, {}, :expected_status => 401)
     end
 
-    it "404S with invalid parent id" do
+    it "404s with invalid parent id" do
       api_call(:put, @file_path, @file_path_options, { :parent_folder_id => 0 }, {}, :expected_status => 404)
     end
 

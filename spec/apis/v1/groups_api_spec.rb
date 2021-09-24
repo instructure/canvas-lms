@@ -450,7 +450,7 @@ describe "Groups API", type: :request do
     expect(json).to eq group_json(@community, :include_users => true, :include_permissions => true, :include_category => true)
   end
 
-  it "onlies allow updating a group from private to public" do
+  it "only allows updating a group from private to public" do
     @user = @moderator
     new_attrs = {
       'is_public' => true,

@@ -104,7 +104,7 @@ describe Attachment do
       expect(InstFS).to have_received(:authenticated_url)
     end
 
-    it "stills get url from InstFS when attachment has instfs_uuid and instfs is later disabled" do
+    it "still gets url from InstFS when attachment has instfs_uuid and instfs is later disabled" do
       allow(InstFS).to receive(:enabled?).and_return false
       @attachment.public_url
       expect(InstFS).to have_received(:authenticated_url)
@@ -177,7 +177,7 @@ describe Attachment do
       expect(blob["moderated_grading_allow_list"]).to include(student.moderated_grading_ids.as_json)
     end
 
-    it "alwayses enable annotations when creating a crocodoc url" do
+    it "always enables annotations when creating a crocodoc url" do
       crocodocable_attachment_model
       @attachment.submit_to_crocodoc
 
@@ -566,7 +566,7 @@ describe Attachment do
       expect(@course.attachments.active).not_to be_include(a)
     end
 
-    it "stills destroy without error if file data is lost" do
+    it "still destroys without error if file data is lost" do
       a = attachment_model(:uploaded_data => default_uploaded_data)
       allow(a).to receive(:downloadable?).and_return(false)
       a.destroy
@@ -658,7 +658,7 @@ describe Attachment do
         allow(InstFS).to receive(:app_host).and_return("https://somehost.example")
       end
 
-      it "onlies upload the replacement file to inst-fs once" do
+      it "only uploads the replacement file to inst-fs once" do
         instfs_uuid = "1234-abcd"
         expect(InstFS).to receive(:direct_upload)
           .with(hash_including(file_name: File.basename(Attachment.file_removed_path)))
@@ -1464,7 +1464,7 @@ describe Attachment do
       end
     end
 
-    it "properlies infer encoding" do
+    it "properly infers encoding" do
       attachment_model(:uploaded_data => stub_png_data('blank.gif', "GIF89a\001\000\001\000\200\377\000\377\377\377\000\000\000,\000\000\000\000\001\000\001\000\000\002\002D\001\000;"))
       expect(@attachment.encoding).to be_nil
       @attachment.infer_encoding
@@ -2391,14 +2391,14 @@ describe Attachment do
   end
 
   describe 'local storage' do
-    it 'properlies sanitie a filename containing a slash' do
+    it 'properly sanitizes a filename containing a slash' do
       local_storage!
       course_factory
       a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')
       expect(a.filename).to eql('ENGL_100___ENGL_200.csv')
     end
 
-    it 'stills properly escape the same filename on s3' do
+    it 'still properly escapes the same filename on s3' do
       s3_storage!
       course_factory
       a = attachment_model(filename: 'ENGL_100_/_ENGL_200.csv')

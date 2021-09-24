@@ -817,7 +817,7 @@ describe CoursesController do
       expect(controller.js_env[:PERMISSIONS]).to be_nil
     end
 
-    it "onlies set course color js_env vars for elementary courses" do
+    it "only sets course color js_env vars for elementary courses" do
       @course.account.enable_as_k5_account!
       @course.course_color = "#BAD"
       @course.save!
@@ -1300,7 +1300,7 @@ describe CoursesController do
         expect(assigns(:recent_feedback).first.assignment_id).to eq @a1.id
       end
 
-      it "onlies show recent feedback if user is student in specified course" do
+      it "only shows recent feedback if user is student in specified course" do
         course_with_teacher(:active_all => true, :user => @student)
         @course3 = @course
         get 'show', params: { :id => @course3.id }
@@ -1324,7 +1324,7 @@ describe CoursesController do
         expect(assigns[:pending_enrollment]).to eq @enrollment
       end
 
-      it "stills show unauthorized if unpublished, regardless of if previews are allowed" do
+      it "still shows unauthorized if unpublished, regardless of if previews are allowed" do
         # unpublished course with invited student in default account (allows previews)
         @course.workflow_state = 'claimed'
         @course.save!
@@ -3124,7 +3124,7 @@ describe CoursesController do
       expect(@course.reload).to be_deleted
     end
 
-    it "onlies allow teachers to reset if granted :manage_courses_reset (granular permissions)" do
+    it "only allows teachers to reset if granted :manage_courses_reset (granular permissions)" do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @course.root_account.role_overrides.create!(
         role: teacher_role,
@@ -3798,7 +3798,7 @@ describe CoursesController do
       expect(json.map { |user| user['name'] }).not_to include('account 2 admin', 'account 2 teacher')
     end
 
-    it 'stills work for teachers whose course is concluded by term' do
+    it 'still works for teachers whose course is concluded by term' do
       term = Account.default.enrollment_terms.create!(:name => "long over")
       term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       course_with_teacher_logged_in(active_all: true)
@@ -3812,7 +3812,7 @@ describe CoursesController do
     context "sharding" do
       specs_require_sharding
 
-      it "stills have a functional query when user is from another shard" do
+      it "still has a functional query when user is from another shard" do
         @shard1.activate do
           @cs_user = User.create!
         end

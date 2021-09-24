@@ -284,7 +284,7 @@ describe ProfileController do
       expect(response).to render_template('content_shares')
     end
 
-    it "404S if user has only student enrollments" do
+    it "404s if user has only student enrollments" do
       user_session(@student)
       get 'content_shares', params: { user_id: @student.id }
       expect(response).to be_not_found
@@ -310,7 +310,7 @@ describe ProfileController do
         expect(response).to redirect_to "/login"
       end
 
-      it "404S if IMP is missing" do
+      it "404s if IMP is missing" do
         allow_any_instance_of(ProfileController).to receive(:instructure_misc_plugin_available?).and_return(false)
         user_session(@user)
         get "qr_mobile_login"
@@ -324,7 +324,7 @@ describe ProfileController do
         Account.default.save
       end
 
-      it "404S" do
+      it "404s" do
         user_session(@user)
         get "qr_mobile_login"
         expect(response).to be_not_found

@@ -672,7 +672,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to equal(112.0)
     end
 
-    it "properlies calculate the grade when total weight is less than 100%" do
+    it "properly calculates the grade when total weight is less than 100%" do
       two_groups_two_assignments(50, 10, 40, 40)
       @submission = @assignment.grade_student(@user, grade: "10", grader: @teacher)
       @course.group_weighting_scheme = "percent"
@@ -687,7 +687,7 @@ describe GradeCalculator do
       expect(@user.enrollments.first.computed_final_score).to equal(100.0)
     end
 
-    it "properlies calculate the grade when there are 'not graded' assignments with scores" do
+    it "properly calculates the grade when there are 'not graded' assignments with scores" do
       @group = @course.assignment_groups.create!(:name => "some group")
       @assignment = @group.assignments.build(:title => "some assignments", :points_possible => 10)
       @assignment.context = @course
@@ -764,7 +764,7 @@ describe GradeCalculator do
       @assignment2_1.grade_student(@user, grade: "40", grader: @teacher)
     end
 
-    it "properlies handle submissions with no score" do
+    it "properly handles submissions with no score" do
       nil_graded_assignment
 
       @user.reload

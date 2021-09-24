@@ -319,7 +319,7 @@ describe AccountNotification do
   end
 
   describe "survey notifications" do
-    it "onlies display for flagged accounts" do
+    it "only displays for flagged accounts" do
       flag = AccountNotification::ACCOUNT_SERVICE_NOTIFICATION_FLAGS.first
       account_notification(:required_account_service => flag, :account => Account.site_admin)
       @a1 = account_model
@@ -553,7 +553,7 @@ describe AccountNotification do
   context "sharding" do
     specs_require_sharding
 
-    it "alwayses find notifications for site admin" do
+    it "always finds notifications for site admin" do
       account_notification(:account => Account.site_admin)
 
       @shard1.activate do
@@ -577,7 +577,7 @@ describe AccountNotification do
       end
     end
 
-    it "properlies adjust for built in roles across shards" do
+    it "properly adjusts for built in roles across shards" do
       @announcement.destroy
 
       @shard2.activate do

@@ -98,7 +98,7 @@ describe SIS::CSV::SectionImporter do
     expect(CourseSection.where(sis_source_id: 'section').take.workflow_state).to eq 'deleted'
   end
 
-  it 'stills require a name for new deleted sections' do
+  it 'still requires a name for new deleted sections' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active"

@@ -448,7 +448,7 @@ describe Quizzes::QuizSubmission do
         expect(@submission.score).to eq 6
       end
 
-      it "onlies update the last completed quiz submission" do
+      it "only updates the last completed quiz submission" do
         @quiz_sub.score = 4.0
         @quiz_sub.attempt = 2
         @quiz_sub.with_versioning(true, &:save!)

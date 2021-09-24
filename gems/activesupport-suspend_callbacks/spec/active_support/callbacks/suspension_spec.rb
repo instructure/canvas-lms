@@ -60,18 +60,18 @@ describe ActiveSupport::Callbacks::Suspension do
       @instance.suspend_callbacks { @instance.save }
     end
 
-    it "onlies suspend given callbacks" do
+    it "only suspends given callbacks" do
       expect(@instance).to receive(:validate).never
       expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(:validate) { @instance.save }
     end
 
-    it "onlies suspend callbacks of the given kind" do
+    it "only suspends callbacks of the given kind" do
       expect(@instance).to receive(:validate).once
       @instance.suspend_callbacks(kind: :save) { @instance.update }
     end
 
-    it "onlies suspend callbacks of the given type" do
+    it "only suspends callbacks of the given type" do
       expect(@instance).to receive(:validate).never
       expect(@instance).to receive(:publish).once
       @instance.suspend_callbacks(type: :before) { @instance.save }

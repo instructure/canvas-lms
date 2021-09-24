@@ -1090,7 +1090,7 @@ describe ContentMigration do
       expect(other_quiz2.quiz_data.first['question_text']).to eq expected_html
     end
 
-    it "properlies copy escaped brackets in html comments" do
+    it "properly copies escaped brackets in html comments" do
       bank1 = @copy_from.assessment_question_banks.create!(:title => 'bank')
       text = "&lt;braaackets&gt;"
       q = bank1.assessment_questions.create!(:question_data => {

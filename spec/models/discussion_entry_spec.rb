@@ -319,7 +319,7 @@ describe DiscussionEntry do
       expect(@topic.last_reply_at).to eq @original_last_reply_at
     end
 
-    it "stills work with no last_reply_at" do
+    it "still works with no last_reply_at" do
       @topic.saved_by = :migration
       @topic.last_reply_at = nil
       @topic.save!

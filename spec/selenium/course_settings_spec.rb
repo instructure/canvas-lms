@@ -333,7 +333,7 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
-    it "onlies allow less resrictive options in Customize visibility" do
+    it "only allows less resrictive options in Customize visibility" do
       get "/courses/#{@course.id}/settings"
       click_option('#course_course_visibility', 'institution', :value)
       f('#course_custom_course_visibility').click

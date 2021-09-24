@@ -47,7 +47,7 @@ describe "Gradebook - message students who" do
     end.to change(ConversationMessage, :count).by_at_least(2)
   end
 
-  it "onlies send messages to students who have not submitted and have not been graded" do
+  it "only sends messages to students who have not submitted and have not been graded" do
     # student 1 submitted but not graded yet
     @third_submission = @third_assignment.submit_homework(@student_1, body: ' student 1 submission assignment 4')
     @third_submission.save!

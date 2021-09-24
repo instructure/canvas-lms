@@ -339,7 +339,7 @@ describe 'CommunicationChannels API', type: :request do
                            })
       end
 
-      it "404S if already deleted" do
+      it "404s if already deleted" do
         api_call(:delete, path, path_options)
         raw_api_call(:delete, path, path_options)
         expect(response.code).to eq '404'
@@ -361,7 +361,7 @@ describe 'CommunicationChannels API', type: :request do
         expect(CommunicationChannel.find(channel.id)).to be_retired # for some reason, .reload on a let() bound model returns nil
       end
 
-      it "404S if already deleted by path" do
+      it "404s if already deleted by path" do
         api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                  :controller => 'communication_channels',
                  :action => 'destroy', :user_id => someone.to_param, :format => 'json',

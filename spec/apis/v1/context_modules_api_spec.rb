@@ -175,7 +175,7 @@ describe "Modules API", type: :request do
         expect(json.map { |mod| mod['items'].size }).to eq [5, 2, 0]
       end
 
-      it "onlies fetch visibility information once" do
+      it "only fetches visibility information once" do
         student_in_course(:course => @course)
         @user = @student
 
@@ -433,7 +433,7 @@ describe "Modules API", type: :request do
                  {}, { :expected_status => 404 })
       end
 
-      it "404S if no modules exist with the given ids" do
+      it "404s if no modules exist with the given ids" do
         @modules_to_update.each do |m|
           m.content_tags.scope.delete_all
           m.destroy_permanently!
@@ -442,7 +442,7 @@ describe "Modules API", type: :request do
                  {}, { :expected_status => 404 })
       end
 
-      it "404S if only non-numeric ids are given" do
+      it "404s if only non-numeric ids are given" do
         api_call(:put, @path, @path_opts, { :event => 'publish', :module_ids => @ids_to_update.map { |id| id.to_s + "abc" } },
                  {}, { :expected_status => 404 })
       end
@@ -454,15 +454,15 @@ describe "Modules API", type: :request do
         expect(@modules_to_update.last.reload).to be_active
       end
 
-      it "400S if :module_ids is missing" do
+      it "400s if :module_ids is missing" do
         api_call(:put, @path, @path_opts, { :event => 'publish' }, {}, { :expected_status => 400 })
       end
 
-      it "400S if :event is missing" do
+      it "400s if :event is missing" do
         api_call(:put, @path, @path_opts, { :module_ids => @ids_to_update }, {}, { :expected_status => 400 })
       end
 
-      it "400S if :event is invalid" do
+      it "400s if :event is invalid" do
         api_call(:put, @path, @path_opts, { :event => 'burninate', :module_ids => @ids_to_update },
                  {}, { :expected_status => 400 })
       end
@@ -589,7 +589,7 @@ describe "Modules API", type: :request do
         expect(new_module.prerequisites.map { |m| m[:id] }.sort).to eq [@module1.id, @module2.id].sort
       end
 
-      it "onlies reset prerequisites if parameter is included and is blank" do
+      it "only resets prerequisites if parameter is included and is blank" do
         new_module = @course.context_modules.create!(:name => "published")
         new_module.prerequisites = "module_#{@module1.id},module_#{@module2.id}"
         new_module.save!

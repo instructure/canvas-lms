@@ -47,7 +47,7 @@ describe 'Account Notification API', type: :request do
       expect(json.map { |r| r["message"] }).to match_array(%w{default second})
     end
 
-    it "stills work on the old endpoint" do
+    it "still works on the old endpoint" do
       json = api_call(:get, "/api/v1/accounts/#{@admin.account.id}/users/#{@admin.id}/account_notifications", {
                         controller: 'account_notifications',
                         action: 'user_index_deprecated',

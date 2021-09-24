@@ -389,7 +389,7 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to be_empty
         end
 
-        it "stills return something when there are old deleted group overrides" do
+        it "still returns something when there are old deleted group overrides" do
           @override.destroy!
           overrides = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @student)
           expect(overrides).to be_empty
@@ -513,7 +513,7 @@ describe AssignmentOverrideApplicator do
           expect(overrides).to eq [@override2]
         end
 
-        it "onlies use the latest due_date for student_view_student" do
+        it "only uses the latest due_date for student_view_student" do
           due_at = 3.days.from_now
           a = create_assignment(:course => @course)
           cs1 = @course.course_sections.create!

@@ -58,7 +58,7 @@ describe FilePreviewsController do
     expect(response).to render_template 'lock_explanation'
   end
 
-  it "404S (w/o canvas chrome) if the file doesn't exist" do
+  it "404s (w/o canvas chrome) if the file doesn't exist" do
     attachment_model
     file_id = @attachment.id
     @attachment.destroy_permanently!

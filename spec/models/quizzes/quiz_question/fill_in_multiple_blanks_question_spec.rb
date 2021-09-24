@@ -31,7 +31,7 @@ describe Quizzes::QuizQuestion::FillInMultipleBlanksQuestion do
       expect(question.find_chosen_answer('blank1', 'FIRST')[:id]).to eq answer1[:id]
     end
 
-    it "onlies consider answers for the same blank" do
+    it "only considers answers for the same blank" do
       expect(question.find_chosen_answer('blank1', 'Second')[:id]).to be_nil
     end
 

@@ -858,7 +858,7 @@ describe DeveloperKey do
     context "sharding" do
       specs_require_sharding
 
-      it "alwayses create the default key on the default shard" do
+      it "always creates the default key on the default shard" do
         @shard1.activate do
           expect(DeveloperKey.default.shard).to be_default
         end

@@ -836,13 +836,13 @@ describe "Module Items API", type: :request do
     end
 
     describe "GET 'module_item_sequence'" do
-      it "400S if the asset_type is missing" do
+      it "400s if the asset_type is missing" do
         api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_id=999",
                  { :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
                    :course_id => @course.to_param, :asset_id => '999' }, {}, {}, { :expected_status => 400 })
       end
 
-      it "400S if the asset_id is missing" do
+      it "400s if the asset_id is missing" do
         api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=quiz",
                  { :controller => "context_module_items_api", :action => "item_sequence", :format => "json",
                    :course_id => @course.to_param, :asset_type => 'quiz' }, {}, {}, { :expected_status => 400 })
@@ -897,7 +897,7 @@ describe "Module Items API", type: :request do
           expect(json["items"].first["next"]["id"]).to eq @external_url_tag.id
         end
 
-        it "stills show visible section-specific discussions" do
+        it "still shows visible section-specific discussions" do
           @course.enroll_student(user_factory(:active_all => true), :section => @topic_section, :enrollment_state => "active")
 
           json = api_call(:get, "/api/v1/courses/#{@course.id}/module_item_sequence?asset_type=ModuleItem&asset_id=#{@quiz_tag.id}",

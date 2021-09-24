@@ -148,7 +148,7 @@ describe "context modules" do
       expect(format_time_for_view(unlock_date_in_dialog.attribute("value"))).to eq unlock_date
     end
 
-    it "onlies display out-of on an assignment min score restriction when the assignment has a total" do
+    it "only displays out-of on an assignment min score restriction when the assignment has a total" do
       ag = @course.assignment_groups.create!
       a1 = ag.assignments.create!(:context => @course)
       a1.points_possible = 10
@@ -290,7 +290,7 @@ describe "context modules" do
       end
     end
 
-    it "stills display due date and points possible after indent change" do
+    it "still displays due date and points possible after indent change" do
       get "/courses/#{@course.id}/modules"
       module_item = add_existing_module_item('#assignments_select', 'Assignment', @assignment2.title)
       tag = ContentTag.last

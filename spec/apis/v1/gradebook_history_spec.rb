@@ -231,7 +231,7 @@ describe Api::V1::GradebookHistory do
       expect(submissions.first[:submission_id]).to eq submission.id
     end
 
-    it 'properlies set pervious_* attributes' do
+    it 'properly sets pervious_* attributes' do
       # regrade to get a second version
       @submission.score = '80'
       @submission.with_versioning(:explicit => true) { @submission.save! }

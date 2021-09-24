@@ -104,7 +104,7 @@ describe Api::V1::User do
                                                                                 })
     end
 
-    it 'onlies try to search on in region shards' do
+    it 'only tries to search on in region shards' do
       @user = User.create!(:name => 'User')
       expect(@user).to receive(:in_region_associated_shards).and_call_original
       @test_api.user_json(@user, @admin, {}, [], Account.default)

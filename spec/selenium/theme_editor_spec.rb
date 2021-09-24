@@ -202,7 +202,7 @@ describe 'Theme Editor' do
     expect(color_labels[1].attribute('style')).to include('background-color: rgb(0, 0, 0)')
   end
 
-  it 'onlies store modified values to the database' do
+  it 'only stores modified values to the database' do
     open_theme_editor(Account.default.id)
     ff('.Theme__editor-color-block_input-text')[1].send_keys('#000') # main text color
     expect_new_page_load do

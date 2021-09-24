@@ -1619,7 +1619,7 @@ describe CalendarEventsApiController, type: :request do
       expect(json.size).to eql 1
     end
 
-    it '400S for bad dates' do
+    it '400s for bad dates' do
       raw_api_call(:get, "/api/v1/calendar_events?type=assignment&start_date=201-201-208&end_date=201-201-209&context_codes[]=course_#{@course.id}", {
                      controller: 'calendar_events_api', action: 'index', format: 'json', type: 'assignment',
                      context_codes: ["course_#{@course.id}"], start_date: '201-201-208', end_date: '201-201-209'

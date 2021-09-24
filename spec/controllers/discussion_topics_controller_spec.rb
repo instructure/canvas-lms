@@ -695,7 +695,7 @@ describe DiscussionTopicsController do
         expect(assigns[:groups].size).to eql(2)
       end
 
-      it "onlies show applicable groups if DA applies" do
+      it "only shows applicable groups if DA applies" do
         user_session(@teacher)
 
         asmt = @topic.assignment

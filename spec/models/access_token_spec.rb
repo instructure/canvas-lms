@@ -79,7 +79,7 @@ describe AccessToken do
       @refresh_token_string = @at.plaintext_refresh_token
     end
 
-    it "onlies store the encrypted token" do
+    it "only stores the encrypted token" do
       expect(@token_string).to be_present
       expect(@token_string).not_to eq @at.crypted_token
       expect(AccessToken.find(@at.id).full_token).to be_nil

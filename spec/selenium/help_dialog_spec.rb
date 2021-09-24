@@ -31,7 +31,7 @@ describe "help dialog" do
       expect(f("#help-dialog-options")).to be_displayed
     end
 
-    it "noes longer show a browser warning for IE" do
+    it "no longer shows a browser warning for IE" do
       Setting.set('show_feedback_link', 'true')
       get("/login")
       driver.execute_script("window.INST.browser = {ie: true, version: 8}")

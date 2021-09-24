@@ -266,7 +266,7 @@ describe CanvadocSessionsController do
       get :show, params: { blob: @blob.to_json, hmac: Canvas::Security.hmac_sha1(@blob.to_json) }
     end
 
-    it "alwayses send PDFjs as a preferred plugin" do
+    it "always sends PDFjs as a preferred plugin" do
       allow(Attachment).to receive(:find).and_return(@attachment1)
       expect(@attachment1).to receive(:submit_to_canvadocs) do |arg1, arg2|
         expect(arg1).to eq 1

@@ -32,7 +32,7 @@ describe Canvas::PasswordPolicy do
       @pseudonym.unique_id = "foo"
     end
 
-    it "onlies enforce minimum length by default" do
+    it "only enforces minimum length by default" do
       pseudonym_with_policy({})
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaa"
       expect(@pseudonym).not_to be_valid

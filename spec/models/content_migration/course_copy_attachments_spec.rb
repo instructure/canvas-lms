@@ -72,7 +72,7 @@ describe ContentMigration do
       end
     end
 
-    it "stills copy content in unique_type folders with a name mismatch" do
+    it "still copies content in unique_type folders with a name mismatch" do
       root = Folder.root_folders(@copy_from).first
       f1 = root.sub_folders.create!(:name => "Uploaded Media", :context => @copy_from)
       f2 = Folder.media_folder(@copy_from)

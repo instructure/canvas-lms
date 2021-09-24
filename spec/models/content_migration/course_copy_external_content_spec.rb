@@ -161,7 +161,7 @@ describe ContentMigration do
       run_course_copy
     end
 
-    it "onlies check a few times for the export to finish before timing out" do
+    it "only checks a few times for the export to finish before timing out" do
       allow(TestExternalContentService).to receive(:applies_to_course?).and_return(true)
       allow(TestExternalContentService).to receive(:begin_export).and_return(true)
       expect(Canvas::Migration::ExternalContent::Migrator).to receive(:retry_delay).at_least(:once).and_return(0) # so we're not actually sleeping for 30s a pop

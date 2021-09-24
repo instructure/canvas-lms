@@ -345,7 +345,7 @@ describe NotificationPolicy do
   end
 
   context 'find_all_for' do
-    it 'onlies return course type notification policies if provided a course context type' do
+    it 'only returns course type notification policies if provided a course context type' do
       student = factory_with_protected_attributes(User, :name => "student", :workflow_state => "registered")
       channel = communication_channel(student, { username: 'default@example.com', active_cc: true })
 

@@ -165,7 +165,7 @@ describe AssignmentOverridesController, type: :request do
       validate_override_json(@override, json)
     end
 
-    it "404S for non-visible override" do
+    it "404s for non-visible override" do
       @override.destroy
       raw_api_show_override(@course, @assignment, @override)
       assert_status(404)
@@ -244,7 +244,7 @@ describe AssignmentOverridesController, type: :request do
       expect(response.location).to match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
     end
 
-    it "404S for non-visible group" do
+    it "404s for non-visible group" do
       @original_teacher = @teacher
       course_model
       @other_group = @course.groups.create!
@@ -257,7 +257,7 @@ describe AssignmentOverridesController, type: :request do
       assert_status(404)
     end
 
-    it "404S for unconnected group/assignment" do
+    it "404s for unconnected group/assignment" do
       course_with_teacher(:user => @teacher, :active_all => true)
       @other_group = @course.groups.create!
 
@@ -287,7 +287,7 @@ describe AssignmentOverridesController, type: :request do
       expect(response.location).to match "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}"
     end
 
-    it "404S for non-visible section" do
+    it "404s for non-visible section" do
       Enrollment.limit_privileges_to_course_section!(@course, @teacher, true)
       section = @course.course_sections.create!
 
@@ -298,7 +298,7 @@ describe AssignmentOverridesController, type: :request do
       assert_status(404)
     end
 
-    it "404S for unconnected section/assignment" do
+    it "404s for unconnected section/assignment" do
       course_with_teacher(:user => @teacher, :active_all => true)
 
       raw_api_call(:get, "/api/v1/sections/#{@course.default_section.id}/assignments/#{@assignment.id}/override.json",
@@ -1101,7 +1101,7 @@ describe AssignmentOverridesController, type: :request do
       validate_override_json(@override, json)
     end
 
-    it "404S for non-visible override" do
+    it "404s for non-visible override" do
       @override.destroy
       raw_api_call(:delete, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/overrides/#{@override.id}.json",
                    :controller => 'assignment_overrides', :action => 'destroy', :format => 'json',

@@ -346,7 +346,7 @@ describe Folder do
         expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
       end
 
-      it "stills grant rights to teachers even if the teacher enrollment is concluded" do
+      it "still grants rights to teachers even if the teacher enrollment is concluded" do
         @teacher.enrollments.where(:course_id => @course).first.complete!
         expect(@course.grants_right?(@teacher, :manage_files_add)).to be_falsey
         expect(@course.grants_right?(@teacher, :manage_files_edit)).to be_falsey

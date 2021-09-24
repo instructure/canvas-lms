@@ -42,7 +42,7 @@ describe ContextController do
                                                                                              .map(&:id)
     end
 
-    it 'onlies show active group members to students' do
+    it 'only shows active group members to students' do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
       inactive_student = user_factory
@@ -59,7 +59,7 @@ describe ContextController do
       ]
     end
 
-    it 'onlies show active course instructors to students' do
+    it 'only shows active course instructors to students' do
       active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
       inactive_teacher = user_factory

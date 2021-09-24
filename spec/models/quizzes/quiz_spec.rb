@@ -475,7 +475,7 @@ describe Quizzes::Quiz do
     expect(q.assignment_id).to be_nil
   end
 
-  it "alwayses have an assignment" do
+  it "always has an assignment" do
     g = @course.assignment_groups.create!(:name => "new group")
     q = @course.quizzes.build(:title => "some quiz", :quiz_type => "assignment", :assignment_group_id => g.id)
     q.save!

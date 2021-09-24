@@ -1191,7 +1191,7 @@ describe ContextModule do
       end
 
       context "enabled" do
-        it "properlies require differentiated assignments" do
+        it "properly requires differentiated assignments" do
           expect(@module.evaluate_for(@student_1)).to be_unlocked
           @submission = @assign.submit_homework(@student_1, submission_type: 'online_text_entry', body: '42')
           @module.reload
@@ -1491,7 +1491,7 @@ describe ContextModule do
     end
 
     context "differentiated_assignments enabled" do
-      it "properlies return differentiated assignments" do
+      it "properly returns differentiated assignments" do
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_1).map(&:content).include?(@assignment)).to be_truthy
         expect(@module.content_tags_visible_to(@student_2).map(&:content).include?(@assignment)).to be_falsey
@@ -1503,12 +1503,12 @@ describe ContextModule do
         expect(@student_2.assignment_and_quiz_visibilities(@course)[:assignment_ids].include?(@assignment.id)).to be_falsey
       end
 
-      it "properlies return differentiated assignments for teacher even without update rights" do
+      it "properly returns differentiated assignments for teacher even without update rights" do
         @course.account.role_overrides.create!(role: teacher_role, enabled: false, permission: :manage_content)
         expect(@module.content_tags_visible_to(@teacher).map(&:content).include?(@assignment)).to be_truthy
       end
 
-      it "properlies return unpublished assignments" do
+      it "properly returns unpublished assignments" do
         @assignment.workflow_state = "unpublished"
         @assignment.save!
         @module.reload
@@ -1743,7 +1743,7 @@ describe ContextModule do
     expect(m.grants_right?(@teacher, :manage_content)).to eq false
   end
 
-  it "onlies load visibility and progression information once when calculating prerequisites" do
+  it "only loads visibility and progression information once when calculating prerequisites" do
     course_factory(:active_all => true)
     student_in_course(:course => @course)
     m1 = @course.context_modules.create!(:name => "m1")

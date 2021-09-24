@@ -104,7 +104,7 @@ describe CanvasQuizStatistics::Util do
       expect(Util.deep_symbolize_keys({ nil => 'foo' })).to eq({ nil => 'foo' })
     end
 
-    it 'onlies munge hashes' do
+    it 'only munges hashes' do
       expect(Util.deep_symbolize_keys([])).to eq([])
       expect(Util.deep_symbolize_keys([{ 'foo' => 'bar' }])).to eq([{ 'foo' => 'bar' }])
     end

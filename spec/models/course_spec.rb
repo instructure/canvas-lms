@@ -380,7 +380,7 @@ describe Course do
     end
   end
 
-  it "properlies determine if group weights are active" do
+  it "properly determines if group weights are active" do
     @course.update_attribute(:group_weighting_scheme, nil)
     expect(@course.apply_group_weights?).to eq false
     @course.update_attribute(:group_weighting_scheme, 'equal')
@@ -756,7 +756,7 @@ describe Course do
     expect(@course).to eql(@course2)
   end
 
-  it "onlies change the course code using the course name if the code is nil or empty" do
+  it "only changes the course code using the course name if the code is nil or empty" do
     @course = Course.create_unique
     code = @course.course_code
     @course.name = 'test123'
@@ -781,7 +781,7 @@ describe Course do
     expect(lambda { @course.save! }).to raise_error("Validation failed: Sis source is too long (maximum is 255 characters)")
   end
 
-  it "alwayses have a uuid, if it was created" do
+  it "always has a uuid, if it was created" do
     @course.save!
     expect(@course.uuid).not_to be_nil
   end
@@ -2411,7 +2411,7 @@ describe Course, "gradebook_to_csv" do
     end
   end
 
-  it "onlies include students once" do
+  it "only includes students once" do
     # students might have multiple enrollments in a course
     course_factory(active_all: true)
     @user1 = user_with_pseudonym(:active_all => true, :name => 'Brian', :username => 'brianp@instructure.com')
@@ -2473,7 +2473,7 @@ describe Course, "gradebook_to_csv" do
     expect(rows[5][3]).to be_nil
   end
 
-  it "onlies include students from the appropriate section for a section limited teacher" do
+  it "only includes students from the appropriate section for a section limited teacher" do
     course_factory(active_all: true)
     teacher_in_course(active_all: true)
     @teacher.enrollments.first.update_attribute(:limit_privileges_to_course_section, true)
@@ -4553,7 +4553,7 @@ describe Course, 'tabs_available' do
     expect(tab[:args]).to eq [@course.id, tool.id]
   end
 
-  it "onlies include admin-only external tools for course admins" do
+  it "only includes admin-only external tools for course admins" do
     @course.offer
     @course.is_public = true
     @course.save!
@@ -5538,7 +5538,7 @@ describe Course do
   context "sharding" do
     specs_require_sharding
 
-    it "properlies return site admin permissions from another shard" do
+    it "properly returns site admin permissions from another shard" do
       enable_cache do
         @shard1.activate do
           acct = Account.create!

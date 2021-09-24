@@ -307,7 +307,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(json).to eq @cas_hash
     end
 
-    it "404S" do
+    it "404s" do
       call_show(0, 404)
     end
 
@@ -402,7 +402,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(@account.authentication_providers.first.id).to eq aac2.id
     end
 
-    it "404S" do
+    it "404s" do
       call_update(0, {}, 404)
     end
 
@@ -466,7 +466,7 @@ describe "AuthenticationProviders API", type: :request do
       expect(aac4.position).to eq 2
     end
 
-    it "404S" do
+    it "404s" do
       call_destroy(0, 404)
     end
 

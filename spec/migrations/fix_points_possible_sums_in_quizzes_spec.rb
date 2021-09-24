@@ -64,7 +64,7 @@ describe 'FixPointsPossibleSumsInQuizzes' do
       expect(@quiz.versions.current.number).to eq(broken_version + 1)
     end
 
-    it "onlies select quizzes that appear to have rounding error" do
+    it "only selects quizzes that appear to have rounding error" do
       healthy_quiz = @course.quizzes.create!(title: 'decimal quiz')
       a = Assignment.new
       a.course = @course

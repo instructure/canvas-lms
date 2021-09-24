@@ -225,7 +225,7 @@ describe CommunicationChannel do
     expect(@cc.confirmation_url).to eql('https://test.canvas.com/register/abc123')
   end
 
-  it "onlies allow email, or sms as path types" do
+  it "only allows email, or sms as path types" do
     communication_channel_model
     @cc.path_type = 'email'; @cc.save
     expect(@cc.path_type).to eql('email')
@@ -303,7 +303,7 @@ describe CommunicationChannel do
     end
   end
 
-  it "properlies validate the uniqueness of path" do
+  it "properly validates the uniqueness of path" do
     @user = User.create!
     communication_channel(@user, { username: 'user1@example.com' })
     # should allow a different address
@@ -418,7 +418,7 @@ describe CommunicationChannel do
       expect(cc1.has_merge_candidates?).to be_falsey
     end
 
-    it "onlies check one user for boolean result" do
+    it "only checks one user for boolean result" do
       user2 = User.create!
       communication_channel(user2, { username: 'jt@instructure.com', active_cc: true })
       Account.default.pseudonyms.create!(:user => user2, :unique_id => 'user2')

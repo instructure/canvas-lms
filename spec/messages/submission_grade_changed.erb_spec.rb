@@ -34,7 +34,7 @@ describe 'submission_grade_changed' do
   context ".email" do
     let(:path_type) { :email }
 
-    it "onlies include the score if opted in (and still enabled on root account)" do
+    it "only includes the score if opted in (and still enabled on root account)" do
       @assignment.update_attribute(:points_possible, 10)
       @submission.update_attribute(:score, 5)
       message = generate_message(:submission_grade_changed, :summary, asset)

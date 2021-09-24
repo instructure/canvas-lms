@@ -62,7 +62,7 @@ describe Assignment do
     expect(@a.state).to eql(:unpublished)
   end
 
-  it "alwayses be associated with a group" do
+  it "is always associated with a group" do
     assignment_model(course: @course)
     @assignment.save!
     expect(@assignment.assignment_group).not_to be_nil
@@ -2937,7 +2937,7 @@ describe Assignment do
         expect(submission.grade).to eql('incomplete')
       end
 
-      it "properlies compute pass/fail for nil" do
+      it "properly computes pass/fail for nil" do
         @assignment.points_possible = 10
         grade = @assignment.score_to_grade(nil)
         expect(grade).to eql("incomplete")
@@ -2960,14 +2960,14 @@ describe Assignment do
       expect(@submission.user_id).to eql(@user.id)
     end
 
-    it "properlies calculate letter grades" do
+    it "properly calculates letter grades" do
       @assignment.grading_type = 'letter_grade'
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(8.7)
       expect(grade).to eql("B+")
     end
 
-    it "properlies allow decimal points in grading" do
+    it "properly allows decimal points in grading" do
       @assignment.grading_type = 'letter_grade'
       @assignment.points_possible = 10
       grade = @assignment.score_to_grade(8.6999)

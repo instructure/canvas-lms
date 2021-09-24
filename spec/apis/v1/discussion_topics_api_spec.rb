@@ -537,7 +537,7 @@ describe DiscussionTopicsController, type: :request do
         }.to raise_error DiscussionTopic::Errors::LockBeforeDueDate
       end
 
-      it "onlies include topics with a given scope when specified" do
+      it "only includes topics with a given scope when specified" do
         @topic2 = create_topic(@course, :title => "Topic 2", :message => "<p>content here</p>")
         @topic3 = create_topic(@course, :title => "Topic 3", :message => "<p>content here</p>")
         [@topic, @topic2, @topic3].each do |topic|
@@ -843,7 +843,7 @@ describe DiscussionTopicsController, type: :request do
         expect(json['group_topic_children']).to eq group_topic.child_topics.map { |topic| { "id" => topic.id, "group_id" => topic.context_id } }
       end
 
-      it "properlies translate a video media comment in the discussion topic's message" do
+      it "properly translates a video media comment in the discussion topic's message" do
         @topic.update(
           message: '<p><a id="media_comment_m-spHRwKY5ATHvPQAMKdZV_g" class="instructure_inline_media_comment video_comment" href="/media_objects/m-spHRwKY5ATHvPQAMKdZV_g">this is a media comment</a></p>'
         )
@@ -862,7 +862,7 @@ describe DiscussionTopicsController, type: :request do
         expect(video_tag.inner_text).to eq "this is a media comment"
       end
 
-      it "properlies translate a audio media comment in the discussion topic's message" do
+      it "properly translates a audio media comment in the discussion topic's message" do
         @topic.update(
           message: '<p><a id="media_comment_m-QgvagKCQATEtJAAMKdZV_g" class="instructure_inline_media_comment audio_comment"></a>this is a media comment</p>'
         )
@@ -2002,7 +2002,7 @@ describe DiscussionTopicsController, type: :request do
       expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
     end
 
-    it "onlies include the first 10 replies for each top-level entry" do
+    it "only includes the first 10 replies for each top-level entry" do
       # put in lots of replies
       replies = []
       12.times { |i| replies << create_reply(@entry, :message => i.to_s, :created_at => Time.now + (i + 1).minutes) }
@@ -2195,14 +2195,14 @@ describe DiscussionTopicsController, type: :request do
       @entry = create_entry(@topic, :message => "<p>top-level entry</p>")
     end
 
-    it "401S if the user can't update" do
+    it "401s if the user can't update" do
       student_in_course(:course => @course, :user => user_with_pseudonym)
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
                { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 401)
       expect(@entry.reload.message).to eq '<p>top-level entry</p>'
     end
 
-    it "404S if the entry is deleted" do
+    it "404s if the entry is deleted" do
       @entry.destroy
       api_call(:put, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
                { :controller => "discussion_entries", :action => "update", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, { :message => 'haxor' }, {}, :expected_status => 404)
@@ -2243,7 +2243,7 @@ describe DiscussionTopicsController, type: :request do
       @entry = create_entry(@topic, :message => "top-level entry")
     end
 
-    it "401S if the user can't delete" do
+    it "401s if the user can't delete" do
       student_in_course(:course => @course, :user => user_with_pseudonym)
       api_call(:delete, "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/entries/#{@entry.id}",
                { :controller => "discussion_entries", :action => "destroy", :format => "json", :course_id => @course.id.to_s, :topic_id => @topic.id.to_s, :id => @entry.id.to_s }, {}, {}, :expected_status => 401)
@@ -3064,7 +3064,7 @@ describe DiscussionTopicsController, type: :request do
                :expected_status => 404)
     end
 
-    it "404S if topic does not exist" do
+    it "404s if topic does not exist" do
       @user = @teacher
       bad_id = DiscussionTopic.maximum(:id) + 100
       api_call(:post, "/api/v1/courses/#{@course.id}/discussion_topics/#{bad_id}/duplicate",
@@ -3078,7 +3078,7 @@ describe DiscussionTopicsController, type: :request do
                :expected_status => 404)
     end
 
-    it "404S if deleted" do
+    it "404s if deleted" do
       @user = @teacher
       discussion_topic_model()
       @topic.destroy

@@ -47,7 +47,7 @@ describe CanvasPandaPub::AsyncWorker do
       expect(@worker.push "full", -> {}).to be false
     end
 
-    it "onlies run the last item pushed for a tag" do
+    it "only runs the last item pushed for a tag" do
       a_count = b_count = 0
       @worker.push "a", -> { a_count += 1 }
       @worker.push "b", -> { b_count += 1 }

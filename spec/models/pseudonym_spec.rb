@@ -358,7 +358,7 @@ describe Pseudonym do
         account2
       end
 
-      it "onlies query the pertinent shard" do
+      it "only queries the pertinent shard" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([@shard1])
         expect(Pseudonym).to receive(:active_only).once.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
@@ -482,7 +482,7 @@ describe Pseudonym do
         expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :create)
       end
 
-      it "onlies grant admins :create on accounts they admin" do
+      it "only grants admins :create on accounts they admin" do
         expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :create)
         expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :create)
       end
@@ -509,7 +509,7 @@ describe Pseudonym do
         expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :update)
       end
 
-      it "onlies grant admins :update for others on accounts they admin" do
+      it "only grants admins :update for others on accounts they admin" do
         expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :update)
       end
 
@@ -548,19 +548,19 @@ describe Pseudonym do
           account1.save!
         end
 
-        it "noes longer grant admins :change_password for existing pseudonyms for others on the account" do
+        it "no longer grant admins :change_password for existing pseudonyms for others on the account" do
           expect(pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
         end
 
-        it "stills longer grant admins :change_password for new pseudonym for others on the account" do
+        it "still grants admins :change_password for new pseudonym for others on the account" do
           expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :change_password)
         end
 
-        it "stills grant admins :change_password for their own pseudonym" do
+        it "still grants admins :change_password for their own pseudonym" do
           expect(pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
         end
 
-        it "stills grant non-admins :change_password for their own pseudonym" do
+        it "still grants non-admins :change_password for their own pseudonym" do
           expect(pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
         end
       end
@@ -572,15 +572,15 @@ describe Pseudonym do
         end
 
         context "with canvas authentication enabled on the account" do
-          it "stills grant admins :change_password for others on the account" do
+          it "still grants admins :change_password for others on the account" do
             expect(managed_pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
           end
 
-          it "stills grant admins :change_password for their own pseudonym" do
+          it "still grants admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
           end
 
-          it "stills grant non-admins :change_password for their own pseudonym" do
+          it "still grants non-admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
           end
         end
@@ -590,15 +590,15 @@ describe Pseudonym do
             account1.authentication_providers.scope.delete_all
           end
 
-          it "noes longer grant admins :change_password for others on the account" do
+          it "no longer grants admins :change_password for others on the account" do
             expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
           end
 
-          it "noes longer grant admins :change_password for their own pseudonym" do
+          it "no longer grants admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(sally, account: account1)).not_to be_grants_right(sally, :change_password)
           end
 
-          it "noes longer grant non-admins :change_password for their own pseudonym" do
+          it "no longer grants non-admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(bob, :change_password)
           end
         end

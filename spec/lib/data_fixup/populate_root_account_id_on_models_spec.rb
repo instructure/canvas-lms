@@ -847,7 +847,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     describe 'with sharding' do
       specs_require_sharding
 
-      it 'onlies return tables that are in progress for this shard' do
+      it 'only returns tables that are in progress for this shard' do
         @shard1.activate do
           DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
                                                          n_strand: ["root_account_id_backfill", Shard.current.database_server.id])
@@ -1008,7 +1008,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
   end
 
   describe '#populate_root_account_ids' do
-    it 'onlies update models with an id in the given range' do
+    it 'only updates models with an id in the given range' do
       cm2 = @course.context_modules.create!
       cm2.update_columns(root_account_id: nil)
 

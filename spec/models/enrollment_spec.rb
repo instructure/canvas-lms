@@ -1464,7 +1464,7 @@ describe Enrollment do
   end
 
   context "recompute_final_scores" do
-    it "onlies recompute once per student, per course" do
+    it "only recomputes once per student, per course" do
       course_with_student(:active_all => true)
       @c1 = @course
       @s2 = @course.course_sections.create!(:name => 's2')

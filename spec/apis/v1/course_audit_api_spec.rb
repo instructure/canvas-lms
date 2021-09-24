@@ -29,7 +29,7 @@ describe "CourseAudit API", type: :request do
       course_factory
     end
 
-    it "404S" do
+    it "404s" do
       raw_api_call(:get, "/api/v1/audit/course/courses/#{@course.id}", controller: 'course_audit_api', action: "for_course", course_id: @course.id.to_s, format: 'json')
       assert_status(404)
     end
@@ -147,7 +147,7 @@ describe "CourseAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "200S for inactive courses" do
+      it "200s for inactive courses" do
         @course.destroy
         fetch_for_context(@course, expected_status: 200)
       end
@@ -184,7 +184,7 @@ describe "CourseAudit API", type: :request do
         @json = fetch_for_context(@course, per_page: 2)
       end
 
-      it "onlies return one page of results" do
+      it "only returns one page of results" do
         expect(@json['events'].size).to eq 2
       end
 

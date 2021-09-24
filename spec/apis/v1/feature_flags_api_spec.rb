@@ -255,7 +255,7 @@ describe "Feature Flags API", type: :request do
                        {}, {}, { expected_status: 401 })
     end
 
-    it "404S if the feature doesn't exist" do
+    it "404s if the feature doesn't exist" do
       api_call_as_user(t_root_admin, :get, "/api/v1/accounts/#{t_root_account.id}/features/flags/xyzzy",
                        { controller: 'feature_flags', action: 'show', format: 'json', account_id: t_root_account.to_param, feature: 'xyzzy' },
                        {}, {}, { expected_status: 404 })

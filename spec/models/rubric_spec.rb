@@ -78,7 +78,7 @@ describe Rubric do
           expect(@rubric.points_possible).to eq 12
         end
 
-        it 'onlies update learning outcome text when mastery scales are enabled' do
+        it 'only updates learning outcome text when mastery scales are enabled' do
           Account.default.enable_feature! :account_level_mastery_scales
           @rubric.update_learning_outcome_criteria(@outcome)
           rubric_criterion = @rubric.criteria_object.first

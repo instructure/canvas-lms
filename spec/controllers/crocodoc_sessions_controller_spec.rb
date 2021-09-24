@@ -104,7 +104,7 @@ describe CrocodocSessionsController do
     end
   end
 
-  it "404S if a crocodoc document is unavailable" do
+  it "404s if a crocodoc document is unavailable" do
     get :show, params: { blob: @blob, hmac: @hmac }
     assert_status(404)
   end

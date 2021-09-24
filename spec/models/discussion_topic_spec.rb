@@ -1261,7 +1261,7 @@ describe DiscussionTopic do
       expect(subtopic.user_can_see_posts?(@teacher)).to eq true
     end
 
-    it "onlies allow active admins to see posts without posting" do
+    it "only allows active admins to see posts without posting" do
       @ta_enrollment = course_with_ta(:course => @course, :active_enrollment => true)
       # TA should be able to see
       expect(@topic.user_can_see_posts?(@ta)).to eq true

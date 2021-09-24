@@ -64,7 +64,7 @@ describe "groups" do
     describe "home page" do
       it_behaves_like 'home_page', :student
 
-      it "onlies allow group members to access the group home page", priority: "1", test_id: 319908 do
+      it "only allows group members to access the group home page", priority: "1", test_id: 319908 do
         get url
         expect(f('.recent-activity-header')).to be_displayed
         verify_no_course_user_access(url)
@@ -212,7 +212,7 @@ describe "groups" do
         expect(f('.message').text).to eq 'Group'
       end
 
-      it "onlies allow group members to access announcements" do
+      it "only allows group members to access announcements" do
         get announcements_page
         verify_no_course_user_access(announcements_page)
       end
@@ -300,7 +300,7 @@ describe "groups" do
         expect(f("#content")).not_to contain_css('#podcast_enabled')
       end
 
-      it "onlies allow group members to access discussions", priority: "1", test_id: 315332 do
+      it "only allows group members to access discussions", priority: "1", test_id: 315332 do
         get discussions_page
         expect(f('#add_discussion')).to be_displayed
         verify_no_course_user_access(discussions_page)
@@ -377,7 +377,7 @@ describe "groups" do
           verify_member_sees_group_page
         end
 
-        it "onlies allow group members to access pages", priority: "1", test_id: 315331 do
+        it "only allows group members to access pages", priority: "1", test_id: 315331 do
           get pages_page
           expect(f('.new_page')).to be_displayed
           verify_no_course_user_access(pages_page)
@@ -413,7 +413,7 @@ describe "groups" do
         move_folder(@inner_folder)
       end
 
-      it "onlies allow group members to access files", priority: "1", test_id: 273626 do
+      it "only allows group members to access files", priority: "1", test_id: 273626 do
         get files_page
         verify_no_course_user_access(files_page)
       end
@@ -531,7 +531,7 @@ describe "groups" do
         expect(f(".available-users")).not_to contain_jqcss("li:contains(#{inactive_student.sortable_name}) .icon-user")
       end
 
-      it "onlies allow group members to access the group collaborations page", priority: "1", test_id: 319904 do
+      it "only allows group members to access the group collaborations page", priority: "1", test_id: 319904 do
         get collaborations_page
         expect(find('#breadcrumbs').text).to include('Collaborations')
         verify_no_course_user_access(collaborations_page)

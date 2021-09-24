@@ -359,7 +359,7 @@ test_1,TC 101,Test Course 101,,term1,deleted
     end
 
     describe "with non-standard batches" do
-      it "onlies queue one 'process_all_for_account' job and run together" do
+      it "only queues one 'process_all_for_account' job and run together" do
         begin
           SisBatch.valid_import_types["silly_sis_batch"] = {
             :callback => lambda { |batch| batch.data[:silliness_complete] = true; batch.finish(true) }
@@ -683,7 +683,7 @@ s2,test_1,section2,active},
       expect(b.data[:counts][:batch_courses_deleted]).to eq 1
     end
 
-    it "onlies do batch mode removals for supplied data types" do
+    it "only does batch mode removals for supplied data types" do
       @term = @account.enrollment_terms.first
       @term.update_attribute(:sis_source_id, 'term_1')
       @previous_batch = @account.sis_batches.create!

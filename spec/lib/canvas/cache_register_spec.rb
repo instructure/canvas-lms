@@ -276,7 +276,7 @@ describe Canvas::CacheRegister do
       check_cache
     end
 
-    it "stills work with expiration" do
+    it "still works with expiration" do
       some_key = "some_base_key/withstuff"
       some_value = "some value"
       some_other_value = "some other value"

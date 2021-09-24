@@ -1194,7 +1194,7 @@ describe User do
       expect(@student.load_messageable_user(@deleted_user.id)).to be_nil
     end
 
-    it "onlies include users from the specified section" do
+    it "only includes users from the specified section" do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
       messageable_users = search_messageable_users(@student, :context => "section_#{@course.default_section.id}").map(&:id)
       expect(messageable_users).to include @this_section_user.id
@@ -1225,7 +1225,7 @@ describe User do
       expect(@student.count_messageable_users_in_group(@group)).to eql 1
     end
 
-    it "onlies show admins and the observed if the receiver is an observer" do
+    it "only shows admins and the observed if the receiver is an observer" do
       @course.enroll_user(@admin, 'TeacherEnrollment', :enrollment_state => 'active')
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
 
@@ -1797,7 +1797,7 @@ describe User do
       expect(@user.menu_courses.to_set).to eq @courses.to_set
     end
 
-    it "onlies include favorite courses when set" do
+    it "only includes favorite courses when set" do
       course = @courses.shift
       @user.favorites.where(context_type: "Course", context_id: course).first.destroy
       expect(@user.menu_courses.to_set).to eq @courses.to_set
@@ -1876,7 +1876,7 @@ describe User do
         expect(user.cached_currentish_enrollments).to eq [e1, e2]
       end
 
-      it "properlies update when using new redis cache keys" do
+      it "properly updates when using new redis cache keys" do
         skip("requires redis") unless Canvas.redis_enabled?
         enable_cache(:redis_cache_store) do
           user = User.create!
@@ -2777,17 +2777,17 @@ describe User do
           account1.save!
         end
 
-        it "noes longer grant non-admins :reset_mfa on themselves" do
+        it "no longer grants non-admins :reset_mfa on themselves" do
           pseudonym(charlie, account: account1)
           expect(charlie).not_to be_grants_right(charlie, :reset_mfa)
         end
 
-        it "noes longer grant admins :reset_mfa on themselves" do
+        it "no longer grants admins :reset_mfa on themselves" do
           pseudonym(sally, account: account1)
           expect(sally).not_to be_grants_right(sally, :reset_mfa)
         end
 
-        it "stills grant admins :reset_mfa on other fully admined users" do
+        it "still grants admins :reset_mfa on other fully admined users" do
           pseudonym(charlie, account: account1)
           expect(charlie).to be_grants_right(sally, :reset_mfa)
         end
@@ -3625,7 +3625,7 @@ describe User do
       expect(User.all.order_by_sortable_name.with_last_login.to_sql.scan(".*").count).to eq 1
     end
 
-    it "stills include it if select values aren't present" do
+    it "still includes it if select values aren't present" do
       expect(User.all.with_last_login.to_sql.scan(".*").count).to eq 1
     end
   end

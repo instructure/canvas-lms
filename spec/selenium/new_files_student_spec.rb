@@ -72,7 +72,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_css('.btn-link.published-status')
       end
 
-      it "onlies see Download option on cog icon", priority: "1", test_id: 133105 do
+      it "only sees Download option on cog icon", priority: "1", test_id: 133105 do
         skip_if_safari(:alert)
         get "/courses/#{@course.id}/files"
         content = f("#content")
@@ -83,7 +83,7 @@ describe "better_file_browsing" do
         expect(content).not_to contain_link("Delete")
       end
 
-      it "onlies see View and Download options on toolbar menu", priority: "1", test_id: 133109 do
+      it "only sees View and Download options on toolbar menu", priority: "1", test_id: 133109 do
         get "/courses/#{@course.id}/files"
         content = f("#content")
         f('.ef-item-row').click

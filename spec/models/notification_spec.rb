@@ -54,7 +54,7 @@ describe Notification do
     expect(@notification.state).to eql(:active)
   end
 
-  it "alwayses have some subject" do
+  it "always has some subject" do
     expect(Notification.create!(:name => 'Testing').subject).not_to be_nil
   end
 
