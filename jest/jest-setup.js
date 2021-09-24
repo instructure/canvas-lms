@@ -99,7 +99,6 @@ const ignoredErrors = [
   /The prop `currentUserRoles` is marked as required in `ObserverOptions`/,
   /The prop `dateTime` is marked as required in `FriendlyDatetime`/,
   /The prop `firstAnnouncement.id` is marked as required in `K5Announcement`/,
-  /The prop `focusAttemptOnInit` is marked as required in `AttemptTab`/,
   /The prop `focusLastElement` is marked as required in `RSSFeedList`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
