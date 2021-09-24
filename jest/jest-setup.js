@@ -128,7 +128,6 @@ const ignoredErrors = [
   /The prop `name` is marked as required in `Avatar`/,
   /The prop `onChangeSubmission` is marked as required in `StudentContent`/,
   /The prop `onSelect` is marked as required in `MailboxSelectionDropdown`/,
-  /The prop `outcomeGroup._id` is marked as required in `GroupDescriptionModal`/,
   /The prop `outcomeGroup.title` is marked as required in `(GroupDescriptionModal|GroupEditModal|ManageOutcomesView)`/,
   /The prop `outcomes\[0\].mastery_points` is marked as required in `(Gradebook|ScoresGrid)`/,
   /The prop `permissionName` is marked as required in `PermissionTray`/,
