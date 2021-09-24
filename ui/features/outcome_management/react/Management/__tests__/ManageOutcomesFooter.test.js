@@ -39,7 +39,8 @@ describe('ManageOutcomesFooter', () => {
     selected: generateOutcomes(numberToGenerate, canUnlink),
     selectedCount: numberToGenerate,
     onRemoveHandler: onRemoveHandlerMock,
-    onMoveHandler: onMoveHandlerMock
+    onMoveHandler: onMoveHandlerMock,
+    onClearHandler: jest.fn()
   })
 
   beforeEach(() => {

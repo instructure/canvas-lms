@@ -29,8 +29,10 @@ describe('OutcomesPopover', () => {
       (acc, _curr, idx) => ({
         ...acc,
         [idx + 1]: {
-          linkId: idx + 1,
-          title: `Outcome ${idx + 1}`
+          _id: (idx + 1).toString(),
+          linkId: (idx + 1).toString(),
+          title: `Outcome ${idx + 1}`,
+          canUnlink: false
         }
       }),
       {}
@@ -84,14 +86,16 @@ describe('OutcomesPopover', () => {
   it('shows outcomes in alphanumerical order', async () => {
     const props = {
       outcomes: {
-        22: {linkId: '22', title: 'Outcome 22'},
-        1: {linkId: '1', title: 'Outcome 1'},
-        2: {linkId: '2', title: 'Outcome 2'},
-        12: {linkId: '12', title: 'Outcome 12'}
+        22: {_id: '22', linkId: '22', title: 'Outcome 22', canUnlink: false},
+        1: {_id: '1', linkId: '1', title: 'Outcome 1', canUnlink: false},
+        2: {_id: '2', linkId: '2', title: 'Outcome 2', canUnlink: false},
+        12: {_id: '12', linkId: '12', title: 'Outcome 12', canUnlink: false}
       },
       outcomeCount: 4
     }
-    const {findAllByText, getByRole} = render(<OutcomesPopover {...props} />)
+    const {findAllByText, getByRole} = render(
+      <OutcomesPopover {...props} onClearHandler={onClearHandlerMock} />
+    )
     const button = getByRole('button')
     fireEvent.click(button)
     await act(async () => jest.runOnlyPendingTimers())
