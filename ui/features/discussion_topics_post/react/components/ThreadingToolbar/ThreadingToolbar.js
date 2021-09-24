@@ -82,7 +82,7 @@ export function ThreadingToolbar({...props}) {
             {props.filter === 'drafts' ? (
               <Text weight="bold" size={responsiveProps.textSize}>
                 <View as="span" margin="0 small 0 0">
-                  <IconEditLine color="error" size="x-small" />
+                  <IconEditLine color="primary" size="x-small" />
                 </View>
                 {I18n.t('Continue draft')}
               </Text>
