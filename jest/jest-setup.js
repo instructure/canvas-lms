@@ -130,7 +130,6 @@ const ignoredErrors = [
   /The prop `ltiKeysSetLtiKey` is marked as required in `DeveloperKeyActionButtons`/,
   /The prop `name` is marked as required in `Avatar`/,
   /The prop `onChangeSubmission` is marked as required in `StudentContent`/,
-  /The prop `onClearHandler` is marked as required in `(ManageOutcomesFooter)`/,
   /The prop `onSelect` is marked as required in `MailboxSelectionDropdown`/,
   /The prop `outcome.mastery_points` is marked as required in `StudentOutcomeScore`/,
   /The prop `outcome.title` is marked as required in `StudentOutcomeScore`/,
