@@ -144,6 +144,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   })
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
     },
@@ -557,6 +558,10 @@ DiscussionTopicContainer.propTypes = {
    * Function to be executed to create a Discussion Entry.
    */
   createDiscussionEntry: PropTypes.func,
+  /**
+   * Function to be executed to update the cache for new DiscussionEntryDraft.
+   */
+  updateDraftCache: PropTypes.func,
   /**
    * useState Boolean to toggle highlight
    */
