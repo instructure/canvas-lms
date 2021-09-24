@@ -77,7 +77,6 @@ const ignoredErrors = [
   /Render methods should be a pure function of props and state/,
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
-  /The prop `accountId` is marked as required in `(SecurityPanel|Whitelist)`/,
   /The prop `activeMailbox` is marked as required in `MailboxSelectionDropdown`/,
   /The prop `allSubmissions\[0\]._id` is marked as required in `Header`/,
   /The prop `app.courses\[0\].id` is marked as required in `K5AppLink`/,
