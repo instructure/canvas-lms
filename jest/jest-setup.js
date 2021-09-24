@@ -66,7 +66,6 @@ const ignoredErrors = [
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `heading` of type `object` supplied to `Billboard`/, // https://instructure.atlassian.net/browse/QUIZ-8870
   /Invalid prop `headingAs` of value `h4` supplied to `Billboard`/,
-  /Invalid prop `id` of type `number` supplied to `Option`/,
   /Invalid prop `returnFocusTo` of type `DeprecatedComponent` supplied to `(CourseHomeDialog|HomePagePromptContainer)`/,
   /Invalid prop `selectedDate` of type `date` supplied to `CanvasDateInput`/,
   /Invalid prop `shares\[0\].content_export.id` of type `number` supplied to `ReceivedTable`/,
