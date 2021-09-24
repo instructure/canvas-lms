@@ -284,7 +284,9 @@ describe('DiscussionThreadContainer', () => {
 
       it('root is unread and child reply is unread', () => {
         const container = setup(
-          defaultProps({discussionEntryOverrides: {entryParticipant: {read: false}}})
+          defaultProps({
+            discussionEntryOverrides: {entryParticipant: {read: false, rating: false}}
+          })
         )
         expect(container.getByTestId('is-unread')).toBeTruthy()
       })
@@ -292,7 +294,7 @@ describe('DiscussionThreadContainer', () => {
         const container = setup(
           defaultProps({
             discussionEntryOverrides: {
-              entryParticipant: {read: false},
+              entryParticipant: {read: false, rating: false},
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
@@ -310,7 +312,7 @@ describe('DiscussionThreadContainer', () => {
         const container = setup(
           defaultProps({
             discussionEntryOverrides: {
-              entryParticipant: {read: true},
+              entryParticipant: {read: true, rating: false},
               rootEntryParticipantCounts: {
                 unreadCount: 0,
                 repliesCount: 1,
