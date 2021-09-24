@@ -102,8 +102,6 @@ const ignoredErrors = [
   /The prop `focusLastElement` is marked as required in `RSSFeedList`/,
   /The prop `focusOnInit` is marked as required in `(FileUpload|TextEntry|UrlEntry)`/,
   /The prop `groupTitle` is marked as required in `(GroupMoveModal|GroupRemoveModal|SearchBreadcrumb)`/,
-  /The prop `handleAddOutcomes` is marked as required in `ManagementHeader`/,
-  /The prop `handleFileDrop` is marked as required in `ManagementHeader`/,
   /The prop `hasLoaded` is marked as required in `HistoryList`/,
   /The prop `homeroomAnnouncements` is marked as required in `HomeroomPage`/,
   /The prop `host` is marked as required in `CanvasContentTray`/,
