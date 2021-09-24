@@ -86,7 +86,6 @@ const ignoredErrors = [
   /The prop `canAddObservee` is marked as required in `(K5Dashboard|ObserverOptions|ResponsiveK5Dashboard)`/,
   /The prop `canReadAnnouncements` is marked as required in `(K5Announcement|K5Course)`/,
   /The prop `children` is marked as required in `TruncateText`/,
-  /The prop `closeTray` is marked as required in `HelpTray`/,
   /The prop `color` is marked as required in `StatusColorListItem`/,
   /The prop `colors.late` is marked as required in `StatusColorPanel`/,
   /The prop `conferenceType.type` is marked as required in `Conference`/,
