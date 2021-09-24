@@ -124,7 +124,6 @@ const ignoredErrors = [
   /The prop `jwt` is marked as required in `CanvasContentTray`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
   /The prop `listDeveloperKeyScopesSet` is marked as required in `(Scopes|ScopesList)`/,
-  /The prop `liveRegion` is marked as required in `(SecurityPanel|Whitelist)`/,
   /The prop `loading` is marked as required in `(HomeroomAnnouncementsLayout|LoadingWrapper)`/,
   /The prop `ltiKeysSetLtiKey` is marked as required in `DeveloperKeyActionButtons`/,
   /The prop `name` is marked as required in `Avatar`/,

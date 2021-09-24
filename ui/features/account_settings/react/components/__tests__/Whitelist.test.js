@@ -30,7 +30,7 @@ describe('ConnectedWhitelist', () => {
 
   it('renders items on the allowed domain list after they are added', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const domainInput = getByLabelText('Domain Name')
@@ -45,7 +45,7 @@ describe('ConnectedWhitelist', () => {
 
   it('handles adding wildcard entries to the allowed domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const domainInput = getByLabelText('Domain Name')
@@ -60,7 +60,7 @@ describe('ConnectedWhitelist', () => {
 
   it('renders the empty state when there are no domains', () => {
     const {getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
     const emptyState = getByText('No allowed domains')
     expect(emptyState).toBeInTheDocument()
@@ -68,7 +68,7 @@ describe('ConnectedWhitelist', () => {
 
   it('renders the tools domain list when present', () => {
     const {getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -93,7 +93,7 @@ describe('ConnectedWhitelist', () => {
 
   it('shows an error message when an invalid domain is entered', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const domainInput = getByLabelText('Domain Name')
@@ -108,7 +108,7 @@ describe('ConnectedWhitelist', () => {
 
   it('shows the correct count for the domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const domainInput = getByLabelText('Domain Name')
@@ -123,7 +123,7 @@ describe('ConnectedWhitelist', () => {
 
   it('clears the input box after a successful submisssion', () => {
     const {getByLabelText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />
     )
 
     const domainInput = getByLabelText('Domain Name')
@@ -137,7 +137,7 @@ describe('ConnectedWhitelist', () => {
 
   it('removes items when clicking the delete icon', () => {
     const {getByText, queryByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -156,7 +156,7 @@ describe('ConnectedWhitelist', () => {
 
   it('sets focus to the previous domain delete icon when deleting', () => {
     const {getByText, getByTestId} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -175,7 +175,7 @@ describe('ConnectedWhitelist', () => {
 
   it('sets focus to the the add domain button when removing the first positioned domain from the allowed domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -193,7 +193,7 @@ describe('ConnectedWhitelist', () => {
 
   it('sets focus to the add domain button when removing the last remaining domain from the allowed domain list', () => {
     const {getByLabelText, getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -216,7 +216,7 @@ describe('ConnectedWhitelist', () => {
       exampleDomains.push(`domain-${i}.com`)
     }
     const {getByLabelText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -236,7 +236,7 @@ describe('ConnectedWhitelist', () => {
       exampleDomains.push(`domain-${i}.com`)
     }
     const {getByText} = renderWithRedux(
-      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} liveRegion={[]} />,
       {
         initialState: {
           whitelistedDomains: {
@@ -257,7 +257,13 @@ describe('ConnectedWhitelist', () => {
         exampleDomains.push(`domain-${i}.com`)
       }
       const {queryByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />,
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          inherited
+        />,
         {
           initialState: {
             whitelistedDomains: {
@@ -278,6 +284,7 @@ describe('ConnectedWhitelist', () => {
           context="account"
           contextId="1"
           maxDomains={50}
+          liveRegion={[]}
           inherited
           isSubAccount
         />,
@@ -299,7 +306,13 @@ describe('ConnectedWhitelist', () => {
 
     it('shows the allowed domain list from the inherited account', () => {
       const {getByText, queryByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />,
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          inherited
+        />,
         {
           initialState: {
             whitelistedDomains: {
@@ -319,7 +332,13 @@ describe('ConnectedWhitelist', () => {
 
     it('does not show the count for the allowed domain list', () => {
       const {queryByText, getByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          inherited
+        />
       )
 
       const wrongString = queryByText('Domains (0/50)')
@@ -335,6 +354,7 @@ describe('ConnectedWhitelist', () => {
           context="account"
           contextId="1"
           maxDomains={50}
+          liveRegion={[]}
           inherited
           isSubAccount
         />,
@@ -358,6 +378,7 @@ describe('ConnectedWhitelist', () => {
           context="account"
           contextId="1"
           maxDomains={50}
+          liveRegion={[]}
           inherited
           isSubAccount
         />,
@@ -379,7 +400,13 @@ describe('ConnectedWhitelist', () => {
   describe('isSubAccount', () => {
     it('does not show the option to view a violation log', () => {
       const {queryByText} = renderWithRedux(
-        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} isSubAccount />
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          liveRegion={[]}
+          isSubAccount
+        />
       )
       const violationLogBtn = queryByText('View Violation Log')
       expect(violationLogBtn).toBeNull()
