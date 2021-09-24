@@ -78,7 +78,6 @@ const ignoredErrors = [
   /The 'screenReaderOnly' prop must be used in conjunction with 'liveRegion'/,
   /The above error occurred in the <.*> component/,
   /The prop `activeMailbox` is marked as required in `MailboxSelectionDropdown`/,
-  /The prop `allSubmissions\[0\]._id` is marked as required in `Header`/,
   /The prop `app.courses\[0\].id` is marked as required in `K5AppLink`/,
   /The prop `apps\[0\].courses\[0\].id` is marked as required in `AppsList`/,
   /The prop `avatarName` is marked as required in `UserLink`/,
