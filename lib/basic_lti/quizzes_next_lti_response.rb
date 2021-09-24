@@ -27,7 +27,7 @@ module BasicLTI
       self.body = "<replaceResultResponse />"
       return true unless valid_request?(assignment)
 
-      quiz_lti_submission = QuizzesNextVersionedSubmission.new(assignment, user)
+      quiz_lti_submission = QuizzesNextVersionedSubmission.new(assignment, user, prioritize_non_tool_grade: prioritize_non_tool_grade?)
       quiz_lti_submission = quiz_lti_submission
                             .with_params(
                               submission_type: 'basic_lti_launch',

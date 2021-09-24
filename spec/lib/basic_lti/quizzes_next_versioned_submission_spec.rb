@@ -346,6 +346,40 @@ describe BasicLTI::QuizzesNextVersionedSubmission do
       subject.commit_history('http://url', '80', -1)
     end
 
+    context "with prioritizeNonToolGrade details" do
+      let(:quiz_next_versioned_submission) { BasicLTI::QuizzesNextVersionedSubmission.new(assignment, @user, prioritize_non_tool_grade: true) }
+
+      it "doesn't update the grade if a non-tool graded first" do
+        assignment.grade_student(@user, grader: @teacher, score: 1337)
+        submission.reload
+
+        quiz_next_versioned_submission.commit_history('http://url', '80', -1)
+        expect(submission.reload.score).to eq(1337)
+      end
+
+      it "doesn't update the grader if a non-tool graded first" do
+        assignment.grade_student(@user, grader: @teacher, score: 1337)
+        submission.reload
+
+        quiz_next_versioned_submission.commit_history('http://url', '80', -1)
+        expect(submission.grader_id).to eq(@teacher.id)
+      end
+
+      it "does update the score if a tool graded first" do
+        submission.update!(workflow_state: 'graded', grader_id: -1, score: 80)
+
+        quiz_next_versioned_submission.commit_history("http://url", '10', -1)
+        expect(submission.score).to eq(10)
+      end
+
+      it "does update the grader if a another tool graded first" do
+        submission.update!(workflow_state: 'graded', grader_id: -2, score: 80)
+
+        quiz_next_versioned_submission.commit_history("http://url", '10', -1)
+        expect(submission.grader_id).to eq(-1)
+      end
+    end
+
     context 'when grading period is closed' do
       before do
         gpg = GradingPeriodGroup.create(
