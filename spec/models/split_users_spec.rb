@@ -308,7 +308,7 @@ describe SplitUsers do
         expect(source_user.as_student_observation_links.first.workflow_state).to eq 'active'
       end
 
-      it 'onlies split users from merge_data when specified' do
+      it 'only splits users from merge_data when specified' do
         enrollment1 = course1.enroll_user(restored_user)
         enrollment2 = course1.enroll_student(source_user, enrollment_state: 'active')
         enrollment3 = course2.enroll_student(restored_user, enrollment_state: 'active')

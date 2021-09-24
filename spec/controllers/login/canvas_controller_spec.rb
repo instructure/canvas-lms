@@ -74,7 +74,7 @@ describe Login::CanvasController do
     expect(assigns[:aacs_with_buttons]).to eq [aac]
   end
 
-  it "stills show sso buttons on login error" do
+  it "still shows sso buttons on login error" do
     aac = Account.default.authentication_providers.create!(auth_type: 'facebook')
     allow(Canvas::Plugin.find(:facebook)).to receive(:settings).and_return({})
     post 'create'
@@ -252,7 +252,7 @@ describe Login::CanvasController do
       assert_status(400)
     end
 
-    it "onlies query the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
+    it "only queries the LDAP server once, even with a differing identifier_format but a matching pseudonym" do
       user_with_pseudonym(:username => 'username', :active_all => 1)
       aac = Account.default.authentication_providers.create!(:auth_type => 'ldap', :identifier_format => 'uid')
       expect_any_instantiation_of(aac).to receive(:ldap_bind_result).once.with('username', 'password').and_return(nil)

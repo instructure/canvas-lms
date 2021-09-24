@@ -73,7 +73,7 @@ describe 'Account Reports API', type: :request do
       expect(report.key?('id')).to be_truthy
     end
 
-    it '404S for non existing reports' do
+    it '404s for non existing reports' do
       raw_api_call(:post, "/api/v1/accounts/#{@admin.account.id}/reports/bad_report_csv",
                    { :report => 'bad_report_csv', :controller => 'account_reports', :action => 'create', :format => 'json', :account_id => @admin.account.id.to_s })
       assert_status(404)

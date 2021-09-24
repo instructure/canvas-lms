@@ -120,7 +120,7 @@ describe AppointmentGroup do
   context "add context" do
     let_once(:course1) { course_factory(active_all: true) }
 
-    it "onlies add contexts" do
+    it "only adds contexts" do
       course_with_student(:active_all => true)
       course2 = @course
 
@@ -181,7 +181,7 @@ describe AppointmentGroup do
       @course2 = course_factory
     end
 
-    it "onlies add sub_contexts when first adding a course" do
+    it "only adds sub_contexts when first adding a course" do
       ag = AppointmentGroup.create! :title => 'test',
                                     :contexts => [@course1],
                                     :sub_context_codes => [@c1section1.asset_string]

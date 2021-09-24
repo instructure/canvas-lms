@@ -73,7 +73,7 @@ describe PageView do
     describe "sharding" do
       specs_require_sharding
 
-      it "alwayses assign the birth shard" do
+      it "always assigns the birth shard" do
         expect(PageView.new.shard).to eq Shard.birth
         pv = nil
         u = User.create!

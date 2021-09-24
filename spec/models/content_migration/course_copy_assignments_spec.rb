@@ -250,7 +250,7 @@ describe ContentMigration do
       expect(new_assignment.reload.allowed_extensions).to eq []
     end
 
-    it "onlies auto-import into an active assignment group" do
+    it "only auto-imports into an active assignment group" do
       assign = @copy_from.assignments.create!
       run_export_and_import do |export|
         export.selected_content = { 'assignments' => { mig_id(assign) => "1" } }

@@ -777,7 +777,7 @@ describe CalendarEvent do
       expect { appointment.reserve_for(g1, teacher) }.not_to raise_error
     end
 
-    it "onlies accept users with StudentEnrollments as valid user participants" do
+    it "only accepts users with StudentEnrollments as valid user participants" do
       expect(@ag.eligible_participant?(@student1)).to be_truthy
       expect { @appointment.reserve_for(@student1, @student1) }.not_to raise_error
 
@@ -872,7 +872,7 @@ describe CalendarEvent do
       expect(ag.reload.available_slots).to eql 0
     end
 
-    it "alwayses allow editing the description on an appointment" do
+    it "always allows editing the description on an appointment" do
       @appointment.update_attribute :workflow_state, "locked"
       @appointment.description = "bacon"
       @appointment.save!

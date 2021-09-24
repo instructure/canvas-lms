@@ -28,7 +28,7 @@ describe "sis imports ui" do
     user_session(@admin)
   end
 
-  it 'properlies show sis stickiness options' do
+  it 'properly shows sis stickiness options' do
     account_with_admin_logged_in
     @account.update_attribute(:allow_sis_import, true)
     get "/accounts/#{@account.id}/sis_import"

@@ -63,20 +63,20 @@ describe 'Eportfolio Reports' do
     expect(parsed.length).to eq 2
   end
 
-  it 'onlies include deleted eportfolios' do
+  it 'only includes deleted eportfolios' do
     @eportfolio.destroy
     parsed =
       read_report(@type, { params: { 'include_deleted' => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'onlies include eportfolios from users with no enrollments' do
+  it 'only includes eportfolios from users with no enrollments' do
     parsed =
       read_report(@type, { params: { 'no_enrollments' => true }, order: 1, account: @account1 })
     expect(parsed.length).to eq 1
   end
 
-  it 'onlies include deleted eportfolios from users with no enrollments' do
+  it 'only includes deleted eportfolios from users with no enrollments' do
     @eportfolio.destroy
     parsed =
       read_report(

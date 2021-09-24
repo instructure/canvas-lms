@@ -207,7 +207,7 @@ describe "User Profile API", type: :request do
       ]
     end
 
-    it "onlies return visible services for other users" do
+    it "only returns visible services for other users" do
       @user = @admin
       json = api_call(:get, "/api/v1/users/#{@student.id}/profile?include[]=user_services",
                       :controller => "profile", :action => "settings",

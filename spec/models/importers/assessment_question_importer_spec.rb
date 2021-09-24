@@ -31,7 +31,7 @@ describe "Assessment Question import from hash" do
     end
   end
 
-  it "onlies import assessment question once" do
+  it "only imports assessment question once" do
     context = get_import_context
     data = get_import_data '', 'single_question'
     data = { 'assessment_questions' => { 'assessment_questions' => data } }

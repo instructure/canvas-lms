@@ -102,7 +102,7 @@ describe 'Wiki pages and Tiny WYSIWYG editor Files', ignore_js_errors: true do
       expect(tray_container).to include_text('bar.png')
     end
 
-    it 'onlies show one image for student after saving additional to course' do
+    it 'only shows one image for student after saving additional to course' do
       @new_attachment = @course.attachments.build(filename: 'new_course.png', folder: @root_folder)
       @new_attachment.content_type = 'image/png'
       @new_attachment.save!

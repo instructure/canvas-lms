@@ -224,7 +224,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(good_course.teachers.first.name).to eq "User Uno"
   end
 
-  it "properlies handle repeated courses and sections" do
+  it "properly handles repeated courses and sections" do
     # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -408,7 +408,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(importer.batch.data[:counts][:enrollments]).to eq 1
   end
 
-  it "alwayses update sis_batch_id" do
+  it "always updates sis_batch_id" do
     # because people get confused otherwise
     course = course_model(account: @account, sis_source_id: 'C001')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -605,7 +605,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
-  it 'onlies queue up one DueDateCacher job per course' do
+  it 'only queues up one DueDateCacher job per course' do
     course1 = course_model(account: @account, sis_source_id: 'C001')
     course2 = course_model(account: @account, sis_source_id: 'C002')
     user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -635,7 +635,7 @@ describe SIS::CSV::EnrollmentImporter do
     end
   end
 
-  it 'onlies queue up one recache_grade_distribution job per course' do
+  it 'only queues up one recache_grade_distribution job per course' do
     Course.create!(account: @account, sis_source_id: 'C001', workflow_state: 'available')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
@@ -1039,7 +1039,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(errors.first).to include("not a valid section")
   end
 
-  it "stills work when creating a completed enrollment" do
+  it "still works when creating a completed enrollment" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"

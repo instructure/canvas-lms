@@ -79,7 +79,7 @@ describe BrandConfig do
       setup_subaccount_with_config
     end
 
-    it "properlies find ancestors" do
+    it "properly finds ancestors" do
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@parent_config)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.include?(@subaccount_bc)).to be_truthy
       expect(@subaccount_bc.chain_of_ancestor_configs.length).to eq 2

@@ -183,7 +183,7 @@ describe "report helper" do
       expect(time).to eq og_time
     end
 
-    it 'onlies fallback to a time when one is not provided' do
+    it 'only falls back to a time when one is not provided' do
       og_time = 1.day.ago.iso8601
       account_report.parameters = { 'start_at' => og_time }
       other_time = 3.days.ago.iso8601

@@ -161,7 +161,7 @@ describe Quizzes::QuizExtension do
       expect(extension.extra_time).to eq 10080
     end
 
-    it "onlies allow numbers or bool for input" do
+    it "only allows numbers or bool for input" do
       extension = Quizzes::QuizExtension.new(@qs,
                                              extra_attempts: "abc",
                                              extra_time: "abc",

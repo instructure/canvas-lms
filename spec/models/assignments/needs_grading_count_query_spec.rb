@@ -29,7 +29,7 @@ module Assignments
     end
 
     describe "#count" do
-      it "onlies count submissions in the user's visible section(s)" do
+      it "only counts submissions in the user's visible section(s)" do
         @section = @course.course_sections.create!(:name => 'section 2')
         @user2 = user_with_pseudonym(:active_all => true, :name => 'Student2', :username => 'student2@instructure.com')
         @section.enroll_user(@user2, 'StudentEnrollment', 'active')
@@ -163,7 +163,7 @@ module Assignments
           @ta2 = ta_in_course(:course => @course, :active_all => true).user
         end
 
-        it "onlies include students with no marks when unmoderated" do
+        it "only includes students with no marks when unmoderated" do
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 
@@ -177,7 +177,7 @@ module Assignments
           expect(querier.count).to eq 2
         end
 
-        it "onlies include students without two marks when moderated" do
+        it "only includes students without two marks when moderated" do
           querier = NeedsGradingCountQuery.new(@assignment, @teacher)
           expect(querier.count).to eq 3
 

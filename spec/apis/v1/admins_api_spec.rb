@@ -159,7 +159,7 @@ describe "Admins API", type: :request do
         @user = user_factory :account => @account
       end
 
-      it "401S" do
+      it "401s" do
         api_call(:delete, @path, @path_opts, {}, {}, :expected_status => 401)
       end
     end
@@ -183,7 +183,7 @@ describe "Admins API", type: :request do
         expect(@account.account_users.active.where(user_id: @new_user)).not_to be_exists
       end
 
-      it "404S if the user doesn't exist" do
+      it "404s if the user doesn't exist" do
         temp_user = User.create!
         bad_id = temp_user.to_param
         temp_user.destroy_permanently!
@@ -209,17 +209,17 @@ describe "Admins API", type: :request do
         expect(@account.account_users.active.find_by_user_id_and_role_id(@new_user.id, @role.id)).to be_nil
       end
 
-      it "stills work using the deprecated role param" do
+      it "still works using the deprecated role param" do
         api_call(:delete, @path + "?role=CustomAdmin", @path_opts.merge(role: "CustomAdmin"))
         expect(@account.account_users.active.where(user_id: @new_user, role_id: @role.id).exists?).to eq false
       end
 
-      it "404S if the membership type doesn't exist" do
+      it "404s if the membership type doesn't exist" do
         api_call(:delete, @path + "?role=Blah", @path_opts.merge(role: "Blah"), {}, {}, expected_status: 404)
         expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
       end
 
-      it "404S if the membership type isn't specified" do
+      it "404s if the membership type isn't specified" do
         api_call(:delete, @path, @path_opts, {}, {}, expected_status: 404)
         expect(@account.account_users.where(user_id: @new_user, role_id: @role.id).exists?).to eq true
       end
@@ -261,7 +261,7 @@ describe "Admins API", type: :request do
         @user = user_factory :account => @account
       end
 
-      it "401S" do
+      it "401s" do
         api_call(:get, @path, @path_opts, {}, {}, :expected_status => 401)
       end
     end

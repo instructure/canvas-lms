@@ -355,7 +355,7 @@ describe "content migrations", :non_parallel do
       expect(source_link['href']).to include("/courses/#{@copy_from.id}")
     end
 
-    it "onlies show courses the user is authorized to see", priority: "1", test_id: 2889686 do
+    it "only shows courses the user is authorized to see", priority: "1", test_id: 2889686 do
       new_course = Course.create!(:name => "please don't see me")
       visit_page
       select_migration_type

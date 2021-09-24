@@ -150,7 +150,7 @@ describe Conversation do
       expect(convo.participants.size).to eq 3 # includes the sender (though we don't show him in the ui)
     end
 
-    it "onlies add participants to messages the existing user has participants on" do
+    it "only adds participants to messages the existing user has participants on" do
       root_convo = Conversation.initiate([sender, recipient], false)
       msgs = []
       msgs << root_convo.add_message(sender, "first message body") <<
@@ -462,7 +462,7 @@ describe Conversation do
       expect(conversation.messages_sent).to include("Conversation Created")
     end
 
-    it "onlies ever change the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
+    it "only ever changes the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
       Conversation.initiate([sender, recipient], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.update_attribute(:workflow_state, "unread")
@@ -540,7 +540,7 @@ describe Conversation do
       expect(rconvo.unread?).to be_truthy
     end
 
-    it "onlies alert message participants" do
+    it "only alerts message participants" do
       recipients = create_users(5, return_type: :record)
       convo = Conversation.initiate([sender] + recipients, false)
       convo.add_message(sender, 'test')
@@ -1001,7 +1001,7 @@ describe Conversation do
   end
 
   context "root_account_ids" do
-    it "alwayses be ordered" do
+    it "is always ordered" do
       conversation = Conversation.create
       conversation.update_attribute :root_account_ids, [3, 2, 1]
       expect(conversation.root_account_ids).to eql [1, 2, 3]

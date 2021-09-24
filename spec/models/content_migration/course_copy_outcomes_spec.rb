@@ -326,7 +326,7 @@ describe ContentMigration do
       expect(to_assign.learning_outcome_alignments.map(&:learning_outcome_id).sort).to eq [lo.id, new_lo2.id].sort
     end
 
-    it "stills associate rubrics and assignments and copy rubric association properties" do
+    it "still associates rubrics and assignments and copy rubric association properties" do
       create_rubric_asmnt
       @assoc.summary_data = { :saved_comments => { "309_6312" => ["what the comment", "hey"] } }
       @assoc.save!
@@ -394,7 +394,7 @@ describe ContentMigration do
       expect(group.reload).to be_active
     end
 
-    it "stills work when copying the same outcome twice" do
+    it "still works when copying the same outcome twice" do
       default = @copy_from.root_outcome_group
       log1 = @copy_from.learning_outcome_groups.create!(:title => "some group")
       default.adopt_outcome_group(log1)

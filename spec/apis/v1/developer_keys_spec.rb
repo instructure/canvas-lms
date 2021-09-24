@@ -70,7 +70,7 @@ describe DeveloperKeysController, type: :request do
       expect(row["developer_key_account_binding"]["developer_key_id"]).to eq key.global_id.to_s
     end
 
-    it 'onlies include a subset of attributes if inherited is set' do
+    it 'only includes a subset of attributes if inherited is set' do
       a = Account.create!
       allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
       user_session(account_admin_user(account: a))
@@ -82,7 +82,7 @@ describe DeveloperKeysController, type: :request do
       )
     end
 
-    it 'onlies include tool_configuration if inherited is not set' do
+    it 'only includes tool_configuration if inherited is not set' do
       a = Account.create!
       allow_any_instance_of(DeveloperKeysController).to receive(:context_is_domain_root_account?).and_return(true)
       user_session(account_admin_user(account: a))

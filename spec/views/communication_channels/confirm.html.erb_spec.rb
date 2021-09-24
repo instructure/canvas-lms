@@ -33,7 +33,7 @@ describe "communication_channels/confirm.html.erb" do
   end
 
   shared_examples_for "user registration" do
-    it "onlies show the registration form if no merge opportunities" do
+    it "only shows the registration form if no merge opportunities" do
       assign(:merge_opportunities, [])
       render
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')

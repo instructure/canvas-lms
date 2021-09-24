@@ -178,7 +178,7 @@ describe PlannerController do
         expect(event['plannable']['title']).to eq 'appointment group'
       end
 
-      it "onlies show section specific announcements to students who can view them" do
+      it "only shows section specific announcements to students who can view them" do
         a1 = @course.announcements.create!(:message => "for the defaults", :is_section_specific => true, :course_sections => [@course.default_section])
         sec2 = @course.course_sections.create!
         a2 = @course.announcements.create!(:message => "for my favorites", :is_section_specific => true, :course_sections => [sec2])
@@ -351,7 +351,7 @@ describe PlannerController do
           assert_status(200)
         end
 
-        it "onlies return data from contexted courses if specified" do
+        it "only returns data from contexted courses if specified" do
           get :index, params: { context_codes: [@course1.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -366,7 +366,7 @@ describe PlannerController do
           expect(response_hash.length).to be 8
         end
 
-        it "onlies return data from contexted users if specified" do
+        it "only returns data from contexted users if specified" do
           get :index, params: { context_codes: [@user.asset_string] }
           response_json = json_parse(response.body)
           response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
@@ -813,7 +813,7 @@ describe PlannerController do
           )
         end
 
-        it "stills work with context code if the student is from another shard" do
+        it "still works with context code if the student is from another shard" do
           @shard1.activate do
             @cs_student = user_factory(:active_all => true, :account => Account.create!)
             @original_course.enroll_user(@cs_student, 'StudentEnrollment', :enrollment_state => 'active')

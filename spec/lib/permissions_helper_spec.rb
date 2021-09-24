@@ -54,7 +54,7 @@ describe PermissionsHelper do
       expect(enrollments).to match_array([student_enrollment2])
     end
 
-    it 'onlies return enrollments that have permission for the given override' do
+    it 'only returns enrollments that have permission for the given override' do
       course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_grades', enabled: true, role: @student_role, account: Account.default)
@@ -364,7 +364,7 @@ describe PermissionsHelper do
                                                                                             })
     end
 
-    it "stills let concluded term teachers read_as_admin" do
+    it "still lets concluded term teachers read_as_admin" do
       concluded_teacher_term = Account.default.enrollment_terms.create!(:name => "concluded")
       concluded_teacher_term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
       concluded_teacher_enrollment = course_with_teacher(user: @user, active_all: true)
@@ -403,7 +403,7 @@ describe PermissionsHelper do
                                                                                                            })
     end
 
-    it 'onlies return true for enrollments that have permission for the given override' do
+    it 'only returns true for enrollments that have permission for the given override' do
       student_enrollment = course_with_student(active_all: true)
       teacher_enrollment = course_with_teacher(user: @user, active_all: true)
       RoleOverride.create!(permission: 'manage_grades', enabled: true, role: student_role, account: Account.default) # can't actually turn manage_grades on for students

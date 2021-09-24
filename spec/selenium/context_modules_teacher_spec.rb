@@ -219,7 +219,7 @@ describe "context modules" do
       expect(module_item).to include_text(header_text)
     end
 
-    it "alwayses show module contents on empty module", priority: "1", test_id: 126732 do
+    it "always shows module contents on empty module", priority: "1", test_id: 126732 do
       get "/courses/#{@course.id}/modules"
       add_module 'Test module'
       ff(".icon-mini-arrow-down")[0].click
@@ -300,7 +300,7 @@ describe "context modules" do
       expect(add_form.find_element(:css, '.unlock_module_at_details')).not_to be_displayed
     end
 
-    it "properlies change indent of an item with arrows" do
+    it "properly changes indent of an item with arrows" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -313,7 +313,7 @@ describe "context modules" do
       expect(tag.indent).to eq 1
     end
 
-    it "properlies change indent of an item from edit dialog" do
+    it "properly changes indent of an item from edit dialog" do
       get "/courses/#{@course.id}/modules"
 
       add_existing_module_item('#assignments_select', 'Assignment', @assignment.title)
@@ -389,7 +389,7 @@ describe "context modules" do
         expect(f(".due_date_display").text).not_to eq "Multiple Due Dates"
       end
 
-      it "onlies use the sections the user is restricted to" do
+      it "only uses the sections the user is restricted to" do
         skip("needs to ignore base if all visible sections are overridden")
         modules = create_modules(1, true)
         modules[0].add_item({ :id => @assignment.id, :type => 'assignment' })

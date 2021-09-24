@@ -287,7 +287,7 @@ describe StickySisFields do
     ac.save!
   end
 
-  it "alwayses return an empty list and not run callbacks when just overriding" do
+  it "always returns an empty list and not run callbacks when just overriding" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -305,7 +305,7 @@ describe StickySisFields do
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name].to_set
   end
 
-  it "alwayses return an empty list and run callbacks when overriding and adding" do
+  it "always returns an empty list and run callbacks when overriding and adding" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -323,7 +323,7 @@ describe StickySisFields do
     expect(AbstractCourse.find(ac.id).stuck_sis_fields).to eq [:name, :short_name].to_set
   end
 
-  it "alwayses return an empty list and run callbacks when overriding and clearing" do
+  it "always returns an empty list and run callbacks when overriding and clearing" do
     ac = create_abstract_course
     expect(ac.stuck_sis_fields).to eq [].to_set
     ac.name = "ac name"
@@ -397,7 +397,7 @@ describe StickySisFields do
     end
   end
 
-  it "onlies process changed fields marked as sticky" do
+  it "only processes changed fields marked as sticky" do
     old_sticky_sis_fields = AbstractCourse.sticky_sis_fields
     begin
       ac = create_abstract_course

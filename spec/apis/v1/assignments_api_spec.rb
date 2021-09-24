@@ -2678,7 +2678,7 @@ describe AssignmentsApiController, type: :request do
           .to be_include 'Multiple Dates'
       end
 
-      it "onlies notify students with visibility on creation" do
+      it "only notifies students with visibility on creation" do
         section2 = @course.course_sections.create!
         student2 = student_in_section(section2, :user => user_with_communication_channel(:active_all => true))
         student2.email_channel.notification_policies.create!(notification: @notification, frequency: 'immediately')
@@ -3247,7 +3247,7 @@ describe AssignmentsApiController, type: :request do
       expect(JSON.parse(response.body)['id']).to eq @assignment.id
     end
 
-    it "400S with invalid date times" do
+    it "400s with invalid date times" do
       the_date = 1.day.ago
       @assignment = @course.assignments.create({
                                                  :name => "some assignment",

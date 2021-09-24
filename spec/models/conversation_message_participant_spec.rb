@@ -50,7 +50,7 @@ describe ConversationMessageParticipant do
     end
 
     describe "#deleted" do
-      it "onlies include soft deletes" do
+      it "only includes soft deletes" do
         @teacher.conversations.first.remove_messages(@msg)
         expect(ConversationMessageParticipant.all.count).to eql 3
         expect(ConversationMessageParticipant.deleted.map(&:workflow_state)).to eql ['deleted']

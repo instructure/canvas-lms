@@ -1270,7 +1270,7 @@ describe Account do
   context "sharding" do
     specs_require_sharding
 
-    it "properlies return site admin permissions regardless of active shard" do
+    it "properly returns site admin permissions regardless of active shard" do
       enable_cache do
         user_factory
         site_admin = Account.site_admin
@@ -1405,7 +1405,7 @@ describe Account do
   end
 
   context "manually created courses account" do
-    it "stills work with existing manually created courses accounts" do
+    it "still works with existing manually created courses accounts" do
       acct = Account.default
       sub = acct.sub_accounts.create!(:name => "Manually-Created Courses")
       manual_courses_account = acct.manually_created_courses_account
@@ -1744,7 +1744,7 @@ describe Account do
   end
 
   context "quota cache" do
-    it "onlies clear the quota cache if something changes" do
+    it "only clears the quota cache if something changes" do
       account = account_model
 
       expect(Account).to receive(:invalidate_inherited_caches).once
@@ -2075,7 +2075,7 @@ describe Account do
     end
   end
 
-  it "onlies send new account user notifications to active admins" do
+  it "only sends new account user notifications to active admins" do
     active_admin = account_admin_user(:active_all => true)
     deleted_admin = account_admin_user(:active_all => true)
     deleted_admin.account_users.destroy_all

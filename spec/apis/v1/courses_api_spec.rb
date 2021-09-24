@@ -53,11 +53,11 @@ describe Api::V1::Course do
       expect(@test_api.course_json(@course1, @me, {}, [], [])).to_not include 'html_url'
     end
 
-    it 'onlies include needs_grading_count if requested' do
+    it 'only includes needs_grading_count if requested' do
       expect(@test_api.course_json(@course1, @me, {}, [], [teacher_enrollment])).to_not include 'needs_grading_count'
     end
 
-    it 'onlies include is_favorite if requested' do
+    it 'only includes is_favorite if requested' do
       expect(@test_api.course_json(@course1, @me, {}, ['favorites'], [teacher_enrollment])).to include 'is_favorite'
     end
 
@@ -302,7 +302,7 @@ describe Api::V1::Course do
 
       let(:expected_fields_with_unposted) { expected_fields_without_unposted.merge(unposted_fields) }
 
-      it "alwayses include computed scores" do
+      it "always includes computed scores" do
         expect(student_enrollment).to include(expected_fields_without_unposted)
       end
 
@@ -1485,7 +1485,7 @@ describe CoursesController, type: :request do
         expect(@course.reload.grade_passback_setting).to be_nil
       end
 
-      it "onlies allow valid grade_passback_setting" do
+      it "only allows valid grade_passback_setting" do
         json = api_call(:put, @path, @params, course: { grade_passback_setting: 'invalid' })
         expect(json['errors']['grade_passback_setting'].first['message']).to eq 'Invalid grade_passback_setting'
         expect(@course.reload.grade_passback_setting).to be_nil
@@ -2603,7 +2603,7 @@ describe CoursesController, type: :request do
     end
   end
 
-  it "onlies return teacher enrolled courses on ?enrollment_type=teacher" do
+  it "only returns teacher enrolled courses on ?enrollment_type=teacher" do
     json = api_call(:get, "/api/v1/courses.json?enrollment_type=teacher",
                     { :controller => 'courses', :action => 'index', :format => 'json', :enrollment_type => 'teacher' })
 
@@ -3907,7 +3907,7 @@ describe CoursesController, type: :request do
         user_with_pseudonym(:user => @admin)
       end
 
-      it "401S for unauthorized users" do
+      it "401s for unauthorized users" do
         other_account = Account.create!
         other_course = other_account.courses.create!
         json = api_call(:get, "/api/v1/accounts/#{other_account.id}/courses/#{other_course.id}.json",
@@ -3915,7 +3915,7 @@ describe CoursesController, type: :request do
                         {}, {}, :expected_status => 401)
       end
 
-      it "404S for bad account id" do
+      it "404s for bad account id" do
         bad_account_id = Account.last.id + 9999
         json = api_call(:get, "/api/v1/accounts/#{bad_account_id}/courses/#{@course.id}.json",
                         { :controller => 'courses', :action => 'show', :id => @course.id.to_param, :format => 'json', :account_id => bad_account_id.to_s },
@@ -4502,7 +4502,7 @@ describe ContentImportsController, type: :request do
     expect(json['errors']).to eq 'You can not use "only" and "except" options at the same time.'
   end
 
-  it "onlies copy course settings" do
+  it "only copies course settings" do
     @copy_from.default_view = 'modules'
     @copy_from.save!
     run_only_copy(:course_settings)
@@ -4511,14 +4511,14 @@ describe ContentImportsController, type: :request do
     expect(@copy_to.default_view).to eq 'modules'
   end
 
-  it "onlies copy wiki pages" do
+  it "only copies wiki pages" do
     run_only_copy(:wiki_pages)
     check_counts 0
     expect(@copy_to.wiki_pages.count).to eq 1
   end
 
   each_copy_option do |option, association|
-    it "onlies copy #{option}" do
+    it "only copies #{option}" do
       skip if !Qti.qti_enabled? && association == :quizzes
       run_only_copy(option)
       expect(@copy_to.send(association).count).to eq 1

@@ -120,7 +120,7 @@ describe 'Speedgrader' do
         end
       end
 
-      it 'onlies display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
+      it 'only displays needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_questions_need_review[0]).to include_text('Question 2')
           expect(Speedgrader.quiz_questions_need_review[1]).to include_text('Question 3')

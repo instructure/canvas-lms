@@ -1529,7 +1529,7 @@ RSpec.describe ApplicationController do
       expect { controller.send(:verify_authenticity_token) }.not_to raise_exception
     end
 
-    it "stills raise on session-authenticated api request with invalid tokens" do
+    it "still raises on session-authenticated api request with invalid tokens" do
       allow(controller.request).to receive(:path).and_return('/api/endpoint')
       allow(controller).to receive(:valid_request_origin?).and_return(true)
       expect { controller.send(:verify_authenticity_token) }.to raise_exception(ActionController::InvalidAuthenticityToken)

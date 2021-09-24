@@ -392,7 +392,7 @@ describe ContentTag do
     expect(@tag.title[0, 250]).to eq @page.title[0, 250]
   end
 
-  it "properlies trim asset name for assignments" do
+  it "properly trims asset name for assignments" do
     course_factory
     @assign = @course.assignments.create!(:title => "some assignment")
     @module = @course.context_modules.create!(:name => "module")

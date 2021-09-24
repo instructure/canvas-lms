@@ -77,7 +77,7 @@ describe "student interactions links" do
       user_session(@teacher)
     end
 
-    it "onlies show the student link on the student's page" do
+    it "only shows the student link on the student's page" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
       expect(response.body).to match(/Interactions Report/)

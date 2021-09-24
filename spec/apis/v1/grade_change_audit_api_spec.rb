@@ -30,7 +30,7 @@ describe "GradeChangeAudit API", type: :request do
       @user.account_users.create(account: Account.default)
     end
 
-    it "404S" do
+    it "404s" do
       raw_api_call(:get, "/api/v1/audit/grade_change/students/#{@user.id}", controller: :grade_change_audit_api, action: :for_student, student_id: @user.id.to_s, format: :json)
       assert_status(404)
     end
@@ -339,7 +339,7 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "404S for inactive assignments" do
+      it "404s for inactive assignments" do
         @assignment.destroy
         fetch_for_context(@assignment, expected_status: 404)
       end
@@ -367,7 +367,7 @@ describe "GradeChangeAudit API", type: :request do
         end
       end
 
-      it "404S for inactive students" do
+      it "404s for inactive students" do
         @student.destroy
         fetch_for_context(@student, expected_status: 404, type: "student")
       end
@@ -387,7 +387,7 @@ describe "GradeChangeAudit API", type: :request do
         fetcher.call(contexts)
       end
 
-      it "404S for inactive grader" do
+      it "404s for inactive grader" do
         @teacher.destroy
         fetch_for_context(@teacher, expected_status: 404, type: "grader")
       end
@@ -561,7 +561,7 @@ describe "GradeChangeAudit API", type: :request do
           @viewing_user = user_with_pseudonym(account: @new_root_account)
         end
 
-        it "404S if nothing matches the type" do
+        it "404s if nothing matches the type" do
           fetch_for_context(@student, expected_status: 404, type: "student")
           fetch_for_context(@teacher, expected_status: 404, type: "grader")
         end
@@ -585,7 +585,7 @@ describe "GradeChangeAudit API", type: :request do
         @json = fetch_for_context(@student, per_page: 2, type: "student")
       end
 
-      it "onlies return one page of results" do
+      it "only returns one page of results" do
         expect(@json['events'].size).to eq 2
       end
 

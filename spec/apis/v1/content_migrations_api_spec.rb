@@ -61,7 +61,7 @@ describe ContentMigrationsController, type: :request do
       expect(json.first['id']).to eq @migration.id
     end
 
-    it "401S" do
+    it "401s" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end
@@ -178,11 +178,11 @@ describe ContentMigrationsController, type: :request do
       expect(json['workflow_state']).to eq 'waiting_for_select'
     end
 
-    it "404S" do
+    it "404s" do
       api_call(:get, @migration_url + "000", @params.merge({ :id => @migration.id.to_param + "000" }), {}, {}, :expected_status => 404)
     end
 
-    it "401S" do
+    it "401s" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @migration_url, @params, {}, {}, :expected_status => 401)
     end

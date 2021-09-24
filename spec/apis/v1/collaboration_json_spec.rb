@@ -36,7 +36,7 @@ describe Api::V1::Collaboration do
     @collaboration.save!
   end
 
-  it 'properlies serialize' do
+  it 'properly serializes' do
     json = collaboration_json(@collaboration, @current_user, nil)
 
     expect(json['id']).to eq @collaboration.id

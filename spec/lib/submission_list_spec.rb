@@ -116,7 +116,7 @@ describe SubmissionList do
       end
     end
 
-    it "onlies keep one diff per grader per day" do
+    it "only keeps one diff per grader per day" do
       SubmissionList.days(@course).each do |day|
         day.graders.each do |grader|
           grader.assignments.each do |assignment|

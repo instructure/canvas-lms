@@ -196,7 +196,7 @@ describe "Outcomes API", type: :request do
         expect(response).to be_successful
       end
 
-      it "stills require a user for global outcomes" do
+      it "still requires a user for global outcomes" do
         @outcome = LearningOutcome.create!(:title => "My Outcome")
         @user = nil
         raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
@@ -207,7 +207,7 @@ describe "Outcomes API", type: :request do
         assert_status(401)
       end
 
-      it "404S for deleted outcomes" do
+      it "404s for deleted outcomes" do
         @outcome.destroy
         raw_api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
                      :controller => 'outcomes_api',

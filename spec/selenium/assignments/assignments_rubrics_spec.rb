@@ -293,7 +293,7 @@ describe "assignment rubrics" do
       expect(f('.grading_value')).to have_attribute(:value, '5')
     end
 
-    it "properlies manage rubric focus on submission preview page", priority: "2", test_id: 220329 do
+    it "properly manages rubric focus on submission preview page", priority: "2", test_id: 220329 do
       student_in_course(:active_all => true)
       outcome_with_rubric
       @assignment = @course.assignments.create(:name => 'assignment with rubric')
@@ -472,7 +472,7 @@ describe "assignment rubrics" do
         expect(ffj('.range_rating:visible .min_points')[1]).to include_text "0"
       end
 
-      it "properlies update the lowest rating range when scaled up" do
+      it "properly updates the lowest rating range when scaled up" do
         rubric_params = {
           :criteria => {
             "0" => {
@@ -662,7 +662,7 @@ describe "assignment rubrics" do
       course_with_student_logged_in
     end
 
-    it "properlies show rubric criterion details for learning outcomes", priority: "2", test_id: 220332 do
+    it "properly shows rubric criterion details for learning outcomes", priority: "2", test_id: 220332 do
       @assignment = @course.assignments.create(name: 'assignment with rubric')
       outcome_with_rubric
 

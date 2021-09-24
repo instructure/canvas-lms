@@ -122,21 +122,21 @@ describe AccountUser do
       expect(@au2.is_subset_of?(@user1)).to be_truthy
     end
 
-    it "properlies compute differing applies_to (descendants vs. all)" do
+    it "properly computes differing applies_to (descendants vs. all)" do
       @ro1.applies_to_self = false
       @ro1.save!
       expect(@au1.is_subset_of?(@user2)).to be_truthy
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
-    it "properlies compute differing applies_to (self vs. all)" do
+    it "properly computes differing applies_to (self vs. all)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
       expect(@au1.is_subset_of?(@user2)).to be_truthy
       expect(@au2.is_subset_of?(@user1)).to be_falsey
     end
 
-    it "properlies compute differing applies_to (self vs. descendants)" do
+    it "properly computes differing applies_to (self vs. descendants)" do
       @ro1.applies_to_descendants = false
       @ro1.save!
       @ro2.applies_to_self = false

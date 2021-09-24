@@ -169,7 +169,7 @@ describe AdheresToPolicy::InstanceMethods do
     expect(actor.total).to eq 2
   end
 
-  it "onlies execute relevant conditions when searching for specific rights" do
+  it "only executes relevant conditions when searching for specific rights" do
     actor_class = Class.new do
       attr_accessor :total
 

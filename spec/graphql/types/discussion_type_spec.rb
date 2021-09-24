@@ -270,7 +270,7 @@ RSpec.shared_examples "DiscussionType" do
       @de2 = discussion.discussion_entries.create!(message: 'find me', user: @teacher)
     end
 
-    it "onlies count entries that match the search term" do
+    it "only counts entries that match the search term" do
       entryCount = discussion_type.resolve('searchEntryCount(filter: all, searchTerm: "boo")')
       result = discussion_type.resolve('discussionEntriesConnection(searchTerm:"boo") { nodes { message } }')
       expect(result.count).to be 1

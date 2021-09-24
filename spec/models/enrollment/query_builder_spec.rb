@@ -280,7 +280,7 @@ describe "Enrollment::QueryBuilder" do
       context "with #{state.inspect}" do
         let(:state) { state }
 
-        it "onlies return #{state} enrollments" do
+        it "only returns #{state} enrollments" do
           create_enrollments(
             %w{active available StudentEnrollment},
             [state.to_s, "available", "StudentEnrollment"]

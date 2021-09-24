@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe TermsController do
-  it "onlies touch courses once when setting overrides" do
+  it "only touches courses once when setting overrides" do
     a = Account.default
     u = user_factory(active_all: true)
     a.account_users.create!(user: u)

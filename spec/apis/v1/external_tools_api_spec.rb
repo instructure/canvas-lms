@@ -59,7 +59,7 @@ describe ExternalToolsController, type: :request do
       search_call(@course)
     end
 
-    it "onlies find selectable tools" do
+    it "only finds selectable tools" do
       only_selectables(@course)
     end
 
@@ -280,7 +280,7 @@ describe ExternalToolsController, type: :request do
       search_call(@account, "account")
     end
 
-    it "onlies find selectable tools" do
+    it "only finds selectable tools" do
       only_selectables(@account, "account")
     end
 

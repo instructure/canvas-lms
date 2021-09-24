@@ -229,7 +229,7 @@ describe "announcements" do
       expect(announcement.find_element(:css, '.ic-announcement-row__content')).to include_text(@announcement.message)
     end
 
-    it "alwayses see student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
+    it "always sees student replies when 'initial post required' is turned on", priority: "1", test_id: 150524 do
       skip_if_chrome('Student view breaks this test')
       student_entry = 'this is my reply'
 

@@ -360,7 +360,7 @@ describe ContentExportsApiController, type: :request do
       context "selection with sharding" do
         specs_require_sharding
 
-        it "properlies select content with global ids when asset_strings are used" do
+        it "properly selects content with global ids when asset_strings are used" do
           json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
                                   { :select => { :context_modules => { mod.asset_string => "1" } } })
@@ -400,7 +400,7 @@ describe ContentExportsApiController, type: :request do
           expect(@course.attachments.where(filename: att_to_not_copy.filename)).not_to be_exists
         end
 
-        it "properlies select content with global ids when arrays of ids are used" do
+        it "properly selects content with global ids when arrays of ids are used" do
           json = api_call_as_user(t_teacher, :post, "/api/v1/courses/#{t_course.id}/content_exports?export_type=common_cartridge",
                                   { controller: 'content_exports_api', action: 'create', format: 'json', course_id: t_course.to_param, export_type: 'common_cartridge' },
                                   { :select => { :context_modules => [mod.id] } })

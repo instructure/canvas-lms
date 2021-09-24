@@ -174,7 +174,7 @@ describe AssessmentQuestion do
     expect(question.question_data[:assessment_question_id]).to eq question.id
   end
 
-  it "alwayses return a HashWithIndifferentAccess and allow editing" do
+  it "always returns a HashWithIndifferentAccess and allow editing" do
     data = {
       :name => 'mc question',
       :question_type => 'multiple_choice_question',

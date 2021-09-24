@@ -57,7 +57,7 @@ describe 'CrocodocDocument' do
                                                              })
     end
 
-    it "onlies include ids specified in the allow list" do
+    it "only includes ids specified in the allow list" do
       expect(@crocodoc.permissions_for_user(@teacher, [@teacher.crocodoc_id!, @submitter.crocodoc_id!])).to eq({
                                                                                                                  :filter => "#{@teacher.crocodoc_id!},#{@submitter.crocodoc_id!}",
                                                                                                                  :admin => true,
@@ -87,7 +87,7 @@ describe 'CrocodocDocument' do
                                                                  })
       end
 
-      it "onlies see their own annotations when grades are not posted" do
+      it "only sees their own annotations when grades are not posted" do
         expect(@crocodoc.permissions_for_user(@submitter)).to eq({
                                                                    :filter => @submitter.crocodoc_id,
                                                                    :admin => false,
@@ -96,7 +96,7 @@ describe 'CrocodocDocument' do
       end
     end
 
-    it "onlies allow classmates to see their own annotations" do
+    it "only allows classmates to see their own annotations" do
       expect(@crocodoc.permissions_for_user(@other_student)).to eq({
                                                                      :filter => @other_student.crocodoc_id!,
                                                                      :admin => false,

@@ -54,7 +54,7 @@ describe "Learning Outcome exporting" do
       @bank.reload
     end
 
-    it 'onlies export alignments for the current course on account level outcomes' do
+    it 'only exports alignments for the current course on account level outcomes' do
       course_factory
       @course.root_outcome_group.add_outcome(@outcome)
       assessment_question_bank_model

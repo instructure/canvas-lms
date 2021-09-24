@@ -95,7 +95,7 @@ describe "site admin jobs ui" do
   end
 
   context "search" do
-    it "onlies action the individual job when it has been searched for" do
+    it "only actions the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
       get "/jobs?flavor=id&q=#{job.id}"
       expect(f('#jobs-grid .slick-cell')).to be

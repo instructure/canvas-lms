@@ -300,7 +300,7 @@ describe Group do
     expect(group.grants_right?(@student, :participate)).to be_falsey
   end
 
-  it "onlies allow me to moderate_forum if I can moderate_forum of group's context" do
+  it "only allows me to moderate_forum if I can moderate_forum of group's context" do
     course_with_teacher(active_course: true)
     student_in_course
     group = @course.groups.create

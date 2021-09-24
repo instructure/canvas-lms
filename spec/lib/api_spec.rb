@@ -577,7 +577,7 @@ describe Api do
       expect(lambda { Api.relation_for_sis_mapping_and_columns(User, {}, {}, user_factory) }).to raise_error("sis_root_account required for lookups")
     end
 
-    it 'properlies generate an escaped arg string' do
+    it 'properly generates an escaped arg string' do
       expect(Api.relation_for_sis_mapping_and_columns(User, { "id" => ["1", 2, 3] }, { :scope => "scope" }, Account.default).to_sql).to match(/\(scope = #{Account.default.id} AND id IN \('1',2,3\)\)/)
     end
 

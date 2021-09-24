@@ -142,7 +142,7 @@ describe BigBlueButtonConference do
       @bbb.initiate_conference
     end
 
-    it "properlies serialize a response with no recordings" do
+    it "properly serializes a response with no recordings" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
       response = { returncode: 'SUCCESS', recordings: "\n  ",
                    messageKey: 'noRecordings', message: 'There are no recordings for the meeting(s).' }
@@ -150,7 +150,7 @@ describe BigBlueButtonConference do
       expect(@bbb.recordings).to eq []
     end
 
-    it "properlies serialize a response with recordings" do
+    it "properly serializes a response with recordings" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
       response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
       allow(@bbb).to receive(:send_request).and_return(response)

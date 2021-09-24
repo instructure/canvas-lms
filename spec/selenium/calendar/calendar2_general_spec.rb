@@ -278,7 +278,7 @@ describe "calendar2" do
       expect(f("#context-list li[data-context=user_#{@user.id}].not-checked")).to be
     end
 
-    it "onlies consider active enrollments for upcoming events list", priority: "2", test_id: 854796 do
+    it "only considers active enrollments for upcoming events list", priority: "2", test_id: 854796 do
       make_event(title: "Test Event", start: Time.zone.now + 1.day, context: @course)
       get "/"
       expect(f('.coming_up').text).to include('Test Event')

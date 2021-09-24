@@ -33,7 +33,7 @@ describe WikiPagesController do
     page
   end
 
-  it "stills work with periods in titles for new pages" do
+  it "still works with periods in titles for new pages" do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
 
     get "/courses/#{@course.id}/pages/windurs%203.won/edit?titleize=1"

@@ -182,7 +182,7 @@ describe ContentZipper do
       expect(content).to include("Anonymous User")
     end
 
-    it "onlies include submissions in the correct section" do
+    it "only includes submissions in the correct section" do
       course_with_student(active_all: true)
       submission_model(body: "hai this is my answer")
       @section = @course.course_sections.create!
@@ -286,7 +286,7 @@ describe ContentZipper do
   end
 
   describe "hard concluded course submissions" do
-    it "stills download the content" do
+    it "still downloads the content" do
       course_with_teacher
       @assignment = assignment_model(course: @course)
       submissions = 5.times.map.with_index do |i|

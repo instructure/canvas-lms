@@ -30,7 +30,7 @@ describe "AuthenticationAudit API", type: :request do
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end
 
-    it "404S" do
+    it "404s" do
       raw_api_call(:get, "/api/v1/audit/authentication/logins/#{@pseudonym.id}", controller: 'authentication_audit_api', action: "for_login", :login_id => @pseudonym.id.to_s, format: 'json')
       assert_status(404)
     end
@@ -319,19 +319,19 @@ describe "AuthenticationAudit API", type: :request do
     end
 
     context "deleted entities" do
-      it "404S for inactive logins" do
+      it "404s for inactive logins" do
         @pseudonym.destroy
         fetch_for_context(@pseudonym, expected_status: 404, type: 'login')
       end
 
-      it "404S for inactive accounts" do
+      it "404s for inactive accounts" do
         # can't just delete Account.default
         @account = account_model
         @account.destroy
         fetch_for_context(@account, expected_status: 404)
       end
 
-      it "404S for inactive users" do
+      it "404s for inactive users" do
         @user.destroy
         fetch_for_context(@user, expected_status: 404)
       end
@@ -545,7 +545,7 @@ describe "AuthenticationAudit API", type: :request do
         @json = fetch_for_context(@user, :per_page => 2)
       end
 
-      it "onlies return one page of results" do
+      it "only returns one page of results" do
         expect(@json['events'].size).to eq 2
       end
 

@@ -117,7 +117,7 @@ describe ContentMigration do
       expect(@copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first).not_to be_nil
     end
 
-    it "properlies copy selected delayed announcements" do
+    it "properly copies selected delayed announcements" do
       from_time = 1.hour.from_now
       until_time = 25.hours.from_now
       from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: from_time, lock_at: until_time)
@@ -147,7 +147,7 @@ describe ContentMigration do
       end
     end
 
-    it "properlies copy selected delayed announcements even if they've already posted and locked" do
+    it "properly copies selected delayed announcements even if they've already posted and locked" do
       from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago)
       from_ann.save!
       run_jobs

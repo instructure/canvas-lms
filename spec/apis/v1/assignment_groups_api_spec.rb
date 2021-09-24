@@ -285,7 +285,7 @@ describe AssignmentGroupsController, type: :request do
   end
 
   context "differentiated assignments" do
-    it "onlies return visible assignments when differentiated assignments is on" do
+    it "only returns visible assignments when differentiated assignments is on" do
       setup_groups
       setup_four_assignments(only_visible_to_overrides: true)
       @user.enrollments.each(&:destroy_permanently!)
@@ -360,7 +360,7 @@ describe AssignmentGroupsController, type: :request do
         }
       end
 
-      it "onlies return assignments within the grading period" do
+      it "only returns assignments within the grading period" do
         json = api_call(:get, api_path, api_settings)
         expect(json[1]['assignments'].length).to eq 1
       end
@@ -372,7 +372,7 @@ describe AssignmentGroupsController, type: :request do
     end
 
     describe "#show" do
-      it "onlies return assignments and submissions within the grading period" do
+      it "only returns assignments and submissions within the grading period" do
         student = User.create!
         @course.enroll_student(student)
         api_path = "/api/v1/courses/#{@course.id}/assignment_groups/#{@group1.id}"
@@ -673,7 +673,7 @@ describe AssignmentGroupsApiController, type: :request do
       end
     end
 
-    it 'onlies return assignments in the given grading period with MGP on' do
+    it 'only returns assignments in the given grading period with MGP on' do
       @course.enroll_student(User.create!)
       setup_grading_periods
 

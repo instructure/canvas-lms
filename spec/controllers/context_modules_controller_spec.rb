@@ -231,7 +231,7 @@ describe ContextModulesController do
       assert_unauthorized
     end
 
-    it "stills redirect for unpublished modules if teacher" do
+    it "still redirects for unpublished modules if teacher" do
       user_session(@teacher)
 
       @module = @course.context_modules.create!
@@ -247,7 +247,7 @@ describe ContextModulesController do
       expect(response).to redirect_to course_assignment_url(@course, assignment1, :module_item_id => assignmentTag1.id)
     end
 
-    it "stills redirect for unpublished modules if teacher and course is concluded" do
+    it "still redirects for unpublished modules if teacher and course is concluded" do
       user_session(@teacher)
 
       @module = @course.context_modules.create!
@@ -514,7 +514,7 @@ describe ContextModulesController do
       expect(tags.map(&:id)).to eq [tagA.id, tagB.id]
     end
 
-    it "onlies touch module once on reorder" do
+    it "only touches module once on reorder" do
       course_with_teacher_logged_in(:active_all => true)
       assign_group = @course.assignment_groups.create!
       mod = @course.context_modules.create!
@@ -1177,7 +1177,7 @@ describe ContextModulesController do
       assert_redirected_to controller: 'assignments', action: 'edit', id: assignment.id, anchor: 'mastery-paths-editor'
     end
 
-    it "404S if module item is not a graded type" do
+    it "404s if module item is not a graded type" do
       page = @course.wiki_pages.create title: "test"
       item = @mod.add_item type: 'page', id: page.id
 

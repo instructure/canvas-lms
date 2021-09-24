@@ -79,7 +79,7 @@ describe "Conferences API", type: :request do
       expect(json).to eq api_conferences_json([WebConference.find(@conferences[1].id)], @course, @user)
     end
 
-    it "onlies list conferences the user is a participant of" do
+    it "only lists conferences the user is a participant of" do
       @user = @student
       @conferences = (1..2).map { |i|
         @course.web_conferences.create!(:conference_type => 'Wimba',

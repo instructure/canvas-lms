@@ -37,7 +37,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
                           "Improper grade_publishing_status \"asplode\" for enrollment 2"]
   end
 
-  it 'properlies update the db' do
+  it 'properly updates the db' do
     course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'
@@ -52,7 +52,7 @@ describe SIS::CSV::GradePublishingResultsImporter do
     expect(@enrollment.grade_publishing_status).to eq 'published'
   end
 
-  it 'properlies pass in messages' do
+  it 'properly passes in messages' do
     course_with_student(account: @account)
 
     @enrollment.grade_publishing_status = 'publishing'

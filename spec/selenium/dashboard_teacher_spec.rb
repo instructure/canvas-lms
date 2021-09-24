@@ -266,7 +266,7 @@ describe "dashboard" do
     end
 
     context "course menu customization" do
-      it "alwayses have a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
+      it "always has a link to the courses page (with customizations)", priority: "1", test_id: 216404 do
         course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true })
 
         get "/"

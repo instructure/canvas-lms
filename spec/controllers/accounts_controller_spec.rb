@@ -68,26 +68,26 @@ describe AccountsController do
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
 
-    it "404S for non-existent users as html" do
+    it "404s for non-existent users as html" do
       post 'remove_user', params: { :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1) }
       expect(flash[:notice]).to be_nil
       expect(response).to be_not_found
     end
 
-    it "404S for non-existent users as json" do
+    it "404s for non-existent users as json" do
       post 'remove_user', params: { :account_id => @account.id, :user_id => (User.all.map(&:id).max + 1) }, :format => "json"
       expect(flash[:notice]).to be_nil
       expect(response).to be_not_found
     end
 
-    it "onlies remove user from the account, but not delete them" do
+    it "only removes user from the account, but not delete them" do
       user_with_pseudonym :account => @account
       workflow_state_was = @user.workflow_state
       post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
       expect(@user.reload.workflow_state).to eql workflow_state_was
     end
 
-    it "onlies remove users from the specified account" do
+    it "only removes users from the specified account" do
       @other_account = account_model
       account_with_admin_logged_in
       user_with_pseudonym :account => @account, :username => "nobody@example.com"
@@ -157,7 +157,7 @@ describe AccountsController do
       expect(response).to be_unauthorized
     end
 
-    it '404S for non-existent users' do
+    it '404s for non-existent users' do
       put 'restore_user', params: { account_id: @account.id, user_id: 0 }
       expect(response).to be_not_found
 
@@ -178,7 +178,7 @@ describe AccountsController do
       expect(@doomed_user.user_account_associations.find_by(account: @account)).not_to be_nil
     end
 
-    it '400S for non-deleted users' do
+    it '400s for non-deleted users' do
       @active_user = user_with_pseudonym(account: @account)
 
       put 'restore_user', params: { account_id: @account.id, user_id: @active_user.id }
@@ -1225,7 +1225,7 @@ describe AccountsController do
       expect(response.headers.to_a.find { |a| a.first == "Link" }.last).to include("last")
     end
 
-    it "properlies remove sections from includes" do
+    it "properly removes sections from includes" do
       @s1 = @course.course_sections.create!
       @course.enroll_student(user_factory(:active_all => true), :section => @s1, :allow_multiple_enrollments => true)
 

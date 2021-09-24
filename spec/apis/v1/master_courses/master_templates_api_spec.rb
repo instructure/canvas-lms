@@ -117,7 +117,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
       @params = @base_params.merge(:action => 'update_associations')
     end
 
-    it "onlies add courses in the blueprint courses' account (or sub-accounts)" do
+    it "only adds courses in the blueprint courses' account (or sub-accounts)" do
       sub1 = Account.default.sub_accounts.create!
       sub2 = Account.default.sub_accounts.create!
       @course.update_attribute(:account, sub1)

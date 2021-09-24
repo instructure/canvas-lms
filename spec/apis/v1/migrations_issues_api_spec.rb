@@ -50,7 +50,7 @@ describe MigrationIssuesController, type: :request do
       expect(json.first['id']).to eq issue.id
     end
 
-    it "401S" do
+    it "401s" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @issue_url, @params, {}, {}, :expected_status => 401)
     end
@@ -84,11 +84,11 @@ describe MigrationIssuesController, type: :request do
       expect(json['error_report_html_url']).to eq "http://www.example.com/error_reports/0"
     end
 
-    it "404S" do
+    it "404s" do
       api_call(:get, @issue_url + "000", @params.merge({ :id => @issue.id.to_param + "000" }), {}, {}, :expected_status => 404)
     end
 
-    it "401S" do
+    it "401s" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:get, @issue_url, @params, {}, {}, :expected_status => 401)
     end
@@ -115,11 +115,11 @@ describe MigrationIssuesController, type: :request do
       expect(@issue.workflow_state).to eq 'active'
     end
 
-    it "404S" do
+    it "404s" do
       api_call(:put, @issue_url + "000", @params.merge({ :id => @issue.id.to_param + "000" }), @body_params, {}, :expected_status => 404)
     end
 
-    it "401S" do
+    it "401s" do
       course_with_student_logged_in(:course => @course, :active_all => true)
       api_call(:put, @issue_url, @params, @body_params, {}, :expected_status => 401)
       @issue.reload

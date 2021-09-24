@@ -46,7 +46,7 @@ describe SubmissionsController do
       expect(assigns[:submission].url).to eql("http://url")
     end
 
-    it 'onlies emit one live event' do
+    it 'only emits one live event' do
       expect(Canvas::LiveEvents).to receive(:submission_created).once
       expect(Canvas::LiveEvents).not_to receive(:submission_updated)
       course_with_student_logged_in(:active_all => true)

@@ -334,7 +334,7 @@ describe UserLearningObjectScopes do
         expect(@student.assignments_for_student('submitting', **@opts).order(:id)).to eq [@assignment1, @assignment2]
       end
 
-      it "onlies include assignments from given course ids" do
+      it "only includes assignments from given course ids" do
         opts = @opts.merge({ course_ids: [@course1.id], group_ids: [] })
         expect(@student.assignments_for_student('submitting', **opts).order(:id)).to eq [@assignment1]
       end
@@ -351,7 +351,7 @@ describe UserLearningObjectScopes do
       end
     end
 
-    it "alwayses have the only_visible_to_overrides attribute" do
+    it "always has the only_visible_to_overrides attribute" do
       course_with_student(:active_all => true)
       assignment_quiz([], :course => @course, :user => @user)
       @quiz.unlock_at = nil
@@ -631,7 +631,7 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_grading).to include @course1.assignments.first
     end
 
-    it "onlies count submissions in accessible course sections" do
+    it "only counts submissions in accessible course sections" do
       expect(@ta.assignments_needing_grading.size).to be 2
       expect(@ta.assignments_needing_grading).to be_include(@course1.assignments.first)
       expect(@ta.assignments_needing_grading).to be_include(@course2.assignments.first)
@@ -701,7 +701,7 @@ describe UserLearningObjectScopes do
       expect(@teacher.assignments_needing_grading.size).to eq 15
     end
 
-    it "alwayses have the only_visible_to_overrides attribute" do
+    it "always has the only_visible_to_overrides attribute" do
       expect(@teacher.assignments_needing_grading).to all(have_attribute(:only_visible_to_overrides))
     end
 
@@ -1035,7 +1035,7 @@ describe UserLearningObjectScopes do
           expect(@student.discussion_topics_needing_viewing(**@opts).order(:id)).to eq [@discussion1, @discussion2, @group_discussion]
         end
 
-        it "onlies include assignments from given course/group ids" do
+        it "only includes assignments from given course/group ids" do
           expect(@student.discussion_topics_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
           opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
           expect(@student.discussion_topics_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]
@@ -1237,7 +1237,7 @@ describe UserLearningObjectScopes do
         expect(@student.wiki_pages_needing_viewing(**@opts).order(:id)).to eq [@discussion1, @discussion2, @group_discussion]
       end
 
-      it "onlies include assignments from given course/group ids" do
+      it "only includes assignments from given course/group ids" do
         expect(@student.wiki_pages_needing_viewing(**@opts.merge({ course_ids: [], group_ids: [] })).order(:id)).to eq []
         opts = @opts.merge({ course_ids: [@course1.id], group_ids: [@group.id] })
         expect(@student.wiki_pages_needing_viewing(**opts).order(:id)).to eq [@discussion1, @group_discussion]

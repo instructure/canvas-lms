@@ -103,7 +103,7 @@ describe ApplicationHelper do
   end
 
   describe "tomorrow_at_midnight" do
-    it "alwayses return a time in the future" do
+    it "always returns a time in the future" do
       now = 1.day.from_now.midnight - 5.seconds
       expect(tomorrow_at_midnight).to be > now
     end

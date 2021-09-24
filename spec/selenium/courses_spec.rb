@@ -64,7 +64,7 @@ describe "courses" do
       end
 
       it "displays a creative commons license when set", priority: "1", test_id: 272274 do
-        @course.license =  'cc_by_sa'
+        @course.license = 'cc_by_sa'
         @course.save!
         get "/courses/#{@course.id}"
         wait_for_ajaximations
@@ -207,7 +207,7 @@ describe "courses" do
       expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)
     end
 
-    it "onlies show users that a user has permissions to view" do
+    it "only shows users that a user has permissions to view" do
       # Set up the test
       course_factory(active_course: true)
       %w[One Two].each do |name|
@@ -273,7 +273,7 @@ describe "courses" do
         expect(f('.course-home-sub-navigation-lti')).to have_attribute("href", /launch_type=course_home_sub_navigation/)
       end
 
-      it "onlies display active tools", priority: "1", test_id: 2624912 do
+      it "only displays active tools", priority: "1", test_id: 2624912 do
         course_with_teacher_logged_in(active_all: true)
         tool = create_course_home_sub_navigation_tool
         tool.workflow_state = 'deleted'
@@ -409,7 +409,7 @@ describe "courses" do
     end
   end
 
-  it "properlies apply visible sections to announcement limit" do
+  it "properly applies visible sections to announcement limit" do
     course_with_teacher(active_course: true)
     @course.show_announcements_on_home_page = true
     @course.home_page_announcement_limit = 2

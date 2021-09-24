@@ -392,7 +392,7 @@ describe 'RequestThrottle' do
           end
         end
 
-        it "stills decrement when an error is thrown" do
+        it "still decrements when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
             expect {

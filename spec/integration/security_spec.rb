@@ -53,7 +53,7 @@ describe "security" do
   end
 
   describe 'session cookies' do
-    it "alwayses set the primary cookie to session expiration" do
+    it "always sets the primary cookie to session expiration" do
       # whether they select "stay logged in" or not, the actual session cookie
       # should go away with the user agent session. the secondary
       # pseudonym_credentials cookie will stick around and authenticate them
@@ -351,7 +351,7 @@ describe "security" do
     end
   end
 
-  it "onlies allow user list username resolution if the current user has appropriate rights" do
+  it "only allows user list username resolution if the current user has appropriate rights" do
     u = User.create!(:name => 'test user')
     u.pseudonyms.create!(:unique_id => "A1234567", :account => Account.default)
     @course = Account.default.courses.create!

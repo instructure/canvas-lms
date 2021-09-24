@@ -41,7 +41,7 @@ describe NotificationMessageCreator do
       allow_any_instance_of(Message).to receive(:get_template).and_return('template')
     end
 
-    it "onlies send dashboard messages for users with non-validated channels" do
+    it "only sends dashboard messages for users with non-validated channels" do
       assignment_model
       notification_model
       u1 = user_model(:workflow_state => "registered")
@@ -58,7 +58,7 @@ describe NotificationMessageCreator do
       expect(messages.map(&:to).sort).to eq ['dashboard', 'dashboard', 'user@example.com']
     end
 
-    it "onlies send messages to active communication channels" do
+    it "only sends messages to active communication channels" do
       assignment_model
       user_model(:workflow_state => 'registered')
       a = communication_channel_model(:workflow_state => 'active')
@@ -689,7 +689,7 @@ describe NotificationMessageCreator do
       expect(@cc.delayed_messages.reload).not_to be_empty
     end
 
-    it "properlies find the root account for cross-shard summary messages" do
+    it "properly finds the root account for cross-shard summary messages" do
       Canvas::MessageHelper.create_notification(:name => 'Summaries', :category => 'Summaries')
       notification_model(:name => 'Assignment Created')
 

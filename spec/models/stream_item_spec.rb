@@ -121,7 +121,7 @@ describe StreamItem do
       end
     end
 
-    it "alwayses cache stream items on the user's shard" do
+    it "always caches stream items on the user's shard" do
       course_with_teacher(:active_all => 1)
       @user2 = @shard1.activate { user_model }
       @course.enroll_student(@user2).accept!

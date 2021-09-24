@@ -149,7 +149,7 @@ describe 'new ui' do
   end
 
   context 'as student' do
-    it 'stills have courses icon when only course is unpublished', priority: "1", test_id: 288860 do
+    it 'still has courses icon when only course is unpublished', priority: "1", test_id: 288860 do
       course_with_student_logged_in(active_course: false)
       get "/"
       # make sure that "courses" shows up in the global nav even though we only have an unpublisned course

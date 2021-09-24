@@ -458,7 +458,7 @@ describe "More Standard Common Cartridge importing" do
     allow(@migration).to receive(:add_imported_item)
   end
 
-  it "properlies handle top-level resource references" do
+  it "properly handles top-level resource references" do
     orgs = <<~XML
       <organizations>
         <organization structure="rooted-hierarchy" identifier="org_1">

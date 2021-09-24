@@ -130,7 +130,7 @@ describe CommMessagesApiController, type: :request do
           expect(response.code).to eql '401'
         end
 
-        it "onlies be able to see associated account's messages" do
+        it "is only able to see associated account's messages" do
           Account.default.settings[:admins_can_view_notifications] = true
           Account.default.save!
           Message.create!(:user => @test_user, :body => "site admin message", :root_account_id => Account.site_admin.id)

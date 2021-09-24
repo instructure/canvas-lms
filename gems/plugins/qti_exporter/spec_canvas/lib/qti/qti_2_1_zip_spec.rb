@@ -38,7 +38,7 @@ if Qti.migration_executable
       expect(@course_data[:full_export_file_path].index('course_export.json')).not_to be_nil
     end
 
-    it "properlies detect whether a package is QTI 2.1" do
+    it "properly detects whether a package is QTI 2.1" do
       qti1 = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_1_2.xml')
       qti2 = File.join(BASE_FIXTURE_DIR, 'qti', 'manifest_qti_2_1.xml')
       expect(Qti::Converter.is_qti_2(qti1)).to be_falsey

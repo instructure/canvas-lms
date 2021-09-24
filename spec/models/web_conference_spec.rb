@@ -430,7 +430,7 @@ describe WebConference do
           expect(WebConference.conference_types(course).pluck(:name)).to include another_tool.name
         end
 
-        it "onlies include tools with conference_selection placements" do
+        it "only includes tools with conference_selection placements" do
           editor_button = new_valid_tool(course)
           editor_button.name = 'different type of tool'
           editor_button.editor_button = { message_type: 'LtiResourceLinkRequest' }
@@ -439,7 +439,7 @@ describe WebConference do
           expect(WebConference.conference_types(course).pluck(:name)).not_to include editor_button.name
         end
 
-        it "onlies include types from the given context" do
+        it "only includes types from the given context" do
           another_course = course_model
           another_tool = new_valid_tool(another_course)
           another_tool.name = 'another course tool'

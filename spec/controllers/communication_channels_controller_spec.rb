@@ -201,7 +201,7 @@ describe CommunicationChannelsController do
         expect(@cc).to be_active
       end
 
-      it "properlies validate pseudonym for a pre-registered user" do
+      it "properly validates pseudonym for a pre-registered user" do
         u1 = user_with_communication_channel(:username => 'asdf@qwerty.com', :user_state => 'creation_pending')
         cc1 = @cc
         # another user claimed the pseudonym
@@ -638,7 +638,7 @@ describe CommunicationChannelsController do
         expect(assigns[:merge_opportunities]).to eq [[@user1, [@pseudonym1, @pseudonym2]]]
       end
 
-      it "onlies include the current account's pseudonym if there are multiple" do
+      it "only includes the current account's pseudonym if there are multiple" do
         @account1 = Account.default
         @account2 = Account.create!
         user_with_pseudonym(:username => 'jt@instructure.com', :active_all => 1, :account => @account1)
@@ -1381,7 +1381,7 @@ describe CommunicationChannelsController do
     let(:sns_access_token) { @user.access_tokens.create!(developer_key: sns_developer_key) }
     let(:sns_channel) { @user.communication_channels.create(path_type: CommunicationChannel::TYPE_PUSH, path: 'push') }
 
-    it '404S if there is no communication channel', type: :request do
+    it '404s if there is no communication channel', type: :request do
       status = raw_api_call(:delete, "/api/v1/users/self/communication_channels/push",
                             { controller: 'communication_channels', action: 'delete_push_token', format: 'json',
                               push_token: 'notatoken' }, { push_token: 'notatoken' })
@@ -1450,7 +1450,7 @@ describe CommunicationChannelsController do
           expect(endpoints.length).to eq 0
         end
 
-        it 'onlies delete specified endpoint', type: :request do
+        it 'only deletes specified endpoint', type: :request do
           another_token = 'another'
           another_endpoint = second_sns_access_token.notification_endpoints.create!(token: another_token)
 

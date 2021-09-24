@@ -200,7 +200,7 @@ describe "External Tools" do
       expect(menu_link2.text).to match_ignoring_whitespace(@member_tool.label_for(:global_navigation))
     end
 
-    it "onlies show the member level global navigation menu items to students" do
+    it "only shows the member level global navigation menu items to students" do
       course_with_student_logged_in(:account => @account, :active_all => true)
       get "/courses"
       expect(response).to be_successful

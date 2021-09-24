@@ -518,7 +518,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(200)
       end
 
-      it "404S for non-global groups" do
+      it "404s for non-global groups" do
         group = Account.default.root_outcome_group
         raw_api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -528,7 +528,7 @@ describe "Outcome Groups API", type: :request do
         assert_status(404)
       end
 
-      it "404S for deleted groups" do
+      it "404s for deleted groups" do
         group = LearningOutcomeGroup.global_root_outcome_group.child_outcome_groups.create!(:title => 'subgroup')
         group.destroy
         raw_api_call(:get, "/api/v1/global/outcome_groups/#{group.id}",
@@ -606,7 +606,7 @@ describe "Outcome Groups API", type: :request do
         @account_user = @user.account_users.create(:account => @account)
       end
 
-      it "404S for groups outside the context" do
+      it "404s for groups outside the context" do
         group = LearningOutcomeGroup.global_root_outcome_group
         raw_api_call(:get, "/api/v1/accounts/#{@account.id}/outcome_groups/#{group.id}",
                      :controller => 'outcome_groups_api',
@@ -1586,7 +1586,7 @@ describe "Outcome Groups API", type: :request do
       assert_status(401)
     end
 
-    it "404S if the outcome isn't linked in the group" do
+    it "404s if the outcome isn't linked in the group" do
       @outcome = LearningOutcome.global.create!(:title => 'outcome')
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',

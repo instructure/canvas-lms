@@ -126,7 +126,7 @@ describe ConversationsController, type: :request do
       ]
     end
 
-    it "properlies respond to include[]=participant_avatars" do
+    it "properlt responds to include[]=participant_avatars" do
       conversation(@bob, :workflow_state => 'read')
 
       json = api_call(:get, "/api/v1/conversations.json",
@@ -693,7 +693,7 @@ describe ConversationsController, type: :request do
           expect(json.first["context_code"]).to eq "account_#{Account.default.id}"
         end
 
-        it "stills use course context if messages are NOT coming from an admin through a course" do
+        it "still uses course context if messages are NOT coming from an admin through a course" do
           conversation = conversation(@bob, :context_type => "Course", :context_id => @course.id)
           json = api_call(:get, "/api/v1/conversations/#{conversation.conversation_id}",
                           { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s,
@@ -701,7 +701,7 @@ describe ConversationsController, type: :request do
           expect(json["context_code"]).to eq @course.asset_string
         end
 
-        it "alwayses have the right tags when sending a bulk message in course context" do
+        it "always has the right tags when sending a bulk message in course context" do
           other_course = Account.default.courses.create!(:workflow_state => 'available')
           other_course.enroll_teacher(@user).accept!
           other_course.enroll_student(@bob).accept!
@@ -1407,7 +1407,7 @@ describe ConversationsController, type: :request do
       expect(json["cannot_reply"]).to_not be_truthy
     end
 
-    it "stills include attachment verifiers when using session auth" do
+    it "still includes attachment verifiers when using session auth" do
       conversation = conversation(@bob)
       attachment = @me.conversation_attachments_folder.attachments.create!(:context => @me, :filename => 'test.txt', :display_name => "test.txt", :uploaded_data => StringIO.new('test'))
       message = conversation.add_message("another", :attachment_ids => [attachment.id], :media_comment => media_object)
@@ -1501,7 +1501,7 @@ describe ConversationsController, type: :request do
       expect(conversation.reload).to be_unread
     end
 
-    it "properlies flag if starred in the response" do
+    it "properly flags if starred in the response" do
       conversation1 = conversation(@bob)
       conversation2 = conversation(@billy, :starred => true)
 
@@ -1572,7 +1572,7 @@ describe ConversationsController, type: :request do
                           })
     end
 
-    it "onlies add participants for the new message to the given recipients" do
+    it "only adds participants for the new message to the given recipients" do
       conversation = conversation(@bob, private: false)
 
       json = api_call(:post, "/api/v1/conversations/#{conversation.conversation_id}/add_message",

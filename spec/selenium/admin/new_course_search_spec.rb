@@ -221,7 +221,7 @@ describe "new account course search" do
       @account.root_account.enable_feature!(:granular_permissions_manage_users)
     end
 
-    it "onlies show non-admin manageable roles in new enrollment dialog" do
+    it "only shows non-admin manageable roles in new enrollment dialog" do
       custom_name = 'Custom Student role'
       custom_student_role(custom_name, account: @account)
 

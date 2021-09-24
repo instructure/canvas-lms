@@ -271,14 +271,14 @@ describe UserObservationLink do
       pseudonym(@observer, account: @a2)
     end
 
-    it "onlies add the observer in courses on the same root account as the link when created" do
+    it "only adds the observer in courses on the same root account as the link when created" do
       e1 = student_in_course(course: @c1, user: student, active_all: true)
       e2 = student_in_course(course: @c2, user: student, active_all: true)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       expect(@observer.enrollments.pluck(:course_id)).to eq [@c1.id]
     end
 
-    it "onlies add observers linked on the same root account to a new student enrollment" do
+    it "only adds observers linked on the same root account to a new student enrollment" do
       @observer2 = user_with_pseudonym(account: @a2)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer2, student: student, root_account: @a2)
@@ -287,7 +287,7 @@ describe UserObservationLink do
       expect(@observer2.enrollments).to be_empty
     end
 
-    it "onlies remove the observer in courses on the same root account as the link" do
+    it "only removes the observer in courses on the same root account as the link" do
       e1 = student_in_course(course: @c1, user: student, active_all: true)
       e2 = student_in_course(course: @c2, user: student, active_all: true)
       link1 = UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
@@ -297,7 +297,7 @@ describe UserObservationLink do
       expect(@observer.enrollments.active.pluck(:course_id)).to eq [@c2.id]
     end
 
-    it "onlies update observer enrollments linked on the same root account" do
+    it "only updates observer enrollments linked on the same root account" do
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a1)
       UserObservationLink.create_or_restore(observer: @observer, student: student, root_account: @a2)
       e1 = student_in_course(course: @c1, user: student, active_all: true)

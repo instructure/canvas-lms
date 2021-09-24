@@ -396,7 +396,7 @@ describe SIS::CSV::ImportRefactored do
       end
     end
 
-    it 'onlies run an importer once if successful' do
+    it 'only runs an importer once if successful' do
       expect_any_instance_of(SIS::CSV::ImportRefactored).to receive(:run_parallel_importer).once.and_call_original
       process_csv_data(
         "term_id,name,status",

@@ -381,7 +381,7 @@ describe "context modules" do
         expect(f("#context_module_item_#{@tag.id} .requirement-description .must_mark_done_requirement .unfulfilled")).to_not be_displayed
       end
 
-      it "stills show the mark done button when navigating directly" do
+      it "still shows the mark done button when navigating directly" do
         mod = create_context_module('Mark Done Module')
         page = @course.wiki_pages.create!(:title => "page", :body => 'hi')
         assmt = @course.assignments.create!(:title => "assmt")

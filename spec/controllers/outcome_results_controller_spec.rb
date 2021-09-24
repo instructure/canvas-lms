@@ -500,7 +500,7 @@ describe OutcomeResultsController do
               @course.root_account.enable_feature!(:limit_section_visibility_in_lmgb)
             end
 
-            it 'onlies return students in the teachers section' do
+            it 'only returns students in the teachers section' do
               get_rollups(sort_by: 'student', sort_order: 'desc')
               json = parse_response(response)
               expect_user_order(json['rollups'], [@student2])

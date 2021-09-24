@@ -99,7 +99,7 @@ describe "quizzes section hierarchy" do
         term.save!
       end
 
-      it "stills be accessible for student in the section after term end date", priority: "1", test_id: 323087 do
+      it "is still accessible for student in the section after term end date", priority: "1", test_id: 323087 do
         user_session(@student)
         take_hierarchy_quiz
       end
