@@ -207,7 +207,9 @@
 class SubmissionsApiController < ApplicationController
   before_action :get_course_from_section, :require_context, :require_user
   batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
-
+  before_action :ensure_submission, :only => [:show,
+                                              :document_annotations_read_state,
+                                              :mark_document_annotations_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -600,9 +602,6 @@ class SubmissionsApiController < ApplicationController
   # @argument include[] [String, "submission_history"|"submission_comments"|"rubric_assessment"|"full_rubric_assessment"|"visibility"|"course"|"user"|"read_status"]
   #   Associations to include with the group.
   def show
-    @assignment = api_find(@context.assignments.active, params[:assignment_id])
-    @user = get_user_considering_section(params[:user_id])
-    @submission = @assignment.submission_for_student(@user)
     bulk_load_attachments_and_previews([@submission])
 
     if authorized_action(@submission, @current_user, :read)
@@ -1142,6 +1141,52 @@ class SubmissionsApiController < ApplicationController
     change_topic_read_state("unread")
   end
 
+  # @API Get document annotations read state
+  #
+  # Return whether annotations made on a submitted document have been read by the student
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/document_annotations/read' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #   {
+  #     "read": false
+  #   }
+  #
+  def document_annotations_read_state
+    if authorized_action(@submission, @current_user, :read)
+      render json: { read: !@user.unread_submission_annotations?(@submission) }
+    end
+  end
+
+  # @API Mark document annotations as read
+  #
+  # Indicate that annotations made on a submitted document have been read by the student.
+  # Only the student who owns the submission can use this endpoint.
+  #
+  # NOTE: Document annotations will be marked as read automatically when they are viewed in Canvas web.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/document_annotations/read' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  #
+  # @example_response
+  #   {
+  #     "read": true
+  #   }
+  #
+  def mark_document_annotations_read
+    return render_unauthorized_action unless @user == @current_user
+
+    @user.mark_submission_annotations_read!(@submission)
+    render json: { read: true }
+  end
+
   def map_user_ids(user_ids)
     Api.map_ids(user_ids, User, @domain_root_account, @current_user)
   end
@@ -1251,5 +1296,11 @@ class SubmissionsApiController < ApplicationController
     end
 
     result
+  end
+
+  def ensure_submission
+    @assignment = api_find(@context.assignments.active, params[:assignment_id])
+    @user = get_user_considering_section(params[:user_id])
+    @submission = @assignment.submission_for_student(@user)
   end
 end

@@ -119,3 +119,10 @@ remember_settings_tab:
       state: allowed_on
     ci:
       state: allowed_on
+submission_feedback_indicators:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Submission feedback indicators
+  description: |-
+    Adds visual indicators to the submission details page to tell students that unread
+    document annotations or rubric comments exist

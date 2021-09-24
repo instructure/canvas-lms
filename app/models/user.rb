@@ -1683,6 +1683,19 @@ class User < ActiveRecord::Base
     set_preference(:closed_notifications, closed.uniq)
   end
 
+  def unread_submission_annotations?(submission)
+    !!get_preference(:unread_submission_annotations, submission.global_id)
+  end
+
+  def mark_submission_annotations_unread!(submission)
+    set_preference(:unread_submission_annotations, submission.global_id, true)
+  end
+
+  def mark_submission_annotations_read!(submission)
+    # this will delete the user_preference_value
+    set_preference(:unread_submission_annotations, submission.global_id, nil)
+  end
+
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
   end

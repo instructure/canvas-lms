@@ -220,6 +220,12 @@
             >
               <%= button_text %>
             </a>
+            <% if @context.root_account.feature_enabled?(:submission_feedback_indicators) &&
+                  @current_user&.unread_submission_annotations?(@submission) %>
+              <span class="submission_annotation_unread_indicator"
+                    data-tooltip title="<%= I18n.t('There is unread feedback') %>">
+              </span>
+            <% end %>
           <% end %>
         </div>
 
