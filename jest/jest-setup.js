@@ -108,8 +108,6 @@ const ignoredErrors = [
   /The prop `imageUrl` is marked as required in `GenericErrorPage`/,
   /The prop `isLiked` is marked as required in `Like`/,
   /The prop `isLoading` is marked as required in `LoadingWrapper`/,
-  /The prop `item.assignment.name` is marked as required in `Row`/,
-  /The prop `item.gradedAnonymously` is marked as required in `Row`/,
   /The prop `jwt` is marked as required in `CanvasContentTray`/,
   /The prop `label` is marked as required in `(CanvasInstUIModal|FormField|FormFieldLayout|Modal)`/,
   /The prop `listDeveloperKeyScopesSet` is marked as required in `(Scopes|ScopesList)`/,
