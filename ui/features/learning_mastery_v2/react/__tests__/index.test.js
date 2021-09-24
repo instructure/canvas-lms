@@ -60,6 +60,7 @@ describe('LearningMastery', () => {
     {
       id: '1',
       title: 'outcome 1',
+      mastery_points: 5,
       ratings
     }
   ]
