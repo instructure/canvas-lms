@@ -62,7 +62,6 @@ const ignoredErrors = [
   /Invalid prop `children` of type `array` supplied to `Transition`/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `conversation._id` of type `number` supplied to `ComposeModalManager`/,
-  /Invalid prop `currentUserId` of type `number` supplied to `AddStudentModal`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `firstAnnouncement.postedDate` of type `String` supplied to `K5Announcement`/,

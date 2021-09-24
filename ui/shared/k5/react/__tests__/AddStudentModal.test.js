@@ -25,7 +25,7 @@ const LINK_STUDENT_URL = '/api/v1/users/1/observees'
 
 const defaultProps = {
   open: true,
-  currentUserId: 1,
+  currentUserId: '1',
   handleClose: () => {},
   onStudentPaired: () => {}
 }
