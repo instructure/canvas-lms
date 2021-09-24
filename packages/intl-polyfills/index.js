@@ -166,7 +166,7 @@ export function loadRelativeTimeFormatPolyfill(locale) {
 // skip.
 export function loadAllLocalePolyfills(locale) {
   const ver = chromeVersion()
-  if (ver >= 92 && ver < 94) {
+  if (ver >= 92) {
     // eslint-disable-next-line no-console
     console.info(`Skipping language polyfills for Chrome ${ver}`)
     return null
