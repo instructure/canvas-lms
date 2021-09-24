@@ -132,8 +132,6 @@ const ignoredErrors = [
   /The prop `outcomeGroup.title` is marked as required in `(GroupDescriptionModal|GroupEditModal|ManageOutcomesView)`/,
   /The prop `outcomes\[0\].mastery_points` is marked as required in `(Gradebook|ScoresGrid)`/,
   /The prop `permissionName` is marked as required in `PermissionTray`/,
-  /The prop `pollTimeout` is marked as required in `LinkValidator`/,
-  /The prop `pollTimeoutInitial` is marked as required in `LinkValidator`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
   /The prop `reply` is marked as required in `MessageActionButtons`/,
