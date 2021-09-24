@@ -49,7 +49,11 @@ $(document).ready(() => {
         height: $(document).height() * 0.75
       })
       .loadDocPreview($.extend({height: '100%'}, $(this).data()))
-    $('.submission_annotation_unread_indicator').hide()
+    $('.submission_annotation.unread_indicator').hide()
+    $('.file-upload-submission-attachment .modal_preview_link').attr(
+      'title',
+      I18n.t('Preview your submission and view teacher feedback, if available')
+    )
     return false
   })
 })

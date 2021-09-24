@@ -209,7 +209,9 @@ class SubmissionsApiController < ApplicationController
   batch_jobs_in_actions :only => [:update], :batch => { :priority => Delayed::LOW_PRIORITY }
   before_action :ensure_submission, :only => [:show,
                                               :document_annotations_read_state,
-                                              :mark_document_annotations_read]
+                                              :mark_document_annotations_read,
+                                              :rubric_comments_read_state,
+                                              :mark_rubric_comments_read]
   include Api::V1::Progress
   include Api::V1::Submission
   include Submissions::ShowHelper
@@ -1139,6 +1141,52 @@ class SubmissionsApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   def mark_submission_unread
     change_topic_read_state("unread")
+  end
+
+  # @API Get rubric comments read state
+  #
+  # Return whether new rubric comments made on a submission have been seen by the student being assessed.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_comments/read' \
+  #        -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #   {
+  #     "read": false
+  #   }
+  #
+  def rubric_comments_read_state
+    if authorized_action(@submission, @current_user, :read)
+      render json: { read: !@user.unread_rubric_comments?(@submission) }
+    end
+  end
+
+  # @API Mark rubric comments as read
+  #
+  # Indicate that rubric comments made on a submission have been read by the student being assessed.
+  # Only the student who owns the submission can use this endpoint.
+  #
+  # NOTE: Rubric comments will be marked as read automatically when they are viewed in Canvas web.
+  #
+  # @example_request
+  #
+  #   curl 'https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/rubric_comments/read' \
+  #        -X PUT \
+  #        -H "Authorization: Bearer <token>" \
+  #        -H "Content-Length: 0"
+  #
+  # @example_response
+  #   {
+  #     "read": true
+  #   }
+  #
+  def mark_rubric_comments_read
+    return render_unauthorized_action unless @user == @current_user
+
+    @user.mark_rubric_comments_read!(@submission)
+    render json: { read: true }
   end
 
   # @API Get document annotations read state
