@@ -114,8 +114,6 @@ const ignoredErrors = [
   /The prop `permissionName` is marked as required in `PermissionTray`/,
   /The prop `rcsProps.canUploadFiles` is marked as required in `ForwardRef`/,
   /The prop `renderLabel` is marked as required in `(FileDrop|NumberInput|Select)`/,
-  /The prop `reply` is marked as required in `MessageActionButtons`/,
-  /The prop `replyAll` is marked as required in `MessageActionButtons`/,
   /The prop `rollup.outcomeId` is marked as required in `StudentOutcomeScore`/,
   /The prop `rollup.rating.mastery` is marked as required in `StudentOutcomeScore`/,
   /The prop `rollups\[0\].outcomeRollups\[0\].rating.mastery` is marked as required in `Gradebook`/,
