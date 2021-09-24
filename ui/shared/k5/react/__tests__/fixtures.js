@@ -163,5 +163,10 @@ export const MOCK_OBSERVER_LIST = [
     name: 'Student 2',
     avatar_url:
       'http://localhost:3000/images/thumbnails/424/pLccjAlvK1xtbcCRgvSMElUOwCBnFU26kgXRif8h'
+  },
+  {
+    id: '5',
+    name: 'Student 5',
+    avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
   }
 ]
