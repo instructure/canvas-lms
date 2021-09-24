@@ -66,23 +66,23 @@ assignments) that are associated with the tool:
 
 
 ```
-{  
+{
    "title":"Cool AGS Tool ",
    "scopes":[
       "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem",
       "https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly",
       "https://purl.imsglobal.org/spec/lti-ags/scope/score"
       ],
-   "extensions":[  
-      {  
+   "extensions":[
+      {
          "domain":"agsexample.com",
          "tool_id":"ags-tool-123",
          "platform":"canvas.instructure.com",
-         "settings":{  
+         "settings":{
             "text":"Cool AGS Text",
             "icon_url":"https://some.icon.url",
-            "placements":[                 
-               {  
+            "placements":[
+               {
                   "text":"Embed Tool Content as a Canvas Assignment",
                   "enabled":true,
                   "icon_url":"https://some.icon.url",
@@ -94,7 +94,7 @@ assignments) that are associated with the tool:
          }
       }
    ],
-   "public_jwk":{  
+   "public_jwk":{
       "kty":"RSA",
       "alg":"RS256",
       "e":"AQAB",
@@ -422,6 +422,44 @@ result score or result total score are not present.
           2017-04-16T18:54:36.736+00:00
         </submittedAt>
       </submissionDetails>
+      <resultRecord>
+        <sourcedGUID>
+          <sourcedId>3124567</sourcedId>
+        </sourcedGUID>
+        <result>
+          <resultScore>
+            <language>en</language>
+            <textString>0.92</textString>
+          </resultScore>
+        </result>
+      </resultRecord>
+    </replaceResultRequest>
+  </imsx_POXBody>
+</imsx_POXEnvelopeRequest>
+```
+
+### Submission Prioritize Non-tool Grade from Tool Provider
+
+If an external tool wants to honor/preserve any grading done in Canvas by a human, it can augment the POX sent with a
+prioritize non-tool grade tag.
+
+Simply add a node called `prioritizeNonToolGrade` to the `submissionDetails` node. The tag expects no data, just its
+presence is all that is required for Canvas.  If included, any grading done by something other than an LTI tool will
+be preserved.
+
+```xml
+<?xml version = "1.0" encoding = "UTF-8"?>
+<imsx_POXEnvelopeRequest xmlns="http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
+  <imsx_POXHeader>
+    <imsx_POXRequestHeaderInfo>
+      <imsx_version>V1.0</imsx_version>
+      <imsx_messageIdentifier>999999123</imsx_messageIdentifier>
+    </imsx_POXRequestHeaderInfo>
+  </imsx_POXHeader>
+  <imsx_POXBody>
+    <replaceResultRequest>
+      <!-- Added element -->
+      <prioritizeNonToolGrade/>
       <resultRecord>
         <sourcedGUID>
           <sourcedId>3124567</sourcedId>

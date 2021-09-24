@@ -448,6 +448,55 @@ describe BasicLTI::BasicOutcomes do
       end
     end
 
+    context "with prioritizeNonToolGrade details" do
+      before(:each) do
+        xml.at_css('imsx_POXBody > replaceResultRequest').add_child(
+          "<submissionDetails><prioritizeNonToolGrade/></submissionDetails>"
+        )
+      end
+
+      it "is correctly parsed and identified" do
+        response = BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(response).to be_prioritize_non_tool_grade
+      end
+
+      it "does not overwrite a non tool grade" do
+        submission = assignment.grade_student(@user, grader: @teacher, grade: 177.0).first
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission.reload
+        expect(submission.score).to eq(177.0)
+      end
+
+      it "does not overwrite the grader id" do
+        submission = assignment.grade_student(@user, grader: @teacher, grade: 177.0).first
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission.reload
+        expect(submission.grader_id).to eq(@teacher.id)
+      end
+    end
+
+    context "without prioritizeNonToollGrade details" do
+      it "is properly identified as not being there" do
+        response = BasicLTI::BasicOutcomes.process_request(tool, xml)
+        expect(response).not_to be_prioritize_non_tool_grade
+      end
+
+      it "overwrites a non tool grade" do
+        submission = assignment.grade_student(@user, grader: @teacher, grade: 177.0).first
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission.reload
+        # 1.38 is assignment points possible of 1.5 * 92% from the xml
+        expect(submission.score).to eq(1.38)
+      end
+
+      it "overwrites the non tool grader id" do
+        submission = assignment.grade_student(@user, grader: @teacher, grade: 177.0).first
+        BasicLTI::BasicOutcomes.process_request(tool, xml)
+        submission.reload
+        expect(submission.grader_id).to eq(-tool.id)
+      end
+    end
+
     it 'accepts LTI launch URLs as a data format with a specific submission type' do
       xml.css('resultScore').remove
       xml.at_css('text').replace('<ltiLaunchUrl>http://example.com/launch</ltiLaunchUrl>')
@@ -733,6 +782,38 @@ describe BasicLTI::BasicOutcomes do
         expect(BasicLTI::QuizzesNextLtiResponse).not_to receive(:new)
         BasicLTI::BasicOutcomes.process_request(tool, xml)
       end
+    end
+  end
+
+  describe "LTIReponse.ensure_score_update_possible" do
+    let(:lti_response) { BasicLTI::BasicOutcomes::LtiResponse }
+    let(:submission) { Submission.find_by(assignment_id: assignment.id, user_id: @user.id) }
+
+    it "invokes the block when there is no submission" do
+      expect do |b|
+        lti_response.ensure_score_update_possible(submission: nil, prioritize_non_tool_grade: :taco, &b)
+      end.to yield_control
+    end
+
+    it "invokes the block when the grader_id is in the tool id range" do
+      submission.grader_id = -100
+      expect do |b|
+        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: :taco, &b)
+      end.to yield_control
+    end
+
+    it "does not invoke the block when the grader_id is in the user id range and prioritize_non_tool_grade is true" do
+      submission.grader_id = 100
+      expect do |b|
+        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: true, &b)
+      end.not_to yield_control
+    end
+
+    it "invokes the block when the grader_id is in the user id range and prioritize_non_tool_grade is false" do
+      submission.grader_id = 100
+      expect do |b|
+        lti_response.ensure_score_update_possible(submission: submission, prioritize_non_tool_grade: false, &b)
+      end.to yield_control
     end
   end
 end

@@ -125,6 +125,10 @@ module BasicLTI
         @lti_request&.at_css('imsx_POXBody > replaceResultRequest > resultRecord > result > resultData > ltiLaunchUrl').try(:content)
       end
 
+      def prioritize_non_tool_grade?
+        @lti_request&.at_css('imsx_POXBody > replaceResultRequest > submissionDetails > prioritizeNonToolGrade').present?
+      end
+
       def user_enrollment_active?(assignment, user)
         assignment.context.student_enrollments.where(user_id: user).active_or_pending_by_date.any?
       end
@@ -198,6 +202,10 @@ module BasicLTI
         false
       end
 
+      def self.ensure_score_update_possible(submission:, prioritize_non_tool_grade:)
+        yield if block_given? && !(submission&.grader_id && submission.grader_id > 0 && prioritize_non_tool_grade)
+      end
+
       protected
 
       # rubocop:disable Metrics/PerceivedComplexity, Metrics/MethodLength
@@ -250,21 +258,25 @@ module BasicLTI
           submission_hash[:submission_type] = 'external_tool'
         end
 
-        if assignment.grading_type == "pass_fail" && (raw_score || new_score)
-          submission_hash[:grade] = ((raw_score || new_score) > 0 ? 'pass' : 'fail')
-          submission_hash[:grader_id] = -tool.id
-        elsif raw_score
-          submission_hash[:grade] = raw_score
-          submission_hash[:grader_id] = -tool.id
-        elsif new_score
-          if (0.0..1.0).cover?(new_score)
-            submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
+        # Sometimes we want to pass back info, but not overwrite the submission score if entered by something other
+        # than the ltitool before the tool finished pushing it. We've seen this need with NewQuizzes
+        LtiResponse.ensure_score_update_possible(submission: existing_submission, prioritize_non_tool_grade: prioritize_non_tool_grade?) do
+          if assignment.grading_type == "pass_fail" && (raw_score || new_score)
+            submission_hash[:grade] = ((raw_score || new_score) > 0 ? 'pass' : 'fail')
             submission_hash[:grader_id] = -tool.id
-          else
-            error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
+          elsif raw_score
+            submission_hash[:grade] = raw_score
+            submission_hash[:grader_id] = -tool.id
+          elsif new_score
+            if (0.0..1.0).cover?(new_score)
+              submission_hash[:grade] = "#{round_if_whole(new_score * 100)}%"
+              submission_hash[:grader_id] = -tool.id
+            else
+              error_message = I18n.t('lib.basic_lti.bad_score', "Score is not between 0 and 1")
+            end
+          elsif !error_message && !text && !url && !launch_url
+            error_message = I18n.t('lib.basic_lti.no_score', "No score given")
           end
-        elsif !error_message && !text && !url && !launch_url
-          error_message = I18n.t('lib.basic_lti.no_score', "No score given")
         end
 
         xml_submitted_at = submission_submitted_at
