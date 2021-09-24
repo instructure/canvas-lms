@@ -24,7 +24,6 @@ module CC::Exporter::Epub::Converters
     def settings_doc(html = false)
       path = @package_root.item_path("course_settings", "module_meta.xml")
       return nil unless File.exist? path
-
       if html
         open_file path
       else
@@ -39,7 +38,6 @@ module CC::Exporter::Epub::Converters
 
       doc.css('module').each do |r_node|
         next unless get_node_val(r_node, 'workflow_state') == 'active'
-
         mod = {}
         mod[:identifier] = r_node['identifier']
         mod[:workflow_state] = get_node_val(r_node, 'workflow_state')
@@ -57,7 +55,6 @@ module CC::Exporter::Epub::Converters
 
         mod[:items] = r_node.css('item').map do |item_node|
           next unless get_node_val(item_node, 'workflow_state') == "active"
-
           item = {
             item_migration_id: item_node['identifier'],
             position: get_int_val(item_node, 'position'),
@@ -104,5 +101,6 @@ module CC::Exporter::Epub::Converters
 
       modules
     end
+
   end
 end

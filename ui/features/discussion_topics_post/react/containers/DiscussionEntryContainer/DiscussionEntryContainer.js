@@ -16,47 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {AuthorInfo} from '../../components/AuthorInfo/AuthorInfo'
-import {CREATE_DISCUSSION_ENTRY_DRAFT} from '../../../graphql/Mutations'
 import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPostMessage'
-import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import {User} from '../../../graphql/User'
-import {useMutation} from 'react-apollo'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
-  const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    }
-  })
-
-  const findDraftMessage = () => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (draftEntry.discussionEntryId === props.discussionEntry._id) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
-  }
-
   if (props.deleted) {
     return (
       <DeletedPostMessage
@@ -157,16 +129,6 @@ export const DiscussionEntryContainer = props => {
               onSave={props.onSave}
               onCancel={props.onCancel}
               isIsolatedView={props.isIsolatedView}
-              draftMessage={findDraftMessage()}
-              onCreateDiscussionEntryDraft={newDraftMessage =>
-                createDiscussionEntryDraft({
-                  variables: {
-                    discussionTopicId: ENV.discussion_topic_id,
-                    message: newDraftMessage,
-                    discussionEntryId: props.isEditing ? props.discussionEntry._id : null
-                  }
-                })
-              }
             >
               {props.children}
             </PostMessage>
@@ -183,8 +145,6 @@ DiscussionEntryContainer.propTypes = {
   author: User.shape,
   children: PropTypes.node,
   title: PropTypes.string,
-  discussionEntry: PropTypes.object,
-  discussionTopic: PropTypes.object,
   message: PropTypes.string,
   isEditing: PropTypes.bool,
   onSave: PropTypes.func,
@@ -198,7 +158,6 @@ DiscussionEntryContainer.propTypes = {
   lastReplyAtDisplay: PropTypes.string,
   deleted: PropTypes.bool,
   isTopicAuthor: PropTypes.bool,
-  updateDraftCache: PropTypes.func,
   quotedEntry: PropTypes.object
 }
 

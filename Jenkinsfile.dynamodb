@@ -36,7 +36,6 @@ pipeline {
         }
       }
     }
-
     stage('Build DynamoDB Image') {
       steps {
         script {
@@ -44,7 +43,6 @@ pipeline {
         }
       }
     }
-
     stage('Push DynamoDB Image') {
       steps {
         script {

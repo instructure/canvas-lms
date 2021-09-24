@@ -123,7 +123,6 @@ module AdheresToPolicy
     def grants_all_rights?(user, *args)
       session, sought_rights = parse_args(args)
       return false if sought_rights.empty?
-
       sought_rights.none? do |sought_right|
         !check_right?(user, session, sought_right)
       end
@@ -151,7 +150,6 @@ module AdheresToPolicy
     def grants_right?(user, *args)
       session, sought_rights = parse_args(args)
       raise ArgumentError if sought_rights.length > 1
-
       check_right?(user, session, sought_rights.first)
     end
 
@@ -170,7 +168,6 @@ module AdheresToPolicy
     #
     def clear_permissions_cache(user, session = nil)
       return if respond_to?(:new_record?) && new_record?
-
       Cache.clear
       self.class.policy.available_rights.each do |available_right|
         Rails.cache.delete(permission_cache_key_for(user, session, available_right))
@@ -233,8 +230,8 @@ module AdheresToPolicy
       blacklist = config.blacklist
 
       use_rails_cache = config.cache_permissions &&
-                        !blacklist.include?(sought_right_cookie) &&
-                        (Thread.current[:primary_permission_under_evaluation] || config.cache_intermediate_permissions)
+        !blacklist.include?(sought_right_cookie) &&
+        (Thread.current[:primary_permission_under_evaluation] || config.cache_intermediate_permissions)
 
       was_primary_permission, Thread.current[:primary_permission_under_evaluation] =
         Thread.current[:primary_permission_under_evaluation], false
@@ -246,6 +243,7 @@ module AdheresToPolicy
         permission_cache_key_for(user, session, sought_right),
         use_rails_cache: use_rails_cache
       ) do
+
         conditions = self.class.policy.conditions[sought_right]
         next false unless conditions
 
@@ -262,6 +260,7 @@ module AdheresToPolicy
             # that belong to it and cache them.  This will short circut the above
             # Rails.cache.fetch for future checks that we won't have to do again.
             condition.rights.each do |condition_right|
+
               # Skip the condition_right if its the one we are looking for.
               # The Rails.cache.fetch will take care of caching it for us.
               if condition_right != sought_right
@@ -304,14 +303,13 @@ module AdheresToPolicy
     # provided user and/or right.
     def permission_cache_key_for(user, session, right)
       return nil if respond_to?(:new_record?) && new_record?
-
       # If you're going to add something to the user session that
       # affects permissions, you'd durn well better a :permissions_key
       # on the session as well
       permissions_key = session ? (session[:permissions_key] || 'default') : nil # no session != no permissions_key
-      ['permissions', self, user, permissions_key, right].compact
-                                                         .map { |element| ActiveSupport::Cache.expand_cache_key(element) }
-                                                         .to_param
+      ['permissions', self, user, permissions_key, right].compact.
+        map{ |element| ActiveSupport::Cache.expand_cache_key(element) }.
+        to_param
     end
   end
 end

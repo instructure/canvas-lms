@@ -23,6 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 require 'csv'
 
 describe Quizzes::QuizStatistics do
+
   before(:once) do
     student_in_course(:active_all => true)
     @quiz = @course.quizzes.create!
@@ -32,7 +33,7 @@ describe Quizzes::QuizStatistics do
     @quiz.save!
   end
 
-  it 'delegates context to quiz' do
+  it 'should delegate context to quiz' do
     stats = @quiz.current_statistics_for 'item_analysis'
     expect(stats.context).to eq @quiz.context
   end
@@ -43,7 +44,7 @@ describe Quizzes::QuizStatistics do
     stats.reload_csv_attachment.open.read
   end
 
-  it "uses the last completed submission, even if the current submission is in progress" do
+  it "should use the last completed submission, even if the current submission is in progress" do
     # one complete submission
     qs = @quiz.generate_submission(@student)
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -55,7 +56,7 @@ describe Quizzes::QuizStatistics do
     expect(stats[:multiple_attempts_exist]).to be_falsey
   end
 
-  it 'includes previous versions even if the current version is incomplete' do
+  it 'should include previous versions even if the current version is incomplete' do
     # one complete submission
     qs = @quiz.generate_submission(@student)
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -67,7 +68,7 @@ describe Quizzes::QuizStatistics do
     expect(stats.first.length).to eq 10
   end
 
-  it 'does not include previous versions by default' do
+  it 'should not include previous versions by default' do
     # two complete submissions
     qs = @quiz.generate_submission(@student)
     Quizzes::SubmissionGrader.new(qs).grade_submission
@@ -175,39 +176,39 @@ describe Quizzes::QuizStatistics do
     end
 
     context 'quiz_statistics_max_questions' do
-      it 'is true when there are too many questions' do
+      it 'should be true when there are too many questions' do
         expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
-                                              Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 25
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
-      it 'is false otherwise' do
+      it 'should be false otherwise' do
         expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
-                                              Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
 
         expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
-                                              Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end
     end
 
     context 'quiz_statistics_max_submissions' do
-      it 'is true when there are too many submissions' do
+      it 'should be true when there are too many submissions' do
         expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
-                                              Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
         expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
-                                              Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 5
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 5
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_truthy
       end
 
-      it 'is false otherwise' do
+      it 'should be false otherwise' do
         expect(Setting).to receive(:get).with('quiz_statistics_max_questions',
-                                              Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
+          Quizzes::QuizStatistics::DefaultMaxQuestions).and_return 100
         expect(Setting).to receive(:get).with('quiz_statistics_max_submissions',
-                                              Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
+          Quizzes::QuizStatistics::DefaultMaxSubmissions).and_return 25
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end

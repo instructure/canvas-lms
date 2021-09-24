@@ -23,6 +23,7 @@ require_dependency "importers/attachment_importer"
 
 module Importers
   describe AttachmentImporter do
+
     describe '#process_migration', no_retry: true do
       let(:course) { ::Course.new }
       let(:course_id) { 1 }
@@ -31,12 +32,13 @@ module Importers
       let(:attachment_id) { 456 }
       let(:attachment) do
         double(:context= => true,
-               :migration_id= => true,
-               :migration_id => migration_id,
-               :save_without_broadcasting! => true,
-               :set_publish_state_for_usage_rights => nil,
-               :mark_as_importing! => nil,
-               :handle_duplicates => nil)
+             :migration_id= => true,
+             :migration_id => migration_id,
+             :save_without_broadcasting! => true,
+             :set_publish_state_for_usage_rights => nil,
+             :mark_as_importing! => nil,
+             :handle_duplicates => nil
+        )
       end
 
       before :each do
@@ -46,12 +48,12 @@ module Importers
 
       it 'imports an attachment' do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
@@ -70,15 +72,15 @@ module Importers
 
       it "imports attachments when the migration id is in the files_to_import hash" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              files_to_import: {
-                migration_id => true
-              }
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                    files_to_import: {
+                        migration_id => true
+                    }
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
@@ -90,12 +92,12 @@ module Importers
 
       it "finds attachments by migration id" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
@@ -108,13 +110,13 @@ module Importers
 
       it "finds attachment from the path" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              path_name: "path/to/file"
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                    path_name: "path/to/file"
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: nil))
@@ -128,12 +130,12 @@ module Importers
 
       it "uses files if attachments are not found on the migration" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
@@ -147,13 +149,13 @@ module Importers
 
       it "does not import files that are not part of the migration" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              files_to_import: {}
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                    files_to_import: {}
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).never
@@ -163,14 +165,14 @@ module Importers
 
       it "does not import files if there is a file_to_import key" do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              files_to_import: {
-              }
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                    files_to_import: {
+                    }
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).never
@@ -180,15 +182,15 @@ module Importers
 
       it 'sets locked, file_state, and display_name when present' do
         data = {
-          'file_map' => {
-            'a' => {
-              id: attachment_id,
-              migration_id: migration_id,
-              locked: true,
-              hidden: true,
-              display_name: "display name"
+            'file_map' => {
+                'a' => {
+                    id: attachment_id,
+                    migration_id: migration_id,
+                    locked: true,
+                    hidden: true,
+                    display_name: "display name"
+                }
             }
-          }
         }
 
         expect(::Attachment).to receive(:where).with(context_type: "Course", context_id: course, id: attachment_id).and_return(double(first: attachment))
@@ -201,10 +203,10 @@ module Importers
 
       it "locks folders" do
         data = {
-          locked_folders: [
-            "path1/foo",
-            "path2/bar"
-          ]
+            locked_folders: [
+                "path1/foo",
+                "path2/bar"
+            ]
         }
 
         active_folders_association = double()
@@ -220,10 +222,10 @@ module Importers
 
       it "hidden_folders" do
         data = {
-          hidden_folders: [
-            "path1/foo",
-            "path2/bar"
-          ]
+            hidden_folders: [
+                "path1/foo",
+                "path2/bar"
+            ]
         }
 
         active_folders_association = double()
@@ -240,13 +242,13 @@ module Importers
       describe "saving import failures" do
         it "saves import failures with display name" do
           data = {
-            'file_map' => {
-              'a' => {
-                id: attachment_id,
-                migration_id: migration_id,
-                display_name: "foo"
+              'file_map' => {
+                  'a' => {
+                      id: attachment_id,
+                      migration_id: migration_id,
+                      display_name: "foo"
+                  }
               }
-            }
           }
 
           error = RuntimeError.new
@@ -258,13 +260,13 @@ module Importers
 
         it "saves import failures with path name" do
           data = {
-            'file_map' => {
-              'a' => {
-                id: attachment_id,
-                migration_id: migration_id,
-                path_name: "bar"
+              'file_map' => {
+                  'a' => {
+                      id: attachment_id,
+                      migration_id: migration_id,
+                      path_name: "bar"
+                  }
               }
-            }
           }
 
           error = RuntimeError.new

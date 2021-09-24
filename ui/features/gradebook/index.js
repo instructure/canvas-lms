@@ -30,12 +30,12 @@ const settingsModalButtonContainer = document.getElementById(
 const gridColorNode = document.querySelector('[data-component="GridColor"]')
 
 const props = {
+  ...ENV.GRADEBOOK_OPTIONS,
   currentUserId: ENV.current_user_id,
   locale: ENV.LOCALE,
   gradebookMenuNode,
   gridColorNode,
-  settingsModalButtonContainer,
-  gradebookEnv: ENV.GRADEBOOK_OPTIONS
+  settingsModalButtonContainer
 }
 
 const component = React.createElement(Gradebook, props)

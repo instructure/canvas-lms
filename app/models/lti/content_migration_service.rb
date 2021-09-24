@@ -52,7 +52,6 @@ module Lti
     def self.importer_for(key)
       match = KEY_REGEX.match(key)
       return unless match
-
       Lti::ContentMigrationService::Importer.new(match[:id].to_i)
     end
   end

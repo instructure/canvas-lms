@@ -43,7 +43,7 @@ describe "assignments" do
     override.save!
   end
 
-  it "correctlies list ungraded and total submissions for teacher" do
+  it "should correctly list ungraded and total submissions for teacher" do
     multiple_section_submissions
 
     course_with_teacher_logged_in(:course => @course, :active_all => true)
@@ -53,7 +53,7 @@ describe "assignments" do
     expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 2/)
   end
 
-  it "correctlies list ungraded and total submissions for ta" do
+  it "should correctly list ungraded and total submissions for ta" do
     multiple_section_submissions
 
     @taenrollment = course_with_ta(:course => @course, :active_all => true)
@@ -67,7 +67,7 @@ describe "assignments" do
     expect(Nokogiri::HTML5(response.body).at_css('.graded_count').text).to match(/0 out of 1/)
   end
 
-  it "shows student view student submission as needing grading" do
+  it "should show student view student submission as needing grading" do
     course_with_teacher_logged_in(:active_all => true)
     @fake_student = @course.student_view_student
     assignment_model(:course => @course, :submission_types => 'online_text_entry', :title => 'Assignment 1')
@@ -90,7 +90,7 @@ describe "assignments" do
       @cs2 = @course.course_sections.create!
     end
 
-    it "shows 'Everyone' when there are no overrides" do
+    it "should show 'Everyone' when there are no overrides" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       doc = Nokogiri::HTML5(response.body)
@@ -98,7 +98,7 @@ describe "assignments" do
       expect(doc.css(".assignment_dates").text).not_to include "Everyone else"
     end
 
-    it "shows 'Everyone else' when some sections have due date overrides" do
+    it "should show 'Everyone else' when some sections have due date overrides" do
       due_at1 = 3.days.from_now
       create_assignment_section_override(@cs1, due_at1)
 
@@ -108,7 +108,7 @@ describe "assignments" do
       expect(doc.css(".assignment_dates").text).to include "Everyone else"
     end
 
-    it "does not show 'Everyone else' when all sections have due date overrides" do
+    it "should not show 'Everyone else' when all sections have due date overrides" do
       due_at1, due_at2 = 3.days.from_now, 4.days.from_now
       create_assignment_section_override(@cs1, due_at1)
       create_assignment_section_override(@cs2, due_at2)
@@ -122,6 +122,7 @@ describe "assignments" do
 end
 
 describe "download submissions link" do
+
   before do
     course_with_teacher_logged_in(:active_all => true)
     assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
@@ -139,14 +140,14 @@ describe "download submissions link" do
     @student2.save!
   end
 
-  it "does not show download submissions button with no submissions" do
+  it "should not show download submissions button with no submissions" do
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
-  it "does not show download submissions button with no submissions from active students" do
+  it "should not show download submissions button with no submissions from active students" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update(submission_type: 'online_url')
     @student.enrollments.each(&:conclude)
@@ -157,7 +158,7 @@ describe "download submissions link" do
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
 
-  it "shows download submissions button with submission not graded" do
+  it "should show download submissions button with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update(submission_type: 'online_url')
     expect(@submission.state).to eql(:submitted)
@@ -168,7 +169,7 @@ describe "download submissions link" do
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
-  it "shows download submissions button with a submission graded" do
+  it "should show download submissions button with a submission graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     @submission.grade_it
@@ -184,7 +185,7 @@ describe "download submissions link" do
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
-  it "shows download submissions button with all submissions graded" do
+  it "should show download submissions button with all submissions graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     @submission.grade_it
@@ -204,7 +205,7 @@ describe "download submissions link" do
     expect(doc.at_css('#download_submission_button')).not_to be_nil
   end
 
-  it "does not show download submissions button to students" do
+  it "should not show download submissions button to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     expect(@submission.state).to eql(:submitted)
@@ -214,9 +215,11 @@ describe "download submissions link" do
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#download_submission_button')).to be_nil
   end
+
 end
 
 describe "ratio of submissions graded" do
+
   before do
     course_with_teacher_logged_in(:active_all => true)
     assignment_model(:course => @course, :submission_types => 'online_url', :title => 'Assignment 1')
@@ -234,14 +237,15 @@ describe "ratio of submissions graded" do
     @student2.save!
   end
 
-  it "does not show ratio of submissions graded with no submissions" do
+  it "should not show ratio of submissions graded with no submissions" do
+
     get "/courses/#{@course.id}/assignments/#{@assignment.id}"
     expect(response).to be_successful
     doc = Nokogiri::HTML5(response.body)
     expect(doc.at_css('#ratio_of_submissions_graded')).to be_nil
   end
 
-  it "shows ratio of submissions graded with submission not graded" do
+  it "should show ratio of submissions graded with submission not graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     expect(@submission.state).to eql(:submitted)
@@ -255,7 +259,7 @@ describe "ratio of submissions graded" do
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "0 out of 2 Submissions Graded"
   end
 
-  it "shows ratio of submissions graded with a submission graded" do
+  it "should show ratio of submissions graded with a submission graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     @submission.grade_it
@@ -271,7 +275,7 @@ describe "ratio of submissions graded" do
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "1 out of 2 Submissions Graded"
   end
 
-  it "shows ratio of submissions graded with all submissions graded" do
+  it "should show ratio of submissions graded with all submissions graded" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     @submission.grade_it
@@ -291,7 +295,7 @@ describe "ratio of submissions graded" do
     expect(doc.at_css('#ratio_of_submissions_graded').text.strip).to eq "2 out of 2 Submissions Graded"
   end
 
-  it "does not show ratio of submissions graded to students" do
+  it "should not show ratio of submissions graded to students" do
     @submission = @assignment.submissions.find_by!(user: @student)
     @submission.update!(submission_type: 'online_url')
     expect(@submission.state).to eql(:submitted)
@@ -344,7 +348,7 @@ describe "assignments_2 feature flag and parameter" do
         Account.default.enable_feature! :assignments_2_teacher
       end
 
-      it "shows new assignments" do
+      it "it shows new assignments" do
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         html = Nokogiri::HTML5(response.body)
         expect(html.at_css('div#assignment_show')).not_to be
@@ -460,7 +464,7 @@ describe "assignments_2 feature flag and parameter" do
     end
 
     let(:description) { <<~HTML }
-      <a href="#{attachment_model.public_download_url}">link</a>
+        <a href="#{attachment_model.public_download_url}">link</a>
     HTML
 
     it "excludes verifiers if course is not public" do

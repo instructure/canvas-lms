@@ -83,9 +83,7 @@ describe('ManagementHeader', () => {
   })
 
   it('renders Outcomes title', () => {
-    const {getByText} = render(
-      <ManagementHeader handleFileDrop={jest.fn()} handleAddOutcomes={jest.fn()} />
-    )
+    const {getByText} = render(<ManagementHeader />)
     expect(getByText('Outcomes')).toBeInTheDocument()
   })
 

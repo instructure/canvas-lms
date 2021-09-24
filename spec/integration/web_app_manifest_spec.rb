@@ -20,7 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe 'site-wide', :type => :request do
+
   context "web app manifest" do
+
     before(:once) do
       student_in_course
       user_with_pseudonym(:user => @student, :username => 'student@example.com', :password => 'password')
@@ -38,5 +40,6 @@ describe 'site-wide', :type => :request do
       get "/"
       expect(response.body).to include('link rel="manifest" href="/web-app-manifest/manifest.json"')
     end
+
   end
 end

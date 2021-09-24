@@ -185,7 +185,6 @@ module SectionTabHelper
 
     def a_aria_label
       return unless @tab.hide? || @tab.unused?
-
       if @tab.hide?
         I18n.t('%{label}. Disabled. Not visible to students', { label: @tab.label })
       else
@@ -223,7 +222,6 @@ module SectionTabHelper
 
     def indicate_hidden
       return unless @tab.hide? || @tab.unused?
-
       "<i class='nav-icon icon-off' aria-hidden='true' role='presentation'></i>".html_safe
     end
 

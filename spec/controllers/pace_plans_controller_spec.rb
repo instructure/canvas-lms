@@ -90,58 +90,58 @@ describe PacePlansController, type: :controller do
     it "populates js_env with course, enrollment, sections, and pace_plan details" do
       @section = @course.course_sections.first
       @student_enrollment = @course.enrollments.find_by(user_id: @student.id)
-      get :show, { params: { course_id: @course.id } }
+      get :show, {params: {course_id: @course.id}}
 
       expect(response).to be_successful
       expect(assigns[:js_bundles].flatten).to include(:pace_plans)
       expect(controller.js_env[:BLACKOUT_DATES]).to eq([])
       expect(controller.js_env[:COURSE]).to match(hash_including({
-                                                                   id: @course.id,
-                                                                   name: @course.name,
-                                                                   start_at: @course.start_at,
-                                                                   end_at: @course.end_at
-                                                                 }))
+       id: @course.id,
+       name: @course.name,
+       start_at: @course.start_at,
+       end_at: @course.end_at
+     }))
       expect(controller.js_env[:ENROLLMENTS].length).to be(1)
       expect(controller.js_env[:ENROLLMENTS][@student_enrollment.id]).to match(hash_including({
-                                                                                                id: @student_enrollment.id,
-                                                                                                user_id: @student.id,
-                                                                                                course_id: @course.id,
-                                                                                                full_name: @student.name,
-                                                                                                sortable_name: @student.sortable_name
-                                                                                              }))
+        id: @student_enrollment.id,
+        user_id: @student.id,
+        course_id: @course.id,
+        full_name: @student.name,
+        sortable_name: @student.sortable_name
+      }))
       expect(controller.js_env[:SECTIONS].length).to be(1)
       expect(controller.js_env[:SECTIONS][@section.id]).to match(hash_including({
-                                                                                  id: @section.id,
-                                                                                  course_id: @course.id,
-                                                                                  name: @section.name,
-                                                                                  start_at: @section.start_at,
-                                                                                  end_at: @section.end_at
-                                                                                }))
+        id: @section.id,
+        course_id: @course.id,
+        name: @section.name,
+        start_at: @section.start_at,
+        end_at: @section.end_at
+      }))
       expect(controller.js_env[:PACE_PLAN]).to match(hash_including({
-                                                                      id: @pace_plan.id,
-                                                                      course_id: @course.id,
-                                                                      course_section_id: nil,
-                                                                      user_id: nil,
-                                                                      workflow_state: "active",
-                                                                      exclude_weekends: true,
-                                                                      hard_end_dates: true,
-                                                                      context_id: @course.id,
-                                                                      context_type: "Course"
-                                                                    }))
+        id: @pace_plan.id,
+        course_id: @course.id,
+        course_section_id: nil,
+        user_id: nil,
+        workflow_state: "active",
+        exclude_weekends: true,
+        hard_end_dates: true,
+        context_id: @course.id,
+        context_type: "Course"
+      }))
       expect(controller.js_env[:PACE_PLAN][:modules].length).to be(2)
       expect(controller.js_env[:PACE_PLAN][:modules][0][:items].length).to be(1)
       expect(controller.js_env[:PACE_PLAN][:modules][1][:items].length).to be(2)
       expect(controller.js_env[:PACE_PLAN][:modules][1][:items][1]).to match(hash_including({
-                                                                                              assignment_title: @a3.title,
-                                                                                              module_item_type: 'Assignment',
-                                                                                              duration: 4
-                                                                                            }))
+        assignment_title: @a3.title,
+        module_item_type: 'Assignment',
+        duration: 4
+      }))
     end
 
     it "responds with not found if the pace_plans feature is disabled" do
       @course.account.disable_feature!(:pace_plans)
       assert_page_not_found do
-        get :show, params: { course_id: @course.id }
+        get :show, params: {course_id: @course.id}
       end
     end
 
@@ -149,13 +149,13 @@ describe PacePlansController, type: :controller do
       @course.enable_pace_plans = false
       @course.save!
       assert_page_not_found do
-        get :show, params: { course_id: @course.id }
+        get :show, params: {course_id: @course.id}
       end
     end
 
     it "responds with forbidden if the user doesn't have authorization" do
       user_session(@student)
-      get :show, params: { course_id: @course.id }
+      get :show, params: {course_id: @course.id}
       assert_unauthorized
     end
   end
@@ -169,7 +169,7 @@ describe PacePlansController, type: :controller do
   end
 
   describe "PUT #update" do
-    it "updates the PacePlan" do
+    it "should update the PacePlan" do
       put :update, params: { course_id: @course.id, id: @pace_plan.id, pace_plan: valid_update_params }
       expect(response).to be_successful
       expect(@pace_plan.reload.start_date.to_s).to eq(valid_update_params[:start_date])
@@ -190,7 +190,7 @@ describe PacePlansController, type: :controller do
   describe "POST #create" do
     let(:create_params) { valid_update_params.merge(course_id: @course.id, user_id: @student.id) }
 
-    it "creates the PacePlan and all the PacePlanModuleItems" do
+    it "should create the PacePlan and all the PacePlanModuleItems" do
       pace_plan_count_before = PacePlan.count
       pace_plan_module_item_count_before = PacePlanModuleItem.count
 

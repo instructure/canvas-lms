@@ -32,14 +32,14 @@ describe "one time passwords" do
 
   context "mid-login" do
     before do
-      post '/login/canvas', params: { :pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' } }
+      post '/login/canvas', params: {:pseudonym_session => { :unique_id => @pseudonym.unique_id, :password => 'qwertyuiop' }}
     end
 
-    it "redirects" do
+    it "should redirect" do
       expect(response).to redirect_to(otp_login_url)
     end
 
-    it "does not allow access to the rest of canvas" do
+    it "should not allow access to the rest of canvas" do
       get '/'
       expect(response).to redirect_to login_url
       follow_redirect!
@@ -48,7 +48,7 @@ describe "one time passwords" do
       expect(response).to be_successful
     end
 
-    it "does not destroy your session when someone does an XHR accidentally" do
+    it "should not destroy your session when someone does an XHR accidentally" do
       get '/api/v1/conversations/unread_count', :xhr => true
       expect(response.status).to eq 403
       get otp_login_url

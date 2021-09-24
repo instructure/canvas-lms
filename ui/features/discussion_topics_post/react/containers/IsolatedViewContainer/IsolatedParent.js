@@ -164,8 +164,6 @@ export const IsolatedParent = props => {
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
-                    discussionTopic={props.discussionTopic}
-                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
                       <ThreadActions
@@ -226,7 +224,6 @@ export const IsolatedParent = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
@@ -260,6 +257,5 @@ IsolatedParent.propTypes = {
   RCEOpen: PropTypes.bool,
   setRCEOpen: PropTypes.func,
   isHighlighted: PropTypes.bool,
-  goToTopic: PropTypes.func,
-  updateDraftCache: PropTypes.func
+  goToTopic: PropTypes.func
 }

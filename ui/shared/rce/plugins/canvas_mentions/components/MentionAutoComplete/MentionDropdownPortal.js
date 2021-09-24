@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events */
 /*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
@@ -56,7 +57,7 @@ MentionDropdownPortal.propTypes = {
   /**
    * Array of optons to be presented to user
    */
-  rceBodyRef: PropTypes.oneOfType([PropTypes.node, PropTypes.object]),
+  rceBodyRef: PropTypes.node,
   /**
    * Array of optons to be presented to user
    */

@@ -43,7 +43,6 @@ module Canvadocs
 
     def canvadoc_permissions_for_user(user, enable_annotations, read_only = false)
       return {} unless enable_annotations && canvadocs_can_annotate?(user)
-
       opts = canvadocs_default_options_for_user(user, read_only)
       return opts if submissions.empty?
 
@@ -66,13 +65,12 @@ module Canvadocs
 
     def observing?(user)
       user.observer_enrollments.active.where(course_id: submission_context_ids,
-                                             associated_user_id: submissions.map(&:user_id)).exists?
+        associated_user_id: submissions.map(&:user_id)).exists?
     end
 
     def managing?(user)
       is_teacher = user.teacher_enrollments.active.where(course_id: submission_context_ids).exists?
       return true if is_teacher
-
       course = submissions.first.assignment.course
       course.account_membership_allows(user)
     end
@@ -87,7 +85,6 @@ module Canvadocs
       if ApplicationController.test_cluster?
         return "default-#{ApplicationController.test_cluster_name}"
       end
-
       "default"
     end
     private :canvadocs_annotation_context
@@ -97,7 +94,6 @@ module Canvadocs
       return 'readwrite' if submissions.empty?
       return 'readwritemanage' if managing?(user)
       return 'read' if observing?(user)
-
       'readwrite'
     end
     private :canvadocs_permissions

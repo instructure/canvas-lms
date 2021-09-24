@@ -37,7 +37,6 @@ class PostPolicy < ActiveRecord::Base
   end
 
   private
-
   def set_course_from_assignment
     self.course_id = assignment.context_id if assignment.present? && course.blank?
   end

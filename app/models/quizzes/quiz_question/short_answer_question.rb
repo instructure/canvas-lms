@@ -46,4 +46,5 @@ class Quizzes::QuizQuestion::ShortAnswerQuestion < Quizzes::QuizQuestion::Base
     end
     answer
   end
+
 end

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 class Enrollment
   class RecentActivity
     attr_reader :context, :enrollment
@@ -30,7 +31,6 @@ class Enrollment
 
     def record_for_access(response)
       return if response.response_code.to_s =~ /^((4|5)\d{2})$/
-
       if context.is_a?(Course) && enrollment
         record!
       end
@@ -38,7 +38,6 @@ class Enrollment
 
     def record!(as_of = Time.zone.now)
       return unless record_worthwhile?(as_of, last_threshold)
-
       if increment_total_activity?(as_of)
         new_total = total_activity_interval(as_of)
         enrollment.total_activity_time = new_total
@@ -50,15 +49,14 @@ class Enrollment
     end
 
     private
-
     def total_activity_interval(as_of)
       total_activity_time + (as_of - last_activity_at).to_i
     end
 
     def update_with(options)
-      all_enrollments_scope
-        .where("last_activity_at IS NULL OR last_activity_at < ?", options[:last_activity_at] - last_threshold)
-        .update_all_locked_in_order(options)
+      all_enrollments_scope.
+        where("last_activity_at IS NULL OR last_activity_at < ?", options[:last_activity_at] - last_threshold).
+        update_all_locked_in_order(options)
     end
 
     def increment_total_activity?(as_of)
@@ -68,13 +66,13 @@ class Enrollment
     end
 
     def last_threshold
-      @_last_threshold ||= @settings
-                           .get('enrollment_last_activity_at_threshold', 2.minutes).to_i
+      @_last_threshold ||= @settings.
+        get('enrollment_last_activity_at_threshold', 2.minutes).to_i
     end
 
     def total_threshold
-      @_total_threshold ||= @settings
-                            .get('enrollment_total_activity_time_threshold', 10.minutes).to_i
+      @_total_threshold ||= @settings.
+        get('enrollment_total_activity_time_threshold', 10.minutes).to_i
     end
 
     def record_worthwhile?(as_of, threshold)

@@ -19,6 +19,7 @@
 #
 
 class Quizzes::QuizRegrader::Submission
+
   attr_reader :submission, :question_regrades
 
   def initialize(hash)

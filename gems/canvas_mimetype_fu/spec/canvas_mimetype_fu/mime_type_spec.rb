@@ -24,12 +24,12 @@ describe 'A file with a know extension' do
     @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.jpg')
   end
 
-  it 'has an extension' do
+  it 'should have an extension' do
     expect(File.extname(@file.path)).to eq('.jpg')
   end
 
-  it 'has a mime type' do
-    expect(File.mime_type?(@file)).to eq("image/jpeg")
+  it 'should have a mime type' do
+   expect(File.mime_type?(@file)).to eq("image/jpeg")
   end
 
   it 'find a extension from mime_typee' do
@@ -45,12 +45,12 @@ describe 'A file with anunknow extension' do
     @file = File.open(File.dirname(__FILE__) + '/../fixtures/file.unknown')
   end
 
-  it 'has an extension' do
+  it 'should have an extension' do
     expect(File.extname(@file.path)).to eq('.unknown')
   end
 
-  it 'has an unkwown mime type' do
-    expect(File.mime_type?(@file)).to eq("unknown/unknown")
+  it 'should have an unkwown  mime type' do
+   expect(File.mime_type?(@file)).to eq("unknown/unknown")
   end
 end
 
@@ -59,7 +59,7 @@ describe 'A valid file path' do
     @file_path = "#{Dir.pwd} + /picture.png"
   end
 
-  it 'has a mime type' do
+  it 'should have a mime type' do
     expect(File.mime_type?(@file_path)).to eq("image/png")
 
     @file_path = "#{Dir.pwd} + /picture.zip"
@@ -73,7 +73,7 @@ describe "An unknown extension" do
     @file_path = 'file.unknown'
   end
 
-  it 'has an unknown mime type' do
+  it 'should have an unknown mime type' do
     expect(File.mime_type?(@file_path)).to eq("unknown/unknown")
   end
 end

@@ -47,7 +47,7 @@ RSpec.describe Lti::LineItem, type: :model do
   end
 
   context 'on create' do
-    it 'adds a root account id' do
+    it 'should add a root account id' do
       line_item = line_item_model
       expect(line_item.root_account).not_to be_nil
     end

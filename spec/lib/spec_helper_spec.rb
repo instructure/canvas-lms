@@ -21,8 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "spec_helper" do
+
   context "encompass" do
-    it "checks values" do
+    it "should check values" do
       root = { :key1 => :value1, :key2 => :value2 }
       expect(root).not_to encompass({ :key1 => "value1", :key2 => "value2" })
       expect(root).to encompass({ :key1 => :value1, :key2 => :value2 })
@@ -30,22 +31,22 @@ describe "spec_helper" do
       expect([root]).to encompass([{ :key1 => :value1, :key2 => :value2 }])
     end
 
-    it "checks array length" do
+    it "should check array length" do
       root = [{ :key1 => :value1, :key2 => :value2 },
               { :key1 => :value1, :key2 => :value2 },
               { :key1 => :value1, :key2 => :value2 }]
       expect(root).to encompass([{ :key1 => :value1, :key2 => :value2 },
-                                 { :key1 => :value1, :key2 => :value2 },
+                             { :key1 => :value1, :key2 => :value2 },
+                             { :key1 => :value1, :key2 => :value2 }])
+      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
                                  { :key1 => :value1, :key2 => :value2 }])
       expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
-                                     { :key1 => :value1, :key2 => :value2 }])
-      expect(root).not_to encompass([{ :key1 => :value1, :key2 => :value2 },
-                                     { :key1 => :value1, :key2 => :value2 },
-                                     { :key1 => :value1, :key2 => :value2 },
-                                     { :key1 => :value1, :key2 => :value2 }])
+                                 { :key1 => :value1, :key2 => :value2 },
+                                 { :key1 => :value1, :key2 => :value2 },
+                                 { :key1 => :value1, :key2 => :value2 }])
     end
 
-    it "supports comparing dictionaries with different types of things" do
+    it "should support comparing dictionaries with different types of things" do
       thing_to_check = { :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }
       expect({ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }).to encompass(thing_to_check)
       expect({ :mkey1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "val4" }).not_to encompass(thing_to_check)
@@ -67,7 +68,7 @@ describe "spec_helper" do
       expect([{ :key1 => 1, "key2" => 2.0, 3 => :val3, 4.0 => "mval4" }]).not_to encompass([thing_to_check])
     end
 
-    it "supports dictionary encompassing" do
+    it "should support dictionary encompassing" do
       root = { :key1 => :val1, :key2 => :val2, :key3 => :val3 }
       expect(root).to encompass({ :key1 => :val1, :key2 => :val2 })
       expect(root).to encompass({ :key1 => :val1, :key3 => :val3 })
@@ -89,20 +90,22 @@ describe "spec_helper" do
       expect(root).not_to encompass({ :key3 => :val1 })
     end
 
-    it "supports array encompassing" do
-      root = [{ :key1 => :val1, :key2 => :val2 }, { :key3 => :val3, :key4 => :val4 }]
-      expect(root).to encompass([{ :key1 => :val1 }, { :key3 => :val3, :key4 => :val4 }])
-      expect(root).to encompass([{ :key2 => :val2 }, { :key3 => :val3 }])
-      expect(root).to encompass([{ :key1 => :val1 }, { :key4 => :val4 }])
-      expect(root).to encompass([{ :key2 => :val2 }, { :key4 => :val4 }])
-      expect(root).to encompass([{ :key2 => :val2, :key1 => :val1 }, { :key4 => :val4 }])
-      expect(root).not_to encompass([{ :key2 => :val1 }, { :key4 => :val4 }])
-      expect(root).not_to encompass([{ :key2 => :val1 }, { :key4 => :val3 }])
-      expect(root).not_to encompass([{ :key2 => :val2 }, { :key4 => :val3 }])
-      expect(root).not_to encompass([{ :key2 => :val2 }, { :key4 => :val3 }, { :key1 => :val2 }])
-      expect(root).not_to encompass([{ :key4 => :val4 }, { :key2 => :val2 }])
-      expect(root).not_to encompass([{ :key2 => :val2 }])
-      expect(root).not_to encompass([{ :key2 => :val2, :key3 => :val3 }, { :key4 => :val4 }])
+    it "should support array encompassing" do
+      root = [{:key1 => :val1, :key2 => :val2}, {:key3 => :val3, :key4 => :val4}]
+      expect(root).to encompass([{:key1 => :val1}, {:key3 => :val3, :key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2}, {:key3 => :val3}])
+      expect(root).to encompass([{:key1 => :val1}, {:key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2}, {:key4 => :val4}])
+      expect(root).to encompass([{:key2 => :val2, :key1 => :val1}, {:key4 => :val4}])
+      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val4}])
+      expect(root).not_to encompass([{:key2 => :val1}, {:key4 => :val3}])
+      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}])
+      expect(root).not_to encompass([{:key2 => :val2}, {:key4 => :val3}, {:key1 => :val2}])
+      expect(root).not_to encompass([{:key4 => :val4}, {:key2 => :val2}])
+      expect(root).not_to encompass([{:key2 => :val2}])
+      expect(root).not_to encompass([{:key2 => :val2, :key3 => :val3}, {:key4 => :val4}])
     end
+
   end
+
 end

@@ -27,10 +27,7 @@ describe('StudentOutcomeScore', () => {
   const defaultProps = (props = {}) => {
     return {
       outcome: {
-        id: '1',
-        title: 'Title',
-        mastery_points: 5,
-        ratings: []
+        mastery_points: 5
       },
       rollup: {
         rating: {

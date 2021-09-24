@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Lti::ExternalToolTab do
+
   let(:context) do
     account = Account.new
     allow(account).to receive(:id).and_return(1)
@@ -29,7 +30,7 @@ describe Lti::ExternalToolTab do
   let(:course_navigation) do
     {
       text: "Course Placement",
-      url: "http://example.com/ims/lti",
+      url:  "http://example.com/ims/lti",
       default: false,
       visibility: 'admins'
     }
@@ -38,7 +39,7 @@ describe Lti::ExternalToolTab do
   let(:account_navigation) do
     {
       text: "Account Placement",
-      url: "http://example.com/ims/lti",
+      url:  "http://example.com/ims/lti",
       default: 'disabled',
       visibility: 'members'
     }
@@ -47,7 +48,7 @@ describe Lti::ExternalToolTab do
   let(:user_navigation) do
     {
       text: "User Placement",
-      url: "http://example.com/ims/lti",
+      url:  "http://example.com/ims/lti",
     }
   end
 
@@ -65,7 +66,7 @@ describe Lti::ExternalToolTab do
     tool
   end
 
-  subject { described_class.new(context, nil, [tool]) }
+  subject {described_class.new(context, nil, [tool])}
 
   it 'sets the tab id to the tools asset_string' do
     expect(subject.tabs.first[:id]).to eq tool.asset_string
@@ -102,7 +103,7 @@ describe Lti::ExternalToolTab do
   it "adds {dispaly: 'borderless'} if the windowTarget is present" do
     tool[:settings][:windowTarget] = "_blank"
     subject = described_class.new(context, nil, [tool])
-    expect(subject.tabs.first[:args]).to include({ display: 'borderless' })
+    expect(subject.tabs.first[:args]).to include({display: 'borderless'})
   end
 
   it "sorts by tool id" do
@@ -116,7 +117,7 @@ describe Lti::ExternalToolTab do
     )
     allow(tool2).to receive(:id).and_return(9)
     subject = described_class.new(context, nil, [tool2, tool])
-    expect(subject.tabs.map { |t| t[:id] }).to eq [tool.asset_string, tool2.asset_string]
+    expect(subject.tabs.map{|t| t[:id]}).to eq [tool.asset_string, tool2.asset_string]
   end
 
   describe "course_navigation" do
@@ -125,7 +126,7 @@ describe Lti::ExternalToolTab do
       allow(course).to receive(:id).and_return(3)
       course
     end
-    subject { described_class.new(context, :course_navigation, [tool]) }
+    subject {described_class.new(context, :course_navigation, [tool])}
 
     it 'sets the label based on placement' do
       expect(subject.tabs.first[:label]).to eq course_navigation[:text]
@@ -148,10 +149,11 @@ describe Lti::ExternalToolTab do
       subject = described_class.new(context, :course_navigation, [tool])
       expect(subject.tabs.first[:target]).to eq '_blank'
     end
+
   end
 
   describe "account_navigation" do
-    subject { described_class.new(context, :account_navigation, [tool]) }
+    subject {described_class.new(context, :account_navigation, [tool])}
 
     it 'sets the label based on placement' do
       expect(subject.tabs.first[:label]).to eq account_navigation[:text]
@@ -174,6 +176,7 @@ describe Lti::ExternalToolTab do
       subject = described_class.new(context, :account_navigation, [tool])
       expect(subject.tabs.first[:target]).to eq '_blank'
     end
+
   end
 
   describe "user_navigation" do
@@ -182,7 +185,7 @@ describe Lti::ExternalToolTab do
       allow(user).to receive(:id).and_return(4)
       user
     end
-    subject { described_class.new(context, :user_navigation, [tool]) }
+    subject {described_class.new(context, :user_navigation, [tool])}
 
     it 'sets the label based on placement' do
       expect(subject.tabs.first[:label]).to eq user_navigation[:text]
@@ -198,4 +201,5 @@ describe Lti::ExternalToolTab do
       expect(subject.tabs.first[:target]).to eq '_blank'
     end
   end
+
 end

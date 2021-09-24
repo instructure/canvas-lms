@@ -33,6 +33,7 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   end
 end
 
+
 module Types
   class ModuleType < ApplicationObjectType
     graphql_name "Module"

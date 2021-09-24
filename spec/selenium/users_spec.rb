@@ -24,7 +24,7 @@ describe "users" do
   include_context "in-process server selenium tests"
 
   context "logins" do
-    it "allows setting passwords for new pseudonyms" do
+    it "should allow setting passwords for new pseudonyms" do
       admin = User.create!
       Account.site_admin.account_users.create!(user: admin)
       user_session(admin)
@@ -51,13 +51,14 @@ describe "users" do
   end
 
   context "page views" do
+
     before (:each) do
       course_with_admin_logged_in
       @student = student_in_course.user
       Setting.set('enable_page_views', 'db')
     end
 
-    it "validates a basic page view" do
+    it "should validate a basic page view" do
       page_view(:user => @student, :course => @course, :url => 'assignments')
       get "/users/#{@student.id}"
       rows = ff('#page_view_results tr')
@@ -68,13 +69,13 @@ describe "users" do
       expect(f("#page_view_results")).not_to contain_css('tr img') # should not have a participation
     end
 
-    it "validates page view with a participation" do
+    it "should validate page view with a participation" do
       page_view(:user => @student, :course => @course, :participated => true)
       get "/users/#{@student.id}"
       expect(f("#page_view_results .icon-check")).to be_displayed
     end
 
-    it "validates a page view url" do
+    it "should validate a page view url" do
       second_student_name = 'test student for page views'
       get "/users/#{@student.id}"
       page_view(:user => @student, :course => @course, :participated => true, :url => student_in_course(:name => second_student_name).user.id.to_s)
@@ -87,7 +88,7 @@ describe "users" do
       expect(f("#page_view_results")).not_to contain_css('tr') # validate the second student has no page views
     end
 
-    it "validates all page views were loaded" do
+    it "should validate all page views were loaded" do
       page_views_count = 100
       page_views_count.times { |i| page_view(:user => @student, :course => @course, :url => "#{"%03d" % i}") }
       get "/users/#{@student.id}"
@@ -153,7 +154,7 @@ describe "users" do
       @users = [@student_1, @student_2]
     end
 
-    it "merges user a with user b" do
+    it "should merge user a with user b" do
       setup_user_merge(@student_2, @student_1)
       submit_merge
       reload_users(@users)
@@ -162,7 +163,7 @@ describe "users" do
       validate_login_info(@student_1_id)
     end
 
-    it "merges user b with user a" do
+    it "should merge user b with user a" do
       setup_user_merge(@student_1, @student_2)
       submit_merge
       reload_users(@users)
@@ -171,7 +172,7 @@ describe "users" do
       validate_login_info(@student_2_id)
     end
 
-    it "validates switching the users to merge" do
+    it "should validate switching the users to merge" do
       setup_user_merge(@student_2, @student_1)
       user_names = ff('.result td')
       expect(user_names[0]).to include_text(@student_2.name)
@@ -188,7 +189,7 @@ describe "users" do
       validate_login_info(@student_1_id)
     end
 
-    it "cancels a merge and validate both users still exist" do
+    it "should cancel a merge and validate both users still exist" do
       setup_user_merge(@student_2, @student_1)
       expect_new_page_load { f('#prepare_to_merge').click }
       wait_for_ajaximations
@@ -199,7 +200,7 @@ describe "users" do
       expect(@student_2.workflow_state).to eq 'registered'
     end
 
-    it "shows an error if the user id entered is the current users" do
+    it "should show an error if the user id entered is the current users" do
       get "/users/#{@student_1.id}/admin_merge"
       expect_no_flash_message :error
       f('#manual_user_id').send_keys(@student_1.id)
@@ -208,7 +209,7 @@ describe "users" do
       expect_flash_message :error, "You can't merge an account with itself."
     end
 
-    it "shows an error if invalid text is entered in the id box" do
+    it "should show an error if invalid text is entered in the id box" do
       get "/users/#{@student_1.id}/admin_merge"
       expect_no_flash_message :error
       f('#manual_user_id').send_keys("azxcvbytre34567uijmm23456yhj")
@@ -217,7 +218,7 @@ describe "users" do
       expect_flash_message :error, "No active user with that ID was found."
     end
 
-    it "shows an error if the user id doesnt exist" do
+    it "should show an error if the user id doesnt exist" do
       get "/users/#{@student_1.id}/admin_merge"
       expect_no_flash_message :error
       f('#manual_user_id').send_keys(1234567809)
@@ -231,7 +232,7 @@ describe "users" do
       Account.default.canvas_authentication_provider.update_attribute(:self_registration, true)
     end
 
-    it "does not require terms if globally not configured to do so" do
+    it "should not require terms if globally not configured to do so" do
       Setting.set('terms_required', 'false')
 
       get '/register'
@@ -244,7 +245,7 @@ describe "users" do
       end
     end
 
-    it "does not require terms if account not configured to do so" do
+    it "should not require terms if account not configured to do so" do
       default_account = Account.default
       default_account.settings[:account_terms_required] = false
       default_account.save!
@@ -259,7 +260,7 @@ describe "users" do
       end
     end
 
-    it "requires terms if configured to do so" do
+    it "should require terms if configured to do so" do
       if terms = Account.default.terms_of_service
         terms.update(passive: false)
       end
@@ -278,7 +279,7 @@ describe "users" do
       end
     end
 
-    it "registers a student with a join code" do
+    it "should register a student with a join code" do
       if terms = Account.default.terms_of_service
         terms.update(passive: false)
       end
@@ -304,7 +305,7 @@ describe "users" do
       expect(User.last.initial_enrollment_type).to eq 'student'
     end
 
-    it "registers a teacher" do
+    it "should register a teacher" do
       if terms = Account.default.terms_of_service
         terms.update(passive: false)
       end
@@ -337,7 +338,7 @@ describe "users" do
       expect(User.last.initial_enrollment_type).to eq 'teacher'
     end
 
-    it "registers an observer" do
+    it "should register an observer" do
       if terms = Account.default.terms_of_service
         terms.update(passive: false)
       end
@@ -366,7 +367,7 @@ describe "users" do
   end
 
   context "masquerading" do
-    it "masquerades as a user", priority: "1", test_id: 134743 do
+    it "should masquerade as a user", priority: "1", test_id: 134743 do
       site_admin_logged_in(:name => 'The Admin')
       user_with_pseudonym(:active_user => true, :name => 'The Student')
 

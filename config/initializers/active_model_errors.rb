@@ -81,7 +81,6 @@ module ActiveModel
 
       def value
         return if attribute == :base
-
         base.send :read_attribute, attribute
       end
 
@@ -92,8 +91,8 @@ module ActiveModel
       def i18n_keys
         self_and_descendants = ([base.class] + base.class.descendants)
         keys = self_and_descendants.map do |klass|
-          [:"models.#{klass.name.underscore}.attributes.#{attribute}.#{type}",
-           :"models.#{klass.name.underscore}.#{type}"]
+          [ :"models.#{klass.name.underscore}.attributes.#{attribute}.#{type}",
+            :"models.#{klass.name.underscore}.#{type}" ]
         end.flatten
 
         keys << options.delete(:default)
@@ -109,7 +108,6 @@ module ActiveModel
     class InstructureHumanMessageReporter < HumanMessageReporter
       def full_message(attribute, message)
         return message if attribute == :base
-
         str = attribute.to_s.gsub('.', '_').humanize
         str = base.class.human_attribute_name(attribute, default: str)
 
@@ -119,10 +117,10 @@ module ActiveModel
         ]
 
         I18n.send(:t,
-                  keys.shift,
-                  default: keys,
-                  attribute: str,
-                  message: message)
+               keys.shift,
+               default: keys,
+               attribute: str,
+               message: message)
       end
     end
 

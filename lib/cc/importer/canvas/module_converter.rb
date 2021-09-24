@@ -79,5 +79,6 @@ module CC::Importer::Canvas
 
       modules
     end
+
   end
 end

@@ -19,6 +19,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper.rb')
 
+
 describe Lti::PermissionChecker do
   include_context 'lti2_spec_helper'
 
@@ -58,7 +59,7 @@ describe Lti::PermissionChecker do
         other_tp = tool_proxy.dup
         other_tp.update(guid: SecureRandom.uuid, context: course)
         allow(other_tp).to receive(:active_in_context?) { true }
-        allow(other_tp).to receive(:resources) { [double(message_handlers: [message_handler])] }
+        allow(other_tp).to receive(:resources) { [double(message_handlers: [ message_handler ])] }
         other_tp
       end
 

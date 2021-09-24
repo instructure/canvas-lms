@@ -20,7 +20,7 @@
 
 module Submissions
   class AttachmentForSubmissionDownload
-    def initialize(submission, options = {})
+    def initialize(submission, options={})
       @submission = submission
       @options = options
     end
@@ -28,16 +28,14 @@ module Submissions
 
     def attachment
       raise ActiveRecord::RecordNotFound unless download_id.present?
-
       return attachment_from_submission_comment ||
-             attachment_belonging_to_submission ||
-             prior_attachment ||
-             attachment_from_submission_attachments ||
-             attachment_from_versioned_attachments
+        attachment_belonging_to_submission ||
+        prior_attachment ||
+        attachment_from_submission_attachments ||
+        attachment_from_versioned_attachments
     end
 
     private
-
     def attachment_belonging_to_submission
       submission.attachment_id == download_id && submission.attachment
     end
@@ -48,7 +46,6 @@ module Submissions
 
     def attachment_from_submission_comment
       return nil unless comment_id.present?
-
       submission.all_submission_comments.find(comment_id).attachments.find do |attachment|
         attachment.id == download_id
       end

@@ -20,6 +20,7 @@
 
 # Public: Delete old (> 90 days) records from conversation_batches table.
 class ConversationBatchScrubber < MessageScrubber
+
   protected
 
   def filter_attribute

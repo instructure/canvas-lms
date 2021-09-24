@@ -136,9 +136,10 @@ module DrDiff
       }
     end
 
+
     describe "#relevant?" do
       context "diff with new code" do
-        let(:parser) { described_class.new(add_diff) }
+        let(:parser){ described_class.new(add_diff) }
 
         it "is true for same file with a line number in the range" do
           expect(parser.relevant?("some_file.rb", 3)).to be(true)
@@ -168,7 +169,7 @@ module DrDiff
         end
 
         context "with campsite mode turned off" do
-          let(:parser) { described_class.new(add_diff, true, false) }
+          let(:parser){ described_class.new(add_diff, true, false) }
 
           it "is only true for touched lines" do
             expect(parser.relevant?("some_file.rb", 60, true)).to be(true)
@@ -186,11 +187,13 @@ module DrDiff
             expect(parser.relevant?("some_file.rb", 66, true)).to be(false)
             expect(parser.relevant?("some_file.rb", 67, true)).to be(false)
           end
+
         end
+
       end
 
       context "for diffs with deletions" do
-        let(:parser) { described_class.new(subtractive_diff) }
+        let(:parser){ described_class.new(subtractive_diff) }
 
         it 'respects the boundary of a removed diff set' do
           expect(parser.relevant?("some_file.rb", 55, true)).to be(false)
@@ -200,7 +203,7 @@ module DrDiff
         end
 
         context "with campsite mode turned off" do
-          let(:parser) { described_class.new(subtractive_diff, true, false) }
+          let(:parser){ described_class.new(subtractive_diff, true, false) }
 
           it "does not count deletions as relevant" do
             expect(parser.relevant?("some_file.rb", 55, true)).to be(false)
@@ -209,6 +212,7 @@ module DrDiff
             expect(parser.relevant?("some_file.rb", 61, true)).to be(false)
           end
         end
+
       end
     end
 
@@ -217,7 +221,7 @@ module DrDiff
         parser = described_class.new(combination_diff)
         diff = parser.diff
         expect(diff['Gemfile.d/development.rb'][:change]).to eq([7])
-        expect(diff['script/rlint'][:change]).to eq([64] + (68..79).to_a)
+        expect(diff['script/rlint'][:change]).to eq([64]+(68..79).to_a)
       end
 
       it "parses additive diffs correctly" do

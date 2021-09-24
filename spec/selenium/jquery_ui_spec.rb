@@ -27,9 +27,9 @@ describe "jquery ui" do
 
   def shift_tab
     driver.action.key_down(:shift)
-          .send_keys(:tab)
-          .key_up(:shift)
-          .perform
+      .send_keys(:tab)
+      .key_up(:shift)
+      .perform
   end
 
   def create_simple_modal
@@ -46,7 +46,7 @@ describe "jquery ui" do
     get "/"
   end
 
-  it "makes dialogs modal by default" do
+  it "should make dialogs modal by default" do
     expect(driver.execute_script(<<-JS)).to eq true
       return $('<div />').dialog().dialog('option', 'modal');
     JS
@@ -63,7 +63,7 @@ describe "jquery ui" do
     expect(f(".ui-widget-overlay")).to be_displayed
   end
 
-  it "captures tabbing" do
+  it "should capture tabbing" do
     create_simple_modal
     expect(active.tag_name).to eq 'select'
     active.send_keys(:tab)
@@ -76,7 +76,7 @@ describe "jquery ui" do
     expect(active.tag_name).to eq 'select'
   end
 
-  it "captures shift-tabbing" do
+  it "should capture shift-tabbing" do
     skip_if_chrome('fragile')
     create_simple_modal
     active.click # sometimes the viewport doesn't have focus
@@ -90,7 +90,7 @@ describe "jquery ui" do
   end
 
   context "calendar widget" do
-    it "lets you replace content by selecting and typing instead of appending" do
+    it "should let you replace content by selecting and typing instead of appending" do
       get "/courses/#{@course.id}/assignments"
 
       f(".add_assignment").click
@@ -112,13 +112,14 @@ describe "jquery ui" do
   end
 
   context "dialog titles" do
+
     # jquery ui doesn't escape dialog titles by default (even when inferred from
     # title attributes!). our modified ui.dialog does (and hopefully jquery.ui
     # will too in 1.9). to pass in an html title that you don't want escaped,
     # wrap it in a jquery object.
     #
     # see http://bugs.jqueryui.com/ticket/6016
-    it "html-escapes inferred dialog titles" do
+    it "should html-escape inferred dialog titles" do
       title = "<b>this</b> is the title"
       expect(driver.execute_script(<<-JS)).to eq title
         return $('<div id="jqueryui_test" title="#{title}">hello</div>')
@@ -129,7 +130,7 @@ describe "jquery ui" do
       JS
     end
 
-    it "uses a non-breaking space for empty titles" do
+    it "should use a non-breaking space for empty titles" do
       expect(driver.execute_script(<<-JS)).to eq "\302\240"
         return $('<div id="jqueryui_test">hello</div>')
           .dialog()
@@ -149,7 +150,7 @@ describe "jquery ui" do
       JS
     end
 
-    it "html-escapes explicit string dialog titles" do
+    it "should html-escape explicit string dialog titles" do
       title = "<b>this</b> is the title"
       expect(driver.execute_script(<<-JS)).to eq title
         return $('<div id="jqueryui_test">hello again</div>')
@@ -170,7 +171,7 @@ describe "jquery ui" do
       JS
     end
 
-    it "accepts jquery object dialog titles" do
+    it "should accept jquery object dialog titles" do
       title = "<i>i want formatting <b>for realz</b></i>"
       expect(driver.execute_script(<<-JS)).to eq title
         return $('<div id="jqueryui_test">here we go</div>')
@@ -210,7 +211,7 @@ describe "jquery ui" do
       JS
     end
 
-    it "opens every time when pressing return" do
+    it "should open every time when pressing return" do
       container = f('.al-selenium')
       options = '.al-options:visible'
       scroll_to(f('.footer-logo'))

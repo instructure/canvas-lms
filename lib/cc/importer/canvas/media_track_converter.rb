@@ -24,7 +24,6 @@ module CC::Importer::Canvas
     def convert_media_tracks(doc)
       track_map = {}
       return track_map unless doc
-
       if media_tracks = doc.at_css('media_tracks')
         media_tracks.css('media').each do |media|
           file_migration_id = media['identifierref']
@@ -40,5 +39,6 @@ module CC::Importer::Canvas
       end
       track_map
     end
+
   end
 end

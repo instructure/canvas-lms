@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -88,7 +87,6 @@ module QuizMathDataFixup
 
   def fixup_html(html_str)
     return html_str unless html_str
-
     html = Nokogiri::HTML5.fragment(html_str)
     if html.children.length == 1 && html.children[0].node_type == Nokogiri::XML::Node::TEXT_NODE
       # look for an equation_images URL in the text and extract the latex
@@ -154,7 +152,6 @@ module QuizMathDataFixup
     html.search('span.hidden-readable').each(&:remove)
 
     return html_str if html.content.length == 0 && html.search('img.equation_image').length == 0
-
     html.to_s
   end
 

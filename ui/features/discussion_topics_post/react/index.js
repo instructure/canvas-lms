@@ -17,38 +17,19 @@
  */
 
 import AlertManager from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider, createClient, createPersistentCache} from '@canvas/apollo'
+import {ApolloProvider, createClient} from '@canvas/apollo'
 import DiscussionTopicManager from './DiscussionTopicManager'
 import ErrorBoundary from '@canvas/error-boundary'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
 import I18n from 'i18n!discussion_topics_post'
-import LoadingIndicator from '@canvas/loading-indicator'
-import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react'
+import React from 'react'
+import ReactDOM from 'react-dom'
 
-export const DiscussionTopicsPost = props => {
-  const [client, setClient] = useState(null)
-  const [loading, setLoading] = useState(true)
+const client = createClient()
 
-  useEffect(() => {
-    const setupApolloClient = async () => {
-      if (ENV.apollo_caching) {
-        const cache = await createPersistentCache(ENV.discussion_cache_key)
-        setClient(createClient({cache}))
-      } else {
-        setClient(createClient())
-      }
-      setLoading(false)
-    }
-    setupApolloClient()
-  }, [])
-
-  if (loading) {
-    return <LoadingIndicator />
-  }
-
-  return (
+export default function renderDiscussionPosts(env, elt) {
+  ReactDOM.render(
     <ApolloProvider client={client}>
       <ErrorBoundary
         errorComponent={
@@ -59,13 +40,10 @@ export const DiscussionTopicsPost = props => {
         }
       >
         <AlertManager>
-          <DiscussionTopicManager discussionTopicId={props.discussionTopicId} />
+          <DiscussionTopicManager discussionTopicId={env.discussion_topic_id} />
         </AlertManager>
       </ErrorBoundary>
-    </ApolloProvider>
+    </ApolloProvider>,
+    elt
   )
-}
-
-DiscussionTopicsPost.propTypes = {
-  discussionTopicId: PropTypes.string
 }

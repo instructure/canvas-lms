@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # coding: utf-8
-
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -23,7 +22,7 @@
 module Factories
   def assessment_question_bank_model
     @course ||= course_model(:reusable => true)
-    @bank = @course.assessment_question_banks.create!(:title => 'Test Bank')
+    @bank = @course.assessment_question_banks.create!(:title=>'Test Bank')
   end
 
   def assessment_question_bank_with_questions
@@ -36,7 +35,7 @@ module Factories
         :question_data => {
           'name' => "test question #{i}",
           'points_possible' => 10,
-          'answers' => [{ 'id' => 1 }, { 'id' => 2 }]
+          'answers' => [{'id' => 1}, {'id' => 2}]
         }
       )
       instance_variable_set("@q#{i}", q)

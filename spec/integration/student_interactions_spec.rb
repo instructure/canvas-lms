@@ -31,8 +31,8 @@ describe "student interactions links" do
                             :password => password
     u.save!
     @e = course_with_teacher :active_course => true,
-                             :user => u,
-                             :active_enrollment => true
+                            :user => u,
+                            :active_enrollment => true
     @e.save!
     @teacher = u
 
@@ -47,6 +47,7 @@ describe "student interactions links" do
     user_model
     @ta = @user
     @course.enroll_ta(@ta).accept
+
   end
 
   context "as a user without permissions to view grades" do
@@ -58,14 +59,14 @@ describe "student interactions links" do
       user_session(@ta)
     end
 
-    it "does not show the student link on the student's page" do
+    it "should not show the student link on the student's page" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
       expect(response.body).not_to match(/Interactions Report/)
       expect(response.body).not_to match(/Student Interactions Report/)
     end
 
-    it "does not show the teacher link on the teacher's page" do
+    it "should not show the teacher link on the teacher's page" do
       get "/courses/#{@course.id}/users/#{@teacher.id}"
       expect(response).to be_successful
       expect(response.body).not_to match(/Student Interactions Report/)
@@ -77,27 +78,27 @@ describe "student interactions links" do
       user_session(@teacher)
     end
 
-    it "only shows the student link on the student's page" do
+    it "should only show the student link on the student's page" do
       get "/courses/#{@course.id}/users/#{@student.id}"
       expect(response).to be_successful
       expect(response.body).to match(/Interactions Report/)
       expect(response.body).not_to match(/Student Interactions Report/)
     end
 
-    it "shows the teacher link on the teacher's page" do
+    it "should show the teacher link on the teacher's page" do
       get "/courses/#{@course.id}/users/#{@teacher.id}"
       expect(response).to be_successful
       expect(response.body).to match(/Student Interactions Report/)
     end
 
-    it "shows mail link for teachers" do
+    it "should show mail link for teachers" do
       get "/users/#{@teacher.id}/teacher_activity/course/#{@course.id}"
       expect(response).to be_successful
       html = Nokogiri::HTML5(response.body)
       expect(html.css('.message_student_link')).not_to be_nil
     end
 
-    it "does not show mail link for admins" do
+    it "should not show mail link for admins" do
       user_model
       Account.site_admin.account_users.create!(user: @user)
       user_session(@user)
@@ -108,3 +109,5 @@ describe "student interactions links" do
     end
   end
 end
+
+

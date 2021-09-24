@@ -59,7 +59,6 @@ module Types
     DESC
     def override_grade
       return nil if object.override_score.blank?
-
       object.effective_final_grade
     end
 
@@ -79,5 +78,6 @@ module Types
     def enrollment
       load_association(:enrollment)
     end
+
   end
 end

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 # coding: utf-8
-
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -25,6 +24,7 @@ describe "Exportable" do
   # this class is only necessary until we get our package into a public repo
   # (canvas_offline_course_viewer npm package)
   class ZipPackageTest < CC::Exporter::WebZip::ZipPackage
+
     def initialize(exporter, course, user, progress_key)
       super(exporter, course, user, progress_key)
       @index_file = 'dist/index.html'
@@ -65,10 +65,10 @@ describe "Exportable" do
 
     def attachment
       @_attachment ||= Attachment.create({
-                                           context: Course.create,
-                                           filename: 'exportable-test-file',
-                                           uploaded_data: File.open(@cartridge_path)
-                                         })
+        context: Course.create,
+        filename: 'exportable-test-file',
+        uploaded_data: File.open(@cartridge_path)
+      })
     end
 
     def cartridge_path
@@ -85,6 +85,7 @@ describe "Exportable" do
   end
 
   context "#convert_to_web_zip" do
+
     before do
       @create_date = 1.minute.ago
       course_with_teacher(active_all: true)
@@ -102,7 +103,7 @@ describe "Exportable" do
       File.open(zip_path)
     end
 
-    it "creates a zip file" do
+    it "should create a zip file" do
       expect(zip).not_to be_nil
     end
 
@@ -113,7 +114,7 @@ describe "Exportable" do
     end
 
     context "course-data.js file" do
-      it "creates a course-data.js file" do
+      it "should create a course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
@@ -122,20 +123,20 @@ describe "Exportable" do
         end
       end
 
-      it "creates a 'files' key in the course-data.js file" do
+      it "should create a 'files' key in the course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
-          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =', ''))
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
           expect(contents['files']).not_to be_nil
         end
       end
 
-      it "creates the right structure in the 'files' key" do
+      it "should create the right structure in the 'files' key" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
-          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =', ''))
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
           expect(contents['files'].length).to eq(3)
           expect(contents['files'][0]['type']).to eq('file')
           expect(contents['files'][0]['name']).not_to be_nil
@@ -144,11 +145,11 @@ describe "Exportable" do
         end
       end
 
-      it "adds course data to the course-data.js file" do
+      it "should add course data to the course-data.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/course-data.js').first
           expect(file).not_to be_nil
-          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =', ''))
+          contents = JSON.parse(file.get_input_stream.read.sub('window.COURSE_DATA =',''))
           expect(contents['language']).to eq 'en'
           expect(contents['lastDownload']).to eq @create_date.in_time_zone(@student.time_zone).iso8601
           expect(contents['title']).to eq @course.name
@@ -157,7 +158,7 @@ describe "Exportable" do
     end
 
     context "canvas_offline_course_viewer files" do
-      it "inserts the index.html file" do
+      it "should insert the index.html file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/index.html').first
           expect(file.name).not_to include '//'
@@ -167,7 +168,7 @@ describe "Exportable" do
         end
       end
 
-      it "inserts the viewer/bundle.js file" do
+      it "should insert the viewer/bundle.js file" do
         Zip::File.open(zip_path) do |zip_file|
           file = zip_file.glob('**/viewer/bundle.js').first
           expect(file.name).not_to include '//'
@@ -186,4 +187,5 @@ describe "Exportable" do
       File.delete(zip_path) if File.exist?(zip_path)
     end
   end
+
 end

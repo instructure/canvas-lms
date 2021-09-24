@@ -21,9 +21,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::ChangeSisIdImporter do
-  before { account_model }
 
-  it 'changes values of sis ids' do
+  before {account_model}
+
+  it 'should change values of sis ids' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     p1 = u1.pseudonym
     a = Account.create(parent_account: @account, name: 'English')
@@ -53,7 +54,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(t.reload.sis_source_id).to eq 'term_a'
   end
 
-  it 'gives errors and warnings' do
+  it 'should give errors and warnings' do
     c = course_model(account: @account)
     c.sis_source_id = 'c001'
     c.save!
@@ -71,14 +72,14 @@ describe SIS::CSV::ChangeSisIdImporter do
     )
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An old_id, 'invalid', referenced a non-existent term and was not changed.",
-                          "No old_id or old_integration_id given for change_sis_id",
-                          "No new_id or new_integration_id given for change_sis_id",
-                          "No type given for change_sis_id",
-                          "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
-                          "Invalid type 'invalid' for change_sis_id"]
+                            "No old_id or old_integration_id given for change_sis_id",
+                            "No new_id or new_integration_id given for change_sis_id",
+                            "No type given for change_sis_id",
+                            "A new_id, 'c001', referenced an existing course and the course with sis_source_id 'c002' was not updated",
+                            "Invalid type 'invalid' for change_sis_id"]
   end
 
-  it 'allows removing user.integration_ids' do
+  it 'should allow removing user.integration_ids' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     p1 = u1.pseudonym
     p1.integration_id = 'int1'
@@ -90,7 +91,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(p1.reload.integration_id).to be_nil
   end
 
-  it 'allows changing integration_ids' do
+  it 'should allow changing integration_ids' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     p1 = u1.pseudonym
     p1.integration_id = 'int1'
@@ -102,7 +103,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(p1.reload.integration_id).to eq('int2')
   end
 
-  it 'changes both SIS ID and integration ID' do
+  it 'should change both SIS ID and integration ID' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     p1 = u1.pseudonym
     p1.integration_id = 'int1'
@@ -115,7 +116,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(p1.sis_user_id).to eq('sis2')
   end
 
-  it 'changes both SIS ID and integration ID if only one is passed in' do
+  it 'should change both SIS ID and integration ID if only one is passed in' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     p1 = u1.pseudonym
     p1.integration_id = 'int1'
@@ -128,7 +129,7 @@ describe SIS::CSV::ChangeSisIdImporter do
     expect(p1.sis_user_id).to eq('sis2')
   end
 
-  it 'throws an error when you pass in mismatched SIS ID and integration ID' do
+  it 'should throw an error when you pass in mismatched SIS ID and integration ID' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     u2 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     u1.pseudonym.update!(integration_id: 'int1')
@@ -141,9 +142,9 @@ describe SIS::CSV::ChangeSisIdImporter do
   end
 
   describe 'group categories' do
-    let!(:gc) { group_category(context: @account, sis_source_id: 'GC1') }
+    let!(:gc) {group_category(context: @account, sis_source_id: 'GC1')}
 
-    it 'changes the sis id for a group category' do
+    it 'should change the sis id for a group category' do
       importer = process_csv_data(
         'old_id,new_id,type',
         'GC1,GC2,group_category'
@@ -153,7 +154,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(gc.sis_source_id).to eq('GC2')
     end
 
-    it 'does not error if other rows have an integration_id' do
+    it 'should not error if other rows have an integration_id' do
       u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
       u1.pseudonym.integration_id = 'int1'
       u1.pseudonym.save!
@@ -167,7 +168,7 @@ describe SIS::CSV::ChangeSisIdImporter do
       expect(gc.sis_source_id).to eq('GC2')
     end
 
-    it 'cleanlies handle error if integration_id is given' do
+    it 'should cleanly handle error if integration_id is given' do
       u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
       importer = process_csv_data(

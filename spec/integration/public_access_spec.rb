@@ -57,7 +57,7 @@ context "accessing public content" do
     end
   end
 
-  it "shows assignments" do
+  it "should show assignments" do
     assignment = @course.assignments.create!(:name => "blah")
 
     test_public_access do
@@ -65,7 +65,7 @@ context "accessing public content" do
     end
   end
 
-  it "shows quizzes" do
+  it "should show quizzes" do
     quiz = @course.quizzes.create!
     quiz.publish!
 
@@ -74,7 +74,7 @@ context "accessing public content" do
     end
   end
 
-  it "shows wiki pages" do
+  it "should show wiki pages" do
     page = @course.wiki_pages.create!(:title => "stuff")
 
     test_public_access do

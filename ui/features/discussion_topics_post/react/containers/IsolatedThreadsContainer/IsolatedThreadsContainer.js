@@ -132,7 +132,6 @@ export const IsolatedThreadsContainer = props => {
           setToBeMarkedAsRead={setToBeMarkedAsRead}
           goToTopic={props.goToTopic}
           isHighlighted={entry._id === props.highlightEntryId}
-          updateDraftCache={props.updateDraftCache}
         />
       ))}
       {props.hasMoreNewerReplies && (
@@ -171,8 +170,7 @@ IsolatedThreadsContainer.propTypes = {
   hasMoreOlderReplies: PropTypes.bool,
   hasMoreNewerReplies: PropTypes.bool,
   fetchingMoreOlderReplies: PropTypes.bool,
-  fetchingMoreNewerReplies: PropTypes.bool,
-  updateDraftCache: PropTypes.func
+  fetchingMoreNewerReplies: PropTypes.bool
 }
 
 export default IsolatedThreadsContainer
@@ -296,8 +294,6 @@ const IsolatedThreadContainer = props => {
               <Flex padding="small">
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
-                    discussionTopic={props.discussionTopic}
-                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
                       <ThreadActions
@@ -355,7 +351,6 @@ const IsolatedThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
-                    updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
                   >
                     <View as="div" padding="x-small none none">
@@ -384,6 +379,5 @@ IsolatedThreadContainer.propTypes = {
   onOpenInSpeedGrader: PropTypes.func,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  isHighlighted: PropTypes.bool,
-  updateDraftCache: PropTypes.func
+  isHighlighted: PropTypes.bool
 }

@@ -21,26 +21,27 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Pseudonym do
-  it "creates a new instance given valid attributes" do
+
+  it "should create a new instance given valid attributes" do
     user_model
-    expect { factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes) }.to change(Pseudonym, :count).by(1)
+    expect{factory_with_protected_attributes(Pseudonym, valid_pseudonym_attributes)}.to change(Pseudonym, :count).by(1)
   end
 
-  it "allows single character usernames" do
+  it "should allow single character usernames" do
     user_model
     pseudonym_model
     @pseudonym.unique_id = 'c'
     expect(@pseudonym.save).to be true
   end
 
-  it "allows a username that starts with a special character" do
+  it "should allow a username that starts with a special character" do
     user_model
     pseudonym_model
     @pseudonym.unique_id = '+c'
     expect(@pseudonym.save).to be true
   end
 
-  it "allows apostrophes in usernames" do
+  it "should allow apostrophes in usernames" do
     pseudonym = Pseudonym.new(:unique_id => "o'brien@example.com",
                               :password => 'password',
                               :password_confirmation => 'password')
@@ -48,7 +49,7 @@ describe Pseudonym do
     expect(pseudonym).to be_valid
   end
 
-  it "validates the presence of user and infer default account" do
+  it "should validate the presence of user and infer default account" do
     Account.default
     u = User.create!
     p = Pseudonym.new(:unique_id => 'cody@instructure.com')
@@ -63,7 +64,7 @@ describe Pseudonym do
     expect(p.password).not_to match /tmp-pw/
   end
 
-  it "does not allow active duplicates" do
+  it "should not allow active duplicates" do
     u = User.create!
     p1 = Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
     p2 = Pseudonym.create(:unique_id => 'cody@instructure.com', :user => u)
@@ -78,7 +79,7 @@ describe Pseudonym do
     Pseudonym.create!(:unique_id => 'cody@instructure.com', :user => u)
   end
 
-  it "finds the correct pseudonym for logins" do
+  it "should find the correct pseudonym for logins" do
     user = User.create!
     p1 = Pseudonym.create!(:unique_id => 'Cody@instructure.com', :user => user)
     p2 = Pseudonym.create!(:unique_id => 'codY@instructure.com', :user => user) { |p| p.workflow_state = 'deleted' }
@@ -88,17 +89,17 @@ describe Pseudonym do
     expect(Pseudonym.active.by_unique_id('cody@instructure.com').sort).to eq [p1, p3]
   end
 
-  it "does not blow up if by_unique_id is passed a non-string" do
+  it "should not blow up if by_unique_id is passed a non-string" do
     expect(Pseudonym.active.by_unique_id(123)).to eq []
   end
 
-  it "associates to another user" do
+  it "should associate to another user" do
     user_model
     pseudonym_model
     expect(@pseudonym.user).to eql(@user)
   end
 
-  it "orders by position" do
+  it "should order by position" do
     user_model
     p1 = pseudonym_model(:user_id => @user.id)
     p2 = pseudonym_model(:user_id => @user.id)
@@ -108,7 +109,7 @@ describe Pseudonym do
     expect(Pseudonym.all.sort.map(&:id)).to eql([p3.id, p2.id, p1.id])
   end
 
-  it "updates user account associations on CRUD" do
+  it "should update user account associations on CRUD" do
     account_model
     user_model
     account1 = account_model
@@ -132,13 +133,13 @@ describe Pseudonym do
     expect(@user.user_account_associations).to eq []
   end
 
-  it "allows deleting pseudonyms" do
+  it "should allow deleting pseudonyms" do
     user_with_pseudonym(:active_all => true)
     expect(@pseudonym.destroy).to eql(true)
     expect(@pseudonym).to be_deleted
   end
 
-  it "allows deleting system-generated pseudonyms" do
+  it "should allow deleting system-generated pseudonyms" do
     user_with_pseudonym(:active_all => true)
     @pseudonym.sis_user_id = 'something_cool'
     @pseudonym.save!
@@ -147,7 +148,7 @@ describe Pseudonym do
     expect(@pseudonym).to be_deleted
   end
 
-  it "defaults to nil for blank integration_id and sis_user_id" do
+  it "should default to nil for blank integration_id and sis_user_id" do
     user_factory
     pseudonym = Pseudonym.new(user: @user, unique_id: 'test@example.com', password: 'passwd123')
     pseudonym.password_confirmation = 'passwd123'
@@ -163,24 +164,24 @@ describe Pseudonym do
       require 'net/ldap'
       user_with_pseudonym(:active_all => true)
       @aac = @pseudonym.account.authentication_providers.create!(
-        :auth_type => 'ldap',
-        :auth_base => "ou=people,dc=example,dc=com",
-        :auth_host => "ldap.example.com",
-        :auth_username => "cn=query,dc=example,dc=com",
-        :auth_port => 636,
-        :auth_filter => "(uid={{login}})",
-        :auth_over_tls => true
+        :auth_type      => 'ldap',
+        :auth_base      => "ou=people,dc=example,dc=com",
+        :auth_host      => "ldap.example.com",
+        :auth_username  => "cn=query,dc=example,dc=com",
+        :auth_port      => 636,
+        :auth_filter    => "(uid={{login}})",
+        :auth_over_tls  => true
       )
     end
 
-    it "gracefullies handle unreachable LDAP servers" do
+    it "should gracefully handle unreachable LDAP servers" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
       expect(Canvas::Errors).to receive(:capture) do |ex, data, level|
         expect(ex.class).to eq(Net::LDAP::LdapError)
         expect(data[:account]).to eq(@pseudonym.account)
         expect(level).to eq(:warn)
       end.and_call_original
-      expect { @pseudonym.ldap_bind_result('blech') }.not_to raise_error
+      expect{ @pseudonym.ldap_bind_result('blech') }.not_to raise_error
     end
 
     it "passes a success result through" do
@@ -188,7 +189,7 @@ describe Pseudonym do
       expect(@pseudonym.ldap_bind_result('yay!')).to be_truthy
     end
 
-    it "sets last_timeout_failure on LDAP servers that timeout" do
+    it "should set last_timeout_failure on LDAP servers that timeout" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).once.and_raise(Timeout::Error, "timed out")
       expect(Canvas::Errors).to receive(:capture_exception) do |_subsystem, e, level|
         expect(e.class.to_s).to eq("Timeout::Error")
@@ -213,13 +214,13 @@ describe Pseudonym do
     end
   end
 
-  it "does not error on malformed SSHA password" do
+  it "should not error on malformed SSHA password" do
     pseudonym_model
     @pseudonym.sis_ssha = '{SSHA}garbage'
     expect(@pseudonym.valid_ssha?('garbage')).to be_falsey
   end
 
-  it "does not attempt validating a blank password" do
+  it "should not attempt validating a blank password" do
     pseudonym_model
     expect(@pseudonym).to receive(:sis_ssha).never
     @pseudonym.valid_ssha?('')
@@ -234,18 +235,18 @@ describe Pseudonym do
       pseudonym_model
     end
 
-    it "offers the user code as the user's uuid" do
+    it "should offer the user code as the user's uuid" do
       expect(@pseudonym.user).to eql(@user)
       expect(@pseudonym.user_code).to eql(@user.uuid)
     end
 
-    it "is able to change the user email" do
+    it "should be able to change the user email" do
       @pseudonym.email = 'admin@example.com'
       @pseudonym.reload
       expect(@pseudonym.user.email_channel.path).to eql('admin@example.com')
     end
 
-    it "offers the user sms if there is one" do
+    it "should offer the user sms if there is one" do
       communication_channel_model(:path_type => 'sms')
       @user.communication_channels << @cc
       @user.save!
@@ -254,7 +255,7 @@ describe Pseudonym do
     end
   end
 
-  it "determines if the password is managed" do
+  it "should determine if the password is managed" do
     u = User.create!
     p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
     p.sis_user_id = 'jt'
@@ -269,7 +270,7 @@ describe Pseudonym do
     p.authentication_provider = p.account.canvas_authentication_provider
   end
 
-  it "determines if the password is settable" do
+  it "should determine if the password is settable" do
     u = User.create!
     p = Pseudonym.create!(unique_id: 'jt@instructure.com', user: u)
     expect(p).to be_passwordable
@@ -285,13 +286,13 @@ describe Pseudonym do
   end
 
   context "login assertions" do
-    it "creates a CC if LDAP gave an e-mail we don't have" do
+    it "should create a CC if LDAP gave an e-mail we don't have" do
       account = Account.create!
       account.authentication_providers.create!(:auth_type => 'ldap')
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
+      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
 
       pseudonym.add_ldap_channel
       u.reload
@@ -320,7 +321,7 @@ describe Pseudonym do
       u = User.create!
       u.register
       pseudonym = u.pseudonyms.create!(unique_id: 'jt', account: account) { |p| p.sis_user_id = 'jt' }
-      pseudonym.instance_variable_set(:@ldap_result, { :mail => ['jt@instructure.com'] })
+      pseudonym.instance_variable_set(:@ldap_result, {:mail => ['jt@instructure.com']})
 
       pseudonym.infer_auth_provider(ap)
       pseudonym.add_ldap_channel
@@ -329,7 +330,7 @@ describe Pseudonym do
   end
 
   describe 'valid_arbitrary_credentials?' do
-    it "ignores password if canvas authentication is disabled" do
+    it "should ignore password if canvas authentication is disabled" do
       user_with_pseudonym(:password => 'qwertyuiop')
       expect(@pseudonym.valid_arbitrary_credentials?('qwertyuiop')).to be_truthy
       # once auth provider is required, this whole spec can go away, because the situation will
@@ -358,14 +359,14 @@ describe Pseudonym do
         account2
       end
 
-      it "only queries the pertinent shard" do
+      it "should only query the pertinent shard" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([@shard1])
         expect(Pseudonym).to receive(:active_only).once.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
       end
 
-      it "queries all pertinent shards" do
+      it "should query all pertinent shards" do
         expect(Pseudonym).to receive(:associated_shards).with('abc').and_return([Shard.default, @shard1])
         expect(Pseudonym).to receive(:active_only).twice.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
@@ -394,7 +395,7 @@ describe Pseudonym do
       allow(Canvas.redis).to receive(:ttl).and_return(1.day)
     end
 
-    it 'checks cas ticket expiration' do
+    it 'should check cas ticket expiration' do
       expect(Canvas.redis).to receive(:get).with(redis_key).and_return(nil)
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_falsey
 
@@ -402,18 +403,20 @@ describe Pseudonym do
       expect(@pseudonym.cas_ticket_expired?(cas_ticket)).to be_truthy
     end
 
-    it 'expires a cas ticket' do
+    it 'should expire a cas ticket' do
       expect(Canvas.redis).to receive(:set).once.and_return(true)
       expect(Pseudonym.expire_cas_ticket(cas_ticket)).to be_truthy
     end
   end
 
   describe '#verify_unique_sis_user_id' do
+
     it 'is true if there is no sis_user_id' do
       expect(Pseudonym.new.verify_unique_sis_user_id).to be_truthy
     end
 
     describe 'when a pseudonym already exists' do
+
       let(:sis_user_id) { "1234554321" }
 
       before :once do
@@ -433,6 +436,7 @@ describe Pseudonym do
         new_pseudonym.sis_user_id = sis_user_id.to_i
         expect { new_pseudonym.verify_unique_sis_user_id }.to throw_symbol(:abort)
       end
+
     end
   end
 
@@ -445,79 +449,71 @@ describe Pseudonym do
     }
     let(:account2) { Account.create! }
 
-    let(:sally) {
-      account_admin_user(
-        user: student_in_course(account: account2).user,
-        account: account1
-      )
-    }
+    let(:sally) { account_admin_user(
+      user: student_in_course(account: account2).user,
+      account: account1) }
 
-    let(:bob) {
-      student_in_course(
-        user: student_in_course(account: account2).user,
-        course: course_factory(account: account1)
-      ).user
-    }
+    let(:bob) { student_in_course(
+      user: student_in_course(account: account2).user,
+      course: course_factory(account: account1)).user }
 
     let(:charlie) { student_in_course(account: account2).user }
 
     let(:alice) {
       account_admin_user_with_role_changes(
-        account: account1,
-        role: custom_account_role('StrongerAdmin', account: account1),
-        role_changes: { view_notifications: true }
-      )
-    }
+      account: account1,
+      role: custom_account_role('StrongerAdmin', account: account1),
+      role_changes: { view_notifications: true }) }
 
     describe ":create" do
-      it "grants admins :create for themselves on the account" do
+      it "should grant admins :create for themselves on the account" do
         expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :create)
       end
 
-      it "grants admins :create for others on the account" do
+      it "should grant admins :create for others on the account" do
         expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :create)
       end
 
-      it "does not grant non-admins :create for themselves on the account" do
+      it "should not grant non-admins :create for themselves on the account" do
         expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :create)
       end
 
-      it "only grants admins :create on accounts they admin" do
+      it "should only grant admins :create on accounts they admin" do
         expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :create)
         expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :create)
       end
 
-      it "does not grant admins :create for others from other accounts" do
+      it "should not grant admins :create for others from other accounts" do
         expect(account1.pseudonyms.build(user: charlie)).not_to be_grants_right(sally, :create)
       end
 
-      it "does not grant subadmins :create on stronger admins" do
+      it "should not grant subadmins :create on stronger admins" do
         expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :create)
       end
     end
 
     describe ":update" do
-      it "grants admins :update for their own pseudonyms" do
+      it "should grant admins :update for their own pseudonyms" do
         expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :update)
       end
 
-      it "grants admins :update for others on the account" do
+      it "should grant admins :update for others on the account" do
         expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :update)
       end
 
-      it "does not grant non-admins :update for their own pseudonyms" do
+      it "should not grant non-admins :update for their own pseudonyms" do
         expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(bob, :update)
       end
 
-      it "only grants admins :update for others on accounts they admin" do
+      it "should only grant admins :update for others on accounts they admin" do
         expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :update)
       end
 
-      it "does not grant admins :update for their own pseudonyms on accounts they don't admin" do
+      it "should not grant admins :update for their own pseudonyms on accounts they don't admin" do
         expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :update)
       end
 
-      it "does not grant subadmins :update on stronger admins" do
+      it "should not grant subadmins :update on stronger admins" do
         expect(account1.pseudonyms.build(user: alice)).not_to be_grants_right(sally, :update)
       end
     end
@@ -529,15 +525,15 @@ describe Pseudonym do
           account1.save!
         end
 
-        it "grants admins :change_password for others on the account" do
+        it "should grant admins :change_password for others on the account" do
           expect(pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
         end
 
-        it "grants non-admins :change_password for their own pseudonyms" do
+        it "should grant non-admins :change_password for their own pseudonyms" do
           expect(pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
         end
 
-        it "grants admins :change_password for their own pseudonyms on accounts they don't admin" do
+        it "should grant admins :change_password for their own pseudonyms on accounts they don't admin" do
           expect(pseudonym(sally, account: account2)).to be_grants_right(sally, :change_password)
         end
       end
@@ -548,19 +544,19 @@ describe Pseudonym do
           account1.save!
         end
 
-        it "no longer grant admins :change_password for existing pseudonyms for others on the account" do
+        it "should no longer grant admins :change_password for existing pseudonyms for others on the account" do
           expect(pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
         end
 
-        it "still grants admins :change_password for new pseudonym for others on the account" do
+        it "should still longer grant admins :change_password for new pseudonym for others on the account" do
           expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :change_password)
         end
 
-        it "still grants admins :change_password for their own pseudonym" do
+        it "should still grant admins :change_password for their own pseudonym" do
           expect(pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
         end
 
-        it "still grants non-admins :change_password for their own pseudonym" do
+        it "should still grant non-admins :change_password for their own pseudonym" do
           expect(pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
         end
       end
@@ -572,15 +568,15 @@ describe Pseudonym do
         end
 
         context "with canvas authentication enabled on the account" do
-          it "still grants admins :change_password for others on the account" do
+          it "should still grant admins :change_password for others on the account" do
             expect(managed_pseudonym(bob, account: account1)).to be_grants_right(sally, :change_password)
           end
 
-          it "still grants admins :change_password for their own pseudonym" do
+          it "should still grant admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(sally, account: account1)).to be_grants_right(sally, :change_password)
           end
 
-          it "still grants non-admins :change_password for their own pseudonym" do
+          it "should still grant non-admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(bob, account: account1)).to be_grants_right(bob, :change_password)
           end
         end
@@ -590,15 +586,15 @@ describe Pseudonym do
             account1.authentication_providers.scope.delete_all
           end
 
-          it "no longer grants admins :change_password for others on the account" do
+          it "should no longer grant admins :change_password for others on the account" do
             expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(sally, :change_password)
           end
 
-          it "no longer grants admins :change_password for their own pseudonym" do
+          it "should no longer grant admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(sally, account: account1)).not_to be_grants_right(sally, :change_password)
           end
 
-          it "no longer grants non-admins :change_password for their own pseudonym" do
+          it "should no longer grant non-admins :change_password for their own pseudonym" do
             expect(managed_pseudonym(bob, account: account1)).not_to be_grants_right(bob, :change_password)
           end
         end
@@ -611,19 +607,19 @@ describe Pseudonym do
           account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: true)
         end
 
-        it "grants admins :manage_sis for their own pseudonyms on that account" do
+        it "should grant admins :manage_sis for their own pseudonyms on that account" do
           expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :manage_sis)
         end
 
-        it "grants admins :manage_sis for others on that account" do
+        it "should grant admins :manage_sis for others on that account" do
           expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :manage_sis)
         end
 
-        it "does not grant admins :manage_sis for others on other accounts" do
+        it "should not grant admins :manage_sis for others on other accounts" do
           expect(account2.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :manage_sis)
         end
 
-        it "does not grant admins :manage_sis for their own pseudonyms on other accounts" do
+        it "should not grant admins :manage_sis for their own pseudonyms on other accounts" do
           expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :manage_sis)
         end
       end
@@ -633,18 +629,18 @@ describe Pseudonym do
           account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: false)
         end
 
-        it "does not grant admins :manage_sis for others" do
+        it "should not grant admins :manage_sis for others" do
           expect(account1.pseudonyms.build(user: bob)).not_to be_grants_right(sally, :manage_sis)
         end
 
-        it "does not grant admins :manage_sis even for their own pseudonyms" do
+        it "should not grant admins :manage_sis even for their own pseudonyms" do
           expect(account1.pseudonyms.build(user: sally)).not_to be_grants_right(sally, :manage_sis)
         end
       end
     end
 
     describe ":delete" do
-      it "grantses users :delete on pseudonyms they can update" do
+      it "should grants users :delete on pseudonyms they can update" do
         expect(account1.pseudonyms.build(user: sally)).to be_grants_right(sally, :delete)
         expect(account1.pseudonyms.build(user: bob)).to be_grants_right(sally, :delete)
         expect(account2.pseudonyms.build(user: sally)).not_to be_grants_right(bob, :delete)
@@ -659,12 +655,12 @@ describe Pseudonym do
           p
         end
 
-        it "grants admins :delete if they can :manage_sis" do
+        it "should grant admins :delete if they can :manage_sis" do
           account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: true)
           expect(system_pseudonym).to be_grants_right(sally, :manage_sis)
         end
 
-        it "does not grant admins :delete if they can't :manage_sis" do
+        it "should not grant admins :delete if they can't :manage_sis" do
           account1.role_overrides.create!(permission: 'manage_sis', role: admin_role, enabled: false)
           expect(system_pseudonym).not_to be_grants_right(sally, :manage_sis)
         end
@@ -673,11 +669,11 @@ describe Pseudonym do
   end
 
   describe ".for_auth_configuration" do
-    let!(:bob) { user_model }
+    let!(:bob){ user_model }
     let!(:new_pseud) { Account.default.pseudonyms.create!(user: bob, unique_id: "BobbyRicky") }
 
     context "with legacy auth types" do
-      let!(:aac) { Account.default.authentication_providers.create!(auth_type: 'ldap') }
+      let!(:aac){ Account.default.authentication_providers.create!(auth_type: 'ldap') }
 
       it "filters down by unique ID" do
         pseud = Account.default.pseudonyms.for_auth_configuration("BobbyRicky", aac)
@@ -692,7 +688,8 @@ describe Pseudonym do
     end
 
     context "with contemporary auth types" do
-      let!(:aac) { Account.default.authentication_providers.create!(auth_type: 'facebook') }
+
+      let!(:aac){ Account.default.authentication_providers.create!(auth_type: 'facebook') }
 
       before do
         new_pseud.authentication_provider_id = aac.id
@@ -709,6 +706,7 @@ describe Pseudonym do
         expect(pseud).to be_nil
       end
     end
+
   end
 
   it "allows duplicate unique_ids, in different providers" do
@@ -748,7 +746,7 @@ describe Pseudonym do
       wat = " " * 3000
       unique_id = "asdf#{wat}asdf"
       creds = { unique_id: unique_id, password: 'foobar' }
-      expect { Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
+      expect{ Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
     end
 
     it "doesn't find deleted pseudonyms" do

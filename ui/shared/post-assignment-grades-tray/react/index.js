@@ -113,21 +113,13 @@ export default class PostAssignmentGradesTray extends PureComponent {
       )
     } else {
       postRequest = postAssignmentGrades(assignment.id, options)
-      if (options.gradedOnly) {
-        successMessage = I18n.t(
-          'Success! Grades have been posted to everyone graded for %{assignmentName}.',
-          {
-            assignmentName: assignment.name
-          }
-        )
-      } else {
-        successMessage = I18n.t(
-          'Success! Grades have been posted to everyone for %{assignmentName}.',
-          {
-            assignmentName: assignment.name
-          }
-        )
-      }
+      successMessage = I18n.t(
+        'Success! Grades have been posted to %{postedTo} for %{assignmentName}.',
+        {
+          assignmentName: assignment.name,
+          postedTo: options.gradedOnly ? 'everyone graded' : 'everyone'
+        }
+      )
     }
 
     this.setState({postingGrades: true})

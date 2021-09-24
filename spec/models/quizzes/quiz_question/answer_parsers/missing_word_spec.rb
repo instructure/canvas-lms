@@ -21,7 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
+
 describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
+
   describe "#parse" do
     let(:raw_answers) do
       [
@@ -65,6 +67,8 @@ describe Quizzes::QuizQuestion::AnswerParsers::MissingWord do
       it "defaults to the first answer being correct" do
         expect(@answer_data.answers.first[:weight]).to eq 100
       end
+
     end
+
   end
 end

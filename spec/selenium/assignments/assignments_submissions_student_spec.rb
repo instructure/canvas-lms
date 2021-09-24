@@ -31,6 +31,7 @@ describe "submissions" do
   include K5Common
 
   context 'as a student' do
+
     before(:once) do
       @due_date = Time.now.utc + 2.days
       course_with_student(active_all: true)
@@ -44,7 +45,7 @@ describe "submissions" do
       user_session(@student)
     end
 
-    it "lets a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
+    it "should let a student submit a text entry", :xbrowser, priority: "1", test_id: 56015 do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -56,7 +57,7 @@ describe "submissions" do
       expect(f("#content")).not_to contain_css(".error_text")
     end
 
-    it "does not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
+    it "should not let a student submit a text entry with no text entered", priority: "2", test_id: 238143 do
       @assignment.update(submission_types: "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
@@ -66,9 +67,9 @@ describe "submissions" do
       expect(f(".error_text")).to be
     end
 
-    it "does not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
+    it "should not break when you open and close the media comment dialog", priority: "1", test_id: 237020 do
       stub_kaltura
-      # pending("failing because it is dependant on an external kaltura system")
+      #pending("failing because it is dependant on an external kaltura system")
 
       create_assignment_and_go_to_page('media_recording')
 
@@ -94,10 +95,10 @@ describe "submissions" do
       submit_form('#submit_media_recording_form')
     end
 
-    it "does not allow blank media submission", priority: "1", test_id: 237021 do
+    it "should not allow blank media submission", priority: "1", test_id: 237021 do
       skip_if_safari(:alert)
       stub_kaltura
-      # pending("failing because it is dependant on an external kaltura system")
+      #pending("failing because it is dependant on an external kaltura system")
 
       create_assignment_and_go_to_page 'media_recording'
       f(".submit_assignment_link").click
@@ -107,7 +108,7 @@ describe "submissions" do
       driver.switch_to.alert.accept
     end
 
-    it "allows you to submit a file", priority: "1", test_id: 237022 do
+    it "should allow you to submit a file", priority: "1", test_id: 237022 do
       @assignment.submission_types = 'online_upload'
       @assignment.save!
       filename, fullpath, data = get_file("testfile1.txt")
@@ -155,7 +156,7 @@ describe "submissions" do
       expect(element_exists?('.attachment_wrapper')).to be_falsy
     end
 
-    it "does not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
+    it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
       skip('investigate in LA-843')
       skip_if_safari(:alert)
       @assignment.submission_types = 'online_upload'
@@ -174,7 +175,8 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "does not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
+
+    it "should not allow a user to submit a file-submission assignment with an empty file", priority: "1" do
       skip('flaky, will be fixed in ADMIN-3015')
       @assignment.submission_types = 'online_upload'
       @assignment.save!
@@ -194,7 +196,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "does not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1", test_id: 237024 do
+    it "should not allow a user to submit a file-submission assignment with an illegal file extension", priority: "1", test_id: 237024 do
       @assignment.submission_types = 'online_upload'
       @assignment.allowed_extensions = ['bash']
       @assignment.save!
@@ -217,7 +219,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "shows as not turned in when submission was auto created in speedgrader", priority: "1", test_id: 237025 do
+    it "should show as not turned in when submission was auto created in speedgrader", priority: "1", test_id: 237025 do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
@@ -230,7 +232,7 @@ describe "submissions" do
       expect(f('.submit_assignment_link')).to include_text "Start Assignment"
     end
 
-    it "does not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
+    it "should not show as turned in or not turned in when assignment doesn't expect a submission", priority: "1", test_id: 237025 do
       # given
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
@@ -244,7 +246,7 @@ describe "submissions" do
       expect(f("#content")).not_to contain_css('.submit_assignment_link')
     end
 
-    it "shows not graded anonymously" do
+    it "should show not graded anonymously" do
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
       @assignment.grade_student(@student, grade: "0", grader: @teacher, graded_anonymously: false)
@@ -252,7 +254,7 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: no"
     end
 
-    it "shows graded anonymously" do
+    it "should show graded anonymously" do
       @teacher = User.create!
       @course.enroll_teacher(@teacher)
       @assignment.grade_student(@student, grade: "0", grader: @teacher, graded_anonymously: true)
@@ -260,7 +262,7 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Graded Anonymously: yes"
     end
 
-    it "does not allow blank submissions for text entry", priority: "1", test_id: 237026 do
+    it "should not allow blank submissions for text entry", priority: "1", test_id: 237026 do
       @assignment.update(:submission_types => "online_text_entry")
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
       f('.submit_assignment_link').click
@@ -280,7 +282,7 @@ describe "submissions" do
       expect(submission.reload.body).to eq "<p>#{body_text}</p>"
     end
 
-    it "does not allow a submission with only comments", priority: "1", test_id: 237027 do
+    it "should not allow a submission with only comments", priority: "1", test_id: 237027 do
       skip_if_safari(:alert)
       skip('flash alert is fragile, will be addressed in ADMIN-3015')
       @assignment.update(:submission_types => "online_text_entry")
@@ -302,7 +304,7 @@ describe "submissions" do
       driver.switch_to.default_content
     end
 
-    it "does not allow peer reviewers to see turnitin scores/reports", priority: "1", test_id: 237028 do
+    it "should not allow peer reviewers to see turnitin scores/reports", priority: "1", test_id: 237028 do
       @student1 = @user
       @assignment.submission_types = 'online_upload'
       @assignment.save!
@@ -327,16 +329,16 @@ describe "submissions" do
 
       asset = @submission.turnitin_assets.first.asset_string
       @submission.turnitin_data = {
-        "#{asset}" => {
-          :object_id => "123456",
-          :publication_overlap => 5,
-          :similarity_score => 100,
-          :state => "failure",
-          :status => "scored",
-          :student_overlap => 44,
-          :web_overlap => 100
-        },
-        :last_processed_attempt => 1
+          "#{asset}" => {
+              :object_id => "123456",
+              :publication_overlap => 5,
+              :similarity_score => 100,
+              :state => "failure",
+              :status => "scored",
+              :student_overlap => 44,
+              :web_overlap => 100
+          },
+          :last_processed_attempt => 1
       }
       @submission.turnitin_data_changed!
       @submission.save!
@@ -347,17 +349,18 @@ describe "submissions" do
       end
     end
 
+
     it "should submit an assignment and validate confirmation information", priority: "1", test_id: 237029
 
     context 'with Canvadocs enabled' do
       before(:once) do
         PluginSetting.create! name: 'canvadocs',
-                              settings: { "api_key" => "blahblahblahblahblah",
-                                          "base_url" => "http://example.com",
-                                          "disabled" => false }
+                              settings: {"api_key" => "blahblahblahblahblah",
+                                            "base_url" => "http://example.com",
+                                            "disabled" => false}
       end
 
-      it "shows preview link after submitting a canvadocable file type", priority: "1", test_id: 587302 do
+      it "should show preview link after submitting a canvadocable file type", priority: "1", test_id: 587302 do
         @assignment.submission_types = 'online_upload'
         @assignment.save!
 
@@ -386,7 +389,7 @@ describe "submissions" do
         driver.execute_script("$('.folder_item').addClass('folder_item_hover')")
       end
 
-      it "allows uploaded files to be used for submission", priority: "1", test_id: 237030 do
+      it "should allow uploaded files to be used for submission", priority: "1", test_id: 237030 do
         local_storage!
 
         add_file(fixture_file_upload('files/html-editing-test.html', 'text/html'),
@@ -411,7 +414,7 @@ describe "submissions" do
         expect(f('.details')).to include_text "html-editing-test.html"
       end
 
-      it "does not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
+      it "should not allow a user to submit a file-submission assignment from previously uploaded files with an illegal file extension", priority: "1", test_id: 237031 do
         skip_if_safari(:alert)
         FILENAME = "hello-world.sh"
         FIXTURE_FN = "files/#{FILENAME}"
@@ -432,7 +435,7 @@ describe "submissions" do
 
         # traverse the tree
         f('li[aria-label="My files"] button').click
-        f('li[aria-label="' + FILENAME + '"] button').click
+        f('li[aria-label="'+FILENAME+'"] button').click
 
         f('#submit_file_button').click
 
@@ -462,7 +465,7 @@ describe "submissions" do
         )
       end
 
-      it "loads submission lti tool on clicking tab" do
+      it "should load submission lti tool on clicking tab" do
         tool = create_submission_tool
         @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -474,7 +477,7 @@ describe "submissions" do
         expect(f("iframe[src^='/courses/#{@course.id}/external_tools/#{tool.id}/resource_selection?launch_type=homework_submission']")).to be_displayed
       end
 
-      it "loads submission lti tool on kb-nav to tab" do
+      it "should load submission lti tool on kb-nav to tab" do
         tool = create_submission_tool
         @assignment.update(submission_types: "online_upload")
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -485,7 +488,7 @@ describe "submissions" do
       end
     end
 
-    it "does not show course nav on submissions detail page in k5 subject" do
+    it "should not show course nav on submissions detail page in k5 subject" do
       toggle_k5_setting(@course.account)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}"
       expect(f("#back_to_subject")).to include_text "Back to Subject"
@@ -513,7 +516,7 @@ describe "submissions" do
       end
 
       it 'indicates as excused on the submission details page', priority: "1", test_id: 201937 do
-        get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
+         get "/courses/#{@course.id}/assignments/#{assignment.id}/submissions/#{@student.id}"
         expect(f("#content .submission_details .entered_grade")).to include_text 'Excused'
       end
     end
@@ -524,7 +527,7 @@ describe "submissions" do
       end
 
       before(:once) do
-        assignment.submit_homework(@student, { submission_type: 'online_text_entry' })
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 
@@ -537,7 +540,7 @@ describe "submissions" do
       end
 
       before(:once) do
-        assignment.submit_homework(@student, { submission_type: 'online_text_entry' })
+        assignment.submit_homework(@student, {submission_type: 'online_text_entry'})
         assignment.grade_student @student, excuse: true, grader: @teacher
       end
 

@@ -29,11 +29,13 @@ describe 'taking a quiz one question at a time' do
   end
 
   context 'as a student' do
+
     before(:each) do
       user_session(@student)
     end
 
     context 'when the \'Lock Questions after Answering\' setting is off' do
+
       before(:each) do
         @quiz.update_attribute(:cant_go_back, false)
         begin_quiz
@@ -66,6 +68,7 @@ describe 'taking a quiz one question at a time' do
     end
 
     context 'when the \'Lock Questions after Answering\' setting is on' do
+
       before(:each) do
         @quiz.update_attribute(:cant_go_back, true)
         take_the_quiz
@@ -114,11 +117,13 @@ describe 'taking a quiz one question at a time' do
   end
 
   context 'as a teacher' do
+
     before(:each) do
       user_session(@teacher)
     end
 
     context 'when the \'Lock Questions after Answering\' setting is off' do
+
       before(:each) do
         @quiz.update_attribute(:cant_go_back, false)
         preview_the_quiz
@@ -138,6 +143,7 @@ describe 'taking a quiz one question at a time' do
     end
 
     context 'when the \'Lock Questions after Answering\' setting is on' do
+
       before(:each) do
         @quiz.update_attribute(:cant_go_back, true)
         preview_the_quiz

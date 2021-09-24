@@ -42,7 +42,6 @@ Rails.application.config.after_initialize do
 
       def settings
         return {} unless self.class.columns_hash.key?('settings')
-
         s = super
         if s.nil?
           self.settings = s = {}
@@ -125,7 +124,6 @@ Rails.application.config.after_initialize do
       # either way there's only one shard, and we always want to see it
       return [default] unless default.is_a?(Switchman::Shard)
       return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-
       in_region(ApplicationController.region)
     end
   end
@@ -156,7 +154,7 @@ Rails.application.config.after_initialize do
         start_day.send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
       end + relevant_weeks.map do |ordinal|
         (start_day + 1.month).send("#{ordinal}_#{maintenance_window_weekday}_in_month".downcase)
-      end
+      end 
 
       next_day = maintenance_days.find { |d| d.future? }
       # Time offsets are strange
@@ -201,7 +199,6 @@ Rails.application.config.after_initialize do
       all.each do |db|
         next if (regions.include?(db.config[:region]) || !db.config[:region])
         next if db.shards.empty?
-
         regions << db.config[:region]
         db.shards.first.activate do
           klass.delay(**enqueue_args).__send__(method, *args)
@@ -222,7 +219,6 @@ Rails.application.config.after_initialize do
       end
 
       raise "Could not find a shard in region #{region}" unless shard
-
       shard.activate do
         klass.delay(**enqueue_args).__send__(method, *args)
       end

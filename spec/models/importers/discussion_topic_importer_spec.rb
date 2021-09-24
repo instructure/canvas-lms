@@ -23,9 +23,10 @@ require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 require 'nokogiri'
 
 describe Importers::DiscussionTopicImporter do
+
   SYSTEMS.each do |system|
     if import_data_exists? system, 'discussion_topic'
-      it "imports topics for #{system}" do
+      it "should import topics for #{system}" do
         data = get_import_data(system, 'discussion_topic')
         data = data.first
         data = data.with_indifferent_access
@@ -53,15 +54,15 @@ describe Importers::DiscussionTopicImporter do
           expect(topic.assignment.points_possible).to eq data[:grading][:points_possible].to_f
           expect(topic.assignment.submission_types).to eq 'discussion_topic'
         end
+
       end
     end
   end
 
-  describe "Importing announcements" do # rubocop:disable RSpec/EmptyExampleGroup
-    # RuboCop can't detect the examples that are dynamically defined
+  describe "Importing announcements" do
     SYSTEMS.each do |system|
       if import_data_exists? system, 'announcements'
-        it "imports assignments for #{system}" do
+        it "should import assignments for #{system}" do
           data = get_import_data(system, 'announcements')
           context = get_import_context(system)
           migration = context.content_migrations.create!
@@ -82,7 +83,7 @@ describe Importers::DiscussionTopicImporter do
     end
   end
 
-  it "does not attach files when no attachment_migration_id is specified" do
+  it "should not attach files when no attachment_migration_id is specified" do
     data = get_import_data('bb8', 'discussion_topic').first.with_indifferent_access
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
@@ -90,7 +91,7 @@ describe Importers::DiscussionTopicImporter do
     data[:attachment_migration_id] = nil
     attachment_model(:context => context) # create a file with no migration id
 
-    data[:topics_to_import] = { data[:migration_id] => true }
+    data[:topics_to_import] = {data[:migration_id] => true}
     Importers::DiscussionTopicImporter.import_from_migration(data, context, migration)
 
     topic = DiscussionTopic.where(migration_id: data[:migration_id]).first

@@ -250,15 +250,14 @@ export function createMediaServerSession() {
 export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
   return (_dispatch, getState) => {
     const {source, jwt, host, contextId, contextType} = getState()
-    const {onDuplicate} = uploadSettings
-
     const svgAsFile = new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'})
     const fileMetaProps = {
       file: {
         name: svg.name,
         type: 'image/svg+xml'
       },
-      name: svg.name
+      name: svg.name,
+      onDuplicate: uploadSettings.onDuplicate
     }
 
     return source
@@ -266,7 +265,7 @@ export function uploadToButtonsAndIconsFolder(svg, uploadSettings = {}) {
       .then(({folders}) => {
         fileMetaProps.parentFolderId = folders[0].id
         return source
-          .preflightUpload(fileMetaProps, {host, contextId, contextType, onDuplicate})
+          .preflightUpload(fileMetaProps, {host, contextId, contextType})
           .then(results => {
             return source.uploadFRD(svgAsFile, results)
           })

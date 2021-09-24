@@ -27,11 +27,11 @@ describe BigBlueButtonConference do
   context "big_blue_button" do
     before do
       allow(WebConference).to receive(:plugins).and_return([
-                                                             web_conference_plugin_mock("big_blue_button", {
-                                                                                          :domain => "bbb.instructure.com",
-                                                                                          :secret_dec => "secret",
-                                                                                        })
-                                                           ])
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+        })
+      ])
       @course = course_factory
       user_with_communication_channel
       @course.enroll_teacher(@user).accept
@@ -42,21 +42,21 @@ describe BigBlueButtonConference do
       )
     end
 
-    it "correctlies retrieve a config hash" do
+    it "should correctly retrieve a config hash" do
       config = @conference.config
       expect(config).not_to be_nil
       expect(config[:conference_type]).to eql('BigBlueButton')
       expect(config[:class_name]).to eql('BigBlueButtonConference')
     end
 
-    it "correctlies generate join urls" do
+    it "should correctly generate join urls" do
       expect(@conference.config).not_to be_nil
       # set some vars so it thinks it's been created and doesn't do an api call
       @conference.conference_key = 'test'
       @conference.settings[:admin_key] = 'admin'
       @conference.settings[:user_key] = 'user'
       @conference.save
-      params = { :fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id }
+      params = {:fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id}
       admin_params = params.merge(:password => 'admin').to_query
       user_params = params.merge(:password => 'user').to_query
       expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" +
@@ -65,12 +65,12 @@ describe BigBlueButtonConference do
         Digest::SHA1.hexdigest("join#{user_params}secret"))
     end
 
-    it "confirms valid config" do
+    it "should confirm valid config" do
       expect(BigBlueButtonConference.new).to be_valid_config
       expect(BigBlueButtonConference.new(:conference_type => "BigBlueButton")).to be_valid_config
     end
 
-    it "recreates the conference" do
+    it "should recreate the conference" do
       expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
       # load a new instance to clear out @conference_active
@@ -79,18 +79,18 @@ describe BigBlueButtonConference do
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
-    it "does not recreate the conference if it is active" do
+    it "should not recreate the conference if it is active" do
       expect(@conference).to receive(:send_request).once.with(:create, anything).and_return(true)
       @conference.initiate_conference
       expect(@conference).to be_active
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
-    it "has a well formed user string as for recording_user_ready" do
+    it "should have a well formed user string as for recording_user_ready" do
       expect(@conference.recording_ready_user).to eq "#{@user['name']} <#{@user.email}>"
     end
 
-    it "has a well formed user string as for recording_user_ready in a group context" do
+    it "should have a well formed user string as for recording_user_ready in a group context" do
       group1 = @course.groups.create!(:name => "group 1")
       group_conference = BigBlueButtonConference.create!(
         :title => "my group conference",
@@ -100,6 +100,7 @@ describe BigBlueButtonConference do
       expect(group_conference.recording_ready_user).to eq "#{@user['name']} <#{@user.email}>"
     end
 
+
     it "return nil if a request times out" do
       allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
       expect(@conference.initiate_conference).to be_nil
@@ -107,18 +108,18 @@ describe BigBlueButtonConference do
   end
 
   describe 'plugin setting recording_enabled is enabled' do
-    let(:get_recordings_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json')) }
-    let(:get_recordings_bulk_fixture) { File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_bulk.json')) }
+    let(:get_recordings_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_two.json'))}
+    let(:get_recordings_bulk_fixture){File.read(Rails.root.join('spec', 'fixtures', 'files', 'conferences', 'big_blue_button_get_recordings_bulk.json'))}
 
     before do
       allow(WebConference).to receive(:plugins).and_return([
-                                                             web_conference_plugin_mock("big_blue_button", {
-                                                                                          :domain => "bbb.instructure.com",
-                                                                                          :secret_dec => "secret",
-                                                                                          :recording_enabled => true,
-                                                                                          :use_fallback => true,
-                                                                                        })
-                                                           ])
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+          :recording_enabled => true,
+          :use_fallback => true,
+        })
+      ])
       @bbb = BigBlueButtonConference.new
       @bbb.user_settings = { :record => true }
       @bbb.user = user_factory
@@ -126,49 +127,49 @@ describe BigBlueButtonConference do
       @bbb.save!
     end
 
-    it "has visible record user_setting" do
+    it "should have visible record user_setting" do
       expect(BigBlueButtonConference.user_setting_fields[:record][:visible].call).to be_truthy
     end
 
-    it "sends record flag if record user_setting is set" do
+    it "should send record flag if record user_setting is set" do
       expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "true"))
       @bbb.initiate_conference
     end
 
-    it "does not send record flag if record user setting is unset" do
+    it "should not send record flag if record user setting is unset" do
       @bbb.user_settings = { :record => false }
       @bbb.save!
       expect(@bbb).to receive(:send_request).with(:create, hash_including(record: "false"))
       @bbb.initiate_conference
     end
 
-    it "properly serializes a response with no recordings" do
+    it "should properly serialize a response with no recordings" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
-      response = { returncode: 'SUCCESS', recordings: "\n  ",
-                   messageKey: 'noRecordings', message: 'There are no recordings for the meeting(s).' }
+      response = {returncode: 'SUCCESS', recordings: "\n  ",
+                  messageKey: 'noRecordings', message: 'There are no recordings for the meeting(s).'}
       allow(@bbb).to receive(:send_request).and_return(response)
       expect(@bbb.recordings).to eq []
     end
 
-    it "properly serializes a response with recordings" do
+    it "should properly serialize a response with recordings" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
-      response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
       allow(@bbb).to receive(:send_request).and_return(response)
       expect(@bbb.recordings).not_to eq []
     end
 
-    it "does not have duration_minutes set to 0" do
+    it "should not have duration_minutes set to 0" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
-      response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
       allow(@bbb).to receive(:send_request).and_return(response)
       @bbb.recordings.each do |recording|
         expect(recording[:duration_minutes]).not_to eq(0)
       end
     end
 
-    it "includes whether to show to students (and be true for everything but statistics)" do
+    it "should include whether to show to students (and be true for everything but statistics)" do
       allow(@bbb).to receive(:conference_key).and_return('12345')
-      response = JSON.parse(get_recordings_fixture, { symbolize_names: true })
+      response = JSON.parse(get_recordings_fixture, {symbolize_names: true})
       allow(@bbb).to receive(:send_request).and_return(response)
       @bbb.recordings.each do |recording|
         recording[:playback_formats].each do |format|
@@ -220,35 +221,35 @@ describe BigBlueButtonConference do
 
       it "doesn't delete the recording if record_id is not found" do
         recording_id = ''
-        allow(@bbb).to receive(:send_request).and_return({ :returncode => "SUCCESS", :deleted => "false" })
+        allow(@bbb).to receive(:send_request).and_return({:returncode=>"SUCCESS", :deleted=>"false"})
         response = @bbb.delete_recording(recording_id)
         expect(response[:deleted]).to eq false
       end
 
       it "does delete the recording if record_id is found" do
         recording_id = 'abc123-xyz'
-        allow(@bbb).to receive(:send_request).and_return({ :returncode => "SUCCESS", :deleted => "true" })
+        allow(@bbb).to receive(:send_request).and_return({:returncode=>"SUCCESS", :deleted=>"true"})
         response = @bbb.delete_recording(recording_id)
         expect(response[:deleted]).to eq true
       end
     end
 
     describe "recording preloading" do
-      it "loads up all recordings in a single api call" do
+      it "should load up all recordings in a single api call" do
         @bbb2 = BigBlueButtonConference.create!(:context => @bbb.context, :user => @bbb.user, :user_settings => @bbb.user_settings)
         allow(@bbb).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey1')
         allow(@bbb2).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey2')
 
-        response = JSON.parse(get_recordings_bulk_fixture, { symbolize_names: true })
+        response = JSON.parse(get_recordings_bulk_fixture, {symbolize_names: true})
         allow(BigBlueButtonConference).to receive(:send_request).and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
-        [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        [@bbb, @bbb2].each{|c| expect(c).to_not receive(:send_request)} # shouldn't need to send individual requests anymore
+        expect(@bbb.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
       end
 
-      it "makes a separate api call for old conferences" do
+      it "should make a separate api call for old conferences" do
         old_config = {
           :domain => "bbb_old.instructure.com",
           :secret_dec => "old_secret",
@@ -260,28 +261,28 @@ describe BigBlueButtonConference do
         allow(@bbb).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey1')
         allow(@bbb2).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey2')
 
-        response = JSON.parse(get_recordings_bulk_fixture, { symbolize_names: true })
-        expect(BigBlueButtonConference).to receive(:send_request)
-          .with(:getRecordings, { :meetingID => 'instructure_web_conference_somemeetingkey1' }, use_fallback_config: true)
-          .and_return(response)
-        expect(BigBlueButtonConference).to receive(:send_request)
-          .with(:getRecordings, { :meetingID => 'instructure_web_conference_somemeetingkey2' }, use_fallback_config: false)
-          .and_return(response)
+        response = JSON.parse(get_recordings_bulk_fixture, {symbolize_names: true})
+        expect(BigBlueButtonConference).to receive(:send_request).
+          with(:getRecordings, {:meetingID => 'instructure_web_conference_somemeetingkey1'}, use_fallback_config: true).
+          and_return(response)
+        expect(BigBlueButtonConference).to receive(:send_request).
+          with(:getRecordings, {:meetingID => 'instructure_web_conference_somemeetingkey2'}, use_fallback_config: false).
+          and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
-        [@bbb, @bbb2].each { |c| expect(c).to_not receive(:send_request) } # shouldn't need to send individual requests anymore
-        expect(@bbb.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        [@bbb, @bbb2].each{|c| expect(c).to_not receive(:send_request)} # shouldn't need to send individual requests anymore
+        expect(@bbb.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting1a", "somerecordingidformeeting1b"])
+        expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
       end
 
-      it "does not make a call for conferences without keys" do
+      it "should not make a call for conferences without keys" do
         allow(@bbb).to receive(:conference_key).and_return(nil)
         expect(BigBlueButtonConference).to receive(:send_request).never
 
         BigBlueButtonConference.preload_recordings([@bbb])
       end
 
-      it "makes not make an empty call when preloading for old conferences" do
+      it "should make not make an empty call when preloading for old conferences" do
         old_config = {
           :domain => "bbb_old.instructure.com",
           :secret_dec => "old_secret",
@@ -293,15 +294,15 @@ describe BigBlueButtonConference do
         allow(@bbb).to receive(:conference_key).and_return(nil)
         allow(@bbb2).to receive(:conference_key).and_return('instructure_web_conference_somemeetingkey2')
 
-        response = JSON.parse(get_recordings_bulk_fixture, { symbolize_names: true })
+        response = JSON.parse(get_recordings_bulk_fixture, {symbolize_names: true})
         # don't make an empty call for the old fallback config because the conference didn't have a key
-        expect(BigBlueButtonConference).to receive(:send_request)
-          .with(:getRecordings, { :meetingID => 'instructure_web_conference_somemeetingkey2' }, use_fallback_config: false)
-          .and_return(response)
+        expect(BigBlueButtonConference).to receive(:send_request).
+          with(:getRecordings, {:meetingID => 'instructure_web_conference_somemeetingkey2'}, use_fallback_config: false).
+          and_return(response)
 
         BigBlueButtonConference.preload_recordings([@bbb, @bbb2])
         expect(@bbb2).to_not receive(:send_request)
-        expect(@bbb2.recordings.map { |r| r[:recording_id] }).to match_array(["somerecordingidformeeting2"])
+        expect(@bbb2.recordings.map{|r| r[:recording_id]}).to match_array(["somerecordingidformeeting2"])
       end
     end
   end
@@ -309,19 +310,19 @@ describe BigBlueButtonConference do
   describe 'plugin setting recording disabled' do
     before do
       allow(WebConference).to receive(:plugins).and_return([
-                                                             web_conference_plugin_mock("big_blue_button", {
-                                                                                          :domain => "bbb.instructure.com",
-                                                                                          :secret_dec => "secret",
-                                                                                          :recording_enabled => false,
-                                                                                        })
-                                                           ])
+        web_conference_plugin_mock("big_blue_button", {
+          :domain => "bbb.instructure.com",
+          :secret_dec => "secret",
+          :recording_enabled => false,
+        })
+      ])
     end
 
-    it "has invisible record user_setting" do
+    it "should have invisible record user_setting" do
       expect(BigBlueButtonConference.user_setting_fields[:record][:visible].call).to be_falsey
     end
 
-    it "does not send record flag even if record user_setting is set" do
+    it "should not send record flag even if record user_setting is set" do
       bbb = BigBlueButtonConference.new
       bbb.user_settings = { :record => true }
       bbb.user = user_factory
@@ -350,51 +351,51 @@ describe BigBlueButtonConference do
       allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(old_config)
 
       allow(WebConference).to receive(:plugins).and_return([
-                                                             web_conference_plugin_mock("big_blue_button", bbb_config)
-                                                           ])
+        web_conference_plugin_mock("big_blue_button", bbb_config)
+      ])
     end
 
-    it "saves the domain for the current config when initiating the conference" do
+    it "should save the domain for the current config when initiating the conference" do
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything) # should initiate on the current config
       bbb.initiate_conference
       expect(bbb.settings[:domain]).to eq "bbb_new.instructure.com"
     end
 
-    it "generates a url with the current config if the saved domain matches" do
+    it "should generate a url with the current config if the saved domain matches" do
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       bbb.settings[:domain] = "bbb_new.instructure.com"
       expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
-      bbb.send(:send_request, :action, { :query => 1 })
+      bbb.send(:send_request, :action, {:query => 1})
     end
 
-    it "generates a url with the fallback config if the saved domain doesn't match" do
+    it "should generate a url with the fallback config if the saved domain doesn't match" do
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       bbb.settings[:domain] = "bbb_old.instructure.com"
       expect(CanvasHttp).to receive(:get).with(/bbb_old\.instructure\.com/, anything)
-      bbb.send(:send_request, :action, { :query => 1 })
+      bbb.send(:send_request, :action, {:query => 1})
     end
 
-    it "generates a url with the fallback config if the saved domain wasn't set (i.e. old data)" do
+    it "should generate a url with the fallback config if the saved domain wasn't set (i.e. old data)" do
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       expect(CanvasHttp).to receive(:get).with(/bbb_old\.instructure\.com/, anything)
-      bbb.send(:send_request, :action, { :query => 1 })
+      bbb.send(:send_request, :action, {:query => 1})
     end
 
-    it "generates a url with the current config if fallback is disabled" do
+    it "should generate a url with the current config if fallback is disabled" do
       allow(WebConference).to receive(:plugins).and_return([
-                                                             web_conference_plugin_mock("big_blue_button", bbb_config.merge(:use_fallback => false))
-                                                           ])
+        web_conference_plugin_mock("big_blue_button", bbb_config.merge(:use_fallback => false))
+      ])
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
-      bbb.send(:send_request, :action, { :query => 1 })
+      bbb.send(:send_request, :action, {:query => 1})
     end
 
-    it "generates a url with the current config if the saved domain wasn't set but there is no fallback configured" do
+    it "should generate a url with the current config if the saved domain wasn't set but there is no fallback configured" do
       allow(Canvas::Plugin.find(:big_blue_button_fallback)).to receive(:settings).and_return(nil)
       bbb = BigBlueButtonConference.create!(:user => user_factory, :context => course_factory)
       expect(CanvasHttp).to receive(:get).with(/bbb_new\.instructure\.com/, anything)
-      bbb.send(:send_request, :action, { :query => 1 })
+      bbb.send(:send_request, :action, {:query => 1})
     end
   end
 end

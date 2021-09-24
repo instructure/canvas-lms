@@ -20,6 +20,7 @@
 
 # Public: Delete old (> 360 days) records from messages table.
 class MessageScrubber
+
   # Public: The minimum wait time in seconds between processing batches.
   MIN_DELAY = 1
 

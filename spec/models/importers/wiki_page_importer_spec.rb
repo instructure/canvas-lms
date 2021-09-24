@@ -21,9 +21,10 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing wikis" do
+
   SYSTEMS.each do |system|
     if import_data_exists? system, 'wiki'
-      it "imports for #{system}" do
+      it "should import for #{system}" do
         data = get_import_data(system, 'wiki')
         context = get_import_context(system)
         migration = context.content_migrations.create!
@@ -38,7 +39,7 @@ describe "Importing wikis" do
     end
   end
 
-  it "updates BB9 wiki page links to the correct url" do
+  it "should update BB9 wiki page links to the correct url" do
     data = get_import_data('bb9', 'wikis')
     context = get_import_context('bb9')
     migration = context.content_migrations.create!
@@ -58,7 +59,7 @@ describe "Importing wikis" do
     expect(wiki.body =~ /\/courses\/\d+\/pages\/course-glossary-n-o-p-q-r/).not_to be_nil
   end
 
-  it 'resurrects deleted pages' do
+  it 'should resurrect deleted pages' do
     data = get_import_data('bb9', 'wiki')
     context = get_import_context('bb9')
     migration = context.content_migrations.create!

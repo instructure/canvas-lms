@@ -26,7 +26,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CloseButton} from '@instructure/ui-buttons'
 import {
   CREATE_DISCUSSION_ENTRY,
-  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_ENTRY,
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY
@@ -208,32 +207,6 @@ export const IsolatedViewContainer = props => {
     })
   }
 
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    }
-  })
-
-  const findDraftMessage = rootId => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (
-        draftEntry.rootEntryId &&
-        draftEntry.rootEntryId === rootId &&
-        !draftEntry.discussionEntryId
-      ) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
-  }
-
   const isolatedEntryOlderDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
     variables: {
       discussionEntryID: props.discussionEntryId,
@@ -405,19 +378,6 @@ export const IsolatedViewContainer = props => {
                     .nodes,
                   props.replyFromId
                 )}
-                value={findDraftMessage(
-                  isolatedEntryOlderDirection.data.legacyNode.root_entry_id ||
-                    isolatedEntryOlderDirection.data.legacyNode._id
-                )}
-                updateDraft={newDraftMessage => {
-                  createDiscussionEntryDraft({
-                    variables: {
-                      discussionTopicId: props.discussionTopic._id,
-                      message: newDraftMessage,
-                      parentId: props.replyFromId
-                    }
-                  })
-                }}
               />
             </View>
           )}
@@ -455,7 +415,6 @@ export const IsolatedViewContainer = props => {
               }
               fetchingMoreOlderReplies={fetchingMoreOlderReplies}
               fetchingMoreNewerReplies={fetchingMoreNewerReplies}
-              updateDraftCache={props.updateDraftCache}
             />
           </View>
         )}
@@ -525,8 +484,7 @@ IsolatedViewContainer.propTypes = {
   highlightEntryId: PropTypes.string,
   replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
-  relativeEntryId: PropTypes.string,
-  updateDraftCache: PropTypes.func
+  relativeEntryId: PropTypes.string
 }
 
 export default IsolatedViewContainer

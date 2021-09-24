@@ -26,7 +26,7 @@ describe "Importers::QuizImporter" do
     @migration = @course.content_migrations.create!
   end
 
-  it "gets the quiz properties" do
+  it "should get the quiz properties" do
     context = course_model
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -46,7 +46,7 @@ describe "Importers::QuizImporter" do
       allow(@migration).to receive(:quizzes_next_migration?).and_return(true)
     end
 
-    it "does not set the description field for the classic quiz" do
+    it "should not set the description field for the classic quiz" do
       context = course_model
       question_data = import_example_questions context
       data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -57,7 +57,8 @@ describe "Importers::QuizImporter" do
     end
   end
 
-  it "completes a quiz question reference" do
+
+  it "should complete a quiz question reference" do
     context = course_model
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -68,7 +69,7 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_questions.active.first.question_data[:question_name]).to eq "Rocket Bee!"
   end
 
-  it "imports a text only question" do
+  it "should import a text only question" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
@@ -81,7 +82,7 @@ describe "Importers::QuizImporter" do
     expect(sorted_questions.first.question_data[:question_type]).to eq 'text_only_question'
   end
 
-  it "imports a question group" do
+  it "should import a question group" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'group_quiz_data'
@@ -93,7 +94,7 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_groups.first.question_points).to eq data[:questions].first[:question_points]
   end
 
-  it "is practice if it's not for an assignment" do
+  it "should be practice if it's not for an assignment" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'text_only_quiz_data'
@@ -105,11 +106,11 @@ describe "Importers::QuizImporter" do
     expect(quiz.assignment).to be_nil
   end
 
-  it "does not build an assignment, instead set to unpublished for canvas imports" do
+  it "should not build an assignment, instead set to unpublished for canvas imports" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    data = { 'assessments' => { 'assessments' => [quiz_hash] } }
+    data = {'assessments' => {'assessments' => [quiz_hash]}}
     migration = context.content_migrations.create!
     allow(migration).to receive(:canvas_import?).and_return(true)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
@@ -122,11 +123,11 @@ describe "Importers::QuizImporter" do
     expect(quiz.assignment).to be_nil
   end
 
-  it "builds an assignment for non-canvas imports" do
+  it "should build an assignment for non-canvas imports" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
-    data = { 'assessments' => { 'assessments' => [quiz_hash] } }
+    data = {'assessments' => {'assessments' => [quiz_hash]}}
     migration = context.content_migrations.create!
     allow(migration).to receive(:canvas_import?).and_return(false)
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
@@ -139,14 +140,14 @@ describe "Importers::QuizImporter" do
     expect(quiz.assignment).to_not be_nil
   end
 
-  it "does not create an extra assignment if it already references one (but not set unpublished)" do
+  it "should not create an extra assignment if it already references one (but not set unpublished)" do
     context = get_import_context
 
     quiz_hash = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
     assignment_hash = get_import_data 'vista', 'assignment'
     quiz_hash['assignment_migration_id'] = assignment_hash['migration_id']
 
-    data = { 'assessments' => { 'assessments' => [quiz_hash] }, 'assignments' => [assignment_hash] }
+    data = {'assessments' => {'assessments' => [quiz_hash]}, 'assignments' => [assignment_hash]}
 
     migration = context.content_migrations.create!
     Importers::CourseContentImporter.import_content(context, data, @migration, migration)
@@ -160,7 +161,7 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_type).to eq 'assignment'
   end
 
-  it "converts relative file references to course-relative file references" do
+  it "should convert relative file references to course-relative file references" do
     context = @course
     import_example_questions context
     @migration.resolve_content_links!
@@ -171,7 +172,7 @@ describe "Importers::QuizImporter" do
     expect(question.data[:answers].last[:html]).to eq "Chance can't; this is a big problem for evolution. BTW, rockets are cool: <img src=\"/courses/#{context.id}/file_contents/course%20files/rocket.png\">"
   end
 
-  it "updates quiz question on re-import" do
+  it "should update quiz question on re-import" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -186,7 +187,7 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_questions.active.first.question_data[:question_name]).to eq "Not Rocket Bee?"
   end
 
-  it "updates quiz question on re-import even if the associated quiz is published" do
+  it "should update quiz question on re-import even if the associated quiz is published" do
     context = get_import_context
     question_data = import_example_questions context
     data = get_import_data ['vista', 'quiz'], 'simple_quiz_data'
@@ -203,7 +204,7 @@ describe "Importers::QuizImporter" do
     expect(quiz.quiz_data).to_not include(hash_including("question_name" => "Rocket Bee!"))
   end
 
-  it "does not clear dates if these are null in the source hash" do
+  it "should not clear dates if these are null in the source hash" do
     course_model
     quiz_hash = {
       "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",

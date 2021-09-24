@@ -45,35 +45,35 @@ shared_examples_for "a message" do
 
   context ".email" do
     let(:path_type) { :email }
-    it "renders" do
+    it "should render" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
   end
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "renders" do
+    it "should render" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
   end
 
   context ".summary" do
     let(:path_type) { :summary }
-    it "renders" do
+    it "should render" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
   end
 
   context ".twitter" do
     let(:path_type) { :twitter }
-    it "renders" do
+    it "should render" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
   end
 
   context ".push" do
     let(:path_type) { :push }
-    it "renders" do
+    it "should render" do
       generate_message(notification_name, path_type, asset, message_data_with_default)
     end
   end

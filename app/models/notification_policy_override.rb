@@ -19,6 +19,7 @@
 #
 
 class NotificationPolicyOverride < ActiveRecord::Base
+
   # NotificationPolicyOverride(id: integer,
   #                            context_id: integer,
   #                            context_type: string,

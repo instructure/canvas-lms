@@ -25,6 +25,7 @@ describe "blueprint courses - file locking" do
   include_context "blueprint courses files context"
 
   context "In the associated course" do
+
     before :once do
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -45,8 +46,8 @@ describe "blueprint courses - file locking" do
       user_session(@teacher)
     end
 
-    it "does not show the manageable cog-menu options when a file is locked" do
-      @tag.update(restrictions: { :all => true })
+    it "should not show the manageable cog-menu options when a file is locked" do
+      @tag.update(restrictions: {:all => true})
 
       get "/courses/#{@copy_to.id}/files"
 
@@ -57,13 +58,14 @@ describe "blueprint courses - file locking" do
 
       options_button.click
       expect(options_panel).not_to include_text("Delete")
+
     end
 
-    it "does not show the manageable cog-menu options when a folder contains a locked file" do
+    it "should not show the manageable cog-menu options when a folder contains a locked file" do
       subfolder = Folder.root_folders(@copy_to).first.sub_folders.create!(:name => "subfolder", :context => @copy_to)
       @file_copy.folder = subfolder
       @file_copy.save!
-      @tag.update(restrictions: { :all => true })
+      @tag.update(restrictions: {:all => true})
 
       get "/courses/#{@copy_to.id}/files"
 
@@ -77,7 +79,7 @@ describe "blueprint courses - file locking" do
       expect(options_panel).not_to include_text("Delete")
     end
 
-    it "shows the manageable cog-menu options when a file is unlocked" do
+    it "should show the manageable cog-menu options when a file is unlocked" do
       get "/courses/#{@copy_to.id}/files"
 
       expect(lock_icon_container).to contain_css('.icon-blueprint')
@@ -89,7 +91,7 @@ describe "blueprint courses - file locking" do
       expect(options_panel).to include_text("Delete")
     end
 
-    it "shows the manageable cog-menu options when a folder contains an unlocked file" do
+    it "should show the manageable cog-menu options when a folder contains an unlocked file" do
       subfolder = Folder.root_folders(@copy_to).first.sub_folders.create!(:name => "subfolder", :context => @copy_to)
       @file_copy.folder = subfolder
       @file_copy.save!
@@ -104,6 +106,7 @@ describe "blueprint courses - file locking" do
   end
 
   context "in the blueprint course" do
+
     before :once do
       @copy_from = course_factory(:active_all => true)
       @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -111,14 +114,15 @@ describe "blueprint courses - file locking" do
       @original_file = Attachment.create!(:filename => @filename, :uploaded_data => StringIO.new('1'),
                                           :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       @tag = @template.create_content_tag_for!(@original_file)
+
     end
 
     before :each do
       user_session(@teacher)
     end
 
-    it "shows the manageable cog-menu options when a file is locked" do
-      @tag.update(restrictions: { :all => true })
+    it "should show the manageable cog-menu options when a file is locked" do
+      @tag.update(restrictions: {:all => true})
 
       get "/courses/#{@copy_from.id}/files"
 
@@ -135,11 +139,11 @@ describe "blueprint courses - file locking" do
       expect(options_text).to include_text("Delete")
     end
 
-    it "shows the manageable cog-menu options when a folder contains a locked file" do
+    it "should show the manageable cog-menu options when a folder contains a locked file" do
       subfolder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "subfolder", :context => @copy_from)
       @original_file.folder = subfolder
       @original_file.save!
-      @tag.update(restrictions: { :all => true })
+      @tag.update(restrictions: {:all => true})
 
       get "/courses/#{@copy_from.id}/files"
 
@@ -157,7 +161,7 @@ describe "blueprint courses - file locking" do
       expect(options_text).to include_text("Delete")
     end
 
-    it "shows the manageable cog-menu options when a file is unlocked" do
+    it "should show the manageable cog-menu options when a file is unlocked" do
       get "/courses/#{@copy_from.id}/files"
 
       expect(lock_icon_container).to contain_css('.icon-blueprint')
@@ -173,7 +177,7 @@ describe "blueprint courses - file locking" do
       expect(options_text).to include_text("Delete")
     end
 
-    it "shows the manageable cog-menu options when a folder contains an unlocked file" do
+    it "should show the manageable cog-menu options when a folder contains an unlocked file" do
       subfolder = Folder.root_folders(@copy_from).first.sub_folders.create!(:name => "subfolder", :context => @copy_from)
       @original_file.folder = subfolder
       @original_file.save!
@@ -186,5 +190,6 @@ describe "blueprint courses - file locking" do
       expect(options_text).to include_text("Move")
       expect(options_text).to include_text("Delete")
     end
+
   end
 end

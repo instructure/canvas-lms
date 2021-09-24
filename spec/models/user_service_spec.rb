@@ -22,32 +22,33 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe UserService do
+
   before :once do
     user_service_model
   end
 
-  it "has a useful workflow" do
+  it "should have a useful workflow" do
     expect(@user_service.state).to eql(:active)
     @user_service.failed_request
     expect(@user_service.state).to eql(:failed)
   end
 
-  it "has a named scope for type" do
+  it "should have a named scope for type" do
     @user_service.type = 'BookmarkService'
     @user_service.save!
     expect(UserService.of_type('BookmarkService').first.id).to eql(@user_service.id)
   end
 
-  it "has a named scope for service" do
+  it "should have a named scope for service" do
     expect(UserService.for_service(@user_service)).to eq [@user_service]
     expect(UserService.for_service(@user_service.service)).to eq [@user_service]
   end
 
-  it "has a service_name" do
+  it "should have a service_name" do
     expect(@user_service.service_name).to eql('Value For Service')
   end
 
-  it "is able to crypt a password" do
+  it "should be able to crypt a password" do
     expect(@user_service.crypted_password).to be_nil
     @user_service.password = 'password'
     expect(@user_service.crypted_password).not_to be_nil
@@ -57,7 +58,7 @@ describe UserService do
   context "registration" do
     specs_require_sharding
 
-    it "is able to register a UserService, defaulting to a GoogleDocs service" do
+    it "should be able to register a UserService, defaulting to a GoogleDocs service" do
       @registration = UserService.register(
         :user => user_model,
         :token => 'some token',
@@ -76,7 +77,7 @@ describe UserService do
       expect(@registration.type).to eql('DocumentService')
     end
 
-    it "is able to register a delicious service" do
+    it "should be able to register a delicious service" do
       params = {}
       params[:service] = 'delicious'
       params[:user_name] = 'some username'
@@ -91,7 +92,7 @@ describe UserService do
       expect(us.decrypted_password).to eql('password')
     end
 
-    it "is able to register a diigo service" do
+    it "should be able to register a diigo service" do
       params = {}
       params[:service] = 'diigo'
       params[:user_name] = 'some username'
@@ -106,7 +107,7 @@ describe UserService do
       expect(us.decrypted_password).to eql('password')
     end
 
-    it 'allows user services to be setup cross shard' do
+    it 'Should allow user services to be setup cross shard' do
       user = User.new
       @shard1.activate { user.save! }
       @shard2.activate do
@@ -130,36 +131,36 @@ describe UserService do
       end
     end
 
-    it "is not able to register an unknown service type" do
+    it "should not be able to register an unknown service type" do
       params = {}
       params[:service] = 'some crazy service'
       params[:user_name] = 'some username'
       params[:password] = 'password'
 
-      expect { UserService.register_from_params(user_model, params) }.to raise_error("Unknown Service Type")
+      expect{UserService.register_from_params(user_model, params)}.to raise_error("Unknown Service Type")
     end
   end
 
   context "service type disambiguation" do
-    it "knows that google_drive means 'DocumentService" do
+    it "should know that google_drive means 'DocumentService" do
       expect(UserService.service_type('google_drive')).to eql('DocumentService')
     end
 
-    it "knows that diigo means BookmarkService" do
+    it "should know that diigo means BookmarkService" do
       expect(UserService.service_type('diigo')).to eql('BookmarkService')
     end
 
-    it "knows that delicious means BookmarkService" do
+    it "should know that delicious means BookmarkService" do
       expect(UserService.service_type('delicious')).to eql('BookmarkService')
     end
 
-    it "uses other things as a generic UserService" do
+    it "should use other things as a generic UserService" do
       expect(UserService.service_type('anything else')).to eql('UserService')
     end
   end
 
   context "password" do
-    it "decrypts the password to the original value" do
+    it "should decrypt the password to the original value" do
       s = UserService.new
       s.password = "asdf"
       expect(s.decrypted_password).to eql("asdf")

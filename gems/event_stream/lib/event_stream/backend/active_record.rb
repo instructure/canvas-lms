@@ -79,7 +79,6 @@ module EventStream::Backend
     end
 
     private
-
     def insert(record)
       active_record_type.create_from_event_stream!(record)
     end

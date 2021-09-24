@@ -23,7 +23,7 @@ describe "MediaConverter" do
   class MediaConverterTest
     include CC::Exporter::Epub::Converters::MediaConverter
 
-    def initialize(course = {})
+    def initialize(course={})
       @course = course
     end
 
@@ -62,7 +62,7 @@ describe "MediaConverter" do
       MediaConverterTest.new
     end
 
-    it "updates link hrefs containing WEB_CONTENT_TOKEN" do
+    it "should update link hrefs containing WEB_CONTENT_TOKEN" do
       expect(doc.search('a').all? do |element|
         element['href'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
       end).to be_truthy, 'precondition'
@@ -78,7 +78,7 @@ describe "MediaConverter" do
       end).to be_falsey
     end
 
-    it "updates img srcs containing WEB_CONTENT_TOKEN" do
+    it "should update img srcs containing WEB_CONTENT_TOKEN" do
       expect(doc.search('img').all? do |element|
         element['src'].match(CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN))
       end).to be_truthy, 'precondition'
@@ -94,7 +94,7 @@ describe "MediaConverter" do
       end).to be_falsey
     end
 
-    it "replaces media that is not present with a span" do
+    it "should replace media that is not present with a span" do
       expect(doc.search("a[href*='#{mov_path}']").any?).to be_truthy, 'precondition'
       expect(doc.search("span").empty?).to be_truthy, 'precondition'
 
@@ -104,10 +104,9 @@ describe "MediaConverter" do
       expect(doc.search("span").any?).to be_truthy
     end
 
-    it "does not explode with non standard file names" do
+    it "shouldn't explode with non standard file names" do
       other_doc = Nokogiri::HTML5.fragment(
-        "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>"
-      )
+        "<div><a href=\"#{CGI.escape(MediaConverterTest::WEB_CONTENT_TOKEN)}/path/to/im%28g.jpg\"}>blah</a>")
 
       test_instance.convert_media_paths!(other_doc)
 
@@ -127,7 +126,7 @@ describe "MediaConverter" do
     end
     subject(:test_instance) { MediaConverterTest.new }
 
-    it "hrefses with flv to hrefs with mp4" do
+    it "should hrefs with flv to hrefs with mp4" do
       expect(doc.search('a').all? do |element|
         element['href'].match('flv')
       end).to be_truthy, 'precondition'
@@ -156,7 +155,7 @@ describe "MediaConverter" do
       end
       subject(:test_instance) { MediaConverterTest.new }
 
-      it "changes a tags to audio tags" do
+      it "should change a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
         expect(doc.search('audio').empty?).to be_truthy, 'precondition'
 
@@ -178,7 +177,7 @@ describe "MediaConverter" do
       end
       subject(:test_instance) { MediaConverterTest.new }
 
-      it "changes a tags to audio tags" do
+      it "should change a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
         expect(doc.search('audio').empty?).to be_truthy, 'precondition'
 
@@ -202,7 +201,7 @@ describe "MediaConverter" do
       end
       subject(:test_instance) { MediaConverterTest.new }
 
-      it "changes a tags to audio tags" do
+      it "should change a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
         expect(doc.search('video').empty?).to be_truthy, 'precondition'
 
@@ -224,7 +223,7 @@ describe "MediaConverter" do
       end
       subject(:test_instance) { MediaConverterTest.new }
 
-      it "changes a tags to audio tags" do
+      it "should change a tags to audio tags" do
         expect(doc.search('a').any?).to be_truthy, 'precondition'
         expect(doc.search('video').empty?).to be_truthy, 'precondition'
 

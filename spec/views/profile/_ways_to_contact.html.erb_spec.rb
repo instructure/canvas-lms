@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/profile/_ways_to_contact" do
-  it "renders" do
+  it "should render" do
     course_with_student
     view_context
     assign(:email_channels, [])
@@ -34,10 +34,10 @@ describe "/profile/_ways_to_contact" do
     expect(response).not_to be_nil
   end
 
-  it "does not show a student the confirm link" do
+  it "should not show a student the confirm link" do
     course_with_student
     view_context
-    communication_channel(@user, { username: 'someone@somewhere.com' })
+    communication_channel(@user, {username: 'someone@somewhere.com'})
     expect(@user.communication_channels.first.state).to eq :unconfirmed
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
@@ -48,10 +48,10 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).not_to match /confirm_channel_link/
   end
 
-  it "shows an admin the confirm link" do
+  it "should show an admin the confirm link" do
     account_admin_user
     view_context
-    communication_channel(@user, { username: 'someone@somewhere.com' })
+    communication_channel(@user, {username: 'someone@somewhere.com'})
     expect(@user.communication_channels.first.state).to eq :unconfirmed
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
@@ -62,10 +62,10 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).to match /confirm_channel_link/
   end
 
-  it "does not show confirm link for confirmed channels" do
+  it "should not show confirm link for confirmed channels" do
     account_admin_user
     view_context
-    communication_channel(@user, { username: 'someone@somewhere.com', active_cc: true })
+    communication_channel(@user, {username: 'someone@somewhere.com', active_cc: true})
     expect(@user.communication_channels.first.state).to eq :active
     assign(:email_channels, @user.communication_channels.to_a)
     assign(:other_channels, [])
@@ -76,10 +76,10 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).not_to match /confirm_channel_link/
   end
 
-  it "does not show confirm link for push channels" do
+  it "should not show confirm link for push channels" do
     account_admin_user
     view_context
-    communication_channel(@user, { username: 'someone@somewhere.com', path_type: 'push', active_cc: true })
+    communication_channel(@user, {username: 'someone@somewhere.com', path_type: 'push', active_cc: true})
     expect(@user.communication_channels.first.state).to eq :active
     assign(:email_channels, [])
     assign(:other_channels, @user.communication_channels.to_a)
@@ -94,8 +94,8 @@ describe "/profile/_ways_to_contact" do
   it "shows the default email channel even when its position is greater than one" do
     course_with_student
     view_context
-    communication_channel(@user, { username: 'someone@somewhere.com', path_type: 'sms' })
-    email = communication_channel(@user, { username: 'someone@somewhere.com' })
+    communication_channel(@user, {username: 'someone@somewhere.com', path_type: 'sms'})
+    email = communication_channel(@user, {username: 'someone@somewhere.com'})
     expect(@user.communication_channels.first.state).to eq :unconfirmed
     assign(:email_channels, @user.communication_channels.email.to_a)
     assign(:default_email_channel, @user.communication_channels.email.to_a.first)
@@ -107,11 +107,11 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).to match /channel default.*channel_#{email.id}/
   end
 
-  it "shows an admin masquerading as a user the confirm link" do
+  it "should show an admin masquerading as a user the confirm link" do
     course_with_student
     account_admin_user
     view_context(@course, @student, @admin)
-    communication_channel(@student, { username: 'someone@somewhere.com' })
+    communication_channel(@student, {username: 'someone@somewhere.com'})
     expect(@student.communication_channels.first.state).to eq :unconfirmed
     assign(:email_channels, @student.communication_channels.to_a)
     assign(:other_channels, [])
@@ -122,7 +122,7 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).to match /confirm_channel_link/
   end
 
-  it 'does not show the "I want to log in" for non-default accounts' do
+  it 'should not show the "I want to log in" for non-default accounts' do
     course_with_student
     view_context
     assign(:email_channels, [])
@@ -135,3 +135,4 @@ describe "/profile/_ways_to_contact" do
     expect(response.body).not_to match /I want to log in to Canvas using this email address/
   end
 end
+

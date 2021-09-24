@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CanvasLinkedInConfig
+
   def self.call
     settings = Canvas::Plugin.find(:linked_in).try(:settings)
     if settings
@@ -28,6 +29,7 @@ class CanvasLinkedInConfig
     else
       ConfigFile.load('linked_in').dup
     end
+
   end
 end
 

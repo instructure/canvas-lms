@@ -25,9 +25,10 @@ describe "Gradebook - permissions" do
   include GradebookCommon
 
   context "as an admin" do
+
     let(:course) { Course.create! }
 
-    it "displays for admins" do
+    it "should display for admins" do
       admin_logged_in
 
       Gradebook.visit(course)
@@ -36,14 +37,15 @@ describe "Gradebook - permissions" do
   end
 
   context "as a ta" do
+
     def disable_view_all_grades
       RoleOverride.create!(role: ta_role,
-                           permission: 'view_all_grades',
-                           context: Account.default,
-                           enabled: false)
+                            permission: 'view_all_grades',
+                            context: Account.default,
+                            enabled: false)
     end
 
-    it "does not show gradebook after course conclude if view_all_grades disabled", priority: "1", test_id: 417601 do
+    it "should not show gradebook after course conclude if view_all_grades disabled", priority: "1", test_id: 417601 do
       disable_view_all_grades
       concluded_course = course_with_ta_logged_in
       concluded_course.conclude

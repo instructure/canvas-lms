@@ -47,6 +47,7 @@ class SubmissionDetails
       fj('button:contains("Save")')
     end
 
+
     # page actions
 
     def submit_comment(text)

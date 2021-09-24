@@ -20,6 +20,7 @@
 require 'spec_helper'
 
 describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
+
   def ids_to_string(*ids)
     ids.sort.join(',')
   end
@@ -29,7 +30,7 @@ describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
   end
 
   def check_root_account_ids(expected, *models)
-    models.each { |m| expect(m.reload.root_account_ids).to eq expected }
+    models.each { |m| expect(m.reload.root_account_ids).to eq expected}
   end
 
   before :once do
@@ -127,4 +128,5 @@ describe DataFixup::PopulateRootAccountIdsOnConversationsTables do
       check_conversation_message_participants(@c, @ids)
     end
   end
+
 end

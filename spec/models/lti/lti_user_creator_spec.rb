@@ -276,5 +276,6 @@ describe Lti::LtiUserCreator do
         end
       end
     end
+
   end
 end

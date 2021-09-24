@@ -39,4 +39,5 @@ module Canvas
     TokenExpired = CanvasSecurity::AuthenticationError
     InvalidJwtKey = CanvasSecurity::InvalidJwtKey
   end
+
 end

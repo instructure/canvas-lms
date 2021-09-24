@@ -73,7 +73,7 @@ class Eportfolio < ActiveRecord::Base
     given do |user|
       user&.eportfolios_enabled? &&
         !user.eportfolios.active.flagged_or_marked_as_spam.exists? &&
-        (user.has_enrollment? || user.account_membership?)
+        (user.enrollments.exists? || user.account_users.exists?)
     end
     can :create
 

@@ -19,6 +19,8 @@
 require_relative '../../common'
 
 module NewCourseAddCourseModal
+
+
   # ---------------------- Controls ----------------------
   def add_course_modal
     f('[aria-label="Add a New Course"]')

@@ -105,7 +105,6 @@ module Lti::Messages
       @assignment_line_item_url ||= begin
         line_item = line_item_for_assignment
         return if line_item.blank?
-
         # assume @context is either Group or Course, per #include_assignment_and_grade_service_claims?
         @expander.controller.lti_line_item_show_url(
           course_id: @context.is_a?(Group) ? context.context_id : @context.id,

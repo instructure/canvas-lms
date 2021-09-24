@@ -53,7 +53,6 @@ module Lti
         raise InvalidTokenError, 'invalid iss' if decoded_jwt['iss'] != ISS
         raise InvalidTokenError, 'invalid aud' unless [*decoded_jwt[:aud]].include?(aud)
         raise InvalidTokenError, 'iat must be in the past' unless Time.zone.at(decoded_jwt['iat']) < Time.zone.now
-
         true
       rescue InvalidTokenError
         raise
@@ -96,6 +95,7 @@ module Lti
           raise InvalidTokenError, "the following assertions are missing: #{missing_assertions.join(',')}"
         end
       end
+
     end
   end
 end

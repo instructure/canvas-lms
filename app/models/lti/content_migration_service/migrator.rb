@@ -30,7 +30,6 @@ module Lti
 
       def expanded_variables
         return @expanded_variabled if @expanded_variables
-
         variable_expander = Lti::VariableExpander.new(root_account, @course, nil, tool: @tool)
         @expanded_variables = variable_expander.expand_variables!(
           @tool.set_custom_fields('content_migration')
@@ -38,12 +37,12 @@ module Lti
       end
 
       def generate_jwt
-        key = JSON::JWK.new({ k: @tool.shared_secret, kid: @tool.consumer_key, kty: 'oct' })
+        key = JSON::JWK.new({k: @tool.shared_secret, kid: @tool.consumer_key, kty: 'oct'})
         Canvas::Security.create_jwt({}, JWT_LIFETIME.from_now, key)
       end
 
       def base_request_headers
-        { 'Authorization' => "Bearer #{generate_jwt}" }
+        {'Authorization' => "Bearer #{generate_jwt}"}
       end
 
       def root_account
@@ -52,3 +51,4 @@ module Lti
     end
   end
 end
+

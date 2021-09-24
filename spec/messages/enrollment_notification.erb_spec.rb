@@ -36,12 +36,12 @@ describe 'enrollment_notification' do
 
     context "creation_pending student" do
       before :once do
-        communication_channel(@student, { username: 'jacob@isntructure.com' })
+        communication_channel(@student, {username: 'jacob@isntructure.com'})
       end
 
       let(:asset) { @enrollment }
 
-      it "renders" do
+      it "should render" do
         generate_message(:enrollment_notification, :email, asset)
         expect(@message.html_body).to include 'Click here to view the course page'
         expect(@message.html_body).to include 'Update your notification settings</a>'

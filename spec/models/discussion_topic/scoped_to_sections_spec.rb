@@ -79,3 +79,4 @@ describe DiscussionTopic::ScopedToSections do
     end
   end
 end
+

@@ -98,6 +98,7 @@
 #     }
 #
 class ProgressController < ApplicationController
+
   include Api::V1::Progress
 
   # @API Query progress

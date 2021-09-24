@@ -21,9 +21,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::TermImporter do
+
   before { account_model }
 
-  it 'skips bad content' do
+  it 'should skip bad content' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -36,11 +37,11 @@ describe SIS::CSV::TermImporter do
 
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["No term_id given for a term",
-                          "Improper status \"inactive\" for term T002",
-                          "No name given for term T003"]
+                      "Improper status \"inactive\" for term T002",
+                      "No name given for term T003"]
   end
 
-  it 'creates terms' do
+  it 'should create terms' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
@@ -62,15 +63,14 @@ describe SIS::CSV::TermImporter do
     expect(t2.start_at).to be_nil
     expect(t2.end_at).to be_nil
 
-    expect(importer.errors.map { |r| r.last }).to eq ["Bad date format for term T002"]
+    expect(importer.errors.map{|r|r.last}).to eq ["Bad date format for term T002"]
   end
 
-  it 'supports stickiness' do
+  it 'should support stickiness' do
     before_count = EnrollmentTerm.where.not(:sis_source_id => nil).count
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
-    )
+      "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
     expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Winter11"
@@ -79,8 +79,7 @@ describe SIS::CSV::TermImporter do
     end
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00"
-    )
+      "T001,Winter12,active,2010-1-05 00:00:00,2010-4-14 00:00:00")
     expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Winter12"
@@ -93,8 +92,7 @@ describe SIS::CSV::TermImporter do
     end
     importer = process_csv_data(
       "term_id,name,status,start_date,end_date",
-      "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
-    )
+      "T001,Fall12,active,2011-1-05 00:00:00,2011-4-14 00:00:00")
     expect(EnrollmentTerm.where.not(:sis_source_id => nil).count).to eq before_count + 1
     EnrollmentTerm.last.tap do |t|
       expect(t.name).to eq "Fall11"
@@ -103,7 +101,7 @@ describe SIS::CSV::TermImporter do
     end
   end
 
-  it 'does not delete terms with active courses' do
+  it 'should not delete terms with active courses' do
     process_csv_data(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00",
@@ -122,20 +120,20 @@ describe SIS::CSV::TermImporter do
 
     t1.reload
     expect(t1).to_not be_deleted
-    expect(importer.errors.map { |r| r.last }.first).to include "Cannot delete a term with active courses"
+    expect(importer.errors.map{|r|r.last}.first).to include "Cannot delete a term with active courses"
 
     @course.destroy
 
     importer = process_csv_data(
-      "term_id,name,status,start_date,end_date",
-      "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
+        "term_id,name,status,start_date,end_date",
+        "T001,Winter11,deleted,2011-1-05 00:00:00,2011-4-14 00:00:00",
     )
 
     t1.reload
     expect(t1).to be_deleted
   end
 
-  it 'allows setting and removing enrollment type date overrides' do
+  it 'should allow setting and removing enrollment type date overrides' do
     process_csv_data(
       "term_id,name,status,start_date,end_date,date_override_enrollment_type",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00,",
@@ -155,7 +153,7 @@ describe SIS::CSV::TermImporter do
     expect(t1.enrollment_dates_overrides.where(:enrollment_type => "StudentEnrollment").first).to be_nil
   end
 
-  it 'creates rollback data' do
+  it 'should create rollback data' do
     process_csv_data_cleanly(
       "term_id,name,status,start_date,end_date",
       "T001,Winter11,active,2011-1-05 00:00:00,2011-4-14 00:00:00"
@@ -170,4 +168,5 @@ describe SIS::CSV::TermImporter do
     batch2.restore_states_for_batch
     expect(@account.enrollment_terms.where(sis_source_id: 'T001').take.workflow_state).to eq 'active'
   end
+
 end

@@ -25,17 +25,17 @@ describe Conversation do
   let_once(:recipient) { user_factory }
 
   context "initiation" do
-    it "sets private_hash for private conversations" do
+    it "should set private_hash for private conversations" do
       users = create_users(2, return_type: :record)
       expect(Conversation.initiate(users, true).private_hash).not_to be_nil
     end
 
-    it "does not set private_hash for group conversations" do
+    it "should not set private_hash for group conversations" do
       users = create_users(3, return_type: :record)
       expect(Conversation.initiate(users, false).private_hash).to be_nil
     end
 
-    it "reuses private conversations" do
+    it "should reuse private conversations" do
       users = create_users(2, return_type: :record)
       c1 = Conversation.initiate(users, true)
       c2 = Conversation.initiate(users, true)
@@ -43,19 +43,19 @@ describe Conversation do
       ActiveRecord::Base
     end
 
-    it "does not reuse group conversations" do
+    it "should not reuse group conversations" do
       users = create_users(2, return_type: :record)
       expect(Conversation.initiate(users, false)).not_to eq(
-        Conversation.initiate(users, false)
+      Conversation.initiate(users, false)
       )
     end
 
-    it "populates subject if provided" do
+    it "should populate subject if provided" do
       users = create_users(2, return_type: :record)
       expect(Conversation.initiate(users, nil, :subject => 'lunch').subject).to eq 'lunch'
     end
 
-    it 'sets the root account ids even for root accounts' do
+    it 'should set the root account ids even for root accounts' do
       account = Account.create!
       users = create_users(2, return_type: :record)
       expect(
@@ -66,7 +66,7 @@ describe Conversation do
     context "sharding" do
       specs_require_sharding
 
-      it "creates the conversation on the appropriate shard" do
+      it "should create the conversation on the appropriate shard" do
         users = []
         users << user_factory(:name => 'a')
         @shard1.activate { users << user_factory(:name => 'b') }
@@ -86,7 +86,7 @@ describe Conversation do
         end
       end
 
-      it "re-uses a private conversation from any shard" do
+      it "should re-use a private conversation from any shard" do
         users = [user_factory]
         @shard1.activate { users << user_factory }
         conversation = Conversation.initiate(users, true)
@@ -99,7 +99,7 @@ describe Conversation do
         end
       end
 
-      it "re-uses a private conversation from an unrelated shard" do
+      it "should re-use a private conversation from an unrelated shard" do
         users = []
         @shard1.activate { users << user_factory }
         @shard2.activate { users << user_factory }
@@ -113,7 +113,7 @@ describe Conversation do
         end
       end
 
-      it "keeps the counts from double-incrementing" do
+      it "should keep the counts from double-incrementing" do
         @user1 = user_factory(:name => 'a')
         @shard1.activate { @user2 = user_factory(:name => 'b') }
         conversation = Conversation.initiate([@user1, @user2], false)
@@ -125,23 +125,23 @@ describe Conversation do
         @shard1.activate do
           cs_cp.process_new_message([@user1, "reply2"], [@user1, @user2], [message1.id], [])
         end
-        [cp1, cp2, cs_cp].each { |p| expect(p.reload.message_count).to eq 3 }
+        [cp1, cp2, cs_cp].each{|p| expect(p.reload.message_count).to eq 3}
       end
     end
   end
 
   context "adding participants" do
-    it "does not add participants to private conversations" do
+    it "should not add participants to private conversations" do
       root_convo = Conversation.initiate([sender, recipient], true)
-      expect { root_convo.add_participants(sender, [user_factory]) }.to raise_error("can't add participants to a private conversation")
+      expect{ root_convo.add_participants(sender, [user_factory]) }.to raise_error("can't add participants to a private conversation")
     end
 
-    it "adds new participants to group conversations and give them all messages" do
+    it "should add new participants to group conversations and give them all messages" do
       root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
       new_guy = user_factory
-      expect { root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
+      expect{ root_convo.add_participants(sender, [new_guy]) }.not_to raise_error
       expect(root_convo.participants(true).size).to eq 3
 
       convo = new_guy.conversations.first
@@ -150,13 +150,13 @@ describe Conversation do
       expect(convo.participants.size).to eq 3 # includes the sender (though we don't show him in the ui)
     end
 
-    it "only adds participants to messages the existing user has participants on" do
+    it "should only add participants to messages the existing user has participants on" do
       root_convo = Conversation.initiate([sender, recipient], false)
       msgs = []
-      msgs << root_convo.add_message(sender, "first message body") <<
-        root_convo.add_message(sender, "second message body") <<
-        root_convo.add_message(sender, "third message body")  <<
-        root_convo.add_message(sender, "fourth message body")
+      msgs << root_convo.add_message(sender, "first message body")  <<
+              root_convo.add_message(sender, "second message body") <<
+              root_convo.add_message(sender, "third message body")  <<
+              root_convo.add_message(sender, "fourth message body")
       sender.conversations.first.remove_messages(msgs[0])
       sender.conversations.first.delete_messages(msgs[1])
 
@@ -166,13 +166,14 @@ describe Conversation do
       expect(new_guy.conversations.first.messages.size).to eql(msgs.size - 1 + 1)
     end
 
-    it "does not re-add existing participants to group conversations" do
+
+    it "should not re-add existing participants to group conversations" do
       root_convo = Conversation.initiate([sender, recipient], false)
-      expect { root_convo.add_participants(sender, [recipient]) }.not_to raise_error
+      expect{ root_convo.add_participants(sender, [recipient]) }.not_to raise_error
       expect(root_convo.participants.size).to eq 2
     end
 
-    it "updates the updated_at timestamp and clear the identity header cache of new participants" do
+    it "should update the updated_at timestamp and clear the identity header cache of new participants" do
       root_convo = Conversation.initiate([sender, recipient], false)
       root_convo.add_message(sender, 'test')
 
@@ -185,7 +186,7 @@ describe Conversation do
     context "sharding" do
       specs_require_sharding
 
-      it "adds participants to the proper shards" do
+      it "should add participants to the proper shards" do
         users = []
         users << user_factory(:name => 'a')
         users << user_factory(:name => 'b')
@@ -221,13 +222,13 @@ describe Conversation do
           @recipient = user_factory
         end
       end
-      it "increments when adding messages" do
+      it "should increment when adding messages" do
         Conversation.initiate([@sender, @recipient], false).add_message(@sender, 'test')
         expect(@sender.conversations.first.message_count).to eql 1
         expect(@recipient.conversations.first.message_count).to eql 1
       end
 
-      it "decrements when removing messages" do
+      it "should decrement when removing messages" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
         root_convo.add_message(@sender, 'test')
         msg = root_convo.add_message(@sender, 'test2')
@@ -239,7 +240,7 @@ describe Conversation do
         expect(@recipient.conversations.first.reload.message_count).to eql 2
       end
 
-      it "decrements when deleting messages" do
+      it "should decrement when deleting messages" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
         root_convo.add_message(@sender, 'test')
         msg = root_convo.add_message(@sender, 'test2')
@@ -271,7 +272,7 @@ describe Conversation do
         end
       end
 
-      it "increments for recipients when sending the first message in a conversation" do
+      it "should increment for recipients when sending the first message in a conversation" do
         root_convo = Conversation.initiate([@sender, @recipient], false)
         expect(ConversationParticipant.unread.size).to eql 0 # only once the first message is added
         root_convo.add_message(@sender, 'test')
@@ -281,7 +282,7 @@ describe Conversation do
         expect(@recipient.conversations.unread.size).to eql 1
       end
 
-      it "increments for subscribed recipients when adding a message to a read conversation" do
+      it "should increment for subscribed recipients when adding a message to a read conversation" do
         root_convo = Conversation.initiate([@sender, @unread_guy, @subscribed_guy, @unsubscribed_guy], false)
         root_convo.add_message(@sender, 'test')
 
@@ -304,7 +305,7 @@ describe Conversation do
         expect(@unsubscribed_guy.conversations.unread.size).to eql 0
       end
 
-      it "increments only for message participants" do
+      it "should increment only for message participants" do
         root_convo = Conversation.initiate([@sender, @recipient, @subscribed_guy], false)
         root_convo.add_message(@sender, 'test')
 
@@ -318,7 +319,7 @@ describe Conversation do
         expect(@subscribed_guy.conversations.unread.size).to eql 0
       end
 
-      it "decrements when deleting an unread conversation" do
+      it "should decrement when deleting an unread conversation" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, 'test')
 
@@ -329,7 +330,7 @@ describe Conversation do
         expect(@unread_guy.conversations.unread.size).to eql 0
       end
 
-      it "decrements when marking as read" do
+      it "should decrement when marking as read" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, 'test')
 
@@ -340,7 +341,7 @@ describe Conversation do
         expect(@unread_guy.conversations.unread.size).to eql 0
       end
 
-      it "indecrements when marking as unread" do
+      it "should indecrement when marking as unread" do
         root_convo = Conversation.initiate([@sender, @unread_guy], false)
         root_convo.add_message(@sender, 'test')
         @unread_guy.conversations.first.update_attribute(:workflow_state, "read")
@@ -361,7 +362,7 @@ describe Conversation do
   end
 
   context "subscription" do
-    it "mark-as-reads when unsubscribing iff it was unread" do
+    it "should mark-as-read when unsubscribing iff it was unread" do
       subscription_guy = user_factory
       archive_guy = user_factory
       root_convo = Conversation.initiate([sender, archive_guy, subscription_guy], false)
@@ -378,7 +379,7 @@ describe Conversation do
       expect(archive_guy.conversations.archived.size).to eql 1
     end
 
-    it "mark-as-unreads when re-subscribing iff there are newer messages" do
+    it "should mark-as-unread when re-subscribing iff there are newer messages" do
       flip_flopper_guy = user_factory
       subscription_guy = user_factory
       archive_guy = user_factory
@@ -412,7 +413,7 @@ describe Conversation do
       expect(subscription_guy.conversations.first.last_message_at.to_i).to eql last_message_at.to_i
     end
 
-    it "does not toggle read/unread until the subscription change is saved" do
+    it "should not toggle read/unread until the subscription change is saved" do
       subscription_guy = user_factory
       root_convo = Conversation.initiate([sender, user_factory, subscription_guy], false)
       root_convo.add_message(sender, 'test')
@@ -431,7 +432,7 @@ describe Conversation do
   end
 
   context "adding messages" do
-    it "delivers the message to all participants" do
+    it "should deliver the message to all participants" do
       recipients = create_users(5, return_type: :record)
       Conversation.initiate([sender] + recipients, false).add_message(sender, 'test')
       convo = sender.conversations.first
@@ -446,11 +447,12 @@ describe Conversation do
       end
     end
 
-    it "broadcasts conversation created", priority: "1", test_id: 193163 do
+    it "should broadcast conversation created", priority: "1", test_id: 193163 do
+
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
       [sender].each do |user|
-        channel = communication_channel(user, { username: "test_channel_email_#{user.id}@test.com", active_cc: true })
+        channel = communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
 
         NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
       end
@@ -462,7 +464,7 @@ describe Conversation do
       expect(conversation.messages_sent).to include("Conversation Created")
     end
 
-    it "only ever changes the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
+    it "should only ever change the workflow_state for the sender if it's archived and it's a direct message (not bulk)" do
       Conversation.initiate([sender, recipient], true).add_message(sender, 'test')
       convo = sender.conversations.first
       convo.update_attribute(:workflow_state, "unread")
@@ -483,7 +485,7 @@ describe Conversation do
       expect(convo.reload.read?).to be_truthy
     end
 
-    it "does not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
+    it "should not set last_message_at for the sender if the conversation is deleted and update_for_sender=false" do
       rconvo = Conversation.initiate([sender, recipient], true)
       message = rconvo.add_message(sender, 'test')
       convo = sender.conversations.first
@@ -497,7 +499,7 @@ describe Conversation do
       expect(convo.last_message_at).to be_nil
     end
 
-    it "sets last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
+    it "should set last_authored_at and visible_last_authored_at on deleted conversations even if update_for_sender=false" do
       expected_times = [Time.now.utc - 1.hours, Time.now.utc].map { |t| Time.at(t.to_i).utc }
 
       convo = nil
@@ -521,7 +523,7 @@ describe Conversation do
       end
     end
 
-    it "delivers the message to unsubscribed participants but not alert them" do
+    it "should deliver the message to unsubscribed participants but not alert them" do
       recipients = create_users(5, return_type: :record)
       Conversation.initiate([sender] + recipients, false).add_message(sender, 'test')
 
@@ -540,7 +542,7 @@ describe Conversation do
       expect(rconvo.unread?).to be_truthy
     end
 
-    it "only alerts message participants" do
+    it "should only alert message participants" do
       recipients = create_users(5, return_type: :record)
       convo = Conversation.initiate([sender] + recipients, false)
       convo.add_message(sender, 'test')
@@ -558,7 +560,7 @@ describe Conversation do
 
   context "context tags" do
     context "current_context_strings" do
-      it "does not double-count duplicate enrollments" do
+      it "should not double-count duplicate enrollments" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true).user
         course1 = @course
@@ -577,7 +579,7 @@ describe Conversation do
     end
 
     context "initial tags" do
-      it "saves all valid tags on the conversation" do # NOTE: this will change if/when we allow arbitrary tags
+      it "should save all valid tags on the conversation" do # NOTE: this will change if/when we allow arbitrary tags
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         conversation = Conversation.initiate([u1, u2], true)
@@ -585,7 +587,7 @@ describe Conversation do
         expect(conversation.tags).to eql [@course.asset_string]
       end
 
-      it "sets initial empty tags on the conversation and conversation_participant" do
+      it "should set initial empty tags on the conversation and conversation_participant" do
         u1 = student_in_course.user
         u2 = student_in_course(:course => @course).user
         conversation = Conversation.initiate([u1, u2], true)
@@ -597,7 +599,7 @@ describe Conversation do
         expect(u2.all_conversations.first.tags).to eql []
       end
 
-      it "ignores explicit context tags not shared by at least two participants" do
+      it "should ignore explicit context tags not shared by at least two participants" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         u3 = user_factory
@@ -609,7 +611,7 @@ describe Conversation do
         expect(conversation.tags).to eql [@course1.asset_string]
       end
 
-      it "saves all visible tags on the conversation_participant" do
+      it "should save all visible tags on the conversation_participant" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         u3 = user_factory
@@ -621,7 +623,7 @@ describe Conversation do
         expect(u3.conversations.first.tags).to eql []
       end
 
-      it "defaults all tags to common ones over the 50% threshold if none are specified" do
+      it "should default all tags to common ones over the 50% threshold if none are specified" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
@@ -636,7 +638,7 @@ describe Conversation do
         expect(u3.conversations.first.tags).to eql [@course2.asset_string]
       end
 
-      it "defaults the conversation_participant tags to common ones over the 50% threshold if no specified tags match" do
+      it "should default the conversation_participant tags to common ones over the 50% threshold if no specified tags match" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         @course1 = @course
@@ -654,9 +656,9 @@ describe Conversation do
       context "sharding" do
         specs_require_sharding
 
-        it "sets all tags on the other shard's participants" do
-          course1 = @shard1.activate { course_factory(:account => Account.create!, :active_all => true) }
-          course2 = @shard2.activate { course_factory(:account => Account.create!, :active_all => true) }
+        it "should set all tags on the other shard's participants" do
+          course1 = @shard1.activate{ course_factory(:account => Account.create!, :active_all => true) }
+          course2 = @shard2.activate{ course_factory(:account => Account.create!, :active_all => true) }
           user1 = student_in_course(:course => course1, :active_all => true).user
           user2 = student_in_course(:course => course2, :active_all => true).user
           student_in_course(:course => course2, :user => user1, :active_all => true)
@@ -670,7 +672,7 @@ describe Conversation do
     end
 
     context "deletion" do
-      it "removes tags when all messages are deleted" do
+      it "should remove tags when all messages are deleted" do
         u1 = student_in_course(:active_all => true).user
         u2 = student_in_course(:active_all => true, :course => @course).user
         conversation = Conversation.initiate([u1, u2], true)
@@ -703,14 +705,14 @@ describe Conversation do
         conversation
       end
 
-      it "adds new tags to the conversation" do
+      it "should add new tags to the conversation" do
         expect(conversation.tags).to eql [@course1.asset_string]
 
         conversation.add_message(u1, 'another', :tags => [@course2.asset_string])
         expect(conversation.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
       end
 
-      it "adds new visible tags to the conversation_participant" do
+      it "should add new visible tags to the conversation_participant" do
         expect(u1.conversations.first.tags).to eq [@course1.asset_string]
         expect(u2.conversations.first.tags).to eq [@course1.asset_string]
         expect(u3.conversations.first.tags).to eq [@course2.asset_string]
@@ -721,7 +723,7 @@ describe Conversation do
         expect(u3.conversations.first.tags).to eq [@course2.asset_string]
       end
 
-      it "ignores conversation_participants without a valid user" do
+      it "should ignore conversation_participants without a valid user" do
         expect(u1.conversations.first.tags).to eq [@course1.asset_string]
         expect(u2.conversations.first.tags).to eq [@course1.asset_string]
         expect(u3.conversations.first.tags).to eq [@course2.asset_string]
@@ -742,7 +744,7 @@ describe Conversation do
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
-      it "saves new visible tags on the conversation_message_participant" do
+      it "should save new visible tags on the conversation_message_participant" do
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
@@ -754,7 +756,7 @@ describe Conversation do
         expect(cp.messages.human.first.tags).to eql [@course2.asset_string]
       end
 
-      it "saves the previous message tags on the conversation_message_participant if there are no new visible ones" do
+      it "should save the previous message tags on the conversation_message_participant if there are no new visible ones" do
         conversation = Conversation.initiate([u1, u2], true)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
         cp = u2.conversations.first
@@ -764,7 +766,7 @@ describe Conversation do
         expect(cp.messages.human.first.tags).to eql [@course1.asset_string]
       end
 
-      it "recomputes the conversation_participant's tags when removing messages" do
+      it "should recompute the conversation_participant's tags when removing messages" do
         @course2.enroll_student(u1).update_attribute(:workflow_state, 'active')
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         conversation = Conversation.initiate([u1, u2], true)
@@ -788,7 +790,7 @@ describe Conversation do
       let_once(:u1) { student_in_course(active_all: true, course: course1).user }
       let_once(:u2) { student_in_course(active_all: true, course: course1).user }
 
-      it "does not save tags on the conversation_message_participant" do
+      it "should not save tags on the conversation_message_participant" do
         u3 = student_in_course(:active_all => true, :course => @course1).user
         conversation = Conversation.initiate([u1, u2, u3], false)
         conversation.add_message(u1, 'test', :tags => [@course1.asset_string])
@@ -797,7 +799,7 @@ describe Conversation do
         expect(u3.conversations.first.messages.human.first.tags).to eql []
       end
 
-      it "does not recompute the conversation_participant's tags when removing messages" do
+      it "should not recompute the conversation_participant's tags when removing messages" do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         conversation = Conversation.initiate([u1, u2, u3], false)
@@ -812,7 +814,7 @@ describe Conversation do
         expect(cp.reload.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
       end
 
-      it "adds tags specified along with new recipients" do
+      it "should add tags specified along with new recipients" do
         @course2.enroll_student(u2).update_attribute(:workflow_state, 'active')
         u3 = student_in_course(:active_all => true, :course => @course2).user
         u4 = student_in_course(:active_all => true, :course => @course2).user
@@ -849,7 +851,7 @@ describe Conversation do
         @conversation = Conversation.find(@conversation.id)
       end
 
-      it "sets the default tags when migrating" do
+      it "should set the default tags when migrating" do
         @conversation.migrate_context_tags!
 
         expect(@conversation.tags.sort).to eql [@course1.asset_string, @course2.asset_string].sort
@@ -858,7 +860,7 @@ describe Conversation do
         expect(@u3.conversations.first.tags).to eql [@course2.asset_string]
       end
 
-      it "ignores conversation_participants without a user" do
+      it "should ignore conversation_participants without a user" do
         broken_one = @u3.conversations.first
         ConversationParticipant.where(id: broken_one).update_all(user_id: 0)
 
@@ -881,7 +883,7 @@ describe Conversation do
       let_once(:student1) { student_in_course(:active_all => true, :course => @old_course).user }
       let_once(:student2) { student_in_course(:active_all => true, :course => @old_course).user }
 
-      it "removes old tags and add new ones" do
+      it "should remove old tags and add new ones" do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
@@ -905,7 +907,7 @@ describe Conversation do
         end
       end
 
-      it "continues to use old tags if there are no current shared contexts" do
+      it "should continue to use old tags if there are no current shared contexts" do
         conversation = Conversation.initiate([@teacher, @student], true)
         conversation.add_message(@teacher, 'first message')
 
@@ -927,7 +929,7 @@ describe Conversation do
         end
       end
 
-      it "uses concluded tags from multiple courses" do
+      it "should use concluded tags from multiple courses" do
         old_course2 = course_factory
 
         old_course2.offer!
@@ -955,7 +957,7 @@ describe Conversation do
         end
       end
 
-      it "includes concluded group contexts when no active ones exist" do
+      it "should include concluded group contexts when no active ones exist" do
         group      = Group.create!(:context => @old_course)
         [student1, student2].each { |s| group.users << s }
 
@@ -972,7 +974,7 @@ describe Conversation do
         end
       end
 
-      it "replaces concluded group contexts with active ones" do
+      it "should replace concluded group contexts with active ones" do
         old_group = Group.create!(:context => @old_course)
         [student1, student2].each { |s| old_group.users << s }
 
@@ -1001,13 +1003,13 @@ describe Conversation do
   end
 
   context "root_account_ids" do
-    it "is always ordered" do
+    it "should always be ordered" do
       conversation = Conversation.create
       conversation.update_attribute :root_account_ids, [3, 2, 1]
       expect(conversation.root_account_ids).to eql [1, 2, 3]
     end
 
-    it "is saved on the conversation when adding a message" do
+    it "should be saved on the conversation when adding a message" do
       u1 = user_factory
       u2 = user_factory
       a1 = account_model
@@ -1024,7 +1026,7 @@ describe Conversation do
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
     end
 
-    it 'updates conversation participants root account ids when changed' do
+    it 'should update conversation participants root account ids when changed' do
       a1 = Account.create!
       a2 = Account.create!
       users = create_users(2, return_type: :record)
@@ -1037,7 +1039,7 @@ describe Conversation do
       ).to eq [a1.id, a2.id].sort
     end
 
-    it 'updates conversation messages root account ids when changed' do
+    it 'should update conversation messages root account ids when changed' do
       a1 = Account.create!
       a2 = Account.create!
       users = create_users(2, return_type: :record)
@@ -1051,7 +1053,7 @@ describe Conversation do
       ).to eq [a1.id, a2.id].sort
     end
 
-    it 'updates conversation message participants root account ids when changed' do
+    it 'should update conversation message participants root account ids when changed' do
       a1 = Account.create!
       a2 = Account.create!
       users = create_users(2, return_type: :record)
@@ -1068,7 +1070,7 @@ describe Conversation do
     context "sharding" do
       specs_require_sharding
 
-      it "uses global ids" do
+      it "should use global ids" do
         @shard1.activate do
           @account = account_model
           new_course = course_factory(:account => @account)
@@ -1087,12 +1089,11 @@ describe Conversation do
 
   def merge_and_check(sender, source, target, source_user, target_user)
     raise "source_user and target_user must be the same" if source_user && target_user && source_user != target_user
-
     source.add_participants(sender, [source_user]) if source_user
     target.add_participants(sender, [target_user]) if target_user
     target_user = source_user || target_user
-    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => source }).count }
-    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => { :conversation_id => target }).count }
+    message_count = source.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => source}).count }
+    message_count += target.shard.activate { ConversationMessageParticipant.joins(:conversation_message).where(:user_id => target_user, :conversation_messages => {:conversation_id => target}).count }
 
     source.merge_into(target)
 

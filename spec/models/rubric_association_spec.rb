@@ -18,10 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe RubricAssociation do
-  def rubric_association_params_for_assignment(assign, override = {})
+
+  def rubric_association_params_for_assignment(assign, override={})
     HashWithIndifferentAccess.new({
       hide_score_total: "0",
       purpose: "grading",
@@ -95,7 +97,7 @@ describe RubricAssociation do
           @assignment.assign_peer_review(@student_2, @student_1)
         end
 
-        it "has 2 assessment_requests" do
+        it "should have 2 assessment_requests" do
           expect(@rubric_assoc.assessment_requests.count).to eq 2
         end
       end
@@ -122,7 +124,7 @@ describe RubricAssociation do
             @rubric_assoc = RubricAssociation.generate(@teacher, @rubric, @course, ra_params)
           end
 
-          it "has 2 assessment_requests" do
+          it "should have 2 assessment_requests" do
             expect(@rubric_assoc.assessment_requests.count).to eq 2
           end
         end
@@ -130,7 +132,7 @@ describe RubricAssociation do
     end
 
     context "#update_alignments" do
-      it "does nothing if it is not associated to an assignment" do
+      it "should do nothing if it is not associated to an assignment" do
         rubric = @course.rubrics.create!
         ra = RubricAssociation.create!(
           :rubric => rubric,
@@ -142,7 +144,7 @@ describe RubricAssociation do
         ra.update_alignments
       end
 
-      it "aligns the outcome to the assignment when created and remove when destroyed" do
+      it "should align the outcome to the assignment when created and remove when destroyed" do
         assignment = @course.assignments.create!(
           :title => 'Test Assignment',
           :peer_reviews => true,
@@ -161,7 +163,7 @@ describe RubricAssociation do
       end
     end
 
-    it "does not delete assessments when an association is destroyed" do
+    it "should not delete assessments when an association is destroyed" do
       assignment = @course.assignments.create!(
         :title => 'Test Assignment',
         :peer_reviews => true,
@@ -174,23 +176,23 @@ describe RubricAssociation do
         :purpose => 'grading'
       )
       assess = ra.assess({
-                           :user => @student_1,
-                           :assessor => @teacher,
-                           :artifact => assignment.find_or_create_submission(@student_1),
-                           :assessment => {
-                             :assessment_type => 'grading',
-                             :criterion_crit1 => {
-                               :points => 5
-                             }
-                           }
-                         })
+        :user => @student_1,
+        :assessor => @teacher,
+        :artifact => assignment.find_or_create_submission(@student_1),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5
+          }
+        }
+      })
 
       expect(assess).not_to be_nil
       ra.destroy
       expect(assess.reload).not_to be_nil
     end
 
-    it "does not delete assessment requests when an association is destroyed" do
+    it "should not delete assessment requests when an association is destroyed" do
       submission_student = student_in_course(active_all: true, course: @course).user
       review_student = student_in_course(active_all: true, course: @course).user
       assignment = @course.assignments.create!
@@ -203,13 +205,13 @@ describe RubricAssociation do
         :purpose => 'grading'
       )
       request = AssessmentRequest.create!(user: submission_student, asset: submission, assessor_asset: assessor_submission,
-                                          assessor: review_student, rubric_association: ra)
+        assessor: review_student, rubric_association: ra)
       expect(request).not_to be_nil
       ra.destroy
       expect(request.reload).not_to be_nil
     end
 
-    it 'softs delete learning outcome results when an association is replaced' do
+    it 'should soft delete learning outcome results when an association is replaced' do
       student_in_course(active_all: true)
       outcome_with_rubric
       assessment = rubric_assessment_model(purpose: 'grading', rubric: @rubric, user: @student)
@@ -223,7 +225,7 @@ describe RubricAssociation do
       expect(result.reload).to be_deleted
     end
 
-    it 'lets account admins without manage_courses do things' do
+    it 'should let account admins without manage_courses do things' do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)
@@ -242,7 +244,7 @@ describe RubricAssociation do
       end
     end
 
-    it 'lets account admins without manage_courses_admin do things (granular permissions)' do
+    it 'should let account admins without manage_courses_admin do things (granular permissions)' do
       @course.root_account.enable_feature!(:granular_permissions_manage_courses)
       @rubric = @course.rubrics.create! { |r| r.user = @teacher }
       ra_params = rubric_association_params_for_assignment(@assignment)
@@ -263,24 +265,24 @@ describe RubricAssociation do
   end
 
   context "when a rubric is associated with an account" do
-    it "does not try to link to assessments" do
+    it "should not try to link to assessments" do
       site_admin_user
       user_session(@user)
       @account = @user.account
       @rubric = @account.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ :association_object => @account, :hide_score_total => "0", :use_for_grading => "0", :purpose => "bookmark" })
-      # 8864: the below raised a MethodNotFound error by trying to call @account.submissions
+      rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
+      rubric_association_params = HashWithIndifferentAccess.new({:association_object=>@account, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
+      #8864: the below raised a MethodNotFound error by trying to call @account.submissions
       expect { @rubric.update_with_association(@user, rubric_params, @account, rubric_association_params) }.not_to raise_error
     end
   end
 
   context "when a rubric is associated with a course" do
-    it "does not try to link to assessments" do
+    it "should not try to link to assessments" do
       course_with_teacher(:active_all => true)
       @rubric = @course.rubrics.build
-      rubric_params = HashWithIndifferentAccess.new({ "title" => "Some Rubric", "criteria" => { "0" => { "learning_outcome_id" => "", "ratings" => { "0" => { "points" => "5", "id" => "blank", "description" => "Full Marks" }, "1" => { "points" => "0", "id" => "blank_2", "description" => "No Marks" } }, "points" => "5", "long_description" => "", "id" => "", "description" => "Description of criterion" } }, "points_possible" => "5", "free_form_criterion_comments" => "0" })
-      rubric_association_params = HashWithIndifferentAccess.new({ :association_object => @course, :hide_score_total => "0", :use_for_grading => "0", :purpose => "bookmark" })
+      rubric_params = HashWithIndifferentAccess.new({"title"=>"Some Rubric", "criteria"=>{"0"=>{"learning_outcome_id"=>"", "ratings"=>{"0"=>{"points"=>"5", "id"=>"blank", "description"=>"Full Marks"}, "1"=>{"points"=>"0", "id"=>"blank_2", "description"=>"No Marks"}}, "points"=>"5", "long_description"=>"", "id"=>"", "description"=>"Description of criterion"}}, "points_possible"=>"5", "free_form_criterion_comments"=>"0"})
+      rubric_association_params = HashWithIndifferentAccess.new({:association_object=>@course, :hide_score_total=>"0", :use_for_grading=>"0", :purpose=>"bookmark"})
       expect_any_instantiation_of(@course).to receive(:submissions).never
       @rubric.update_with_association(@user, rubric_params, @course, rubric_association_params)
     end
@@ -297,15 +299,15 @@ describe RubricAssociation do
         r.title = "rubric"
         r.user = first_teacher
         r.data = [{
-          id: "stuff",
-          description: "stuff",
-          long_description: "",
-          points: 1.0,
-          ratings: [
-            { description: "Full Marks", points: 1.0, id: "blank" },
-            { description: "No Marks", points: 0.0, id: "blank_2" }
-          ]
-        }]
+                    id: "stuff",
+                    description: "stuff",
+                    long_description: "",
+                    points: 1.0,
+                    ratings: [
+                      { description: "Full Marks", points: 1.0, id: "blank" },
+                      { description: "No Marks", points: 0.0, id: "blank_2" }
+                    ]
+                  }]
       end
     end
     let!(:rubric_association) do
@@ -368,7 +370,7 @@ describe RubricAssociation do
         it "does not record a rubric_updated event when no updating_user present" do
           ra = old_rubric.rubric_associations.last
           ra.update!(updating_user: nil)
-          expect { ra.update!(skip_updating_points_possible: true) }.not_to change { AnonymousOrModerationEvent.count }
+          expect{ ra.update!(skip_updating_points_possible: true) }.not_to change{ AnonymousOrModerationEvent.count }
         end
 
         it 'records a rubric_updated event for the assignment' do
@@ -468,13 +470,13 @@ describe RubricAssociation do
     end
 
     it 'sets the root_account_id using root account' do
-      rubric_association_model({ context: root_account })
+      rubric_association_model({context: root_account})
       expect(@rubric_association.root_account_id).to eq root_account.id
     end
 
     it 'sets the root_account_id using sub account' do
       sub_account = root_account.sub_accounts.create!
-      rubric_association_model({ context: sub_account })
+      rubric_association_model({context: sub_account})
       expect(@rubric_association.root_account_id).to eq sub_account.root_account_id
     end
   end

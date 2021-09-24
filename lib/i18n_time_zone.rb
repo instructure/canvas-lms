@@ -27,11 +27,9 @@ class I18nTimeZone < ActiveSupport::TimeZone
   # override to include both standard and DST offsets if they exist
   def formatted_offset(colon = true)
     return super unless tzinfo
-
     period = tzinfo.current_period
     # not planning on ever switching to/from DST again
     return super unless period.end_transition
-
     other_period = tzinfo.period_for_utc(period.end_transition.at)
     # always sort the DST offset second
     periods = [period, other_period].sort_by { |p| p.dst? ? 1 : 0 }
@@ -44,7 +42,7 @@ class I18nTimeZone < ActiveSupport::TimeZone
   end
 
   def keyify
-    "time_zones.#{name.gsub(/(\W|\s|-)/, '').underscore}"
+    "time_zones.#{name.gsub(/(\W|\s|-)/,'').underscore}"
   end
 
   def self.us_zones

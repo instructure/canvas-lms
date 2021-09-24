@@ -22,6 +22,7 @@ require_relative '../../spec_helper'
 describe DataFixup::UpdateMasteryConnectToolConfig do
   before :once do
     course_model
+
   end
 
   describe 'context_external_tool' do
@@ -61,4 +62,5 @@ describe DataFixup::UpdateMasteryConnectToolConfig do
       expect(tool2.settings).to include("submission_type_selection")
     end
   end
+
 end

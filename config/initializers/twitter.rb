@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class CanvasTwitterConfig
+
   def self.call
     settings = Canvas::Plugin.find(:twitter).try(:settings)
     if settings
@@ -28,7 +29,9 @@ class CanvasTwitterConfig
     else
       ConfigFile.load('twitter').dup
     end
+
   end
 end
+
 
 Twitter::Connection.config = CanvasTwitterConfig

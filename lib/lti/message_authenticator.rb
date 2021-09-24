@@ -59,5 +59,6 @@ module Lti
     def cache_key
       "#{CACHE_KEY_PREFIX}_#{@oauth_consumer_key}_#{@nonce}"
     end
+
   end
 end

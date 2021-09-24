@@ -32,12 +32,12 @@ describe "courses" do
     @submission = @assignment.grade_student(@student, grade: 3, grader: @teacher).first
   end
 
-  it "shows badges in the left nav of a course" do
+  it "should show badges in the left nav of a course" do
     get "/courses/#{@course.id}"
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
   end
 
-  it "decrements the badge when the grades page is visited" do
+  it "should decrement the badge when the grades page is visited" do
     get "/courses/#{@course.id}"
     expect(f("#section-tabs .grades .nav-badge").text).to eq "1"
 

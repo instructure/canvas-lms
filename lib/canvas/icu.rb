@@ -32,7 +32,7 @@ module Canvas::ICU
     end
 
     def self.collate(sortable)
-      sortable.sort { |a, b| compare(a, b) }
+      sortable.sort{ |a, b| compare(a, b) }
     end
   end
 
@@ -54,6 +54,7 @@ module Canvas::ICU
         end
       end
     end
+
 
     unless ICU::Lib.respond_to?(:ucol_getAttribute)
       ICU::Lib.attach_function(:ucol_getAttribute, "ucol_getAttribute#{suffix}", [:pointer, :int, :pointer], :int)
@@ -114,7 +115,7 @@ module Canvas::ICU
           lower_first: 24,
           upper_first: 25,
         }.freeze
-        ATTRIBUTE_VALUES_INVERSE = Hash[ATTRIBUTE_VALUES.map { |k, v| [v, k] }].freeze
+        ATTRIBUTE_VALUES_INVERSE = Hash[ATTRIBUTE_VALUES.map {|k,v| [v, k]}].freeze
       end
     end
 
@@ -134,6 +135,7 @@ module Canvas::ICU
         collator
       end
     end
+
   rescue LoadError
     # in test, this will reveal system configuration problems
     throw if Rails.env.test?
@@ -158,7 +160,6 @@ module Canvas::ICU
 
   def self.collation_key(string)
     return string unless string.is_a?(String)
-
     collator.collation_key(string)
   end
 
@@ -187,7 +188,6 @@ module Canvas::ICU
       schema, collation = available_collations.find { |(_schema, locale)| locale == 'und-u-kn-true' }
     end
     return unless collation
-
     ActiveRecord::ConnectionAdapters::PostgreSQL::Name.new(schema, collation).quoted
   end
 end

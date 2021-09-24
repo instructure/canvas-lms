@@ -22,31 +22,31 @@ shared_examples 'essay [:full_credit]' do
     { points_possible: 3 }
   end
 
-  it 'counts all students who received full credit' do
+  it 'should count all students who received full credit' do
     output = subject.run([
-                           { points: 3 }, { points: 2 }, { points: 3 }
-                         ])
+      { points: 3 }, { points: 2 }, { points: 3 }
+    ])
 
     expect(output[:full_credit]).to eq(2)
   end
 
-  it 'counts students who received more than full credit' do
+  it 'should count students who received more than full credit' do
     output = subject.run([
-                           { points: 3 }, { points: 2 }, { points: 5 }
-                         ])
+      { points: 3 }, { points: 2 }, { points: 5 }
+    ])
 
     expect(output[:full_credit]).to eq(2)
   end
 
-  it 'is 0 otherwise' do
+  it 'should be 0 otherwise' do
     output = subject.run([
-                           { points: 1 }
-                         ])
+      { points: 1 }
+    ])
 
     expect(output[:full_credit]).to eq(0)
   end
 
-  it 'counts those who exceed the maximum points possible' do
+  it 'should count those who exceed the maximum points possible' do
     output = subject.run([{ points: 5 }])
     expect(output[:full_credit]).to eq(1)
   end

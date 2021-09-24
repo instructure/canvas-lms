@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "enhanceable_content" do
   include_context "in-process server selenium tests"
 
-  it "automaticallies enhance content using jQuery UI" do
+  it "should automatically enhance content using jQuery UI" do
     stub_kaltura
     course_with_teacher_logged_in
 
@@ -80,6 +80,7 @@ describe "enhanceable_content" do
     expect(ul).to be_displayed
     expect(ul).to have_class('ui-sortable')
 
+
     tabs = f(".enhanceable_content.tabs")
     expect(tabs).to have_class('ui-tabs')
     headers = tabs.find_elements(:css, ".ui-tabs-nav li")
@@ -108,7 +109,7 @@ describe "enhanceable_content" do
       @page.save!
     end
 
-    it "shows for students" do
+    it "should show for students" do
       student_in_course(:course => @course, :active_user => true)
       user_session(@student)
       get "/courses/#{@course.id}/wiki/#{@page.url}"
@@ -121,14 +122,14 @@ describe "enhanceable_content" do
         @attachment.save!
       end
 
-      it "does not show for students" do
+      it "should not show for students" do
         student_in_course(:course => @course, :active_user => true)
         user_session(@student)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
         expect(f("#content")).not_to contain_css('#media_comment_0_deadbeef span.media_comment_thumbnail')
       end
 
-      it "shows for teachers" do
+      it "should show for teachers" do
         teacher_in_course(:course => @course, :active_user => true)
         user_session(@teacher)
         get "/courses/#{@course.id}/wiki/#{@page.url}"
@@ -137,3 +138,4 @@ describe "enhanceable_content" do
     end
   end
 end
+
