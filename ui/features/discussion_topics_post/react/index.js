@@ -34,7 +34,7 @@ export const DiscussionTopicsPost = props => {
   useEffect(() => {
     const setupApolloClient = async () => {
       if (ENV.apollo_caching) {
-        const cache = await createPersistentCache()
+        const cache = await createPersistentCache(ENV.discussion_cache_key)
         setClient(createClient({cache}))
       } else {
         setClient(createClient())
