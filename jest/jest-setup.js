@@ -99,7 +99,6 @@ const ignoredErrors = [
   /The prop `hasLoaded` is marked as required in `HistoryList`/,
   /The prop `host` is marked as required in `CanvasContentTray`/,
   /The prop `id` is marked as required in `(CanvasSelectOption|ColHeader|DashboardCard|FormField|Option)`/,
-  /The prop `imageUrl` is marked as required in `GenericErrorPage`/,
   /The prop `isLiked` is marked as required in `Like`/,
   /The prop `isLoading` is marked as required in `LoadingWrapper`/,
   /The prop `jwt` is marked as required in `CanvasContentTray`/,

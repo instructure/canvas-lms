@@ -33,7 +33,8 @@ class ThrowsErrorComponent extends React.Component {
 }
 
 const defaultGenericProps = {
-  errorCategory: '404'
+  errorCategory: '404',
+  imageUrl: 'http://imageUrl'
 }
 
 const defaultProps = () => ({
