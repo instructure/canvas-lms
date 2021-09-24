@@ -25,6 +25,7 @@ describe('HomeroomPage', () => {
     visible: true,
     createPermissions: 'admin',
     loadingAnnouncements: false,
+    loadingCards: false,
     ...overrides
   })
 

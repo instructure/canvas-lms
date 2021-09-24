@@ -36,6 +36,7 @@ export const DiscussionEntryContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
+    update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
     },
@@ -197,6 +198,7 @@ DiscussionEntryContainer.propTypes = {
   lastReplyAtDisplay: PropTypes.string,
   deleted: PropTypes.bool,
   isTopicAuthor: PropTypes.bool,
+  updateDraftCache: PropTypes.func,
   quotedEntry: PropTypes.object
 }
 

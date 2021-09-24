@@ -372,6 +372,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               onDelete={props.discussionTopic.permissions.delete ? onDelete : null}
                               repliesCount={props.discussionTopic.entryCounts?.repliesCount}
                               unreadCount={props.discussionTopic.entryCounts?.unreadCount}
+                              updateDraftCache={props.updateDraftCache}
                               onSend={
                                 props.discussionTopic.permissions?.copyAndSendTo
                                   ? () => setSendToOpen(true)
