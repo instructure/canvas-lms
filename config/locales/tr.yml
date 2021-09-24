@@ -1392,7 +1392,7 @@ tr:
       open_report_description: "Açık Rapor Açıklaması"
       page_header_title: "Hesap Ayarları"
       page_title: "Hesap Ayarları"
-      quiz_ip_filters_delete: "Filtreyi Kaldır"
+      quiz_ip_filters_delete: "Kısa Sınav IP Filtresini Kaldır"
       quiz_ip_filters_help_message: |-
           Kısa sınav IP filtreleri, kısa sınavlara belirli IP aralığındaki bilgisayarlar tarafından erişimi sağlama yöntemidir.
           
@@ -5204,6 +5204,7 @@ tr:
     course_options: 
       course_options: 
         concluded: Sonlandırıldı
+        favorite: "Favori Dersler"
         groups: Gruplar
         more_courses: "Daha Fazla Dersler"
     hide: Gizle
@@ -5669,6 +5670,7 @@ tr:
   course_name_successfully_added_48116a50: "%{course_name} başarıyla eklendi!"
   course_navigation_dd035109: "Ders Gezinme Menüsü"
   course_not_found_c248a721: "Ders bulunamadı"
+  course_notification_settings_d9821d36: "Ders Bildirim Ayarları"
   course_option_links_a79d263d: "Ders seçeneği bağlantıları"
   course_outcomes_7dc1cbc7: "Dersin Çıktıları"
   course_pages_449f1dd4: "Ders Sayfaları"
@@ -6191,10 +6193,12 @@ tr:
         choose_home_page: "Ana Sayfayı Seçin"
         course_setup: "Ders Oluşturma Denetim Listesi"
         drop_course: "Bu Dersi Bırak"
+        import: "Mevcut İçeriği İçe Aktar"
         join_course: "Bu Derse Katıl"
         new_announcement: "Yeni Duyuru"
         student_view: "Öğrenci Görünümü"
         view_course_calendar: "Ders Takvimini Göster"
+        view_course_notification_settings: "Ders Bildirimlerini Göster"
         view_course_stream: "Ders Akışını Gör"
       re_sending: "Yeniden Gönderiliyor..."
       send_done: "Tamamlandı! Mesaj biraz zaman alabilir."
@@ -8117,6 +8121,7 @@ tr:
   fair_score_554e2558: "Adil Puan"
   fair_use_bee47d77: "Adil Kullanım"
   favicon_6e658914: "Site ikonu"
+  favorite_courses_fbd356f0: "Favori Dersler"
   favorites_c7e0207c: Favoriler
   feature_flags: 
     feature_flag: 
@@ -17963,6 +17968,7 @@ tr:
       global_support_desk_description: "ASC lerimiz sizin ilk destek hattınızdır ve ek yardım gerektiren konularla ilgili Dünya Genelinde Destek Bölümü ile iletişime geçebilirsiniz."
       networking_academy_description: "Sıkça sorulan soruları ve Cisco cevaplarını inceleyin."
       networking_academy_faqs: "Networking Academy SSS'leri"
+      student_support: "NetAcad Desteği - Öğrenci"
       support_desk_livechat: "Destek Masası Canlı Sohbet"
   sweden_46_55cc3620: "İsveç (+46)"
   switch_to_3f310557: "Geçiş Yap"
@@ -18144,6 +18150,7 @@ tr:
   there_was_a_problem_posting_assignment_grades_958669e8: "Ödev notlarını yayınlamada bir sorun oluştu."
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: "Notlandırma şemasını kaydetmede hata"
   there_was_an_error_in_processing_your_request_6513a49a: "İsteğin işlenmesinde hata ile karşılaşıldı"
+  there_was_an_error_saving_the_changes_to_the_cours_ed2b1d24: "Dersteki değişiklikler kaydedilirken bir hata oluştu"
   there_was_an_error_setting_usage_rights_53739e1d: "Kullanım haklarını ayarlamada hata oluştu"
   there_were_errors_with_the_form_errors_ab5b559a: "Şu formla ilgili hatalar oluştu: %{errors}"
   this_area_will_be_used_by_the_assessor_to_leave_co_98a5db8b: "Bu bölüm, değerlendirici tarafından yorum yapılması amacıyla kullanılacaktır."
@@ -19321,8 +19328,10 @@ tr:
   you_can_t_edit_this_rubric_either_because_you_don__c2472826: "İzniniz olmadığı ya da birden fazla yerde kullanıldığı için bu yönergeyi düzenleyemezsiniz. Yapacağınız değişiklikler eski yönergeyi baz alan yeni bir yönerge oluşturacaktır. Devam etmek istiyor musunuz?"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Bu kullanıcının bilgilerinden bazılarını güncelleyebilirsiniz fakat isterlerse kendileri tekrar değiştirebilir."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Bu alt hesapta temaları düzenleyemezsiniz."
+  you_cannot_set_a_grouped_discussion_as_a_student_a20f363: "Öğrenci olarak gruplandırılmış bir tartışma ayarlayamazsınız."
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Şu anda yorumlara kapalı bir tartışmanız yok"
   you_currently_have_no_pinned_discussions_6f0078b8: "Şu anda hiçbir tartışma sabitlenmedi"
+  you_do_not_have_access_to_the_requested_announceme_a774d80a: "İstenen duyuruya erişiminiz yok."
   you_do_not_have_access_to_the_requested_discussion_90d8ec99: "İstediğiniz tartışmaya erişiminiz yok."
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "İstenilen kısa sınava erişiminiz yok."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "İstenilen kaynağa erişiminiz yok."
