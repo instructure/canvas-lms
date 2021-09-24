@@ -20,7 +20,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import ExternalToolsTable from '../ExternalToolsTable'
 
-function renderTable(canAddEdit) {
+function renderTable(canAdd = true, canEdit = true, canDelete = true, canAddEdit = true) {
   window.ENV = {
     context_asset_string: 'account_1',
     ACCOUNT: {
@@ -30,19 +30,27 @@ function renderTable(canAddEdit) {
   }
 
   const setFocusAbove = jest.fn()
-  return render(<ExternalToolsTable canAddEdit={canAddEdit} setFocusAbove={setFocusAbove} />)
+  return render(
+    <ExternalToolsTable
+      canAdd={canAdd}
+      canEdit={canEdit}
+      canDelete={canDelete}
+      canAddEdit={canAddEdit}
+      setFocusAbove={setFocusAbove}
+    />
+  )
 }
 
 describe('ExternalToolsTable', () => {
   describe('rce favorites toggle', function () {
     it('shows if admin has permission', () => {
-      const {queryByText} = renderTable(true)
+      const {queryByText} = renderTable()
       expect(queryByText('Name')).toBeInTheDocument()
       expect(queryByText('Add to RCE toolbar')).toBeInTheDocument()
     })
 
     it('does not show if admin does not have permission', () => {
-      const {queryByText} = renderTable(false)
+      const {queryByText} = renderTable(false, false, false, false)
       expect(queryByText('Name')).toBeInTheDocument()
       expect(queryByText('Add to RCE toolbar')).not.toBeInTheDocument()
     })

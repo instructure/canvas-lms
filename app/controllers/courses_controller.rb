@@ -1468,7 +1468,6 @@ class CoursesController < ApplicationController
         can_manage_courses: @context.account.grants_any_right?(@current_user, session, :manage_courses, :manage_courses_admin),
         manage_students: @context.grants_right?(@current_user, session, :manage_students),
         manage_account_settings: @context.account.grants_right?(@current_user, session, :manage_account_settings),
-        create_tool_manually: @context.grants_right?(@current_user, session, :create_tool_manually),
         manage_feature_flags: @context.grants_right?(@current_user, session, :manage_feature_flags),
         manage: @context.grants_right?(@current_user, session, :manage)
       }
@@ -1476,6 +1475,13 @@ class CoursesController < ApplicationController
         js_permissions[:can_allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       else
         js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
+      end
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_lti)
+        js_permissions[:add_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_add)
+        js_permissions[:edit_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_edit)
+        js_permissions[:delete_tool_manually] = @context.grants_right?(@current_user, session, :manage_lti_delete)
+      else
+        js_permissions[:create_tool_manually] = @context.grants_right?(@current_user, session, :create_tool_manually)
       end
       js_env({
                COURSE_ID: @context.id,

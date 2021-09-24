@@ -81,6 +81,9 @@ function renderRow(props) {
   return render(
     <ExternalToolsTableRow
       tool={tools[0]}
+      canAdd
+      canEdit
+      canDelete
       canAddEdit
       setFocusAbove={() => {}}
       favoriteCount={0}

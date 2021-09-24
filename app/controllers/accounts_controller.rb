@@ -1198,6 +1198,16 @@ class AccountsController < ApplicationController
                                         })
       end
 
+      js_permissions = {
+        manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags)
+      }
+      if @account.root_account.feature_enabled?(:granular_permissions_manage_lti)
+        js_permissions[:add_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_add)
+        js_permissions[:edit_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_edit)
+        js_permissions[:delete_tool_manually] = @account.grants_right?(@current_user, session, :manage_lti_delete)
+      else
+        js_permissions[:create_tool_manually] = @account.grants_right?(@current_user, session, :create_tool_manually)
+      end
       js_env({
                APP_CENTER: { enabled: Canvas::Plugin.find(:app_center).enabled? },
                LTI_LAUNCH_URL: account_tool_proxy_registration_path(@account),
@@ -1206,10 +1216,7 @@ class AccountsController < ApplicationController
                MEMBERSHIP_SERVICE_FEATURE_FLAG_ENABLED: @account.root_account.feature_enabled?(:membership_service_for_lti_tools),
                CONTEXT_BASE_URL: "/accounts/#{@context.id}",
                MASKED_APP_CENTER_ACCESS_TOKEN: @account.settings[:app_center_access_token].try(:[], 0...5),
-               PERMISSIONS: {
-                 create_tool_manually: @account.grants_right?(@current_user, session, :create_tool_manually),
-                 manage_feature_flags: @account.grants_right?(@current_user, session, :manage_feature_flags)
-               },
+               PERMISSIONS: js_permissions,
                CSP: {
                  enabled: @account.csp_enabled?,
                  inherited: @account.csp_inherited?,
