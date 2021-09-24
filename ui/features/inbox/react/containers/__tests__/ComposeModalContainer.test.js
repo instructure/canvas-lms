@@ -254,19 +254,19 @@ describe('ComposeModalContainer', () => {
     it('allows replying all to a conversation', async () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
       const component = setup(jest.fn(), mockedSetOnSuccess, false, true, {
-        _id: 1,
+        _id: '1',
         conversationMessagesConnection: {
           nodes: [
             {
               author: {
-                _id: 1337
+                _id: '1337'
               },
               recipients: [
                 {
-                  _id: 1337
+                  _id: '1337'
                 },
                 {
-                  _id: 1338
+                  _id: '1338'
                 }
               ]
             }
