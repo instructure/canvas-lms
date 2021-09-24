@@ -1,100 +1,30 @@
-inherit_from: .rubocop.common.yml
+# if you want to see what this all evaluates to, you can run
+# `require 'erb'; puts ERB.new(File.read(".rubocop.yml")).result(binding)` from IRB
 
-AllCops:
-  NewCops: enable # TODO
+inherit_from:
+  - .rubocop.common.yml
 
-Lint/AmbiguousBlockAssociation: # TODO
-  Exclude:
-    - spec/**/*
+<%=
 
-Naming/VariableNumber: # TODO
-  Enabled: false
+# disable auto-correct on all non-explicitly-configured cops
+unless ENV['RUBOCOP_INCLUDE_AUTOCORRECTS']
+  require 'yaml'
 
-Rails/HasManyOrHasOneDependent: # TODO
-  Enabled: false
-Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
-  Enabled: false # accessors are often defined in terms of read_attribute
-Rails/TimeZone: # TODO: autocorrect (unsafe)
-  Enabled: false
+  require 'rubocop'
+  common_config = YAML.safe_load(File.read(".rubocop.common.yml"))
+  common_config["require"].each { |f| require f }
+  already_configured_cops = common_config.keys.select { |k| k.include?("/") && !common_config[k]['Exclude'] }.to_set
+  already_configured_departments = common_config.keys.select { |k| !k.include?("/") }.map(&:to_sym).to_set
 
-RSpec/ContextWording: # TODO
-  Enabled: false
-RSpec/DescribeClass: # TODO
-  Enabled: false
-RSpec/DescribedClass: # TODO: autocorrect (unsafe)
-  Enabled: false
-RSpec/ExpectChange: # TODO: autocorrect (unsafe)
-  Enabled: false
-RSpec/HookArgument: # TODO: autocorrect
-  Enabled: false
-RSpec/NamedSubject: # TODO
-  Enabled: false
-RSpec/NotToNot: # TODO: autocorrect
-  Enabled: false
-RSpec/ScatteredSetup: # TODO: investigate if these are required
-  Enabled: false
-RSpec/VerifiedDoubles: # TODO
-  Enabled: false
+  config = {}
+  RuboCop::Cop::Registry.all.each do |cop|
+    next if already_configured_departments.include?(cop.department)
+    next if already_configured_cops.include?(cop.cop_name)
+    next unless cop.support_autocorrect?
 
-Style/BlockDelimiters: # TODO: autocorrect
-  Enabled: true
-  Exclude:
-    - spec/**/*_spec.rb
-    - spec/shared_examples/**/*.rb
-Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/DoubleNegation: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/Dir: # TODO: autocorrect
-  Enabled: false
-Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
-  Enabled: false
-Style/GuardClause: # TODO
-  Enabled: false
-Style/IfUnlessModifier: # TODO: autocorrect
-  Enabled: false
-Style/Lambda: # TODO: autocorrect
-  Enabled: false
-Style/MethodCallWithArgsParentheses: # TODO: autocorrect
-  Enabled: false
-Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
-  Enabled: false
-Style/NumericLiterals: # TODO: autocorrect
-  Enabled: false
-Style/NumericPredicate: # TODO: autocorrect (unsafe)
-  Enabled: false
-Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
-  Enabled: false
-Style/PercentLiteralDelimiters: # TODO: autocorrect
-  Enabled: false
-Style/PercentQLiterals: # TODO: autocorrect
-  Enabled: false
-Style/RedundantSelf: # TODO: autocorrect
-  Enabled: false
-Style/RegexpLiteral: # TODO: autocorrect
-  Enabled: false
-Style/RescueModifier: # TODO
-  Severity: warning
-Style/RescueStandardError: # TODO: autocorrect
-  EnforcedStyle: implicit
-  Enabled: false
-Style/ReturnNil: # TODO: autocorrect (investigate violations)
-  Enabled: false
-Style/SignalException: # TODO: autocorrect
-  Enabled: false
-Style/StderrPuts: # TODO: autocorrect
-  Enabled: false
-Style/SymbolArray: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInArguments: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
-  Enabled: false
-Style/TrailingCommaInHashLiteral: # TODO: autocorrect
-  Enabled: false
-Style/WhileUntilModifier: # TODO: autocorrect
-  Enabled: false
-Style/WordArray: # TODO: autocorrect
-  Enabled: false
-Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
-  Enabled: false
+    config[cop.cop_name] = { "AutoCorrect" => false }
+  end
+
+  config.to_yaml.sub(/^---\n/, "")
+end
+%>

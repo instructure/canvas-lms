@@ -21,30 +21,25 @@ require "forwardable"
 
 module DrDiff
   class Manager
-    attr_reader :git
+    attr_reader :git, :git_dir, :campsite, :heavy, :base_dir, :severe_anywhere
+
     private :git
-
-    attr_reader :git_dir
     private :git_dir
-
-    attr_reader :campsite
     private :campsite
-
-    attr_reader :heavy
     private :heavy
-
-    attr_reader :base_dir
     private :base_dir
+    private :severe_anywhere
 
     # all levels: %w(error warn info)
     SEVERE_LEVELS = %w(error warn).freeze
 
-    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, heavy: false, base_dir: nil)
+    def initialize(git: nil, git_dir: nil, sha: nil, campsite: true, heavy: false, base_dir: nil, severe_anywhere: true)
       @git_dir = git_dir
       @git = git || GitProxy.new(git_dir: git_dir, sha: sha)
       @campsite = campsite
       @heavy = heavy
       @base_dir = base_dir || ""
+      @severe_anywhere = severe_anywhere
     end
 
     extend Forwardable
@@ -67,17 +62,21 @@ module DrDiff
                  severe_levels: SEVERE_LEVELS)
 
       command_comments = CommandCapture.run(format, command)
-      diff = DiffParser.new(git.diff, true, campsite)
+      diff = DiffParser.new(git.diff, raw: true, campsite: campsite)
 
       result = []
 
       command_comments.each do |comment|
         path = comment[:path]
         path = path[git_dir.length..-1] if git_dir
-        if heavy || diff.relevant?(path, comment[:position], severe?(comment[:severity], severe_levels))
-          comment[:path] = path unless include_git_dir_in_output
-          result << comment
-        end
+        severe = severe?(comment[:severity], severe_levels)
+        next unless heavy ||
+                    severe && severe_anywhere ||
+                    diff.relevant?(path, comment[:position], severe: severe) ||
+                    comment[:corrected]
+
+        comment[:path] = path unless include_git_dir_in_output
+        result << comment
       end
 
       result

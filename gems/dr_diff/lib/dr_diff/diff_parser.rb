@@ -22,13 +22,13 @@ module DrDiff
     attr_reader :diff
     attr_reader :campsite
 
-    # campsite = true: consider relevant the severe linter errors near lines changed
-    def initialize(input, raw = true, campsite = true)
+    # campsite = true: consider relevant linter errors near lines changed
+    def initialize(input, raw: true, campsite: true)
       @diff = (raw ? parse_raw_diff(input) : input)
       @campsite = campsite
     end
 
-    def relevant?(path, line_number, severe = false)
+    def relevant?(path, line_number, severe: false)
       return false unless diff[path]
       return true if line_number == 1 # whole-file comments are addressed to line 1
 

@@ -18,14 +18,12 @@ linter_options = {
   boyscout_mode: false
 }
 no_fail = false
-optional = false
 
 OptionParser.new do |opts|
   # boy scout means treat everything as an error
   opts.on("--boy-scout", "Treat all comments as errors") { linter_options[:boyscout_mode] = true }
   # heavy means inspect entire files if a file was changed
   opts.on("--heavy") { linter_options[:heavy_mode] = true }
-  opts.on("--optional", "Run against the optional rubocop ruleset, instead of the default") { optional = true }
   opts.on("--plugin PLUGIN", "Inspect changes from the given plugin, instead of canvas-lms") do |v|
     linter_options[:plugin] = v
   end
@@ -42,10 +40,7 @@ OptionParser.new do |opts|
   end
   opts.on("--summary", "Print a summary of offense counts by cop, instead of individual offenses") do
     linter_options[:comment_post_processing] = proc do |comments|
-      grouped_comments = comments.group_by do |comment|
-        comment[:message] =~ %r{^\[rubocop\]( \[Corrected\])?( \[Correctable\])? ([A-Za-z/]+)}
-        $3
-      end
+      grouped_comments = comments.group_by { |comment| comment[:rule] }
 
       require 'pp'
       pp grouped_comments.transform_values(&:length).to_a.sort_by(&:last).reverse.to_h
@@ -54,17 +49,14 @@ OptionParser.new do |opts|
   end
   opts.on("-a", "--auto-correct") do |_v|
     linter_options[:auto_correct] = true
-    linter_options[:heavy_mode] = true
     linter_options[:command] << " -a"
   end
   opts.on("-A", "--auto-correct-all") do |_v|
     linter_options[:auto_correct] = true
-    linter_options[:heavy_mode] = true
     linter_options[:command] << " -A"
   end
   opts.on("-x", "--fix-layout") do
     linter_options[:auto_correct] = true
-    linter_options[:heavy_mode] = true
     linter_options[:command] << " -x"
   end
   opts.on("-h", "--help", "Display this usage information") do
@@ -72,11 +64,6 @@ OptionParser.new do |opts|
     exit 1
   end
 end.parse!
-
-# without optional, we only run against the "enforced" config. this makes it so
-# that jenkins will warn about a larger config, but the pre-commit hook can
-# auto-correct against a much smaller config.
-linter_options[:command] << " -c .rubocop.enforced.yml" unless optional
 
 rlint = Linter.new(linter_options)
 exit 1 if !rlint.run && !no_fail

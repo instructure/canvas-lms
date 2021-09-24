@@ -1,0 +1,8 @@
+inherit_from:
+  - ../.rubocop.yml
+
+Layout/IndentationConsistency:
+  Enabled: false # we purposely indent dependent gems
+
+Rails:
+  Enabled: false # Rails isn't loaded yet

@@ -10,10 +10,15 @@ require:
 
 AllCops:
   TargetRubyVersion: 2.7
+  NewCops: enable
 
+Bundler:
+  Severity: error
 Bundler/OrderedGems:
   Enabled: false # this isn't good for us because of how we pin dependencies
 
+Gemspec:
+  Severity: error
 Gemspec/RequiredRubyVersion:
   # all the gemspecs in this repo are non-published gems
   # the root Gemfile enforces the Ruby version, and we purposely
@@ -21,12 +26,8 @@ Gemspec/RequiredRubyVersion:
   # maintenance pain when updating ruby versions
   Enabled: false
 
-Layout/EmptyLineAfterMagicComment:
-  Exclude:
-    - gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**/* # fixtures purposely have errors
-Layout/IndentationConsistency:
-  Exclude:
-    - "**/Gemfile.d/*" # we purposely indent dependent gems
+Layout:
+  Severity: error
 Layout/LineLength:
   Enabled: false # TODO. Maybe.
 
@@ -48,18 +49,21 @@ Naming/FileName:
   Exclude:
     - "**/Gemfile.d/~after.rb"
 
-Rails:
-  Exclude:
-    - "**/Gemfile.d/*" # Rails isn't loaded yet, so can't use their helpers in the Gemfile
 Rails/ApplicationRecord:
   Enabled: false # we never bothered creating an ApplicationRecord
+Rails/HasManyOrHasOneDependent:
+  Enabled: false # legacy code + most things we soft delete anyway
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
 
+RSpec/DescribedClass:
+  Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/EmptyExampleGroup:
   Severity: error
 RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
+RSpec/ExampleWording:
+  Severity: error
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -80,11 +84,110 @@ Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/FrozenStringLiteralComment:
   Severity: error
-Style/HashSyntax:
-  Enabled: false # TODO. Maybe.
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+
+# the following cops are currently silenced, but we may want to enable them IF
+# we correct all instances in the codebase first
+
+Lint/AmbiguousBlockAssociation: # TODO
+  Exclude:
+    - spec/**/*
+
+Naming/VariableNumber: # TODO
+  Enabled: false
+
+Rails/ReadWriteAttribute: # TODO: autocorrect (unsafe)
+  Enabled: false # accessors are often defined in terms of read_attribute
+Rails/TimeZone: # TODO: autocorrect (unsafe)
+  Enabled: false
+
+RSpec/ContextWording: # TODO
+  Enabled: false
+RSpec/DescribeClass: # TODO
+  Enabled: false
+RSpec/ExpectChange: # TODO: autocorrect (unsafe)
+  Enabled: false
+RSpec/HookArgument: # TODO: autocorrect
+  Enabled: false
+RSpec/NamedSubject: # TODO
+  Enabled: false
+RSpec/NotToNot: # TODO: autocorrect
+  Enabled: false
+RSpec/ScatteredSetup: # TODO: investigate if these are required
+  Enabled: false
+RSpec/VerifiedDoubles: # TODO
+  Enabled: false
+
+Style/BlockDelimiters: # TODO: autocorrect
+  Enabled: true
+  Exclude:
+    - spec/**/*_spec.rb
+    - spec/shared_examples/**/*.rb
+  AutoCorrect: false
+Style/ClassAndModuleChildren: # TODO: autocorrect (unsafe)
+  Enabled: false
+Style/DoubleNegation: # TODO: autocorrect (unsafe)
+  Enabled: false
+Style/Dir: # TODO: autocorrect
+  Enabled: false
+Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
+  Enabled: false
+Style/GuardClause: # TODO
+  Enabled: false
+Style/HashSyntax:
+  EnforcedStyle: ruby19_no_mixed_keys
+  Enabled: false # TODO: autocorrect
+Style/IfUnlessModifier: # TODO: autocorrect
+  Enabled: false
+Style/Lambda: # TODO: autocorrect
+  Enabled: false
+Style/MethodCallWithArgsParentheses: # TODO: autocorrect
+  Enabled: false
+Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
+  Enabled: false
+Style/NumericLiterals: # TODO: autocorrect
+  Enabled: false
+Style/NumericPredicate: # TODO: autocorrect (unsafe)
+  Enabled: false
+Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
+  Enabled: false
+Style/PercentLiteralDelimiters: # TODO: autocorrect
+  Enabled: false
+Style/PercentQLiterals: # TODO: autocorrect
+  Enabled: false
+Style/RedundantSelf: # TODO: autocorrect
+  Enabled: false
+Style/RegexpLiteral: # TODO: autocorrect
+  Enabled: false
+Style/RescueModifier: # TODO
+  Severity: warning
+  AutoCorrect: false
+Style/RescueStandardError: # TODO: autocorrect
+  EnforcedStyle: implicit
+  Enabled: false
+Style/ReturnNil: # TODO: autocorrect (investigate violations)
+  Enabled: false
+Style/SignalException: # TODO: autocorrect
+  Enabled: false
+Style/StderrPuts: # TODO: autocorrect
+  Enabled: false
 Style/StringLiterals:
-  Enabled: false # TODO. Maybe.
+  EnforcedStyle: double_quotes
+  Enabled: false # TODO: auotcorrect
+Style/SymbolArray: # TODO: autocorrect
+  Enabled: false
+Style/TrailingCommaInArguments: # TODO: autocorrect
+  Enabled: false
+Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
+  Enabled: false
+Style/TrailingCommaInHashLiteral: # TODO: autocorrect
+  Enabled: false
+Style/WhileUntilModifier: # TODO: autocorrect
+  Enabled: false
+Style/WordArray: # TODO: autocorrect
+  Enabled: false
+Style/ZeroLengthPredicate: # TODO: autocorrect (unsafe)
+  Enabled: false

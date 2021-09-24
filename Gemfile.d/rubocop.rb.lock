@@ -22,7 +22,7 @@ GEM
       zeitwerk (~> 2.2, >= 2.2.2)
     ast (2.4.2)
     concurrent-ruby (1.1.9)
-    gergich (1.2.3)
+    gergich (2.0.0)
       httparty (~> 0.17)
       sqlite3 (~> 1.4)
     httparty (0.18.1)
@@ -79,7 +79,7 @@ PLATFORMS
   x86_64-darwin-20
 
 DEPENDENCIES
-  gergich (= 1.2.3)
+  gergich (= 2.0.0)
   mime-types-data (= 3.2021.0901)
   rainbow (= 3.0.0)
   rubocop (= 1.19.1)
