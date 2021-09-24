@@ -24,7 +24,9 @@ export default function configStore(initialState) {
   // TODO: Make this comprehensible
   const middleware = [
     ReduxThunk,
-    process.env.NODE_ENV !== 'production' && require('redux-logger').logger
+    process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'test' &&
+      require('redux-logger').logger
   ].filter(Boolean)
   return applyMiddleware(...middleware)(createStore)(rootReducer, initialState)
 }

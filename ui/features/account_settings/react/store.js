@@ -37,6 +37,7 @@ export function configStore(initialState, api, options = {}) {
   const middleware = [
     ReduxThunk.withExtraArgument({axios: api}),
     process.env.NODE_ENV !== 'production' &&
+      process.env.NODE_ENV !== 'test' &&
       !options.disableLogger &&
       require('redux-logger').logger
   ].filter(Boolean)
