@@ -250,6 +250,7 @@ en-CA:
   access_canvas_training_videos_and_courses_ea43173a: "Access Canvas training videos and courses"
   access_denied_f922a9ff: "Access Denied"
   access_report_80d28095: "Access Report"
+  access_to_these_tabs_requires_the_outcome_proficie_dd8ca732: "Access to these tabs requires the Outcome Proficiency Calculations - add / edit and Outcome Mastery Scales - add / edit permissions."
   access_token_3be22221: "Access Token"
   access_token_count_access_token_count_dfb5463c: "Access Token Count: %{access_token_count}"
   access_token_created_or_regenerated_4ce9ed1f: "Access Token Created or Regenerated"
@@ -1677,6 +1678,7 @@ en-CA:
     default_name: "No Name"
   add_cc_subtitle_a9ef4a66: "Add CC/Subtitle"
   add_collaboration_da9665ac: "Add Collaboration"
+  add_comment_3205529f: "Add Comment"
   add_comment_to_library_1e3d95db: "Add comment to library"
   add_conclude_delete_publish_9d8434e7: "add / conclude / delete / publish"
   add_conclude_delete_publish_reset_15c3e5a2: "add / conclude / delete / publish / reset"
@@ -1769,6 +1771,7 @@ en-CA:
   add_scope_a5208f8b: "Add Scope"
   add_section_8b027a1c: "Add Section"
   add_set_of_grading_periods_5b4d6e51: "Add Set of Grading Periods"
+  add_student_1152afc0: "Add Student"
   add_students_by_searching_by_name_course_section_o_abb9e2f2: "Add students by searching by name, course section or group. After entering text, navigate results by using the down arrow key. Select a result by using the Enter key."
   add_students_tas_and_observers_to_your_course_e84692dd: "Add Students, TAs, and Observers to your course"
   add_students_to_courses_4910cb33: "Add Students to courses"
@@ -1860,6 +1863,7 @@ en-CA:
   after_last_attempt_c9168da2: "After Last Attempt"
   after_the_assignment_is_graded_53754607: "After the assignment is graded"
   after_the_due_date_eee89c9c: "After the due date"
+  after_the_first_attempt_you_cannot_leave_comments__3922325f: "After the first attempt, you cannot leave comments until you submit the assignment."
   ahead_21f22939: Ahead
   ajax_errors: 
     error_heading: "Ajax Error: %{status_code}"
@@ -1951,6 +1955,8 @@ en-CA:
   all_modules_20c9a1c8: "All Modules"
   all_my_files_a0213441: "All My Files"
   all_my_sections_375248b3: "All my sections"
+  all_outcomes_from_grouptitle_have_been_successfull_38e3c33c: "All outcomes from %{groupTitle} have been successfully added to this course."
+  all_outcomes_from_grouptitle_have_been_successfull_cb6ad008: "All outcomes from %{groupTitle} have been successfully added to this account."
   all_roles_f3bba14d: "All Roles"
   all_rubrics_5114c466: "All Rubrics"
   all_scopename_scopes_6c220783: "All %{scopeName} scopes"
@@ -2046,6 +2052,7 @@ en-CA:
       timestamps. Default order is newest to oldest for root level replies.
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Allows Help Links to be tagged as Featured or New and prominently displays the Featured Help Link in the Help Menu."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Allows learning outcomes to be selectable when migrating course content"
+  allows_modifying_notification_settings_for_any_cou_5004ac71: "Allows modifying notification settings for any course from within the account-level notification settings page."
   allows_setting_account_course_level_mastery_scales_1939e0fd: "Allows setting Account & Course Level mastery scales and calculation methods, replacing per-outcome criterion ratings & calculation methods"
   allows_students_to_access_other_student_groups_wit_43918810: "Allows students to access other student groups within a group set with a direct link."
   allows_syncing_of_canvas_course_members_to_a_micro_785119b4: "Allows syncing of Canvas course members to a Microsoft Team"
@@ -2105,6 +2112,7 @@ en-CA:
       Allows user to act as other users in the account. This permission should only be assigned to users that your institution has authorized to act as other users in your entire Canvas account.
               Users with this permission may be able to use the Act as feature to manage account settings, view and adjust grades, access user information, etc.
               This permissions also allows admins designated to a sub-account to access settings and information outside of their sub-account.
+  allows_user_to_add_a_group_for_a_group_assignment__b77a71cc: "Allows user to add a group for a group assignment in a course."
   allows_user_to_add_and_remove_associated_courses_2ae6e4d6: "Allows user to add and remove associated courses."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Allows user to add and remove other account admins."
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: "Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role."
@@ -2113,6 +2121,7 @@ en-CA:
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "Allows user to add and remove students to the course. Allows user to add and remove observers to the course. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to conclude or delete enrollments on a student’s details page. Allows user to resend course invitations."
   allows_user_to_add_announcements_in_the_announceme_726541b5: "Allows user to add announcements in the Announcements page."
   allows_user_to_add_assignment_groups_in_a_course_3054675c: "Allows user to add assignment groups in a course."
+  allows_user_to_add_assignments_in_a_course_4513bd22: "Allows user to add assignments in a course."
   allows_user_to_add_course_files_and_folders_566e3447: "Allows user to add course files and folders."
   allows_user_to_add_course_files_and_folders_allows_eecf49f9: "Allows user to add course files and folders. Allows user to import a zip file."
   allows_user_to_add_course_sections_in_course_setti_f8e4cabf: "Allows user to add course sections in Course Settings."
@@ -2158,8 +2167,13 @@ en-CA:
       Allows user to enable and edit assignment group weighting in a course.
   allows_user_to_add_events_to_list_view_dashboard_v_1339e29e: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox. "
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Allows user to add events to List View Dashboard via the Add to Student To-Do checkbox."
+  allows_user_to_add_group_members_to_account_or_cou_5b143ef: "Allows user to add group members to account or course groups."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Allows user to add new assignments to a module."
   allows_user_to_add_new_courses_to_an_account_bcb32ad2: "Allows user to add new courses to an account."
+  allows_user_to_add_new_question_banks_to_a_course__9731f87d: "Allows user to add new question banks to a course or account."
+  allows_user_to_add_new_question_banks_to_a_course_a18a410a: "Allows user to add new question banks to a course."
+  allows_user_to_add_new_questions_to_new_or_existin_995b8fee: "Allows user to add new questions to new or existing question banks in a course or account."
+  allows_user_to_add_new_questions_to_new_or_existin_fde9db3b: "Allows user to add new questions to new or existing question banks in a course."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Allows user to add non-graded discussions to List View Dashboard via the Add to Student To-Do checkbox."
   allows_user_to_add_observers_in_the_course_allows__9c6bb78c: "Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role."
   allows_user_to_add_observers_to_a_course_ca1a678b: "Allows user to add observers to a course."
@@ -2168,6 +2182,7 @@ en-CA:
   allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: "Allows user to add observers to the course from the account Courses page. Allows user to add observers in the course. Allows user to view login ID information for observers. Allows user to view user details for observers. Allows user to edit an observer’s section or role."
   allows_user_to_add_page_to_student_to_do_list_7085a054: "Allows user to add page to student to-do list."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Allows user to add pages to List View Dashboard via the Add to Student To-Do checkbox."
+  allows_user_to_add_quizzes_in_a_course_80916c02: "Allows user to add quizzes in a course."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Allows user to add/remove other teachers, course designers, or TAs.
       Allows user to add/remove observers to the course.
@@ -2193,6 +2208,7 @@ en-CA:
   allows_user_to_add_students_to_a_course_aa642fa6: "Allows user to add students to a course."
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Allows user to add students to a course from the account Courses page."
   allows_user_to_add_students_to_a_course_from_the_a_43abb0e6: "Allows user to add students to a course from the account Courses page. Allows user to add students to a course."
+  allows_user_to_add_students_to_course_groups_969f968: "Allows user to add students to course groups."
   allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: "Allows user to add TAs in the course. Allows user to view login ID information for TAs. Allows user to view user details for TAs. Allows user to edit a TA’s section or role."
   allows_user_to_add_tas_in_the_course_f4de4c19: "Allows user to add TAs in the course."
   allows_user_to_add_tas_to_a_course_from_the_accoun_66e76aee: "Allows user to add TAs to a course from the account Courses page."
@@ -2204,6 +2220,10 @@ en-CA:
   allows_user_to_add_teachers_to_a_course_from_the_a_40af6066: "Allows user to add teachers to a course from the account Courses page. Allows user to add teachers to a course."
   allows_user_to_add_teachers_to_a_course_from_the_a_afbe4c3d: "Allows user to add teachers to a course from the account Courses page."
   allows_user_to_add_teachers_to_the_course_from_the_dc03e973: "Allows user to add teachers to the course from the account Courses page. Allows user to add teachers in the course. Allows user to view login ID information for teachers. Allows user to view user details for teachers. Allows user to edit a teacher’s section or role."
+  allows_user_to_add_users_to_a_course_group_aa0df439: "Allows user to add users to a course group."
+  allows_user_to_add_users_to_an_account_or_course_g_f2a3a2b8: "Allows user to add users to an account or course group."
+  allows_user_to_assign_a_student_group_leader_in_a__6851d646: "Allows user to assign a student group leader in a course."
+  allows_user_to_assign_a_student_group_leader_in_an_73e12cb6: "Allows user to assign a student group leader in an account or course."
   allows_user_to_change_start_and_end_dates_for_cour_f437cee1: "Allows user to change start and end dates for course sections."
   allows_user_to_change_the_template_being_used_by_a_86f46490: "Allows user to change the template being used by an account. Allows user to view names of course templates in the root account."
   allows_user_to_change_the_template_being_used_by_a_eab509a3: "Allows user to change the template being used by an account."
@@ -2214,6 +2234,7 @@ en-CA:
   allows_user_to_configure_alerts_in_course_settings_c6b938ab: "Allows user to configure alerts in Course Settings."
   allows_user_to_configure_alerts_in_course_settings_f8acd7ba: "Allows user to configure alerts in Course Settings. Alerts are a seldom-used feature designed to send an alert to students, teachers or admins for specific triggers (e.g., no student-teacher interaction for 7 days). They are checked every day, and notifications will be sent to the student and/or the teacher until the triggering problem is resolved."
   allows_user_to_copy_individual_course_items_to_ano_46ba40d6: "Allows user to copy individual course items to another course."
+  allows_user_to_create_account_or_course_groups_1d5c4aaf: "Allows user to create account or course groups."
   allows_user_to_create_accounts_for_new_users_allow_bb7575e9: "Allows user to create accounts for new users. Allows user to remove and merge users in an account. Allows user to modify user account details. Allows user to view and modify login information for a user."
   allows_user_to_create_accounts_for_new_users_e4ec27c3: "Allows user to create accounts for new users."
   allows_user_to_create_accounts_for_new_users_with__30b55094: "Allows user to create accounts for new users with the account-level Add People button. Allows user to remove and merge users in an account. Allows user to modify user account details such as name, email, and time zone. Allows user to view and modify login information for a user."
@@ -2227,6 +2248,8 @@ en-CA:
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Allows user to create collaborations. Allows user to view, edit, and delete conferences they created."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "Allows user to create collaborations. Allows user to view, edit, and delete collaborations they created."
   allows_user_to_create_collaborations_b4f214bf: "Allows user to create collaborations."
+  allows_user_to_create_course_groups_created_by_stu_2be56e8f: "Allows user to create course groups created by students."
+  allows_user_to_create_course_groups_e169f91b: "Allows user to create course groups."
   allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "Allows user to create course pages. Allows user to edit blueprint lock settings for individual pages in a Blueprint Master Course."
   allows_user_to_create_course_pages_ec9c6647: "Allows user to create course pages."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Allows user to create developer keys for accounts."
@@ -2250,14 +2273,25 @@ en-CA:
   allows_user_to_create_new_conferences_in_courses_a_80899f64: "Allows user to create new conferences in courses and groups."
   allows_user_to_create_new_entries_in_the_faculty_j_2a280fec: "Allows user to create new entries in the Faculty Journal."
   allows_user_to_cross_list_sections_f6726df2: "Allows user to cross-list sections."
+  allows_user_to_deactivate_designers_in_a_course_e4ed0881: "Allows user to deactivate designers in a course."
+  allows_user_to_deactivate_observers_in_a_course_d6e0fee2: "Allows user to deactivate observers in a course."
+  allows_user_to_deactivate_students_in_a_course_ffb1dddc: "Allows user to deactivate students in a course."
+  allows_user_to_deactivate_tas_in_a_course_a4e38cff: "Allows user to deactivate TAs in a course."
+  allows_user_to_deactivate_teachers_in_a_course_626cab36: "Allows user to deactivate teachers in a course."
   allows_user_to_define_users_allowed_to_edit_the_pa_39fddc1c: "Allows user to define users allowed to edit the page."
   allows_user_to_delete_a_submission_file_65f1dd7d: "Allows user to delete a submission file."
   allows_user_to_delete_a_user_from_a_course_section_4b99a5c4: "Allows user to delete a user from a course section."
+  allows_user_to_delete_account_or_course_groups_3078d0c5: "Allows user to delete account or course groups."
+  allows_user_to_delete_assignment_groups_in_a_cours_88c89c76: "Allows user to delete assignment groups in a course."
+  allows_user_to_delete_assignments_in_a_course_b0f220c4: "Allows user to delete assignments in a course."
   allows_user_to_delete_course_files_and_folders_34a7793c: "Allows user to delete course files and folders."
+  allows_user_to_delete_course_groups_5ce7382e: "Allows user to delete course groups."
   allows_user_to_delete_course_pages_allows_user_to__d6e4174d: "Allows user to delete course pages. Allows user to edit blueprint lock settings for individual pages in a Blueprint Master Course."
   allows_user_to_delete_course_pages_dfaf4fb7: "Allows user to delete course pages."
   allows_user_to_delete_course_sections_19193a35: "Allows user to delete course sections."
   allows_user_to_delete_course_sections_allows_user__649d2d0d: "Allows user to delete course sections. Allows user to delete a user from a course section."
+  allows_user_to_delete_question_banks_in_a_course_o_d9cd0b2f: "Allows user to delete question banks in a course or account."
+  allows_user_to_delete_quizzes_in_a_course_acdbdfba: "Allows user to delete quizzes in a course."
   allows_user_to_designate_a_course_as_a_blueprint_c_15109885: "Allows user to designate a course as a Blueprint Course."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Allows user to designate a course as a Blueprint Course. Allows user to manage Blueprint Course settings in Course Settings. Allows user to add associated courses."
   allows_user_to_designate_a_course_as_a_blueprint_c_255aca84: |-
@@ -2269,8 +2303,13 @@ en-CA:
       Allows user to add associated courses.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "Allows user to differentiate assignments to individual students."
   allows_user_to_download_all_comments_in_a_student__33b36d0a: "Allows user to download all comments in a student’s submission."
+  allows_user_to_duplicate_assignments_in_a_course_a3bf4f54: "Allows user to duplicate assignments in a course."
+  allows_user_to_duplicate_quizzes_in_a_course_1d3437f2: "Allows user to duplicate quizzes in a course."
   allows_user_to_edit_a_student_s_section_or_role_d2b312ad: "Allows user to edit a student’s section or role."
   allows_user_to_edit_a_user_s_section_or_role_if_no_cf272262: "Allows user to edit a user’s section or role (if not added via SIS)."
+  allows_user_to_edit_account_and_course_groups_259139c0: "Allows user to edit account and course groups."
+  allows_user_to_edit_and_publish_unpublish_assignme_54d13630: "Allows user to edit and publish/unpublish assignments."
+  allows_user_to_edit_and_publish_unpublish_quizzes_bdc5b306: "Allows user to edit and publish/unpublish quizzes."
   allows_user_to_edit_assignment_details_on_individu_3e50993a: "Allows user to edit assignment details on individual discussions. Modules: Allows user to add new assignments to a module."
   allows_user_to_edit_assignment_details_on_individu_ecf19e63: "Allows user to edit assignment details on individual discussions."
   allows_user_to_edit_blueprint_content_lock_setting_25128c82: "Allows user to edit blueprint content lock settings on individual discussions."
@@ -2292,6 +2331,7 @@ en-CA:
   allows_user_to_edit_conferences_61eb62e0: "Allows user to edit Conferences."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Allows user to edit configurations for manually added external apps."
   allows_user_to_edit_course_files_and_folders_7a3fc8c7: "Allows user to edit course files and folders."
+  allows_user_to_edit_course_groups_d459145d: "Allows user to edit course groups."
   allows_user_to_edit_course_image_name_course_code__8a4681c8: "Allows user to edit course image, name, course code, time zone, subaccount, term, and other options in Course Details tab."
   allows_user_to_edit_course_pages_30f188b4: "Allows user to edit course pages."
   allows_user_to_edit_course_pages_allows_user_to_de_65fec49b: |-
@@ -2312,6 +2352,8 @@ en-CA:
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "Allows user to edit grades in the Gradebook. Allows user to access Gradebook History."
   allows_user_to_edit_grading_schemes_98c35117: "Allows user to edit grading schemes."
   allows_user_to_edit_lock_settings_on_individual_as_80ed188a: "Allows user to edit lock settings on individual assignments, pages, or discussions."
+  allows_user_to_edit_lock_settings_on_the_assignmen_4c347262: "Allows user to edit lock settings on the Assignments and Quizzes index pages."
+  allows_user_to_edit_question_banks_in_a_course_or__f72a39cf: "Allows user to edit question banks in a course or account."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Allows user to edit the course SIS ID."
   allows_user_to_edit_the_course_syllabus_a28ff262: "Allows user to edit the course syllabus."
   allows_user_to_edit_title_description_or_remove_co_483daae5: "Allows user to edit title, description, or remove collaborators on all collaborations."
@@ -2358,18 +2400,24 @@ en-CA:
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Allows user to moderate a quiz and view the quiz statistics page."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Allows user to moderate a quiz. Settings: Allows user to edit grading schemes."
   allows_user_to_modify_user_account_details_e16fb115: "Allows user to modify user account details."
+  allows_user_to_move_group_members_to_another_group_697d8da9: "Allows user to move group members to another group in an account or course."
+  allows_user_to_move_group_members_to_another_group_fc9d8d92: "Allows user to move group members to another group in a course."
   allows_user_to_publish_and_unpublish_pages_e9397f80: "Allows user to publish and unpublish pages."
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "Allows user to publish, conclude, and delete courses."
+  allows_user_to_randomly_assign_users_to_a_course_g_e866fc4: "Allows user to randomly assign users to a course group."
+  allows_user_to_randomly_assign_users_to_an_account_f6f24e8b: "Allows user to randomly assign users to an account or course group."
   allows_user_to_remove_a_course_as_a_course_templat_15e653d3: "Allows user to remove a course as a course template in Course Settings."
   allows_user_to_remove_a_course_as_a_course_templat_5a171e4c: "Allows user to remove a course as a course template in Course Settings. Allows user to set an account to not use a template."
   allows_user_to_remove_and_merge_users_in_an_accoun_b7e1aec7: "Allows user to remove and merge users in an account."
   allows_user_to_remove_designers_from_a_course_fa9e887e: "Allows user to remove designers from a course."
   allows_user_to_remove_designers_to_the_course_from_1053d170: "Allows user to remove designers to the course from the account Courses page. Allows user to remove designers from the course."
   allows_user_to_remove_designers_to_the_course_from_f5a7225e: "Allows user to remove designers to the course from the account Courses page."
+  allows_user_to_remove_group_members_from_course_gr_4f745b58: "Allows user to remove group members from course groups."
   allows_user_to_remove_observers_from_a_course_e090d53e: "Allows user to remove observers from a course."
   allows_user_to_remove_observers_from_the_course_2ad4c60c: "Allows user to remove observers from the course."
   allows_user_to_remove_observers_from_the_course_fr_6a3625ff: "Allows user to remove observers from the course from the account Courses page. Allows user to remove observers from the course."
   allows_user_to_remove_students_from_a_course_70952ba6: "Allows user to remove students from a course."
+  allows_user_to_remove_students_from_account_or_cou_845945f9: "Allows user to remove students from account or course groups."
   allows_user_to_remove_tas_from_a_course_c8002894: "Allows user to remove TAs from a course."
   allows_user_to_remove_tas_from_the_course_bd8ac630: "Allows user to remove TAs from the course."
   allows_user_to_remove_tas_from_the_course_from_the_fe838c70: "Allows user to remove TAs from the course from the account Courses page. Allows user to remove TAs from the course."
@@ -2424,6 +2472,7 @@ en-CA:
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Allows user to set outcome proficiency scales at the account and course levels."
   allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: "Allows user to set outcome proficiency scales at the course level."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Allows user to share a quiz to Commons."
+  allows_user_to_share_an_assignment_to_commons_5b0fd98b: "Allows user to share an assignment to Commons."
   allows_user_to_share_assignments_to_commons_or_edi_c70ddf7: "Allows user to share assignments to Commons or edit previously shared content."
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Allows user to share course items directly with other users. Allows user to copy individual course items to another course."
   allows_user_to_share_course_items_directly_with_ot_e5793d35: "Allows user to share course items directly with other users."
@@ -2558,6 +2607,8 @@ en-CA:
   allows_user_to_view_student_specific_data_in_analy_4abbf6be: "Allows user to view student-specific data in Analytics."
   allows_user_to_view_the_announcements_link_in_cour_b3522273: "Allows user to view the Announcements link in Course Navigation."
   allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "Allows user to view the Announcements link in Course Navigation. Allows user to view course announcements."
+  allows_user_to_view_the_clone_group_set_button_for_d68aab98: "Allows user to view the Clone Group Set button for an account or course group."
+  allows_user_to_view_the_clone_group_set_button_for_f975352: "Allows user to view the Clone Group Set button for a course group."
   allows_user_to_view_the_conclude_course_button_e90a1175: "Allows user to view the Conclude Course button."
   allows_user_to_view_the_course_grading_scheme_32a6042: "Allows user to view the course grading scheme."
   allows_user_to_view_the_course_setup_checklist_but_4d7524f0: "Allows user to view the Course Setup Checklist button."
@@ -2583,6 +2634,11 @@ en-CA:
   allows_user_to_view_the_new_announcement_button_in_4f1a0a2b: "Allows user to view the New Announcement button in the Home page."
   allows_user_to_view_the_new_announcement_button_in_d21f2922: "Allows user to view the New Announcement button in the Home page. Allows user to add announcements in the Announcements page."
   allows_user_to_view_the_new_gradebook_50f53ef0: "Allows user to view the New Gradebook."
+  allows_user_to_view_the_outcomes_calculation_tab_a_def5fecb: "Allows user to view the Outcomes Calculation tab and set outcome proficiency calculations at the course level."
+  allows_user_to_view_the_outcomes_calculations_tab__d320b540: "Allows user to view the Outcomes Calculations tab and set outcome proficiency calculations at the account and course levels."
+  allows_user_to_view_the_outcomes_manage_tab_at_the_a7d5ffce: "Allows user to view the Outcomes Manage tab at the account and course levels."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_a93a23d2: "Allows user to view the Outcomes Mastery tab and set outcome mastery scales at the account and course levels."
+  allows_user_to_view_the_outcomes_mastery_tab_and_s_d9626906: "Allows user to view the Outcomes Mastery tab and set outcome mastery scales at the course level."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "Allows user to view the People link in Course Navigation."
   allows_user_to_view_the_previous_sis_import_dates__1716ddb5: "Allows user to view the previous SIS import dates, errors, and imported items."
   allows_user_to_view_the_prior_enrollments_button_i_b04b8132: "Allows user to view the Prior Enrollments button in the course People page."
@@ -2597,11 +2653,13 @@ en-CA:
   allows_user_to_view_user_details_for_course_users_ec1b6218: "Allows user to view user details for course users."
   allows_user_to_view_user_sis_ids_68a9d218: "Allows user to view user SIS IDs."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "Allows user to view user SIS IDs in a course People page."
+  allows_user_to_weight_assignment_groups_95cb11b2: "Allows user to weight assignment groups."
   allows_users_to_add_a_friendly_description_to_outc_7acf6286: "Allows users to add a friendly description to outcomes for student and parent view in the Student Learning Mastery Gradebook."
   allows_users_to_add_conferences_from_the_calendar_f36c5008: "Allows users to add conferences from the calendar"
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Allows users to add LTI tools with conference_selection placement type"
   allows_users_to_edit_conferences_2d3c960c: "Allows users to edit Conferences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Allows users to enable the \"Launch SpeedGrader Filtered by Student Group\" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group."
+  allows_users_to_import_groups_in_a_course_a8b5c73e: "Allows users to import groups in a course."
   allows_users_to_merge_multiple_accounts_together_g_e4ceeae6: "Allows users to merge multiple accounts together (given proper credentials)."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Allows users to mute notifications on a course level granularity."
   allows_users_to_override_specific_notification_pre_ed2f5555: |-
@@ -3870,6 +3928,7 @@ en-CA:
   assignments_and_quizzes_add_b1473591: "Assignments and Quizzes - add"
   assignments_and_quizzes_add_edit_delete_5bac17ed: "Assignments and Quizzes - add / edit / delete"
   assignments_and_quizzes_delete_84ecc680: "Assignments and Quizzes - delete"
+  assignments_and_quizzes_edit_1c23f658: "Assignments and Quizzes - edit"
   assignments_and_quizzes_manage_edit_8b4b1edc: "Assignments and Quizzes - manage / edit"
   assignments_and_quizzes_view_answer_matrix_e7a65578: "Assignments and Quizzes - view answer matrix"
   assignments_and_speedgrader_7a7cd90: "Assignments and SpeedGrader"
@@ -4126,6 +4185,8 @@ en-CA:
   available_date_must_be_before_the_until_date_9ccc52b: "Available date must be before the Until date"
   available_folders_694d0436: "Available folders"
   available_from_587ce92f: "Available From"
+  available_from_availabledate_b8cb93ef: "Available from %{availableDate}"
+  available_from_availabledate_until_untildate_f27b70aa: "Available from %{availableDate} until %{untilDate}"
   available_from_date_43b5e11d: "Available From Date"
   available_from_date_must_precede_available_until_c9f9e533: "\"Available From\" date must precede \"Available Until\""
   available_from_f84e4611: "Available from"
@@ -4138,6 +4199,7 @@ en-CA:
   available_until_f3b9c4ed: "Available Until"
   available_until_field_for_styleguide_85d5d65a: "Available Until field for styleguide"
   available_until_lock_at_ab022445: "Available until %{lock_at}"
+  available_until_untildate_b926fe11: "Available until %{untilDate}"
   availableslots_available_87b8b69d: "%{availableSlots} Available"
   availableslots_more_available_be5193a8: "%{availableSlots} more available"
   avatar_8a8aa935: Avatar
@@ -4204,6 +4266,7 @@ en-CA:
     recording_setting_enabled_description: "Enable recording for this conference"
   blackboard: 
     no_manifest: "This Blackboard .zip has no imsmanifest.xml file in the root directory."
+  blackout_dates_4a140a72: "Blackout Dates"
   blank_38df4238: blank
   blocked_by_running_migration_d8a57cb7: "Blocked by running migration"
   blocked_domain_name_b5b93150: "Blocked Domain Name"
@@ -4328,10 +4391,12 @@ en-CA:
   browse_your_computer_9a735a4: "browse your computer"
   browse_your_computer_for_a_course_image_d7db2376: "Browse your computer for a course image"
   bucket_name_must_be_one_of_the_following_bucket_na_81c1be40: "bucket name must be one of the following: %{bucket_names}"
+  build_78955b82: Build
   build_pages_containing_content_and_educational_res_6474319f: |-
       Build Pages containing content and educational resources that
                       help students learn but aren't assignments. Include text,
                       multimedia, and links to files and external resources.
+  build_quiz_7f4cdc74: "Build quiz"
   bulgarian_feccab7e: Bulgarian
   bulk_course_migration: 
     export_failed: "There was an error exporting the course with bb_lcid %{id} from Blackboard"
@@ -4450,6 +4515,7 @@ en-CA:
   by_default_students_can_always_create_groups_in_a__149d08b7: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - add / edit / delete must be enabled and the Let students organize their own groups checkbox in Course Settings must be deselected."
   by_default_students_can_always_create_groups_in_a__60ca6e9e: "By default, students can always create groups in a course."
   by_default_students_can_always_create_groups_in_a__af000dd: "By default, students can always create groups in a course. To restrict students from creating groups, Manage Courses: Admin - manage / update must be enabled and the Let students organize their own groups checkbox in Course Settings must be deselected."
+  by_default_students_can_always_create_groups_in_a__dac761d3: "By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected."
   by_lti_2_registration_url_e421e523: "By LTI 2 Registration URL"
   by_url_a163275e: "By URL"
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
@@ -4997,6 +5063,7 @@ en-CA:
   canvas_for_elementary_many_announcements_in_homero_5adacca1: "Canvas for Elementary: many announcements in homeroom"
   canvas_for_elementary_parent_support_74a2356e: "Canvas for Elementary: Parent Support"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
+  canvas_guides_d65431: "Canvas Guides"
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas helps you leverage collaborative technology so multiple
             users can work together on the same document at the same time. Create
@@ -7012,6 +7079,7 @@ en-CA:
   course_notification_settings_updated_f6726d7e: "Course notification settings updated"
   course_option_links_a79d263d: "Course option links"
   course_outcomes_7dc1cbc7: "Course Outcomes"
+  course_pace_plan_c79cbffc: "Course Pace Plan"
   course_pages_449f1dd4: "Course Pages"
   course_participation_and_access_settings_7a3d6297: "Course Participation and Access Settings"
   course_participation_is_limited_to_course_start_an_7315866d: "Course participation is limited to *course* start and end dates. Any section dates created in the course may override course dates."
@@ -7573,6 +7641,7 @@ en-CA:
   courses_account_settings_79e2f748: "Courses - Account Settings"
   courses_add_20891f99: "Courses - add"
   courses_add_edit_delete_aa2b55d3: "Courses - add / edit / delete"
+  courses_can_only_be_created_at_the_course_level_if_192bb838: "Courses can only be created at the course level if allowed by a Canvas admin. If allowed, courses can be created in the Dashboard."
   courses_cannot_be_created_on_the_site_admin_accoun_68053d94: "Courses cannot be created on the site_admin account."
   courses_change_visibility_9150ff1b: "Courses - change visibility"
   courses_conclude_7bf4ce68: "Courses - conclude"
@@ -8247,6 +8316,7 @@ en-CA:
   determines_visibility_and_management_of_rubrics_ta_e5dad169: "Determines visibility and management of Rubrics tab in the account navigation. Allows user to manage rubrics."
   determines_visibility_and_management_of_sis_import_a91ed255: "Determines visibility and management of SIS Import tab in account navigation."
   determines_visibility_and_management_of_sis_import_bf386823: "Determines visibility and management of SIS Import link in Account Navigation."
+  determines_visibility_and_management_of_the_outcom_aace9659: "Determines visibility and management of the Outcomes link in Account Navigation."
   determines_visibility_and_management_of_the_questi_c57c5b31: "Determines visibility and management of the Question Banks link in Account Navigation."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "Determines visibility and management of the Question Banks account navigation link."
   determines_visibility_and_management_of_the_rubric_533da0b8: "Determines visibility and management of the Rubrics link in Account Navigation."
@@ -8368,6 +8438,9 @@ en-CA:
   disabling_f594bda: Disabling...
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Disabling Post to SIS is not available for non-published courses"
   disabling_sync_to_name_failed_e7521ebb: "Disabling Sync to %{name} failed"
+  disabling_the_assignments_and_quizzes_add_permissi_e06f1379: "Disabling the Assignments and Quizzes - add permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from creating rubrics for an individual assignment."
+  disabling_the_assignments_and_quizzes_delete_permi_ad890eb3: "Disabling the Assignments and Quizzes - delete permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing user from deleting rubrics for an individual assignment."
+  disabling_the_assignments_and_quizzes_edit_permiss_529f9360: "Disabling the Assignments and Quizzes - edit permission will override (if enabled) the Rubrics - add / edit / delete permission, preventing users from editing rubrics from an individual assignment."
   disabling_the_elementary_theme_will_change_the_fon_d7f31a3b: "Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course."
   disabling_the_mastery_paths_feature_will_release_c_4b96c86d: |-
       Disabling the Mastery Paths feature will release configured assignments and content to all students.
@@ -9097,6 +9170,7 @@ en-CA:
   email_alias_mailnickname_d92fa8bd: "Email Alias (mailNickname)"
   email_already_in_use_330248e: "Email already in use"
   email_e366fa29: email
+  email_example_com_99490d29: email@example.com
   email_is_invalid_e0d982eb: "Email is invalid!"
   email_is_required_736ac26b: "Email is required"
   email_name_d1ef8b39: "Email %{name}"
@@ -9157,6 +9231,7 @@ en-CA:
   enables_sorting_by_sis_id_integration_id_and_login_6aa901b9: "Enables sorting by SIS ID, integration ID and login ID in New Gradebook."
   enables_support_for_observers_within_canvas_for_el_c5e31b5b: "Enables support for observers within Canvas for Elementary."
   enables_the_course_templates_feature_globally_79d5302f: "Enables the Course Templates feature globally"
+  enables_the_microsoft_immersive_reader_button_in_s_ab4af0cd: "Enables the Microsoft Immersive Reader button in supported areas of Canvas. The button may still be enabled in a course regardless of this setting if the account administrator has turned it on for all users."
   enabling_the_elementary_theme_will_change_the_font_c944b619: "Enabling the Elementary Theme will change the font in the Canvas interface and simplify the Course Navigation Menu for all users in your course."
   encourage_class_participation_4e069479: "Encourage class participation"
   encourage_student_discourse_7836b9f7: "Encourage student discourse"
@@ -9294,6 +9369,7 @@ en-CA:
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ensures that users without the Import Outcomes permission cannot see the button within the Outcomes tab"
   enter_a_filename_for_the_photo_4f0fc10e: "Enter a filename for the photo"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Enter a hexcode here to use a custom color."
+  enter_a_student_pairing_code_below_to_add_a_studen_15789251: "Enter a student pairing code below to add a student to observe."
   enter_a_valid_date_46d77547: "Enter a valid date"
   enter_a_what_if_score_668c91a3: "Enter a What-If score."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Enter \"{{ACCOUNT_DOMAIN}}\" to substitute the user's root account domain"
@@ -9313,6 +9389,7 @@ en-CA:
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: "Enter the login IDs of the users you would like to add, separated by commas or line breaks"
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: "Enter the SIS IDs of the users you would like to add, separated by commas or line breaks"
   enter_url_e8bb8a33: "Enter URL"
+  enter_web_url_483c2cbb: "Enter Web URL"
   enter_your_alternate_description_here_a8d4a58d: "Enter your alternate description here"
   enter_your_description_9e24c917: "Enter your description"
   enter_your_friendly_description_here_b3c230d3: "Enter your friendly description here"
@@ -9850,6 +9927,7 @@ en-CA:
   failed_loading_course_sections_refresh_page_to_try_f97160bf: "Failed loading course sections. Refresh page to try again."
   failed_loading_sync_history_component_is_your_netw_2d04fc10: "Failed loading Sync History component. Is your network connection OK?"
   failed_loading_unsynced_changes_component_is_your__89f863d6: "Failed loading Unsynced Changes component. Is your network connection OK?"
+  failed_pairing_student_c9f0863b: "Failed pairing student."
   failed_please_report_the_following_error_code_to_y_42248d60: "Failed, please report the following error code to your system administrator: ErrorReport:%{error};"
   failed_retrieving_media_source_3f0cfd49: "Failed retrieving media source"
   failed_retrieving_media_sources_32aed288: "Failed retrieving media sources."
@@ -9865,6 +9943,7 @@ en-CA:
   failed_to_delete_external_feed_36f19d70: "Failed to delete external feed"
   failed_to_delete_role_label_27959de3: "Failed to delete role %{label}"
   failed_to_delete_selected_pages_26fa87db: "Failed to delete selected pages"
+  failed_to_export_pace_plans_9832daac: "Failed to export pace plans"
   failed_to_export_some_tool_settings_c992fc56: "Failed to export some tool settings"
   failed_to_ignore_assignment_46565fa3: "Failed to ignore assignment"
   failed_to_import_media_objects_4c1fcb4f: "Failed to import media objects"
@@ -9876,6 +9955,7 @@ en-CA:
   failed_to_load_apps_for_name_fc6ce1c: "Failed to load apps for %{name}."
   failed_to_load_assignments_in_important_dates_ce3b4227: "Failed to load assignments in important dates."
   failed_to_load_course_navigation_for_name_aded3650: "Failed to load course navigation for %{name}."
+  failed_to_load_courses_refresh_the_page_to_try_aga_4248fa3f: "Failed to load courses. Refresh the page to try again."
   failed_to_load_csp_information_try_refreshing_the__4a056997: "Failed to load CSP information, try refreshing the page."
   failed_to_load_events_in_important_dates_2195b227: "Failed to load events in important dates."
   failed_to_load_external_feeds_7ac8411d: "Failed to Load External Feeds"
@@ -10520,6 +10600,7 @@ en-CA:
   gradebook_and_speedgrader_will_be_inaccessible_if__4de0e869: "Gradebook and SpeedGrader will be inaccessible if both Grades - edit​ and Grades - view all grades​ are disabled."
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades​ are disabled."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Gradebook and SpeedGrader will be inaccessible if both Grades - edit and Grades - view all grades are disabled."
+  gradebook_assignment_search_and_redesign_409c5b21: "Gradebook Assignment Search And Redesign"
   gradebook_context_name_9dbae5bc: "Gradebook - %{context_name}"
   gradebook_csv_export_assignment_order_matches_the__9044f08e: "Gradebook CSV Export Assignment Order Matches the Gradebook Grid"
   gradebook_csv_headers_include_grading_period_1015185c: "Gradebook CSV Headers Include Grading Period"
@@ -11599,6 +11680,7 @@ en-CA:
   if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       If an LTI tool configured with the placement is installed, will show a new entry in the
       assignment submission type dropdown to quickly configure the assignment for the tool
+  if_blueprint_courses_add_edit_associate_delete_and_82f7ee06: "If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page."
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "If both Grades - edit​ and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_9bfa7a61: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "If both Grades - edit and Grades - view all grades are disabled, Gradebook will be hidden from Course Navigation."
@@ -11692,8 +11774,10 @@ en-CA:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "If Statistics - view or Users - manage login details is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "If Statistics - view​ or Users - manage login details is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin Tools, both of these permissions need to be disabled."
+  if_the_account_and_course_level_outcome_mastery_sc_a59cef30: "If the Account and Course Level Outcome Mastery Scales feature preview is enabled, the Manage tab displays an updated interface. Additionally, the Outcomes page will display two additional tabs that decouple mastery scales and proficiency calculations from outcomes management."
   if_the_additional_permissions_are_enabled_but_this_619c2a4a: "If the additional permissions are enabled, but this permission is not enabled, lock settings can be edited on individual discussions."
   if_the_course_content_permission_enabled_and_web_c_85f91e32: "If the Course Content permission enabled and Web Conferences - create is disabled, the user can still manage conferences."
+  if_the_feature_preview_is_enabled_and_this_permiss_e79925a7: "If the feature preview is enabled, and this permission is enabled, the Outcomes page includes three tabs: Manage, Mastery, and Calculation."
   if_the_open_registration_account_setting_is_enable_10b1965c: "If the Open Registration account setting is enabled, users with this permission can add designers to a course from the Courses page via email address or login ID even if a designer does not already have a Canvas account."
   if_the_open_registration_account_setting_is_enable_1994a971: "If the Open Registration account setting is enabled, users with this permission can add TAs to a course via email address or login ID even if the TA does not already have a Canvas account."
   if_the_open_registration_account_setting_is_enable_1e679e07: "If the Open Registration account setting is enabled, users with this permission can add TAs to a course from the Courses page via email address or login ID even if a TA does not already have a Canvas account."
@@ -11759,6 +11843,7 @@ en-CA:
       If this permission is disabled and Courses - add / edit / delete​ is enabled,
       users can add a new course with the Add a New Course button in Account
       Settings.
+  if_this_permission_is_disabled_and_courses_add_is__acccce1b: "If this permission is disabled and Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings."
   if_this_permission_is_disabled_and_manage_courses__8fbc2efe: "If this permission is disabled and Manage Courses - add is enabled, users can add a new course with the Add a New Course button in Account Settings."
   if_this_permission_is_disabled_and_users_view_logi_9dbd9236: "If this permission is disabled, and Users - view login IDs is enabled, users will still see email addresses used as login IDs."
   if_this_permission_is_disabled_at_the_account_leve_1b0e403f: "If this permission is disabled, at the account level, the user cannot view any existing account groups. At the course level, the user can view, but not access, any existing groups, including groups created by students."
@@ -11773,6 +11858,7 @@ en-CA:
   if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "If this permission is enabled and Courses - view list is disabled, users can add a new course with the Add a New Course button in Account Settings."
   if_this_permission_is_enabled_and_if_users_view_pr_9ba99d6: "If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs."
   if_this_permission_is_enabled_but_blueprint_course_ccc15486: "If this permission is enabled, but Blueprint Courses - add / edit / associate / delete is not enabled, users can still sync Blueprint Courses and view Sync history."
+  if_this_permission_is_enabled_the_learning_mastery_af45b0ca: "If this permission is enabled, the Learning Mastery tab displays on the Outcomes page instead of the Rubrics page."
   if_this_permission_is_enabled_users_do_not_need_th_49974dc2: "If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled. To add users to courses via SIS ID, Users - add/remove students from courses - and or Users - add/remove teachers, course designers, or TAs from courses must also be enabled."
   if_this_permission_is_enabled_users_do_not_need_th_95b69e6: |-
       If this permission is enabled, users do not need the SIS Data - read permission enabled. The account permission overrides the course permission. To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled.
@@ -12144,6 +12230,7 @@ en-CA:
   invalid_csv_file_2c076da5: "Invalid CSV File"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Invalid CSV file. Grades could not be updated."
   invalid_custom_fields_c66dcdb6: "Invalid custom fields."
+  invalid_custom_parameters_please_ensure_they_match_b35cd355: "Invalid custom parameters. Please ensure they match the LTI 1.3 specification."
   invalid_date_2a10bb7b: "Invalid Date"
   invalid_date_and_time_1a42d206: "Invalid date and time"
   invalid_date_or_datetime_for_field_b38fe386: "Invalid date or datetime for %{field}"
@@ -12170,6 +12257,7 @@ en-CA:
   invalid_microsoft_teams_sync_login_attribute_valid_9905edaf: "Invalid Microsoft Teams Sync login attribute. Valid login attributes: %{valid_attributes}"
   invalid_or_missing_login_attribute_config_in_accou_eb1d9a0: "Invalid or missing \"login attribute\" config in account"
   invalid_or_missing_session_for_oauth_3ce4b605: "Invalid or missing session for oauth"
+  invalid_pairing_code_dde8d40a: "Invalid pairing code."
   invalid_points_8e929c3f: "Invalid points"
   invalid_points_for_rating_tier_index_i_400d307e: "Invalid points for rating tier %{index}: \"%{i}\""
   invalid_points_possible: "The value of possible points for this assignment must be zero or greater."
@@ -12955,6 +13043,7 @@ en-CA:
             course, allow students to manage course content areas, and hide grade
             details from students. You may also be able to adjust the course name and code.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Makes a Microsoft Immersive Reader link option show up on wiki pages."
+  makes_microsoft_immersive_reader_appear_in_more_su_b8a360d9: "Makes Microsoft Immersive Reader appear in more supported areas."
   makes_the_student_grades_page_responsive_c13e00eb: "Makes the student grades page responsive."
   making_a_copy_of_original_assignment_name_8f029a9b: "Making a copy of \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Making a copy of \"%{originalAssignmentName}\""
@@ -14999,6 +15088,7 @@ en-CA:
   modified_by_c1584b3c: "Modified By"
   modified_by_user_e6c8ade3: "modified by: %{user}"
   modify_permissions_for_account_rubrics_6c3aee59: "Modify permissions for Account Rubrics"
+  modify_settings_ed8b9ccf: "Modify Settings"
   module_90d9fd32: Module
   module_completed_50c50762: "Module Completed"
   module_content_import_enhancements_c00b0ea2: "Module Content Import Enhancements"
@@ -15060,6 +15150,7 @@ en-CA:
   more_info_at_web_address_dba7e187: "More info at %{web_address}"
   more_information_3dfb76b5: "More information"
   more_information_about_ratings_57cdd446: "More Information About Ratings"
+  more_microsoft_immersive_reader_78c32ad5: "More Microsoft Immersive Reader"
   more_modules_d9a9f003: "More Modules"
   more_options_272b4953: "More Options"
   more_options_e89670cf: "More options"
@@ -15346,6 +15437,7 @@ en-CA:
   new_quizzes_account_and_course_level_item_banks_9152fb1: "New Quizzes Account and Course Level Item Banks"
   new_quizzes_assignment_build_button_72b6531a: "New Quizzes Assignment Build Button"
   new_quizzes_banks_migrations_9ab4de4a: "New Quizzes Banks Migrations"
+  new_quizzes_build_button_in_module_items_10f651fb: "New Quizzes Build Button In Module Items"
   new_quizzes_dbda7e0a: "New Quizzes"
   new_quizzes_embedded_module_progression_cd2307b6: "New Quizzes Embedded Module Progression"
   new_quizzes_importing_c167dce0: "New Quizzes Importing"
@@ -15841,6 +15933,8 @@ en-CA:
       parent: "Parent Emails"
       scheduling: Scheduling
   notification_preferences_cf47083d: "Notification Preferences"
+  notification_settings_652dc60b: "Notification Settings"
+  notification_settings_course_selector_ff07468b: "Notification settings: Course selector"
   notifications_cbfa7704: Notifications
   notifications_off_80da021c: "Notifications off"
   notifications_search_results_80a0b06f: "Notifications Search Results"
@@ -16347,6 +16441,7 @@ en-CA:
   own_copyright_cc59db55: "Own Copyright"
   owner_email_236d1b2: "Owner Email"
   owner_email_4d02f795: "Owner Email:"
+  pace_plan_56e8fb1d: "Pace Plan"
   pace_plans_4bb9c5ff: "Pace Plans"
   pace_plans_adds_support_for_rolling_enrollments_to_10a27107: "Pace Plans adds support for rolling enrollments to Canvas; allowing magical distribution of due dates for students with different start dates based on an instructor's defined pace. Learn more and give feedback by joining the Pace Plans User Group."
   pace_plans_is_in_active_development_f6c20046: "Pace Plans is in active development."
@@ -16433,8 +16528,13 @@ en-CA:
     view_more_link: "View More"
   paginated_view: 
     loading_more_results: "Loading more results"
+  pair_4d942a74: Pair
   pair_with_observer_b1541895: "Pair with Observer"
+  pair_with_student_6f76e69a: "Pair with student"
+  pairing_code_1ddbd699: "Pairing code"
   pairing_code_bde979a7: "Pairing Code"
+  pairing_codes_are_only_supported_when_self_registr_1c8201cf: "Pairing codes are only supported when self registration is enabled for the course."
+  pairing_codes_are_only_supported_when_self_registr_af82b9bc: "Pairing codes are only supported when self registration is enabled for the account."
   pakistan_92_da28c36: "Pakistan (+92)"
   panama_507_831fbc99: "Panama (+507)"
   paper_view_7405eeab: "Paper View"
@@ -16451,6 +16551,8 @@ en-CA:
   partially_anonymous_483a892d: "Partially Anonymous"
   partially_enabled_and_locked_9a39d38a: "Partially enabled and Locked"
   partially_enabled_cd506819: "Partially enabled"
+  participantcount_less_8d258f6: "%{participantCount} less"
+  participantcount_more_50363e55: "%{participantCount} more"
   participation_af2598: Participation
   participations_1823832d: Participations
   pass_2a8c4f07: pass
@@ -16595,6 +16697,7 @@ en-CA:
   please_log_in_to_view_this_content_eec6cd0: "Please Log in to view this content"
   please_make_sure_no_one_is_able_to_capture_the_ima_3d6498e7: "Please make sure no one is able to capture the image on your screen from your surroundings or from a screen sharing service."
   please_provide_a_field_e5a7d0b3: "Please provide a %{field}"
+  please_provide_a_pairing_code_530d1e9d: "Please provide a pairing code."
   please_provide_a_valid_tenant_domain_check_your_az_7acb215b: "Please provide a valid tenant domain. Check your Azure Active Directory settings to find it."
   please_select_a_group_set_for_this_assignment_e1da63d3: "Please select a group set for this assignment"
   please_select_a_user_role_for_this_link_9fb4e655: "Please select a user role for this link."
@@ -17228,7 +17331,7 @@ en-CA:
         token_never_expires: never
       titles: 
         delete_this_token: "Delete this Token"
-    account_notification_settings_title: "Account Notification Settings"
+    account_notification_settings_title: "Notification Settings"
     buttons: 
       generate_token: "Generate Token"
       generating_token: "Generating Token..."
@@ -17542,6 +17645,7 @@ en-CA:
   provide_tutorial_information_for_new_users_in_a_fl_c23462ac: "Provide tutorial information for new users in a flyout tray."
   provider_attribute_b1cad655: "Provider Attribute"
   provider_icon_5064fa6e: "Provider icon"
+  provides_a_button_which_navigates_straight_to_the__5891d96a: "Provides a button which navigates straight to the Build screen in the kebab menu for New Quizzes items on the Modules page."
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: "Provides a flag on the Devloper Key to support Include Parameters on API requests"
   provides_users_with_a_to_do_list_dashboard_option_9334f9fa: "Provides users with a To Do List Dashboard option."
   provision_a_catalog_account_8cea67f6: "Provision a Catalog Account"
@@ -17645,6 +17749,8 @@ en-CA:
   qatar_974_7e9684ca: "Qatar (+974)"
   qr_code_display_was_canceled_96234bf2: "QR code display was canceled"
   qr_code_image_2b3a89b5: "QR Code Image"
+  qr_codes_are_not_the_same_as_pairing_codes_and_are_19f506d4: "QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps."
+  qr_codes_are_not_the_same_as_pairing_codes_and_are_e9a16676: "QR codes are not the same as pairing codes and are only used to help users log into their own accounts via the Canvas mobile apps. To disable QR code logins for all users in your account, please contact your Customer Success Manager."
   qr_for_mobile_login_1b1560ce: "QR for Mobile Login"
   qti_display: QTI
   qti_export_from_date_8f018de5: "*QTI Export from %{date}*"
@@ -19287,6 +19393,7 @@ en-CA:
   require_authentication_provider_on_logins_2aeb580e: "Require Authentication Provider on Logins"
   require_authenticion_provider_on_logins_1dba5ef7: "Require Authenticion Provider on Logins"
   require_captcha_for_self_registration_b3b2ea02: "Require Captcha for Self Registration"
+  require_completion_by_specified_end_date_ed742ecb: "Require Completion by Specified End Date"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Require group members to be in the same section"
   require_respondus_lockdown_browser_31425b3a: "Require Respondus LockDown Browser"
   require_signed_token_for_oembed_64883303: "Require signed token for oEmbed"
@@ -19805,6 +19912,7 @@ en-CA:
   search_280d00bd: Search
   search_announcements_by_title_407a998e: "Search announcements by title"
   search_assignments_8c3c21bb: "Search Assignments"
+  search_assignments_in_gradebook_and_new_design_for_8f966bcc: "Search assignments in Gradebook and new design for assignment and student search"
   search_by_99d1ba5f: "Search by"
   search_by_c559efd: "Search By"
   search_by_student_name_26536097: "Search by student name"
@@ -19977,6 +20085,7 @@ en-CA:
   select_all_students_7c2c34b3: "Select all students"
   select_an_edit_operation_ec1467d: "Select an edit operation"
   select_an_outcome_group_6edb08a7: "Select an outcome group"
+  select_another_group_24773e5f: "Select another group"
   select_assignment_title_4571ffcb: "Select assignment: %{title}"
   select_audio_file_7d905cce: "Select Audio File"
   select_by_date_range_c3af0101: "Select by date range"
@@ -20250,6 +20359,7 @@ en-CA:
   settings_5aa0fd0c: Settings
   settings_changed_exceptions_e5247936: "Settings changed exceptions:"
   settings_for_assignment_name_c19565e1: "Settings for Assignment %{name}"
+  settings_for_e2322172: "Settings for"
   settings_for_name_7731a33d: "Settings for %{name}"
   settings_for_tab_label_3bff4468: "Settings for %{tab_label}"
   settings_for_title_d3ca495: "Settings for %{title}"
@@ -21051,6 +21161,7 @@ en-CA:
   size_f1873a2: ", size: "
   size_size_a77bd760: "size: %{size}"
   skip_bcb86160: Skip
+  skip_weekends_13cbd889: "Skip Weekends"
   skipped_file_filename_due_to_error_94f0194: "Skipped file %{filename} due to error"
   skipping_unknown_file_type_cd1086ee: "Skipping unknown file type"
   skype_18850ba7: Skype
@@ -21305,6 +21416,7 @@ en-CA:
   statuses_497dfa15: Statuses…
   statuses_f41543d8: Statuses
   step: Step
+  sticky_left_navigation_3d438a81: "Sticky Left Navigation"
   stop_acting_as_user_8809a97f: "Stop Acting as User"
   storage_quotas_manage_6ca14bbb: "Storage Quotas - manage"
   storage_used_in_mb_c75fbd9c: "storage used in MB"
@@ -21371,6 +21483,7 @@ en-CA:
       mastery/remedial.
   student_page_history_ce86b3c2: "Student Page History"
   student_page_history_pages_update_ae55fa03: "Student Page History (Pages - Update)"
+  student_paired_successfully_a88def61: "Student paired successfully"
   student_planner_date_4cc73abb: "Student Planner Date:"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
   student_position_6d3b7750: "Student %{position}"
@@ -21820,6 +21933,7 @@ en-CA:
     modules: Modules
     observees: Observing
     outcomes: Outcomes
+    pace_plans: "Pace Plans"
     pages: Pages
     past_global_announcements: "Global Announcements"
     people: People
@@ -22293,6 +22407,7 @@ en-CA:
   these_domains_have_automatically_been_added_to_you_cef51600: |-
       These domains have automatically been added to your whitelist.
                     If you wish to remove them, you should remove the associated tool.
+  these_permissions_do_not_manage_discussions_discus_79defb66: "These permissions do not manage Discussions. Discussions are managed via individual Discussion permissions."
   these_pronouns_will_appear_after_your_name_when_sh_6b7ff5b2: "These pronouns will appear after your name when shown in the UI"
   these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: "These pronouns will be available to Canvas users in your account to choose from."
   these_scores_are_out_of_order_4f0859ef: "these scores are out of order"
@@ -22358,6 +22473,8 @@ en-CA:
   this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "This ePortfolio has been identified as possible spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe. Otherwise, you can confirm it as spam."
   this_eportfolio_has_been_identified_as_spam_and_is_8430467: "This ePortfolio has been identified as spam, and is only visible to you. Please contact an administrator if you have any questions."
   this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "This ePortfolio has been identified as spam. It is currently only visible to administrators and the author. If you're sure this content is not spam, you can mark it as safe."
+  this_feature_affects_existing_data_for_all_courses_4fc75fe1: "This feature affects existing data for all courses in the account."
+  this_feature_affects_existing_data_for_an_entire_a_2372dc52: "This feature affects existing data for an entire account."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "This feature allows teachers to easily copy single items from one course to another, and to share a single item of content with other users so they can import those items into their courses as well."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "This feature can't be disabled because there is at least one sub-account or course with this feature enabled."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "This feature can't be enabled while autodetection of field separators is enabled"
@@ -22494,6 +22611,8 @@ en-CA:
   this_permission_only_controls_adding_users_at_the__f33e8ae8: |-
       This permission only controls adding users at the account level. To add users
       to a course, Users - add / remove students from courses or Users - add / remove teachers, course designers, or TAs from courses to the course​ must be enabled.
+  this_permission_requires_the_account_and_course_le_b09106c: "This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which can only be enabled at the account level."
+  this_permission_requires_the_account_and_course_le_b2b8d826: "This permission requires the Account and Course Level Outcome Mastery Scales feature preview, which must be enabled by a Customer Success Manager."
   this_permission_should_only_be_assigned_to_users_t_231c182e: "This permission should only be assigned to users that your institution has authorized to act as other users in your entire Canvas account."
   this_placement_requires_deep_link_support_by_the_v_702d554f: "This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality"
   this_pronoun_appears_after_last_name_bf5c0bf5: "This pronoun appears after last name"
@@ -22785,6 +22904,7 @@ en-CA:
   title_appointment_group_you_can_sign_up_for_this_1c254712: "*%{title} appointment group* You can **sign up** for this."
   title_current_750a3c65: "%{title} (Current)"
   title_due_date_d3f46bfb: "%{title}: Due %{date}"
+  title_eb77c512: "%{title}"
   title_ee03d132: Title
   title_f8e03596: "* Title"
   title_has_been_moved_to_newgrouptitle_739707b4: "\"%{title}\" has been moved to \"%{newGroupTitle}\"."
@@ -22825,10 +22945,13 @@ en-CA:
   to_access_assignment_submissions_through_assignmen_ecbb8fb7: |-
       To access assignment submissions through Assignments and the
       Gradebook, Grades - view all grades​ must also be enabled.
+  to_access_item_banks_for_a_course_item_banks_manag_a60a144f: "To access item banks for a course, Item Banks - manage account must also be enabled."
+  to_access_item_banks_for_a_course_or_account_item__f1f7b0af: "To access item banks for a course or account, Item Banks - manage account must also be enabled."
   to_access_the_account_courses_page_courses_view_li_e1da6165: "To access the account Courses page, Courses - view list must be enabled."
   to_access_the_account_settings_tab_account_level_s_9676d44b: "To access the Account Settings tab, Account-level settings - manage must also be enabled."
   to_access_the_assignments_index_page_course_conten_49d884f2: "To access the Assignments Index Page, Course Content - view must be enabled."
   to_access_the_assignments_index_page_course_conten_a5b00f98: "To access the Assignments Index Page, Course Content - view must be enabled. To differentiate assignments to individual students, Users - view list ​must also be enabled."
+  to_access_the_calculation_tab_the_outcome_proficie_cdd40cdf: "To access the Calculation tab, the Outcome Proficiency Calculations - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled."
   to_access_the_courses_link_in_account_navigation_c_4f4a7ffc: "To access the Courses link in Account Navigation, Courses - view list must also be enabled."
   to_access_the_courses_link_in_account_navigation_c_5aa3d76c: "To access the Courses link in Account Navigation, Courses - view list must be enabled."
   to_access_the_courses_link_in_account_navigation_c_649a10af: |-
@@ -22838,6 +22961,9 @@ en-CA:
   to_access_the_courses_link_in_account_navigation_c_eee259fa: "To access the Courses link in Account Navigation, Courses - manage / update and Courses - view list must be enabled."
   to_access_the_courses_link_in_account_navigation_m_ce68b53d: "To access the Courses link in Account Navigation, Manage Courses: Admin - manage / update and Courses - view list must be enabled."
   to_access_the_manage_question_banks_link_in_a_cour_202b4cd8: "To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - add / edit / delete must also be enabled."
+  to_access_the_manage_question_banks_link_in_a_cour_cc26af7c: "To access the Manage Question Banks link in a course Quizzes Index Page, Course content - view and Assignments and Quizzes - manage / edit must also be enabled."
+  to_access_the_mastery_tab_the_outcome_mastery_scal_46ae1c5b: "To access the Mastery tab, the Outcome Mastery Scales - add / edit permission must also be enabled. To access the Manage tab, the Learning Outcomes - add / edit / delete permission must also be enabled."
+  to_access_the_people_page_and_view_course_groups_u_e2dc13eb: "To access the People page and view course groups, Users - view list must also be enabled."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "To access the People page and view Groups, Users - view list must also be enabled."
   to_access_the_people_page_users_view_list_must_be__1e9e5d75: "To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled."
   to_access_the_people_page_users_view_list_must_be__2f01333b: "To access the People page, Users - view list must be enabled. If this permission is enabled, and if Users - view primary email address is disabled, users will see email addresses used as login IDs. To view login IDs, Users - add / remove students in courses and Users - add / remove teachers, course designers, or TAs in courses must also be enabled."
@@ -22858,21 +22984,26 @@ en-CA:
       To access the People page, Users - view list must be enabled.
       
       If this permission is disabled, and Users - view login IDs is enabled, users will still see email addresses used as login IDs.
+  to_access_the_quizzes_index_page_course_content_vi_d9607c01: "To access the Quizzes Index Page, Course Content - view must be enabled."
   to_access_the_student_interactions_report_courses__e8432cd0: "To access the Student Interactions report, Courses - view usage reports must also be enabled."
   to_access_the_student_interactions_report_grades_v_69105662: "To access the Student Interactions report, Grades - view all grades must also be enabled."
   to_act_as_other_users_users_act_as_must_also_be_en_cc96faf1: "To act as other users, Users - act as must also be enabled."
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "To activate SMS, enter the four-character confirmation code sent to %{sms_number}."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}."
+  to_add_a_course_courses_add_must_also_be_enabled_8c2231d9: "To add a course, Courses - add must also be enabled."
   to_add_a_course_group_to_a_collaboration_group_vie_36a5d341: "To add a course group to a collaboration, Group view all student groups must also be enabled."
   to_add_a_course_group_to_a_collaboration_groups_ad_7e51136a: "To add a course group to a collaboration, Groups - add / edit / delete must also be enabled."
+  to_add_a_course_group_to_a_collaboration_groups_ad_c26d8db0: "To add a course group to a collaboration, Groups - add must also be enabled."
   to_add_a_user_via_sis_id_sis_data_manage_must_also_30b6624a: "To add a user via SIS ID, SIS Data - manage must also be enabled."
   to_add_account_level_groups_via_csv_sis_data_impor_b1a4ccf3: "To add account level groups via CSV, SIS Data - import must also be enabled."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "To add announcements, Discussions - moderate must also be enabled. To view recent announcements on the home page, the Show recent announcements on Course home page checkbox must be selected in Course Settings."
   to_add_announcements_discussions_moderate_must_als_a83fd681: "To add announcements, Discussions - moderate must also be enabled."
   to_add_associated_courses_blueprint_courses_add_ed_224e93a3: "To add associated courses, Blueprint Courses - add / edit / associate / delete and Manage Courses - add must also be enabled."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled."
+  to_add_associated_courses_blueprint_courses_add_ed_c1567d8a: "To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add must also be enabled."
   to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "To add bulk users, courses, and enrollments, click SIS Imports."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "To add, edit, or delete groups, Groups - add / edit / delete must also be enabled."
+  to_add_groups_groups_add_must_also_be_enabled_33680f91: "To add groups, Groups - add must also be enabled."
   to_add_individual_courses_click_courses_c5355180: "To add individual courses, click Courses."
   to_add_individual_users_click_people_4d6de56a: "To add individual users, click People."
   to_add_or_remove_a_student_to_or_from_a_course_the_a357b751: "To add or remove a student to or from a course, the Users - Student permission must be enabled."
@@ -22911,6 +23042,7 @@ en-CA:
       To end a long-running conference, Course Content - add / edit / delete​ must be enabled.
       If Course Content - add / edit / delete is enabled and Web Conferences - create is disabled, user can still manage conferences.
       This permission controls a user’s ability to create conferences in courses and groups.
+  to_allow_other_users_to_create_courses_in_an_accou_1f2c70a4: "To allow other users to create courses in an account, select the appropriate user role in the Account Settings page: teachers, students, and/or users with no enrollments."
   to_allow_the_outcomes_page_as_read_only_this_permi_ddb00693: "To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled."
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: "To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled."
   to_allow_user_to_moderate_grades_grades_select_fin_e98c1f0e: "To allow user to moderate grades, Grades - Select final grade for moderation must also be enabled."
@@ -22943,6 +23075,7 @@ en-CA:
   to_create_a_link_you_can_use_in_canvas_you_ll_need_5c6d93e4: "to create a link you can use in Canvas. You’ll need to sign-up for a Zoom account if you don’t already have one."
   to_create_a_link_you_can_use_in_canvas_you_ll_need_7dd85497: "to create a link you can use in Canvas. You’ll need a Google account to use Google Meet."
   to_create_a_new_course_to_use_as_a_course_template_9e7e2c6c: "To create a new course to use as a course template, Manage Courses - add must also be enabled."
+  to_create_a_new_course_to_use_as_a_course_template_aa0ff48e: "To create a new course to use as a course template, Courses - add must also be enabled."
   to_create_announcements_discussions_manage_must_al_932ac38f: "To create announcements, Discussions - manage must also be enabled."
   to_create_announcements_discussions_moderate_must__8a8278f2: "To create announcements, Discussions - moderate must also be enabled."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "To cross-list a section, Course Sections - add / edit / delete must also be enabled. To edit the course SIS ID, SIS Data - manage must also be enabled. To allow an account-level user to delete a course, Course State - manage must also be enabled."
@@ -22958,6 +23091,8 @@ en-CA:
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "To cross-list sections, Courses - add / edit / delete must also be enabled."
   to_date_can_t_come_before_from_date_cf9e18aa: "\"To Date\" can't come before \"From Date\""
   to_date_cannot_come_before_from_date_3eeb2633: "To Date cannot come before From Date"
+  to_delete_groups_groups_delete_must_also_be_enable_5157ff6e: "To delete groups, Groups - delete must also be enabled."
+  to_differentiate_assignments_to_individual_student_69373d88: "To differentiate assignments to individual students, Users - view list must also be enabled."
   to_differentiate_assignments_to_individual_student_6cc40fde: "To differentiate assignments to individual students, Users - view list ​must also be enabled."
   to_disallow_users_from_managing_sis_ids_at_the_cou_2058787b: "To disallow users from managing SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled."
   to_disallow_users_from_viewing_any_sis_ids_at_the__7e0cac1b: "To disallow users from viewing any SIS IDs at the course level, SIS Data - manage and SIS Data - read must both be disabled."
@@ -22973,6 +23108,7 @@ en-CA:
   to_do_items_loading_d1cdfcd5: "To Do Items Loading"
   to_do_list_dashboard_d741f64e: "To Do List Dashboard"
   to_do_time_a7e17623: "To Do Time"
+  to_edit_a_discussion_discussions_moderate_must_als_bd4c60f7: "To edit a discussion, Discussions - moderate must also be enabled."
   to_edit_a_grade_or_add_comments_in_speedgrader_or__ee4a36e: "To edit a grade or add comments in SpeedGrader or Gradebook, Grades - edit must be enabled."
   to_edit_a_student_s_section_conversations_send_to__12a2623f: "To edit a student’s section, Conversations - send to individual course members must also be enabled."
   to_edit_a_student_s_section_users_add_remove_stude_1f188d80: |-
@@ -22992,6 +23128,7 @@ en-CA:
   to_edit_a_user_s_section_users_allow_administrativ_69b3cdaa: "To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled. "
   to_edit_a_user_s_section_users_allow_administrativ_966b3fcc: "To edit a user’s section, Users - allow administrative actions in courses and Users - view list must also be enabled."
   to_edit_assignment_details_on_a_discussion_assignm_1764e657: "To edit assignment details on a discussion, Assignments and Quizzes - add / edit / delete must also be enabled."
+  to_edit_assignment_details_on_individual_discussio_99f718a7: "To edit assignment details on individual discussions, Discussions - manage must also be enabled."
   to_edit_blueprint_course_settings_in_course_settin_59befcfa: "To edit Blueprint course settings in Course Settings, Blueprint Courses - add / edit / associate / delete​ - must also be enabled. To add an associated course, Blueprint Courses - add / edit / associate / delete - and Courses - view list must also be enabled. To edit lock settings on any blueprint object, this permission must be enabled. To edit lock settings on files, Course Files - add / edit / delete must also be enabled. To edit lock settings on quizzes, Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_blueprint_lock_settings_from_the_assignmen_ac5af0f5: "To edit blueprint lock settings from the Assignments index page, Courses - add / edit / delete must also be enabled. If this permission is not enabled, and Courses - add / edit / delete is enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page. To edit blueprint lock settings on an individual quiz, or on the Quizzes index page, Courses - add / edit / delete must also be enabled."
   to_edit_blueprint_lock_settings_from_the_discussio_66c1f4d3: "To edit Blueprint lock settings from the Discussions index page, Discussions - moderate must also be enabled."
@@ -23006,6 +23143,7 @@ en-CA:
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "To edit course settings, Courses - add / edit / delete must be enabled."
   to_edit_course_settings_courses_manage_update_must_172a4fe5: "To edit course settings, Courses - manage / update must be enabled."
   to_edit_course_settings_manage_courses_admin_manag_fe44d1fe: "To edit course settings, Manage Courses: Admin - manage / update must be enabled."
+  to_edit_groups_groups_manage_must_also_be_enabled_64b30525: "To edit groups, Groups - manage must also be enabled."
   to_edit_lock_settings_for_course_files_course_file_392f6f70: "To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update must also be enabled."
   to_edit_lock_settings_for_course_files_course_file_60ff11c0: "To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update must also be enabled."
   to_edit_lock_settings_from_the_assignments_index_p_53f2f063: "To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled."
@@ -23019,6 +23157,7 @@ en-CA:
   to_edit_lock_settings_on_an_individual_quiz_or_on__eeb62722: "To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled."
   to_edit_lock_settings_on_files_courses_manage_upda_1ae54c88: "To edit lock settings on files, Courses - manage / update and Course Files - edit must also be enabled."
   to_edit_lock_settings_on_files_manage_courses_admi_de9c4e6f: "To edit lock settings on files, Manage Courses: Admin - manage / update and Course Files - edit must also be enabled."
+  to_edit_lock_settings_on_quizzes_courses_manage_up_6366321f: "To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - manage / edit must also be enabled."
   to_edit_lock_settings_on_quizzes_courses_manage_up_ca877392: "To edit lock settings on quizzes, Courses - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_lock_settings_on_quizzes_manage_courses_ad_ebe40e19: "To edit lock settings on quizzes, Manage Courses: Admin - manage / update and Assignments and Quizzes - add / edit / delete must also be enabled."
   to_edit_lock_settings_on_the_discussions_index_pag_35b7a124: "To edit lock settings on the Discussions index page, Manage Courses: Admin - manage / update and Discussions - view must also be enabled. If the additional permissions are enabled, but this permission is not enabled, lock settings can be edited on individual discussions."
@@ -23026,6 +23165,7 @@ en-CA:
   to_edit_lock_settings_on_the_discussions_index_pag_789c61ae: "To edit lock settings on the Discussions index page, Courses - manage / update and Discussions - view must also be enabled."
   to_edit_lock_settings_on_the_pages_index_page_page_40e7352c: "To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update."
   to_edit_lock_settings_on_the_pages_index_page_page_ce2c99e: "To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Manage Courses: Admin - manage / update."
+  to_edit_quizzes_assignments_and_quizzes_manage_edi_d57651dd: "To edit quizzes, Assignments and Quizzes - manage / edit must also be enabled."
   to_edit_the_course_sis_id_courses_manage_update_an_47dfbeb: "To edit the course SIS ID, Courses - manage / update and SIS Data - manage must also be enabled."
   to_edit_the_course_sis_id_manage_courses_admin_man_421b31b8: "To edit the course SIS ID, Manage Courses: Admin - manage / update and SIS Data - manage must also be enabled."
   to_edit_the_course_sis_id_sis_data_manage_must_als_ce0896ba: "To edit the course SIS ID, SIS Data - manage must also be enabled."
@@ -23039,6 +23179,7 @@ en-CA:
   to_end_a_long_running_conference_the_course_conten_63e3f993: "To end a long-running conference, the Course Content permission must be enabled."
   to_f0e90538: "To:"
   to_fully_manage_course_level_question_banks_assign_2c31396f: "To fully manage course-level question banks, Assignments and Quizzes - add / edit / delete permission must also be enabled."
+  to_fully_manage_course_level_question_banks_assign_3e5eb580: "To fully manage course-level question banks, Assignments and Quizzes - manage / edit permission must also be enabled."
   to_generate_a_pairing_code_from_a_student_s_user_d_28a10a61: "To generate a pairing code from a student's User Details page, the Users - add/remove students in courses permission must also be enabled."
   to_generate_a_pairing_code_from_a_student_s_user_d_7a282f3d: "To generate a pairing code from a student's User Details page, the Users - allow administrative actions in courses permission must also be enabled."
   to_generate_a_pairing_code_from_a_student_s_user_d_9c907ed3: "To generate a pairing code from a student's User Details page, the Users - add / remove students in courses permission must also be enabled."
@@ -23061,6 +23202,7 @@ en-CA:
   to_import_sis_data_sis_data_import_must_also_be_en_187c39b: "To import SIS data, SIS Data - import must also be enabled."
   to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "To import SIS data, SIS Data - import​ must also be enabled."
   to_learn_more_about_canvas_for_elementary_please_r_7fd3af37: "To learn more about Canvas for Elementary, please refer to *our documentation*."
+  to_learn_more_becd2ce2: "to learn more."
   to_link_an_observer_to_a_student_conversations_sen_37aad7b5: "To link an observer to a student, Conversations - send to individual course members must be enabled."
   to_link_an_observer_to_a_student_users_manage_logi_b77cb019: |-
       To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
@@ -23073,6 +23215,7 @@ en-CA:
   to_log_in_to_your_canvas_account_when_you_re_on_th_54faeb1c: "To log in to your Canvas account when you’re on the go, scan this QR code from the Canvas Student app."
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: "To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app."
   to_make_outcome_alignment_easier_only_add_outcomes_aecf5e0e: "To make outcome alignment easier, only add outcomes that are pertinent to this course."
+  to_manage_associated_courses_courses_view_list_and_26f4c15c: "To manage associated courses, Courses - view list and Courses - add must also be enabled."
   to_manage_associated_courses_courses_view_list_and_7bb3bedb: "To manage associated courses, Courses - view list and Manage Courses - add must also be enabled."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "To manage Blueprint Course settings in Course Settings, Courses - add / edit / delete must also be enabled."
   to_manage_course_announcements_discussions_moderat_5f02f46e: "To manage course announcements, Discussions - moderate ​must also be enabled."
@@ -23098,6 +23241,7 @@ en-CA:
   to_manage_moderated_grading_grades_moderate_must_a_ed821722: |-
       To manage moderated grading, Grades - moderate must also be enabled.
       NOTE: This permission will replace Grades - moderate, which is being deprecated.
+  to_manage_moderated_grading_grades_select_final_gr_d701c298: "To manage moderated grading, Grades - Select final grade for moderation must also be enabled."
   to_manage_sis_data_sis_data_manage_must_also_be_en_748806e8: "To manage SIS data, SIS Data - manage must also be enabled."
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "To manage SIS data, SIS Data - manage​ must also be enabled."
   to_manage_sis_data_sis_data_manage_must_be_enabled_23f57d2: "To manage SIS data, SIS Data - manage​ must be enabled. If SIS Data - manage ​is enabled and SIS Data - read is disabled, the account permission overrides the course permission. If SIS Data - manage ​is disabled and SIS Data - read​ is enabled, users can only view course, user, and subaccount SIS IDs. To disallow users from viewing any SIS IDs at the course level, SIS Data - manage​ and SIS Data - read​ must both be disabled."
@@ -23123,7 +23267,9 @@ en-CA:
               To view the user SIS ID column in the Quiz Item Analysis CSV file, SIS Data - read must also be enabled.
               To view the submission log, Quizzes - view submission log must also be enabled.
   to_moderate_a_quiz_assignments_and_quizzes_add_edi_ebdecaf8: "To moderate a quiz, Assignments and Quizzes - add / edit / delete must also be enabled."
+  to_moderate_a_quiz_assignments_and_quizzes_manage__b96b1937: "To moderate a quiz, Assignments and Quizzes - manage / edit must also be enabled."
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "To moderate a quiz, Grades - edit​ must also be enabled."
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_eae38da2: "To moderate a quiz, Grades - edit must also be enabled."
   to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "To moderate grades, Grades - Select final grade for moderation must also be enabled. To post or hide grades for an assignment, Grades - edit must also be enabled."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "To moderate grades, Grades - Select final grade for moderation must also be enabled."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "To obtain a client ID, an account admin will need to generate an LTI developer key."
@@ -23180,6 +23326,7 @@ en-CA:
   to_see_the_course_setup_checklist_option_on_the_co_6c485483: "To see the Course Setup Checklist option on the Course Home Page, Manage - add / edit / delete courses must also be enabled."
   to_send_a_message_to_an_individual_user_conversati_8d86a0da: "To send a message to an individual user, Conversations - send messages to individual course members must also be enabled."
   to_share_a_discussion_to_commons_course_content_ad_962c5e53: "To share a discussion to Commons, Course Content - add / edit / delete must also be enabled."
+  to_share_a_discussion_to_commons_courses_manage_up_232a8707: "To share a discussion to Commons, Courses - manage / update must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "To share a Discussion to Commons, Discussions - view​ must also be enabled."
   to_share_a_discussion_to_commons_discussions_view__ef6c015a: "To share a Discussion to Commons, Discussions - view must also be enabled."
   to_toggle_microsoft_teams_sync_you_need_to_input_a_d32476b0: "To toggle Microsoft Teams Sync you need to input a tenant domain."
@@ -23193,7 +23340,10 @@ en-CA:
   to_view_a_user_s_login_details_users_view_list_and_6d42118b: "To view a user’s login details, Users - view list and Modify login details for users must also both be enabled."
   to_view_a_user_s_sis_id_sis_data_manage_or_sis_dat_1f603502: "To view a user’s SIS ID, SIS Data - manage or SIS Data - read must also be enabled."
   to_view_account_level_groups_groups_add_edit_delet_bf12e984: "To view account-level groups, Groups - add / edit / delete must also be enabled."
+  to_view_account_level_groups_groups_manage_must_al_ca16b035: "To view account-level groups, Groups - manage must also be enabled."
+  to_view_account_level_groups_users_view_list_must__3e933ddf: "To view account-level groups, Users - view list must also be enabled."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "To view all notifications sent to a Canvas user, select the user and date range for your search."
+  to_view_all_student_groups_in_a_course_groups_view_7a16b659: "To view all student groups in a course, Groups - view all student groups must also be enabled."
   to_view_announcements_announcements_view_must_also_75f652df: "To view announcements, Announcements - view must also be enabled."
   to_view_choose_home_page_and_course_setup_checklis_84797b4f: "To view Choose Home Page and Course Setup Checklist buttons, Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
   to_view_choose_home_page_and_course_setup_checklis_e7067bc1: "To view Choose Home Page and Course Setup Checklist buttons, Manage Courses: Admin - manage / update and Course Content - view must also be enabled. (Teachers, designers, and TAs can set the home page of a course, regardless of their permissions.)"
@@ -23468,6 +23618,7 @@ en-CA:
     originality_report_visible_after_due_date: "After the Due Date"
     originality_report_visible_after_grading: "After the assignment is graded"
     originality_report_visible_immediately: Immediately
+  turns_left_side_navigation_sidebar_sticky_333df56f: "Turns left-side navigation sidebar sticky."
   turns_on_phase_2_features_for_assignment_bulk_edit_20245881: "Turns on phase 2 features for Assignment Bulk Editing"
   twitter_fcef6b54: Twitter
   txt_cae4e953: TXT
@@ -24256,7 +24407,9 @@ en-CA:
       Subaccount admins are not able to view SIS information unless they are also granted an instructor role in a course. Subaccount admins cannot view SIS information without the course association, as the instructor role has permission to read SIS data at the account level.
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Users and terms are located at the account, so the SIS endpoint always confirms the user’s permissions according to account. Subaccounts only have ownership of courses and sections; they do not own user data. Subaccount admins are not able to view SIS information unless they are also granted an instructor role in a course. Subaccount admins cannot view SIS information without the course association, as the instructor role has permission to read SIS data at the account level."
   users_and_terms_are_located_at_the_account_so_the__8f3258e6: "Users and terms are located at the account, so the SIS endpoint always confirms the user’s permissions according to account."
+  users_can_access_and_create_but_not_edit_individua_59bcb8dd: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add is enabled."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add / edit / delete are enabled."
+  users_can_access_and_create_but_not_edit_individua_a0b26adf: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Course Content - view and Assignments and Quizzes - add are enabled."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Users can access the Manage Question Banks link on the Quizzes Index Page when Course content - view and Assignments and Quizzes - add / edit / delete are enabled."
   users_d1b60cb0: Users
@@ -24318,6 +24471,7 @@ en-CA:
   view_assignment_group_totals_c8db16b2: "View Assignment Group Totals"
   view_audit_trail_12f774b6: "View audit trail"
   view_ba339f93: View
+  view_blackout_dates_1723673a: "View Blackout Dates"
   view_canvas_insights_beta_fe446d71: "View Canvas Insights (Beta)"
   view_count_outcomes_9609792: 
     one: "View 1 Outcome"
@@ -24864,6 +25018,7 @@ en-CA:
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "You do not have permission to edit this assignment"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "You do not have permission to invite users that do not already exist."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "You do not have permission to publish this course."
+  you_do_not_have_permission_to_view_announcements_i_6b2e31a2: "You do not have permission to view announcements in this course."
   you_do_not_have_permissions_to_edit_this_moderated_3195294f: "You do not have permissions to edit this moderated assignment"
   you_don_t_have_access_to_view_this_resource_8378e0e8: "You don't have access to view this resource."
   you_don_t_have_any_active_courses_yet_fb3c4418: "You don't have any active courses yet."
@@ -25015,6 +25170,7 @@ en-CA:
   your_content_has_been_exported_bbb57764: "Your content has been exported."
   your_course_db806851: "Your Course"
   your_custom_theme_has_been_successfully_applied_eaa0fc82: "Your custom theme has been successfully applied."
+  your_email_address_844297ea: "Your Email Address"
   your_email_address_f881e583: "Your email address"
   your_email_b5364bee: "Your Email"
   your_group_is_being_created_88c0c024: "Your Group is Being Created"
