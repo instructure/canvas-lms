@@ -190,6 +190,18 @@ export const DiscussionThreadContainer = props => {
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
 
+  const findDraftMessage = () => {
+    let rootEntryDraftMessage = ''
+    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
+      if (draftEntry.rootEntryId === props.discussionEntry._id && !draftEntry.discussionEntryId) {
+        rootEntryDraftMessage = draftEntry.message
+        return false
+      }
+      return true
+    })
+    return rootEntryDraftMessage
+  }
+
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -197,6 +209,7 @@ export const DiscussionThreadContainer = props => {
         key={`reply-${props.discussionEntry._id}`}
         authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
+        hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
@@ -222,7 +235,7 @@ export const DiscussionThreadContainer = props => {
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.entryParticipant?.rating}
+        isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />

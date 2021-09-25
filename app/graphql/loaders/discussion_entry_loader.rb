@@ -34,6 +34,26 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
     objects.each do |object|
       scope = scope_for(object)
       scope = scope.reorder("created_at #{@sort_order}")
+
+      if @filter == 'drafts'
+        object.shard.activate do
+          drafts = scope.map do |draft|
+            de = DiscussionEntry.new(id: -draft.id,
+                                     message: draft.message,
+                                     root_entry_id: draft.root_entry_id,
+                                     parent_id: draft.parent_id,
+                                     discussion_topic_id: draft.discussion_topic_id,
+                                     user_id: @current_user.id,
+                                     created_at: draft.created_at,
+                                     updated_at: draft.updated_at,
+                                     workflow_state: 'active')
+            de.readonly!
+            de
+          end
+          return fulfill(object, drafts)
+        end
+      end
+
       scope = scope.where(parent_id: nil) if @root_entries
       if @search_term.present?
         # search results cannot look at the messages from deleted
@@ -71,7 +91,9 @@ class Loaders::DiscussionEntryLoader < GraphQL::Batch::Loader
   end
 
   def scope_for(object)
-    if object.is_a?(DiscussionTopic)
+    if @filter == 'drafts'
+      object.discussion_entry_drafts.where(user: @current_user, discussion_entry_id: nil)
+    elsif object.is_a?(DiscussionTopic)
       object.discussion_entries
     elsif object.is_a?(DiscussionEntry)
       if object.root_entry_id.nil?

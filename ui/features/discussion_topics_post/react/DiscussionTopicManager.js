@@ -114,10 +114,9 @@ const DiscussionTopicManager = props => {
 
   const updateDraftCache = (cache, result) => {
     try {
-      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
       const options = {
         query: DISCUSSION_QUERY,
-        variables: {...variables, page: btoa(lastPage * PER_PAGE)}
+        variables: {...variables}
       }
       const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
@@ -134,7 +133,7 @@ const DiscussionTopicManager = props => {
         cache.writeQuery({...options, data: currentDiscussion})
       }
     } catch (e) {
-      discussionTopicQuery.refetch(variables)
+      // do nothing for errors updating the cache on a draft
     }
   }
 
