@@ -53,6 +53,7 @@ export const IsolatedViewContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const [fetchingMoreOlderReplies, setFetchingMoreOlderReplies] = useState(false)
   const [fetchingMoreNewerReplies, setFetchingMoreNewerReplies] = useState(false)
+  const [draftSaved, setDraftSaved] = useState(true)
 
   const updateCache = (cache, result) => {
     const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
@@ -212,6 +213,7 @@ export const IsolatedViewContainer = props => {
     update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
+      setDraftSaved(true)
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
@@ -409,6 +411,8 @@ export const IsolatedViewContainer = props => {
                   isolatedEntryOlderDirection.data.legacyNode.root_entry_id ||
                     isolatedEntryOlderDirection.data.legacyNode._id
                 )}
+                onSetDraftSaved={setDraftSaved}
+                draftSaved={draftSaved}
                 updateDraft={newDraftMessage => {
                   createDiscussionEntryDraft({
                     variables: {

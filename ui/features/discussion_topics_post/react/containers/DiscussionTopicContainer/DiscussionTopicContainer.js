@@ -66,6 +66,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
+  const [draftSaved, setDraftSaved] = useState(true)
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
@@ -147,6 +148,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
+      setDraftSaved(true)
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
@@ -507,6 +509,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               setExpandedReply(false)
                             }}
                             value={findRootEntryDraftMessage()}
+                            onSetDraftSaved={setDraftSaved}
+                            draftSaved={draftSaved}
                             updateDraft={newDraftMessage => {
                               createDiscussionEntryDraft({
                                 variables: {

@@ -23,7 +23,7 @@ import {DeletedPostMessage} from '../../components/DeletedPostMessage/DeletedPos
 import I18n from 'i18n!discussion_posts'
 import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
-import React, {useContext} from 'react'
+import React, {useContext, useState} from 'react'
 import {responsiveQuerySizes} from '../../utils'
 import {User} from '../../../graphql/User'
 import {useMutation} from 'react-apollo'
@@ -33,12 +33,14 @@ import {Responsive} from '@instructure/ui-responsive'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
+  const [draftSaved, setDraftSaved] = useState(true)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
     update: props.updateDraftCache,
     onCompleted: () => {
       setOnSuccess('Draft message saved.')
+      setDraftSaved(true)
     },
     onError: () => {
       setOnFailure(I18n.t('Unable to save draft message.'))
@@ -158,6 +160,8 @@ export const DiscussionEntryContainer = props => {
               onCancel={props.onCancel}
               isIsolatedView={props.isIsolatedView}
               draftMessage={findDraftMessage()}
+              onSetDraftSaved={setDraftSaved}
+              draftSaved={draftSaved}
               onCreateDiscussionEntryDraft={newDraftMessage =>
                 createDiscussionEntryDraft({
                   variables: {
