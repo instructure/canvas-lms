@@ -20,12 +20,13 @@ import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
 import {responsiveQuerySizes} from '../../utils'
-import {Text} from '@instructure/ui-text'
 
 import {AccessibleContent} from '@instructure/ui-a11y-content'
 import {CondensedButton} from '@instructure/ui-buttons'
 import {IconEditLine} from '@instructure/ui-icons'
 import {Responsive} from '@instructure/ui-responsive'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 export function Reply({...props}) {
   let replyButtonText = I18n.t('Reply')
@@ -57,7 +58,9 @@ export function Reply({...props}) {
             alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
           >
             <Text weight="bold" size={responsiveProps.textSize}>
-              {props.hasDraftEntry && <IconEditLine color="error" size="x-small" />}
+              <View margin="0 small 0 0">
+                {props.hasDraftEntry && <IconEditLine size="x-small" />}
+              </View>
               {replyButtonText}
             </Text>
           </AccessibleContent>

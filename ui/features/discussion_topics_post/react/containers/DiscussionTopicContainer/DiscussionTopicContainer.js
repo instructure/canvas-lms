@@ -51,6 +51,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
+import {IconEditLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -306,7 +307,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               </Text>
             </Alert>
           )}
-          {!isSearch && (
+          {!isSearch && filter !== 'drafts' && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
                 <Flex.Item>
@@ -479,7 +480,18 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 }}
                                 data-testid="discussion-topic-reply"
                               >
-                                <Text size="medium">{I18n.t('Reply')}</Text>
+                                {findRootEntryDraftMessage() ? (
+                                  <Text weight="bold" size={responsiveProps.textSize}>
+                                    <View as="span" margin="0 small 0 0">
+                                      <IconEditLine size="x-small" />
+                                    </View>
+                                    {I18n.t('Continue draft')}
+                                  </Text>
+                                ) : (
+                                  <Text weight="bold" size={responsiveProps.textSize}>
+                                    {I18n.t('Reply')}
+                                  </Text>
+                                )}
                               </Button>
                             </View>
                           )}

@@ -362,7 +362,7 @@ export const DiscussionThreadContainer = props => {
                     discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
-                      !props.discussionEntry.deleted ? (
+                      filter !== 'drafts' && !props.discussionEntry.deleted ? (
                         <ThreadActions
                           id={props.discussionEntry._id}
                           isUnread={!props.discussionEntry.entryParticipant?.read}
