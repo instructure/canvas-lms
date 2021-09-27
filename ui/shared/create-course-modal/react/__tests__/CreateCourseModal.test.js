@@ -77,6 +77,7 @@ describe('CreateCourseModal', () => {
     isModalOpen: true,
     setModalOpen,
     permissions: 'admin',
+    isK5User: true,
     ...overrides
   })
 
@@ -91,7 +92,7 @@ describe('CreateCourseModal', () => {
     await waitFor(() => expect(getByText('Loading accounts...')).toBeInTheDocument())
   })
 
-  it('shows form fields for account and subject name after loading accounts', async () => {
+  it('shows form fields for account and subject name and homeroom sync after loading accounts', async () => {
     fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
     const {getByLabelText} = render(<CreateCourseModal {...getProps()} />)
     await waitFor(() => {
@@ -99,6 +100,9 @@ describe('CreateCourseModal', () => {
         getByLabelText('Which account will this subject be associated with?')
       ).toBeInTheDocument()
       expect(getByLabelText('Subject Name')).toBeInTheDocument()
+      expect(
+        getByLabelText('Sync enrollments and course start/end dates from homeroom')
+      ).toBeInTheDocument()
     })
   })
 
@@ -228,5 +232,34 @@ describe('CreateCourseModal', () => {
     act(() => getByLabelText('Which account will this subject be associated with?').click())
     expect(getByText('Orange Elementary')).toBeInTheDocument()
     expect(getByText('Clark HS')).toBeInTheDocument()
+  })
+
+  describe('with isK5User set to false', () => {
+    beforeEach(() => {
+      fetchMock.get(MANAGEABLE_COURSES_URL, MANAGEABLE_COURSES)
+    })
+
+    it('does not show the homeroom sync options', async () => {
+      const {findByLabelText, queryByText} = render(
+        <CreateCourseModal {...getProps({isK5User: false})} />
+      )
+      expect(await findByLabelText('Course Name')).toBeInTheDocument()
+      expect(
+        queryByText('Sync enrollments and course start/end dates from homeroom')
+      ).not.toBeInTheDocument()
+      expect(queryByText('Select a homeroom')).not.toBeInTheDocument()
+    })
+
+    it('uses classic canvas vocabulary', async () => {
+      const {findByLabelText, getByLabelText, getByText} = render(
+        <CreateCourseModal {...getProps({isK5User: false})} />
+      )
+      expect(await findByLabelText('Course Name')).toBeInTheDocument()
+      expect(getByLabelText('Create Course')).toBeInTheDocument()
+      expect(
+        getByLabelText('Which account will this course be associated with?')
+      ).toBeInTheDocument()
+      expect(getByText('Course Details')).toBeInTheDocument()
+    })
   })
 })

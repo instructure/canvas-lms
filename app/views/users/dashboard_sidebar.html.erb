@@ -45,7 +45,11 @@
             id="start_new_course"
             class="element_toggler btn button-sidebar-wide"
             aria-controls="new_course_form"><%= t('start_new_course', 'Start a New Course') %></button>
-    <%= render :partial => 'shared/new_course_form' %>
+    <% if @domain_root_account.feature_enabled?(:create_course_subaccount_picker) %>
+      <div id="create_course_modal_container"></div>
+    <% else %>
+      <%= render :partial => 'shared/new_course_form' %>
+    <% end %>
   <% end %>
 
   <a href="<%= grades_path %>" class="Button button-sidebar-wide">
