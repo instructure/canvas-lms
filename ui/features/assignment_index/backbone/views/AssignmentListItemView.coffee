@@ -210,6 +210,7 @@ export default class AssignmentListItemView extends Backbone.View
     data = @_setJSONForGrade(data) unless data.canManage
 
     data.canEdit = @canEdit()
+    data.canShowBuildLink = @canShowBuildLink()
     data.canMove = @canMove()
     data.canDelete = @canDelete()
     data.canDuplicate = @canDuplicate()
@@ -401,6 +402,9 @@ export default class AssignmentListItemView extends Backbone.View
 
   canManage: ->
     ENV.PERMISSIONS.manage
+
+  canShowBuildLink: ->
+    !!(ENV.FLAGS && ENV.FLAGS.new_quizzes_skip_to_build_module_button && @model.isQuizLTIAssignment())
 
   canOpenManageOptions: ->
     @canManage() || @canAdd() || @canDelete() || ENV.DIRECT_SHARE_ENABLED
