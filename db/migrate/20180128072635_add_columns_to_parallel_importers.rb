@@ -21,7 +21,7 @@ class AddColumnsToParallelImporters < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    remove_column :parallel_importers, :type if column_exists?(:parallel_importers, :type)
+    remove_column :parallel_importers, :type if column_exists?(:parallel_importers, :type) # rubocop:disable Migration/RemoveColumn
     add_column :parallel_importers, :importer_type, :string, null: false, limit: 255
     add_column :parallel_importers, :attachment_id, :integer, limit: 8, null: false
     add_column :parallel_importers, :rows_processed, :integer, default: 0, null: false

@@ -21,8 +21,10 @@ class FixDateFormatInAccountReports < ActiveRecord::Migration[4.2]
   tag :predeploy
 
   def change
+    # rubocop:disable Migration/RemoveColumn column replaced transactionally
     remove_column :account_reports, :start_at, :date
     remove_column :account_reports, :end_at, :date
+    # rubocop:enable Migration/RemoveColumn
     add_column :account_reports, :start_at, :datetime
     add_column :account_reports, :end_at, :datetime
   end

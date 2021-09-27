@@ -27,7 +27,7 @@ class FixupAddIndexToObserverAlertThreshold < ActiveRecord::Migration[5.1]
     revert AddIndexToObserverAlertThreshold
 
     change_table :observer_alert_thresholds do |t|
-      t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' }
+      t.remove_belongs_to :user_observation_link, foreign_key: { to_table: 'user_observers' } # rubocop:disable Migration/RemoveColumn
       t.references :user, null: false, foreign_key: { to_table: 'users' }
       t.references :observer, null: false, foreign_key: { to_table: 'users' }
     end
