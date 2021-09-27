@@ -168,6 +168,30 @@
                     <span class="screenreader-only">{{#t}}You do not have permissions to edit this moderated assignment{{/t}}</span>
                   </li>
                 {{/if}}
+                {{#if canShowBuildLink}}
+                  {{#if canEdit}}
+                    <li>
+                      <a
+                        class="icon-quiz"
+                        id="assignment_{{id}}_settings_build_item"
+                        aria-label="{{#t}}Build {{name}}{{/t}}"
+                        data-focus-returns-to="assign_{{id}}_manage_link"
+                        href="{{htmlBuildUrl}}"
+                      >{{#t}}Build{{/t}}</a>
+                    </li>
+                  {{else}}
+                    <li>
+                      <a
+                        class="icon-quiz disabled"
+                        id="assignment_{{id}}_settings_build_item"
+                        aria-label="{{#t}}Build {{name}}{{/t}}"
+                        data-focus-returns-to="assign_{{id}}_manage_link"
+                        href="{{htmlBuildUrl}}"
+                      >{{#t}}Build{{/t}}</a>
+                      <span class="screenreader-only">{{#t}}You do not have permissions to build this moderated assignment{{/t}}</span>
+                    </li>
+                  {{/if}}
+                {{/if}}
                 {{#if canDuplicate}}
                 <li>
                   <a
