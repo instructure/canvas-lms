@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 require File.join(%W[#{File.dirname(__FILE__)} lib canvas_partman version])

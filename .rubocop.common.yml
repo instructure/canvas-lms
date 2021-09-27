@@ -82,6 +82,8 @@ Style/AsciiComments:
   Enabled: false # we have comments in other languages
 Style/Documentation:
   Enabled: false # most things don't need to be documented
+Style/Encoding:
+  Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/PerlBackrefs:
