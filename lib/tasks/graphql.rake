@@ -39,6 +39,7 @@ namespace :graphql do
       config
     end
 
+    desc "Publish the subgraph schema to the schema registry as configured by the given VARIANT_KEY"
     task publish: :environment do
       abort "VARIANT_KEY env var must be set" if ENV['VARIANT_KEY'].blank?
 
