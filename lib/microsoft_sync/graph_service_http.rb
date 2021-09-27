@@ -43,7 +43,7 @@ module MicrosoftSync
     class ApplicationNotAuthorizedForTenant < MicrosoftSync::Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Application not authorized for tenant. ' \
-          'Please make sure your admin has granted access for us to access your Microsoft tenant.'
+               'Please make sure your admin has granted access for us to access your Microsoft tenant.'
       end
     end
 

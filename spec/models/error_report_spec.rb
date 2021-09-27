@@ -105,7 +105,7 @@ describe ErrorReport do
     expect(report.data["QUERY_STRING"]).to eq "?access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
 
     expected_uri = "https://www.instructure.example.com?"\
-      "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
+                   "access_token=[FILTERED]&pseudonym[password]=[FILTERED]"
     expect(report.data["REQUEST_URI"]).to eq(expected_uri)
     expect(report.data["path_parameters"]).to eq({ :api_key => "[FILTERED]" }.inspect)
     q_params = { "access_token" => "[FILTERED]", "pseudonym[password]" => "[FILTERED]" }

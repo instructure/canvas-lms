@@ -307,7 +307,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, create, update, and delete root-account " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@root_account_group.rights_status(@root_account_admin, *permissions)).to eq({
                                                                                                read: true,
                                                                                                create: true,
@@ -317,7 +317,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, update, and delete but NOT create course level " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@course_group.rights_status(@root_account_admin, *permissions)).to eq({
                                                                                          read: true,
                                                                                          create: false,
@@ -334,7 +334,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read but NOT create, update, not delete root-account " \
-          "grading period groups", priority: "1", test_id: 2528644 do
+           "grading period groups", priority: "1", test_id: 2528644 do
           expect(@root_account_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: true,
@@ -345,7 +345,7 @@ describe GradingPeriodGroup do
         end
 
         it "cannot read, create, update, delete course " \
-          "grading period groups, when the course is under a root-account" do
+           "grading period groups, when the course is under a root-account" do
           expect(@course_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: false,
@@ -358,7 +358,7 @@ describe GradingPeriodGroup do
 
       context "teacher" do
         it "can read but NOT create, update, nor delete root-account " \
-          "grading period groups", priority: "1", test_id: 2528645 do
+           "grading period groups", priority: "1", test_id: 2528645 do
           expect(@root_account_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,
@@ -369,7 +369,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, update, and delete but NOT create course " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@course_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,
@@ -420,7 +420,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, create, update, and delete root-account " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@root_account_group
             .rights_status(@root_account_admin, *permissions)).to eq({
                                                                        read: true,
@@ -431,7 +431,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, update, and destroy but NOT create course " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@course_group
             .rights_status(@root_account_admin, *permissions)).to eq({
                                                                        read: true,
@@ -459,7 +459,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, update, and delete but NOT create course grading " \
-          "period groups when the course is under the sub-account" do
+           "period groups when the course is under the sub-account" do
           expect(@course_group
             .rights_status(@sub_account_admin, *permissions)).to eq({
                                                                       read: true,
@@ -482,7 +482,7 @@ describe GradingPeriodGroup do
         end
 
         it "can read, update and delete but NOT create course " \
-          "grading period groups" do
+           "grading period groups" do
           expect(@course_group
             .rights_status(@teacher, *permissions)).to eq({
                                                             read: true,

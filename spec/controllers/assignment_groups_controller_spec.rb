@@ -157,8 +157,8 @@ describe AssignmentGroupsController do
         end
 
         it 'if scope_assignments_to_student is passed in and the requesting user ' \
-        'is a student, it should only include an assignment if its effective due ' \
-        'date for the requesting user falls within the given grading period' do
+           'is a student, it should only include an assignment if its effective due ' \
+           'date for the requesting user falls within the given grading period' do
           user_session(student)
           get :index, params: index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true), format: :json
           expect(assignments_ids).to_not include assignment_with_override.id
@@ -166,8 +166,8 @@ describe AssignmentGroupsController do
         end
 
         it 'if scope_assignments_to_student is passed in and the requesting user ' \
-        'is a fake student, it should only include an assignment if its effective due ' \
-        'date for the requesting user falls within the given grading period' do
+           'is a fake student, it should only include an assignment if its effective due ' \
+           'date for the requesting user falls within the given grading period' do
           fake_student = course.student_view_student
           override = assignment_with_override.assignment_overrides.first
           override.assignment_override_students.create!(user: fake_student)
@@ -178,8 +178,8 @@ describe AssignmentGroupsController do
         end
 
         it 'if scope_assignments_to_student is passed in and the requesting user ' \
-        'is not a student or fake student, it should behave as though ' \
-        'scope_assignments_to_student was not passed in' do
+           'is not a student or fake student, it should behave as though ' \
+           'scope_assignments_to_student was not passed in' do
           user_session(@admin)
           get :index, params: index_params.merge(grading_period_id: jan_grading_period.id, scope_assignments_to_student: true), format: :json
           expect(assignments_ids).to include assignment_with_override.id

@@ -86,7 +86,7 @@ describe 'editing a quiz' do
         alert_box = f('.alert .unpublished_warning')
         expect(alert_box.text).to \
           eq "You have made changes to the questions in this quiz.\nThese "\
-            "changes will not appear for students until you save the quiz."
+             "changes will not appear for students until you save the quiz."
 
         # verify button
         save_it_now_button = fj('.btn.btn-primary', '.edit_quizzes_quiz')

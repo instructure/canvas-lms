@@ -100,7 +100,7 @@ describe GradeCalculator do
     end
 
     it "muted assignments are not considered for the drop list when computing " \
-        "current grade for students (they are just excluded from the computation entirely)" do
+       "current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[4, 10], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       @assignments.first.mute!
@@ -112,7 +112,7 @@ describe GradeCalculator do
     end
 
     it "ungraded assignments are not considered for the drop list when computing " \
-        "current grade for students (they are just excluded from the computation entirely)" do
+       "current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[nil, 20], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       # nil/20 is excluded from the computation because it's not graded
@@ -123,7 +123,7 @@ describe GradeCalculator do
     end
 
     it "ungraded + muted assignments are not considered for the drop list when " \
-        "computing current grade for students (they are just excluded from the computation entirely)" do
+       "computing current grade for students (they are just excluded from the computation entirely)" do
       set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       @assignments.second.mute!
@@ -136,7 +136,7 @@ describe GradeCalculator do
     end
 
     it "muted assignments are treated as 0/points_possible for the drop list when " \
-        "computing final grade for students" do
+       "computing final grade for students" do
       set_grades([[4, 10], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       @assignments.first.mute!
@@ -149,7 +149,7 @@ describe GradeCalculator do
     end
 
     it "ungraded assignments are treated as 0/points_possible for the drop list " \
-        "when computing final grade for students" do
+       "when computing final grade for students" do
       set_grades([[nil, 20], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       # nil/20 is treated as 0/20 because it's not graded
@@ -160,7 +160,7 @@ describe GradeCalculator do
     end
 
     it "ungraded are treated as 0/points_possible for the drop list and muted " \
-        "assignments are ignored for the drop list when computing final grade for students" do
+       "assignments are ignored for the drop list when computing final grade for students" do
       set_grades([[nil, 20], [4, 10], [3, 10], [9, 10]])
       @group.update_attribute(:rules, 'drop_lowest:1')
       @assignments.second.mute!

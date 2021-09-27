@@ -52,7 +52,7 @@ describe GradesPresenter do
     end
 
     it 'does not throw an error when there exists a user with multiple student enrollments and ' \
-      'some of those enrollments have a score while others do not' do
+       'some of those enrollments have a score while others do not' do
       @section_one_student_enrollment.scores.create!(current_score: 80.0)
       expect { @presenter.course_grade_summaries }.not_to raise_error
     end

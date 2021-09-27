@@ -723,7 +723,7 @@ module MicrosoftSync
 
             [[nil, :my_mem_state], [:my_mem_state, nil]].each do |mem_state1, mem_state2|
               context "when there is another initial job with the same " \
-                "initial_mem_state (#{mem_state1.inspect}) enqueued" do
+                      "initial_mem_state (#{mem_state1.inspect}) enqueued" do
                 it 'does nothing (ignores/drops the job)' do
                   subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
 
@@ -738,7 +738,7 @@ module MicrosoftSync
               end
 
               context "when there are other jobs but none with the same initial_mem_state " \
-                "(#{mem_state1.inspect})" do
+                      "(#{mem_state1.inspect})" do
                 it 'enqueues another job one second after the currently retrying one' do
                   subject.direct_enqueue_run(2.minutes.from_now, nil, mem_state1)
                   allow(Delayed::Worker).to receive(:current_job).and_return(Delayed::Job.last)

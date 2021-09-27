@@ -200,7 +200,7 @@ describe Enrollment do
     let(:override_student) { @override.assignment_override_students.unscope(:where).find_by(user_id: @enrollment.user) }
 
     it 'does not destroy assignment override students on the user if other enrollments' \
-    'for the user exist in the course' do
+       'for the user exist in the course' do
       @course.enroll_user(
         @enrollment.user,
         'StudentEnrollment',
@@ -234,7 +234,7 @@ describe Enrollment do
       end
 
       it 'does not remove the user as final grader from assignments if the user ' \
-      'has other active enrollments of the same type' do
+         'has other active enrollments of the same type' do
         section_one = @course.course_sections.create!
         @course.enroll_teacher(@teacher, active_all: true, allow_multiple_enrollments: true, section: section_one)
         expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
@@ -243,7 +243,7 @@ describe Enrollment do
       end
 
       it 'does not remove the user as final grader from assignments if the user ' \
-      'has other active instructor enrollments' do
+         'has other active instructor enrollments' do
         @course.enroll_ta(@teacher, active_all: true, allow_multiple_enrollments: true)
         expect { @course.enrollments.find_by!(user: @teacher).destroy }.not_to change {
           @course.assignments.order(:created_at).pluck(:final_grader_id)

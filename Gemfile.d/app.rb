@@ -113,8 +113,6 @@ gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.16'
 gem 'outrigger', '3.0.0'
-gem 'parallel', '1.20.0', require: false
-  gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.3'
 gem 'rack-brotli', '1.0.0'

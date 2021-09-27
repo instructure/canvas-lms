@@ -380,14 +380,14 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Assignment Group' as an option if all of the " \
-    "assignments belong to the same assignment group" do
+       "assignments belong to the same assignment group" do
       @course.assignments.create!(title: "Math Assignment")
       @course.assignments.create!(title: "Science Assignment")
       expect(presenter.sort_options).to_not include assignment_group_option
     end
 
     it "returns 'Assignment Group' as an option if there are " \
-    "assignments that belong to different assignment groups" do
+       "assignments that belong to different assignment groups" do
       @course.assignments.create!(title: "Math Assignment")
       science_group = @course.assignment_groups.create!(name: "Science Assignments")
       @course.assignments.create!(title: "Science Assignment", assignment_group: science_group)
@@ -526,7 +526,7 @@ describe GradeSummaryPresenter do
           end
 
           it "sorts by module position, then context module tag position, " \
-          "with those not belonging to a module sorted last" do
+             "with those not belonging to a module sorted last" do
             assignment3.context_module_tags.first.destroy!
             expected_id_order = [assignment2.id, assignment1.id, assignment3.id]
             expect(ordered_assignment_ids).to eq(expected_id_order)

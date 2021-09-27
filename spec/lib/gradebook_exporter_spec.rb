@@ -311,7 +311,7 @@ describe GradebookExporter do
         end
 
         it "the length of the 'muted' row matches the length of the header row when include_sis_id " \
-          "is true and the account is a trust account" do
+           "is true and the account is a trust account" do
           expect(@course.root_account).to receive(:trust_exists?).and_return(true)
           @exporter_options[:include_sis_id] = true
           expect(header_row_length).to eq muted_row_length

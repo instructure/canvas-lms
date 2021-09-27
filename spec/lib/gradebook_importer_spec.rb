@@ -646,7 +646,7 @@ describe GradebookImporter do
     @assignment1 = @course.assignments.create!(:name => 'Assignment 1', :points_possible => 10)
     importer_with_rows(
       "Student,ID,Section,Assignment 1,Current Points,Final Points,Unposted Current Score," \
-        "Unposted Final Score,Unposted Final Grade",
+      "Unposted Final Score,Unposted Final Grade",
       "Points Possible,,,20,,,,,"
     )
     expect(@gi.assignments).to eq [@assignment1]
@@ -1200,7 +1200,7 @@ describe GradebookImporter do
         end
 
         it "excludes entire assignments if there are no submissions in the assignment" \
-        "being uploaded that are gradeable" do
+           "being uploaded that are gradeable" do
           @override_in_open_grading_period.update_attribute(:due_at, date_in_closed_period)
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
@@ -1211,7 +1211,7 @@ describe GradebookImporter do
         end
 
         it "includes assignments if there is at least one submission in the assignment" \
-        "being uploaded that is gradeable (it does not fall in a closed grading period)" do
+           "being uploaded that is gradeable (it does not fall in a closed grading period)" do
           importer_with_rows(
             "Student,ID,Section,Assignment in closed period,Assignment in open period",
             ",#{@student.id},,5,5"

@@ -239,7 +239,7 @@ describe 'Excuse an Assignment' do
 
       if view == 'srgb'
         skip "Skipped because this spec fails if not run in foreground\n"\
-          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+             "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
         get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
         click_option f('#assignment_select'), assignment.title
         click_option f('#student_select'), @student.name
@@ -259,7 +259,7 @@ describe 'Excuse an Assignment' do
       expect(grade_row).to have_class '.excused'
       expect(grade).to eq 'EX'
       expect(grade_row).to have_attribute('title', 'This assignment is excused ' \
-       'and will not be considered in the total calculation')
+                                                   'and will not be considered in the total calculation')
     end
 
     ['percent', 'letter_grade', 'gpa_scale', 'points'].each do |type|
@@ -278,7 +278,7 @@ describe 'Excuse an Assignment' do
         total = ''
         if view == 'srgb'
           skip "Skipped because this spec fails if not run in foreground\n"\
-          "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+               "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
           get "/courses/#{@course.id}/gradebook/change_gradebook_version?version=srgb"
           click_option f('#student_select'), @student.name
           total = f('span.total-grade').text[/\d+(\.\d+)?%/]

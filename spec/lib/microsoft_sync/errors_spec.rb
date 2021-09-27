@@ -257,8 +257,8 @@ describe MicrosoftSync::Errors do
       expect(described_class::GroupHasNoOwners.public_message).to eq(
         I18n.t(
           'The team could be not be created because the Microsoft group has no owners. ' \
-            'This may be an intermittent error: please try to sync again, and ' \
-            'if the problem persists, contact support.'
+          'This may be an intermittent error: please try to sync again, and ' \
+          'if the problem persists, contact support.'
         )
       )
     end

@@ -99,7 +99,7 @@ describe 'creating a quiz' do
       save_settings
 
       expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You ' \
-        'must have a student or section selected'
+                                                                            'must have a student or section selected'
     end
 
     it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785, custom_timeout: 30 do

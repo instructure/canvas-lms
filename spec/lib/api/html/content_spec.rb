@@ -78,14 +78,14 @@ module Api
       describe "#rewritten_html" do
         it "stuffs mathml into a data attribute on equation images" do
           string = "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/></li>"\
-                 "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
-                 "<li><img class='nothing_special'></li></ul></div>"
+                   "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>"\
+                   "<li><img class='nothing_special'></li></ul></div>"
           url_helper = double(rewrite_api_urls: nil)
           html = Content.new(string).rewritten_html(url_helper)
           expected = "<div><ul>"\
-              "<li><img class=\"equation_image\" data-equation-content=\"\int f(x)/g(x)\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo><mo>/</mo><mi>g</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo></math>\"></li>"\
-              "<li><img class=\"equation_image\" data-equation-content=\"\\sum 1..n\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mo lspace=&quot;thinmathspace&quot; rspace=&quot;thinmathspace&quot;>&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math>\"></li>"\
-              "<li><img class=\"nothing_special\"></li></ul></div>"
+                     "<li><img class=\"equation_image\" data-equation-content=\"\int f(x)/g(x)\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo><mo>/</mo><mi>g</mi><mo stretchy='false'>(</mo><mi>x</mi><mo stretchy='false'>)</mo></math>\"></li>"\
+                     "<li><img class=\"equation_image\" data-equation-content=\"\\sum 1..n\" x-canvaslms-safe-mathml=\"<math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;><mo lspace=&quot;thinmathspace&quot; rspace=&quot;thinmathspace&quot;>&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math>\"></li>"\
+                     "<li><img class=\"nothing_special\"></li></ul></div>"
           expect(html).to eq(expected)
         end
 

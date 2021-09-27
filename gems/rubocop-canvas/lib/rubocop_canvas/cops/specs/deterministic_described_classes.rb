@@ -79,16 +79,16 @@ module RuboCop
           full_path = full_name.underscore
 
           "`#{const_name}` appears to be an auto-loaded constant nested in " \
-          "`#{nesting_name}`, but you are not explicitly requiring it.`\n\n" \
+            "`#{nesting_name}`, but you are not explicitly requiring it.`\n\n" \
           \
-          "You should `require_dependency #{full_path.inspect}` to ensure that " \
-          "`described_class` is really what you think it is. Otherwise auto-" \
-          "loading roulette could break your specs if there's another module/" \
-          "class of the same name at a higher nesting (e.g. " \
-          "`::#{const_name}`)\n\n" \
+            "You should `require_dependency #{full_path.inspect}` to ensure that " \
+            "`described_class` is really what you think it is. Otherwise auto-" \
+            "loading roulette could break your specs if there's another module/" \
+            "class of the same name at a higher nesting (e.g. " \
+            "`::#{const_name}`)\n\n" \
           \
-          "Alternatively, get rid of the outer `module`(s) and just do " \
-          "`describe #{full_name}`"
+            "Alternatively, get rid of the outer `module`(s) and just do " \
+            "`describe #{full_name}`"
         end
 
         # Return an array of module nesting names for the given node in

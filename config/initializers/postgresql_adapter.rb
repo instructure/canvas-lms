@@ -234,7 +234,7 @@ module PostgreSQLAdapterExtensions
 
     if matching_indexes.count > 1
       raise ArgumentError, "Multiple indexes found on #{table_name} columns #{column_names}. " \
-                                 "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
+                           "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
     elsif matching_indexes.none?
       return if options.is_a?(Hash) && options[:if_exists]
 

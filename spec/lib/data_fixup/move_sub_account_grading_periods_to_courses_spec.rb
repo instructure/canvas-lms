@@ -212,7 +212,7 @@ describe DataFixup::MoveSubAccountGradingPeriodsToCourses do
       end
 
       context "nearest sub-account does not have grading periods, next sub-account " \
-      "does, and root account does not have grading periods" do
+              "does, and root account does not have grading periods" do
         before(:each) do
           sub_group = legacy_group_for_sub_account.call(@sub_account)
           period_helper.create_presets_for_group(sub_group, :current)

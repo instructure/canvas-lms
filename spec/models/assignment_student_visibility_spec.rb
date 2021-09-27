@@ -471,7 +471,7 @@ describe "differentiated_assignments" do
       end
 
       it "returns a hash with assignment ids and their associated user ids " \
-      "(or an empty array if the assignment is visible to everyone)" do
+         "(or an empty array if the assignment is visible to everyone)" do
         expected_visibilities = {
           assignment.id => [],
           assignment_only_visible_to_overrides.id => [first_student.id]
@@ -489,7 +489,7 @@ describe "differentiated_assignments" do
       end
 
       it "does not call AssignmentStudentVisibility.users_with_visibility_by_assignment " \
-      "if all assignments are visible to everyone" do
+         "if all assignments are visible to everyone" do
         expect(AssignmentStudentVisibility).to receive(:users_with_visibility_by_assignment).never
         # change this assignment so that it is visible to all students
         assignment_only_visible_to_overrides.only_visible_to_overrides = false

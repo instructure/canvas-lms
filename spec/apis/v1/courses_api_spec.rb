@@ -2462,7 +2462,7 @@ describe CoursesController, type: :request do
       end
 
       it "includes current grading period scores if 'total_scores' " \
-      "and 'current_grading_period_scores' are requested" do
+         "and 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
         expect(enrollment_json).to include(*grading_period_score_keys)
@@ -2478,14 +2478,14 @@ describe CoursesController, type: :request do
       end
 
       it "does not include current grading period scores if 'total_scores' are " \
-      "not requested, even if 'current_grading_period_scores' are requested" do
+         "not requested, even if 'current_grading_period_scores' are requested" do
         json_response = courses_api_index_call(includes: ['current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
         expect(enrollment_json).to_not include(*grading_period_score_keys)
       end
 
       it "does not include current grading period scores if final grades are hidden, " \
-      " even if 'total_scores' and 'current_grading_period_scores' are requested" do
+         " even if 'total_scores' and 'current_grading_period_scores' are requested" do
         @course2.hide_final_grades = true
         @course2.save
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
@@ -2494,7 +2494,7 @@ describe CoursesController, type: :request do
       end
 
       it "returns true for 'has_grading_periods' on the enrollment " \
-      "JSON if the course has grading periods" do
+         "JSON if the course has grading periods" do
         json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores'])
         enrollment_json = enrollment(json_response)
         expect(enrollment_json['has_grading_periods']).to be true
@@ -2502,7 +2502,7 @@ describe CoursesController, type: :request do
       end
 
       it "returns 'has_grading_periods' and 'has_weighted_grading_periods' keys at the course-level " \
-      "on the JSON response if 'current_grading_period_scores' are requested" do
+         "on the JSON response if 'current_grading_period_scores' are requested" do
         course_json_response = courses_api_index_call(includes: ['total_scores', 'current_grading_period_scores']).first
         expect(course_json_response).to have_key 'has_grading_periods'
         expect(course_json_response).to have_key 'multiple_grading_periods_enabled'
@@ -2510,7 +2510,7 @@ describe CoursesController, type: :request do
       end
 
       it "does not return 'has_grading_periods' and 'has_weighted_grading_periods' keys at the course-level " \
-      "on the JSON response if 'current_grading_period_scores' are not requested" do
+         "on the JSON response if 'current_grading_period_scores' are not requested" do
         course_json_response = courses_api_index_call.first
         expect(course_json_response).not_to have_key 'has_grading_periods'
         expect(course_json_response).not_to have_key 'multiple_grading_periods_enabled'

@@ -310,7 +310,7 @@ module Importers
             migration.add_warning(
               t(
                 'The External Tool resource link (including any possible custom ' \
-                  'parameters) could not be set for module item "%{title}"',
+                'parameters) could not be set for module item "%{title}"',
                 title: title
               )
             )

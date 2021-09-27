@@ -235,7 +235,7 @@ describe MissingPolicyApplicator do
     end
 
     it 'applies deductions to assignments expecting on paper submissions if the ' \
-      'submission status has been set to "Missing"' do
+       'submission status has been set to "Missing"' do
       late_policy_missing_enabled
       create_recent_paper_assignment
       submission = @course.submissions.first

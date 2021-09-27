@@ -104,8 +104,8 @@ module MicrosoftSync
     class GroupHasNoOwners < PublicError
       def self.public_message
         I18n.t 'The team could be not be created because the Microsoft group has no owners. ' \
-          'This may be an intermittent error: please try to sync again, and ' \
-          'if the problem persists, contact support.'
+               'This may be an intermittent error: please try to sync again, and ' \
+               'if the problem persists, contact support.'
       end
     end
 
@@ -114,15 +114,15 @@ module MicrosoftSync
     class MissingOwners < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'A Microsoft 365 Group must have owners, and no users ' \
-          'corresponding to the instructors of the Canvas course could be found on the ' \
-          'Microsoft side.'
+               'corresponding to the instructors of the Canvas course could be found on the ' \
+               'Microsoft side.'
       end
     end
 
     class NotEducationTenant < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'The Microsoft 365 tenant provided in account settings is not an Education ' \
-          'tenant, so cannot be used with the Microsoft Teams Sync integration.'
+               'tenant, so cannot be used with the Microsoft Teams Sync integration.'
       end
     end
 

@@ -205,7 +205,7 @@ module MicrosoftSync
 
       if (n_total_additions = members.length + owners.length) > GROUP_USERS_BATCH_SIZE
         raise ArgumentError, "Only #{GROUP_USERS_BATCH_SIZE} users can be batched at " \
-          "once. Got #{n_total_additions}."
+                             "once. Got #{n_total_additions}."
       end
     end
 
