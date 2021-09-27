@@ -66,6 +66,7 @@ export const DiscussionEdit = props => {
   }, [props.value, setRceContent])
 
   const handleDraftResponse = nextDraft => {
+    if (!ENV.draft_discussions) return
     if (!nextDraft) return
 
     setAwaitingChanges(true)
@@ -205,27 +206,29 @@ export const DiscussionEdit = props => {
               </View>
             ) : (
               <Flex key="nonMobileButtons">
-                <Flex.Item shouldGrow textAlign="start">
-                  {props.draftSaved ? (
-                    !awaitingChanges && (
+                {ENV.draft_discussions && (
+                  <Flex.Item shouldGrow textAlign="start">
+                    {props.draftSaved ? (
+                      !awaitingChanges && (
+                        <span>
+                          <Text size="small">{I18n.t('Saved')}</Text>
+                          <View as="span" margin="0 0 0 small">
+                            <IconCheckMarkLine color="success" />
+                          </View>
+                        </span>
+                      )
+                    ) : (
                       <span>
-                        <Text size="small">{I18n.t('Saved')}</Text>
-                        <View as="span" margin="0 0 0 small">
-                          <IconCheckMarkLine color="success" />
-                        </View>
+                        <Text size="small">{I18n.t('Saving')}</Text>
+                        <Spinner
+                          renderTitle="Saving draft in progress"
+                          margin="0 0 0 small"
+                          size="x-small"
+                        />
                       </span>
-                    )
-                  ) : (
-                    <span>
-                      <Text size="small">{I18n.t('Saving')}</Text>
-                      <Spinner
-                        renderTitle="Saving draft in progress"
-                        margin="0 0 0 small"
-                        size="x-small"
-                      />
-                    </span>
-                  )}
-                </Flex.Item>
+                    )}
+                  </Flex.Item>
+                )}
                 <Flex.Item shouldGrow textAlign="end">
                   {rceButtons}
                 </Flex.Item>
