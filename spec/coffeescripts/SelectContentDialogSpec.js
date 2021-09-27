@@ -46,9 +46,7 @@ QUnit.module('SelectContentDialog', {
     $(window).off('beforeunload')
     clickEvent = {}
     fixtures.innerHTML = ''
-    $('#resource_selection_dialog')
-      .parent()
-      .remove()
+    $('#resource_selection_dialog').parent().remove()
   }
 })
 
@@ -60,14 +58,14 @@ test('it creates a confirm alert before closing the modal', () => {
   strictEqual(window.confirm.callCount, 1)
 })
 
-test('sets the iframe allowances', function() {
+test('sets the iframe allowances', function () {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
   equal($dialog.find('#resource_selection_iframe').attr('allow'), this.allowances.join('; '))
 })
 
-test('sets the iframe "data-lti-launch" attribute', function() {
+test('sets the iframe "data-lti-launch" attribute', function () {
   const l = document.getElementById('test-tool')
   SelectContentDialog.Events.onContextExternalToolSelect.bind(l)(clickEvent)
   const $dialog = $('#resource_selection_dialog')
@@ -102,7 +100,7 @@ test('close resource selection dialog when content items attribute is empty', as
 
   const deepLinkingEvent = {
     data: {
-      messageType: 'LtiDeepLinkingResponse',
+      subject: 'LtiDeepLinkingResponse',
       content_items: [],
       ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
     }

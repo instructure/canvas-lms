@@ -116,7 +116,7 @@ function getInstance(_container, overrides) {
 const data = overrides => ({
   content_items,
   ltiEndpoint: 'https://www.instructure.com/lti',
-  messageType: 'LtiDeepLinkingResponse',
+  subject: 'LtiDeepLinkingResponse',
   ...overrides
 })
 
@@ -411,7 +411,7 @@ describe('handleDeepLinking', () => {
 
   it('ignores non-deep linking responses', async () => {
     const instance = await getInstance(container)
-    const ev = {origin: 'deepOrigin', data: data({messageType: 'notdeeplinking'})}
+    const ev = {origin: 'deepOrigin', data: data({subject: 'notdeeplinking'})}
     instance.handleDeepLinking(ev)
     expect(send).not.toHaveBeenCalled()
   })

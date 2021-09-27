@@ -159,10 +159,10 @@ const MentionUIManager = ({editor, onExited, onFocusedUserChange, rceRef}) => {
       return
     }
 
-    const messageType = e.data.messageType
+    const subject = e.data.subject
     const value = e.data.value
 
-    switch (messageType) {
+    switch (subject) {
       case NAVIGATION_MESSAGE:
         keyboardEvents(value)
         break

@@ -65,14 +65,14 @@ describe('processEditorContentItems', () => {
 
   describe('static', () => {
     it('closes the dialog', async () => {
-      const ev = {data: {content_items: contentItems, messageType: 'LtiDeepLinkingResponse'}}
+      const ev = {data: {content_items: contentItems, subject: 'LtiDeepLinkingResponse'}}
       const dialog = {close: jest.fn()}
       await processEditorContentItems(ev, editor, dialog)
       expect(dialog.close).toHaveBeenCalled()
     })
 
     it('ignores non deep linking event types', async () => {
-      const ev = {data: {messageType: 'OtherMessage'}}
+      const ev = {data: {subject: 'OtherMessage'}}
       const dialog = {close: jest.fn()}
       await processEditorContentItems(ev, editor, dialog)
       expect(dialog.close).not.toHaveBeenCalled()
