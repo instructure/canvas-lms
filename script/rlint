@@ -14,10 +14,13 @@ linter_options = {
   auto_correct: false,
   campsite_mode: false,
   append_files_to_command: true,
-  severe_levels: [],
-  boyscout_mode: false
+  boyscout_mode: false,
+  severe_levels: %w[error fatal].freeze
 }
 no_fail = false
+
+SEVERITIES = %w[info warn error fatal].freeze
+rlint = nil
 
 OptionParser.new do |opts|
   # boy scout means treat everything as an error
@@ -62,6 +65,20 @@ OptionParser.new do |opts|
   opts.on("-h", "--help", "Display this usage information") do
     puts opts
     exit 1
+  end
+  opts.on("-s", "--severe SEVERITY", "Configure which level is considered severe") do |v|
+    severity = SEVERITIES.find { |s| s[0...v.length].casecmp(v).zero? }
+    raise "Unknown severity #{v}" unless severity
+
+    linter_options[:severe_levels] = SEVERITIES[SEVERITIES.index(severity)..]
+  end
+  opts.on("--only-severe", "Filter non-severe comments out of results") do
+    linter_options[:comment_post_processing] = ->(comments) do
+      min_severity = SEVERITIES.index(rlint.severe_levels.first)
+      comments.select do |c|
+        c[:corrected] || SEVERITIES.index(c[:severity]) >= min_severity
+      end
+    end
   end
 end.parse!
 

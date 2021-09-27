@@ -86,16 +86,18 @@ class Linter
     publish_comments
   end
 
+  def severe_levels
+    return @severe_levels if @severe_levels
+
+    boyscout_mode ? %w(info warn error fatal) : %w(warn error fatal)
+  end
+
   private
 
   attr_reader(*DEFAULT_OPTIONS.keys)
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
-  end
-
-  def severe_levels
-    boyscout_mode ? %w(error warn info) : %w(error warn)
   end
 
   def dr_diff
@@ -161,7 +163,7 @@ class Linter
         puts "Fix and/or git add the corrections and try to commit again."
       end
     end
-    false
+    boyscout_mode ? false : processed_comments.any? { |c| severe_levels.include?(c[:severity]) }
   end
 
   def publish_gergich_comments(comments)
