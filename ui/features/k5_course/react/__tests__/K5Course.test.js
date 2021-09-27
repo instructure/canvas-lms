@@ -292,6 +292,18 @@ describe('K-5 Subject Course', () => {
       expect(link).toBeInTheDocument()
       expect(link.href).toBe('http://localhost/courses/30/settings#tab-navigation')
     })
+
+    it('does not render anything when tabContentOnly is true', () => {
+      const {queryByText} = render(<K5Course {...defaultProps} tabContentOnly />)
+
+      // Course hero shouldn't be shown
+      expect(queryByText(defaultProps.name)).not.toBeInTheDocument()
+
+      // Tabs should not be shown
+      ;['Home', 'Schedule', 'Modules', 'Grades', 'Resources', 'Groups'].forEach(t =>
+        expect(queryByText(t)).not.toBeInTheDocument()
+      )
+    })
   })
 
   describe('Manage course functionality', () => {

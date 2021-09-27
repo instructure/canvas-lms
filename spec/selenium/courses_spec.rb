@@ -353,6 +353,15 @@ describe "courses" do
         expect(f('#course_home_content')).to be_displayed
       end
     end
+
+    it "does not display global nav on k5 subject with embed mode enabled" do
+      toggle_k5_setting(@course.account)
+      enroll_student(@student, true)
+      user_session(@student)
+      get "/courses/#{@course.id}?embed=true"
+
+      expect(element_exists?('header')).to be_falsey
+    end
   end
 
   it "does not cache unauth permissions for semi-public courses from sessionless permission checks" do

@@ -96,15 +96,10 @@ describe('useTabState hook', () => {
       const {result} = renderHook(() => useTabState(TAB_IDS.GRADES, TABS))
 
       act(() => result.current.handleTabChange(TAB_IDS.RESOURCES))
-
-      expect(window.history.replaceState).toHaveBeenCalled()
-      expect(window.history.replaceState.mock.calls[0][0].id).toBe(TAB_IDS.RESOURCES)
-      expect(window.history.replaceState.mock.calls[0][2]).toBe('http://localhost/#resources')
+      expect(window.location.href).toBe('http://localhost/#resources')
 
       act(() => result.current.handleTabChange(TAB_IDS.HOME))
-
-      expect(window.history.replaceState.mock.calls[1][0].id).toBe(TAB_IDS.HOME)
-      expect(window.history.replaceState.mock.calls[1][2]).toBe('http://localhost/#home')
+      expect(window.location.href).toBe('http://localhost/#home')
     })
   })
 })
