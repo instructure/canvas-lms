@@ -137,6 +137,27 @@ const DiscussionTopicManager = props => {
     }
   }
 
+  const removeDraftFromDiscussionCache = (cache, result) => {
+    try {
+      const options = {
+        query: DISCUSSION_QUERY,
+        variables: {...variables}
+      }
+      const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
+      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
+
+      currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
+        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
+          draft =>
+            draft.rootEntryId != newDiscussionEntry.rootEntryId &&
+            draft.discussionTopicID != newDiscussionEntry.discussionTopicID
+        )
+      cache.writeQuery({...options, data: currentDiscussion})
+    } catch (e) {
+      // do nothing for errors updating the cache on a draft
+    }
+  }
+
   const updateCache = (cache, result) => {
     try {
       const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
@@ -149,12 +170,7 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
-          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-            draft =>
-              draft.rootEntryId != newDiscussionEntry.rootEntryId &&
-              draft.discussionTopicID != newDiscussionEntry.discussionTopicID
-          )
+        removeDraftFromDiscussionCache(cache, result)
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
@@ -220,6 +236,7 @@ const DiscussionTopicManager = props => {
         <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
           updateDraftCache={updateDraftCache}
+          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
           onOpenIsolatedView={(
             discussionEntryId,
             isolatedEntryId,
@@ -237,6 +254,7 @@ const DiscussionTopicManager = props => {
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
           relativeEntryId={relativeEntryId}
+          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
           updateDraftCache={updateDraftCache}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
