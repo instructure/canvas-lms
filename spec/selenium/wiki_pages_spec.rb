@@ -215,7 +215,7 @@ describe "Wiki Pages" do
       # validation
       lock_explanation = f('.lock_explanation').text
       expect(lock_explanation).to include "This page is part of the module the_mod and hasn't been unlocked yet"
-      expect(lock_explanation).to match /foo\s+must view the page/
+      expect(lock_explanation).to match(/foo\s+must view the page/)
     end
 
     it "does not show the show all pages link if the pages tab is disabled" do

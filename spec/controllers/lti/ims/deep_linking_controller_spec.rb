@@ -339,7 +339,7 @@ module Lti
             let(:content_items) {
               [
                 { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
-                { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: { 'mycustom': '123' } },
+                { type: 'ltiResourceLink', url: launch_url, title: 'Item 2', custom: { mycustom: '123' } },
                 { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
               ]
             }

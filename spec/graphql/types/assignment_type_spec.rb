@@ -63,7 +63,7 @@ describe Types::AssignmentType do
       # assignment
       expect(
         CanvasSchema.execute(<<~GQL, context: { current_user: student }).dig("data", "assignment")
-          query { assignment(id: "#{assignment.id.to_s}") { id } }
+          query { assignment(id: "#{assignment.id}") { id } }
         GQL
       ).to be_nil
     end

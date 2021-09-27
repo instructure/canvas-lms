@@ -123,7 +123,7 @@ describe BrandConfig do
     end
 
     it "defines right-looking css in the :root scope" do
-      expect(@subaccount_bc.to_css).to match /:root \{
+      expect(@subaccount_bc.to_css).to match(/:root \{
 [\s|\S]*--ic-brand-primary-darkened-5: #312111;
 --ic-brand-primary-darkened-10: #2E1F10;
 --ic-brand-primary-darkened-15: #2C1D0F;
@@ -136,7 +136,7 @@ describe BrandConfig do
 --ic-brand-button--secondary-bgd-darkened-15: #27333B;
 [\s|\S]*--ic-brand-primary: #321;
 [\s|\S]*--ic-brand-global-nav-bgd: #123;
-/
+/)
     end
   end
 

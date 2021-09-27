@@ -198,7 +198,7 @@ describe CanvasPartman::Concerns::Partitioned do
 
         expect(count_records("partman_trails")).to eq 1
         expect(count_records("partman_trails_#{zoo.id / 5}")).to eq 1
-        expect(count_records("partman_trails_#{zoo.id / 5 + 1}")).to eq 0
+        expect(count_records("partman_trails_#{(zoo.id / 5) + 1}")).to eq 0
       end
 
       context 'via an association scope' do
@@ -210,7 +210,7 @@ describe CanvasPartman::Concerns::Partitioned do
 
           expect(count_records("partman_trails")).to eq 1
           expect(count_records("partman_trails_#{zoo.id / 5}")).to eq 1
-          expect(count_records("partman_trails_#{zoo.id / 5 + 1}")).to eq 0
+          expect(count_records("partman_trails_#{(zoo.id / 5) + 1}")).to eq 0
 
           expect(zoo.trails.count).to eq 1
           expect(south.zoo).to eq zoo

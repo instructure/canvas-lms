@@ -45,33 +45,33 @@ RSpec.describe 'Outcomes Service - GET Content Export', :pact do
     end
     let(:expected_export_get_response_body) do
       {
-        "id": Pact.like(5),
-        "context_type": "course",
-        "context_id": Pact.like("100"),
-        "state": "completed",
-        "export_settings": {
-          "format": "canvas",
-          "artifacts": [
+        id: Pact.like(5),
+        context_type: "course",
+        context_id: Pact.like("100"),
+        state: "completed",
+        export_settings: {
+          format: "canvas",
+          artifacts: [
             {
-              "external_id": Pact.each_like(1),
-              "external_type": "canvas.page"
+              external_id: Pact.each_like(1),
+              external_type: "canvas.page"
             }
           ]
         },
-        "data": {
-          "format": "canvas",
-          "alignments": Pact.each_like({
-                                         "artifact": Pact.like({
-                                                                 "$canvas_wiki_page_id": "1"
-                                                               }),
-                                         "outcomes": Pact.each_like({
-                                                                      "$canvas_learning_outcome_id": "external-id-1"
-                                                                    })
-                                       })
+        data: {
+          format: "canvas",
+          alignments: Pact.each_like({
+                                       artifact: Pact.like({
+                                                             "$canvas_wiki_page_id": "1"
+                                                           }),
+                                       outcomes: Pact.each_like({
+                                                                  "$canvas_learning_outcome_id": "external-id-1"
+                                                                })
+                                     })
         }
       }
     end
-    let(:export_data) { { "export_id": "1" } }
+    let(:export_data) { { export_id: "1" } }
 
     before do
       outcomes.given('artifacts and an export to retrieve')

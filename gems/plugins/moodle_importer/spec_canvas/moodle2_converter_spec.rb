@@ -92,13 +92,13 @@ describe Moodle::Converter do
 
     it "converts Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.where(title: "Quiz Name").first
-      expect(quiz.description).to match /Quiz Description/
+      expect(quiz.description).to match(/Quiz Description/)
       expect(quiz.quiz_questions.count).to eq 11
     end
 
     it "converts Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.where(title: "Questionnaire Name").first
-      expect(quiz.description).to match /Sumary/
+      expect(quiz.description).to match(/Sumary/)
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 10
     end

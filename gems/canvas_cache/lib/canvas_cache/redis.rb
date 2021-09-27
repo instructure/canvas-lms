@@ -33,7 +33,7 @@ module CanvasCache
       raise "Redis is not enabled for this install" unless CanvasCache::Redis.enabled?
 
       conf = CanvasCache::Redis.config
-      if conf == 'cache_store' || conf.is_a?(Hash) && conf['servers'] == 'cache_store'
+      if conf == 'cache_store' || (conf.is_a?(Hash) && conf['servers'] == 'cache_store')
         return Rails.cache.redis
       end
 

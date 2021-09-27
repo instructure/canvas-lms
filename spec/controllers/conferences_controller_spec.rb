@@ -261,7 +261,7 @@ describe ConferencesController do
       @conference = @course.web_conferences.create!(:conference_type => 'Wimba', :duration => 60, :user => @teacher)
       post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
       expect(response).to be_redirect
-      expect(response['Location']).to match /wimba\.test/
+      expect(response['Location']).to match(/wimba\.test/)
     end
 
     it "lets students join an inactive long running conference" do
@@ -272,7 +272,7 @@ describe ConferencesController do
       allow_any_instance_of(WimbaConference).to receive(:conference_status).and_return(:closed)
       post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
       expect(response).to be_redirect
-      expect(response['Location']).to match /wimba\.test/
+      expect(response['Location']).to match(/wimba\.test/)
     end
 
     describe 'when student is part of the conference' do
@@ -289,7 +289,7 @@ describe ConferencesController do
         expect_any_instance_of(WimbaConference).to receive(:active?).and_return(false)
         post 'join', params: { :course_id => @course.id, :conference_id => @conference.id }
         expect(response).to be_redirect
-        expect(response['Location']).not_to match /wimba\.test/
+        expect(response['Location']).not_to match(/wimba\.test/)
         expect(flash[:notice]).to match(/That conference is not currently active/)
       end
 
@@ -302,7 +302,7 @@ describe ConferencesController do
 
         it "lets students join an active conference" do
           expect(response).to be_redirect
-          expect(response['Location']).to match /wimba\.test/
+          expect(response['Location']).to match(/wimba\.test/)
         end
 
         it 'logs an asset access record for the discussion topic' do

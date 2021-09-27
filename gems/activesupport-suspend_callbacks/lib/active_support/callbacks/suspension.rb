@@ -82,8 +82,8 @@ module ActiveSupport::Callbacks
     #   end
     #
     def suspended_callback?(callback, kind, type = nil)
-      val = suspended_callbacks_defined? &&
-            suspended_callbacks.include?(callback, kind, type) ||
+      val = (suspended_callbacks_defined? &&
+            suspended_callbacks.include?(callback, kind, type)) ||
             suspended_callback_ancestor&.suspended_callback?(callback, kind, type)
 
       val

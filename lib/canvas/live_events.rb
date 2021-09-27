@@ -607,7 +607,7 @@ module Canvas::LiveEvents
     end
 
     enrollment_data = {}
-    if context_membership&.is_a?(Enrollment)
+    if context_membership.is_a?(Enrollment)
       enrollment_data = {
         enrollment_id: context_membership.id,
         section_id: context_membership.course_section_id

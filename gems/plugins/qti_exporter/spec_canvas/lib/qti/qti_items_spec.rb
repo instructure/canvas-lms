@@ -31,7 +31,7 @@ if Qti.migration_executable
       file_path = File.join(BASE_FIXTURE_DIR, 'qti')
       question = get_question_hash(file_path, 'sanitize_metadata')
       expect(question[:question_bank_name]).to eql 'Sad & Broken'
-      expect(question[:question_text]).not_to match /divp/
+      expect(question[:question_text]).not_to match(/divp/)
     end
 
     it "gets answers correctly even when people write gross xml" do

@@ -83,7 +83,7 @@ unless $canvas_tasks_loaded
 
       combined_time = batch_times.reduce(:+)
 
-      puts (
+      puts(
         "Finished compiling assets in #{real_time.round(2)}s. " +
         "Parallelism saved #{(combined_time - real_time).round(2)}s " +
         "(#{(real_time.to_f / combined_time.to_f * 100.0).round(2)}%)"
@@ -203,9 +203,9 @@ unless $canvas_tasks_loaded
 
   Switchman::Rake.filter_database_servers do |servers, block|
     ENV['REGION']&.split(',')&.each do |region|
-      method = :"select!"
+      method = :select!
       if region[0] == '-'
-        method = :"reject!"
+        method = :reject!
         region = region[1..-1]
       end
       if region == 'self'

@@ -113,7 +113,7 @@ describe Quizzes::QuizQuestionsController, type: :request do
 
         request_data = {
           question: {
-            'question_text': file_link,
+            question_text: file_link,
           }
         }
         json = api_call(

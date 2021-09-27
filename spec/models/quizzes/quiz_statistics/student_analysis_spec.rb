@@ -122,10 +122,10 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     sub.score = 20
     sub.with_versioning(true, &:save!)
     stats = q.statistics
-    expect(stats[:submission_score_average]).to be_within(0.0000000001).of(17 + 1.0 / 3)
+    expect(stats[:submission_score_average]).to be_within(0.0000000001).of(17 + (1.0 / 3))
     expect(stats[:submission_score_high]).to eq 20
     expect(stats[:submission_score_low]).to eq 15
-    expect(stats[:submission_score_stdev]).to be_within(0.0000000001).of(Math::sqrt(4 + 2.0 / 9))
+    expect(stats[:submission_score_stdev]).to be_within(0.0000000001).of(Math::sqrt(4 + (2.0 / 9)))
     expect(stats[:submission_scores]).to eq({ 50 => 1, 57 => 1, 67 => 1 })
   end
 
@@ -500,7 +500,7 @@ describe Quizzes::QuizStatistics::StudentAnalysis do
     # calculated field also includes the values for the variables, something like:
     #   "x=>4.3,y=>21,calculated"
     # so we'll match instead
-    expect(stats.last[15]).to match /,calculated$/
+    expect(stats.last[15]).to match(/,calculated$/)
   end
 
   it 'does not count teacher preview submissions' do

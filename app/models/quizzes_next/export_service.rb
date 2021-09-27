@@ -33,11 +33,11 @@ module QuizzesNext
         return if assignments.empty?
 
         {
-          "original_course_uuid": course.uuid,
-          "assignments": assignments.map do |assignment|
+          original_course_uuid: course.uuid,
+          assignments: assignments.map do |assignment|
             {
-              "original_resource_link_id": assignment.lti_resource_link_id,
-              "original_assignment_id": assignment.id,
+              original_resource_link_id: assignment.lti_resource_link_id,
+              original_assignment_id: assignment.id,
               "$canvas_assignment_id": assignment.id # transformed to new id
             }
           end

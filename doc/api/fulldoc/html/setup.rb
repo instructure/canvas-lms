@@ -23,7 +23,7 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'api_scopes'))
 require 'controller_list_view'
 require 'api_scope_mapping_writer'
 
-Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").each { |file| require file }
+Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").sort.each { |file| require file }
 
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
@@ -49,7 +49,7 @@ module YARD::Templates::Helpers::BaseHelper
         html_file = "#{topicize topic.first}.html"
         action = $2
         name = controller.name.to_s
-        name = "#{controller.namespace.name.to_s}/#{name}" if controller.namespace.name != :root
+        name = "#{controller.namespace.name}/#{name}" if controller.namespace.name != :root
         link_url("#{html_file}#method.#{topicize(name).sub("_controller", "")}.#{action}", args[1])
       else
         raise "couldn't find API link for #{args.first}"

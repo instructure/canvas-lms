@@ -525,7 +525,7 @@ describe Quizzes::QuizzesController do
       course_quiz !!:active
       get 'show', params: { :course_id => @course.id, :id => @quiz.id, :force_user => 1 }
       expect(response).to be_redirect
-      expect(response.location).to match /login/
+      expect(response.location).to match(/login/)
     end
 
     it "renders the show page for public courses" do

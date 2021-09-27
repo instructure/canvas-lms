@@ -58,7 +58,7 @@ describe AppCenter::AppApi do
       endpoint = '/?myparam=value'
       per_page = 11
       page = 3
-      expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{page * per_page - per_page}").and_return(response)
+      expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{(page * per_page) - per_page}").and_return(response)
       api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
     end
 
@@ -79,7 +79,7 @@ describe AppCenter::AppApi do
       endpoint = '/?myparam=value'
       per_page = 1
       page = 1
-      offset = page * per_page - per_page
+      offset = (page * per_page) - per_page
       expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").and_return(response)
       response = api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
       results = response['objects']
@@ -94,7 +94,7 @@ describe AppCenter::AppApi do
       endpoint = '/?myparam=value'
       per_page = 5
       page = 1
-      offset = page * per_page - per_page
+      offset = (page * per_page) - per_page
       expect(CanvasHttp).to receive(:get).with("#{api.app_center.settings['base_url']}#{endpoint}&offset=#{offset}").and_return(response)
       response = api.fetch_app_center_response(endpoint, 11.minutes, page, per_page)
       results = response['objects']

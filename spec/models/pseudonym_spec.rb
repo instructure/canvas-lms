@@ -60,7 +60,7 @@ describe Pseudonym do
 
     # make sure a password was generated
     expect(p.password).not_to be_nil
-    expect(p.password).not_to match /tmp-pw/
+    expect(p.password).not_to match(/tmp-pw/)
   end
 
   it "does not allow active duplicates" do

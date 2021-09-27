@@ -23,16 +23,16 @@ module ContextModulesHelper
   include CyoeHelper
 
   TRANSLATED_COMMENT_TYPE = {
-    'Announcement': I18n.t('Announcement'),
-    'Assignment': I18n.t('Assignment'),
-    'Attachment': I18n.t('Attachment'),
-    'ContextExternalTool': I18n.t('External Tool'),
-    'ContextModuleSubHeader': I18n.t('Context Module Sub Header'),
-    'DiscussionTopic': I18n.t('Discussion Topic'),
-    'ExternalUrl': I18n.t('External Url'),
-    'Quiz': I18n.t('Quiz'),
+    Announcement: I18n.t('Announcement'),
+    Assignment: I18n.t('Assignment'),
+    Attachment: I18n.t('Attachment'),
+    ContextExternalTool: I18n.t('External Tool'),
+    ContextModuleSubHeader: I18n.t('Context Module Sub Header'),
+    DiscussionTopic: I18n.t('Discussion Topic'),
+    ExternalUrl: I18n.t('External Url'),
+    Quiz: I18n.t('Quiz'),
     'Quizzes::Quiz': I18n.t('Quiz'),
-    'WikiPage': I18n.t('Page')
+    WikiPage: I18n.t('Page')
   }.freeze
 
   def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)

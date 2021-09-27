@@ -155,7 +155,7 @@ module Api
           :scope => 'root_account_id' }.freeze,
   }.freeze
 
-  MAX_ID = (2**63 - 1)
+  MAX_ID = ((2**63) - 1)
   MAX_ID_LENGTH = MAX_ID.to_s.length
   MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}

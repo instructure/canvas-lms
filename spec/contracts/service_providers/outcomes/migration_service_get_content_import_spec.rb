@@ -46,7 +46,7 @@ RSpec.describe 'Outcomes Service - GET Content Import', :pact do
     end
     let(:expected_import_get_response_body) do
       {
-        "state": "completed"
+        state: "completed"
       }
     end
     let!(:course) { course_factory(active_course: true) }

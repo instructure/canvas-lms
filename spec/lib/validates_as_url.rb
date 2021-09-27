@@ -54,7 +54,7 @@ shared_examples_for "url validation tests" do
       saved = model.save
       expect([model.url, saved]).to eq [invalid_url, false]
       expect(model.errors.size).to eq 1
-      expect(model.errors.full_messages.join).to match /not a valid URL/
+      expect(model.errors.full_messages.join).to match(/not a valid URL/)
     end
 
     # should work on valid urls

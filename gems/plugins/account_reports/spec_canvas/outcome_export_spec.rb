@@ -83,7 +83,7 @@ describe "Outcome Reports" do
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 
       preparsed_report = run_report('outcome_export_csv', preparsed_report_options)
-      actual_headers = parse_report(preparsed_report, preparsed_report_options.merge('col_sep': ';'))[0].headers
+      actual_headers = parse_report(preparsed_report, preparsed_report_options.merge(col_sep: ';'))[0].headers
       expect(actual_headers[0..2]).to eq(expected_headers)
     end
 

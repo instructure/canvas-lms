@@ -31,7 +31,37 @@ Layout:
 Layout/LineLength:
   Enabled: false # TODO. Maybe.
 
+Lint/AmbiguousOperator:
+  Severity: error
+Lint/AmbiguousOperatorPrecedence:
+  Severity: error
+Lint/AmbiguousRegexpLiteral:
+  Severity: error
 Lint/Debugger:
+  Severity: error
+Lint/DeprecatedClassMethods:
+  Severity: error
+Lint/DeprecatedOpenSSLConstant:
+  Severity: error
+Lint/NonDeterministicRequireOrder:
+  Severity: error
+Lint/ParenthesesAsGroupedExpression:
+  Severity: error
+Lint/RedundantRequireStatement:
+  Severity: error
+Lint/RedundantSafeNavigation:
+  Severity: error
+Lint/RedundantSplatExpansion:
+  Severity: error
+Lint/RedundantStringCoercion:
+  Severity: error
+Lint/RedundantWithIndex:
+  Severity: error
+Lint/SendWithMixinArgument:
+  Severity: error
+Lint/SymbolConversion:
+  Severity: error
+Lint/UnifiedInteger:
   Severity: error
 
 Metrics:
@@ -102,6 +132,14 @@ Style/SpecialGlobalVars:
 Lint/AmbiguousBlockAssociation: # TODO
   Exclude:
     - spec/**/*
+Lint/UnusedBlockArgument: # TODO maually fix these by removing the argument if possible
+  Severity: warning
+  AutoCorrect: false
+Lint/UnusedMethodArgument: # TODO maually fix these by removing the argument if possible
+  Severity: warning
+  AutoCorrect: false
+Lint/UselessAssignment: # TODO
+  Severity: warning
 
 Naming/VariableNumber: # TODO
   Enabled: false

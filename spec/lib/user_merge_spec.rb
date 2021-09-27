@@ -754,8 +754,9 @@ describe UserMerge do
       @user2.set_preference(:custom_colors,
                             { "course_#{@shard_course.local_id}" => "#254284", "course_#{course.global_id}" => "#346543" })
       UserMerge.from(@user2).into(user1)
-      expect(user1.reload.get_preference(:custom_colors)).to eq (
-        { "course_#{@shard_course.global_id}" => "#254284", "course_#{course.local_id}" => "#346543" })
+      expect(user1.reload.get_preference(:custom_colors)).to eq(
+        { "course_#{@shard_course.global_id}" => "#254284", "course_#{course.local_id}" => "#346543" }
+      )
     end
 
     it 'moves nicknames with old format' do

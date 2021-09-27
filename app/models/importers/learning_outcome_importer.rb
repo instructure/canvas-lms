@@ -158,7 +158,7 @@ module Importers
           end
 
           if asset
-            options = alignment.slice(*[:mastery_type, :mastery_score])
+            options = alignment.slice(:mastery_type, :mastery_score)
             item.align(asset, context, options)
           end
         end

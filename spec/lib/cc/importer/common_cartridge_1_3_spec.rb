@@ -137,7 +137,7 @@ describe "Standard Common Cartridge importing" do
 
     it "does not loop on circular references" do
       m = @course.context_modules.first
-      expect(m.content_tags[4].url).to match /loop(1|2)/
+      expect(m.content_tags[4].url).to match(/loop(1|2)/)
       # also, the import finished executing. :)
     end
   end

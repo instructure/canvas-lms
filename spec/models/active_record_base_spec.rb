@@ -776,8 +776,8 @@ describe ActiveRecord::Base do
       class MockAccount < Account
         include RSpec::Matchers
         before_save do
-          expect(Account.all.to_sql).not_to match /callbacks something/
-          expect(MockAccount.all.to_sql).not_to match /callbacks something/
+          expect(Account.all.to_sql).not_to match(/callbacks something/)
+          expect(MockAccount.all.to_sql).not_to match(/callbacks something/)
           true
         end
       end

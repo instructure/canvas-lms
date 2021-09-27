@@ -44,8 +44,8 @@ describe ApplicationHelper do
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[4].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/)
     end
 
     it "limits depth" do
@@ -54,8 +54,8 @@ describe ApplicationHelper do
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 3
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[2].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[2].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2.name}/)
     end
 
     it "works without supplying all folders" do
@@ -64,8 +64,8 @@ describe ApplicationHelper do
       html = Nokogiri::HTML5.fragment("<select>#{option_string}</select>")
       expect(html.css('option').count).to eq 5
       expect(html.css('option')[0].text).to eq @f.name
-      expect(html.css('option')[1].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/
-      expect(html.css('option')[4].text).to match /^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/
+      expect(html.css('option')[1].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_1.name}/)
+      expect(html.css('option')[4].text).to match(/^\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0\xC2\xA0- #{@f_2_1_1.name}/)
     end
   end
 
@@ -160,18 +160,18 @@ describe ApplicationHelper do
 
       it 'builds a whole time tag with a useful title showing the timezone offset if theres a context' do
         tag = friendly_datetime(Time.now, context: context)
-        expect(tag).to match /^<time.*<\/time>$/
-        expect(tag).to match /data-html-tooltip-title=/
-        expect(tag).to match /Local: Mar 13 at  1:12am/
-        expect(tag).to match /Course: Mar 13 at  3:12am/
+        expect(tag).to match(/^<time.*<\/time>$/)
+        expect(tag).to match(/data-html-tooltip-title=/)
+        expect(tag).to match(/Local: Mar 13 at  1:12am/)
+        expect(tag).to match(/Course: Mar 13 at  3:12am/)
       end
 
       it 'can produce an alternate tag type' do
         tag = friendly_datetime(Time.now, context: context, tag_type: :span)
-        expect(tag).to match /^<span.*<\/span>$/
-        expect(tag).to match /data-html-tooltip-title=/
-        expect(tag).to match /Local: Mar 13 at  1:12am/
-        expect(tag).to match /Course: Mar 13 at  3:12am/
+        expect(tag).to match(/^<span.*<\/span>$/)
+        expect(tag).to match(/data-html-tooltip-title=/)
+        expect(tag).to match(/Local: Mar 13 at  1:12am/)
+        expect(tag).to match(/Course: Mar 13 at  3:12am/)
       end
 
       it 'produces no tooltip for a nil datetime' do

@@ -33,24 +33,24 @@ describe CustomGradebookColumnDatum do
 
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": @first_col.id.to_s,
-                                                                        "user_id": @first_student.id.to_s,
-                                                                        "content": "first column, first student"
+                                                                        column_id: @first_col.id.to_s,
+                                                                        user_id: @first_student.id.to_s,
+                                                                        content: "first column, first student"
                                                                       },
                                                                       {
-                                                                        "column_id": @first_col.id.to_s,
-                                                                        "user_id": @second_student.id.to_s,
-                                                                        "content": "first column, second student"
+                                                                        column_id: @first_col.id.to_s,
+                                                                        user_id: @second_student.id.to_s,
+                                                                        content: "first column, second student"
                                                                       },
                                                                       {
-                                                                        "column_id": @second_col.id.to_s,
-                                                                        "user_id": @first_student.id.to_s,
-                                                                        "content": "second column, first student"
+                                                                        column_id: @second_col.id.to_s,
+                                                                        user_id: @first_student.id.to_s,
+                                                                        content: "second column, first student"
                                                                       },
                                                                       {
-                                                                        "column_id": @second_col.id.to_s,
-                                                                        "user_id": @second_student.id.to_s,
-                                                                        "content": "second column, second student"
+                                                                        column_id: @second_col.id.to_s,
+                                                                        user_id: @second_student.id.to_s,
+                                                                        content: "second column, second student"
                                                                       }
                                                                     ])
     end
@@ -91,9 +91,9 @@ describe CustomGradebookColumnDatum do
     it "does not create new columns when column doesn't exist" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": (@second_col.id + 1001).to_s,
-                                                                        "user_id": @second_student.id.to_s,
-                                                                        "content": "first column, second student"
+                                                                        column_id: (@second_col.id + 1001).to_s,
+                                                                        user_id: @second_student.id.to_s,
+                                                                        content: "first column, second student"
                                                                       },
                                                                     ])
 
@@ -104,9 +104,9 @@ describe CustomGradebookColumnDatum do
     it "updates the content for existing student and column" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": @second_col.id.to_s,
-                                                                        "user_id": @second_student.id.to_s,
-                                                                        "content": "2, 2"
+                                                                        column_id: @second_col.id.to_s,
+                                                                        user_id: @second_student.id.to_s,
+                                                                        content: "2, 2"
                                                                       }
                                                                     ])
 
@@ -118,9 +118,9 @@ describe CustomGradebookColumnDatum do
     it "can also pass the column ID as a number" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": @second_col.id,
-                                                                        "user_id": @second_student.id,
-                                                                        "content": "2, 2"
+                                                                        column_id: @second_col.id,
+                                                                        user_id: @second_student.id,
+                                                                        content: "2, 2"
                                                                       }
                                                                     ])
 
@@ -138,9 +138,9 @@ describe CustomGradebookColumnDatum do
 
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": @second_col.id.to_s,
-                                                                        "user_id": @second_student.id.to_s,
-                                                                        "content": "3, 2"
+                                                                        column_id: @second_col.id.to_s,
+                                                                        user_id: @second_student.id.to_s,
+                                                                        content: "3, 2"
                                                                       },
                                                                     ])
 
@@ -151,9 +151,9 @@ describe CustomGradebookColumnDatum do
     it "destroys data when uploading empty string" do
       CustomGradebookColumnDatum.process_bulk_update_custom_columns({}, @course, [
                                                                       {
-                                                                        "column_id": @first_col.id.to_s,
-                                                                        "user_id": @first_student.id.to_s,
-                                                                        "content": ""
+                                                                        column_id: @first_col.id.to_s,
+                                                                        user_id: @first_student.id.to_s,
+                                                                        content: ""
                                                                       },
                                                                     ])
 

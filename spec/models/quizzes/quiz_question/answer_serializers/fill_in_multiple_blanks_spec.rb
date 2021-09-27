@@ -85,14 +85,14 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
       ['asdf', nil].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
-        expect(rc.error).to match /must be of type hash/i
+        expect(rc.error).to match(/must be of type hash/i)
       end
     end
 
     it 'rejects an answer to an unknown blank' do
       rc = subject.serialize({ foobar: 'yeeeeeeeeee' })
       expect(rc.error).not_to be_nil
-      expect(rc.error).to match /unknown blank/i
+      expect(rc.error).to match(/unknown blank/i)
     end
   end
 end

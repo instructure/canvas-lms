@@ -472,8 +472,8 @@ class MessageableUser
 
         return unless options[:admin_context] ||
                       fully_visible_courses.include?(course) ||
-                      section_visible_courses.include?(course) &&
-                      visible_section_ids_in_courses([course]).include?(section.id)
+                      (section_visible_courses.include?(course) &&
+                      visible_section_ids_in_courses([course]).include?(section.id))
 
         scope = enrollment_scope(options.merge(include_concluded_students: false, course_workflow_state: course.workflow_state))
                 .where(enrollments: { course_section_id: sections || section })
@@ -499,7 +499,7 @@ class MessageableUser
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
           # bail early if user doesn't have permission to message group members
-          return if group&.context&.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
+          return if group&.context.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
 
           group_user_scope.where('group_memberships.group_id' => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)

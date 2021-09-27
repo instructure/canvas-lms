@@ -1297,13 +1297,13 @@ class User < ActiveRecord::Base
         (Account.site_admin.grants_right?(user, :reset_any_mfa)) ||
         # an admin can reset another user's MFA only if they can manage *all*
         # of the user's pseudonyms
-        self != user && self.pseudonyms.shard(self).all? do |p|
+        (self != user && self.pseudonyms.shard(self).all? do |p|
           p.grants_right?(user, :update) ||
             # the account does not have mfa enabled
             p.account.mfa_settings == :disabled ||
             # they are an admin user and have reset MFA permission
             p.account.grants_right?(user, :reset_any_mfa)
-        end
+        end)
     end
     can :reset_mfa
 
@@ -2909,7 +2909,7 @@ class User < ActiveRecord::Base
     if pseudonym_hint
       mfa_settings = pseudonym_hint.account.mfa_settings
       return :required if mfa_settings == :required ||
-                          mfa_settings == :required_for_admins && !pseudonym_hint.account.cached_all_account_users_for(self).empty?
+                          (mfa_settings == :required_for_admins && !pseudonym_hint.account.cached_all_account_users_for(self).empty?)
     end
     return :required if pseudonym_hint&.authentication_provider&.mfa_required?
 
@@ -2952,7 +2952,7 @@ class User < ActiveRecord::Base
     # midnight sunday morning the rest of the time.
     account_bucket = (shard.id.to_i + pseudonym.try(:account_id).to_i) % DelayedMessage::WEEKLY_ACCOUNT_BUCKETS
     user_bucket = self.id % DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET
-    account_bucket * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET + user_bucket
+    (account_bucket * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET) + user_bucket
   end
 
   def weekly_notification_time

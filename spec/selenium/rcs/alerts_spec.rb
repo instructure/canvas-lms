@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 describe "Alerts" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     @context = Account.default
     @context.settings[:enable_alerts] = true
     @context.save!

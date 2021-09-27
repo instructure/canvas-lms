@@ -20,7 +20,7 @@
 module AttachmentFu
   class Railtie < ::Rails::Railtie
     initializer "attachment_fu.canvas_plugin" do
-      ActiveRecord::Base.send(:extend, AttachmentFu::ActMethods)
+      ActiveRecord::Base.extend AttachmentFu::ActMethods
       AttachmentFu::Railtie.setup_tempfile_path
     end
 

@@ -1414,10 +1414,10 @@ class Enrollment < ActiveRecord::Base
     # find it, fall back to the section or course creation date.
     enrollment_dates.map(&:first).compact.min ||
       start_at ||
-      course_section && course_section.start_at ||
+      (course_section && course_section.start_at) ||
       course.start_at ||
-      course.enrollment_term && course.enrollment_term.start_at ||
-      course_section && course_section.created_at ||
+      (course.enrollment_term && course.enrollment_term.start_at) ||
+      (course_section && course_section.created_at) ||
       course.created_at
   end
 
@@ -1427,9 +1427,9 @@ class Enrollment < ActiveRecord::Base
     # looking at the enrollment, section, course, then term.
     enrollment_dates.map(&:last).compact.max ||
       end_at ||
-      course_section && course_section.end_at ||
+      (course_section && course_section.end_at) ||
       course.conclude_at ||
-      course.enrollment_term && course.enrollment_term.end_at
+      (course.enrollment_term && course.enrollment_term.end_at)
   end
 
   def self.cross_shard_invitations?
@@ -1540,10 +1540,10 @@ class Enrollment < ActiveRecord::Base
   end
 
   def can_delete_via_granular(user, session, context)
-    self.teacher? && context.grants_right?(user, session, :remove_teacher_from_course) ||
-      self.ta? && context.grants_right?(user, session, :remove_ta_from_course) ||
-      self.designer? && context.grants_right?(user, session, :remove_designer_from_course) ||
-      self.observer? && context.grants_right?(user, session, :remove_observer_from_course)
+    (self.teacher? && context.grants_right?(user, session, :remove_teacher_from_course)) ||
+      (self.ta? && context.grants_right?(user, session, :remove_ta_from_course)) ||
+      (self.designer? && context.grants_right?(user, session, :remove_designer_from_course)) ||
+      (self.observer? && context.grants_right?(user, session, :remove_observer_from_course))
   end
 
   def remove_user_as_final_grader?

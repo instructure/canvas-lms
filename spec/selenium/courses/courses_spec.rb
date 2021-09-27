@@ -64,7 +64,7 @@ describe "courses" do
   end
 
   context "as a student" do
-    before (:each) do
+    before(:each) do
       course_with_teacher(:active_all => true, :name => 'discussion course')
       @student = User.create!(:name => "First Student")
       en = @course.enroll_student(@student)

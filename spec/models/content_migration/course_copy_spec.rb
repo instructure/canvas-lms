@@ -91,7 +91,7 @@ describe ContentMigration do
 
       run_course_copy
 
-      expect(@copy_to.syllabus_body).to match /#{@copy_from.syllabus_body}/
+      expect(@copy_to.syllabus_body).to match(/#{@copy_from.syllabus_body}/)
     end
 
     it "does not migrate a blank syllabus" do
@@ -834,7 +834,7 @@ describe ContentMigration do
       run_course_copy
 
       page_to = @copy_to.wiki_pages.where(:migration_id => mig_id(page)).first
-      expect(page_to.body).to eq (body % @copy_to.id.to_s)
+      expect(page_to.body).to eq(body % @copy_to.id.to_s)
     end
   end
 end

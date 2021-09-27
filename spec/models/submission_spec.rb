@@ -1304,7 +1304,7 @@ describe Submission do
     s = submission_spec_model(submit_homework: true)
     expect(s.url).to eq 'http://www.instructure.com'
 
-    long_url = ("a" * 300 + ".com")
+    long_url = (("a" * 300) + ".com")
     s.url = long_url
     s.save!
     expect(s.url).to eq "http://#{long_url}"

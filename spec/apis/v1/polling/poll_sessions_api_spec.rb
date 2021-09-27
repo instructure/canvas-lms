@@ -277,7 +277,7 @@ describe Polling::PollSessionsController, type: :request do
         post_create({ course_section_id: @section.id + 666, course_id: @course.id }, true)
 
         expect(response.code).to eq "404"
-        expect(response.body).to match /The specified resource does not exist/
+        expect(response.body).to match(/The specified resource does not exist/)
       end
     end
   end

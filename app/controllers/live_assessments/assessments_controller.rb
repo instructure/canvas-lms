@@ -96,7 +96,7 @@ module LiveAssessments
           assessment.save!
           if @outcome
             criterion = @outcome.rubric_criterion
-            mastery_score = criterion && criterion[:mastery_points] / criterion[:points_possible]
+            mastery_score = criterion && (criterion[:mastery_points] / criterion[:points_possible])
             @outcome.align(assessment, @context, mastery_type: "none", mastery_score: mastery_score)
           end
           @assessments << assessment

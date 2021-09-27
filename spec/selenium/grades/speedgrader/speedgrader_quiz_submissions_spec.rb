@@ -82,15 +82,15 @@ describe "speed grader - quiz submissions" do
     # create our quiz and our multiple answers question
     @context = @course
     @q = quiz_model
-    answers = [{ 'id': 1, 'text': 'one', 'weight': 100 },
-               { 'id': 2, 'text': 'two', 'weight': 100 },
-               { 'id': 3, 'text': 'three', 'weight': 100 },
-               { 'id': 4, 'text': 'four', 'weight': 0 }]
+    answers = [{ id: 1, text: 'one', weight: 100 },
+               { id: 2, text: 'two', weight: 100 },
+               { id: 3, text: 'three', weight: 100 },
+               { id: 4, text: 'four', weight: 0 }]
     @quest1 = @q.quiz_questions.create!(
       question_data: {
         name: "first question",
-        'question_type': 'multiple_answers_question',
-        'answers': answers,
+        question_type: 'multiple_answers_question',
+        answers: answers,
         points_possible: 4
       }
     )
@@ -146,7 +146,7 @@ describe "speed grader - quiz submissions" do
     @quiz.workflow_state = 'available'
     @quiz.save!
     qs = @quiz.generate_submission(@student)
-    qs.submission_data = { "foo": "bar1" }
+    qs.submission_data = { foo: "bar1" }
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -178,7 +178,7 @@ describe "speed grader - quiz submissions" do
 
     [@student, @teacher].each do
       @quiz.generate_submission(@student).tap do |qs|
-        qs.submission_data = { 'foo': 'bar1' }
+        qs.submission_data = { foo: 'bar1' }
         Quizzes::SubmissionGrader.new(qs).grade_submission
       end
     end

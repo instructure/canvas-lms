@@ -72,7 +72,7 @@ describe LtiApiController, type: :request do
   it "rejects an invalid secret" do
     make_call('secret' => 'not secret')
     expect(response.status).to eql 401
-    expect(response.body).to match /Invalid authorization header/
+    expect(response.body).to match(/Invalid authorization header/)
   end
 
   it "rejects an invalid token" do
@@ -81,7 +81,7 @@ describe LtiApiController, type: :request do
     token_parts[1] = (token_parts[1].to_i + 1).to_s
     make_call('path' => api_path(token_parts.join('-')))
     expect(response.status).to eql 401
-    expect(response.body).to match /Invalid logout service token/
+    expect(response.body).to match(/Invalid logout service token/)
   end
 
   it "rejects an expired token" do
@@ -90,7 +90,7 @@ describe LtiApiController, type: :request do
     end
     make_call('path' => api_path(token))
     expect(response.status).to eql 401
-    expect(response.body).to match /Logout service token has expired/
+    expect(response.body).to match(/Logout service token has expired/)
   end
 
   it "registers callbacks" do
@@ -113,7 +113,7 @@ describe LtiApiController, type: :request do
       expect(response).to be_successful
       make_call('path' => api_path(token, 'http://logout.notify.example.com/456'))
       expect(response.status).to eql 401
-      expect(response.body).to match /Logout service token has already been used/
+      expect(response.body).to match(/Logout service token has already been used/)
     end
   end
 

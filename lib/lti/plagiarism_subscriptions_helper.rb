@@ -96,7 +96,7 @@ module Lti
     end
 
     def transport_metadata
-      { 'Url': submission_event_service&.endpoint }
+      { Url: submission_event_service&.endpoint }
     end
   end
 end

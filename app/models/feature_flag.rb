@@ -127,7 +127,7 @@ class FeatureFlag < ActiveRecord::Base
   private
 
   def valid_state
-    unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)
+    unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || (context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state))
       errors.add(:state, "is not valid in context")
     end
   end

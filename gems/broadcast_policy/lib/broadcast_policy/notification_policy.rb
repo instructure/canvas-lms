@@ -36,7 +36,7 @@ module BroadcastPolicy
     # reasons.
     def broadcast(record)
       return if record.respond_to?(:skip_broadcasts) && record.skip_broadcasts
-      return unless record.instance_eval &self.whenever
+      return unless record.instance_eval(&self.whenever)
 
       notification = BroadcastPolicy.notification_finder.by_name(self.dispatch)
       return if notification.nil?

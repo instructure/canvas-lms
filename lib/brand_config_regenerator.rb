@@ -97,7 +97,7 @@ class BrandConfigRegenerator
     config = thing.brand_config
     return unless config
 
-    new_parent_md5 = config.parent_md5 && @new_configs[config.parent_md5].try(:md5) || @account.brand_config_md5
+    new_parent_md5 = (config.parent_md5 && @new_configs[config.parent_md5].try(:md5)) || @account.brand_config_md5
     new_config = config.clone_with_new_parent(new_parent_md5)
     new_config.save_unless_dup!
 

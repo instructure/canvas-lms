@@ -86,7 +86,7 @@ class Attachments::S3Storage
 
   def shared_secret(datetime)
     config = bucket.client.config
-    sha256 = OpenSSL::Digest::SHA256.new
+    sha256 = OpenSSL::Digest.new('SHA256')
     date_key = OpenSSL::HMAC.digest(sha256, "AWS4#{config.secret_access_key}", datetime[0, 8])
     date_region_key = OpenSSL::HMAC.digest(sha256, date_key, config.region)
     date_region_service_key = OpenSSL::HMAC.digest(sha256, date_region_key, "s3")

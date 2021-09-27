@@ -45,7 +45,7 @@ describe "Common Cartridge exporting" do
     expect(content_export.error_messages.length).to eq 1
     error = content_export.error_messages.first
     expect(error.first).to eq "Failed to export wiki pages"
-    expect(error.last).to match /ErrorReport id: \d*/
+    expect(error.last).to match(/ErrorReport id: \d*/)
     expect(ErrorReport.last.message).to eq message
   end
 

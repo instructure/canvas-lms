@@ -40,7 +40,7 @@ describe "communication_channels/confirm.html.erb" do
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
       if @enrollment
-        expect(registration_form['style']).to match /display:\s*none/
+        expect(registration_form['style']).to match(/display:\s*none/)
         expect(page.css('#register.btn').first).not_to be_nil
         expect(page.css('#back.btn').first).to be_nil
       else
@@ -57,7 +57,7 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
-      expect(registration_form['style']).to match /display:\s*none/
+      expect(registration_form['style']).to match(/display:\s*none/)
       expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
       expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
@@ -75,7 +75,7 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
-      expect(registration_form['style']).to match /display:\s*none/
+      expect(registration_form['style']).to match(/display:\s*none/)
       expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
       expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
@@ -93,7 +93,7 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
-      expect(registration_form['style']).to match /display:\s*none/
+      expect(registration_form['style']).to match(/display:\s*none/)
       expect(page.css('input[type="radio"][name="pseudonym_select"]')).to be_empty
       expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
@@ -111,7 +111,7 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
-      expect(registration_form['style']).to match /display:\s*none/
+      expect(registration_form['style']).to match(/display:\s*none/)
       expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 2
       expect(page.css('#register.btn').first).not_to be_nil
       merge_button = page.css('#merge.btn').first
@@ -138,7 +138,7 @@ describe "communication_channels/confirm.html.erb" do
       page = Nokogiri::HTML5('<document>' + response.body + '</document>')
       registration_form = page.css('#registration_confirmation_form').first
       expect(registration_form).not_to be_nil
-      expect(registration_form['style']).to match /display:\s*none/
+      expect(registration_form['style']).to match(/display:\s*none/)
       expect(page.css('input[type="radio"][name="pseudonym_select"]').length).to eq 6
       expect(page.css('#register.btn')).to be_empty
       merge_button = page.css('#merge.btn').first

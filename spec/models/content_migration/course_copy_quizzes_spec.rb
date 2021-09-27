@@ -865,7 +865,7 @@ describe ContentMigration do
       q2 = @copy_to.quizzes.where(migration_id: mig_id(q)).first
       answer = q2.quiz_questions[0].question_data["answers"][0]
       expect(answer["numerical_answer_type"]).to eq "range_answer"
-      expect(answer["start"]).to eq -1
+      expect(answer["start"]).to eq(-1)
       expect(answer["end"]).to eq 2
     end
 

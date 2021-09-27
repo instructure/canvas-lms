@@ -251,7 +251,7 @@ module AttachmentFu # :nodoc:
       return filename if thumbnail.blank?
 
       ext = nil
-      basename = filename.gsub /\.\w+$/ do |s|
+      basename = filename.gsub(/\.\w+$/) do |s|
         ext = s; ''
       end
       # ImageScience doesn't create gif thumbnails, only pngs
@@ -495,17 +495,17 @@ module AttachmentFu # :nodoc:
 
     # Generates a unique filename for a Tempfile.
     def random_tempfile_filename
-      "#{rand Time.now.to_i}#{filename && filename.last(50) || 'attachment'}"
+      "#{rand Time.now.to_i}#{(filename && filename.last(50)) || 'attachment'}"
     end
 
     def sanitize_filename(filename)
       filename.strip.tap do |name|
         # NOTE: File.basename doesn't work right with Windows paths on Unix
         # get only the filename, not the whole path
-        name.gsub! /^.*(\\|\/)/, ''
+        name.gsub!(/^.*(\\|\/)/, '')
 
         # Finally, replace all non alphanumeric, underscore or periods with underscore
-        name.gsub! /[^\w\.\-]/, '_'
+        name.gsub!(/[^\w\.\-]/, '_')
       end
     end
 

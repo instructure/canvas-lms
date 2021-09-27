@@ -198,7 +198,7 @@ describe "observer k5 dashboard" do
   end
 
   context 'k5 subject dashboard observee selections' do
-    let (:wiki_page_data) { "Here's where we have content" }
+    let(:wiki_page_data) { "Here's where we have content" }
 
     before :once do
       @subject_course.wiki_pages.create!(:title => "K5 Course Front Page", :body => wiki_page_data).set_as_front_page!

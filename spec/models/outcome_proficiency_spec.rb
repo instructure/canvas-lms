@@ -144,7 +144,7 @@ describe OutcomeProficiency, type: :model do
   end
 
   describe 'interaction with cache' do
-    let (:account) { account_model }
+    let(:account) { account_model }
 
     it 'clears the account cache on save' do
       expect(account).to receive(:clear_downstream_caches).with(:resolved_outcome_proficiency)

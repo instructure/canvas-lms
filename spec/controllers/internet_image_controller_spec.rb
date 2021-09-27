@@ -83,19 +83,19 @@ describe InternetImageController do
     end
 
     it 'sends the app key as a client id header' do
-      stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").with(headers: { 'Authorization': 'Client-ID key' })
+      stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").with(headers: { Authorization: 'Client-ID key' })
       get 'image_search', params: { query: 'cats' }
       expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats")
-        .with(headers: { 'Authorization': 'Client-ID key' }).once
+        .with(headers: { Authorization: 'Client-ID key' }).once
     end
 
     it 'reads params back correctly' do
       begin
         WebMock::Config.instance.query_values_notation = :flat_array
-        stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: { 'Authorization': 'Client-ID key' })
+        stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: { Authorization: 'Client-ID key' })
         get 'image_search', params: { "query" => 'cats', "per_page" => 18, "page" => 2, "orientation" => 'landscape' }
         expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=2&per_page=18&query=cats&orientation=landscape")
-          .with(headers: { 'Authorization': 'Client-ID key' }).once
+          .with(headers: { Authorization: 'Client-ID key' }).once
       ensure
         WebMock::Config.instance.query_values_notation = :subscript
       end
@@ -115,20 +115,20 @@ describe InternetImageController do
     end
 
     it 'shows success message if successful' do
-      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { 'Authorization': 'Client-ID key' })
+      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { Authorization: 'Client-ID key' })
                                                                                 .to_return(status: 200, headers: { 'Content-Type' => 'application/json' })
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
       expect(WebMock).to have_requested(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download")
-        .with(headers: { 'Authorization': 'Client-ID key' }).once
+        .with(headers: { Authorization: 'Client-ID key' }).once
       expect(JSON.parse(response.body)).to eq({ "message" => 'Confirmation success. Thank you.' })
     end
 
     it 'shows Unsplash message if Unsplash gives a 404' do
-      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { 'Authorization': 'Client-ID key' })
+      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download").with(headers: { Authorization: 'Client-ID key' })
                                                                                 .to_return(status: 404, body: "{\"errors\": [\"Couldn't find Photo\"]}", headers: { 'Content-Type' => 'application/json' })
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
       expect(WebMock).to have_requested(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download")
-        .with(headers: { 'Authorization': 'Client-ID key' }).once
+        .with(headers: { Authorization: 'Client-ID key' }).once
       expect(JSON.parse(response.body)).to eq({ "message" => "Couldn't find Photo" })
     end
 
@@ -138,11 +138,11 @@ describe InternetImageController do
     end
 
     it 'shows 500 error if another error happens' do
-      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI").with(headers: { 'Authorization': 'Client-ID key' })
+      stub_request(:head, "https://api.unsplash.com/photos/bPxGLgJiMI").with(headers: { Authorization: 'Client-ID key' })
                                                                        .to_return(status: 400)
       post 'image_selection', params: { id: "MNXkDmA1CTOTRxPFXAtX59DunVompzL9sdrM_Qa18WkF96Kd9ZlGD6xWDJlNgU4S3RQMdMPX4lrZ~dWUR5iRwMEGydMoD~fCYd8vLgJASKwTKsesSgTQ" }
       expect(WebMock).to have_requested(:head, "https://api.unsplash.com/photos/bPxGLgJiMI/download")
-        .with(headers: { 'Authorization': 'Client-ID key' }).once
+        .with(headers: { Authorization: 'Client-ID key' }).once
       assert_status(500)
     end
   end

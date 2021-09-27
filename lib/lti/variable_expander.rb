@@ -93,7 +93,7 @@ module Lti
     MEDIA_OBJECT_ID_GUARD = -> { @attachment && (@attachment.media_object || @attachment.media_entry_id) }
     LTI1_GUARD = -> { @tool.is_a?(ContextExternalTool) }
     MASQUERADING_GUARD = -> { !!@controller && @controller.logged_in_user != @current_user }
-    MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch&.instance_of?(Lti::Launch) }
+    MESSAGE_TOKEN_GUARD = -> { @post_message_token.present? || @launch.instance_of?(Lti::Launch) }
     ORIGINALITY_REPORT_GUARD = -> { @originality_report.present? }
     ORIGINALITY_REPORT_ATTACHMENT_GUARD = -> { @originality_report&.attachment.present? }
     LTI_ASSIGN_ID = -> { @assignment.present? || @originality_report.present? || @secure_params.present? }

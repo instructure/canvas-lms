@@ -154,8 +154,8 @@ module AccountReports
       row << user.unique_id
       row << nil if @sis_format
       name_parts = User.name_parts(user.sortable_name, likely_already_surname_first: true)
-      row << name_parts[0] || '' # first name
-      row << name_parts[1] || '' # last name
+      (row << name_parts[0]) || '' # first name
+      (row << name_parts[1]) || '' # last name
       row << user.name
       row << user.sortable_name
       row << user.short_name

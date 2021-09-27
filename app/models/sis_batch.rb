@@ -368,7 +368,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def file_diff_percent(current_file_size, previous_zip_size)
-    (1 - current_file_size.to_f / previous_zip_size.to_f).abs * 100
+    (1 - (current_file_size.to_f / previous_zip_size.to_f)).abs * 100
   end
 
   def download_zip

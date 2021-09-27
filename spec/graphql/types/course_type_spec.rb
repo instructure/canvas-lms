@@ -49,7 +49,7 @@ describe Types::CourseType do
       # course
       expect(
         CanvasSchema.execute(<<~GQL, context: { current_user: @student2 }).dig("data", "course")
-          query { course(id: "#{course.id.to_s}") { id } }
+          query { course(id: "#{course.id}") { id } }
         GQL
       ).to be_nil
     end

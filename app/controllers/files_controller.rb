@@ -634,7 +634,7 @@ class FilesController < ApplicationController
 
           [json[:attachment],
            doc_preview_json(attachment, @current_user),
-           attachment_json(attachment, @current_user, {}, json_include)].reduce &:merge!
+           attachment_json(attachment, @current_user, {}, json_include)].reduce(&:merge!)
 
           log_asset_access(attachment, "files", "files")
         end
@@ -843,7 +843,7 @@ class FilesController < ApplicationController
 
     @context = @attachment.context
     @attachment.workflow_state = nil
-    @attachment.uploaded_data = params[:file] || params[:attachment] && params[:attachment][:uploaded_data]
+    @attachment.uploaded_data = params[:file] || (params[:attachment] && params[:attachment][:uploaded_data])
     if @attachment.save
       # for consistency with the s3 upload client flow, we redirect to the success url here to finish up
       includes = Array(params[:success_include])

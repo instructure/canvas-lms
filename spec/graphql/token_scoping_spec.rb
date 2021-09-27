@@ -53,7 +53,7 @@ describe "GraphQL Token Scoping" do
         }
       }
     GQL
-    expect(result.dig("errors", 0, "message")).to match /insufficient scopes/
+    expect(result.dig("errors", 0, "message")).to match(/insufficient scopes/)
     expect(result.dig("data", "createAssignment")).to be_nil
   end
 end

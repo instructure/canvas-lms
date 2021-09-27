@@ -56,8 +56,8 @@ module Lti
     end
     let(:available_canvas_resources) {
       [
-        { 'id': '1', 'name': 'item 1' },
-        { 'id': '2', 'name': 'item 2' }
+        { id: '1', name: 'item 1' },
+        { id: '2', name: 'item 2' }
       ]
     }
 
@@ -68,10 +68,10 @@ module Lti
       allow(request_mock).to receive(:scheme).and_return('https')
       allow(request_mock).to receive(:parameters).and_return(
         {
-          'com_instructure_course_accept_canvas_resource_types': ['page', 'module'],
-          'com_instructure_course_canvas_resource_type': 'page',
-          'com_instructure_course_allow_canvas_resource_selection': 'true',
-          'com_instructure_course_available_canvas_resources': available_canvas_resources
+          com_instructure_course_accept_canvas_resource_types: ['page', 'module'],
+          com_instructure_course_canvas_resource_type: 'page',
+          com_instructure_course_allow_canvas_resource_selection: 'true',
+          com_instructure_course_available_canvas_resources: available_canvas_resources
         }.with_indifferent_access
       )
       m = double('controller')
@@ -149,7 +149,7 @@ module Lti
     it 'clears the lti_helper instance variable when you set the current_user' do
       expect(variable_expander.lti_helper).not_to be nil
       variable_expander.current_user = nil
-      expect(variable_expander.instance_variable_get(:"@current_user")).to be nil
+      expect(variable_expander.instance_variable_get(:@current_user)).to be nil
     end
 
     it 'expands registered variables' do
@@ -1808,7 +1808,7 @@ module Lti
         end
 
         context 'attachment' do
-          let (:attachment) do
+          let(:attachment) do
             attachment = attachment_obj_with_context(course)
             attachment.media_object = media_object
             attachment.usage_rights = usage_rights

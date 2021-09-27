@@ -7,7 +7,7 @@ require 'shellwords'
 namespace :i18n do
   desc "Verifies all translation calls"
   task :check => :i18n_environment do
-    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+    Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     def I18nliner.manual_translations
       I18n.available_locales
@@ -105,8 +105,8 @@ namespace :i18n do
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'locales.yml')]
     I18n.load_path += Dir[Rails.root.join('config', 'locales', 'community.csv')]
 
-    I18n::Backend::Simple.send(:include, I18nTasks::CsvBackend)
-    I18n::Backend::Simple.send(:include, I18n::Backend::Fallbacks)
+    I18n::Backend::Simple.include I18nTasks::CsvBackend
+    I18n::Backend::Simple.include I18n::Backend::Fallbacks
 
     require 'i18nliner/extractors/translation_hash'
     I18nliner::Extractors::TranslationHash.class_eval do
@@ -118,7 +118,7 @@ namespace :i18n do
 
   desc "Generates JS bundle i18n files (non-en) and adds them to assets.yml"
   task :generate_js => :i18n_environment do
-    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+    Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     locales = I18n.available_locales
     all_translations = I18n.backend.send(:translations)
@@ -188,7 +188,7 @@ namespace :i18n do
     t = Time.now
     translations = YAML.safe_load(open('config/locales/generated/en.yml'))
 
-    I18n.send :extend, I18nTasks::Lolcalize
+    I18n.extend I18nTasks::Lolcalize
     lolz_translations = Hash.new
     lolz_translations['lolz'] = process_lolz.call(translations['en'])
     puts
@@ -217,7 +217,7 @@ namespace :i18n do
 
   desc "Exports new/changed English strings to be translated"
   task :export => :environment do
-    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+    Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     begin
       base_filename = "config/locales/generated/en.yml"
@@ -321,7 +321,7 @@ namespace :i18n do
   desc "Validates and imports new translations"
   task :import, [:source_file, :translated_file] => :environment do |t, args|
     require 'open-uri'
-    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+    Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     if args[:source_file]
       source_translations = YAML.safe_load(open(args[:source_file]))
@@ -401,7 +401,7 @@ namespace :i18n do
   end
 
   def autoimport(source_translations, new_translations)
-    Hash.send(:include, I18nTasks::HashExtensions) unless Hash.new.kind_of?(I18nTasks::HashExtensions)
+    Hash.include I18nTasks::HashExtensions unless Hash.new.kind_of?(I18nTasks::HashExtensions)
 
     raise "Need source translations" unless source_translations
     raise "Need translated_file" unless new_translations

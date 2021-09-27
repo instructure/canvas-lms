@@ -230,8 +230,8 @@ describe QuizzesHelper do
         :answers => @answers
       )
 
-      expect(html).to match /aria\-label/
-      expect(html).to match /Fill in the blank/
+      expect(html).to match(/aria\-label/)
+      expect(html).to match(/Fill in the blank/)
     end
     it 'handles equation img tags in the question text' do
       broken_question_text = "\"<p>Rubisco is a <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name=\\\"question_8_26534e6c8737f63335d5d98ca4136d09\\\" value='{{question_8_26534e6c8737f63335d5d98ca4136d09}}' > responsible for the first enzymatic step of carbon <input class='question_input' type='text' autocomplete='off' style='width: 120px;' name='question_8_f8e302199c03689d87c52e942b56e1f4' value='{{question_8_f8e302199c03689d87c52e942b56e1f4}}' >. <br><br>equation here: <img class=\\\"equation_image\\\" title=\\\"\\sum\\frac{k}{l}\\\" src=\\\"/equation_images/%255Csum%255Cfrac%257Bk%257D%257Bl%257D\\\" alt=\\\"\\sum\\frac{k}{l}\\\"></p>\""
@@ -244,9 +244,9 @@ describe QuizzesHelper do
         answer_list: @answer_list,
         answers: @answers
       )
-      expect(html).to match /"readonly"/
-      expect(html).to match /value='fixing'/
-      expect(html).to match /value='protein'/
+      expect(html).to match(/"readonly"/)
+      expect(html).to match(/value='fixing'/)
+      expect(html).to match(/value='protein'/)
     end
     it "sanitizes the answer blocks in the noisy question data" do
       broken_question_text = "<p><span>\"Roses are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0'\n value='{{question_244_ec9a1c7e5a9f3a6278e9055d8dec00f0}}' />\n, violets are <input\n class='question_input'\n type='text'\n autocomplete='off'\n style='width: 120px;'\n name='question_244_01731fa53c4cf2f32e893d5c3dbae9c1'\n value='{{question_244_01731fa53c4cf2f32e893d5c3dbae9c1}}' />\n\")</span></p>"
@@ -274,7 +274,7 @@ describe QuizzesHelper do
                                            answer_list: ['val'],
                                            editable: true
                                          })
-      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>' # rubocop:disable Layout/LineLength
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="val" selected="selected">val</option></select>'
       expect(html).to be_html_safe
     end
 
@@ -286,7 +286,7 @@ describe QuizzesHelper do
                                            answer_list: ['val'],
                                            editable: true
                                          })
-      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="other_val">val</option></select>' # rubocop:disable Layout/LineLength
+      expect(html).to eq 'some <select class="question_input" name="question_4" aria-label="Multiple dropdowns, read surrounding text"><option value="other_val">val</option></select>'
       expect(html).to be_html_safe
     end
 
@@ -437,7 +437,7 @@ describe QuizzesHelper do
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match /last attempt/
+      expect(message).to match(/last attempt/)
     end
     it 'provides a useful message when "no"' do
       quiz = double({
@@ -449,7 +449,7 @@ describe QuizzesHelper do
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match /are hidden/
+      expect(message).to match(/are hidden/)
     end
 
     it 'provides nothing when "yes"' do
@@ -475,7 +475,7 @@ describe QuizzesHelper do
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match /will be available/
+      expect(message).to match(/will be available/)
     end
 
     it 'provides a useful message, and a date, when "hide at" is set' do
@@ -488,7 +488,7 @@ describe QuizzesHelper do
       quiz_submission = double(last_attempt_completed?: false)
 
       message = render_correct_answer_protection(quiz, quiz_submission)
-      expect(message).to match /are available until/
+      expect(message).to match(/are available until/)
     end
   end
 

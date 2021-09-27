@@ -413,10 +413,10 @@ describe GradeCalculator do
           GradeCalculator.new(@user.id, @course.id).compute_and_save_scores
           enrollment = Enrollment.find_by(user_id: @user.id, course_id: @course.id)
           score = enrollment.find_score(assignment_group: @group)
-          expect(score.score_metadata.calculation_details).to eq ({
-            'current' => { 'dropped' => [find_submission(@overridden_middle)] },
-            'final' => { 'dropped' => [find_submission(@overridden_middle)] }
-          })
+          expect(score.score_metadata.calculation_details).to eq({
+                                                                   'current' => { 'dropped' => [find_submission(@overridden_middle)] },
+                                                                   'final' => { 'dropped' => [find_submission(@overridden_middle)] }
+                                                                 })
         end
 
         it "does not include muted assignments in the dropped submission list in group score metadata" do
@@ -464,10 +464,10 @@ describe GradeCalculator do
           @group.update_attribute(:rules, 'drop_highest:1')
           expect { GradeCalculator.new(@user.id, @course.id).compute_and_save_scores }.not_to change { ScoreMetadata.count }
           metadata.reload
-          expect(metadata.calculation_details).to eq ({
-            'current' => { 'dropped' => [find_submission(@overridden_highest)] },
-            'final' => { 'dropped' => [find_submission(@overridden_highest)] }
-          })
+          expect(metadata.calculation_details).to eq({
+                                                       'current' => { 'dropped' => [find_submission(@overridden_highest)] },
+                                                       'final' => { 'dropped' => [find_submission(@overridden_highest)] }
+                                                     })
         end
       end
     end

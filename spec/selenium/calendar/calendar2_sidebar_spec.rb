@@ -161,7 +161,7 @@ describe "calendar2" do
           wait_for_ajaximations
           undated_events = ff("#undated-events > ul > li")
           expect(undated_events.size).to eq 1
-          expect(undated_events.first.text).to match /#{e.title}/
+          expect(undated_events.first.text).to match(/#{e.title}/)
         end
 
         it "truncates very long undated event titles" do

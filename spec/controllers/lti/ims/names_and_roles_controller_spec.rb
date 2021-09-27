@@ -316,7 +316,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:action) { :course_index }
     let(:context) { course }
     let(:context_param_name) { :course_id }
-    let(:unknown_context_id) { course && Course.maximum(:id) + 1 }
+    let(:unknown_context_id) { course && (Course.maximum(:id) + 1) }
 
     it_behaves_like 'advantage services'
     it_behaves_like 'lti services'
@@ -871,7 +871,7 @@ describe Lti::Ims::NamesAndRolesController do
     let(:action) { :group_index }
     let(:context) { group_record }
     let(:context_param_name) { :group_id }
-    let(:unknown_context_id) { group_record && Group.maximum(:id) + 1 }
+    let(:unknown_context_id) { group_record && (Group.maximum(:id) + 1) }
 
     it_behaves_like 'advantage services'
     it_behaves_like 'lti services'

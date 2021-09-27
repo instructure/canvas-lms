@@ -28,7 +28,7 @@ module CC::Importer::Standard
       resources_by_type(WEBCONTENT, "associatedcontent").each do |res|
         if res[:intended_use] || @convert_html_to_pages
           path = get_full_path(res[:href])
-          if path && File.exists?(path) && Attachment.mimetype(path) =~ /html/
+          if path && File.exist?(path) && Attachment.mimetype(path) =~ /html/
             case res[:intended_use]
             when "assignment"
               new_assignments << { :migration_id => res[:migration_id], :description => File.read(path) }

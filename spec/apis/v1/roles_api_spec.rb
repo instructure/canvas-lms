@@ -88,13 +88,13 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                           :account_id => sub_account.id.to_param, :show_inherited => '1' })
 
-        expect(json.map { |r| r['id'] }).to match_array ([role.id] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
+        expect(json.map { |r| r['id'] }).to match_array([role.id] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
         expect(json.detect { |r| r['id'] == role.id }['account']['id']).to eq @account.id
 
         json2 = api_call(:get, "/api/v1/accounts/#{sub_account.id}/roles",
                          { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                            :account_id => sub_account.id.to_param })
-        expect(json2.map { |r| r['id'] }).to match_array (Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
+        expect(json2.map { |r| r['id'] }).to match_array(Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
       end
 
       it "paginates" do

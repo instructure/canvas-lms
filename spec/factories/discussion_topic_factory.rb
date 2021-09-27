@@ -65,7 +65,7 @@ module Factories
     @reply3 = @root2.reply_from(:user => @student, :html => "reply3")
     @reply1.destroy
     @all_entries = [@root1, @root2, @reply1, @reply2, @reply_reply1, @reply_reply2, @reply3]
-    @all_entries.each &:reload
+    @all_entries.each(&:reload)
     @topic.reload
   end
 

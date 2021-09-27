@@ -239,7 +239,7 @@ describe Api::V1::SisAssignment do
 
         user_overrides = result[0]["user_overrides"]
         expect(user_overrides.size).to eq 1
-        expect(user_overrides.first).to include({ "id" => @override.id, "due_at": @override.due_at })
+        expect(user_overrides.first).to include({ "id" => @override.id, due_at: @override.due_at })
 
         students = user_overrides.first["students"]
         expect(students).to include({ "user_id" => @student1.id, 'sis_user_id' => nil })

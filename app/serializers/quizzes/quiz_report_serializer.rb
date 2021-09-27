@@ -30,7 +30,7 @@ module Quizzes
 
     def_delegators :object, :quiz
 
-    attributes *%w[
+    attributes(*%w[
       id
       report_type
       readable_type
@@ -42,7 +42,7 @@ module Quizzes
       progress_url
       created_at
       updated_at
-    ].map(&:to_sym)
+    ].map(&:to_sym))
 
     has_one :quiz, embed: :ids, root: :quiz
     has_one :progress, {

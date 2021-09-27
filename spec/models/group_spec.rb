@@ -59,7 +59,7 @@ describe Group do
   it 'delegates time_zone through to its context' do
     zone = ActiveSupport::TimeZone["America/Denver"]
     @course.time_zone = zone
-    expect(@group.time_zone.to_s).to match /Mountain Time/
+    expect(@group.time_zone.to_s).to match(/Mountain Time/)
   end
 
   it "correctlies identify group as active" do

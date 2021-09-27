@@ -127,7 +127,7 @@ class UserListV2
       if results.count == 1
         @resolved_results << results.first
       elsif results.uniq { |r| Shard.global_id_for(r[:user_id]) }.count == 1
-        @resolved_results << results.detect { |r| r[:account_id] == @root_account.id } || results.first # prioritize local result first
+        (@resolved_results << results.detect { |r| r[:account_id] == @root_account.id }) || results.first # prioritize local result first
       else
         @duplicate_results << results
       end
@@ -223,7 +223,7 @@ class UserListV2
       if a[:type] == :sms
         path_header = a[:address].gsub(/[^\d]/, '')
         sms_path_header_map[path_header] = a[:address]
-        sms_paths << path_header + "@%"
+        sms_paths << (path_header + "@%")
       else
         email_paths << a[:address].downcase
       end

@@ -68,10 +68,10 @@ describe PseudonymsController, type: :request do
                         })
         expect(json.count).to eql 1
         headers = response.headers['Link'].split(',')
-        expect(headers[0]).to match /page=1&per_page=1/ # current page
-        expect(headers[1]).to match /page=2&per_page=1/ # next page
-        expect(headers[2]).to match /page=1&per_page=1/ # first page
-        expect(headers[3]).to match /page=2&per_page=1/ # last page
+        expect(headers[0]).to match(/page=1&per_page=1/) # current page
+        expect(headers[1]).to match(/page=2&per_page=1/) # next page
+        expect(headers[2]).to match(/page=1&per_page=1/) # first page
+        expect(headers[3]).to match(/page=2&per_page=1/) # last page
       end
 
       it "returns all pseudonyms for a user" do

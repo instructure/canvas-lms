@@ -197,7 +197,7 @@ describe StreamItemsHelper do
       @categorized = helper.categorize_stream_items(@items, @teacher)
       expect(@categorized["Announcement"].first.summary).to eq @announcement.title
       expect(@categorized["Conversation"].first.summary).to eq @participant.last_message.body
-      expect(@categorized["Assignment"].first.summary).to match /Assignment Created/
+      expect(@categorized["Assignment"].first.summary).to match(/Assignment Created/)
       expect(@categorized["DiscussionTopic"].first.summary).to eq @discussion.title
       expect(@categorized["DiscussionEntry"].first.summary).to eq "#{@other_user.short_name} mentioned you in #{@discussion.title}."
       expect(@categorized["AssessmentRequest"].first.summary).to include(@assignment.title)

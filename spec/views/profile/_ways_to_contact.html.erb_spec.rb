@@ -45,7 +45,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).not_to match /confirm_channel_link/
+    expect(response.body).not_to match(/confirm_channel_link/)
   end
 
   it "shows an admin the confirm link" do
@@ -59,7 +59,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).to match /confirm_channel_link/
+    expect(response.body).to match(/confirm_channel_link/)
   end
 
   it "does not show confirm link for confirmed channels" do
@@ -73,7 +73,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).not_to match /confirm_channel_link/
+    expect(response.body).not_to match(/confirm_channel_link/)
   end
 
   it "does not show confirm link for push channels" do
@@ -104,7 +104,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @user)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).to match /channel default.*channel_#{email.id}/
+    expect(response.body).to match(/channel default.*channel_#{email.id}/)
   end
 
   it "shows an admin masquerading as a user the confirm link" do
@@ -119,7 +119,7 @@ describe "/profile/_ways_to_contact" do
     assign(:user, @student)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).to match /confirm_channel_link/
+    expect(response.body).to match(/confirm_channel_link/)
   end
 
   it 'does not show the "I want to log in" for non-default accounts' do
@@ -132,6 +132,6 @@ describe "/profile/_ways_to_contact" do
     assign(:domain_root_account, Account.create!)
 
     render :partial => "profile/ways_to_contact"
-    expect(response.body).not_to match /I want to log in to Canvas using this email address/
+    expect(response.body).not_to match(/I want to log in to Canvas using this email address/)
   end
 end

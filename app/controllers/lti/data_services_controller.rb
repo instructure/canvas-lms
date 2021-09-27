@@ -173,7 +173,7 @@ module Lti
     def update
       sub = params.require(:subscription)
       SubscriptionsValidator.validate_subscription_context!(sub) if sub[:ContextType]
-      updates = add_updater({ 'Id': params[:id] }.merge(sub.to_unsafe_h))
+      updates = add_updater({ Id: params[:id] }.merge(sub.to_unsafe_h))
       response = Services::LiveEventsSubscriptionService.update(jwt_body, updates)
       forward_service_response(response)
     end

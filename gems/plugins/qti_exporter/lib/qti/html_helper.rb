@@ -74,13 +74,13 @@ module Qti
       if remove_extraneous_nodes
         while true
           node.children.each do |child|
-            break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
 
             child.remove
           end
 
           node.children.reverse_each do |child|
-            break unless child.text? && child.text =~ /\A\s+\z/ || child.element? && child.name.downcase == 'br'
+            break unless (child.text? && child.text =~ /\A\s+\z/) || (child.element? && child.name.downcase == 'br')
 
             child.remove
           end

@@ -32,7 +32,7 @@ module AcceptOpenIDConnectParamAsValidResponse
     opts[:headers].merge!(headers)
     response = request(options[:token_method], token_url, opts)
     # only change is on this line; Microsoft doesn't send back an access_token if you're doing a pure OpenID Connect auth
-    if options[:raise_errors] && !(response.parsed.is_a?(Hash) && response.parsed['access_token'] || response.parsed['id_token'])
+    if options[:raise_errors] && !((response.parsed.is_a?(Hash) && response.parsed['access_token']) || response.parsed['id_token'])
       error = ::OAuth2::Error.new(response)
       raise(error)
     end

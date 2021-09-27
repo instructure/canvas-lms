@@ -1313,7 +1313,7 @@ ActiveRecord::Relation.class_eval do
 
     while ids.first.present?
       ids.map!(&:to_i) if is_integer
-      ids << ids.first + batch_size if loose_mode
+      ids << (ids.first + batch_size) if loose_mode
 
       yield(*ids)
       last_value = ids.last
@@ -1747,7 +1747,7 @@ if CANVAS_RAILS6_0
       scope.scoping { super }
     end
   end
-  ActiveRecord::Base.send(:include, UnscopeCallbacks)
+  ActiveRecord::Base.include UnscopeCallbacks
 end
 
 module MatchWithDiscard

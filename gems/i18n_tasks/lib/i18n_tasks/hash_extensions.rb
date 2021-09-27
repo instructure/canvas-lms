@@ -47,6 +47,6 @@ module I18nTasks
       end
     end
 
-    Hash.send(:include, HashExtensions)
+    Hash.include HashExtensions
   end
 end

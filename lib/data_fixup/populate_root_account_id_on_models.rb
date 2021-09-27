@@ -277,12 +277,12 @@ module DataFixup::PopulateRootAccountIdOnModels
     incomplete_tables = []
     complete_tables = []
     migration_tables.each_with_object({}) do |(table, assoc), memo|
-      incomplete_tables << table && next unless table.column_names.include?(get_column_name(table))
+      (incomplete_tables << table) && next unless table.column_names.include?(get_column_name(table))
       next if (tables_in_progress + complete_tables + DONE_TABLES).include?(table)
 
       association_hash = hash_association(assoc)
       direct_relation_associations = replace_polymorphic_associations(table, association_hash)
-      check_if_table_has_root_account(table, direct_relation_associations.keys) ? complete_tables << table && next : incomplete_tables << table
+      check_if_table_has_root_account(table, direct_relation_associations.keys) ? (complete_tables << table) && next : incomplete_tables << table
 
       all_dependencies = direct_relation_associations.keys + Array(dependencies[table])
       prereqs_ready = all_dependencies.all? do |a|
@@ -297,7 +297,7 @@ module DataFixup::PopulateRootAccountIdOnModels
           # and User jobs are complete, we are good to fill in comm channels
           User.where.not(root_account_ids: nil).any?
         else
-          check_if_association_has_root_account(table, assoc_reflection) ? complete_tables << table && true : incomplete_tables << table && false
+          check_if_association_has_root_account(table, assoc_reflection) ? (complete_tables << table) && true : (incomplete_tables << table) && false
         end
       end
       memo[table] = direct_relation_associations if prereqs_ready
@@ -577,7 +577,7 @@ module DataFixup::PopulateRootAccountIdOnModels
                   .update_all("root_account_id = #{Shard.global_id_for(attributes.root_id, foreign_shard) || "null"}")
         end
       end
-      min = scope.where("#{foreign_key} > ?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
+      min = scope.where("#{foreign_key} > ?", ((min / Shard::IDS_PER_SHARD) + 1) * Shard::IDS_PER_SHARD).minimum(foreign_key)
     end
   end
 

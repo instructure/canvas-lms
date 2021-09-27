@@ -41,7 +41,7 @@ shared_examples 'Arrange By dropdown' do |context|
 
     table_rows = ff('#grades_summary tr')
     title_order.each_with_index do |assign_name, index|
-      expect(table_rows[4 * index + 1].find_element(:css, 'th')).to include_text assign_name
+      expect(table_rows[(4 * index) + 1].find_element(:css, 'th')).to include_text assign_name
     end
   end
 
@@ -81,7 +81,7 @@ shared_examples 'Arrange By dropdown' do |context|
 
     table_rows = ff('#grades_summary tr')
     title_order.each_with_index do |assign_name, index|
-      expect(table_rows[4 * index + 1].find_element(:css, 'th')).to include_text assign_name
+      expect(table_rows[(4 * index) + 1].find_element(:css, 'th')).to include_text assign_name
     end
   end
 
@@ -90,7 +90,7 @@ shared_examples 'Arrange By dropdown' do |context|
 
     table_rows = ff('#grades_summary tr')
     due_date_order.each_with_index do |assign_name, index|
-      expect(table_rows[4 * index + 1].find_element(:css, 'th')).to include_text assign_name
+      expect(table_rows[(4 * index) + 1].find_element(:css, 'th')).to include_text assign_name
     end
   end
 
@@ -100,7 +100,7 @@ shared_examples 'Arrange By dropdown' do |context|
 
     table_rows = ff('#grades_summary tr')
     module_order.each_with_index do |assign_name, index|
-      expect(table_rows[4 * index + 1].find_element(:css, 'th')).to include_text assign_name
+      expect(table_rows[(4 * index) + 1].find_element(:css, 'th')).to include_text assign_name
     end
   end
 
@@ -110,7 +110,7 @@ shared_examples 'Arrange By dropdown' do |context|
     table_rows = ff('#grades_summary tr')
 
     assign_group_order.each_with_index do |assign_name, index|
-      expect(table_rows[4 * index + 1].find_element(:css, 'th')).to include_text assign_name
+      expect(table_rows[(4 * index) + 1].find_element(:css, 'th')).to include_text assign_name
     end
   end
 

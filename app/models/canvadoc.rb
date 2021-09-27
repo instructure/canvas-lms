@@ -54,7 +54,7 @@ class Canvadoc < ActiveRecord::Base
   def submissions
     self.canvadocs_submissions
         .preload(submission: :assignment)
-        .map &:submission
+        .map(&:submission)
   end
 
   def available?

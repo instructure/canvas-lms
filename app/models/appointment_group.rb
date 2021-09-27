@@ -36,7 +36,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def contexts
-    appointment_group_contexts.map &:context
+    appointment_group_contexts.map(&:context)
   end
 
   def active_contexts
@@ -45,7 +45,7 @@ class AppointmentGroup < ActiveRecord::Base
 
   def sub_contexts
     # I wonder how rails is adding multiples of the same sub_contexts
-    appointment_group_sub_contexts.map &:sub_context
+    appointment_group_sub_contexts.map(&:sub_context)
   end
 
   validates_presence_of :workflow_state
@@ -184,7 +184,7 @@ class AppointmentGroup < ActiveRecord::Base
   end
 
   def sub_context_codes
-    appointment_group_sub_contexts.map &:sub_context_code
+    appointment_group_sub_contexts.map(&:sub_context_code)
   end
 
   # complements :reserve permission

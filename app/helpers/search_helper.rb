@@ -142,7 +142,7 @@ module SearchHelper
   end
 
   def search_contexts_and_users(options = {})
-    types = (options[:types] || [] + [options[:type]]).compact
+    types = (options[:types] || ([] + [options[:type]])).compact
     types |= [:course, :section, :group] if types.delete('context')
     types = if types.present?
               { user: types.delete('user').present?, context: types.present? && types.map(&:to_sym) }

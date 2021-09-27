@@ -65,7 +65,7 @@ module IncomingMailProcessor
     # Raises anything the timeout method raises.
     def with_timeout(&block)
       method = @timeout_method || method(:default_timeout_method)
-      method.call &block
+      method.call(&block)
     end
 
     # Public: Wrap an object's methods in with_timeout calls. The original

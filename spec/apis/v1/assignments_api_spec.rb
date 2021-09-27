@@ -985,7 +985,7 @@ describe AssignmentsApiController, type: :request do
         @assignment = @course.assignments.create!(title: "title", points_possible: '20.0')
 
         # Generate an array with min=10, max=18, mean=14
-        scores = [10] + [14] * (count - 2) + [18]
+        scores = [10] + ([14] * (count - 2)) + [18]
 
         @students.take(count).each do |student|
           score = scores.pop().to_s
@@ -3139,7 +3139,7 @@ describe AssignmentsApiController, type: :request do
                                                   :points_possible => 15
                                                 })
 
-      api_update_assignment_call(@course, @assignment, { 'points_possible': 10 })
+      api_update_assignment_call(@course, @assignment, { points_possible: 10 })
 
       expect(response.code).to eq "401"
     end
@@ -3154,7 +3154,7 @@ describe AssignmentsApiController, type: :request do
       @assignment.grade_student(@student, grade: 15, grader: @teacher)
 
       @user = @teacher
-      api_update_assignment_call(@course, @assignment, { 'grading_type': 'percent' })
+      api_update_assignment_call(@course, @assignment, { grading_type: 'percent' })
       expect(response).to be_successful
       expect(@assignment.grading_type).to eq 'percent'
     end
@@ -3169,7 +3169,7 @@ describe AssignmentsApiController, type: :request do
       RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
       account_admin_user(active_all: true)
 
-      api_update_assignment_call(@course, @assignment, { 'grading_type': 'percent' })
+      api_update_assignment_call(@course, @assignment, { grading_type: 'percent' })
       expect(response).to be_successful
       expect(@assignment.grading_type).to eq 'percent'
     end
@@ -3186,7 +3186,7 @@ describe AssignmentsApiController, type: :request do
       RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
       account_admin_user(active_all: true)
 
-      api_update_assignment_call(@course, @assignment, { 'grading_type': 'percent' })
+      api_update_assignment_call(@course, @assignment, { grading_type: 'percent' })
       expect(response.code).to eq "401"
     end
 
@@ -3755,7 +3755,7 @@ describe AssignmentsApiController, type: :request do
       end
 
       it "updates the assignments grading_type when type is empty" do
-        @json = api_update_assignment_call(@course, @assignment, { 'grading_type': '' })
+        @json = api_update_assignment_call(@course, @assignment, { grading_type: '' })
         @assignment.reload
         expect(@assignment.grading_type).to eq 'points'
         expect(@json['grading_type']).to eq @assignment.grading_type

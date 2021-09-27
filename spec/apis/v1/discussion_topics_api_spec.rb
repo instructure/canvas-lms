@@ -765,7 +765,6 @@ describe DiscussionTopicsController, type: :request do
             expect(json.first["id"]).to eq @announcement2.id
           end
 
-          # rubocop:disable RSpec/NestedGroups
           context "as a user that can view all sections" do
             it "includes all announcements" do
               json = api_call_as_user(
@@ -784,7 +783,6 @@ describe DiscussionTopicsController, type: :request do
               expect(json.map { |i| i["id"] }).to match_array [@announcement.id, @announcement2.id]
             end
           end
-          # rubocop:enable RSpec/NestedGroups
         end
       end
     end
@@ -1576,9 +1574,9 @@ describe DiscussionTopicsController, type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
-    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
 
     # get the last page
     json = api_call(:get, "/api/v1/courses/#{@course.id}/discussion_topics.json?page=3&per_page=3",
@@ -1586,9 +1584,9 @@ describe DiscussionTopicsController, type: :request do
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
-    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
   end
 
   it "works with groups" do
@@ -1679,9 +1677,9 @@ describe DiscussionTopicsController, type: :request do
     expect(json.length).to eq 3
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
-    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+    expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
 
     # get the last page
     json = api_call(:get, "/api/v1/groups/#{group.id}/discussion_topics.json?page=3&per_page=3",
@@ -1689,9 +1687,9 @@ describe DiscussionTopicsController, type: :request do
     expect(json.length).to eq 1
     links = response.headers['Link'].split(",")
     expect(links.all? { |l| l =~ /api\/v1\/groups\/#{group.id}\/discussion_topics/ }).to be_truthy
-    expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
-    expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-    expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+    expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+    expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
   end
 
   it "fulfills module viewed requirements when marking a topic read" do
@@ -1851,7 +1849,7 @@ describe DiscussionTopicsController, type: :request do
       )
       expect(json['attachment']).to be_present
       new_file = Attachment.find(json['attachment']['id'])
-      expect(new_file.display_name).to match /txt-[0-9]+\.txt/
+      expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
       expect(json['attachment']['display_name']).to eq new_file.display_name
       expect(json['attachment']['url']).to be_include 'verifier='
     end
@@ -1983,9 +1981,9 @@ describe DiscussionTopicsController, type: :request do
       expect(json.map { |e| e['id'] }).to eq entries.last(3).reverse.map { |e| e.id }
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
 
       # last page
       json = api_call(
@@ -1997,9 +1995,9 @@ describe DiscussionTopicsController, type: :request do
       expect(json.map { |e| e['id'] }).to eq [entries.first, @entry].map { |e| e.id }
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
     end
 
     it "only includes the first 10 replies for each top-level entry" do
@@ -2079,9 +2077,9 @@ describe DiscussionTopicsController, type: :request do
       expect(json.map { |e| e['id'] }).to eq replies.last(3).reverse.map { |e| e.id }
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
 
       # last page
       json = api_call(
@@ -2093,9 +2091,9 @@ describe DiscussionTopicsController, type: :request do
       expect(json.map { |e| e['id'] }).to eq [replies.first, @reply].map { |e| e.id }
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/courses\/#{@course.id}\/discussion_topics\/#{@topic.id}\/entries\/#{@entry.id}\/replies/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
     end
   end
 
@@ -2720,7 +2718,7 @@ describe DiscussionTopicsController, type: :request do
       @reply_reply1.editor = @teacher
       @reply_reply1.update(:message => '<p>censored</p>')
 
-      @all_entries.each &:reload
+      @all_entries.each(&:reload)
 
       # materialized view jobs are now delayed
       Timecop.travel(Time.zone.now + 20.seconds) do

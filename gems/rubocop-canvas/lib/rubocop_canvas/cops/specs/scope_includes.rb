@@ -54,8 +54,8 @@ module RuboCop
             ancestor.module_type? ||
               ancestor.class_type? ||
               ancestor.def_type? ||
-              ancestor.block_type? &&
-                WHITELISTED_BLOCKS.include?(ancestor.method_name)
+              (ancestor.block_type? &&
+                WHITELISTED_BLOCKS.include?(ancestor.method_name))
           end
         end
       end

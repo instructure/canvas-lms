@@ -88,7 +88,7 @@ describe SearchController do
       course_with_student_logged_in(:active_all => true)
       @enrollment.update(workflow_state: 'deleted')
       get 'recipients', params: { search: 'foo', :context => @course.asset_string }
-      expect(response.body).to match /\[\]\z/
+      expect(response.body).to match(/\[\]\z/)
     end
 
     it "handles groups in courses without messageable enrollments" do
@@ -111,7 +111,7 @@ describe SearchController do
           :type => 'section', :skip_visibility_checks => true,
           :synthetic_contexts => true, :context => "course_#{@course.id}_sections"
         }
-        expect(response.body).to match /\[\]\z/
+        expect(response.body).to match(/\[\]\z/)
       end
 
       it "returns sub-contexts" do

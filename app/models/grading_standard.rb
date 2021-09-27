@@ -113,9 +113,9 @@ class GradingStandard < ActiveRecord::Base
     # otherwise, we step down just 1/10th of a point, which is the
     # granularity we support right now
     elsif idx && (ordered_scheme[idx].last - ordered_scheme[idx - 1].last).abs >= 0.01.to_d
-      ordered_scheme[idx - 1].last * 100.0.to_d - 1.0.to_d
+      (ordered_scheme[idx - 1].last * 100.0.to_d) - 1.0.to_d
     elsif idx
-      ordered_scheme[idx - 1].last * 100.0.to_d - 0.1.to_d
+      (ordered_scheme[idx - 1].last * 100.0.to_d) - 0.1.to_d
     else
       nil
     end

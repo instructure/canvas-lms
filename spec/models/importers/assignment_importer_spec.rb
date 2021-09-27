@@ -845,7 +845,7 @@ describe "Importing assignments" do
         "title" => "post_to_sis",
         "post_to_sis" => false,
         "date_shift_options" => {
-          "remove_dates": true
+          remove_dates: true
         }
       }.with_indifferent_access
     end

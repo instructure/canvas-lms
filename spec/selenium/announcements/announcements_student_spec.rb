@@ -59,7 +59,7 @@ describe "announcements" do
   end
 
   context "announcements as a student" do
-    before (:each) do
+    before(:each) do
       course_with_student_logged_in
     end
 
@@ -162,7 +162,7 @@ describe "announcements" do
     end
 
     context "section specific announcements" do
-      before (:once) do
+      before(:once) do
         course_with_teacher(active_course: true)
         @section = @course.course_sections.create!(name: 'test section')
 

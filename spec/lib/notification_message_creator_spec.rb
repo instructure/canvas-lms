@@ -778,15 +778,15 @@ describe NotificationMessageCreator do
 
       it "targets 3 partitions if it's really long" do
         now = Time.parse("2020-08-24 03:00:00UTC")
-        Setting.set("pending_duplicate_message_window_hours", 7 * 24 + 6)
+        Setting.set("pending_duplicate_message_window_hours", (7 * 24) + 6)
         Timecop.freeze(now) do
-          set_up_stubs(now - (7 * 24 + 6).hours, "created_at>=?", now - (7 * 24 + 6).hours)
+          set_up_stubs(now - ((7 * 24) + 6).hours, "created_at>=?", now - ((7 * 24) + 6).hours)
           set_up_stubs(now - 6.hours)
           set_up_stubs(now, "created_at<=?", now)
           subject.send(:cancel_pending_duplicate_messages)
         end
         # now verify the in_partition calls will result in what we expect
-        expect(Message.infer_partition_table_name('created_at' => now - (24 * 7 + 6).hours)).to eq "messages_2020_33"
+        expect(Message.infer_partition_table_name('created_at' => now - ((24 * 7) + 6).hours)).to eq "messages_2020_33"
         expect(Message.infer_partition_table_name('created_at' => now - 6.hours)).to eq "messages_2020_34"
         expect(Message.infer_partition_table_name('created_at' => now)).to eq "messages_2020_35"
       end

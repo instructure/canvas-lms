@@ -516,7 +516,7 @@ describe "assignments" do
           replace_content(fj(".datePickerDateField[data-date-type='due_at']"), 'Sep 20, 2012')
         end
 
-        expect(f('.assignment_dates').text).to match /Sep 20, 2012/
+        expect(f('.assignment_dates').text).to match(/Sep 20, 2012/)
         # some sort of time zone issue is occurring with Sep 20, 2012 - it rolls back a day and an hour locally.
         expect(@frozen_assign.reload.due_at.to_i).not_to eq old_due_at.to_i
       end

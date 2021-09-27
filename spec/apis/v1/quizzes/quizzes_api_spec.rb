@@ -278,7 +278,7 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     before(:once) { teacher_in_course(:active_all => true) }
 
-    let (:new_quiz) { @course.quizzes.first }
+    let(:new_quiz) { @course.quizzes.first }
 
     context "jsonapi style request" do
       it "renders in a jsonapi style" do
@@ -312,7 +312,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     it "renders an error when the title is too long" do
-      title = 'a' * ActiveRecord::Base.maximum_string_length + '!'
+      title = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
       json = api_create_quiz({ 'title' => title }, :expected_status => 400)
       expect(json).to have_key 'errors'
       expect(new_quiz).to be_nil
@@ -571,8 +571,8 @@ describe Quizzes::QuizzesApiController, type: :request do
 
     before { teacher_in_course(:active_all => true) }
 
-    let (:updated_quiz) { @course.quizzes.first }
-    let (:quiz_params) { {} }
+    let(:updated_quiz) { @course.quizzes.first }
+    let(:quiz_params) { {} }
 
     it "updates quiz attributes" do
       api_update_quiz({ 'title' => 'old title' }, { 'title' => 'new title' })
@@ -614,7 +614,7 @@ describe Quizzes::QuizzesApiController, type: :request do
     end
 
     it "renders an error when the title is too long" do
-      long_title = 'a' * ActiveRecord::Base.maximum_string_length + '!'
+      long_title = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
       json = api_update_quiz({}, { 'title' => long_title }, :expected_status => 400)
       expect(json).to have_key 'errors'
       expect(updated_quiz.title).to eq 'title'
@@ -772,7 +772,7 @@ describe Quizzes::QuizzesApiController, type: :request do
       context 'allowed_attempts' do
         it 'discards values less than -1' do
           api_update_quiz({ 'allowed_attempts' => -1 }, { 'allowed_attempts' => -25 })
-          expect(updated_quiz.allowed_attempts).to eq -1
+          expect(updated_quiz.allowed_attempts).to eq(-1)
         end
       end
     end

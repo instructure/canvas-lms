@@ -149,7 +149,7 @@ module CanvasKaltura
       sources = sources.sort_by do |a|
         [a[:hasWarnings] || a[:isOriginal] != '0' ? CanvasSort::Last : CanvasSort::First,
          a[:isOriginal] == '0' ? CanvasSort::First : CanvasSort::Last,
-         PREFERENCE.index(a[:fileExt]) || PREFERENCE.size + 1,
+         PREFERENCE.index(a[:fileExt]) || (PREFERENCE.size + 1),
          a[:bitrate].to_i < suspicious_bitrate_threshold ? CanvasSort::First : CanvasSort::Last,
          0 - a[:bitrate].to_i]
       end

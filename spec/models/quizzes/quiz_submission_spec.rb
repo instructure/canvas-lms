@@ -156,11 +156,11 @@ describe Quizzes::QuizSubmission do
 
         qs.update_scores({ :fudge_points => -5, :question_score_1 => 50 })
         expect(qs.score).to eq 45
-        expect(qs.fudge_points).to eq -5
+        expect(qs.fudge_points).to eq(-5)
         expect(qs.kept_score).to eq 45
         v = qs.versions.current.model
         expect(v.score).to eq 45
-        expect(v.fudge_points).to eq -5
+        expect(v.fudge_points).to eq(-5)
         expect(qs.submission.unread?(@student)).to eq true
       end
 
@@ -179,11 +179,11 @@ describe Quizzes::QuizSubmission do
 
           qs.update_scores({ :fudge_points => -5, :question_score_1 => 50 })
           expect(qs.score).to eq 42
-          expect(qs.fudge_points).to eq -5
+          expect(qs.fudge_points).to eq(-5)
           expect(qs.kept_score).to eq 42
           v = qs.versions.current.model
           expect(v.score).to eq 42
-          expect(v.fudge_points).to eq -5
+          expect(v.fudge_points).to eq(-5)
         end
       end
 
@@ -386,7 +386,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
         expect(@quiz_sub.kept_score).to eq 3
-        expect(@quiz_sub.fudge_points).to eq -2
+        expect(@quiz_sub.fudge_points).to eq(-2)
         expect(@quiz_sub.manually_scored).not_to be_truthy
 
         @submission.reload
@@ -411,7 +411,7 @@ describe Quizzes::QuizSubmission do
         @quiz_sub.reload
         expect(@quiz_sub.score).to eq 3
         expect(@quiz_sub.kept_score).to eq 3
-        expect(@quiz_sub.fudge_points).to eq -1
+        expect(@quiz_sub.fudge_points).to eq(-1)
         expect(@quiz_sub.manually_scored).to be_truthy
         @submission.reload
         expect(@submission.score).to eq 3

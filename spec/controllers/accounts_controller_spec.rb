@@ -63,7 +63,7 @@ describe AccountsController do
     it "removes user from the account" do
       user_with_pseudonym :account => @account
       post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
-      expect(flash[:notice]).to match /successfully deleted/
+      expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
@@ -93,7 +93,7 @@ describe AccountsController do
       user_with_pseudonym :account => @account, :username => "nobody@example.com"
       pseudonym @user, :account => @other_account, :username => "nobody2@example.com"
       post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
-      expect(flash[:notice]).to match /successfully deleted/
+      expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
       expect(@user.associated_accounts.map(&:id)).to include(@other_account.id)
@@ -117,7 +117,7 @@ describe AccountsController do
     it "removes users with managed passwords with html" do
       user_with_managed_pseudonym :account => @account
       post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }
-      expect(flash[:notice]).to match /successfully deleted/
+      expect(flash[:notice]).to match(/successfully deleted/)
       expect(response).to redirect_to(account_users_url(@account))
       expect(@user.associated_accounts.map(&:id)).not_to include(@account.id)
     end
@@ -126,7 +126,7 @@ describe AccountsController do
       Timecop.freeze do
         user_with_managed_pseudonym :account => @account, :name => "John Doe"
         post 'remove_user', params: { :account_id => @account.id, :user_id => @user.id }, :format => "json"
-        expect(flash[:notice]).to match /successfully deleted/
+        expect(flash[:notice]).to match(/successfully deleted/)
         expect(json_parse(response.body)).to eq json_parse(@user.reload.to_json)
         expect(@user.associated_accounts.map(&:id)).to_not include(@account.id)
       end

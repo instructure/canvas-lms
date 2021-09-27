@@ -40,8 +40,8 @@ describe "/users/admin_merge" do
 
     render "users/admin_merge"
     expect(response).not_to be_nil
-    expect(response.body).to match /My Root Account/
-    expect(response.body).to match /Sub-Account/
-    expect(response.body).not_to match /Default Account/
+    expect(response.body).to match(/My Root Account/)
+    expect(response.body).to match(/Sub-Account/)
+    expect(response.body).not_to match(/Default Account/)
   end
 end

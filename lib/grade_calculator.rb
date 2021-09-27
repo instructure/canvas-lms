@@ -920,7 +920,7 @@ class GradeCalculator
       q_mid  = (q_low + q_high) / 2
 
       x, kept = big_f_blk.call(q_mid, submissions, cant_drop, keep)
-      threshold = 1 / (2 * keep * max_total**2)
+      threshold = 1 / (2 * keep * (max_total**2))
       until q_high - q_low < threshold
         x < 0 ?
           q_high = q_mid :
@@ -939,12 +939,12 @@ class GradeCalculator
 
   def big_f(q, submissions, cant_drop, keep, &sort_blk)
     kept = submissions.map { |s|
-      rated_score = s[:score] - q * s[:total]
+      rated_score = s[:score] - (q * s[:total])
       [rated_score, s]
     }.sort(&sort_blk).first(keep)
 
     q_kept = kept.reduce(0) { |sum, (rated_score, _)| sum + rated_score }
-    q_cant_drop = cant_drop.reduce(0) { |sum, s| sum + (s[:score] - q * s[:total]) }
+    q_cant_drop = cant_drop.reduce(0) { |sum, s| sum + (s[:score] - (q * s[:total])) }
 
     [q_kept + q_cant_drop, kept.map(&:last)]
   end
@@ -995,7 +995,7 @@ class GradeCalculator
         gs[:possible].zero? || gs[:possible].nil?
       }
       final_grade = relevant_group_sums.reduce(0) { |grade, gs|
-        grade + (gs[:score].to_d / gs[:possible]) * gs[:weight].to_d
+        grade + ((gs[:score].to_d / gs[:possible]) * gs[:weight].to_d)
       }
 
       # scale the grade up if total weights don't add up to 100%

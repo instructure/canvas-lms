@@ -2324,7 +2324,7 @@ describe ExternalToolsController do
 
         it { is_expected.to include "display=borderless" }
 
-        it { is_expected.to match /session_token=\w+/ }
+        it { is_expected.to match(/session_token=\w+/) }
       end
     end
   end

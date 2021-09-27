@@ -139,7 +139,7 @@ module SIS
           if pseudo_by_integration && status_is_active && pseudo_by_integration != pseudo
             id_message = pseudo_by_integration.sis_user_id ? I18n.t('SIS ID') : I18n.t('Canvas ID')
             user_id = pseudo_by_integration.sis_user_id || pseudo_by_integration.user_id
-            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+            message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s requested integration_id, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
             @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
             next
           end
@@ -159,11 +159,11 @@ module SIS
                 next
               end
             end
-            if pseudo_by_login && (pseudo != pseudo_by_login && status_is_active ||
+            if pseudo_by_login && ((pseudo != pseudo_by_login && status_is_active) ||
               !Pseudonym.where("LOWER(?)=LOWER(?)", pseudo.unique_id, user_row.login_id).exists?)
               id_message = pseudo_by_login.sis_user_id ? 'SIS ID' : 'Canvas ID'
               user_id = pseudo_by_login.sis_user_id || pseudo_by_login.user_id
-              message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id.to_s}", other_user_id: user_row.user_id)
+              message = I18n.t("An existing Canvas user with the %{user_id} has already claimed %{other_user_id}'s user_id requested login information, skipping", user_id: "#{id_message} #{user_id}", other_user_id: user_row.user_id)
               @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)
               next
             end
@@ -266,7 +266,7 @@ module SIS
 
           # if a password is provided, use it only if this is a new user, or the user hasn't changed the password in canvas *AND* the incoming password has changed
           # otherwise the persistence_token will change even though we're setting to the same password, logging the user out
-          if !user_row.password.blank? && (pseudo.new_record? || pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password))
+          if !user_row.password.blank? && (pseudo.new_record? || (pseudo.password_auto_generated && !pseudo.valid_password?(user_row.password)))
             pseudo.password = user_row.password
             pseudo.password_confirmation = user_row.password
             pseudo.password_auto_generated = true

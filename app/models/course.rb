@@ -1162,7 +1162,7 @@ class Course < ActiveRecord::Base
 
   def update_enrolled_users(sis_batch: nil)
     self.shard.activate do
-      if self.workflow_state_changed? || sis_batch && self.saved_change_to_workflow_state?
+      if self.workflow_state_changed? || (sis_batch && self.saved_change_to_workflow_state?)
         if self.completed?
           enrollment_info = Enrollment.where(:course_id => self, :workflow_state => ['active', 'invited']).select(:id, :workflow_state).to_a
           if enrollment_info.any?
@@ -1625,7 +1625,7 @@ class Course < ActiveRecord::Base
       can permission
     end
 
-    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered") && (self.available? || self.completed? || self.claimed? && hash[:is_admin]) }
+    given { |user, session| session && session[:enrollment_uuid] && (hash = Enrollment.course_user_state(self, session[:enrollment_uuid]) || {}) && (hash[:enrollment_state] == "invited" || (hash[:enrollment_state] == "active" && hash[:user_state].to_s == "pre_registered")) && (self.available? || self.completed? || (self.claimed? && hash[:is_admin])) }
     can :read and can :read_outcomes
 
     given { |user| (self.available? || self.completed?) && user && fetch_on_enrollments("has_not_inactive_enrollment", user) { enrollments.for_user(user).not_inactive_by_date.exists? } }

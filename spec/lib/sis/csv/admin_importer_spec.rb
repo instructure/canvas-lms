@@ -107,7 +107,7 @@ describe SIS::CSV::AdminImporter do
     before_count = AccountUser.active.count
     process_csv_data_cleanly(
       'user_id,account_id,role_id,status',
-      "U001,sub1,#{role.id.to_s},active"
+      "U001,sub1,#{role.id},active"
     )
     expect(AccountUser.active.count).to eq before_count + 1
   end

@@ -57,7 +57,7 @@ module CanvasDynamoDB
           tables[pair[0]] ||= []
           tables[pair[0]] << pair[1]
         end
-        sleep 2**@backoff_exp / 1000 if @backoff_exp > 0
+        sleep (2**@backoff_exp) / 1000 if @backoff_exp > 0
         resp = @database.send(operation, { request_items: request_items(tables) })
         responses << resp
         until resp.send(unprocessed_attr).empty?

@@ -1889,7 +1889,7 @@ describe DiscussionTopicsController do
       expect(response).to be_successful
       json = JSON.parse(response.body)
       new_file = Attachment.find(json['attachments'][0]['id'])
-      expect(new_file.display_name).to match /txt-[0-9]+\.txt/
+      expect(new_file.display_name).to match(/txt-[0-9]+\.txt/)
       expect(json['attachments'][0]['display_name']).to eq new_file.display_name
     end
 
@@ -1968,7 +1968,7 @@ describe DiscussionTopicsController do
       t1, t2, _ = topics
       post 'reorder', params: { :course_id => @course.id, :order => "#{t2.id},#{t1.id}" }, :format => 'json'
       expect(response).to be_successful
-      topics.each &:reload
+      topics.each(&:reload)
       expect(topics.map(&:position)).to eq [2, 1, 3]
     end
   end

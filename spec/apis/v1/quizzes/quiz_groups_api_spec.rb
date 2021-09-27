@@ -35,7 +35,7 @@ describe Quizzes::QuizGroupsController, type: :request do
                { 'Accept' => 'application/vnd.api+json' }, opts)
     end
 
-    let (:new_quiz_group) { @quiz.reload; @quiz.quiz_groups.first }
+    let(:new_quiz_group) { @quiz.reload; @quiz.quiz_groups.first }
 
     it "creates a question group for a quiz" do
       api_create_quiz_group('name' => 'testing')
@@ -58,7 +58,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     end
 
     it "renders a validation error when the name is too long" do
-      name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
+      name = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
       json = api_create_quiz_group({ 'name' => name }, :expected_status => 422)
       expect(json).to have_key 'errors'
       expect(json["errors"]).to have_key "name"
@@ -112,7 +112,7 @@ describe Quizzes::QuizGroupsController, type: :request do
     end
 
     it "renders a validation error when the name is too long" do
-      name = 'a' * ActiveRecord::Base.maximum_string_length + '!'
+      name = ('a' * ActiveRecord::Base.maximum_string_length) + '!'
       json = api_update_quiz_group({ 'name' => name }, :expected_status => 422)
       expect(json).to have_key 'errors'
       expect(@group.reload.name).to eq 'Test Group'

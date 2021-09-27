@@ -96,7 +96,7 @@ module Context
       context_codes = sharded_course_ids.map { |id| "course_#{id}" }
       if Shard.current == self.shard
         context = self
-        while context && context.respond_to?(:account) || context.respond_to?(:parent_account)
+        while (context && context.respond_to?(:account)) || context.respond_to?(:parent_account)
           context = context.respond_to?(:account) ? context.account : context.parent_account
           context_codes << context.asset_string if context
         end

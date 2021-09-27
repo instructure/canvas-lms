@@ -66,8 +66,8 @@ module LtiProviderStateHelper
 
   def self.create_external_tool(developer_key)
     configuration = {
-      "title": "Canvas Data Services",
-      "scopes": [
+      title: "Canvas Data Services",
+      scopes: [
         "https://canvas.instructure.com/lti/public_jwk/scope/update",
         "https://canvas.instructure.com/lti/data_services/scope/create",
         "https://canvas.instructure.com/lti/data_services/scope/show",
@@ -77,33 +77,33 @@ module LtiProviderStateHelper
         "https://canvas.instructure.com/lti/data_services/scope/list_event_types",
         "https://canvas.instructure.com/lti/feature_flags/scope/show"
       ],
-      "public_jwk_url": "http://live-events-lti/api/jwks",
-      "description": "Data service management for Canvas LMS",
-      "target_link_uri": "http://live-events-lti/resource_link_request",
-      "oidc_initiation_url": "http://live-events-lti/login",
-      "extensions": [
+      public_jwk_url: "http://live-events-lti/api/jwks",
+      description: "Data service management for Canvas LMS",
+      target_link_uri: "http://live-events-lti/resource_link_request",
+      oidc_initiation_url: "http://live-events-lti/login",
+      extensions: [
         {
-          "platform": "canvas.instructure.com",
-          "domain": "http://live-events-lti",
-          "privacy_level": "public",
-          "settings": {
-            "placements": [
+          platform: "canvas.instructure.com",
+          domain: "http://live-events-lti",
+          privacy_level: "public",
+          settings: {
+            placements: [
               {
-                "text": "Data Services",
-                "enabled": true,
-                "placement": "account_navigation",
-                "target_link_uri": "http://live-events-lti/resource_link_request",
-                "required_permissions": "manage_data_services"
+                text: "Data Services",
+                enabled: true,
+                placement: "account_navigation",
+                target_link_uri: "http://live-events-lti/resource_link_request",
+                required_permissions: "manage_data_services"
               }
             ]
           }
         }
       ],
-      "custom_fields": {
-        "canvas_account_uuid": "$vnd.Canvas.root_account.uuid",
-        "canvas_api_domain": "$Canvas.api.domain",
-        "canvas_user_uuid": "$Canvas.user.globalId",
-        "canvas_high_contrast_enabled": "$Canvas.user.prefersHighContrast"
+      custom_fields: {
+        canvas_account_uuid: "$vnd.Canvas.root_account.uuid",
+        canvas_api_domain: "$Canvas.api.domain",
+        canvas_user_uuid: "$Canvas.user.globalId",
+        canvas_high_contrast_enabled: "$Canvas.user.prefersHighContrast"
       }
     }
     tool_config = Lti::ToolConfiguration.create!(developer_key: developer_key, settings: configuration, privacy_level: 'public')

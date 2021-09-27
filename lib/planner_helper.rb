@@ -75,7 +75,7 @@ module PlannerHelper
   # until the graded objects are handled more uniformly,
   # we have to look around for an associated override
   def self.find_planner_override_for_submission(submission)
-    return unless submission&.respond_to?(:submission_type) && submission&.respond_to?(:assignment_id)
+    return unless submission.respond_to?(:submission_type) && submission.respond_to?(:assignment_id)
 
     planner_override = case submission.submission_type
                        when "discussion_topic"

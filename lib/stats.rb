@@ -100,7 +100,7 @@ module Stats
       vals = []
 
       # 1st Q
-      n = (sorted_items.length + 1) / 4.0 - 1
+      n = ((sorted_items.length + 1) / 4.0) - 1
       if n < 0
         # n must be in [0,n]
         n = 0
@@ -110,13 +110,13 @@ module Stats
       vals << get_weighted_nth(sorted_items, n, weight)
 
       # 2nd Q
-      n = (sorted_items.length + 1) / 2.0 - 1
+      n = ((sorted_items.length + 1) / 2.0) - 1
       weight = 1.0 - (n - n.to_i)
       n = n.to_i
       vals << get_weighted_nth(sorted_items, n, weight)
 
       # 3rd Q
-      n = (sorted_items.length + 1) * 3.0 / 4.0 - 1
+      n = ((sorted_items.length + 1) * 3.0 / 4.0) - 1
       if n > sorted_items.length - 1
         # n must be in [0,n]
         n = sorted_items.length - 1
@@ -141,7 +141,7 @@ module Stats
       ret_val = { :bin_width => bin_width, :bin_base => bin_base }
       bins = {}
       @items.each do |i|
-        bin = ((i - bin_base) / bin_width).floor * bin_width + bin_base
+        bin = (((i - bin_base) / bin_width).floor * bin_width) + bin_base
         if bins.has_key?(bin)
           bins[bin] = bins[bin] + 1
         else

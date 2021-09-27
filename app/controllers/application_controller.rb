@@ -707,7 +707,7 @@ class ApplicationController < ActionController::Base
   end
 
   def tab_enabled?(id, opts = {})
-    return true unless @context&.respond_to?(:tabs_available)
+    return true unless @context.respond_to?(:tabs_available)
 
     valid = Rails.cache.fetch(['tab_enabled4', id, @context, @current_user, @domain_root_account, session[:enrollment_uuid]].cache_key) do
       @context.tabs_available(@current_user,
@@ -1504,7 +1504,7 @@ class ApplicationController < ActionController::Base
 
   def log_gets
     if @page_view && !request.xhr? && request.get? && (((response.media_type || "").to_s.match(/html/)) ||
-      (Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?)
+      ((Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?))
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
     end
@@ -2845,7 +2845,7 @@ class ApplicationController < ActionController::Base
   }.freeze
 
   def show_student_view_button?
-    return false unless @context&.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
+    return false unless @context.is_a?(Course) && can_do(@context, @current_user, :use_student_view)
 
     controller_action = "#{params[:controller]}##{params[:action]}"
     STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))

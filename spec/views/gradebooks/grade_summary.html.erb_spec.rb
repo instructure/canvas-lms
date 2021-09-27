@@ -532,7 +532,7 @@ describe "/gradebooks/grade_summary" do
     end
 
     context "when comments exist" do
-      before (:each) do
+      before(:each) do
         submission = assignment.submission_for_student(student)
         submission.add_comment(author: teacher, comment: "hello")
       end

@@ -148,7 +148,7 @@ describe Moodle::Converter do
     it "converts Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.where(title: "First Quiz").first
       expect(quiz).not_to be_nil
-      expect(quiz.description).to match /Pop quiz hot shot/
+      expect(quiz.description).to match(/Pop quiz hot shot/)
       expect(quiz.quiz_questions.count).to eq 9
     end
 
@@ -198,7 +198,7 @@ describe Moodle::Converter do
       quiz = @course.quizzes.where(title: "First Quiz").first
       question = quiz.quiz_questions[4]
       expect(question.question_data[:question_name]).to eq "Embedded Answers Question"
-      expect(question.question_data[:question_text]).to match /Embedded Answers Question Text/
+      expect(question.question_data[:question_text]).to match(/Embedded Answers Question Text/)
       expect(question.question_data[:question_type]).to eq 'essay_question'
       expect(question.question_data[:neutral_comments]).to eq 'Embedded Answers Question General Feedback'
     end
@@ -242,7 +242,7 @@ describe Moodle::Converter do
     it "converts Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.where(title: "My Questionnaire").first
       expect(quiz).not_to be_nil
-      expect(quiz.description).to match /Questionnaire Summary/
+      expect(quiz.description).to match(/Questionnaire Summary/)
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 10
     end
@@ -337,7 +337,7 @@ describe Moodle::Converter do
     it "converts Moodle Choice module to a quiz" do
       quiz = @course.quizzes.where(title: "My Choice").first
       expect(quiz).not_to be_nil
-      expect(quiz.description).to match /Which one will you choose\?/
+      expect(quiz.description).to match(/Which one will you choose\?/)
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 1
       question = quiz.quiz_questions.first

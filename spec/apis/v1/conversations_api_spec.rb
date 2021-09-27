@@ -180,9 +180,9 @@ describe ConversationsController, type: :request do
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/conversations/ }).to be_truthy
       expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
-      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
 
       # get the last page
       json = api_call(:get, "/api/v1/conversations.json?scope=default&page=3&per_page=3",
@@ -191,9 +191,9 @@ describe ConversationsController, type: :request do
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/conversations/ }).to be_truthy
       expect(links.all? { |l| l.scan(/scope=default/).size == 1 }).to be_truthy
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=3>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=3>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=3&per_page=3>/
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=3>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=3&per_page=3>/)
     end
 
     it "filters conversations by scope" do
@@ -2442,9 +2442,9 @@ describe ConversationsController, type: :request do
 
       links = response.headers['Link'].split(",")
       expect(links.all? { |l| l =~ /api\/v1\/conversations\/deleted/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="current"/) }).to match /page=1&per_page=10>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=10>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=1&per_page=10>/
+      expect(links.find { |l| l.match(/rel="current"/) }).to match(/page=1&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=1&per_page=10>/)
     end
 
     it 'can respond with multiple users data' do

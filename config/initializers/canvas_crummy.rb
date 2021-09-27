@@ -19,5 +19,5 @@
 
 require 'canvas_crummy'
 
-ActionController::Base.send :include, CanvasCrummy::ControllerMethods
-ActionView::Base.send :include, CanvasCrummy::ViewMethods
+ActionController::Base.include CanvasCrummy::ControllerMethods
+ActionView::Base.include CanvasCrummy::ViewMethods

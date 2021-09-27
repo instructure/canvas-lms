@@ -449,7 +449,7 @@ describe InstFS do
       context "upload via url" do
         it "throw ArgumentError when appropriate" do
           expect { InstFS.upload_preflight_json(default_args.merge({ target_url: "foo" })) }.to raise_error(ArgumentError)
-          expect { InstFS.upload_preflight_json(default_args.merge({ progress_json: { "foo": 1 } })) }.to raise_error(ArgumentError)
+          expect { InstFS.upload_preflight_json(default_args.merge({ progress_json: { foo: 1 } })) }.to raise_error(ArgumentError)
         end
 
         it "responds properly when passed target_url and progress_json" do

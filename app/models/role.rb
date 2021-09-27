@@ -186,7 +186,7 @@ class Role < ActiveRecord::Base
   # Should order course roles so we get "StudentEnrollment", custom student roles, "Teacher Enrollment", custom teacher roles, etc
   def display_sort_index
     if self.course_role?
-      ENROLLMENT_TYPES.index(self.base_role_type) * 2 + (self.built_in? ? 0 : 1)
+      (ENROLLMENT_TYPES.index(self.base_role_type) * 2) + (self.built_in? ? 0 : 1)
     else
       self.built_in? ? 0 : 1
     end

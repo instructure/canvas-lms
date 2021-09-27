@@ -190,19 +190,19 @@ describe SIS::CSV::UserImporter do
       "user_1,user1,User,One,\"One, User\",user@example.com,active"
     )
     user = CommunicationChannel.by_path('user@example.com').first.user
-    expect(user.name).to eq ("User One")
+    expect(user.name).to eq("User One")
     expect(user.sortable_name).to eql("One, User")
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,sortable_name,email,status",
       "user_1,user1,User,Uno,\"One, User\",user@example.com,active"
     )
-    expect(user.reload.name).to eq ("User Uno")
+    expect(user.reload.name).to eq("User Uno")
     expect(user.sortable_name).to eql("One, User")
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,status",
       "user_1,user1,Usero,Uno,active"
     )
-    expect(user.reload.name).to eq ("Usero Uno")
+    expect(user.reload.name).to eq("Usero Uno")
     expect(user.sortable_name).to eql("Uno, Usero")
   end
 

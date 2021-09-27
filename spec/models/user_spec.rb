@@ -2313,7 +2313,7 @@ describe User do
     it "sums up associated root account quotas" do
       @user.associated_root_accounts << Account.create! << (a = Account.create!)
       a.update_attribute :default_user_storage_quota_mb, a.default_user_storage_quota_mb + 10
-      expect(@user.quota).to eql(2 * User.default_storage_quota + 10.megabytes)
+      expect(@user.quota).to eql((2 * User.default_storage_quota) + 10.megabytes)
     end
   end
 

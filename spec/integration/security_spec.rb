@@ -552,7 +552,7 @@ describe "security" do
       it "role_overrides" do
         get "/accounts/#{Account.site_admin.id}/settings"
         expect(response).to be_successful
-        expect(response.body).not_to match /Permissions/
+        expect(response.body).not_to match(/Permissions/)
 
         get "/accounts/#{Account.site_admin.id}/role_overrides"
         assert_status(401)
@@ -564,7 +564,7 @@ describe "security" do
 
         get "/accounts/#{Account.site_admin.id}/settings"
         expect(response).to be_successful
-        expect(response.body).to match /Permissions/
+        expect(response.body).to match(/Permissions/)
       end
     end
 
@@ -580,7 +580,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_successful
-        expect(response.body).not_to match /Recently Logged-In Users/
+        expect(response.body).not_to match(/Recently Logged-In Users/)
 
         add_permission :read_roster
 
@@ -592,7 +592,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_successful
-        expect(response.body).to match /Recently Logged-In Users/
+        expect(response.body).to match(/Recently Logged-In Users/)
       end
 
       it "read_course_list" do
@@ -605,19 +605,19 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_successful
-        expect(response.body).not_to match /Recently Started Courses/
-        expect(response.body).not_to match /Recently Ended Courses/
+        expect(response.body).not_to match(/Recently Started Courses/)
+        expect(response.body).not_to match(/Recently Ended Courses/)
 
         add_permission :read_course_list
 
         get "/accounts/#{Account.default.id}"
         expect(response).to be_successful
-        expect(response.body).to match /Courses/
+        expect(response.body).to match(/Courses/)
 
         get "/accounts/#{Account.default.id}/statistics"
         expect(response).to be_successful
-        expect(response.body).to match /Recently Started Courses/
-        expect(response.body).to match /Recently Ended Courses/
+        expect(response.body).to match(/Recently Started Courses/)
+        expect(response.body).to match(/Recently Ended Courses/)
       end
 
       it "view_statistics" do
@@ -626,7 +626,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_successful
-        expect(response.body).not_to match /Statistics/
+        expect(response.body).not_to match(/Statistics/)
 
         add_permission :view_statistics
 
@@ -635,7 +635,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_successful
-        expect(response.body).to match /Statistics/
+        expect(response.body).to match(/Statistics/)
       end
 
       it "manage_user_notes" do
@@ -650,7 +650,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_successful
-        expect(response.body).not_to match /Faculty Journal/
+        expect(response.body).not_to match(/Faculty Journal/)
 
         get "/users/#{@student.id}/user_notes"
         assert_status(401)
@@ -671,7 +671,7 @@ describe "security" do
 
         get "/accounts/#{Account.default.id}/settings"
         expect(response).to be_successful
-        expect(response.body).to match /Faculty Journal/
+        expect(response.body).to match(/Faculty Journal/)
 
         get "/users/#{@student.id}/user_notes"
         expect(response).to be_successful
@@ -739,7 +739,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).not_to match /People/
+        expect(response.body).not_to match(/People/)
         html = Nokogiri::HTML5(response.body)
         expect(html.css('#tab-users')).to be_empty
 
@@ -747,9 +747,9 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match /View User Groups/
-        expect(response.body).to match /View Prior Enrollments/
-        expect(response.body).not_to match /Manage Users/
+        expect(response.body).to match(/View User Groups/)
+        expect(response.body).to match(/View Prior Enrollments/)
+        expect(response.body).not_to match(/Manage Users/)
 
         get "/courses/#{@course.id}/users/prior"
         expect(response).to be_successful
@@ -759,7 +759,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /People/
+        expect(response.body).to match(/People/)
       end
 
       it "manage_students" do
@@ -774,7 +774,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).not_to match /People/
+        expect(response.body).not_to match(/People/)
 
         add_permission :manage_students
 
@@ -788,8 +788,8 @@ describe "security" do
 
         get "/courses/#{@course.id}/users"
         expect(response).to be_successful
-        expect(response.body).to match /View User Groups/
-        expect(response.body).to match /View Prior Enrollments/
+        expect(response.body).to match(/View User Groups/)
+        expect(response.body).to match(/View Prior Enrollments/)
 
         get "/courses/#{@course.id}/users/prior"
         expect(response).to be_successful
@@ -799,7 +799,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /People/
+        expect(response.body).to match(/People/)
 
         @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
@@ -808,7 +808,7 @@ describe "security" do
         # manage stuff in it
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /People/
+        expect(response.body).to match(/People/)
       end
 
       it "Display groups and persons for students" do
@@ -891,9 +891,9 @@ describe "security" do
         expect(html.css('.section .quizzes')).to be_empty
         expect(html.css('.section .discussions')).to be_empty
         expect(html.css('.section .files')).to be_empty
-        expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).not_to match /Export this Course/
+        expect(response.body).not_to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).not_to match(/Export this Course/)
 
         add_permission :read_course_content
         add_permission :read_roster
@@ -901,14 +901,14 @@ describe "security" do
 
         get "/courses/#{@course.id}"
         expect(response).to be_successful
-        expect(response.body).to match /People/
+        expect(response.body).to match(/People/)
 
         @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         get "/courses/#{@course.id}/assignments"
         expect(response).to be_successful
-        expect(response.body).to match /People/ # still has read_as_admin rights
+        expect(response.body).to match(/People/) # still has read_as_admin rights
 
         get "/courses/#{@course.id}/assignments/syllabus"
         expect(response).to be_successful
@@ -940,11 +940,11 @@ describe "security" do
         expect(html.css('.section .quizzes')).not_to be_empty
         expect(html.css('.section .discussions')).not_to be_empty
         expect(html.css('.section .files')).not_to be_empty
-        expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).to match /Export Course Content/
-        expect(response.body).not_to match /Delete this Course/
-        expect(response.body).not_to match /End this Course/
+        expect(response.body).not_to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).to match(/Export Course Content/)
+        expect(response.body).not_to match(/Delete this Course/)
+        expect(response.body).not_to match(/End this Course/)
         expect(html.css('input#course_account_id')).to be_empty
         expect(html.css('input#course_enrollment_term_id')).to be_empty
 
@@ -958,16 +958,16 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).to match /Export Course Content/
-        expect(response.body).to_not match /Delete this Course/
+        expect(response.body).to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).to match(/Export Course Content/)
+        expect(response.body).to_not match(/Delete this Course/)
 
         add_permission :change_course_state
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /Delete this Course/
+        expect(response.body).to match(/Delete this Course/)
 
         html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
@@ -1026,9 +1026,9 @@ describe "security" do
         expect(html.css('.section .quizzes')).to be_empty
         expect(html.css('.section .discussions')).to be_empty
         expect(html.css('.section .files')).to be_empty
-        expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).not_to match /Export this Course/
+        expect(response.body).not_to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).not_to match(/Export this Course/)
 
         add_permission :read_course_content
         add_permission :read_roster
@@ -1036,14 +1036,14 @@ describe "security" do
 
         get "/courses/#{@course.id}"
         expect(response).to be_successful
-        expect(response.body).to match /People/
+        expect(response.body).to match(/People/)
 
         @course.tab_configuration = [{ :id => Course::TAB_PEOPLE, :hidden => true }]
         @course.save!
 
         get "/courses/#{@course.id}/assignments"
         expect(response).to be_successful
-        expect(response.body).to match /People/ # still has read_as_admin rights
+        expect(response.body).to match(/People/) # still has read_as_admin rights
 
         get "/courses/#{@course.id}/assignments/syllabus"
         expect(response).to be_successful
@@ -1075,11 +1075,11 @@ describe "security" do
         expect(html.css('.section .quizzes')).not_to be_empty
         expect(html.css('.section .discussions')).not_to be_empty
         expect(html.css('.section .files')).not_to be_empty
-        expect(response.body).not_to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).to match /Export Course Content/
-        expect(response.body).not_to match /Delete this Course/
-        expect(response.body).not_to match /End this Course/
+        expect(response.body).not_to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).to match(/Export Course Content/)
+        expect(response.body).not_to match(/Delete this Course/)
+        expect(response.body).not_to match(/End this Course/)
         expect(html.css('input#course_account_id')).to be_empty
         expect(html.css('input#course_enrollment_term_id')).to be_empty
 
@@ -1093,16 +1093,16 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /Copy this Course/
-        expect(response.body).not_to match /Import Course Content/
-        expect(response.body).to match /Export Course Content/
-        expect(response.body).to_not match /Delete this Course/
+        expect(response.body).to match(/Copy this Course/)
+        expect(response.body).not_to match(/Import Course Content/)
+        expect(response.body).to match(/Export Course Content/)
+        expect(response.body).to_not match(/Delete this Course/)
 
         add_permission :manage_courses_admin
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to_not match /Delete this Course/
+        expect(response.body).to_not match(/Delete this Course/)
 
         html = Nokogiri::HTML5(response.body)
         expect(html.css('#course_account_id')).not_to be_empty
@@ -1115,7 +1115,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /Delete this Course/
+        expect(response.body).to match(/Delete this Course/)
 
         delete "/courses/#{@course.id}", params: { :event => 'delete' }
         expect(response).to be_redirect
@@ -1126,7 +1126,7 @@ describe "security" do
       it 'manage_content' do
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).not_to match /Import Course Content/
+        expect(response.body).not_to match(/Import Course Content/)
 
         get "/courses/#{@course.id}/content_migrations"
         assert_status(401)
@@ -1135,7 +1135,7 @@ describe "security" do
 
         get "/courses/#{@course.id}/details"
         expect(response).to be_successful
-        expect(response.body).to match /Import Course Content/
+        expect(response.body).to match(/Import Course Content/)
 
         get "/courses/#{@course.id}/content_migrations"
         expect(response).to be_successful

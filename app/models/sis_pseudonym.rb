@@ -158,7 +158,7 @@ class SisPseudonym
   end
 
   def use_loaded_collection?(shard)
-    user.pseudonyms.loaded? && user.shard == shard ||
+    (user.pseudonyms.loaded? && user.shard == shard) ||
       (include_deleted ? user.all_pseudonyms_loaded? : user.all_active_pseudonyms_loaded?)
   end
 

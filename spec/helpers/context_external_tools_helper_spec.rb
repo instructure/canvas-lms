@@ -99,7 +99,7 @@ describe ContextExternalToolsHelper do
         enabled: true
       }
 
-      settings_hash[:canvas_icon_class] = "icon-#{setting.to_s}" if include_class
+      settings_hash[:canvas_icon_class] = "icon-#{setting}" if include_class
       settings_hash
     end
 

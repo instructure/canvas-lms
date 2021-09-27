@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'thread'
-
 module LiveEvents
   # TODO: Consider refactoring out common functionality from this and
   # CanvasPandaPub::AsyncWorker. Their semantics are a bit different so

@@ -100,7 +100,7 @@ describe Polling::PollSubmissionsController, type: :request do
         post_create({ filler: true }, true)
 
         expect(response.code).to eq "404"
-        expect(response.body).to match /The specified resource does not exist/
+        expect(response.body).to match(/The specified resource does not exist/)
       end
 
       it "doesn't submit if the student isn't enrolled in the specified section" do

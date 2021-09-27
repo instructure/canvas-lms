@@ -71,7 +71,7 @@ describe "calendar2" do
         expect(title).to be_displayed
         replace_content(title, event_title)
         expect_new_page_load { f('.more_options_link').click }
-        expect(driver.current_url).to match /start_date=\d\d\d\d-\d\d-\d\d/ # passed in ISO format, not localized
+        expect(driver.current_url).to match(/start_date=\d\d\d\d-\d\d-\d\d/) # passed in ISO format, not localized
         expect(f('.title')).to have_value event_title
         expect(f('#editCalendarEventFull .btn-primary').text).to eq "Create Event"
         replace_content(f('#calendar_event_location_name'), location_name)
@@ -194,15 +194,15 @@ describe "calendar2" do
         expect(CalendarEvent.count).to eq(6) # 2 parent events each with 2 child events
         s1_events = CalendarEvent.where(:context_code => section1.asset_string)
                                  .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
-        expect(s1_events[1].start_at.to_date).to eq (s1_events[0].start_at.to_date + 1.week)
+        expect(s1_events[1].start_at.to_date).to eq(s1_events[0].start_at.to_date + 1.week)
 
         s2_events = CalendarEvent.where(:context_code => section2.asset_string)
                                  .where.not(:parent_calendar_event_id => nil).order(:start_at).to_a
-        expect(s2_events[1].start_at.to_date).to eq (s2_events[0].start_at.to_date + 1.week)
+        expect(s2_events[1].start_at.to_date).to eq(s2_events[0].start_at.to_date + 1.week)
       end
 
       it "queries for all the sections in a course when creating an event" do
-        15.times.with_index { |i| add_section("Section #{i}") }
+        15.times { |i| add_section("Section #{i}") }
 
         num_sections = @course.course_sections.count
 

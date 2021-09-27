@@ -165,7 +165,7 @@ describe "outcomes as a teacher" do
   end
 
   context "moving outcomes tree" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in
       who_to_login == 'teacher' ? @context = @course : @context = account
     end

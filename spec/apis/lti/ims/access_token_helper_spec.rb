@@ -114,7 +114,7 @@ module Lti
         let(:access_token_helper) { subject }
 
         it 'returns the bearer token for auth header' do
-          @request.headers['Authorization'] = "Bearer #{dev_key_access_token.to_s}"
+          @request.headers['Authorization'] = "Bearer #{dev_key_access_token}"
           expect(access_token_helper.oauth2_request?).to be_truthy
         end
       end

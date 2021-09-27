@@ -841,7 +841,7 @@ class AccountsController < ApplicationController
               @account.errors.add(quota_type, t(:quota_integer_required, 'An integer value is required'))
             else
               @account.errors.add(quota_type, t(:quota_must_be_positive, 'Value must be positive')) if quota_value.to_i < 0
-              @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= 2**62 / 1.megabytes
+              @account.errors.add(quota_type, t(:quota_too_large, 'Value too large')) if quota_value.to_i >= (2**62) / 1.megabytes
             end
           end
         else

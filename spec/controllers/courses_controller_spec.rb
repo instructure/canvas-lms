@@ -2806,10 +2806,10 @@ describe CoursesController do
             { 'assignment' => { 'content' => '1', 'due_dates' => '1' }, 'quiz' => { 'content' => '1' } } } }, :format => 'json'
         expect(response).to be_successful
         template = MasterCourses::MasterTemplate.full_template_for(@course)
-        expect(template.default_restrictions_by_type).to eq ({
-          "Assignment" => { :content => true, :due_dates => true },
-          "Quizzes::Quiz" => { :content => true }
-        })
+        expect(template.default_restrictions_by_type).to eq({
+                                                              "Assignment" => { :content => true, :due_dates => true },
+                                                              "Quizzes::Quiz" => { :content => true }
+                                                            })
       end
 
       it "validates default template restrictions by object type" do
@@ -3069,7 +3069,7 @@ describe CoursesController do
 
     it "requires authorization" do
       get 'public_feed', params: { :feed_code => @enrollment.feed_code + 'x' }, :format => 'atom'
-      expect(assigns[:problem]).to match /The verification code does not match/
+      expect(assigns[:problem]).to match(/The verification code does not match/)
     end
 
     it "includes absolute path for rel='self' link" do

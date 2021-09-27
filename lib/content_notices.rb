@@ -22,7 +22,7 @@ module ContentNotices
   NOTICE_ATTRIBUTES = [:tag, :text, :variant, :link_text, :link_target, :should_show]
 
   class ContentNotice
-    attr_accessor *NOTICE_ATTRIBUTES
+    attr_accessor(*NOTICE_ATTRIBUTES)
   end
 
   module ClassMethods

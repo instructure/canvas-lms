@@ -992,8 +992,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def should_clear_all_stream_items?
-    !self.published? && self.saved_change_to_attribute?(:workflow_state) ||
-      self.is_announcement && self.not_available_yet? && self.saved_change_to_attribute?(:delayed_post_at)
+    (!self.published? && self.saved_change_to_attribute?(:workflow_state)) ||
+      (self.is_announcement && self.not_available_yet? && self.saved_change_to_attribute?(:delayed_post_at))
   end
 
   def clear_non_applicable_stream_items
@@ -1341,7 +1341,7 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   def visible_to_admins_only?
-    self.context.respond_to?(:available?) && !self.context.available? ||
+    (self.context.respond_to?(:available?) && !self.context.available?) ||
       unpublished? || not_available_yet? || not_available_anymore?
   end
 

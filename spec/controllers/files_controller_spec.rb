@@ -416,7 +416,7 @@ describe FilesController do
       user_session(@teacher)
       get 'show', params: { course_id: @course.id, id: @old_file.id, preview: 1 }
       expect(response).to be_redirect
-      expect(response.location).to match /\/courses\/#{@course.id}\/files\/#{@file.id}/
+      expect(response.location).to match(/\/courses\/#{@course.id}\/files\/#{@file.id}/)
     end
 
     describe "as a student" do

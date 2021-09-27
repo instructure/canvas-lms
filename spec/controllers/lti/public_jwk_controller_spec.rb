@@ -74,7 +74,7 @@ module Lti
 
         context 'when pubic jwk is not valid' do
           let(:params_overrides) do
-            { developer_key: { public_jwk: { 'hello': 'world' } } }
+            { developer_key: { public_jwk: { hello: 'world' } } }
           end
 
           before do

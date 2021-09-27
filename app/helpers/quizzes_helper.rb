@@ -462,9 +462,9 @@ module QuizzesHelper
     end
 
     if answer_list.empty?
-      answers.delete_if { |k, v| !k.match /^question_#{hash_get(question, :id)}/ }
-      answers.each { |k, v| res.sub! /\{\{#{k}\}\}/, h(v) }
-      res.gsub! /\{\{question_[^}]+\}\}/, ""
+      answers.delete_if { |k, v| !k.match(/^question_#{hash_get(question, :id)}/) }
+      answers.each { |k, v| res.sub!(/\{\{#{k}\}\}/, h(v)) }
+      res.gsub!(/\{\{question_[^}]+\}\}/, "")
     end
 
     # all of our manipulation lost this flag - reset it

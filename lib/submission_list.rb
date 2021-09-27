@@ -111,7 +111,7 @@ class SubmissionList
 
   # An iterator on the day only, not each submission
   def each_day(&block)
-    self.list.each &block
+    self.list.each(&block)
   end
 
   # An array of days with an array of grader open structs for that day and course.

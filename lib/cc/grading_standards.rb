@@ -22,8 +22,8 @@ module CC
     def add_referenced_grading_standards
       @course.assignments.active.where('grading_standard_id IS NOT NULL').each do |assignment|
         next unless export_object?(assignment) ||
-                    assignment.quiz && export_object?(assignment.quiz) ||
-                    assignment.discussion_topic && export_object?(assignment.discussion_topic)
+                    (assignment.quiz && export_object?(assignment.quiz)) ||
+                    (assignment.discussion_topic && export_object?(assignment.discussion_topic))
 
         gs = assignment.grading_standard
         add_item_to_export(gs) if gs && gs.context_type == 'Course' && gs.context_id == @course.id

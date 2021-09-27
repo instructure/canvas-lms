@@ -105,7 +105,7 @@ shared_examples_for "lti services" do
 
     context 'with "canvas.instructure.com" aud' do
       let(:universal_grant_host) { 'http://canvas.instructure.com/login/oauth2/token' }
-      let(:access_token_jwt_hash) { super().merge('aud': universal_grant_host) }
+      let(:access_token_jwt_hash) { super().merge(aud: universal_grant_host) }
 
       it 'returns 200 success' do
         expect(response).to have_http_status http_success_status

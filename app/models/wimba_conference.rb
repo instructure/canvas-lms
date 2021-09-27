@@ -183,7 +183,7 @@ class WimbaConference < WebConference
   end
 
   def admin_settings_url(user, return_to = "http://www.instructure.com")
-    initiate_conference and touch or return nil
+    (initiate_conference and touch) or return nil
     add_user_to_conference(user, :admin) &&
       settings_url(user)
   end

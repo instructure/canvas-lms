@@ -154,8 +154,8 @@ module Submittable
       @old_assignment_id = self.assignment_id_was
     end
     if self.assignment_id
-      self.assignment_id = nil unless self.assignment &&
-                                      self.assignment.context == self.context ||
+      self.assignment_id = nil unless (self.assignment &&
+                                      self.assignment.context == self.context) ||
                                       self.try(:root_topic).try(:assignment_id) == self.assignment_id
       self.old_assignment_id = self.assignment_id if self.assignment_id
     end

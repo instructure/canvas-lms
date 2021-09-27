@@ -31,12 +31,12 @@ module Api::V1::ContextModule
   MODULE_ITEM_JSON_ATTRS = %w(id position title indent).freeze
 
   ITEM_TYPE = {
-    'Assignment': 'assignment',
-    'Attachment': 'file',
-    'DiscussionTopic': 'topic',
-    'Quiz': 'quiz',
+    Assignment: 'assignment',
+    Attachment: 'file',
+    DiscussionTopic: 'topic',
+    Quiz: 'quiz',
     'Quizzes::Quiz': 'quiz',
-    'WikiPage': 'page'
+    WikiPage: 'page'
   }.freeze
 
   # optionally pass progression to include 'state', 'completed_at'

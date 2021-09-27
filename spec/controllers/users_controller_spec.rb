@@ -1974,7 +1974,7 @@ describe UsersController do
 
     it "requires authorization" do
       get 'public_feed', params: { :feed_code => @user.feed_code + 'x' }, format: 'atom'
-      expect(assigns[:problem]).to match /The verification code is invalid/
+      expect(assigns[:problem]).to match(/The verification code is invalid/)
     end
 
     it "includes absolute path for rel='self' link" do

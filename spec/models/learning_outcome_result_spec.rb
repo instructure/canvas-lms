@@ -345,7 +345,7 @@ describe LearningOutcomeResult do
       it "properly calculates percent based on outcome.mastery_points even if an outcome proficiency object exists" do
         learning_outcome_result.update(score: 1, possible: nil)
         learning_outcome_result.calculate_percent!
-        expect(learning_outcome_result.percent).to eq (1.to_f / learning_outcome_result.learning_outcome.mastery_points.to_f)
+        expect(learning_outcome_result.percent).to eq(1.to_f / learning_outcome_result.learning_outcome.mastery_points.to_f)
       end
     end
   end

@@ -116,7 +116,7 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
 
       if size > 1 && variance != 0
         variance_sum = items.map(&:variance).sum
-        size / (size - 1.0) * (1 - variance_sum / variance)
+        size / (size - 1.0) * (1 - (variance_sum / variance))
       else
         nil
       end

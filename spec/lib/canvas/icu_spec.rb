@@ -44,7 +44,7 @@ describe Canvas::ICU do
         a_prime = Canvas::ICU.collation_key(a)
         expect(a.object_id).not_to eq a_prime.object_id
         b_prime = Canvas::ICU.collation_key(b)
-        expect(a_prime <=> b_prime).to eq -1
+        expect(a_prime <=> b_prime).to eq(-1)
       end
 
       it "pass-thrus CanvasSort::First" do
@@ -54,11 +54,11 @@ describe Canvas::ICU do
 
     describe ".compare" do
       it "works" do
-        expect(Canvas::ICU.compare("a", "b")).to eq -1
+        expect(Canvas::ICU.compare("a", "b")).to eq(-1)
       end
 
       it "handles CanvasSort::First" do
-        expect(Canvas::ICU.compare(CanvasSort::First, "a")).to eq -1
+        expect(Canvas::ICU.compare(CanvasSort::First, "a")).to eq(-1)
       end
     end
 

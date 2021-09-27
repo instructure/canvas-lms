@@ -25,8 +25,8 @@ require_dependency "lti/message_handler"
 
 module Lti
   describe MessageHandler do
-    let (:account) { Account.create }
-    let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
+    let(:account) { Account.create }
+    let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
 
     describe 'validations' do
       before(:each) do

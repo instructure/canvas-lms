@@ -135,7 +135,7 @@ describe ContentZipper do
       expect(attachment.workflow_state).to eq 'zipped'
       Zip::File.foreach(attachment.full_filename) do |f|
         if f.file?
-          expect(f.name).to match /some9991234guy/
+          expect(f.name).to match(/some9991234guy/)
           expect(f.get_input_stream.read).to match(%r{This submission was a url})
           expect(f.get_input_stream.read).to be_include("http://www.instructure.com/")
         end
@@ -278,10 +278,10 @@ describe ContentZipper do
 
       zipper = ContentZipper.new
       filename = zipper.assignment_zip_filename(@assignment)
-      expect(filename).to match /#{@course.short_name_slug}/
-      expect(filename).to match /#{@assignment.title_slug}/
-      expect(filename).not_to match /#{@course.short_name}/
-      expect(filename).not_to match /#{@assignment.title}/
+      expect(filename).to match(/#{@course.short_name_slug}/)
+      expect(filename).to match(/#{@assignment.title_slug}/)
+      expect(filename).not_to match(/#{@course.short_name}/)
+      expect(filename).not_to match(/#{@assignment.title}/)
     end
   end
 
@@ -289,7 +289,7 @@ describe ContentZipper do
     it "still downloads the content" do
       course_with_teacher
       @assignment = assignment_model(course: @course)
-      submissions = 5.times.map.with_index do |i|
+      submissions = 5.times do |i|
         attachment = attachment_model(uploaded_data: stub_png_data("file_#{i}.png"), content_type: 'image/png')
         submission_model(course: @course, assignment: @assignment, submission_type: 'online_upload', attachments: [attachment])
       end

@@ -279,7 +279,7 @@ describe "Gradebook" do
     # toggle to descending sort
     it 'toggles sort order on student column by name' do
       cell = Gradebook.student_cell
-      driver.action.move_to(cell, 0, cell.size.height / 2 - 2).click.perform
+      driver.action.move_to(cell, 0, (cell.size.height / 2) - 2).click.perform
 
       expect(Gradebook.student_grades_link(Gradebook.student_cell(0)).text).to eq(students[0].name)
       expect(Gradebook.student_grades_link(Gradebook.student_cell(1)).text).to eq(students[1].name)

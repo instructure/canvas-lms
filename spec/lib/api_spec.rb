@@ -996,11 +996,11 @@ describe Api do
                                 :last => 10,
                               })
       expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
-      expect(links.find { |l| l.match(/rel="current"/) }).to match /page=8&per_page=10>/
-      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=4&per_page=10>/
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=10>/
-      expect(links.find { |l| l.match(/rel="first"/) }).to match /page=1&per_page=10>/
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=10&per_page=10>/
+      expect(links.find { |l| l.match(/rel="current"/) }).to match(/page=8&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=4&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="first"/) }).to match(/page=1&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=10&per_page=10>/)
     end
 
     it "maintains query parameters" do
@@ -1043,10 +1043,10 @@ describe Api do
                               })
       expect(links.all? { |l| l =~ /www.example.com\/\?/ }).to be_truthy
       expect(links.find { |l| l.match(/rel="current"/) }).to be_nil
-      expect(links.find { |l| l.match(/rel="next"/) }).to match /page=4&per_page=10>/
-      expect(links.find { |l| l.match(/rel="prev"/) }).to match /page=2&per_page=10>/
+      expect(links.find { |l| l.match(/rel="next"/) }).to match(/page=4&per_page=10>/)
+      expect(links.find { |l| l.match(/rel="prev"/) }).to match(/page=2&per_page=10>/)
       expect(links.find { |l| l.match(/rel="first"/) }).to be_nil
-      expect(links.find { |l| l.match(/rel="last"/) }).to match /page=10&per_page=10>/
+      expect(links.find { |l| l.match(/rel="last"/) }).to match(/page=10&per_page=10>/)
     end
   end
 

@@ -222,8 +222,8 @@ class RubricsController < ApplicationController
   private
 
   def can_manage_rubrics_or_association_object?(object)
-    return true if object && (can_update?(object) || can_read?(object) && can_manage_rubrics_context?) ||
-                   !object && can_manage_rubrics_context?
+    return true if (object && (can_update?(object) || (can_read?(object) && can_manage_rubrics_context?))) ||
+                   (!object && can_manage_rubrics_context?)
 
     render_unauthorized_action
     false

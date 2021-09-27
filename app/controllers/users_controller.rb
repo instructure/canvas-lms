@@ -322,12 +322,12 @@ class UsersController < ApplicationController
         Canvas::Errors.capture_exception(:oauth, e, :warn)
         flash[:error] = e.to_s
       end
-      return redirect_to (@current_user ? user_profile_url(@current_user) : root_url)
+      return redirect_to(@current_user ? user_profile_url(@current_user) : root_url)
     end
 
     if !oauth_request || (request.host_with_port == oauth_request.original_host_with_port && oauth_request.user != @current_user)
       flash[:error] = t('oauth_fail', "OAuth Request failed. Couldn't find valid request")
-      redirect_to (@current_user ? user_profile_url(@current_user) : root_url)
+      redirect_to(@current_user ? user_profile_url(@current_user) : root_url)
     elsif request.host_with_port != oauth_request.original_host_with_port
       url = url_for request.parameters.merge(:host => oauth_request.original_host_with_port, :only_path => false)
       redirect_to url
@@ -2883,7 +2883,7 @@ class UsersController < ApplicationController
     force_validations = value_to_boolean(params[:force_validations])
     manage_user_logins = @context.grants_right?(@current_user, session, :manage_user_logins)
     self_enrollment = params[:self_enrollment].present?
-    allow_non_email_pseudonyms = !force_validations && manage_user_logins || self_enrollment && params[:pseudonym_type] == 'username'
+    allow_non_email_pseudonyms = (!force_validations && manage_user_logins) || (self_enrollment && params[:pseudonym_type] == 'username')
     require_password = self_enrollment && allow_non_email_pseudonyms
     allow_password = require_password || manage_user_logins || use_pairing_code
 
@@ -3016,7 +3016,7 @@ class UsersController < ApplicationController
       @cc.confirmation_redirect = cc_confirmation_redirect
     end
 
-    if @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?
+    if @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && (@invalid_observee_creds.nil? & @invalid_observee_code.nil?)
       # saving the user takes care of the @pseudonym and @cc, so we can't call
       # save_without_session_maintenance directly. we don't want to auto-log-in
       # unless the user is registered/pre_registered (if the latter, he still

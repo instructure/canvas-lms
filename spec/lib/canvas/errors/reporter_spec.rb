@@ -47,7 +47,7 @@ describe Canvas::Errors::Reporter do
 
   it "has correct backtrace" do
     new_class = error_instance
-    expect(new_class.backtrace[0]).to match /typical_usage/
+    expect(new_class.backtrace[0]).to match(/typical_usage/)
   end
 
   it "does not mess with existing classes" do

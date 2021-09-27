@@ -299,7 +299,7 @@ describe DelayedMessage do
           @dm.communication_channel.user.pseudonym.account_id = i
           @dm.send_at = nil
           @dm.send(:set_send_at)
-          actual_windows << (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
+          actual_windows << ((@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET))
           expected_windows << i
         end
 
@@ -324,7 +324,7 @@ describe DelayedMessage do
           @dm.send(:set_send_at)
           window = (@dm.send_at - saturday).to_i / (60 * DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET)
           windows << window
-          actual_diffs << @dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes.to_i
+          actual_diffs << (@dm.send_at - saturday - (DelayedMessage::MINUTES_PER_WEEKLY_ACCOUNT_BUCKET * window).minutes.to_i)
           expected_diffs << i.minutes
         end
 

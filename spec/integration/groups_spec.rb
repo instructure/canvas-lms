@@ -44,7 +44,7 @@ describe GroupsController do
       g1 = @course.groups.create!(:name => "some group", :group_category => category1)
 
       get "/courses/#{@course.id}/groups/#{g1.id}?join=1"
-      expect(response.body).not_to match /This group has received your request to join/
+      expect(response.body).not_to match(/This group has received your request to join/)
     end
   end
 

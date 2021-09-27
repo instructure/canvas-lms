@@ -197,7 +197,7 @@ describe "calendar2" do
   end
 
   context "as a spanish student" do
-    before (:each) do
+    before(:each) do
       # Setup with spanish locale
       @student = course_with_student_logged_in(:active_all => true).user
       @student.locale = 'es'

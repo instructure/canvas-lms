@@ -272,8 +272,8 @@ describe Quizzes::TakeQuizPresenter do
 
   describe "#question_class" do
     it "always returns 'list_question'" do
-      expect(presenter.question_class(question1)).to match /list_question/
-      expect(presenter.question_class(question2)).to match /list_question/
+      expect(presenter.question_class(question1)).to match(/list_question/)
+      expect(presenter.question_class(question2)).to match(/list_question/)
     end
 
     it "adds 'answered' if the question was answered" do
@@ -282,8 +282,8 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question2[:id]}" => nil
       )
 
-      expect(presenter.question_class(question1)).to match /answered/
-      expect(presenter.question_class(question2)).not_to match /answered/
+      expect(presenter.question_class(question1)).to match(/answered/)
+      expect(presenter.question_class(question2)).not_to match(/answered/)
     end
 
     it "adds 'marked' if the question was marked" do
@@ -292,21 +292,21 @@ describe Quizzes::TakeQuizPresenter do
         "question_#{question2[:id]}_marked" => false
       )
 
-      expect(presenter.question_class(question1)).to match /marked/
-      expect(presenter.question_class(question2)).not_to match /marked/
+      expect(presenter.question_class(question1)).to match(/marked/)
+      expect(presenter.question_class(question2)).not_to match(/marked/)
     end
 
     it "adds 'seen' if the question was seen" do
-      expect(presenter.question_class(question1)).to match /seen/
-      expect(presenter.question_class(question2)).not_to match /seen/
+      expect(presenter.question_class(question1)).to match(/seen/)
+      expect(presenter.question_class(question2)).not_to match(/seen/)
     end
 
     it "adds 'text_only' if the question is a text only question" do
       q2 = question2.dup
       q2['question_type'] = 'text_only_question'
 
-      expect(presenter.question_class(question1)).not_to match /text_only/
-      expect(presenter.question_class(q2)).to match /text_only/
+      expect(presenter.question_class(question1)).not_to match(/text_only/)
+      expect(presenter.question_class(q2)).to match(/text_only/)
     end
   end
 

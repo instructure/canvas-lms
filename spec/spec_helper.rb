@@ -50,7 +50,7 @@ module WebMock::API
   end
 end
 
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Dir[Rails.root.join("spec/support/**/*.rb")].sort.each { |f| require f }
 require_relative 'sharding_spec_helper'
 
 # nuke the db (say, if `rake db:migrate RAILS_ENV=test` created records),
@@ -233,7 +233,7 @@ require File.expand_path(File.dirname(__FILE__) + '/ams_spec_helper')
 require 'i18n_tasks'
 require_relative 'factories'
 
-Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].each { |f| require f }
+Dir[File.dirname(__FILE__) + "/shared_examples/**/*.rb"].sort.each { |f| require f }
 
 # rspec aliases :describe to :context in a way that it's pretty much defined
 # globally on every object. :context is already heavily used in our application,
@@ -249,7 +249,7 @@ end
 RSpec::Mocks.configuration.allow_message_expectations_on_nil = false
 
 # Require all custom matchers
-Dir[Rails.root.join('spec', 'support', 'custom_matchers', '*.rb')].each { |f| require f }
+Dir[Rails.root.join('spec', 'support', 'custom_matchers', '*.rb')].sort.each { |f| require f }
 
 module RSpec::Matchers::Helpers
   # allows for matchers to use symbols and literals even though URIs are always strings.
@@ -617,7 +617,7 @@ RSpec.configure do |config|
     BACKENDS = %w{FileSystem S3}.map { |backend| AttachmentFu::Backends.const_get(:"#{backend}Backend") }.freeze
 
     class As # :nodoc:
-      private *instance_methods.select { |m| m !~ /(^__|^\W|^binding$|^untaint$)/ }
+      private(*instance_methods.select { |m| m !~ /(^__|^\W|^binding$|^untaint$)/ })
 
       def initialize(subject, ancestor)
         @subject = subject
@@ -861,7 +861,7 @@ module I18nStubs
 end
 LazyPresumptuousI18nBackend.prepend(I18nStubs)
 
-Dir[Rails.root + '{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].each { |file| require file }
+Dir[Rails.root + '{gems,vendor}/plugins/*/spec_canvas/spec_helper.rb'].sort.each { |file| require file }
 
 Shoulda::Matchers.configure do |config|
   config.integrate do |with|

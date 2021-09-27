@@ -163,7 +163,7 @@ describe FilesController do
         get "http://test.host/users/#{@me.id}/files/#{@att.id}/download?download_frd=1&verifier=#{@att.uuid}"
         expect(response).to be_redirect
         get response['Location']
-        expect(response.headers['Content-Disposition']).to match /attachment/
+        expect(response.headers['Content-Disposition']).to match(/attachment/)
       end
     end
   end

@@ -130,7 +130,7 @@ class CalendarEvent < ActiveRecord::Base
   end
 
   def effective_context
-    effective_context_code && ActiveRecord::Base.find_all_by_asset_string(effective_context_code).first || context
+    (effective_context_code && ActiveRecord::Base.find_all_by_asset_string(effective_context_code).first) || context
   end
 
   scope :active, -> { where("calendar_events.workflow_state<>'deleted'") }
@@ -661,7 +661,7 @@ class CalendarEvent < ActiveRecord::Base
     given { |user, session|
       appointment_group? && (
         grants_right?(user, session, :manage) ||
-        context.grants_right?(user, :reserve) && context.participant_for(user).present?
+        (context.grants_right?(user, :reserve) && context.participant_for(user).present?)
       )
     }
     can :reserve

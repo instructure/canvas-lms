@@ -117,7 +117,7 @@ module BookmarkedCollection
     TYPE_MAP = {
       string: ->(val) { val.is_a?(String) },
       integer: ->(val) { val.is_a?(Integer) },
-      datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || val.is_a?(String) && !!(DateTime.parse(val) rescue false) }
+      datetime: ->(val) { val.is_a?(DateTime) || val.is_a?(Time) || (val.is_a?(String) && !!(DateTime.parse(val) rescue false)) }
     }
 
     def existing_column_definition(col_name)
@@ -137,7 +137,7 @@ module BookmarkedCollection
         columns.each.with_index.all? do |col, i|
           type = TYPE_MAP[column_definitions[col][:type]]
           nullable = column_definitions[col][:null]
-          type && (nullable && bookmark[i].nil? || type.(bookmark[i]))
+          type && ((nullable && bookmark[i].nil?) || type.(bookmark[i]))
         end
     end
 

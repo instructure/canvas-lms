@@ -188,7 +188,7 @@ module MessageBus
     # like test/beta/edge whatever and not have to provision
     # other overhead to separate them or deal with the confusion of shared
     # data in a single topic.
-    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns.to_s}/#{app_env}-#{topic_name}"
+    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns}/#{app_env}-#{topic_name}"
   end
 
   ##

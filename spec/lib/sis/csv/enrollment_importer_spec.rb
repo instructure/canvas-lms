@@ -1195,7 +1195,7 @@ describe SIS::CSV::EnrollmentImporter do
       "c3,s3,v1,student,active", # invalid course_id
       "c2,s2,v1,student,active",
     )
-    errors = importer.errors.map &:last
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["An enrollment referenced a non-existent course c3"]
     a1 = @account.sub_accounts.find_by(sis_source_id: 'a1')
     a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')

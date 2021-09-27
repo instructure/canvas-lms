@@ -100,12 +100,12 @@ def render_properties(json)
     if json['description'].present?
       result << render_comment(json)
     end
-    result << "{\n" + indent(
+    result << ("{\n" + indent(
       properties.map do |name, prop|
         render_comment(prop) +
         %{"#{name}": } + render_value(prop)
       end.join(",\n")
-    ) + "\n}"
+    ) + "\n}")
   end
 rescue
   puts "error rendering properties for model:\n#{json}"

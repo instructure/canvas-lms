@@ -25,7 +25,7 @@ describe "dashboard" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
-    before (:each) do
+    before(:each) do
       course_with_teacher_logged_in(:active_cc => true)
     end
 

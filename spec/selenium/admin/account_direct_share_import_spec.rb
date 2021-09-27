@@ -60,7 +60,7 @@ describe "direct share page" do
   it "notifies on global nav tray" do
     global_nav_profile_link.click
     wait_for_ajaximations
-    expect(profile_tray_menu_items.text).to match /Shared Content/i
+    expect(profile_tray_menu_items.text).to match(/Shared Content/i)
     expect(profile_tray_menu_items.text).to include '2 unread.'
   end
 

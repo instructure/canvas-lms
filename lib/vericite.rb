@@ -341,7 +341,7 @@ module VeriCite
             token_user_role = 'Instructor'
           end
           # @return [Array<ReportURLLinkReponse>]
-          data, status_code, headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { :'user_id_filter' => user_id, :'external_content_id_filter' => args[:oid] })
+          data, status_code, headers = vericite_client.reports_urls_context_id_get(context_id, assignment_id_filter, consumer, consumer_secret, token_user, token_user_role, { user_id_filter => user_id, external_content_id_filter => args[:oid] })
           # check status code
           response[:return_code] = status_code
           if !is_response_success?(response)

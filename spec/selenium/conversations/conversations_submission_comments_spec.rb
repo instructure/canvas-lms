@@ -86,8 +86,8 @@ describe "conversations new" do
         conversation_elements[0].click
         wait_for_ajaximations
         reply_to_submission_comment
-        expect(ffj('.message-item-view').length).to eq (initial_message_count + 1)
-        expect(@submission.reload.submission_comments.count).to eq (initial_message_count + 1)
+        expect(ffj('.message-item-view').length).to eq(initial_message_count + 1)
+        expect(@submission.reload.submission_comments.count).to eq(initial_message_count + 1)
       end
 
       it 'marks unread on click', priority: "2", test_id: 197521 do
@@ -133,7 +133,7 @@ describe "conversations new" do
 
         it 'shows replies in the submission comments', priority: "2", test_id: pick_test_id(context, student: "2642301", teacher: "2642303") do
           reply_to_submission_comment
-          expect(ffj('.message-item-view').length).to eq (3)
+          expect(ffj('.message-item-view').length).to eq(3)
           expect(@submission.submission_comments.count).to eq(3)
         end
       end

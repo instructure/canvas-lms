@@ -26,7 +26,7 @@ module Lti::Ims::Providers
     attr_reader :context, :controller, :tool
 
     def self.unwrap(wrapped)
-      wrapped&.respond_to?(:unwrap) ? wrapped.unwrap : wrapped
+      wrapped.respond_to?(:unwrap) ? wrapped.unwrap : wrapped
     end
 
     def initialize(context, controller, tool)

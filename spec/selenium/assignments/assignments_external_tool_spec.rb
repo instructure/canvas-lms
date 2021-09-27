@@ -22,7 +22,7 @@ require_relative '../common'
 describe "external tool assignments" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     @t1 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool1", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 1')
     @t2 = factory_with_protected_attributes(@course.context_external_tools, :url => "http://www.justanexamplenotarealwebsite.com/tool2", :shared_secret => 'test123', :consumer_key => 'test123', :name => 'tool 2')

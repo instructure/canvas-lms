@@ -1582,7 +1582,7 @@ class Submission < ActiveRecord::Base
   def score_late_or_none(late_policy, points_possible, grading_type)
     raw_score = score_changed? || @regraded ? score : entered_score
     deducted = late_points_deducted(raw_score, late_policy, points_possible, grading_type)
-    new_score = raw_score && raw_score - deducted
+    new_score = raw_score && (raw_score - deducted)
     self.points_deducted = late? ? deducted : nil
     self.score = new_score
   end
@@ -1945,7 +1945,7 @@ class Submission < ActiveRecord::Base
     # since they're all being held on the assignment for now.
     attachments ||= []
     old_ids = (Array(self.attachment_ids || "").join(",")).split(",").map { |id| id.to_i }
-    write_attribute(:attachment_ids, attachments.select { |a| a && a.id && old_ids.include?(a.id) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map { |a| a.id }.join(","))
+    write_attribute(:attachment_ids, attachments.select { |a| (a && a.id && old_ids.include?(a.id)) || (a.recently_created? && a.context == self.assignment) || a.context != self.assignment }.map { |a| a.id }.join(","))
   end
 
   # someday code-archaeologists will wonder how this method came to be named

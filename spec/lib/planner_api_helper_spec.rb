@@ -51,7 +51,7 @@ describe PlannerApiHelper do
 
     describe "#sync_module_requirement_done" do
       it "sets module requirement as done when completed in planner for assignment" do
-        planner_override_model({ "plannable": @assignment, "marked_complete": true })
+        planner_override_model({ plannable: @assignment, marked_complete: true })
         sync_module_requirement_done(@assignment, @user, true)
         progression = @module1.find_or_create_progression(@user)
         expect(progression.finished_item?(@assignment_tag)).to eq true
@@ -59,14 +59,14 @@ describe PlannerApiHelper do
 
       it "sets module requirement as not done when un-completed in planner for assignment" do
         @assignment_tag.context_module_action(@user, :done)
-        planner_override_model({ "plannable": @assignment, "marked_complete": false })
+        planner_override_model({ plannable: @assignment, marked_complete: false })
         sync_module_requirement_done(@assignment, @user, false)
         progression = @module1.find_or_create_progression(@user)
         expect(progression.finished_item?(@assignment_tag)).to eq false
       end
 
       it "sets module requirement as done when completed in planner for wiki page" do
-        planner_override_model({ "plannable": @wiki_page, "marked_complete": true })
+        planner_override_model({ plannable: @wiki_page, marked_complete: true })
         sync_module_requirement_done(@wiki_page, @user, true)
         progression = @module1.find_or_create_progression(@user)
         expect(progression.finished_item?(@wiki_page_tag)).to eq true
@@ -74,7 +74,7 @@ describe PlannerApiHelper do
 
       it "sets module requirement as not done when un-completed in planner for wiki page" do
         @wiki_page_tag.context_module_action(@user, :done)
-        planner_override_model({ "plannable": @wiki_page, "marked_complete": false })
+        planner_override_model({ plannable: @wiki_page, marked_complete: false })
         sync_module_requirement_done(@wiki_page, @user, false)
         progression = @module1.find_or_create_progression(@user)
         expect(progression.finished_item?(@wiki_page_tag)).to eq false
@@ -87,9 +87,9 @@ describe PlannerApiHelper do
 
     describe "#sync_planner_completion" do
       it "updates existing override for assignment" do
-        planner_override_model({ "plannable": @assignment,
-                                 "marked_complete": false,
-                                 "dismissed": false })
+        planner_override_model({ plannable: @assignment,
+                                 marked_complete: false,
+                                 dismissed: false })
 
         override = sync_planner_completion(@assignment, @user, true)
         expect(override.marked_complete).to eq true
@@ -107,9 +107,9 @@ describe PlannerApiHelper do
       end
 
       it "updates existing override for wiki page" do
-        planner_override_model({ "plannable": @wiki_page,
-                                 "marked_complete": false,
-                                 "dismissed": false })
+        planner_override_model({ plannable: @wiki_page,
+                                 marked_complete: false,
+                                 dismissed: false })
 
         override = sync_planner_completion(@wiki_page, @user, true)
         expect(override.marked_complete).to eq true

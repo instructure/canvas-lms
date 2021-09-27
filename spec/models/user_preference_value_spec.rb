@@ -21,18 +21,18 @@
 require_relative "../sharding_spec_helper"
 
 describe UserPreferenceValue do
-  let (:regular_key) { :custom_colors }
-  let (:subbed_key) { :course_nicknames }
+  let(:regular_key) { :custom_colors }
+  let(:subbed_key) { :course_nicknames }
 
-  let (:sample_preferences) {
+  let(:sample_preferences) {
     { regular_key => [:arbitrary_data], subbed_key => { :a => 1, :b => [:other_stuff] } }
   }
 
-  let (:preexisting_user) {
+  let(:preexisting_user) {
     User.create!(:preferences => sample_preferences)
   }
 
-  let (:migrated_user) {
+  let(:migrated_user) {
     u = User.create!(:preferences => sample_preferences)
     u.migrate_preferences_if_needed
     u.save!
@@ -121,16 +121,16 @@ describe UserPreferenceValue do
   context "gradebook_column_size" do
     specs_require_sharding
 
-    let (:course1) { Course.create! }
-    let (:course2) { Course.create! }
-    let (:assignment1) { course1.assignments.create! }
-    let (:assignment2) { course2.assignments.create! }
-    let (:assignment_group1) { course1.assignment_groups.create! }
-    let (:assignment_group2) { course2.assignment_groups.create! }
-    let (:column1) { course1.custom_gradebook_columns.create!(:title => "1") }
-    let (:column2) { course2.custom_gradebook_columns.create!(:title => "2") }
+    let(:course1) { Course.create! }
+    let(:course2) { Course.create! }
+    let(:assignment1) { course1.assignments.create! }
+    let(:assignment2) { course2.assignments.create! }
+    let(:assignment_group1) { course1.assignment_groups.create! }
+    let(:assignment_group2) { course2.assignment_groups.create! }
+    let(:column1) { course1.custom_gradebook_columns.create!(:title => "1") }
+    let(:column2) { course2.custom_gradebook_columns.create!(:title => "2") }
 
-    let (:old_format) {
+    let(:old_format) {
       {
         "student" => "100",
         "assignment_#{assignment1.id}" => "10",

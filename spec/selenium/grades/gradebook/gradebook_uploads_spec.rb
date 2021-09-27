@@ -123,7 +123,7 @@ describe "Gradebook - uploads" do
     assignment_count = @course.assignments.count
     wait_for_new_page_load(true) { submit_form('#gradebook_grid_form') }
     run_jobs
-    expect(@course.assignments.count).to eql (assignment_count + 1)
+    expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
     submission = assignment.submissions.last
     expect(submission.score).to eq 0
@@ -157,7 +157,7 @@ describe "Gradebook - uploads" do
     assignment_count = @course.assignments.count
     wait_for_new_page_load { submit_form('#gradebook_grid_form') }
     run_jobs
-    expect(@course.assignments.count).to eql (assignment_count + 1)
+    expect(@course.assignments.count).to eql(assignment_count + 1)
     assignment = @course.assignments.order(:created_at).last
     expect(assignment.name).to eq "Assignment 2"
     expect(assignment.submissions.having_submission.count).to eql 0

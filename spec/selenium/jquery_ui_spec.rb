@@ -41,7 +41,7 @@ describe "jquery ui" do
     JS
   end
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     get "/"
   end

@@ -71,7 +71,7 @@ module DrDiff
         path = path[git_dir.length..-1] if git_dir
         severe = severe?(comment[:severity], severe_levels)
         next unless heavy ||
-                    severe && severe_anywhere ||
+                    (severe && severe_anywhere) ||
                     diff.relevant?(path, comment[:position], severe: severe) ||
                     comment[:corrected]
 

@@ -155,7 +155,7 @@ describe MicrosoftSync::GraphServiceHelpers do
 
       it 'truncates the description' do
         expect(graph_service).to \
-          receive(:create_education_class).with(hash_including(description: 'a' * 1021 + '...'))
+          receive(:create_education_class).with(hash_including(description: ('a' * 1021) + '...'))
         subject.create_education_class(@course)
       end
     end
@@ -213,7 +213,7 @@ describe MicrosoftSync::GraphServiceHelpers do
 
     it 'truncates course descriptions longer than 256 characters' do
       course_model(public_description: 'a' * 257)
-      expect_lms_ext_properties(lmsCourseDescription: 'a' * 253 + '...')
+      expect_lms_ext_properties(lmsCourseDescription: ('a' * 253) + '...')
       update_group
     end
 

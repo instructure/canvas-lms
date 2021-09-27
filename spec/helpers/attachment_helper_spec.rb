@@ -33,18 +33,18 @@ describe AttachmentHelper do
     @current_user = @student
     allow(@att).to receive(:crocodoc_available?).and_return(true)
     attrs = doc_preview_attributes(@att)
-    expect(attrs).to match /crocodoc_session/
-    expect(attrs).to match /#{@current_user.id}/
-    expect(attrs).to match /#{@att.id}/
+    expect(attrs).to match(/crocodoc_session/)
+    expect(attrs).to match(/#{@current_user.id}/)
+    expect(attrs).to match(/#{@att.id}/)
   end
 
   it "returns a valid canvadoc session url" do
     @current_user = @student
     allow(@att).to receive(:canvadocable?).and_return(true)
     attrs = doc_preview_attributes(@att)
-    expect(attrs).to match /canvadoc_session/
-    expect(attrs).to match /#{@current_user.id}/
-    expect(attrs).to match /#{@att.id}/
+    expect(attrs).to match(/canvadoc_session/)
+    expect(attrs).to match(/#{@current_user.id}/)
+    expect(attrs).to match(/#{@att.id}/)
   end
 
   it "includes anonymous_instructor_annotations in canvadoc url" do

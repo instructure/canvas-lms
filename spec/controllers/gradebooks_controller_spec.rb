@@ -1586,9 +1586,9 @@ describe GradebooksController do
       student2 = student_in_course(active_all: true, name: "Ron").user
       student3 = student_in_course(active_all: true, name: "Don").user
       @teacher.set_preference(:gradebook_settings, @course.global_id, {
-                                "sort_rows_by_column_id": "student",
-                                "sort_rows_by_setting_key": "name",
-                                "sort_rows_by_direction": "descending"
+                                sort_rows_by_column_id: "student",
+                                sort_rows_by_setting_key: "name",
+                                sort_rows_by_direction: "descending"
                               })
 
       user_session(@teacher)

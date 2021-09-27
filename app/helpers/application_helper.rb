@@ -293,7 +293,7 @@ module ApplicationHelper
 
   def css_variant(opts = {})
     variant = use_responsive_layout? ? 'responsive_layout' : 'new_styles'
-    use_high_contrast = @current_user && @current_user.prefers_high_contrast? || opts[:force_high_contrast]
+    use_high_contrast = (@current_user && @current_user.prefers_high_contrast?) || opts[:force_high_contrast]
     variant + (use_high_contrast ? '_high_contrast' : '_normal_contrast') + (I18n.rtl? ? '_rtl' : '')
   end
 

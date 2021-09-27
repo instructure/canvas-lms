@@ -370,7 +370,7 @@ class AssignmentOverride < ActiveRecord::Base
       self.assignment.created_at < 3.hours.ago &&
       (saved_change_to_workflow_state? ||
         saved_change_to_due_at_overridden? ||
-        due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save))
+        (due_at_overridden && !Assignment.due_dates_equal?(due_at, due_at_before_last_save)))
   end
 
   def set_title_if_needed

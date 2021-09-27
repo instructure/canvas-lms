@@ -241,7 +241,7 @@ class ContextModule < ActiveRecord::Base
   # kept in the same module.
   def duplicate_content_tag(original_content_tag)
     new_tag = duplicate_content_tag_base_model(original_content_tag)
-    if original_content_tag.content&.respond_to?(:duplicate)
+    if original_content_tag.content.respond_to?(:duplicate)
       new_tag.content = original_content_tag.content.duplicate
       # If we have multiple assignments (e.g.) make sure they each get unused titles.
       # A title isn't marked used if the assignment hasn't been saved yet.
@@ -634,7 +634,7 @@ class ContextModule < ActiveRecord::Base
 
   def add_item(params, added_item = nil, opts = {})
     params[:type] = params[:type].underscore if params[:type]
-    position = opts[:position] || (self.content_tags.not_deleted.maximum(:position) || 0) + 1
+    position = opts[:position] || ((self.content_tags.not_deleted.maximum(:position) || 0) + 1)
     position = [position, params[:position].to_i].max if params[:position]
     if params[:type] == "wiki_page" || params[:type] == "page"
       item = opts[:wiki_page] || self.context.wiki_pages.where(id: params[:id]).first

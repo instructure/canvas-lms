@@ -39,7 +39,7 @@ describe CanvasSlug do
     end
 
     it "prepends a provided purpose" do
-      expect(subject.generate("foobar")).to match /\Afoobar-\w{4}\z/
+      expect(subject.generate("foobar")).to match(/\Afoobar-\w{4}\z/)
     end
   end
 end

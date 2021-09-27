@@ -903,9 +903,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def can_be_proxied?
-    mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i ||
-      mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i ||
-      content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i
+    (mime_class == 'html' && size < Setting.get('max_inline_html_proxy_size', 128 * 1024).to_i) ||
+      (mime_class == 'flash' && size < Setting.get('max_swf_proxy_size', 1024 * 1024).to_i) ||
+      (content_type == 'text/css' && size < Setting.get('max_css_proxy_size', 64 * 1024).to_i)
   end
 
   def local_storage_path
@@ -1028,7 +1028,7 @@ class Attachment < ActiveRecord::Base
     block ||= lambda { |str, len| str[0...len] }
     ext_index = filename.rindex('.')
     if ext_index
-      ext = block.call(filename[ext_index..-1], len / 2 + 1)
+      ext = block.call(filename[ext_index..-1], (len / 2) + 1)
       base = block.call(filename[0...ext_index], len - ext.length)
       base + ext
     else

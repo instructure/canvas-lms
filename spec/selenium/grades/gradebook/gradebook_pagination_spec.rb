@@ -47,6 +47,6 @@ describe "Gradebook" do
   end
 
   it "works for >2 pages" do
-    test_n_students @page_size * 2 + 1
+    test_n_students (@page_size * 2) + 1
   end
 end

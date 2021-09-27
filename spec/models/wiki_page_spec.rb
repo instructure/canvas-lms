@@ -170,7 +170,7 @@ describe WikiPage do
     p1 = @course.wiki_pages.create!(:title => "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki_pages.create!(:title => p1.title)
     p3 = @course.wiki_pages.create!(:title => p1.title)
-    p4 = @course.wiki_pages.create!(:title => "a" * (WikiPage::TITLE_LENGTH - 2) + "-2")
+    p4 = @course.wiki_pages.create!(:title => ("a" * (WikiPage::TITLE_LENGTH - 2)) + "-2")
     expect(p2.title.length).to eq WikiPage::TITLE_LENGTH
     expect(p2.title.end_with?('-2')).to be_truthy
     expect(p3.title.length).to eq WikiPage::TITLE_LENGTH
@@ -539,7 +539,7 @@ describe WikiPage do
   end
 
   describe "destroy" do
-    before (:once) { course_factory }
+    before(:once) { course_factory }
 
     it "destroys its assignment if enabled" do
       @course.enable_feature!(:conditional_release)
@@ -567,7 +567,7 @@ describe WikiPage do
   end
 
   describe "restore" do
-    before (:once) { course_factory }
+    before(:once) { course_factory }
 
     it "restores to unpublished state" do
       @page = @course.wiki_pages.create! title: 'dot dot dot'

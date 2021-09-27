@@ -23,7 +23,7 @@ require 'nokogiri'
 describe CC::BasicLTILinks do
   subject { (Class.new { include CC::BasicLTILinks }).new }
 
-  let (:tool) do
+  let(:tool) do
     ContextExternalTool.new
   end
 

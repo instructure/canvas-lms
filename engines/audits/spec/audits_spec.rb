@@ -29,8 +29,8 @@ RSpec.describe Audits do
 
   def inject_auditors_settings(yaml_string)
     DynamicSettings.fallback_data = {
-      "private": {
-        "canvas": {
+      private: {
+        canvas: {
           "auditors.yml": yaml_string
         }
       }

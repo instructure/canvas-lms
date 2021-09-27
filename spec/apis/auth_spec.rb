@@ -354,14 +354,14 @@ describe "API Authentication", type: :request do
       it "requires the developer key to have a redirect_uri" do
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response" }
         expect(response).to be_client_error
-        expect(response.body).to match /redirect_uri/
+        expect(response.body).to match(/redirect_uri/)
       end
 
       it "requires the redirect_uri domains to match" do
         @key.update_attribute :redirect_uri, 'http://www.example2.com/oauth2response'
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response" }
         expect(response).to be_client_error
-        expect(response.body).to match /redirect_uri/
+        expect(response.body).to match(/redirect_uri/)
 
         @key.update_attribute :redirect_uri, 'http://www.example.com/oauth2response'
         get "/login/oauth2/auth", params: { :response_type => 'code', :client_id => @client_id, :redirect_uri => "http://www.example.com/oauth2response" }

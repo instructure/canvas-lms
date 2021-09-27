@@ -22,12 +22,12 @@ module CanvasStringex
   require "lucky_sneaks/unidecoder"
   require "lucky_sneaks/acts_as_url"
 
-  String.send :include, LuckySneaks::StringExtensions
+  String.include LuckySneaks::StringExtensions
 
   if defined?(ActiveRecord)
     # Prevents uninitialized constant ActiveRecord::DatabaseConfigurations::ConnectionUrlResolver::URI
     # (probably only relevant for specs in practice)
     require 'uri'
-    ActiveRecord::Base.send :include, LuckySneaks::ActsAsUrl
+    ActiveRecord::Base.include LuckySneaks::ActsAsUrl
   end
 end

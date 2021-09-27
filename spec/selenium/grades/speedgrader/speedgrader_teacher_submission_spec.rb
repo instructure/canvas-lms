@@ -352,7 +352,7 @@ describe "speed grader submissions" do
         get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
         wait_for_ajaximations
 
-        expect(ff('#submission_files_list .turnitin_similarity_score').map(&:text).join).to match /96%/
+        expect(ff('#submission_files_list .turnitin_similarity_score').map(&:text).join).to match(/96%/)
         expect(f('#submission_files_list .submission_pending')).not_to be_nil
       end
 

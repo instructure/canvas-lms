@@ -1697,7 +1697,7 @@ class CoursesController < ApplicationController
         row = []
         row << opc.user.last_name
         row << opc.user.first_name
-        row << '="' + opc.code + '"'
+        row << ('="' + opc.code + '"')
         row << opc.expires_at
         csv << row
       end
@@ -1772,7 +1772,7 @@ class CoursesController < ApplicationController
         enrollment = nil
         return false
       end
-    elsif !@current_user && enrollment.user.registered? || !enrollment.user.email_channel
+    elsif (!@current_user && enrollment.user.registered?) || !enrollment.user.email_channel
       session[:return_to] = course_url(@context.id)
       flash[:notice] = t('notices.login_to_accept', "You'll need to log in before you can accept the enrollment.")
       return redirect_to login_url(:force_login => 1) if @current_user
@@ -2869,8 +2869,8 @@ class CoursesController < ApplicationController
       end
       if params_for_update.key?(:template)
         template = value_to_boolean(params_for_update.delete(:template))
-        if template && @course.grants_right?(@current_user, session, :add_course_template) ||
-           !template && @course.grants_right?(@current_user, session, :delete_course_template)
+        if (template && @course.grants_right?(@current_user, session, :add_course_template)) ||
+           (!template && @course.grants_right?(@current_user, session, :delete_course_template))
           @course.template = template
         end
       end

@@ -72,7 +72,7 @@ describe SessionToken do
     token.signature = Canvas::Security.hmac_sha1(token.signature_string)
     expect(SessionToken.parse(token.to_s)).not_to be_valid
 
-    token.created_at += (2 * SessionToken::VALIDITY_PERIOD + 10).seconds
+    token.created_at += ((2 * SessionToken::VALIDITY_PERIOD) + 10).seconds
     token.signature = Canvas::Security.hmac_sha1(token.signature_string)
     expect(SessionToken.parse(token.to_s)).not_to be_valid
 

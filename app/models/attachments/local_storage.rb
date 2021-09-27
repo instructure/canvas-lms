@@ -29,7 +29,7 @@ class Attachments::LocalStorage
   end
 
   def exists?
-    File.exists?(attachment.full_filename)
+    File.exist?(attachment.full_filename)
   end
 
   def change_namespace(old_full_filename)

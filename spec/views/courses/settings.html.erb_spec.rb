@@ -96,8 +96,8 @@ describe "courses/settings.html.erb" do
       assign(:current_user, admin)
       assign(:publishing_enabled, true)
       render
-      expect(response.body).to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
-      expect(response.body).to match /<div id="tab-grade-publishing">/
+      expect(response.body).to match(/<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/)
+      expect(response.body).to match(/<div id="tab-grade-publishing">/)
     end
 
     it "does not show grade export when disabled" do
@@ -106,8 +106,8 @@ describe "courses/settings.html.erb" do
       assign(:current_user, admin)
       assign(:publishing_enabled, false)
       render
-      expect(response.body).not_to match /<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/
-      expect(response.body).not_to match /<div id="tab-grade-publishing">/
+      expect(response.body).not_to match(/<a href="#tab-grade-publishing" id="tab-grade-publishing-link">/)
+      expect(response.body).not_to match(/<div id="tab-grade-publishing">/)
     end
   end
 

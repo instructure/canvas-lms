@@ -1256,14 +1256,14 @@ describe EnrollmentsApiController, type: :request do
             json = api_call(:get, @path, @params)
             json_user_ids = json.map { |user| user["user_id"] }
             section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
-            expect(json.length).to eq (@course.course_sections.first.enrollments.length)
+            expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             expect(json_user_ids).to match_array(section_user_ids)
           end
 
           it "filters by a list of sis_section_ids" do
             @params[:sis_section_id] = ['SIS123', 'SIS456']
             json = api_call(:get, @path, @params)
-            expect(json.length).to eq (@course.course_sections.first.enrollments.length)
+            expect(json.length).to eq(@course.course_sections.first.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
             section_user_ids = @course.course_sections.first.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(section_user_ids)
@@ -1284,7 +1284,7 @@ describe EnrollmentsApiController, type: :request do
           it "filters by a single sis_course_id" do
             @params[:sis_course_id] = 'SIS123'
             json = api_call(:get, @path, @params)
-            expect(json.length).to eq (@course.enrollments.length)
+            expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
             course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
@@ -1293,7 +1293,7 @@ describe EnrollmentsApiController, type: :request do
           it "filters by a list of sis_course_ids" do
             @params[:sis_course_id] = ['SIS123', 'LULZ']
             json = api_call(:get, @path, @params)
-            expect(json.length).to eq (@course.enrollments.length)
+            expect(json.length).to eq(@course.enrollments.length)
             json_user_ids = json.map { |user| user["user_id"] }
             course_user_ids = @course.enrollments.map { |e| e.user_id }
             expect(json_user_ids).to match_array(course_user_ids)
@@ -2312,18 +2312,18 @@ describe EnrollmentsApiController, type: :request do
           end
 
           link_header = response.headers['Link'].split(',')
-          expect(link_header[0]).to match /page=1&per_page=1/ # current page
-          expect(link_header[1]).to match /page=2&per_page=1/ # next page
-          expect(link_header[2]).to match /page=1&per_page=1/ # first page
-          expect(link_header[3]).to match /page=2&per_page=1/ # last page
+          expect(link_header[0]).to match(/page=1&per_page=1/) # current page
+          expect(link_header[1]).to match(/page=2&per_page=1/) # next page
+          expect(link_header[2]).to match(/page=1&per_page=1/) # first page
+          expect(link_header[3]).to match(/page=2&per_page=1/) # last page
           expect(json).to eql [enrollments[0]]
 
           json = api_call(:get, "#{@path}?page=2&per_page=1", @params.merge(:page => 2.to_param, :per_page => 1.to_param))
           link_header = response.headers['Link'].split(',')
-          expect(link_header[0]).to match /page=2&per_page=1/ # current page
-          expect(link_header[1]).to match /page=1&per_page=1/ # prev page
-          expect(link_header[2]).to match /page=1&per_page=1/ # first page
-          expect(link_header[3]).to match /page=2&per_page=1/ # last page
+          expect(link_header[0]).to match(/page=2&per_page=1/) # current page
+          expect(link_header[1]).to match(/page=1&per_page=1/) # prev page
+          expect(link_header[2]).to match(/page=1&per_page=1/) # first page
+          expect(link_header[3]).to match(/page=2&per_page=1/) # last page
           expect(json).to eql [enrollments[1]]
         end
       end
@@ -2374,18 +2374,18 @@ describe EnrollmentsApiController, type: :request do
             h
           end
           link_header = response.headers['Link'].split(',')
-          expect(link_header[0]).to match /page=.*&per_page=1/ # current page
+          expect(link_header[0]).to match(/page=.*&per_page=1/) # current page
           md = link_header[1].match(/page=(.*)&per_page=1/) # next page
           bookmark = md[1]
           expect(bookmark).to be_present
-          expect(link_header[2]).to match /page=.*&per_page=1/ # first page
+          expect(link_header[2]).to match(/page=.*&per_page=1/) # first page
           expect(json).to eql [enrollments[0]]
 
           json = api_call(:get, "#{@path}?page=#{bookmark}&per_page=1", @params.merge(:page => bookmark, :per_page => 1.to_param))
           link_header = response.headers['Link'].split(',')
-          expect(link_header[0]).to match /page=#{bookmark}&per_page=1/ # current page
-          expect(link_header[1]).to match /page=.*&per_page=1/ # first page
-          expect(link_header[2]).to match /page=.*&per_page=1/ # last page
+          expect(link_header[0]).to match(/page=#{bookmark}&per_page=1/) # current page
+          expect(link_header[1]).to match(/page=.*&per_page=1/) # first page
+          expect(link_header[2]).to match(/page=.*&per_page=1/) # last page
           expect(json).to eql [enrollments[1]]
         end
       end

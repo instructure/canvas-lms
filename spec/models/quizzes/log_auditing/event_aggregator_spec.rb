@@ -64,7 +64,7 @@ describe Quizzes::LogAuditing::EventAggregator do
     }
     # Build out each event in pairs to test that we are aggregating correctly
     event_types.each.with_index do |event_type, i|
-      build_an_event(event_type, event_data_examples[event_type][0], i * 2 - 1)
+      build_an_event(event_type, event_data_examples[event_type][0], (i * 2) - 1)
       build_an_event(event_type, event_data_examples[event_type][1], i * 2)
     end
     @events = Quizzes::QuizSubmissionEvent.all

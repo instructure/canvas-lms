@@ -258,7 +258,7 @@ class AccountNotification < ActiveRecord::Base
     # we just need a stable reference point, doesn't matter what it is, so
     # let's use unix epoch
     start_time = Time.at(0).utc
-    months_since_start_time = (current_time.year - start_time.year) * 12 + (current_time.month - start_time.month)
+    months_since_start_time = ((current_time.year - start_time.year) * 12) + (current_time.month - start_time.month)
     periods_since_start_time = months_since_start_time / months_in_period
     months_into_current_period = months_since_start_time % months_in_period
     mod_value = (Random.new(periods_since_start_time).rand(months_in_period) + months_into_current_period) % months_in_period

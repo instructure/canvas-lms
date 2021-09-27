@@ -71,11 +71,11 @@ class UserMerge
       target_user.preferences = target_user.preferences.merge(prefs)
       target_user.save if target_user.changed?
 
-      { 'access_token_ids': from_user.access_tokens.shard(from_user).pluck(:id),
-        'conversation_messages_ids': ConversationMessage.where(author_id: from_user, conversation_id: nil).shard(from_user).pluck(:id),
-        'conversation_ids': from_user.all_conversations.shard(from_user).pluck(:id),
-        'ignore_ids': from_user.ignores.shard(from_user).pluck(:id),
-        'user_past_lti_id_ids': from_user.past_lti_ids.shard(from_user).pluck(:id),
+      { access_token_ids: from_user.access_tokens.shard(from_user).pluck(:id),
+        conversation_messages_ids: ConversationMessage.where(author_id: from_user, conversation_id: nil).shard(from_user).pluck(:id),
+        conversation_ids: from_user.all_conversations.shard(from_user).pluck(:id),
+        ignore_ids: from_user.ignores.shard(from_user).pluck(:id),
+        user_past_lti_id_ids: from_user.past_lti_ids.shard(from_user).pluck(:id),
         'Polling::Poll_ids': from_user.polls.shard(from_user).pluck(:id) }.each do |k, ids|
         merge_data.items.create!(user: from_user, item_type: k, item: ids) unless ids.empty?
       end

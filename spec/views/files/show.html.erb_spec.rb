@@ -38,6 +38,6 @@ describe "/files/index" do
     attachment.save!
     assign(:attachment, attachment)
     render "files/show"
-    expect(rendered).to match /This file is currently locked/
+    expect(rendered).to match(/This file is currently locked/)
   end
 end

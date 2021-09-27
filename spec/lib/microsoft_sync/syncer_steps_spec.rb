@@ -929,7 +929,7 @@ describe MicrosoftSync::SyncerSteps do
     it 'only serializes the group so other values are reloaded when the job runs' do
       syncer_steps.send(:account_settings)
       syncer_steps.send(:tenant)
-      expect(syncer_steps.instance_variables).to include *%i[@group @account_settings @tenant]
+      expect(syncer_steps.instance_variables).to include(*%i[@group @account_settings @tenant])
       serialized = syncer_steps.to_yaml
       deserialized = YAML.unsafe_load(serialized)
       expect(deserialized.instance_variables).to eq %i[@group]

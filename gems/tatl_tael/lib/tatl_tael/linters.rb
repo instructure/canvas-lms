@@ -95,4 +95,4 @@ module TatlTael
   end
 end
 
-Dir[File.dirname(__FILE__) + "/linters/**/*_linter.rb"].each { |file| require file }
+Dir[File.dirname(__FILE__) + "/linters/**/*_linter.rb"].sort.each { |file| require file }

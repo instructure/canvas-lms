@@ -154,7 +154,7 @@ module GradebooksHelper
   end
 
   def pass_fail_icon(score, grade)
-    if score && score > 0 || grade == 'complete'
+    if (score && score > 0) || grade == 'complete'
       icon_attrs = pass_icon_attributes
     else
       icon_attrs = fail_icon_attributes

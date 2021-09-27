@@ -160,7 +160,7 @@ module IncomingMail
     end
 
     def parse_tag(tag)
-      match = tag.match /^(\h+)-([0-9~]+)(?:-([0-9]+))?$/
+      match = tag.match(/^(\h+)-([0-9~]+)(?:-([0-9]+))?$/)
       return match[1], match[2], match[3] if match
     end
 

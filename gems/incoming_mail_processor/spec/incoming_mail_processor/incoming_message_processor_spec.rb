@@ -236,7 +236,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
 
     context "reporting stats" do
-      let (:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
+      let(:message) { Mail.new(content_type: 'text/plain; charset=UTF-8', body: "hello") }
 
       it "increments the processed count" do
         expect(InstStatsd::Statsd).to receive(:increment).with("incoming_mail_processor.incoming_message_processed.",

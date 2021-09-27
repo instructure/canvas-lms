@@ -67,7 +67,7 @@ describe OutcomesService::MigrationExtractor do
           cm.add_imported_item(global_outcome)
           outcomes = subject.learning_outcomes(@course)
           expect(outcomes.length).to eq 1
-          expect(outcomes[0][:'$canvas_learning_outcome_id']).to eq course_outcome.id
+          expect(outcomes[0][:$canvas_learning_outcome_id]).to eq course_outcome.id
         end
       end
     end

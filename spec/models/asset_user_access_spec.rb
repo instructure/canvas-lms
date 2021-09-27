@@ -403,7 +403,7 @@ describe AssetUserAccess do
       subject.participate_score = 4
       allow(subject).to receive(:asset_group_code).and_return('quizzes')
 
-      expect(subject.corrected_view_score).to eq -4
+      expect(subject.corrected_view_score).to eq(-4)
     end
   end
 

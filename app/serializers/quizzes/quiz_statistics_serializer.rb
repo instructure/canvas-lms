@@ -31,50 +31,40 @@ module Quizzes
 
     root :quiz_statistics
 
-    attributes *[
-      # the id is really only included in JSON-API and only because the spec
-      # requires it, this is because the output of this serializer is a mix of
-      # two entities, an id doesn't make much sense, but we'll use the id of the
-      # StudentAnalysis when needed
-      :id,
-      :url,
-      :html_url,
-
-      # whether any of the participants has taken the quiz more than one time
-      :multiple_attempts_exist,
-
-      # the time of the generation of the analysis (the earliest one)
-      :generated_at,
-
-      # whether the statistics were based on earlier and current quiz submissions
-      #
-      # PS: this is always true for item analysis
-      :includes_all_versions,
-
-      # whether statistics report includes sis ids
-      # always false for item analysis
-      :includes_sis_ids,
-
-      :points_possible,
-      :anonymous_survey,
-
-      :speed_grader_url,
-      :quiz_submissions_zip_url,
-
-      # an aggregate of question stats from both student and item analysis
-      :question_statistics,
-
-      # submission-related statistics (extracted from student analysis):
-      #
-      #   - correct_count_average
-      #   - incorrect_count_average
-      #   - duration_average
-      #   - score_average
-      #   - score_high
-      #   - score_low
-      #   - score_stdev
-      :submission_statistics,
-    ]
+    # the id is really only included in JSON-API and only because the spec
+    # requires it, this is because the output of this serializer is a mix of
+    # two entities, an id doesn't make much sense, but we'll use the id of the
+    # StudentAnalysis when needed
+    attributes :id,
+               :url,
+               :html_url,
+               # whether any of the participants has taken the quiz more than one time
+               :multiple_attempts_exist,
+               # the time of the generation of the analysis (the earliest one)
+               :generated_at,
+               # whether the statistics were based on earlier and current quiz submissions
+               #
+               # PS: this is always true for item analysis
+               :includes_all_versions,
+               # whether statistics report includes sis ids
+               # always false for item analysis
+               :includes_sis_ids,
+               :points_possible,
+               :anonymous_survey,
+               :speed_grader_url,
+               :quiz_submissions_zip_url,
+               # an aggregate of question stats from both student and item analysis
+               :question_statistics,
+               # submission-related statistics (extracted from student analysis):
+               #
+               #   - correct_count_average
+               #   - incorrect_count_average
+               #   - duration_average
+               #   - score_average
+               #   - score_high
+               #   - score_low
+               #   - score_stdev
+               :submission_statistics
 
     def_delegators :@controller,
                    :course_quiz_statistics_url,

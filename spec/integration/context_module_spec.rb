@@ -271,8 +271,8 @@ describe ContextModule do
         expect(response).to be_successful
         body2 = Nokogiri::HTML5(response.body)
 
-        expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /4am/
-        expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match /7am/
+        expect(body1.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match(/4am/)
+        expect(body2.at_css("#context_module_content_#{mod.id} .unlock_details").text).to match(/7am/)
       end
     end
   end

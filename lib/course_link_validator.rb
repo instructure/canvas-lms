@@ -250,7 +250,7 @@ class CourseLinkValidator
     path = path.chomp("/")
 
     @route_set ||= ::Rails.application.routes.set.routes.select { |r| r.verb === "GET" }
-    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && File.exists?(File.join(Rails.root, "public", path)))
+    @route_set.any? { |r| r.path.match(path) } || (!Pathname(path).each_filename.include?('..') && File.exist?(File.join(Rails.root, "public", path)))
   end
 
   # makes sure that links to course objects exist and are in a visible state

@@ -28,7 +28,7 @@ module AvatarHelper
     if session["reported_#{user_id}"] && !is_admin && !(user && user.avatar_state == :approved)
       ["/images/messages/avatar-50.png", '']
     else
-      avatar_settings = @domain_root_account && @domain_root_account.settings[:avatars] || 'enabled'
+      avatar_settings = (@domain_root_account && @domain_root_account.settings[:avatars]) || 'enabled'
       user_id = Shard.global_id_for(user_id)
       user_shard = Shard.shard_for(user_id)
       image_url, alt_tag = user_shard.activate do
@@ -103,7 +103,7 @@ module AvatarHelper
     default_avatar = use_fallback ? User.avatar_fallback_url(User.default_avatar_fallback, request) : nil
     url = if avatars_enabled_for_user?(user, root_account: root_account)
             user.avatar_url(nil,
-                            (root_account && root_account.settings[:avatars] || 'enabled'),
+                            ((root_account && root_account.settings[:avatars]) || 'enabled'),
                             default_avatar,
                             request,
                             use_fallback)

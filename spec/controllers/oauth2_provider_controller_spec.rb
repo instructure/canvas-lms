@@ -31,14 +31,14 @@ describe Oauth2ProviderController do
     it 'renders a 401 when there is no client_id' do
       get :auth
       assert_status(401)
-      expect(response.body).to match /unknown client/
+      expect(response.body).to match(/unknown client/)
       expect(response['WWW-Authenticate']).to_not be_blank
     end
 
     it 'renders 400 on a bad redirect_uri' do
       get :auth, params: { :client_id => key.id }
       assert_status(400)
-      expect(response.body).to match /redirect_uri does not match/
+      expect(response.body).to match(/redirect_uri does not match/)
     end
 
     context 'with invalid scopes' do

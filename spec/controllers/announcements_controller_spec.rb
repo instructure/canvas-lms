@@ -78,7 +78,7 @@ describe AnnouncementsController do
 
     it "requires authorization" do
       get 'public_feed', :format => 'atom', params: { :feed_code => @enrollment.feed_code + 'x' }
-      expect(assigns[:problem]).to match /The verification code does not match/
+      expect(assigns[:problem]).to match(/The verification code does not match/)
     end
 
     it "includes absolute path for rel='self' link" do

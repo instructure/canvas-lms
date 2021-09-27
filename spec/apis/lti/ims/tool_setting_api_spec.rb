@@ -25,7 +25,7 @@ module Lti
   module Ims
     describe ToolSettingController, type: :request do
       let(:account) { Account.new }
-      let (:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
+      let(:product_family) { ProductFamily.create(vendor_code: '123', product_code: 'abc', vendor_name: 'acme', root_account: account) }
       let(:tool_proxy) do
         ToolProxy.create!(
           context: account,

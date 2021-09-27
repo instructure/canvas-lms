@@ -334,7 +334,7 @@ describe CommunicationChannel do
       @cc.send_confirmation!(account)
       message = Message.where(:communication_channel_id => @cc, :notification_id => notification).first
       expect(message).not_to be_nil
-      expect(message.body).to match /someserver.com/
+      expect(message.body).to match(/someserver.com/)
     end
   end
 

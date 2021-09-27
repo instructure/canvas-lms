@@ -172,7 +172,7 @@ module FeatureFlags
     # if this feature requires root account opt-in, reject a default or site admin flag
     # if the context is beneath a root account
     if retval && (retval.state == Feature::STATE_DEFAULT_OFF || retval.hidden?) && feature_def.root_opt_in && !is_site_admin &&
-       (retval.default? || retval.context_type == 'Account' && retval.context_id == Account.site_admin.id)
+       (retval.default? || (retval.context_type == 'Account' && retval.context_id == Account.site_admin.id))
       if is_root_account
         # create a virtual feature flag in corresponding default state state
         retval = self.feature_flags.temp_record feature: feature, state: 'off' unless retval.hidden?

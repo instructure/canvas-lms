@@ -221,7 +221,7 @@ describe TermsApiController, type: :request do
     it "includes overrides by default if requested" do
       @term.set_overrides(@account, 'StudentEnrollment' => { end_at: "2017-01-20T00:00:00Z" })
       json = get_term
-      expect(json['overrides']).to eq ({ "StudentEnrollment" => { "start_at" => nil, "end_at" => "2017-01-20T00:00:00Z" } })
+      expect(json['overrides']).to eq({ "StudentEnrollment" => { "start_at" => nil, "end_at" => "2017-01-20T00:00:00Z" } })
     end
 
     describe "authorization" do
@@ -458,8 +458,8 @@ describe TermsController, type: :request do
         api_call(:put, "/api/v1/accounts/#{@account.id}/terms/#{@term1.id}",
                  { controller: 'terms', action: 'update', format: 'json',
                    account_id: @account.to_param, id: @term1.to_param },
-                 { enrollment_term: { overrides: { 'ObserverEnrollment': {
-                   'start_at': '2017-01-17T20:00:00Z', 'end_at': '2017-01-17T20:00:00Z'
+                 { enrollment_term: { overrides: { ObserverEnrollment: {
+                   start_at: '2017-01-17T20:00:00Z', end_at: '2017-01-17T20:00:00Z'
                  } } } },
                  {},
                  { expected_status: 400 })

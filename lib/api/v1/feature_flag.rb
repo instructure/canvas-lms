@@ -51,7 +51,7 @@ module Api::V1::FeatureFlag
       # return 'hidden' if the feature is hidden or if this flag is the one that unhides it
       # (so removing it would re-hide the feature)
       hash['hidden'] = feature_flag.hidden? ||
-                       !feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?
+                       (!feature_flag.default? && feature_flag.context == context && feature_flag.unhides_feature?)
     end
     # To allow for determinations of when to delete vs update
     hash['parent_state'] = context.lookup_feature_flag(feature_flag.feature, skip_cache: true, inherited_only: true)&.state

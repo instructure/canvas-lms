@@ -106,7 +106,7 @@ class NotificationEndpoint < ActiveRecord::Base
         # is happening.
         endpoint_updated = false
         if retried
-          raise FailedSnsInteraction, "Unable to create or reassign SNS endpoint for access_token #{access_token.global_id.to_s}"
+          raise FailedSnsInteraction, "Unable to create or reassign SNS endpoint for access_token #{access_token.global_id}"
         end
 
         retried = true

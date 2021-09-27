@@ -615,7 +615,7 @@ class ContentMigration < ActiveRecord::Base
       self.update_master_migration('failed') if self.for_master_course_import?
       raise e
     ensure
-      File.delete(all_files_path) if all_files_path && File.exists?(all_files_path)
+      File.delete(all_files_path) if all_files_path && File.exist?(all_files_path)
       clear_migration_data
     end
   end

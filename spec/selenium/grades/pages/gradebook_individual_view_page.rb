@@ -197,7 +197,7 @@ class GradebookIndividualViewPage
 
     def drop_lowest(course, num_assignment)
       ag = course.assignment_groups.first
-      ag.rules_hash = { "drop_lowest": num_assignment }
+      ag.rules_hash = { drop_lowest: num_assignment }
       ag.save!
     end
 

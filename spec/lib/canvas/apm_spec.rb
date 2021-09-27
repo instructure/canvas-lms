@@ -29,8 +29,8 @@ describe Canvas::Apm do
 
   def inject_apm_settings(yaml_string)
     Canvas::DynamicSettings.fallback_data = {
-      "private": {
-        "canvas": {
+      private: {
+        canvas: {
           "datadog_apm.yml": yaml_string
         }
       }
@@ -156,8 +156,8 @@ describe Canvas::Apm do
     around do |example|
       Canvas::Apm.reset!
       Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
+        private: {
+          canvas: {
             "datadog_apm.yml": "sample_rate: 1.0\nhost_sample_rate: 1.0"
           }
         }
@@ -208,8 +208,8 @@ describe Canvas::Apm do
     it 'still yields if there is no configuration' do
       Canvas::Apm.reset!
       Canvas::DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
+        private: {
+          canvas: {
             "datadog_apm.yml": "sample_rate: 0.0\nhost_sample_rate: 0.0"
           }
         }

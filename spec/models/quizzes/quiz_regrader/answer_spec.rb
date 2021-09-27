@@ -197,7 +197,7 @@ describe Quizzes::QuizRegrader::Answer do
       it 'returns -points if prev correct but wrong after regrading' do
         mark_original_answer_as!(:correct)
         score_question_as!(:wrong)
-        expect(wrapper.regrade!).to eq -points
+        expect(wrapper.regrade!).to eq(-points)
         assert_answer_has_regrade_option!('current_correct_only')
       end
 

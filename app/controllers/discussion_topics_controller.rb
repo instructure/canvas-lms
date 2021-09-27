@@ -1533,7 +1533,7 @@ class DiscussionTopicsController < ApplicationController
 
   def handle_assignment_edit_params(hash)
     hash[:title] = params[:title] if params[:title]
-    if params.slice(*[:due_at, :points_possible, :assignment_group_id]).present?
+    if params.slice(:due_at, :points_possible, :assignment_group_id).present?
       if hash[:assignment].nil? && @context.respond_to?(:assignments) && @context.assignments.temp_record.grants_right?(@current_user, session, :create)
         hash[:assignment] ||= {}
       end

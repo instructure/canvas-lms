@@ -22,7 +22,7 @@ require_relative '../common'
 describe "assignments turn it in" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     account = Account.default
     account.turnitin_account_id = 'asdf'

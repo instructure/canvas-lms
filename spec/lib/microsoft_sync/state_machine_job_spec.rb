@@ -384,7 +384,7 @@ module MicrosoftSync
               let(:steps_object) { StateMachineJobTestSteps2.new(2, max_delay + 3.minutes) }
 
               it 'clips the delay the maximum' do
-                expect(run_ats).to eq([nil, nil] + [max_delay.from_now] * 4)
+                expect(run_ats).to eq([nil, nil] + ([max_delay.from_now] * 4))
               end
             end
 

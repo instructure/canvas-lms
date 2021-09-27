@@ -376,8 +376,8 @@ module Api::V1::Assignment
       if should_show_statistics && (stats = assignment&.score_statistic)
         hash["score_statistics"] = {
           'min' => stats.minimum.to_f.round(1),
-          'max': stats.maximum.to_f.round(1),
-          'mean': stats.mean.to_f.round(1)
+          'max' => stats.maximum.to_f.round(1),
+          'mean' => stats.mean.to_f.round(1)
         }
       end
     end

@@ -30,8 +30,8 @@ describe Auditors do
 
   def inject_auditors_settings(yaml_string)
     Canvas::DynamicSettings.fallback_data = {
-      "private": {
-        "canvas": {
+      private: {
+        canvas: {
           "auditors.yml": yaml_string
         }
       }

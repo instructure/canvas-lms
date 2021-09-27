@@ -124,7 +124,7 @@ module Types
           if !apply_overrides && course.grants_any_right?(current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
             assignment.send(field_name)
           else
-            OverrideAssignmentLoader.for(current_user).load(assignment).then &field_name
+            OverrideAssignmentLoader.for(current_user).load(assignment).then(&field_name)
           end
         end
       end

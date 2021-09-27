@@ -24,7 +24,7 @@ module CanvasPartman
         max_id = base_class.maximum(base_class.partitioning_field)
         return ensure_partitions(advance_partitions) if max_id.nil?
 
-        (0..max_id / base_class.partition_size + advance_partitions).each do |index|
+        (0..(max_id / base_class.partition_size) + advance_partitions).each do |index|
           create_partition(index * base_class.partition_size, graceful: true)
         end
       end

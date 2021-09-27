@@ -515,7 +515,7 @@ RSpec.describe ApplicationController do
       expect(HostUrl).to receive(:file_host_with_shard).with(42, '').and_return(['myfiles', Shard.default])
       controller.instance_variable_set(:@domain_root_account, 42)
       url = controller.send(:safe_domain_file_url, @attachment)
-      expect(url).to match /myfiles/
+      expect(url).to match(/myfiles/)
     end
 
     it "includes :download=>1 in inline urls for relative contexts" do
@@ -792,7 +792,7 @@ RSpec.describe ApplicationController do
       let(:course) { course_model }
 
       before do
-        controller.instance_variable_set(:"@context", course)
+        controller.instance_variable_set(:@context, course)
         allow(course).to receive(:grants_right?).and_return true
         Account.site_admin.enable_feature!(:new_quizzes_modules_support)
       end
@@ -901,7 +901,7 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:named_context_url).and_return('wrong_url')
           allow(controller).to receive(:render)
           allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:"@context", course)
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
           allow(controller).to receive(:require_user) { user_model }
           allow(controller).to receive(:lti_launch_params) { {} }
@@ -993,7 +993,7 @@ RSpec.describe ApplicationController do
 
           allow(controller).to receive(:render)
           allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:"@context", course)
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
           allow(controller).to receive(:require_user) { user_model }
           controller.instance_variable_set(:@current_user, user)
@@ -1132,7 +1132,6 @@ RSpec.describe ApplicationController do
               end
             end
           end
-          # rubocop:enable RSpec/NestedGroups
         end
 
         it 'creates a basic lti launch request when tool is not configured to use LTI 1.3' do
@@ -1148,7 +1147,7 @@ RSpec.describe ApplicationController do
 
       context 'return_url' do
         before do
-          controller.instance_variable_set(:"@context", course)
+          controller.instance_variable_set(:@context, course)
           content_tag.update!(context: assignment_model)
           allow(content_tag.context).to receive(:quiz_lti?).and_return(true)
           allow(controller).to receive(:render)
@@ -1330,7 +1329,7 @@ RSpec.describe ApplicationController do
         ).and_return('wrong_url')
         allow(controller).to receive(:render)
         allow(controller).to receive_messages(js_env: [])
-        controller.instance_variable_set(:"@context", course)
+        controller.instance_variable_set(:@context, course)
         controller.send(:content_tag_redirect, course, content_tag, nil)
       end
 
@@ -1338,7 +1337,7 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:named_context_url).and_return('wrong_url')
         allow(controller).to receive(:render)
         allow(controller).to receive_messages(js_env: [])
-        controller.instance_variable_set(:"@context", course)
+        controller.instance_variable_set(:@context, course)
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["resource_link_id"]).to eq 'e62d81a8a1587cdf9d3bbc3de0ef303d6bc70d78'
@@ -1348,7 +1347,7 @@ RSpec.describe ApplicationController do
         allow(controller).to receive(:named_context_url).and_return('wrong_url')
         allow(controller).to receive(:render)
         allow(controller).to receive_messages(js_env: [])
-        controller.instance_variable_set(:"@context", course)
+        controller.instance_variable_set(:@context, course)
         allow(content_tag).to receive(:id).and_return(42)
         controller.send(:content_tag_redirect, course, content_tag, nil)
         expect(assigns[:lti_launch].params["custom_test_token"]).to be_present
@@ -1359,7 +1358,7 @@ RSpec.describe ApplicationController do
           allow(controller).to receive(:named_context_url).and_return(tool.url)
           allow(controller).to receive(:render)
           allow(controller).to receive_messages(js_env: [])
-          controller.instance_variable_set(:"@context", course)
+          controller.instance_variable_set(:@context, course)
           allow(content_tag).to receive(:id).and_return(42)
         end
 
@@ -1435,12 +1434,12 @@ RSpec.describe ApplicationController do
   describe 'external_tool_display_hash' do
     def tool_settings(setting, include_class = false)
       settings_hash = {
-        url: "http://example.com/?#{setting.to_s}",
-        icon_url: "http://example.com/icon.png?#{setting.to_s}",
+        url: "http://example.com/?#{setting}",
+        icon_url: "http://example.com/icon.png?#{setting}",
         enabled: true
       }
 
-      settings_hash[:canvas_icon_class] = "icon-#{setting.to_s}" if include_class
+      settings_hash[:canvas_icon_class] = "icon-#{setting}" if include_class
       settings_hash
     end
 
@@ -1477,8 +1476,8 @@ RSpec.describe ApplicationController do
     it 'all settings are correct' do
       @tool_settings.each do |setting|
         hash = controller.external_tool_display_hash(@tool, setting)
-        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
-        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting}"
         expect(hash[:canvas_icon_class]).to be nil
       end
     end
@@ -1497,9 +1496,9 @@ RSpec.describe ApplicationController do
         @tool.save!
 
         hash = controller.external_tool_display_hash(@tool, setting)
-        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting.to_s}"
-        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting.to_s}"
-        expect(hash[:canvas_icon_class]).to eq "icon-#{setting.to_s}"
+        expect(hash[:base_url]).to eq "http://test.host/courses/#{@course.id}/external_tools/#{@tool.id}?launch_type=#{setting}"
+        expect(hash[:icon_url]).to eq "http://example.com/icon.png?#{setting}"
+        expect(hash[:canvas_icon_class]).to eq "icon-#{setting}"
       end
     end
   end

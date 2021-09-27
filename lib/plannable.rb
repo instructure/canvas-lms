@@ -170,7 +170,7 @@ module Plannable
             if col
               type = TYPE_MAP[col.type]
               nullable = col.null
-              type && (nullable && bookmark[i].nil? || type.call(bookmark[i]))
+              type && ((nullable && bookmark[i].nil?) || type.call(bookmark[i]))
             else
               true
             end

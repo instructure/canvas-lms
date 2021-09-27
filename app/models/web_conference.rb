@@ -177,9 +177,9 @@ class WebConference < ActiveRecord::Base
   # redirecting through here again in case the url has a short-lived token and needs to be
   # regenerated)
   def external_url_for(key, user, url_id = nil)
-    external_urls[key.to_sym] &&
+    (external_urls[key.to_sym] &&
       respond_to?("#{key}_external_url") &&
-      send("#{key}_external_url", user, url_id) || []
+      send("#{key}_external_url", user, url_id)) || []
   end
 
   def self.external_urls
@@ -355,7 +355,7 @@ class WebConference < ActiveRecord::Base
 
   def restart
     self.start_at ||= Time.now
-    self.end_at = self.duration && self.start_at + self.duration_in_seconds
+    self.end_at = self.duration && (self.start_at + self.duration_in_seconds)
     self.started_at ||= self.start_at
     self.ended_at = nil
     self.save
@@ -374,7 +374,7 @@ class WebConference < ActiveRecord::Base
   def active?(force_check = false, allow_check = true)
     if !force_check
       return false if self.ended_at && Time.now > self.ended_at
-      return true if self.start_at && (self.end_at.nil? || self.end_at && Time.now > self.start_at && Time.now < self.end_at)
+      return true if self.start_at && (self.end_at.nil? || (self.end_at && Time.now > self.start_at && Time.now < self.end_at))
       return true if self.ended_at && Time.now < self.ended_at
       return @conference_active unless @conference_active.nil?
     end
@@ -438,7 +438,7 @@ class WebConference < ActiveRecord::Base
 
   def craft_url(user = nil, session = nil, return_to = "http://www.instructure.com")
     user ||= self.user
-    initiate_conference and touch or return nil
+    (initiate_conference and touch) or return nil
     if user == self.user || self.grants_right?(user, session, :initiate)
       admin_join_url(user, return_to)
     else

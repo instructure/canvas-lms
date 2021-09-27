@@ -46,13 +46,13 @@ RSpec.describe 'Outcomes Service - POST Content Import', :pact do
     end
     let(:import_post_request_body) do
       {
-        "format": "canvas",
-        "alignments": [
+        format: "canvas",
+        alignments: [
           {
-            "artifact": {
+            artifact: {
               "$canvas_wiki_page_id": "100"
             },
-            "outcomes": [
+            outcomes: [
               {
                 "$canvas_learning_outcome_id": "1"
               },
@@ -62,38 +62,38 @@ RSpec.describe 'Outcomes Service - POST Content Import', :pact do
             ]
           }
         ],
-        "outcomes": [
+        outcomes: [
           {
             "$canvas_learning_outcome_id": "1000",
-            "title": "outcome_title",
-            "description": "outcome_description",
-            "rubric_criterion": {
-              "description": "scoring method description",
-              "ratings": [
+            title: "outcome_title",
+            description: "outcome_description",
+            rubric_criterion: {
+              description: "scoring method description",
+              ratings: [
                 {
-                  "description": "Exceeds Expectations",
-                  "points": 5
+                  description: "Exceeds Expectations",
+                  points: 5
                 },
                 {
-                  "description": "Does Not Meet Expectations",
-                  "points": 0
+                  description: "Does Not Meet Expectations",
+                  points: 0
                 }
               ],
-              "mastery_points": 1,
-              "points_possible": 5
+              mastery_points: 1,
+              points_possible: 5
             }
           }
         ],
-        "context_type": "course",
-        "context_id": 100,
-        "groups": [
+        context_type: "course",
+        context_id: 100,
+        groups: [
           {
             "$canvas_learning_outcome_group_id": "1001",
-            "title": "outcome_group_title",
-            "description": "outcome_group_description"
+            title: "outcome_group_title",
+            description: "outcome_group_description"
           }
         ],
-        "edges": [
+        edges: [
           {
             "$canvas_learning_outcome_link_id": "1002",
             "$canvas_learning_outcome_id": "1000",
@@ -104,10 +104,10 @@ RSpec.describe 'Outcomes Service - POST Content Import', :pact do
     end
     let(:expected_import_post_response_body) do
       {
-        "id": Pact.like(1),
-        "context_type": "course",
-        "context_id": Pact.like("100"),
-        "state": "created"
+        id: Pact.like(1),
+        context_type: "course",
+        context_id: Pact.like("100"),
+        state: "created"
       }
     end
     let!(:course) { course_factory(active_course: true) }

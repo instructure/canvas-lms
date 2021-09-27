@@ -320,4 +320,4 @@ module SimplyVersioned
   end
 end
 
-ActiveRecord::Base.send(:include, SimplyVersioned)
+ActiveRecord::Base.include SimplyVersioned

@@ -95,7 +95,7 @@ describe AuditLogFieldExtension::Logger do
 
   it "sanitizes arguments" do
     logger = AuditLogFieldExtension::Logger.new(mutation, {}, { input: { password: "TOP SECRET" } })
-    expect(logger.instance_variable_get(:@params)).to eq ({ password: "[FILTERED]" })
+    expect(logger.instance_variable_get(:@params)).to eq({ password: "[FILTERED]" })
   end
 
   it "truncates long text" do
@@ -108,11 +108,11 @@ describe AuditLogFieldExtension::Logger do
                                                     nested_hash: { a: long_string }
                                                   }
                                                 })
-    expect(logger.instance_variable_get(:@params)).to eq ({
-      string: shortened_string,
-      array: [shortened_string],
-      nested_hash: { a: shortened_string }
-    })
+    expect(logger.instance_variable_get(:@params)).to eq({
+                                                           string: shortened_string,
+                                                           array: [shortened_string],
+                                                           nested_hash: { a: shortened_string }
+                                                         })
   end
 
   context "#log_entry_ids" do

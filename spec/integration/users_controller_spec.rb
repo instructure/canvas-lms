@@ -282,8 +282,8 @@ describe UsersController do
       get grades_url
       student_grades = Nokogiri::HTML5(response.body).css('.student_grades tr')
       expect(student_grades.length).to eq 2
-      expect(student_grades.text).to match /#{@first_course.name}/
-      expect(student_grades.text).to match /#{@course.name}/
+      expect(student_grades.text).to match(/#{@first_course.name}/)
+      expect(student_grades.text).to match(/#{@course.name}/)
     end
 
     it "lets an admin with view_all_grades view" do
@@ -297,8 +297,8 @@ describe UsersController do
       get "/users/#{@student.id}/grades"
       student_grades = Nokogiri::HTML5(response.body).css('.student_grades tr')
       expect(student_grades.length).to eq 2
-      expect(student_grades.text).to match /#{@first_course.name}/
-      expect(student_grades.text).to match /#{@course.name}/
+      expect(student_grades.text).to match(/#{@first_course.name}/)
+      expect(student_grades.text).to match(/#{@course.name}/)
     end
   end
 

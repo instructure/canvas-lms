@@ -78,10 +78,10 @@ describe QuizzesNext::ExportService do
 
       expect(ExportService.begin_export(course, {})).to eq(
         {
-          "original_course_uuid": 1234,
-          "assignments": [
-            { "original_resource_link_id": "link-id-0", "$canvas_assignment_id": 0, "original_assignment_id": 0 },
-            { "original_resource_link_id": "link-id-1", "$canvas_assignment_id": 1, "original_assignment_id": 1 }
+          original_course_uuid: 1234,
+          assignments: [
+            { original_resource_link_id: "link-id-0", "$canvas_assignment_id": 0, original_assignment_id: 0 },
+            { original_resource_link_id: "link-id-1", "$canvas_assignment_id": 1, original_assignment_id: 1 }
           ]
         }
       )
@@ -104,12 +104,12 @@ describe QuizzesNext::ExportService do
     let(:old_assignment2) { assignment_model(id: 4) }
     let(:basic_import_content) do
       {
-        'original_course_uuid': '100005',
-        'assignments': [
+        original_course_uuid: '100005',
+        assignments: [
           {
-            'original_resource_link_id': 'link-1234',
+            original_resource_link_id: 'link-1234',
             '$canvas_assignment_id': new_assignment1.id,
-            'original_assignment_id': old_assignment1.id
+            original_assignment_id: old_assignment1.id
           }
         ]
       }
@@ -125,9 +125,9 @@ describe QuizzesNext::ExportService do
 
     it 'emits live events for each copied assignment' do
       basic_import_content[:assignments] << {
-        'original_resource_link_id': 'link-5678',
+        original_resource_link_id: 'link-5678',
         '$canvas_assignment_id': new_assignment2.id,
-        'original_assignment_id': old_assignment2.id
+        original_assignment_id: old_assignment2.id
       }
 
       expect(Canvas::LiveEvents).to receive(:quizzes_next_quiz_duplicated).once
@@ -136,7 +136,7 @@ describe QuizzesNext::ExportService do
 
     it 'ignores not found assignments' do
       basic_import_content[:assignments] << {
-        'original_resource_link_id': '5678',
+        original_resource_link_id: '5678',
         '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND
       }
 
@@ -173,7 +173,7 @@ describe QuizzesNext::ExportService do
 
     it 'skips assignments that are not duplicates' do
       basic_import_content[:assignments] << {
-        'original_resource_link_id': '5678',
+        original_resource_link_id: '5678',
         '$canvas_assignment_id': new_assignment2.id
       }
 

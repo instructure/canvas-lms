@@ -995,7 +995,7 @@ describe CoursesController, type: :request do
          :open_enrollment, :self_enrollment, :license, :sis_course_id,
          :allow_student_forum_attachments, :public_description,
          :restrict_enrollments_to_course_dates].each do |attr|
-          expect(new_course.send(attr)).to eq ([:start_at, :end_at].include?(attr) ?
+          expect(new_course.send(attr)).to eq([:start_at, :end_at].include?(attr) ?
             Time.parse(post_params['course'][attr.to_s]) :
             post_params['course'][attr.to_s])
         end
@@ -3093,9 +3093,9 @@ describe CoursesController, type: :request do
         json = api_call(:get, api_url, api_route, :search_term => "SSS", :limit => 1)
         expect(json.length).to eq 1
         link_header = response.headers['Link'].split(',')
-        expect(link_header[0]).to match /page=1&per_page=1/ # current page
-        expect(link_header[1]).to match /page=2&per_page=1/ # next page
-        expect(link_header[2]).to match /page=1&per_page=1/ # first page
+        expect(link_header[0]).to match(/page=1&per_page=1/) # current page
+        expect(link_header[1]).to match(/page=2&per_page=1/) # next page
+        expect(link_header[2]).to match(/page=1&per_page=1/) # first page
       end
 
       it "respects includes" do
@@ -3603,9 +3603,9 @@ describe CoursesController, type: :request do
         expect(json.map { |x| x['id'] }.uniq.length).to eq 5
 
         link_header = response.headers['Link'].split(',')
-        expect(link_header[0]).to match /page=1&per_page=5/ # current page
-        expect(link_header[1]).to match /page=2&per_page=5/ # next page
-        expect(link_header[2]).to match /page=1&per_page=5/ # first page
+        expect(link_header[0]).to match(/page=1&per_page=5/) # current page
+        expect(link_header[1]).to match(/page=2&per_page=5/) # next page
+        expect(link_header[2]).to match(/page=1&per_page=5/) # first page
       end
 
       it "allows jumping to a user's page based on id" do

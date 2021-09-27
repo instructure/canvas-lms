@@ -302,7 +302,7 @@ class ConversationMessage < ActiveRecord::Base
   end
 
   def forwarded_messages
-    @forwarded_messages ||= forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a } || []
+    @forwarded_messages ||= (forwarded_message_ids && self.class.unscoped { self.class.where(id: forwarded_message_ids.split(',')).order('created_at DESC').to_a }) || []
   end
 
   def all_forwarded_messages

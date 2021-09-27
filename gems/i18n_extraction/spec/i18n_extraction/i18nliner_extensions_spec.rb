@@ -81,7 +81,7 @@ describe I18nliner::Extractors::RubyExtractor do
     end
 
     it "requires explicit keys if a key is provided and there is no scope" do
-      expect { extract("t 'foo', 'Foo'", I18nliner::Scope.root) }.to raise_error /ambiguous translation key/
+      expect { extract("t 'foo', 'Foo'", I18nliner::Scope.root) }.to raise_error(/ambiguous translation key/)
     end
 
     it "does not require explicit keys if the key is inferred and there is no scope" do
@@ -95,7 +95,7 @@ describe I18nliner::Extractors::RubyExtractor do
 
   context "sanitization" do
     it "rejects stuff that looks sufficiently html-y" do
-      expect { extract "t 'dude', 'this is <em>important</em>'" }.to raise_error /html tags in default translation/
+      expect { extract "t 'dude', 'this is <em>important</em>'" }.to raise_error(/html tags in default translation/)
     end
 
     it "generallies be ok with angle brackets" do

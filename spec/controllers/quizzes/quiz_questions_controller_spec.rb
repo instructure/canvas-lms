@@ -114,7 +114,7 @@ describe Quizzes::QuizQuestionsController do
       post 'create', params: { course_id: @course.id, quiz_id: @quiz, question: {
         question_text: long_data
       } }, xhr: true
-      expect(response.body).to match /max length is 16384/
+      expect(response.body).to match(/max length is 16384/)
     end
 
     it 'strips the origin from local URLs in answers' do
@@ -221,7 +221,7 @@ describe Quizzes::QuizQuestionsController do
       put 'update', params: { course_id: @course.id, quiz_id: @quiz, id: @question.id, question: {
         question_text: long_data
       } }, xhr: true
-      expect(response.body).to match /max length is 16384/
+      expect(response.body).to match(/max length is 16384/)
     end
 
     it "deletes non-html comments if needed" do
@@ -254,7 +254,7 @@ describe Quizzes::QuizQuestionsController do
 
       translated_text = aq.reload.question_data['question_text']
       expect(translated_text).to match %r{/assessment_questions/\d+/files/\d+}
-      expect(translated_text).to match /verifier=/
+      expect(translated_text).to match(/verifier=/)
 
       # add the first question directly onto the quiz, so it shouldn't get "randomly" selected from the group
       linked_question = @quiz.quiz_questions.build(:question_data => aq.question_data)

@@ -52,7 +52,7 @@ class EnrollmentState < ActiveRecord::Base
 
   # check if we've manually marked the enrollment state as potentially out of date (or if the stored date trigger has past)
   def state_needs_recalculation?
-    !self.state_is_current? || self.state_valid_until && self.state_valid_until < Time.now
+    !self.state_is_current? || (self.state_valid_until && self.state_valid_until < Time.now)
   end
 
   def ensure_current_state

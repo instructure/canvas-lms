@@ -24,7 +24,7 @@ describe "course settings" do
   include_context "in-process server selenium tests"
   include CourseSettingsPage
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account
   end
@@ -438,7 +438,7 @@ describe "course settings" do
     it "does not include student view student in the statistics count" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
-      expect(fj('.summary tr:nth(0)').text).to match /Students:\s*None/
+      expect(fj('.summary tr:nth(0)').text).to match(/Students:\s*None/)
     end
 
     it "shows the count of custom role enrollments" do
@@ -450,9 +450,9 @@ describe "course settings" do
       student_role.deactivate!
       course_with_teacher(:course => @course, :role => teacher_role)
       get "/courses/#{@course.id}/settings"
-      expect(fj('.summary tr:nth(1)').text).to match /weirdo \(inactive\):\s*1/
-      expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
-      expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
+      expect(fj('.summary tr:nth(1)').text).to match(/weirdo \(inactive\):\s*1/)
+      expect(fj('.summary tr:nth(3)').text).to match(/teach:\s*1/)
+      expect(fj('.summary tr:nth(5)').text).to match(/taaaa:\s*None/)
     end
 
     it "shows publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
@@ -507,7 +507,7 @@ describe "course settings" do
   end
 
   context "link validator" do
-    before (:each) do
+    before(:each) do
       Setting.set('link_validator_poll_timeout', 100)
       Setting.set('link_validator_poll_timeout_initial', 100)
     end

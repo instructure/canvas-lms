@@ -104,7 +104,7 @@ module CC::Importer::Standard
       unless mig_id
         full_path = @package_root.item_path(path)
 
-        if File.exists?(full_path)
+        if File.exist?(full_path)
           # try to make it work even if the file wasn't technically included in the manifest :/
           mig_id = Digest::MD5.hexdigest(path)
           file = { :path_name => path, :migration_id => mig_id,

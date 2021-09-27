@@ -70,8 +70,8 @@ module AccountReports
     def parallel_proc
       unless instance_variable_defined?(:@parallel_proc)
         @parallel_proc = self[:parallel_proc] ||
-                         module_class.public_methods.include?(:"parallel_#{type}") &&
-                         module_class.method(:"parallel_#{type}")
+                         (module_class.public_methods.include?(:"parallel_#{type}") &&
+                         module_class.method(:"parallel_#{type}"))
       end
       @parallel_proc
     end

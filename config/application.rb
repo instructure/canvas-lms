@@ -254,7 +254,7 @@ module CanvasRails
     Autoextend.hook(:"Thor::Option", PatchThorWarning, method: :prepend)
 
     # Extend any base classes, even gem classes
-    Dir.glob("#{Rails.root}/lib/ext/**/*.rb").each { |file| require file }
+    Dir.glob("#{Rails.root}/lib/ext/**/*.rb").sort.each { |file| require file }
 
     # tell Rails to use the native XML parser instead of REXML
     ActiveSupport::XmlMini.backend = 'Nokogiri'

@@ -3380,7 +3380,7 @@ describe Assignment do
       end
 
       it "treats negative score with decimals as a number" do
-        expect(@assignment.interpret_grade("-.2")).to eq (-0.2)
+        expect(@assignment.interpret_grade("-.2")).to eq(-0.2)
       end
 
       it "treats positive score with decimals as a number" do
@@ -5618,7 +5618,7 @@ describe Assignment do
         expect(@sub2.messages_sent['Submission Graded']).to be_present
         expect(@sub2.messages_sent['Submission Graded'].first.from_name).to eq @course.name
         expect(@sub2.messages_sent['Submission Grade Changed']).to be_nil
-        @sub2.update(:graded_at => Time.zone.now - 60 * 60)
+        @sub2.update(:graded_at => Time.zone.now - (60 * 60))
         @sub2 = @assignment.grade_student(@stu2, grade: 9, grader: @teacher).first
         expect(@sub2.messages_sent).not_to be_empty
         expect(@sub2.messages_sent['Submission Graded']).to be_nil
@@ -5629,7 +5629,7 @@ describe Assignment do
       it "does not notify students when their grade is changed when grades are not yet posted" do
         @assignment.ensure_post_policy(post_manually: true)
         @sub2 = @assignment.grade_student(@stu2, grade: 8, grader: @teacher).first
-        @sub2.update(:graded_at => Time.zone.now - 60 * 60)
+        @sub2.update(:graded_at => Time.zone.now - (60 * 60))
         @sub2 = @assignment.grade_student(@stu2, grade: 9, grader: @teacher).first
         expect(@sub2.messages_sent).to be_empty
       end
@@ -6861,7 +6861,7 @@ describe Assignment do
       @assignment.title = "a" * 31
       expect(@assignment.title.length).to eq 31
       expect(@assignment.title_slug.length).to eq 30
-      expect(@assignment.title).to match /^#{@assignment.title_slug}/
+      expect(@assignment.title).to match(/^#{@assignment.title_slug}/)
     end
 
     it "does not change the title" do
@@ -7831,7 +7831,7 @@ describe Assignment do
     def assignment(group_category = nil)
       a = @course.assignments.build name: "test"
       a.group_category = group_category
-      a.tap &:save!
+      a.tap(&:save!)
     end
 
     it "lets you change group category attributes before homework is submitted" do
@@ -9694,7 +9694,6 @@ describe Assignment do
             end
           end
 
-          # rubocop:disable RSpec/NestedGroups
           context 'to a different LTI 1.3 tool' do
             it_behaves_like 'unchanged line item and resource link check'
             it_behaves_like 'assignment to line item attribute sync check'
@@ -9706,7 +9705,6 @@ describe Assignment do
             it_behaves_like 'unchanged line item and resource link check'
             it_behaves_like 'assignment to line item attribute sync check'
           end
-          # rubocop:enable RSpec/NestedGroups
         end
 
         context 'and the tool binding is abandoned' do

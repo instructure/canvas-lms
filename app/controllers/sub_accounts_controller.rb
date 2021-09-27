@@ -54,7 +54,7 @@ class SubAccountsController < ApplicationController
       permissions: [:manage_account_settings, :manage_courses, :manage_courses_admin]
     )
 
-    @query = params[:account] && params[:account][:name] || params[:term]
+    @query = (params[:account] && params[:account][:name]) || params[:term]
     if @query
       @accounts = []
       if @context && @context.is_a?(Account)

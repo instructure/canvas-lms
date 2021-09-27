@@ -44,7 +44,7 @@ class Canvas::Migration::Worker::ZipFileWorker < Canvas::Migration::Worker::Base
         scaled = percent_complete
 
         if cm.import_immediately?
-          scaled = scaled / 2 + 50
+          scaled = (scaled / 2) + 50
         end
 
         # Only update if progress has incremented 1 percent

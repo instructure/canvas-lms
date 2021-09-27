@@ -22,12 +22,12 @@ require File.expand_path(File.dirname(__FILE__) + '/common')
 describe "links", priority: "2" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
   end
 
   describe "course links" do
-    before (:each) do
+    before(:each) do
       get "/courses/#{@course.id}"
     end
 
@@ -104,7 +104,7 @@ describe "links", priority: "2" do
   end
 
   describe "dashboard links" do
-    before (:each) do
+    before(:each) do
       get "/"
     end
 

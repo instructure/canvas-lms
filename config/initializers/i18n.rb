@@ -142,7 +142,7 @@ end
 
 if ENV['LOLCALIZE']
   require 'i18n_tasks'
-  I18n.send :extend, I18nTasks::Lolcalize
+  I18n.extend I18nTasks::Lolcalize
 end
 
 module I18nUtilities
@@ -173,9 +173,9 @@ module I18nUtilities
   end
 end
 
-ActionView::Base.send(:include, I18nUtilities)
-ActionView::Helpers::FormHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
+ActionView::Base.include I18nUtilities
+ActionView::Helpers::FormHelper.include I18nUtilities
+ActionView::Helpers::FormTagHelper.include I18nUtilities
 
 module I18nFormHelper
   # a convenience method to put the ":" after the label text (or do whatever

@@ -62,7 +62,7 @@ module DataFixup::PopulateRootAccountIdsOnUsers
       # group into one other shard at a time
       foreign_shard = Shard.lookup(min / Shard::IDS_PER_SHARD)
       unless foreign_shard
-        min = User.where("id>?", (min / Shard::IDS_PER_SHARD + 1) * Shard::IDS_PER_SHARD).minimum(:id)
+        min = User.where("id>?", ((min / Shard::IDS_PER_SHARD) + 1) * Shard::IDS_PER_SHARD).minimum(:id)
         next if min
       end
       scope = UserAccountAssociation.where("user_id>=? AND user_id<?", min, (foreign_shard.id + 1) * Shard::IDS_PER_SHARD)

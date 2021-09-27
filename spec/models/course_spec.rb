@@ -3453,16 +3453,16 @@ describe Course, 'grade_publishing' do
         make_student_enrollments
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "error", "unpublishable", "error", "unpublishable", "unpublishable", "unpublished", "unpublished", "unpublished"]
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil, "cause of this reason", nil, "cause of that reason", nil, nil, nil, nil, nil]
-        expect(@student_enrollments.map(&:workflow_state)).to eq ["active"] * 6 + ["inactive"] + ["active"] * 2
+        expect(@student_enrollments.map(&:workflow_state)).to eq (["active"] * 6) + ["inactive"] + (["active"] * 2)
         expect(@student_enrollments.map(&:last_publish_attempt_at)).to eq [nil] * 9
         grade_publishing_user("U2")
         expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil).and_return(nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["pending"] * 6 + ["unpublished"] + ["pending"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["pending"] * 6) + ["unpublished"] + (["pending"] * 2)
         expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 9
-        expect(@student_enrollments.map(&:workflow_state)).to eq ["active"] * 6 + ["inactive"] + ["active"] * 2
+        expect(@student_enrollments.map(&:workflow_state)).to eq (["active"] * 6) + ["inactive"] + (["active"] * 2)
         @student_enrollments.map(&:last_publish_attempt_at).each_with_index do |time, i|
           if i == 6
             expect(time).to be_nil
@@ -3683,16 +3683,16 @@ describe Course, 'grade_publishing' do
       it "makes sure grade publishing is enabled" do
         allow(@plugin).to receive(:enabled?).and_return(false)
         expect(lambda { @course.send_final_grades_to_endpoint nil }).to raise_error("final grade publishing disabled")
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["final grade publishing disabled"] * 6 + [nil] + ["final grade publishing disabled"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["final grade publishing disabled"] * 6) + [nil] + (["final grade publishing disabled"] * 2)
       end
 
       it "makes sure an endpoint is defined" do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge! :publish_endpoint => ""
         expect(lambda { @course.send_final_grades_to_endpoint nil }).to raise_error("endpoint undefined")
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["endpoint undefined"] * 6 + [nil] + ["endpoint undefined"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["endpoint undefined"] * 6) + [nil] + (["endpoint undefined"] * 2)
       end
 
       it "makes sure the publishing user can publish" do
@@ -3704,8 +3704,8 @@ describe Course, 'grade_publishing' do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("publishing disallowed for this publishing user")
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["publishing disallowed for this publishing user"] * 6 + [nil] + ["publishing disallowed for this publishing user"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["publishing disallowed for this publishing user"] * 6) + [nil] + (["publishing disallowed for this publishing user"] * 2)
       end
 
       it "makes sure there's a grading standard" do
@@ -3717,16 +3717,16 @@ describe Course, 'grade_publishing' do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("grade publishing requires a grading standard")
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["grade publishing requires a grading standard"] * 6 + [nil] + ["grade publishing requires a grading standard"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["grade publishing requires a grading standard"] * 6) + [nil] + (["grade publishing requires a grading standard"] * 2)
       end
 
       it "makes sure the format type is supported" do
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge! :publish_endpoint => "http://localhost/endpoint", :format_type => "invalid_Format"
         expect(lambda { @course.send_final_grades_to_endpoint @user }).to raise_error("unknown format type: invalid_Format")
-        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error"] * 6 + ["unpublished"] + ["error"] * 2
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["unknown format type: invalid_Format"] * 6 + [nil] + ["unknown format type: invalid_Format"] * 2
+        expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq (["error"] * 6) + ["unpublished"] + (["error"] * 2)
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["unknown format type: invalid_Format"] * 6) + [nil] + (["unknown format type: invalid_Format"] * 2)
       end
 
       def sample_grade_publishing_request(published_status)
@@ -3817,7 +3817,7 @@ describe Course, 'grade_publishing' do
         expect(SSLCommon).to receive(:post_data).with("http://localhost/endpoint", "post3", "test/mime3", {})
         expect(lambda { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["published", "published", "published", "published", "error", "unpublishable", "unpublished", "unpublishable", "error"]
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq [nil] * 4 + ["waaah fail"] + [nil] * 3 + ["waaah fail"]
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ([nil] * 4) + ["waaah fail"] + ([nil] * 3) + ["waaah fail"]
       end
 
       it "tries and make all posts even if two of the postings fail" do
@@ -3866,7 +3866,7 @@ describe Course, 'grade_publishing' do
                                                                        })
         expect(lambda { @course.send_final_grades_to_endpoint(@user) }).to raise_error("waaah fail")
         expect(@student_enrollments.map(&:reload).map(&:grade_publishing_status)).to eq ["error", "error", "error", "error", "error", "error", "unpublished", "error", "error"]
-        expect(@student_enrollments.map(&:grade_publishing_message)).to eq ["waaah fail"] * 6 + [nil] + ["waaah fail"] * 2
+        expect(@student_enrollments.map(&:grade_publishing_message)).to eq (["waaah fail"] * 6) + [nil] + (["waaah fail"] * 2)
       end
 
       it "passes header parameters to post" do
@@ -5484,11 +5484,11 @@ describe Course do
       expect(c1.self_enrollment_code).to be_nil # normally only set when self_enrollment is enabled
       c1.update_attribute(:self_enrollment, true)
       expect(c1.self_enrollment_code).not_to be_nil
-      expect(c1.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
+      expect(c1.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
 
       c2 = course_factory()
       c2.update_attribute(:self_enrollment, true)
-      expect(c2.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
+      expect(c2.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
       expect(c1.self_enrollment_code).not_to eq c2.self_enrollment_code
     end
 
@@ -5497,7 +5497,7 @@ describe Course do
       c1.reload
       expect(c1.read_attribute(:self_enrollment_code)).to be_nil
       expect(c1.self_enrollment_code).not_to be_nil
-      expect(c1.self_enrollment_code).to match /\A[A-Z0-9]{6}\z/
+      expect(c1.self_enrollment_code).to match(/\A[A-Z0-9]{6}\z/)
     end
   end
 
@@ -5966,7 +5966,7 @@ describe Course do
       @course.short_name = "a" * 31
       expect(@course.short_name.length).to eq 31
       expect(@course.short_name_slug.length).to eq 30
-      expect(@course.short_name).to match /^#{@course.short_name_slug}/
+      expect(@course.short_name).to match(/^#{@course.short_name_slug}/)
     end
 
     it "does not change the short_name" do

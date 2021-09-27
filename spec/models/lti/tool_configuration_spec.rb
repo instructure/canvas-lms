@@ -135,7 +135,7 @@ module Lti
       end
 
       context 'when public_jwk is not present' do
-        let (:settings) do
+        let(:settings) do
           s = super()
           s.delete('public_jwk')
           s['public_jwk_url'] = "https://test.com"
@@ -150,7 +150,7 @@ module Lti
       end
 
       context 'when public_jwk_url is not present' do
-        let (:settings) do
+        let(:settings) do
           s = super()
           s.delete('public_jwk_url')
           s['public_jwk'] = public_jwk
@@ -165,7 +165,7 @@ module Lti
       end
 
       context 'when public_jwk_url and public_jwk are not present' do
-        let (:settings) do
+        let(:settings) do
           s = super()
           s.delete('public_jwk_url')
           s.delete('public_jwk')
@@ -459,7 +459,7 @@ module Lti
           before { allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error) }
 
           it 'raises exception if timeout occurs' do
-            expect { tool_configuration }.to raise_error /Could not retrieve settings, the server response timed out./
+            expect { tool_configuration }.to raise_error(/Could not retrieve settings, the server response timed out./)
           end
         end
 
@@ -479,7 +479,7 @@ module Lti
             end
 
             it 'adds a "not found error to the model' do
-              expect { tool_configuration }.to raise_error /Not found/
+              expect { tool_configuration }.to raise_error(/Not found/)
             end
           end
 
@@ -490,7 +490,7 @@ module Lti
             end
 
             it 'adds a "unauthorized error to the model' do
-              expect { tool_configuration }.to raise_error /Unauthorized/
+              expect { tool_configuration }.to raise_error(/Unauthorized/)
             end
           end
 
@@ -501,7 +501,7 @@ module Lti
             end
 
             it 'adds a "internal server error to the model' do
-              expect { tool_configuration }.to raise_error /Internal server error/
+              expect { tool_configuration }.to raise_error(/Internal server error/)
             end
           end
 
@@ -512,7 +512,7 @@ module Lti
             end
 
             it 'adds an error to the model' do
-              expect { tool_configuration }.to raise_error /Content type must be \"application\/json\"/
+              expect { tool_configuration }.to raise_error(/Content type must be \"application\/json\"/)
             end
           end
         end

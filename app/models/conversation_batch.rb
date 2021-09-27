@@ -91,7 +91,7 @@ class ConversationBatch < ActiveRecord::Base
       # headway. every minute we will advance half of the remainder of
       # job_start_factor.
       minutes = (Time.zone.now - created_at).to_i / 60.0
-      job_start_factor * (1 - (1 / 2**minutes))
+      job_start_factor * (1 - (1 / (2**minutes)))
     else
       # the rest of the progress bar is nice and linear
       job_start_factor + ((1 - job_start_factor) * conversation_message_ids.size / recipient_ids.size)

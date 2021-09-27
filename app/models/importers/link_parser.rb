@@ -64,7 +64,7 @@ module Importers
       return unless node[attr].present?
 
       if attr == 'value'
-        return unless node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE} || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
+        return unless (node[attr] && node[attr] =~ %r{IMS(?:-|_)CC(?:-|_)FILEBASE}) || node[attr] =~ %r{CANVAS_COURSE_REFERENCE}
       end
 
       url = node[attr].dup
@@ -143,14 +143,14 @@ module Importers
 
       elsif url =~ %r{\$IMS(?:-|_)CC(?:-|_)FILEBASE\$/(.*)}
         rel_path = URI.unescape($1)
-        if attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
-           attr == 'src' && node.name == 'iframe' && node['data-media-id']
+        if (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+           (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
           unresolved(:media_object, :rel_path => rel_path)
         else
           unresolved(:file, :rel_path => rel_path)
         end
-      elsif attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/ ||
-            attr == 'src' && node.name == 'iframe' && node['data-media-id']
+      elsif (attr == 'href' && node['class'] && node['class'] =~ /instructure_inline_media_comment/) ||
+            (attr == 'src' && node.name == 'iframe' && node['data-media-id'])
         # Course copy media reference, leave it alone
         resolved
       elsif attr == 'src' && (info_match = url.match(/\Adata:(?<mime_type>[-\w]+\/[-\w\+\.]+)?;base64,(?<image>.*)/m))

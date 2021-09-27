@@ -2433,7 +2433,7 @@ describe Quizzes::Quiz do
     end
 
     it "excludes quizzes that don't meet either criterion" do
-      expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include (@quiz)
+      expect(@course.quizzes.due_between_with_overrides(1.hour.ago, 1.hour.from_now)).not_to include(@quiz)
     end
   end
 

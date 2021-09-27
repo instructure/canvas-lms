@@ -200,7 +200,7 @@ describe CC::CCHelper do
       <a href='/courses/#{@course.id}/users/#{@teacher.id}'>ME</a>
       HTML
       translated = @exporter.html_content(orig)
-      expect(translated).to match /users\/#{@teacher.id}/
+      expect(translated).to match(/users\/#{@teacher.id}/)
     end
 
     it "interprets links to the files page as normal course pages" do

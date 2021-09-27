@@ -51,7 +51,7 @@ describe "users" do
   end
 
   context "page views" do
-    before (:each) do
+    before(:each) do
       course_with_admin_logged_in
       @student = student_in_course.user
       Setting.set('enable_page_views', 'db')
@@ -136,7 +136,7 @@ describe "users" do
       expect(f('#login_information')).to include_text(user_id)
     end
 
-    before (:each) do
+    before(:each) do
       @student_1_id = 'student1@example.com'
       @student_2_id = 'student2@example.com'
 

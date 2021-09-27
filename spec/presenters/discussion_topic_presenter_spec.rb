@@ -22,11 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe DiscussionTopicPresenter do
-  let (:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
-  let (:user)       { user_model }
-  let (:presenter)  { DiscussionTopicPresenter.new(topic, user) }
-  let (:course)     { course_model }
-  let (:assignment) {
+  let(:topic)      { DiscussionTopic.new(:title => 'Test Topic', :assignment => assignment) }
+  let(:user)       { user_model }
+  let(:presenter)  { DiscussionTopicPresenter.new(topic, user) }
+  let(:course)     { course_model }
+  let(:assignment) {
     Assignment.new(:title => 'Test Topic',
                    :due_at => Time.now,
                    :lock_at => Time.now + 1.week,

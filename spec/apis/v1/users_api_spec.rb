@@ -716,8 +716,8 @@ describe "Users API", type: :request do
         expect(json[0]['created_at']).to be > json[1]['created_at']
         expect(json[0]['app_name']).to be_nil
         expect(json[1]['app_name']).to eq 'User-Generated'
-        expect(response.headers['Link']).to match /next/
-        expect(response.headers['Link']).not_to match /last/
+        expect(response.headers['Link']).to match(/next/)
+        expect(response.headers['Link']).not_to match(/last/)
         response.headers['Link'].split(',').find { |l| l =~ /<([^>]+)>.+next/ }
         url = $1
         path, querystring = url.split("?")
@@ -726,8 +726,8 @@ describe "Users API", type: :request do
                         { :controller => "page_views", :action => "index", :user_id => @student.to_param, :format => 'json', :page => page, :per_page => Setting.get('api_max_per_page', '2') })
         expect(json.size).to eq 1
         json.each { |j| expect(j['url']).to eq "http://www.example.com/courses/1" }
-        expect(response.headers['Link']).not_to match /next/
-        expect(response.headers['Link']).to match /last/
+        expect(response.headers['Link']).not_to match(/next/)
+        expect(response.headers['Link']).to match(/last/)
       end
 
       it "recognizes start_time parameter" do

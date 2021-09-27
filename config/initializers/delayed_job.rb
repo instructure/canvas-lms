@@ -227,4 +227,4 @@ module CanvasDelayedMessageSending
     delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
   end
 end
-Object.send(:include, CanvasDelayedMessageSending)
+Object.include CanvasDelayedMessageSending

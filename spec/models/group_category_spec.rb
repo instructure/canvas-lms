@@ -28,7 +28,7 @@ describe GroupCategory do
     zone = ActiveSupport::TimeZone["America/Denver"]
     course = Course.new(time_zone: zone)
     category = GroupCategory.new(context: course)
-    expect(category.time_zone.to_s).to match /Mountain Time/
+    expect(category.time_zone.to_s).to match(/Mountain Time/)
   end
 
   context "protected_name_for_context?" do

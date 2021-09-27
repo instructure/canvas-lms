@@ -105,7 +105,7 @@ module CustomWaitMethods
       } else {
         var fallbackCallback = window.setTimeout(function() {
           callback(-2);
-        }, #{SeleniumDriverSetup.timeouts[:script] * 1000 - 500})
+        }, #{(SeleniumDriverSetup.timeouts[:script] * 1000) - 500})
 
         function onXHRCompleted () {
           // while there are no outstanding requests, a new one could be

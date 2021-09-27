@@ -775,7 +775,7 @@ describe "Canvas Cartridge importing" do
     Importers::WikiPageImporter.process_migration({ 'wikis' => [hash, nil] }, @migration)
     @migration.resolve_content_links!
 
-    expect(ErrorReport.last.message).to match /nil wiki/
+    expect(ErrorReport.last.message).to match(/nil wiki/)
 
     page_2 = @copy_to.wiki_pages.where(migration_id: migration_id).first
     expect(page_2.title).to eq page.title

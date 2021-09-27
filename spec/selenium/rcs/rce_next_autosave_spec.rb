@@ -134,7 +134,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       # remove ignore_js_errors in LS-1163
       get '/'
       driver.local_storage.clear
-      driver.local_storage['xyzzy'] = 'x' * 5_119 * 1_024 + 'x' * 1_000
+      driver.local_storage['xyzzy'] = ('x' * 5_119 * 1_024) + ('x' * 1_000)
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       expect(saved_content).to be_nil # though it didn't throw an exception
@@ -149,7 +149,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       get '/'
       driver.local_storage.clear
       driver.local_storage[autosave_key(@teacher.id, 'http://some/url', 'id')] =
-        make_autosave_entry('x' * 5_119 * 1_024 + 'x' * 921)
+        make_autosave_entry(('x' * 5_119 * 1_024) + ('x' * 921))
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       saved_content = JSON.parse(saved_content)

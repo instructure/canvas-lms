@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + "/common")
 describe "i18n js" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     get "/"
     # get I18n global for all the tests

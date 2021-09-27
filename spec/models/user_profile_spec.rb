@@ -102,7 +102,7 @@ describe UserProfile do
                   "default" => "enabled",
                   "text" => "LTI or die",
                   "visibility" => visibility,
-                  'required_permissions': 'manage_data_services'
+                  required_permissions: 'manage_data_services'
                 }
             }.with_indifferent_access
           end
@@ -180,7 +180,7 @@ describe UserProfile do
                 "default" => "enabled",
                 "text" => "LTI or die",
                 "visibility" => visibility,
-                'required_permissions': 'manage_data_services'
+                required_permissions: 'manage_data_services'
               }
           }.with_indifferent_access
         end

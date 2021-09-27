@@ -356,7 +356,7 @@ describe LtiApiController, type: :request do
       expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to match /^No score given/
+      expect(xml.at_css('imsx_description').content).to match(/^No score given/)
 
       expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
     end
@@ -366,7 +366,7 @@ describe LtiApiController, type: :request do
       expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to match /^Score is not between 0 and 1/
+      expect(xml.at_css('imsx_description').content).to match(/^Score is not between 0 and 1/)
 
       expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
     end
@@ -377,7 +377,7 @@ describe LtiApiController, type: :request do
       expect(response.code.to_i).to eq 422
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('imsx_codeMajor').content).to eq 'failure'
-      expect(xml.at_css('imsx_description').content).to match /^Assignment has no points possible\./
+      expect(xml.at_css('imsx_description').content).to match(/^Assignment has no points possible\./)
     end
 
     it "passes if assignment has 0 points possible" do
@@ -511,7 +511,7 @@ describe LtiApiController, type: :request do
         check_success
         submission = @assignment.submissions.where(user_id: @student).first
         expect(submission).to be_present
-        expect(submission.score).to eq -7
+        expect(submission.score).to eq(-7)
       end
     end
   end
