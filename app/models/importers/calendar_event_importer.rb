@@ -76,13 +76,13 @@ module Importers
     end
 
     def self.external_url_attachment_description(hash, context)
-      return unless url = hash[:attachment_value]
+      return unless (url = hash[:attachment_value])
 
       import_migration_attachment_link(url, ERB::Util.h(t('#calendar_event.see_related_link', "See Related Link")))
     end
 
     def self.assignment_attachment_description(hash, context)
-      return unless assignment = context.assignments.where(migration_id: hash[:attachment_value]).first
+      return unless (assignment = context.assignments.where(migration_id: hash[:attachment_value]).first)
 
       import_migration_attachment_link(
         attachment_url(context, assignment),
@@ -91,7 +91,7 @@ module Importers
     end
 
     def self.assessment_attachment_description(hash, context)
-      return unless quiz = context.quizzes.where(migration_id: hash[:attachment_value]).first
+      return unless (quiz = context.quizzes.where(migration_id: hash[:attachment_value]).first)
 
       import_migration_attachment_link(
         attachment_url(context, quiz),
@@ -100,7 +100,7 @@ module Importers
     end
 
     def self.file_attachment_description(hash, context)
-      return unless file = context.attachments.where(migration_id: hash[:attachment_value]).first
+      return unless (file = context.attachments.where(migration_id: hash[:attachment_value]).first)
 
       import_migration_attachment_link(
         attachment_url(context, file),
@@ -120,7 +120,7 @@ module Importers
     end
 
     def self.topic_attachment_description(hash, context)
-      return unless topic = context.discussion_topics.where(migration_id: hash[:attachment_value]).first
+      return unless (topic = context.discussion_topics.where(migration_id: hash[:attachment_value]).first)
 
       import_migration_attachment_link(
         attachment_url(context, topic),

@@ -346,7 +346,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
       reject! 'missing required key :quiz_submissions'
     end
 
-    if resource_params = resource_params[0]
+    if (resource_params = resource_params[0])
       @service.update_scores(@quiz_submission,
                              resource_params[:attempt],
                              resource_params)

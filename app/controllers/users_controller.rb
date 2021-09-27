@@ -2005,11 +2005,11 @@ class UsersController < ApplicationController
                           @user.grants_right?(@current_user, :manage_user_details)
 
     includes = %w{locale avatar_url email time_zone}
-    if title = user_params.delete(:title)
+    if (title = user_params.delete(:title))
       @user.profile.title = title
       includes << "title"
     end
-    if bio = user_params.delete(:bio)
+    if (bio = user_params.delete(:bio))
       @user.profile.bio = bio
       includes << "bio"
     end

@@ -47,7 +47,7 @@ class FilePreviewsController < ApplicationController
       if Canvas::Plugin.value_to_boolean(params[:annotate]) && (url = @file.crocodoc_url(@current_user))
         redirect_to url and return
       # canvadocs
-      elsif url = @file.canvadoc_url(@current_user)
+      elsif (url = @file.canvadoc_url(@current_user))
         redirect_to url and return
       # google docs
       elsif GoogleDocsPreview.previewable?(@domain_root_account, @file)

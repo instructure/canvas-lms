@@ -135,7 +135,7 @@ module MasterCourses::Restrictor
       changed_columns << "manually_deleted"
     end
     if changed_columns.any?
-      if self.is_a?(Assignment) && submittable = self.submittable_object
+      if self.is_a?(Assignment) && (submittable = self.submittable_object)
         tag_content = submittable # mark on the owner's tag
       else
         tag_content = self

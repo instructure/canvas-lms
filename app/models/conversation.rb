@@ -464,7 +464,7 @@ class Conversation < ActiveRecord::Base
     message_tags = if self.private?
                      if new_tags.present?
                        new_tags
-                     elsif participant.message_count > 0 and last_message = participant.last_message
+                     elsif participant.message_count > 0 and (last_message = participant.last_message)
                        last_message.tags
                      end
                    end
@@ -593,7 +593,7 @@ class Conversation < ActiveRecord::Base
       new_participants = other.conversation_participants.index_by(&:user_id)
       ConversationParticipant.suspend_callbacks(:destroy_conversation_message_participants) do
         conversation_participants.reload.each do |cp|
-          if new_cp = new_participants[cp.user_id]
+          if (new_cp = new_participants[cp.user_id])
             if cp.unread? || new_cp.archived?
               ConversationParticipant.where(id: new_cp).update_all(workflow_state: cp.workflow_state)
               new_cp.workflow_state = cp.workflow_state

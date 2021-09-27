@@ -135,7 +135,7 @@ class Quizzes::TakeQuizPresenter
   end
 
   def neighboring_question(direction)
-    if current_index = all_questions.index(current_question)
+    if (current_index = all_questions.index(current_question))
       modifier = (direction == :next) ? 1 : -1
       neighbor_index = current_index + modifier
       all_questions[neighbor_index] if neighbor_index >= 0

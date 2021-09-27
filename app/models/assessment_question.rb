@@ -101,7 +101,7 @@ class AssessmentQuestion < ActiveRecord::Base
 
   def self.translate_links(ids)
     ids.each do |aqid|
-      if aq = AssessmentQuestion.find(aqid)
+      if (aq = AssessmentQuestion.find(aqid))
         aq.translate_links
       end
     end
@@ -145,7 +145,7 @@ class AssessmentQuestion < ActiveRecord::Base
       new_file.save if new_file
       file_substitutions[id_or_path] = new_file
     end
-    if sub = file_substitutions[id_or_path]
+    if (sub = file_substitutions[id_or_path])
       query_rest = match_data[3] ? "&#{match_data[3]}" : ''
       "/assessment_questions/#{self.id}/files/#{sub.id}/download?verifier=#{sub.uuid}#{query_rest}"
     else
@@ -218,7 +218,7 @@ class AssessmentQuestion < ActiveRecord::Base
   end
 
   def question_data
-    if data = read_attribute(:question_data)
+    if (data = read_attribute(:question_data))
       if data.class == Hash
         write_attribute(:question_data, data.with_indifferent_access)
         data = read_attribute(:question_data)

@@ -206,7 +206,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
   end
 
   def migration_id_for(obj, prepend = "")
-    if obj.is_a?(Assignment) && submittable = obj.submittable_object
+    if obj.is_a?(Assignment) && (submittable = obj.submittable_object)
       obj = submittable # i.e. use the same migration id as the topic on a graded topic's assignment - same restrictions
     end
     key = obj.is_a?(ActiveRecord::Base) ? obj.global_asset_string : obj.to_s
@@ -289,7 +289,7 @@ class MasterCourses::MasterTemplate < ActiveRecord::Base
 
   def default_restrictions_for(object)
     if self.use_default_restrictions_by_type
-      if object.is_a?(Assignment) && submittable = object.submittable_object
+      if object.is_a?(Assignment) && (submittable = object.submittable_object)
         object = submittable
       end
       self.default_restrictions_by_type[object.class.base_class.name] || {}

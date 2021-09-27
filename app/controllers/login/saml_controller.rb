@@ -263,7 +263,7 @@ class Login::SamlController < ApplicationController
       # for parent using self-registration to observe a student
       # following saml validation of student
       # resume registration process
-      if data = session.delete(:parent_registration)
+      if (data = session.delete(:parent_registration))
         if data[:unique_id_match]
           if data[:observee_only].present?
             # TODO: a race condition exists where the observee unique_id is

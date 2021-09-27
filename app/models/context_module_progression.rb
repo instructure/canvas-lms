@@ -365,7 +365,7 @@ class ContextModuleProgression < ActiveRecord::Base
     related_progressions = nil
     (context_module.active_prerequisites || []).all? do |pre|
       related_progressions ||= context_module.context.find_or_create_progressions_for_user(user).index_by(&:context_module_id)
-      if pre[:type] == 'context_module' && progression = related_progressions[pre[:id]]
+      if pre[:type] == 'context_module' && (progression = related_progressions[pre[:id]])
         progression.evaluate!(context_module)
         progression.completed?
       else

@@ -148,7 +148,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       mutation.fields.each do |_, return_field|
         next if return_field.original_name == :errors
 
-        if entry = value[return_field.original_name]
+        if (entry = value[return_field.original_name])
           # technically we could be returning lists of lists but gosh dang i
           # hope we never do that
           if entry.respond_to?(:each)

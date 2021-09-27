@@ -1477,7 +1477,7 @@ class Assignment < ActiveRecord::Base
       0.0
     else
       # try to treat it as a letter grade
-      if uses_grading_standard && standard_based_score = grading_standard_or_default.grade_to_score(grade)
+      if uses_grading_standard && (standard_based_score = grading_standard_or_default.grade_to_score(grade))
         ((points_possible || 0.0).to_d * standard_based_score.to_d / 100.0.to_d).to_f
       else
         nil
@@ -1656,7 +1656,7 @@ class Assignment < ActiveRecord::Base
       assignment_for_user = self.overridden_for(user)
       if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now)
         locked = { object: assignment_for_user, unlock_at: assignment_for_user.unlock_at }
-      elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
+      elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
       elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now)
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
@@ -1664,10 +1664,8 @@ class Assignment < ActiveRecord::Base
         each_submission_type do |submission, _, short_type|
           next unless self.send("#{short_type}?")
 
-          if submission_locked = submission.low_level_locked_for?(user, opts.merge(:skip_assignment => true))
-
+          if (submission_locked = submission.low_level_locked_for?(user, opts.merge(:skip_assignment => true)))
             locked = submission_locked
-
           end
           break
         end
@@ -1830,7 +1828,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def filter_attributes_for_user(hash, user, session)
-    if lock_info = self.locked_for?(user, :check_policies => true)
+    if (lock_info = self.locked_for?(user, :check_policies => true))
       hash.delete('description') unless include_description?(user, lock_info)
       hash['lock_info'] = lock_info
     end
@@ -3167,7 +3165,7 @@ class Assignment < ActiveRecord::Base
   def att_frozen?(att, user = nil)
     return false unless frozen?
 
-    if settings = PluginSetting.settings_for_plugin(:assignment_freezer)
+    if (settings = PluginSetting.settings_for_plugin(:assignment_freezer))
       if Canvas::Plugin.value_to_boolean(settings[att.to_s])
         if user
           return !self.context.grants_right?(user, :manage_frozen_assignments)

@@ -75,7 +75,7 @@ module Exporters
     private
 
     def compute_common_folder
-      if root_folder = @folders.detect { |f| f.parent_folder.nil? }
+      if (root_folder = @folders.detect { |f| f.parent_folder.nil? })
         # exporting all files
         @common_folder_name = root_folder.name
         @common_prefix = root_folder.full_name + '/'

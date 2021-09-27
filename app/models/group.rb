@@ -348,7 +348,7 @@ class Group < ActiveRecord::Base
 
     member = nil
     GroupMembership.unique_constraint_retry do
-      if member = self.group_memberships.where(user_id: user).first
+      if (member = self.group_memberships.where(user_id: user).first)
         member.workflow_state = new_record_state unless member.active?
         # only update moderator if true/false is explicitly passed in
         member.moderator = moderator unless moderator.nil?

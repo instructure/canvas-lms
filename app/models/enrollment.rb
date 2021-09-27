@@ -834,7 +834,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def completed_at
-    if date = self.read_attribute(:completed_at)
+    if (date = self.read_attribute(:completed_at))
       date
     elsif !new_record? && completed?
       self.enrollment_state.state_started_at

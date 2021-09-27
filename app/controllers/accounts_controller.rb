@@ -1070,8 +1070,9 @@ class AccountsController < ApplicationController
         end
 
         if params[:account][:settings] && params[:account][:settings].has_key?(:trusted_referers)
-          if trusted_referers = params[:account][:settings].delete(:trusted_referers)
-            @account.trusted_referers = trusted_referers if @account.root_account?
+          if (trusted_referers = params[:account][:settings].delete(:trusted_referers)) &&
+             @account.root_account?
+            @account.trusted_referers = trusted_referers
           end
         end
 
@@ -1088,7 +1089,7 @@ class AccountsController < ApplicationController
 
         ensure_sis_max_name_length_value!(params[:account]) if params[:account][:settings]
 
-        if sis_id = params[:account].delete(:sis_source_id)
+        if (sis_id = params[:account].delete(:sis_source_id))
           if !@account.root_account? && sis_id != @account.sis_source_id && @account.root_account.grants_right?(@current_user, session, :manage_sis)
             if sis_id == ''
               @account.sis_source_id = nil
@@ -1559,7 +1560,7 @@ class AccountsController < ApplicationController
   # TODO Refactor add_account_user and remove_account_user actions into
   # AdminsController. see https://redmine.instructure.com/issues/6634
   def add_account_user
-    if role_id = params[:role_id]
+    if (role_id = params[:role_id])
       role = Role.get_role_by_id(role_id)
       raise ActiveRecord::RecordNotFound unless role
     else

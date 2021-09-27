@@ -120,11 +120,9 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   end
 
   def question_data
-    if data = read_attribute(:question_data)
-      if data.class == Hash
-        write_attribute(:question_data, data.with_indifferent_access)
-        data = read_attribute(:question_data)
-      end
+    if (data = read_attribute(:question_data)) && data.class == Hash
+      write_attribute(:question_data, data.with_indifferent_access)
+      data = read_attribute(:question_data)
     end
 
     unless data.is_a?(Quizzes::QuizQuestion::QuestionData)

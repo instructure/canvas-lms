@@ -63,7 +63,7 @@ module Importers
       if context.respond_to?(:assignment_group_no_drop_assignments) && context.assignment_group_no_drop_assignments
         context.assignments.active.where.not(:migration_id => nil)
                .where(:assignment_group_id => context.assignment_group_no_drop_assignments.values).each do |item|
-          if group = context.assignment_group_no_drop_assignments[item.migration_id]
+          if (group = context.assignment_group_no_drop_assignments[item.migration_id])
             AssignmentGroup.add_never_drop_assignment(group, item)
           end
         end
@@ -176,7 +176,7 @@ module Importers
       if hash[:grading_type]
         item.grading_type = hash[:grading_type]
         item.points_possible = hash[:points_possible]
-      elsif grading = hash[:grading]
+      elsif (grading = hash[:grading])
         hash[:due_at] ||= grading[:due_at] || grading[:due_date]
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
         if grading[:grade_type] =~ /numeric|points/i
@@ -278,15 +278,14 @@ module Importers
       if quiz
         item.quiz = quiz
       elsif hash[:quiz_migration_id]
-        if q = context.quizzes.where(migration_id: hash[:quiz_migration_id]).first
-          if !item.quiz || item.quiz.id == q.id
-            # the quiz is published because it has an assignment
-            q.assignment = item
-            q.generate_quiz_data
-            q.published_at = Time.now
-            q.workflow_state = 'available'
-            q.save
-          end
+        if (q = context.quizzes.where(migration_id: hash[:quiz_migration_id]).first) &&
+           (!item.quiz || item.quiz.id == q.id)
+          # the quiz is published because it has an assignment
+          q.assignment = item
+          q.generate_quiz_data
+          q.published_at = Time.now
+          q.workflow_state = 'available'
+          q.save
         end
         item.submission_types = 'online_quiz'
         item.saved_by = :quiz

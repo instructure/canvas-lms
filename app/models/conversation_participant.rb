@@ -429,7 +429,7 @@ class ConversationParticipant < ActiveRecord::Base
 
   def update_cached_data(options = {})
     options = { :recalculate_count => true, :set_last_message_at => true, :regenerate_tags => true }.update(options)
-    if latest = last_message
+    if (latest = last_message)
       self.tags = message_tags if options[:regenerate_tags] && private?
       self.message_count = messages.human.size if options[:recalculate_count]
       self.last_message_at = if last_message_at.nil?
@@ -448,8 +448,8 @@ class ConversationParticipant < ActiveRecord::Base
       self.has_media_objects = messages.with_media_comments.exists?
       self.visible_last_authored_at = if latest.author_id == user_id
                                         latest.created_at
-                                      elsif latest_authored = last_authored_message
-                                        latest_authored.created_at
+                                      else
+                                        last_authored_message&.created_at
                                       end
     else
       self.tags = nil
@@ -494,7 +494,7 @@ class ConversationParticipant < ActiveRecord::Base
       self.class.unscoped do
         old_shard = self.user.shard
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user.id)
-        if existing = conversation.conversation_participants.where(user_id: new_user).first
+        if (existing = conversation.conversation_participants.where(user_id: new_user).first)
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
           existing.clear_participants_cache
           destroy

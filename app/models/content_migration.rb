@@ -218,7 +218,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def plugin_type
-    if plugin = Canvas::Plugin.find(migration_type)
+    if (plugin = Canvas::Plugin.find(migration_type))
       plugin.metadata(:select_text) || plugin.name
     else
       t(:unknown, 'Unknown')
@@ -453,10 +453,10 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_default_settings
-    if self.context && self.context.respond_to?(:root_account) && account = self.context.root_account
-      if default_ms = account.settings[:default_migration_settings]
-        self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
-      end
+    if self.context && self.context.respond_to?(:root_account) &&
+       (account = self.context.root_account) &&
+       (default_ms = account.settings[:default_migration_settings])
+      self.migration_settings = default_ms.merge(self.migration_settings).with_indifferent_access
     end
 
     if !self.migration_settings.has_key?(:overwrite_quizzes)

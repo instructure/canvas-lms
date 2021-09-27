@@ -654,7 +654,7 @@ class FilesController < ApplicationController
     verify_authenticity_token unless @context.is_a?(Account)
 
     # if the relative path matches the given file id use that file
-    if file_id && @attachment = @context.attachments.where(id: file_id).first
+    if file_id && (@attachment = @context.attachments.where(id: file_id).first)
       unless @attachment.matches_full_display_path?(path) || @attachment.matches_full_path?(path)
         @attachment = nil
       end

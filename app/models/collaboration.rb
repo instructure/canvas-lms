@@ -118,7 +118,7 @@ class Collaboration < ActiveRecord::Base
   #
   # Returns a class or nil.
   def self.collaboration_class(type)
-    if klass = "#{type}Collaboration".constantize
+    if (klass = "#{type}Collaboration".constantize)
       klass.ancestors.include?(Collaboration) && klass.config ? klass : nil
     end
   rescue NameError

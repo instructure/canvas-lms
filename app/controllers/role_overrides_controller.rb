@@ -421,7 +421,7 @@ class RoleOverridesController < ApplicationController
     # Add base_role_type_label for this role
     json = role_json(@context, role, @current_user, session)
 
-    if base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type }
+    if (base_role = RoleOverride.enrollment_type_labels.find { |br| br[:base_role_name] == base_role_type })
       # NOTE: p[1][:label_v2].call could eventually be removed if we copied everything over to :label
       json["base_role_type_label"] = base_role.key?(:label_v2) ? base_role[:label_v2].call : base_role[:label].call
     end

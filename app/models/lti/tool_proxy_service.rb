@@ -125,7 +125,7 @@ module Lti
     def create_product_family(tp, account, developer_key)
       vendor_code = tp.tool_profile.product_instance.product_info.product_family.vendor.code
       product_code = tp.tool_profile.product_instance.product_info.product_family.code
-      unless product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code, developer_key: developer_key).first
+      unless (product_family = ProductFamily.where(vendor_code: vendor_code, product_code: product_code, developer_key: developer_key).first)
         product_family = ProductFamily.new
         product_family.vendor_code = vendor_code
         product_family.product_code = product_code

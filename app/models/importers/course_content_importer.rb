@@ -67,7 +67,7 @@ module Importers
           :rename_files => migration.migration_settings[:files_import_allow_rename],
           :migration_id_map => migration.attachment_path_id_lookup,
         }
-        if root_path = migration.migration_settings[:files_import_root_path]
+        if (root_path = migration.migration_settings[:files_import_root_path])
           unzip_opts[:root_directory] = Folder.assert_path(
             root_path, migration.context
           )
@@ -175,7 +175,7 @@ module Importers
           if migration.for_course_copy? && !migration.for_master_course_import? &&
              (source = migration.source_course || Course.where(id: migration.migration_settings[:source_course_id]).first)
             mig_id = migration.content_export.create_key(source.wiki.front_page)
-            if new_front_page = course.wiki_pages.where(migration_id: mig_id).first
+            if (new_front_page = course.wiki_pages.where(migration_id: mig_id).first)
               course.wiki.set_front_page_url!(new_front_page.url)
             end
           end
@@ -278,7 +278,7 @@ module Importers
     def self.adjust_dates(course, migration)
       begin
         # Adjust dates
-        if shift_options = migration.date_shift_options
+        if (shift_options = migration.date_shift_options)
           shift_options = self.shift_date_options(course, shift_options)
 
           Assignment.suspend_due_date_caching do
@@ -410,7 +410,7 @@ module Importers
             all_tools ||= migration.cross_institution? ?
                 course.context_external_tools.having_setting('course_navigation') :
                 ContextExternalTool.find_all_for(course, :course_navigation)
-            if tool = (all_tools.detect { |t| t.migration_id == tool_mig_id } ||
+            if (tool = all_tools.detect { |t| t.migration_id == tool_mig_id } ||
                 all_tools.detect { |t|
                   CC::CCHelper.create_key(t) == tool_mig_id ||
                   CC::CCHelper.create_key(t, global: true) == tool_mig_id
@@ -435,10 +435,9 @@ module Importers
       # superhax to force new wiki front page if home view changed (or is master course sync)
       if settings['default_view'] && data[:wikis] && (migration.for_master_course_import? || (settings['default_view'] != course.default_view))
         course.wiki # ensure that it exists already
-        if page_hash = data[:wikis].detect { |h| h[:front_page] }
-          if page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id])
-            page.set_as_front_page!
-          end
+        if (page_hash = data[:wikis].detect { |h| h[:front_page] }) &&
+           (page = migration.find_imported_migration_item(WikiPage, page_hash[:migration_id]))
+          page.set_as_front_page!
         end
       end
 
@@ -458,13 +457,13 @@ module Importers
         if settings[:grading_standard_enabled]
           course.grading_standard_enabled = true
           if settings[:grading_standard_identifier_ref]
-            if gs = course.grading_standards.where(migration_id: settings[:grading_standard_identifier_ref]).first
+            if (gs = course.grading_standards.where(migration_id: settings[:grading_standard_identifier_ref]).first)
               course.grading_standard = gs
             else
               migration.add_warning(t(:copied_grading_standard_warning, "Couldn't find copied grading standard for the course."))
             end
           elsif settings[:grading_standard_id].present?
-            if gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first
+            if (gs = GradingStandard.for(course).where(id: settings[:grading_standard_id]).first)
               course.grading_standard = gs
             else
               migration.add_warning(t(:account_grading_standard_warning, "Couldn't find account grading standard for the course."))
@@ -475,14 +474,13 @@ module Importers
           course.grading_standard = nil
         end
       end
-      if image_url = settings[:image_url]
+      if (image_url = settings[:image_url])
         course.image_url = image_url
         course.image_id = nil
-      elsif image_ref = settings[:image_identifier_ref]
-        if image_att = course.attachments.where(:migration_id => image_ref).active.first
-          course.image_id = image_att.id
-          course.image_url = nil
-        end
+      elsif (image_ref = settings[:image_identifier_ref]) &&
+            (image_att = course.attachments.where(:migration_id => image_ref).active.first)
+        course.image_id = image_att.id
+        course.image_url = nil
       end
       if settings[:lock_all_announcements]
         Announcement.lock_from_course(course)

@@ -931,7 +931,7 @@ class ApplicationController < ActionController::Base
           end
           @context_membership = @context_enrollment
           check_for_readonly_enrollment_state
-        elsif params[:account_id] || (self.is_a?(AccountsController) && params[:account_id] = params[:id])
+        elsif params[:account_id] || (self.is_a?(AccountsController) && (params[:account_id] = params[:id]))
           @context = api_find(Account.active, params[:account_id])
           params[:context_id] = @context.id
           params[:context_type] = "Account"
@@ -944,13 +944,13 @@ class ApplicationController < ActionController::Base
           params[:context_type] = "Group"
           @context_enrollment = @context.group_memberships.where(user_id: @current_user).first if @context && @current_user
           @context_membership = @context_enrollment
-        elsif params[:user_id] || (self.is_a?(UsersController) && params[:user_id] = params[:id])
+        elsif params[:user_id] || (self.is_a?(UsersController) && (params[:user_id] = params[:id]))
           scope = include_deleted ? User : User.active
           @context = api_find(scope, params[:user_id])
           params[:context_id] = params[:user_id]
           params[:context_type] = "User"
           @context_membership = @context if @context == @current_user
-        elsif params[:course_section_id] || (self.is_a?(SectionsController) && params[:course_section_id] = params[:id])
+        elsif params[:course_section_id] || (self.is_a?(SectionsController) && (params[:course_section_id] = params[:id]))
           params[:context_id] = params[:course_section_id]
           params[:context_type] = "CourseSection"
           @context = api_find(CourseSection, params[:course_section_id])
@@ -1994,7 +1994,7 @@ class ApplicationController < ActionController::Base
   def calendar_url_for(contexts_to_link_to = nil, options = {})
     options[:query] ||= {}
     contexts_to_link_to = Array(contexts_to_link_to)
-    if event = options.delete(:event)
+    if (event = options.delete(:event))
       options[:query][:event_id] = event.id
     end
     options[:query][:include_contexts] = contexts_to_link_to.map { |c| c.asset_string }.join(",") unless contexts_to_link_to.empty?
@@ -2446,19 +2446,19 @@ class ApplicationController < ActionController::Base
       if !browser_supported? && !@embedded_view && !cookies['unsupported_browser_dismissed']
         notices << { :type => 'warning', :content => { html: unsupported_browser }, :classes => 'unsupported_browser' }
       end
-      if error = flash[:error]
+      if (error = flash[:error])
         flash.delete(:error)
         notices << { :type => 'error', :content => error, :icon => 'warning' }
       end
-      if warning = flash[:warning]
+      if (warning = flash[:warning])
         flash.delete(:warning)
         notices << { :type => 'warning', :content => warning, :icon => 'warning' }
       end
-      if info = flash[:info]
+      if (info = flash[:info])
         flash.delete(:info)
         notices << { :type => 'info', :content => info, :icon => 'info' }
       end
-      if notice = (flash[:html_notice] ? { html: flash[:html_notice] } : flash[:notice])
+      if (notice = flash[:html_notice] ? { html: flash[:html_notice] } : flash[:notice])
         if flash[:html_notice]
           flash.delete(:html_notice)
         else
@@ -2765,7 +2765,7 @@ class ApplicationController < ActionController::Base
             end
         end
 
-        if tctx = Thread.current[:context]
+        if (tctx = Thread.current[:context])
           ctx[:request_id] = tctx[:request_id]
           ctx[:session_id] = tctx[:session_id]
         end

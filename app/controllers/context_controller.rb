@@ -204,7 +204,7 @@ class ContextController < ApplicationController
         @users = @context.participating_users_in_context(sort: true).distinct.order_by_sortable_name
       end
       @primary_users = { t('roster.group_members', 'Group Members') => @users }
-      if course = @context.context.try(:is_a?, Course) && @context.context
+      if (course = @context.context.is_a?(Course) && @context.context)
         @secondary_users = { t('roster.teachers_and_tas', 'Teachers & TAs') => course.participating_instructors.order_by_sortable_name.distinct }
       end
     end

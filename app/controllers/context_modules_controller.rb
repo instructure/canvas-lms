@@ -412,7 +412,7 @@ class ContextModulesController < ApplicationController
     tags = mod.content_tags_visible_to(@current_user)
     pres = []
     tags.each do |tag|
-      if req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id }
+      if (req = (mod.completion_requirements || []).detect { |r| r[:id] == tag.id })
         progression.requirements_met ||= []
         if !progression.requirements_met.any? { |r| r[:id] == req[:id] && r[:type] == req[:type] }
           if !before_tag || tag.position <= before_tag.position
@@ -656,7 +656,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       if request.format == :json
         if @context.grants_right?(@current_user, session, :view_all_grades)
-          if params[:user_id] && @user = @context.students.find(params[:user_id])
+          if params[:user_id] && (@user = @context.students.find(params[:user_id]))
             @progressions = @context.context_modules.active.map { |m| m.evaluate_for(@user) }
           else
             if @context.large_roster

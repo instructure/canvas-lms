@@ -380,7 +380,7 @@ class SubmissionComment < ActiveRecord::Base
 
   def formatted_body(truncate = nil)
     # stream items pre-serialize the return value of this method
-    if formatted_body = read_attribute(:formatted_body)
+    if (formatted_body = read_attribute(:formatted_body))
       return formatted_body
     end
 

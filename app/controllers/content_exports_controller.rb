@@ -77,7 +77,7 @@ class ContentExportsController < ApplicationController
   end
 
   def destroy
-    if params[:id].present? && export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first
+    if params[:id].present? && (export = @context.content_exports_visible_to(@current_user).where(id: params[:id]).first)
       export.destroy
       render :json => { :success => 'true' }
     else
@@ -86,7 +86,7 @@ class ContentExportsController < ApplicationController
   end
 
   def xml_schema
-    if filename = CC::Schema.for_version(params[:version])
+    if (filename = CC::Schema.for_version(params[:version]))
       cancel_cache_buster
       send_file(filename, :type => 'text/xml', :disposition => 'inline')
     else

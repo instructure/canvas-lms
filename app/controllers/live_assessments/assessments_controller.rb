@@ -82,7 +82,7 @@ module LiveAssessments
 
       Assessment.transaction do
         params[:assessments].each do |assessment_hash|
-          if assessment_hash[:links] && outcome_id = assessment_hash[:links][:outcome]
+          if (outcome_id = assessment_hash.dig(:links, :outcome))
             return unless authorized_action(@context, @current_user, :manage_outcomes)
 
             @outcome = @context.linked_learning_outcomes.where(id: outcome_id).first

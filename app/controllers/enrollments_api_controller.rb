@@ -421,9 +421,9 @@ class EnrollmentsApiController < ApplicationController
     GuardRail.activate(:secondary) do
       endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
-      return unless enrollments = @context.is_a?(Course) ?
+      return unless (enrollments = @context.is_a?(Course) ?
                                     course_index_enrollments :
-                                    user_index_enrollments
+                                    user_index_enrollments)
 
       enrollments = enrollments.joins(:user).select("enrollments.*")
 
@@ -616,9 +616,9 @@ class EnrollmentsApiController < ApplicationController
 
       type = params[:enrollment].delete(:type)
 
-      if role_id = params[:enrollment].delete(:role_id)
+      if (role_id = params[:enrollment].delete(:role_id))
         role = @context.account.get_role_by_id(role_id)
-      elsif role_name = params[:enrollment].delete(:role)
+      elsif (role_name = params[:enrollment].delete(:role))
         role = @context.account.get_course_role_by_name(role_name)
       else
         type = "StudentEnrollment" if type.blank?

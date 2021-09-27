@@ -129,7 +129,7 @@ class WikiPage < ActiveRecord::Base
       baddies = self.context.wiki_pages.not_deleted.where(title: "Front Page").select { |p| p.url != "front-page" }
       baddies.each { |p| p.title = to_cased_title.call(p.url); p.save_without_broadcasting! }
     end
-    if existing = self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
+    if self.context.wiki_pages.not_deleted.where(title: self.title).where.not(:id => self.id).first
       real_title = self.title.gsub(/-(\d*)\z/, '') # remove any "-#" at the end
       n = $1 ? $1.to_i + 1 : 2
       begin
@@ -255,7 +255,7 @@ class WikiPage < ActiveRecord::Base
 
     RequestCache.cache(locked_request_cache_key(user), opts[:deep_check_if_needed]) do
       locked = false
-      if item = locked_by_module_item?(user, opts)
+      if (item = locked_by_module_item?(user, opts))
         locked = { object: self, :module => item.context_module }
         unlock_at = locked[:module].unlock_at
         locked[:unlock_at] = unlock_at if unlock_at && unlock_at > Time.now.utc
