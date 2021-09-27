@@ -75,12 +75,12 @@ spec/dr_diff_spec.rb}
             :message =>
              "[rubocop] Avoid using sleep.\n\n       sleep 1\n       ^^^^^^^\n",
             :position => 5,
-            :severity => "warn" }
+            :severity => "convention" }
         ]
       end
 
       before :each do
-        expect(DiffParser).to receive(:new).with(git.diff, true, true).and_return(diff_parser)
+        expect(DiffParser).to receive(:new).with(git.diff, raw: true, campsite: true).and_return(diff_parser)
         expect(CommandCapture).to receive(:run).with(format, command).and_return(command_capture_comments)
         allow(diff_parser).to receive(:relevant?).and_return(true)
       end
@@ -105,7 +105,7 @@ spec/dr_diff_spec.rb}
           path_without_git_dir = comment[:path][git_dir.length..-1]
           expect(diff_parser).to receive(:relevant?).with(path_without_git_dir,
                                                           comment[:position],
-                                                          true)
+                                                          severe: false)
           subject.comments(format: format, command: command)
         end
 
@@ -134,7 +134,7 @@ spec/dr_diff_spec.rb}
           comment = command_capture_comments.first
           expect(diff_parser).to receive(:relevant?).with(comment[:path],
                                                           comment[:position],
-                                                          true)
+                                                          severe: false)
           subject.comments(format: format, command: command)
         end
       end

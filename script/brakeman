@@ -9,6 +9,7 @@ linter_options = {
   format: 'brakeman',
   command: 'bundle exec brakeman --rails6 --quiet --format json --confidence-level 2',
   append_files_to_command: false,
+  severe_anywhere: false
 }
 
 brakeman = Linter.new(linter_options)

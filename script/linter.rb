@@ -42,7 +42,8 @@ class Linter
     plugin: ENV['GERRIT_PROJECT'],
     skip_file_size_check: false,
     skip_wips: false,
-    base_dir: nil
+    base_dir: nil,
+    severe_anywhere: true
   }.freeze
 
   def initialize(options = {})
@@ -87,7 +88,7 @@ class Linter
 
   private
 
-  attr_reader *DEFAULT_OPTIONS.keys
+  attr_reader(*DEFAULT_OPTIONS.keys)
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
@@ -98,7 +99,7 @@ class Linter
   end
 
   def dr_diff
-    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode, heavy: heavy_mode, base_dir: base_dir)
+    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode, heavy: heavy_mode, base_dir: base_dir, severe_anywhere: severe_anywhere)
   end
 
   def wip?
@@ -172,9 +173,13 @@ class Linter
     end
 
     comments.each do |comment|
+      message = +"[#{comment[:source]}] "
+      message << "#{comment[:rule]}: " if comment[:rule]
+      message << comment[:message]
+
       draft.add_comment comment[:path],
                         comment[:position],
-                        comment[:message],
+                        message,
                         comment[:severity]
     end
 
@@ -189,12 +194,18 @@ class Linter
   end
 
   def pretty_comment(comment)
-    message = ""
-    message += "[#{comment[:severity]}]".colorize(:yellow)
+    message = +""
+    severity_color = severe_levels.include?(comment[:severity]) ? :red : :yellow
+    severity_color = :green if comment[:corrected]
+    message << "[#{comment[:severity]}]".colorize(severity_color)
     unless comment[:cover_message]
-      message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+      message << " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
     end
-    message += " => #{comment[:message].colorize(:green)}"
+    message << " => "
+    message << "[Correctable] ".colorize(:yellow) if comment[:correctable]
+    message << "[Corrected] ".colorize(:green) if comment[:corrected]
+    message << "#{comment[:rule]}: " if comment[:rule]
+    message << comment[:message].colorize(:green)
     puts message
   end
 end

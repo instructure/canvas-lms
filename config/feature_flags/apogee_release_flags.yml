@@ -108,3 +108,8 @@ gradebook_assignment_search_and_redesign:
   display_name: Gradebook Assignment Search And Redesign
   description: Search assignments in Gradebook and new design for assignment
     and student search
+visible_assignments_scope_change:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Visible Assignments Scope Change
+  description: Reverts the visible assignments scope to its original form

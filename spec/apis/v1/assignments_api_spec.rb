@@ -923,7 +923,7 @@ describe AssignmentsApiController, type: :request do
           expect(json).to eq []
         end
 
-        it "does not show assignments assigned to  the user has an inactive sectionenrollments for" do
+        it "does not show assignments assigned to the user's inactive section enrollment" do
           inactive_enrollment = @course.enroll_student(@student2, :allow_multiple_enrollments => true,
                                                                   :enrollment_state => 'inactive', :section => @section2)
 

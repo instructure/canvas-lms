@@ -516,6 +516,66 @@ describe Assignment do
     end
   end
 
+  describe '#visible_to_students_in_course_with_da' do
+    before(:once) do
+      Account.site_admin.enable_feature!(:visible_assignments_scope_change)
+    end
+
+    let(:student_enrollment) { @course.enrollments.find_by(user: @student) }
+    let(:visible_assignments) do
+      Assignment.visible_to_students_in_course_with_da(@student.id, @course.id)
+    end
+
+    it 'excludes unpublished assignments' do
+      assignment = @course.assignments.create!(workflow_state: 'unpublished')
+      expect(visible_assignments).not_to include assignment
+    end
+
+    it 'excludes assignments not assigned to the given user' do
+      section = @course.course_sections.create!
+      assignment = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment, course_section: section)
+      expect(visible_assignments).not_to include assignment
+    end
+
+    it 'excludes assignments assigned to a deactivated enrollment for the given user' do
+      assignment = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
+      student_enrollment.deactivate
+      expect(visible_assignments).not_to include assignment
+    end
+
+    it 'excludes assignments that were assigned to the given user and then unassigned' do
+      section = @course.course_sections.create!
+      assignment = @course.assignments.create! # initially assigned
+      assignment.update!(only_visible_to_overrides: true) # unassigned
+      create_section_override_for_assignment(assignment, course_section: section)
+      expect(visible_assignments).not_to include assignment
+    end
+
+    it 'excludes assignments for which the given user submitted something before being unassigned' do
+      section = @course.course_sections.create!
+      assignment = @course.assignments.create!(submission_types: ['online_text_entry']) # initially assigned
+      assignment.submit_homework(@student, submission_type: :online_text_entry, body: :foo)
+      assignment.update!(only_visible_to_overrides: true) # unassigned
+      create_section_override_for_assignment(assignment, course_section: section)
+      expect(visible_assignments).not_to include assignment
+    end
+
+    it 'includes assignments assigned to a concluded enrollment for the given user' do
+      assignment = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
+      student_enrollment.conclude
+      expect(visible_assignments).to include assignment
+    end
+
+    it 'includes assignments assigned to an active enrollment for the given user' do
+      assignment = @course.assignments.create!(only_visible_to_overrides: true)
+      create_section_override_for_assignment(assignment, course_section: student_enrollment.course_section)
+      expect(visible_assignments).to include assignment
+    end
+  end
+
   describe '#annotated_document?' do
     before(:once) do
       @assignment = @course.assignments.build

@@ -23,7 +23,7 @@
 group :test do
   dedicated_gemfile = ENV['BUNDLE_GEMFILE']&.end_with?('rubocop.rb')
 
-  gem 'gergich', '1.2.3', require: false
+  gem 'gergich', '2.0.0', require: false
     gem 'mime-types-data', '3.2021.0901', require: false
 
   gem 'rubocop', '1.19.1', require: false
