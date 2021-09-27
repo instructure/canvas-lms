@@ -454,6 +454,9 @@ export default class Assignment extends Model
   htmlEditUrl: =>
     "#{@get 'html_url'}/edit"
 
+  htmlBuildUrl: =>
+    return @get 'html_url'
+
   labelId: =>
     return @id
 
@@ -583,7 +586,7 @@ export default class Assignment extends Model
       'failedToImport', 'failedToMigrate', 'freezeOnCopy', 'frozen',
       'frozenAttributes', 'gradeGroupStudentsIndividually',
       'gradersAnonymousToGraders', 'gradingStandardId', 'gradingType',
-      'groupCategoryId', 'hasDueDate', 'hasPointsPossible', 'htmlEditUrl',
+      'groupCategoryId', 'hasDueDate', 'hasPointsPossible', 'htmlEditUrl', 'htmlBuildUrl',
       'htmlUrl', 'iconType', 'inClosedGradingPeriod', 'isDefaultTool',
       'isDuplicating', 'isExternalTool', 'isGenericExternalTool', 'isGpaScaled',
       'isImporting', 'isLetterGraded', 'isMasteryConnectTool', 'isMigrating',
