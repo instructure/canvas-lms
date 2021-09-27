@@ -88,7 +88,7 @@ const immersive_reader_mobile_mount_point = document.getElementById(
 if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
   import('../../shared/immersive-reader/ImmersiveReader')
     .then(ImmersiveReader => {
-      const content = document.querySelector('#course_syllabus').innerHTML
+      const content = document.querySelector('#course_syllabus_details').innerHTML
       const title = I18n.t('Course Syllabus')
 
       if (immersive_reader_mount_point) {
@@ -108,10 +108,13 @@ if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
 }
 
 // When all of the fetches have completed, render the view and bind behaviors
-$.when.apply(this, deferreds).then(() => {
-  view.render()
-  SyllabusBehaviors.bindToSyllabus()
-})
+$.when
+  .apply(this, deferreds)
+  .then(() => {
+    view.render()
+    SyllabusBehaviors.bindToSyllabus()
+  })
+  .fail(() => {})
 
 // Add the loading indicator now that the collections are fetching
 $('#loading_indicator').replaceWith('<img src="/images/ajax-reload-animated.gif">')
