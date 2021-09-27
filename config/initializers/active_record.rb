@@ -661,11 +661,12 @@ class ActiveRecord::Base
     end
   end
 
-  def self.wait_for_replication(start: nil, timeout: nil)
+  def self.wait_for_replication(start: nil, timeout: nil, use_report: false)
     return true unless GuardRail.activate(:secondary) { connection.readonly? }
 
+    replica = use_report ? :report : :secondary
     start ||= current_xlog_location
-    GuardRail.activate(:secondary) do
+    GuardRail.activate(replica) do
       # positive == first value greater, negative == second value greater
       start_time = Time.now.utc
       while connection.wal_lsn_diff(start, :last_replay) >= 0
