@@ -24,7 +24,6 @@ describe('MessageListItem', () => {
   const createProps = overrides => {
     return {
       conversation: {
-        _id: '191',
         subject: 'This is the subject line',
         conversationParticipantsConnection: {
           nodes: [
@@ -119,36 +118,8 @@ describe('MessageListItem', () => {
   it('renders the unread badge when the conversation is unread', () => {
     const props = createProps({isUnread: true})
 
-    const container = render(<MessageListItem {...props} />)
+    const {getByText} = render(<MessageListItem {...props} />)
 
-    expect(container.getByText('Unread')).toBeInTheDocument()
-    expect(container.getByTestId('unread-badge')).toBeInTheDocument()
-  })
-
-  it('renders the read badge when the conversation is read', () => {
-    const props = createProps()
-
-    const container = render(<MessageListItem {...props} />)
-
-    expect(container.getByText('Read')).toBeInTheDocument()
-    expect(container.getByTestId('read-badge')).toBeInTheDocument()
-  })
-
-  it('update read state called with correct parameters', () => {
-    const changeReadState = jest.fn()
-
-    const props = createProps({readStateChangeConversationParticipants: changeReadState})
-
-    const container = render(<MessageListItem {...props} />)
-
-    const unreadBadge = container.queryByTestId('read-badge')
-    fireEvent.click(unreadBadge)
-
-    expect(changeReadState).toHaveBeenCalledWith({
-      variables: {
-        conversationIds: ['191'],
-        workflowState: 'unread'
-      }
-    })
+    expect(getByText('Unread')).toBeInTheDocument()
   })
 })

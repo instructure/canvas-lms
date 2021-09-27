@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/answer_parser_spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerParsers::MultipleChoice do
+
   context "#parse" do
     let(:raw_answers) do
       [
@@ -51,5 +52,6 @@ describe Quizzes::QuizQuestion::AnswerParsers::MultipleChoice do
     let(:parser_class) { Quizzes::QuizQuestion::AnswerParsers::MultipleChoice }
 
     include_examples "All answer parsers"
+
   end
 end

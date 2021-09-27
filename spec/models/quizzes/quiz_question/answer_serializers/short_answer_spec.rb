@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
+
   include_examples 'Answer Serializers'
 
   let :input do
@@ -34,11 +35,11 @@ describe Quizzes::QuizQuestion::AnswerSerializers::ShortAnswer do
     }.with_indifferent_access
   end
 
-  it 'returns nil when un-answered' do
+  it 'should return nil when un-answered' do
     expect(subject.deserialize({})).to eq nil
   end
 
-  it 'degracefullies sanitize its text' do
+  it 'should degracefully sanitize its text' do
     expect(subject.serialize('Hello World!').answer).to eq({
       question_5: 'hello world!'
     }.with_indifferent_access)

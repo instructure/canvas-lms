@@ -61,7 +61,6 @@ module Auditors::ActiveRecord
 
     def course_id
       return nil unless context_type == 'Course'
-
       context_id
     end
 
@@ -79,7 +78,6 @@ module Auditors::ActiveRecord
 
     def self.resolve_id_or_placeholder(id)
       return nil if id == Auditors::GradeChange::NULL_PLACEHOLDER
-
       Shard.relative_id_for(id, Shard.current, Shard.current)
     end
     private_class_method :resolve_id_or_placeholder

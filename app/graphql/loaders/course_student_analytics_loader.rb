@@ -31,3 +31,4 @@ class Loaders::CourseStudentAnalyticsLoader < GraphQL::Batch::Loader
     users.each { |u| fulfill(u, nil) }
   end
 end
+

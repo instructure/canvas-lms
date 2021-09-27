@@ -34,6 +34,7 @@ module Canvas
       end
     end
 
+
     def self.included(klass)
       if (r = klass.reflections['root_account'])
         r.extend(ExtendRootAccountReflection)
@@ -48,7 +49,7 @@ module Canvas
           return super
         end
       RUBY
-      klass.include(m)
+      klass.include(m)  
     end
   end
 end

@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #

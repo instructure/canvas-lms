@@ -19,11 +19,12 @@
 
 module Quizzes
   class SubmissionManager
+
     def initialize(quiz)
       @quiz = quiz
     end
 
-    def find_or_create_submission(user, temporary = false, state = nil)
+    def find_or_create_submission(user, temporary=false, state=nil)
       s = nil
       state ||= 'untaken'
       @quiz.shard.activate do
@@ -47,12 +48,11 @@ module Quizzes
     end
 
     private
-
     # this is needed because Rails 2 expects a User object instead of an id
     def generate_build_hash(query_hash, user)
       return query_hash unless query_hash[:user_id]
-
-      { user: user }
+      { user: user}
     end
+
   end
 end

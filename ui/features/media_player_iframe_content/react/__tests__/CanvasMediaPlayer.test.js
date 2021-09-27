@@ -374,7 +374,6 @@ describe('CanvasMediaPlayer', () => {
             media_sources={[defaultMediaObject()]}
             media_tracks={[
               {
-                id: '1',
                 label: 'English',
                 language: 'en',
                 src: '/media_objects/more/stuff',

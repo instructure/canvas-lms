@@ -56,7 +56,6 @@ module Quizzes
     end
 
     private
-
     def non_preview_user_ids
       non_preview_quiz_submissions.not_settings_only.select(:user_id)
     end

@@ -86,4 +86,5 @@ class GradesPresenter
       @enrollments.select { |e| e.state_based_on_date == :active }
     end
   end
+
 end

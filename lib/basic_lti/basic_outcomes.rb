@@ -28,6 +28,7 @@ module BasicLTI
       end
     end
 
+
     class InvalidRequest < StandardError
       def response_status
         415
@@ -35,7 +36,7 @@ module BasicLTI
     end
 
     # gives instfs about 7 hours to have an outage and eventually take the file
-    MAX_ATTEMPTS = 10
+    MAX_ATTEMPTS=10
 
     SOURCE_ID_REGEX = %r{^(\d+)-(\d+)-(\d+)-(\d+)-(\w+)$}
 
@@ -43,7 +44,6 @@ module BasicLTI
       tool.shard.activate do
         sourcedid = BasicLTI::Sourcedid.load!(sourceid)
         raise BasicLTI::Errors::InvalidSourceId, 'Tool is invalid' unless tool == sourcedid.tool
-
         return sourcedid.assignment, sourcedid.user
       end
     end
@@ -142,7 +142,6 @@ module BasicLTI
 
       def self.envelope
         return @envelope if @envelope
-
         @envelope = Nokogiri::XML.parse <<-XML
       <imsx_POXEnvelopeResponse xmlns = "http://www.imsglobal.org/services/ltiv1p1/xsd/imsoms_v1p0">
         <imsx_POXHeader>
@@ -169,7 +168,6 @@ module BasicLTI
       def handle_request(tool)
         # check if we recognize the xml structure
         return false unless operation_ref_identifier
-
         # verify the lis_result_sourcedid param, which will be a canvas-signed
         # tuple of (assignment, user) to ensure that only this launch of
         # the tool is attempting to modify this data.
@@ -285,9 +283,9 @@ module BasicLTI
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
           end
-          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<~NO_POINTS, :grade => submission_hash[:grade]))
-            An external tool attempted to grade this assignment as %{grade}, but was unable
-            to because the assignment has no points possible.
+          submission.submission_comments.create!(:comment => I18n.t('lib.basic_lti.no_points_comment', <<-NO_POINTS, :grade => submission_hash[:grade]))
+An external tool attempted to grade this assignment as %{grade}, but was unable
+to because the assignment has no points possible.
           NO_POINTS
           self.code_major = 'failure'
           self.description = I18n.t('lib.basic_lti.no_points_possible', 'Assignment has no points possible.')
@@ -348,7 +346,7 @@ module BasicLTI
       end
 
       # rubocop:disable Metrics/ParameterLists
-      def fetch_attachment_and_save_submission(url, attachment, submission_hash, assignment, user, attempt_number = 0)
+      def fetch_attachment_and_save_submission(url, attachment, submission_hash, assignment, user, attempt_number=0)
         failed_retryable = attachment.clone_url(url, 'rename', true)
         if failed_retryable && ((attempt_number += 1) < MAX_ATTEMPTS)
           # Exits out of the first job and creates a second one so that the run_at time won't hold back
@@ -359,7 +357,7 @@ module BasicLTI
             # because inst-jobs only takes 2 items from an array to make a string strand
             # name and this uses 3
             n_strand: (Attachment.clone_url_strand(url) << 'failed').join('/'),
-            run_at: Time.now.utc + (attempt_number**4) + 5
+            run_at: Time.now.utc + (attempt_number ** 4) + 5
           }
           delay(**job_options).fetch_attachment_and_save_submission(
             url,
@@ -398,12 +396,12 @@ module BasicLTI
 
         def operation_ref_identifier
           case @params[:lti_message_type].try(:downcase)
-          when 'basic-lis-updateresult'
-            'replaceResult'
-          when 'basic-lis-readresult'
-            'readResult'
-          when 'basic-lis-deleteresult'
-            'deleteResult'
+            when 'basic-lis-updateresult'
+              'replaceResult'
+            when 'basic-lis-readresult'
+              'readResult'
+            when 'basic-lis-deleteresult'
+              'deleteResult'
           end
         end
 
@@ -421,7 +419,6 @@ module BasicLTI
 
         def self.envelope
           return @envelope if @envelope
-
           @envelope = Nokogiri::XML.parse <<-XML
         <message_response>
           <lti_message_type></lti_message_type>
@@ -443,6 +440,7 @@ module BasicLTI
           @envelope.encoding = 'UTF-8'
           @envelope
         end
+
       end
     end
   end

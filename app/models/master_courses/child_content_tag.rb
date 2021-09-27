@@ -40,7 +40,8 @@ class MasterCourses::ChildContentTag < ActiveRecord::Base
                                      :rubric,
                                      :wiki,
                                      :wiki_page,
-                                     quiz: 'Quizzes::Quiz']
+                                     quiz: 'Quizzes::Quiz'
+  ]
   belongs_to :root_account, :class_name => 'Account'
 
   validates_with MasterCourses::TagValidator

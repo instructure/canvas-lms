@@ -41,8 +41,7 @@ import {View} from '@instructure/ui-view'
 export const getMenuConfig = props => {
   const options = {
     all: () => I18n.t('All'),
-    unread: () => I18n.t('Unread'),
-    drafts: () => I18n.t('My Drafts')
+    unread: () => I18n.t('Unread')
   }
   if (props.enableDeleteFilter) {
     options.deleted = () => I18n.t('Deleted')

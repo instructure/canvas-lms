@@ -39,4 +39,5 @@ describe Loaders::EntryParticipantLoader do
       }
     end
   end
+
 end

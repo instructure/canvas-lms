@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,7 +22,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe WikiPage do
-  it "sends page updated notifications" do
+  it "should send page updated notifications" do
     course_with_teacher(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -38,7 +39,7 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@user)
   end
 
-  it "sends page updated notifications to students if active" do
+  it "should send page updated notifications to students if active" do
     course_with_student(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -50,7 +51,7 @@ describe WikiPage do
     expect(p.messages_sent["Updated Wiki Page"].map(&:user)).to be_include(@student)
   end
 
-  it "does not send page updated notifications to students if not active" do
+  it "should not send page updated notifications to students if not active" do
     course_with_student(:active_all => true)
     n = Notification.create(:name => "Updated Wiki Page", :category => "TestImmediately")
     NotificationPolicy.create(:notification => n, :communication_channel => @user.communication_channel, :frequency => "immediately")
@@ -102,15 +103,15 @@ describe WikiPage do
     end
   end
 
-  it "validates the title" do
+  it "should validate the title" do
     course_with_teacher(:active_all => true)
     expect(@course.wiki_pages.new(:title => "").valid?).not_to be_truthy
     expect(@course.wiki_pages.new(:title => "!!!").valid?).not_to be_truthy
-    expect(@course.wiki_pages.new(:title => "a" * 256).valid?).not_to be_truthy
+    expect(@course.wiki_pages.new(:title => "a"*256).valid?).not_to be_truthy
     expect(@course.wiki_pages.new(:title => "asdf").valid?).to be_truthy
   end
 
-  it "sets as front page" do
+  it "should set as front page" do
     course_with_teacher(:active_all => true)
 
     new_front_page = @course.wiki_pages.create!(:title => "asdf")
@@ -120,7 +121,7 @@ describe WikiPage do
     expect(@course.wiki.front_page).to eq new_front_page
   end
 
-  it "validates that the front page is always visible" do
+  it "should validate that the front page is always visible" do
     course_with_teacher(:active_all => true)
     @course.wiki.set_front_page_url!('front-page')
     front_page = @course.wiki.front_page
@@ -140,7 +141,7 @@ describe WikiPage do
     expect(new_front_page.valid?).not_to be_truthy
   end
 
-  it "does not allow the front page to be unpublished" do
+  it "shouldn't allow the front page to be unpublished" do
     course_with_teacher(active_all: true)
     @course.wiki.set_front_page_url!('front-page')
 
@@ -151,13 +152,13 @@ describe WikiPage do
     # front_page.should_not be_valid
   end
 
-  it "transliterates unicode characters in the title for the url" do
+  it "should transliterate unicode characters in the title for the url" do
     course_with_teacher(:active_all => true)
     page = @course.wiki_pages.create!(:title => "æ vęrÿ ßpéçïâł なまえ ¼‽")
     expect(page.url).to eq 'ae-very-sspecial-namae-1-slash-4'
   end
 
-  it "makes the title/url unique" do
+  it "should make the title/url unique" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create(:title => "Asdf")
     p2 = @course.wiki_pages.create(:title => "Asdf")
@@ -165,7 +166,7 @@ describe WikiPage do
     expect(p2.url).to eql('asdf-2')
   end
 
-  it "makes the title unique and truncate to proper length" do
+  it "should make the title unique and truncate to proper length" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create!(:title => "a" * WikiPage::TITLE_LENGTH)
     p2 = @course.wiki_pages.create!(:title => p1.title)
@@ -179,7 +180,7 @@ describe WikiPage do
     expect(p4.title.end_with?('-4')).to be_truthy
   end
 
-  it "lets you reuse the title/url of a deleted page" do
+  it "should let you reuse the title/url of a deleted page" do
     course_with_teacher(:active_all => true)
     p1 = @course.wiki_pages.create(:title => "Asdf")
     p1.workflow_state = 'deleted'
@@ -215,12 +216,12 @@ describe WikiPage do
       @page.save!
     end
 
-    it "does not allow students to read" do
+    it "should not allow students to read" do
       student_in_course(:course => @course, :active_all => true)
       expect(@page.can_read_page?(@student)).to eq false
     end
 
-    it "allows teachers to read" do
+    it "should allow teachers to read" do
       expect(@page.can_read_page?(@teacher)).to eq true
     end
 
@@ -302,7 +303,7 @@ describe WikiPage do
         user_session(@user)
       end
 
-      it 'sets the front page body' do
+      it 'should set the front page body' do
         @course.wiki.set_front_page_url!('front-page')
         front_page = @course.wiki.front_page
         expect(front_page.body).to be_nil
@@ -310,14 +311,14 @@ describe WikiPage do
         expect(front_page.body).not_to be_empty
       end
 
-      it 'publishes the front page' do
+      it 'should publish the front page' do
         @course.wiki.set_front_page_url!('front-page')
         front_page = @course.wiki.front_page
         front_page.initialize_wiki_page(@teacher)
         expect(front_page).to be_published
       end
 
-      it 'does not change the URL in a wiki page link' do
+      it 'should not change the URL in a wiki page link' do
         allow_any_instance_of(UserContent::HtmlRewriter).to receive(:user_can_view_content?).and_return true
         course = course_factory()
         some_other_course = course_factory()
@@ -334,7 +335,7 @@ describe WikiPage do
         group_with_user
       end
 
-      it 'sets the front page body' do
+      it 'should set the front page body' do
         @group.wiki.set_front_page_url!('front-page')
         front_page = @group.wiki.front_page
         expect(front_page.body).to be_nil
@@ -356,23 +357,23 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'is given read rights' do
+      it 'should be given read rights' do
         expect(@page.grants_right?(@admin, :read)).to be_truthy
       end
 
-      it 'is given create rights' do
+      it 'should be given create rights' do
         expect(@page.grants_right?(@admin, :create)).to be_truthy
       end
 
-      it 'is given update rights' do
+      it 'should be given update rights' do
         expect(@page.grants_right?(@admin, :update)).to be_truthy
       end
 
-      it 'is given delete rights' do
+      it 'should be given delete rights' do
         expect(@page.grants_right?(@admin, :delete)).to be_truthy
       end
 
-      it 'is given delete rights for unpublished pages' do
+      it 'should be given delete rights for unpublished pages' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@admin, :delete)).to be_truthy
       end
@@ -385,23 +386,23 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'is given read rights' do
+      it 'should be given read rights' do
         expect(@page.grants_right?(@teacher, :read)).to be_truthy
       end
 
-      it 'is given create rights' do
+      it 'should be given create rights' do
         expect(@page.grants_right?(@teacher, :create)).to be_truthy
       end
 
-      it 'is given update rights' do
+      it 'should be given update rights' do
         expect(@page.grants_right?(@teacher, :update)).to be_truthy
       end
 
-      it 'is given delete rights' do
+      it 'should be given delete rights' do
         expect(@page.grants_right?(@teacher, :delete)).to be_truthy
       end
 
-      it 'is given delete rights for unpublished pages' do
+      it 'should be given delete rights for unpublished pages' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@teacher, :delete)).to be_truthy
       end
@@ -414,33 +415,33 @@ describe WikiPage do
         @page.workflow_state = 'active'
       end
 
-      it 'is given read rights' do
+      it 'should be given read rights' do
         expect(@page.grants_right?(@user, :read)).to be_truthy
       end
 
-      it 'is given read rights, unless hidden from students' do
+      it 'should be given read rights, unless hidden from students' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@user, :read)).to be_falsey
       end
 
-      it 'is given read rights, unless unpublished' do
+      it 'should be given read rights, unless unpublished' do
         @page.workflow_state = 'unpublished'
         expect(@page.grants_right?(@user, :read)).to be_falsey
       end
 
-      it 'is not given create rights' do
+      it 'should not be given create rights' do
         expect(@page.grants_right?(@user, :create)).to be_falsey
       end
 
-      it 'is not given update rights' do
+      it 'should not be given update rights' do
         expect(@page.grants_right?(@user, :update)).to be_falsey
       end
 
-      it 'is not given update_content rights' do
+      it 'should not be given update_content rights' do
         expect(@page.grants_right?(@user, :update_content)).to be_falsey
       end
 
-      it 'is not given delete rights' do
+      it 'should not be given delete rights' do
         expect(@page.grants_right?(@user, :delete)).to be_falsey
       end
 
@@ -449,19 +450,19 @@ describe WikiPage do
           @page.editing_roles = 'teachers,students'
         end
 
-        it 'is given update_content rights' do
+        it 'should be given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_truthy
         end
 
-        it 'is not given create rights' do
+        it 'should not be given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'is not given update rights' do
+        it 'should not be given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'is not given delete rights' do
+        it 'should not be given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -473,19 +474,19 @@ describe WikiPage do
           @page.reload
         end
 
-        it 'is given create rights' do
+        it 'should be given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_truthy
         end
 
-        it 'is given update rights' do
+        it 'should be given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_truthy
         end
 
-        it 'is given update_content rights' do
+        it 'should be given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_truthy
         end
 
-        it 'is not given delete rights' do
+        it 'should not be given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -496,19 +497,19 @@ describe WikiPage do
           @page.editing_roles = 'teachers'
         end
 
-        it 'is not given create rights' do
+        it 'should not be given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'is not given update rights' do
+        it 'should not be given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'is not given update_content rights' do
+        it 'should not be given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_falsey
         end
 
-        it 'is not given delete rights' do
+        it 'should not be given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -519,19 +520,19 @@ describe WikiPage do
           @page.workflow_state = 'unpublished'
         end
 
-        it 'is not given create rights' do
+        it 'should not be given create rights' do
           expect(@page.grants_right?(@user, :create)).to be_falsey
         end
 
-        it 'is not given update rights' do
+        it 'should not be given update rights' do
           expect(@page.grants_right?(@user, :update)).to be_falsey
         end
 
-        it 'is not given update_content rights' do
+        it 'should not be given update_content rights' do
           expect(@page.grants_right?(@user, :update_content)).to be_falsey
         end
 
-        it 'is not given delete rights' do
+        it 'should not be given delete rights' do
           expect(@page.grants_right?(@user, :delete)).to be_falsey
         end
       end
@@ -541,7 +542,7 @@ describe WikiPage do
   describe "destroy" do
     before (:once) { course_factory }
 
-    it "destroys its assignment if enabled" do
+    it "should destroy its assignment if enabled" do
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @page.destroy
@@ -549,14 +550,14 @@ describe WikiPage do
       expect(@assignment.reload).to be_deleted
     end
 
-    it "does not destroy its assignment" do
+    it "should not destroy its assignment" do
       wiki_page_assignment_model course: @course
       @page.destroy
       expect(@page.reload).to be_deleted
       expect(@assignment.reload).not_to be_deleted
     end
 
-    it "destroys its content tags" do
+    it "should destroy its content tags" do
       @page = @course.wiki_pages.create! title: 'destroy me'
       @module = @course.context_modules.create!(:name => "module")
       tag = @module.add_item(type: 'WikiPage', title: 'kill meeee', id: @page.id)
@@ -569,14 +570,14 @@ describe WikiPage do
   describe "restore" do
     before (:once) { course_factory }
 
-    it "restores to unpublished state" do
+    it "should restore to unpublished state" do
       @page = @course.wiki_pages.create! title: 'dot dot dot'
       @page.update_attribute(:workflow_state, 'deleted')
       @page.restore
       expect(@page.reload).to be_unpublished
     end
 
-    it "restores a linked assignment if enabled" do
+    it "should restore a linked assignment if enabled" do
       @course.enable_feature!(:conditional_release)
       wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
@@ -587,14 +588,14 @@ describe WikiPage do
       expect(@page.assignment).to be_unpublished
     end
 
-    it "does not restore a linked assignment" do
+    it "should not restore a linked assignment" do
       wiki_page_assignment_model course: @course
       @page.workflow_state = 'deleted'
       expect { @page.save! }.not_to change { @assignment.workflow_state }
       expect { @page.restore }.not_to change { @assignment.workflow_state }
     end
 
-    it "does not restore its content tags" do
+    it "should not restore its content tags" do
       @page = @course.wiki_pages.create! title: 'dot dot dot'
       @module = @course.context_modules.create!(:name => "module")
       tag = @module.add_item(type: 'WikiPage', title: 'dash dash dash', id: @page.id)
@@ -606,7 +607,7 @@ describe WikiPage do
   end
 
   describe "context_module_action" do
-    it "processes all content tags" do
+    it "should process all content tags" do
       course_with_student active_all: true
       page = @course.wiki_pages.create! title: 'teh page'
       mod1 = @course.context_modules.create name: 'module1'
@@ -624,7 +625,7 @@ describe WikiPage do
   end
 
   describe "locked_for?" do
-    it "locks by preceding item and sequential progress" do
+    it "should lock by preceding item and sequential progress" do
       course_with_student active_all: true
       pageB = @course.wiki_pages.create! title: 'B'
       pageC = @course.wiki_pages.create! title: 'C'
@@ -701,7 +702,7 @@ describe WikiPage do
 
       @section = @course.course_sections.create!(name: "test section")
       student_in_section(@section, user: @student1)
-      create_section_override_for_assignment(@assignment, { course_section: @section })
+      create_section_override_for_assignment(@assignment, {course_section: @section})
 
       @course.enroll_student(@student2, :enrollment_state => 'active')
       @course.reload
@@ -725,68 +726,68 @@ describe WikiPage do
 
   describe ".reinterpret_version_yaml" do
     it "replaces the unescaped media comments" do
-      bad_yaml = <<~YAML
-        ---
-        id: 787500
-        wiki_id: 15160
-        title: \"\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico\"
-        body: \"<p style=\\\"text-align: center;\\\"><a id=\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\" class=\"instructure_inline_media_comment audio_comment\" data-media_comment_type=\"audio\" data-alt=\"\" href=\"/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\"/></p>\\r\
-        <p style=\\\"text-align: center;\\\"> </p>\\r\
-        <p
-          style=\\\"text-align: center;\\\"><span style=\\\"font-size: 18pt;\\\">Geography is the
-          study of Earth and its land, water, air and people. We are concentrating on learning
-          about the physical features, climate and natural resources that affect an area and
-          its people.</span></p>\\r\
-          center;\\\"> </p>\"
-        user_id:#{' '}
-        created_at: !ruby/object:ActiveSupport::TimeWithZone
-          utc: &1 2020-11-05 20:24:57.390301492 Z
-          zone: &2 !ruby/object:ActiveSupport::TimeZone
-            name: Etc/UTC
-          time: *1
-        updated_at: !ruby/object:ActiveSupport::TimeWithZone
-          utc: *1
-          zone: *2
-          time: *1
-        url: ss10-dot-20-|-social-studies-warm-up-las-cruces-new-mexico
-        protected_editing: false
-        revised_at: !ruby/object:ActiveSupport::TimeWithZone
-          utc: &3 2020-11-05 20:24:57.386639804 Z
-          zone: *2
-          time: *3
-        context_id: 23167
-        context_type: Course
-        root_account_id: 1
-      YAML
+      bad_yaml = <<-YAML
+---
+id: 787500
+wiki_id: 15160
+title: \"\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico\"
+body: \"<p style=\\\"text-align: center;\\\"><a id=\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\" class=\"instructure_inline_media_comment audio_comment\" data-media_comment_type=\"audio\" data-alt=\"\" href=\"/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\"/></p>\\r\
+<p style=\\\"text-align: center;\\\"> </p>\\r\
+<p
+  style=\\\"text-align: center;\\\"><span style=\\\"font-size: 18pt;\\\">Geography is the
+  study of Earth and its land, water, air and people. We are concentrating on learning
+  about the physical features, climate and natural resources that affect an area and
+  its people.</span></p>\\r\
+  center;\\\"> </p>\"
+user_id: 
+created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &1 2020-11-05 20:24:57.390301492 Z
+  zone: &2 !ruby/object:ActiveSupport::TimeZone
+    name: Etc/UTC
+  time: *1
+updated_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: *1
+  zone: *2
+  time: *1
+url: ss10-dot-20-|-social-studies-warm-up-las-cruces-new-mexico
+protected_editing: false
+revised_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &3 2020-11-05 20:24:57.386639804 Z
+  zone: *2
+  time: *3
+context_id: 23167
+context_type: Course
+root_account_id: 1
+YAML
       good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
       expect(good_yaml).to include("style=\\\"text-align: center;\\\">")
       expect(good_yaml).to include("<a id=\\\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\\\"")
     end
 
     it "isn't overly greedy in matching other anchor tags" do
-      bad_yaml = <<~YAML
-        ---
-        id: 19903
-        wiki_id: 513
-        title: Jason otitis media treatment
-        body: \"<ul>\\r\\n
-                        <li\n  class=\\\"distractors\\\"><a class=\\\"radio_link\\\" href=\\\"#\\\">Yes</a></li>\\r\\n
-                        <li class=\\\"distractors\\\"><a\n  class=\\\"radio_link answer\\\" href=\\\"#\\\">No</a></li>\\r\\n
-                      </ul>\\r\\n</div>\\r\\n
-                      <div class=\\\"col-md-4\\\">
-                        <img\n  src=\\\"/courses/348/files/102814/preview\\\" alt=\\\"Antibiotics\\\" width=\\\"100%\\\"\n  height=\\\"auto\\\" data-api-endpoint=\\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\\"\n  data-api-returntype=\\\"File\\\">
-                      </div>\\r\\n
-                    </div>\\r\\n
-                    <div class=\\\"feedback\\\">\\r\\n
-                      <p>Jason\n  does not need antibiotics at this time. He is not systemically unwell, he has no\n  high-risk complications and there is no discharge from his ear.</p>\\r\\n
-                    </div>\\r\\n
-                    <div\n  class=\\\"feedback correct\\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
-                    <div class=\\\"feedback\n  incorrect\\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
-                  </div>\\r\\n
-                </div>\\r\\n<div class=\\\"content-box\\\">\\r\\n<div\n  class=\\\"grid-row spacer center-xs\\\">\\r\\n
-                <div class=\\\"col-md-4 text-left\\\">\\r\\n<p\n  class=\\\"text-info\\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\\"col-md-4\\\">
-                <a id=\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\" class=\"instructure_inline_media_comment audio_comment\" href=\"/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\"/>\"
-      YAML
+      bad_yaml = <<-YAML
+---
+id: 19903
+wiki_id: 513
+title: Jason otitis media treatment
+body: \"<ul>\\r\\n
+                <li\n  class=\\\"distractors\\\"><a class=\\\"radio_link\\\" href=\\\"#\\\">Yes</a></li>\\r\\n
+                <li class=\\\"distractors\\\"><a\n  class=\\\"radio_link answer\\\" href=\\\"#\\\">No</a></li>\\r\\n
+              </ul>\\r\\n</div>\\r\\n
+              <div class=\\\"col-md-4\\\">
+                <img\n  src=\\\"/courses/348/files/102814/preview\\\" alt=\\\"Antibiotics\\\" width=\\\"100%\\\"\n  height=\\\"auto\\\" data-api-endpoint=\\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\\"\n  data-api-returntype=\\\"File\\\">
+              </div>\\r\\n
+            </div>\\r\\n
+            <div class=\\\"feedback\\\">\\r\\n
+              <p>Jason\n  does not need antibiotics at this time. He is not systemically unwell, he has no\n  high-risk complications and there is no discharge from his ear.</p>\\r\\n
+            </div>\\r\\n
+            <div\n  class=\\\"feedback correct\\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
+            <div class=\\\"feedback\n  incorrect\\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
+          </div>\\r\\n
+        </div>\\r\\n<div class=\\\"content-box\\\">\\r\\n<div\n  class=\\\"grid-row spacer center-xs\\\">\\r\\n
+        <div class=\\\"col-md-4 text-left\\\">\\r\\n<p\n  class=\\\"text-info\\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\\"col-md-4\\\">
+        <a id=\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\" class=\"instructure_inline_media_comment audio_comment\" href=\"/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\"/>\"
+YAML
       good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
       expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")
     end

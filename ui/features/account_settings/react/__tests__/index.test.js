@@ -43,8 +43,7 @@ describe('start', () => {
       start(fixtures, {
         context: 'account',
         contextId: '1',
-        api: fakeAxios,
-        liveRegion: []
+        api: fakeAxios
       })
     }).not.toThrow()
   })

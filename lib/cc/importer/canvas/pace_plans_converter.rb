@@ -48,5 +48,6 @@ module CC::Importer::Canvas
 
       pace_plans
     end
+
   end
 end

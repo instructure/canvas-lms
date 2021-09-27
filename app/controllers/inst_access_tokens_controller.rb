@@ -37,6 +37,7 @@
 #
 
 class InstAccessTokensController < ApplicationController
+
   before_action :require_user, :require_non_jwt_auth
 
   # @API Create InstAccess token

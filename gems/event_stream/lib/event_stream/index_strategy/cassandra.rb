@@ -49,7 +49,6 @@ module EventStream::IndexStrategy
     def insert(record, key)
       ttl_seconds = event_stream.ttl_seconds(record.created_at)
       return if ttl_seconds < 0
-
       bucket, ordered_id = bookmark_for(record)
       key = create_key(bucket, key)
       database.update(insert_cql, key, ordered_id, record.id, ttl_seconds)
@@ -77,7 +76,7 @@ module EventStream::IndexStrategy
       ids_for_key(key, options)
     end
 
-    def for_key(key, options = {})
+    def for_key(key, options={})
       shard = EventStream.current_shard
       bookmarker = EventStream::IndexStrategy::Cassandra::Bookmarker.new(self)
       BookmarkedCollection.build(bookmarker) do |pager|
@@ -91,7 +90,7 @@ module EventStream::IndexStrategy
     # for each id.  Mostly for use in bulk-scan
     # operations like transferring all data from
     # one store to another.
-    def ids_for_key(key, options = {})
+    def ids_for_key(key, options={})
       shard = EventStream.current_shard
       bookmarker = EventStream::IndexStrategy::Cassandra::Bookmarker.new(self)
       BookmarkedCollection.build(bookmarker) do |pager|

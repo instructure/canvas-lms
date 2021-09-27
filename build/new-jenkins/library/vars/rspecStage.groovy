@@ -19,7 +19,7 @@
 def createDistribution(nestedStages) {
   def rspecNodeTotal = configuration.getInteger('rspec-ci-node-total')
   def seleniumNodeTotal = configuration.getInteger('selenium-ci-node-total')
-  def rspecqNodeTotal = configuration.getInteger('rspecq-ci-node-total')
+  def rspecqNodeTotal = env.TEST_QUEUE_NODES.toInteger()
   def rspecqEnabled = env.RSPECQ_ENABLED == '1' || configuration.isRspecqEnabled()
   def setupNodeHook = this.&setupNode
 
@@ -56,8 +56,8 @@ def createDistribution(nestedStages) {
     "FORCE_FAILURE=${configuration.isForceFailureSelenium() ? '1' : ''}",
     "RERUNS_RETRY=${configuration.getInteger('rspec-rerun-retry')}",
     "RSPEC_PROCESSES=${configuration.getInteger('rspecq-processes')}",
-    "RSPECQ_FILE_SPLIT_THRESHOLD=${configuration.fileSplitThreshold()}",
-    "RSPECQ_MAX_REQUEUES=${configuration.getInteger('rspecq-max-requeues')}",
+    "RSPECQ_FILE_SPLIT_THRESHOLD=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '999' : '150'}",
+    'RSPECQ_MAX_REQUEUES=2',
     'TEST_PATTERN=^./(spec|gems/plugins/.*/spec_canvas)/',
     "RSPECQ_UPDATE_TIMINGS=${env.GERRIT_EVENT_TYPE == 'change-merged' ? '1' : '0'}",
   ]
@@ -104,7 +104,7 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+  def redisPassword = URLEncoder.encode("${RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
   env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
@@ -170,7 +170,7 @@ def runRspecqSuite() {
     def rspecProcesses = env.RSPEC_PROCESSES.toInteger()
 
     rspecProcesses.times { index ->
-      def workerName = "${JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
+      def workerName = "${env.JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
       workers[workerName] = { ->
         def workerStartTime = System.currentTimeMillis()
         sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
@@ -179,7 +179,7 @@ def runRspecqSuite() {
                                         -e RAILS_DB_NAME_TEST=canvas_test_${index} \
                                         -e RSPECQ_UPDATE_TIMINGS \
                                         -T canvas bundle exec rspecq \
-                                          --build ${JOB_NAME}_build${BUILD_NUMBER} \
+                                          --build ${env.JOB_NAME}_build${BUILD_NUMBER} \
                                           --worker ${workerName} \
                                           --include-pattern '${TEST_PATTERN}'  \
                                           --exclude-pattern '${EXCLUDE_TESTS}' \
@@ -192,7 +192,7 @@ def runRspecqSuite() {
         def workerEndTime = System.currentTimeMillis()
 
         //To Do: remove once data gathering exercise is complete and RspecQ is enabled by default.
-        def specCount = sh(script: "docker-compose exec -e $RSPECQ_REDIS_PASSWORD -T redis redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
+        def specCount = sh(script: "docker-compose exec -e ${env.RSPECQ_REDIS_PASSWORD} -T redis redis-cli -h ${env.TEST_QUEUE_HOST} -p 6379 llen ${env.JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
 
         reportToSplunk('test_queue_worker_ended', [
             'workerName': workerName,
@@ -262,7 +262,6 @@ def runReporter() {
 
 def useRspecQ(percentage) {
   if (configuration.isRspecqEnabled()) {
-    env.RSPECQ_ENABLED = '1'
     return true
   }
 

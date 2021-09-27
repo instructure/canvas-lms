@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 lib = File.expand_path('../lib', __FILE__)
@@ -15,6 +16,7 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^(test|spec|features)/})
   spec.require_paths = ["lib"]
 
+
   spec.add_dependency "canvas_http"
   spec.add_dependency "json-jwt", "~> 1.10"
 
@@ -23,3 +25,4 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rspec", "~> 3.0"
   spec.add_development_dependency "webmock", "~> 3.0"
 end
+

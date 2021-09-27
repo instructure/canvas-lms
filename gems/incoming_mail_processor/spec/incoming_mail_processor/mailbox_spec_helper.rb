@@ -19,6 +19,7 @@
 #
 
 shared_examples_for 'Mailbox' do
+
   describe "Mailbox interface" do
     it { is_expected.to respond_to :connect }
     it { is_expected.to respond_to :each_message }

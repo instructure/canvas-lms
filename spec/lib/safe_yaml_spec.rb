@@ -79,7 +79,7 @@ describe "safe_yaml" do
     YAML
   end
 
-  it "is used by default" do
+  it "should be used by default" do
     yaml = <<~YAML
       --- !ruby/regexp /regex/
     YAML
@@ -97,7 +97,7 @@ describe "safe_yaml" do
     expect(YAML.unsafe_load(YAML.dump(regex))).to eq regex
   end
 
-  it "allows some whitelisted classes" do
+  it "should allow some whitelisted classes" do
     result = YAML.load(test_yaml)
 
     def verify(result, key, klass)
@@ -145,62 +145,62 @@ describe "safe_yaml" do
     expect(oo.a).to eq 1
   end
 
-  it "allows some whitelisted classes through psych" do
+  it "should allow some whitelisted classes through psych" do
     old_result = YAML.load(test_yaml)
     psych_yaml = YAML.dump(old_result)
     expect(Psych.load(psych_yaml)).to eq old_result
     expect(YAML.load(psych_yaml)).to eq old_result
   end
 
-  it "works with aliases" do
-    hash = { :a => 1 }.with_indifferent_access
-    obj = { :blah => hash, :bloop => hash }.with_indifferent_access
+  it "should work with aliases" do
+    hash = {:a => 1}.with_indifferent_access
+    obj = {:blah => hash, :bloop => hash}.with_indifferent_access
     yaml = Psych.dump(obj)
     expect(YAML.load(yaml)).to eq obj
   end
 
-  it "dumps whole floats correctly" do
+  it "should dump whole floats correctly" do
     expect(YAML.dump(1.0)).to include("1.0")
   end
 
-  it "dumps freaky floaty-looking strings" do
+  it "should dump freaky floaty-looking strings" do
     str = "1.E+01"
     expect(YAML.load(YAML.dump(str))).to eq str
   end
 
-  it "dumps html-safe strings correctly" do
-    hash = { :blah => "42".html_safe }
+  it "should dump html-safe strings correctly" do
+    hash = {:blah => "42".html_safe}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
-  it "dumps strings with underscores followed by an integer" do
+  it "should dump strings with underscores followed by an integer" do
     # the ride never ends -_-
-    hash = { :blah => "_42" }
+    hash = {:blah => "_42"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
-  it "alsoes dump floaat looking strings followed by an underscore" do
-    hash = { :blah => "42._" }
+  it "should also dump floaat looking strings followed by an underscore" do
+    hash = {:blah => "42._"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
-  it "dumps whatever this is too" do
-    hash = { :blah => "4,2:0." }
+  it "should dump whatever this is too" do
+    hash = {:blah => "4,2:0."}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
-  it "is able to dump and load Canvas:Plugin classes" do
+  it "should be able to dump and load Canvas:Plugin classes" do
     plugin = Canvas::Plugin.find('canvas_cartridge_importer')
     expect(YAML.unsafe_load(YAML.dump(plugin))).to eq plugin
   end
 
-  it "is able to dump and load BigDecimals" do
-    hash = { blah: BigDecimal("1.2") }
+  it "should be able to dump and load BigDecimals" do
+    hash = {blah: BigDecimal("1.2")}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 
-  it "is able to dump and load these strings in stuff" do
-    hash = { :blah => "<<" }
+  it "should be able to dump and load these strings in stuff" do
+    hash = {:blah => "<<"}
     expect(YAML.load(YAML.dump(hash))).to eq hash
   end
 

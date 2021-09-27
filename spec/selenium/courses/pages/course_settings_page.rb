@@ -19,6 +19,7 @@
 
 require_relative '../../common'
 
+
 module CourseSettingsPage
   #------------------------- Selectors --------------------------
   def course_details_tab_link_selector

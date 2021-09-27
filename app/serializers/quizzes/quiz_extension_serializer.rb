@@ -25,3 +25,4 @@ module Quizzes
                :manually_unlocked, :end_at
   end
 end
+

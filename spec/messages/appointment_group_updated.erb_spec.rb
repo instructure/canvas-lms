@@ -36,7 +36,7 @@ describe 'appointment_group_updated' do
 
   context ".email" do
     let(:path_type) { :email }
-    it "renders" do
+    it "should render" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.subject).to include('some title')
       expect(msg.body).to include('some title')
@@ -44,7 +44,7 @@ describe 'appointment_group_updated' do
       expect(msg.body).to include("/appointment_groups/#{@appointment_group.id}")
     end
 
-    it "renders for groups" do
+    it "should render for groups" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include(@cat.name)
     end
@@ -52,7 +52,7 @@ describe 'appointment_group_updated' do
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "renders" do
+    it "should render" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body).to include('some title')
     end
@@ -60,7 +60,7 @@ describe 'appointment_group_updated' do
 
   context ".summary" do
     let(:path_type) { :summary }
-    it "renders" do
+    it "should render" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.subject).to include('some title')
       expect(msg.body).to include('some title')
@@ -69,7 +69,7 @@ describe 'appointment_group_updated' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-    it "renders" do
+    it "should render" do
       msg = generate_message(notification_name, path_type, asset)
       expect(msg.body).to include('some title')
     end

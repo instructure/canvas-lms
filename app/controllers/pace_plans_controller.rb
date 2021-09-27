@@ -26,16 +26,11 @@ class PacePlansController < ApplicationController
   include Api::V1::Course
   include K5Mode
 
-  def index
+  def show
+    not_found unless @context.account.feature_enabled?(:pace_plans) && @context.settings[:enable_pace_plans]
+    return unless authorized_action(@context, @current_user, :manage_content)
+
     @pace_plan = @context.pace_plans.primary.first
-
-    if @pace_plan.nil?
-      @pace_plan = @context.pace_plans.create!
-      @context.context_module_tags.each do |module_item|
-        @pace_plan.pace_plan_module_items.create module_item: module_item, duration: 0
-      end
-    end
-
     js_env({
              BLACKOUT_DATES: [],
              COURSE: course_json(@context, @current_user, session, [], nil),
@@ -88,7 +83,7 @@ class PacePlansController < ApplicationController
         start_at: enrollment.start_at
       }
     end
-    json.index_by { |h| h[:id] }
+    json.index_by {|h| h[:id]}
   end
 
   def sections_json(course)
@@ -101,7 +96,7 @@ class PacePlansController < ApplicationController
         end_at: section.end_at
       }
     end
-    json.index_by { |h| h[:id] }
+    json.index_by {|h| h[:id]}
   end
 
   def authorize_action

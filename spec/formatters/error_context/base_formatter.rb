@@ -32,6 +32,7 @@ require_relative "../rerun_argument"
 #  * video capture (selenium + xvfb)
 module ErrorContext
   class BaseFormatter < ::RSpec::Core::Formatters::BaseFormatter
+
     attr_reader :summary
 
     def example_started(notification)
@@ -48,10 +49,10 @@ module ErrorContext
 
     def self.inherited(klass)
       ::RSpec::Core::Formatters.register klass,
-                                         :example_started,
-                                         :example_failed,
-                                         :example_pending,
-                                         :example_passed
+        :example_started,
+        :example_failed,
+        :example_pending,
+        :example_passed
 
       # TODO: once https://github.com/rspec/rspec-core/pull/2387 lands,
       # remove this and change the register call to use example_finished.
@@ -79,7 +80,6 @@ module ErrorContext
       # beyond a certain point
       MAX_FAILURES_TO_RECORD = 20
       attr_writer :num_failures
-
       def num_failures
         @num_failures ||= 0
       end
@@ -95,7 +95,6 @@ module ErrorContext
 
       def finish
         return unless @summary
-
         note_recent_spec_run @summary.example
         @summary.finish
         @summary = nil
@@ -136,7 +135,6 @@ module ErrorContext
 
     def selenium?
       return @selenium unless @selenium.nil?
-
       @selenium = defined?(SeleniumDependencies) && example.example_group.include?(SeleniumDependencies)
     end
 

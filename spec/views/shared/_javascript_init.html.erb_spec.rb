@@ -22,10 +22,11 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_javascript_init" do
-  it "renders" do
+  it "should render" do
     course_with_student
     view_context
     render :partial => "shared/javascript_init"
     expect(response).not_to be_nil
   end
 end
+

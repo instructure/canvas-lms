@@ -41,6 +41,7 @@ module Lti
       end
     end
 
+
     def accept_update
       if authorized_action(@context, @current_user, :update)
         success = false
@@ -54,6 +55,7 @@ module Lti
           tp_service = ToolProxyService.new
 
           ActiveRecord::Base.transaction do
+
             tp_service.process_tool_proxy_json(
               json: payload,
               context: context,
@@ -134,5 +136,6 @@ module Lti
         Lti::NavigationCache.new(@domain_root_account).invalidate_cache_key
       end
     end
+
   end
 end

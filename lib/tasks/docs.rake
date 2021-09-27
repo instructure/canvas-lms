@@ -44,6 +44,7 @@ begin
           "See #{DOC_DIR}/index.html"
     end
   end
+
 rescue LoadError
   # tasks not enabled
   nil

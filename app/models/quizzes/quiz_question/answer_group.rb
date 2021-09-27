@@ -32,7 +32,6 @@ class Quizzes::QuizQuestion::AnswerGroup
 
   def set_correct_if_none
     return if @answers.empty?
-
     @answers.first[:weight] = 100.to_f unless correct_answer
   end
 
@@ -81,7 +80,7 @@ class Quizzes::QuizQuestion::AnswerGroup
       @data
     end
 
-    def any_value_of(keys, default = "")
+    def any_value_of(keys, default="")
       key = keys.find { |key| @data.key?(key) }
       @data[key] || default
     end
@@ -90,7 +89,8 @@ class Quizzes::QuizQuestion::AnswerGroup
       @data[:weight].to_i == 100
     end
 
-    def set_id(taken_ids, key = :id)
+    def set_id(taken_ids, key=:id)
+
       @data[key] = @data[key.to_s] if @data[key.to_s]
       @data[key] = nil if (@data[key] && @data[key].to_i.zero?) || taken_ids.include?(@data[key])
       @data[key] ||= unique_local_id(taken_ids)
@@ -98,12 +98,10 @@ class Quizzes::QuizQuestion::AnswerGroup
     end
 
     private
-
-    def unique_local_id(taken_ids = [], suggested_id = nil)
+    def unique_local_id(taken_ids = [], suggested_id=nil)
       if suggested_id && suggested_id > 0 && !taken_ids.include?(suggested_id)
         return suggested_id
       end
-
       id = rand(10000)
 
       while taken_ids.include?(id)
@@ -112,5 +110,6 @@ class Quizzes::QuizQuestion::AnswerGroup
 
       id
     end
+
   end
 end

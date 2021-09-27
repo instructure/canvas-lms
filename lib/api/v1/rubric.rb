@@ -43,6 +43,7 @@ module Api::V1::Rubric
     rubrics.map { |r| rubric_json(r, user, session, opts) }
   end
 
+
   def rubric_json(rubric, user, session, opts = {})
     json_attributes = API_ALLOWED_RUBRIC_OUTPUT_FIELDS
     hash = api_json(rubric, user, session, json_attributes)

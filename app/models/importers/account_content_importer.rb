@@ -21,6 +21,7 @@ require_dependency 'importers'
 
 module Importers
   class AccountContentImporter < Importer
+
     self.item_class = Account
     Importers.register_content_importer(self)
 

@@ -55,3 +55,5 @@ shared_examples_for "All answer parsers" do
     expect(@answer_data.first[:comments_html]).not_to include('onerror')
   end
 end
+
+

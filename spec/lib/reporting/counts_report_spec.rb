@@ -27,14 +27,14 @@ describe Reporting::CountsReport do
 
   describe "detailed report" do
     describe "courses" do
-      it "counts available courses" do
+      it "should count available courses" do
         course_factory(:account => @account1, :active_all => 1)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data['courses']).to eq 1
       end
 
-      it "does not count non-available courses" do
+      it "should not count non-available courses" do
         @course1 = course_model(:account => @account1)
         @course2 = course_model(:account => @account1)
         @course2.destroy
@@ -49,13 +49,13 @@ describe Reporting::CountsReport do
     end
 
     shared_examples_for "user_counts" do
-      it "counts users that recently logged in" do
+      it "should count users that recently logged in" do
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 1
       end
 
-      it "does not count users whose enrollment is deleted" do
+      it "should not count users whose enrollment is deleted" do
         @enrollment.destroy
 
         Reporting::CountsReport.process_shard
@@ -63,7 +63,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 0
       end
 
-      it "does not count users whose pseudonym is deleted" do
+      it "should not count users whose pseudonym is deleted" do
         @pseudonym.destroy
 
         Reporting::CountsReport.process_shard
@@ -71,7 +71,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 0
       end
 
-      it "does not count users who haven't recently logged in" do
+      it "should not count users who haven't recently logged in" do
         Setting.set('recently_logged_in_timespan', 1.day.to_s)
         @pseudonym.last_request_at = 2.days.ago
         @pseudonym.save!
@@ -114,13 +114,13 @@ describe Reporting::CountsReport do
       let(:datum) { 'users' }
       include_examples "user_counts"
 
-      it "includes tas" do
+      it "should include tas" do
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
         expect(@snapshot.data[datum]).to eq 1
       end
 
-      it "includes teachers" do
+      it "should include teachers" do
         course_with_teacher(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
@@ -130,7 +130,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 2
       end
 
-      it "includes students" do
+      it "should include students" do
         course_with_student(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
@@ -140,7 +140,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 2
       end
 
-      it "includes designers" do
+      it "should include designers" do
         course_with_designer(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
@@ -150,7 +150,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 2
       end
 
-      it "includes observers" do
+      it "should include observers" do
         course_with_observer(:course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
@@ -160,7 +160,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data[datum]).to eq 2
       end
 
-      it "does not include student view users" do
+      it "should not include student view users" do
         course_with_user('StudentViewEnrollment', :course => @course, :user => user_with_pseudonym, :active_enrollment => 1)
         @pseudonym.last_request_at = 1.day.ago
         @pseudonym.save!
@@ -177,7 +177,7 @@ describe Reporting::CountsReport do
         course_factory(account: @account1, active_course: 1)
       end
 
-      it "counts files with the account's local id in the namespace" do
+      it "should count files with the account's local id in the namespace" do
         attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
@@ -185,7 +185,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data['files_size']).to eq 5 * 1024
       end
 
-      it "counts files with the account's global id in the namespace" do
+      it "should count files with the account's global id in the namespace" do
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
         Reporting::CountsReport.process_shard
         @snapshot = @account1.report_snapshots.detailed.first
@@ -193,7 +193,7 @@ describe Reporting::CountsReport do
         expect(@snapshot.data['files_size']).to eq 3 * 1024
       end
 
-      it "counts with a heterogenous mixture of file namespaces" do
+      it "should count with a heterogenous mixture of file namespaces" do
         attachment_model(namespace: "account_#{@account1.local_id}", size: 5 * 1024)
         attachment_model(namespace: "account_#{@account1.global_id}", size: 3 * 1024)
         Reporting::CountsReport.process_shard

@@ -50,7 +50,7 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
         if (!movedOutcomeGroup) throw new Error(errorMessage)
 
         showFlashAlert({
-          message: I18n.t('"%{groupTitle}" was moved to "%{newGroupTitle}".', {
+          message: I18n.t('"%{groupTitle}" has been moved to "%{newGroupTitle}".', {
             groupTitle,
             newGroupTitle: targetGroup.name
           }),
@@ -59,7 +59,14 @@ const GroupMoveModal = ({groupId, groupTitle, parentGroup, isOpen, onCloseHandle
         onSuccess()
       } catch (err) {
         showFlashAlert({
-          message: I18n.t('An error occurred while moving this group. Please try again.'),
+          message: err.message
+            ? I18n.t('An error occurred moving group "%{groupTitle}": %{message}.', {
+                groupTitle,
+                message: err.message
+              })
+            : I18n.t('An error occurred moving group "%{groupTitle}".', {
+                groupTitle
+              }),
           type: 'error'
         })
       }

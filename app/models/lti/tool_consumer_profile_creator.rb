@@ -21,6 +21,7 @@ require 'ims/lti'
 
 module Lti
   class ToolConsumerProfileCreator
+
     PRODUCT_INSTANCE_JSON = {
       guid: 'replace this',
       product_info: {
@@ -42,6 +43,7 @@ module Lti
         }.freeze
       }.freeze
     }.freeze
+
 
     def initialize(context, tcp_url, tcp_uuid: nil, developer_key: nil)
       @uuid = tcp_uuid || ToolConsumerProfile::DEFAULT_TCP_UUID
@@ -130,5 +132,6 @@ module Lti
         )
       ]
     end
+
   end
 end

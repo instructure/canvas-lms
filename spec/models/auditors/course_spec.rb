@@ -40,24 +40,24 @@ describe Auditors::Course do
 
   describe "with cassandra backend" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra'], 'read_path' => 'cassandra'})
     end
 
     include_examples "cassandra audit logs"
 
     context "nominal cases" do
-      it "includes event" do
+      it "should include event" do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
         expect(Auditors::Course.for_course(@course).paginate(:per_page => 5)).to include(@event)
         expect(Auditors::Course.for_account(@course.account).paginate(:per_page => 5)).to include(@event)
       end
 
-      it "sets request_id" do
+      it "should set request_id" do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
         expect(@event.request_id).to eq request_id.to_s
       end
 
-      it "truncates super long changes" do
+      it "should truncate super long changes" do
         @course.syllabus_body = "ohnoes" * 10_000
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
         expect(@event.attributes["data"].length < 3_000).to be_truthy
@@ -65,17 +65,17 @@ describe Auditors::Course do
     end
 
     context "event source" do
-      it "defaults event source to :manual" do
+      it "should default event source to :manual" do
         @event = Auditors::Course.record_created(@course, @teacher, @course.changes)
         expect(@event.event_source).to eq :manual
       end
 
-      it "logs event with api source" do
+      it "should log event with api source" do
         @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :api)
         expect(@event.event_source).to eq :api
       end
 
-      it "logs event with sis_batch_id and event source of sis" do
+      it "should log event with sis_batch_id and event source of sis" do
         sis_batch = @account.root_account.sis_batches.create
         @event = Auditors::Course.record_created(@course, @teacher, @course.changes, source: :sis, sis_batch: sis_batch)
         expect(@event.event_source).to eq :sis
@@ -84,56 +84,56 @@ describe Auditors::Course do
     end
 
     context "type specific" do
-      it "logs created event" do
+      it "should log created event" do
         @event = Auditors::Course.record_created(@course, @teacher, @course.changes)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "created"
         expect(@event.event_data).to eq @course.changes
       end
 
-      it "logs updated event" do
+      it "should log updated event" do
         @event = Auditors::Course.record_updated(@course, @teacher, @course.changes)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "updated"
         expect(@event.event_data).to eq @course.changes
       end
 
-      it "logs concluded event" do
+      it "should log concluded event" do
         @event = Auditors::Course.record_concluded(@course, @teacher)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "concluded"
         expect(@event.event_data).to eq({})
       end
 
-      it "logs unconcluded event" do
+      it "should log unconcluded event" do
         @event = Auditors::Course.record_unconcluded(@course, @teacher)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "unconcluded"
         expect(@event.event_data).to eq({})
       end
 
-      it "logs published event" do
+      it "should log published event" do
         @event = Auditors::Course.record_published(@course, @teacher)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "published"
         expect(@event.event_data).to eq({})
       end
 
-      it "logs deleted event" do
+      it "should log deleted event" do
         @event = Auditors::Course.record_deleted(@course, @teacher)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "deleted"
         expect(@event.event_data).to eq({})
       end
 
-      it "logs restored event" do
+      it "should log restored event" do
         @event = Auditors::Course.record_restored(@course, @teacher)
         expect(@event.course).to eq @course
         expect(@event.event_type).to eq "restored"
         expect(@event.event_data).to eq({})
       end
 
-      it "logs copied event" do
+      it "should log copied event" do
         @course, @copy_course = @course, course_factory(active_all: true)
         @from_event, @to_event = Auditors::Course.record_copied(@course, @copy_course, @teacher, source: :api)
 
@@ -146,7 +146,7 @@ describe Auditors::Course do
         expect(@to_event.event_data[:copied_to]).to eq(Shard.global_id_for(@copy_course))
       end
 
-      it "logs reset event" do
+      it "should log reset event" do
         @course, @new_course = @course, course_factory(active_all: true)
         @from_event, @to_event = Auditors::Course.record_reset(@course, @new_course, @teacher, source: :api)
 
@@ -176,7 +176,7 @@ describe Auditors::Course do
         @event2 = Auditors::Course::Stream.insert(record)
       end
 
-      it "recognizes :oldest" do
+      it "should recognize :oldest" do
         page = Auditors::Course.for_course(@course, oldest: 12.hours.ago).paginate(:per_page => 2)
         expect(page).to include(@event)
         expect(page).not_to include(@event2)
@@ -186,7 +186,7 @@ describe Auditors::Course do
         expect(acct_page).not_to include(@event2)
       end
 
-      it "recognizes :newest" do
+      it "should recognize :newest" do
         page = Auditors::Course.for_course(@course, newest: 12.hours.ago).paginate(:per_page => 2)
         expect(page).to include(@event2)
         expect(page).not_to include(@event)
@@ -200,7 +200,7 @@ describe Auditors::Course do
 
   describe "with dual writing enabled to postgres" do
     before do
-      allow(Audits).to receive(:config).and_return({ 'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra' })
+      allow(Audits).to receive(:config).and_return({'write_paths' => ['cassandra', 'active_record'], 'read_path' => 'cassandra'})
     end
 
     it "writes to cassandra" do

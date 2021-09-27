@@ -134,6 +134,8 @@ class MediaTracksController < ApplicationController
     end
   end
 
+
+
   # @{not an}API Delete a Media Track
   #
   # Deletes the media track.
@@ -193,6 +195,7 @@ class MediaTracksController < ApplicationController
       new_tracks.each do |t|
         # if the new track coming from the client has no content, it hasn't been updated. Leave it alone.
         next if t["content"].blank?
+
 
         track = @media_object.media_tracks.where(user_id: @current_user.id, locale: t['locale']).first_or_initialize
         track.update! ActionController::Parameters.new(t).permit(*TRACK_SETTABLE_ATTRIBUTES)

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class AddSubscriptionIdToLtiToolProxy < ActiveRecord::Migration[5.2]
+
   tag :predeploy
 
   def up

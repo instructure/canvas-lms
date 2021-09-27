@@ -25,7 +25,6 @@ module AdheresToPolicy
 
       def attr_accessor_with_default(attr_name, default_value)
         attr_writer attr_name
-
         @defaults[attr_name] = default_value
 
         define_method attr_name do

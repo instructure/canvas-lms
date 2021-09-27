@@ -33,5 +33,6 @@ module Canvas::Security
     def public_key
       private_key.public_key
     end
+
   end
 end

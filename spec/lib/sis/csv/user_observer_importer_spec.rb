@@ -21,9 +21,10 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::UserObserverImporter do
+
   before { account_model }
 
-  it 'skips bad content' do
+  it 'should skip bad content' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     before_count = UserObservationLink.active.count
@@ -41,15 +42,15 @@ describe SIS::CSV::UserObserverImporter do
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An observer referenced a non-existent user no_observer",
-                          "Can't observe yourself user U001",
-                          "A student referenced a non-existent user no_student",
-                          "No observer_id given for a user observer",
-                          "No user_id given for a user observer",
-                          "Improper status \"dead\" for a user_observer",
-                          "Can't delete a non-existent observer for observer: U001, student: U002"]
+                            "Can't observe yourself user U001",
+                            "A student referenced a non-existent user no_student",
+                            "No observer_id given for a user observer",
+                            "No user_id given for a user observer",
+                            "Improper status \"dead\" for a user_observer",
+                            "Can't delete a non-existent observer for observer: U001, student: U002"]
   end
 
-  it "adds and remove user_observers" do
+  it "should add and remove user_observers" do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
     before_count = UserObservationLink.active.count
@@ -66,7 +67,7 @@ describe SIS::CSV::UserObserverImporter do
     expect(UserObservationLink.active.count).to eq before_count
   end
 
-  it "is able to disable notifications by default for observers" do
+  it "should be able to disable notifications by default for observers" do
     @account.settings[:default_notifications_disabled_for_observers] = true
     @account.save!
     observer = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')

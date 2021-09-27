@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/id_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
+
   include_examples 'Answer Serializers'
 
   let :factory_options do
@@ -31,7 +32,7 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
   end
 
   let :input do
-    ['9761']
+    [ '9761' ]
   end
 
   let :output do
@@ -50,14 +51,14 @@ describe Quizzes::QuizQuestion::AnswerSerializers::MultipleAnswers do
 
   # for auto specs
   def format(value)
-    [value]
+    [ value ]
   end
 
   context 'validations' do
     include_examples 'Id Answer Serializers'
 
-    it 'rejects unexpected types' do
-      [nil, 'asdf'].each do |bad_input|
+    it 'should reject unexpected types' do
+      [ nil, 'asdf' ].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
         expect(rc.error).to match(/of type array/i)

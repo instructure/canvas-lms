@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "shared/_right_side" do
-  it "renders" do
+  it "should render" do
     course_with_student
     view_context
     render :partial => "shared/right_side"

@@ -20,6 +20,7 @@
 
 module SIS
   class GroupCategoryImporter < BaseImporter
+
     def process
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
@@ -56,7 +57,6 @@ module SIS
           context = @accounts_cache[account_id]
           context ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take
           raise ImportError, "Account with id \"#{account_id}\" didn't exist for group category #{sis_id}" unless context
-
           @accounts_cache[context.sis_source_id] = context
         end
 
@@ -99,7 +99,6 @@ module SIS
 
       def build_data(group_category)
         return unless should_build_roll_back_data?(group_category)
-
         @batch.roll_back_data.build(context: group_category,
                                     previous_workflow_state: old_status(group_category),
                                     updated_workflow_state: current_status(group_category),
@@ -111,7 +110,6 @@ module SIS
 
       def should_build_roll_back_data?(group_category)
         return true if group_category.id_before_last_save.nil? || group_category.saved_change_to_deleted_at?
-
         false
       end
 
@@ -128,6 +126,8 @@ module SIS
       def current_status(group_category)
         group_category.deleted_at.nil? ? 'active' : 'deleted'
       end
+
     end
+
   end
 end

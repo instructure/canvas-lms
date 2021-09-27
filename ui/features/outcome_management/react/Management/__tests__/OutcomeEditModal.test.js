@@ -183,7 +183,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Updated name" was successfully updated.',
+        message: 'This outcome was successfully updated.',
         type: 'success'
       })
     })
@@ -197,7 +197,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while editing this outcome. Please try again.',
+        message: "An error occurred while updating this outcome: GraphQL error: can't be blank.",
         type: 'error'
       })
     })
@@ -212,7 +212,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Outcome" was successfully updated.',
+        message: 'This outcome was successfully updated.',
         type: 'success'
       })
     })
@@ -225,7 +225,7 @@ describe('OutcomeEditModal', () => {
       fireEvent.click(getByText('Save'))
       await act(async () => jest.runOnlyPendingTimers())
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: 'An error occurred while editing this outcome. Please try again.',
+        message: 'An error occurred while updating this outcome: GraphQL error: mutation failed.',
         type: 'error'
       })
     })
@@ -261,7 +261,7 @@ describe('OutcomeEditModal', () => {
       await act(async () => jest.runOnlyPendingTimers())
       // if setFriendlyDescription mutation is called the expectation below will fail
       expect(showFlashAlertSpy).toHaveBeenCalledWith({
-        message: '"Updated name" was successfully updated.',
+        message: 'This outcome was successfully updated.',
         type: 'success'
       })
     })

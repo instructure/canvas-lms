@@ -35,6 +35,7 @@ class ObserverAlertApiHarness
   def course_url(course)
     "/courses/#{course.id}"
   end
+
 end
 
 describe "Api::V1::ObserverAlert" do

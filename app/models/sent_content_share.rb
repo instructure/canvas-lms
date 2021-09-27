@@ -19,6 +19,8 @@
 #
 
 class SentContentShare < ContentShare
+
   has_many :received_content_shares, through: :content_export, source: :received_content_shares
   has_many :receivers, through: :received_content_shares, source: :user
+
 end

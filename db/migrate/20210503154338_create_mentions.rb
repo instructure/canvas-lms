@@ -39,4 +39,5 @@ class CreateMentions < ActiveRecord::Migration[6.0]
   def down
     drop_table :mentions
   end
+
 end

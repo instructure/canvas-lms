@@ -20,6 +20,7 @@
 
 module SIS
   class TermImporter < BaseImporter
+
     def process
       importer = Work.new(@batch, @root_account, @logger)
       EnrollmentTerm.process_as_sis(@sis_options) do
@@ -41,7 +42,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_term(term_id, name, status, start_date = nil, end_date = nil, integration_id = nil, date_override_enrollment_type = nil)
+      def add_term(term_id, name, status, start_date=nil, end_date=nil, integration_id=nil, date_override_enrollment_type=nil)
         raise ImportError, "No term_id given for a term" if term_id.blank?
         raise ImportError, "Improper status \"#{status}\" for term #{term_id}" unless status =~ /\Aactive|\Adeleted/i
         return if @batch.skip_deletes? && status =~ /deleted/i
@@ -57,13 +58,12 @@ module SIS
           end
 
           if status =~ /active/i
-            term.set_overrides(@root_account, { date_override_enrollment_type => { :start_at => start_date, :end_at => end_date } })
+            term.set_overrides(@root_account, {date_override_enrollment_type => {:start_at => start_date, :end_at => end_date}})
           elsif status =~ /deleted/i
             term.enrollment_dates_overrides.where(enrollment_type: date_override_enrollment_type).destroy_all
           end
         else
           raise ImportError, "No name given for term #{term_id}" if name.blank?
-
           # only update the name on new records, and ones that haven't been
           # changed since the last sis import
           if term.new_record? || !term.stuck_sis_fields.include?(:name)
@@ -94,6 +94,7 @@ module SIS
           raise ImportError, msg
         end
       end
+
     end
   end
 end

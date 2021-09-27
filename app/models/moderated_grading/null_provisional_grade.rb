@@ -43,7 +43,6 @@ class ModeratedGrading::NullProvisionalGrade
 
   def scorer
     return nil if @scorer_id.nil?
-
     @scorer ||= User.find(@scorer_id)
   end
 end

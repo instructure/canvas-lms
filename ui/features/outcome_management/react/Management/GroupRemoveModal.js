@@ -28,7 +28,7 @@ import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {removeOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
-const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSuccess}) => {
+const GroupRemoveModal = ({groupId, isOpen, onCloseHandler, onSuccess}) => {
   const {contextType, contextId} = useCanvasContext()
   const isAccount = contextType === 'Account'
   const onRemoveGroupHandler = async () => {
@@ -38,27 +38,28 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
       if (result?.status === 200) {
         onSuccess()
         showFlashAlert({
-          message: I18n.t('This group was successfully removed.'),
+          message: isAccount
+            ? I18n.t('This group was successfully removed from this account.')
+            : I18n.t('This group was successfully removed from this course.'),
           type: 'success'
         })
       } else {
         throw Error()
       }
     } catch (err) {
-      const message = err?.response?.data?.match(
-        /cannot be deleted because it is aligned to content/
-      )
-        ? I18n.t(
-            'An error occurred while removing this group: "%{groupTitle}" contains one or ' +
-              'more Outcomes that are currently aligned to content.',
-            {
-              groupTitle
-            }
-          )
-        : I18n.t('An error occurred while removing this group. Please try again.')
-
+      err.message =
+        err?.response?.data &&
+        err?.response?.data.match(/cannot be deleted because it is aligned to content/)
+          ? I18n.t(
+              'Outcome Group contains one or more Outcomes that are currently aligned to content'
+            )
+          : err.message
       showFlashAlert({
-        message,
+        message: err.message
+          ? I18n.t('An error occurred while removing this group: %{message}.', {
+              message: err.message
+            })
+          : I18n.t('An error occurred while removing this group.'),
         type: 'error'
       })
     }
@@ -99,7 +100,6 @@ const GroupRemoveModal = ({groupId, groupTitle, isOpen, onCloseHandler, onSucces
 
 GroupRemoveModal.propTypes = {
   groupId: PropTypes.string.isRequired,
-  groupTitle: PropTypes.string.isRequired,
   isOpen: PropTypes.bool.isRequired,
   onCloseHandler: PropTypes.func.isRequired,
   onSuccess: PropTypes.func.isRequired

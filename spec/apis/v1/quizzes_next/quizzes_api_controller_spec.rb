@@ -23,15 +23,15 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../file_upload_helper'
 
 describe QuizzesNext::QuizzesApiController, type: :request do
   describe "GET /courses/:course_id/all_quizzes (index)" do
-    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}" } }
+    let(:quizzes) { (0..3).map { |i| @course.quizzes.create! :title => "quiz_#{i}"} }
     let(:assignments) do
       (0..2).map do |i|
-        @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
+        @course.assignments.create! title:"assignment_#{i}", workflow_state: 'unpublished'
       end
     end
     let(:new_quizzes) do
       (3..5).map do |i|
-        quiz = @course.assignments.create! title: "assignment_#{i}", workflow_state: 'unpublished'
+        quiz = @course.assignments.create! title:"assignment_#{i}", workflow_state: 'unpublished'
         quiz.quiz_lti!
         quiz.save!
         quiz
@@ -69,14 +69,14 @@ describe QuizzesNext::QuizzesApiController, type: :request do
         )
       end
 
-      it "returns list of old quizzes" do
+      it "should return list of old quizzes" do
         quiz_collection = subject.collect.reject { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map { |q| q['id'] }).to eq quizzes.map(&:id)
+        expect(quiz_collection.map{ |q| q['id'] }).to eq quizzes.map(&:id)
       end
 
-      it "returns list of assignments (new quizzes)" do
+      it "should return list of assignments (new quizzes)" do
         quiz_collection = subject.collect.select { |quiz| quiz['quiz_type'] == 'quizzes.next' }
-        expect(quiz_collection.map { |q| q['id'] }).to eq new_quizzes.map(&:id)
+        expect(quiz_collection.map{ |q| q['id'] }).to eq new_quizzes.map(&:id)
       end
 
       describe 'search_term query param' do
@@ -97,7 +97,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
 
-        it "searches for quizzes by title" do
+        it "should search for quizzes by title" do
           response = api_call(
             :get,
             "/api/v1/courses/#{@course.id}/all_quizzes?search_term=#{search_term}",
@@ -132,9 +132,9 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           end
         end
 
-        it "deterministicallies order quizzes for pagination" do
+        it "should deterministically order quizzes for pagination" do
           found_quiz_ids = []
-          (quiz_count * 2).times do |i|
+          (quiz_count*2).times do |i|
             page_num = i + 1
             response = api_call(
               :get,
@@ -201,7 +201,7 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           @course.save!
         end
 
-        it "returns unauthorized" do
+        it "should return unauthorized" do
           raw_api_call(
             :get,
             "/api/v1/courses/#{@course.id}/all_quizzes",

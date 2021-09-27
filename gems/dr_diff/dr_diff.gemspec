@@ -1,3 +1,4 @@
+# coding: utf-8
 # frozen_string_literal: true
 
 lib = File.expand_path('../lib', __FILE__)
@@ -14,11 +15,9 @@ Gem::Specification.new do |spec|
   spec.test_files    = spec.files.grep(%r{^spec/})
   spec.require_paths = ["lib"]
 
-  spec.add_dependency "gergich", "2.0.0"
-
-  spec.add_development_dependency "byebug", "~> 11.1"
-  spec.add_development_dependency "pry"
-  spec.add_development_dependency "pry-nav"
+  spec.add_dependency "gergich", "1.2.1"
   spec.add_development_dependency "rspec", "~> 3.5.0"
   spec.add_development_dependency "rspec-mocks"
+  spec.add_development_dependency "pry"
+  spec.add_development_dependency "pry-nav"
 end

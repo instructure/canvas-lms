@@ -43,7 +43,6 @@ module Turnitin
 
     def error_hash
       return {} unless error?
-
       {
         error_code: return_code,
         error_message: return_message,
@@ -57,7 +56,6 @@ module Turnitin
     # up the wording, and then using this to display public facing error messages.
     def public_error_message
       return '' if success?
-
       case return_code
       when 216
         I18n.t('turnitin.error_216', "The student limit for this account has been reached. Please contact your account administrator.")
@@ -109,7 +107,6 @@ module Turnitin
 
     def extract_data_at(xpath, default = '')
       return default unless return_data_node.present?
-
       found_node = return_data_node.at_xpath(xpath)
       found_node.present? ? found_node.content : default
     end

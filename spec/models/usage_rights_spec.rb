@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe UsageRights do
+
   describe '#license_url' do
     it 'returns the private license url if no license is specified' do
       expect(subject.license_url).to eq 'http://en.wikipedia.org/wiki/Copyright'
@@ -31,4 +32,5 @@ describe UsageRights do
       expect(subject.license_url).to eq 'http://creativecommons.org/licenses/by-nc-nd/4.0/'
     end
   end
+
 end

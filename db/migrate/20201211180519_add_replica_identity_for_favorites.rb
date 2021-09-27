@@ -32,3 +32,4 @@ class AddReplicaIdentityForFavorites < ActiveRecord::Migration[5.2]
     change_column_null :favorites, :root_account_id, true
   end
 end
+

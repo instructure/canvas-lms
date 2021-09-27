@@ -116,7 +116,6 @@ class LatePolicyController < ApplicationController
   #
   def show
     raise ActiveRecord::RecordNotFound if course.late_policy.blank?
-
     render json: serialize(course.late_policy)
   end
 
@@ -154,7 +153,6 @@ class LatePolicyController < ApplicationController
   #
   def create
     raise RecordAlreadyExists if course.late_policy.present?
-
     late_policy = course.build_late_policy(late_policy_params)
 
     if late_policy.save
@@ -191,7 +189,6 @@ class LatePolicyController < ApplicationController
   #
   def update
     raise ActiveRecord::RecordNotFound if course.late_policy.blank?
-
     if course.late_policy.update(late_policy_params)
       head :no_content
     else

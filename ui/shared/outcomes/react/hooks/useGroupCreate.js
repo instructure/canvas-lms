@@ -45,13 +45,20 @@ const useGroupCreate = () => {
         setCreatedGroups(prevCreatedGroups => [...prevCreatedGroups, newGroup._id])
 
         showFlashAlert({
-          message: I18n.t('"%{groupName}" was successfully created.', {groupName}),
+          message: I18n.t('"%{groupName}" has been created.', {groupName}),
           type: 'success'
         })
         return newGroup
       } catch (err) {
         showFlashAlert({
-          message: I18n.t('An error occurred while creating this group. Please try again.'),
+          message: err.message
+            ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
+                groupName,
+                message: err.message
+              })
+            : I18n.t('An error occurred adding group "%{groupName}".', {
+                groupName
+              }),
           type: 'error'
         })
       }

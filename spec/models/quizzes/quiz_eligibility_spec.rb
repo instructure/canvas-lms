@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizEligibility do
+
   before do
     course_with_student(active_all: true)
     @quiz = course_quiz(active: true)
@@ -27,10 +28,11 @@ describe Quizzes::QuizEligibility do
   end
 
   describe '#eligible?' do
+
     it 'always returns true if the user is a teacher' do
       allow(@quiz).to receive(:grants_right?).and_return(false)
-      allow(@quiz).to receive(:grants_right?)
-        .with(anything, anything, :manage).and_return(true)
+      allow(@quiz).to receive(:grants_right?).
+        with(anything, anything, :manage).and_return(true)
 
       expect(@eligibility).to be_eligible
       expect(@eligibility).to be_potentially_eligible
@@ -38,8 +40,8 @@ describe Quizzes::QuizEligibility do
 
     it 'always returns true if the user can submit' do
       allow(@quiz).to receive(:grants_right?).and_return(false)
-      allow(@quiz).to receive(:grants_right?)
-        .with(anything, anything, :submit).and_return(true)
+      allow(@quiz).to receive(:grants_right?).
+        with(anything, anything, :submit).and_return(true)
 
       expect(@eligibility).to be_eligible
       expect(@eligibility).to be_potentially_eligible
@@ -69,11 +71,11 @@ describe Quizzes::QuizEligibility do
 
     it 'returns true if a user can read as an admin' do
       allow(@quiz).to receive(:grants_right?).and_return(true)
-      allow(@quiz).to receive(:grants_right?)
-        .with(anything, anything, :manage).and_return(false)
+      allow(@quiz).to receive(:grants_right?).
+        with(anything, anything, :manage).and_return(false)
       allow(@course).to receive(:grants_right?).and_return(false)
-      allow(@course).to receive(:grants_right?)
-        .with(anything, anything, :read_as_admin).and_return(true)
+      allow(@course).to receive(:grants_right?).
+        with(anything, anything, :read_as_admin).and_return(true)
 
       expect(@eligibility).to be_eligible
       expect(@eligibility).to be_potentially_eligible
@@ -106,9 +108,11 @@ describe Quizzes::QuizEligibility do
       expect(@eligibility).to be_eligible
       expect(@eligibility).to be_potentially_eligible
     end
+
   end
 
   describe '#declined_reason_renders' do
+
     it 'returns nil when no additional information should be rendered' do
       expect(@eligibility.declined_reason_renders).to be_nil
     end
@@ -125,6 +129,7 @@ describe Quizzes::QuizEligibility do
   end
 
   describe '#locked?' do
+
     it 'returns false the quiz is not locked' do
       expect(@eligibility).to_not be_locked
     end

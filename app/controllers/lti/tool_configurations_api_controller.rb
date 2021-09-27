@@ -181,13 +181,11 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def require_tool_configuration
     return if developer_key.tool_configuration.present?
-
     head :not_found
   end
 
   def account
     return @context if params[:action] == 'create'
-
     developer_key.owner_account
   end
 
@@ -201,13 +199,12 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def tool_configuration_params
     params.require(:tool_configuration).permit(:settings_url, :custom_fields, :privacy_level, disabled_placements: []).merge(
-      { settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h }
+      {settings: params.require(:tool_configuration)[:settings]&.to_unsafe_h}
     )
   end
 
   def developer_key_params
     return {} if params[:developer_key].blank?
-
     params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :client_credentials_audience, scopes: [])
   end
 

@@ -19,6 +19,7 @@
 
 module Quizzes::QuizQuestion::AnswerSerializers
   class MultipleChoice < Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer
+
     # Select an answer from the set of available answers.
     #
     # Serialization request will be rejected if:
@@ -53,7 +54,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
     #
     # @example output for answer #3 selected:
     #   "3"
-    def deserialize(submission_data, full = false)
+    def deserialize(submission_data, full=false)
       submission_data[question_key]
     end
   end

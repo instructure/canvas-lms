@@ -49,3 +49,4 @@ module CanvasSort
 
   First = FirstClass.new
 end
+

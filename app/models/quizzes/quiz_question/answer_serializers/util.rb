@@ -64,6 +64,7 @@ module Quizzes::QuizQuestion::AnswerSerializers
       #
       # @return [BigDecimal]
       def to_decimal(value)
+
         BigDecimal(value.to_s)
       rescue ArgumentError
         BigDecimal('0.0')

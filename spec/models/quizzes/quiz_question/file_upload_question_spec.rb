@@ -20,8 +20,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::FileUploadQuestion do
+
   let(:question_data) do
-    { :id => 1 }
+    {:id => 1}
   end
 
   let(:question) do

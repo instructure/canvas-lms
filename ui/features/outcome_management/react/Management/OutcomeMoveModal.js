@@ -43,8 +43,6 @@ const OutcomeMoveModal = ({
   const outcomeTitle = Object.values(outcomes)[0]?.title
   const [moveOutcomeLinks] = useMutation(MOVE_OUTCOME_LINKS)
 
-  const disableSaveButton =
-    !targetGroup || (count === 1 && Object.values(outcomes)[0].parentGroupId === targetGroup.id)
   const onMoveOutcomesHandler = () => {
     ;(async () => {
       try {
@@ -83,15 +81,30 @@ const OutcomeMoveModal = ({
         })
       } catch (err) {
         showFlashAlert({
-          message: I18n.t(
-            {
-              one: 'An error occurred while moving this outcome. Please try again.',
-              other: 'An error occurred while moving these outcomes. Please try again.'
-            },
-            {
-              count
-            }
-          ),
+          message: err.message
+            ? I18n.t(
+                {
+                  one: 'An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}": %{errorMessage}.',
+                  other: 'An error occurred moving these outcomes: %{errorMessage}.'
+                },
+                {
+                  newGroupTitle: targetGroup.name,
+                  errorMessage: err.message,
+                  outcomeTitle,
+                  count
+                }
+              )
+            : I18n.t(
+                {
+                  one: 'An error occurred moving outcome "%{outcomeTitle}" to "%{newGroupTitle}".',
+                  other: 'An error occurred moving these outcomes.'
+                },
+                {
+                  newGroupTitle: targetGroup.name,
+                  outcomeTitle,
+                  count
+                }
+              ),
           type: 'error'
         })
       }
@@ -149,7 +162,7 @@ const OutcomeMoveModal = ({
           type="button"
           color="primary"
           margin="0 x-small 0 0"
-          disabled={disableSaveButton}
+          disabled={!targetGroup}
           onClick={onMoveOutcomesHandler}
         >
           {I18n.t('Move')}

@@ -25,7 +25,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 describe "/assignments/show" do
   let(:eula_url) { 'https://www.test.com/eula' }
 
-  it "renders" do
+  it "should render" do
     course_with_teacher(active_all: true)
     view_context(@course, @user)
     g = @course.assignment_groups.create!(:name => "some group")
@@ -42,7 +42,7 @@ describe "/assignments/show" do
     expect(rendered).to include "No additional details were added for this assignment."
   end
 
-  it "renders webcam wrapper" do
+  it "should render webcam wrapper" do
     course_with_student(active_all: true)
     view_context(@course, @student)
     g = @course.assignment_groups.create!(:name => "some group")

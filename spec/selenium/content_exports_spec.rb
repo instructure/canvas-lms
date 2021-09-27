@@ -25,6 +25,7 @@ describe "content exports" do
   include_context "in-process server selenium tests"
 
   context "as a teacher" do
+
     before (:each) do
       course_with_teacher_logged_in
     end
@@ -39,19 +40,19 @@ describe "content exports" do
       expect(new_download_link).to have_attribute('href', %r{/files/\d+/download\?verifier=})
     end
 
-    it "allows course export downloads", priority: "1", test_id: 126678 do
+    it "should allow course export downloads", priority: "1", test_id: 126678 do
       run_export
       expect(@export.export_type).to eq 'common_cartridge'
     end
 
-    it "allows qti export downloads", priority: "1", test_id: 126680 do
+    it "should allow qti export downloads", priority: "1", test_id: 126680 do
       run_export do
         f("input[value=qti]").click
       end
       expect(@export.export_type).to eq 'qti'
     end
 
-    it "selectivelies create qti export", priority: "2", test_id: 1341342 do
+    it "should selectively create qti export", priority: "2", test_id: 1341342 do
       q1 = @course.quizzes.create!(:title => 'quiz1')
       q2 = @course.quizzes.create!(:title => 'quiz2')
 

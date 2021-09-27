@@ -21,14 +21,6 @@ import {fireEvent} from '@testing-library/react'
 import {ConnectedWhitelist} from '../Whitelist'
 import {renderWithRedux} from './utils'
 
-const defaultProps = {
-  context: 'account',
-  accountId: '1',
-  contextId: '1',
-  maxDomains: 50,
-  liveRegion: []
-}
-
 describe('ConnectedWhitelist', () => {
   beforeEach(() => {
     window.ENV = {
@@ -37,7 +29,9 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('renders items on the allowed domain list after they are added', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
 
     const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
@@ -50,7 +44,9 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('handles adding wildcard entries to the allowed domain list', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
 
     const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: '*.instructure.com'}})
@@ -63,35 +59,42 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('renders the empty state when there are no domains', () => {
-    const {getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
     const emptyState = getByText('No allowed domains')
     expect(emptyState).toBeInTheDocument()
   })
 
   it('renders the tools domain list when present', () => {
-    const {getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: ['instructure.com'],
-          tools: {
-            'eduappcenter.com': [
-              {
-                id: '1',
-                name: 'Cool Tool 1',
-                account_id: '1'
-              }
-            ]
+    const {getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com'],
+            tools: {
+              'eduappcenter.com': [
+                {
+                  id: '1',
+                  name: 'Cool Tool 1',
+                  account_id: '1'
+                }
+              ]
+            }
           }
         }
       }
-    })
+    )
 
     const toolDomain = getByText('eduappcenter.com')
     expect(toolDomain).toBeInTheDocument()
   })
 
   it('shows an error message when an invalid domain is entered', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
 
     const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'fake'}})
@@ -104,7 +107,9 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('shows the correct count for the domain list', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
 
     const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
@@ -117,7 +122,9 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('clears the input box after a successful submisssion', () => {
-    const {getByLabelText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />)
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />
+    )
 
     const domainInput = getByLabelText('Domain Name')
     fireEvent.input(domainInput, {target: {value: 'instructure.com'}})
@@ -129,13 +136,16 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('removes items when clicking the delete icon', () => {
-    const {getByText, queryByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
+    const {getByText, queryByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
         }
       }
-    })
+    )
 
     const TEXT = 'Remove instructure.com as an allowed domain'
 
@@ -145,13 +155,16 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('sets focus to the previous domain delete icon when deleting', () => {
-    const {getByText, getByTestId} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
+    const {getByText, getByTestId} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
         }
       }
-    })
+    )
 
     const button = getByText('Remove canvaslms.com as an allowed domain')
     fireEvent.click(button)
@@ -161,13 +174,16 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('sets focus to the the add domain button when removing the first positioned domain from the allowed domain list', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: ['instructure.com', 'canvaslms.com']
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com', 'canvaslms.com']
+          }
         }
       }
-    })
+    )
 
     const deleteButton = getByText('Remove instructure.com as an allowed domain')
     fireEvent.click(deleteButton)
@@ -176,13 +192,16 @@ describe('ConnectedWhitelist', () => {
   })
 
   it('sets focus to the add domain button when removing the last remaining domain from the allowed domain list', () => {
-    const {getByLabelText, getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: ['instructure.com']
+    const {getByLabelText, getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: ['instructure.com']
+          }
         }
       }
-    })
+    )
 
     const deleteButton = getByText('Remove instructure.com as an allowed domain')
     fireEvent.click(deleteButton)
@@ -196,13 +215,16 @@ describe('ConnectedWhitelist', () => {
     for (let i = 0; i < 50; i++) {
       exampleDomains.push(`domain-${i}.com`)
     }
-    const {getByLabelText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: exampleDomains
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: exampleDomains
+          }
         }
       }
-    })
+    )
 
     const addDomainButton = getByLabelText('Add Domain')
     expect(addDomainButton).toBeDisabled()
@@ -213,13 +235,16 @@ describe('ConnectedWhitelist', () => {
     for (let i = 0; i < 50; i++) {
       exampleDomains.push(`domain-${i}.com`)
     }
-    const {getByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} />, {
-      initialState: {
-        whitelistedDomains: {
-          account: exampleDomains
+    const {getByText} = renderWithRedux(
+      <ConnectedWhitelist context="account" contextId="1" maxDomains={50} />,
+      {
+        initialState: {
+          whitelistedDomains: {
+            account: exampleDomains
+          }
         }
       }
-    })
+    )
 
     const domainMessage = getByText(/You have reached the domain limit/)
     expect(domainMessage).toBeInTheDocument()
@@ -231,14 +256,17 @@ describe('ConnectedWhitelist', () => {
       for (let i = 0; i < 50; i++) {
         exampleDomains.push(`domain-${i}.com`)
       }
-      const {queryByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} inherited />, {
-        initialState: {
-          whitelistedDomains: {
-            account: [],
-            inherited: exampleDomains
+      const {queryByText} = renderWithRedux(
+        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />,
+        {
+          initialState: {
+            whitelistedDomains: {
+              account: [],
+              inherited: exampleDomains
+            }
           }
         }
-      })
+      )
 
       const domainMessage = queryByText(/You have reached the domain limit/)
       expect(domainMessage).toBeNull()
@@ -246,7 +274,13 @@ describe('ConnectedWhitelist', () => {
 
     it('shows an information message indicating that switching to custom will allow changes', () => {
       const {getByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          inherited
+          isSubAccount
+        />,
         {
           initialState: {
             whitelistedDomains: {
@@ -265,7 +299,7 @@ describe('ConnectedWhitelist', () => {
 
     it('shows the allowed domain list from the inherited account', () => {
       const {getByText, queryByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited />,
+        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />,
         {
           initialState: {
             whitelistedDomains: {
@@ -285,7 +319,7 @@ describe('ConnectedWhitelist', () => {
 
     it('does not show the count for the allowed domain list', () => {
       const {queryByText, getByText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited />
+        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} inherited />
       )
 
       const wrongString = queryByText('Domains (0/50)')
@@ -297,7 +331,13 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow adding items to the list', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          inherited
+          isSubAccount
+        />,
         {
           initialState: {
             whitelistedDomains: {
@@ -314,7 +354,13 @@ describe('ConnectedWhitelist', () => {
 
     it('does not allow removing items from the list', () => {
       const {getByRole} = renderWithRedux(
-        <ConnectedWhitelist {...defaultProps} inherited isSubAccount />,
+        <ConnectedWhitelist
+          context="account"
+          contextId="1"
+          maxDomains={50}
+          inherited
+          isSubAccount
+        />,
         {
           initialState: {
             whitelistedDomains: {
@@ -332,7 +378,9 @@ describe('ConnectedWhitelist', () => {
 
   describe('isSubAccount', () => {
     it('does not show the option to view a violation log', () => {
-      const {queryByText} = renderWithRedux(<ConnectedWhitelist {...defaultProps} isSubAccount />)
+      const {queryByText} = renderWithRedux(
+        <ConnectedWhitelist context="account" contextId="1" maxDomains={50} isSubAccount />
+      )
       const violationLogBtn = queryByText('View Violation Log')
       expect(violationLogBtn).toBeNull()
     })

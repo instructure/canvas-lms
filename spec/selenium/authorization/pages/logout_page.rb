@@ -19,6 +19,7 @@
 
 require_relative '../../common'
 
+
 module LogoutPage
   #------------------------- Selectors --------------------------
   def logout_confirm_btn_selector

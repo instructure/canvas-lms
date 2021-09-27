@@ -30,7 +30,6 @@ class Feature
     opts.each do |key, val|
       next unless ATTRS.include?(key)
       next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
-
       instance_variable_set "@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
@@ -170,7 +169,6 @@ class Feature
     environments = feature_hash.delete(:environments)
     if environments
       raise "invalid environment tag for feature #{feature_name}: must be one of #{VALID_ENVS}" unless (environments.keys - VALID_ENVS).empty?
-
       env = self.environment
       if environments.key?(env)
         feature_hash.merge!(environments[env])
@@ -202,7 +200,6 @@ class Feature
   def self.feature_applies_to_object(feature, object)
     feature_def = definitions[feature.to_s]
     return false unless feature_def
-
     feature_def.applies_to_object(object)
   end
 
@@ -243,7 +240,6 @@ class Feature
   def self.transitions(feature_name, user, context, orig_state)
     fd = definitions[feature_name.to_s]
     return nil unless fd
-
     fd.transitions(user, context, orig_state)
   end
 

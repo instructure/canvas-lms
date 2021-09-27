@@ -42,15 +42,11 @@ describe('Gradebook', () => {
       outcomes: [
         {
           id: '1',
-          title: 'outcome 1',
-          mastery_points: 5,
-          ratings: []
+          title: 'outcome 1'
         },
         {
           id: '2',
-          title: 'outcome 2',
-          mastery_points: 5,
-          ratings: []
+          title: 'outcome 2'
         }
       ],
       rollups: [

@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe "TimedCache" do
-  it "expires the cache if older than specified" do
+  it "should expire the cache if older than specified" do
     cleared = 0
     Timecop.freeze do
       cache = TimedCache.new(-> { 60.seconds.ago }) do
@@ -38,3 +38,4 @@ describe "TimedCache" do
     end
   end
 end
+

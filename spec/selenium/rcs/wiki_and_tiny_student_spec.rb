@@ -26,12 +26,13 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
   include RCENextPage
 
   context "as a student" do
+
     before(:each) do
       course_with_student_logged_in
       stub_rcs_config
     end
 
-    it "does not allow access to page when marked as hide from student" do
+    it "should not allow access to page when marked as hide from student" do
       expected_error = "Access Denied"
       title = "test_page"
       hfs = true
@@ -44,8 +45,8 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f('#unauthorized_message')).to include_text(expected_error)
     end
 
-    it "does not allow students to edit if marked for only teachers can edit" do
-      # vars for the create_wiki_page method which seeds the used page
+    it "should not allow students to edit if marked for only teachers can edit" do
+      #vars for the create_wiki_page method which seeds the used page
       title = "test_page"
       hfs = false
       edit_roles = "teachers"
@@ -57,7 +58,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f("#content")).not_to contain_css('a.edit-wiki')
     end
 
-    it "allows students to edit wiki if any option but teachers is selected" do
+    it "should allow students to edit wiki if any option but teachers is selected" do
       title = "test_page"
       hfs = false
       edit_roles = "public"
@@ -69,7 +70,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       expect(f('a.edit-wiki')).to be_displayed
 
-      # vars for 2nd wiki page with different permissions
+      #vars for 2nd wiki page with different permissions
       title2 = "test_page2"
       edit_roles2 = "members"
 
@@ -81,7 +82,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f('a.edit-wiki')).to be_displayed
     end
 
-    it "allows students to create new pages if enabled" do
+    it "should allow students to create new pages if enabled" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
 
@@ -96,7 +97,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(new_page).to be_published
     end
 
-    it "does not allow students to add links to new pages" do
+    it "should not allow students to add links to new pages" do
       skip("With new RCE you CAN select pages in this scenario")
       create_wiki_page("test_page", false, "public")
       title = 'test_page'
@@ -117,7 +118,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
       expect(f("#content")).not_to contain_css('#rcs-LinkToNewPage-btn-link')
     end
 
-    it "allows students to add links to pages if they can create them" do
+    it "should allow students to add links to pages if they can create them" do
       @course.default_wiki_editing_roles = "teachers,students"
       @course.save!
       title = 'test_page'

@@ -19,6 +19,7 @@
 
 module SupportHelpers
   module ControllerHelpers
+
     private
 
     def require_site_admin

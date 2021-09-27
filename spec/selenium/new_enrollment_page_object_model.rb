@@ -20,6 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 
 module EnrollmentPageObject
+
   def add_people_button
     f('#addUsers')
   end
@@ -47,6 +48,7 @@ module EnrollmentPageObject
   def course_roster(row)
     f(".roster tbody tr:nth-of-type(#{row}) td")
   end
+
 
   # commenting these until further tests are added
 
@@ -95,6 +97,7 @@ module EnrollmentPageObject
   # end
   #
 
+
   # def second_name_to_be_added
   #   f('.addpeople__peoplereadylist tbody tr:nth-of-type(2) td:nth-of-type(1)').text
   # end
@@ -114,4 +117,6 @@ module EnrollmentPageObject
   # def instituition_belonged_to
   #   f('.addpeople__peoplereadylist tbody tr td:nth-of-type(5)').text
   # end
+
+
 end

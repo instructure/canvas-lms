@@ -27,11 +27,12 @@ describe "submissions" do
   include SubmissionsCommon
 
   context 'as a teacher' do
+
     before(:each) do
       course_with_teacher_logged_in
     end
 
-    it "allows media comments", priority: "1", test_id: 237032 do
+    it "should allow media comments", priority: "1", test_id: 237032 do
       stub_kaltura
 
       student_in_course
@@ -47,7 +48,7 @@ describe "submissions" do
       expect(number_of_comments).to eq 2
     end
 
-    it "displays the grade in grade field", priority: "1", test_id: 237033 do
+    it "should display the grade in grade field", priority: "1", test_id: 237033 do
       student_in_course
       assignment = create_assignment
       assignment.grade_student @student, grade: 2, grader: @teacher
@@ -57,18 +58,18 @@ describe "submissions" do
   end
 
   context "student view" do
+
     before(:each) do
       Account.default.enable_feature!(:rce_enhancements)
       course_with_teacher_logged_in
     end
 
-    it "allows a student view student to view/submit assignments", priority: "1", test_id: 237034 do
+    it "should allow a student view student to view/submit assignments", priority: "1", test_id: 237034 do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_text_entry",
-        :due_at => Time.now.utc + 2.days
-      )
+          :title => 'Cool Assignment',
+          :points_possible => 10,
+          :submission_types => "online_text_entry",
+          :due_at => Time.now.utc + 2.days)
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
@@ -87,13 +88,12 @@ describe "submissions" do
       expect(f('#sidebar_content .details')).to include_text "Submitted!"
     end
 
-    it "allows a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
+    it "should allow a student view student to submit file upload assignments", priority: "1", test_id: 237035 do
       @assignment = @course.assignments.create(
-        :title => 'Cool Assignment',
-        :points_possible => 10,
-        :submission_types => "online_upload",
-        :due_at => Time.now.utc + 2.days
-      )
+          :title => 'Cool Assignment',
+          :points_possible => 10,
+          :submission_types => "online_upload",
+          :due_at => Time.now.utc + 2.days)
 
       enter_student_view
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"

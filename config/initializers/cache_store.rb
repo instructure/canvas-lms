@@ -26,7 +26,6 @@ load_cache_config = -> do
   while !clusters_to_search.empty?
     cluster = clusters_to_search.shift
     next if searched.include?(cluster)
-
     searched << cluster
     config = Canvas.cache_store_config_for(cluster)
 
