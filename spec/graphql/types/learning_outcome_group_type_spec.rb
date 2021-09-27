@@ -55,6 +55,7 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("vendorGuid")).to eq @outcome_group.vendor_guid
     expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
+    expect(outcome_group_type.resolve("notImportedOutcomesCount")).to eq nil
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
     expect(outcome_group_type.resolve("childGroups { nodes { _id } }"))
@@ -162,6 +163,30 @@ describe Types::LearningOutcomeGroupType do
 
     it "accepts search_query in outcomes_count" do
       expect(outcome_group_type.resolve("outcomesCount(searchQuery: \"BBBB\")")).to eq 1
+    end
+  end
+
+  describe '#not_imported_outcomes_count' do
+    before(:once) do
+      @course = course_model :name => 'course', :account => @account, :workflow_state => 'created'
+      @parent_course_group = @course.learning_outcome_groups.create!(:title => 'parent course group')
+      @child_course_group1 = @course.learning_outcome_groups.create!(:title => 'child course group level 1')
+      @child_course_group2 = @course.learning_outcome_groups.create!(:title => 'child course group level 2')
+      @child_course_group1.learning_outcome_group = @parent_course_group
+      @child_course_group1.save!
+      @child_course_group2.learning_outcome_group = @child_course_group1
+      @child_course_group2.save!
+      @child_course_group1.add_outcome @outcome1
+      @child_course_group2.add_outcome @outcome2
+    end
+
+    it 'returns the number of not imported outcomes in the targetGroupId' do
+      expect(outcome_group_type.resolve("notImportedOutcomesCount(targetGroupId: #{@child_course_group1.id})")).to eq 0
+      expect(outcome_group_type.resolve("notImportedOutcomesCount(targetGroupId: #{@child_course_group2.id})")).to eq 1
+    end
+
+    it 'returns nil if no targetGroupId provided' do
+      expect(outcome_group_type.resolve("notImportedOutcomesCount")).to eq nil
     end
   end
 

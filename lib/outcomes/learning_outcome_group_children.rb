@@ -72,6 +72,15 @@ module Outcomes
       end
     end
 
+    def not_imported_outcomes(learning_outcome_group_id, args = {})
+      if group_exists?(args[:target_group_id])
+        target_group = LearningOutcomeGroup.find_by(id: args[:target_group_id])
+        source_group_outcome_ids = outcome_links(learning_outcome_group_id).distinct.pluck(:content_id)
+        target_group_outcome_ids = outcome_links(target_group.id).distinct.pluck(:content_id)
+        (source_group_outcome_ids - (source_group_outcome_ids & target_group_outcome_ids)).size
+      end
+    end
+
     def suboutcomes_by_group_id(learning_outcome_group_id, args = {})
       learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
       relation = ContentTag.active.learning_outcome_links
@@ -104,11 +113,13 @@ module Outcomes
 
     private
 
-    def total_outcomes_for(learning_outcome_group_id, args = {})
-      learning_outcome_groups_ids = children_ids_with_self(learning_outcome_group_id)
+    def outcome_links(learning_outcome_group_id)
+      group_ids = children_ids_with_self(learning_outcome_group_id)
+      ContentTag.active.learning_outcome_links.where(associated_asset_id: group_ids)
+    end
 
-      relation = ContentTag.active.learning_outcome_links
-                           .where(associated_asset_id: learning_outcome_groups_ids)
+    def total_outcomes_for(learning_outcome_group_id, args = {})
+      relation = outcome_links(learning_outcome_group_id)
 
       if args[:search_query]
         relation = relation.joins(:learning_outcome_content)
@@ -199,6 +210,10 @@ module Outcomes
                                         else
                                           LoadAccount.default_domain_root_account.feature_enabled?(:improved_outcomes_management)
                                         end
+    end
+
+    def group_exists?(learning_outcome_group_id)
+      LearningOutcomeGroup.find_by(id: learning_outcome_group_id) != nil
     end
 
     def lang

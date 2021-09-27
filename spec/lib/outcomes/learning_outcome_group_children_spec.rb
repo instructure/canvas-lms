@@ -48,6 +48,11 @@ describe Outcomes::LearningOutcomeGroupChildren do
   let!(:o9) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.1', short_description: 'Outcome 7.1') }
   let!(:o10) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.2', short_description: 'Outcome 7.2') }
   let!(:o11) { outcome_model(context: context, outcome_group: g6, title: 'Outcome 7.3 mathematic', short_description: 'Outcome 7.3 mathematic') }
+  let!(:course) { course_model :name => 'course', :account => context, :workflow_state => 'created' }
+  let!(:cg0) { course.root_outcome_group }
+  let!(:cg1) { outcome_group_model(context: course, outcome_group_id: cg0, title: 'Course Group 1') }
+  let!(:cg2) { outcome_group_model(context: course, outcome_group_id: cg1, title: 'Course Group 2') }
+  let!(:args) { { target_group_id: cg1.id } }
   # rubocop:enable RSpec/LetSetup, Layout/LineLength
 
   # Outcome Structure for visual reference
@@ -64,7 +69,7 @@ describe Outcomes::LearningOutcomeGroupChildren do
   #      g3: Group 2.1
   #         o4: Outcome 4.1
   #         o5: Outcome 4.2
-  #         o6: outcome 4.3
+  #         o6: Outcome 4.3
   #         g6: Group 4
   #            o9:  Outcome 7.1
   #            o10: Outcome 7.2
@@ -72,13 +77,24 @@ describe Outcomes::LearningOutcomeGroupChildren do
   #      g4: Group 2.2
   #         o7: Outcome 5
   #   g2: Group 1.2
-  #      o3: Outcome 2
+  #      o3: Outcome 3
   #      g5: Group 3
   #         o8: Outcome 6
+  # Course
+  # cg0: Root Course Group
+  #   cg1: Course Group 1
+  #      o3: Outcome 3       # imported outcome
+  #      cg2: Course Group 2
+  #         o8: Outcome 6    # imported outcome
 
   before do
     Rails.cache.clear
     context.root_account.enable_feature! :improved_outcomes_management
+  end
+
+  before(:each) do
+    cg1.add_outcome o3
+    cg2.add_outcome o8
   end
 
   describe '#total_outcomes' do
@@ -146,6 +162,22 @@ describe Outcomes::LearningOutcomeGroupChildren do
       it 'returns global outcomes' do
         expect(subject.total_outcomes(global_group.id)).to eq 2
       end
+    end
+  end
+
+  describe '#not_imported_outcomes' do
+    it 'returns the number of not imported outcomes in each group' do
+      expect(subject.not_imported_outcomes(g0.id, args)).to eq 10
+      expect(subject.not_imported_outcomes(g1.id, args)).to eq 9
+      expect(subject.not_imported_outcomes(g2.id, args)).to eq 0
+      expect(subject.not_imported_outcomes(g3.id, args)).to eq 6
+      expect(subject.not_imported_outcomes(g4.id, args)).to eq 1
+      expect(subject.not_imported_outcomes(g5.id, args)).to eq 0
+      expect(subject.not_imported_outcomes(g6.id, args)).to eq 3
+    end
+
+    it 'returns nil if no target_group_id provided' do
+      expect(subject.not_imported_outcomes(g2.id)).to eq nil
     end
   end
 
