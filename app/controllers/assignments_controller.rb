@@ -99,11 +99,24 @@ class AssignmentsController < ApplicationController
   def render_a2_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      !@context_enrollment&.observer?
+      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true")
   end
 
-  def render_a2_student_view
-    submission = @assignment.submissions.find_by(user: @current_user)
+  def a2_active_student_and_enrollment
+    return [@current_user, @context_enrollment] unless @context_enrollment&.observer?
+
+    active_enrollment = ObserverEnrollment.active_or_pending
+                                          .preload(:associated_user)
+                                          .joins(:associated_user)
+                                          .where(course: @context, user: @current_user)
+                                          .order(User.sortable_name_order_by_clause("users"))
+                                          .first
+
+    [active_enrollment&.associated_user, active_enrollment]
+  end
+
+  def render_a2_student_view(student:)
+    submission = @assignment.submissions.find_by(user: student)
     graphql_submisison_id = nil
     if submission
       graphql_submisison_id = CanvasSchema.id_from_object(
@@ -125,7 +138,7 @@ class AssignmentsController < ApplicationController
              belongs_to_unpublished_module: @locked && !@locked[:can_view] && @locked.dig(:context_module, "workflow_state") == "unpublished"
            })
 
-    mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+    mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], student, @assignment)
     if mark_done_presenter.has_requirement?
       js_env({
                CONTEXT_MODULE_ITEM: {
@@ -210,10 +223,14 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
-          js_env({ enrollment_state: @context_enrollment&.state_based_on_date })
-          rce_js_env
-          render_a2_student_view
-          return
+          student_to_view, active_enrollment = a2_active_student_and_enrollment
+          if student_to_view.present?
+            js_env({ enrollment_state: active_enrollment&.state_based_on_date })
+            rce_js_env
+
+            render_a2_student_view(student: student_to_view)
+            return
+          end
         end
 
         env = js_env({ COURSE_ID: @context.id })
