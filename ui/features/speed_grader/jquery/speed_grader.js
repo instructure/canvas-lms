@@ -1187,7 +1187,7 @@ function updateSubmissionAndPageEffects(data) {
   makeSubmissionUpdateRequest(submission, ENV.course_id, data)
     .then(() => {
       refreshGrades(() => {
-        EG.refreshSubmissionsToView()
+        EG.showSubmissionDetails()
         styleSubmissionStatusPills(getLateMissingAndExcusedPills())
         renderStatusMenu(statusMenuComponent(submission), availableMountPointForStatusMenu())
       })
@@ -2413,7 +2413,10 @@ EG = {
       const missing =
         currentSubmission.submission_history[index].submission?.missing ||
         currentSubmission.submission_history[index]?.missing
-      if (missing) {
+      const late =
+        currentSubmission.submission_history[index].submission?.late ||
+        currentSubmission.submission_history[index]?.late
+      if (missing || late) {
         this.refreshSubmissionsToView()
         $submission_details.show()
       } else {
