@@ -78,7 +78,7 @@ module IgnoreMonkeyPatchesInDeprecations
 
   def ignored_callstack(frame)
     if frame.is_a?(String)
-      if md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/)
+      if (md = frame.match(/^(.+?):(\d+)(?::in `(.*?)')?/))
         path, _, label = md.captures
       else
         return false

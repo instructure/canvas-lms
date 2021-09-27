@@ -38,7 +38,7 @@ class ControllerListView < HashView
   end
 
   def canvas_url
-    if config = config_domain_yaml[Rails.env]
+    if (config = config_domain_yaml[Rails.env])
       if config['ssl']
         "https://"
       else

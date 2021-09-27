@@ -386,7 +386,7 @@ module AttachmentFu # :nodoc:
           end
         end
         self.md5 = read_bytes ? digest.hexdigest : nil
-        if existing_attachment = find_existing_attachment_for_md5
+        if (existing_attachment = find_existing_attachment_for_md5)
           self.temp_path = nil if respond_to?(:temp_path=)
           self.temp_data = nil if respond_to?(:temp_data=)
           write_attribute(:filename, nil) if respond_to?(:filename=)

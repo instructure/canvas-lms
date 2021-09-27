@@ -46,9 +46,7 @@ module CanvasKaltura
       @user_secret = config['user_secret_key']
       @host ||= "www.kaltura.com"
       @endpoint ||= "/api_v3"
-      if @cache_play_list_seconds = config['cache_play_list_seconds']
-        @cache_play_list_seconds = @cache_play_list_seconds.to_i
-      end
+      @cache_play_list_seconds = config['cache_play_list_seconds']&.to_i
       @kaltura_sis = config['kaltura_sis']
     end
 
@@ -104,7 +102,7 @@ module CanvasKaltura
             hash = asset.select { |k| keys.member?(k) }
 
             hash[:url] = flavorAssetGetPlaylistUrl(entryId, asset[:id])
-            if hash[:content_type] = CONTENT_TYPES[asset[:fileExt]]
+            if (hash[:content_type] = CONTENT_TYPES[asset[:fileExt]])
               hash[:url] ||= flavorAssetGetDownloadUrl(asset[:id])
             end
 

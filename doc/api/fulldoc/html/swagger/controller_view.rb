@@ -50,7 +50,7 @@ class ControllerView < HashView
   end
 
   def desc
-    if tag = @controller.tags.find { |t| t.tag_name == 'API' }
+    if (tag = @controller.tags.find { |t| t.tag_name == 'API' })
       tag.text
     else
       name

@@ -47,7 +47,7 @@ module ArbitraryStrongishParams
           params[key] = val
         end
       elsif filter[key] == ANYTHING
-        if filtered = recursive_arbitrary_filter(value)
+        if (filtered = recursive_arbitrary_filter(value))
           params[key] = filtered
           params.instance_variable_get(:@anythings)[key] = true
         end
@@ -75,7 +75,7 @@ module ArbitraryStrongishParams
       value.each do |v|
         if permitted_scalar?(v)
           arr << v
-        elsif filtered = recursive_arbitrary_filter(v)
+        elsif (filtered = recursive_arbitrary_filter(v))
           arr << filtered
         end
       end

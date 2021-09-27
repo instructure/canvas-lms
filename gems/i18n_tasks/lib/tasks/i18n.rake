@@ -244,7 +244,7 @@ namespace :i18n do
           if $?.exitstatus == 0
             if ret.include?(base_filename)
               `git checkout #{arg}`
-              if previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil
+              if (previous = YAML.safe_load(File.read(base_filename)).flatten_keys rescue nil)
                 last_export = { :type => :commit, :data => previous }
               else
                 $stderr.puts "Unable to load en.yml file"
@@ -259,7 +259,7 @@ namespace :i18n do
         else
           puts "Loading previous export..."
           if File.exist?(arg)
-            if previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil
+            if (previous = YAML.safe_load(File.read(arg)).flatten_keys rescue nil)
               last_export = { :type => :file, :data => previous }
             else
               $stderr.puts "Unable to load yml file"
