@@ -106,6 +106,8 @@ describe('CanvasInbox Full Page', () => {
     ).toBeInTheDocument()
   })
 
+  // TODO: will be fixed with VICE-2077
+  // eslint-disable-next-line jest/no-disabled-tests
   it.skip('should change the read state of a message', async () => {
     const container = setup()
     const conversation = await container.findByTestId('messageListItem-Checkbox')
