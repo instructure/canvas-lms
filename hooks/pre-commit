@@ -1,13 +1,18 @@
 #!/bin/sh
 
-if [ -f node_modules/.bin/lint-staged ]; then
-  yarn run --silent lint:staged
-else
-  echo 'Trying to run lint:staged inside Docker, if you want things quicker yarn install locally.'
-  docker-compose run --rm --no-deps web yarn run lint:staged ||
-  echo 'You should run `yarn` locally or check to make sure docker is running.'
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+CANVAS=$(dirname $SCRIPTPATH)
+
+if [ `pwd -P` == $CANVAS ]; then 
+  if [ -f node_modules/.bin/lint-staged ]; then
+    yarn run --silent lint:staged
+  else
+    echo 'Trying to run lint:staged inside Docker, if you want things quicker yarn install locally.'
+    docker-compose run --rm --no-deps web yarn run lint:staged ||
+    echo 'You should run `yarn` locally or check to make sure docker is running.'
+  fi
 fi
 
-script/rlint ${RLINT_ARGUMENTS:- --auto-correct}
+$CANVAS/script/rlint ${RLINT_ARGUMENTS:- --auto-correct}
 
 exit 0
