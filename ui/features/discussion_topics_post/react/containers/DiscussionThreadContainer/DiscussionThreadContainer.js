@@ -100,6 +100,7 @@ export const DiscussionThreadContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
+    props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
@@ -499,6 +500,7 @@ DiscussionThreadContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
+  removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func
 }
 
@@ -538,6 +540,7 @@ const DiscussionSubentries = props => {
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
       parentRefCurrent={props.parentRefCurrent}
+      removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
       updateDraftCache={props.updateDraftCache}
     />
   ))
@@ -549,5 +552,6 @@ DiscussionSubentries.propTypes = {
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
   parentRefCurrent: PropTypes.object,
+  removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func
 }

@@ -110,6 +110,7 @@ export const DiscussionTopicRepliesContainer = props => {
             onOpenIsolatedView={props.onOpenIsolatedView}
             goToTopic={props.goToTopic}
             highlightEntryId={props.highlightEntryId}
+            removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
             updateDraftCache={props.updateDraftCache}
           />
         )
@@ -132,6 +133,7 @@ DiscussionTopicRepliesContainer.propTypes = {
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
   highlightEntryId: PropTypes.string,
+  removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func
 }
 

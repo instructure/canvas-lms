@@ -68,6 +68,7 @@ export const IsolatedViewContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
+    props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
 
     props.setHighlightEntryId(newDiscussionEntry.id)
@@ -530,6 +531,7 @@ IsolatedViewContainer.propTypes = {
   replyFromId: PropTypes.string,
   setHighlightEntryId: PropTypes.func,
   relativeEntryId: PropTypes.string,
+  removeDraftFromDiscussionCache: PropTypes.func,
   updateDraftCache: PropTypes.func
 }
 
