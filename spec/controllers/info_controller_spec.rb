@@ -80,11 +80,14 @@ describe InfoController do
   end
 
   describe "GET 'readiness'" do
-    it 'responds with 200 if all system components are alive and serving' do
+    before(:each) do
       allow(Account.connection).to receive(:active?).and_return(true)
       allow(MultiCache.cache).to receive(:fetch).and_call_original
       allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
       allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+    end
+
+    it 'responds with 200 if all system components are alive and serving' do
       get 'readiness'
       expect(response).to be_successful
       json = JSON.parse(response.body)
@@ -92,9 +95,6 @@ describe InfoController do
     end
 
     it 'responds with 503 if a system component is considered down' do
-      allow(Account.connection).to receive(:active?).and_return(true)
-      allow(MultiCache.cache).to receive(:fetch).and_call_original
-      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
       allow(Delayed::Job.connection).to receive(:active?).and_return(false)
       get 'readiness'
       expect(response.code).to eq '503'
@@ -102,11 +102,8 @@ describe InfoController do
       expect(json['status']).to eq 503
     end
 
-    it 'catches any exceptions thrown and log them as errors' do
-      allow(Account.connection).to receive(:active?).and_return(true)
-      allow(MultiCache.cache).to receive(:fetch).and_call_original
+    it 'catchs any exceptions thrown and logs them as errors' do
       allow(MultiCache.cache).to receive(:fetch).with('readiness').and_raise(Redis::TimeoutError)
-      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
       expect(Canvas::Errors).to receive(:capture_exception).once
       get 'readiness'
       expect(response.code).to eq '503'
@@ -115,11 +112,18 @@ describe InfoController do
       expect(redis['status']).to eq 503
     end
 
+    it 'catchs any timeouts thrown and logs them as warnings' do
+      allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+      expect(Canvas::Errors).to receive(:capture_exception)
+        .at_least(:once)
+        .with(:readiness_health_check, 'Timeout::Error', :warn)
+      get 'readiness'
+      expect(response.code).to eq '503'
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 503
+    end
+
     it 'returns all dependent system components in json response' do
-      allow(Account.connection).to receive(:active?).and_return(true)
-      allow(MultiCache.cache).to receive(:fetch).and_call_original
-      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
-      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
       get 'readiness'
       expect(response).to be_successful
       components = JSON.parse(response.body)['components']
@@ -127,6 +131,103 @@ describe InfoController do
         common_css common_js consul filesystem jobs postgresql redis rev_manifest vault
       ]
       expect(components.map { |c| c['status'] }).to eq [200, 200, 200, 200, 200, 200, 200, 200, 200]
+    end
+  end
+
+  describe "GET 'deep'" do
+    let(:canvas_http) { class_double(CanvasHttp) }
+
+    before(:each) do
+      allow(Account.connection).to receive(:active?).and_return(true)
+      allow(MultiCache.cache).to receive(:fetch).and_call_original
+      allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
+      allow(Delayed::Job.connection).to receive(:active?).and_return(true)
+      allow(Shard.connection).to receive(:active?).and_return(true)
+      allow(Canvadocs).to receive(:enabled?).and_return(true)
+      allow(PageView).to receive(:pv4?).and_return(true)
+      allow(Canvadocs).to receive(:config)
+        .and_return({ 'base_url' => 'https://canvadocs.instructure.com/' })
+      allow(ConfigFile).to receive(:load).and_call_original
+      allow(ConfigFile).to receive(:load)
+        .with('pv4').and_return({ 'uri' => 'https://pv4.instructure.com/api/123/' })
+    end
+
+    it 'renders readiness check within json response' do
+      get 'deep'
+      expect(response).to be_successful
+      json = JSON.parse(response.body)
+      expect(json).to have_key('readiness')
+      expect(json['readiness']['components'].count).to be > 0
+    end
+
+    it 'responds with 503 if a readiness system component is considered down' do
+      allow(Delayed::Job.connection).to receive(:active?).and_return(false)
+      get 'deep'
+      expect(response.code).to eq '503'
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 503
+    end
+
+    it 'returns 503 if critical dependency check fails and readiness response is 200' do
+      allow(Shard.connection).to receive(:active?).and_return(false)
+      get 'deep'
+      expect(response.code).to eq '503'
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 503
+    end
+
+    it 'catches any secondary dependency check exceptions without failing the deep check' do
+      allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
+      expect(Canvas::Errors).to receive(:capture_exception)
+        .at_least(:twice)
+        .with(:deep_health_check, 'Timeout::Error', :warn)
+      get 'deep'
+      expect(response.code).to eq '200'
+      secondary = JSON.parse(response.body)['secondary']
+      canvadocs = secondary.find { |c| c['name'] == 'canvadocs' }
+      expect(canvadocs['status']).to eq 503
+    end
+
+    it 'catches any timeouts thrown and logs them as warnings' do
+      allow(Timeout).to receive(:timeout).and_raise(Timeout::Error)
+      expect(Canvas::Errors).to receive(:capture_exception)
+        .at_least(:once)
+        .with(:deep_health_check, 'Timeout::Error', :warn)
+      get 'deep'
+      expect(response.code).to eq '503'
+      json = JSON.parse(response.body)
+      expect(json['status']).to eq 503
+    end
+
+    it 'returns critical dependencies in json response' do
+      get 'deep'
+      expect(response).to be_successful
+      critical = JSON.parse(response.body)['critical']
+      critical.each do |dep|
+        expect(dep['name']).to be_truthy
+        expect(dep['status']).to eq 200
+      end
+    end
+
+    it 'returns secondary dependencies in json response' do
+      allow(canvas_http).to receive(:get).and_return(Net::HTTPSuccess)
+      get 'deep'
+      expect(response).to be_successful
+      secondary = JSON.parse(response.body)['secondary']
+      secondary.each do |dep|
+        expect(dep['name']).to be_truthy
+        expect(dep['status']).to eq 200
+      end
+    end
+
+    it 'returns secondary dependencies in json response only if enabled' do
+      allow(Canvadocs).to receive(:enabled?).and_return(false)
+      allow(PageView).to receive(:pv4?).and_return(false)
+      allow(canvas_http).to receive(:get).and_return(Net::HTTPSuccess)
+      get 'deep'
+      expect(response).to be_successful
+      secondary = JSON.parse(response.body)['secondary']
+      expect(secondary).to eq []
     end
   end
 
@@ -178,7 +279,7 @@ describe InfoController do
 
       get 'help_links'
       links = json_parse(response.body)
-      expect(links.select { |link| link[:text] == 'Ask Your Instructor a Question' }.size).to eq 0
+      expect(links.count { |link| link[:text] == 'Ask Your Instructor a Question' }).to eq 0
     end
   end
 
