@@ -83,9 +83,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, isolatedEntryId, withRCE, relativeId = null) => {
+  const openIsolatedView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
     setReplyFromId(discussionEntryId)
-    setIsolatedEntryId(isolatedEntryId || discussionEntryId)
+    setIsolatedEntryId(isolatedId || discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -124,7 +124,7 @@ const DiscussionTopicManager = props => {
       if (currentDiscussion && newDiscussionEntryDraft) {
         currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
           currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-            draft => draft.id != newDiscussionEntryDraft.id
+            draft => draft.id !== newDiscussionEntryDraft.id
           )
         currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.push(
           newDiscussionEntryDraft
@@ -149,8 +149,8 @@ const DiscussionTopicManager = props => {
       currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
         currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
           draft =>
-            draft.rootEntryId != newDiscussionEntry.rootEntryId &&
-            draft.discussionTopicID != newDiscussionEntry.discussionTopicID
+            draft.rootEntryId !== newDiscussionEntry.rootEntryId &&
+            draft.discussionTopicID !== newDiscussionEntry.discussionTopicID
         )
       cache.writeQuery({...options, data: currentDiscussion})
     } catch (e) {
@@ -237,15 +237,9 @@ const DiscussionTopicManager = props => {
           discussionTopic={discussionTopicQuery.data.legacyNode}
           updateDraftCache={updateDraftCache}
           removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-          onOpenIsolatedView={(
-            discussionEntryId,
-            isolatedEntryId,
-            withRCE,
-            relativeId,
-            highlightId
-          ) => {
+          onOpenIsolatedView={(discussionEntryId, isolatedId, withRCE, relativeId, highlightId) => {
             setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, isolatedEntryId, withRCE, relativeId)
+            openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
