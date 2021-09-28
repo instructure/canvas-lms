@@ -22,7 +22,7 @@ import WikiPageIndexView from 'ui/features/wiki_page_index/backbone/views/WikiPa
 import $ from 'jquery'
 import '@canvas/jquery/jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
-import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import {ltiState} from '@canvas/lti/jquery/messages'
 import * as ConfirmDeleteModal from 'ui/features/wiki_page_index/react/ConfirmDeleteModal.js'
 
 const indexMenuLtiTool = {

@@ -28,7 +28,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Text} from '@instructure/ui-text'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
 import QuizEngineModal from '../../react/QuizEngineModal'
-import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import {ltiState} from '@canvas/lti/jquery/messages'
 import getCookie from 'get-cookie'
 
 export default class IndexView extends Backbone.View {
@@ -50,7 +50,7 @@ export default class IndexView extends Backbone.View {
       'click .reset-quiz-engine': 'resetQuizEngine'
     }
 
-    this.prototype.keyUpSearch = _.debounce(function() {
+    this.prototype.keyUpSearch = _.debounce(function () {
       this.filterResults()
       return this.announceCount()
     }, 200)

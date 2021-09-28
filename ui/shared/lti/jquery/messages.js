@@ -25,6 +25,10 @@ import ToolLaunchResizer from './tool_launch_resizer'
 import handleLtiPostMessage from './post_message/handleLtiPostMessage'
 import {setUnloadMessage, removeUnloadMessage, findDomForWindow} from './util'
 
+// page-global storage for data relevant to LTI postMessage events
+const ltiState = {}
+export {ltiState}
+
 export function ltiMessageHandler(e) {
   if (e.data.source && e.data.source.includes('react-devtools')) {
     return

@@ -32,7 +32,7 @@ import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternal
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import '@canvas/jquery/jquery.disableWhileLoading'
-import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import {ltiState} from '@canvas/lti/jquery/messages'
 
 export default class WikiPageIndexView extends PaginatedCollectionView {
   static initClass() {
