@@ -410,6 +410,17 @@ describe DiscussionTopicsController do
           expect(assigns.dig(:js_env, :rce_mentions_in_discussions)).to be false
         end
       end
+
+      context "podcast_enabled" do
+        it "adds podcast_url to header" do
+          discussion.podcast_enabled = true
+          discussion.save
+
+          subject
+          expect(response.to_a.to_s).to match(/.+enrollment.+\.rss/)
+          expect(response.to_a.to_s).to include("Discussion Podcast Feed")
+        end
+      end
     end
 
     context 'section specific announcements' do
