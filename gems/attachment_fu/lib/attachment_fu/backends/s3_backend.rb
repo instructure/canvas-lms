@@ -184,7 +184,7 @@ module AttachmentFu # :nodoc:
       # INSTRUCTURE: fallback to old path style if there is no cluster attribute
       def namespaced_path
         obj = (respond_to?(:root_attachment) && self.root_attachment) || self
-        if namespace = obj.read_attribute(:namespace)
+        if (namespace = obj.read_attribute(:namespace))
           File.join(namespace, obj.attachment_options[:path_prefix])
         else
           obj.attachment_options[:path_prefix]

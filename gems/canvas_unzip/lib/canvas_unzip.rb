@@ -222,14 +222,14 @@ class CanvasUnzip
           entry.get_input_stream do |is|
             entry.set_extra_attributes_on_path(dest_path)
             buf = +''
-            while buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf)
+            while (buf = is.sysread(::Zip::Decompressor::CHUNK_SIZE, buf))
               os << buf
               digest.update(buf)
               yield(buf.size) if block_given?
             end
           end
         elsif type == :tar
-          while buf = entry.read(BUFFER_SIZE)
+          while (buf = entry.read(BUFFER_SIZE))
             os << buf
             digest.update(buf)
             yield(buf.size) if block_given?

@@ -72,7 +72,7 @@ module YARD::Templates::Helpers::BaseHelper
     elsif args.first.is_a?(String) && args.first == 'Appendix:' && args.size > 1
       __errmsg = "unable to locate referenced appendix '#{args[1]}'"
 
-      unless appendix = lookup_appendix(args[1].to_s)
+      unless (appendix = lookup_appendix(args[1].to_s))
         raise __errmsg
       end
 
@@ -141,7 +141,7 @@ module YARD::Templates::Helpers::HtmlHelper
   def link_appendix(ref)
     __errmsg = "unable to locate referenced appendix '#{ref}'"
 
-    unless appendix = lookup_appendix(ref.to_s)
+    unless (appendix = lookup_appendix(ref.to_s))
       raise __errmsg
     end
 

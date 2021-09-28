@@ -58,7 +58,7 @@ module EventStream::IndexStrategy
 
     def self.pager_to_records(index_scope, pager)
       bookmark_scope = index_scope
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         bookmark_scope = bookmark_scope.where("created_at < ?", Time.zone.parse(bookmark))
       end
       bookmark_scope = bookmark_scope.order("created_at DESC")

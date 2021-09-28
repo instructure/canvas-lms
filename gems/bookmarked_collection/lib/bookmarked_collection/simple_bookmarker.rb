@@ -142,7 +142,7 @@ module BookmarkedCollection
     end
 
     def restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         scope = scope.where(*comparison(bookmark, pager.include_bookmark))
       end
       scope.order order_by

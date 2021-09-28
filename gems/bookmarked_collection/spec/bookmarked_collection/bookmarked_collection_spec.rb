@@ -32,7 +32,7 @@ describe "BookmarkedCollection" do
     end
 
     def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
         scope = scope.where(comparison, bookmark)
       end
@@ -50,7 +50,7 @@ describe "BookmarkedCollection" do
     end
 
     def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         comparison = (pager.include_bookmark ? 'name >= ?' : 'name > ?')
         scope = scope.where(comparison, bookmark)
       end

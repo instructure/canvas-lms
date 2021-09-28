@@ -31,7 +31,7 @@ describe "BookmarkedCollection::MergeProxy" do
     end
 
     def self.restrict_scope(scope, pager)
-      if bookmark = pager.current_bookmark
+      if (bookmark = pager.current_bookmark)
         comparison = (pager.include_bookmark ? 'id >= ?' : 'id > ?')
         scope = scope.where(comparison, bookmark)
       end

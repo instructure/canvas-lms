@@ -30,21 +30,16 @@ module RuboCop
         def on_send(node)
           super
           _receiver, method_name = *node
-          if method_name.to_s =~ /^delay/
-            check_send_later(node, method_name)
-          end
-        end
 
-        def check_send_later(node, method_name)
-          if method_name.to_s !~ /if_production/
-            add_offense(node,
-                        message: "All `delay`s in migrations should be `delay_if_production`",
-                        severity: :warning)
-          end
+          return unless %i[delay delay_if_production].include?(method_name)
 
-          if tags.include?(:predeploy)
-            add_offense(node, message: PREDEPLOY_MSG, severity: :warning)
-          end
+          return add_offense(node, message: PREDEPLOY_MSG, severity: :warning) if tags.include?(:predeploy)
+
+          return unless method_name == :delay
+
+          add_offense(node,
+                      message: "All `delay`s in migrations should be `delay_if_production`",
+                      severity: :warning)
         end
       end
     end

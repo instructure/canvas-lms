@@ -206,7 +206,7 @@ module CanvasHttp
   end
 
   def self.insecure_host?(host)
-    return unless filters = self.blocked_ip_filters
+    return unless (filters = self.blocked_ip_filters)
 
     resolved_addrs = Resolv.getaddresses(host)
     unless resolved_addrs.any?

@@ -2075,9 +2075,9 @@ module Serialization
 
     # the rest of this method is from ActiveModel::Serialization
     attribute_names = self.attribute_names
-    if only = options[:only]
+    if (only = options[:only])
       attribute_names &= Array(only).map(&:to_s)
-    elsif except = options[:except]
+    elsif (except = options[:except])
       attribute_names -= Array(except).map(&:to_s)
     end
 
