@@ -20,6 +20,7 @@
 #
 
 require_relative '../spec_helper'
+require_relative '../sharding_spec_helper'
 
 describe ObserverEnrollmentsHelper do
   include ObserverEnrollmentsHelper
@@ -154,5 +155,25 @@ describe ObserverEnrollmentsHelper do
     users = observed_users(@observer, nil, @course2.id)
     expect(users.length).to be(1)
     expect(users[0][:name]).to eq("Student 1")
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it "includes and sorts observed users from multiple shards" do
+      @shard2.activate do
+        @student3 = user_factory(active_all: true, name: "Student 3")
+        @student3.sortable_name = "0" # before student 1
+        @student3.save!
+      end
+      @course1.enroll_student(@student3)
+      enroll_observer(@course1, @observer, @student3)
+      enroll_observer(@course1, @observer, @student1)
+
+      users = observed_users(@observer, nil)
+      expect(users.length).to be(2)
+      expect(users[0][:name]).to eq("Student 3")
+      expect(users[1][:name]).to eq("Student 1")
+    end
   end
 end
