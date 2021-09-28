@@ -34,7 +34,7 @@ end
 describe "enumerable pluck extension" do
   specs_require_sharding
 
-  it "transforms ids" do
+  it "should transform ids" do
     u = User.create!
     @shard1.activate do
       expect([u].pluck(:id)).to eq [u.global_id]

@@ -95,7 +95,8 @@ describe "site admin jobs ui" do
   end
 
   context "search" do
-    it "only actions the individual job when it has been searched for" do
+
+    it "should only action the individual job when it has been searched for" do
       job = Delayed::Job.list_jobs(:current, 1).first
       get "/jobs?flavor=id&q=#{job.id}"
       expect(f('#jobs-grid .slick-cell')).to be
@@ -105,7 +106,7 @@ describe "site admin jobs ui" do
       expect(jobs_on_hold.count).to eq 1
     end
 
-    it "loads handler via ajax" do
+    it "should load handler via ajax" do
       Delayed::Job.delete_all
       job = "test".delay(ignore_transaction: true).to_s
       load_jobs_page
@@ -133,31 +134,31 @@ describe "site admin jobs ui" do
         load_jobs_page
       end
 
-      it "checks current popular tags" do
+      it "should check current popular tags" do
         filter_tags(FlavorTags::CURRENT)
         expect(f("#tags-grid")).to include_text "String#reverse"
         expect(f("#tags-grid")).to include_text "2"
       end
 
-      it "checks all popular tags", priority: "2" do
+      it "should check all popular tags", priority: "2" do
         filter_tags(FlavorTags::ALL)
         expect(f("#tags-grid")).to include_text("String#reverse\n2")
         expect(f("#tags-grid")).to include_text("String#capitalize\n1")
       end
 
-      it "does not action if no rows are selected" do
+      it "should not action if no rows are selected" do
         f("#hold-jobs").click
         expect(driver.switch_to.alert).not_to be_nil
         driver.switch_to.alert.accept
         expect(jobs_on_hold.count).to eq 0
       end
 
-      it "confirms that all current rows were selected and put on hold", priority: "2" do
+      it "should confirm that all current rows were selected and put on hold", priority: "2" do
         filter_jobs(FlavorTags::CURRENT)
         put_on_hold
       end
 
-      it "confirms to put jobs on hold and unhold" do
+      it "should confirm to put jobs on hold and unhold" do
         put_on_hold
         validate_all_jobs_selected
         f("#un-hold-jobs").click
@@ -168,7 +169,7 @@ describe "site admin jobs ui" do
         expect(jobs_on_hold.count).to eq 0
       end
 
-      it "confirms that future jobs were selected" do
+      it "should confirm that future jobs were selected" do
         filter_jobs(FlavorTags::FUTURE)
         f("#jobs-refresh").click
         wait_for_ajax_requests
@@ -176,7 +177,7 @@ describe "site admin jobs ui" do
         expect(f("#jobs-grid .b0").text).to eq job.id.to_s
       end
 
-      it "confirms that failed jobs were selected" do
+      it "should confirm that failed jobs were selected" do
         filter_jobs(FlavorTags::FAILED)
         f("#jobs-refresh").click
         wait_for_ajax_requests
@@ -184,7 +185,7 @@ describe "site admin jobs ui" do
         expect(f("#jobs-grid .f1")).to include_text "String#downcase"
       end
 
-      it "confirms that clicking on delete button should delete all future jobs" do
+      it "should confirm that clicking on delete button should delete all future jobs" do
         2.times { "test".delay(run_at: 2.hours.from_now).to_s }
         filter_jobs(FlavorTags::FUTURE)
         validate_all_jobs_selected
@@ -211,7 +212,7 @@ describe "site admin jobs ui" do
   end
 
   context "running jobs" do
-    it "displays running jobs in the workers grid" do
+    it "should display running jobs in the workers grid" do
       Delayed::Job.get_and_lock_next_available('my test worker')
       load_jobs_page
       expect(ff('#running-grid .slick-row').size).to eq 1
@@ -219,7 +220,7 @@ describe "site admin jobs ui" do
       expect(first_cell).to include_text 'my test worker'
     end
 
-    it "sorts by runtime by default" do
+    it "should sort by runtime by default" do
       j1 = Delayed::Job.get_and_lock_next_available('my test worker 1')
       j2 = Delayed::Job.get_and_lock_next_available('my test worker 2')
       j2.update_attribute(:locked_at, 48.hours.ago)
@@ -232,7 +233,7 @@ describe "site admin jobs ui" do
       expect(last_cell).not_to be_nil
     end
 
-    it "sorts dynamically" do
+    it "should sort dynamically" do
       Delayed::Job.get_and_lock_next_available('my test worker 1')
       Delayed::Job.get_and_lock_next_available('my test worker 2')
 

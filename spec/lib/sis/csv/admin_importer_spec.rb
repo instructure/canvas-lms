@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::AdminImporter do
+
   before do
     account_model
     sis = @account.sis_batches.create
@@ -30,7 +31,7 @@ describe SIS::CSV::AdminImporter do
     @sub_account.save!
   end
 
-  it 'skips bad content' do
+  it 'should skip bad content' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     before_count = AccountUser.active.count
     importer = process_csv_data(
@@ -48,16 +49,16 @@ describe SIS::CSV::AdminImporter do
 
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["No user_id given for admin",
-                          "Invalid or unknown user_id 'invalid' for admin",
-                          "Invalid account_id given for admin",
-                          "Invalid role 'invalid role' for admin",
-                          "Invalid role_id 'invalid' for admin",
-                          "Invalid status invalid for admin",
-                          "No status given for admin",
-                          "No role_id or role given for admin"]
+                            "Invalid or unknown user_id 'invalid' for admin",
+                            "Invalid account_id given for admin",
+                            "Invalid role 'invalid role' for admin",
+                            "Invalid role_id 'invalid' for admin",
+                            "Invalid status invalid for admin",
+                            "No status given for admin",
+                            "No role_id or role given for admin"]
   end
 
-  it 'adds and remove admins' do
+  it 'should add and remove admins' do
     u1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
     before_count = AccountUser.active.count
@@ -82,7 +83,7 @@ describe SIS::CSV::AdminImporter do
     expect(@account.account_users.where(user_id: u1).count).to eq 1
   end
 
-  it 'adds admins from other root_account' do
+  it 'should add admins from other root_account' do
     account2 = Account.create!
     user_with_managed_pseudonym(account: account2, sis_user_id: 'U001')
 
@@ -99,7 +100,7 @@ describe SIS::CSV::AdminImporter do
     expect(@account.account_users.active.count).to eq before_count + 1
   end
 
-  it 'adds admins by role_id' do
+  it 'should add admins by role_id' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
 
     role = @sub_account.available_account_roles.first
@@ -112,7 +113,7 @@ describe SIS::CSV::AdminImporter do
     expect(AccountUser.active.count).to eq before_count + 1
   end
 
-  it 'creates rollback data' do
+  it 'should create rollback data' do
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(

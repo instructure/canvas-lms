@@ -33,6 +33,7 @@ module Canvas
           }
         }
       end
+
     end
   end
 end

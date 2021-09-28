@@ -37,6 +37,11 @@ import LatePolicyApplicator from 'ui/features/gradebook/react/LatePolicyApplicat
 import SubmissionCommentApi from 'ui/features/gradebook/react/default_gradebook/apis/SubmissionCommentApi'
 import SubmissionStateMap from '@canvas/grading/SubmissionStateMap'
 import studentRowHeaderConstants from 'ui/features/gradebook/react/default_gradebook/constants/studentRowHeaderConstants'
+import {
+  darken,
+  statusColors,
+  defaultColors
+} from 'ui/features/gradebook/react/default_gradebook/constants/colors'
 import ViewOptionsMenu from 'ui/features/gradebook/react/default_gradebook/components/ViewOptionsMenu'
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
@@ -55,16 +60,6 @@ const $fixtures = document.getElementById('fixtures')
 
 /* eslint-disable qunit/no-identical-names */
 QUnit.module('Gradebook')
-
-test('correctly loads initial colors', () => {
-  const color = '#F3EFEA'
-  equal(
-    createGradebook({
-      colors: {late: color}
-    }).options.colors.late,
-    color
-  )
-})
 
 test('normalizes the grading period set from the env', () => {
   const options = {
@@ -1603,12 +1598,6 @@ QUnit.module('Gradebook', () => {
       notOk(UserSettings.contextGet('warned_about_totals_display'))
       gradebook.switchTotalDisplay({dontWarnAgain: true})
       strictEqual(UserSettings.contextGet('warned_about_totals_display'), true)
-    })
-
-    test('show_total_grade_as_points env is mutable', () => {
-      const originalValue = gradebook.options.show_total_grade_as_points
-      gradebook.options.show_total_grade_as_points = !gradebook.options.show_total_grade_as_points
-      notEqual(originalValue, gradebook.options.show_total_grade_as_points)
     })
 
     test('disables "Show Total Grade as Points" when previously enabled', () => {

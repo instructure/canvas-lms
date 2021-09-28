@@ -82,5 +82,6 @@ describe ContentMigration do
         expect(pace_plan_to.pace_plan_module_items.count).to eq 1
       end
     end
+
   end
 end

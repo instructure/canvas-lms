@@ -35,7 +35,6 @@ import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
 import {DiscussionEntryContainer} from '../DiscussionEntryContainer/DiscussionEntryContainer'
 import {
-  CREATE_DISCUSSION_ENTRY_DRAFT,
   DELETE_DISCUSSION_TOPIC,
   UPDATE_DISCUSSION_TOPIC,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
@@ -51,7 +50,6 @@ import {Alert} from '@instructure/ui-alerts'
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
-import {IconEditLine} from '@instructure/ui-icons'
 import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
@@ -59,7 +57,6 @@ import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
 
 import rubricTriggers from '../../../../discussion_topic/jquery/assignmentRubricDialog'
 import rubricEditing from '../../../../../shared/rubrics/jquery/edit_rubric'
-import {AssignmentAvailabilityWindow} from '../../components/AssignmentAvailabilityWindow/AssignmentAvailabilityWindow'
 
 export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -67,7 +64,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
   const [copyToOpen, setCopyToOpen] = useState(false)
   const [expandedReply, setExpandedReply] = useState(false)
   const [lastMarkAllAction, setLastMarkAllAction] = useState('')
-  const [draftSaved, setDraftSaved] = useState(true)
 
   const {searchTerm, filter} = useContext(SearchContext)
   const isSearch = searchTerm || filter === 'unread'
@@ -145,17 +141,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
     }
   })
 
-  const [createDiscussionEntryDraft] = useMutation(CREATE_DISCUSSION_ENTRY_DRAFT, {
-    update: props.updateDraftCache,
-    onCompleted: () => {
-      setOnSuccess('Draft message saved.')
-      setDraftSaved(true)
-    },
-    onError: () => {
-      setOnFailure(I18n.t('Unable to save draft message.'))
-    }
-  })
-
   const onDelete = () => {
     // eslint-disable-next-line no-alert
     if (window.confirm(I18n.t('Are you sure you want to delete this topic'))) {
@@ -212,18 +197,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
         subscribed: !props.discussionTopic.subscribed
       }
     })
-  }
-
-  const findRootEntryDraftMessage = () => {
-    let rootEntryDraftMessage = ''
-    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
-      if (!draftEntry.rootEntryId && !draftEntry.discussionEntryId) {
-        rootEntryDraftMessage = draftEntry.message
-        return false
-      }
-      return true
-    })
-    return rootEntryDraftMessage
   }
 
   return (
@@ -307,7 +280,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
               </Text>
             </Alert>
           )}
-          {!isSearch && filter !== 'drafts' && (
+          {!isSearch && (
             <Highlight isHighlighted={props.isHighlighted} data-testid="highlight-container">
               <Flex as="div" direction="column" data-testid="discussion-topic-container">
                 <Flex.Item>
@@ -320,7 +293,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                     padding="xx-small 0 small"
                   >
                     <Flex direction="column" padding={responsiveProps.container.padding}>
-                      {isGraded(props.discussionTopic.assignment) ? (
+                      {isGraded(props.discussionTopic.assignment) && (
                         <Flex.Item
                           shouldShrink
                           shouldGrow
@@ -349,13 +322,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             )
                           )}
                         </Flex.Item>
-                      ) : (
-                        <AssignmentAvailabilityWindow
-                          availableDate={props.discussionTopic.delayedPostAt}
-                          untilDate={props.discussionTopic.lockAt}
-                          showOnMobile
-                          showDateWithTime
-                        />
                       )}
                       <Flex.Item shouldShrink shouldGrow>
                         <DiscussionEntryContainer
@@ -375,7 +341,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               onDelete={props.discussionTopic.permissions.delete ? onDelete : null}
                               repliesCount={props.discussionTopic.entryCounts?.repliesCount}
                               unreadCount={props.discussionTopic.entryCounts?.unreadCount}
-                              updateDraftCache={props.updateDraftCache}
                               onSend={
                                 props.discussionTopic.permissions?.copyAndSendTo
                                   ? () => setSendToOpen(true)
@@ -480,18 +445,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                                 }}
                                 data-testid="discussion-topic-reply"
                               >
-                                {findRootEntryDraftMessage() ? (
-                                  <Text weight="bold" size={responsiveProps.textSize}>
-                                    <View as="span" margin="0 small 0 0">
-                                      <IconEditLine size="x-small" />
-                                    </View>
-                                    {I18n.t('Continue draft')}
-                                  </Text>
-                                ) : (
-                                  <Text weight="bold" size={responsiveProps.textSize}>
-                                    {I18n.t('Reply')}
-                                  </Text>
-                                )}
+                                <Text size="medium">{I18n.t('Reply')}</Text>
                               </Button>
                             </View>
                           )}
@@ -519,18 +473,6 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             }}
                             onCancel={() => {
                               setExpandedReply(false)
-                            }}
-                            value={findRootEntryDraftMessage()}
-                            onSetDraftSaved={setDraftSaved}
-                            draftSaved={draftSaved}
-                            updateDraft={newDraftMessage => {
-                              createDiscussionEntryDraft({
-                                variables: {
-                                  discussionTopicId: props.discussionTopic._id,
-                                  message: newDraftMessage,
-                                  parentId: null
-                                }
-                              })
                             }}
                           />
                         )}
@@ -575,10 +517,6 @@ DiscussionTopicContainer.propTypes = {
    * Function to be executed to create a Discussion Entry.
    */
   createDiscussionEntry: PropTypes.func,
-  /**
-   * Function to be executed to update the cache for new DiscussionEntryDraft.
-   */
-  updateDraftCache: PropTypes.func,
   /**
    * useState Boolean to toggle highlight
    */

@@ -20,13 +20,14 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::QuizSubmissionAttempt do
+
   describe "#initialize" do
-    it "assigns number" do
+    it "should assign number" do
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1)
       expect(attempt.number).to eq 1
     end
 
-    it "assigns versions" do
+    it "should assign versions" do
       versions = [1, 2, 3]
       attempt = Quizzes::QuizSubmissionAttempt.new(:number => 1, :versions => versions)
       expect(attempt.versions).to eq versions

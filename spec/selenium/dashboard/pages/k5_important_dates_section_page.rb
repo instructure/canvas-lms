@@ -329,6 +329,7 @@ module K5ImportantDatesSectionPageObject
 
   #----------------------- Click Items -------------------------------
 
+
   def click_calendar_add
     calendar_add.click
   end
@@ -420,4 +421,5 @@ module K5ImportantDatesSectionPageObject
   def is_calendar_modal_gone?
     wait_for_no_such_element { calendar_modal }
   end
+
 end

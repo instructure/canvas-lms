@@ -25,3 +25,4 @@ module CC
     include ::Canvas::Migration::XMLHelper
   end
 end
+

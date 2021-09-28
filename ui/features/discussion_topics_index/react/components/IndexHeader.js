@@ -36,7 +36,7 @@ import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-con
 import {TextInput} from '@instructure/ui-text-input'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import {ltiState} from '@canvas/lti/jquery/messages'
+import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
 
 const filters = {
   all: I18n.t('All'),

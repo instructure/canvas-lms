@@ -44,7 +44,6 @@ module Types
     field :assessor, UserType, null: true
     def assessor
       return nil unless object.grants_right?(current_user, session, :read_assessor)
-
       load_association(:assessor)
     end
 

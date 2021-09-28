@@ -41,7 +41,6 @@ module Polling
     end
 
     private
-
     def is_teacher?
       poll.grants_right?(current_user, session, :update)
     end

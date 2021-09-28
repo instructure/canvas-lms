@@ -159,8 +159,8 @@ describe('SubmissionManager', () => {
       beforeEach(() => {
         window.ENV = {
           CONFETTI_ENABLED: enabled,
-          ASSIGNMENT_ID: '1',
-          COURSE_ID: '1'
+          ASSIGNMENT_ID: 1,
+          COURSE_ID: 1
         }
       })
 
@@ -302,19 +302,18 @@ describe('SubmissionManager', () => {
         }
       })
 
-      const {getByRole} = render(
+      const {getByTestId, getByText} = render(
         <MockedProvider>
           <SubmissionManager {...props} />
         </MockedProvider>
       )
 
-      const submitButton = getByRole('button', {name: /Submit Assignment/})
+      const submitButton = getByText('Submit Assignment')
       fireEvent.click(submitButton)
 
-      const confirmationDialog = await screen.findByRole('dialog', {label: 'Delete your work?'})
-      expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
-      expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
-      expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
+      expect(getByTestId('submission-confirmation-modal')).toBeInTheDocument()
+      expect(getByTestId('cancel-submit')).toBeInTheDocument()
+      expect(getByTestId('confirm-submit')).toBeInTheDocument()
     })
   })
 
@@ -324,9 +323,7 @@ describe('SubmissionManager', () => {
 
       const successfulResponse = {
         data: {
-          setModuleItemCompletion: {
-            __typename: ''
-          }
+          setModuleItemCompletion: {}
         },
         errors: null
       }
@@ -832,7 +829,7 @@ describe('SubmissionManager', () => {
     beforeAll(async () => {
       // This gets the lazy loaded components loaded before our specs.
       // otherwise, the first one (at least) will fail.
-      const {unmount} = render(<TextEntry submission={{id: '1', _id: '1', state: 'unsubmitted'}} />)
+      const {unmount} = render(<TextEntry submission={{state: 'unsubmitted'}} />)
       await waitFor(() => {
         expect(tinymce.editors[0]).toBeDefined()
       })

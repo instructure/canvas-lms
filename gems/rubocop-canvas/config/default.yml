@@ -17,11 +17,6 @@ Migration/ConcurrentIndex:
   Include:
     - "**/db/migrate/*.rb"
 
-Migration/Delay:
-  Enabled: true
-  Include:
-    - "**/db/migrate/*.rb"
-
 Migration/PrimaryKey:
   Enabled: true
   Include:

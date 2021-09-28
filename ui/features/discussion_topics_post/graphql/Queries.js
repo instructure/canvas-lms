@@ -18,7 +18,6 @@
 
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
-import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import gql from 'graphql-tag'
 import {PageInfo} from './PageInfo'
 import {User} from './User'
@@ -69,14 +68,6 @@ export const DISCUSSION_QUERY = gql`
             ...PageInfo
           }
         }
-        discussionEntryDraftsConnection {
-          nodes {
-            ...DiscussionEntryDraft
-          }
-          pageInfo {
-            ...PageInfo
-          }
-        }
         entriesTotalPages(
           perPage: $perPage
           rootEntries: $rootEntries
@@ -90,7 +81,6 @@ export const DISCUSSION_QUERY = gql`
   ${User.fragment}
   ${Discussion.fragment}
   ${DiscussionEntry.fragment}
-  ${DiscussionEntryDraft.fragment}
   ${PageInfo.fragment}
 `
 

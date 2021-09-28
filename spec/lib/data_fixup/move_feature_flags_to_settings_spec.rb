@@ -41,9 +41,9 @@ describe DataFixup::MoveFeatureFlagsToSettings do
 
   def with_feature_definitions
     allow(Feature).to receive(:definitions).and_return({
-                                                         'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
-                                                         'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
-                                                       })
+        'course_feature_going_away' => Feature.new(feature: 'course_feature_going_away', applies_to: 'Course', state: 'hidden'),
+        'root_account_feature_going_away' => Feature.new(feature: 'root_account_feature_going_away', applies_to: 'RootAccount', state: 'hidden'),
+    })
     yield
     allow(Feature).to receive(:definitions).and_call_original
   end
@@ -61,19 +61,20 @@ describe DataFixup::MoveFeatureFlagsToSettings do
   end
 
   context "RootAccount" do
-    it "works for root account feature flag when allowed" do
+
+    it "should work for root account feature flag when allowed" do
       with_feature_definitions do
         @root_account.allow_feature!(:root_account_feature_going_away)
       end
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
-      expect { @root_account.feature_enabled?(:root_account_feature_going_away) }.to raise_error("no such feature - root_account_feature_going_away")
+      expect{ @root_account.feature_enabled?(:root_account_feature_going_away) }.to raise_error("no such feature - root_account_feature_going_away")
       expect(@root_account.some_root_only_setting?).to eq(false)
       expect(@root_account.settings.key?(:some_root_only_setting)).to eq(false)
     end
 
-    it "works for root account feature flag when off" do
+    it "should work for root account feature flag when off" do
       with_feature_definitions do
         @root_account.disable_feature!(:root_account_feature_going_away)
       end
@@ -84,7 +85,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@root_account.settings.key?(:some_root_only_setting)).to eq(true)
     end
 
-    it "works for root account feature flag when on" do
+    it "should work for root account feature flag when on" do
       with_feature_definitions do
         @root_account.enable_feature!(:root_account_feature_going_away)
       end
@@ -95,7 +96,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@root_account.settings.key?(:some_root_only_setting)).to eq(true)
     end
 
-    it "works for root account feature flag when not overridden" do
+    it "should work for root account feature flag when not overridden" do
       DataFixup::MoveFeatureFlagsToSettings.run(:root_account_feature_going_away, "RootAccount", :some_root_only_setting)
       reload_all
 
@@ -103,7 +104,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@root_account.settings.key?(:some_root_only_setting)).to eq(false)
     end
 
-    it "migrates an unknown setting" do
+    it "should migrate an unknown setting" do
       with_feature_definitions do
         @root_account.enable_feature!(:root_account_feature_going_away)
       end
@@ -115,7 +116,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
   end
 
   context "AccountAndCourseInherited" do
-    it "works for course feature flag when allowed and enabled in course" do
+    it "should work for course feature flag when allowed and enabled in course" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @sub_account.allow_feature!(:course_feature_going_away)
@@ -134,7 +135,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings.key?(:some_course_setting)).to eq(true)
     end
 
-    it "works for course feature flag when allowed and disabled in course" do
+    it "should work for course feature flag when allowed and disabled in course" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @sub_account.allow_feature!(:course_feature_going_away)
@@ -153,7 +154,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings.key?(:some_course_setting)).to eq(true)
     end
 
-    it "works for course feature flag when off" do
+    it "should work for course feature flag when off" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @sub_account.disable_feature!(:course_feature_going_away)
@@ -171,7 +172,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings.key?(:some_course_setting)).to eq(false)
     end
 
-    it "works for course feature flag when on" do
+    it "should work for course feature flag when on" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @sub_account.enable_feature!(:course_feature_going_away)
@@ -189,7 +190,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings.key?(:some_course_setting)).to eq(false)
     end
 
-    it "works for course feature flag when not overridden" do
+    it "should work for course feature flag when not overridden" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
       end
@@ -206,7 +207,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings.key?(:some_course_setting)).to eq(false)
     end
 
-    it "migrates an unknown setting" do
+    it "should migrate an unknown setting" do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @sub_account.enable_feature!(:course_feature_going_away)
@@ -221,7 +222,7 @@ describe DataFixup::MoveFeatureFlagsToSettings do
       expect(@course.settings[:some_other_account_setting]).to be_nil
     end
 
-    it "migrates an unknown setting that is overridden at a course, and it should not be enabled." do
+    it "should migrate an unknown setting that is overridden at a course, and it should not be enabled." do
       with_feature_definitions do
         @root_account.allow_feature!(:course_feature_going_away)
         @course.disable_feature!(:course_feature_going_away)

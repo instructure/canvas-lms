@@ -23,14 +23,36 @@ import '@canvas/rails-flash-notifications'
 import htmlEscape from 'html-escape'
 import ToolLaunchResizer from './tool_launch_resizer'
 import handleLtiPostMessage from './post_message/handleLtiPostMessage'
-import {setUnloadMessage, removeUnloadMessage, findDomForWindow} from './util'
 
-// page-global storage for data relevant to LTI postMessage events
-const ltiState = {}
-export {ltiState}
+let beforeUnloadHandler
+function setUnloadMessage(msg) {
+  removeUnloadMessage()
+
+  beforeUnloadHandler = function (e) {
+    return (e.returnValue = msg || '')
+  }
+  window.addEventListener('beforeunload', beforeUnloadHandler)
+}
+
+function removeUnloadMessage() {
+  if (beforeUnloadHandler) {
+    window.removeEventListener('beforeunload', beforeUnloadHandler)
+    beforeUnloadHandler = null
+  }
+}
+
+function findDomForWindow(sourceWindow) {
+  const iframes = document.getElementsByTagName('IFRAME')
+  for (let i = 0; i < iframes.length; i += 1) {
+    if (iframes[i].contentWindow === sourceWindow) {
+      return iframes[i]
+    }
+  }
+  return null
+}
 
 export function ltiMessageHandler(e) {
-  if (e.data.source && e.data.source.includes('react-devtools')) {
+  if (e.data.source && e.data.source === 'react-devtools-bridge') {
     return
   }
 
@@ -50,9 +72,9 @@ export function ltiMessageHandler(e) {
 
   try {
     switch (message.subject) {
-      case 'lti.frameResize': {
+      case 'lti.frameResize':
         const toolResizer = new ToolLaunchResizer()
-        let height = message.height
+        var height = message.height
         if (height <= 0) height = 1
 
         const container = toolResizer
@@ -73,7 +95,7 @@ export function ltiMessageHandler(e) {
           }
         }
         break
-      }
+
       case 'lti.fetchWindowSize': {
         const iframe = findDomForWindow(e.source)
         if (iframe) {

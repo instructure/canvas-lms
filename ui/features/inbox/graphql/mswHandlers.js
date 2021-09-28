@@ -25,18 +25,6 @@ import {graphql} from 'msw'
 import {Group} from './Group'
 import {User} from './User'
 
-// helper function that filters out undefined values in objects before assigning
-const mswAssign = (target, ...objects) => {
-  return Object.assign(
-    target,
-    ...objects.map(object => {
-      return Object.entries(object)
-        .filter(([_k, v]) => v !== undefined)
-        .reduce((obj, [k, v]) => ((obj[k] = v), obj), {}) // eslint-disable-line no-sequences
-    })
-  )
-}
-
 export const handlers = [
   graphql.query('GetConversationsQuery', (req, res, ctx) => {
     const data = {
@@ -259,13 +247,11 @@ export const handlers = [
       ctx.data({
         updateConversationParticipants: {
           conversationParticipants: [
-            mswAssign(
-              {...ConversationParticipant.mock()},
-              {
-                id: req.body.variables.conversationId,
-                read: req.body.variables.read
-              }
-            )
+            {
+              ...ConversationParticipant.mock(),
+              id: req.body.variables.conversationId,
+              read: req.body.variables.read
+            }
           ],
           errors: null,
           __typename: 'UpdateConversationParticipantsPayload'

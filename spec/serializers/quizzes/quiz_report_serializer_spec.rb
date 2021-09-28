@@ -20,31 +20,32 @@
 require 'spec_helper'
 
 shared_examples_for 'QuizReportSerializer Associations' do
-  it 'embeds its attachment as :file when present' do
+
+  it 'should embed its attachment as :file when present' do
     statistics.generate_csv
     statistics.reload
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-                                                     controller: controller,
-                                                     scope: user,
-                                                     session: session,
-                                                     includes: ['file']
-                                                   })
+      controller: controller,
+      scope: user,
+      session: session,
+      includes: [ 'file' ]
+    })
 
     json = serializer.as_json[:quiz_report].stringify_keys
     expect(json).to have_key 'file'
     expect(json['file']['id']).to be_present
   end
 
-  it 'embeds its progress when present' do
+  it 'should embed its progress when present' do
     statistics.generate_csv_in_background
 
     serializer = Quizzes::QuizReportSerializer.new(statistics, {
-                                                     controller: controller,
-                                                     scope: user,
-                                                     session: session,
-                                                     includes: ['progress']
-                                                   })
+      controller: controller,
+      scope: user,
+      session: session,
+      includes: [ 'progress' ]
+    })
 
     json = serializer.as_json[:quiz_report].stringify_keys
     expect(json).to have_key 'progress'
@@ -83,10 +84,10 @@ describe Quizzes::QuizReportSerializer do
 
   subject do
     Quizzes::QuizReportSerializer.new(statistics, {
-                                        controller: controller,
-                                        scope: user,
-                                        session: session
-                                      })
+      controller: controller,
+      scope: user,
+      session: session
+    })
   end
 
   let :json do
@@ -103,11 +104,11 @@ describe Quizzes::QuizReportSerializer do
       end
     end
 
-    it 'exposes whether the report is generatable' do
+    it 'should expose whether the report is generatable' do
       expect(json['generatable']).to eq statistics.report.generatable?
     end
 
-    it 'links to itself' do
+    it 'should link to itself' do
       expect(json['url']).to eq(
         "http://example.com/api/v1/courses/1/quizzes/2/reports/#{statistics.id}"
       )
@@ -126,7 +127,7 @@ describe Quizzes::QuizReportSerializer do
     context 'associations' do
       include_examples 'QuizReportSerializer Associations'
 
-      it 'links to the quiz' do
+      it 'should link to the quiz' do
         expect(json['links']).to be_present
         expect(json['links']['quiz']).to eq 'http://example.com/api/v1/courses/1/quizzes/2'
       end
@@ -142,11 +143,11 @@ describe Quizzes::QuizReportSerializer do
       expect(json['id']).to eq statistics.id
     end
 
-    it 'includes quiz_id' do
+    it 'should include quiz_id' do
       expect(json['quiz_id']).to eq quiz.id
     end
 
-    it 'includes the progress_url' do
+    it 'should include the progress_url' do
       statistics.generate_csv_in_background
 
       expect(json['progress_url']).to eq(

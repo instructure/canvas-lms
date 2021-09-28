@@ -22,6 +22,7 @@ require_dependency "broadcast_policies/submission_policy"
 
 module BroadcastPolicies
   describe SubmissionPolicy do
+
     let(:course) do
       double("Course").tap do |c|
         allow(c).to receive(:available?).and_return(true)
@@ -85,19 +86,16 @@ module BroadcastPolicies
       it 'is true with the inputs are true' do
         expect(policy.should_dispatch_assignment_submitted_late?).to be_truthy
       end
-      specify {
-        wont_send_when {
-          allow(submission).to receive(:group_broadcast_submission).and_return true
-        }
-      }
-      specify {
-        wont_send_when {
-          allow(course).to receive(:available?).and_return false
-        }
-      }
-      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
+      specify { wont_send_when {
+        allow(submission).to receive(:group_broadcast_submission).and_return true
+      } }
+      specify { wont_send_when {
+        allow(course).to receive(:available?).and_return false
+      } }
+      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false} }
       specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
       specify { wont_send_when { allow(submission).to receive(:late?).and_return false } }
+
     end
 
     describe '#should_dispatch_assignment_submitted?' do
@@ -109,9 +107,9 @@ module BroadcastPolicies
       it 'is true when the relevant inputs are true' do
         expect(policy.should_dispatch_assignment_submitted?).to be_truthy
       end
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false}}
+      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false }}
+      specify { wont_send_when { allow(submission).to receive(:late?).and_return true }}
     end
 
     describe '#should_dispatch_assignment_resubmitted' do
@@ -128,10 +126,10 @@ module BroadcastPolicies
       it 'is true when the relevant inputs are true' do
         expect(policy.should_dispatch_assignment_resubmitted?).to be_truthy
       end
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:late?).and_return true } }
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false}}
+      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false }}
+      specify { wont_send_when { allow(submission).to receive(:has_submission?).and_return false }}
+      specify { wont_send_when { allow(submission).to receive(:late?).and_return true }}
     end
 
     describe '#should_dispatch_group_assignment_submitted_late?' do
@@ -148,10 +146,10 @@ module BroadcastPolicies
       it 'returns true when the inputs are all true' do
         expect(policy.should_dispatch_group_assignment_submitted_late?).to be_truthy
       end
-      specify { wont_send_when { allow(submission).to receive(:group_broadcast_submission).and_return false } }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:late?).and_return false } }
+      specify { wont_send_when { allow(submission).to receive(:group_broadcast_submission).and_return false }}
+      specify { wont_send_when { allow(course).to receive(:available?).and_return false}}
+      specify { wont_send_when { allow(submission).to receive(:submitted?).and_return false}}
+      specify { wont_send_when { allow(submission).to receive(:late?).and_return false }}
     end
 
     describe '#should_dispatch_submission_graded?' do
@@ -168,13 +166,14 @@ module BroadcastPolicies
         expect(policy.should_dispatch_submission_graded?).to be_truthy
       end
 
-      specify { wont_send_when { allow(submission).to receive(:posted?).and_return false } }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return double } }
-      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
-      specify { wont_send_when { allow(policy).to receive(:user_active_or_invited?).and_return(false) } }
-      specify { wont_send_when { allow(course).to receive(:concluded?).and_return true } }
+      specify { wont_send_when{ allow(submission).to receive(:posted?).and_return false }}
+      specify { wont_send_when{ allow(course).to receive(:available?).and_return false}}
+      specify { wont_send_when{ allow(submission).to receive(:quiz_submission_id).and_return double }}
+      specify { wont_send_when{ allow(assignment).to receive(:published?).and_return false}}
+      specify { wont_send_when{ allow(policy).to receive(:user_active_or_invited?).and_return(false)}}
+      specify { wont_send_when{ allow(course).to receive(:concluded?).and_return true }}
     end
+
 
     describe '#should_dispatch_submission_grade_changed?' do
       before do
@@ -193,13 +192,13 @@ module BroadcastPolicies
         expect(policy.should_dispatch_submission_grade_changed?).to be_truthy
       end
 
-      specify { wont_send_when { allow(submission).to receive(:posted?).and_return false } }
-      specify { wont_send_when { allow(submission).to receive(:graded_at).and_return nil } }
-      specify { wont_send_when { allow(submission).to receive(:quiz_submission_id).and_return double } }
-      specify { wont_send_when { allow(course).to receive(:available?).and_return false } }
-      specify { wont_send_when { allow(assignment).to receive(:published?).and_return false } }
-      specify { wont_send_when { allow(course).to receive(:concluded?).and_return true } }
-      specify { wont_send_when { allow(policy).to receive(:user_has_visibility?).and_return(false) } }
+      specify { wont_send_when{ allow(submission).to receive(:posted?).and_return false }}
+      specify { wont_send_when{ allow(submission).to receive(:graded_at).and_return nil }}
+      specify { wont_send_when{ allow(submission).to receive(:quiz_submission_id).and_return double }}
+      specify { wont_send_when{ allow(course).to receive(:available?).and_return false }}
+      specify { wont_send_when{ allow(assignment).to receive(:published?).and_return false }}
+      specify { wont_send_when{ allow(course).to receive(:concluded?).and_return true }}
+      specify { wont_send_when{ allow(policy).to receive(:user_has_visibility?).and_return(false)}}
     end
 
     describe "#should_dispatch_submission_posted?" do

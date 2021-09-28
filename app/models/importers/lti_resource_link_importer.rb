@@ -21,6 +21,7 @@ require_dependency 'importers'
 
 module Importers
   class LtiResourceLinkImporter < Importer
+
     self.item_class = Lti::ResourceLink
 
     def self.process_migration(hash, migration)

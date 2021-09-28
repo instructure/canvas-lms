@@ -4,7 +4,6 @@ namespace :ci do
   desc "set up test shards if they don't already exist"
   task prepare_test_shards: :environment do
     raise "need to set RAILS_ENV=test" unless Rails.env.test?
-
     ::Switchman::TestHelper.recreate_persistent_test_shards
   end
 
@@ -15,7 +14,6 @@ namespace :ci do
   task reset_database: :environment do
     ENV["RANDOMIZE_SEQUENCES"] = "0"
     raise "need to set RAILS_ENV=test" unless Rails.env.test?
-
     require "spec/support/test_database_utils"
     TestDatabaseUtils.reset_database!
   end

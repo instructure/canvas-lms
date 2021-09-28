@@ -21,6 +21,5 @@
 # plugins.
 Dir[File.join(File.dirname(__FILE__), '../gems/plugins/*/Gemfile.d/*')].each do |g|
   next if g.end_with?('/_before.rb')
-
-  eval(File.read(g), nil, g) # rubocop:disable Security/Eval
+  eval(File.read(g), nil, g)
 end

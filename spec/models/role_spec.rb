@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
 
 describe Role do
   context "without account" do
-    it "requires an account" do
+    it "should require an account" do
       role = Role.create :name => "1337 Student"
       role.base_role_type = 'StudentEnrollment'
       expect(role).not_to be_valid
@@ -34,24 +34,24 @@ describe Role do
       account_model
     end
 
-    it "accepts a valid Role" do
+    it "should accept a valid Role" do
       role = @account.roles.create :name => "1337 Student"
       role.base_role_type = 'StudentEnrollment'
       expect(role).to be_valid
     end
 
-    it "requires a name" do
+    it "should require a name" do
       role = @account.roles.build
       role.base_role_type = 'StudentEnrollment'
       expect(role).not_to be_valid
     end
 
-    it "requires a base role type" do
+    it "should require a base role type" do
       role = @account.roles.build :name => 'CustomRole'
       expect(role).not_to be_valid
     end
 
-    it "enforces known base role types" do
+    it "should enforce known base role types" do
       role = @account.roles.create :name => 'CustomRole'
 
       role.base_role_type = 'TeacherEnrollment'
@@ -70,7 +70,7 @@ describe Role do
       expect(role).not_to be_valid
     end
 
-    it "disallows names that match base role types" do
+    it "should disallow names that match base role types" do
       role = @account.roles.create
       role.base_role_type = 'StudentEnrollment'
 
@@ -93,7 +93,7 @@ describe Role do
       expect(role).to be_valid
     end
 
-    it "disallows names that match base sis enrollment role names" do
+    it "should disallow names that match base sis enrollment role names" do
       role = @account.roles.create
       role.base_role_type = 'StudentEnrollment'
 
@@ -116,7 +116,7 @@ describe Role do
       expect(role).to be_valid
     end
 
-    it "infers the root account id" do
+    it "should infer the root account id" do
       role = custom_student_role("1337 Student")
       expect(role.root_account_id).to eq @account.id
     end
@@ -133,11 +133,11 @@ describe Role do
       @role = custom_student_role('TestRole', :account => @sub_account_1a)
     end
 
-    it "infers the root account name" do
+    it "should infer the root account name" do
       expect(@role.root_account_id).to eq @root_account_1.id
     end
 
-    it "allows a role name to be reused with the same base role type within a root account" do
+    it "should allow a role name to be reused with the same base role type within a root account" do
       new_role = @sub_account_1b.roles.create :name => 'TestRole'
       new_role.base_role_type = 'StudentEnrollment'
       expect(new_role).to be_valid
@@ -151,7 +151,7 @@ describe Role do
       @role.reload
     end
 
-    it "does not allow a duplicate active role to be created in the same account" do
+    it "should not allow a duplicate active role to be created in the same account" do
       dup_role = @account.roles.new :name => "1337 Student"
       dup_role.base_role_type = 'StudentEnrollment'
       expect(dup_role).to be_invalid
@@ -160,22 +160,22 @@ describe Role do
     end
 
     describe "workflow" do
-      it "defaults to active state" do
+      it "should default to active state" do
         expect(@role).to be_active
       end
 
-      it "is set to deleted by destroy" do
+      it "should be set to deleted by destroy" do
         @role.destroy
         expect(@role.reload).to be_deleted
       end
     end
 
     describe "deleted_at" do
-      it "defaults to nil" do
+      it "should default to nil" do
         expect(@role.deleted_at).to be_nil
       end
 
-      it "is set upon destroy" do
+      it "should be set upon destroy" do
         @role.destroy
         expect(@role.reload.deleted_at).to be > 1.minute.ago
       end
@@ -187,7 +187,7 @@ describe Role do
         @deleted_role.destroy
       end
 
-      it "includes only active Roles" do
+      it "should include only active Roles" do
         expect(@account.roles.sort_by(&:id)).to eq [@role, @deleted_role]
         expect(@account.roles.active).to eq [@role]
       end
@@ -210,10 +210,10 @@ describe Role do
     end
 
     def get_base_type(hash, name)
-      hash.find { |br| br[:base_role_name] == name }
+      hash.find{|br|br[:base_role_name] == name}
     end
 
-    it "finds all custom roles" do
+    it "should find all custom roles" do
       all = Role.all_enrollment_roles_for_account(@sub_account)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
@@ -222,7 +222,7 @@ describe Role do
       expect { Role.all_enrollment_roles_for_account(@sub_account) }.to_not raise_error
     end
 
-    it "gets counts for all roles" do
+    it "should get counts for all roles" do
       course_factory(:account => @sub_account)
 
       @base_types.each do |bt|
@@ -253,8 +253,8 @@ describe Role do
       end
     end
 
-    it "includes inactive roles" do
-      @account.roles.each { |r| r.deactivate! }
+    it "should include inactive roles" do
+      @account.roles.each{|r| r.deactivate! }
       all = Role.all_enrollment_roles_for_account(@sub_account, true)
       @base_types.each do |bt|
         expect(get_base_type(all, bt)[:custom_roles][0][:name]).to eq "custom #{bt}"
@@ -267,26 +267,26 @@ describe Role do
         @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
 
-      it "sets manageable_by_user correctly with manage_admin_users permission restricted" do
+      it "should set manageable_by_user correctly with manage_admin_users permission restricted" do
         @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
 
         roles = Role.role_data(@course, @ta)
         [ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.detect { |r| r[:id] == role.id }[:manageable_by_user]).to be_falsey
+          expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
         end
         [student_role, observer_role].each do |role|
-          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
+          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
         end
       end
 
-      it "sets manageable_by_user correctly with manage_students permission restricted" do
+      it "should set manageable_by_user correctly with manage_students permission restricted" do
         @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: :manage_admin_users)
         @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
 
         roles = Role.role_data(@course, @ta)
-        expect(roles.find { |r| r[:id] == student_role.id }[:manageable_by_user]).to be_falsey
+        expect(roles.find{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
         [observer_role, ta_role, teacher_role, designer_role].each do |role|
-          expect(roles.find { |r| r[:id] == role.id }[:manageable_by_user]).to be_truthy
+          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
         end
       end
     end
@@ -335,7 +335,7 @@ describe Role do
 
   describe "cross-shard built-in role translation" do
     specs_require_sharding
-    it "uses the built-in role on the correct shard when setting for associations" do
+    it "should use the built-in role on the correct shard when setting for associations" do
       built_in_role = admin_role
       @shard1.activate do
         account = Account.create

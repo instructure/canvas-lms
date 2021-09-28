@@ -6,7 +6,8 @@ class IndexAttachmentsFindExistingRoot < ActiveRecord::Migration[5.2]
 
   def up
     add_index :attachments, [:md5, :namespace, :content_type], algorithm: :concurrently,
-                                                               where: "root_attachment_id IS NULL and filename IS NOT NULL"
+      where: "root_attachment_id IS NULL and filename IS NOT NULL"
+
   end
 
   def down

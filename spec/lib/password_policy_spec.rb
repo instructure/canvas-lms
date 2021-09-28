@@ -32,7 +32,7 @@ describe Canvas::PasswordPolicy do
       @pseudonym.unique_id = "foo"
     end
 
-    it "only enforces minimum length by default" do
+    it "should only enforce minimum length by default" do
       pseudonym_with_policy({})
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaa"
       expect(@pseudonym).not_to be_valid
@@ -52,9 +52,10 @@ describe Canvas::PasswordPolicy do
 
       @pseudonym.password = "abcdefgh"
       expect(@pseudonym).not_to be_valid
+
     end
 
-    it "enforces minimum length" do
+    it "should enforce minimum length" do
       pseudonym_with_policy(:min_length => 10)
       @pseudonym.password = @pseudonym.password_confirmation = "asdfg"
       expect(@pseudonym).not_to be_valid
@@ -63,7 +64,7 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
-    it "rejects common passwords" do
+    it "should reject common passwords" do
       pseudonym_with_policy(:disallow_common_passwords => true)
       @pseudonym.password = @pseudonym.password_confirmation = "football"
       expect(@pseudonym).not_to be_valid
@@ -72,7 +73,7 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
-    it "enforces repeated character limits" do
+    it "should enforce repeated character limits" do
       pseudonym_with_policy(:max_repeats => 4)
       @pseudonym.password = @pseudonym.password_confirmation = "aaaaabbbb"
       expect(@pseudonym).not_to be_valid
@@ -81,7 +82,7 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
-    it "enforces sequence limits" do
+    it "should enforce sequence limits" do
       pseudonym_with_policy(:max_sequence => 4)
       @pseudonym.password = @pseudonym.password_confirmation = "edcba1234"
       expect(@pseudonym).not_to be_valid
@@ -90,7 +91,7 @@ describe Canvas::PasswordPolicy do
       expect(@pseudonym).to be_valid
     end
 
-    it "rejects passwords longer than 255 characters" do
+    it "should reject passwords longer than 255 characters" do
       pseudonym_with_policy({})
       @pseudonym.password = @pseudonym.password_confirmation = "a" * 255
       expect(@pseudonym).to be_valid

@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PactApiConsumerProxy
+
   AUTH_HEADER = 'HTTP_AUTHORIZATION'.freeze
   USER_HEADER = 'HTTP_AUTH_USER'.freeze
 

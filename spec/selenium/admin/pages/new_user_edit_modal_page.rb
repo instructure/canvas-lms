@@ -19,6 +19,7 @@
 require_relative '../../common'
 
 module NewUserEditModalPage
+
   # ---------------------- Controls ----------------------
 
   def modal_object

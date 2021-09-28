@@ -23,7 +23,9 @@ require_dependency "lti/resource_placement"
 
 module Lti
   describe ResourcePlacement do
+
     describe 'validations' do
+
       it 'requires a resource_handler' do
         subject.save
         expect(subject.errors.first).to eq [:message_handler, "can't be blank"]
@@ -34,6 +36,7 @@ module Lti
         subject.save
         expect(subject.errors).to_not include(:placement)
       end
+
     end
 
     describe 'valid_placements' do
@@ -55,14 +58,14 @@ module Lti
       let(:tabs_with_item_banks) {
         [
           {
-            :id => "context_external_tool_1",
-            :label => "Item Banks",
-            :css_class => "context_external_tool_1",
-            :visibility => nil,
-            :href => :course_external_tool_path,
-            :external => true,
-            :hidden => false,
-            :args => [2, 1]
+            :id=>"context_external_tool_1",
+            :label=>"Item Banks",
+            :css_class=>"context_external_tool_1",
+            :visibility=>nil,
+            :href=>:course_external_tool_path,
+            :external=>true,
+            :hidden=>false,
+            :args=>[2, 1]
           }
         ]
       }
@@ -70,14 +73,14 @@ module Lti
       let(:tabs_without_item_banks) {
         [
           {
-            :id => "context_external_tool_1",
-            :label => "Another",
-            :css_class => "context_external_tool_1",
-            :visibility => nil,
-            :href => :course_external_tool_path,
-            :external => true,
-            :hidden => false,
-            :args => [2, 1]
+            :id=>"context_external_tool_1",
+            :label=>"Another",
+            :css_class=>"context_external_tool_1",
+            :visibility=>nil,
+            :href=>:course_external_tool_path,
+            :external=>true,
+            :hidden=>false,
+            :args=>[2, 1]
           }
         ]
       }

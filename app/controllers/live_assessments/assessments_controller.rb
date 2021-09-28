@@ -75,16 +75,14 @@ module LiveAssessments
     #
     def create
       return unless authorized_action(Assessment.new(context: @context), @current_user, :create)
-
       reject! 'missing required key :assessments' unless params[:assessments].is_a?(Array)
 
       @assessments = []
 
       Assessment.transaction do
         params[:assessments].each do |assessment_hash|
-          if (outcome_id = assessment_hash.dig(:links, :outcome))
+          if assessment_hash[:links] && outcome_id = assessment_hash[:links][:outcome]
             return unless authorized_action(@context, @current_user, :manage_outcomes)
-
             @outcome = @context.linked_learning_outcomes.where(id: outcome_id).first
             reject! 'outcome must be linked to the context' unless @outcome
           end

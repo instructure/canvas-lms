@@ -31,7 +31,7 @@ import {shimGetterShorthand} from '@canvas/util/legacyCoffeesScriptHelpers'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import {ltiState} from '@canvas/lti/jquery/messages'
+import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
 
 
 export default class AssignmentGroupListItemView extends DraggableCollectionView

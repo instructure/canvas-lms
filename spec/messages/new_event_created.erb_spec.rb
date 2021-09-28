@@ -31,3 +31,4 @@ describe 'new_event_created' do
 
   include_examples "a message"
 end
+

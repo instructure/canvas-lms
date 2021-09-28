@@ -22,6 +22,7 @@ require_dependency "broadcast_policies/wiki_page_policy"
 
 module BroadcastPolicies
   describe WikiPagePolicy do
+
     let(:course) do
       double("Course").tap do |c|
         allow(c).to receive(:unpublished?).and_return(false)

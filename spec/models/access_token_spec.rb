@@ -22,19 +22,21 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe AccessToken do
+
   context "Authenticate" do
     shared_examples "#authenticate" do
+
       it "new access tokens shouldnt have an expiration" do
         at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
         expect(at.permanent_expires_at).to eq nil
       end
 
-      it "authenticates valid token" do
+      it "should authenticate valid token" do
         at = AccessToken.create!(:user => user_model, :developer_key => DeveloperKey.default)
         expect(AccessToken.authenticate(at.full_token)).to eq at
       end
 
-      it "does not authenticate expired tokens" do
+      it "shouldn't authenticate expired tokens" do
         at = AccessToken.create!(
           user: user_model,
           developer_key: DeveloperKey.default,
@@ -50,7 +52,7 @@ describe AccessToken do
         DeveloperKey.default.save!
       end
 
-      it "does not have auto expire tokens" do
+      it "shouldn't have auto expire tokens" do
         expect(DeveloperKey.default.auto_expire_tokens).to be true
       end
 
@@ -64,7 +66,8 @@ describe AccessToken do
         d.save!
       end
 
-      it "does not have auto expire tokens" do
+      it "shouldn't have auto expire tokens" do
+
         expect(DeveloperKey.default.auto_expire_tokens).to be false
       end
 
@@ -79,17 +82,17 @@ describe AccessToken do
       @refresh_token_string = @at.plaintext_refresh_token
     end
 
-    it "only stores the encrypted token" do
+    it "should only store the encrypted token" do
       expect(@token_string).to be_present
       expect(@token_string).not_to eq @at.crypted_token
       expect(AccessToken.find(@at.id).full_token).to be_nil
     end
 
-    it "authenticates via crypted_token" do
+    it "should authenticate via crypted_token" do
       expect(AccessToken.authenticate(@token_string)).to eq @at
     end
 
-    it "does not auth old tokens after regeneration" do
+    it "shouldn't auth old tokens after regeneration" do
       expect(AccessToken.authenticate(@token_string)).to eq @at
       @at.regenerate_access_token
       new_token_string = @at.full_token
@@ -100,16 +103,16 @@ describe AccessToken do
       expect(AccessToken.authenticate(@token_string)).to_not eq @at
     end
 
-    it "does not authenticate expired tokens" do
+    it "should not authenticate expired tokens" do
       @at.update!(permanent_expires_at: 2.hours.ago)
       expect(AccessToken.authenticate(@token_string)).to be_nil
     end
 
-    it "authenticates via crypted_refresh_token" do
+    it "should authenticate via crypted_refresh_token" do
       expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
     end
 
-    it "authenticates expired tokens by the refresh token" do
+    it "should authenticate expired tokens by the refresh token" do
       @at.update!(expires_at: 2.hours.ago)
       expect(AccessToken.authenticate_refresh_token(@refresh_token_string)).to eq @at
     end
@@ -122,36 +125,36 @@ describe AccessToken do
       @refresh_token_string = @at.plaintext_refresh_token
     end
 
-    it "is not usable without proper fields" do
+    it "shouldn't be usable without proper fields" do
       token = AccessToken.new
       expect(token.usable?).to eq false
     end
 
-    it "is usable" do
+    it "Should be usable" do
       expect(@at.usable?).to eq true
     end
 
-    it "is usable without dev key" do
+    it "Should be usable without dev key" do
       @at.developer_key_id = nil
       expect(@at.usable?).to eq true
     end
 
-    it "is not usable if expired" do
+    it "Shouldn't be usable if expired" do
       @at.update!(permanent_expires_at: 2.hours.ago)
       expect(@at.usable?).to eq false
     end
 
-    it "is not usable if it needs refreshed" do
+    it "Shouldn't be usable if it needs refreshed" do
       @at.update!(expires_at: 2.hours.ago)
       expect(@at.usable?).to eq false
     end
 
-    it "is usable if it needs refreshed, but requesting with a refresh_token" do
+    it "Should be usable if it needs refreshed, but requesting with a refresh_token" do
       @at.update!(expires_at: 2.hours.ago)
       expect(@at.usable?(:crypted_refresh_token)).to eq true
     end
 
-    it "is not usable if dev key isn't active" do
+    it "Shouldn't be usable if dev key isn't active" do
       dk = DeveloperKey.create!(account: account_model)
       dk.deactivate
       @at.developer_key = dk
@@ -160,7 +163,7 @@ describe AccessToken do
       expect(@at.reload.usable?).to eq false
     end
 
-    it "is not usable if dev key isn't active, even if we request with a refresh token" do
+    it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
       dk = DeveloperKey.create!(account: account_model)
       dk.deactivate
       @at.developer_key = dk
@@ -175,10 +178,10 @@ describe AccessToken do
     it "only displays integrations from non-internal developer keys" do
       user = User.create!
       trustedkey = DeveloperKey.create!(internal_service: true)
-      trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
+      trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
 
       untrustedkey = DeveloperKey.create!()
-      third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
+      third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
 
       expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
       expect(AccessToken.visible_tokens(user.access_tokens).first.id).to eq third_party_access_token.id
@@ -195,8 +198,8 @@ describe AccessToken do
 
       @shard2.activate do
         user = User.create!
-        trusted_access_token = user.access_tokens.create!({ developer_key: trustedkey })
-        third_party_access_token = user.access_tokens.create!({ developer_key: untrustedkey })
+        trusted_access_token = user.access_tokens.create!({developer_key: trustedkey})
+        third_party_access_token = user.access_tokens.create!({developer_key: untrustedkey})
         user.save!
 
         expect(AccessToken.visible_tokens(user.access_tokens).length).to eq 1
@@ -212,25 +215,25 @@ describe AccessToken do
       token
     end
 
-    it "matches named scopes" do
+    it "should match named scopes" do
       expect(token.scoped_to?(['https://canvas.instructure.com/login/oauth2/auth/user_profile', 'accounts'])).to eq true
     end
 
-    it "does not partially match scopes" do
+    it "should not partially match scopes" do
       expect(token.scoped_to?(['user', 'accounts'])).to eq false
       expect(token.scoped_to?(['profile', 'accounts'])).to eq false
     end
 
-    it "does not match if token has more scopes then requested" do
+    it "should not match if token has more scopes then requested" do
       expect(token.scoped_to?(['user_profile', 'accounts', 'courses'])).to eq false
     end
 
-    it "does not match if token has less scopes then requested" do
+    it "should not match if token has less scopes then requested" do
       expect(token.scoped_to?(['user_profile'])).to eq false
     end
 
     it "does not validate scopes if the workflow state is deleted" do
-      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id", "url:GET|/api/v1/accounts/:account_id/admins"]
+      dk_scopes = ["url:POST|/api/v1/accounts/:account_id/admins", "url:DELETE|/api/v1/accounts/:account_id/admins/:user_id",  "url:GET|/api/v1/accounts/:account_id/admins"]
       dk = DeveloperKey.create!(scopes: dk_scopes, require_scopes: true)
       token = AccessToken.new(developer_key: dk, scopes: dk_scopes)
       dk.update!(scopes: [])
@@ -277,6 +280,7 @@ describe AccessToken do
   end
 
   describe "account scoped access" do
+
     before :once do
       @ac = account_model
       @sub_ac = @ac.sub_accounts.create!
@@ -414,7 +418,7 @@ describe AccessToken do
     end
 
     describe 'adding scopes' do
-      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0, 10) }
+      let(:dev_key) { DeveloperKey.create! require_scopes: true, scopes: TokenScopes.all_scopes.slice(0,10)}
       let(:access_token) { AccessToken.new(user: user_model, developer_key: dev_key, scopes: scopes) }
       let(:scopes) { [TokenScopes.all_scopes[12]] }
 
@@ -463,7 +467,7 @@ describe AccessToken do
       @refresh_token_string = @at.plaintext_refresh_token
     end
 
-    it "regenerates the token" do
+    it "should regenerate the token" do
       allow(Time).to receive(:now).and_return(Time.zone.parse('2015-06-29T23:01:00+00:00'))
 
       @at.update!(expires_at: 2.hours.ago)
@@ -487,26 +491,26 @@ describe AccessToken do
       user_model
     end
 
-    it 'sends a notification when a new manually created access token is created' do
+    it 'should send a notification when a new manually created access token is created' do
       access_token = AccessToken.create!(user: @user)
       expect(access_token.messages_sent).to include('Manually Created Access Token Created')
     end
 
-    it 'sends a notification when a manually created access token is regenerated' do
+    it 'should send a notification when a manually created access token is regenerated' do
       AccessToken.create!(user: @user)
       access_token = AccessToken.last
       access_token.regenerate_access_token
       expect(access_token.messages_sent).to include('Manually Created Access Token Created')
     end
 
-    it 'does not send a notification when a manually created access token is touched' do
+    it 'should not send a notification when a manually created access token is touched' do
       AccessToken.create!(user: @user)
       access_token = AccessToken.last
       access_token.touch
       expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
     end
 
-    it 'does not send a notification when a new non-manually created access token is created' do
+    it 'should not send a notification when a new non-manually created access token is created' do
       developer_key = DeveloperKey.create!
       access_token = AccessToken.create!(user: @user, developer_key: developer_key)
       expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')

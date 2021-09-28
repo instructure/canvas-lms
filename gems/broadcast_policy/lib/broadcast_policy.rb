@@ -54,7 +54,8 @@
 # a = Account.first
 # a.check_policy(u)
 
-module BroadcastPolicy # :nodoc:
+module BroadcastPolicy #:nodoc:
+ 
   def self.notifier
     @notifier ||= @notifier_proc.call if @notifier_proc
     @notifier

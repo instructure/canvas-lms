@@ -21,6 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Quizzes::SubmissionManager do
+
   describe '#find_or_create_submission' do
     let(:test_user) { user_factory }
 
@@ -58,6 +59,7 @@ describe Quizzes::SubmissionManager do
         expect(s.temporary_user_code).to eq "user_#{test_user.id}"
       end
     end
+
 
     context 'for a non-temporary user' do
       it 'uses the user id to query the db' do

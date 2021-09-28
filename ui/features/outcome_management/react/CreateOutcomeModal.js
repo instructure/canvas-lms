@@ -121,12 +121,16 @@ const CreateOutcomeModal = ({isOpen, onCloseHandler, onSuccess, starterGroupId})
         setSelectedGroup(null)
 
         showFlashAlert({
-          message: I18n.t('"%{title}" was successfully created.', {title}),
+          message: I18n.t('Outcome "%{title}" was successfully created.', {title}),
           type: 'success'
         })
       } catch (err) {
         showFlashAlert({
-          message: I18n.t('An error occurred while creating this outcome. Please try again.'),
+          message: err.message
+            ? I18n.t('An error occurred while creating this outcome: %{message}.', {
+                message: err.message
+              })
+            : I18n.t('An error occurred while creating this outcome.'),
           type: 'error'
         })
       }

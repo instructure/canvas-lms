@@ -21,7 +21,8 @@
 require_dependency 'canvas'
 
 module Canvas
-  class NoPluginError < StandardError; end
+
+  class NoPluginError < StandardError;end
 
   class Plugin
     @registered_plugins = {}
@@ -29,22 +30,23 @@ module Canvas
     attr_accessor :meta, :settings
     attr_reader :id, :tag
 
-    def initialize(id, tag = nil)
+    def initialize(id, tag=nil)
       @id = id.to_s
       @tag = tag.to_s if tag
       @meta = {
-        :name => id.to_s.humanize,
-        :description => nil,
-        :website => nil,
-        :author => nil,
-        :author_website => nil,
-        :version => nil,
-        :settings_partial => nil,
-        :settings => nil,
-        :encrypted_settings => nil,
-        :base => nil
+              :name=>id.to_s.humanize,
+              :description=>nil,
+              :website=>nil,
+              :author=>nil,
+              :author_website=>nil,
+              :version=>nil,
+              :settings_partial=>nil,
+              :settings=>nil,
+              :encrypted_settings=>nil,
+              :base=>nil
       }.with_indifferent_access
     end
+
 
     # custom serialization, since the meta can containt procs
     def _dump(depth)
@@ -80,7 +82,6 @@ module Canvas
     def enabled?
       ps = PluginSetting.cached_plugin_setting(self.id)
       return false unless ps
-
       ps.valid_settings? && ps.enabled?
     end
 
@@ -134,7 +135,7 @@ module Canvas
       t_if_proc(@meta[name])
     end
 
-    def translate(key, default, options = {})
+    def translate(key, default, options={})
       key = "canvas.plugins.#{@id}.#{key}" unless key =~ /\A#/
       I18n.translate(key, default, options)
     end
@@ -165,9 +166,8 @@ module Canvas
       end
     end
 
-    def self.register(id, tag = nil, meta = {})
+    def self.register(id, tag=nil, meta={})
       raise "Id required for a plugin" if id.nil?
-
       p = Plugin.new(id, tag)
       p.meta.merge! meta
       @registered_plugins[p.id] = p
@@ -178,7 +178,7 @@ module Canvas
     end
 
     def self.all_for_tag(tag)
-      @registered_plugins.values.select { |p| p.tag == tag.to_s }.sort_by(&:name)
+      @registered_plugins.values.select{|p|p.tag == tag.to_s}.sort_by(&:name)
     end
 
     def self.find(id)
@@ -187,7 +187,6 @@ module Canvas
 
     def self.find!(id)
       raise(NoPluginError) if id.nil?
-
       @registered_plugins[id.to_s] || raise(NoPluginError)
     end
 
@@ -198,7 +197,6 @@ module Canvas
       end
       return value if [true, false].include?(value)
       return nil if ignore_unrecognized
-
       return value.to_i != 0
     end
   end

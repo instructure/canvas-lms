@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module BroadcastPolicy
+
   class PolicyList
     attr_reader :notifications
 
@@ -38,14 +39,12 @@ module BroadcastPolicy
       titleized = notification_name.to_s.titleize.gsub(/sms/i, "SMS")
       @current_notification = @notifications.find { |notification| notification.dispatch == titleized }
       return if @current_notification
-
       @current_notification = NotificationPolicy.new(titleized)
       @notifications << @current_notification
     end
 
     def current_notification
       raise "Must call dispatch in the policy block first" unless @current_notification
-
       @current_notification
     end
     protected :current_notification
@@ -70,7 +69,8 @@ module BroadcastPolicy
     end
 
     def find_policy_for(notification)
-      @notifications.detect { |policy| policy.dispatch == notification }
+      @notifications.detect{|policy| policy.dispatch == notification}
     end
   end
+
 end

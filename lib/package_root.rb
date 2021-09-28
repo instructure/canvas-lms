@@ -38,7 +38,6 @@ class PackageRoot
   def item_path(*relative_path_entries)
     path = Pathname(File.join(@prefix, *relative_path_entries)).cleanpath.to_s
     raise ArgumentError, "invalid relative_path_entries" unless path.start_with?(@prefix)
-
     path
   end
 
@@ -51,4 +50,5 @@ class PackageRoot
   def contents(pattern = '**/*')
     Dir[@root_path.join(pattern).to_s]
   end
+
 end

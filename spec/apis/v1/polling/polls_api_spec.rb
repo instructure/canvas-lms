@@ -28,7 +28,7 @@ describe Polling::PollsController, type: :request do
   describe 'GET index' do
     before :once do
       5.times do |n|
-        @teacher.polls.create!(question: "Example Poll #{n + 1}")
+        @teacher.polls.create!(question: "Example Poll #{n+1}")
       end
     end
 
@@ -47,7 +47,7 @@ describe Polling::PollsController, type: :request do
       expect(poll_json.size).to eq 5
 
       poll_json.each_with_index do |poll, i|
-        expect(poll['question']).to eq "Example Poll #{5 - i}"
+        expect(poll['question']).to eq "Example Poll #{5-i}"
       end
     end
 
@@ -57,7 +57,7 @@ describe Polling::PollsController, type: :request do
       expect(poll_json.size).to eq 5
 
       poll_json.each_with_index do |poll, i|
-        expect(poll['question']).to eq "Example Poll #{5 - i}"
+        expect(poll['question']).to eq "Example Poll #{5-i}"
       end
 
       expect(json).to have_key('meta')
@@ -74,7 +74,7 @@ describe Polling::PollsController, type: :request do
         expect(poll_json.size).to eq 5
 
         poll_json.each_with_index do |poll, i|
-          expect(poll['question']).to eq "Example Poll #{5 - i}"
+          expect(poll['question']).to eq "Example Poll #{5-i}"
         end
       end
     end
@@ -90,8 +90,10 @@ describe Polling::PollsController, type: :request do
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}",
                   { controller: 'polling/polls', action: 'show', format: 'json',
-                    id: @poll.id.to_s }, data)
+                    id: @poll.id.to_s
+                  }, data)
     end
+
 
     it "retrieves the poll specified" do
       json = get_show
@@ -124,7 +126,7 @@ describe Polling::PollsController, type: :request do
         expect(poll_json).not_to have_key("total_results")
       end
 
-      it "does not return the id of the user that created the poll" do
+      it "shouldn't return the id of the user that created the poll" do
         student_in_course(:active_all => true, :course => @course)
         session = @poll.poll_sessions.create!(course: @course)
         session.publish!
@@ -149,11 +151,12 @@ describe Polling::PollsController, type: :request do
         get_show(true)
         expect(response.code).to eq '401'
       end
+
     end
   end
 
   describe 'POST create' do
-    def post_create(params, raw = false)
+    def post_create(params, raw=false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls",
@@ -172,10 +175,11 @@ describe Polling::PollsController, type: :request do
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        post_create({ question: 'New Title' }, true)
+        post_create({question: 'New Title'}, true)
         expect(response.code).to eq '401'
       end
     end
+
   end
 
   describe 'PUT update' do
@@ -183,14 +187,15 @@ describe Polling::PollsController, type: :request do
       @poll = @teacher.polls.create!(question: 'An Old Title')
     end
 
-    def put_update(params, raw = false)
+    def put_update(params, raw=false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
-                  "/api/v1/polls/#{@poll.id}",
-                  { controller: 'polling/polls', action: 'update', format: 'json',
-                    id: @poll.id.to_s },
-                  { polls: [params] }, {}, {})
+               "/api/v1/polls/#{@poll.id}",
+               { controller: 'polling/polls', action: 'update', format: 'json',
+                 id: @poll.id.to_s },
+               { polls: [params] }, {}, {})
+
     end
 
     context "as a teacher" do
@@ -203,10 +208,11 @@ describe Polling::PollsController, type: :request do
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        put_update({ question: 'New Title' }, true)
+        put_update({question: 'New Title'}, true)
         expect(response.code).to eq '401'
       end
     end
+
   end
 
   describe 'DELETE destroy' do
@@ -226,10 +232,11 @@ describe Polling::PollsController, type: :request do
 
     def delete_destroy
       raw_api_call(:delete,
-                   "/api/v1/polls/#{@poll.id}",
-                   { controller: 'polling/polls', action: 'destroy', format: 'json',
-                     id: @poll.id.to_s },
-                   {}, {}, {})
+               "/api/v1/polls/#{@poll.id}",
+               { controller: 'polling/polls', action: 'destroy', format: 'json',
+                 id: @poll.id.to_s },
+               {}, {}, {})
+
     end
 
     context "as a teacher" do

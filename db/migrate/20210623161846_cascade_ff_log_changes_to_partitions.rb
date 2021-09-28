@@ -39,3 +39,4 @@ class CascadeFfLogChangesToPartitions < CanvasPartman::Migration
     end
   end
 end
+

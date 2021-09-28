@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/assignments/text_entry_page" do
-  it "renders" do
+  it "should render" do
     course_with_student
     view_context(@course, @user)
     ass = assign(:assignment, @course.assignments.create!(:title => "some assignment"))
@@ -31,3 +31,4 @@ describe "/assignments/text_entry_page" do
     expect(response).not_to be_nil
   end
 end
+

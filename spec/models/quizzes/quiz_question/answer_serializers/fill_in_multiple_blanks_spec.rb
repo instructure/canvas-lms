@@ -22,6 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/support/answer_serializers_s
 require File.expand_path(File.dirname(__FILE__) + '/support/textual_answer_serializers_specs.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
+
   include_examples 'Answer Serializers'
 
   let :input do
@@ -81,15 +82,15 @@ describe Quizzes::QuizQuestion::AnswerSerializers::FillInMultipleBlanks do
   context 'validations' do
     include_examples 'Textual Answer Serializers'
 
-    it 'rejects unexpected types' do
-      ['asdf', nil].each do |bad_input|
+    it 'should reject unexpected types' do
+      [ 'asdf', nil ].each do |bad_input|
         rc = subject.serialize(bad_input)
         expect(rc.error).not_to be_nil
         expect(rc.error).to match /must be of type hash/i
       end
     end
 
-    it 'rejects an answer to an unknown blank' do
+    it 'should reject an answer to an unknown blank' do
       rc = subject.serialize({ foobar: 'yeeeeeeeeee' })
       expect(rc.error).not_to be_nil
       expect(rc.error).to match /unknown blank/i

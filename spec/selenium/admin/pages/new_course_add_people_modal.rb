@@ -19,6 +19,8 @@
 require_relative '../../common'
 
 module NewCourseAddPeopleModal
+
+
   # ---------------------- Controls ----------------------
   def add_people_modal
     f('#add_people_modal')

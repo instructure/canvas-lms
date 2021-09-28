@@ -21,14 +21,6 @@ import {fireEvent} from '@testing-library/react'
 import {ConnectedSecurityPanel} from '../SecurityPanel'
 import {renderWithRedux} from './utils'
 
-const defaultProps = {
-  context: 'account',
-  accountId: '1',
-  contextId: '1',
-  maxDomains: 50,
-  liveRegion: []
-}
-
 describe('ConnectedSecurityPanel', () => {
   beforeEach(() => {
     window.ENV = {
@@ -37,7 +29,9 @@ describe('ConnectedSecurityPanel', () => {
   })
 
   it('updates CSP enabled status when the checkbox is clicked', () => {
-    const {getByLabelText} = renderWithRedux(<ConnectedSecurityPanel {...defaultProps} />)
+    const {getByLabelText} = renderWithRedux(
+      <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} />
+    )
 
     const checkbox = getByLabelText('Enable Content Security Policy')
     fireEvent.click(checkbox)
@@ -47,7 +41,7 @@ describe('ConnectedSecurityPanel', () => {
   describe('isSubAccount prop', () => {
     it('updates CSP inherited status when the inherit checkbox is clicked', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount />
+        <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} isSubAccount />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')
@@ -57,7 +51,7 @@ describe('ConnectedSecurityPanel', () => {
 
     it('disables the enable checkbox when the inherit option is set to true', () => {
       const {getByLabelText} = renderWithRedux(
-        <ConnectedSecurityPanel {...defaultProps} isSubAccount />
+        <ConnectedSecurityPanel context="account" contextId="1" maxDomains={50} isSubAccount />
       )
 
       const checkbox = getByLabelText('Inherit Content Security Policy')

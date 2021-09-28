@@ -35,8 +35,7 @@ module CC::Exporter::Epub::Converters
 
         quiz = convert_quiz(quiz_meta_data)
         next unless get_bool_val(quiz_meta_data, 'available') &&
-                    !get_bool_val(quiz_meta_data, 'module_locked')
-
+          !get_bool_val(quiz_meta_data, 'module_locked')
         quizzes << quiz
       end
       quizzes

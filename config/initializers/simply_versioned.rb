@@ -31,8 +31,7 @@ Rails.configuration.to_prepare do
     :submission,
     :wiki_page,
     { quiz: 'Quizzes::Quiz',
-      quiz_submission: 'Quizzes::QuizSubmission' }
-  ]
+      quiz_submission: 'Quizzes::QuizSubmission' }]
   Version.add_polymorph_methods(reflection)
 
   Version.include(CanvasPartman::Concerns::Partitioned)

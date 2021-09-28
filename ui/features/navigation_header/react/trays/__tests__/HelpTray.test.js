@@ -42,8 +42,7 @@ describe('HelpTray', () => {
   const props = {
     trayTitle,
     links,
-    hasLoaded: true,
-    closeTray: jest.fn()
+    hasLoaded: true
   }
 
   beforeEach(() => {

@@ -24,7 +24,6 @@ import {DiscussionPermissions} from './DiscussionPermissions'
 import gql from 'graphql-tag'
 import {User} from './User'
 import {DiscussionEntry} from './DiscussionEntry'
-import {DiscussionEntryDraft} from './DiscussionEntryDraft'
 import {PageInfo} from './PageInfo'
 import {ChildTopic} from './ChildTopic'
 import {RootTopic} from './RootTopic'
@@ -51,7 +50,6 @@ export const Discussion = {
       subscribed
       published
       canUnpublish
-      lockAt
       entryCounts {
         unreadCount
         repliesCount
@@ -103,7 +101,6 @@ export const Discussion = {
     allowRating: bool,
     onlyGradersCanRate: bool,
     delayedPostAt: string,
-    lockAt: string,
     subscribed: bool,
     published: bool,
     canUnpublish: bool,
@@ -141,7 +138,6 @@ export const Discussion = {
     allowRating = true,
     onlyGradersCanRate = false,
     delayedPostAt = null,
-    lockAt = null,
     subscribed = true,
     published = true,
     canUnpublish = false,
@@ -165,11 +161,6 @@ export const Discussion = {
       nodes: [DiscussionEntry.mock()],
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionEntriesConnection'
-    },
-    discussionEntryDraftsConnection = {
-      nodes: [DiscussionEntryDraft.mock()],
-      pageInfo: PageInfo.mock(),
-      __typename: 'DiscussionEntryDraftsConnection'
     }
   } = {}) => ({
     id,
@@ -187,7 +178,6 @@ export const Discussion = {
     allowRating,
     onlyGradersCanRate,
     delayedPostAt,
-    lockAt,
     subscribed,
     published,
     canUnpublish,
@@ -204,7 +194,6 @@ export const Discussion = {
     searchEntryCount,
     entriesTotalPages,
     discussionEntriesConnection,
-    discussionEntryDraftsConnection,
     __typename: 'Discussion'
   })
 }

@@ -36,7 +36,7 @@ describe "report helper" do
   let(:account_report) { AccountReport.new(report_type: 'test_report', account: account, user: user) }
   let(:report) { AccountReports::TestReport.new(account_report) }
 
-  it 'handles basic math' do
+  it 'should handle basic math' do
     # default min
     expect(report.number_of_items_per_runner(1)).to eq 25
     # divided by 99 to make for 100 jobs except for when exactly divisible by 99
@@ -49,14 +49,14 @@ describe "report helper" do
     expect(report.number_of_items_per_runner(109213081, max: 100)).to eq 100
   end
 
-  it 'creates report runners with a single trip' do
+  it 'should create report runners with a single trip' do
     account_report.save!
     expect(AccountReport).to receive(:bulk_insert_objects).once.and_call_original
     report.create_report_runners((1..50).to_a, 50)
     expect(account_report.account_report_runners.count).to eq 2
   end
 
-  it 'creates report runners with few trips to the db' do
+  it 'should create report runners with few trips to the db' do
     account_report.save!
     # lower the setting so we can do more than one trip with less data
     Setting.set("ids_per_report_runner_batch", 1_000)
@@ -68,7 +68,7 @@ describe "report helper" do
     expect(account_report.account_report_runners.count).to eq 100
   end
 
-  it 'fails when no csv' do
+  it 'should fail when no csv' do
     AccountReports.finalize_report(account_report, 'hi', nil)
     expect(account_report.parameters["extra_text"]).to eq "Failed, the report failed to generate a file. Please try again."
   end
@@ -85,107 +85,107 @@ describe "report helper" do
                                                 role: role)
     end
 
-    it 'does one query for pseudonyms' do
+    it 'should do one query for pseudonyms' do
       report.preload_logins_for_users([@user])
       expect(SisPseudonym).to receive(:for).never
-      report.loaded_pseudonym({ @user.id => [@pseudonym] }, @user, enrollment: @enrollmnent)
+      report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, enrollment: @enrollmnent)
     end
 
-    it 'ignores deleted pseudonyms' do
+    it 'should ignore deleted pseudonyms' do
       @pseudonym.destroy
       report.preload_logins_for_users([@user])
       expect(SisPseudonym).to receive(:for).once.and_call_original
-      pseudonym = report.loaded_pseudonym({ @user.id => [@pseudonym] }, @user, enrollment: @enrollmnent)
+      pseudonym = report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, enrollment: @enrollmnent)
       expect(pseudonym).to be_nil
     end
 
-    it 'uses deleted pseudonyms when passed' do
+    it 'should use deleted pseudonyms when passed' do
       @pseudonym.destroy
       report.preload_logins_for_users([@user])
       expect(SisPseudonym).to receive(:for).never
-      pseudonym = report.loaded_pseudonym({ @user.id => [@pseudonym] }, @user, include_deleted: true, enrollment: @enrollmnent)
+      pseudonym = report.loaded_pseudonym({@user.id => [@pseudonym]}, @user, include_deleted: true, enrollment: @enrollmnent)
       expect(pseudonym).to eq @pseudonym
     end
   end
 
   describe "#send_report" do
     before do
-      allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => { title: 'test_report' })
+      allow(AccountReports).to receive(:available_reports).and_return(account_report.report_type => {title: 'test_report'})
       allow(report).to receive(:report_title).and_return('TitleReport')
     end
 
-    it "does not break for nil parameters" do
+     it "Should not break for nil parameters" do
       expect(AccountReports).to receive(:finalize_report)
       report.send_report
     end
 
-    it "allows aborting" do
+    it "Should allow aborting" do
       account_report.workflow_state = 'deleted'
       account_report.save!
-      expect { report.write_report(['header']) { |csv| csv << 'hi' } }.to raise_error(/aborted/)
+      expect{report.write_report(['header']) { |csv| csv << 'hi' }}.to raise_error(/aborted/)
     end
   end
 
   describe "timezone_strftime" do
-    it "formats DateTime" do
+    it "Should format DateTime" do
       date_time = DateTime.new(2003, 9, 13)
       formatted = report.timezone_strftime(date_time, '%d-%b')
       expect(formatted).to eq "13-Sep"
     end
 
-    it "formats Time" do
+    it "Should format Time" do
       time_zone = Time.use_zone('UTC') { Time.zone.parse('2013-09-13T00:00:00Z') }
       formatted = report.timezone_strftime(time_zone, '%d-%b')
       expect(formatted).to eq "13-Sep"
     end
 
-    it "formats String" do
+    it "Should format String" do
       time_zone = Time.use_zone('UTC') { Time.zone.parse('2013-09-13T00:00:00Z') }
       formatted = report.timezone_strftime(time_zone.to_s, '%d-%b')
       expect(formatted).to eq "13-Sep"
     end
 
-    it 'parses time' do
+    it 'should parse time' do
       og_time = 1.day.ago.iso8601
-      account_report.parameters = { 'start_at' => og_time }
+      account_report.parameters = {'start_at' => og_time }
       time = report.restricted_datetime_from_param('start_at')
       expect(time).to eq og_time
     end
 
-    it 'parses and restrict time' do
+    it 'should parse and restrict time' do
       og_time = 2.days.ago.iso8601
-      account_report.parameters = { 'start_at' => og_time }
+      account_report.parameters = {'start_at' => og_time}
       restricted_time = 1.day.ago.iso8601
       time = report.restricted_datetime_from_param('start_at', earliest: restricted_time)
       expect(time).to eq restricted_time
     end
 
-    it 'parses and not change to restrict time' do
+    it 'should parse and not change to restrict time' do
       og_time = 2.days.ago.iso8601
-      account_report.parameters = { 'start_at' => og_time }
+      account_report.parameters = {'start_at' => og_time}
       restricted_time = 3.days.ago.iso8601
       time = report.restricted_datetime_from_param('start_at', earliest: restricted_time)
       expect(time).to eq og_time
     end
 
-    it 'parses and restrict latest times' do
+    it 'should parse and restrict latest times' do
       og_time = 2.days.ago.iso8601
-      account_report.parameters = { 'end_at' => og_time }
+      account_report.parameters = {'end_at' => og_time}
       restricted_time = 3.days.ago.iso8601
       time = report.restricted_datetime_from_param('end_at', latest: restricted_time)
       expect(time).to eq restricted_time
     end
 
-    it 'fallbacks to a time' do
+    it 'should fallback to a time' do
       og_time = 1.day.ago.iso8601
       account_report.parameters = {}
       time = report.restricted_datetime_from_param('start_at', fallback: og_time)
       expect(time).to eq og_time
     end
 
-    it 'only falls back to a time when one is not provided' do
+    it 'should only fallback to a time when one is not provided' do
       og_time = 1.day.ago.iso8601
-      account_report.parameters = { 'start_at' => og_time }
+      account_report.parameters = {'start_at' => og_time}
       other_time = 3.days.ago.iso8601
       time = report.restricted_datetime_from_param('start_at', fallback: other_time)
       expect(time).to eq og_time
@@ -200,7 +200,7 @@ describe "report helper" do
         user.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
       end
 
-      it "does not have byte order mark and semicolons when i18n compatibility disabled" do
+      it "Should not have byte order mark and semicolons when i18n compatibility disabled" do
         file = report.generate_and_run_report(['h1', 'h2']) do |csv|
           csv << ['val1', 'val2']
         end
@@ -208,7 +208,7 @@ describe "report helper" do
         expect(contents).to eq "h1,h2\nval1,val2\n"
       end
 
-      it "uses i18n compatibility when enabled" do
+      it "Should use i18n compatibility when enabled" do
         file = report.generate_and_run_report(['h1', 'h2'], 'csv', true) do |csv|
           csv << ['val1', 'val2']
         end
@@ -219,6 +219,7 @@ describe "report helper" do
   end
 
   context 'Scopes' do
+
     before(:once) do
       @enrollment_term = EnrollmentTerm.new(workflow_state: 'active', name: 'Fall term', sis_source_id: 'fall14')
       @enrollment_term.root_account_id = account.id
@@ -251,7 +252,8 @@ describe "report helper" do
     end
 
     describe '#add_course_scope' do
-      it 'adds course scope if course is set' do
+
+      it 'should add course scope if course is set' do
         courses = Course.all
 
         allow(report).to receive(:course).and_return(@course3)
@@ -259,17 +261,18 @@ describe "report helper" do
         expect(courses.count(:all)).to eq(1)
       end
 
-      it 'does not add course scope if course is not set' do
+      it 'should not add course scope if course is not set' do
         courses = Course.all
 
         allow(report).to receive(:course).and_return(nil)
         courses = report.add_course_scope(courses)
         expect(courses.count(:all)).to eq(3)
       end
+
     end
 
     describe '#add_term_scope' do
-      it 'adds term scope if term is set' do
+      it 'should add term scope if term is set' do
         courses = Course.all
 
         allow(report).to receive(:term).and_return(@enrollment_term)
@@ -277,13 +280,16 @@ describe "report helper" do
         expect(courses.count(:all)).to eq(2)
       end
 
-      it 'does not add term scope if term is not set' do
+      it 'should not add term scope if term is not set' do
         courses = Course.all
 
         allow(report).to receive(:term).and_return(nil)
         courses = report.add_term_scope(courses)
         expect(courses.count(:all)).to eq(3)
       end
+
     end
+
   end
+
 end

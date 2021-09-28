@@ -45,7 +45,6 @@ module CanvasAPI
       args.each_with_index do |arg, index|
         key = arg.to_sym
         next unless deprecation_keys.include?(key)
-
         dates[key] = args[index + 1]
       end
       dates
@@ -67,7 +66,7 @@ module CanvasAPI
       if @description.blank?
         raise(
           ArgumentError,
-          "Expected a description for #{@description_key.present? ? "`#{@description_key}`" : 'the deprecation'}" \
+          "Expected a description for #{@description_key.present? ? "`#{@description_key}`": 'the deprecation'}" \
           ", but it was not provided.#{reference_line}"
         )
       end

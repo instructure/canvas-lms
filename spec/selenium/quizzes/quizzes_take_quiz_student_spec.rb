@@ -134,6 +134,7 @@ describe 'taking a quiz' do
           end
 
           yield if block_given?
+
         ensure
           # This prevents selenium from freezing when the dialog appears upon leaving the quiz
           begin

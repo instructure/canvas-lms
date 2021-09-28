@@ -19,6 +19,7 @@
 require_relative '../../common'
 
 module RCSSidebarPage
+
   # ---------------------- Controls ----------------------
 
   def pages_accordion_button

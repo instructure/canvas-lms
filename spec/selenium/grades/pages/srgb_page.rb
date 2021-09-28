@@ -29,6 +29,7 @@ class SRGB
       due_date: 'By Due Date'
     }.freeze
 
+
     def switch_to_default_gradebook_link
       f('#switch_to_default_gradebook')
     end
@@ -224,7 +225,7 @@ class SRGB
 
     def drop_lowest(course, num_assignment)
       ag = course.assignment_groups.first
-      ag.rules_hash = { "drop_lowest" => num_assignment }
+      ag.rules_hash = {"drop_lowest"=>num_assignment}
       ag.save!
     end
 
@@ -237,5 +238,6 @@ class SRGB
     def assignment_sort_order_selector
       'select#arrange_assignments'
     end
+
   end
 end

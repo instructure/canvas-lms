@@ -34,4 +34,5 @@ RSpec.configure do |config|
       raise ActiveRecord::Rollback
     end
   end
+
 end

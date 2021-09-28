@@ -40,7 +40,7 @@ describe "calendar2" do
       course_with_teacher_logged_in
     end
 
-    it "navigates to month view when month button is clicked", :xbrowser do
+    it "should navigate to month view when month button is clicked", :xbrowser do
       load_week_view
       f('#month').click
       wait_for_ajaximations
@@ -48,7 +48,8 @@ describe "calendar2" do
     end
 
     describe "main month calendar" do
-      it "remembers the selected calendar view" do
+
+      it "should remember the selected calendar view" do
         get "/calendar2"
         expect(find("#month")).to have_class('active')
         find('#agenda').click
@@ -58,15 +59,15 @@ describe "calendar2" do
         expect(find('#agenda')).to have_class('active')
       end
 
-      it "creates an event through clicking on a calendar day", priority: "1", test_id: 138638 do
+      it "should create an event through clicking on a calendar day", priority: "1", test_id: 138638 do
         create_middle_day_event
       end
 
-      it "creates an assignment by clicking on a calendar day" do
+      it "should create an assignment by clicking on a calendar day" do
         create_middle_day_assignment
       end
 
-      it 'translates am/pm time strings in assignment event datepicker', priority: "2", test_id: 467482 do
+      it 'should translate am/pm time strings in assignment event datepicker', priority: "2", test_id: 467482 do
         skip('CNVS-28437')
         @user.locale = 'fa'
         @user.save!
@@ -81,6 +82,7 @@ describe "calendar2" do
       end
 
       context "drag and drop" do
+
         def element_location
           driver.execute_script("return $('#calendar-app .fc-content-skeleton:first')
           .find('tbody td.fc-event-container').index()")
@@ -96,7 +98,7 @@ describe "calendar2" do
           @three_days_earlier = @initial_time - 72.hours
         end
 
-        it "drags and drop assignment override forward" do
+        it "should drag and drop assignment override forward" do
           assignment1 = @course.assignments.create!(title: 'new month view assignment')
           assignment1.assignment_overrides.create! do |override|
             override.set = @course.course_sections.first
@@ -121,7 +123,7 @@ describe "calendar2" do
           expect(assignment1.assignment_overrides.first.due_at).to eql(@one_day_later)
         end
 
-        it "drags and drop assignment forward", priority: "1", test_id: 495537 do
+        it "should drag and drop assignment forward", priority: "1", test_id: 495537 do
           assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -141,7 +143,7 @@ describe "calendar2" do
           expect(assignment1.start_at).to eql(@one_day_later)
         end
 
-        it "drags and drop event forward", priority: "1", test_id: 495538 do
+        it "should drag and drop event forward", priority: "1", test_id: 495538 do
           event1 = make_event(start: @initial_time, title: 'new week view event')
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -161,7 +163,7 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@one_day_later)
         end
 
-        it "drags and drop assignment back", priority: "1", test_id: 567749 do
+        it "should drag and drop assignment back", priority: "1", test_id: 567749 do
           assignment1 = @course.assignments.create!(title: 'new month view assignment', due_at: @initial_time)
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -181,7 +183,7 @@ describe "calendar2" do
           expect(assignment1.start_at).to eql(@three_days_earlier)
         end
 
-        it "drags and drop event back", priority: "1", test_id: 567750 do
+        it "should drag and drop event back", priority: "1", test_id: 567750 do
           event1 = make_event(start: @initial_time, title: 'new week view event')
           get "/calendar2"
           quick_jump_to_date(@initial_time_str)
@@ -201,7 +203,7 @@ describe "calendar2" do
           expect(event1.start_at).to eql(@three_days_earlier)
         end
 
-        it "extends event to multiple days by draging", priority: "2", test_id: 419527 do
+        it "should extend event to multiple days by draging", priority: "2", test_id: 419527 do
           create_middle_day_event
           date_of_middle_day = find_middle_day.attribute('data-date')
           date_of_next_day = (date_of_middle_day.to_datetime + 1.day).strftime('%Y-%m-%d')
@@ -226,7 +228,7 @@ describe "calendar2" do
         expect(find('#breadcrumbs')).to include_text 'Calendar Events'
       end
 
-      it "goes to assignment page when clicking assignment title" do
+      it "should go to assignment page when clicking assignment title" do
         name = 'special assignment'
         create_middle_day_assignment(name)
         f('.fc-event.assignment').click
@@ -245,7 +247,7 @@ describe "calendar2" do
         expect(find('#assignment_name').attribute(:value)).to include(name)
       end
 
-      it "publishes a new assignment when toggle is clicked" do
+      it "should publish a new assignment when toggle is clicked" do
         create_published_middle_day_assignment
         f('.fc-event.assignment').click
         hover_and_click '.edit_event_link'
@@ -253,7 +255,7 @@ describe "calendar2" do
         expect(find('#assignment-draft-state')).not_to include_text("Not Published")
       end
 
-      it "deletes an event" do
+      it "should delete an event" do
         create_middle_day_event('doomed event')
         f('.fc-event').click
         hover_and_click '.delete_event_link'
@@ -264,7 +266,7 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_jqcss('.fc-event:visible')
       end
 
-      it "deletes an assignment" do
+      it "should delete an assignment" do
         create_middle_day_assignment
         f('.fc-event').click()
         hover_and_click '.delete_event_link'
@@ -278,12 +280,12 @@ describe "calendar2" do
         expect(f("#content")).not_to contain_css('.fc-event')
       end
 
-      it "does not have a delete link for a frozen assignment" do
-        allow(PluginSetting).to receive(:settings_for_plugin).and_return({ "assignment_group_id" => "true" })
+      it "should not have a delete link for a frozen assignment" do
+        allow(PluginSetting).to receive(:settings_for_plugin).and_return({"assignment_group_id" => "true"})
         frozen_assignment = @course.assignments.build(
-          name: "frozen assignment",
-          due_at: Time.zone.now,
-          freeze_on_copy: true,
+            name: "frozen assignment",
+            due_at: Time.zone.now,
+            freeze_on_copy: true,
         )
         frozen_assignment.copied = true
         frozen_assignment.save!
@@ -293,7 +295,7 @@ describe "calendar2" do
         expect(f('body')).not_to contain_css('.delete_event_link')
       end
 
-      it "correctlies display next month on arrow press", priority: "1", test_id: 197555 do
+      it "should correctly display next month on arrow press", priority: "1", test_id: 197555 do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:next)
@@ -308,7 +310,7 @@ describe "calendar2" do
         expect(fj(last_thursday)).to have_attribute('data-date', '2012-03-01')
       end
 
-      it "correctlies display previous month on arrow press", priority: "1", test_id: 419290 do
+      it "should correctly display previous month on arrow press", priority: "1", test_id: 419290 do
         load_month_view
         quick_jump_to_date('Jan 1, 2012')
         change_calendar(:prev)
@@ -323,7 +325,7 @@ describe "calendar2" do
         expect(fj(last_saturday)).to have_attribute('data-date', '2011-12-31')
       end
 
-      it "fixes up the event's date for events after 11:30pm" do
+      it "should fix up the event's date for events after 11:30pm" do
         time = Time.zone.now.at_beginning_of_day + 23.hours + 45.minutes
         @course.calendar_events.create! title: 'ohai', start_at: time, end_at: time + 5.minutes
 
@@ -332,7 +334,7 @@ describe "calendar2" do
         expect(fj('.fc-event .fc-time').text).to eq('11:45p')
       end
 
-      it "changes the month" do
+      it "should change the month" do
         get "/calendar2"
         old_header_title = header_text
         change_calendar
@@ -340,7 +342,7 @@ describe "calendar2" do
         expect(old_header_title).not_to eq new_header_title
       end
 
-      it "navigates with jump-to-date control" do
+      it "should navigate with jump-to-date control" do
         Account.default.change_root_account_setting!(:agenda_view, true)
         # needs to be 2 months out so it doesn't appear at the start of the next month
         eventStart = 2.months.from_now
@@ -353,14 +355,14 @@ describe "calendar2" do
         expect(find('.fc-event')).to be
       end
 
-      it "shows section-level events, but not the parent event" do
+      it "should show section-level events, but not the parent event" do
         @course.default_section.update_attribute(:name, "default section!")
         s2 = @course.course_sections.create!(:name => "other section!")
         date = Date.today
         e1 = @course.calendar_events.build :title => "ohai",
                                            :child_event_data => [
-                                             { :start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string },
-                                             { :start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string },
+                                               {:start_at => "#{date} 12:00:00", :end_at => "#{date} 13:00:00", :context_code => @course.default_section.asset_string},
+                                               {:start_at => "#{date} 13:00:00", :end_at => "#{date} 14:00:00", :context_code => s2.asset_string},
                                            ]
         e1.updating_user = @user
         e1.save!
@@ -376,7 +378,7 @@ describe "calendar2" do
         expect(details.find('.view_event_link')[:href]).to include "/calendar_events/#{e1.id}" # links to parent event
       end
 
-      it "has a working today button", priority: "1", test_id: 142041 do
+      it "should have a working today button", priority: "1", test_id: 142041 do
         load_month_view
         date = Time.now.strftime("%-d")
 
@@ -396,24 +398,24 @@ describe "calendar2" do
         expect(ffj(".fc-state-highlight")[1].text).to include(date)
       end
 
-      it "shows the location when clicking on a calendar event" do
+      it "should show the location when clicking on a calendar event" do
         location_name = "brighton"
         location_address = "cottonwood"
         make_event(:location_name => location_name, :location_address => location_address)
         load_month_view
 
-        # Click calendar item to bring up event summary
+        #Click calendar item to bring up event summary
         find(".fc-event").click
 
-        # expect to find the location name and address
+        #expect to find the location name and address
         expect(find('.event-details-content')).to include_text(location_name)
         expect(find('.event-details-content')).to include_text(location_address)
       end
 
-      it "brings up a calendar date picker when clicking on the month" do
+      it "should bring up a calendar date picker when clicking on the month" do
         load_month_view
 
-        # Click on the month header
+        #Click on the month header
         find('.navigation_title').click
 
         # Expect that a the event picker is present
@@ -422,7 +424,7 @@ describe "calendar2" do
         expect(find('.ui-datepicker-calendar')).to include_text("Mo")
       end
 
-      it "strikethroughs past due assignment", priority: "1", test_id: 518370 do
+      it "should strikethrough past due assignment", priority: "1", test_id: 518370 do
         date_due = Time.zone.now.utc - 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -438,7 +440,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "strikethroughs past due graded discussion", priority: "1", test_id: 518371 do
+      it "should strikethrough past due graded discussion", priority: "1", test_id: 518371 do
         date_due = Time.zone.now.utc - 2.days
         a = @course.assignments.create!(title: 'past due assignment', due_at: date_due, points_possible: 10)
         @pub_graded_discussion_due = @course.discussion_topics.build(assignment: a, title: 'graded discussion')
@@ -452,7 +454,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "returns back to the original calendar view after editing a section child event" do
+      it "should return back to the original calendar view after editing a section child event" do
         calendar_event_model(:start_at => "Sep 3 2008", :title => "some event")
         child = @event.child_events.build
         child.context = @course.course_sections.create!
@@ -475,11 +477,12 @@ describe "calendar2" do
   end
 
   context "as a student" do
+
     before(:each) do
       course_with_student_logged_in
     end
 
-    it "navigates to month view when month button is clicked" do
+    it "should navigate to month view when month button is clicked" do
       load_week_view
       f('#month').click
       wait_for_ajaximations
@@ -487,7 +490,8 @@ describe "calendar2" do
     end
 
     describe "main month calendar" do
-      it "strikethroughs completed assignment title", priority: "1", test_id: 518372 do
+
+      it "should strikethrough completed assignment title", priority: "1", test_id: 518372 do
         date_due = Time.zone.now.utc + 2.days
         @assignment = @course.assignments.create!(
           title: 'new outdated assignment',
@@ -509,7 +513,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "strikethroughs completed graded discussion", priority: "1", test_id: 518373 do
+      it "should strikethrough completed graded discussion", priority: "1", test_id: 518373 do
         date_due = Time.zone.now.utc + 2.days
         reply = 'Replying to discussion'
 
@@ -531,7 +535,7 @@ describe "calendar2" do
         expect(find('.fc-title').css_value('text-decoration')).to include('line-through')
       end
 
-      it "loads events from adjacent months correctly" do
+      it "should load events from adjacent months correctly" do
         time = DateTime.parse("2016-04-01")
         @course.calendar_events.create! title: 'aprilfools', start_at: time, end_at: time + 5.minutes
 

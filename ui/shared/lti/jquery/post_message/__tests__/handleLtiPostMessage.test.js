@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import handleLtiPostMessage from '../handleLtiPostMessage'
-import {ltiState} from '../../messages'
+import handleLtiPostMessage, {ltiState} from '../handleLtiPostMessage'
 
 const requestFullWindowLaunchMessage = {
   messageType: 'requestFullWindowLaunch',

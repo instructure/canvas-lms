@@ -21,4 +21,5 @@
 class Quizzes::QuizSubmissionSnapshot < ActiveRecord::Base
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
   serialize :data
+
 end

@@ -19,7 +19,6 @@
 import I18n from 'i18n!discussion_posts'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {IconEditLine} from '@instructure/ui-icons'
 import {InlineList} from '@instructure/ui-list'
 import {Reply} from './Reply'
 import {Like} from './Like'
@@ -46,7 +45,7 @@ export function ThreadingToolbar({...props}) {
         }
       }}
       render={(responsiveProps, matches) =>
-        (props.searchTerm || props.filter !== 'all') &&
+        (props.searchTerm || props.filter === 'unread') &&
         ENV.isolated_view &&
         !props.isIsolatedView ? (
           <Link
@@ -61,36 +60,18 @@ export function ThreadingToolbar({...props}) {
                 ? props.discussionEntry._id
                 : null
 
-              if (props.filter === 'drafts') {
-                props.onOpenIsolatedView(
-                  props.discussionEntry.isolatedEntryId,
-                  props.discussionEntry.isolatedEntryId,
-                  props.filter === 'drafts',
-                  null
-                )
-              } else {
-                props.onOpenIsolatedView(
-                  isolatedId,
-                  props.discussionEntry.isolatedEntryId,
-                  props.filter === 'drafts',
-                  relativeId,
-                  props.discussionEntry._id
-                )
-              }
+              props.onOpenIsolatedView(
+                isolatedId,
+                props.discussionEntry.isolatedEntryId,
+                false,
+                relativeId,
+                props.discussionEntry._id
+              )
             }}
           >
-            {props.filter === 'drafts' ? (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                <View as="span" margin="0 small 0 0">
-                  <IconEditLine color="primary" size="x-small" />
-                </View>
-                {I18n.t('Continue draft')}
-              </Text>
-            ) : (
-              <Text weight="bold" size={responsiveProps.textSize}>
-                {I18n.t('Go to Reply')}
-              </Text>
-            )}
+            <Text weight="bold" size={responsiveProps.textSize}>
+              {I18n.t('Go to Reply')}
+            </Text>
           </Link>
         ) : (
           <InlineList delimiter="pipe" display="inline-flex">

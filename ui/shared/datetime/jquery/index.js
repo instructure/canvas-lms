@@ -21,7 +21,7 @@ import $ from 'jquery'
 import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
 import * as dateFunctions from '../date-functions'
-import DatetimeField from './InstrumentedDatetimeField'
+import DatetimeField from './DatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 import '@canvas/keycodes'
 import 'date' /* Date.parse, Date.UTC, Date.today */

@@ -418,8 +418,7 @@ export function K5Course({
   hasSyllabusBody,
   parentSupportEnabled,
   observerList,
-  selfEnrollment,
-  tabContentOnly
+  selfEnrollment
 }) {
   const renderTabs = toRenderTabs(tabs, hasSyllabusBody)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, renderTabs)
@@ -562,7 +561,7 @@ export function K5Course({
       }}
     >
       <View as="section" data-testid="main-content" elementRef={e => (contentRef.current = e)}>
-        {!tabContentOnly && courseTabs}
+        {courseTabs}
         {!renderTabs?.length && <EmptyCourse name={name} id={id} canManage={canManage} />}
         {currentTab === renderTabs?.[0]?.id && (
           <K5Announcement
@@ -657,8 +656,7 @@ K5Course.propTypes = {
   hasSyllabusBody: PropTypes.bool.isRequired,
   parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
-  selfEnrollment: PropTypes.object,
-  tabContentOnly: PropTypes.bool
+  selfEnrollment: PropTypes.object
 }
 
 const WrappedK5Course = connect(mapStateToProps, {

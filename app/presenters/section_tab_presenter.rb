@@ -25,7 +25,6 @@ class SectionTabPresenter
     @context = context
   end
   attr_reader :tab, :context
-
   delegate :css_class, :label, :target, to: :tab
 
   def active?(active_tab)

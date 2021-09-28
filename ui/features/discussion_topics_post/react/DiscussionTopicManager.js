@@ -83,9 +83,9 @@ const DiscussionTopicManager = props => {
     }
   }, [highlightEntryId])
 
-  const openIsolatedView = (discussionEntryId, isolatedId, withRCE, relativeId = null) => {
+  const openIsolatedView = (discussionEntryId, isolatedEntryId, withRCE, relativeId = null) => {
     setReplyFromId(discussionEntryId)
-    setIsolatedEntryId(isolatedId || discussionEntryId)
+    setIsolatedEntryId(isolatedEntryId || discussionEntryId)
     setIsolatedViewOpen(true)
     setEditorExpanded(withRCE)
     setRelativeEntryId(relativeId)
@@ -109,54 +109,8 @@ const DiscussionTopicManager = props => {
 
   const discussionTopicQuery = useQuery(DISCUSSION_QUERY, {
     variables,
-    fetchPolicy: searchTerm ? 'no-cache' : 'cache-and-network'
+    fetchPolicy: searchTerm ? 'no-cache' : 'cache-first'
   })
-
-  const updateDraftCache = (cache, result) => {
-    try {
-      const options = {
-        query: DISCUSSION_QUERY,
-        variables: {...variables}
-      }
-      const newDiscussionEntryDraft = result.data.createDiscussionEntryDraft.discussionEntryDraft
-      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
-
-      if (currentDiscussion && newDiscussionEntryDraft) {
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
-          currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-            draft => draft.id !== newDiscussionEntryDraft.id
-          )
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.push(
-          newDiscussionEntryDraft
-        )
-
-        cache.writeQuery({...options, data: currentDiscussion})
-      }
-    } catch (e) {
-      // do nothing for errors updating the cache on a draft
-    }
-  }
-
-  const removeDraftFromDiscussionCache = (cache, result) => {
-    try {
-      const options = {
-        query: DISCUSSION_QUERY,
-        variables: {...variables}
-      }
-      const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
-      const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
-
-      currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes =
-        currentDiscussion.legacyNode.discussionEntryDraftsConnection.nodes.filter(
-          draft =>
-            draft.rootEntryId !== newDiscussionEntry.rootEntryId &&
-            draft.discussionTopicID !== newDiscussionEntry.discussionTopicID
-        )
-      cache.writeQuery({...options, data: currentDiscussion})
-    } catch (e) {
-      // do nothing for errors updating the cache on a draft
-    }
-  }
 
   const updateCache = (cache, result) => {
     try {
@@ -170,7 +124,6 @@ const DiscussionTopicManager = props => {
 
       if (currentDiscussion && newDiscussionEntry) {
         currentDiscussion.legacyNode.entryCounts.repliesCount += 1
-        removeDraftFromDiscussionCache(cache, result)
         if (variables.sort === 'desc') {
           currentDiscussion.legacyNode.discussionEntriesConnection.nodes.unshift(newDiscussionEntry)
         } else {
@@ -216,7 +169,6 @@ const DiscussionTopicManager = props => {
     <SearchContext.Provider value={searchContext}>
       <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
-        updateDraftCache={updateDraftCache}
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {
           createDiscussionEntry({
@@ -235,11 +187,15 @@ const DiscussionTopicManager = props => {
       ) : (
         <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
-          updateDraftCache={updateDraftCache}
-          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-          onOpenIsolatedView={(discussionEntryId, isolatedId, withRCE, relativeId, highlightId) => {
+          onOpenIsolatedView={(
+            discussionEntryId,
+            isolatedEntryId,
+            withRCE,
+            relativeId,
+            highlightId
+          ) => {
             setHighlightEntryId(highlightId)
-            openIsolatedView(discussionEntryId, isolatedId, withRCE, relativeId)
+            openIsolatedView(discussionEntryId, isolatedEntryId, withRCE, relativeId)
           }}
           goToTopic={goToTopic}
           highlightEntryId={highlightEntryId}
@@ -248,8 +204,6 @@ const DiscussionTopicManager = props => {
       {ENV.isolated_view && isolatedEntryId && (
         <IsolatedViewContainer
           relativeEntryId={relativeEntryId}
-          removeDraftFromDiscussionCache={removeDraftFromDiscussionCache}
-          updateDraftCache={updateDraftCache}
           discussionTopic={discussionTopicQuery.data.legacyNode}
           discussionEntryId={isolatedEntryId}
           replyFromId={replyFromId}

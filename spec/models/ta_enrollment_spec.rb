@@ -20,6 +20,7 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
+
 #
 # Table name: enrollments
 #
@@ -33,7 +34,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 #
 
 describe TaEnrollment do
-  it "subclasses Enrollment" do
+  it "should subclass Enrollment" do
     expect(TaEnrollment.ancestors).to be_include(Enrollment)
   end
 end

@@ -34,16 +34,13 @@ class GroupLeadership
 
   def auto_assign!(strategy)
     return if valid_leader_in_place?
-
     group.update_attribute(:leader, select_leader(strategy))
   end
 
   private
-
   def select_leader(strategy)
     return users.first if strategy == "first"
     return users.sample if strategy == "random"
-
     raise(ArgumentError, "Unknown auto leader strategy: '#{strategy}'")
   end
 
@@ -93,4 +90,5 @@ class GroupLeadership
   def membership_ids
     group.reload.group_memberships.pluck(:id)
   end
+
 end

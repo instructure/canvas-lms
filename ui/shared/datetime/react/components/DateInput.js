@@ -26,8 +26,6 @@ import {Calendar} from '@instructure/ui-calendar'
 import {DateInput} from '@instructure/ui-date-input'
 import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {nanoid} from 'nanoid'
-import {log} from '@canvas/datetime-natural-parsing-instrument'
 
 /*
  *   This is a helper component that interfaces with InstUI 7's DateInput.
@@ -140,8 +138,6 @@ export default function CanvasDateInput({
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
   const [renderedMoment, setRenderedMoment] = useState(selectedMoment || todayMoment)
   const [internalMessages, setInternalMessages] = useState([])
-  const [widgetId] = useState(nanoid())
-  const [inputDetails, setInputDetails] = useState({})
 
   const priorSelectedMoment = useRef(null)
   function isDifferentMoment(firstMoment, secondMoment) {
@@ -233,7 +229,6 @@ export default function CanvasDateInput({
     const parsedMoment = moment.tz(date, timezone)
     syncInput(parsedMoment)
     onSelectedDateChange(parsedMoment.toDate())
-    setInputDetails({ method: 'pick', date })
   }
 
   function handleBlur() {
@@ -243,39 +238,6 @@ export default function CanvasDateInput({
 
     syncInput(newDate ? moment.tz(newDate, timezone) : priorSelectedMoment.current)
     onSelectedDateChange(newDate)
-
-    if (inputDetails.method === 'pick') {
-      const { date } = inputDetails
-
-      setInputDetails({})
-
-      log({
-        id: widgetId,
-        method: 'pick',
-        parsed: newDate && newDate.toISOString() || null,
-        value: date,
-      })
-    }
-    else if (inputDetails.method === 'paste') {
-      const { pastedValue } = inputDetails
-
-      setInputDetails({})
-
-      log({
-        id: widgetId,
-        method: 'paste',
-        parsed: newDate && newDate.toISOString() || null,
-        value: pastedValue,
-      })
-    }
-    else if (!inputEmpty) {
-      log({
-        id: widgetId,
-        method: 'type',
-        parsed: newDate && newDate.toISOString() || null,
-        value: inputValue.trim(),
-      })
-    }
   }
 
   function handleKeyDown(e) {
@@ -286,13 +248,6 @@ export default function CanvasDateInput({
     } else if (e.key === 'ArrowUp' || e.keyCode === 38) {
       modifySelectedMoment(-1, 'day')
     }
-  }
-
-  function trackPasteEvent(e) {
-    setInputDetails({
-      method: 'paste',
-      pastedValue: e.clipboardData.getData('text')
-    })
   }
 
   function handleHideCalendar() {
@@ -368,7 +323,6 @@ export default function CanvasDateInput({
       assistiveText={I18n.t('Type a date or use arrow keys to navigate date picker.')}
       value={inputValue}
       onChange={handleChange}
-      onPaste={trackPasteEvent}
       onKeyDown={handleKeyDown}
       isInline
       placement={placement}

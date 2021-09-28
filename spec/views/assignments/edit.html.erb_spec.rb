@@ -37,14 +37,15 @@ describe "/assignments/edit" do
     assign(:current_user_rubrics, [])
   end
 
-  it "renders" do
+  it "should render" do
     render 'assignments/edit'
     expect(response).not_to be_nil # have_tag()
   end
 
-  it "renders rubrics" do
+  it "should render rubrics" do
     allow(@assignment).to receive(:quiz_lti?).and_return(true)
     render 'assignments/edit'
     expect(response).to render_template(partial: '_rubrics_component')
   end
 end
+

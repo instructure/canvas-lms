@@ -69,7 +69,6 @@ docker-compose/api-gateway.override.yml
 /packages/*/es
 /packages/*/lib
 /packages/*/coverage/
-/packages/*/coverage-js/
 /packages/canvas-planner/.babel-cache
 
 # pact artifacts

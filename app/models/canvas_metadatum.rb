@@ -36,9 +36,8 @@ class CanvasMetadatum < ActiveRecord::Base
   # it or not.
   self.table_name = "canvas_metadata"
 
-  def self.get(key, default = {})
+  def self.get(key, default={})
     raise MetadataArgumentError, "default payload should be a hash: #{default}" unless default.is_a?(Hash)
-
     object = CanvasMetadatum.where(key: key).take
     (object&.payload || default).with_indifferent_access
   end
@@ -50,7 +49,6 @@ class CanvasMetadatum < ActiveRecord::Base
   # we expect.
   def self.set(key, payload)
     raise MetadataArgumentError, "payload should be a hash: #{payload}" unless payload.is_a?(Hash)
-
     object = CanvasMetadatum.find_or_initialize_by(key: key)
     object.payload = payload
     object.save!

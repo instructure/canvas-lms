@@ -43,6 +43,7 @@ module Lti
           expect(subject.cache_key).to eq uuid
         end
       end
+
     end
 
     describe "#invalidate_cache_key" do
@@ -56,5 +57,7 @@ module Lti
         end
       end
     end
+
   end
+
 end

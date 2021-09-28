@@ -22,7 +22,6 @@ module CanvadocsHelper
   include CoursesHelper
 
   private
-
   def canvadocs_session_url(user, annotation_context, submission, disable_annotation_notifications = false)
     assignment = submission.assignment
     opts = {
@@ -45,7 +44,7 @@ module CanvadocsHelper
     user.global_id.to_s
   end
 
-  def canvadocs_user_role(course, user, enrollments = nil)
+  def canvadocs_user_role(course, user, enrollments=nil)
     user_type(course, user, enrollments)
   end
 end

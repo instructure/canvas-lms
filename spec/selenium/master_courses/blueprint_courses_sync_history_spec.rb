@@ -21,6 +21,7 @@ require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
 shared_context "Blueprint Sync History Context" do
+
   def verify_sync_history
     second_migration = f('.bcs__history-item:nth-of-type(2)')
     expect(fj("span:contains('Created')", second_migration)).to be_displayed
@@ -42,6 +43,7 @@ shared_context "Blueprint Sync History Context" do
     f('.bcs__history-item__change-exceps')
   end
 end
+
 
 describe "sync history modal" do
   include_context "in-process server selenium tests"

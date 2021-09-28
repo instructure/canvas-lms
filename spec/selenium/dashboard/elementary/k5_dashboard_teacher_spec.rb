@@ -246,10 +246,12 @@ describe "teacher k5 dashboard" do
       click_important_info_edit_pencil
       expect(driver.current_url).to include("/courses/#{@homeroom_course.id}/assignments/syllabus")
     end
+
   end
 
   context 'homeroom dashboard resource panel LTI resources' do
     let(:lti_resource_name) { 'Commons' }
+
 
     before :once do
       create_lti_resource(lti_resource_name)
@@ -261,7 +263,7 @@ describe "teacher k5 dashboard" do
       expect(k5_app_buttons[0].text).to eq lti_resource_name
     end
 
-    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors: true do
+    it 'shows course modal to choose which LTI resource context when button clicked', ignore_js_errors:true do
       second_course_title = 'Second Course'
       course_with_teacher(
         active_course: 1,
@@ -277,7 +279,7 @@ describe "teacher k5 dashboard" do
       expect(course_list.count).to eq(2)
     end
 
-    it 'shows the LTI resource scoped to the course', ignore_js_errors: true do
+    it 'shows the LTI resource scoped to the course', ignore_js_errors:true do
       create_lti_resource('New Commons')
 
       get "/#resources"
@@ -366,7 +368,7 @@ describe "teacher k5 dashboard" do
       expect(driver.current_url).to include("/courses/#{latest_course.id}/settings")
     end
 
-    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout: 30 do
+    it 'allows for sync of course to selected homeroom', ignore_js_errors: true, custom_timeout:30 do
       second_homeroom_course_name = "Second homeroom course"
 
       new_course = course_with_teacher(

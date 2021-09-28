@@ -25,10 +25,8 @@ module RuboCop
         def on_send(node)
           receiver, method_name, *args = *node
           return unless receiver.nil?
-
           first_arg = args.first
           return unless first_arg
-
           if DESCRIBE_METHOD_NAMES.include?(method_name)
             process_describe first_arg
           elsif REQUIRE_METHOD_NAMES.include?(method_name)
@@ -50,14 +48,12 @@ module RuboCop
             _receiver, method_name, *args = *node
             next unless method_name == :require_dependency
             next unless args.first && args.first.str_type?
-
             result << args.first.to_a.first
           end
         end
 
         def process_describe(arg)
           return unless arg && arg.const_type?
-
           nesting = module_nesting(arg) # find outer modules/classes
           return if nesting.empty?
 
@@ -68,8 +64,8 @@ module RuboCop
           return if require_dependency_calls.include? full_name.join("::").underscore
 
           add_offense(arg,
-                      message: error_message(nesting, const_parts),
-                      severity: :warning)
+            message: error_message(nesting, const_parts),
+            severity: :warning)
         end
 
         def error_message(nesting, const_parts)
@@ -79,16 +75,16 @@ module RuboCop
           full_path = full_name.underscore
 
           "`#{const_name}` appears to be an auto-loaded constant nested in " \
-            "`#{nesting_name}`, but you are not explicitly requiring it.`\n\n" \
+          "`#{nesting_name}`, but you are not explicitly requiring it.`\n\n" \
           \
-            "You should `require_dependency #{full_path.inspect}` to ensure that " \
-            "`described_class` is really what you think it is. Otherwise auto-" \
-            "loading roulette could break your specs if there's another module/" \
-            "class of the same name at a higher nesting (e.g. " \
-            "`::#{const_name}`)\n\n" \
+          "You should `require_dependency #{full_path.inspect}` to ensure that " \
+          "`described_class` is really what you think it is. Otherwise auto-" \
+          "loading roulette could break your specs if there's another module/" \
+          "class of the same name at a higher nesting (e.g. " \
+          "`::#{const_name}`)\n\n" \
           \
-            "Alternatively, get rid of the outer `module`(s) and just do " \
-            "`describe #{full_name}`"
+          "Alternatively, get rid of the outer `module`(s) and just do " \
+          "`describe #{full_name}`"
         end
 
         # Return an array of module nesting names for the given node in
@@ -104,10 +100,8 @@ module RuboCop
         def module_nesting(node)
           node.ancestors.each_with_object([]) do |parent, result|
             next unless parent.module_type? || parent.class_type?
-
             mod_name = parent.to_a[0]
             next unless mod_name && mod_name.const_type?
-
             mod_segments, top_level = extract_mod_parts(mod_name)
             result.unshift(*mod_segments)
             return result if top_level # disregard any further/outer nesting

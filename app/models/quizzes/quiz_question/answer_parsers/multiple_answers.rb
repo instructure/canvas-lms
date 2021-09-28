@@ -21,6 +21,7 @@
 module Quizzes::QuizQuestion::AnswerParsers
   class MultipleAnswers < AnswerParser
     def parse(question)
+
       @answers.map_with_group! do |answer_group, answer|
         fields = Quizzes::QuizQuestion::RawFields.new(answer)
         a = {

@@ -16,14 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useCallback, useEffect, useRef, useState} from 'react'
-import {useHash} from 'react-use'
+import {useEffect, useRef, useState} from 'react'
+import qs from 'qs'
 
-export const getTabFromHash = (hash, tabs) => {
-  const tab = hash.replace('#', 'tab-')
-  if (tabs.find(({id}) => id === tab)) {
-    return tab
+export const getInitialTab = (defaultTab, tabs) => {
+  if (window.location.hash) {
+    const newTab = window.location.hash.replace('#', 'tab-')
+    if (tabs.find(({id}) => id === newTab)) {
+      return newTab
+    }
   }
+  if (!defaultTab && tabs?.length) {
+    return tabs[0].id
+  }
+  return defaultTab
 }
 
 /**
@@ -46,28 +52,28 @@ export const getTabFromHash = (hash, tabs) => {
  * @returns {useTabStateReturnVal} - See {@link useTabStateReturnVal}
  */
 export default function useTabState(defaultTab, tabs = []) {
-  const [hash, setHash] = useHash()
-
-  const findCurrentTab = useCallback(
-    () => getTabFromHash(hash, tabs) || defaultTab || tabs[0]?.id,
-    [defaultTab, hash, tabs]
-  )
   // This ref is used to pass the current tab to the planner's getActiveApp()
   // function-- we can't use currentTab directly because that gets stuck in
   // a stale closure within the effect where it is referenced.
   const activeTab = useRef()
-  const [currentTab, setCurrentTab] = useState(findCurrentTab)
-
-  useEffect(() => setCurrentTab(findCurrentTab()), [findCurrentTab])
+  const [currentTab, setCurrentTab] = useState(() => getInitialTab(defaultTab, tabs))
 
   useEffect(() => {
     activeTab.current = currentTab
   }, [currentTab])
 
-  const handleTabChange = id => {
+  const handleTabChange = (id, focusTarget = '') => {
     if (!tabs.some(tab => tab.id === id)) return
     setCurrentTab(id)
-    setHash(id.replace('tab-', ''))
+    const {protocol, host, pathname, search} = window.location
+    if (window.history.replaceState) {
+      const queryParams = qs.parse(search.substring(1))
+      queryParams.focusTarget = focusTarget || undefined
+      let query = qs.stringify(queryParams)
+      query = query ? `?${query}` : ''
+      const newUrl = `${protocol}//${host}${pathname}${query}#${id.replace('tab-', '')}`
+      window.history.replaceState({id}, null, newUrl)
+    }
   }
 
   return {currentTab, activeTab, handleTabChange}

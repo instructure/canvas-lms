@@ -35,7 +35,7 @@ import customPropTypes from '@canvas/files/react/modules/customPropTypes'
 import RestrictedDialogForm from '@canvas/files/react/components/RestrictedDialogForm'
 import '@canvas/rails-flash-notifications'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import {ltiState} from '@canvas/lti/jquery/messages'
+import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
 
 export default class Toolbar extends React.Component {
   static propTypes = {

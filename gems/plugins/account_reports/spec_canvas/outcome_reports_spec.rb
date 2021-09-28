@@ -124,10 +124,10 @@ describe "Outcome Reports" do
                            result.score
                          else
                            result.percent * outcome.points_possible
-                         end
+                 end
                  r[:points].present? && r[:points] <= score
                end&.first
-             end
+    end
     rating ||= {}
 
     hide_points = outcome_result&.hide_points
@@ -205,7 +205,7 @@ describe "Outcome Reports" do
   let(:report) { read_report(report_type, merged_params) }
 
   shared_examples 'common outcomes report behavior' do
-    it "runs the report" do
+    it "should run the report" do
       expect(report[0].headers).to eq expected_headers
     end
 
@@ -213,7 +213,7 @@ describe "Outcome Reports" do
       verify_all(report, all_values)
     end
 
-    it 'includes concluded courses' do
+    it 'should include concluded courses' do
       @course1.update! workflow_state: 'completed'
       verify_all(report, all_values)
     end
@@ -230,12 +230,12 @@ describe "Outcome Reports" do
 
       let(:report_params) { { params: { 'enrollment_term' => @term1.id } } }
 
-      it "filters out courses not in term" do
+      it "should filter out courses not in term" do
         expect(report.length).to eq 1
         expect(report[0][0]).to eq "No outcomes found"
       end
 
-      it 'includes courses in term' do
+      it 'should include courses in term' do
         @course1.update! enrollment_term: @term1
         verify_all(report, all_values)
       end
@@ -248,12 +248,12 @@ describe "Outcome Reports" do
 
       let(:report_params) { { account: @sub_account } }
 
-      it "filters courses in a sub account" do
+      it "should filter courses in a sub account" do
         expect(report.length).to eq 1
         expect(report[0][0]).to eq "No outcomes found"
       end
 
-      it "includes courses in the sub account" do
+      it "should include courses in the sub account" do
         @sub_account.root_outcome_group.add_outcome(@outcome)
         @course1.update! account: @sub_account
         verify_all(report, all_values)
@@ -265,12 +265,12 @@ describe "Outcome Reports" do
         @enrollment2.destroy!
       end
 
-      it 'excludes deleted enrollments by default' do
+      it 'should exclude deleted enrollments by default' do
         remaining_values = all_values.reject { |v| v[:user] == @user2 }
         verify_all(report, remaining_values)
       end
 
-      it 'includes deleted enrollments when include_deleted is set' do
+      it 'should include deleted enrollments when include_deleted is set' do
         report_record = run_report(report_type, account: @root_account, params: { 'include_deleted' => true })
         expect(report_record.parameters["extra_text"]).to eq "Term: All Terms; Include Deleted Objects;"
 
@@ -279,13 +279,13 @@ describe "Outcome Reports" do
       end
     end
 
-    it "does not include scores when hidden on learning outcome results" do
+    it "should not include scores when hidden on learning outcome results" do
       lor = user1_values[:outcome_result]
       lor.update!(hide_points: true)
       verify_all(report, all_values)
     end
 
-    it "does not include invalid learning outcome results" do
+    it "should not include invalid learning outcome results" do
       # create result that is invalid because
       # it has an artifact type of submission, instead of
       # a rubric assessment or assessment question
@@ -423,7 +423,7 @@ describe "Outcome Reports" do
         @quiz_outcome_result = LearningOutcomeResult.find_by(artifact: @quiz_submission)
       end
 
-      it "works with quizzes" do
+      it "should work with quizzes" do
         common_quiz_values = {
           user: @user2,
           quiz: @quiz,
@@ -457,7 +457,7 @@ describe "Outcome Reports" do
         )
       end
 
-      it 'includes ratings for quiz questions' do
+      it 'should include ratings for quiz questions' do
         expect(report[0]['assessment type']).to eq 'quiz'
         expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
       end
@@ -465,36 +465,37 @@ describe "Outcome Reports" do
       context 'With Account Level Mastery' do
         before(:once) do
           user1_values[:outcome_result]
-          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Account", context: @root_account,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Account", context: @root_account,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
                                                           id: 1, points: 5, color: '3ADF00', description: "High Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
+                                                            mastery: false, outcome_proficiency: @outcome_proficiency
                                                         ), OutcomeProficiencyRating.new(
                                                           id: 2, points: 3, color: 'FFFF00', description: "Mastery Rating",
-                                                          mastery: true, outcome_proficiency: @outcome_proficiency
+                                                            mastery: true, outcome_proficiency: @outcome_proficiency
                                                         ), OutcomeProficiencyRating.new(
                                                           id: 3, points: 1, color: 'FF0000', description: "Low Rating",
-                                                          mastery: false, outcome_proficiency: @outcome_proficiency
+                                                            mastery: false, outcome_proficiency: @outcome_proficiency
                                                         )])
           @root_account.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+
         end
 
-        it 'operates as before when the feature flag is disabled' do
+        it 'should operate as before when the feature flag is disabled' do
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'off')
           expect(report[0]['assessment type']).to eq 'quiz'
           expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
           expect(report[0]['learning outcome points possible']).to eq '45.0'
         end
 
-        it 'runs the report and use the outcome proficiencies' do
+        it 'should run the report and use the outcome proficiencies' do
           report[0]
           expect(report[0]['learning outcome rating']).to eq 'Low Rating'
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
           expect(report[2]['learning outcome rating']).to eq 'Mastery Rating'
         end
 
-        it 'uses the total percent to calculate the rating as opposed to score' do
+        it 'should use the total percent to calculate the rating as opposed to score' do
           @outcome_proficiency.outcome_proficiency_ratings[0].points = 2
           @outcome_proficiency.outcome_proficiency_ratings[1].points = 1
           @outcome_proficiency.outcome_proficiency_ratings[2].points = 0
@@ -502,7 +503,7 @@ describe "Outcome Reports" do
           expect(report[0]['learning outcome rating']).to eq 'Low Rating'
         end
 
-        it 'uses the score to create a ratio when calculating rating' do
+        it 'should use the score to create a ratio when calculating rating' do
           @outcome.learning_outcome_results[0].score = 3.0
           @outcome.learning_outcome_results[0].original_score = 3.0
           @outcome.learning_outcome_results[0].percent = 1.0
@@ -518,7 +519,7 @@ describe "Outcome Reports" do
           expect(report[2]['learning outcome points possible']).to eq '50.0'
         end
 
-        it 'has no rating if the score and total_percent are nil' do
+        it 'should have no rating if the score and total_percent are nil' do
           @outcome.learning_outcome_results[0].score = nil
           @outcome.learning_outcome_results[0].original_score = nil
           @outcome.learning_outcome_results[0].percent = nil
@@ -527,11 +528,12 @@ describe "Outcome Reports" do
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
           expect(report[2]['learning outcome rating']).to eq nil
         end
+
       end
 
       context 'With Course Level Mastery' do
         before(:once) do
-          @outcome_proficiency = OutcomeProficiency.new(id: 1, root_account_id: @root_account.id, context_type: "Course", context: @course1,
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Course", context: @course1,
                                                         outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
                                                           id: 1, points: 5, color: '3ADF00', description: "High Rating",
                                                           mastery: false, outcome_proficiency: @outcome_proficiency
@@ -544,9 +546,10 @@ describe "Outcome Reports" do
                                                         )])
           @course1.outcome_proficiency = @outcome_proficiency
           @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+
         end
 
-        it 'runs the report and use the course outcome proficiencies' do
+        it 'should run the report and use the course outcome proficiencies' do
           report[0]
           expect(report[0]['learning outcome rating']).to eq 'Low Rating'
           expect(report[1]['learning outcome rating']).to eq 'Low Rating'
@@ -554,7 +557,9 @@ describe "Outcome Reports" do
           expect(report[0]['learning outcome points possible']).to eq '45.0'
           expect(report[2]['learning outcome points possible']).to eq '5.0'
         end
+
       end
     end
+
   end
 end

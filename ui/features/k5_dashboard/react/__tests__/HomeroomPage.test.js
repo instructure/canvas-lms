@@ -24,9 +24,6 @@ describe('HomeroomPage', () => {
   const getProps = (overrides = {}) => ({
     visible: true,
     createPermissions: 'admin',
-    loadingAnnouncements: false,
-    loadingCards: false,
-    homeroomAnnouncements: [],
     ...overrides
   })
 

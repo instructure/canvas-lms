@@ -21,6 +21,7 @@
 require 'mail'
 
 class Mailer < ActionMailer::Base
+
   attr_reader :email
 
   # define in rails3-style
@@ -41,7 +42,7 @@ class Mailer < ActionMailer::Base
       [:body, :html_body].each do |attr|
         if m.send(attr)
           body = m.send(attr).bytesize > Message.maximum_text_length ? Message.unavailable_message : m.send(attr)
-          attr == :body ? format.text { render plain: body } : format.html { render plain: body }
+          attr == :body ? format.text{ render plain: body } : format.html{ render plain: body }
         end
       end
     end
@@ -66,7 +67,6 @@ class Mailer < ActionMailer::Base
   end
 
   private
-
   def quoted_address(display_name, address)
     addr = Mail::Address.new(address)
     addr.display_name = display_name

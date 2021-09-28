@@ -36,7 +36,6 @@ pipeline {
         }
       }
     }
-
     stage('Build Postgres Image') {
       steps {
         script {
@@ -44,7 +43,6 @@ pipeline {
         }
       }
     }
-
     stage('Push Postgres Image') {
       steps {
         script {

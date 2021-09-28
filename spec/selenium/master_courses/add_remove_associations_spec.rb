@@ -20,6 +20,7 @@
 require_relative '../common'
 require_relative '../helpers/blueprint_common'
 
+
 describe "master courses - add and remove course associations" do
   include_context "in-process server selenium tests"
   include BlueprintCourseCommon
@@ -60,7 +61,7 @@ describe "master courses - add and remove course associations" do
     user_session(@admin)
   end
 
-  it "adds associated courses", priority: "1", test_id: "3078972" do
+  it "should add associated courses", priority: "1", test_id: "3078972" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list
@@ -96,7 +97,7 @@ describe "master courses - add and remove course associations" do
     expect(minions[1].attribute('id')).to eq(course1_id)
   end
 
-  it "removes an associated course", priority: "1", test_id: "3077488" do
+  it "should remove an associated course", priority: "1", test_id: "3077488" do
     @minion0 = @template.add_child_course!(@course0).child_course
     @minion1 = @template.add_child_course!(@course1).child_course
 
@@ -130,7 +131,7 @@ describe "master courses - add and remove course associations" do
     expect(f("#course_#{@course0.id}", table)).to be_displayed
   end
 
-  it "adds and remove a to-be-added course", priority: "1", test_id: "3077487" do
+  it "should add and remove a to-be-added course", priority: "1", test_id: "3077487" do
     get "/courses/#{@master_course.id}"
     open_associations
     open_courses_list

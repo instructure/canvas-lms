@@ -60,13 +60,14 @@ module Lti
     #     }
     #
     class AuthorizationController < ApplicationController
+
       skip_before_action :load_user
       before_action :require_context
 
       SERVICE_DEFINITIONS = [
         {
           id: 'vnd.Canvas.authorization',
-          endpoint: ->(context) { "api/lti/#{context.class.name.downcase}s/#{context.id}/authorize" },
+          endpoint: -> (context) {"api/lti/#{context.class.name.downcase}s/#{context.id}/authorize"},
           format: ['application/json'].freeze,
           action: ['POST'].freeze
         }.freeze
@@ -85,7 +86,7 @@ module Lti
                   Lti::Oauth2::AuthorizationValidator::MissingAuthorizationCode,
                   InvalidGrant do |e|
         Lti::Errors::ErrorLogger.log_error(e)
-        render json: { error: 'invalid_grant' }, status: :bad_request
+        render json: {error: 'invalid_grant'}, status: :bad_request
       end
       # @API authorize
       #
@@ -113,7 +114,6 @@ module Lti
       def authorize
         raise InvalidGrant unless GRANT_TYPES.include?(params[:grant_type])
         raise InvalidGrant if params[:assertion].blank?
-
         code = params[:code]
         jwt_validator = Lti::Oauth2::AuthorizationValidator.new(
           jwt: params[:assertion],
