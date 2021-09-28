@@ -59,7 +59,6 @@ const ignoredErrors = [
   /Function components cannot be given refs/,
   /Functions are not valid as a React child/,
   /invalid messageType: (notSupported|undefined)/,
-  /Invalid prop `children` of type `array` supplied to `Transition`/,
   /Invalid prop `children` supplied to `(Option|View)`/,
   /Invalid prop `editorOptions.plugins` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453
   /Invalid prop `editorOptions.toolbar\[0\]` of type `string` supplied to `(ForwardRef|RCEWrapper)`/, // https://instructure.atlassian.net/browse/MAT-453

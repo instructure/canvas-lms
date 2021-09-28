@@ -89,30 +89,32 @@ const IntegrationRow = ({
       expanded={expanded}
       onToggle={onToggle}
     >
-      <div role="region" aria-live="polite">
-        {error && !loading && (
-          <Alert variant="error" margin="small">
-            <Text>
-              {error.message ||
-                I18n.t('An error occurred, please try again. Error: %{error}', {error})}
-            </Text>
-          </Alert>
-        )}
-        {((!enabled && !loading) || info) && (
-          <Alert variant={info?.variant || 'info'} margin="small">
-            <Text>
-              {enabled
-                ? info?.message || info
-                : I18n.t(
-                    'This integration is not enabled. Please enable it to interact with settings.'
-                  )}
-            </Text>
-          </Alert>
-        )}
-      </div>
-      <View display="block" padding="small">
-        {children}
-      </View>
+      <>
+        <div role="region" aria-live="polite">
+          {error && !loading && (
+            <Alert variant="error" margin="small">
+              <Text>
+                {error.message ||
+                  I18n.t('An error occurred, please try again. Error: %{error}', {error})}
+              </Text>
+            </Alert>
+          )}
+          {((!enabled && !loading) || info) && (
+            <Alert variant={info?.variant || 'info'} margin="small">
+              <Text>
+                {enabled
+                  ? info?.message || info
+                  : I18n.t(
+                      'This integration is not enabled. Please enable it to interact with settings.'
+                    )}
+              </Text>
+            </Alert>
+          )}
+        </div>
+        <View display="block" padding="small">
+          {children}
+        </View>
+      </>
     </ToggleGroup>
   ) : (
     <></>
