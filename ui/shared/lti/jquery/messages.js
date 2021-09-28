@@ -26,7 +26,7 @@ import handleLtiPostMessage from './post_message/handleLtiPostMessage'
 import {setUnloadMessage, removeUnloadMessage, findDomForWindow} from './util'
 
 export function ltiMessageHandler(e) {
-  if (e.data.source && e.data.source === 'react-devtools-bridge') {
+  if (e.data.source && e.data.source.includes('react-devtools')) {
     return
   }
 
