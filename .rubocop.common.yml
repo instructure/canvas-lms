@@ -55,6 +55,11 @@ Rails/HasManyOrHasOneDependent:
   Enabled: false # legacy code + most things we soft delete anyway
 Rails/SkipsModelValidations:
   Enabled: false # Canvas skips validations in many places for optimization reasons
+Rails/ContentTag:
+  Severity: error
+  Exclude:
+    - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
+    - "doc/**/*"
 
 RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
