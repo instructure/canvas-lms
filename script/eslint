@@ -16,7 +16,8 @@ linter_options = {
     comments.each do |comment|
       comment[:severity] = 'warn'
     end
-  end
+  end,
+  severe_anywhere: false
 }
 
 eslint = Linter.new(linter_options)
