@@ -16,13 +16,39 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useReducer} from 'react'
 
 import formatMessage from '../../../../../../format-message'
-import {Group} from '../Group'
+import reducer, {initialState, modes} from '../../../reducers/imageSection'
 
-export const ImageSection = ({editor}) => (
-  <Group as="section" defaultExpanded summary={formatMessage('Image')}>
-    <p>Image mode selection placeholder</p>
-  </Group>
-)
+import {Flex} from '@instructure/ui-flex'
+import {Text} from '@instructure/ui-text'
+import {Group} from '../Group'
+import ModeSelect from './ModeSelect'
+import Course from './Course'
+
+export const ImageSection = ({editor}) => {
+  const [state, dispatch] = useReducer(reducer, initialState)
+  const allowedModes = {[modes.courseImages.type]: Course}
+
+  return (
+    <Group as="section" defaultExpanded summary={formatMessage('Image')}>
+      <Flex direction="column" margin="small">
+        <Flex.Item>
+          <Text weight="bold">{formatMessage('Current Image')}</Text>
+        </Flex.Item>
+        <Flex.Item>
+          <Flex>
+            <Flex.Item shouldGrow>Preview Placeholder</Flex.Item>
+            <Flex.Item>
+              <ModeSelect dispatch={dispatch} />
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
+        <Flex.Item>
+          {!!allowedModes[state.mode] && React.createElement(allowedModes[state.mode])}
+        </Flex.Item>
+      </Flex>
+    </Group>
+  )
+}
