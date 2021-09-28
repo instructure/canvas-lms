@@ -1066,104 +1066,7 @@ acknowledge that you have read and agreed to the
 
   <div id="tab-announcements">
     <h2><%= t(:global_announcements_title, "Global Announcements") %></h2>
-    <ul class="announcements_list unstyled_list">
-      <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
-      <% @announcements.each do |announcement| %>
-        <li class="announcements_list_item">
-          <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
-            <div class="ic-notification__icon" role="presentation">
-              <i class="<%= notification_icon_classname(announcement) %>"></i>
-              <span class="screenreader-only">
-                <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
-              </span>
-            </div>
-            <div class="notification_account_content">
-              <div class="ic-notification__content">
-                <div class="ic-notification__message">
-                  <h2 class="ic-notification__title notification_subject">
-                    <%= announcement.subject %>
-                  </h2>
-                  <span class="notification_message">
-                    <%= user_content(announcement.message) %>
-                  </span>
-                  <% if can_do(@account, @current_user, :manage_alerts) %>
-                    <div class="ic-notification__admin-actions">
-                      <button
-                        id="<%= "notification_edit_#{announcement.id}" %>"
-                        class="Button Button--icon-action element_toggler edit_notification_toggle_focus"
-                        aria-controls="<%= "edit_notification_form_#{announcement.id}" %>"
-                        data-edit-toggle-id="<%= announcement.id %>"
-                      >
-                        <span class="screenreader-only"><%= t("Edit announcement %{title}", :title => announcement.subject) %></span>
-                        <i class="icon-edit"></i>
-                      </button>
-                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete announcement %{title}", :title => announcement.subject) %>">
-                        <span class="screenreader-only"><%= t("Delete announcement %{title}", :title => announcement.subject) %></span>
-                        <i class="icon-trash"></i>
-                      </a>
-                    </div>
-                  <% end %>
-                </div>
-              </div>
-              <span class="notification_account_content_text">
-                <% if @account.site_admin? %>
-                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
-                <% else %>
-                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
-                <% end %>
-              </span>
-            </div>
-
-          </div>
-          <div class="announcement-details">
-            <div class="announcement-details-post-info">
-              <div class="announcement-details-post-info__datetime">
-                <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
-                      :start_at => datetime_string(announcement.start_at),
-                      :end_at => datetime_string(announcement.end_at)) %>
-              </div>
-              <div class="announcement-details-post-info__sender">
-                <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
-              </div>
-            </div>
-            <% if announcement.required_account_service %>
-              <div>
-                <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
-              </div>
-            <% end %>
-            <% unless announcement.account_notification_roles.empty? %>
-              <div class="announcement-details-roles">
-                <%= t "Send only to the following types of users:" %>
-                <%= roles_message(@account) %>
-                <ul>
-                  <% announcement.account_notification_roles.each do |r| %>
-                    <% @course_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
-                      <li><%= rt[:label] %></li>
-                    <% end %>
-                    <% # NilEnrollment is a special case %>
-                    <% if r.role_id.nil? %>
-                      <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
-                    <% end %>
-                    <% @account_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
-                      <li><%= rt[:label]  %></li>
-                    <% end %>
-                  <% end %>
-                </ul>
-              </div>
-            <% end %>
-            <% if announcement.months_in_display_cycle %>
-              <div>
-                <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
-              </div>
-            <% end %>
-            <% if can_do(@account, @current_user, :manage_alerts) %>
-              <%= render(:partial => "edit_account_notification", :locals => {:announcement => announcement}) %>
-            <% end %>
-          </div>
-        </li>
-      <% end %>
-    </ul>
-    <% if can_do(@account, @current_user, :manage_alerts) %>
+        <% if can_do(@account, @current_user, :manage_alerts) %>
       <button id="add_announcement_button" class="Button Button--primary element_toggler add_notification_toggle_focus" aria-controls="add_notification_form" title="<%= t('Add New Announcement') %>" aria-label="<%= t('Add New Announcement') %>">
         <i class="icon-plus"></i> <%= t("New Announcement") %>
       </button>
@@ -1344,6 +1247,103 @@ acknowledge that you have read and agreed to the
         </div>
       <% end %>
     <% end %>
+    <ul class="announcements_list unstyled_list">
+      <%= will_paginate(@announcements, params: {anchor: "tab-announcements"}) %>
+      <% @announcements.each do |announcement| %>
+        <li class="announcements_list_item">
+          <div class="ic-notification ic-notification--admin-created ic-notification--<%= notification_container_classname(announcement) %>">
+            <div class="ic-notification__icon" role="presentation">
+              <i class="<%= notification_icon_classname(announcement) %>"></i>
+              <span class="screenreader-only">
+                <%= accessible_message_icon_text(notification_icon_type(announcement)) %>
+              </span>
+            </div>
+            <div class="notification_account_content">
+              <div class="ic-notification__content">
+                <div class="ic-notification__message">
+                  <h2 class="ic-notification__title notification_subject">
+                    <%= announcement.subject %>
+                  </h2>
+                  <span class="notification_message">
+                    <%= user_content(announcement.message) %>
+                  </span>
+                  <% if can_do(@account, @current_user, :manage_alerts) %>
+                    <div class="ic-notification__admin-actions">
+                      <button
+                        id="<%= "notification_edit_#{announcement.id}" %>"
+                        class="Button Button--icon-action element_toggler edit_notification_toggle_focus"
+                        aria-controls="<%= "edit_notification_form_#{announcement.id}" %>"
+                        data-edit-toggle-id="<%= announcement.id %>"
+                      >
+                        <span class="screenreader-only"><%= t("Edit announcement %{title}", :title => announcement.subject) %></span>
+                        <i class="icon-edit"></i>
+                      </button>
+                      <a href="#" rel="<%= context_url(@account, :context_account_notification_url, announcement) %>" class="Button Button--icon-action delete_notification_link" title="<%= t("Delete announcement %{title}", :title => announcement.subject) %>">
+                        <span class="screenreader-only"><%= t("Delete announcement %{title}", :title => announcement.subject) %></span>
+                        <i class="icon-trash"></i>
+                      </a>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              <span class="notification_account_content_text">
+                <% if @account.site_admin? %>
+                  <%= t("This is a message from *Canvas Administration*", wrapper: '<b>\1</b>') %>
+                <% else %>
+                  <%= t("This is a message from *%{name}*", name: announcement.account.name, wrapper: '<b>\1</b>') %>
+                <% end %>
+              </span>
+            </div>
+
+          </div>
+          <div class="announcement-details">
+            <div class="announcement-details-post-info">
+              <div class="announcement-details-post-info__datetime">
+                <%= t(:alert_timespan, "from %{start_at} to %{end_at}",
+                      :start_at => datetime_string(announcement.start_at),
+                      :end_at => datetime_string(announcement.end_at)) %>
+              </div>
+              <div class="announcement-details-post-info__sender">
+                <%= link_to(context_user_name(@account, announcement.user_id), user_path(announcement.user_id)) %>
+              </div>
+            </div>
+            <% if announcement.required_account_service %>
+              <div>
+                <%= AccountServices.allowable_services[announcement.required_account_service.to_sym].try(:[], :name) %>
+              </div>
+            <% end %>
+            <% unless announcement.account_notification_roles.empty? %>
+              <div class="announcement-details-roles">
+                <%= t "Send only to the following types of users:" %>
+                <%= roles_message(@account) %>
+                <ul>
+                  <% announcement.account_notification_roles.each do |r| %>
+                    <% @course_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
+                      <li><%= rt[:label] %></li>
+                    <% end %>
+                    <% # NilEnrollment is a special case %>
+                    <% if r.role_id.nil? %>
+                      <li><%= t :no_enrollment_roles, "Unenrolled users" %></li>
+                    <% end %>
+                    <% @account_roles.select {|rt| rt[:id] == r.role_id }.each do |rt| %>
+                      <li><%= rt[:label]  %></li>
+                    <% end %>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            <% if announcement.months_in_display_cycle %>
+              <div>
+                <%= t :announcement_sent_to_subset, "Sent to 1 / %{denominator} users each month", denominator: announcement.months_in_display_cycle %>
+              </div>
+            <% end %>
+            <% if can_do(@account, @current_user, :manage_alerts) %>
+              <%= render(:partial => "edit_account_notification", :locals => {:announcement => announcement}) %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
   </div>
   <% if can_do(@context, @current_user, :read_reports) %>
     <div id="tab-reports">
