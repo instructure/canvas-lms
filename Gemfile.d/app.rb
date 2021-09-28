@@ -24,7 +24,7 @@ if CANVAS_RAILS6_0
     gem 'tzinfo', '1.2.7'
   gem 'switchman', '2.2.1'
     gem 'guardrail', '2.0.1'
-  gem 'switchman-inst-jobs', '3.2.1'
+  gem 'switchman-inst-jobs', '3.2.2'
 else
   gem 'rails', '6.1.4.1'
     gem 'tzinfo', '2.0.4'
@@ -86,7 +86,7 @@ gem 'inst_statsd', '2.2.0'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '2.4.8'
+gem 'inst-jobs', '2.4.9'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.0'
