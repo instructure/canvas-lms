@@ -1681,9 +1681,9 @@ describe GradebooksController do
     end
 
     describe "js_env" do
-      describe "OVERRIDE_GRADES_ENABLED" do
-        before(:each) { user_session(@teacher) }
+      before(:each) { user_session(@teacher) }
 
+      describe "OVERRIDE_GRADES_ENABLED" do
         let(:override_grades_enabled) { assigns[:js_env][:OVERRIDE_GRADES_ENABLED] }
 
         context "when the final_grade_override_in_gradebook_history feature is enabled" do
@@ -1717,6 +1717,26 @@ describe GradebooksController do
         it "is set to false if the final_grade_override_in_gradebook_history feature is not enabled" do
           get 'history', params: { course_id: @course.id }
           expect(override_grades_enabled).to be false
+        end
+      end
+
+      describe "COURSE_URL" do
+        it "is set to the context url for the current course" do
+          get 'history', params: { course_id: @course.id }
+          expect(assigns[:js_env][:COURSE_URL]).to eq "/courses/#{@course.id}"
+        end
+      end
+
+      describe "OUTCOME_GRADEBOOK_ENABLED" do
+        it "is set to true if outcome_gradebook is enabled for the course" do
+          @course.enable_feature!(:outcome_gradebook)
+          get 'history', params: { course_id: @course.id }
+          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to eq true
+        end
+
+        it "is set to false if outcome_gradebook is not enabled for the course" do
+          get 'history', params: { course_id: @course.id }
+          expect(assigns[:js_env][:OUTCOME_GRADEBOOK_ENABLED]).to eq false
         end
       end
     end
