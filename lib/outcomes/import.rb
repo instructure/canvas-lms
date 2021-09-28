@@ -243,7 +243,12 @@ module Outcomes
     end
 
     def find_parents(object)
-      return [root_parent] if object[:parent_guids].nil? || object[:parent_guids].blank?
+      if object[:parent_guids].nil? || object[:parent_guids].blank?
+        group = [LearningOutcomeGroup.find(object[:learning_outcome_group_id])] if object[:learning_outcome_group_id]
+        group ||= [root_parent]
+
+        return group
+      end
 
       guids = object[:parent_guids].strip.split
       LearningOutcomeGroup.where(context: context, outcome_import_id: outcome_import_id)

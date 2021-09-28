@@ -160,6 +160,7 @@ module Outcomes
 
       object = simple.to_h
       object[:ratings] = parse_ratings(ratings)
+      object[:learning_outcome_group_id] = @import[:learning_outcome_group_id]
       if object[:mastery_points].present?
         object[:mastery_points] = strict_parse_float(object[:mastery_points], I18n.t('mastery points'))
       end

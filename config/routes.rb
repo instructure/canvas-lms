@@ -1394,7 +1394,7 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :outcome_imports_api) do
       %w(account course).each do |context|
-        post "#{context}s/:#{context}_id/outcome_imports", action: :create
+        post "#{context}s/:#{context}_id/outcome_imports(/group/:learning_outcome_group_id)", action: :create
         get "#{context}s/:#{context}_id/outcome_imports/:id", action: :show
       end
     end
