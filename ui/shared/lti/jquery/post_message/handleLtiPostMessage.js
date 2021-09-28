@@ -37,10 +37,6 @@ const SUBJECT_IGNORE_LIST = [
   MENTIONS_SELECTION_MESSAGE
 ]
 
-// page-global storage for data relevant to LTI postMessage events
-const ltiState = {}
-export {ltiState}
-
 const handleLtiPostMessage = async e => {
   const {messageType, data} = e.data
   let handler

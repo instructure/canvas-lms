@@ -23,7 +23,7 @@ import ExternalToolModalLauncher from '@canvas/external-tools/react/components/E
 import Actions from './actions/IndexMenuActions'
 import ReactDOM from 'react-dom'
 import ContentTypeExternalToolTray from '@canvas/trays/react/ContentTypeExternalToolTray'
-import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import {ltiState} from '@canvas/lti/jquery/messages'
 
 export default class IndexMenu extends React.Component {
   static propTypes = {

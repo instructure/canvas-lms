@@ -21,7 +21,7 @@ import LinkContentItem from './models/LinkContentItem'
 import ResourceLinkContentItem from './models/ResourceLinkContentItem'
 import ImageContentItem from './models/ImageContentItem'
 import HtmlFragmentContentItem from './models/HtmlFragmentContentItem'
-import {ltiState} from '@canvas/lti/jquery/post_message/handleLtiPostMessage'
+import {ltiState} from '@canvas/lti/jquery/messages'
 
 export default class ContentItemProcessor {
   constructor(contentItems, messages, logs, ltiEndpoint, processHandler) {
