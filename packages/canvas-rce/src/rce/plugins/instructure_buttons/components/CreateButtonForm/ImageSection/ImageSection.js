@@ -26,6 +26,7 @@ import {Text} from '@instructure/ui-text'
 import {Group} from '../Group'
 import ModeSelect from './ModeSelect'
 import Course from './Course'
+import PreviewIcon from '../../../../shared/PreviewIcon'
 
 export const ImageSection = ({editor}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
@@ -39,7 +40,16 @@ export const ImageSection = ({editor}) => {
         </Flex.Item>
         <Flex.Item>
           <Flex>
-            <Flex.Item shouldGrow>Preview Placeholder</Flex.Item>
+            <Flex.Item shouldGrow>
+              <Flex>
+                <Flex.Item margin="0 small 0 0">
+                  <PreviewIcon variant="large" testId="selected-image-preview" />
+                </Flex.Item>
+                <Flex.Item>
+                  <Text>{!state.currentImage && formatMessage('None Selected')}</Text>
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
             <Flex.Item>
               <ModeSelect dispatch={dispatch} />
             </Flex.Item>

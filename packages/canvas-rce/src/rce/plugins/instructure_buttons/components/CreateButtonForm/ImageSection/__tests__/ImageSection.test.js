@@ -32,6 +32,18 @@ describe('ImageSection', () => {
     expect(getByText('Add Image')).toBeInTheDocument()
   })
 
+  it('renders the image preview', () => {
+    const {getByTestId} = subject()
+    expect(getByTestId('selected-image-preview')).toBeInTheDocument()
+  })
+
+  describe('when no image is selected', () => {
+    it('renders a "None Selected" message', () => {
+      const {getByText} = subject()
+      expect(getByText('None Selected')).toBeInTheDocument()
+    })
+  })
+
   describe('when the "course images" mode is selected', () => {
     let getByTestId, getByText
 
