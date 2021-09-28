@@ -271,8 +271,8 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ScheduledSmartAlert, :queue_current_jobs)
   end
 
-  Delayed::Periodic.cron 'Course.sync_homeroom_enrollments', '5 0 * * *' do
-    with_each_shard_by_database(Course, :sync_homeroom_enrollments)
+  Delayed::Periodic.cron 'Course.sync_with_homeroom', '5 0 * * *' do
+    with_each_shard_by_database(Course, :sync_with_homeroom)
   end
 
   # the default is hourly, and we picked a weird minute just to avoid

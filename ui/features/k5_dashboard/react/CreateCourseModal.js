@@ -202,7 +202,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
               </CanvasAsyncSelect>
             )}
             <Checkbox
-              label={I18n.t('Sync enrollments from homeroom')}
+              label={I18n.t('Sync enrollments and course start/end dates from homeroom')}
               value="syncHomeroomEnrollments"
               checked={syncHomeroomEnrollments}
               onChange={event => setSyncHomeroomEnrollments(event.target.checked)}
