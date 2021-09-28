@@ -21,6 +21,7 @@ CopyrightLinter:
       - "**/shims/**"
       - "**/vendor/**"
       - "gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**"
+      - "gems/plugins/**"
   Regexes:
     FirstLineExceptions:
       - !ruby/regexp '/^#!/' # e.g. "#!/usr/bin/env ruby"
