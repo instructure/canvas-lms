@@ -1759,6 +1759,18 @@ describe CoursesController do
         end
       end
 
+      describe 'embed mode' do
+        it 'sets ENV.TAB_CONTENT_ONLY appropriately' do
+          user_session(@student)
+
+          get 'show', params: { id: @course.id, embed: true }
+          expect(assigns[:js_env][:TAB_CONTENT_ONLY]).to be_truthy
+
+          get 'show', params: { id: @course.id }
+          expect(assigns[:js_env][:TAB_CONTENT_ONLY]).to be_falsy
+        end
+      end
+
       describe "update" do
         it "syncs enrollments if setting is set" do
           progress = double('Progress').as_null_object
