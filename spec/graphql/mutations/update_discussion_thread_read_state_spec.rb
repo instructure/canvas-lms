@@ -25,7 +25,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    discussion_topic_model({context: @course})
+    discussion_topic_model({ context: @course })
     @root_entry = @topic.discussion_entries.create!(message: 'I am root', user: @student)
     @parent_entry = @topic.discussion_entries.create!(message: 'I am parent', user: @student, parent_id: @root_entry.id)
     @child_entry = @topic.discussion_entries.create!(message: 'I am child', user: @student, parent_id: @parent_entry.id)
@@ -44,7 +44,7 @@ RSpec.describe Mutations::UpdateDiscussionEntry do
         }) {
           discussionEntry {
             _id
-            entryParticipant { 
+            entryParticipant {#{' '}
               read
             }
           }

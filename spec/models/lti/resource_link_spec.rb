@@ -133,7 +133,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
   describe '.find_or_initialize_for_context_and_lookup_uuid' do
     subject do
       described_class.find_or_initialize_for_context_and_lookup_uuid(
-        context: context, context_external_tool: tool, lookup_uuid: lookup_uuid, custom: {'a' => 'b'}
+        context: context, context_external_tool: tool, lookup_uuid: lookup_uuid, custom: { 'a' => 'b' }
       )
     end
 
@@ -165,7 +165,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
         subject do
           described_class.find_or_initialize_for_context_and_lookup_uuid(
             context: context, context_external_tool_launch_url: tool.url,
-            lookup_uuid: lookup_uuid, custom: {'a' => 'b'}
+            lookup_uuid: lookup_uuid, custom: { 'a' => 'b' }
           )
         end
 

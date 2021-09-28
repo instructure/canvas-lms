@@ -30,7 +30,7 @@ describe FileInContext do
   end
 
   context "#attach" do
-    it "should create files with the supplied filename escaped for s3" do
+    it "creates files with the supplied filename escaped for s3" do
       # This horrible hack is because we need Attachment to behave like S3 in this case, as far as filename
       # escaping goes. With attachment_fu, the filename is escaped, without it it is not. Because we're not
       # able to dynamically switch out the S3 status during specs (see the selenium specs that fork a new process
@@ -54,12 +54,12 @@ describe FileInContext do
         @filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files a_file.txt)))
       end
 
-      it "should create files in unpublished state" do
+      it "creates files in unpublished state" do
         attachment = FileInContext.attach(@course, @filename)
         expect(attachment).not_to be_published
       end
 
-      it "should create files as published in non-course context" do
+      it "creates files as published in non-course context" do
         assignment = @course.assignments.create!
         attachment = FileInContext.attach(assignment, @filename)
         expect(attachment).to be_published

@@ -60,8 +60,8 @@ class SisImportErrorsApiController < ApplicationController
   include Api::V1::SisImportError
 
   def check_account
-    return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
-    return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import
+    return render json: { errors: ["SIS imports can only be executed on root accounts"] }, status: :bad_request unless @account.root_account?
+    return render json: { errors: ["SIS imports are not enabled for this account"] }, status: :forbidden unless @account.allow_sis_import
   end
 
   # @API Get SIS import error list
@@ -93,8 +93,7 @@ class SisImportErrorsApiController < ApplicationController
       url = api_v1_sis_batch_import_errors_url if params[:id]
       url ||= api_v1_account_sis_import_errors_url
       errors = Api.paginate(scope, self, url)
-      render json: {sis_import_errors: sis_import_errors_json(errors)}
+      render json: { sis_import_errors: sis_import_errors_json(errors) }
     end
   end
-
 end

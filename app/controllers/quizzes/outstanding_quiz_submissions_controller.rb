@@ -66,5 +66,4 @@ class Quizzes::OutstandingQuizSubmissionsController < ApplicationController
       head :no_content
     end
   end
-
 end

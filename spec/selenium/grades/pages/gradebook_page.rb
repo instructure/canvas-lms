@@ -110,7 +110,7 @@ module Gradebook
     ff('.student-name')
   end
 
-  def self.student_column_cell_element(x,y)
+  def self.student_column_cell_element(x, y)
     f("div .slick-cell.b#{x}.f#{y}.meta-cell")
   end
 
@@ -316,7 +316,7 @@ module Gradebook
     fj('button:contains("Save")')
   end
 
-  def self.select_section(section=nil)
+  def self.select_section(section = nil)
     section = section.name if section.is_a?(CourseSection)
     section ||= ''
     section_dropdown.click
@@ -589,10 +589,10 @@ module Gradebook
   end
 
   def self.scores_scraped
-    class_names = ff('.total-cell.total_grade').map{ |grade| fxpath('..', grade).attribute("class") }
-    user_ids = class_names.map{|name| name.match('student_([0-9]+)')[1]}
-    total_grades = ff('.total-cell.total_grade .grades').map{ |grade| grade.text.split("%")[0] }
-    total_grades.map.with_index{ |grade, index| { user_id: user_ids[index].to_i, score: grade.to_f } }
+    class_names = ff('.total-cell.total_grade').map { |grade| fxpath('..', grade).attribute("class") }
+    user_ids = class_names.map { |name| name.match('student_([0-9]+)')[1] }
+    total_grades = ff('.total-cell.total_grade .grades').map { |grade| grade.text.split("%")[0] }
+    total_grades.map.with_index { |grade, index| { user_id: user_ids[index].to_i, score: grade.to_f } }
   end
 
   def self.scores_api(course)
@@ -660,8 +660,8 @@ module Gradebook
     student_names.map(&:text)
   end
 
-  def self.student_column_cell_select(x,y)
-    student_column_cell_element(x,y)
+  def self.student_column_cell_select(x, y)
+    student_column_cell_element(x, y)
   end
 
   # ASSIGNMENT COLUMN HEADER OPTIONS

@@ -50,6 +50,7 @@ module CustomSidebarLinksHelper
   # @context is the course
   def roster_user_custom_links(user)
     return [] unless @context.is_a?(Course) && @context.user_has_been_student?(user)
+
     base_placements = RequestCache.cache('user_in_course_placement_info', @context) do
       external_tools_display_hashes(:student_context_card, tool_ids: TOOL_IDS)
     end

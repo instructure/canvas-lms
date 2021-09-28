@@ -47,7 +47,7 @@ class UserAccountAssociation < ActiveRecord::Base
     # per user. This Setting allows us to control if root_account_ids syncing
     # occurs.
     return unless Setting.get('sync_root_account_ids_on_user_records', 'true') == 'true'
+
     user.update_root_account_ids_later
   end
-
 end

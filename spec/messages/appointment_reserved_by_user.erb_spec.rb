@@ -53,7 +53,7 @@ describe 'appointment_reserved_by_user.twitter' do
                                     updating_user: @user)
     end
 
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.subject).to include('some title')
       expect(msg.body).to include('some title')
@@ -62,7 +62,7 @@ describe 'appointment_reserved_by_user.twitter' do
       expect(msg.body).to include("/appointment_groups/#{@appointment_group.id}")
     end
 
-    it "should render for groups" do
+    it "renders for groups" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include(@group.name)
     end
@@ -70,7 +70,7 @@ describe 'appointment_reserved_by_user.twitter' do
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include('some title')
       expect(msg.body).to include(@user.name)
@@ -79,7 +79,7 @@ describe 'appointment_reserved_by_user.twitter' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_data)
       expect(msg.body).to include('some title')
       expect(msg.body).to include(@user.name)

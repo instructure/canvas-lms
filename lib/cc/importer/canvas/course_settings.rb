@@ -29,6 +29,7 @@ module CC::Importer::Canvas
       path = @package_root.item_path(COURSE_SETTINGS_DIR, file)
       return nil unless File.exist? path
       return nil if File.size(path) > Setting.get('course_settings_import_xml_threshold', 25.megabytes).to_i # totally arbitrary hack to keep some broken exports from killing things
+
       if html
         open_file path
       else
@@ -55,7 +56,8 @@ module CC::Importer::Canvas
     def convert_course_settings(doc)
       course = {}
       return course unless doc
-      course[:migration_id] = get_node_att(doc, 'course',  'identifier')
+
+      course[:migration_id] = get_node_att(doc, 'course', 'identifier')
 
       ['title', 'course_code', 'default_wiki_editing_roles',
        'turnitin_comments', 'default_view', 'license', 'locale',
@@ -76,8 +78,7 @@ module CC::Importer::Canvas
        'allow_student_discussion_editing', 'show_announcements_on_home_page', 'usage_rights_required',
        'restrict_student_future_view', 'restrict_student_past_view', 'show_total_grade_as_points',
        'organize_epub_by_content_type', 'enable_offline_web_export', 'restrict_enrollments_to_course_dates',
-       'homeroom_course'
-      ].each do |bool_val|
+       'homeroom_course'].each do |bool_val|
         val = get_bool_val(doc, bool_val)
         course[bool_val] = val unless val.nil?
       end
@@ -96,7 +97,7 @@ module CC::Importer::Canvas
           # Validate the format a little bit
           # Should be something like [{"id"=>0},{"id"=>5},{"id"=>4}]
           if nav.present? && nav.is_a?(Array)
-            course[:tab_configuration] = nav.select{|i| i.is_a?(Hash) && i["id"] }
+            course[:tab_configuration] = nav.select { |i| i.is_a?(Hash) && i["id"] }
           end
         rescue
           add_warning(I18n.t('errors.bad_navigation_config', "Invalid course tab configuration"), $!)
@@ -104,7 +105,7 @@ module CC::Importer::Canvas
       end
 
       post_manually = get_bool_val(doc, 'default_post_policy post_manually')
-      course[:default_post_policy] = {post_manually: post_manually} unless post_manually.nil?
+      course[:default_post_policy] = { post_manually: post_manually } unless post_manually.nil?
 
       course
     end
@@ -116,6 +117,7 @@ module CC::Importer::Canvas
     def convert_assignment_groups(doc = nil)
       groups = []
       return groups unless doc
+
       doc.css('assignmentGroup').each do |node|
         group = {}
         group['migration_id'] = node['identifier']
@@ -141,6 +143,7 @@ module CC::Importer::Canvas
     def convert_external_tools(doc)
       tools = []
       return tools unless doc
+
       doc.css('externalTool').each do |node|
         tool = {}
         tool['migration_id'] = node['identifier']
@@ -159,6 +162,7 @@ module CC::Importer::Canvas
     def convert_external_feeds(doc)
       feeds = []
       return feeds unless doc
+
       doc.css('externalFeed').each do |node|
         feed = {}
         feed['migration_id'] = node['identifier']
@@ -176,6 +180,7 @@ module CC::Importer::Canvas
     def convert_grading_standards(doc)
       standards = []
       return standards unless doc
+
       doc.css('gradingStandard').each do |node|
         standard = {}
         standard['migration_id'] = node['identifier']
@@ -191,6 +196,7 @@ module CC::Importer::Canvas
     def convert_events(doc)
       events = []
       return events unless doc
+
       doc.css('event').each do |node|
         event = {}
         event['migration_id'] = node['identifier']
@@ -205,6 +211,5 @@ module CC::Importer::Canvas
 
       events
     end
-
   end
 end

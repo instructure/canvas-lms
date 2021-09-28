@@ -50,16 +50,16 @@ module CC::Importer::Canvas
           # As `el.content` returns a String, we're trying to convert the
           # custom parameter value to the orignal data type
           value = if FLOAT_REGEX.match? value
-            value.to_f
-          elsif INTEGER_REGEX.match? value
-            value.to_i
-          elsif value == 'true'
-            true
-          elsif value == 'false'
-            false
-          else
-            value
-          end
+                    value.to_f
+                  elsif INTEGER_REGEX.match? value
+                    value.to_i
+                  elsif value == 'true'
+                    true
+                  elsif value == 'false'
+                    false
+                  else
+                    value
+                  end
 
           custom[key.to_sym] = value
         end

@@ -49,7 +49,7 @@ module Canvas
       described_class.instance_variable_set(:@registry, @old_registry)
     end
 
-    let(:error){double("Some Error") }
+    let(:error) { double("Some Error") }
 
     describe '.capture_exception' do
       it 'tags with the exception type and default level' do
@@ -59,6 +59,5 @@ module Canvas
         expect(@error_harness.level).to eq(:error)
       end
     end
-
   end
 end

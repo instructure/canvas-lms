@@ -54,7 +54,7 @@ describe "Learning Outcome exporting" do
       @bank.reload
     end
 
-    it 'should only export alignments for the current course on account level outcomes' do
+    it 'only exports alignments for the current course on account level outcomes' do
       course_factory
       @course.root_outcome_group.add_outcome(@outcome)
       assessment_question_bank_model
@@ -119,10 +119,10 @@ describe "Learning Outcome exporting" do
       outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
       friendly_description = "a friendly description"
       OutcomeFriendlyDescription.create!({
-        learning_outcome: outcome1,
-        context: @course,
-        description: friendly_description
-      })
+                                           learning_outcome: outcome1,
+                                           context: @course,
+                                           description: friendly_description
+                                         })
       @ce.selected_content = {
         'learning_outcomes' => {
           @ce.create_key(outcome1) => "1"
@@ -169,10 +169,10 @@ describe "Learning Outcome exporting" do
       outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
       friendly_description = "a friendly description"
       OutcomeFriendlyDescription.create!({
-        learning_outcome: outcome1,
-        context: @course,
-        description: friendly_description
-      })
+                                           learning_outcome: outcome1,
+                                           context: @course,
+                                           description: friendly_description
+                                         })
       @ce.selected_content = {
         'learning_outcomes' => {
           @ce.create_key(outcome1) => "1"
@@ -195,16 +195,16 @@ describe "Learning Outcome exporting" do
       root_group = outcome_group_model(title: 'root group')
       outcome1 = outcome_model(outcome_group: root_group, title: 'thing1')
       OutcomeFriendlyDescription.create!({
-        learning_outcome: outcome1,
-        context: @course.account,
-        description: 'an account-level friendly description'
-      })
+                                           learning_outcome: outcome1,
+                                           context: @course.account,
+                                           description: 'an account-level friendly description'
+                                         })
       friendly_description = "a course-level friendly description"
       OutcomeFriendlyDescription.create!({
-        learning_outcome: outcome1,
-        context: @course,
-        description: friendly_description
-      })
+                                           learning_outcome: outcome1,
+                                           context: @course,
+                                           description: friendly_description
+                                         })
       @ce.selected_content = {
         'learning_outcomes' => {
           @ce.create_key(outcome1) => "1"

@@ -37,8 +37,8 @@ module Types
 
       def perform(outcomes)
         imported_ids = ContentTag.learning_outcome_links.active
-          .where(content_id: outcomes, context_id: @target_context_id, context_type: @target_context_type)
-          .pluck(:content_id)
+                                 .where(content_id: outcomes, context_id: @target_context_id, context_type: @target_context_type)
+                                 .pluck(:content_id)
 
         outcomes.each do |outcome|
           fulfill(outcome, imported_ids.include?(outcome.id))

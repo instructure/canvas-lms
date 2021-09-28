@@ -21,12 +21,11 @@ require 'spec_helper'
 require_dependency "messages/name_helper"
 
 module Messages
-
   describe NameHelper do
     let(:course) { double(:course, account_membership_allows: false) }
     let(:author) { double("Author", short_name: "Author Name") }
-    let(:user){ double("User", short_name: "User Name") }
-    let(:asset){ double("Asset", user: user, author: author) }
+    let(:user) { double("User", short_name: "User Name") }
+    let(:asset) { double("Asset", user: user, author: author) }
     let(:message_recipient) { double(:user) }
     let(:assignment) { double(:assignment, anonymize_students?: false, context: course) }
     let(:submission) { double(:submission, assignment: assignment, user: user) }

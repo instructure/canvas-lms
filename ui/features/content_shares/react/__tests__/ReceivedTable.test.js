@@ -147,7 +147,7 @@ describe('content shares table', () => {
   })
 
   it('handles an incomplete content_export', () => {
-    const pendingShare = mockShare({content_export: {id: 4, workflow_state: 'exporting'}})
+    const pendingShare = mockShare({content_export: {id: '4', workflow_state: 'exporting'}})
     const {getByText, queryByText, queryByTestId} = render(
       <ReceivedTable shares={[pendingShare]} />
     )

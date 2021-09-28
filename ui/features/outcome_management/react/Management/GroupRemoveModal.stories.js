@@ -25,6 +25,7 @@ export default {
   component: GroupRemoveModal,
   args: {
     groupId: '1',
+    groupTitle: 'State Standards',
     isOpen: true,
     onCloseHandler: () => {}
   }

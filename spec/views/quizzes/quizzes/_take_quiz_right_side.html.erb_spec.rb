@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
 describe '/quizzes/quizzes/_take_quiz_right_side' do
-  it 'should display quiz due date' do
+  it 'displays quiz due date' do
     course_with_student
     view_context
     due_at = 5.days.from_now

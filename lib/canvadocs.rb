@@ -71,11 +71,11 @@ module Canvadocs
     # Returns a hash containing the document's id and status
     def upload(obj, extra_params = {})
       params = if obj.is_a?(File)
-        { file: obj }.merge(extra_params)
-        raise Canvadocs::Error, "TODO: support raw files"
-      else
-        { url: obj.to_s }.merge(extra_params)
-      end
+                 { file: obj }.merge(extra_params)
+                 raise Canvadocs::Error, "TODO: support raw files"
+               else
+                 { url: obj.to_s }.merge(extra_params)
+               end
 
       raw_body = api_call(:post, "documents", params)
       JSON.parse(raw_body)
@@ -102,7 +102,7 @@ module Canvadocs
     #   # => { "id": "CFAmd3Qjm_2ehBI7HyndnXKsDrQXJ7jHCuzcRv" }
     #
     # Returns a hash containing the session id
-    def session(document_id, opts={})
+    def session(document_id, opts = {})
       raw_body = api_call(:post, "sessions",
                           opts.merge(:document_id => document_id))
       JSON.parse(raw_body)
@@ -120,7 +120,6 @@ module Canvadocs
     def view(session_id)
       "#{@url}/sessions/#{session_id}/view?theme=dark"
     end
-
 
     # -- API Glue --
 
@@ -140,7 +139,7 @@ module Canvadocs
     #   # => { "id": 1234 }
     #
     # Returns the json parsed response body of the call
-    def api_call(method, endpoint, params={})
+    def api_call(method, endpoint, params = {})
       # dispatch to the right method, with the full path (/api/v2 + endpoint)
       request = self.send("format_#{method}", "#{@url.path}/#{endpoint}", params)
       request["Authorization"] = "Token #{token}"
@@ -157,7 +156,6 @@ module Canvadocs
       response.body
     end
 
-
     # Internal: Format and create a Net::HTTP get request, with query
     # parameters.
     #
@@ -173,7 +171,7 @@ module Canvadocs
     #
     # Returns a Net::HTTP::Get object for the path with query params
     def format_get(path, params)
-      query = params.map { |k,v| "#{k}=#{CGI::escape(v.to_s)}" }.join("&")
+      query = params.map { |k, v| "#{k}=#{CGI::escape(v.to_s)}" }.join("&")
       Net::HTTP::Get.new("#{path}?#{query}")
     end
 
@@ -199,9 +197,13 @@ module Canvadocs
   end
 
   class Error < StandardError; end
+
   class HttpError < Error; end
+
   class ServerError < HttpError; end
+
   class BadGateway < HttpError; end
+
   class BadRequest < HttpError; end
 
   def self.config
@@ -224,6 +226,7 @@ module Canvadocs
   def self.user_session_params(current_user, attachment: nil, submission: nil)
     if submission.nil?
       return {} if attachment.nil?
+
       submission = Submission.find_by(
         id: AttachmentAssociation.where(context_type: 'Submission', attachment: attachment).select(:context_id)
       )
@@ -290,10 +293,10 @@ module Canvadocs
       # Not calling submission.anonymous_identities here because we want to include
       # anonymous_ids for moderation_graders that have not yet taken a slot
       anonymous_id = if submission.user_id == current_user.id
-        submission.anonymous_id
-      elsif submission.assignment.moderated_grading?
-        submission.assignment.moderation_graders.find_by(user: current_user)&.anonymous_id
-      end
+                       submission.anonymous_id
+                     elsif submission.assignment.moderated_grading?
+                       submission.assignment.moderation_graders.find_by(user: current_user)&.anonymous_id
+                     end
 
       current_user_params[:user_anonymous_id] = anonymous_id if anonymous_id
       current_user_params
@@ -304,10 +307,10 @@ module Canvadocs
       is_instructor = submission.course.participating_instructors.include?(current_user)
       is_admin = submission.course.account_membership_allows(current_user)
       users_for_filter = if current_user == submission.user || is_instructor || is_admin
-        User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
-      else
-        []
-      end
+                           User.where(id: submission.assessment_requests.pluck(:assessor_id)).to_a
+                         else
+                           []
+                         end
 
       # The current user's annotations should always be visible.
       users_for_filter.push(current_user)

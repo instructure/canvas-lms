@@ -31,7 +31,7 @@ class Gergich::CompileAssets
       )
     |mx
 
-    result = output.scan(pattern).map {|file, line, error|
+    result = output.scan(pattern).map { |file, line, error|
       error.sub!(/\n/, "\n\n") # separate first line from the rest, which will be indented (monospace)
       { path: file, message: error, position: line.to_i, severity: "error" }
     }
@@ -46,7 +46,7 @@ class Gergich::CompileAssets
       ([^\n]+)\n                                        #   ^^^^^
     |mx
 
-    result.concat output.scan(pattern).map {|file, line, error, context1, context2|
+    result.concat output.scan(pattern).map { |file, line, error, context1, context2|
       error = "#{error}\n\n #{context1}\n #{context2}"
       { path: file, message: error, position: line.to_i, severity: "error" }
     }

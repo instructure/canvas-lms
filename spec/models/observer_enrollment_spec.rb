@@ -43,14 +43,13 @@ describe ObserverEnrollment do
   end
 
   describe 'observed_students' do
-    it "should not fail if the observed has been deleted" do
-      expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({ @student => [@student_enrollment]})
+    it "does not fail if the observed has been deleted" do
+      expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({ @student => [@student_enrollment] })
       @student_enrollment.destroy
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
     end
 
     describe 'date restricted future sections' do
-
       let(:unrestricted_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2, include_restricted_access: false) }
       let(:all_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2) }
 
@@ -69,12 +68,10 @@ describe ObserverEnrollment do
       end
 
       it 'does not include students in future sections with restricted access when called with current_only' do
-
         expect(unrestricted_observed_students).not_to have_key(@student2)
       end
 
       it 'includes all students when called without current_only' do
-
         expect(all_observed_students).to include(@student2 => [@student_enrollment])
       end
 
@@ -87,13 +84,13 @@ describe ObserverEnrollment do
     end
   end
   describe 'observed_student_ids_by_observer_id' do
-    it "should return a properly formatted hash" do
+    it "returns a properly formatted hash" do
       @observer_two = user_factory
       @observer_enrollment_two = @course1.enroll_user(@observer_two, 'ObserverEnrollment')
       expect(ObserverEnrollment
                .observed_student_ids_by_observer_id(@course1,
-                                                    [@observer.id,@observer_two.id]))
-        .to eq({@observer.id => [@student.id], @observer_two.id => []})
+                                                    [@observer.id, @observer_two.id]))
+        .to eq({ @observer.id => [@student.id], @observer_two.id => [] })
     end
   end
 

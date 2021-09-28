@@ -27,7 +27,6 @@ RSpec::Matchers.define :have_question_field do |expected|
 end
 
 describe Quizzes::QuizQuestion::QuestionData do
-
   let(:question_data_params) do
     {
       answers: [],
@@ -135,7 +134,6 @@ describe Quizzes::QuizQuestion::QuestionData do
     end
   end
 
-
   describe "#to_hash" do
     it "returns an indifferent hash" do
       question = Quizzes::QuizQuestion::QuestionData.generate
@@ -205,7 +203,6 @@ describe Quizzes::QuizQuestion::QuestionData do
         question = Quizzes::QuizQuestion::QuestionData.generate(question_type: 'true_false_question')
         expect(question.answer_parser).to eq Quizzes::QuizQuestion::AnswerParsers::TrueFalse
       end
-
     end
   end
 end

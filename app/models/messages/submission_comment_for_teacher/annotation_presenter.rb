@@ -20,7 +20,6 @@
 
 module Messages::SubmissionCommentForTeacher
   class AnnotationPresenter < Presenter
-
     def subject
       if anonymous?
         I18n.t(
@@ -61,6 +60,5 @@ module Messages::SubmissionCommentForTeacher
     def submission
       message.context
     end
-
   end
 end

@@ -23,10 +23,10 @@ describe ContentMigration do
   context "course copy discussions" do
     include_examples "course copy"
 
-    it "should copy discussion topic attributes" do
+    it "copies discussion topic attributes" do
       topic = @copy_from.discussion_topics.create!(:title => "topic", :message => "<p>bloop</p>",
-        :pinned => true, :discussion_type => "threaded",
-        :require_initial_post => true, :locked => true)
+                                                   :pinned => true, :discussion_type => "threaded",
+                                                   :require_initial_post => true, :locked => true)
       todo_date = 1.day.from_now
       topic.todo_date = todo_date
       topic.posted_at = 2.days.ago
@@ -48,7 +48,7 @@ describe ContentMigration do
       expect(new_topic.todo_date.to_i).to eq todo_date.to_i
     end
 
-    it "should copy locked state for announcements" do
+    it "copies locked state for announcements" do
       topic = @copy_from.announcements.create!(:title => "topic", :message => "<p>bloop</p>", :locked => true)
 
       run_course_copy
@@ -77,7 +77,7 @@ describe ContentMigration do
       expect(new_topic2.sort_by_rating).to eq true
     end
 
-    it "should copy group setting" do
+    it "copies group setting" do
       group_category = @copy_from.group_categories.create!(name: 'blah')
       topic = @copy_from.discussion_topics.create! group_category: group_category
 
@@ -100,15 +100,15 @@ describe ContentMigration do
       expect(new_topic.group_category.name).to eq "blah"
     end
 
-    it "should copy a discussion topic when assignment is selected" do
+    it "copies a discussion topic when assignment is selected" do
       graded_discussion_topic(context: @copy_from)
 
       # Should not fail if the destination has a group
       @copy_to.groups.create!(:name => 'some random group of people')
 
       @cm.copy_options = {
-              :assignments => {mig_id(@assignment) => "1"},
-              :discussion_topics => {mig_id(@topic) => "0"},
+        :assignments => { mig_id(@assignment) => "1" },
+        :discussion_topics => { mig_id(@topic) => "0" },
       }
       @cm.save!
 
@@ -117,14 +117,14 @@ describe ContentMigration do
       expect(@copy_to.discussion_topics.where(migration_id: mig_id(@topic)).first).not_to be_nil
     end
 
-    it "should properly copy selected delayed announcements" do
+    it "properly copies selected delayed announcements" do
       from_time = 1.hour.from_now
       until_time = 25.hours.from_now
       from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: from_time, lock_at: until_time)
       from_ann.workflow_state = "post_delayed"
       from_ann.save!
 
-      @cm.copy_options = { :announcements => {mig_id(from_ann) => "1"}}
+      @cm.copy_options = { :announcements => { mig_id(from_ann) => "1" } }
       @cm.save!
 
       run_course_copy
@@ -147,8 +147,8 @@ describe ContentMigration do
       end
     end
 
-    it "should properly copy selected delayed announcements even if they've already posted and locked" do
-      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago )
+    it "properly copies selected delayed announcements even if they've already posted and locked" do
+      from_ann = @copy_from.announcements.create!(:message => "goodbye", :title => "goodbye announcement", delayed_post_at: 5.days.ago, lock_at: 2.days.ago)
       from_ann.save!
       run_jobs
       from_ann.reload
@@ -185,11 +185,11 @@ describe ContentMigration do
       end
     end
 
-    it "should not copy announcements if not selected" do
+    it "does not copy announcements if not selected" do
       ann = @copy_from.announcements.create!(:message => "howdy", :title => "announcement title")
 
       @cm.copy_options = {
-          :all_discussion_topics => "1", :all_announcements => "0"
+        :all_discussion_topics => "1", :all_announcements => "0"
       }
       @cm.save!
 
@@ -198,14 +198,14 @@ describe ContentMigration do
       expect(@copy_to.announcements.where(migration_id: mig_id(ann)).first).to be_nil
     end
 
-    it "should implicitly copy files attached to topics" do
+    it "implicitlies copy files attached to topics" do
       att = Attachment.create!(:filename => 'test.txt', :display_name => "testing.txt", :uploaded_data => StringIO.new('file'),
-        :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
+                               :folder => Folder.root_folders(@copy_from).first, :context => @copy_from)
       topic = @copy_from.discussion_topics.new(:message => "howdy", :title => "title")
       topic.attachment = att
       topic.save!
 
-      @cm.copy_options = {:all_discussion_topics => "1"}
+      @cm.copy_options = { :all_discussion_topics => "1" }
       @cm.save!
 
       run_course_copy
@@ -217,7 +217,7 @@ describe ContentMigration do
       expect(topic_copy.attachment).to eq att_copy
     end
 
-    it "should not copy deleted assignment attached to topic" do
+    it "does not copy deleted assignment attached to topic" do
       graded_discussion_topic(context: @copy_from)
       @assignment.workflow_state = 'deleted'
       @assignment.save!
@@ -231,7 +231,7 @@ describe ContentMigration do
       expect(@copy_to.assignments.where(migration_id: mig_id(@assignment)).first).to be_nil
     end
 
-    it "should copy the assignment group and grading standard in complete copy" do
+    it "copies the assignment group and grading standard in complete copy" do
       graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
@@ -245,7 +245,7 @@ describe ContentMigration do
       expect(new_topic.assignment.grading_standard.migration_id).to eql mig_id(gs)
     end
 
-    it "should copy the grading standard (but not assignment group) in selective copy" do
+    it "copies the grading standard (but not assignment group) in selective copy" do
       graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
@@ -260,7 +260,7 @@ describe ContentMigration do
       expect(new_topic.assignment.grading_standard.migration_id).to eql mig_id(gs)
     end
 
-    it "should not copy the assignment group and grading standard in selective export" do
+    it "does not copy the assignment group and grading standard in selective export" do
       graded_discussion_topic(context: @copy_from)
       gs = make_grading_standard(@copy_from, title: 'One')
       group = @copy_from.assignment_groups.create!(:name => "new group")
@@ -283,7 +283,7 @@ describe ContentMigration do
       expect(decoy_ag.reload.name).not_to eql group.name
     end
 
-    it "should copy references to locked discussions even if manage_content is not true" do
+    it "copies references to locked discussions even if manage_content is not true" do
       @role = Account.default.roles.build :name => 'SuperTeacher'
       @role.base_role_type = 'TeacherEnrollment'
       @role.save!
@@ -306,7 +306,7 @@ describe ContentMigration do
       expect(@copy_to.syllabus_body).to be_include("/courses/#{@copy_to.id}/discussion_topics/#{topic2.id}")
     end
 
-    it "should not copy lock_at directly when on assignment" do
+    it "does not copy lock_at directly when on assignment" do
       graded_discussion_topic(context: @copy_from)
       @assignment.update_attribute(:lock_at, 3.days.from_now)
 
@@ -317,7 +317,7 @@ describe ContentMigration do
       expect(topic2.lock_at).to be_nil
     end
 
-    it "should not apply the late policy right away if shifting dates to the future" do
+    it "does not apply the late policy right away if shifting dates to the future" do
       graded_discussion_topic(context: @copy_from)
       @assignment.update(:due_at => 3.days.ago, :points_possible => 4)
 

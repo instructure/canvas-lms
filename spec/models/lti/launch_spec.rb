@@ -23,10 +23,10 @@ require_dependency "lti/launch"
 
 module Lti
   describe Launch do
-    let(:launch) {Launch.new}
+    let(:launch) { Launch.new }
 
     describe '#iframe_allowances' do
-      subject{ Launch.iframe_allowances(user_agent) }
+      subject { Launch.iframe_allowances(user_agent) }
 
       context 'when Chrome is used' do
         let(:user_agent) do
@@ -133,12 +133,12 @@ module Lti
 
     describe 'initialize' do
       it 'correctly sets tool dimension default' do
-        expect(subject.tool_dimensions).to eq({selection_height: '100%', selection_width: '100%'})
+        expect(subject.tool_dimensions).to eq({ selection_height: '100%', selection_width: '100%' })
       end
 
       it 'uses specified tool dimensions if they are provided' do
         options = {
-          tool_dimensions: {selection_height: '800', selection_width: '600'}
+          tool_dimensions: { selection_height: '800', selection_width: '600' }
         }
         launch = Launch.new(options)
         expect(launch.tool_dimensions).to eq options[:tool_dimensions]

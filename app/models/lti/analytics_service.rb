@@ -41,6 +41,7 @@ module Lti
         unless parts.size == 6 && Canvas::Security.hmac_sha1(parts[0..-2].join('-'), key) == parts[-1]
           raise BasicLTI::BasicOutcomes::Unauthorized, "Invalid analytics service token"
         end
+
         user = User.find(parts[1].to_i)
         course = Course.find(parts[2].to_i)
         timestamp = parts[3].to_i
@@ -53,7 +54,7 @@ module Lti
       Token.create(tool, user, course).serialize
     end
 
-    def self.log_page_view(token, opts={})
+    def self.log_page_view(token, opts = {})
       course = token.course
       user = token.user
       tool = token.tool
@@ -62,8 +63,8 @@ module Lti
 
       if seconds
 
-        course.all_enrollments.where(:user_id => user).
-          update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
+        course.all_enrollments.where(:user_id => user)
+              .update_all(['total_activity_time = COALESCE(total_activity_time, 0) + ?', seconds])
       end
 
       AssetUserAccess.log(user, course, code: tool.asset_string, group_code: "external_tools", category: "external_tools")

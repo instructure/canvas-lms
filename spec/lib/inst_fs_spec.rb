@@ -22,18 +22,18 @@ require 'spec_helper'
 
 describe InstFS do
   context "settings are set" do
-    let(:app_host){ 'http://test.host' }
-    let(:secret){ "supersecretyup" }
-    let(:rotating_secret){ "anothersecret" }
-    let(:secrets){ [secret, rotating_secret] }
-    let(:encoded_secrets){ secrets.map{ |sec| Base64.encode64(sec) }.join(" ") }
-    let(:settings_hash){ { 'app-host' => app_host, 'secret' => encoded_secrets } }
+    let(:app_host) { 'http://test.host' }
+    let(:secret) { "supersecretyup" }
+    let(:rotating_secret) { "anothersecret" }
+    let(:secrets) { [secret, rotating_secret] }
+    let(:encoded_secrets) { secrets.map { |sec| Base64.encode64(sec) }.join(" ") }
+    let(:settings_hash) { { 'app-host' => app_host, 'secret' => encoded_secrets } }
     before do
       allow(InstFS).to receive(:enabled?).and_return(true)
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).
-        with(service: "inst-fs", default_ttl: 5.minutes).
-        and_return(settings_hash)
+      allow(Canvas::DynamicSettings).to receive(:find)
+        .with(service: "inst-fs", default_ttl: 5.minutes)
+        .and_return(settings_hash)
     end
 
     it "returns primary decoded base 64 secret" do
@@ -121,8 +121,8 @@ describe InstFS do
         url = InstFS.authenticated_url(@attachment, {})
         expect(url).to match(/token=/)
         token = url.split(/token=/).last
-        expect(->{
-          Canvas::Security.decode_jwt(token, [ secret ])
+        expect(-> {
+          Canvas::Security.decode_jwt(token, [secret])
         }).not_to raise_error
       end
 
@@ -130,17 +130,17 @@ describe InstFS do
         url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
         token = url.split(/token=/).last
         Timecop.freeze(2.hours.from_now) do
-          expect(->{
-            Canvas::Security.decode_jwt(token, [ secret ])
+          expect(-> {
+            Canvas::Security.decode_jwt(token, [secret])
           }).to raise_error(Canvas::Security::TokenExpired)
         end
       end
 
       describe "jwt claims" do
-        def claims_for(options={})
+        def claims_for(options = {})
           url = InstFS.authenticated_url(@attachment, options)
           token = url.split(/token=/).last
-          Canvas::Security.decode_jwt(token, [ secret ])
+          Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "no matter what time it is, the token has no less than 12 hours of validity left and never more than 24" do
@@ -181,21 +181,21 @@ describe InstFS do
         it "includes a jti in the token" do
           url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
           token = url.split(/token=/).last
-          expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
+          expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
         end
 
         it "includes the original_url claim with the redirect and no_cache param" do
           original_url = "https://example.test/preview"
           url = InstFS.authenticated_url(@attachment, original_url: original_url)
           token = url.split(/token=/).last
-          expect(Canvas::Security.decode_jwt(token, [ secret ])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
+          expect(Canvas::Security.decode_jwt(token, [secret])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
         end
 
         it "doesn't include the original_url claim if already redirected" do
           original_url = "https://example.test/preview?redirect=true"
           url = InstFS.authenticated_url(@attachment, original_url: original_url)
           token = url.split(/token=/).last
-          expect(Canvas::Security.decode_jwt(token, [ secret ])).not_to have_key(:original_url)
+          expect(Canvas::Security.decode_jwt(token, [secret])).not_to have_key(:original_url)
         end
 
         describe "legacy api claims" do
@@ -255,8 +255,8 @@ describe InstFS do
         url = InstFS.authenticated_thumbnail_url(@attachment)
         expect(url).to match(/token=/)
         token = url.split(/token=/).last
-        expect(->{
-          Canvas::Security.decode_jwt(token, [ secret ])
+        expect(-> {
+          Canvas::Security.decode_jwt(token, [secret])
         }).not_to raise_error
       end
 
@@ -264,8 +264,8 @@ describe InstFS do
         url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
         token = url.split(/token=/).last
         Timecop.freeze(2.hours.from_now) do
-          expect(->{
-            Canvas::Security.decode_jwt(token, [ secret ])
+          expect(-> {
+            Canvas::Security.decode_jwt(token, [secret])
           }).to raise_error(Canvas::Security::TokenExpired)
         end
       end
@@ -273,9 +273,8 @@ describe InstFS do
       it "includes a jti in the token" do
         url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
         token = url.split(/token=/).last
-        expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
+        expect(Canvas::Security.decode_jwt(token, [secret])).to have_key(:jti)
       end
-
     end
 
     context "upload_preflight_json" do
@@ -330,15 +329,15 @@ describe InstFS do
         upload_url = URI.parse(preflight_json[:upload_url])
         expect(upload_url.query).to match %r{token=[^&]+}
         token = upload_url.query.split('=').last
-        expect(->{
-          Canvas::Security.decode_jwt(token, [ secret ])
+        expect(-> {
+          Canvas::Security.decode_jwt(token, [secret])
         }).not_to raise_error
       end
 
       describe "the upload JWT" do
         let(:jwt) do
           token = preflight_json[:upload_url].split('token=').last
-          Canvas::Security.decode_jwt(token, [ secret ])
+          Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "embeds the user_id and acting_as_user_id in the token" do
@@ -414,7 +413,7 @@ describe InstFS do
         def claims_for(options)
           json = InstFS.upload_preflight_json(default_args.merge(options))
           token = json[:upload_url].split('token=').last
-          Canvas::Security.decode_jwt(token, [ secret ])
+          Canvas::Security.decode_jwt(token, [secret])
         end
 
         it "are not added without an access token" do
@@ -449,17 +448,17 @@ describe InstFS do
 
       context "upload via url" do
         it "throw ArgumentError when appropriate" do
-          expect { InstFS.upload_preflight_json(default_args.merge({target_url: "foo"})) }.to raise_error(ArgumentError)
-          expect { InstFS.upload_preflight_json(default_args.merge({progress_json: {"foo": 1}})) }.to raise_error(ArgumentError)
+          expect { InstFS.upload_preflight_json(default_args.merge({ target_url: "foo" })) }.to raise_error(ArgumentError)
+          expect { InstFS.upload_preflight_json(default_args.merge({ progress_json: { "foo": 1 } })) }.to raise_error(ArgumentError)
         end
 
         it "responds properly when passed target_url and progress_json" do
           progress_json = { id: 1 }
           target_url = "http://www.example.com/"
-          preflight_json = InstFS.upload_preflight_json(default_args.merge({target_url: target_url, progress_json: progress_json}))
+          preflight_json = InstFS.upload_preflight_json(default_args.merge({ target_url: target_url, progress_json: progress_json }))
 
           token = preflight_json[:upload_url].split('token=').last
-          jwt = Canvas::Security.decode_jwt(token, [ secret ])
+          jwt = Canvas::Security.decode_jwt(token, [secret])
 
           expect(jwt[:capture_params][:progress_id]).to eq(progress_json[:id])
           expect(preflight_json[:file_paran]).to be_nil
@@ -502,10 +501,10 @@ describe InstFS do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:post).and_return(double(
-          class: Net::HTTPCreated,
-          code: 200,
-          body: {instfs_uuid: instfs_uuid}.to_json
-        ))
+                                                         class: Net::HTTPCreated,
+                                                         code: 200,
+                                                         body: { instfs_uuid: instfs_uuid }.to_json
+                                                       ))
 
         res = InstFS.direct_upload(
           file_name: "a.png",
@@ -517,10 +516,10 @@ describe InstFS do
       it "requests a streaming upload to allow large files" do
         instfs_uuid = "1234-abcd"
         expect(CanvasHttp).to receive(:post).with(anything, hash_including(streaming: true)).and_return(double(
-          class: Net::HTTPCreated,
-          code: 200,
-          body: {instfs_uuid: instfs_uuid}.to_json
-        ))
+                                                                                                          class: Net::HTTPCreated,
+                                                                                                          code: 200,
+                                                                                                          body: { instfs_uuid: instfs_uuid }.to_json
+                                                                                                        ))
 
         InstFS.direct_upload(
           file_name: "a.png",
@@ -542,10 +541,10 @@ describe InstFS do
         instfs_uuid = "1234-abcd"
         new_instfs_uuid = "5678-efgh"
         allow(CanvasHttp).to receive(:post).with(/\/files\/#{instfs_uuid}\/duplicate/).and_return(double(
-          class: Net::HTTPCreated,
-          code: 200,
-          body: {id: new_instfs_uuid}.to_json
-        ))
+                                                                                                    class: Net::HTTPCreated,
+                                                                                                    code: 200,
+                                                                                                    body: { id: new_instfs_uuid }.to_json
+                                                                                                  ))
         expect(InstFS.duplicate_file(instfs_uuid)).to eq new_instfs_uuid
       end
     end
@@ -554,9 +553,9 @@ describe InstFS do
       it "makes a network request to the inst-fs endpoint" do
         instfs_uuid = "1234-abcd"
         allow(CanvasHttp).to receive(:delete).with(/\/files\/#{instfs_uuid}/).and_return(double(
-          class: Net::HTTPOK,
-          code: 200,
-        ))
+                                                                                           class: Net::HTTPOK,
+                                                                                           code: 200,
+                                                                                         ))
         expect(InstFS.delete_file(instfs_uuid)).to eq true
       end
     end
@@ -565,11 +564,11 @@ describe InstFS do
   context "settings not set" do
     before do
       allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
-      allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs").
-        and_return({
-          'app-host' => nil,
-          'secret' => nil
-        })
+      allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs")
+                                                      .and_return({
+                                                                    'app-host' => nil,
+                                                                    'secret' => nil
+                                                                  })
     end
 
     it "instfs is not enabled" do

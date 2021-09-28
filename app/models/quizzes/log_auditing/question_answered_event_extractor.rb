@@ -52,11 +52,11 @@ module Quizzes::LogAuditing
       event = build_event(submission_data, quiz_submission)
 
       predecessors = Quizzes::QuizSubmissionEvent.where(SQL_FIND_PREDECESSORS, {
-        quiz_submission_id: quiz_submission.id,
-        attempt: event.attempt,
-        started_at: quiz_submission.started_at,
-        created_at: event.created_at
-      }).order('created_at DESC')
+                                                          quiz_submission_id: quiz_submission.id,
+                                                          attempt: event.attempt,
+                                                          started_at: quiz_submission.started_at,
+                                                          created_at: event.created_at
+                                                        }).order('created_at DESC')
 
       if predecessors.any?
         optimizer = Quizzes::LogAuditing::QuestionAnsweredEventOptimizer.new

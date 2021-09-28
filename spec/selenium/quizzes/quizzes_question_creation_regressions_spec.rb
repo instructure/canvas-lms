@@ -38,7 +38,7 @@ describe 'quizzes question creation' do
       @last_quiz = start_quiz_question
     end
 
-    it 'should create a quiz with a variety of quiz questions', priority: "1", test_id: 197489, custom_timeout: 30 do
+    it 'creates a quiz with a variety of quiz questions', priority: "1", test_id: 197489, custom_timeout: 30 do
       quiz = @last_quiz
 
       create_multiple_choice_question
@@ -59,7 +59,7 @@ describe 'quizzes question creation' do
       expect(questions[2]).to have_class('short_answer_question')
     end
 
-    it 'should not create an extra, blank, correct answer when [answer] is used as a placeholder', priority: "1", test_id: 197490 do
+    it 'does not create an extra, blank, correct answer when [answer] is used as a placeholder', priority: "1", test_id: 197490 do
       quiz = @last_quiz
 
       # be a multiple dropdown question
@@ -96,7 +96,7 @@ describe 'quizzes question creation' do
 
       # check to make sure extra answers were not generated
       expect(quiz.quiz_questions.first.question_data['answers'].count).to eq 2
-      expect(quiz.quiz_questions.first.question_data['answers'].detect{|a| a['text'] == ''}).to be_nil
+      expect(quiz.quiz_questions.first.question_data['answers'].detect { |a| a['text'] == '' }).to be_nil
     end
 
     it 'respects character limits on short answer questions', priority: "2", test_id: 197493 do
@@ -113,7 +113,6 @@ describe 'quizzes question creation' do
         expect(alert.text).to eq 'Answers for fill in the blank questions must be under 80 characters long'
       end
     end
-
 
     it 'respects character limits on short answer questions- MFIB', priority: "2", test_id: 1160451 do
       skip('Skipping this as there is already an existing bug CNVS-27665 for this')
@@ -145,7 +144,6 @@ describe 'quizzes question creation' do
     #  This is a function written to capture common code used
     #  in MFIB and FIB case for checking number of characters are <80 in answers
     def trigger_max_characters_alert(web_element)
-
       short_answer_field = lambda do
         replace_content(web_element, 'a' * 100)
         web_element.send_keys(:tab)
@@ -163,7 +161,7 @@ describe 'quizzes question creation' do
       quiz_with_new_questions(false)
     end
 
-    it 'should show errors for graded quizzes', priority: "1", test_id: 197491 do
+    it 'shows errors for graded quizzes', priority: "1", test_id: 197491 do
       open_quiz_edit_form
       click_questions_tab
       edit_first_question
@@ -172,7 +170,7 @@ describe 'quizzes question creation' do
       expect(error_displayed?).to be_truthy
     end
 
-    it 'should not show errors for surveys', priority: "1", test_id: 197491 do
+    it 'does not show errors for surveys', priority: "1", test_id: 197491 do
       @quiz.update_attribute :quiz_type, "graded_survey"
       open_quiz_edit_form
       click_questions_tab

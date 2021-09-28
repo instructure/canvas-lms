@@ -28,8 +28,9 @@ class StreamItem < ActiveRecord::Base
   has_many :users, :through => :stream_item_instances
   belongs_to :context, polymorphic: [:course, :account, :group, :assignment_override, :assignment]
   belongs_to :asset, polymorphic: [
-      :collaboration, :conversation, :discussion_entry,
-      :discussion_topic, :message, :submission, :web_conference, :assessment_request]
+    :collaboration, :conversation, :discussion_entry,
+    :discussion_topic, :message, :submission, :web_conference, :assessment_request
+  ]
   validates_presence_of :asset_type, :data
 
   after_destroy :destroy_stream_item_instances
@@ -49,6 +50,7 @@ class StreamItem < ActiveRecord::Base
 
   def self.reconstitute_ar_object(type, data)
     return nil unless data
+
     data = data.instance_variable_get(:@table) if data.is_a?(OpenObject)
     data = data.with_indifferent_access
     type = data['type'] || type
@@ -127,7 +129,7 @@ class StreamItem < ActiveRecord::Base
     # most active posters in the conversation, but we'll just leave it at "9
     # Participants" for now when the count is > 8.
     if res['participant_count'] <= 8
-      res['participants'] = conversation.participants.map{ |u| prepare_user(u) }
+      res['participants'] = conversation.participants.map { |u| prepare_user(u) }
     end
 
     messages = conversation.conversation_messages.human.order(:created_at => :desc).limit(LATEST_ENTRY_LIMIT).to_a.reverse
@@ -144,9 +146,10 @@ class StreamItem < ActiveRecord::Base
     res
   end
 
-  def regenerate!(obj=nil)
+  def regenerate!(obj = nil)
     obj ||= asset
     return nil if self.asset_type == 'Message' && self.asset_id.nil?
+
     if !obj || (obj.respond_to?(:workflow_state) && obj.workflow_state == 'deleted')
       self.destroy
       return nil
@@ -207,10 +210,10 @@ class StreamItem < ActiveRecord::Base
       res[:course_id] = object.context.id
     when Collaboration
       res = object.attributes
-      res['users'] = object.users.map{|u| prepare_user(u)}
+      res['users'] = object.users.map { |u| prepare_user(u) }
     when WebConference
       res = object.attributes
-      res['users'] = object.users.map{|u| prepare_user(u)}
+      res['users'] = object.users.map { |u| prepare_user(u) }
     when AssessmentRequest
       res = object.attributes
     else
@@ -272,8 +275,8 @@ class StreamItem < ActiveRecord::Base
 
     l_context_type = res.context_type
     Shard.partition_by_shard(user_ids) do |user_ids_subset|
-      #these need to be determined per shard
-      #hence the local caching inside the partition block
+      # these need to be determined per shard
+      # hence the local caching inside the partition block
       l_context_id = res.context_id
       stream_item_id = res.id
 
@@ -281,7 +284,6 @@ class StreamItem < ActiveRecord::Base
       user_ids_subset.sort!
 
       user_ids_subset.each_slice(500) do |sliced_user_ids|
-
         inserts = sliced_user_ids.map do |user_id|
           {
             :stream_item_id => stream_item_id,
@@ -294,7 +296,7 @@ class StreamItem < ActiveRecord::Base
         end
         if object.is_a?(Submission) && !object.posted?
           # set the hidden flag if this submission is not posted
-          if (owner_insert = inserts.detect{|i| i[:user_id] == object.user_id})
+          if (owner_insert = inserts.detect { |i| i[:user_id] == object.user_id })
             owner_insert[:hidden] = true
           end
         end
@@ -304,7 +306,7 @@ class StreamItem < ActiveRecord::Base
           StreamItemInstance.bulk_insert(inserts)
         end
 
-        #reset caches manually because the observer wont trigger off of the above mass inserts
+        # reset caches manually because the observer wont trigger off of the above mass inserts
         sliced_user_ids.each do |user_id|
           StreamItemCache.invalidate_recent_stream_items(user_id, l_context_type, l_context_id)
         end
@@ -334,10 +336,10 @@ class StreamItem < ActiveRecord::Base
 
   def self.prepare_object_for_unread(object)
     case object
-      when DiscussionEntry
-        ActiveRecord::Associations::Preloader.new.preload(object, :discussion_entry_participants)
-      when DiscussionTopic
-        ActiveRecord::Associations::Preloader.new.preload(object, :discussion_topic_participants)
+    when DiscussionEntry
+      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_entry_participants)
+    when DiscussionTopic
+      ActiveRecord::Associations::Preloader.new.preload(object, :discussion_topic_participants)
     end
   end
 
@@ -373,9 +375,9 @@ class StreamItem < ActiveRecord::Base
     user_ids = Set.new
     count = 0
 
-    scope = where("updated_at<?", before_date).
-        preload(:context).
-        limit(1000)
+    scope = where("updated_at<?", before_date)
+            .preload(:context)
+            .limit(1000)
     scope = scope.preload(:stream_item_instances) if touch_users
 
     while true
@@ -462,7 +464,7 @@ class StreamItem < ActiveRecord::Base
       end
     when Conversation
       if res.latest_messages_from_stream_item
-        res.latest_messages_from_stream_item.select!{|m| m["participating_user_ids"].include?(viewing_user_id)}
+        res.latest_messages_from_stream_item.select! { |m| m["participating_user_ids"].include?(viewing_user_id) }
       end
     end
 
@@ -470,12 +472,13 @@ class StreamItem < ActiveRecord::Base
   end
 
   public
+
   def destroy_stream_item_instances
     self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
-        StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY).
-          invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
+        StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY)
+                       .invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       end

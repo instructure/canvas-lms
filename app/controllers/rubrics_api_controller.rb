@@ -276,6 +276,7 @@ class RubricsApiController < ApplicationController
 
   def index
     return unless authorized_action(@context, @current_user, :manage_rubrics)
+
     rubrics = Api.paginate(@context.rubrics.active, self, rubric_pagination_url)
     render json: rubrics_json(rubrics, @current_user, session) unless performed?
   end
@@ -292,15 +293,15 @@ class RubricsApiController < ApplicationController
     return unless authorized_action(@context, @current_user, :manage_rubrics)
 
     rubric = @context.rubric_associations.bookmarked.find_by(rubric_id: params[:id])&.rubric
-    return render json: {message: "Rubric not found"}, status: :not_found unless rubric.present? && !rubric.deleted?
+    return render json: { message: "Rubric not found" }, status: :not_found unless rubric.present? && !rubric.deleted?
 
     if !@context.errors.present?
       assessments = rubric_assessments(rubric)
       associations = rubric_associations(rubric)
       render json: rubric_json(rubric, @current_user, session,
-             assessments: assessments,
-             associations: associations,
-             style: params[:style])
+                               assessments: assessments,
+                               associations: associations,
+                               style: params[:style])
     else
       render json: @context.errors, status: :bad_request
     end
@@ -356,7 +357,7 @@ class RubricsApiController < ApplicationController
       end
     end
 
-    errs.each{|key, msg| @context.errors.add(key, msg, att_name: key)}
+    errs.each { |key, msg| @context.errors.add(key, msg, att_name: key) }
   end
 
   def validate_inclusion_category(category_items, errs, name)
@@ -373,4 +374,3 @@ class RubricsApiController < ApplicationController
     @api_includes ||= Array(params[:include])
   end
 end
-

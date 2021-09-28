@@ -36,7 +36,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
-      it "should render the content export link" do
+      it "renders the content export link" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/content_exports")
       end
@@ -44,7 +44,7 @@ describe 'content_export_finished' do
 
     context ".email.html" do
       let(:path_type) { :summary }
-      it "should render the content export link" do
+      it "renders the content export link" do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/content_exports")
       end
@@ -60,7 +60,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
-      it 'should render the epub export link' do
+      it 'renders the epub export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include('/epub_exports')
       end
@@ -68,7 +68,7 @@ describe 'content_export_finished' do
 
     context ".summary" do
       let(:path_type) { :summary }
-      it 'should render the epub export link' do
+      it 'renders the epub export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include('/epub_exports')
       end
@@ -84,7 +84,7 @@ describe 'content_export_finished' do
 
     context ".email" do
       let(:path_type) { :email }
-      it 'should render the web zip export link' do
+      it 'renders the web zip export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/offline_web_exports")
       end
@@ -92,7 +92,7 @@ describe 'content_export_finished' do
 
     context ".summary" do
       let(:path_type) { :summary }
-      it 'should render the web zip export link' do
+      it 'renders the web zip export link' do
         message = generate_message(notification_name, path_type, asset)
         expect(message.body).to include("/courses/#{@course.id}/offline_web_exports")
       end

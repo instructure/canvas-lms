@@ -23,6 +23,6 @@ class AddIndexOnWikiPagesForPlanner < ActiveRecord::Migration[5.2]
 
   def change
     add_index :wiki_pages, [:wiki_id, :todo_date], where: "todo_date IS NOT NULL",
-              algorithm: :concurrently, if_not_exists: true
+                                                   algorithm: :concurrently, if_not_exists: true
   end
 end

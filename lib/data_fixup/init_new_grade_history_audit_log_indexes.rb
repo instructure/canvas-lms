@@ -20,7 +20,6 @@
 
 module DataFixup
   class InitNewGradeHistoryAuditLogIndexes
-
     def self.run
       new.build_indexes
     end
@@ -67,6 +66,7 @@ module DataFixup
       last_id = nil
       result = database.execute(SEARCH_CQL, starting_key, read_batch_size)
       return true, nil if result.rows == 0
+
       result.fetch do |row|
         last_id = row['id']
         INDEX_METHODS.each do |method|
@@ -87,6 +87,7 @@ module DataFixup
 
     def write_batch(batch)
       return if batch.empty?
+
       database.batch { batch.each { |r| r.index.strategy_for(:cassandra).insert(r.record, r.key) } }
     end
 

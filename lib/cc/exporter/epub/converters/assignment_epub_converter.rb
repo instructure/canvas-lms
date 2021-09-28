@@ -35,12 +35,13 @@ module CC::Exporter::Epub::Converters
 
         assignment = assignment_data(meta_node, html_node)
         next unless include_item?(meta_node)
+
         assignments << assignment
       end
       assignments
     end
 
-    def assignment_data(meta_doc, html_doc=nil)
+    def assignment_data(meta_doc, html_doc = nil)
       assignment = {}
       if html_doc
         _title, body = get_html_title_and_body(html_doc)
@@ -69,7 +70,8 @@ module CC::Exporter::Epub::Converters
 
     def submission_types(types)
       return [] unless types.present?
-      types.split(",").map{|sub_type| CartridgeConverter::SUBMISSION_TYPES[sub_type]}
+
+      types.split(",").map { |sub_type| CartridgeConverter::SUBMISSION_TYPES[sub_type] }
     end
   end
 end

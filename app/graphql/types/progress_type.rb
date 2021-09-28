@@ -66,6 +66,6 @@ module Types
 
     field :state, ProgressStateType, method: :workflow_state, null: false
 
-    field :message, String, "details about the job", null:  true
+    field :message, String, "details about the job", null: true
   end
 end

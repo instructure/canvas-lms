@@ -22,7 +22,7 @@ require 'spec_helper'
 describe MicrosoftSync::GraphService do
   include WebMock::API
 
-  def json_response(status, body, extra_headers={})
+  def json_response(status, body, extra_headers = {})
     {
       status: status,
       body: body.to_json,
@@ -76,7 +76,7 @@ describe MicrosoftSync::GraphService do
 
   ###### SHARED CODE
 
-  shared_examples_for 'a graph service endpoint' do |opts={}|
+  shared_examples_for 'a graph service endpoint' do |opts = {}|
     let(:statsd_tags) do
       {
         msft_endpoint: "#{http_method}_#{url_path_prefix_for_statsd}",
@@ -87,7 +87,7 @@ describe MicrosoftSync::GraphService do
 
     unless opts[:ignore_404]
       context 'with a 404 status code' do
-        let(:response) { json_response(404, error: {message: 'uh-oh!'}) }
+        let(:response) { json_response(404, error: { message: 'uh-oh!' }) }
 
         it 'raises an HTTPNotFound error' do
           expect { subject }.to raise_error(
@@ -102,7 +102,7 @@ describe MicrosoftSync::GraphService do
 
     [400, 403, 409].each do |code|
       context "with a #{code} status code" do
-        let(:response) { json_response(code, error: {message: 'uh-oh!'}) }
+        let(:response) { json_response(code, error: { message: 'uh-oh!' }) }
 
         it 'raises an HTTPInvalidStatus with the code and message' do
           expect { subject }.to raise_error(
@@ -117,7 +117,7 @@ describe MicrosoftSync::GraphService do
 
     context 'with a 429 status code' do
       let(:response) do
-        json_response(429, {error: {message: 'uh-oh!'}}, 'Retry-After' => '2.128')
+        json_response(429, { error: { message: 'uh-oh!' } }, 'Retry-After' => '2.128')
       end
 
       it 'raises an HTTPTooManyRequests error and increments a "throttled" counter' do
@@ -151,9 +151,9 @@ describe MicrosoftSync::GraphService do
     context 'with a 401 tenant unauthorized error' do
       let(:response) do
         json_response(401, error: {
-          code: "Authorization_IdentityNotFound",
-          message: "The identity of the calling application could not be established."
-        })
+                        code: "Authorization_IdentityNotFound",
+                        message: "The identity of the calling application could not be established."
+                      })
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
@@ -170,9 +170,9 @@ describe MicrosoftSync::GraphService do
     context 'with a 403 tenant unauthorized error' do
       let(:response) do
         json_response(403, error: {
-          code: "AccessDenied",
-          message: "Required roles claim values are not provided."
-        })
+                        code: "AccessDenied",
+                        message: "Required roles claim values are not provided."
+                      })
       end
 
       it 'raises an ApplicationNotAuthorizedForTenant error' do
@@ -211,8 +211,8 @@ describe MicrosoftSync::GraphService do
     subject { service.send(method_name, *method_args) }
 
     let(:http_method) { :get }
-    let(:expected_first_page_results) { [{'id' => 'page_item1'}] }
-    let(:response_body) { {'value' => expected_first_page_results } }
+    let(:expected_first_page_results) { [{ 'id' => 'page_item1' }] }
+    let(:response_body) { { 'value' => expected_first_page_results } }
 
     it_behaves_like 'a graph service endpoint'
 
@@ -222,9 +222,9 @@ describe MicrosoftSync::GraphService do
       end
 
       context 'when a filter is used' do
-        subject { service.send(method_name, *method_args, filter: {'abc' => "d'ef"}) }
+        subject { service.send(method_name, *method_args, filter: { 'abc' => "d'ef" }) }
 
-        let(:with_params) { {query: {'$filter' => "abc eq 'd''ef'" }} }
+        let(:with_params) { { query: { '$filter' => "abc eq 'd''ef'" } } }
 
         it { is_expected.to eq(expected_first_page_results) }
       end
@@ -233,7 +233,7 @@ describe MicrosoftSync::GraphService do
         subject do
           service.send(
             method_name, *method_args,
-            filter: {userPrincipalName: %w[user1@domain.com user2@domain.com]},
+            filter: { userPrincipalName: %w[user1@domain.com user2@domain.com] },
             select: %w[id userPrincipalName]
           )
         end
@@ -267,40 +267,40 @@ describe MicrosoftSync::GraphService do
       before do
         page2_response = {
           '@odata.nextLink' => 'https://graph.microsoft.com/continued2',
-          'value' => [{'id' => 'page2_item'}]
+          'value' => [{ 'id' => 'page2_item' }]
         }
-        page3_response = {'value' => [{'id' => 'page3_item'}]}
-        WebMock.stub_request(:get, 'https://graph.microsoft.com/continued1').
-          and_return(json_response(200, page2_response))
-        WebMock.stub_request(:get, 'https://graph.microsoft.com/continued2').
-          and_return(json_response(200, page3_response))
+        page3_response = { 'value' => [{ 'id' => 'page3_item' }] }
+        WebMock.stub_request(:get, 'https://graph.microsoft.com/continued1')
+               .and_return(json_response(200, page2_response))
+        WebMock.stub_request(:get, 'https://graph.microsoft.com/continued2')
+               .and_return(json_response(200, page3_response))
       end
 
       it 'calls the block for the results for each page' do
         expect(all_pages).to eq([
-          expected_first_page_results, [{'id' => 'page2_item'}], [{'id' => 'page3_item'}]
-        ])
+                                  expected_first_page_results, [{ 'id' => 'page2_item' }], [{ 'id' => 'page3_item' }]
+                                ])
       end
 
       context 'when a filter and select are used' do
-        let(:method_args) { super() + [filter: {id: 'abc'}, select: %w[def ghi]] }
-        let(:with_params) { {query: {'$filter' => "id eq 'abc'", '$select' => 'def,ghi'}} }
+        let(:method_args) { super() + [filter: { id: 'abc' }, select: %w[def ghi]] }
+        let(:with_params) { { query: { '$filter' => "id eq 'abc'", '$select' => 'def,ghi' } } }
 
         it 'uses the filter and select in the first request' do
           expect(all_pages).to eq([
-            expected_first_page_results, [{'id' => 'page2_item'}], [{'id' => 'page3_item'}]
-          ])
+                                    expected_first_page_results, [{ 'id' => 'page2_item' }], [{ 'id' => 'page3_item' }]
+                                  ])
         end
       end
 
       context 'when top is used' do
         let(:method_args) { super() + [top: 999] }
-        let(:with_params) { {query: {'$top' => 999}} }
+        let(:with_params) { { query: { '$top' => 999 } } }
 
         it 'uses the $top parameter in the first request' do
           expect(all_pages).to eq([
-            expected_first_page_results, [{'id' => 'page2_item'}], [{'id' => 'page3_item'}]
-          ])
+                                    expected_first_page_results, [{ 'id' => 'page2_item' }], [{ 'id' => 'page3_item' }]
+                                  ])
         end
       end
     end
@@ -318,20 +318,20 @@ describe MicrosoftSync::GraphService do
   # Shared helpers/examples for batching
 
   def succ(id)
-    {id: id, status: 204, body: nil}
+    { id: id, status: 204, body: nil }
   end
 
   def err(id)
-    {id: id, status: 400, body: "bad"}
+    { id: id, status: 400, body: "bad" }
   end
 
   def err2(id)
-    {id: id, status: 500, body: "bad2"}
+    { id: id, status: 500, body: "bad2" }
   end
 
-  def throttled(id, retry_after=nil)
-    resp = {id: id, status: 429, body: "badthrottled"}
-    resp[:headers] = {'Retry-After' => retry_after.to_s} if retry_after
+  def throttled(id, retry_after = nil)
+    resp = { id: id, status: 429, body: "badthrottled" }
+    resp[:headers] = { 'Retry-After' => retry_after.to_s } if retry_after
     resp
   end
 
@@ -469,7 +469,7 @@ describe MicrosoftSync::GraphService do
       let(:response) do
         {
           status: 400,
-          body:  "{\"error\":{\"code\":\"Request_UnsupportedQuery\",\"message\":\"Property 'extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType' does not exist as a declared property or extension property.\"}"
+          body: "{\"error\":{\"code\":\"Request_UnsupportedQuery\",\"message\":\"Property 'extension_fe2174665583431c953114ff7268b7b3_Education_ObjectType' does not exist as a declared property or extension property.\"}"
         }
       end
 
@@ -488,8 +488,8 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :post }
     let(:url) { 'https://graph.microsoft.com/v1.0/education/classes' }
-    let(:with_params) { {body: {abc: 123}} }
-    let(:response_body) { {'id' => 'newclass', 'val' => 'etc'} }
+    let(:with_params) { { body: { abc: 123 } } }
+    let(:response_body) { { 'id' => 'newclass', 'val' => 'etc' } }
 
     it { is_expected.to eq(response_body) }
 
@@ -498,12 +498,12 @@ describe MicrosoftSync::GraphService do
   end
 
   describe '#update_group' do
-    subject { service.update_group('msgroupid', abc: {def: 'ghi'}) }
+    subject { service.update_group('msgroupid', abc: { def: 'ghi' }) }
 
     let(:http_method) { :patch }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
-    let(:with_params) { {body: {abc: {def: 'ghi'}}} }
-    let(:response) { {status: 204, body: ''} }
+    let(:with_params) { { body: { abc: { def: 'ghi' } } } }
+    let(:response) { { status: 204, body: '' } }
 
     it { is_expected.to eq(nil) }
 
@@ -523,7 +523,7 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :patch }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
-    let(:with_params) { {body: req_body} }
+    let(:with_params) { { body: req_body } }
     let(:req_body) do
       {
         'members@odata.bind' => %w[
@@ -536,7 +536,7 @@ describe MicrosoftSync::GraphService do
         ]
       }
     end
-    let(:response) { {status: 204, body: ''} }
+    let(:response) { { status: 204, body: '' } }
 
     it_behaves_like 'a graph service endpoint'
 
@@ -571,7 +571,7 @@ describe MicrosoftSync::GraphService do
       let(:req_body) do
         {
           'members@odata.bind' =>
-            (1..20).map{|i| "https://graph.microsoft.com/v1.0/directoryObjects/#{i}"}
+            (1..20).map { |i| "https://graph.microsoft.com/v1.0/directoryObjects/#{i}" }
         }
       end
 
@@ -594,7 +594,7 @@ describe MicrosoftSync::GraphService do
     end
 
     context 'when using JSON batching because some users already exist' do
-      let(:response) { {status: 400, body: 'One or more added object references already exist'} }
+      let(:response) { { status: 400, body: 'One or more added object references already exist' } }
       let(:batch_overall_response_code) { 200 }
       let(:batch_url) { 'https://graph.microsoft.com/v1.0/$batch' }
       let(:batch_method) { :post }
@@ -627,12 +627,12 @@ describe MicrosoftSync::GraphService do
 
       def dupe(id)
         err_msg = "One or more added object references already exist for the following modified properties: 'members'."
-        {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: err_msg}}}
+        { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: err_msg } } }
       end
 
       before do
         stub_request(batch_method, batch_url).with(body: batch_body)
-          .to_return(json_response(batch_overall_response_code, responses: batch_responses))
+                                             .to_return(json_response(batch_overall_response_code, responses: batch_responses))
       end
 
       context 'when all are successfully added' do
@@ -698,7 +698,7 @@ describe MicrosoftSync::GraphService do
 
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/groups/msgroupid' }
-    let(:response_body) { {'abc' => 'def'} }
+    let(:response_body) { { 'abc' => 'def' } }
 
     it { is_expected.to eq(response_body) }
 
@@ -708,7 +708,7 @@ describe MicrosoftSync::GraphService do
     context 'when certain fields are selected' do
       subject { service.get_group('msgroupid', select: %w[abc d e]) }
 
-      let(:with_params) { {query: {'$select' => 'abc,d,e' }} }
+      let(:with_params) { { query: { '$select' => 'abc,d,e' } } }
 
       it { is_expected.to eq(response_body) }
     end
@@ -754,7 +754,7 @@ describe MicrosoftSync::GraphService do
         }
       }
     end
-    let(:response_body) { {responses: batch_responses} }
+    let(:response_body) { { responses: batch_responses } }
     let(:batch_responses) { [] }
     let(:status) { batch_overall_response_code }
     let(:batch_overall_response_code) { 200 }
@@ -762,19 +762,19 @@ describe MicrosoftSync::GraphService do
     def missing(id)
       err_msg = "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of " \
         "its queried reference-property objects are not present."
-      {id: id, status: 404, body: {error: {code: "Request_ResourceNotFound", msg: err_msg}}}
+      { id: id, status: 404, body: { error: { code: "Request_ResourceNotFound", msg: err_msg } } }
     end
 
     # This style seems to happen if we remove with the API after (right after?) removing from the UI
     def missing2(id)
       msg = "One or more removed object references do not exist for the following " \
             "modified properties: 'members'."
-      {id: id, status: 400, body: {error: {code:"Request_BadRequest", message: msg}}}
+      { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: msg } } }
     end
 
     def last_owner_removed(id)
       msg = "The group must have at least one owner, hence this owner cannot be removed."
-      {id: id, status: 400, body: {error: {code: "Request_BadRequest", message: msg}}}
+      { id: id, status: 400, body: { error: { code: "Request_BadRequest", message: msg } } }
     end
 
     context 'when all are successfully removed' do
@@ -857,7 +857,6 @@ describe MicrosoftSync::GraphService do
       let(:endpoint_name) { 'group_remove_users' }
       let(:ignored_members_m1_response) { missing('members_m1') }
     end
-
   end
 
   describe '#team_exists?' do
@@ -866,7 +865,7 @@ describe MicrosoftSync::GraphService do
     let(:http_method) { :get }
     let(:url) { 'https://graph.microsoft.com/v1.0/teams/mygroupid' }
     let(:url_variables) { ['mygroupid'] }
-    let(:response_body) { {'foo' => 'bar'} }
+    let(:response_body) { { 'foo' => 'bar' } }
 
     it_behaves_like 'a graph service endpoint', ignore_404: true
 
@@ -875,7 +874,7 @@ describe MicrosoftSync::GraphService do
     end
 
     context "when the team doesn't exist" do
-      let(:response) { json_response(404, error: {code: 'NotFound', message: 'Does not exist'}) }
+      let(:response) { json_response(404, error: { code: 'NotFound', message: 'Does not exist' }) }
 
       it { is_expected.to eq(false) }
 
@@ -902,8 +901,8 @@ describe MicrosoftSync::GraphService do
         "group@odata.bind" => "https://graph.microsoft.com/v1.0/groups('Evan''s group id')"
       }
     end
-    let(:with_params) { {body: req_body} }
-    let(:response) { {status: 204, body: ''} }
+    let(:with_params) { { body: req_body } }
+    let(:response) { { status: 204, body: '' } }
 
     it { is_expected.to eq(nil) }
 

@@ -49,13 +49,16 @@ module ContextModuleItem
     preferred_id = preferred_id[Api::ID_REGEX] if preferred_id.is_a?(String)
     objs_to_search.each do |obj|
       next unless obj.present?
+
       tag = obj.context_module_tags.where(:id => preferred_id).first
       return tag if tag
     end
     objs_to_search.each do |obj|
       next unless obj.present?
+
       tags = obj.context_module_tags.to_a
       return nil if tags.size > 1
+
       tag = tags.first
       return tag if tag
     end

@@ -51,47 +51,47 @@ module DifferentiatedAssignments
 
     private
 
-      def initialize_assignees(assignees)
-        @assignees = Array(assignees)
-        validate_self
+    def initialize_assignees(assignees)
+      @assignees = Array(assignees)
+      validate_self
+    end
+
+    def validate_self
+      raise ArgumentError, 'Invalid homework assignee!' unless validate_assignees
+    end
+
+    def validate_assignees
+      (DifferentiatedAssignments::HomeworkAssignee::ASSIGNEES & self.assignees).empty?
+    end
+
+    def assign_to(assignee)
+      users = DifferentiatedAssignments::Users
+      super(user: users.student(assignee)) if HomeworkAssignee::Student::ALL.include? assignee
+      super(section: users.section(assignee)) if HomeworkAssignee::Section::ALL.include? assignee
+      super(group: users.group(assignee)) if HomeworkAssignee::Group::ALL.include? assignee
+    end
+
+    def organize_by_type(type)
+      grouped_type = assignees_by_type(type)
+
+      if grouped_type.size > 1
+        # turn into an array of the specific type assignees, e.g. ["1", "2", "3"]
+        grouped_type_list = remove_word_from_array_items(grouped_type, type)
+
+        # pluralize the type and make a list of the specific type
+        "#{type}s #{grouped_type_list.to_sentence}"
+      else
+        grouped_type.to_sentence
       end
+    end
 
-      def validate_self
-        raise ArgumentError, 'Invalid homework assignee!' unless validate_assignees
-      end
+    def remove_word_from_array_items(an_array, word)
+      an_array.map { |item| item.sub(word, '').strip }
+    end
 
-      def validate_assignees
-        (DifferentiatedAssignments::HomeworkAssignee::ASSIGNEES & self.assignees).empty?
-      end
-
-      def assign_to(assignee)
-        users = DifferentiatedAssignments::Users
-        super(user: users.student(assignee)) if HomeworkAssignee::Student::ALL.include? assignee
-        super(section: users.section(assignee)) if HomeworkAssignee::Section::ALL.include? assignee
-        super(group: users.group(assignee)) if HomeworkAssignee::Group::ALL.include? assignee
-      end
-
-      def organize_by_type(type)
-        grouped_type = assignees_by_type(type)
-
-        if grouped_type.size > 1
-          # turn into an array of the specific type assignees, e.g. ["1", "2", "3"]
-          grouped_type_list = remove_word_from_array_items(grouped_type, type)
-
-          # pluralize the type and make a list of the specific type
-          "#{type}s #{grouped_type_list.to_sentence}"
-        else
-          grouped_type.to_sentence
-        end
-      end
-
-      def remove_word_from_array_items(an_array, word)
-        an_array.map { |item| item.sub(word, '').strip }
-      end
-
-      def assignees_by_type(type)
-        self.assignees.select { |a| a.include? type }
-                      .sort
-      end
+    def assignees_by_type(type)
+      self.assignees.select { |a| a.include? type }
+          .sort
+    end
   end
 end

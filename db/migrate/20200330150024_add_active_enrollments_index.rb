@@ -6,6 +6,6 @@ class AddActiveEnrollmentsIndex < ActiveRecord::Migration[5.2]
 
   def change
     add_index :enrollments, [:course_id], where: "workflow_state = 'active'",
-      name: "index_enrollments_on_course_when_active", algorithm: :concurrently
+                                          name: "index_enrollments_on_course_when_active", algorithm: :concurrently
   end
 end

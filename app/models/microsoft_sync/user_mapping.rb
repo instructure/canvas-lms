@@ -144,7 +144,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
     # We only need one job deleting UserMappings, so we can drop all other jobs
     # for the same root account that try to start up.
     self.delay_if_production(singleton: "microsoft_sync_delete_old_user_mappings_account_#{account.global_id}")
-      .delete_user_mappings_for_account(account, batch_size)
+        .delete_user_mappings_for_account(account, batch_size)
   end
 
   def self.delete_user_mappings_for_account(account, batch_size)

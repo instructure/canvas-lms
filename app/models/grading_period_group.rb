@@ -41,7 +41,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
     given do |user|
       root_account &&
-      root_account.associated_user?(user)
+        root_account.associated_user?(user)
     end
     can :read
 
@@ -52,13 +52,14 @@ class GradingPeriodGroup < ActiveRecord::Base
 
     given do |user|
       root_account &&
-      root_account.grants_right?(user, :manage)
+        root_account.grants_right?(user, :manage)
     end
     can :create
   end
 
   def self.for(account)
     raise ArgumentError.new("argument is not an Account") unless account.is_a?(Account)
+
     root_account = account.root_account? ? account : account.root_account
     root_account.grading_period_groups.active
   end
@@ -92,7 +93,7 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   if Rails.env.production?
     handle_asynchronously :recompute_course_scores,
-      singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
+                          singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
   end
 
   def weighted_actually_changed?
@@ -123,8 +124,8 @@ class GradingPeriodGroup < ActiveRecord::Base
   def cleanup_associations_and_recompute_scores_later(updating_user: nil)
     root_account_id = course_id ? course.root_account.global_id : root_account.global_id
     delay_if_production(strand: "GradingPeriodGroup#cleanup_associations_and_recompute_scores:Account#{root_account_id}",
-        priority: Delayed::LOW_PRIORITY).
-      cleanup_associations_and_recompute_scores(updating_user: updating_user)
+                        priority: Delayed::LOW_PRIORITY)
+      .cleanup_associations_and_recompute_scores(updating_user: updating_user)
   end
 
   def cleanup_associations_and_recompute_scores(updating_user: nil)

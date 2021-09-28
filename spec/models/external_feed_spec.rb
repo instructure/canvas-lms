@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe ExternalFeed do
-  it "should add rss entries" do
+  it "adds rss entries" do
     @feed = external_feed_model
     require 'rss/1.0'
     require 'rss/2.0'
@@ -29,7 +29,7 @@ describe ExternalFeed do
     res = @feed.add_rss_entries(rss)
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
-    expect(res.all?{|r| r.valid?}).to be_truthy
+    expect(res.all? { |r| r.valid? }).to be_truthy
     expect(res[0].title).to eql("Star City")
     expect(res[1].title).to eql("Space Exploration")
     expect(res[2].title).to eql("The Engine That Does More")
@@ -103,7 +103,7 @@ describe ExternalFeed do
     expect(@feed.inactive?).to be(true)
   end
 
-  it "should add rss entries as course announcements" do
+  it "adds rss entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'rss/1.0'
@@ -113,14 +113,14 @@ describe ExternalFeed do
     expect(res).not_to be_nil
     expect(res.length).to eql(4)
     expect(@course.announcements.count).to eql(4)
-    expect(res.map{|i| i.asset} - @course.announcements).to be_empty
+    expect(res.map { |i| i.asset } - @course.announcements).to be_empty
 
     # don't create duplicates
     @feed.add_rss_entries(rss)
     expect(@course.announcements.count).to eql(4)
   end
 
-  it "should add atom entries" do
+  it "adds atom entries" do
     @feed = external_feed_model
     require 'atom'
     atom = Atom::Feed.load_feed atom_example
@@ -131,7 +131,7 @@ describe ExternalFeed do
     expect(res[0].title).to eql("Atom-Powered Robots Run Amok")
   end
 
-  it "should add atom entries as course announcements" do
+  it "adds atom entries as course announcements" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'atom'
@@ -144,7 +144,7 @@ describe ExternalFeed do
     expect(res[0].asset).to eql(@course.announcements.first)
   end
 
-  it "should allow deleting" do
+  it "allows deleting" do
     @course = course_model
     @feed = external_feed_model(:context => @course)
     require 'rss/1.0'
@@ -161,7 +161,7 @@ describe ExternalFeed do
 end
 
 def atom_example
-%{<?xml version="1.0" encoding="utf-8"?>
+  %{<?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
  <title>Example Feed</title>
@@ -187,7 +187,7 @@ def atom_example
 end
 
 def rss_example
-%{<?xml version="1.0"?>
+  %{<?xml version="1.0"?>
 <rss version="2.0">
   <channel>
     <title>Lift Off News</title>

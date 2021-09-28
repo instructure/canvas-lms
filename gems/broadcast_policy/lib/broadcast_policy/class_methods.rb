@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module BroadcastPolicy
-  module ClassMethods #:nodoc:
+  module ClassMethods # :nodoc:
     def has_a_broadcast_policy
       extend BroadcastPolicy::SingletonMethods
       include BroadcastPolicy::InstanceMethods

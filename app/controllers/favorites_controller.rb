@@ -44,7 +44,6 @@
 #     }
 #
 class FavoritesController < ApplicationController
-
   before_action :require_user
   before_action :check_defaults, :only => [:remove_favorite_course]
   after_action :touch_user, :only => [:add_favorite_course, :remove_favorite_course, :reset_course_favorites]
@@ -74,11 +73,11 @@ class FavoritesController < ApplicationController
     courses = @current_user.menu_courses
     if courses.any? && value_to_boolean(params[:exclude_blueprint_courses])
       mc_ids = MasterCourses::MasterTemplate.active.where(:course_id => courses).pluck(:course_id)
-      courses.reject!{|c| mc_ids.include?(c.id)}
+      courses.reject! { |c| mc_ids.include?(c.id) }
     end
 
     if params[:sort] == "nickname"
-      courses.sort_by!{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.nickname_for(@current_user))] }
+      courses.sort_by! { |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.nickname_for(@current_user))] }
     end
 
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, [:read_sis, :manage_sis])
@@ -87,13 +86,13 @@ class FavoritesController < ApplicationController
       unless Array(params[:exclude]).include?('enrollments')
         enrollments = course.current_enrollments.where(:user_id => @current_user).to_a
         if includes.include?('observed_users') &&
-            enrollments.any?(&:assigned_observer?)
+           enrollments.any?(&:assigned_observer?)
           enrollments.concat(ObserverEnrollment.observed_enrollments_for_courses(course, @current_user))
         end
       end
 
       course_json(course, @current_user, session, includes, enrollments,
-        precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
+                  precalculated_permissions: all_precalculated_permissions&.dig(course.global_id))
     }
   end
 
@@ -115,11 +114,12 @@ class FavoritesController < ApplicationController
       fave_group_memberships = @current_user.groups.active.shard(@current_user).where(id: @current_user.favorite_context_ids("Group"))
     end
     if fave_group_memberships.any?
-      render :json => fave_group_memberships.map{ |g| group_json(g, @current_user,session)}
+      render :json => fave_group_memberships.map { |g| group_json(g, @current_user, session) }
     else
-      render :json => @current_user.groups.active.shard(@current_user).map{ |g| group_json(g, @current_user,session)}
+      render :json => @current_user.groups.active.shard(@current_user).map { |g| group_json(g, @current_user, session) }
     end
   end
+
   # @API Add course to favorites
   # Add a course to the current user's favorites.  If the course is already
   # in the user's favorites, nothing happens. Canvas for Elementary subject
@@ -240,7 +240,6 @@ class FavoritesController < ApplicationController
     end
   end
 
-
   # @API Reset course favorites
   # Reset the current user's course favorites to the default
   # automatically generated list of enrolled courses
@@ -292,5 +291,4 @@ class FavoritesController < ApplicationController
     # Menu is cached, clear it
     @current_user.touch
   end
-
 end

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module KalturaHelper
-
   def append_sis_data(js_hash)
     if CanvasKaltura::ClientV3.config && CanvasKaltura::ClientV3.config['kaltura_sis'].present? && CanvasKaltura::ClientV3.config['kaltura_sis'] == "1" && @current_user
       pseudonym = @context ? SisPseudonym.for(@current_user, @context) : @current_user.primary_pseudonym
@@ -26,5 +25,4 @@ module KalturaHelper
       js_hash[:SIS_USER_ID] = pseudonym.sis_user_id if (pseudonym && pseudonym.sis_user_id)
     end
   end
-
 end

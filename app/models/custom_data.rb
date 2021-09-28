@@ -23,7 +23,7 @@ class CustomData < ActiveRecord::Base
     attr_accessor :conflict_scope, :type_at_conflict, :value_at_conflict
 
     def initialize(opts = {})
-      opts.each do |k,v|
+      opts.each do |k, v|
         instance_variable_set("@#{k}", v)
       end
       super 'write conflict for custom_data hash'
@@ -72,6 +72,7 @@ class CustomData < ActiveRecord::Base
     keys = scope.split('/')
     keys.inject(hash) do |hash, k|
       raise ArgumentError, 'invalid scope for hash' unless hash.is_a? Hash
+
       hash[k]
     end
   end
@@ -82,18 +83,19 @@ class CustomData < ActiveRecord::Base
 
     traverse = ->(hsh, key_idx) do
       return hsh if key_idx == keys.length
+
       k = keys[key_idx]
       h = hsh[k]
       if h.nil?
         hsh[k] = {}
       elsif !h.is_a? Hash
         raise WriteConflict.new({
-            conflict_scope: keys.slice(1..key_idx).join('/'),
-            type_at_conflict: h.class,
-            value_at_conflict: h
-        })
+                                  conflict_scope: keys.slice(1..key_idx).join('/'),
+                                  type_at_conflict: h.class,
+                                  value_at_conflict: h
+                                })
       end
-      traverse.call(hsh[k], key_idx+1)
+      traverse.call(hsh[k], key_idx + 1)
     end
 
     h = traverse.call(hash, 0)
@@ -108,10 +110,12 @@ class CustomData < ActiveRecord::Base
       k = keys.shift
       if keys.empty?
         raise ArgumentError, 'invalid scope for hash' unless hash.has_key? k
+
         hash.delete k
       else
         h = hash[k]
         raise ArgumentError, 'invalid scope for hash' if h.nil?
+
         ret = del_frd.call(h)
         hash.delete k if h.empty?
         ret

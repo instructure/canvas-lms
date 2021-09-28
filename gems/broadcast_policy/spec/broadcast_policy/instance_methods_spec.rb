@@ -20,7 +20,6 @@
 require_relative '../spec_helper'
 
 describe BroadcastPolicy::InstanceMethods do
-
   class Harness
     include BroadcastPolicy::InstanceMethods
     attr_accessor :attributes, :changed_attributes
@@ -67,7 +66,7 @@ describe BroadcastPolicy::InstanceMethods do
   end
 
   let(:harness) do
-    Harness.new.tap{|h| h.attributes = default_attrs}
+    Harness.new.tap { |h| h.attributes = default_attrs }
   end
 
   describe "#changed_in_state" do

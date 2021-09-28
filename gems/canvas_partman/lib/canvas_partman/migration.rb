@@ -56,7 +56,7 @@ module CanvasPartman
     end
 
     def find_partition_tables
-      return [ @partition_scope ] if @partition_scope
+      return [@partition_scope] if @partition_scope
 
       partition_manager.partition_tables
     end

@@ -36,5 +36,4 @@ shared_examples_for "Quizzes::QuizStatistics::Report" do
     expect(progress.completion).to eq 100
     expect(progress).to be_completed
   end
-
 end

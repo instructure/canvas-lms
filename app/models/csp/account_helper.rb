@@ -83,6 +83,7 @@ module Csp::AccountHelper
   def set_csp_locked!(value)
     csp_settings = self.settings[:csp_inherited_data].dup
     raise "csp not explicitly set" unless csp_settings
+
     csp_settings[:locked] = !!value
     self.settings[:csp_inherited_data] = csp_settings
     self.save!
@@ -162,10 +163,10 @@ module Csp::AccountHelper
     if config['attachment_specific_file_domain'] == 'true'
       separator = config['attachment_specific_file_domain_separator'] || '.'
       files_host = if separator != '.'
-        "*.#{files_host[files_host.index('.') + 1..-1]}"
-      else
-        "*.#{files_host}"
-      end
+                     "*.#{files_host[files_host.index('.') + 1..-1]}"
+                   else
+                     "*.#{files_host}"
+                   end
     end
     canvadocs_host = Canvadocs.enabled?.presence && URI.parse(Canvadocs.config['base_url']).host
     inst_fs_host = InstFS.enabled?.presence && URI.parse(InstFS.app_host).host

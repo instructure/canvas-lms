@@ -67,50 +67,51 @@ class Auditors::Authentication
 
     add_index :pseudonym do
       table :authentications_by_pseudonym
-      entry_proc lambda{ |record| record.pseudonym }
-      key_proc lambda{ |pseudonym| pseudonym.global_id }
+      entry_proc lambda { |record| record.pseudonym }
+      key_proc lambda { |pseudonym| pseudonym.global_id }
       ar_scope_proc lambda { |pseudonym| auth_ar_type.where(pseudonym_id: pseudonym.id) }
     end
 
     add_index :user do
       table :authentications_by_user
-      entry_proc lambda{ |record| record.user }
-      key_proc lambda{ |user| user.global_id }
+      entry_proc lambda { |record| record.user }
+      key_proc lambda { |user| user.global_id }
       ar_scope_proc lambda { |user| auth_ar_type.where(user_id: user.id) }
     end
 
     add_index :account do
       table :authentications_by_account
-      entry_proc lambda{ |record| record.account }
-      key_proc lambda{ |account| account.global_id }
+      entry_proc lambda { |record| record.account }
+      key_proc lambda { |account| account.global_id }
       ar_scope_proc lambda { |account| auth_ar_type.where(account_id: account.id) }
     end
   end
 
   def self.record(pseudonym, event_type)
     return unless pseudonym
+
     event_record = nil
     pseudonym.shard.activate do
       event_record = Auditors::Authentication::Record.generate(pseudonym, event_type)
-      Auditors::Authentication::Stream.insert(event_record, {backend_strategy: :cassandra}) if Audits.write_to_cassandra?
-      Auditors::Authentication::Stream.insert(event_record, {backend_strategy: :active_record}) if Audits.write_to_postgres?
+      Auditors::Authentication::Stream.insert(event_record, { backend_strategy: :cassandra }) if Audits.write_to_cassandra?
+      Auditors::Authentication::Stream.insert(event_record, { backend_strategy: :active_record }) if Audits.write_to_postgres?
     end
     event_record
   end
 
-  def self.for_account(account, options={})
+  def self.for_account(account, options = {})
     account.shard.activate do
       Auditors::Authentication::Stream.for_account(account, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_pseudonym(pseudonym, options={})
+  def self.for_pseudonym(pseudonym, options = {})
     pseudonym.shard.activate do
       Auditors::Authentication::Stream.for_pseudonym(pseudonym, Audits.read_stream_options(options))
     end
   end
 
-  def self.for_pseudonyms(pseudonyms, options={})
+  def self.for_pseudonyms(pseudonyms, options = {})
     # each for_pseudonym does a shard.activate, so this partition_by_shard is
     # not necessary for correctness. but it improves performance (prevents
     # shard-thrashing)
@@ -122,7 +123,7 @@ class Auditors::Authentication
     BookmarkedCollection.merge(*collections)
   end
 
-  def self.for_user(user, options={})
+  def self.for_user(user, options = {})
     collections = []
     dbs_seen = Set.new
     Shard.with_each_shard(user.associated_shards) do
@@ -130,6 +131,7 @@ class Auditors::Authentication
       # a database. if so, we only need to query from it once
       db_fingerprint = Auditors::Authentication::Stream.database_fingerprint
       next if dbs_seen.include?(db_fingerprint)
+
       dbs_seen << db_fingerprint
 
       # query from that database, and label it with the database server's id

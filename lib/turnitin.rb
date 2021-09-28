@@ -26,38 +26,40 @@ module Turnitin
     return 'acceptable' if similarity_score < 25
     return 'warning' if similarity_score < 50
     return 'problem' if similarity_score < 75
+
     'failure'
   end
 
   class Client
     attr_accessor :endpoint, :account_id, :shared_secret, :host, :testing
 
-    def initialize(account_id, shared_secret, host=nil, testing=false)
+    def initialize(account_id, shared_secret, host = nil, testing = false)
       @host = host || "api.turnitin.com"
       @endpoint = "/api.asp"
       raise "Account ID required" unless account_id
       raise "Shared secret required" unless shared_secret
+
       @account_id = account_id
       @shared_secret = shared_secret
       @testing = testing
       @functions = {
-        :create_user              => '1', # instructor or student
-        :create_course            => '2', # instructor only
-        :enroll_student           => '3', # student only
-        :create_assignment        => '4', # instructor only
-        :submit_paper             => '5', # student or teacher
-        :generate_report          => '6',
-        :show_paper               => '7',
-        :delete_paper             => '8',
-        :change_password          => '9',
-        :list_papers              => '10',
-        :check_user_paper         => '11',
-        :view_admin_statistics    => '12',
-        :view_grade_mark          => '13',
-        :report_turnaround_times  => '14',
-        :submission_scores        => '15',
-        :login_user               => '17',
-        :logout_user              => '18',
+        :create_user => '1', # instructor or student
+        :create_course => '2', # instructor only
+        :enroll_student => '3', # student only
+        :create_assignment => '4', # instructor only
+        :submit_paper => '5', # student or teacher
+        :generate_report => '6',
+        :show_paper => '7',
+        :delete_paper => '8',
+        :change_password => '9',
+        :list_papers => '10',
+        :check_user_paper => '11',
+        :view_admin_statistics => '12',
+        :view_grade_mark => '13',
+        :report_turnaround_times => '14',
+        :submission_scores => '15',
+        :login_user => '17',
+        :logout_user => '18',
       }
     end
 
@@ -81,10 +83,10 @@ module Turnitin
       email ||= "#{item.asset_string}@null.instructure.example.com"
     end
 
-    TurnitinUser = Struct.new(:asset_string,:first_name,:last_name,:name)
+    TurnitinUser = Struct.new(:asset_string, :first_name, :last_name, :name)
 
     def testSettings
-      user = TurnitinUser.new("admin_test","Admin","Test","Admin Test")
+      user = TurnitinUser.new("admin_test", "Admin", "Test", "Admin Test")
       res = createTeacher(user)
       res.success?
     end
@@ -126,7 +128,7 @@ module Turnitin
         settings = settings.slice(*valid_keys)
 
         settings[:originality_report_visibility] = 'immediate' unless ['immediate', 'after_grading', 'after_due_date', 'never'].include?(settings[:originality_report_visibility])
-        settings[:s_view_report] =  determine_student_visibility(settings[:originality_report_visibility])
+        settings[:s_view_report] = determine_student_visibility(settings[:originality_report_visibility])
 
         [:s_paper_check, :internet_check, :journal_check, :exclude_biblio, :exclude_quoted, :submit_papers_to].each do |key|
           bool = Canvas::Plugin.value_to_boolean(settings[key])
@@ -135,10 +137,10 @@ module Turnitin
         exclude_value = settings[:exclude_value].to_i
         settings[:exclude_type] = '0' unless ['0', '1', '2'].include?(settings[:exclude_type])
         settings[:exclude_value] = case settings[:exclude_type]
-          when '0'; ''
-          when '1'; [exclude_value, 1].max.to_s
-          when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
-        end
+                                   when '0'; ''
+                                   when '1'; [exclude_value, 1].max.to_s
+                                   when '2'; (0..100).include?(exclude_value) ? exclude_value.to_s : '0'
+                                   end
       end
       settings
     end
@@ -161,22 +163,22 @@ module Turnitin
       # institution_check   - 1/0, check institution
       # submit_papers_to    - 0=none, 1=standard, 2=institution
       response = sendRequest(:create_assignment, settings.delete(:created) ? '3' : '2', settings.merge!({
-        :user => course,
-        :course => course,
-        :assignment => assignment,
-        :utp => '2',
-        :dtstart => "#{today.strftime} 00:00:00",
-        :dtdue => "#{today.strftime} 00:00:00",
-        :dtpost => "#{today.strftime} 00:00:00",
-        :late_accept_flag => '1',
-        :post => true
-      }))
+                                                                                                          :user => course,
+                                                                                                          :course => course,
+                                                                                                          :assignment => assignment,
+                                                                                                          :utp => '2',
+                                                                                                          :dtstart => "#{today.strftime} 00:00:00",
+                                                                                                          :dtdue => "#{today.strftime} 00:00:00",
+                                                                                                          :dtpost => "#{today.strftime} 00:00:00",
+                                                                                                          :late_accept_flag => '1',
+                                                                                                          :post => true
+                                                                                                        }))
 
       response.success? ? { assignment_id: response.assignment_id } : response.error_hash
     end
 
     # if asset_string is passed in, only submit that attachment
-    def submitPaper(submission, asset_string=nil)
+    def submitPaper(submission, asset_string = nil)
       student = submission.user
       assignment = submission.assignment
       course = assignment.context
@@ -190,7 +192,7 @@ module Turnitin
       }
       responses = {}
       if submission.submission_type == 'online_upload'
-        attachments = submission.attachments.select{ |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
+        attachments = submission.attachments.select { |a| a.turnitinable? && (asset_string.nil? || a.asset_string == asset_string) }
         attachments.each do |a|
           responses[a.asset_string] = sendRequest(:submit_paper, '2', { :ptl => a.display_name, :pdata => a.open(), :ptype => '2' }.merge!(opts))
         end
@@ -202,7 +204,7 @@ module Turnitin
 
       responses.keys.each do |asset_string|
         res = responses[asset_string]
-        responses[asset_string] = res.success? ? {object_id: res.returned_object_id} : res.error_hash
+        responses[asset_string] = res.success? ? { object_id: res.returned_object_id } : res.error_hash
       end
 
       responses
@@ -277,7 +279,7 @@ module Turnitin
     def request_md5(params)
       keys_used = []
       str = ""
-      keys = [:aid,:assign,:assignid,:cid,:cpw,:ctl,:diagnostic,:dis,:dtdue,:dtstart,:dtpost,:encrypt,:fcmd,:fid,:gmtime,:newassign,:newupw,:oid,:pfn,:pln,:ptl,:ptype,:said,:tem,:uem,:ufn,:uid,:uln,:upw,:utp]
+      keys = [:aid, :assign, :assignid, :cid, :cpw, :ctl, :diagnostic, :dis, :dtdue, :dtstart, :dtpost, :encrypt, :fcmd, :fid, :gmtime, :newassign, :newupw, :oid, :pfn, :pln, :ptl, :ptype, :said, :tem, :uem, :ufn, :uid, :uln, :upw, :utp]
       keys.each do |key|
         keys_used << key if params[key] && !params[key].empty?
         str += (params[key] || "")
@@ -305,14 +307,14 @@ module Turnitin
       assignment = args.delete :assignment
       post = args.delete :post
       params = args.merge({
-        :gmtime => Time.now.utc.strftime("%Y%m%d%H%M")[0,11],
-        :fid => @functions[command],
-        :fcmd => fcmd.to_s,
-        :encrypt => '0',
-        :aid => @account_id,
-        :src => '15',
-        :dis => '1'
-      })
+                            :gmtime => Time.now.utc.strftime("%Y%m%d%H%M")[0, 11],
+                            :fid => @functions[command],
+                            :fcmd => fcmd.to_s,
+                            :encrypt => '0',
+                            :aid => @account_id,
+                            :src => '15',
+                            :dis => '1'
+                          })
       if user
         params[:uid] = id(user)
         params[:uem] = email(user)
@@ -351,7 +353,7 @@ module Turnitin
         query, headers = mp.prepare_query(params)
         http = Net::HTTP.new(@host, 443)
         http.use_ssl = true
-        http_response = http.start{|con|
+        http_response = http.start { |con|
           req = Net::HTTP::Post.new(@endpoint, headers)
           con.read_timeout = 30
           begin
@@ -365,6 +367,7 @@ module Turnitin
         requestParams = ""
         params.each do |key, value|
           next if value.nil?
+
           requestParams += "&#{URI.escape(key.to_s)}=#{CGI.escape(value.to_s)}"
         end
         if params[:fcmd] == '1'
@@ -372,7 +375,7 @@ module Turnitin
         else
           http = Net::HTTP.new(@host, 443)
           http.use_ssl = true
-          http_response = http.start{|conn|
+          http_response = http.start { |conn|
             conn.get("#{@endpoint}?#{requestParams}")
           }
         end
@@ -382,7 +385,7 @@ module Turnitin
 
       response = Turnitin::Response.new(http_response)
       if response.error?
-        Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{ response.return_code }")
+        Rails.logger.error("Turnitin API error for account_id #{@account_id}: error #{response.return_code}")
         Rails.logger.error(params.to_json)
         Rails.logger.error(http_response.body)
       end

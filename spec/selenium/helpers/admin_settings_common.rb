@@ -31,8 +31,8 @@ module AdminSettingsCommon
     account.set_feature_flag! 'post_grades', 'on'
     account.set_feature_flag! :new_sis_integrations, 'on'
     account.allow_sis_import = true
-    account.settings[:sis_syncing] = {:value=>true, :locked=>false}
-    account.settings[:sis_default_grade_export] = {:value=>true}
+    account.settings[:sis_syncing] = { :value => true, :locked => false }
+    account.settings[:sis_default_grade_export] = { :value => true }
     account.save!
   end
 
@@ -72,7 +72,7 @@ module AdminSettingsCommon
     set_checkbox_via_label(NAME_LENGTH_ID, false)
   end
 
-  def name_length_sis(length=255)
+  def name_length_sis(length = 255)
     label_val = NAME_LENGTH_VALUE_ID[1..-1]
     label = f("label[for=\"#{label_val}\"]")
     set_value(label, length)

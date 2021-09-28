@@ -116,7 +116,6 @@ describe LiveEventsObserver do
     end
   end
 
-
   describe "conversation messsage" do
     it "posts conversation message create events" do
       expect(Canvas::LiveEvents).to receive(:conversation_message_created).once
@@ -358,11 +357,10 @@ describe LiveEventsObserver do
       course.enable_feature!(:quizzes_next)
       # do quizzes next provision
       # quizzes_next is available to users only after quizzes next provisioning
-      course.root_account.settings[:provision] = {'lti' => 'lti url'}
+      course.root_account.settings[:provision] = { 'lti' => 'lti url' }
       course.root_account.save!
     end
   end
-
 
   describe "content_migration_completed" do
     it "posts update events" do

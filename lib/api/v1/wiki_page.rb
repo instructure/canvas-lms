@@ -26,7 +26,7 @@ module Api::V1::WikiPage
 
   WIKI_PAGE_JSON_ATTRS = %w(url title created_at editing_roles).freeze
 
-  def wiki_page_json(wiki_page, current_user, session, include_body = true, opts={})
+  def wiki_page_json(wiki_page, current_user, session, include_body = true, opts = {})
     opts = opts.reverse_merge(include_assignment: true, assignment_opts: {})
     opts.delete(:include_assignment) unless wiki_page.context.try(:feature_enabled?, :conditional_release)
 
@@ -59,7 +59,7 @@ module Api::V1::WikiPage
     hash
   end
 
-  def wiki_pages_json(wiki_pages, current_user, session, opts={})
+  def wiki_pages_json(wiki_pages, current_user, session, opts = {})
     wiki_pages.map { |page| wiki_page_json(page, current_user, session, false, opts) }
   end
 
@@ -74,10 +74,10 @@ module Api::V1::WikiPage
     end
     if include_content
       hash.merge!({
-        'url' => page.url,
-        'title' => page.title,
-        'body' => api_user_content(page.body)
-      })
+                    'url' => page.url,
+                    'title' => page.title,
+                    'body' => api_user_content(page.body)
+                  })
     end
     hash['edited_by'] = user_display_json(page.user, page.context) if page.user
     hash

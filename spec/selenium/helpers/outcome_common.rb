@@ -21,7 +21,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 
 module OutcomeCommon
-
   # when 'teacher'; course_with_teacher_logged_in
   # when 'student'; course_with_student_logged_in
   # when 'admin';   course_with_admin_logged_in
@@ -90,20 +89,20 @@ module OutcomeCommon
 
   def valid_outcome_data
     {
-        :mastery_points => 3,
-        :ratings => [
-          {:points => 3, :description => "Rockin"},
-          {:points => 0, :description => "Lame"}
-        ]
+      :mastery_points => 3,
+      :ratings => [
+        { :points => 3, :description => "Rockin" },
+        { :points => 0, :description => "Lame" }
+      ]
     }
   end
 
   def state_outcome
-      state_outcome = [
-        'CCSS.ELA-Literacy.CCRA.R - Reading',
-        'Craft and Structure'
-      ]
-      state_outcome
+    state_outcome = [
+      'CCSS.ELA-Literacy.CCRA.R - Reading',
+      'Craft and Structure'
+    ]
+    state_outcome
   end
 
   def course_bulk_outcome_groups_course(num_of_groups, num_of_outcomes)
@@ -143,8 +142,8 @@ module OutcomeCommon
 
     ## expect
     # should show up in directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:first li.outcome-link').
-        detect { |li| li.text == outcome_name }).not_to be_nil
+    expect(ffj('.outcomes-sidebar .outcome-level:first li.outcome-link')
+        .detect { |li| li.text == outcome_name }).not_to be_nil
     # should show outcome in main content window
     # title
     expect(f(".outcomes-content .title").text).to eq outcome_name
@@ -208,8 +207,8 @@ module OutcomeCommon
 
     ## expect
     # should show up in nested directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link').
-        detect { |li| li.text == outcome_name }).not_to be_nil
+    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-link')
+        .detect { |li| li.text == outcome_name }).not_to be_nil
     # should show outcome in main content window
     expect(f(".outcomes-content .title").text).to eq outcome_name
     # db
@@ -355,7 +354,6 @@ module OutcomeCommon
   end
 
   def should_create_an_outcome_group_nested
-
     get outcome_url
 
     ## when
@@ -393,8 +391,8 @@ module OutcomeCommon
 
     ## expect
     # should show up in nested directory browser
-    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group').
-        detect { |li| li.text == nested_group_title }).not_to be_nil
+    expect(ffj('.outcomes-sidebar .outcome-level:eq(1) li.outcome-group')
+        .detect { |li| li.text == nested_group_title }).not_to be_nil
     # should show group in main content window
     expect(f(".outcomes-content .title").text).to eq nested_group_title
     # db

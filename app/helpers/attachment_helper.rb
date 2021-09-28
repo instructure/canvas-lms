@@ -20,7 +20,7 @@
 
 module AttachmentHelper
   # returns a string of html attributes suitable for use with $.loadDocPreview
-  def doc_preview_attributes(attachment, attrs={})
+  def doc_preview_attributes(attachment, attrs = {})
     url_opts = {
       anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
       enable_annotations: attrs.delete(:enable_annotations),
@@ -43,21 +43,21 @@ module AttachmentHelper
     context_name = url_helper_context_from_object(attachment.context)
     url_helper = "#{context_name}_file_inline_view_url"
     if self.respond_to?(url_helper)
-      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id, {:verifier => params[:verifier]})
+      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id, { :verifier => params[:verifier] })
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true
     end
-    attrs.map { |attr,val|
+    attrs.map { |attr, val|
       %|data-#{attr}="#{ERB::Util.html_escape(val)}"|
     }.join(" ").html_safe
   end
 
-  def media_preview_attributes(attachment, attrs={})
+  def media_preview_attributes(attachment, attrs = {})
     attrs[:type] = attachment.content_type.match(/video/) ? 'video' : 'audio'
     attrs[:download_url] = context_url(attachment.context, :context_file_download_url, attachment.id)
     attrs[:media_entry_id] = attachment.media_entry_id if attachment.media_entry_id
-    attrs.inject(+"") { |s,(attr,val)| s << "data-#{attr}=#{val} " }
+    attrs.inject(+"") { |s, (attr, val)| s << "data-#{attr}=#{val} " }
   end
 
   def doc_preview_json(attachment, user)
@@ -84,7 +84,7 @@ module AttachmentHelper
     set_cache_header(attachment, direct)
     if safer_domain_available?
       redirect_to safe_domain_file_url(attachment, host_and_shard: @safer_domain_host,
-        verifier: verifier, download: !inline)
+                                                   verifier: verifier, download: !inline)
     elsif attachment.stored_locally?
       @headers = false if @files_domain
       send_file(attachment.full_filename, :type => attachment.content_type_with_encoding, :disposition => (inline ? 'inline' : 'attachment'), :filename => attachment.display_name)
@@ -130,5 +130,4 @@ module AttachmentHelper
       response.headers["Expires"] = ttl.from_now.httpdate
     end
   end
-
 end

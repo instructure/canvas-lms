@@ -43,8 +43,8 @@ module DataFixup::Lti::FillCustomClaimColumnsForResourceLink
   end
 
   def self.update_context!
-    Lti::ResourceLink.
-      joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.lti_context_id = lti_resource_links.resource_link_id").
-      update_all("context_type = 'Assignment', context_id = assignments.id")
+    Lti::ResourceLink
+      .joins("INNER JOIN #{Assignment.quoted_table_name} ON assignments.lti_context_id = lti_resource_links.resource_link_id")
+      .update_all("context_type = 'Assignment', context_id = assignments.id")
   end
 end

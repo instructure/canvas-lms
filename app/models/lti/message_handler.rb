@@ -20,7 +20,6 @@
 
 module Lti
   class MessageHandler < ActiveRecord::Base
-
     BASIC_LTI_LAUNCH_REQUEST = 'basic-lti-launch-request'.freeze
     TOOL_PROXY_REREGISTRATION_REQUEST = 'ToolProxyRegistrationRequest'.freeze
 
@@ -46,23 +45,23 @@ module Lti
 
     scope :has_placements, lambda { |*placements|
       where('EXISTS (?)',
-            Lti::ResourcePlacement.where(placement: placements).
-                where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
+            Lti::ResourcePlacement.where(placement: placements)
+                .where("lti_message_handlers.id = lti_resource_placements.message_handler_id"))
     }
 
     def self.lti_apps_tabs(context, placements, _opts)
-      apps = Lti::MessageHandler.for_context(context).
-        has_placements(*placements).
-        by_message_types(Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST).to_a
+      apps = Lti::MessageHandler.for_context(context)
+                                .has_placements(*placements)
+                                .by_message_types(Lti::MessageHandler::BASIC_LTI_LAUNCH_REQUEST).to_a
 
       launch_path_helper = case context
-                             when Course
-                               :course_basic_lti_launch_request_path
-                             when Account
-                               :account_basic_lti_launch_request_path
+                           when Course
+                             :course_basic_lti_launch_request_path
+                           when Account
+                             :account_basic_lti_launch_request_path
                            end
       apps.sort_by(&:id).map do |app|
-        args = {message_handler_id: app.id, resource_link_fragment: "nav"}
+        args = { message_handler_id: app.id, resource_link_fragment: "nav" }
         args["#{context.class.name.downcase}_id".to_sym] = context.id
         {
           :id => app.asset_string,

@@ -41,7 +41,7 @@ describe Mutations::DeleteCommentBankItem do
         }
       }
     GQL
-    context = {current_user: user_executing, deleted_models: {}, request: ActionDispatch::TestRequest.create}
+    context = { current_user: user_executing, deleted_models: {}, request: ActionDispatch::TestRequest.create }
     CanvasSchema.execute(mutation_command, context: context)
   end
 

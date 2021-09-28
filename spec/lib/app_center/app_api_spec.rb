@@ -44,12 +44,12 @@ describe AppCenter::AppApi do
     let(:response) do
       response = double
       allow(response).to receive(:body).and_return(
-          {
-              'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=60"},
-              'current_offset' => 0,
-              'limit' => 50,
-              'objects' => %w(object1 object2 object3 object4)
-          }.to_json
+        {
+          'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=60" },
+          'current_offset' => 0,
+          'limit' => 50,
+          'objects' => %w(object1 object2 object3 object4)
+        }.to_json
       )
       response
     end
@@ -69,7 +69,7 @@ describe AppCenter::AppApi do
     end
 
     it "can handle an error response" do
-      message = {"message" => "Tool not found", "type" => "error"}
+      message = { "message" => "Tool not found", "type" => "error" }
       allow(response).to receive(:body).and_return(message.to_json)
       expect(CanvasHttp).to receive(:get).and_return(response)
       expect(api.fetch_app_center_response('', 13.minutes, 6, 9)).to eq message
@@ -89,7 +89,7 @@ describe AppCenter::AppApi do
     end
 
     it "can omit next page" do
-      message = {"objects" => %w(object1 object2 object3 object4), "meta" => {}}
+      message = { "objects" => %w(object1 object2 object3 object4), "meta" => {} }
       allow(response).to receive(:body).and_return(message.to_json)
       endpoint = '/?myparam=value'
       per_page = 5
@@ -133,31 +133,31 @@ describe AppCenter::AppApi do
   describe '#get_app_config_url' do
     let(:app_center_response) do
       {
-         "id"   =>163,
-         "short_name" => "pr_youtube",
-         "name" => "YouTube",
-         "description" => "\n<p>Search publicly available YouTube videos.</p>\n",
-         "short_description" => "Search publicly available YouTube videos.",
-         "status" => "active",
-         "app_type" => nil,
-         "preview_url" => "https://www.edu-apps.org/lti_public_resources/?tool_id=youtube",
-         "banner_image_url" => "https://edu-app-center.s3.amazonaws.com/uploads/pr_youtube.png",
-         "logo_image_url" => nil,
-         "icon_image_url" => nil,
-         "average_rating" => 4.0,
-         "total_ratings" => 5.0,
-         "is_certified" => false,
-         "config_xml_url" => "https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube",
-         "requires_secret" => false,
-         "config_options" => [
-           {
-              "name" => "channel_name",
-              "param_type" => "text",
-              "default_value" => "",
-              "description" => "Channel Name (Optional)",
-              "is_required" => false
-           }
-         ]
+        "id" => 163,
+        "short_name" => "pr_youtube",
+        "name" => "YouTube",
+        "description" => "\n<p>Search publicly available YouTube videos.</p>\n",
+        "short_description" => "Search publicly available YouTube videos.",
+        "status" => "active",
+        "app_type" => nil,
+        "preview_url" => "https://www.edu-apps.org/lti_public_resources/?tool_id=youtube",
+        "banner_image_url" => "https://edu-app-center.s3.amazonaws.com/uploads/pr_youtube.png",
+        "logo_image_url" => nil,
+        "icon_image_url" => nil,
+        "average_rating" => 4.0,
+        "total_ratings" => 5.0,
+        "is_certified" => false,
+        "config_xml_url" => "https://www.edu-apps.org/lti_public_resources/config.xml?id=youtube",
+        "requires_secret" => false,
+        "config_options" => [
+          {
+            "name" => "channel_name",
+            "param_type" => "text",
+            "default_value" => "",
+            "description" => "Channel Name (Optional)",
+            "is_required" => false
+          }
+        ]
       }
     end
     let(:app_center_id) { 'pr_youtube' }
@@ -166,7 +166,6 @@ describe AppCenter::AppApi do
     let(:sub_api) { AppCenter::AppApi.new(sub_account) }
     let(:get_app_config_url) { api.get_app_config_url(app_center_id, config_settings) }
     let(:get_sub_app_config_url) { sub_api.get_app_config_url(app_center_id, config_settings) }
-
 
     it 'gets the details of the specified app' do
       config_settings = {}
@@ -219,7 +218,7 @@ describe AppCenter::AppApi do
       @account.settings[:app_center_access_token] = 'root_account_token'
       endpoint = "/api/v1/lti_apps/pr_youtube?access_token=root_account_token"
 
-      allow_any_instance_of(Account).to receive(:calculate_inherited_setting).and_return({locked: false, value: 'root_account_token'})
+      allow_any_instance_of(Account).to receive(:calculate_inherited_setting).and_return({ locked: false, value: 'root_account_token' })
 
       expect(sub_api).to receive(:fetch_app_center_response).with(endpoint, 5.minutes, 1, 1).and_return(app_center_response)
       get_sub_app_config_url
@@ -239,21 +238,21 @@ describe AppCenter::AppApi do
     let(:response) do
       response = double
       allow(response).to receive(:body).and_return(
-          {
-              'meta' => {"next" => "https://www.example.com/api/v1/apps?offset=72"},
-              'current_offset' => 0,
-              'limit' => 72,
-              'objects' => [
-                  {
-                      'name' => 'First Tool',
-                      'id' => 'first_tool',
-                  },
-                  {
-                      'name' => 'Second Tool',
-                      'id' => 'second_tool',
-                  }
-              ]
-          }.to_json
+        {
+          'meta' => { "next" => "https://www.example.com/api/v1/apps?offset=72" },
+          'current_offset' => 0,
+          'limit' => 72,
+          'objects' => [
+            {
+              'name' => 'First Tool',
+              'id' => 'first_tool',
+            },
+            {
+              'name' => 'Second Tool',
+              'id' => 'second_tool',
+            }
+          ]
+        }.to_json
       )
       response
     end
@@ -305,69 +304,69 @@ describe AppCenter::AppApi do
 
     it "can handle an edu-apps api v1 response" do
       app = {
-          "name" => "Wikipedia",
-          "id" => "wikipedia",
-          "categories" => [
-              "Completely Free",
-              "Open Content",
-              "Web 2.0"
-          ],
-          "levels" => [
-              "K-6th Grade",
-              "7th-12th Grade",
-              "Postsecondary"
-          ],
-          "description" => "Search through English Wikipedia articles and link to or embed these articles into course material.",
-          "app_type" => "open_launch",
-          "short_description" => "Articles from The Free Encyclopedia",
-          "extensions" => [
-              "editor_button",
-              "resource_selection"
-          ],
-          "beta" => false,
-          "test_instructions" => "",
-          "support_link" => "https://twitter.com/whitmer",
-          "ims_link" => "",
-          "author_name" => "Brian Whitmer",
-          "privacy_level" => "anonymous",
-          "width" => 590,
-          "height" => 450,
-          "added" => "2012-03-22T00:00:00Z",
-          "uses" => 30,
-          "submitter_name" => nil,
-          "submitter_url" => nil,
-          "ratings_count" => 1,
-          "comments_count" => 1,
-          "avg_rating" => 5,
-          "banner_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
-          "logo_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
-          "icon_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
-          "new" => false,
-          "config_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
-          "any_key" => true,
-          "preview" => {
-              "url" => "/tools/wikipedia/index.html",
-              "height" => 450
-          },
-          "short_name" => "wikipedia",
-          "banner_image_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
-          "logo_image_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
-          "icon_image_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
-          "config_xml_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
-          "average_rating" => 5,
-          "total_ratings" => 1,
-          "config_options" => [
-              {
-                  "name" => "launch_url",
-                  "description" => "Launch URL",
-                  "type" => "text",
-                  "value" => "example.com",
-                  "required" => true
-              }
-          ]
+        "name" => "Wikipedia",
+        "id" => "wikipedia",
+        "categories" => [
+          "Completely Free",
+          "Open Content",
+          "Web 2.0"
+        ],
+        "levels" => [
+          "K-6th Grade",
+          "7th-12th Grade",
+          "Postsecondary"
+        ],
+        "description" => "Search through English Wikipedia articles and link to or embed these articles into course material.",
+        "app_type" => "open_launch",
+        "short_description" => "Articles from The Free Encyclopedia",
+        "extensions" => [
+          "editor_button",
+          "resource_selection"
+        ],
+        "beta" => false,
+        "test_instructions" => "",
+        "support_link" => "https://twitter.com/whitmer",
+        "ims_link" => "",
+        "author_name" => "Brian Whitmer",
+        "privacy_level" => "anonymous",
+        "width" => 590,
+        "height" => 450,
+        "added" => "2012-03-22T00:00:00Z",
+        "uses" => 30,
+        "submitter_name" => nil,
+        "submitter_url" => nil,
+        "ratings_count" => 1,
+        "comments_count" => 1,
+        "avg_rating" => 5,
+        "banner_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
+        "logo_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
+        "icon_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
+        "new" => false,
+        "config_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
+        "any_key" => true,
+        "preview" => {
+          "url" => "/tools/wikipedia/index.html",
+          "height" => 450
+        },
+        "short_name" => "wikipedia",
+        "banner_image_url" => "http://mosdef.instructure.com/tools/wikipedia/banner.png",
+        "logo_image_url" => "http://mosdef.instructure.com/tools/wikipedia/logo.png",
+        "icon_image_url" => "http://mosdef.instructure.com/tools/wikipedia/icon.png",
+        "config_xml_url" => "http://mosdef.instructure.com/tools/wikipedia/config.xml",
+        "average_rating" => 5,
+        "total_ratings" => 1,
+        "config_options" => [
+          {
+            "name" => "launch_url",
+            "description" => "Launch URL",
+            "type" => "text",
+            "value" => "example.com",
+            "required" => true
+          }
+        ]
       }
 
-      allow(response).to receive(:body).and_return({"objects" => [app]}.to_json)
+      allow(response).to receive(:body).and_return({ "objects" => [app] }.to_json)
       expect(CanvasHttp).to receive(:get).and_return(response)
       json = api.get_apps(0)
       tool = json['lti_apps'].first
@@ -389,68 +388,68 @@ describe AppCenter::AppApi do
 
     it "can handle an edu-apps api v2 response" do
       app = {
-          'id' => 2,
-          'short_name' => "public_collections",
-          'name' => "Public Collections",
-          'short_description' => "",
-          'status' => "active",
-          'is_public' => true,
-          'app_type' => "open_launch",
-          'preview_url' => "http://www.edu-apps.org/tools/public_collections/index.html",
-          'banner_image_url' => "http://www.edu-apps.org/tools/public_collections/banner.png",
-          'logo_image_url' => "http://www.edu-apps.org/tools/public_collections/logo.png",
-          'icon_image_url' => nil,
-          'average_rating' => 0,
-          'total_ratings' => 0,
-          'is_certified' => false,
-          'config_xml_url' => "http://localhost:3001/configurations/b1us84b2fewp5gqr.xml",
-          'requires_secret' => true,
-          'tags' => [
-              {
-                  'id' => 11,
-                  'short_name' => "media",
-                  'name' => "Media",
-                  'context' => "category"
-              },
-              {
-                  'id' => 12,
-                  'short_name' => "open_content",
-                  'name' => "Open Content",
-                  'context' => "category"
-              },
-              {
-                  'id' => 16,
-                  'short_name' => "web_20",
-                  'name' => "Web 2.0",
-                  'context' => "category"
-              },
-              {
-                  'id' => 17,
-                  'short_name' => "free",
-                  'name' => "Completely Free",
-                  'context' => "category"
-              },
-              {
-                  'id' => 19,
-                  'short_name' => "K-6",
-                  'name' => "K-6th Grade",
-                  'context' => "education_level"
-              },
-              {
-                  'id' => 20,
-                  'short_name' => "7-12",
-                  'name' => "7th-12th Grade",
-                  'context' => "education_level"
-              },
-              {
-                  'id' => 21,
-                  'short_name' => "postsecondary",
-                  'name' => "Postsecondary",
-                  'context' => "education_level"
-              }
-          ]
+        'id' => 2,
+        'short_name' => "public_collections",
+        'name' => "Public Collections",
+        'short_description' => "",
+        'status' => "active",
+        'is_public' => true,
+        'app_type' => "open_launch",
+        'preview_url' => "http://www.edu-apps.org/tools/public_collections/index.html",
+        'banner_image_url' => "http://www.edu-apps.org/tools/public_collections/banner.png",
+        'logo_image_url' => "http://www.edu-apps.org/tools/public_collections/logo.png",
+        'icon_image_url' => nil,
+        'average_rating' => 0,
+        'total_ratings' => 0,
+        'is_certified' => false,
+        'config_xml_url' => "http://localhost:3001/configurations/b1us84b2fewp5gqr.xml",
+        'requires_secret' => true,
+        'tags' => [
+          {
+            'id' => 11,
+            'short_name' => "media",
+            'name' => "Media",
+            'context' => "category"
+          },
+          {
+            'id' => 12,
+            'short_name' => "open_content",
+            'name' => "Open Content",
+            'context' => "category"
+          },
+          {
+            'id' => 16,
+            'short_name' => "web_20",
+            'name' => "Web 2.0",
+            'context' => "category"
+          },
+          {
+            'id' => 17,
+            'short_name' => "free",
+            'name' => "Completely Free",
+            'context' => "category"
+          },
+          {
+            'id' => 19,
+            'short_name' => "K-6",
+            'name' => "K-6th Grade",
+            'context' => "education_level"
+          },
+          {
+            'id' => 20,
+            'short_name' => "7-12",
+            'name' => "7th-12th Grade",
+            'context' => "education_level"
+          },
+          {
+            'id' => 21,
+            'short_name' => "postsecondary",
+            'name' => "Postsecondary",
+            'context' => "education_level"
+          }
+        ]
       }
-      allow(response).to receive(:body).and_return({"lti_apps" => [app]}.to_json)
+      allow(response).to receive(:body).and_return({ "lti_apps" => [app] }.to_json)
       expect(CanvasHttp).to receive(:get).and_return(response)
       json = api.get_apps(0)
       tool = json['lti_apps'].first

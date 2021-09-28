@@ -37,7 +37,6 @@ describe DataFixup::PopulateRootAccountIdOnAttachments do
       expect(attachment1.reload.root_account_id).to eq account.id
       expect(attachment2.reload.root_account_id).to eq account.id
     end
-
   end
 
   describe('.from_model') do

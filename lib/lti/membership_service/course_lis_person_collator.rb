@@ -21,7 +21,6 @@
 module Lti
   module MembershipService
     class CourseLisPersonCollator < LisPersonCollatorBase
-
       private
 
       def scope
@@ -35,10 +34,10 @@ module Lti
 
       def generate_roles(user)
         enrollments = if user.association(:not_ended_enrollments).loaded?
-          user.not_ended_enrollments.select{|enr| enr.course_id == context.id}
-        else
-          user.not_ended_enrollments.where(course: context)
-        end
+                        user.not_ended_enrollments.select { |enr| enr.course_id == context.id }
+                      else
+                        user.not_ended_enrollments.where(course: context)
+                      end
         enrollments.map do |enrollment|
           case enrollment.type
           when 'TeacherEnrollment'

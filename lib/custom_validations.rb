@@ -19,10 +19,7 @@
 #
 
 module CustomValidations
-
-
   module ClassMethods
-
     def validates_as_url(*fields, allowed_schemes: %w{http https})
       validates_each(fields, :allow_nil => true) do |record, attr, value|
         begin
@@ -49,7 +46,7 @@ module CustomValidations
       validates_each(field) do |record, attr, value|
         if !record.new_record? && record.send("#{attr}_changed?")
           old_val = record.send("#{attr}_was")
-          unless alloweds.any? { |old,news| old_val == old && Array(news).include?(value) }
+          unless alloweds.any? { |old, news| old_val == old && Array(news).include?(value) }
             record.errors.add attr, "cannot be changed to that value"
           end
         end
@@ -62,5 +59,4 @@ module CustomValidations
       klass.send :extend, ClassMethods
     end
   end
-
 end

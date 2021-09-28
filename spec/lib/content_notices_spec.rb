@@ -29,13 +29,13 @@ describe ContentNotices do
   end
 
   describe "content_notices" do
-    it "should return [] if no notices are active" do
+    it "returns [] if no notices are active" do
       enable_cache do
         expect(Thing.new.content_notices('user')).to eql([])
       end
     end
 
-    it "should add and remove a content notice" do
+    it "adds and remove a content notice" do
       enable_cache do
         thing = Thing.new
         thing.add_content_notice :foo
@@ -48,7 +48,7 @@ describe ContentNotices do
       end
     end
 
-    it "should check the show condition of a notice" do
+    it "checks the show condition of a notice" do
       enable_cache do
         thing = Thing.new
         thing.add_content_notice :foo
@@ -58,7 +58,7 @@ describe ContentNotices do
       end
     end
 
-    it "should create expiring notices" do
+    it "creates expiring notices" do
       enable_cache do
         thing = Thing.new
         thing.add_content_notice :foo, 1.hour

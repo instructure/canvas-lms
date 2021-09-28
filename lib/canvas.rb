@@ -57,7 +57,7 @@ module Canvas
   end
 
   def self.lookup_cache_store(config, cluster)
-    config = {'cache_store' => 'nil_store'}.merge(config)
+    config = { 'cache_store' => 'nil_store' }.merge(config)
     if config['cache_store'] == 'redis_store'
       ActiveSupport::Deprecation.warn("`redis_store` is no longer supported. Please change to `redis_cache_store`, and change `servers` to `url`.")
       config['cache_store'] = 'redis_cache_store'
@@ -114,6 +114,7 @@ module Canvas
   #     Canvas.reloadable_plugin(File.dirname(__FILE__))
   def self.reloadable_plugin(dirname)
     return unless Rails.env.development?
+
     base_path = File.expand_path(dirname)
     base_path.gsub(%r{/lib/[^/]*$}, '')
     ActiveSupport::Dependencies.autoload_once_paths.reject! { |p|
@@ -123,34 +124,35 @@ module Canvas
 
   def self.revision
     return @revision if defined?(@revision)
-    @revision = if File.file?(Rails.root+"VERSION")
-      File.readlines(Rails.root+"VERSION").first.try(:strip)
-    else
-      nil
-    end
+
+    @revision = if File.file?(Rails.root + "VERSION")
+                  File.readlines(Rails.root + "VERSION").first.try(:strip)
+                else
+                  nil
+                end
   end
 
-  DEFAULT_RETRY_CALLBACK = -> (ex, tries) {
-      Rails.logger.debug do
-        {
-          error_class: ex.class,
-          error_message: ex.message,
-          error_backtrace: ex.backtrace,
-          tries: tries,
-          message: "Retrying service call!"
-        }.to_json
-      end
-    }
+  DEFAULT_RETRY_CALLBACK = ->(ex, tries) {
+    Rails.logger.debug do
+      {
+        error_class: ex.class,
+        error_message: ex.message,
+        error_backtrace: ex.backtrace,
+        tries: tries,
+        message: "Retrying service call!"
+      }.to_json
+    end
+  }
 
   DEFAULT_RETRIABLE_OPTIONS = {
-    interval: -> (attempts) { 0.5 + 4 ** (attempts - 1) }, # Sleeps: 0.5, 4.5, 16.5
+    interval: ->(attempts) { 0.5 + 4**(attempts - 1) }, # Sleeps: 0.5, 4.5, 16.5
     on_retry: DEFAULT_RETRY_CALLBACK,
     tries: 3,
   }.freeze
   def self.retriable(opts = {}, &block)
     if opts[:on_retry]
       original_callback = opts[:on_retry]
-      opts[:on_retry] = -> (ex, tries) {
+      opts[:on_retry] = ->(ex, tries) {
         original_callback.call(ex, tries)
         DEFAULT_RETRY_CALLBACK.call(ex, tries)
       }
@@ -187,7 +189,7 @@ module Canvas
   #
   # all the configurable params have service-specific Settings with fallback to
   # generic Settings.
-  def self.timeout_protection(service_name, options={}, &block)
+  def self.timeout_protection(service_name, options = {}, &block)
     timeout = (Setting.get("service_#{service_name}_timeout", nil) || options[:fallback_timeout_length] || Setting.get("service_generic_timeout", 15.seconds.to_s)).to_f
 
     if Canvas.redis_enabled?
@@ -201,13 +203,14 @@ module Canvas
     end
   rescue TimeoutCutoff, Timeout::Error => e
     log_message = if e.is_a?(TimeoutCutoff)
-      "Skipping service call due to error count: #{service_name} #{e.error_count}"
-    else
-      "Timeout during service call: #{service_name}"
-    end
+                    "Skipping service call due to error count: #{service_name} #{e.error_count}"
+                  else
+                    "Timeout during service call: #{service_name}"
+                  end
     Rails.logger.error(log_message)
     Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
+
     return nil
   end
 
@@ -317,7 +320,7 @@ module Canvas
   # As long as all authorized console users are provisioned with siteadmin
   # pseudonyms that share their username, this will look up their associated user record.
   # Otherwise it's still safe, it will just return a nil user.
-  def self.infer_user(username=nil)
+  def self.infer_user(username = nil)
     unix_user = username || ENV['SUDO_USER'] || ENV['USER']
     Account.site_admin.pseudonyms.active.by_unique_id(unix_user).first&.user
   end

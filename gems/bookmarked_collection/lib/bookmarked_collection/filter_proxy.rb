@@ -40,11 +40,13 @@ class BookmarkedCollection::FilterProxy < BookmarkedCollection::Proxy
       subpager = @collection.execute_pager(subpager)
 
       break if subpager.empty?
+
       bookmark = subpager.next_bookmark
 
       while pager.size < pager.per_page && !subpager.empty?
         item = subpager.shift
         next unless @filter_proc.call(item)
+
         pager << item
       end
 

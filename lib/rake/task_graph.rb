@@ -74,10 +74,10 @@ module Rake
 
     def task(name_and_deps, &transformer)
       name, deps = if name_and_deps.is_a?(Hash)
-        name_and_deps.first
-      else
-        [name_and_deps, []]
-      end
+                     name_and_deps.first
+                   else
+                     [name_and_deps, []]
+                   end
 
       @nodes[name] = deps
       @transformers[name] = transformer || IDENTITY

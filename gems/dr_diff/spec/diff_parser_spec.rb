@@ -136,10 +136,9 @@ module DrDiff
       }
     end
 
-
     describe "#relevant?" do
       context "diff with new code" do
-        let(:parser){ described_class.new(add_diff) }
+        let(:parser) { described_class.new(add_diff) }
 
         it "is true for same file with a line number in the range" do
           expect(parser.relevant?("some_file.rb", 3)).to be(true)
@@ -162,57 +161,54 @@ module DrDiff
         end
 
         it "is relevant anywhere in ranges if severe" do
-          expect(parser.relevant?("some_file.rb", 56, true)).to be(false)
-          expect(parser.relevant?("some_file.rb", 57, true)).to be(true)
-          expect(parser.relevant?("some_file.rb", 66, true)).to be(true)
-          expect(parser.relevant?("some_file.rb", 67, true)).to be(false)
+          expect(parser.relevant?("some_file.rb", 56, severe: true)).to be(false)
+          expect(parser.relevant?("some_file.rb", 57, severe: true)).to be(true)
+          expect(parser.relevant?("some_file.rb", 66, severe: true)).to be(true)
+          expect(parser.relevant?("some_file.rb", 67, severe: true)).to be(false)
         end
 
         context "with campsite mode turned off" do
-          let(:parser){ described_class.new(add_diff, true, false) }
+          let(:parser) { described_class.new(add_diff, raw: true, campsite: false) }
 
           it "is only true for touched lines" do
-            expect(parser.relevant?("some_file.rb", 60, true)).to be(true)
-            expect(parser.relevant?("some_file.rb", 61, true)).to be(true)
-            expect(parser.relevant?("some_file.rb", 62, true)).to be(true)
+            expect(parser.relevant?("some_file.rb", 60, severe: true)).to be(true)
+            expect(parser.relevant?("some_file.rb", 61, severe: true)).to be(true)
+            expect(parser.relevant?("some_file.rb", 62, severe: true)).to be(true)
           end
 
           it "is not relevant for files in ranges that are not touched" do
-            expect(parser.relevant?("some_file.rb", 57, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 58, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 59, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 63, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 64, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 65, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 66, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 67, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 57, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 58, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 59, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 63, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 64, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 65, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 66, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 67, severe: true)).to be(false)
           end
-
         end
-
       end
 
       context "for diffs with deletions" do
-        let(:parser){ described_class.new(subtractive_diff) }
+        let(:parser) { described_class.new(subtractive_diff) }
 
         it 'respects the boundary of a removed diff set' do
-          expect(parser.relevant?("some_file.rb", 55, true)).to be(false)
-          expect(parser.relevant?("some_file.rb", 56, true)).to be(true)
-          expect(parser.relevant?("some_file.rb", 60, true)).to be(true)
-          expect(parser.relevant?("some_file.rb", 61, true)).to be(false)
+          expect(parser.relevant?("some_file.rb", 55, severe: true)).to be(false)
+          expect(parser.relevant?("some_file.rb", 56, severe: true)).to be(true)
+          expect(parser.relevant?("some_file.rb", 60, severe: true)).to be(true)
+          expect(parser.relevant?("some_file.rb", 61, severe: true)).to be(false)
         end
 
         context "with campsite mode turned off" do
-          let(:parser){ described_class.new(subtractive_diff, true, false) }
+          let(:parser) { described_class.new(subtractive_diff, raw: true, campsite: false) }
 
           it "does not count deletions as relevant" do
-            expect(parser.relevant?("some_file.rb", 55, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 56, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 60, true)).to be(false)
-            expect(parser.relevant?("some_file.rb", 61, true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 55, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 56, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 60, severe: true)).to be(false)
+            expect(parser.relevant?("some_file.rb", 61, severe: true)).to be(false)
           end
         end
-
       end
     end
 
@@ -221,7 +217,7 @@ module DrDiff
         parser = described_class.new(combination_diff)
         diff = parser.diff
         expect(diff['Gemfile.d/development.rb'][:change]).to eq([7])
-        expect(diff['script/rlint'][:change]).to eq([64]+(68..79).to_a)
+        expect(diff['script/rlint'][:change]).to eq([64] + (68..79).to_a)
       end
 
       it "parses additive diffs correctly" do

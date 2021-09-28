@@ -21,7 +21,6 @@
 require 'spec_helper'
 
 describe GoogleDrive::Client do
-
   let(:client_secrets) {
     {
       'client_id' => "6",
@@ -31,7 +30,6 @@ describe GoogleDrive::Client do
   }
 
   it 'creates a new Google API client' do
-
     client = described_class.create(client_secrets)
     expect(client.authorization.client_secret).to eq 'secret'
     expect(client.authorization.refresh_token).to be_nil
@@ -56,7 +54,6 @@ describe GoogleDrive::Client do
     expect(auth_uri).to include 'state=awesome_scope'
     expect(auth_uri).to include 'login_hint=my_crazy_username'
   end
-
 
   it 'auth_uri handles scope and no username' do
     client = described_class.create(client_secrets, nil, 'access_token')

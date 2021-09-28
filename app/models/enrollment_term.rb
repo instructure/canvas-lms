@@ -79,14 +79,14 @@ class EnrollmentTerm < ActiveRecord::Base
     self.courses.touch_all
   end
 
-  def update_courses_and_states_later(enrollment_type=nil)
+  def update_courses_and_states_later(enrollment_type = nil)
     return if new_record?
 
     delay_if_production(singleton: "EnrollmentTerm#touch_all_courses_#{self.global_id}").touch_all_courses unless @touched_courses
     @touched_courses = true
 
-    EnrollmentState.delay_if_production(singleton: "EnrollmentState.invalidate_states_for_term_#{self.global_id}_#{enrollment_type}").
-      invalidate_states_for_term(self, enrollment_type)
+    EnrollmentState.delay_if_production(singleton: "EnrollmentState.invalidate_states_for_term_#{self.global_id}_#{enrollment_type}")
+                   .invalidate_states_for_term(self, enrollment_type)
   end
 
   def self.i18n_default_term_name
@@ -96,8 +96,8 @@ class EnrollmentTerm < ActiveRecord::Base
   def recompute_course_scores_later(update_all_grading_period_scores: true, strand_identifier: "EnrollmentTerm:#{global_id}")
     courses_to_recompute.find_ids_in_ranges(batch_size: 1000) do |min_id, max_id|
       delay_if_production(n_strand: "EnrollmentTerm#recompute_scores_for_batch:#{strand_identifier}",
-          priority: Delayed::LOW_PRIORITY).
-        recompute_scores_for_batch(min_id, max_id, update_all_grading_period_scores)
+                          priority: Delayed::LOW_PRIORITY)
+        .recompute_scores_for_batch(min_id, max_id, update_all_grading_period_scores)
     end
   end
 
@@ -123,6 +123,7 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def set_overrides(context, params)
     return unless params && context
+
     params.map do |type, values|
       type = type.classify
       enrollment_type = Enrollment.typed_enrollment(type).to_s
@@ -152,18 +153,18 @@ class EnrollmentTerm < ActiveRecord::Base
 
   def self.user_counts(root_account, terms)
     # Warning: returns keys as strings, I think because of the join
-    Enrollment.active.joins(:course).
-      where(root_account_id: root_account, courses: {enrollment_term_id: terms}).
-      group(:enrollment_term_id).
-      distinct.
-      count(:user_id)
+    Enrollment.active.joins(:course)
+              .where(root_account_id: root_account, courses: { enrollment_term_id: terms })
+              .group(:enrollment_term_id)
+              .distinct
+              .count(:user_id)
   end
 
   def self.course_counts(terms)
-    Course.active.
-      where(enrollment_term_id: terms).
-      group(:enrollment_term_id).
-      count
+    Course.active
+          .where(enrollment_term_id: terms)
+          .group(:enrollment_term_id)
+          .count
   end
 
   workflow do
@@ -175,10 +176,10 @@ class EnrollmentTerm < ActiveRecord::Base
     # detect will cause the whole collection to load; that's fine, it's a small collection, and
     # we'll probably call enrollment_dates_for multiple times in a single request, so we want
     # it cached, rather than using .scoped which would force a re-query every time
-    override = enrollment_dates_overrides.detect { |ov| ov.enrollment_type == enrollment.type.to_s}
+    override = enrollment_dates_overrides.detect { |ov| ov.enrollment_type == enrollment.type.to_s }
 
     # ignore the start dates as admin
-    [ override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at ]
+    [override.try(:start_at) || (enrollment.admin? ? nil : start_at), override.try(:end_at) || end_at]
   end
 
   # return the term dates applicable to the given enrollment(s)
@@ -208,7 +209,7 @@ class EnrollmentTerm < ActiveRecord::Base
   scope :started, -> { where('enrollment_terms.start_at IS NULL OR enrollment_terms.start_at < ?', Time.now.utc) }
   scope :not_ended, -> { where('enrollment_terms.end_at IS NULL OR enrollment_terms.end_at >= ?', Time.now.utc) }
   scope :not_started, -> { where('enrollment_terms.start_at IS NOT NULL AND enrollment_terms.start_at > ?', Time.now.utc) }
-  scope :not_default, -> { where.not(name: EnrollmentTerm::DEFAULT_TERM_NAME)}
+  scope :not_default, -> { where.not(name: EnrollmentTerm::DEFAULT_TERM_NAME) }
   scope :by_name, -> { order(best_unicode_collation_key('name')) }
 
   private

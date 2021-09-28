@@ -35,7 +35,7 @@ describe CanvasCache::Redis do
     end
 
     it "is true when it finds a config" do
-      allow(ConfigFile).to receive(:load).with('redis').and_return({some: :data})
+      allow(ConfigFile).to receive(:load).with('redis').and_return({ some: :data })
       expect(CanvasCache::Redis).to be_enabled
     end
 
@@ -45,7 +45,7 @@ describe CanvasCache::Redis do
     end
   end
 
-  it "should should not ignore redis guards when not enabled" do
+  it "shoulds not ignore redis guards when not enabled" do
     allow(ConfigFile).to receive(:load).with('redis').and_return(nil)
     expect(CanvasCache::Redis).to_not be_ignore_redis_guards
   end
@@ -55,7 +55,7 @@ describe CanvasCache::Redis do
       skip("redis required to test") unless CanvasCache::Redis.enabled?
     end
 
-    let(:redis_client){ CanvasCache::Redis.redis }
+    let(:redis_client) { CanvasCache::Redis.redis }
 
     it "doesn't marshall" do
       redis_client.set('test', 1)
@@ -74,24 +74,24 @@ describe CanvasCache::Redis do
     end
 
     describe "locking" do
-      it "should succeed if the lock isn't taken" do
+      it "succeeds if the lock isn't taken" do
         expect(CanvasCache::Redis.lock('test1')).to eq true
         expect(CanvasCache::Redis.lock('test2')).to eq true
       end
 
-      it "should fail if the lock is taken" do
+      it "fails if the lock is taken" do
         expect(CanvasCache::Redis.lock('test1')).to eq true
         expect(CanvasCache::Redis.lock('test1')).to eq false
         expect(CanvasCache::Redis.unlock('test1')).to eq true
         expect(CanvasCache::Redis.lock('test1')).to eq true
       end
 
-      it "should live forever if no expire time is given" do
+      it "lives forever if no expire time is given" do
         expect(CanvasCache::Redis.lock('test1')).to eq true
         expect(CanvasCache::Redis.redis.ttl(CanvasCache::Redis.lock_key('test1'))).to eq(-1)
       end
 
-      it "should set the expire time if given" do
+      it "sets the expire time if given" do
         expect(CanvasCache::Redis.lock('test1', 15)).to eq true
         ttl = CanvasCache::Redis.redis.ttl(CanvasCache::Redis.lock_key('test1'))
         expect(ttl).to be > 0
@@ -108,17 +108,17 @@ describe CanvasCache::Redis do
         CanvasCache::Redis.reset_redis_failure
       end
 
-      it "should protect against errnos" do
+      it "protects against errnos" do
         expect(redis_client._client).to receive(:write).and_raise(Errno::ETIMEDOUT).once
         expect(redis_client.set('blah', 'blah')).to eq nil
       end
 
-      it "should protect against max # of client errors" do
+      it "protects against max # of client errors" do
         expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("ERR max number of clients reached")).once
         expect(redis_client.set('blah', 'blah')).to eq nil
       end
 
-      it "should pass through other command errors" do
+      it "passes through other command errors" do
         expect(InstStatsd::Statsd).not_to receive(:increment)
 
         expect(redis_client._client).to receive(:write).and_raise(Redis::CommandError.new("NOSCRIPT No matching script. Please use EVAL.")).once
@@ -135,13 +135,13 @@ describe CanvasCache::Redis do
           allow(cache.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError)
         end
 
-        it "should not fail cache.read" do
+        it "does not fail cache.read" do
           override_cache(cache) do
             expect(Rails.cache.read('blah')).to eq nil
           end
         end
 
-        it "should not call redis again after an error" do
+        it "does not call redis again after an error" do
           override_cache(cache) do
             expect(Rails.cache.read('blah')).to eq nil
             # call again, the .once means that if it hits Redis::Client again it'll fail
@@ -149,37 +149,37 @@ describe CanvasCache::Redis do
           end
         end
 
-        it "should not fail cache.write" do
+        it "does not fail cache.write" do
           override_cache(cache) do
             expect(Rails.cache.write('blah', 'someval')).to eq nil
           end
         end
 
-        it "should not fail cache.delete" do
+        it "does not fail cache.delete" do
           override_cache(cache) do
             expect(Rails.cache.delete('blah')).to eq 0
           end
         end
 
-        it "should not fail cache.delete for a ring" do
+        it "does not fail cache.delete for a ring" do
           override_cache(ActiveSupport::Cache::RedisCacheStore.new(url: ['redis://localhost:1234', 'redis://localhost:4567'])) do
             expect(Rails.cache.delete('blah')).to eq 0
           end
         end
 
-        it "should not fail cache.exist?" do
+        it "does not fail cache.exist?" do
           override_cache(cache) do
             expect(Rails.cache.exist?('blah')).to be_falsey
           end
         end
 
-        it "should not fail cache.delete_matched" do
+        it "does not fail cache.delete_matched" do
           override_cache(cache) do
             expect(Rails.cache.delete_matched('blah')).to eq nil
           end
         end
 
-        it "should fail separate servers separately" do
+        it "fails separate servers separately" do
           cache = ActiveSupport::Cache::RedisCacheStore.new(url: [redis_client.id, 'redis://nonexistent:1234/0'])
           client = cache.redis
           key2 = 2
@@ -200,7 +200,7 @@ describe CanvasCache::Redis do
           ].compact).to eq [true]
         end
 
-        it "should not fail raw redis commands" do
+        it "does not fail raw redis commands" do
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
           expect(redis_client.setnx('my_key', 5)).to eq nil
         end
@@ -217,7 +217,6 @@ describe CanvasCache::Redis do
           expect(redis_client._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
           expect(redis_client.set('my_key', 5, nx: true)).to eq nil
         end
-
       end
     end
 
@@ -228,7 +227,7 @@ describe CanvasCache::Redis do
 
       before { allow(CanvasCache::Redis).to receive(:log_style).and_return('json') }
 
-      it "should log information on the redis request" do
+      it "logs information on the redis request" do
         log_lines = capture_log_messages do
           redis_client.set(key, val)
         end
@@ -236,13 +235,13 @@ describe CanvasCache::Redis do
         expect(message["message"]).to eq("redis_request")
         expect(message["command"]).to eq("set")
         expect(message["key"]).to eq("mykey")
-        expect(message["request_size"]).to eq((key+val).size)
+        expect(message["request_size"]).to eq((key + val).size)
         expect(message["response_size"]).to eq(2) # "OK"
         expect(message["host"]).not_to be_nil
         expect(message["request_time_ms"]).to be_a(Float)
       end
 
-      it "should not log the lua eval code" do
+      it "does not log the lua eval code" do
         log_lines = capture_log_messages do
           redis_client.eval('local a = 1')
         end
@@ -250,7 +249,7 @@ describe CanvasCache::Redis do
         expect(message["key"]).to be_nil
       end
 
-      it "should log error on redis error response" do
+      it "logs error on redis error response" do
         log_lines = capture_log_messages do
           expect { redis_client.eval('totes not lua') }.to raise_error(Redis::CommandError)
         end
@@ -264,7 +263,7 @@ describe CanvasCache::Redis do
           ActiveSupport::Cache::RedisCacheStore.new(redis: redis_client)
         end
 
-        it "should log the cache fetch block generation time" do
+        it "logs the cache fetch block generation time" do
           begin
             Timecop.safe_mode = false
             Timecop.freeze
@@ -304,7 +303,7 @@ describe CanvasCache::Redis do
           end
         end
 
-        it "should log zero response size on cache miss" do
+        it "logs zero response size on cache miss" do
           cache.delete(key)
           log_lines = capture_log_messages do
             expect(cache.read(key)).to be_nil
@@ -316,7 +315,7 @@ describe CanvasCache::Redis do
       end
     end
 
-    it "should log compactly by default on the redis request" do
+    it "logs compactly by default on the redis request" do
       # cache to avoid capturing a log line for db lookup
       CanvasCache::Redis.log_style
       log_lines = capture_log_messages do
@@ -326,7 +325,7 @@ describe CanvasCache::Redis do
       expect(msg).to match(/Redis \(\d+\.\d+ms\) set mykey \[.*\]/)
     end
 
-    it "should allow disabling redis logging" do
+    it "allows disabling redis logging" do
       allow(CanvasCache::Redis).to receive(:log_style).and_return('off')
       log_lines = capture_log_messages do
         redis_client.set('mykey', 'myvalue')
@@ -334,12 +333,12 @@ describe CanvasCache::Redis do
       expect(log_lines).to be_empty
     end
 
-    it "should not ignore redis guards by default" do
+    it "does not ignore redis guards by default" do
       expect(CanvasCache::Redis).to_not be_ignore_redis_guards
     end
 
     describe "CanvasCache::RedisWrapper" do
-      it "should raise on unsupported commands" do
+      it "raises on unsupported commands" do
         expect { redis_client.keys }.to raise_error(CanvasCache::Redis::UnsupportedRedisMethod)
       end
     end
@@ -358,12 +357,12 @@ describe CanvasCache::Redis do
         expect(Rails.logger).to receive(:error) do |message|
           messages << message
         end.at_least(:once)
-        CanvasCache::Redis.handle_redis_failure({'failure'=>'val'}, 'local_fake_redis') do
+        CanvasCache::Redis.handle_redis_failure({ 'failure' => 'val' }, 'local_fake_redis') do
           raise ::Redis::InheritedError, "intentional failure"
         end
         # we don't log the second message under spring, cause reasons; we only
         # care about the primary message anyway
-        msgs = messages.select{|m| m =~ /Query failure/ }
+        msgs = messages.select { |m| m =~ /Query failure/ }
         expect(msgs.length).to eq(1)
         m = msgs.first
         expect(m).to match(/\[REDIS\] Query failure/)

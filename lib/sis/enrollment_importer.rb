@@ -22,7 +22,6 @@ require "set"
 
 module SIS
   class EnrollmentImporter < BaseImporter
-
     def process(messages)
       i = Work.new(@batch, @root_account, @logger, messages)
 
@@ -61,20 +60,21 @@ module SIS
       User.update_account_associations(i.update_account_association_user_ids.to_a, :account_chain_cache => i.account_chain_cache)
       i.users_to_touch_ids.to_a.in_groups_of(1000, false) do |batch|
         User.where(id: batch).touch_all
-               User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
+        User.where(id: UserObserver.where(user_id: batch).select(:observer_id)).touch_all
 
         ids_to_touch = (batch + UserObserver.where(user_id: batch).pluck(:observer_id)).uniq
         User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
       i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
-        Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}").
-          batch_add_to_favorites(sliced_ids)
+        Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}")
+                  .batch_add_to_favorites(sliced_ids)
       end
       if i.enrollments_to_delete.any?
         new_data = Enrollment::BatchStateUpdater.destroy_batch(
           i.enrollments_to_delete,
           sis_batch: @batch,
-          ignore_due_date_caching_for: i.courses_to_recache_due_dates)
+          ignore_due_date_caching_for: i.courses_to_recache_due_dates
+        )
         i.roll_back_data.push(*new_data)
       end
       SisBatchRollBackData.bulk_insert_roll_back_data(i.roll_back_data)
@@ -128,6 +128,7 @@ module SIS
 
       def process_batch
         return unless any_left_to_process?
+
         enrollment_info = nil
         while !@enrollment_batch.empty?
           enrollment_info = @enrollment_batch.shift
@@ -176,7 +177,7 @@ module SIS
           @section ||= @root_account.course_sections.where(sis_source_id: enrollment_info.section_id).take unless enrollment_info.section_id.blank?
           if @course.nil? && @section.nil?
             message = "Neither course nor section existed for user enrollment " +
-              "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
+                      "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
@@ -198,20 +199,19 @@ module SIS
           # explicitly provided
           @section = @course.default_section(:include_xlists => true) if @section.nil? || enrollment_info.section_id.blank? && !@section.default_section
           @course = @section.course if @course.nil? ||
-            (enrollment_info.course_id.blank? && @course.id != @section.course_id) ||
-            (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
+                                       (enrollment_info.course_id.blank? && @course.id != @section.course_id) ||
+                                       (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
 
           if @course.id != @section.course_id
             message = "An enrollment listed a section (#{enrollment_info.section_id}) " +
-              "and a course (#{enrollment_info.course_id}) that are unrelated " +
-              "for user (#{enrollment_info.user_id})"
+                      "and a course (#{enrollment_info.course_id}) that are unrelated " +
+                      "for user (#{enrollment_info.user_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
 
           # preload the course object to avoid later queries for it
           @section.course = @course
-
 
           # cache available course roles for this account
           @course_roles_by_account_id[@course.account_id] ||= @course.account.available_course_roles
@@ -223,9 +223,9 @@ module SIS
 
           role = nil
           if enrollment_info.role_id
-            role = @course_roles_by_account_id[@course.account_id].detect {|r| r.global_id == Shard.global_id_for(enrollment_info.role_id, @course.shard)}
+            role = @course_roles_by_account_id[@course.account_id].detect { |r| r.global_id == Shard.global_id_for(enrollment_info.role_id, @course.shard) }
           end
-          role ||= @course_roles_by_account_id[@course.account_id].detect {|r| r.name == enrollment_info.role}
+          role ||= @course_roles_by_account_id[@course.account_id].detect { |r| r.name == enrollment_info.role }
 
           type = if role
                    role.base_role_type
@@ -325,7 +325,7 @@ module SIS
               msg = "An enrollment did not pass validation "
               msg += "(" + "course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
               msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                msg += enrollment.errors.full_messages.join(",") + ")"
+                     msg += enrollment.errors.full_messages.join(",") + ")"
               @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
               next
             rescue ActiveRecord::RecordNotUnique
@@ -333,7 +333,7 @@ module SIS
                 msg = "An enrollment failed to save "
                 msg += "(course: #{enrollment_info.course_id}, section: #{enrollment_info.section_id}, "
                 msg += "user: #{enrollment_info.user_id}, role: #{enrollment_info.role}, error: " +
-                  msg += enrollment.errors.full_messages.join(",") + ")"
+                       msg += enrollment.errors.full_messages.join(",") + ")"
                 @messages << SisBatch.build_error(enrollment_info.csv, msg, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
                 @retry = false
               else
@@ -360,11 +360,10 @@ module SIS
           @update_account_association_user_ids.merge(@incrementally_update_account_associations_user_ids)
         else
           User.update_account_associations(@incrementally_update_account_associations_user_ids.to_a,
-            :incremental => true,
-            :precalculated_associations => User.calculate_account_associations_from_accounts(
-              [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq, @account_chain_cache
-            )
-          )
+                                           :incremental => true,
+                                           :precalculated_associations => User.calculate_account_associations_from_accounts(
+                                             [@last_course.account_id, @last_section.nonxlist_course.try(:account_id)].compact.uniq, @account_chain_cache
+                                           ))
         end
         @incrementally_update_account_associations_user_ids = Set.new
       end
@@ -374,6 +373,7 @@ module SIS
       def enrollment_status(associated_user_id, enrollment, enrollment_info, pseudo, role, user)
         all_done = false
         return true if enrollment.workflow_state == 'deleted' && pseudo.workflow_state == 'deleted'
+
         if enrollment_info.status =~ /\Aactive/i
           message = set_enrollment_workflow_state(enrollment, enrollment_info, pseudo, user)
           @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info) if message
@@ -450,9 +450,9 @@ module SIS
         unless %w(active inactive).include? enrollment.workflow_state_before_last_save
           return %w(active inactive).include? enrollment.workflow_state
         end
+
         false
       end
     end
-
   end
 end

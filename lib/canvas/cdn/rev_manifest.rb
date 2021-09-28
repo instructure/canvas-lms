@@ -99,8 +99,10 @@ module Canvas
         end
 
         private
+
         def load_gulp_data_if_needed
           return if ActionController::Base.perform_caching && defined? @gulp_manifest
+
           RequestCache.cache("rev-manifest") do
             benchmark("reading rev-manifest") do
               file = Rails.root.join('public', 'dist', 'rev-manifest.json')
@@ -112,13 +114,14 @@ module Canvas
               else
                 @gulp_manifest = {}.freeze
               end
-              @gulp_revved_urls = Set.new(@gulp_manifest.values.map{|s| "/dist/#{s}" }).freeze
+              @gulp_revved_urls = Set.new(@gulp_manifest.values.map { |s| "/dist/#{s}" }).freeze
             end
           end
         end
 
         def load_webpack_data_if_needed
           return if (ActionController::Base.perform_caching || webpack_prod?) && defined? @webpack_manifest
+
           RequestCache.cache("webpack_manifest") do
             benchmark("reading webpack_manifest") do
               file = Rails.root.join('public', webpack_dir, 'webpack-manifest.json')
@@ -127,12 +130,12 @@ module Canvas
                 @webpack_manifest = JSON.parse(file.read).freeze
               else
                 raise "you need to run webpack" unless Rails.env.test?
+
                 @webpack_manifest = Hash.new(["Error: you need to run webpack"]).freeze
               end
             end
           end
         end
-
       end
     end
   end

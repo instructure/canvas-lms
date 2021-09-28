@@ -25,8 +25,8 @@ class GradingPeriod < ActiveRecord::Base
   has_many :scores, -> { active }
   has_many :submissions, -> { active }
   has_many :auditor_grade_change_records,
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    inverse_of: :grading_period
+           class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+           inverse_of: :grading_period
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validates :weight, numericality: true, allow_nil: true
@@ -133,10 +133,10 @@ class GradingPeriod < ActiveRecord::Base
   def last?
     # should never be nil, because self is part of the potential set
     @last_period ||= grading_period_group
-      .grading_periods
-      .active
-      .order(end_date: :desc)
-      .first
+                     .grading_periods
+                     .active
+                     .order(end_date: :desc)
+                     .first
     @last_period == self
   end
   alias_method :is_last, :last?
@@ -175,6 +175,7 @@ class GradingPeriod < ActiveRecord::Base
 
   def disable_post_to_sis
     raise(RangeError, "The grading period is not yet closed.") if Time.zone.now < close_date
+
     # This method is called from a job, to know if it is already processed we
     # cache that the job has processed.
     # If the look_back in the job is changed, the amount of time we cache needs
@@ -182,14 +183,14 @@ class GradingPeriod < ActiveRecord::Base
     look_back = Setting.get('disable_post_to_sis_on_grading_period', '60').to_i + 10
     due_at_range = start_date..end_date
     Rails.cache.fetch(['disable_post_to_sis_in_completed', self].cache_key, expires_in: look_back.minutes) do
-      possible_assignments_scope = Assignment.active.
-        where(root_account_id: root_account_id, post_to_sis: true)
-      scope = possible_assignments_scope.
-        where(due_at: due_at_range).
-        union(possible_assignments_scope.where("EXISTS (?)",
-          AssignmentOverride.active.
-            where("assignment_id = assignments.id").
-            where(set_type: "CourseSection", due_at_overridden: true, due_at: due_at_range)))
+      possible_assignments_scope = Assignment.active
+                                             .where(root_account_id: root_account_id, post_to_sis: true)
+      scope = possible_assignments_scope
+              .where(due_at: due_at_range)
+              .union(possible_assignments_scope.where("EXISTS (?)",
+                                                      AssignmentOverride.active
+                                                        .where("assignment_id = assignments.id")
+                                                        .where(set_type: "CourseSection", due_at_overridden: true, due_at: due_at_range)))
       # until all post_to_sis in scope are false, repeat.
       while scope.limit(1_000).update_all(post_to_sis: false, updated_at: Time.zone.now) == 1_000 do; end
       # caching that it has completed, so if this gets called again, it can skip.
@@ -238,7 +239,7 @@ class GradingPeriod < ActiveRecord::Base
   def not_overlapping
     if overlapping?
       errors.add(:base, t('errors.overlap_message',
-        "Grading period cannot overlap with existing grading periods in group"))
+                          "Grading period cannot overlap with existing grading periods in group"))
     end
   end
 

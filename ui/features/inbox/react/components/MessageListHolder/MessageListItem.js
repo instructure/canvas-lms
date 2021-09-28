@@ -21,7 +21,12 @@ import {Button, IconButton} from '@instructure/ui-buttons'
 import {Checkbox} from '@instructure/ui-checkbox'
 import {Focusable} from '@instructure/ui-focusable'
 import {Grid} from '@instructure/ui-grid'
-import {IconStarLightLine, IconStarSolid} from '@instructure/ui-icons'
+import {
+  IconStarLightLine,
+  IconStarSolid,
+  IconEmptyLine,
+  IconEmptySolid
+} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React, {useState} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
@@ -161,17 +166,25 @@ export const MessageListItem = ({...props}) => {
           <Grid.Row>
             <Grid.Col width="auto">
               <View textAlign="center" as="div" width={30} height={30} margin="0 small 0 0">
-                {props.isUnread && (
-                  <Badge
-                    type="notification"
-                    data-testid="unread-badge"
-                    standalone
-                    margin="x-small"
-                    formatOutput={() => {
-                      return <ScreenReaderContent>{I18n.t('Unread')}</ScreenReaderContent>
-                    }}
-                  />
-                )}
+                <IconButton
+                  color="primary"
+                  data-testid={props.isUnread ? 'unread-badge' : 'read-badge'}
+                  margin="x-small"
+                  onClick={() =>
+                    props.readStateChangeConversationParticipants({
+                      variables: {
+                        conversationIds: [props.conversation._id],
+                        workflowState: props.isUnread ? 'read' : 'unread'
+                      }
+                    })
+                  }
+                  screenReaderLabel={props.isUnread ? I18n.t('Unread') : I18n.t('Read')}
+                  size="small"
+                  withBackground={false}
+                  withBorder={false}
+                >
+                  {props.isUnread ? <IconEmptySolid /> : <IconEmptyLine />}
+                </IconButton>
               </View>
             </Grid.Col>
             <Grid.Col>{formatParticipants()}</Grid.Col>
@@ -277,7 +290,8 @@ export const conversationProp = PropTypes.shape({
   subject: PropTypes.string,
   participants: PropTypes.arrayOf(participantProp),
   conversationMessages: PropTypes.arrayOf(conversationMessageProp),
-  conversationMessagesConnection: PropTypes.object
+  conversationMessagesConnection: PropTypes.object,
+  conversationParticipantsConnection: PropTypes.object
 })
 
 MessageListItem.propTypes = {
@@ -288,5 +302,6 @@ MessageListItem.propTypes = {
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
-  onStar: PropTypes.func
+  onStar: PropTypes.func,
+  readStateChangeConversationParticipants: PropTypes.func
 }

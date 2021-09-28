@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 module ColorCommon
   def convert_hex_to_rgb_color(hex_color)
     hex_color = hex_color[1..-1]
-    rgb_array = hex_color.scan(/../).map {|color| color.to_i(16)}
+    rgb_array = hex_color.scan(/../).map { |color| color.to_i(16) }
     "(#{rgb_array[0]}, #{rgb_array[1]}, #{rgb_array[2]})"
   end
 

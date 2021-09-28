@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -29,11 +28,10 @@ describe "Exporter" do
     end
 
     @attachment = Attachment.create({
-      context: course_factory,
-      filename: 'exportable-test-file',
-      uploaded_data: File.open(cartridge_path)
-    })
-
+                                      context: course_factory,
+                                      filename: 'exportable-test-file',
+                                      uploaded_data: File.open(cartridge_path)
+                                    })
   end
 
   context "create web zip package default settings" do
@@ -41,11 +39,11 @@ describe "Exporter" do
       CC::Exporter::WebZip::Exporter.new(@attachment.open, false, :web_zip)
     end
 
-    it "should sort content by module" do
+    it "sorts content by module" do
       expect(exporter.base_template).to eq "../templates/module_sorting_template.html.erb"
     end
 
-    it "should not URL escape file names" do
+    it "does not URL escape file names" do
       expect(exporter.unsupported_files[1][:file_name]).to eq '!@#$%^&*().txt'
     end
   end

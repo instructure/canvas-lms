@@ -30,9 +30,9 @@ module DifferentiatedAssignments
 
       private
 
-        def create_section(section_name)
-          DifferentiatedAssignments.the_course.course_sections.create!(name: section_name)
-        end
+      def create_section(section_name)
+        DifferentiatedAssignments.the_course.course_sections.create!(name: section_name)
+      end
     end
   end
 end

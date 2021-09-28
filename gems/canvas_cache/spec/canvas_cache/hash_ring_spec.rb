@@ -31,12 +31,12 @@ describe CanvasCache::HashRing do
           @name
         end
       end
-      ring = CanvasCache::HashRing.new(["node1", "node2", "node3"].map{|n| node_klass.new(n) })
+      ring = CanvasCache::HashRing.new(["node1", "node2", "node3"].map { |n| node_klass.new(n) })
       keys = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p"]
-      mapping_1 = keys.map{|k| ring.get_node(k) }
+      mapping_1 = keys.map { |k| ring.get_node(k) }
       ring.add_node(node_klass.new("node4"))
-      mapping_2 = keys.map{|k| ring.get_node(k) }
-      stable_nodes = mapping_1.each_with_index.select{|node, i| mapping_2[i] == node }
+      mapping_2 = keys.map { |k| ring.get_node(k) }
+      stable_nodes = mapping_1.each_with_index.select { |node, i| mapping_2[i] == node }
       # at least half the keys don't change nodes
       expect(stable_nodes.count > (keys.count / 2)).to be_truthy
     end

@@ -21,10 +21,13 @@ module Lti
   class SubscriptionsValidator
     class InvalidContextType < StandardError
     end
+
     class MissingCapability < StandardError
     end
+
     class ToolNotInContext < StandardError
     end
+
     class ContextNotFound < StandardError
     end
 
@@ -65,6 +68,7 @@ module Lti
 
     def self.validate_subscription_context!(subscription)
       raise ContextNotFound unless retrieve_context(subscription).present?
+
       true
     end
 

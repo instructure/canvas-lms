@@ -46,10 +46,10 @@ module AssignmentsHelper
       submission_author_name_for(assessment)
     ]
     href = if assignment.anonymous_peer_reviews?
-      context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
-    else
-      context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
-    end
+             context_url(context, :context_assignment_anonymous_submission_url, assignment.id, assessment.asset.anonymous_id)
+           else
+             context_url(context, :context_assignment_submission_url, assignment.id, assessment.asset.user_id)
+           end
     link_to text, href, options
   end
 
@@ -92,18 +92,19 @@ module AssignmentsHelper
 
   def turnitin_active?
     @assignment.turnitin_enabled? && @context.turnitin_enabled? &&
-    !@assignment.submission_types.include?("none")
+      !@assignment.submission_types.include?("none")
   end
 
   def vericite_active?
     @assignment.vericite_enabled? && @context.vericite_enabled? &&
-    !@assignment.submission_types.include?("none")
+      !@assignment.submission_types.include?("none")
   end
 
   def i18n_grade(grade, grading_type = nil)
     if grading_type == "pass_fail" && %w{complete incomplete}.include?(grade)
       return grade == "complete" ? I18n.t("Complete") : I18n.t("Incomplete")
     end
+
     number = Float(grade.sub(/%$/, '')) rescue nil
     if number.present?
       if grading_type.nil?

@@ -19,7 +19,6 @@
 #
 
 class Quizzes::QuizRegrader::Answer
-
   REGRADE_OPTIONS = [
     'full_credit',
     'current_and_previous_correct',

@@ -25,7 +25,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    discussion_topic_model({context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED})
+    discussion_topic_model({ context: @course, discussion_type: DiscussionTopic::DiscussionTypes::THREADED })
   end
 
   def mutation_str(
@@ -80,6 +80,21 @@ RSpec.describe Mutations::CreateDiscussionEntry do
     entry = @topic.discussion_entries.last
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', '_id')).to eq entry.id.to_s
     expect(result.dig('data', 'createDiscussionEntry', 'discussionEntry', 'message')).to eq entry.message
+  end
+
+  it 'deletes discussion_entry_drafts on create' do
+    draft_id = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: 'Howdy Hey')
+    run_mutation(discussion_topic_id: @topic.id, message: 'Howdy Hey')
+    expect(DiscussionEntryDraft.where(id: draft_id)).to eq []
+  end
+
+  it 'deletes discussion_entry_drafts on create for the correct entry' do
+    parent = @topic.discussion_entries.create!(message: 'parent entry', user: @teacher, discussion_topic: @topic)
+
+    keeper = DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, message: 'Howdy Hey')
+    DiscussionEntryDraft.upsert_draft(user: @student, topic: @topic, parent: parent, message: 'delete_me')
+    run_mutation(discussion_topic_id: @topic.id, message: 'child entry', parent_entry_id: parent.id)
+    expect(DiscussionEntryDraft.where(discussion_topic_id: @topic).pluck(:id)).to eq keeper
   end
 
   it 'replies to an existing discussion entry' do
@@ -170,7 +185,7 @@ RSpec.describe Mutations::CreateDiscussionEntry do
 
     it 'if the user does not have permission to read' do
       user = user_model
-      result = run_mutation({discussion_topic_id: @topic.id, message: 'this should fail'}, user)
+      result = run_mutation({ discussion_topic_id: @topic.id, message: 'this should fail' }, user)
       expect(result.dig('data', 'createDiscussionEntry')).to be nil
       expect(result.dig('errors', 0, 'message')).to eq 'not found'
     end

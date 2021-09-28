@@ -24,7 +24,6 @@ describe "Course Account Reports" do
   include ReportSpecHelper
 
   before(:once) do
-
     Notification.where(name: "Report Generated").first_or_create
     Notification.where(name: "Report Generation Failed").first_or_create
     @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
@@ -77,33 +76,32 @@ describe "Course Account Reports" do
       @report = 'unpublished_courses_csv'
     end
 
-    it "should run unpublished courses report on a term" do
+    it "runs unpublished courses report on a term" do
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = read_report(@report, {params: parameters})
+      parsed = read_report(@report, { params: parameters })
 
       expect(parsed).to eq [[@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                         "Science 101", nil, nil]]
-      expect(parsed.length).to eq 1
-
-    end
-
-    it "should run unpublished courses report on sub account" do
-      parsed = read_report(@report, {account: @sub_account})
-
-      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                         "English 101", @course1.start_at.iso8601,
-                         @course1.conclude_at.iso8601]]
+                             "Science 101", nil, nil]]
       expect(parsed.length).to eq 1
     end
 
-    it "should run unpublished courses report" do
-      parsed = read_report(@report, {order: 1})
+    it "runs unpublished courses report on sub account" do
+      parsed = read_report(@report, { account: @sub_account })
+
       expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                         "English 101", @course1.start_at.iso8601,
-                         @course1.conclude_at.iso8601],
-                        [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                         "Science 101", nil, nil]]
+                             "English 101", @course1.start_at.iso8601,
+                             @course1.conclude_at.iso8601]]
+      expect(parsed.length).to eq 1
+    end
+
+    it "runs unpublished courses report" do
+      parsed = read_report(@report, { order: 1 })
+      expect(parsed).to eq [[@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
+                             "English 101", @course1.start_at.iso8601,
+                             @course1.conclude_at.iso8601],
+                            [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
+                             "Science 101", nil, nil]]
       expect(parsed.length).to eq 2
     end
   end
@@ -113,37 +111,37 @@ describe "Course Account Reports" do
       @report = 'recently_deleted_courses_csv'
     end
 
-    it "should run recently deleted courses report on a term" do
+    it "runs recently deleted courses report on a term" do
       @course1.destroy
       parameters = {}
       parameters["enrollment_term_id"] = @default_term.id
-      parsed = read_report(@report,{params: parameters})
+      parsed = read_report(@report, { params: parameters })
 
       expect(parsed[0]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
-                           "Math 101", nil, nil]
+                               "Math 101", nil, nil]
       expect(parsed.length).to eq 1
     end
 
-    it "should run recently deleted courses report on sub account" do
+    it "runs recently deleted courses report on sub account" do
       @course1.destroy
-      parsed = read_report(@report, {account: @sub_account})
+      parsed = read_report(@report, { account: @sub_account })
 
       expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                           "English 101", @course1.start_at.iso8601,
-                           @course1.conclude_at.iso8601]
+                               "English 101", @course1.start_at.iso8601,
+                               @course1.conclude_at.iso8601]
       expect(parsed.length).to eq 1
     end
 
-    it "should run recently deleted courses report" do
+    it "runs recently deleted courses report" do
       @course1.destroy
-      parsed = read_report(@report, {order: 1})
+      parsed = read_report(@report, { order: 1 })
       expect(parsed.length).to eq 2
 
       expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                           "English 101", @course1.start_at.iso8601,
-                           @course1.conclude_at.iso8601]
+                               "English 101", @course1.start_at.iso8601,
+                               @course1.conclude_at.iso8601]
       expect(parsed[1]).to eq [@course2.id.to_s, "SIS_COURSE_ID_2", "MAT101",
-                           "Math 101", nil, nil]
+                               "Math 101", nil, nil]
     end
   end
   describe "Unused Course report" do
@@ -161,40 +159,41 @@ describe "Course Account Reports" do
       @quiz = @course5.quizzes.create!(:title => "new quiz")
     end
 
-    it "should find courses with no active objects" do
+    it "finds courses with no active objects" do
       @assignment.destroy
       @attachment.destroy
 
-      parsed = read_report(@type, {order: 3})
+      parsed = read_report(@type, { order: 3 })
       expect(parsed.length).to eq 3
 
       expect(parsed[0]).to eq [@course1.id.to_s, "SIS_COURSE_ID_1", "ENG101",
-                           "English 101", "unpublished",
-                           @course1.created_at.iso8601]
+                               "English 101", "unpublished",
+                               @course1.created_at.iso8601]
       expect(parsed[1]).to eq [@course3.id.to_s, "SIS_COURSE_ID_3", "SCI101",
-                           "Science 101", "unpublished",
-                           @course3.created_at.iso8601]
+                               "Science 101", "unpublished",
+                               @course3.created_at.iso8601]
       expect(parsed[2]).to eq [@course6.id.to_s, nil, "THE01",
-                           "Theology 101", "unpublished",
-                           @course6.created_at.iso8601]
+                               "Theology 101", "unpublished",
+                               @course6.created_at.iso8601]
     end
 
-    it "should not find courses with objects" do
+    it "does not find courses with objects" do
       @wiki_page = @course6.wiki_pages.create(
         :title => "Some random wiki page",
-        :body => "wiki page content")
+        :body => "wiki page content"
+      )
       report = run_report(@type)
       expect(report.parameters["extra_text"]).to eq "Term: All Terms;"
       parsed = parse_report(report)
       expect(parsed.length).to eq 0
     end
 
-    it "should set run_at" do
+    it "sets run_at" do
       report = run_report(@type)
       expect(report.start_at).not_to be_nil
     end
 
-    it "should run unused courses report with a term" do
+    it "runs unused courses report with a term" do
       @term1 = @account.enrollment_terms.create(:name => 'Fall')
       @assignment.destroy
       @course5.enrollment_term = @term1
@@ -203,15 +202,15 @@ describe "Course Account Reports" do
       @course6.save
       parameters = {}
       parameters["enrollment_term_id"] = @term1.id
-      parsed = read_report(@type, {params: parameters})
+      parsed = read_report(@type, { params: parameters })
       expect(parsed.length).to eq 1
 
       expect(parsed[0]).to eq [@course6.id.to_s, nil, "THE01",
-                           "Theology 101", "unpublished",
-                           @course6.created_at.iso8601]
+                               "Theology 101", "unpublished",
+                               @course6.created_at.iso8601]
     end
 
-    it "should run unused courses report on a sub account" do
+    it "runs unused courses report on a sub account" do
       sub_account = Account.create(:parent_account => @account,
                                    :name => 'English')
       @course3.account = sub_account
@@ -219,12 +218,12 @@ describe "Course Account Reports" do
       @course4.account = sub_account
       @course4.save
       @module.destroy
-      parsed = read_report(@type, {account: sub_account})
+      parsed = read_report(@type, { account: sub_account })
       expect(parsed.length).to eq 1
 
       expect(parsed[0]).to eq [@course4.id.to_s, nil, "self",
-                           "self help", "active",
-                           @course4.created_at.iso8601]
+                               "self help", "active",
+                               @course4.created_at.iso8601]
     end
   end
 
@@ -249,32 +248,31 @@ describe "Course Account Reports" do
       child.save!
     end
 
-    it 'should add up storage for courses' do
-      parsed = read_report(@report, {account: @account, order: "skip", header: true})
+    it 'adds up storage for courses' do
+      parsed = read_report(@report, { account: @account, order: "skip", header: true })
       expect(parsed.length).to eq 5
       headers = parsed.shift
       expect(headers.length).to eq parsed[0].length
       expect(parsed).to match_array [
-                              [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
-                               'English 101', @sub_account.id.to_s, 'sub1',
-                               'Math', '1.23', '81.23'],
-                              [@course3.id.to_s, 'SIS_COURSE_ID_3', 'SCI101',
-                               'Science 101', @account.id.to_s, nil,
-                               @account.name, '0.0', '0.0'],
-                              [@course5.id.to_s, nil, 'Tal101', 'talking 101',
-                               @account.id.to_s, nil, @account.name, '92.0', '92.0'],
-                              [@course4.id.to_s, nil, 'self', 'self help',
-                               @account.id.to_s, nil, @account.name, '4.65', '4.65']
+        [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
+         'English 101', @sub_account.id.to_s, 'sub1',
+         'Math', '1.23', '81.23'],
+        [@course3.id.to_s, 'SIS_COURSE_ID_3', 'SCI101',
+         'Science 101', @account.id.to_s, nil,
+         @account.name, '0.0', '0.0'],
+        [@course5.id.to_s, nil, 'Tal101', 'talking 101',
+         @account.id.to_s, nil, @account.name, '92.0', '92.0'],
+        [@course4.id.to_s, nil, 'self', 'self help',
+         @account.id.to_s, nil, @account.name, '4.65', '4.65']
       ]
     end
 
-    it 'should add up storage for courses in sub account' do
-      parsed = read_report(@report, {account: @sub_account})
+    it 'adds up storage for courses in sub account' do
+      parsed = read_report(@report, { account: @sub_account })
       expect(parsed.length).to eq 1
       expect(parsed[0]).to eq [@course1.id.to_s, 'SIS_COURSE_ID_1', 'ENG101',
                                'English 101', @sub_account.id.to_s, 'sub1',
                                'Math', '1.23', '81.23']
     end
   end
-
 end

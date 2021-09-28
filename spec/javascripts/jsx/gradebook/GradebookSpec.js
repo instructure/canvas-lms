@@ -1600,6 +1600,13 @@ QUnit.module('Gradebook', () => {
       strictEqual(UserSettings.contextGet('warned_about_totals_display'), true)
     })
 
+    test('show_total_grade_as_points env is mutable', () => {
+      const originalValue = gradebook.options.show_total_grade_as_points
+      gradebook.options.show_total_grade_as_points = !gradebook.options.show_total_grade_as_points
+      notEqual(originalValue, gradebook.options.show_total_grade_as_points)
+      gradebook.options.show_total_grade_as_points = originalValue
+    })
+
     test('disables "Show Total Grade as Points" when previously enabled', () => {
       gradebook.switchTotalDisplay({dontWarnAgain: false})
       strictEqual(gradebook.options.show_total_grade_as_points, false)

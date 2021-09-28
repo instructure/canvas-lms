@@ -64,13 +64,13 @@ describe Types::MediaObjectType do
       }
 
       expect(resolve_media_object_field(
-        'mediaSources {
+               'mediaSources {
           url
         }'
-      )).to eq([
-        random_url,
-        random_url2
-      ])
+             )).to eq([
+                        random_url,
+                        random_url2
+                      ])
     end
 
     it 'returns the correct media tracks for the media object' do
@@ -98,10 +98,10 @@ describe Types::MediaObjectType do
       }
 
       expect(resolve_media_object_field(
-        'mediaSources {
+               'mediaSources {
           url
         }'
-      )).to eq([])
+             )).to eq([])
     end
 
     it 'checks permissions on canAddCaptions' do

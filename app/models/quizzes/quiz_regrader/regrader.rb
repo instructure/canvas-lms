@@ -20,7 +20,6 @@
 
 module Quizzes::QuizRegrader
   class Regrader
-
     attr_reader :quiz, :quiz_version_number
 
     def initialize(options)
@@ -37,7 +36,8 @@ module Quizzes::QuizRegrader
         submissions.each do |submission|
           Quizzes::QuizRegrader::Submission.new(
             :submission => submission,
-            :question_regrades => question_regrades).regrade!
+            :question_regrades => question_regrades
+          ).regrade!
         end
       end
     end
@@ -57,10 +57,12 @@ module Quizzes::QuizRegrader
 
     def find_quiz_version(quiz)
       return quiz unless quiz_version_number.present?
+
       Version.where(
         versionable_type: Quizzes::Quiz.class_names,
         versionable_id: quiz.id,
-        number: quiz_version_number).first.model
+        number: quiz_version_number
+      ).first.model
     end
 
     # quiz question regrades keyed by question id

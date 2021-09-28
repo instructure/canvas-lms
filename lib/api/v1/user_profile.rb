@@ -43,7 +43,7 @@ module Api::V1::UserProfile
     json[:effective_locale] = I18n.locale if user == current_user
 
     if user == current_user
-      json[:calendar] = {:ics => "#{feeds_calendar_url(user.feed_code)}.ics"}
+      json[:calendar] = { :ics => "#{feeds_calendar_url(user.feed_code)}.ics" }
       json[:lti_user_id] = user.lti_context_id if user.lti_context_id.present?
       json[:k5_user] = k5_user?
     end
@@ -53,7 +53,7 @@ module Api::V1::UserProfile
         user.user_services :
         user.user_services.visible
 
-      services = services.select{|s| feature_and_service_enabled?(s.service)}
+      services = services.select { |s| feature_and_service_enabled?(s.service) }
       json[:user_services] = services.map { |s| user_service_json(s, current_user, session) }
     end
 

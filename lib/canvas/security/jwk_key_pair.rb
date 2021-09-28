@@ -20,6 +20,7 @@
 module Canvas::Security
   class JWKKeyPair
     attr_reader :public_key, :private_key, :alg, :use
+
     def to_jwk
       private_key.to_jwk(kid: kid, alg: alg, use: use)
     end

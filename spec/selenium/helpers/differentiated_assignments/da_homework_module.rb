@@ -24,7 +24,6 @@ require_relative 'da_homework_quizzes_module'
 module DifferentiatedAssignments
   module Homework
     class << self
-
       def initialize
         DifferentiatedAssignments::Homework::Assignments.initialize
         DifferentiatedAssignments::Homework::Discussions.initialize

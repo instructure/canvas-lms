@@ -75,8 +75,8 @@ describe AuthenticationProvider::PluginSettings do
 
     before do
       allow(plugin).to receive(:settings).and_return(auth_host: 'ps',
-                                      noninherited_method: 'hidden',
-                                      renamed_setting: 'renamed')
+                                                     noninherited_method: 'hidden',
+                                                     renamed_setting: 'renamed')
     end
 
     context "with plugin config" do

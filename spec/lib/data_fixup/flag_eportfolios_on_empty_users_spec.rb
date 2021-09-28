@@ -38,12 +38,12 @@ describe DataFixup::FlagEportfoliosOnEmptyUsers do
     DataFixup::FlagEportfoliosOnEmptyUsers.run
 
     # Don't touch normal user eportfolios
-    expect([te1, te2, aae1].map{|e| e.reload.spam_status}).to eq [nil, nil, nil]
+    expect([te1, te2, aae1].map { |e| e.reload.spam_status }).to eq [nil, nil, nil]
 
     # Don't touch already flagged eportfolios
-    expect([te3, se3].map{|e| e.reload.spam_status}).to eq ['marked_as_safe', 'marked_as_spam']
+    expect([te3, se3].map { |e| e.reload.spam_status }).to eq ['marked_as_safe', 'marked_as_spam']
 
     # Flag others
-    expect([se1, se2].map{|e| e.reload.spam_status}).to eq ['flagged_as_possible_spam', 'flagged_as_possible_spam']
+    expect([se1, se2].map { |e| e.reload.spam_status }).to eq ['flagged_as_possible_spam', 'flagged_as_possible_spam']
   end
 end

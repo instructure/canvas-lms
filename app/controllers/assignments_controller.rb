@@ -48,7 +48,8 @@ class AssignmentsController < ApplicationController
 
       if authorized_action(@context, @current_user, :read)
         return unless tab_enabled?(@context.class::TAB_ASSIGNMENTS)
-        log_asset_access([ "assignments", @context ], 'assignments', 'other')
+
+        log_asset_access(["assignments", @context], 'assignments', 'other')
 
         add_crumb(t('#crumbs.assignments', "Assignments"), named_context_url(@context, :context_assignments_url))
 
@@ -113,26 +114,26 @@ class AssignmentsController < ApplicationController
     end
 
     assignment_prereqs = if @locked && @locked[:unlock_at]
-      @locked
-     elsif @locked && !@locked[:can_view]
-       context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
-     else
-       {}
-     end
+                           @locked
+                         elsif @locked && !@locked[:can_view]
+                           context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+                         else
+                           {}
+                         end
 
     js_env({
-      belongs_to_unpublished_module: @locked && !@locked[:can_view] && @locked.dig(:context_module, "workflow_state") == "unpublished"
-    })
+             belongs_to_unpublished_module: @locked && !@locked[:can_view] && @locked.dig(:context_module, "workflow_state") == "unpublished"
+           })
 
     mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
     if mark_done_presenter.has_requirement?
       js_env({
-        CONTEXT_MODULE_ITEM: {
-          done: mark_done_presenter.checked?,
-          id: mark_done_presenter.item.id,
-          module_id: mark_done_presenter.module.id
-        }
-      })
+               CONTEXT_MODULE_ITEM: {
+                 done: mark_done_presenter.checked?,
+                 id: mark_done_presenter.item.id,
+                 module_id: mark_done_presenter.module.id
+               }
+             })
     end
 
     if @assignment.turnitin_enabled? || @assignment.vericite_enabled? || @assignment.tool_settings_tool.present?
@@ -142,16 +143,16 @@ class AssignmentsController < ApplicationController
         PLEDGE_TEXT: pledge_text,
       }
 
-      js_env({SIMILARITY_PLEDGE: similarity_pledge})
+      js_env({ SIMILARITY_PLEDGE: similarity_pledge })
     end
 
     js_env({
-      ASSIGNMENT_ID: params[:id],
-      CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
-      COURSE_ID: @context.id,
-      PREREQS: assignment_prereqs,
-      SUBMISSION_ID: graphql_submisison_id
-    })
+             ASSIGNMENT_ID: params[:id],
+             CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+             COURSE_ID: @context.id,
+             PREREQS: assignment_prereqs,
+             SUBMISSION_ID: graphql_submisison_id
+           })
     css_bundle :assignments_2_student
     js_bundle :assignments_show_student
     render html: '', layout: true
@@ -161,6 +162,7 @@ class AssignmentsController < ApplicationController
     if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
+
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
@@ -196,8 +198,8 @@ class AssignmentsController < ApplicationController
         if can_read_submissions
           @current_user_submission = @assignment.submissions.where(user_id: @current_user).first if @current_user
           @current_user_submission = nil if @current_user_submission &&
-            !@current_user_submission.graded? &&
-            !@current_user_submission.submission_type
+                                            !@current_user_submission.graded? &&
+                                            !@current_user_submission.submission_type
           if @current_user_submission
             GuardRail.activate(:primary) do
               @current_user_submission.delay.context_module_action
@@ -214,7 +216,7 @@ class AssignmentsController < ApplicationController
           return
         end
 
-        env = js_env({COURSE_ID: @context.id})
+        env = js_env({ COURSE_ID: @context.id })
         submission = @assignment.submissions.find_by(user: @current_user)
         if submission
           js_env({ SUBMISSION_ID: submission.id })
@@ -227,7 +229,7 @@ class AssignmentsController < ApplicationController
         if env[:SETTINGS][:filter_speed_grader_by_student_group]
           eligible_categories = @context.group_categories.active
           eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
-          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
+          env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, { include: ['groups'] })
 
           selected_group_id = @current_user&.get_preference(:gradebook_settings, @context.global_id)&.dig('filter_rows_by', 'student_group_id')
           # If this is a group assignment and we had previously filtered by a
@@ -246,10 +248,10 @@ class AssignmentsController < ApplicationController
         if @assignment.quiz?
           return redirect_to named_context_url(@context, :context_quiz_url, @assignment.quiz.id)
         elsif @assignment.discussion_topic? &&
-          @assignment.discussion_topic.grants_right?(@current_user, session, :read)
+              @assignment.discussion_topic.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_discussion_topic_url, @assignment.discussion_topic.id)
         elsif @context.feature_enabled?(:conditional_release) && @assignment.wiki_page? &&
-          @assignment.wiki_page.grants_right?(@current_user, session, :read)
+              @assignment.wiki_page.grants_right?(@current_user, session, :read)
           return redirect_to named_context_url(@context, :context_wiki_page_url, @assignment.wiki_page.id)
         elsif @assignment.submission_types == 'external_tool' && @assignment.external_tool_tag && @unlocked
           tag_type = params[:module_item_id].present? ? :modules : :assignments
@@ -258,10 +260,10 @@ class AssignmentsController < ApplicationController
 
         add_crumb(@assignment.title, polymorphic_url([@context, @assignment]))
         @page_title = if @assignment.new_record?
-          t(:new_assignment, "New Assignment")
-        else
-          @assignment.title
-        end
+                        t(:new_assignment, "New Assignment")
+                      else
+                        @assignment.title
+                      end
 
         rce_js_env
         assignment_prereqs = {}
@@ -269,9 +271,9 @@ class AssignmentsController < ApplicationController
           assignment_prereqs = context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
         end
         js_env({
-          ASSIGNMENT_ID: @assignment.id,
-          PREREQS: assignment_prereqs
-        })
+                 ASSIGNMENT_ID: @assignment.id,
+                 PREREQS: assignment_prereqs
+               })
 
         if @context.feature_enabled?(:assignments_2_teacher) && (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2]))
           if can_do(@context, @current_user, :read_as_admin)
@@ -309,14 +311,14 @@ class AssignmentsController < ApplicationController
         @similarity_pledge = pledge_text
 
         js_env({
-          EULA_URL: tool_eula_url,
-          EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
-          PERMISSIONS: permissions,
-          ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
-          SIMILARITY_PLEDGE: @similarity_pledge,
-          CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
-          USER_ASSET_STRING: @current_user&.asset_string,
-        })
+                 EULA_URL: tool_eula_url,
+                 EXTERNAL_TOOLS: external_tools_json(@external_tools, @context, @current_user, session),
+                 PERMISSIONS: permissions,
+                 ROOT_OUTCOME_GROUP: outcome_group_json(@context.root_outcome_group, @current_user, session),
+                 SIMILARITY_PLEDGE: @similarity_pledge,
+                 CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
+                 USER_ASSET_STRING: @current_user&.asset_string,
+               })
 
         set_master_course_js_env_data(@assignment, @context)
         conditional_release_js_env(@assignment, includes: :rule)
@@ -399,11 +401,11 @@ class AssignmentsController < ApplicationController
       rescue GoogleDrive::NoTokenError,
              Google::APIClient::AuthorizationError => e
         Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs =  { errors: { base: t("Auth failure in connecting to Google Drive.") } }
+        docs = { errors: { base: t("Auth failure in connecting to Google Drive.") } }
         status_code = :unauthorized
       rescue GoogleDrive::ConnectionException => e
         Canvas::Errors.capture_exception(:oauth, e, :warn)
-        docs =  { errors: { base: t("Unable to connect to Google Drive.") } }
+        docs = { errors: { base: t("Unable to connect to Google Drive.") } }
         status_code = :gateway_timeout
       rescue ArgumentError => e
         Canvas::Errors.capture_exception(:oauth, e)
@@ -415,9 +417,8 @@ class AssignmentsController < ApplicationController
         format.json { render json: docs.to_hash, status: status_code }
       end
     else
-      error_object = {errors:
-        {base: t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.")}
-      }
+      error_object = { errors:
+        { base: t('errors.google_docs_masquerade_rejected', "Unable to connect to Google Docs as a masqueraded user.") } }
       respond_to do |format|
         format.json { render json: error_object, status: :bad_request }
       end
@@ -468,7 +469,7 @@ class AssignmentsController < ApplicationController
           format.json { render :json => @request }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => t('errors.reminder_failed', "Reminder failed")}}, :status => :bad_request }
+          format.json { render :json => { :errors => { :base => t('errors.reminder_failed', "Reminder failed") } }, :status => :bad_request }
         end
       end
     end
@@ -484,7 +485,7 @@ class AssignmentsController < ApplicationController
           format.json { render :json => @request }
         else
           format.html { redirect_to named_context_url(@context, :context_assignment_peer_reviews_url) }
-          format.json { render :json => {:errors => {:base => t('errors.delete_reminder_failed', "Delete failed")}}, :status => :bad_request }
+          format.json { render :json => { :errors => { :base => t('errors.delete_reminder_failed', "Delete failed") } }, :status => :bad_request }
         end
       end
     end
@@ -516,13 +517,14 @@ class AssignmentsController < ApplicationController
 
     @course_home_sub_navigation_tools =
       ContextExternalTool.all_tools_for(@context, placements: :course_home_sub_navigation,
-                                        root_account: @domain_root_account, current_user: @current_user).to_a
+                                                  root_account: @domain_root_account, current_user: @current_user).to_a
     unless @context.grants_right?(@current_user, session, :manage_content)
-      @course_home_sub_navigation_tools.reject! {|tool| tool.course_home_sub_navigation(:visibility) == 'admins'}
+      @course_home_sub_navigation_tools.reject! { |tool| tool.course_home_sub_navigation(:visibility) == 'admins' }
     end
 
     if authorized_action(@context, @current_user, [:read, :read_syllabus])
       return unless tab_enabled?(@context.class::TAB_SYLLABUS)
+
       @groups = @context.assignment_groups.active.order(
         :position,
         AssignmentGroup.best_unicode_collation_key('name')
@@ -536,7 +538,7 @@ class AssignmentsController < ApplicationController
       js_env(hash)
       set_tutorial_js_env
 
-      log_asset_access([ "syllabus", @context ], "syllabus", 'other')
+      log_asset_access(["syllabus", @context], "syllabus", 'other')
       respond_to do |format|
         format.html
       end
@@ -545,6 +547,7 @@ class AssignmentsController < ApplicationController
 
   def toggle_mute
     return nil unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
+
     @assignment = @context.assignments.active.find(params[:assignment_id])
 
     toggle_value = params[:status] == 'true'
@@ -590,7 +593,7 @@ class AssignmentsController < ApplicationController
           if @assignment.save
             flash[:notice] = t 'notices.created', "Assignment was successfully created."
             format.html { redirect_to named_context_url(@context, :context_assignment_url, @assignment.id) }
-            format.json { render :json => @assignment.as_json(:permissions => {:user => @current_user, :session => session}), :status => :created}
+            format.json { render :json => @assignment.as_json(:permissions => { :user => @current_user, :session => session }), :status => :created }
           else
             format.html { render :new }
             format.json { render :json => @assignment.errors, :status => :bad_request }
@@ -638,14 +641,14 @@ class AssignmentsController < ApplicationController
       elsif @assignment.submission_types == 'discussion_topic' && @assignment.discussion_topic
         return redirect_to edit_polymorphic_url([@context, @assignment.discussion_topic], index_edit_params)
       elsif @context.feature_enabled?(:conditional_release) &&
-        @assignment.submission_types == 'wiki_page' && @assignment.wiki_page
+            @assignment.submission_types == 'wiki_page' && @assignment.wiki_page
         return redirect_to edit_polymorphic_url([@context, @assignment.wiki_page], index_edit_params)
       end
 
       assignment_groups = @context.assignment_groups.active
-      group_categories = @context.group_categories.
-        select { |c| !c.student_organized? }.
-        map { |c| { :id => c.id, :name => c.name } }
+      group_categories = @context.group_categories
+                                 .select { |c| !c.student_organized? }
+                                 .map { |c| { :id => c.id, :name => c.name } }
 
       # if assignment has student submissions and is attached to a deleted group category,
       # add that category to the ENV list so it can be shown on the edit page.
@@ -655,7 +658,7 @@ class AssignmentsController < ApplicationController
       end
 
       json_for_assignment_groups = assignment_groups.map do |group|
-        assignment_group_json(group, @current_user, session, [], {stringify_json_ids: true})
+        assignment_group_json(group, @current_user, session, [], { stringify_json_ids: true })
       end
 
       post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -720,7 +723,7 @@ class AssignmentsController < ApplicationController
       hash[:MODERATED_GRADING_ENABLED] = @context.feature_enabled?(:moderated_grading)
       hash[:ANONYMOUS_INSTRUCTOR_ANNOTATIONS_ENABLED] = @context.feature_enabled?(:anonymous_instructor_annotations)
       hash[:SUBMISSION_TYPE_SELECTION_TOOLS] = external_tools_display_hashes(:submission_type_selection, @context,
-      [:base_title, :external_url, :selection_width, :selection_height])
+                                                                             [:base_title, :external_url, :selection_width, :selection_height])
 
       append_sis_data(hash)
       if context.is_a?(Course)
@@ -753,6 +756,7 @@ class AssignmentsController < ApplicationController
     if @assignment.quiz_lti? && @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       return polymorphic_url([@context, :quizzes])
     end
+
     @assignment.new_record? ? polymorphic_url([@context, :assignments]) : polymorphic_url([@context, @assignment])
   end
 
@@ -884,22 +888,23 @@ class AssignmentsController < ApplicationController
 
   def strong_assignment_params
     params.require(:assignment)
-      .permit(:title, :name, :description, :due_at, :points_possible,
-              :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
-              :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
-              :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
-              :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
-              :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
-              :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
-              :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
-              :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
-              :allowed_extensions => strong_anything,
-              :turnitin_settings => strong_anything,
-              :integration_data => strong_anything)
+          .permit(:title, :name, :description, :due_at, :points_possible,
+                  :grading_type, :submission_types, :assignment_group, :unlock_at, :lock_at,
+                  :group_category, :group_category_id, :peer_review_count, :anonymous_peer_reviews,
+                  :peer_reviews_due_at, :peer_reviews_assign_at, :grading_standard_id,
+                  :peer_reviews, :automatic_peer_reviews, :grade_group_students_individually,
+                  :notify_of_update, :time_zone_edited, :turnitin_enabled, :vericite_enabled,
+                  :context, :position, :external_tool_tag_attributes, :freeze_on_copy,
+                  :only_visible_to_overrides, :post_to_sis, :sis_assignment_id, :integration_id, :moderated_grading,
+                  :omit_from_final_grade, :intra_group_peer_reviews, :important_dates,
+                  :allowed_extensions => strong_anything,
+                  :turnitin_settings => strong_anything,
+                  :integration_data => strong_anything)
   end
 
   def get_assignment_group(assignment_params)
     return unless assignment_params
+
     if (group_id = assignment_params[:assignment_group_id]).present?
       @context.assignment_groups.find(group_id)
     end

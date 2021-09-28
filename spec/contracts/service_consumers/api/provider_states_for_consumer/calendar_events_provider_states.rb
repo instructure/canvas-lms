@@ -19,7 +19,6 @@
 
 PactConfig::Consumers::ALL.each do |consumer|
   Pact.provider_states_for consumer do
-
     # User ID: 2 || Name: Admin1
     # Event ID: 1
     provider_state 'a user with a calendar event' do

@@ -45,14 +45,14 @@ shared_examples_for 'a locked api item' do
     course_with_student(:active_all => true)
   end
 
-  it 'should have the correct helpers' do
+  it 'has the correct helpers' do
     expect(respond_to?(:locked_item)).to be_truthy
     expect(respond_to?(:api_get_json)).to be_truthy
 
     expect(locked_item).not_to be_nil
   end
 
-  it 'should unlock using unlock_at' do
+  it 'unlocks using unlock_at' do
     if locked_item.respond_to?(:unlock_at)
       verify_unlocked
 
@@ -63,7 +63,7 @@ shared_examples_for 'a locked api item' do
     end
   end
 
-  it 'should lock using lock_at' do
+  it 'locks using lock_at' do
     if locked_item.respond_to?(:lock_at)
       verify_unlocked
 
@@ -74,7 +74,7 @@ shared_examples_for 'a locked api item' do
     end
   end
 
-  it 'should be locked by a context module that is not yet complete' do
+  it 'is locked by a context module that is not yet complete' do
     if respond_to?(:item_type)
       verify_unlocked
 
@@ -94,7 +94,7 @@ shared_examples_for 'a locked api item' do
     end
   end
 
-  it 'should be locked by a context module that is not yet unlocked' do
+  it 'is locked by a context module that is not yet unlocked' do
     if respond_to?(:item_type)
       verify_unlocked
 

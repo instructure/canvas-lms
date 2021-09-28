@@ -50,7 +50,7 @@ class RollupScore
                   @median ? median_aggregate_score : aggregate_score
                 else
                   calculate_results
-    end
+                end
     @score = score_set[:score] if score_set
     @hide_points = score_set[:results].all?(&:hide_points) if score_set
     latest_result unless @aggregate
@@ -62,29 +62,32 @@ class RollupScore
     case @calculation_method
     when 'decaying_average'
       return nil if @outcome_results.empty?
+
       decaying_average_set
     when 'n_mastery'
       return nil if @outcome_results.length < @calculation_int
+
       n_mastery_set
     when 'latest'
       latest_set = score_sets.first
-      {score: latest_set[:score].round(PRECISION), results: [latest_set[:result]]}
+      { score: latest_set[:score].round(PRECISION), results: [latest_set[:result]] }
     when 'highest'
-      highest_set = score_sets.max_by {|set| set[:score]}
-      {score: highest_set[:score].round(PRECISION), results: [highest_set[:result]]}
+      highest_set = score_sets.max_by { |set| set[:score] }
+      { score: highest_set[:score].round(PRECISION), results: [highest_set[:result]] }
     end
   end
 
   def n_mastery_set
     return unless @outcome.rubric_criterion
+
     # mastery_points represents the cutoff score for which results
     # will be considered towards mastery
-    tmp_score_sets = score_sets.compact.delete_if {|set| set[:score] < @mastery_points}
+    tmp_score_sets = score_sets.compact.delete_if { |set| set[:score] < @mastery_points }
     return nil if tmp_score_sets.length < @calculation_int
 
     tmp_scores = tmp_score_sets.pluck(:score)
     n_mastery_score = (tmp_scores.sum.to_f / tmp_scores.size).round(PRECISION)
-    {score: n_mastery_score, results: tmp_score_sets.pluck(:result)}
+    { score: n_mastery_score, results: tmp_score_sets.pluck(:result) }
   end
 
   def decaying_average_set
@@ -100,13 +103,13 @@ class RollupScore
     latest = tmp_score_sets.pop
 
     if tmp_score_sets.empty?
-      return {score: latest[:score].round(PRECISION), results: [latest[:result]]}
+      return { score: latest[:score].round(PRECISION), results: [latest[:result]] }
     end
 
     tmp_scores = tmp_score_sets.pluck(:score)
     latest_weighted = latest[:score] * (0.01 * weight)
     older_avg_weighted = (tmp_scores.sum / tmp_scores.length) * (0.01 * (100 - weight))
     decaying_avg_score = (latest_weighted + older_avg_weighted).round(PRECISION)
-    {score: decaying_avg_score, results: tmp_score_sets.pluck(:result).push(latest[:result])}
+    { score: decaying_avg_score, results: tmp_score_sets.pluck(:result).push(latest[:result]) }
   end
 end

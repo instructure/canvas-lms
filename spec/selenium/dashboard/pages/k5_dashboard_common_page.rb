@@ -27,7 +27,7 @@ module K5DashboardCommonPageObject
     rubric = outcome_with_rubric(course: @subject_course)
     assignment = create_assignment(@course, "Rubric Assignment", "Description of Rubric", 10)
     association = rubric.associate_with(assignment, @subject_course, purpose: 'grading', use_for_grading: true)
-    submission = assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    submission = assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
     association.assess(
       user: @student,
       assessor: @teacher,
@@ -51,7 +51,7 @@ module K5DashboardCommonPageObject
 
   def create_and_submit_assignment(course, assignment_title, description, points_possible)
     assignment = create_assignment(course, assignment_title, description, points_possible)
-    assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+    assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
     assignment
   end
 
@@ -105,8 +105,8 @@ module K5DashboardCommonPageObject
   end
 
   def create_lti_resource(resource_name)
-    rendered_icon='https://lor.instructure.com/img/icon_commons.png'
-    lti_resource_url='http://www.example.com'
+    rendered_icon = 'https://lor.instructure.com/img/icon_commons.png'
+    lti_resource_url = 'http://www.example.com'
     tool =
       Account.default.context_external_tools.new(
         {
@@ -129,7 +129,7 @@ module K5DashboardCommonPageObject
         favorite: 'true'
       }
     )
-    tool.course_navigation = {enabled: true}
+    tool.course_navigation = { enabled: true }
     tool.save!
     tool
   end

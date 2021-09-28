@@ -29,7 +29,7 @@ describe Lti::DeepLinkingUtil do
     end
 
     it 'parses JSON if necessary' do
-      val = {'foo' => 'bar'}
+      val = { 'foo' => 'bar' }
       expect(described_class.validate_custom_params(val)).to eq(val)
       expect(described_class.validate_custom_params(val.to_json)).to eq(val)
     end
@@ -38,7 +38,7 @@ describe Lti::DeepLinkingUtil do
       val = {
         'foo' => 'bar',
         'bool1' => true, 'bool2' => false,
-        'abc' => {}, 'def' => {'ghi' => 'jkl'},
+        'abc' => {}, 'def' => { 'ghi' => 'jkl' },
         'mno' => nil, 'pqr' => 1, 1 => 'one',
         'badscalar' => Object.new
       }
@@ -54,7 +54,7 @@ describe Lti::DeepLinkingUtil do
 
     it 'stringifies keys' do
       # Not 100% sure necessary, but safer
-      val = {foo: 'bar'}
+      val = { foo: 'bar' }
       expect(described_class.validate_custom_params(val)).to eq('foo' => 'bar')
     end
   end

@@ -22,8 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 module SubmissionsCommon
   def create_assignment(type = 'online_text_entry')
     assignment = @course.assignments.build({
-                                               :name => 'media assignment',
-                                               :submission_types => type
+                                             :name => 'media assignment',
+                                             :submission_types => type
                                            })
     assignment.workflow_state = 'published'
     assignment.save!

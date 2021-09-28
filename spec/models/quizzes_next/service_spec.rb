@@ -25,7 +25,7 @@ describe QuizzesNext::Service do
   end
 
   describe '.enabled_in_context?' do
-    let(:root_account) { double "root_account", :feature_allowed? => true}
+    let(:root_account) { double "root_account", :feature_allowed? => true }
     let(:context) { double("context", :root_account => root_account) }
 
     context 'when the feature is enabled on the context' do
@@ -80,15 +80,15 @@ describe QuizzesNext::Service do
       expect(active_lti_assignments).not_to include(assignment_active)
 
       filtered_assignments = QService.active_lti_assignments_for_course(course,
-        selected_assignment_ids: [lti_assignment_active2.id, assignment_active.id])
+                                                                        selected_assignment_ids: [lti_assignment_active2.id, assignment_active.id])
       expect(filtered_assignments).to eq [lti_assignment_active2]
     end
   end
 
   describe '.assignment_not_in_export?' do
     it 'returns true for anything except assignment not found' do
-      assignment_hash = {'$canvas_assignment_id': "1234"}
-      assignment_not_found = {'$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND}
+      assignment_hash = { '$canvas_assignment_id': "1234" }
+      assignment_not_found = { '$canvas_assignment_id': Canvas::Migration::ExternalContent::Translator::NOT_FOUND }
 
       expect(QService.assignment_not_in_export?(assignment_hash)).to eq(false)
       expect(QService.assignment_not_in_export?(assignment_not_found)).to eq(true)

@@ -85,6 +85,7 @@ class DueDateCacher
     current_caller = caller(1..1).first
     Rails.logger.debug "DDC.recompute(#{assignment&.id}) - #{current_caller}"
     return unless assignment.persisted? && assignment.active?
+
     # We use a strand here instead of a singleton because a bunch of
     # assignment updates with upgrade_grades could end up causing
     # score table fights.
@@ -143,10 +144,10 @@ class DueDateCacher
 
     @assignment_ids = Array(assignments).map { |a| a.is_a?(Assignment) ? a.id : a }
     @assignments_auditable_by_id = if @assignment_ids.present?
-      Set.new(Assignment.auditable.where(id: @assignment_ids).pluck(:id))
-    else
-      Set.new
-    end
+                                     Set.new(Assignment.auditable.where(id: @assignment_ids).pluck(:id))
+                                   else
+                                     Set.new
+                                   end
 
     @user_ids = Array(user_ids)
     @update_grades = update_grades
@@ -201,8 +202,8 @@ class DueDateCacher
             enrollment_counts.accepted_student_ids - assigned_student_ids - enrollment_counts.prior_student_ids
           deletable_student_ids.each_slice(1000) do |deletable_student_ids_chunk|
             # using this approach instead of using .in_batches because we want to limit the IDs in the IN clause to 1k
-            Submission.active.where(assignment_id: assignment_id, user_id: deletable_student_ids_chunk).
-              update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+            Submission.active.where(assignment_id: assignment_id, user_id: deletable_student_ids_chunk)
+                      .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
           end
           User.clear_cache_keys(deletable_student_ids, :submissions)
         end
@@ -216,9 +217,9 @@ class DueDateCacher
       # 100 students at a time for 10 assignments each == slice of up to 1K submissions
       enrollment_counts.deleted_student_ids.each_slice(100) do |student_slice|
         @assignment_ids.each_slice(10) do |assignment_ids_slice|
-          Submission.active.
-            where(assignment_id: assignment_ids_slice, user_id: student_slice).
-            update_all(workflow_state: :deleted, updated_at: Time.zone.now)
+          Submission.active
+                    .where(assignment_id: assignment_ids_slice, user_id: student_slice)
+                    .update_all(workflow_state: :deleted, updated_at: Time.zone.now)
         end
         User.clear_cache_keys(student_slice, :submissions)
       end
@@ -247,7 +248,7 @@ class DueDateCacher
           previous_cached_dates: cached_due_dates_by_submission
         )
       end
-      User.clear_cache_keys(values.map{|v| v[1]}, :submissions)
+      User.clear_cache_keys(values.map { |v| v[1] }, :submissions)
     end
 
     if @update_grades
@@ -279,9 +280,9 @@ class DueDateCacher
           "count(nullif(workflow_state not in ('rejected', 'deleted', 'completed'), false)) as accepted_count",
           "count(nullif(workflow_state in ('completed'), false)) as prior_count",
           "count(nullif(workflow_state in ('rejected', 'deleted'), false)) as deleted_count"
-        ).
-          where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment']).
-          group(:user_id)
+        )
+                          .where(course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'])
+                          .group(:user_id)
 
         scope = scope.where(user_id: @user_ids) if @user_ids.present?
 
@@ -313,9 +314,9 @@ class DueDateCacher
     return {} if entries.empty?
 
     entries_for_query = assignment_and_student_id_values(entries: entries)
-    submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})").
-      where.not(cached_due_date: nil).
-      pluck(:id, :cached_due_date)
+    submissions_with_due_dates = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})")
+                                           .where.not(cached_due_date: nil)
+                                           .pluck(:id, :cached_due_date)
 
     submissions_with_due_dates.each_with_object({}) do |(submission_id, cached_due_date), map|
       map[submission_id] = cached_due_date
@@ -324,8 +325,8 @@ class DueDateCacher
 
   def record_due_date_changes_for_auditable_assignments!(entries:, previous_cached_dates:)
     entries_for_query = assignment_and_student_id_values(entries: entries)
-    updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})").
-      pluck(:id, :assignment_id, :cached_due_date)
+    updated_submissions = Submission.where("(assignment_id, user_id) IN (#{entries_for_query.join(',')})")
+                                    .pluck(:id, :assignment_id, :cached_due_date)
 
     timestamp = Time.zone.now
     records_to_insert = updated_submissions.each_with_object([]) do |(submission_id, assignment_id, new_due_date), records|
@@ -333,7 +334,7 @@ class DueDateCacher
 
       next if new_due_date == old_due_date
 
-      payload = {due_at: [old_due_date&.iso8601, new_due_date&.iso8601]}
+      payload = { due_at: [old_due_date&.iso8601, new_due_date&.iso8601] }
 
       records << {
         assignment_id: assignment_id,
@@ -363,70 +364,70 @@ class DueDateCacher
     # we only care if the assignment *is* a quiz, LTI, so we'll just
     # keep a set of those assignment ids.
     @quiz_lti_assignments ||=
-      ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id").
-        merge(ContextExternalTool.quiz_lti).
-        where(context_type: 'Assignment').#
-        # We're doing the following direct postgres any() rather than .where(context_id: @assignment_ids) on advice
-        # from our DBAs that the any is considerably faster in the postgres planner than the "IN ()" statement that
-        # AR would have generated.
-        where("content_tags.context_id = any('{?}'::int8[])", @assignment_ids).
-        where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
+      ContentTag.joins("INNER JOIN #{ContextExternalTool.quoted_table_name} ON content_tags.content_type='ContextExternalTool' AND context_external_tools.id = content_tags.content_id")
+                .merge(ContextExternalTool.quiz_lti)
+                .where(context_type: 'Assignment'). #
+      # We're doing the following direct postgres any() rather than .where(context_id: @assignment_ids) on advice
+      # from our DBAs that the any is considerably faster in the postgres planner than the "IN ()" statement that
+      # AR would have generated.
+      where("content_tags.context_id = any('{?}'::int8[])", @assignment_ids)
+                .where.not(workflow_state: 'deleted').distinct.pluck(:context_id).to_set
   end
 
   def existing_anonymous_ids_by_assignment_id
     @existing_anonymous_ids_by_assignment_id ||=
-      Submission.
-        anonymized.
-        for_assignment(effective_due_dates.to_hash.keys).
-        pluck(:assignment_id, :anonymous_id).
-        each_with_object(Hash.new { |h,k| h[k] = [] }) { |data, h| h[data.first] << data.last }
+      Submission
+      .anonymized
+      .for_assignment(effective_due_dates.to_hash.keys)
+      .pluck(:assignment_id, :anonymous_id)
+      .each_with_object(Hash.new { |h, k| h[k] = [] }) { |data, h| h[data.first] << data.last }
   end
 
   def perform_submission_upsert(batch_values)
-      # Construct upsert statement to update existing Submissions or create them if needed.
-      query = <<~SQL
-        UPDATE #{Submission.quoted_table_name}
-          SET
-            cached_due_date = vals.due_date::timestamptz,
-            grading_period_id = vals.grading_period_id::integer,
-            workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
-              #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
-            )),
-            anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
-            cached_quiz_lti = vals.cached_quiz_lti,
-            updated_at = now() AT TIME ZONE 'UTC'
-          FROM (VALUES #{batch_values.join(',')})
-            AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
-          WHERE submissions.user_id = vals.student_id AND
-                submissions.assignment_id = vals.assignment_id AND
-                (
-                  (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
-                  (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
-                  (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
-                    (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
-                  )) OR
-                  (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR
-                  (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)
-                );
-        INSERT INTO #{Submission.quoted_table_name}
-          (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,
-          cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
-          SELECT
-            assignments.id, vals.student_id, 'unsubmitted',
-            now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
-            assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,
-            vals.anonymous_id,
-            vals.cached_quiz_lti,
-            vals.root_account_id
-          FROM (VALUES #{batch_values.join(',')})
-            AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
-          INNER JOIN #{Assignment.quoted_table_name} assignments
-            ON assignments.id = vals.assignment_id
-          LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
-            ON submissions.assignment_id = assignments.id
-            AND submissions.user_id = vals.student_id
-          WHERE submissions.id IS NULL;
-      SQL
+    # Construct upsert statement to update existing Submissions or create them if needed.
+    query = <<~SQL
+      UPDATE #{Submission.quoted_table_name}
+        SET
+          cached_due_date = vals.due_date::timestamptz,
+          grading_period_id = vals.grading_period_id::integer,
+          workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (
+            #{INFER_SUBMISSION_WORKFLOW_STATE_SQL}
+          )),
+          anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),
+          cached_quiz_lti = vals.cached_quiz_lti,
+          updated_at = now() AT TIME ZONE 'UTC'
+        FROM (VALUES #{batch_values.join(',')})
+          AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
+        WHERE submissions.user_id = vals.student_id AND
+              submissions.assignment_id = vals.assignment_id AND
+              (
+                (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR
+                (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR
+                (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),
+                  (#{INFER_SUBMISSION_WORKFLOW_STATE_SQL})
+                )) OR
+                (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR
+                (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)
+              );
+      INSERT INTO #{Submission.quoted_table_name}
+        (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,
+        cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
+        SELECT
+          assignments.id, vals.student_id, 'unsubmitted',
+          now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',
+          assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,
+          vals.anonymous_id,
+          vals.cached_quiz_lti,
+          vals.root_account_id
+        FROM (VALUES #{batch_values.join(',')})
+          AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)
+        INNER JOIN #{Assignment.quoted_table_name} assignments
+          ON assignments.id = vals.assignment_id
+        LEFT OUTER JOIN #{Submission.quoted_table_name} submissions
+          ON submissions.assignment_id = assignments.id
+          AND submissions.user_id = vals.student_id
+        WHERE submissions.id IS NULL;
+    SQL
 
     begin
       Submission.transaction do

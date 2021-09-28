@@ -48,7 +48,7 @@ module ModelCache
   module ClassMethods
     # e.g. use this to cache calls to ConversationParticipant#conversation,
     # no matter how those conversation_participants were loaded
-    def cacheable_method(method, options={})
+    def cacheable_method(method, options = {})
       options[:cache_name] ||= method.to_s.pluralize.to_sym
       options[:key_method] ||= "#{method}_id"
       options[:key_lookup] ||= :id
@@ -57,6 +57,7 @@ module ModelCache
       # ensure the target class is ModelCache-aware, and set up the :id lookup
       target_klass = reflections[method.to_s].klass
       raise "`#{target_klass}` needs to `include ModelCache` before you can make `#{self}##{method}` cacheable" unless target_klass.included_modules.include?(ModelCache)
+
       unless ModelCache.keys[target_klass.name].include?(options[:key_lookup])
         ModelCache.keys[target_klass.name] << options[:key_lookup]
       end
@@ -68,6 +69,7 @@ module ModelCache
   module InstanceMethods
     def add_to_caches
       return unless cache = ModelCache[self.class.name.underscore.pluralize.to_sym]
+
       cache.keys.each do |key|
         cache[key][send(key)] = self
       end
@@ -75,6 +77,7 @@ module ModelCache
 
     def update_in_caches
       return unless cache = ModelCache[self.class.name.underscore.pluralize.to_sym]
+
       cache.keys.each do |key|
         if saved_change_to_attribute?(key)
           cache[key][send(key)] = self
@@ -85,7 +88,7 @@ module ModelCache
   end
 
   def self.with_cache(lookups)
-    @cache = lookups.inject({}){ |h, (k, v)| h[k] = prepare_lookups(v); h }
+    @cache = lookups.inject({}) { |h, (k, v)| h[k] = prepare_lookups(v); h }
     yield
   ensure
     @cache = nil
@@ -93,11 +96,12 @@ module ModelCache
 
   def self.[](cache_name)
     return nil unless @cache
+
     @cache[cache_name] || {}
   end
 
   def self.keys
-    @keys ||= Hash.new{ |h, k| h[k] = [] }
+    @keys ||= Hash.new { |h, k| h[k] = [] }
   end
 
   def self.prepare_lookups(records)
@@ -110,7 +114,7 @@ module ModelCache
     end
   end
 
-  def self.make_cacheable(klass, method, options={})
+  def self.make_cacheable(klass, method, options = {})
     options[:type] ||= :class
     options[:cache_name] ||= klass.name.underscore.pluralize.to_sym
     options[:key_lookup] ||= method
@@ -124,7 +128,7 @@ module ModelCache
     expected_args = options[:key_method] ? 0 : 1
     maybe_reset = "cache[#{key_value}] = #{orig_method} if args.size > #{expected_args}"
 
-    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE, __FILE__, __LINE__+1)
+    klass.send(options[:type] == :instance ? :class_eval : :instance_eval, <<-CODE, __FILE__, __LINE__ + 1)
       def #{method}(*args)
         if cache = ModelCache[#{options[:cache_name].inspect}] and cache = cache[#{options[:key_lookup].inspect}]
           #{maybe_reset}

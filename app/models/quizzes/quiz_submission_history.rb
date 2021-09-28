@@ -50,7 +50,7 @@ class Quizzes::QuizSubmissionHistory
     if attempt == @submission.attempt
       @submission
     else
-      version_models.detect {|qs| qs.attempt == attempt }
+      version_models.detect { |qs| qs.attempt == attempt }
     end
   end
 
@@ -59,7 +59,7 @@ class Quizzes::QuizSubmissionHistory
       if @submission.score == @submission.kept_score
         @submission
       else
-        version_models.detect {|v| v.score == @submission.kept_score }
+        version_models.detect { |v| v.score == @submission.kept_score }
       end
     end
   end

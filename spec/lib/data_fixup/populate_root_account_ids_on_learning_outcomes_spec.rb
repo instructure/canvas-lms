@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe DataFixup::PopulateRootAccountIdsOnLearningOutcomes do
-
   def populate(lo)
     DataFixup::PopulateRootAccountIdsOnLearningOutcomes.populate(lo.id, lo.id)
   end
@@ -78,5 +77,4 @@ describe DataFixup::PopulateRootAccountIdsOnLearningOutcomes do
       expect(lo.reload.root_account_ids).to eq [a1.id, a2.id]
     end
   end
-
 end

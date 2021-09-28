@@ -26,16 +26,17 @@ describe "cross-listing" do
     course_with_teacher_logged_in
     @course1       = @course
     @course2       = course_with_teacher(
-      :active_course     => true,
-      :user              => @user,
-      :active_enrollment => true).course
+      :active_course => true,
+      :user => @user,
+      :active_enrollment => true
+    ).course
 
     @course2.update_attribute(:name, 'my course')
     @section = @course1.course_sections.first
     get "/courses/#{@course1.id}/sections/#{@section.id}"
   end
 
-  it "should allow cross-listing a section" do
+  it "allows cross-listing a section" do
     f('.crosslist_link').click
     form = f('#crosslist_course_form')
     submit_btn = form.find_element(:css, '.submit_button')
@@ -70,7 +71,7 @@ describe "cross-listing" do
     keep_trying_until { expect(driver.current_url).to match /courses\/#{@course1.id}/ }
   end
 
-  it "should not allow cross-listing an invalid section" do
+  it "does not allow cross-listing an invalid section" do
     f('.crosslist_link').click
     form = f('#crosslist_course_form')
     course_id   = form.find_element(:id, 'course_id')
@@ -80,8 +81,7 @@ describe "cross-listing" do
     expect(course_name).to include_text 'Course ID "-1" not authorized for cross-listing'
   end
 
-
-  it "should allow cross-listing a section redux" do
+  it "allows cross-listing a section redux" do
     # so, we have two courses with the teacher enrolled in both.
     course_with_teacher_logged_in
     course = @course

@@ -154,7 +154,7 @@ class ContextModulesApiController < ApplicationController
   # @returns [Module]
   def index
     if authorized_action(@context, @current_user, :read)
-      log_api_asset_access([ "modules", @context ], "modules", "other")
+      log_api_asset_access(["modules", @context], "modules", "other")
       route = polymorphic_url([:api_v1, @context, :context_modules])
       scope = @context.modules_visible_to(@student || @current_user)
 
@@ -177,7 +177,7 @@ class ContextModulesApiController < ApplicationController
 
       if includes.include?('items')
         if @context.user_has_been_observer?(@student || @current_user)
-          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user) )
+          opts[:observed_student_ids] = ObserverEnrollment.observed_student_ids(self.context, (@student || @current_user))
         end
       end
 
@@ -237,8 +237,7 @@ class ContextModulesApiController < ApplicationController
         result_json['ENV_UPDATE'] = attachment_tags.map do |attachment_tag|
           { :id => attachment_tag.id.to_s,
             :content_id => attachment_tag.content_id,
-            :content_details => content_details(attachment_tag, @current_user, :for_admin => true)
-          }
+            :content_details => content_details(attachment_tag, @current_user, :for_admin => true) }
         end
         render :json => result_json
       else
@@ -285,15 +284,15 @@ class ContextModulesApiController < ApplicationController
       completed_ids = []
       modules.each do |mod|
         case event
-          when 'publish'
-            unless mod.active?
-              mod.publish
-              mod.publish_items!
-            end
-          when 'unpublish'
-            mod.unpublish unless mod.unpublished?
-          when 'delete'
-            mod.destroy
+        when 'publish'
+          unless mod.active?
+            mod.publish
+            mod.publish_items!
+          end
+        when 'unpublish'
+          mod.unpublish unless mod.unpublished?
+        when 'delete'
+          mod.destroy
         end
         completed_ids << mod.id
       end
@@ -340,15 +339,15 @@ class ContextModulesApiController < ApplicationController
   # @returns Module
   def create
     if authorized_action(@context.context_modules.temp_record, @current_user, :create)
-      return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
-      return render :json => {:message => "missing module name"}, :status => :bad_request unless params[:module][:name].present?
+      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
+      return render :json => { :message => "missing module name" }, :status => :bad_request unless params[:module][:name].present?
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       @module = @context.context_modules.build(module_parameters)
 
       if ids = params[:module][:prerequisite_module_ids]
-        @module.prerequisites = ids.map{|id| "module_#{id}"}.join(',')
+        @module.prerequisites = ids.map { |id| "module_#{id}" }.join(',')
       end
       @module.workflow_state = 'unpublished'
 
@@ -402,14 +401,15 @@ class ContextModulesApiController < ApplicationController
   def update
     @module = @context.context_modules.not_deleted.find(params[:id])
     if authorized_action(@module, @current_user, :update)
-      return render :json => {:message => "missing module parameter"}, :status => :bad_request unless params[:module]
+      return render :json => { :message => "missing module parameter" }, :status => :bad_request unless params[:module]
+
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
       if ids = params[:module][:prerequisite_module_ids]
         if ids.blank?
           module_parameters[:prerequisites] = []
         else
-          module_parameters[:prerequisites] = ids.map{|id| "module_#{id}"}.join(',')
+          module_parameters[:prerequisites] = ids.map { |id| "module_#{id}" }.join(',')
         end
       end
 
@@ -483,7 +483,7 @@ class ContextModulesApiController < ApplicationController
     if @module.insert_at(params[:module][:position].to_i)
       # see ContextModulesController#reorder
       @context.touch
-      @context.context_modules.not_deleted.each{|m| m.save_without_touching_context }
+      @context.context_modules.not_deleted.each { |m| m.save_without_touching_context }
       @context.touch
 
       @module.reload
@@ -497,7 +497,8 @@ class ContextModulesApiController < ApplicationController
   def find_student
     if params[:student_id]
       student_enrollments = @context.student_enrollments.for_user(params[:student_id])
-      return render_unauthorized_action unless student_enrollments.any?{|e| e.grants_right?(@current_user, session, :read_grades)}
+      return render_unauthorized_action unless student_enrollments.any? { |e| e.grants_right?(@current_user, session, :read_grades) }
+
       @student = student_enrollments.first.user
     elsif @context.grants_right?(@current_user, session, :participate_as_student)
       @student = @current_user

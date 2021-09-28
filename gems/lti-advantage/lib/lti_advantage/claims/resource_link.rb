@@ -9,7 +9,7 @@ module LtiAdvantage::Claims
     include ActiveModel::Model
 
     attr_accessor :description, :id, :title
-    validates_presence_of :id
 
+    validates_presence_of :id
   end
 end

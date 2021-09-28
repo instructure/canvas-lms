@@ -9,6 +9,5 @@ module LtiAdvantage::Claims
     include ActiveModel::Model
 
     attr_accessor :course_offering_sourcedid, :course_section_sourcedid, :person_sourcedid
-
   end
 end

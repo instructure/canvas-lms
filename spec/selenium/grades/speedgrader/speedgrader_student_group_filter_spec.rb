@@ -57,8 +57,8 @@ describe 'filter speed grader by student group' do
     @category.groups.second.add_user(@students[2])
     @category.groups.second.add_user(@students[3])
 
-    @group1_students = @students[0,2]
-    @group2_students = @students[2,2]
+    @group1_students = @students[0, 2]
+    @group2_students = @students[2, 2]
 
     @course.update!(filter_speed_grader_by_student_group: true)
   end

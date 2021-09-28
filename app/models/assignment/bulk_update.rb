@@ -39,11 +39,13 @@ class Assignment::BulkUpdate
     assignment_data.each do |id, data|
       dates = data['all_dates']
       next unless dates.present?
+
       base, overrides = dates.partition { |date| date['base'] }
 
       # 1a. update the assignment
       assignment = assignments[id.to_i]
       raise ActiveRecord::RecordNotFound, "invalid assignment id #{id}" unless assignment
+
       if base.any?
         assignment.content_being_saved_by(@current_user)
         assignment.updating_user = @current_user
@@ -55,6 +57,7 @@ class Assignment::BulkUpdate
       overrides.each do |override_data|
         override = assignment.assignment_overrides.detect { |o| o.id == override_data['id'].to_i }
         raise ActiveRecord::RecordNotFound, "invalid assignment override id #{override_data['id']} for assignment #{assignment.id}" unless override
+
         %w(due_at unlock_at lock_at).each do |date|
           if override_data.key?(date)
             override.send("#{date}=", override_data[date])
@@ -75,13 +78,13 @@ class Assignment::BulkUpdate
     all_errors = []
     assignments_to_save.each do |assignment|
       if !grading_periods_allow_submittable_update?(assignment, {}) || !assignment.valid?
-        all_errors << {'assignment_id' => assignment.id}.
-          merge(assignment.errors.to_hash.deep_stringify_keys)
+        all_errors << { 'assignment_id' => assignment.id }
+                      .merge(assignment.errors.to_hash.deep_stringify_keys)
       end
       assignment.assignment_overrides.each do |override|
         if !grading_periods_allow_assignment_override_update?(override) || !override.valid?
-          all_errors << {'assignment_id' => assignment.id, 'assignment_override_id' => override.id}.
-            merge(override.errors.to_hash.deep_stringify_keys)
+          all_errors << { 'assignment_id' => assignment.id, 'assignment_override_id' => override.id }
+                        .merge(override.errors.to_hash.deep_stringify_keys)
         end
       end
       progress.calculate_completion!(progress_count, progress_total)
@@ -113,9 +116,9 @@ class Assignment::BulkUpdate
     DueDateCacher.recompute_course(@context, assignments: assignments_to_save, update_grades: true, executing_user: @current_user)
 
     progress.complete
-    progress.set_results({"updated_count" => assignments_to_save.size})
+    progress.set_results({ "updated_count" => assignments_to_save.size })
   rescue ActiveRecord::RecordNotFound => e
     progress.fail
-    progress.set_results({"message" => e.message})
+    progress.set_results({ "message" => e.message })
   end
 end

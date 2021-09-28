@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Attachments::Storage
-
   def self.store_for_attachment(attachment, data)
     if InstFS.enabled?
       instfs_uuid = InstFS.direct_upload(

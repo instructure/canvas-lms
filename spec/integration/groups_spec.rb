@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require 'nokogiri'
 
 describe GroupsController do
-  it "should generate the correct 'Add Announcement' link" do
+  it "generates the correct 'Add Announcement' link" do
     course_with_teacher_logged_in(:active_all => true, :user => user_with_pseudonym)
     group_category = @course.group_categories.build(:name => "worldCup")
     @group = Group.create!(:name => "group1", :group_category => group_category, :context => @course)
@@ -35,7 +35,7 @@ describe GroupsController do
     expect(html.css('#right-side a#add-announcement').attribute("href").text).to eq "/groups/#{@group.id}/announcements#new"
   end
 
-  it "should not rendering 'pending' page when joining a self-signup group" do
+  it "does not rendering 'pending' page when joining a self-signup group" do
     enable_cache do
       course_with_student_logged_in(:active_all => true)
       category1 = @course.group_categories.create!(:name => "category 1")
@@ -48,7 +48,7 @@ describe GroupsController do
     end
   end
 
-  it "should render uncategorized groups" do
+  it "renders uncategorized groups" do
     user_session(account_admin_user)
     group = Account.default.groups.create!(name: 'SIS imported')
 

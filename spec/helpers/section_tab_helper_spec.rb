@@ -27,7 +27,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     )
   end
 
-  it 'should include Quiz LTI placement if new_quizzes_account_course_level_item_banks and quizzes_next are enabled' do
+  it 'includes Quiz LTI placement if new_quizzes_account_course_level_item_banks and quizzes_next are enabled' do
     Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
     allow(context).to receive(:feature_enabled?).and_call_original
     allow(context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
@@ -40,7 +40,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     end).to include("context_external_tool_#{quiz_lti_tool.id}")
   end
 
-  it 'should not include Quiz LTI placement if new_quizzes_account_course_level_item_banks is not enabled' do
+  it 'does not include Quiz LTI placement if new_quizzes_account_course_level_item_banks is not enabled' do
     allow(context).to receive(:feature_enabled?).and_call_original
     allow(context).to receive(:feature_enabled?).with(:quizzes_next).and_return(true)
 
@@ -52,7 +52,7 @@ shared_examples 'allow Quiz LTI placement when the correct Feature Flags are ena
     end).not_to include("context_external_tool_#{quiz_lti_tool.id}")
   end
 
-  it 'should not include Quiz LTI placement if next_quizzes is not enabled' do
+  it 'does not include Quiz LTI placement if next_quizzes is not enabled' do
     Account.site_admin.enable_feature!(:new_quizzes_account_course_level_item_banks)
 
     expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(true)
@@ -124,14 +124,14 @@ describe SectionTabHelper do
         end
 
         context 'and tabs include TAB_CONFERENCES' do
-          it 'should include TAB_CONFERENCES if WebConference.config' do
+          it 'includes TAB_CONFERENCES if WebConference.config' do
             allow(WebConference).to receive(:config).and_return({})
             expect(available_section_tabs.to_a.map do |tab|
               tab[:id]
             end).to include(Course::TAB_CONFERENCES)
           end
 
-          it 'should not include TAB_CONFERENCES if !WebConference.config' do
+          it 'does not include TAB_CONFERENCES if !WebConference.config' do
             expect(available_section_tabs.to_a.map do |tab|
               tab[:id]
             end).to_not include(Course::TAB_CONFERENCES)
@@ -139,20 +139,20 @@ describe SectionTabHelper do
         end
 
         context 'and tabs include TAB_COLLABORATIONS' do
-          it 'should include TAB_COLLABORATIONS if Collaboration.any_collaborations_configured?' do
+          it 'includes TAB_COLLABORATIONS if Collaboration.any_collaborations_configured?' do
             allow(Collaboration).to receive(:any_collaborations_configured?).and_return(true)
             expect(available_section_tabs.to_a.map do |tab|
               tab[:id]
             end).to include(Course::TAB_COLLABORATIONS)
           end
 
-          it 'should not include TAB_COLLABORATIONS if !Collaboration.any_collaborations_configured?' do
+          it 'does not include TAB_COLLABORATIONS if !Collaboration.any_collaborations_configured?' do
             expect(available_section_tabs.to_a.map do |tab|
               tab[:id]
             end).to_not include(Course::TAB_COLLABORATIONS)
           end
 
-          it 'should not include TAB_COLLABORATIONS when new_collaborations feature flag has been enabled' do
+          it 'does not include TAB_COLLABORATIONS when new_collaborations feature flag has been enabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "on")
             allow(Collaboration).to receive(:any_collaborations_configured?).and_return(true)
             expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS)
@@ -160,14 +160,13 @@ describe SectionTabHelper do
         end
 
         context 'and tabs include TAB_COLLABORATIONS_NEW' do
-          it 'should include TAB_COLLABORATIONS_NEW if new_collaborations feature flag has been enabled' do
+          it 'includes TAB_COLLABORATIONS_NEW if new_collaborations feature flag has been enabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "on")
             expect(available_section_tabs.to_a.map { |tab| tab[:id] }).to include(Course::TAB_COLLABORATIONS_NEW)
             domain_root_account.set_feature_flag!(:new_collaborations, "off")
           end
 
-
-          it 'should not include TAB_COLLABORATIONS if new_collaborations feature flas has been disabled' do
+          it 'does not include TAB_COLLABORATIONS if new_collaborations feature flas has been disabled' do
             domain_root_account.set_feature_flag!(:new_collaborations, "off")
             expect(available_section_tabs.to_a.map { |tab| tab[:id] }).not_to include(Course::TAB_COLLABORATIONS_NEW)
           end
@@ -179,20 +178,20 @@ describe SectionTabHelper do
           before do
             tabs = [
               {
-                :id=>"context_external_tool_#{quiz_lti_tool.id}",
-                :label=>"Quizzes 2",
-                :css_class=>"context_external_tool_#{quiz_lti_tool.id}",
-                :visibility=>nil,
-                :href=>:account_external_tool_path,
-                :external=>true,
-                :hidden=>false,
-                :args=>[context.id, quiz_lti_tool.id]
+                :id => "context_external_tool_#{quiz_lti_tool.id}",
+                :label => "Quizzes 2",
+                :css_class => "context_external_tool_#{quiz_lti_tool.id}",
+                :visibility => nil,
+                :href => :account_external_tool_path,
+                :external => true,
+                :hidden => false,
+                :args => [context.id, quiz_lti_tool.id]
               },
               {
-                :id=>9,
-                :label=>"Settings",
-                :css_class=>"settings",
-                :href=>:account_settings_path
+                :id => 9,
+                :label => "Settings",
+                :css_class => "settings",
+                :href => :account_settings_path
               }
             ]
             allow(context).to receive(:tabs_available).and_return(tabs)
@@ -206,14 +205,14 @@ describe SectionTabHelper do
 
           before do
             course_placement = {
-              :id=>"context_external_tool_#{quiz_lti_tool.id}",
-              :label=>"Item Banks",
-              :css_class=>"context_external_tool_#{quiz_lti_tool.id}",
-              :visibility=>nil,
-              :href=>:course_external_tool_path,
-              :external=>true,
-              :hidden=>false,
-              :args=>[context.id, quiz_lti_tool.id]
+              :id => "context_external_tool_#{quiz_lti_tool.id}",
+              :label => "Item Banks",
+              :css_class => "context_external_tool_#{quiz_lti_tool.id}",
+              :visibility => nil,
+              :href => :course_external_tool_path,
+              :external => true,
+              :hidden => false,
+              :args => [context.id, quiz_lti_tool.id]
             }
             tabs = Course.default_tabs + [course_placement]
             allow(context).to receive(:tabs_available).and_return(tabs)
@@ -225,14 +224,14 @@ describe SectionTabHelper do
         context 'the root account has non-Quiz_LTI navigation placements' do
           before do
             non_quiz_lti_course_placement = {
-              :id=>"context_external_tool_0",
-              :label=>"Other LTI",
-              :css_class=>"context_external_tool_0",
-              :visibility=>nil,
-              :href=>:some_path,
-              :external=>true,
-              :hidden=>false,
-              :args=>[course.id, 0]
+              :id => "context_external_tool_0",
+              :label => "Other LTI",
+              :css_class => "context_external_tool_0",
+              :visibility => nil,
+              :href => :some_path,
+              :external => true,
+              :hidden => false,
+              :args => [course.id, 0]
             }
             tabs = Course.default_tabs + [non_quiz_lti_course_placement]
             allow(course).to receive(:tabs_available).and_return(tabs)
@@ -244,7 +243,7 @@ describe SectionTabHelper do
             )
           end
 
-          it 'should include non-Quiz_LTI placement ignoring quizzes FFs' do
+          it 'includes non-Quiz_LTI placement ignoring quizzes FFs' do
             expect(Account.site_admin.feature_enabled?(:new_quizzes_account_course_level_item_banks)).to eq(false)
             expect(domain_root_account.feature_enabled?(:quizzes_next)).to eq(false)
             expect(available_section_tabs.to_a.map do |tab|
@@ -275,14 +274,14 @@ describe SectionTabHelper do
         label: "my_tab",
         css_class: "my_class",
         href: :course_external_tool_path,
-        external:  true,
+        external: true,
         target: "_blank",
         args: [1, 1]
       }
     end
 
     describe '#a_classes' do
-      it 'should be an array including tab css_class' do
+      it 'is an array including tab css_class' do
         tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course
         )
@@ -291,7 +290,7 @@ describe SectionTabHelper do
         expect(tag.a_classes).not_to include 'active'
       end
 
-      it 'should include `active` class if tab is active' do
+      it 'includes `active` class if tab is active' do
         tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course, tab_assignments[:css_class]
         )
@@ -301,7 +300,7 @@ describe SectionTabHelper do
     end
 
     describe '#a_attributes' do
-      it 'should include keys href & class' do
+      it 'includes keys href & class' do
         tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_pages, course
         )
@@ -334,15 +333,15 @@ describe SectionTabHelper do
         end
         let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
-        it 'should be an a tag' do
+        it 'is an a tag' do
           expect(html.name).to eq 'a'
         end
 
-        it 'should include text from tab label' do
+        it 'includes text from tab label' do
           expect(html.text).to eq tab_assignments[:label]
         end
 
-        it 'should not include icon indicating it is off' do
+        it 'does not include icon indicating it is off' do
           icon = html.xpath('i')
           expect(icon).to be_empty
         end
@@ -356,13 +355,13 @@ describe SectionTabHelper do
         end
         let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
-        it 'should have a tooltip' do
+        it 'has a tooltip' do
           expect(html.attributes).to include('data-tooltip')
           expect(html.attributes).to include('title')
           expect(html.attributes['title'].value).to eq 'No content. Not visible to students'
         end
 
-        it 'should include icon indicating it is not visible to students' do
+        it 'includes icon indicating it is not visible to students' do
           icon = html.xpath('i[contains(@class, "nav-icon")]')[0]
           expect(icon.attributes['class'].value).to include('icon-off')
         end
@@ -376,13 +375,13 @@ describe SectionTabHelper do
         end
         let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
-        it 'should have a tooltip' do
+        it 'has a tooltip' do
           expect(html.attributes).to include('data-tooltip')
           expect(html.attributes).to include('title')
           expect(html.attributes['title'].value).to eq 'Disabled. Not visible to students'
         end
 
-        it 'should include icon indicating it is not visible to students' do
+        it 'includes icon indicating it is not visible to students' do
           icon = html.xpath('i[contains(@class, "nav-icon")]')[0]
           expect(icon.attributes['class'].value).to include('icon-off')
         end
@@ -396,14 +395,14 @@ describe SectionTabHelper do
         end
         let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
-        it 'shouldn\'t have a title attribute' do
+        it 'does not have a title attribute' do
           expect(html.attributes).not_to include('title')
         end
       end
     end
 
     describe '#li_classess' do
-      it 'should return an array including element `section`' do
+      it 'returns an array including element `section`' do
         tag = SectionTabHelperSpec::SectionTabTag.new(
           tab_assignments, course
         )
@@ -411,9 +410,9 @@ describe SectionTabHelper do
         expect(tag.li_classes).to include('section')
       end
 
-      it 'should include `section-hidden` if tab is hidden' do
+      it 'includes `section-hidden` if tab is hidden' do
         tag = SectionTabHelperSpec::SectionTabTag.new(
-            tab_assignments.merge(hidden: true), course
+          tab_assignments.merge(hidden: true), course
         )
 
         expect(tag.li_classes).to include('section-hidden')
@@ -428,11 +427,11 @@ describe SectionTabHelper do
       end
       let(:html) { Nokogiri::HTML5.fragment(string).children[0] }
 
-      it 'should be an li tag' do
+      it 'is an li tag' do
         expect(html.name).to eq 'li'
       end
 
-      it 'should include a nested a tag' do
+      it 'includes a nested a tag' do
         expect(html.children.any? do |child|
           child.name == 'a'
         end).to be_truthy

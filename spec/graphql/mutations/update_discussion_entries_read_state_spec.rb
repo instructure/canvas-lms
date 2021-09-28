@@ -25,7 +25,7 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
   before(:once) do
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
-    discussion_topic_model({context: @course})
+    discussion_topic_model({ context: @course })
     @entries = []
     10.times do |i|
       @entries.push(@topic.discussion_entries.create!(message: "Howdy #{i}", user: @student))
@@ -65,7 +65,7 @@ RSpec.describe Mutations::UpdateDiscussionEntriesReadState do
       expect(entry.read?(@student)).to be true
     end
 
-    result = run_mutation({ids: @entries.map(&:id), read: false})
+    result = run_mutation({ ids: @entries.map(&:id), read: false })
 
     expect(result.dig('errors')).to be nil
     updated_entries = result.dig('data', 'updateDiscussionEntriesReadState', 'discussionEntries')

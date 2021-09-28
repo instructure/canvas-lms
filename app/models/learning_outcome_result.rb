@@ -27,16 +27,16 @@ class LearningOutcomeResult < ActiveRecord::Base
   belongs_to :association_object, polymorphic:
       [:rubric_association, :assignment,
        { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
-      polymorphic_prefix: :association,
-      foreign_type: :association_type, foreign_key: :association_id
+                                  polymorphic_prefix: :association,
+                                  foreign_type: :association_type, foreign_key: :association_id
   belongs_to :artifact, polymorphic:
       [:rubric_assessment, :submission,
        { quiz_submission: 'Quizzes::QuizSubmission', live_assessments_submission: 'LiveAssessments::Submission' }],
-      polymorphic_prefix: true
+                        polymorphic_prefix: true
   belongs_to :associated_asset, polymorphic:
       [:assessment_question, :assignment,
        { quiz: 'Quizzes::Quiz', assessment: 'LiveAssessments::Assessment' }],
-      polymorphic_prefix: true
+                                polymorphic_prefix: true
   belongs_to :context, polymorphic: [:course]
   belongs_to :root_account, class_name: 'Account'
   has_many :learning_outcome_question_results, dependent: :destroy
@@ -92,7 +92,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     InstStatsd::Statsd.increment('learning_outcome_result.create') if new_record?
     current_version = self.versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt
-      versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
+      versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }
       if !versions.empty?
         versions.each do |version|
           version_data = YAML::load(version.yaml)
@@ -126,10 +126,10 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :for_user, lambda { |user| where(:user_id => user) }
   scope :custom_ordering, lambda { |param|
     orders = {
-      'recent' => {:assessed_at => :desc},
-      'highest' => {:score => :desc},
-      'oldest' => {:score => :asc},
-      'default' => {:assessed_at => :desc}
+      'recent' => { :assessed_at => :desc },
+      'highest' => { :score => :desc },
+      'oldest' => { :score => :asc },
+      'default' => { :assessed_at => :desc }
     }
     order_clause = orders[param] || orders['default']
     order(order_clause)
@@ -140,14 +140,14 @@ class LearningOutcomeResult < ActiveRecord::Base
   scope :with_active_link, lambda { where("content_tags.workflow_state <> 'deleted'").joins(:alignment) }
   # rubocop:disable Layout/LineLength
   scope :exclude_muted_associations, -> {
-    joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'").
-      joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading' AND rassoc.workflow_state = 'active'").
-      joins("LEFT JOIN #{Quizzes::Quiz.quoted_table_name} ON quizzes.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Quizzes::Quiz'").
-      joins("LEFT JOIN #{Assignment.quoted_table_name} qa ON qa.id = quizzes.assignment_id").
-      joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'").
-      joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)").
-      joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)").
-      where('(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)'\
+    joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'")
+      .joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading' AND rassoc.workflow_state = 'active'")
+      .joins("LEFT JOIN #{Quizzes::Quiz.quoted_table_name} ON quizzes.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Quizzes::Quiz'")
+      .joins("LEFT JOIN #{Assignment.quoted_table_name} qa ON qa.id = quizzes.assignment_id")
+      .joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'")
+      .joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)")
+      .joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)")
+      .where('(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)'\
             ' OR submissions.posted_at IS NOT NULL'\
             ' OR ra.grading_type = \'not_graded\''\
             ' OR qa.grading_type = \'not_graded\''\
@@ -175,6 +175,7 @@ class LearningOutcomeResult < ActiveRecord::Base
 
   def set_root_account_id
     return if self.root_account_id.present?
+
     self.root_account_id = self.context&.resolved_root_account_id
   end
 
@@ -197,6 +198,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     parent_mastery = precise_mastery_percent
     alignment_mastery = self.alignment.mastery_score
     return unless parent_mastery && alignment_mastery
+
     if parent_mastery > 0 && alignment_mastery > 0
       { scale_percent: parent_mastery / alignment_mastery,
         alignment_mastery: alignment_mastery }
@@ -220,9 +222,11 @@ class LearningOutcomeResult < ActiveRecord::Base
     # but for scaling it's too imprecise and can lead to inaccurate calculations
     if context&.root_account&.feature_enabled?(:account_level_mastery_scales) && outcome_proficiency.present?
       return unless outcome_proficiency.points_possible > 0 && outcome_proficiency.mastery_points > 0
+
       outcome_proficiency.mastery_points.to_f / outcome_proficiency.points_possible.to_f
     else
       return unless parent_has_mastery? && parent_outcome.points_possible > 0
+
       parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
     end
   end

@@ -46,9 +46,9 @@ class AccountNotification < ActiveRecord::Base
   def create_alert
     if start_at > Time.zone.now
       delay(run_at: start_at,
-        on_conflict: :overwrite,
-        singleton: "create_notification_alert:#{self.global_id}").
-        create_alert
+            on_conflict: :overwrite,
+            singleton: "create_notification_alert:#{self.global_id}")
+        .create_alert
       return
     end
 
@@ -57,15 +57,15 @@ class AccountNotification < ActiveRecord::Base
     roles = self.account_notification_roles.map(&:role_name)
     return if roles.count > 0 && (roles & ['StudentEnrollment', 'ObserverEnrollment']).none?
 
-    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement').
-      where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
+    thresholds = ObserverAlertThreshold.active.where(observer: User.of_account(self.account), alert_type: 'institution_announcement')
+                                       .where.not(id: ObserverAlert.where(context: self).select(:observer_alert_threshold_id))
     thresholds.find_each do |threshold|
       ObserverAlert.create(student: threshold.student, observer: threshold.observer,
                            observer_alert_threshold: threshold, context: self,
                            alert_type: 'institution_announcement', action_date: self.start_at,
                            title: I18n.t('Institution announcement: "%{announcement_title}"', {
-                             announcement_title: self.subject
-                           }))
+                                           announcement_title: self.subject
+                                         }))
     end
   end
 
@@ -86,11 +86,11 @@ class AccountNotification < ActiveRecord::Base
       else
         course_ids = user.enrollments.active_or_pending_by_date.shard(user.in_region_associated_shards).distinct.pluck(:course_id) # fetch sharded course ids
         # and then fetch account_ids separately - using pluck on a joined column doesn't give relative ids
-        all_account_ids = Course.where(:id => course_ids).not_deleted.
-          distinct.pluck(:account_id, :root_account_id).flatten.uniq
-        all_account_ids += user.account_users.active.shard(user.in_region_associated_shards).
-          joins(:account).where(accounts: {workflow_state: 'active'}).
-          distinct.pluck(:account_id).uniq
+        all_account_ids = Course.where(:id => course_ids).not_deleted
+                                .distinct.pluck(:account_id, :root_account_id).flatten.uniq
+        all_account_ids += user.account_users.active.shard(user.in_region_associated_shards)
+                               .joins(:account).where(accounts: { workflow_state: 'active' })
+                               .distinct.pluck(:account_id).uniq
         all_account_ids = Account.multi_account_chain_ids(all_account_ids) # get all parent sub-accounts too
         current = self.for_account(root_account, all_account_ids, include_past: include_past)
       end
@@ -113,13 +113,13 @@ class AccountNotification < ActiveRecord::Base
           else
             announcement.shard.activate do
               if announcement.account.root_account?
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.
-                  where(root_account_id: announcement.account_id).select(:role_id).to_a
+                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date
+                                        .where(root_account_id: announcement.account_id).select(:role_id).to_a
               else
                 sub_account_ids_map[announcement.account_id] ||=
                   Account.sub_account_ids_recursive(announcement.account_id) + [announcement.account_id]
-                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course).
-                  where(:courses => {:account_id => sub_account_ids_map[announcement.account_id]}).select(:role_id).to_a
+                enrollments = Enrollment.where(user_id: user).active_or_pending_by_date.joins(:course)
+                                        .where(:courses => { :account_id => sub_account_ids_map[announcement.account_id] }).select(:role_id).to_a
               end
               account_users = announcement.account.root_account.cached_all_account_users_for(user)
             end
@@ -132,9 +132,9 @@ class AccountNotification < ActiveRecord::Base
           # map to role ids. user role.id instead of role_id to trigger Role#id
           # magic for built in roles. announcements intended for users not
           # enrolled in any courses have the NilEnrollment role type
-          user_role_ids[announcement.account_id] = enrollments.map{ |e| e.role.role_for_root_account_id(root_account.id).id }
+          user_role_ids[announcement.account_id] = enrollments.map { |e| e.role.role_for_root_account_id(root_account.id).id }
           user_role_ids[announcement.account_id] = [nil] if user_role_ids[announcement.account_id].empty?
-          user_role_ids[announcement.account_id] |= account_users.map{ |au| au.role.role_for_root_account_id(root_account.id).id }
+          user_role_ids[announcement.account_id] |= account_users.map { |au| au.role.role_for_root_account_id(root_account.id).id }
         end
 
         role_ids.empty? || (role_ids & user_role_ids[announcement.account_id]).present?
@@ -171,7 +171,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      current.sort_by {|item| item[:end_at]}.reverse
+      current.sort_by { |item| item[:end_at] }.reverse
     end
   end
 
@@ -179,7 +179,7 @@ class AccountNotification < ActiveRecord::Base
     ['root_account_notifications2', Shard.global_id_for(root_account_id), date.strftime('%Y-%m-%d')].cache_key
   end
 
-  def self.for_account(root_account, all_visible_account_ids=nil, include_past: false)
+  def self.for_account(root_account, all_visible_account_ids = nil, include_past: false)
     account_ids = root_account_ids = root_account.account_chain(include_site_admin: true).map(&:id)
     if all_visible_account_ids
       account_ids += all_visible_account_ids
@@ -202,9 +202,9 @@ class AccountNotification < ActiveRecord::Base
       base_shard = Shard.current
       result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
         load_by_account = ->(slice_account_ids) do
-          scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at).
-            order('start_at DESC').
-            preload({:account => :root_account}, account_notification_roles: :role)
+          scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at)
+                                     .order('start_at DESC')
+                                     .preload({ :account => :root_account }, account_notification_roles: :role)
           if Shard.current == root_account.shard
             if slice_account_ids != [root_account.id]
               scope = scope.joins(:account).where("domain_specific=? OR #{Account.resolved_root_account_id_sql}=?", false, root_account.id)
@@ -266,6 +266,7 @@ class AccountNotification < ActiveRecord::Base
   end
 
   attr_accessor :message_recipients
+
   has_a_broadcast_policy
 
   set_broadcast_policy do |p|
@@ -292,8 +293,8 @@ class AccountNotification < ActiveRecord::Base
   def queue_message_broadcast
     if self.send_message? && !self.messages_sent_at && !self.message_recipients
       delay(run_at: start_at || Time.now.utc,
-        on_conflict: :overwrite,
-        singleton: "account_notification_broadcast_messages:#{self.global_id}").broadcast_messages
+            on_conflict: :overwrite,
+            singleton: "account_notification_broadcast_messages:#{self.global_id}").broadcast_messages
     end
   end
 
@@ -314,7 +315,7 @@ class AccountNotification < ActiveRecord::Base
     # don't try to send a message to an entire account in one job
     self.applicable_user_ids.each_slice(self.class.users_per_message_batch) do |sliced_user_ids|
       begin
-        self.message_recipients = sliced_user_ids.map{|id| "user_#{id}"}
+        self.message_recipients = sliced_user_ids.map { |id| "user_#{id}" }
         self.save # trigger the broadcast policy
       ensure
         self.message_recipients = nil
@@ -336,11 +337,12 @@ class AccountNotification < ActiveRecord::Base
       user_ids = Set.new
       get_everybody = roles.empty?
 
-      course_roles = roles.select{|role| role.course_role?}.map{|r| r.role_for_root_account_id(account.resolved_root_account_id)}
+      course_roles = roles.select { |role| role.course_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || course_roles.any?
         Course.find_ids_in_ranges do |min_id, max_id|
           course_ids = Course.active.where(:id => min_id..max_id, :account_id => all_account_ids).pluck(:id)
           next unless course_ids.any?
+
           course_ids.each_slice(50) do |sliced_course_ids|
             scope = Enrollment.active_or_pending_by_date.where(:course_id => sliced_course_ids)
             scope = scope.where(:role_id => course_roles) unless get_everybody
@@ -349,7 +351,7 @@ class AccountNotification < ActiveRecord::Base
         end
       end
 
-      account_roles = roles.select{|role| role.account_role?}.map{|r| r.role_for_root_account_id(account.resolved_root_account_id)}
+      account_roles = roles.select { |role| role.account_role? }.map { |r| r.role_for_root_account_id(account.resolved_root_account_id) }
       if get_everybody || account_roles.any?
         AccountUser.find_ids_in_ranges do |min_id, max_id|
           scope = AccountUser.where(:id => min_id..max_id).active.where(:account_id => all_account_ids)

@@ -28,7 +28,6 @@ require 'dynamic_settings/fallback_proxy'
 require 'dynamic_settings/prefix_proxy'
 
 module DynamicSettings
-
   CONSUL_READ_OPTIONS = %i{recurse stale}.freeze
   KV_NAMESPACE = "config/canvas"
   CACHE_KEY_PREFIX = "dynamic_settings/"
@@ -97,8 +96,8 @@ module DynamicSettings
     def fallback_data=(value)
       @fallback_data = value
       @root_fallback_proxy = if @fallback_data
-        FallbackProxy.new(@fallback_data.with_indifferent_access)
-      end
+                               FallbackProxy.new(@fallback_data.with_indifferent_access)
+                             end
     end
 
     def root_fallback_proxy

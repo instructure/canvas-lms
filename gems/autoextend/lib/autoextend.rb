@@ -24,6 +24,7 @@ module Autoextend
     def const_added(const, source:)
       const_name = const.is_a?(String) ? const : const.name
       return [] unless const_name
+
       extensions_list = extensions_hash.fetch(const_name.to_sym, [])
       sorted_extensions(extensions_list).each do |extension|
         if const == const_name
@@ -64,26 +65,26 @@ module Autoextend
     # so that if you have a spec that checks if all extensions were used
     # it can ignore optional extensions.
     def hook(const_name,
-      module_name = nil,
-      method: :include,
-      singleton: false,
-      after_load: false,
-      optional: false,
-      before: [],
-      after: [],
-      &block)
+             module_name = nil,
+             method: :include,
+             singleton: false,
+             after_load: false,
+             optional: false,
+             before: [],
+             after: [],
+             &block)
       raise ArgumentError, "block is required if module_name is not passed" if !module_name && !block
       raise ArgumentError, "cannot pass both a module_name and a block" if module_name && block
 
       extension = Extension.new(const_name,
-        module_name,
-        method,
-        block,
-        singleton,
-        after_load,
-        optional,
-        Array(before),
-        Array(after))
+                                module_name,
+                                method,
+                                block,
+                                singleton,
+                                after_load,
+                                optional,
+                                Array(before),
+                                Array(after))
 
       const_extensions = extensions_hash[const_name.to_sym] ||= []
       const_extensions << extension
@@ -121,12 +122,14 @@ module Autoextend
         ext.before.each do |before_module|
           other_ext = cloned_list.find { |other| other.module_name == before_module }
           raise "Could not find #{before_module} to include after #{ext.module_name}" unless other_ext
+
           other_ext.after << ext.module_name
         end
         # This isn't needed to build the DAG, but it's useful for sanity
         ext.after.each do |after_module|
           other_ext = cloned_list.find { |other| other.module_name == after_module }
           raise "Could not find #{after_module} to include before #{ext.module_name}" unless other_ext
+
           other_ext.before << ext.module_name
         end
       end
@@ -177,6 +180,7 @@ module Autoextend::ActiveSupport
       constant.constants(false).each do |child|
         child_const = constant.const_get(child, false)
         next unless child_const.is_a?(Module)
+
         notify_autoextend_of_new_constant(child_const)
       end
     end
@@ -185,6 +189,7 @@ module Autoextend::ActiveSupport
       super.each do |constant_name|
         constant = Object.const_get(constant_name, false)
         next unless constant.is_a?(Module)
+
         notify_autoextend_of_new_constant(constant)
       end
     end

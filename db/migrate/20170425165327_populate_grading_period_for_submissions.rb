@@ -22,8 +22,8 @@ class PopulateGradingPeriodForSubmissions < ActiveRecord::Migration[4.2]
   tag :postdeploy
 
   def self.up
-    DataFixup::InitializeSubmissionCachedDueDate.
-      delay_if_production(singleton: "DataFixup:InitializeSubmissionCachedDueDate:#{Shard.current.id}").
-      run
+    DataFixup::InitializeSubmissionCachedDueDate
+      .delay_if_production(singleton: "DataFixup:InitializeSubmissionCachedDueDate:#{Shard.current.id}")
+      .run
   end
 end

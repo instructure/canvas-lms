@@ -37,7 +37,7 @@ describe Mutations::UpdateAssignment do
     @assignment_id = @assignment_group.assignments.create!(context: @course, name: "Example Assignment", group_category: group_category).id
   end
 
-  def execute_with_input(update_input, user_executing=@teacher)
+  def execute_with_input(update_input, user_executing = @teacher)
     mutation_command = <<~GQL
       mutation {
         updateAssignment(input: {
@@ -78,7 +78,7 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -89,7 +89,7 @@ describe Mutations::UpdateAssignment do
   # that an override is mutated is checked.
   #
 
-  def assert_adhoc_override(result_override, student_ids, assignment_id=@assignment_id)
+  def assert_adhoc_override(result_override, student_ids, assignment_id = @assignment_id)
     expect(result_override["set"]["students"].map { |s| s["_id"].to_i }.to_set).to eq student_ids.to_set
     override = Assignment.find(assignment_id).assignment_overrides.detect { |e| e.id.to_s == result_override["_id"] }
     expect(override).to_not be_nil
@@ -98,7 +98,7 @@ describe Mutations::UpdateAssignment do
     result_override["_id"]
   end
 
-  def assert_section_override(result_override, section_id, assignment_id=@assignment_id)
+  def assert_section_override(result_override, section_id, assignment_id = @assignment_id)
     expect(result_override["set"]["_id"]).to eq section_id.to_s
     override = Assignment.find(assignment_id).assignment_overrides.detect { |e| e.id.to_s == result_override["_id"] }
     expect(override).to_not be_nil
@@ -108,7 +108,7 @@ describe Mutations::UpdateAssignment do
     result_override["_id"]
   end
 
-  def assert_group_override(result_override, group_id, assignment_id=@assignment_id)
+  def assert_group_override(result_override, group_id, assignment_id = @assignment_id)
     expect(result_override["set"]["_id"]).to eq group_id.to_s
     override = Assignment.find(assignment_id).assignment_overrides.detect { |e| e.id.to_s == result_override["_id"] }
     expect(override).to_not be_nil
@@ -375,5 +375,4 @@ describe Mutations::UpdateAssignment do
     GQL
     expect(result.dig('errors', 1, 'extensions', 'code')).to eq "argumentLiteralsIncompatible"
   end
-
 end

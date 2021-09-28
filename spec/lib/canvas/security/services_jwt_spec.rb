@@ -26,7 +26,7 @@ module Canvas::Security
       include_context "JWT setup"
 
       let(:translate_token) do
-        ->(jwt){
+        ->(jwt) {
           decoded_crypted_token = Canvas::Security.base64_decode(jwt)
           return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
         }
@@ -40,12 +40,12 @@ module Canvas::Security
 
       describe "#initialize" do
         it "throws an error for nil token string" do
-          expect{ ServicesJwt.new(nil) }.to raise_error(ArgumentError)
+          expect { ServicesJwt.new(nil) }.to raise_error(ArgumentError)
         end
       end
 
       describe "#wrapper_token" do
-        let(:user_id){ 42 }
+        let(:user_id) { 42 }
 
         it "is the body of the wrapper token if wrapped" do
           base64_encoded_wrapper = build_wrapped_token(user_id)
@@ -61,7 +61,7 @@ module Canvas::Security
       end
 
       describe "user ids" do
-        let(:user_id){ 42 }
+        let(:user_id) { 42 }
 
         it "can get the user_id out of a wrapped issued token" do
           base64_encoded_wrapper = build_wrapped_token(user_id)
@@ -78,7 +78,7 @@ module Canvas::Security
       end
 
       describe "initialization" do
-        let(:jwt_string){ ServicesJwt.generate(sub: 1) }
+        let(:jwt_string) { ServicesJwt.generate(sub: 1) }
 
         it "uses SecureRandom for generating the JWT" do
           allow(SecureRandom).to receive_messages(uuid: "some-secure-random-string")
@@ -87,19 +87,18 @@ module Canvas::Security
         end
 
         it "expires in an hour" do
-          Timecop.freeze(Time.utc(2013,3,13,9,12)) do
+          Timecop.freeze(Time.utc(2013, 3, 13, 9, 12)) do
             jwt = ServicesJwt.new(jwt_string, false)
             expect(jwt.expires_at).to eq(1363169520)
           end
         end
 
         describe "via .generate" do
-
           let(:base64_regex) do
             %r{^([A-Za-z0-9+/]{4})*([A-Za-z0-9+/]{4}|[A-Za-z0-9+/]{3}=|[A-Za-z0-9+/]{2}==)$}
           end
 
-          let(:jwt_string){ ServicesJwt.generate(sub: 1) }
+          let(:jwt_string) { ServicesJwt.generate(sub: 1) }
 
           it "builds an encoded token out" do
             expect(jwt_string).to match(base64_regex)
@@ -118,17 +117,16 @@ module Canvas::Security
           end
 
           it "errors if you try to pass data without a sub entry" do
-            expect{ ServicesJwt.generate(foo: "bar", bang: "baz") }.
-              to raise_error(ArgumentError)
+            expect { ServicesJwt.generate(foo: "bar", bang: "baz") }
+              .to raise_error(ArgumentError)
           end
-
         end
 
         describe "via .for_user" do
-          let(:user){ double(global_id: 42) }
-          let(:ctx){ double(id: 47) }
-          let(:host){ "example.instructure.com" }
-          let(:masq_user){ double(global_id: 24) }
+          let(:user) { double(global_id: 42) }
+          let(:ctx) { double(id: 47) }
+          let(:host) { "example.instructure.com" }
+          let(:masq_user) { double(global_id: 24) }
 
           it "can build from a user and host" do
             jwt = ServicesJwt.for_user(host, user)
@@ -172,7 +170,7 @@ module Canvas::Security
 
           it 'includes workflow_state if workflows is given' do
             workflows = [:foo]
-            state = {'a' => 123}
+            state = { 'a' => 123 }
             expect(Canvas::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
             jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
@@ -197,55 +195,55 @@ module Canvas::Security
           end
 
           it "errors without a host" do
-            expect{ ServicesJwt.for_user(nil, user) }.
-              to raise_error(ArgumentError)
+            expect { ServicesJwt.for_user(nil, user) }
+              .to raise_error(ArgumentError)
           end
 
           it "errors without a user" do
-            expect{ ServicesJwt.for_user(host, nil) }.
-              to raise_error(ArgumentError)
+            expect { ServicesJwt.for_user(host, nil) }
+              .to raise_error(ArgumentError)
           end
         end
 
         describe "refresh_for_user" do
-          let(:user1){ double(global_id: 42) }
-          let(:user2){ double(global_id: 43) }
+          let(:user1) { double(global_id: 42) }
+          let(:user2) { double(global_id: 43) }
           let(:host) { 'testhost' }
 
           it 'is invalid if jwt cannot be decoded' do
-            expect{ ServicesJwt.refresh_for_user('invalidjwt', host, user1) }
+            expect { ServicesJwt.refresh_for_user('invalidjwt', host, user1) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
           it 'is invlaid if user id is different' do
             jwt = ServicesJwt.for_user(host, user1)
-            expect{ ServicesJwt.refresh_for_user(jwt, host, user2) }
+            expect { ServicesJwt.refresh_for_user(jwt, host, user2) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
           it 'is invlaid if host is different' do
             jwt = ServicesJwt.for_user('differenthost', user1)
-            expect{ ServicesJwt.refresh_for_user(jwt, host, user1) }
+            expect { ServicesJwt.refresh_for_user(jwt, host, user1) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
           it 'is invlaid masquerading user is different' do
             masq_user = double(global_id: 44)
             jwt = ServicesJwt.for_user(host, user1, real_user: masq_user)
-            expect{ ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
+            expect { ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
           it 'is invalid if masquerading and token does not have masq_sub' do
             jwt = ServicesJwt.for_user(host, user1)
-            expect{ ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
+            expect { ServicesJwt.refresh_for_user(jwt, host, user1, real_user: user2) }
               .to raise_error(ServicesJwt::InvalidRefresh)
           end
 
           it 'is invalid if more than 6 hours past token expiration' do
             jwt = ServicesJwt.for_user(host, user1)
             Timecop.freeze(7.hours.from_now) do
-              expect{ ServicesJwt.refresh_for_user(jwt, host, user1) }
+              expect { ServicesJwt.refresh_for_user(jwt, host, user1) }
                 .to raise_error(ServicesJwt::InvalidRefresh)
             end
           end
@@ -320,10 +318,10 @@ module Canvas::Security
           jwt_non_key = ServicesJwt.new(base64_encoded_wrapper_non_key)
           expect(jwt_new_key.wrapper_token[:iss]).to eq("some other service")
           expect(jwt_old_key.wrapper_token[:iss]).to eq("some other service")
-          expect{ jwt_non_key.wrapper_token }.to raise_error(Canvas::Security::InvalidToken)
+          expect { jwt_non_key.wrapper_token }.to raise_error(Canvas::Security::InvalidToken)
           expect(jwt_new_key.user_global_id).to eq(84)
           expect(jwt_old_key.user_global_id).to eq(84)
-          expect{ jwt_non_key.user_global_id }.to raise_error(Canvas::Security::InvalidToken)
+          expect { jwt_non_key.user_global_id }.to raise_error(Canvas::Security::InvalidToken)
         end
       end
     end

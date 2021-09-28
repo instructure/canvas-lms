@@ -28,7 +28,7 @@ describe UserContent, type: :request do
     attachment_model
   end
 
-  it "should translate course file download links to directly-downloadable urls" do
+  it "translates course file download links to directly-downloadable urls" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -37,19 +37,19 @@ describe UserContent, type: :request do
     HTML
 
     json = api_call(:get,
-      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-      { :controller => 'assignments_api', :action => 'show',
-        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
-  it "should translate group file download links to directly-downloadable urls" do
+  it "translates group file download links to directly-downloadable urls" do
     @group = @course.groups.create!(:name => "course group")
     attachment_model(:context => @group)
     @group.add_user(@teacher)
-    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message =>  <<-HTML)
+    @group_topic = @group.discussion_topics.create!(:title => "group topic", :user => @teacher, :message => <<-HTML)
     <p>
       Hello, students.<br>
       This will explain everything: <img src="/groups/#{@group.id}/files/#{@attachment.id}/download" alt="important">
@@ -57,15 +57,15 @@ describe UserContent, type: :request do
     HTML
 
     json = api_call(:get,
-      "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
-      { :controller => 'discussion_topics_api', :action => 'show',
-        :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
+                    "/api/v1/groups/#{@group.id}/discussion_topics/#{@group_topic.id}",
+                    { :controller => 'discussion_topics_api', :action => 'show',
+                      :format => 'json', :group_id => @group.id.to_s, :topic_id => @group_topic.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/groups/#{@group.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
-  it "should translate file download links to directly-downloadable urls for deleted and replaced files" do
+  it "translates file download links to directly-downloadable urls for deleted and replaced files" do
     @attachment.destroy
     attachment2 = Attachment.create!(:folder => @attachment.folder, :context => @attachment.context, :filename => @attachment.filename, :uploaded_data => StringIO.new("first"))
     expect(@context.attachments.find(@attachment.id).id).to eq attachment2.id
@@ -78,15 +78,15 @@ describe UserContent, type: :request do
     HTML
 
     json = api_call(:get,
-      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-      { :controller => 'assignments_api', :action => 'show',
-        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{attachment2.id}/download?verifier=#{attachment2.uuid}"
   end
 
-  it "should not corrupt absolute links" do
+  it "does not corrupt absolute links" do
     attachment_model(:context => @course)
     @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
     <p>
@@ -95,14 +95,14 @@ describe UserContent, type: :request do
     </p>
     HTML
     json = api_call(:get,
-      "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
-      { :controller => 'discussion_topics_api', :action => 'show',
-        :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
+                    "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}",
+                    { :controller => 'discussion_topics_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :topic_id => @topic.id.to_s })
     doc = Nokogiri::HTML5.fragment(json['message'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}"
   end
 
-  it "should not remove wrap parameter on file download links" do
+  it "does not remove wrap parameter on file download links" do
     attachment_model(:context => @course)
     @topic = @course.discussion_topics.create!(:title => "course topic", :user => @teacher, :message => <<-HTML)
     <p>
@@ -118,7 +118,7 @@ describe UserContent, type: :request do
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/download?verifier=#{@attachment.uuid}&wrap=1"
   end
 
-  it "should translate file preview links to directly-downloadable preview urls" do
+  it "translates file preview links to directly-downloadable preview urls" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -127,15 +127,15 @@ describe UserContent, type: :request do
     HTML
 
     json = api_call(:get,
-      "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-      { :controller => 'assignments_api', :action => 'show',
-        :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview?verifier=#{@attachment.uuid}"
   end
 
-  it "should translate media comment links to embedded video tags" do
+  it "translates media comment links to embedded video tags" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -145,8 +145,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-    { :controller => 'assignments_api', :action => 'show',
-      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     video = doc.at_css('video')
@@ -163,7 +163,7 @@ describe UserContent, type: :request do
     expect(video['height']).to be_nil
   end
 
-  it "should translate media comment audio tags" do
+  it "translates media comment audio tags" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -173,8 +173,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-    { :controller => 'assignments_api', :action => 'show',
-      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     audio = doc.at_css('audio')
@@ -187,7 +187,7 @@ describe UserContent, type: :request do
     expect(audio['src']).to match(%r{entryId=abcde})
   end
 
-  it "should not translate links in content not viewable by user" do
+  it "does not translate links in content not viewable by user" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -204,14 +204,14 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-    { :controller => 'assignments_api', :action => 'show',
-      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/courses/#{@course.id}/files/#{@attachment.id}/preview"
   end
 
-  it "should prepend the hostname to all absolute-path links" do
+  it "prepends the hostname to all absolute-path links" do
     @assignment = @course.assignments.create!(:title => "first assignment", :description => <<-HTML)
     <p>
       Hello, students.<br>
@@ -225,8 +225,8 @@ describe UserContent, type: :request do
 
     json = api_call(:get,
                     "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
-    { :controller => 'assignments_api', :action => 'show',
-      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
+                    { :controller => 'assignments_api', :action => 'show',
+                      :format => 'json', :course_id => @course.id.to_s, :id => @assignment.id.to_s })
 
     doc = Nokogiri::HTML5.fragment(json['description'])
     expect(doc.at_css('img')['src']).to eq "http://www.example.com/equation_images/1234"
@@ -238,20 +238,20 @@ describe UserContent, type: :request do
     ]
   end
 
-  it "should not choke on funny email addresses" do
+  it "does not choke on funny email addresses" do
     @wiki_page = @course.wiki_pages.build(:title => "title")
     @wiki_page.body = "<a href='mailto:djmankiewicz@homestarrunner,com'>e-nail</a>"
     @wiki_page.workflow_state = 'active'
     @wiki_page.save!
     api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
-               { :controller => 'wiki_pages_api', :action => 'show',
-                 :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+             { :controller => 'wiki_pages_api', :action => 'show',
+               :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
     assert_status(200)
   end
 
   context "data api endpoints" do
     context "course context" do
-      it "should process links to each type of object" do
+      it "processes links to each type of object" do
         @wiki_page = @course.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
         <p>
@@ -303,13 +303,13 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/courses/#{@course.id}/external_tools/sessionless_launch?url=http%3A%2F%2Flti-tool-provider.example.com%2Flti_tool"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-            %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz [Module] Module SessionlessLaunchUrl)
+          %w([Assignment] Assignment [Page] Page Page [Page] Page Page [Discussion] Discussion Folder File File [Quiz] Quiz [Module] Module SessionlessLaunchUrl)
         )
       end
     end
 
     context "group context" do
-      it "should process links to each type of object" do
+      it "processes links to each type of object" do
         group_with_user(:active_all => true)
         @wiki_page = @group.wiki_pages.build(:title => "title")
         @wiki_page.body = <<-HTML
@@ -332,23 +332,23 @@ describe UserContent, type: :request do
                           :format => 'json', :group_id => @group.id.to_s, :url => @wiki_page.url })
         doc = Nokogiri::HTML5.fragment(json['body'])
         expect(doc.css('a').collect { |att| att['data-api-endpoint'] }).to eq [
-            "http://www.example.com/api/v1/groups/#{@group.id}/pages",
-            "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
-            "http://www.example.com/api/v1/groups/#{@group.id}/pages",
-            "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
-            "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
-            "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics/1~123",
-            "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
-            "http://www.example.com/api/v1/groups/#{@group.id}/files/789"
+          "http://www.example.com/api/v1/groups/#{@group.id}/pages",
+          "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
+          "http://www.example.com/api/v1/groups/#{@group.id}/pages",
+          "http://www.example.com/api/v1/groups/#{@group.id}/pages/some-page",
+          "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics",
+          "http://www.example.com/api/v1/groups/#{@group.id}/discussion_topics/1~123",
+          "http://www.example.com/api/v1/groups/#{@group.id}/folders/root",
+          "http://www.example.com/api/v1/groups/#{@group.id}/files/789"
         ]
-        expect(doc.css('a').collect{ |att| att['data-api-returntype'] }).to eq(
-            %w([Page] Page [Page] Page [Discussion] Discussion Folder File)
+        expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
+          %w([Page] Page [Page] Page [Discussion] Discussion Folder File)
         )
       end
     end
 
     context "user context" do
-      it "should process links to each type of object" do
+      it "processes links to each type of object" do
         @topic = @course.discussion_topics.create!(:message => <<-HTML)
             <a href='/users/#{@teacher.id}/files'>file index</a>
             <a href='/users/#{@teacher.id}/files/789/preview'>file</a>
@@ -363,7 +363,7 @@ describe UserContent, type: :request do
           "http://www.example.com/api/v1/users/#{@teacher.id}/files/789"
         ]
         expect(doc.css('a').collect { |att| att['data-api-returntype'] }).to eq(
-            %w(Folder File)
+          %w(Folder File)
         )
       end
     end
@@ -376,7 +376,7 @@ describe UserContent, type: :request do
 
     let(:tester) { Tester.new }
 
-    it "should add the expected href to instructure_inline_media_comment anchors" do
+    it "adds the expected href to instructure_inline_media_comment anchors" do
       factory_with_protected_attributes(MediaObject, media_id: 'test2', media_type: 'audio')
       html = tester.process_incoming_html_content(<<-HTML)
       <a id='something-else' href='/blah'>no touchy</a>
@@ -399,7 +399,7 @@ describe UserContent, type: :request do
       expect(anchors[4]['href']).to eq '/media_objects/test3'
     end
 
-    it "should translate video and audio instructure_inline_media_comment tags" do
+    it "translates video and audio instructure_inline_media_comment tags" do
       html = tester.process_incoming_html_content(<<-HTML)
       <video src='/other'></video>
       <video class='instructure_inline_media_comment' src='/some/redirect/url'>no media id</video>
@@ -492,9 +492,9 @@ describe UserContent, type: :request do
       end
 
       expect(ApiClass.new.api_bulk_load_user_content_attachments(
-        [html1, html2],
-        @course
-      )).to eq({a1.id => a1, a2.id => a2, a3.id => a3})
+               [html1, html2],
+               @course
+             )).to eq({ a1.id => a1, a2.id => a2, a3.id => a3 })
     end
   end
 
@@ -539,7 +539,7 @@ describe UserContent, type: :request do
         end
 
         it "handles error gracefully" do
-          expect{ UserContent.escape(@html) }.not_to raise_error
+          expect { UserContent.escape(@html) }.not_to raise_error
         end
 
         it "retains the alt attribute" do

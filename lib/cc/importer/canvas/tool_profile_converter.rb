@@ -27,6 +27,7 @@ module CC::Importer::Canvas
       @manifest.css('resource[type=tool_profile]').each do |res|
         file = res.at_css('file')
         next unless file
+
         file_path = @package_root.item_path file['href']
         json = JSON.parse(File.read(file_path))
         json['resource_href'] = file['href']

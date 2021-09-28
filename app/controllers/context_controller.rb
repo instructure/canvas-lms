@@ -89,9 +89,9 @@ class ContextController < ApplicationController
     config = CanvasKaltura::ClientV3.config
     if config
       redirect_to CanvasKaltura::ClientV3.new.thumbnail_url(mo.try(:media_id) || media_id,
-                                                      :width => width,
-                                                      :height => height,
-                                                      :type => type),
+                                                            :width => width,
+                                                            :height => height,
+                                                            :type => type),
                   :status => 301
     else
       render :plain => t(:media_objects_not_configured, "Media Objects not configured")
@@ -131,13 +131,15 @@ class ContextController < ApplicationController
 
   def roster
     return unless authorized_action(@context, @current_user, :read_roster)
-    log_asset_access([ "roster", @context ], 'roster', 'other')
+
+    log_asset_access(["roster", @context], 'roster', 'other')
 
     if @context.is_a?(Course)
       return unless tab_enabled?(Course::TAB_PEOPLE)
+
       if @context.concluded?
         sections = @context.course_sections.active.select([:id, :course_id, :name, :end_at, :restrict_enrollments_to_section_dates]).preload(:course)
-        concluded_sections = sections.select{|s| s.concluded?}.map{|s| "section_#{s.id}"}
+        concluded_sections = sections.select { |s| s.concluded? }.map { |s| "section_#{s.id}" }
       else
         sections = @context.course_sections.active.select([:id, :name])
         concluded_sections = []
@@ -147,10 +149,10 @@ class ContextController < ApplicationController
       load_all_contexts(:context => @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
       manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
-        @context.grants_right?(@current_user, session, :allow_course_admin_actions)
-      else
-        @context.grants_right?(@current_user, session, :manage_admin_users)
-      end
+                        @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+                      else
+                        @context.grants_right?(@current_user, session, :manage_admin_users)
+                      end
       can_add_enrollments = @context.grants_any_right?(@current_user, session, *add_enrollment_permissions(@context))
       js_permissions = {
         read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
@@ -166,30 +168,30 @@ class ContextController < ApplicationController
         js_permissions[:manage_admin_users] = manage_admins
       end
       js_env({
-        ALL_ROLES: all_roles,
-        SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name} },
-        CONCLUDED_SECTIONS: concluded_sections,
-        SEARCH_URL: search_recipients_url,
-        COURSE_ROOT_URL: "/courses/#{@context.id}",
-        CONTEXTS: @contexts,
-        resend_invitations_url: course_re_send_invitations_url(@context),
-        permissions: js_permissions,
-        course: {
-          id: @context.id,
-          completed: @context.completed?,
-          soft_concluded: @context.soft_concluded?,
-          concluded: @context.concluded?,
-          available: @context.available?,
-          pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
-          hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
-        }
-      })
+               ALL_ROLES: all_roles,
+               SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name } },
+               CONCLUDED_SECTIONS: concluded_sections,
+               SEARCH_URL: search_recipients_url,
+               COURSE_ROOT_URL: "/courses/#{@context.id}",
+               CONTEXTS: @contexts,
+               resend_invitations_url: course_re_send_invitations_url(@context),
+               permissions: js_permissions,
+               course: {
+                 id: @context.id,
+                 completed: @context.completed?,
+                 soft_concluded: @context.soft_concluded?,
+                 concluded: @context.concluded?,
+                 available: @context.available?,
+                 pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
+                 hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+               }
+             })
       set_tutorial_js_env
 
       if can_add_enrollments
-        js_env({ROOT_ACCOUNT_NAME: @domain_root_account.name})
+        js_env({ ROOT_ACCOUNT_NAME: @domain_root_account.name })
         if @context.root_account.open_registration? || @context.root_account.grants_right?(@current_user, session, :manage_user_logins)
-          js_env({INVITE_USERS_URL: course_invite_users_url(@context)})
+          js_env({ INVITE_USERS_URL: course_invite_users_url(@context) })
         end
       end
       if @context.grants_right?(@current_user, session, :read_as_admin)
@@ -216,16 +218,16 @@ class ContextController < ApplicationController
       :allow_course_admin_actions :
       :manage_admin_users
     if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
-      @prior_users = @context.prior_users.
-        by_top_enrollment.merge(Enrollment.not_fake).
-        paginate(:page => params[:page], :per_page => 20)
+      @prior_users = @context.prior_users
+                             .by_top_enrollment.merge(Enrollment.not_fake)
+                             .paginate(:page => params[:page], :per_page => 20)
 
       users = @prior_users.index_by(&:id)
       if users.present?
         # put the relevant prior enrollment on each user
-        @context.prior_enrollments.where({:user_id => users.keys}).
-          top_enrollment_by(:user_id, :student).
-          each { |e| users[e.user_id].prior_enrollment = e }
+        @context.prior_enrollments.where({ :user_id => users.keys })
+                .top_enrollment_by(:user_id, :student)
+                .each { |e| users[e.user_id].prior_enrollment = e }
       end
     end
   end
@@ -235,11 +237,11 @@ class ContextController < ApplicationController
       @users = @context.users.where(show_user_services: true).order_by_sortable_name
       @users_hash = {}
       @users_order_hash = {}
-      @users.each_with_index{|u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
+      @users.each_with_index { |u, i| @users_hash[u.id] = u; @users_order_hash[u.id] = i }
       @current_user_services = {}
-      @current_user.user_services.select{|s| feature_and_service_enabled?(s.service)}.each{|s| @current_user_services[s.service] = s }
-      @services = UserService.for_user(@users.except(:select, :order)).sort_by{|s| @users_order_hash[s.user_id] || CanvasSort::Last}
-      @services = @services.select{|service|
+      @current_user.user_services.select { |s| feature_and_service_enabled?(s.service) }.each { |s| @current_user_services[s.service] = s }
+      @services = UserService.for_user(@users.except(:select, :order)).sort_by { |s| @users_order_hash[s.user_id] || CanvasSort::Last }
+      @services = @services.select { |service|
         feature_and_service_enabled?(service.service.to_sym)
       }
       @services_hash = @services.to_a.inject({}) do |hash, item|
@@ -265,7 +267,7 @@ class ContextController < ApplicationController
           end
           format.json do
             @accesses = Api.paginate(@accesses, self, polymorphic_url([@context, :user_usage], user_id: @user), default_per_page: 50)
-            render :json => @accesses.map {|a| a.as_json(methods: [:readable_name, :asset_class_name, :icon])}
+            render :json => @accesses.map { |a| a.as_json(methods: [:readable_name, :asset_class_name, :icon]) }
           end
         end
       end
@@ -288,8 +290,8 @@ class ContextController < ApplicationController
                  USER_ID: user_id,
                  LAST_ATTENDED_DATE: @enrollments.first.last_attended_at,
                  :course => {
-                     id: @context.id,
-                     hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
+                   id: @context.id,
+                   hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
                  })
 
           log_asset_access(@membership, "roster", "roster")
@@ -336,14 +338,14 @@ class ContextController < ApplicationController
 
       if @user.grants_right?(@current_user, session, :read_profile)
         # self and instructors
-        @topics = @context.discussion_topics.active.reject{|a| a.locked_for?(@current_user, :check_policies => true) }
+        @topics = @context.discussion_topics.active.reject { |a| a.locked_for?(@current_user, :check_policies => true) }
         @messages = []
         @topics.each do |topic|
           @messages << topic if topic.user_id == @user.id
         end
         @messages += DiscussionEntry.active.where(:discussion_topic_id => @topics, :user_id => @user).to_a
 
-        @messages = @messages.select{|m| m.grants_right?(@current_user, session, :read) }.sort_by{|e| e.created_at }.reverse
+        @messages = @messages.select { |m| m.grants_right?(@current_user, session, :read) }.sort_by { |e| e.created_at }.reverse
       end
 
       add_crumb(t('#crumbs.people', "People"), context_url(@context, :context_users_url))

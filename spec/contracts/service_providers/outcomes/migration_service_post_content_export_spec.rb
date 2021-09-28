@@ -44,60 +44,60 @@ RSpec.describe 'Outcomes Service - POST Content Export', :pact do
       }
     end
     let(:export_post_request_body) do
-    {
-      "context_id": "100",
-      "context_type": "course",
-      "export_settings": {
-        "format": "canvas",
-        "artifacts": [
-          {
-            "external_type": "canvas.page",
-            "external_id": [
-              1,
-              2,
-              3
-            ]
-          }
-        ]
+      {
+        "context_id": "100",
+        "context_type": "course",
+        "export_settings": {
+          "format": "canvas",
+          "artifacts": [
+            {
+              "external_type": "canvas.page",
+              "external_id": [
+                1,
+                2,
+                3
+              ]
+            }
+          ]
+        }
       }
-    }
     end
     let(:expected_export_post_response_body) do
-    {
-      "id": Pact.like(2),
-      "context_type": "course",
-      "context_id": Pact.like("100"),
-      "state": "created",
-      "export_settings": {
-        "format": "canvas",
-        "artifacts": [
-          {
-            "external_type": "canvas.page",
-            "external_id": Pact.each_like(1)
-          }
-        ]
+      {
+        "id": Pact.like(2),
+        "context_type": "course",
+        "context_id": Pact.like("100"),
+        "state": "created",
+        "export_settings": {
+          "format": "canvas",
+          "artifacts": [
+            {
+              "external_type": "canvas.page",
+              "external_id": Pact.each_like(1)
+            }
+          ]
+        }
       }
-    }
     end
-    let(:course) {course_factory(active_course: true)}
-    let(:opts) {{}}
+    let(:course) { course_factory(active_course: true) }
+    let(:opts) { {} }
 
     before do
       # We need to create a wiki_page because the export won't begin without an existing artifact
       wiki_page_model(course: course)
-      outcomes.given('a provisioned outcomes service account with existing outcomes and artifacts').
-        upon_receiving('a request to create content exports').
-        with(
-          method: :post,
-          path: '/api/content_exports',
-          headers: export_post_headers,
-          body: export_post_request_body
-        ).
-        will_respond_with(
-          status: 201,
-          headers: { 'Content-Type' => 'application/json; charset=utf-8' },
-          body: expected_export_post_response_body
-        )
+      outcomes.given('a provisioned outcomes service account with existing outcomes and artifacts')
+              .upon_receiving('a request to create content exports')
+              .with(
+                method: :post,
+                path: '/api/content_exports',
+                headers: export_post_headers,
+                body: export_post_request_body
+              )
+              .will_respond_with(
+                status: 201,
+                headers: { 'Content-Type' => 'application/json; charset=utf-8' },
+                body: expected_export_post_response_body
+              )
     end
 
     it 'exports content' do

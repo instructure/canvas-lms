@@ -59,6 +59,7 @@ function fakeWindow() {
     dispatchEvent: jest.fn(),
     confirm: jest.fn().mockReturnValue(true),
     height: 1000,
+    innerHeight: 200,
     $: jest.fn().mockReturnValue({bind: noop, unbind: noop})
   }
 }

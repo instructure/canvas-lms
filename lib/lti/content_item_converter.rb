@@ -21,7 +21,6 @@ require 'ims/lti'
 
 module Lti
   class ContentItemConverter
-
     def self.convert_resource_selection(opts)
       create_content_item(opts[:return_type],
                           {
@@ -34,10 +33,9 @@ module Lti
                           })
     end
 
-
     def self.convert_oembed(data)
       data = data.with_indifferent_access
-      return_type = {photo: 'image_url', link: 'url', video: 'rich_content', rich: 'rich_content'}[data['type'].to_sym]
+      return_type = { photo: 'image_url', link: 'url', video: 'rich_content', rich: 'rich_content' }[data['type'].to_sym]
       converted_opts = {
         id: data['url'],
         url: data['url'],
@@ -56,7 +54,6 @@ module Lti
         create_content_item(return_type, converted_opts)
       end
     end
-
 
     def self.create_content_item(return_type, converted_opts)
       case return_type
@@ -120,7 +117,5 @@ module Lti
     end
 
     private_class_method :lookup_mime
-
-
   end
 end

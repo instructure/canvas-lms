@@ -77,7 +77,6 @@ module CanvasQuizStatistics::Analyzers
       end.sort_by { |v| v[:score] || -1 }
     end
 
-
     # Statistics for answers which scored specific values
     #
     # @return [Hash]
@@ -113,7 +112,7 @@ module CanvasQuizStatistics::Analyzers
     # }
     # ```
     metric :answers do |responses|
-      answers = Hash.new do |h,k|
+      answers = Hash.new do |h, k|
         h[k] = {
           user_ids: [],
           user_names: [],
@@ -129,28 +128,27 @@ module CanvasQuizStatistics::Analyzers
 
       graded_responses = []
       ungraded_responses = []
-      responses.each {|r| r[:correct] == 'defined' ? graded_responses << r : ungraded_responses << r}
-      ranked_responses_by_score = graded_responses.sort_by {|h| h[:points]}
+      responses.each { |r| r[:correct] == 'defined' ? graded_responses << r : ungraded_responses << r }
+      ranked_responses_by_score = graded_responses.sort_by { |h| h[:points] }
 
       previous_floor = ranked_responses_by_score.length
       buckets.each do |name, cutoff|
         floor = (cutoff * ranked_responses_by_score.length).round
-        floor_score = ranked_responses_by_score[floor].try{|h| h[:points]}
+        floor_score = ranked_responses_by_score[floor].try { |h| h[:points] }
 
         # include all tied users in this bucket
         floor -= 1 while (floor > 0) && (ranked_responses_by_score[floor - 1][:points] == floor_score)
 
         # Set bucket for selected buckets
-        ranked_responses_by_score[floor...previous_floor].map {|r| r[:performance_bucket] = name.to_s}
+        ranked_responses_by_score[floor...previous_floor].map { |r| r[:performance_bucket] = name.to_s }
         previous_floor = floor
       end
 
-      ungraded_responses.each {|r| r[:performance_bucket] = "ungraded"}
+      ungraded_responses.each { |r| r[:performance_bucket] = "ungraded" }
 
-      sorted_graded_responses = graded_responses.sort_by {|h| h[:performance_bucket]}.reverse
+      sorted_graded_responses = graded_responses.sort_by { |h| h[:performance_bucket] }.reverse
 
       (sorted_graded_responses + ungraded_responses).each do |response|
-
         hash = answers[response[:performance_bucket]]
         hash[:id] ||= response[:performance_bucket]
         hash[:score] ||= response[:points]

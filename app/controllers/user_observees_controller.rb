@@ -126,7 +126,7 @@ class UserObserveesController < ApplicationController
     if params[:access_token]
       verified_token = AccessToken.authenticate(params[:access_token])
       if verified_token.nil?
-        render json: {errors: [{'message' => 'Unknown observee.'}]}, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
         return
       end
       @student = verified_token.user
@@ -134,7 +134,7 @@ class UserObserveesController < ApplicationController
     elsif params[:pairing_code]
       code = find_observer_pairing_code(params[:pairing_code])
       if code.nil?
-        render json: {errors: [{'message' => 'Invalid pairing code.'}]}, status: 422
+        render json: { errors: [{ 'message' => 'Invalid pairing code.' }] }, status: 422
         return
       end
       @student = code.user
@@ -145,7 +145,7 @@ class UserObserveesController < ApplicationController
 
       common_root_accounts = common_root_accounts_for(observer, observee_pseudonym.user) if observee_pseudonym
       if observee_pseudonym.nil? || common_root_accounts.empty?
-        render json: {errors: [{'message' => 'Unknown observee.'}]}, status: 422
+        render json: { errors: [{ 'message' => 'Unknown observee.' }] }, status: 422
         return
       end
 
@@ -156,13 +156,13 @@ class UserObserveesController < ApplicationController
         session[:parent_registration][:user_id] = @current_user.id
         session[:parent_registration][:observee] = params[:observee]
         session[:parent_registration][:observee_only] = true
-        render(json: {redirect: saml_observee_path})
+        render(json: { redirect: saml_observee_path })
         return
       end
 
       # verify provided password
       unless Pseudonym.authenticate(params[:observee] || {}, [@domain_root_account.id] + @domain_root_account.trusted_account_ids)
-        render json: {errors: [{'message' => 'Invalid credentials provided.'}]}, status: :unauthorized
+        render json: { errors: [{ 'message' => 'Invalid credentials provided.' }] }, status: :unauthorized
         return
       end
 
@@ -171,7 +171,7 @@ class UserObserveesController < ApplicationController
     end
 
     if observer != @current_user
-      common_root_accounts = common_root_accounts.select{|a| a.grants_right?(@current_user, :manage_user_observers)}
+      common_root_accounts = common_root_accounts.select { |a| a.grants_right?(@current_user, :manage_user_observers) }
       return render_unauthorized_action if common_root_accounts.empty?
     end
 
@@ -301,7 +301,7 @@ class UserObserveesController < ApplicationController
     observer.touch if updated
   end
 
-  def has_observation_link?(root_account=nil)
+  def has_observation_link?(root_account = nil)
     scope = observer.as_observer_observation_links.where(student: student)
     scope = scope.for_root_accounts(root_account) if root_account
     scope.exists?
@@ -309,6 +309,7 @@ class UserObserveesController < ApplicationController
 
   def self_or_admin_permission_check
     return true if user == @current_user
+
     admin_permission_check
   end
 
@@ -333,13 +334,12 @@ class UserObserveesController < ApplicationController
     root_account = root_account_for_new_link
     Shard.with_each_shard(shards) do
       user_ids = users.map(&:id)
-      scope = Account.where(id: UserAccountAssociation.
-        joins(:account).where(accounts: {parent_account_id: nil}).
-        where(user_id: user_ids).
-        group(:account_id).
-        having("count(*) = #{user_ids.length}"). # user => account is unique for user_account_associations
-        select(:account_id)
-      )
+      scope = Account.where(id: UserAccountAssociation
+        .joins(:account).where(accounts: { parent_account_id: nil })
+        .where(user_id: user_ids)
+        .group(:account_id)
+        .having("count(*) = #{user_ids.length}") # user => account is unique for user_account_associations
+        .select(:account_id))
       scope = scope.where(:id => root_account) if root_account # scope down to a root_account if specified
       scope
     end
@@ -377,10 +377,10 @@ class UserObserveesController < ApplicationController
     user_rows = Array(user_rows)
     ra_id_map = {}
     if ['observers', 'show_observer'].include?(params[:action])
-      scope = student.as_student_observation_links.where(:observer => user_rows.map{|r| r['id']})
+      scope = student.as_student_observation_links.where(:observer => user_rows.map { |r| r['id'] })
       column = :observer_id
     else
-      scope = observer.as_observer_observation_links.where(:student => user_rows.map{|r| r['id']})
+      scope = observer.as_observer_observation_links.where(:student => user_rows.map { |r| r['id'] })
       column = :user_id
     end
 

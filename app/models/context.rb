@@ -21,39 +21,38 @@
 # These methods are mixed into the classes that can be considered a "context".
 # See Context::CONTEXT_TYPES below.
 module Context
-
   CONTEXT_TYPES = [:Account, :Course, :CourseSection, :User, :Group].freeze
 
   ASSET_TYPES = {
-      Announcement: :Announcement,
-      AssessmentQuestion: :AssessmentQuestion,
-      AssessmentQuestionBank: :AssessmentQuestionBank,
-      Assignment: :Assignment,
-      AssignmentGroup: :AssignmentGroup,
-      Attachment: :Attachment,
-      CalendarEvent: :CalendarEvent,
-      Collaboration: :Collaboration,
-      ContentTag: :ContentTag,
-      ContextExternalTool: :ContextExternalTool,
-      ContextModule: :ContextModule,
-      DiscussionEntry: :DiscussionEntry,
-      DiscussionTopic: :DiscussionTopic,
-      Folder: :Folder,
-      LearningOutcome: :LearningOutcome,
-      LearningOutcomeGroup: :LearningOutcomeGroup,
-      MediaObject: :MediaObject,
-      Progress: :Progress,
-      Quiz: :"Quizzes::Quiz",
-      QuizGroup: :"Quizzes::QuizGroup",
-      QuizQuestion: :"Quizzes::QuizQuestion",
-      QuizSubmission: :"Quizzes::QuizSubmission",
-      Rubric: :Rubric,
-      RubricAssociation: :RubricAssociation,
-      Submission: :Submission,
-      WebConference: :WebConference,
-      Wiki: :Wiki,
-      WikiPage: :WikiPage,
-      Eportfolio: :Eportfolio
+    Announcement: :Announcement,
+    AssessmentQuestion: :AssessmentQuestion,
+    AssessmentQuestionBank: :AssessmentQuestionBank,
+    Assignment: :Assignment,
+    AssignmentGroup: :AssignmentGroup,
+    Attachment: :Attachment,
+    CalendarEvent: :CalendarEvent,
+    Collaboration: :Collaboration,
+    ContentTag: :ContentTag,
+    ContextExternalTool: :ContextExternalTool,
+    ContextModule: :ContextModule,
+    DiscussionEntry: :DiscussionEntry,
+    DiscussionTopic: :DiscussionTopic,
+    Folder: :Folder,
+    LearningOutcome: :LearningOutcome,
+    LearningOutcomeGroup: :LearningOutcomeGroup,
+    MediaObject: :MediaObject,
+    Progress: :Progress,
+    Quiz: :"Quizzes::Quiz",
+    QuizGroup: :"Quizzes::QuizGroup",
+    QuizQuestion: :"Quizzes::QuizQuestion",
+    QuizSubmission: :"Quizzes::QuizSubmission",
+    Rubric: :Rubric,
+    RubricAssociation: :RubricAssociation,
+    Submission: :Submission,
+    WebConference: :WebConference,
+    Wiki: :Wiki,
+    WikiPage: :WikiPage,
+    Eportfolio: :Eportfolio
   }.freeze
 
   def clear_cached_short_name
@@ -86,15 +85,15 @@ module Context
 
   def self.sorted_rubrics(user, context)
     associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
-    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
+    Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select { |r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
   def rubric_contexts(user)
     associations = []
     course_ids = [self.id]
-    course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map{|id| Shard.relative_id_for(id, user.shard, Shard.current)}).uniq if user
+    course_ids = (course_ids + user.participating_instructor_course_with_concluded_ids.map { |id| Shard.relative_id_for(id, user.shard, Shard.current) }).uniq if user
     Shard.partition_by_shard(course_ids) do |sharded_course_ids|
-      context_codes = sharded_course_ids.map{|id| "course_#{id}"}
+      context_codes = sharded_course_ids.map { |id| "course_#{id}" }
       if Shard.current == self.shard
         context = self
         while context && context.respond_to?(:account) || context.respond_to?(:parent_account)
@@ -105,8 +104,8 @@ module Context
       associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
     end
 
-    associations = associations.select(&:rubric).uniq{|a| [a.rubric_id, a.context.asset_string] }
-    contexts = associations.group_by{|a| a.context.asset_string}.map do |code, code_associations|
+    associations = associations.select(&:rubric).uniq { |a| [a.rubric_id, a.context.asset_string] }
+    contexts = associations.group_by { |a| a.context.asset_string }.map do |code, code_associations|
       {
         :rubrics => code_associations.length,
         :context_code => code,
@@ -124,8 +123,10 @@ module Context
     possible_types = {
       files: -> { self.respond_to?(:attachments) && self.attachments.active.exists? },
       modules: -> { self.respond_to?(:context_modules) && self.context_modules.active.exists? },
-      quizzes: -> { (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
-        (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?) },
+      quizzes: -> {
+                 (self.respond_to?(:quizzes) && self.quizzes.active.exists?) ||
+                   (self.respond_to?(:assignments) && self.assignments.active.quiz_lti.exists?)
+               },
       assignments: -> { self.respond_to?(:assignments) && self.assignments.active.exists? },
       pages: -> { self.respond_to?(:wiki_pages) && self.wiki_pages.active.exists? },
       conferences: -> { self.respond_to?(:web_conferences) && self.web_conferences.active.exists? },
@@ -135,10 +136,10 @@ module Context
     }
 
     types_to_check = if only_check
-      possible_types.select { |k| only_check.include?(k) }
-    else
-      possible_types
-    end
+                       possible_types.select { |k| only_check.include?(k) }
+                     else
+                       possible_types
+                     end
 
     raise ArgumentError, "only_check is either an empty array or you are aking for invalid types" if types_to_check.empty?
 
@@ -152,7 +153,7 @@ module Context
 
     # if we're only asking for a subset but the full set is cached return that, but filtered with just what we want
     if only_check.present? && (cache_with_everything = Rails.cache.read([base_cache_key, 'everything', self].cache_key))
-      return @active_record_types[only_check] = cache_with_everything.select { |k,_v| only_check.include?(k) }
+      return @active_record_types[only_check] = cache_with_everything.select { |k, _v| only_check.include?(k) }
     end
 
     # otherwise compute it and store it in the cache
@@ -170,8 +171,9 @@ module Context
     false
   end
 
-  def find_asset(asset_string, allowed_types=nil)
+  def find_asset(asset_string, allowed_types = nil)
     return nil unless asset_string
+
     res = Context.find_asset_by_asset_string(asset_string, self, allowed_types)
     res = nil if res.respond_to?(:deleted?) && res.deleted?
     res
@@ -182,13 +184,14 @@ module Context
     ids_by_type = Hash.new([])
     context_types_and_ids.each do |type, id|
       next unless type && CONTEXT_TYPES.include?(type.to_sym)
+
       ids_by_type[type] += [id]
     end
 
     result = {}
     ids_by_type.each do |type, ids|
       klass = Object.const_get(type, false)
-      klass.where(:id => ids).pluck(:id, :name).map {|id, name| result[[type, id]] = name}
+      klass.where(:id => ids).pluck(:id, :name).map { |id, name| result[[type, id]] = name }
     end
     result
   end
@@ -211,7 +214,7 @@ module Context
     ASSET_TYPES[string.to_sym].to_s.constantize if ASSET_TYPES.key?(string.to_sym)
   end
 
-  def self.find_asset_by_asset_string(string, context=nil, allowed_types=nil)
+  def self.find_asset_by_asset_string(string, context = nil, allowed_types = nil)
     type, id = ActiveRecord::Base.parse_asset_string(string)
     klass = asset_type_for_string(type)
     klass = nil if allowed_types && !allowed_types.include?(klass.to_s.underscore.to_sym)
@@ -256,6 +259,7 @@ module Context
     context = media_obj.context if media_obj
 
     return nil unless context
+
     case params[:controller]
     when 'files'
       rel_path = params[:file_path]
@@ -357,11 +361,11 @@ module Context
       next if ids.empty?
 
       scopes << klass
-        .shard(Shard.current) # prevent it switching shards on us
-        .where(id: ids)
-        .order(updated_at: :desc)
-        .select(:updated_at)
-        .limit(1)
+                .shard(Shard.current) # prevent it switching shards on us
+                .where(id: ids)
+                .order(updated_at: :desc)
+                .select(:updated_at)
+                .limit(1)
     end
 
     return nil if scopes.empty?

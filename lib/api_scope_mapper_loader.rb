@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class ApiScopeMapperLoader
-
   # The ApiScopeMapper is a generated file that we don't commit.
   # This method ensures that if the file doesn't exist specs and canvas won't blow up.
   def self.load
@@ -41,5 +40,4 @@ class ApiScopeMapperLoader
     end
     klass
   end
-
 end

@@ -91,8 +91,8 @@ class CanvasSchema < GraphQL::Schema
 
   def self.unauthorized_object(error)
     raise GraphQL::ExecutionError,
-      I18n.t("An object of type %{graphql_type} was hidden due to insufficient scopes on access token",
-             graphql_type: error.type.graphql_name)
+          I18n.t("An object of type %{graphql_type} was hidden due to insufficient scopes on access token",
+                 graphql_type: error.type.graphql_name)
   end
 
   orphan_types [Types::PageType, Types::FileType, Types::ExternalUrlType,

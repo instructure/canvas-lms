@@ -107,7 +107,6 @@ module Lti
     end
 
     describe '#all_roles' do
-
       it 'converts multiple roles' do
         allow(subject).to receive(:course_enrollments).and_return([StudentEnrollment.new, TeacherEnrollment.new, DesignerEnrollment.new, ObserverEnrollment.new, TaEnrollment.new, AccountUser.new])
         allow(user).to receive(:roles).and_return(['user', 'student', 'teacher', 'admin'])
@@ -480,11 +479,11 @@ module Lti
         end
       end
 
-      it "should return previous canvas course ids" do
+      it "returns previous canvas course ids" do
         expect(subject.previous_course_ids).to eq [@c1.id, @c2.id].sort.join(',')
       end
 
-      it "should return previous lti context_ids" do
+      it "returns previous lti context_ids" do
         expect(subject.previous_lti_context_ids.split(",")).to match_array %w{abc def}
       end
     end
@@ -495,7 +494,7 @@ module Lti
           course.save!
         end
 
-        it "should return empty (no previous lti context_ids)" do
+        it "returns empty (no previous lti context_ids)" do
           expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
         end
       end
@@ -537,11 +536,11 @@ module Lti
           )
         end
 
-        it "should return previous lti context_ids" do
+        it "returns previous lti context_ids" do
           expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
         end
 
-        it "should invalidate cache on last copied migration" do
+        it "invalidates cache on last copied migration" do
           enable_cache do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
             @c4 = Course.create!(root_account: root_account, account: account, lti_context_id: 'jkl')
@@ -562,13 +561,13 @@ module Lti
             )
           end
 
-          it "should not return duplicates but still return in chronological order" do
+          it "does not return duplicates but still return in chronological order" do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'def,ghi,abc'
           end
         end
 
         context "when there are more than (limit=1000) content migration courses in the history" do
-          it 'should truncate after the limit of ids' do
+          it 'truncates after the limit of ids' do
             4.upto(11) do
               c = Course.create!
               c.root_account = root_account
@@ -623,21 +622,21 @@ module Lti
           @e2 = multiple_student_enrollment(user, @sec2, course: course)
         end
 
-        it "should return all canvas section ids" do
+        it "returns all canvas section ids" do
           expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
         end
 
-        it "should return section restricted if all enrollments are restricted" do
-          [@e1, @e2].each{|e| e.update_attribute(:limit_privileges_to_course_section, true)}
+        it "returns section restricted if all enrollments are restricted" do
+          [@e1, @e2].each { |e| e.update_attribute(:limit_privileges_to_course_section, true) }
           expect(subject.section_restricted).to eq true
         end
 
-        it "should not return section restricted if only one is" do
+        it "does not return section restricted if only one is" do
           @e1.update_attribute(:limit_privileges_to_course_section, true)
           expect(subject.section_restricted).to eq false
         end
 
-        it "should return all canvas section sis ids" do
+        it "returns all canvas section sis ids" do
           expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
         end
       end
@@ -660,7 +659,7 @@ module Lti
 
       let(:user) do
         user = User.create!
-        user.email ='test@foo.com'
+        user.email = 'test@foo.com'
         user.save!
         user
       end
@@ -670,16 +669,16 @@ module Lti
           expect(substitution_helper.email).to eq user.email
         end
 
-        let(:sis_email) {'sis@example.com'}
+        let(:sis_email) { 'sis@example.com' }
 
         let(:sis_pseudonym) do
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
           pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
-          pseudonym.sis_communication_channel_id=cc.id
-          pseudonym.communication_channel_id=cc.id
-          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.sis_communication_channel_id = cc.id
+          pseudonym.communication_channel_id = cc.id
+          pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           pseudonym
         end
@@ -698,7 +697,7 @@ module Lti
           # it would return 'test@foo.com' instead of sis_email
           p.account = Account.create!
           p.save!
-          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          course.enroll_user(user, 'StudentEnrollment', { sis_pseudonym_id: p.id, enrollment_state: 'active' })
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           expect(sub_helper.email).to eq sis_email
         end
@@ -711,7 +710,7 @@ module Lti
           p.account = Account.create!
           p.workflow_state = 'deleted'
           p.save!
-          course.enroll_user(user, 'StudentEnrollment', {sis_pseudonym_id: p.id, enrollment_state: 'active'})
+          course.enroll_user(user, 'StudentEnrollment', { sis_pseudonym_id: p.id, enrollment_state: 'active' })
           sub_helper = SubstitutionsHelper.new(course, root_account, user, tool)
           expect(sub_helper.email).to eq 'test@foo.com'
         end
@@ -738,21 +737,19 @@ module Lti
           it "returns the users email if there isn't a sis email" do
             expect(substitution_helper.email).to eq user.email
           end
-
         end
       end
 
       describe "#sis_email" do
-
         it "returns the sis email" do
           sis_email = 'sis@example.com'
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
           pseudonym = cc.user.pseudonyms.build(:unique_id => cc.path, :account => root_account)
-          pseudonym.sis_communication_channel_id=cc.id
-          pseudonym.communication_channel_id=cc.id
-          pseudonym.sis_user_id="some_sis_id"
+          pseudonym.sis_communication_channel_id = cc.id
+          pseudonym.communication_channel_id = cc.id
+          pseudonym.sis_user_id = "some_sis_id"
           pseudonym.save
           expect(substitution_helper.sis_email).to eq sis_email
         end
@@ -760,7 +757,6 @@ module Lti
         it "returns nil if there isn't an sis email" do
           expect(substitution_helper.sis_email).to eq nil
         end
-
       end
     end
   end

@@ -97,7 +97,7 @@ describe "teacher k5 todo dashboard tab" do
 
     it 'shows a todo item again when new submission is made' do
       @assignment1.grade_student(@student, grader: @homeroom_teacher, score: "90", points_deducted: 0)
-      @assignment1.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+      @assignment1.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
 
       get "/#todo"
 

@@ -48,8 +48,8 @@ const locale = {
   "announcement_list_da155734": { "message": "Announcement List" },
   "announcements_a4b8ed4a": { "message": "Announcements" },
   "apply_781a2546": { "message": "Apply" },
-  "apply_changes_to_all_instances_of_this_image_in_th_3f08e243": {
-    "message": "Apply changes to all instances of this image in the course"
+  "apply_changes_to_all_instances_of_this_button_and__3a3bea34": {
+    "message": "Apply changes to all instances of this Button and Icon in the Course"
   },
   "apps_54d24a47": { "message": "Apps" },
   "aspect_ratio_will_be_preserved_cb5fdfb8": {
@@ -356,8 +356,6 @@ const locale = {
     "message": "Sadly, the pretty HTML editor is not keyboard accessible. Access the raw HTML editor here."
   },
   "save_11a80ec3": { "message": "Save" },
-  "save_and_replace_all_951c5f80": { "message": "Save and Replace All" },
-  "save_as_a_new_image_5996d0dd": { "message": "Save as a new image" },
   "saved_buttons_and_icons_8278eed2": { "message": "Saved Buttons and Icons" },
   "search_280d00bd": { "message": "Search" },
   "search_term_b2d2235": { "message": "Search Term" },

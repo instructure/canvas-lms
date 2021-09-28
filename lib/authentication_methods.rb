@@ -61,6 +61,7 @@ module AuthenticationMethods
 
   def load_pseudonym_from_jwt
     return unless api_request?
+
     token_string = AuthenticationMethods.access_token(request)
     return unless token_string.present?
     return if load_pseudonym_from_inst_access_token(token_string)
@@ -72,6 +73,7 @@ module AuthenticationMethods
       unless @current_user && @current_pseudonym
         raise AccessTokenError
       end
+
       if services_jwt.masquerading_user_global_id
         @real_current_user = User.find(services_jwt.masquerading_user_global_id)
         @real_current_pseudonym = SisPseudonym.for(@real_current_user, @domain_root_account, type: :implicit, require_sis: false)
@@ -94,6 +96,7 @@ module AuthenticationMethods
     # no funny business
     params.delete(key) unless params[key].class == Array
     return unless params.key?(key)
+
     params[key] &= ALLOWED_SCOPE_INCLUDES
   end
 
@@ -127,8 +130,8 @@ module AuthenticationMethods
 
   def load_pseudonym_from_access_token
     return unless api_request? ||
-      (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy') ||
-      (params[:controller] == 'login' && params[:action] == 'session_token')
+                  (params[:controller] == 'oauth2_provider' && params[:action] == 'destroy') ||
+                  (params[:controller] == 'login' && params[:action] == 'session_token')
 
     token_string = AuthenticationMethods.access_token(request)
 
@@ -190,8 +193,8 @@ module AuthenticationMethods
           # either my clock is off or whoever set this value's clock is off
           invalid_before = nil if invalid_before && invalid_before > Time.now.utc
           if invalid_before &&
-            (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
-            session_refreshed_at < invalid_before
+             (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+             session_refreshed_at < invalid_before
 
             logger.info "[AUTH] Invalidating session: Session created before user logged out."
             invalidate_session
@@ -199,8 +202,8 @@ module AuthenticationMethods
           end
 
           if @current_pseudonym &&
-            session[:cas_session] &&
-            @current_pseudonym.cas_ticket_expired?(session[:cas_session])
+             session[:cas_session] &&
+             @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
             logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
             invalidate_session
@@ -220,6 +223,7 @@ module AuthenticationMethods
         # sounds like somebody hates cookies.
         return redirect_to(login_url(:needs_cookies => '1'))
       end
+
       @current_user = @current_pseudonym && @current_pseudonym.user
     end
 
@@ -259,7 +263,7 @@ module AuthenticationMethods
 
       if request_become_user && request_become_user.id != session[:become_user_id].to_i && request_become_user.can_masquerade?(@current_user, @domain_root_account)
         params_without_become = params.dup
-        params_without_become.delete_if {|k,v| [ 'become_user_id', 'become_teacher', 'become_student', 'me' ].include? k }
+        params_without_become.delete_if { |k, v| ['become_user_id', 'become_teacher', 'become_student', 'me'].include? k }
         params_without_become[:only_path] = true
         session[:masquerade_return_to] = url_for(params_without_become.to_unsafe_h)
         return redirect_to user_masquerade_url(request_become_user.id)
@@ -278,9 +282,9 @@ module AuthenticationMethods
         if @current_user != user
           # if we're already masquerading from an access token, and now try to
           # masquerade as someone else
-          render :json => {:errors => "Cannot change masquerade"}, :status => :unauthorized
+          render :json => { :errors => "Cannot change masquerade" }, :status => :unauthorized
           return false
-        # else: they do match, everything is already set
+          # else: they do match, everything is already set
         end
         logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url} via masquerade token"
       elsif user&.can_masquerade?(@current_user, @domain_root_account)
@@ -318,7 +322,7 @@ module AuthenticationMethods
   def require_non_jwt_auth
     if @authenticated_with_jwt
       render(
-        json: {error: "cannot generate a JWT when authorized by a JWT"},
+        json: { error: "cannot generate a JWT when authorized by a JWT" },
         status: 403
       )
     end
@@ -326,6 +330,7 @@ module AuthenticationMethods
 
   def clean_return_to(url)
     return nil if url.blank?
+
     begin
       uri = URI.parse(url)
     rescue URI::Error
@@ -333,6 +338,7 @@ module AuthenticationMethods
     end
     return nil unless uri.path && uri.path[0] == '/'
     return "#{request.protocol}#{request.host_with_port}#{uri.path.sub(%r{/download$}, '')}" if uri.path =~ %r{/files/(\d+~)?\d+/download$}
+
     return "#{request.protocol}#{request.host_with_port}#{uri.path}#{uri.query && "?#{uri.query}"}#{uri.fragment && "##{uri.fragment}"}"
   end
 
@@ -341,7 +347,7 @@ module AuthenticationMethods
     redirect_to url
   end
 
-  def store_location(uri=nil, overwrite=true)
+  def store_location(uri = nil, overwrite = true)
     if overwrite || !session[:return_to]
       uri ||= request.get? ? request.fullpath : request.referrer
       session[:return_to] = clean_return_to(uri)
@@ -360,6 +366,7 @@ module AuthenticationMethods
 
   def redirect_to_login
     return unless fix_ms_office_redirects
+
     respond_to do |format|
       format.json { render_json_unauthorized }
       format.all do
@@ -377,13 +384,13 @@ module AuthenticationMethods
         status: I18n.t('lib.auth.status_unauthorized', 'unauthorized'),
         errors: [{ message: I18n.t('lib.auth.not_authorized', "user not authorized to perform that action") }]
       },
-      status: :unauthorized
+             status: :unauthorized
     else
       render json: {
         status: I18n.t('lib.auth.status_unauthenticated', 'unauthenticated'),
         errors: [{ :message => I18n.t('lib.auth.authentication_required', "user authorization required") }]
       },
-      status: :unauthorized
+             status: :unauthorized
     end
   end
 

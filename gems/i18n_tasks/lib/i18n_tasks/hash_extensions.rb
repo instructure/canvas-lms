@@ -19,7 +19,7 @@
 
 module I18nTasks
   module HashExtensions
-    def flatten_keys(result={}, prefix='')
+    def flatten_keys(result = {}, prefix = '')
       each_pair do |k, v|
         if v.is_a?(Hash)
           v.flatten_keys(result, "#{prefix}#{k}.")

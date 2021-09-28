@@ -20,7 +20,6 @@
 
 module SIS
   class GroupMembershipImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       yield importer
@@ -30,6 +29,7 @@ module SIS
     end
 
     private
+
     class Work
       attr_accessor :success_count, :roll_back_data
 
@@ -65,8 +65,8 @@ module SIS
         end
 
         # can't query group.group_memberships, since that excludes deleted memberships
-        group_membership = GroupMembership.where(group_id: group, user_id: user).
-          order(Arel.sql("CASE WHEN workflow_state = 'accepted' THEN 0 ELSE 1 END")).take
+        group_membership = GroupMembership.where(group_id: group, user_id: user)
+                                          .order(Arel.sql("CASE WHEN workflow_state = 'accepted' THEN 0 ELSE 1 END")).take
         group_membership ||= group.group_memberships.build(:user => user)
 
         group_membership.sis_batch_id = @batch.id
@@ -90,7 +90,6 @@ module SIS
         end
         @success_count += 1
       end
-
     end
   end
 end

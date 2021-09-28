@@ -22,6 +22,6 @@ class PopulateMediaTracksWebVttContent < ActiveRecord::Migration[5.1]
 
   def change
     DataFixup::PopulateMediaTracksWebVttContent.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      n_strand: "DataFixup::PopulateMediaTracksWebVttContent:#{Shard.current.database_server.id}").run
+                                                                    n_strand: "DataFixup::PopulateMediaTracksWebVttContent:#{Shard.current.database_server.id}").run
   end
 end

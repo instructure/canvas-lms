@@ -38,11 +38,10 @@ class EportfolioEntry < ActiveRecord::Base
   validates_length_of :slug, :maximum => maximum_string_length, :allow_nil => false, :allow_blank => true
   has_many :page_comments, -> { preload(:user).order('page_comments.created_at DESC') }, as: :page
 
-
   serialize :content
 
   set_policy do
-    given {|user| user && self.allow_comments }
+    given { |user| user && self.allow_comments }
     can :comment
   end
 
@@ -104,7 +103,7 @@ class EportfolioEntry < ActiveRecord::Base
     self.content = []
     cnt.times do |idx|
       obj = params[("section_" + (idx + 1).to_s).to_sym].slice(:section_type, :content, :submission_id, :attachment_id)
-      new_obj = {:section_type => obj[:section_type]}
+      new_obj = { :section_type => obj[:section_type] }
       if obj[:section_type] == 'rich_text' || obj[:section_type] == 'html'
         config = CanvasSanitize::SANITIZE
         new_obj[:content] = Sanitize.clean(obj[:content] || '', config).strip
@@ -128,12 +127,11 @@ class EportfolioEntry < ActiveRecord::Base
       end
 
       if new_obj
-          self.content << new_obj
+        self.content << new_obj
       end
     end
     self.content << t(:default_content, "No Content Added Yet") if self.content.empty?
   end
-
 
   def category_slug
     self.eportfolio_category.slug rescue self.eportfolio_category_id
@@ -151,18 +149,18 @@ class EportfolioEntry < ActiveRecord::Base
   end
   protected :infer_unique_slug
 
-  def to_atom(opts={})
+  def to_atom(opts = {})
     Atom::Entry.new do |entry|
-      entry.title     = "#{self.name}"
-      entry.authors  << Atom::Person.new(:name => t(:atom_author, "ePortfolio Entry"))
+      entry.title = "#{self.name}"
+      entry.authors << Atom::Person.new(:name => t(:atom_author, "ePortfolio Entry"))
       entry.updated   = self.updated_at
       entry.published = self.created_at
       url = "http://#{HostUrl.default_host}/eportfolios/#{self.eportfolio_id}/#{self.eportfolio_category.slug}/#{self.slug}"
       url += "?verifier=#{self.eportfolio.uuid}" if opts[:private]
-      entry.links    << Atom::Link.new(:rel => 'alternate', :href => url)
-      entry.id        = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{self.feed_code}_#{self.created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
+      entry.links << Atom::Link.new(:rel => 'alternate', :href => url)
+      entry.id = "tag:#{HostUrl.default_host},#{self.created_at.strftime("%Y-%m-%d")}:/eportfoli_entries/#{self.feed_code}_#{self.created_at.strftime("%Y-%m-%d-%H-%M") rescue "none"}"
       rendered_content = t(:click_through, "Click to view page content")
-      entry.content   = Atom::Content::Html.new(rendered_content)
+      entry.content = Atom::Content::Html.new(rendered_content)
     end
   end
 

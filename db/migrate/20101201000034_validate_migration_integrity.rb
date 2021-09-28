@@ -47,4 +47,3 @@ class ValidateMigrationIntegrity < ActiveRecord::Migration[4.2]
   def self.down
   end
 end
-

@@ -21,9 +21,7 @@
 require 'mail'
 
 module IncomingMailProcessor
-
   class IncomingMessageProcessor
-
     extend HtmlTextHelper
 
     MailboxClasses = {
@@ -51,13 +49,13 @@ module IncomingMailProcessor
           if self.dedicated_workers_per_mailbox
             # Launch one per mailbox
             self.mailbox_accounts.each do |account|
-              imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}").
-                process({worker_id: worker_id, mailbox_account_address: account.address})
+              imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}")
+                 .process({ worker_id: worker_id, mailbox_account_address: account.address })
             end
           else
             # Just launch the one
-            imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}").
-              process({worker_id: worker_id})
+            imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}")
+               .process({ worker_id: worker_id })
           end
         end
       end
@@ -87,7 +85,7 @@ module IncomingMailProcessor
       end
     end
 
-    def process(opts={})
+    def process(opts = {})
       if opts[:mailbox_account_address]
         # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
         accounts_to_process = self.class.mailbox_accounts.select { |a| a.address == opts[:mailbox_account_address] }
@@ -98,7 +96,7 @@ module IncomingMailProcessor
       accounts_to_process.each do |account|
         mailbox = self.class.create_mailbox(account)
         mailbox_opts = {}
-        mailbox_opts = {offset: opts[:worker_id], stride: self.class.workers} if opts[:worker_id] && self.class.workers > 1
+        mailbox_opts = { offset: opts[:worker_id], stride: self.class.workers } if opts[:worker_id] && self.class.workers > 1
         process_mailbox(mailbox, account, mailbox_opts)
       end
     end
@@ -118,10 +116,9 @@ module IncomingMailProcessor
     private
 
     def extract_body(incoming_message)
-
       if incoming_message.multipart?
         html_part = incoming_message.html_part
-        text_part =  incoming_message.text_part
+        text_part = incoming_message.text_part
 
         html_body = self.class.utf8ify(html_part.body.decoded, html_part.charset) if html_part
         text_body = self.class.utf8ify(text_part.body.decoded, text_part.charset) if text_part
@@ -150,13 +147,13 @@ module IncomingMailProcessor
     def report_stats(incoming_message, mailbox_account)
       InstStatsd::Statsd.increment("incoming_mail_processor.incoming_message_processed.#{mailbox_account.escaped_address}",
                                    short_stat: 'incoming_mail_processor.incoming_message_processed',
-                                   tags: {mailbox: mailbox_account.escaped_address})
+                                   tags: { mailbox: mailbox_account.escaped_address })
       age = age(incoming_message)
       if age
         stat_name = "incoming_mail_processor.message_age.#{mailbox_account.escaped_address}"
         InstStatsd::Statsd.timing(stat_name, age,
                                   short_stat: 'incoming_mail_processor.message_age',
-                                  tags: {mailbox: mailbox_account.escaped_address})
+                                  tags: { mailbox: mailbox_account.escaped_address })
       end
     end
 
@@ -208,11 +205,11 @@ module IncomingMailProcessor
         error_folder = mailbox_config.delete(:error_folder)
         address = mailbox_config[:address] || mailbox_config[:username]
         IncomingMailProcessor::MailboxAccount.new({
-          :protocol => mailbox_protocol.to_sym,
-          :config => mailbox_config,
-          :address => address,
-          :error_folder => error_folder,
-        })
+                                                    :protocol => mailbox_protocol.to_sym,
+                                                    :config => mailbox_config,
+                                                    :address => address,
+                                                    :error_folder => error_folder,
+                                                  })
       end
     end
 
@@ -259,7 +256,6 @@ module IncomingMailProcessor
         else false
         end
       end
-
     end
 
     def self.utf8ify(string, encoding)
@@ -272,8 +268,7 @@ module IncomingMailProcessor
       new_string&.valid_encoding? ? new_string : Utf8Cleaner.strip_invalid_utf8(string)
     end
 
-
-    def process_mailbox(mailbox, account, opts={})
+    def process_mailbox(mailbox, account, opts = {})
       error_folder = account.error_folder
       mailbox.connect
       mailbox.each_message(opts) do |message_id, raw_contents|
@@ -285,11 +280,11 @@ module IncomingMailProcessor
           mailbox.move_message(message_id, error_folder)
           if message
             @error_reporter.log_error(self.class.error_report_category, {
-              :message => "Error parsing email",
-              :backtrace => message.errors.flatten.map(&:to_s).join("\n"),
-              :from => message.from.try(:first),
-              :to => message.to.to_s,
-            })
+                                        :message => "Error parsing email",
+                                        :backtrace => message.errors.flatten.map(&:to_s).join("\n"),
+                                        :from => message.from.try(:first),
+                                        :to => message.to.to_s,
+                                      })
           end
         end
       end
@@ -325,11 +320,12 @@ module IncomingMailProcessor
       tag = self.class.extract_address_tag(message, account)
       # TODO: Add bounce processing and handling of other email to the default notification address.
       return unless tag
+
       process_single(message, tag, account)
     rescue => e
       @error_reporter.log_exception(self.class.error_report_category, e,
-        :from => message.from.try(:first),
-        :to => message.to.to_s)
+                                    :from => message.from.try(:first),
+                                    :to => message.to.to_s)
     end
 
     def self.extract_address_tag(message, account)

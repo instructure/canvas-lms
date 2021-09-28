@@ -37,7 +37,7 @@ class PacePlan < ActiveRecord::Base
   validates :course_id, presence: true
   validate :valid_secondary_context
 
-  scope :primary, -> { where(course_section_id: nil, user_id: nil) }
+  scope :primary, -> { not_deleted.where(course_section_id: nil, user_id: nil) }
   scope :for_section, ->(section) { where(course_section_id: section) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :not_deleted, -> { where.not(workflow_state: 'deleted') }

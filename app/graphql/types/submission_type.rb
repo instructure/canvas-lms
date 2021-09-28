@@ -18,20 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 #############################################################################
 # NOTE: In most cases you shouldn't add new fields here, instead they should
 #       be added to interfaces/submission_interface.rb so that they work for
 #       both submissions and submission histories
 #############################################################################
 
-
 module Types
   class SubmissionHistoryFilterInputType < Types::BaseInputObject
     graphql_name 'SubmissionHistoryFilterInput'
 
     argument :states, [SubmissionStateType], required: false,
-      default_value: DEFAULT_SUBMISSION_HISTORY_STATES
+                                             default_value: DEFAULT_SUBMISSION_HISTORY_STATES
 
     argument :include_current_submission, Boolean, <<~DESC, required: false, default_value: true
       If the most current submission should be included in the submission
@@ -57,12 +55,12 @@ module Types
       states, include_current_submission = filter.values_at(:states, :include_current_submission)
 
       Promise.all([
-        load_association(:versions),
-        load_association(:assignment)
-      ]).then do
+                    load_association(:versions),
+                    load_association(:assignment)
+                  ]).then do
         histories = object.submission_history
         histories.pop unless include_current_submission
-        histories.select{ |h| states.include?(h.workflow_state) }
+        histories.select { |h| states.include?(h.workflow_state) }
       end
     end
   end

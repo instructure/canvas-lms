@@ -29,7 +29,7 @@ module Selenium
           COMMANDS.freeze
 
           def log(type)
-            data = execute :get_log, {}, {type: type.to_s}
+            data = execute :get_log, {}, { type: type.to_s }
 
             Array(data).map do |l|
               begin

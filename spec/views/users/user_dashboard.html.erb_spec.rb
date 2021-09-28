@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/user_dashboard" do
-  it "should render" do
+  it "renders" do
     course_with_student
     view_context
     assign(:courses, [@course])
@@ -36,7 +36,7 @@ describe "/users/user_dashboard" do
     expect(response).not_to be_nil
   end
 
-  it "should show announcements to users with no enrollments" do
+  it "shows announcements to users with no enrollments" do
     user_factory
     view_context
     assign(:courses, [])
@@ -46,14 +46,14 @@ describe "/users/user_dashboard" do
     assign(:upcoming_events, [])
     assign(:stream_items, [])
     assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
-                                                          :end_at => Time.zone.today + 2.days, :user => User.create!,
-                                                          :subject => "My Global Announcement", :account => Account.default)])
+                                                       :end_at => Time.zone.today + 2.days, :user => User.create!,
+                                                       :subject => "My Global Announcement", :account => Account.default)])
     render "users/user_dashboard"
     expect(response.body).to match(/My\sGlobal\sAnnouncement/)
     expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Default\sAccount)/)
   end
 
-  it "should show announcements (site_admin) to users with no enrollments" do
+  it "shows announcements (site_admin) to users with no enrollments" do
     user_factory
     view_context
     assign(:courses, [])
@@ -63,8 +63,8 @@ describe "/users/user_dashboard" do
     assign(:upcoming_events, [])
     assign(:stream_items, [])
     assign(:announcements, [AccountNotification.create(:message => 'hi', :start_at => Time.zone.today - 1.day,
-                                                          :end_at => Time.zone.today + 2.days, :user => User.create!,
-                                                          :subject => "My Global Announcement", :account => Account.site_admin)])
+                                                       :end_at => Time.zone.today + 2.days, :user => User.create!,
+                                                       :subject => "My Global Announcement", :account => Account.site_admin)])
     render "users/user_dashboard"
     expect(response.body).to match(/(This\sis\sa\smessage\sfrom\s<b>Canvas\sAdministration)/)
   end

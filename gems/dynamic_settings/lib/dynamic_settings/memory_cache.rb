@@ -27,8 +27,8 @@ module DynamicSettings
     end
 
     def write_set(hash, ttl: nil)
-      opts = {expires_in: ttl}
-      hash.each{|k, v| write(k, v, opts) }
+      opts = { expires_in: ttl }
+      hash.each { |k, v| write(k, v, opts) }
     end
 
     # Everything from here down is actully a reimplementation

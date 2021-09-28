@@ -22,7 +22,7 @@ class StubbedClient
     events = records.map { |e| JSON.parse(e[:data]).dig('attributes', 'event_name') }.join(' | ')
     puts "Events #{events} put to stream #{stream_name}: #{records}"
     OpenStruct.new(
-      records: records.map { |r| OpenStruct.new(error_code: 'failure', error_message: 'this fails' ) }
+      records: records.map { |r| OpenStruct.new(error_code: 'failure', error_message: 'this fails') }
     )
   end
 
@@ -37,7 +37,7 @@ Rails.configuration.to_prepare do
   LiveEvents.statsd = InstStatsd::Statsd
   LiveEvents.max_queue_size = -> { Setting.get('live_events_max_queue_size', 5000).to_i }
   LiveEvents.settings = -> { Canvas::DynamicSettings.find('live-events', default_ttl: 2.hours) }
-  LiveEvents.aws_credentials = -> (settings) {
+  LiveEvents.aws_credentials = ->(settings) {
     if settings['vault_credential_path']
       Canvas::Vault::AwsCredentialProvider.new(settings['vault_credential_path'])
     else

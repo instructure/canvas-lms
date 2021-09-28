@@ -20,9 +20,9 @@
 require_relative "../spec_helper"
 
 describe SentryProxy do
-  let(:data){ {a: 'b', c: 'd'} }
+  let(:data) { { a: 'b', c: 'd' } }
 
-  before(:each){ SentryProxy.clear_ignorable_errors }
+  before(:each) { SentryProxy.clear_ignorable_errors }
 
   class MyCustomError < StandardError
   end
@@ -78,7 +78,5 @@ describe SentryProxy do
       expect(Raven).to_not receive(:capture_message)
       SentryProxy.capture(e, data)
     end
-
   end
-
 end

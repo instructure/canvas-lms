@@ -19,7 +19,6 @@
 
 module CC::Exporter::WebZip
   class ZipPackage < CC::Exporter::Epub::FilesDirectory
-
     def initialize(exporter, course, user, progress_key)
       @global_identifiers = exporter.global_identifiers
       @files = exporter.unsupported_files + exporter.cartridge_json[:files]
@@ -88,7 +87,7 @@ module CC::Exporter::WebZip
     def filter_and_clean_files(files)
       export_files = filter_for_export_safe_items(files, :attachments)
       cleanup_files = files - export_files
-      cleanup_files.select{|file_data| file_data[:exists]}.map{|file_data| file_data[:path_to_file]}.uniq.each{|path| File.delete(path)}
+      cleanup_files.select { |file_data| file_data[:exists] }.map { |file_data| file_data[:path_to_file] }.uniq.each { |path| File.delete(path) }
       export_files
     end
 
@@ -187,9 +186,9 @@ module CC::Exporter::WebZip
         quizzes: @quizzes,
         attachments: files
       }
-      return unless list.keys.any? {|type| tab_hidden?(type)}
+      return unless list.keys.any? { |type| tab_hidden?(type) }
 
-      list.each {|type, item_list| map_export_item_ids(type, item_list)}
+      list.each { |type, item_list| map_export_item_ids(type, item_list) }
     end
 
     def parse_course_data
@@ -229,6 +228,7 @@ module CC::Exporter::WebZip
       Dir.foreach(dir) do |file|
         path = File.join(dir, file)
         next if ['.', '..'].include? file
+
         is_dir = File.directory?(path)
         if is_dir
           next_files = []
@@ -246,13 +246,13 @@ module CC::Exporter::WebZip
     def parse_module_data
       active_module_ids = Set.new(course.context_modules.active.map(&:id))
       course.context_modules.active.map do |mod|
-        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at &.> Time.now
+        unlock_date = force_timezone(mod.unlock_at) if mod.unlock_at&.> Time.now
         {
           id: mod.id,
           name: mod.name,
           status: user_module_status(mod),
           unlockDate: unlock_date,
-          prereqs: mod.prerequisites.map{|pre| pre[:id]}.select{|id| active_module_ids.include?(id)},
+          prereqs: mod.prerequisites.map { |pre| pre[:id] }.select { |id| active_module_ids.include?(id) },
           requirement: requirement_type(mod),
           sequential: mod.require_sequential_progress || false,
           exportId: create_key(mod),
@@ -263,6 +263,7 @@ module CC::Exporter::WebZip
 
     def user_module_status(modul)
       return 'locked' if modul.locked_for?(user, deep_check_if_needed: true)
+
       status = current_progress&.dig(modul.id, :status) || 'unlocked'
       status == 'locked' ? 'unlocked' : status
     end
@@ -279,12 +280,13 @@ module CC::Exporter::WebZip
 
     def mod_item_or_content_locked?(item)
       return true if item.locked_for?(user, deep_check_if_needed: true)
+
       locked = !!item.content.locked_for?(user) if item.content.respond_to?(:locked_for?)
       locked || false
     end
 
     def parse_module_item_data(modul)
-      items = modul.content_tags.active.select{ |item| item.visible_to_user?(user) }
+      items = modul.content_tags.active.select { |item| item.visible_to_user?(user) }
       items.map do |item|
         item_hash = {
           id: item.id,
@@ -337,6 +339,7 @@ module CC::Exporter::WebZip
         item_hash[:graded] = item_content.present?
       end
       return unless item_content
+
       assignment = AssignmentOverrideApplicator.assignment_overridden_for(item_content, user, skip_clone: true)
       item_hash[:pointsPossible] = assignment&.points_possible if item_hash[:graded]
       item_hash[:dueAt] = force_timezone(assignment&.due_at)
@@ -347,8 +350,9 @@ module CC::Exporter::WebZip
 
     def parse_requirement(item)
       completion_reqs = item.context_module.completion_requirements
-      reqs_for_item = completion_reqs.find{|req| req[:id] == item.id}
+      reqs_for_item = completion_reqs.find { |req| req[:id] == item.id }
       return unless reqs_for_item
+
       [reqs_for_item[:type], reqs_for_item[:min_score]]
     end
 
@@ -399,6 +403,7 @@ module CC::Exporter::WebZip
         tag = (type == :wiki_pages ? item.url : create_key(item))
         type_export_hash[tag] = item
         next unless (type == :discussion_topics || type == :quizzes) && item.assignment
+
         assignment_id = create_key(item.assignment)
         assignment_export_hash[assignment_id] = item
         @discussion_quiz_export_id_map[assignment_id] = tag
@@ -409,7 +414,7 @@ module CC::Exporter::WebZip
     def map_export_item_ids(type, item_list)
       @export_item_map ||= {}
       @export_item_map[type] ||= {}
-      item_list.each {|item| @export_item_map[type][item[:identifier]] = item}
+      item_list.each { |item| @export_item_map[type][item[:identifier]] = item }
       @export_item_map
     end
 
@@ -423,7 +428,7 @@ module CC::Exporter::WebZip
     end
 
     def parse_non_module_items(type)
-      list = {wiki_pages: @pages, assignments: @assignments, discussion_topics: @topics, quizzes: @quizzes}[type]
+      list = { wiki_pages: @pages, assignments: @assignments, discussion_topics: @topics, quizzes: @quizzes }[type]
       list = filter_for_export_safe_items(list, type) if tab_hidden?(type)
       list.map do |export_item|
         item = @canvas_object_export_hash[type][export_item[:identifier]]
@@ -457,6 +462,7 @@ module CC::Exporter::WebZip
       Dir.foreach(dir) do |file|
         path = File.join(dir, file)
         next if ['.', '..'].include? file
+
         if File.directory?(path)
           add_dir_to_zip(path, base_path)
         else

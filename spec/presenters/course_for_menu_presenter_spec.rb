@@ -31,7 +31,7 @@ describe CourseForMenuPresenter do
   let(:dashboard_card_tabs) { UsersController::DASHBOARD_CARD_TABS }
 
   let_once(:presenter) do
-    CourseForMenuPresenter.new(course, user, account, nil, {tabs: dashboard_card_tabs})
+    CourseForMenuPresenter.new(course, user, account, nil, { tabs: dashboard_card_tabs })
   end
 
   describe '#to_h' do
@@ -43,7 +43,7 @@ describe CourseForMenuPresenter do
       expect(presenter.to_h[:links]).to be_empty
     end
 
-    it 'should show all the tab links to a teacher' do
+    it 'shows all the tab links to a teacher' do
       course.enroll_teacher(user).accept
       course.assignments.create!
       course.discussion_topics.create!
@@ -51,22 +51,22 @@ describe CourseForMenuPresenter do
       course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')
 
       expect(presenter.to_h[:links]).to match_array([
-        a_hash_including({css_class: "announcements", icon: "icon-announcement", label: "Announcements"}),
-        a_hash_including({css_class: "discussions", icon: "icon-discussion", label: "Discussions"}),
-        a_hash_including({css_class: "assignments", icon: "icon-assignment", label: "Assignments"}),
-        a_hash_including({css_class: "files", icon: "icon-folder", label: "Files"})
-      ])
+                                                      a_hash_including({ css_class: "announcements", icon: "icon-announcement", label: "Announcements" }),
+                                                      a_hash_including({ css_class: "discussions", icon: "icon-discussion", label: "Discussions" }),
+                                                      a_hash_including({ css_class: "assignments", icon: "icon-assignment", label: "Assignments" }),
+                                                      a_hash_including({ css_class: "files", icon: "icon-folder", label: "Files" })
+                                                    ])
     end
 
-    it 'should only show the tabs a student has access to to students' do
+    it 'only shows the tabs a student has access to to students' do
       course.enroll_student(user).accept
       course.assignments.create!
       course.attachments.create! filename: 'blah', uploaded_data: StringIO.new('blah')
 
       expect(presenter.to_h[:links]).to match_array([
-        a_hash_including({css_class: "assignments", icon: "icon-assignment", label: "Assignments"}),
-        a_hash_including({css_class: "files", icon: "icon-folder", label: "Files"})
-      ])
+                                                      a_hash_including({ css_class: "assignments", icon: "icon-assignment", label: "Assignments" }),
+                                                      a_hash_including({ css_class: "files", icon: "icon-folder", label: "Files" })
+                                                    ])
     end
 
     it 'returns the course nickname if one is set' do

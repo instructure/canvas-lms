@@ -8,7 +8,7 @@ class AddUniqueIndexToRoleOverrides < ActiveRecord::Migration[5.1]
     DataFixup::DeleteDuplicateRows.run(RoleOverride.where(context_type: 'Account'), :context_id, :permission, :role_id)
 
     add_index :role_overrides, [:context_id, :context_type, :role_id, :permission], unique: true, algorithm: :concurrently,
-      name: "index_role_overrides_on_context_role_permission"
+                                                                                    name: "index_role_overrides_on_context_role_permission"
     remove_index :role_overrides, [:context_id, :context_type]
   end
 

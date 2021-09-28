@@ -74,11 +74,11 @@ module CreateHelpers
     user = User.create!(name: theme.user)
     puts "creating '#{user.name}'".blue
     user.pseudonyms.create!({
-      unique_id: Faker::Number.number(10),
-      account: ACCOUNT,
-      require_password: false,
-      workflow_state: 'active'
-    })
+                              unique_id: Faker::Number.number(10),
+                              account: ACCOUNT,
+                              require_password: false,
+                              workflow_state: 'active'
+                            })
     user
   end
 

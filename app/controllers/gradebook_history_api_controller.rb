@@ -206,7 +206,7 @@
 #       }
 #     }
 #
- class GradebookHistoryApiController < ApplicationController
+class GradebookHistoryApiController < ApplicationController
   before_action :require_context
   before_action :require_manage_grades
 
@@ -296,9 +296,9 @@
     assignment = api_find(Assignment, params[:assignment_id]) if params[:assignment_id]
 
     # construct scope of interesting submission versions using index table
-    indexed_versions = SubmissionVersion.
-      where(:context_type => 'Course', :context_id => @context).
-      order(params[:ascending] ? :version_id : 'version_id DESC')
+    indexed_versions = SubmissionVersion
+                       .where(:context_type => 'Course', :context_id => @context)
+                       .order(params[:ascending] ? :version_id : 'version_id DESC')
     indexed_versions = indexed_versions.where(:assignment_id => assignment) if assignment
     indexed_versions = indexed_versions.where(:user_id => student) if student
 
@@ -312,6 +312,7 @@
   end
 
   private
+
   def require_manage_grades
     authorized_action(@context, @current_user, :manage_grades)
   end

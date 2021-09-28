@@ -24,7 +24,6 @@
 # for an assignment, for example, can be referenced by their "anonymous" ID
 # for that specific assignment so that their default ID is concealed.
 module Anonymity
-
   # Returns a unique short id to be used as an anonymous ID. If the
   # generated short id is already in use, loop until an available
   # one is generated.

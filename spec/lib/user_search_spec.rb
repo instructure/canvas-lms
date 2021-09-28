@@ -16,10 +16,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path( '../sharding_spec_helper' , File.dirname(__FILE__))
+require File.expand_path('../sharding_spec_helper', File.dirname(__FILE__))
 
 describe UserSearch do
-
   describe '.for_user_in_context' do
     let(:search_names) { ['Rose Tyler', 'Martha Jones', 'Rosemary Giver', 'Martha Stewart', 'Tyler Pickett', 'Jon Stewart', 'Stewart Little', 'Ĭńşŧřůćƭǜȑȩ Person'] }
     let(:course) { Course.create!(workflow_state: "available") }
@@ -40,7 +39,6 @@ describe UserSearch do
     end
 
     describe 'with complex search enabled' do
-
       before { Setting.set('user_search_with_full_complexity', 'true') }
 
       describe 'with gist setting enabled' do
@@ -101,7 +99,7 @@ describe UserSearch do
           end
 
           describe 'to multiple roles' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_type => ['ta', 'teacher'] ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_type => ['ta', 'teacher']).to_a }
             before do
               ta = User.create!(:name => 'Tyler TA')
               TaEnrollment.create!(:user => ta, :course => course, :workflow_state => 'active')
@@ -113,8 +111,7 @@ describe UserSearch do
           end
 
           describe 'with the broader role parameter' do
-
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role => 'ObserverEnrollment' ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role => 'ObserverEnrollment').to_a }
 
             before do
               ta = User.create!(:name => 'Tyler Observer')
@@ -131,7 +128,7 @@ describe UserSearch do
           end
 
           describe 'with the role name parameter' do
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_role => 'StudentEnrollment' ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, user, nil, :enrollment_role => 'StudentEnrollment').to_a }
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
@@ -145,8 +142,7 @@ describe UserSearch do
           end
 
           describe 'with the role id parameter' do
-
-            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role_id => student_role.id ).to_a }
+            let(:users) { UserSearch.for_user_in_context('Tyler', course, student, nil, :enrollment_role_id => student_role.id).to_a }
 
             before do
               newstudent = User.create!(:name => 'Tyler Student')
@@ -166,7 +162,7 @@ describe UserSearch do
           before do
             pseudonym.sis_user_id = "SOME_SIS_ID"
             pseudonym.unique_id = "SOME_UNIQUE_ID@example.com"
-            pseudonym.current_login_at = Time.utc(2019,11,11)
+            pseudonym.current_login_at = Time.utc(2019, 11, 11)
             pseudonym.save!
           end
 
@@ -176,7 +172,7 @@ describe UserSearch do
 
           it 'will not match against a sis id without :read_sis permission' do
             RoleOverride.create!(context: Account.default, role: teacher_role,
-              permission: 'read_sis', enabled: false)
+                                 permission: 'read_sis', enabled: false)
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
           end
 
@@ -200,13 +196,13 @@ describe UserSearch do
 
           it 'will not search login id without permission' do
             RoleOverride.create!(context: Account.default, role: teacher_role,
-              permission: 'view_user_logins', enabled: false)
+                                 permission: 'view_user_logins', enabled: false)
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
           end
 
           it 'returns the last_login column when searching and sorting' do
             results = UserSearch.for_user_in_context("UNIQUE_ID", course, user, nil, sort: 'last_login')
-            expect(results.first.read_attribute('last_login')).to eq(Time.utc(2019,11,11))
+            expect(results.first.read_attribute('last_login')).to eq(Time.utc(2019, 11, 11))
           end
 
           it 'can match an SIS id and a user name in the same query' do
@@ -220,9 +216,9 @@ describe UserSearch do
 
           it 'sorts by sis id' do
             User.find_by(name: 'Rose Tyler').pseudonyms.create!(unique_id: 'rose.tyler@example.com',
-              sis_user_id: '25rose', account_id: course.root_account_id)
+                                                                sis_user_id: '25rose', account_id: course.root_account_id)
             User.find_by(name: 'Tyler Pickett').pseudonyms.create!(unique_id: 'tyler.pickett@example.com',
-              sis_user_id: '1tyler', account_id: course.root_account_id)
+                                                                   sis_user_id: '1tyler', account_id: course.root_account_id)
             users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'sis_id')
             expect(users.map(&:name)).to eq ['Tyler Pickett', 'Rose Tyler', 'Tyler Teacher']
           end
@@ -237,8 +233,8 @@ describe UserSearch do
         end
 
         describe 'searching on emails' do
-          let(:user1) {user_with_pseudonym(user: user)}
-          let(:cc) {communication_channel(user1, {username: 'the.giver@example.com'})}
+          let(:user1) { user_with_pseudonym(user: user) }
+          let(:cc) { communication_channel(user1, { username: 'the.giver@example.com' }) }
 
           before do
             cc.confirm!
@@ -250,7 +246,7 @@ describe UserSearch do
 
           it 'requires :read_email_addresses permission' do
             RoleOverride.create!(context: Account.default, role: teacher_role,
-              permission: 'read_email_addresses', enabled: false)
+                                 permission: 'read_email_addresses', enabled: false)
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end
 
@@ -271,13 +267,13 @@ describe UserSearch do
           end
 
           it 'matches unconfirmed channels', priority: 1, test_id: 3010726 do
-            communication_channel(user, {username: 'unconfirmed@example.com'})
+            communication_channel(user, { username: 'unconfirmed@example.com' })
             expect(UserSearch.for_user_in_context("unconfirmed", course, user)).to eq [user]
           end
 
           it 'sorts by email' do
-            communication_channel(User.find_by(name: 'Tyler Pickett'), {username: '1tyler@example.com'})
-            communication_channel(User.find_by(name: 'Tyler Teacher'), {username: '25teacher@example.com'})
+            communication_channel(User.find_by(name: 'Tyler Pickett'), { username: '1tyler@example.com' })
+            communication_channel(User.find_by(name: 'Tyler Teacher'), { username: '25teacher@example.com' })
             users = UserSearch.for_user_in_context('Tyler', course, user, nil, sort: 'email')
             expect(users.map(&:name)).to eq ['Tyler Pickett', 'Tyler Teacher', 'Rose Tyler']
           end
@@ -390,7 +386,7 @@ describe UserSearch do
       end
 
       it 'does not match against emails' do
-        communication_channel(user, {username: 'the.giver@example.com'})
+        communication_channel(user, { username: 'the.giver@example.com' })
         expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
       end
     end

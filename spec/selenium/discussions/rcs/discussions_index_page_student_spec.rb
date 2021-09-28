@@ -23,7 +23,7 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:new_section) { course.course_sections.create!(name: "section 2") }
   let(:section_student) do
     student_in_course(course: course,
@@ -37,11 +37,13 @@ describe "discussions" do
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:group_category) { course.group_categories.create!(name: 'group category') }
-  let(:assignment) { course.assignments.create!(
+  let(:assignment) {
+    course.assignments.create!(
       name: 'assignment',
-      #submission_types: 'discussion_topic',
+      # submission_types: 'discussion_topic',
       assignment_group: assignment_group
-  ) }
+    )
+  }
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: 'assignment topic title',
@@ -53,7 +55,7 @@ describe "discussions" do
     let(:url) { "/courses/#{course.id}/discussion_topics/" }
 
     context "as a student" do
-      let(:topic) {student_topic}
+      let(:topic) { student_topic }
 
       before(:each) do
         user_session(student)
@@ -61,7 +63,7 @@ describe "discussions" do
         stub_rcs_config
       end
 
-      it "should allow a student to create a discussion", priority: "1", test_id: 270941 do
+      it "allows a student to create a discussion", priority: "1", test_id: 270941 do
         get url
         expect_new_page_load { f('#add_discussion').click }
         edit_topic("from a student", "tell me a story")

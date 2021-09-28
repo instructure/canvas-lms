@@ -39,7 +39,7 @@ describe 'appointment_reserved_for_user' do
 
   context ".email" do
     let(:path_type) { :email }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.subject).to include('some title')
       expect(msg.body).to include('some title')
@@ -50,7 +50,7 @@ describe 'appointment_reserved_for_user' do
     end
 
     context "for groups" do
-      it "should render group name" do
+      it "renders group name" do
         msg = generate_message(notification_name, path_type, asset, message_options)
 
         expect(msg.body).to include(@group.name)
@@ -60,7 +60,7 @@ describe 'appointment_reserved_for_user' do
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.body).to include('some title')
     end
@@ -68,7 +68,7 @@ describe 'appointment_reserved_for_user' do
 
   context ".summary" do
     let(:path_type) { :summary }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.subject).to include('some title')
       expect(msg.body).to include('some title')
@@ -78,7 +78,7 @@ describe 'appointment_reserved_for_user' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-    it "should render" do
+    it "renders" do
       msg = generate_message(notification_name, path_type, asset, message_options)
       expect(msg.body).to include('some title')
     end

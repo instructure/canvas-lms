@@ -19,7 +19,6 @@
 #
 
 class AbstractCourse < ActiveRecord::Base
-
   include Workflow
 
   belongs_to :root_account, :class_name => 'Account'
@@ -44,5 +43,4 @@ class AbstractCourse < ActiveRecord::Base
 
   include StickySisFields
   are_sis_sticky :name, :short_name, :enrollment_term_id
-
 end

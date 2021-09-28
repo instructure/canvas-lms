@@ -100,7 +100,7 @@ module NewCourseSearchPage
   end
 
   def navigate_to_page(page_number)
-    wait_for_new_page_load{ table_nav_buttons(page_number).click }
+    wait_for_new_page_load { table_nav_buttons(page_number).click }
   end
 
   def select_term(term)
@@ -112,7 +112,7 @@ module NewCourseSearchPage
   end
 
   def click_add_users_to_course(course)
-    row = rows.first{|e| e.text contains(course.name)}
+    row = rows.first { |e| e.text contains(course.name) }
     fj('button:contains("Add Users to Unnamed Course")', row).click
     add_people_modal
     wait_for_ajaximations

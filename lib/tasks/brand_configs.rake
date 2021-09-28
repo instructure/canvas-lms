@@ -15,7 +15,7 @@ namespace :brand_configs do
 
   # This is the rake task we call from a job server that has new code,
   # before restarting all the app servers.  It will make sure that our s3
-  # bucket has the .css (css variables), .js & .json files that are used to 
+  # bucket has the .css (css variables), .js & .json files that are used to
   # load the theme editor variables  for custom themes people
   # have created in the Theme Editor.
   desc "generate all brands and upload everything to s3"

@@ -26,7 +26,7 @@ end
 
 def appendix
   controllers = options[:controllers]
-  
+
   if options[:all_resources]
     controllers = options[:resources].flatten.select { |o|
       o.is_a?(YARD::CodeObjects::NamespaceObject)

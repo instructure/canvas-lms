@@ -56,9 +56,9 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include ActionView::Helpers::NumberHelper
 
   before_action :require_user, :require_quiz_submission, :export_scopes
-  before_action :require_question, only: [ :show, :flag, :unflag, :formatted_answer ]
-  before_action :prepare_service, only: [ :answer, :flag, :unflag ]
-  before_action :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
+  before_action :require_question, only: [:show, :flag, :unflag, :formatted_answer]
+  before_action :prepare_service, only: [:answer, :flag, :unflag]
+  before_action :validate_ldb_status!, only: [:answer, :flag, :unflag]
 
   # @API Get all quiz submission questions.
   #
@@ -84,14 +84,14 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
 
     if authorized_action(@quiz_submission, @current_user, :read)
       render json: quiz_submission_questions_json(@quiz_submission.quiz_questions,
-        @quiz_submission,
-        {
-          user: @current_user,
-          session: session,
-          includes: extract_includes,
-          censored: censored?,
-          shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
-        })
+                                                  @quiz_submission,
+                                                  {
+                                                    user: @current_user,
+                                                    session: session,
+                                                    includes: extract_includes,
+                                                    censored: censored?,
+                                                    shuffle_answers: @quiz.shuffle_answers_for_user?(@current_user)
+                                                  })
     end
   end
 
@@ -190,7 +190,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     if question_type == "numerical_question"
       ## matches behavior of public/javascript/take_quiz.js when entering a numerical answer
       question_has_precision_answers =
-        question[:answers].any? {|answer| answer[:numerical_answer_type] == 'precision_answer'}
+        question[:answers].any? { |answer| answer[:numerical_answer_type] == 'precision_answer' }
       formatting_options = {
         precision: question_has_precision_answers ? 16 : 4,
         strip_insignificant_zeros: true,
@@ -199,7 +199,7 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       student_answer = number_with_precision(student_answer, formatting_options)
     end
 
-    render json: {formatted_answer: student_answer}
+    render json: { formatted_answer: student_answer }
   end
 
   # @API Flagging a question.
@@ -230,8 +230,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
     flag_current_question(true)
-    render json: quiz_submission_questions_json([ @question ],
-      @quiz_submission.reload)
+    render json: quiz_submission_questions_json([@question],
+                                                @quiz_submission.reload)
   end
 
   # @API Unflagging a question.
@@ -262,8 +262,8 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
       reject! 'you are not allowed to update questions for this quiz submission', 403
     end
     flag_current_question(false)
-    render json: quiz_submission_questions_json([ @question ],
-      @quiz_submission.reload)
+    render json: quiz_submission_questions_json([@question],
+                                                @quiz_submission.reload)
   end
 
   private
@@ -311,10 +311,10 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     question_record["question_#{@question.id}_marked"] = flagged_unflagged
 
     @service.update_question(question_record,
-      @quiz_submission,
-      params[:attempt],
-      # we don't want a snapshot generated for each flagging action
-      false)
+                             @quiz_submission,
+                             params[:attempt],
+                             # we don't want a snapshot generated for each flagging action
+                             false)
   end
 
   def extract_includes(key = :include, hash = params)

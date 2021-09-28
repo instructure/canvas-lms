@@ -232,7 +232,6 @@ describe "Outcome Reports" do
         end
       end
 
-
       it 'does not include deleted outcomes' do
         @root_outcome_2.destroy!
         expect(report.length).to eq 3
@@ -267,11 +266,11 @@ describe "Outcome Reports" do
         end
 
         it 'includes groups before outcomes' do
-          LearningOutcomeGroup.where.not(learning_outcome_group_id: nil).to_a.
-            product(LearningOutcome.all).
-            each do |group, outcome|
-              expect(row_index(group)).to be < row_index(outcome)
-            end
+          LearningOutcomeGroup.where.not(learning_outcome_group_id: nil).to_a
+                              .product(LearningOutcome.all)
+                              .each do |group, outcome|
+            expect(row_index(group)).to be < row_index(outcome)
+          end
         end
 
         it 'includes parents for outcome group links' do
@@ -280,8 +279,8 @@ describe "Outcome Reports" do
 
         it 'includes multiple parents if group is linked to multiple outcome groups' do
           @root_group_1.add_outcome(@nested_outcome)
-          expect(find_object(@nested_outcome)['parent_guids']).
-            to eq "canvas_outcome_group:#{@root_group_1.id} canvas_outcome_group:#{@group_1_1_1.id}"
+          expect(find_object(@nested_outcome)['parent_guids'])
+            .to eq "canvas_outcome_group:#{@root_group_1.id} canvas_outcome_group:#{@group_1_1_1.id}"
         end
       end
 

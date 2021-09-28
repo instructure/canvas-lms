@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
@@ -30,8 +29,8 @@ module Lti
 
     let(:authorized_services) do
       [
-        {"service"=>"vnd.Canvas.User", "action"=>["GET"], "@type"=>"RestServiceProfile"},
-        {"service"=>"vnd.Canvas.GroupIndex", "action"=>["GET"], "@type"=>"RestServiceProfile"}
+        { "service" => "vnd.Canvas.User", "action" => ["GET"], "@type" => "RestServiceProfile" },
+        { "service" => "vnd.Canvas.GroupIndex", "action" => ["GET"], "@type" => "RestServiceProfile" }
       ]
     end
 
@@ -66,7 +65,7 @@ module Lti
           "name" => student.name,
           "sortable_name" => student.sortable_name,
           "short_name" => student.short_name,
-          "lti_id" =>  student.lti_context_id,
+          "lti_id" => student.lti_context_id,
           "email" => student.email
         }
       end
@@ -74,20 +73,20 @@ module Lti
       it 'verifies the tool has the required services' do
         tool_proxy.raw_data['security_contract']['tool_service'] = []
         tool_proxy.save!
-        get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
+        get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it "verifies the tool is associated with at least one of the user's assignments" do
         second_course = Course.create!(name: 'second course')
         assignment.update!(course: second_course)
-        get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
+        get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
       it 'does not grant access if the tool and the user have no associated assignments' do
         assignment.destroy!
-        get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
+        get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
         expect(response).to be_unauthorized
       end
 
@@ -97,14 +96,14 @@ module Lti
         end
 
         it 'returns a user by lti id' do
-          get canvas_id_endpoint, params: {id: student.lti_context_id}, headers: request_headers
+          get canvas_id_endpoint, params: { id: student.lti_context_id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
         it 'returns a user by old lti id' do
           UserPastLtiId.create!(user: student, context: course, user_lti_id: student.lti_id, user_lti_context_id: 'old_lti_id', user_uuid: 'old')
-          get canvas_id_endpoint, params: {id: 'old_lti_id'}, headers: request_headers
+          get canvas_id_endpoint, params: { id: 'old_lti_id' }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           new_expected_student = expected_student
           new_expected_student['lti_id'] = 'old_lti_id'
@@ -112,29 +111,28 @@ module Lti
         end
 
         it 'returns a user by Canvas id' do
-          get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
+          get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
-
         it 'does not grant access if the course is inactive and the user has no associated assignments' do
           id = student.id
           course.destroy!
-          get canvas_id_endpoint, params: {id: id}, headers: request_headers
+          get canvas_id_endpoint, params: { id: id }, headers: request_headers
           expect(response).to be_unauthorized
         end
       end
 
       context 'account' do
         it 'returns a user by lti id' do
-          get canvas_id_endpoint, params: {id: student.lti_context_id}, headers: request_headers
+          get canvas_id_endpoint, params: { id: student.lti_context_id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
 
         it 'returns a user by Canvas id' do
-          get canvas_id_endpoint, params: {id: student.id}, headers: request_headers
+          get canvas_id_endpoint, params: { id: student.id }, headers: request_headers
           parsed_body = JSON.parse(response.body)
           expect(parsed_body).to eq expected_student
         end
@@ -180,7 +178,7 @@ module Lti
         expected_json = group.users.map do |user|
           user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
-        expect(parsed_body.sort_by{|u| u[:id]}).to eq(expected_json.sort_by{|u| u[:id]})
+        expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
       end
 
       it 'responds with 401 if group is not in tool context' do
@@ -214,7 +212,7 @@ module Lti
         expected_json = group.users.map do |user|
           user_json(user, user, nil, [], group.context, tool_includes: %w(email lti_id))
         end
-        expect(parsed_body.sort_by{|u| u[:id]}).to eq(expected_json.sort_by{|u| u[:id]})
+        expect(parsed_body.sort_by { |u| u[:id] }).to eq(expected_json.sort_by { |u| u[:id] })
       end
     end
   end

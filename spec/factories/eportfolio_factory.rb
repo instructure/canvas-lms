@@ -19,8 +19,8 @@
 #
 
 module Factories
-  def eportfolio_model(opts={})
-    opts[:user]= user_model if opts[:user].nil?
+  def eportfolio_model(opts = {})
+    opts[:user] = user_model if opts[:user].nil?
     @eportfolio = Eportfolio.create(opts)
     @eportfolio_category = @eportfolio.eportfolio_categories.create!(:name => "category")
 
@@ -31,12 +31,12 @@ module Factories
     @eportfolio
   end
 
-  def eportfolio(opts={})
+  def eportfolio(opts = {})
     user_factory(opts) unless @user
     @portfolio = @user.eportfolios.create!
   end
 
-  def eportfolio_with_user(opts={})
+  def eportfolio_with_user(opts = {})
     user_factory(opts)
     eportfolio(opts)
   end

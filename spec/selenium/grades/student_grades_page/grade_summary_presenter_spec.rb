@@ -25,7 +25,7 @@ describe GradeSummaryPresenter do
   include_context 'reusable_gradebook_course'
 
   describe 'deleted submissions', priority: "2" do
-    it 'should navigate to grade summary page' do
+    it 'navigates to grade summary page' do
       course_with_student_logged_in
       @teacher = User.create!
       @course.enroll_teacher(@teacher)

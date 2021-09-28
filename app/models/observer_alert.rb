@@ -48,6 +48,7 @@ class ObserverAlert < ActiveRecord::Base
   def users_are_still_linked?
     return true if observer.as_observer_observation_links.active.where(student: student).exists?
     return true if observer.enrollments.active.where(associated_user: student).shard(observer).exists?
+
     false
   end
 
@@ -61,29 +62,30 @@ class ObserverAlert < ActiveRecord::Base
       last_user_id = nil
       now = Time.now.utc
       loop do
-        scope = ObserverAlertThreshold.
-          where(alert_type: 'assignment_missing').
-          order(:user_id).limit(100)
+        scope = ObserverAlertThreshold
+                .where(alert_type: 'assignment_missing')
+                .order(:user_id).limit(100)
         scope = scope.where("observer_alert_thresholds.user_id>?", last_user_id) if last_user_id
         user_ids = scope.distinct.pluck(:user_id)
         break if user_ids.empty?
+
         last_user_id = user_ids.last
 
-        submissions = Submission.
-          select("submissions.id, submissions.assignment_id, assignments.title AS title, assignments.context_id AS course_id, observer_alert_thresholds.id AS observer_alert_threshold_id, observer_alert_thresholds.observer_id, observer_alert_thresholds.user_id, assignments.title").
-          active.
-          joins(:assignment).
-          joins("INNER JOIN #{ObserverAlertThreshold.quoted_table_name} ON observer_alert_thresholds.user_id=submissions.user_id").
-          where(observer_alert_thresholds: { alert_type: 'assignment_missing'}).
-          where(user_id: user_ids).
-          for_enrollments(Enrollment.all_active_or_pending).
-          # users_are_still_linked?
-          where("EXISTS (?)", ObserverEnrollment.where("enrollments.course_id=assignments.context_id AND enrollments.user_id=observer_alert_thresholds.observer_id AND enrollments.associated_user_id=submissions.user_id")).
-          missing.
-          merge(Assignment.submittable).
-          merge(Assignment.published).
-          where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago).
-          where("NOT EXISTS (?)", ObserverAlert.where(context_type: 'Submission', alert_type: 'assignment_missing').where("context_id=submissions.id"))
+        submissions = Submission
+                      .select("submissions.id, submissions.assignment_id, assignments.title AS title, assignments.context_id AS course_id, observer_alert_thresholds.id AS observer_alert_threshold_id, observer_alert_thresholds.observer_id, observer_alert_thresholds.user_id, assignments.title")
+                      .active
+                      .joins(:assignment)
+                      .joins("INNER JOIN #{ObserverAlertThreshold.quoted_table_name} ON observer_alert_thresholds.user_id=submissions.user_id")
+                      .where(observer_alert_thresholds: { alert_type: 'assignment_missing' })
+                      .where(user_id: user_ids)
+                      .for_enrollments(Enrollment.all_active_or_pending).
+                      # users_are_still_linked?
+                      where("EXISTS (?)", ObserverEnrollment.where("enrollments.course_id=assignments.context_id AND enrollments.user_id=observer_alert_thresholds.observer_id AND enrollments.associated_user_id=submissions.user_id"))
+                      .missing
+                      .merge(Assignment.submittable)
+                      .merge(Assignment.published)
+                      .where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago)
+                      .where("NOT EXISTS (?)", ObserverAlert.where(context_type: 'Submission', alert_type: 'assignment_missing').where("context_id=submissions.id"))
 
         submissions.find_in_batches do |batch|
           courses = Course.select(:id, :course_code).find(batch.map(&:course_id)).index_by(&:id)
@@ -98,9 +100,9 @@ class ObserverAlert < ActiveRecord::Base
                         updated_at: now,
                         action_date: now,
                         title: I18n.t('Assignment missing: %{assignment_name} in %{course_code}', {
-                          assignment_name: submission.title,
-                          course_code: courses[submission.course_id].course_code
-                        }) }
+                                        assignment_name: submission.title,
+                                        course_code: courses[submission.course_id].course_code
+                                      }) }
           end
         end
       end

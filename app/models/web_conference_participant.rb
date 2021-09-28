@@ -27,5 +27,4 @@ class WebConferenceParticipant < ActiveRecord::Base
   def set_root_account_id
     self.root_account_id ||= web_conference.root_account_id
   end
-
 end

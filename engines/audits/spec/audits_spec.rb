@@ -21,7 +21,6 @@ require 'rails_helper'
 require 'audits'
 
 RSpec.describe Audits do
-
   after(:each) do
     DynamicSettings.config = nil
     DynamicSettings.reset_cache!
@@ -30,12 +29,12 @@ RSpec.describe Audits do
 
   def inject_auditors_settings(yaml_string)
     DynamicSettings.fallback_data = {
-        "private": {
-          "canvas": {
-            "auditors.yml": yaml_string
-          }
+      "private": {
+        "canvas": {
+          "auditors.yml": yaml_string
         }
       }
+    }
   end
 
   describe "settings parsing" do
@@ -81,7 +80,7 @@ RSpec.describe Audits do
 
   describe ".read_stream_options" do
     it "cleanly decorates arbitrary options with backend" do
-      opts = Audits.read_stream_options({foo: :bar})
+      opts = Audits.read_stream_options({ foo: :bar })
       expect(opts[:foo]).to eq(:bar)
       expect(opts[:backend_strategy]).to eq(:cassandra)
     end
@@ -100,7 +99,7 @@ RSpec.describe Audits do
     it "depends on AR connection for AR backend" do
       inject_auditors_settings("write_paths:\n  - active_record\nread_path: active_record")
       expect(Audits.backend_strategy).to eq(:active_record)
-      expect(Rails.configuration).to receive(:database_configuration).and_return({'test' => {"foo" => "bar"}})
+      expect(Rails.configuration).to receive(:database_configuration).and_return({ 'test' => { "foo" => "bar" } })
       expect(Audits.configured?).to eq(true)
       expect(Rails.configuration).to receive(:database_configuration).and_return({})
       expect(Audits.configured?).to eq(false)
@@ -108,7 +107,7 @@ RSpec.describe Audits do
 
     it "complains loudly under other configurations" do
       expect(Audits).to receive(:backend_strategy).and_return(:s3)
-      expect{ Audits.configured? }.to raise_error(ArgumentError)
+      expect { Audits.configured? }.to raise_error(ArgumentError)
     end
   end
 
@@ -117,7 +116,7 @@ RSpec.describe Audits do
       ar_klass = Class.new
       record_klass = Class.new
       stream_obj = Audits.stream do
-        backend_strategy ->{ :active_record }
+        backend_strategy -> { :active_record }
         active_record_type ar_klass
         record_type record_klass
         table :test_stream_items

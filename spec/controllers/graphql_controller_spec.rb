@@ -29,7 +29,7 @@ describe GraphQLController do
     {
       query: 'query ($representations: [_Any!]!) { _entities(representations: $representations) { ...on Course { name } } }',
       variables: {
-        representations: [ {__typename: "Course", id: "Q291cnNlLTE="} ]
+        representations: [{ __typename: "Course", id: "Q291cnNlLTE=" }]
       }
     }
   end
@@ -64,7 +64,7 @@ describe GraphQLController do
 
   context "graphql, without a session" do
     it "requires a user" do
-      post :execute, params: {query: "{}"}, format: :json
+      post :execute, params: { query: "{}" }, format: :json
       expect(response).to be_unauthorized
     end
   end
@@ -73,7 +73,7 @@ describe GraphQLController do
     before { user_session(@student) }
 
     it "works" do
-      post :execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+      post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
       expect(JSON.parse(response.body)["errors"]).to be_blank
       expect(JSON.parse(response.body)["data"]).not_to be_blank
     end
@@ -107,7 +107,7 @@ describe GraphQLController do
               }
             }
           GQL
-          post :execute, params: {query: test_query}, format: :json
+          post :execute, params: { query: test_query }, format: :json
           expect_increment("graphql.operation.count", operation_name: 'GetStuff', domain: 'test.host', operation_md5: String)
           expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'course', operation_md5: String)
           expect_increment("graphql.query.count", operation_name: 'GetStuff', field: 'assignment', operation_md5: String)
@@ -122,7 +122,7 @@ describe GraphQLController do
               assignment(id: "1") { name }
             }
           GQL
-          post :execute, params: {query: test_query}, format: :json
+          post :execute, params: { query: test_query }, format: :json
           expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
           expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'course', operation_md5: String)
           expect_increment("graphql.query.count", operation_name: 'unnamed', field: 'assignment', operation_md5: String)
@@ -140,7 +140,7 @@ describe GraphQLController do
               }
             }
           GQL
-          post :execute, params: {query: test_query}, format: :json
+          post :execute, params: { query: test_query }, format: :json
           expect_increment("graphql.operation.count", operation_name: 'unnamed', domain: 'test.host', operation_md5: String)
           expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'createAssignment', operation_md5: String)
           expect_increment("graphql.mutation.count", operation_name: 'unnamed', field: 'updateAssignment', operation_md5: String)
@@ -154,7 +154,7 @@ describe GraphQLController do
               course(id: "1") { name }
             }
           GQL
-          post :execute, params: {query: test_query}, format: :json
+          post :execute, params: { query: test_query }, format: :json
           expect_increment("graphql.operation.count", operation_name: '3rdparty', domain: 'test.host')
           expect_increment("graphql.query.count", operation_name: '3rdparty', field: 'course')
         end
@@ -175,7 +175,7 @@ describe GraphQLController do
 
       it "handles standard queries" do
         request.headers["Authorization"] = "Bearer #{token.to_unencrypted_token_string}"
-        post :subgraph_execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+        post :subgraph_execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
         expect(JSON.parse(response.body)["errors"]).to be_blank
         expect(JSON.parse(response.body)["data"]).not_to be_blank
       end
@@ -189,7 +189,7 @@ describe GraphQLController do
 
     describe "without authentication" do
       it "services subgraph introspection queries" do
-        post :subgraph_execute, params: {query: 'query FederationSubgraphIntrospection { _service { sdl } }'}, format: :json
+        post :subgraph_execute, params: { query: 'query FederationSubgraphIntrospection { _service { sdl } }' }, format: :json
         expect(JSON.parse(response.body)["errors"]).to be_blank
         expect(JSON.parse(response.body)["data"]).not_to be_blank
       end
@@ -202,13 +202,12 @@ describe GraphQLController do
   end
 
   context "with feature flag disable_graphql_authentication enabled" do
-
     context "graphql, without a session" do
       it "works" do
         expect(Account.site_admin).to(
           receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
         )
-        post :execute, params: {query: '{ course(id: "1") { id } }'}, format: :json
+        post :execute, params: { query: '{ course(id: "1") { id } }' }, format: :json
         expect(JSON.parse(response.body)["errors"]).to be_blank
         expect(JSON.parse(response.body)["data"]).not_to be_blank
       end

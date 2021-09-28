@@ -39,9 +39,7 @@ module Alerts
       end
 
       it 'returns true when the student submission is not past the threshold' do
-
         submission = @assignment.submit_homework(@user, @opts)
-
 
         ungraded_timespan = Alerts::UngradedTimespan.new(@course, [@student.id])
         expect(ungraded_timespan.should_not_receive_message?(@student.id, 2)).to eq true
@@ -56,7 +54,6 @@ module Alerts
         expect(ungraded_timespan.should_not_receive_message?(@student.id, 2)).to eq false
       end
 
-
       it 'returns true when the student has no submissions' do
         ungraded_timespan = Alerts::UngradedTimespan.new(@course, [@student.id])
         expect(ungraded_timespan.should_not_receive_message?(@student.id, 2)).to eq true
@@ -64,7 +61,7 @@ module Alerts
 
       it 'handles submissions from multiple students' do
         student_1 = @student
-        course_with_student({course: @course})
+        course_with_student({ course: @course })
         student_2 = @student
         @assignment.submit_homework(student_1, @opts)
         @assignment.submit_homework(student_2, @opts)
@@ -72,9 +69,6 @@ module Alerts
         ungraded_timespan = Alerts::UngradedTimespan.new(@course, [student_1.id, student_2.id])
         expect(ungraded_timespan.should_not_receive_message?(student_1.id, 2)).to eq true
       end
-
-
-
     end
   end
 end

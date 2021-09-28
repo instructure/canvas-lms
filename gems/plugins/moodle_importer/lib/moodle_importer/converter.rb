@@ -40,7 +40,7 @@ module Moodle
       @course = cc_converter.course
       add_question_warnings
 
-      File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json}
+      File.open(@course[:full_export_file_path], 'w') { |file| file << @course.to_json }
       @course
     ensure
       FileUtils.rm migrator.imscc_path if migrator && migrator.imscc_path && File.exist?(migrator.imscc_path)
@@ -71,13 +71,13 @@ module Moodle
             q_hash = hashes.first
             q_hash['import_warnings'] ||= []
             q_hash['import_warnings'] << I18n.t(:moodle_dropdown_many_warning_title,
-              "There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly",
-              :count => hashes.count)
+                                                "There are %{count} Multiple Dropdowns questions in this bank that may have been imported incorrectly",
+                                                :count => hashes.count)
           else
             hashes.each do |q_hash|
               q_hash['import_warnings'] ||= []
               q_hash['import_warnings'] << I18n.t(:moodle_dropdown_warning_title,
-                "Multiple Dropdowns question may have been imported incorrectly")
+                                                  "Multiple Dropdowns question may have been imported incorrectly")
             end
           end
         end
@@ -87,18 +87,17 @@ module Moodle
             q_hash = hashes.first
             q_hash['import_warnings'] ||= []
             q_hash['import_warnings'] << I18n.t(:moodle_formula_many_warning_title,
-              "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated",
-              :count => hashes.count)
+                                                "There are %{count} Formula questions in this bank that will need to have their possible answers regenerated",
+                                                :count => hashes.count)
           else
             hashes.each do |q_hash|
               q_hash['import_warnings'] ||= []
               q_hash['import_warnings'] << I18n.t(:moodle_formula_warning_title,
-                "Possible answers will need to be regenerated for Formula question")
+                                                  "Possible answers will need to be regenerated for Formula question")
             end
           end
         end
       end
     end
-
   end
 end

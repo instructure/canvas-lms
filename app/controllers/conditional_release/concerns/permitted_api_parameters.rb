@@ -42,24 +42,24 @@ module ConditionalRelease
         params.permit(assignment_set_association_keys)
       end
 
-
       private
+
       def base_rule_keys
-        [ :trigger_assignment_id, :position ]
+        [:trigger_assignment_id, :position]
       end
 
       def base_scoring_range_keys
-        [ :upper_bound, :lower_bound, :position ]
+        [:upper_bound, :lower_bound, :position]
       end
 
       def base_assignment_set_association_keys
-        [ :assignment_id, :position ]
+        [:assignment_id, :position]
       end
 
       # permitted inside nested api requests to allow
       # child updates
       def nested_update_keys
-        [ :id, :position ]
+        [:id, :position]
       end
 
       def rule_keys_for_create

@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/announcements/index" do
-  it "should render" do
+  it "renders" do
     course_with_teacher
     view_context(@course, @user)
     assign(:body_classes, [])

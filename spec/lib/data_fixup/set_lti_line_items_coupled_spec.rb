@@ -39,14 +39,14 @@ describe DataFixup::SetLtiLineItemsCoupled do
 
   let(:assignment) do
     assignment_model({
-      course: course,
-      submission_types: 'external_tool',
-      external_tool_tag_attributes: {
-        url: tool.url,
-        content_type: 'context_external_tool',
-        content_id: tool.id
-      }
-    })
+                       course: course,
+                       submission_types: 'external_tool',
+                       external_tool_tag_attributes: {
+                         url: tool.url,
+                         content_type: 'context_external_tool',
+                         content_id: tool.id
+                       }
+                     })
   end
 
   context 'when there is no resource link' do
@@ -71,7 +71,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
   context "when the line item has extensions" do
     it 'sets coupled to false' do
       line_item = assignment.line_items.first
-      line_item.update!(extensions: {foo: 'bar'})
+      line_item.update!(extensions: { foo: 'bar' })
       described_class.run
       line_item.reload
       expect(line_item.coupled).to be(false)

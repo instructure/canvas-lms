@@ -21,13 +21,12 @@ require_dependency 'importers'
 
 module Importers
   class AssignmentGroupImporter < Importer
-
     self.item_class = AssignmentGroup
 
     def self.process_migration(data, migration)
       AssignmentGroup.suspend_callbacks(:update_student_grades) do
         self.add_groups_for_imported_assignments(data, migration)
-        groups = data['assignment_groups'] ? data['assignment_groups']: []
+        groups = data['assignment_groups'] ? data['assignment_groups'] : []
         groups.each do |group|
           if migration.import_object?("assignment_groups", group['migration_id'])
             begin
@@ -43,14 +42,14 @@ module Importers
 
     def self.add_groups_for_imported_assignments(data, migration)
       return unless migration.migration_settings[:migration_ids_to_import] &&
-          migration.migration_settings[:migration_ids_to_import][:copy] &&
-          migration.migration_settings[:migration_ids_to_import][:copy].length > 0
+                    migration.migration_settings[:migration_ids_to_import][:copy] &&
+                    migration.migration_settings[:migration_ids_to_import][:copy].length > 0
 
       migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'] ||= {}
       data['assignments']&.each do |assignment_hash|
         a_hash = assignment_hash.with_indifferent_access
         if migration.import_object?("assignments", a_hash['migration_id']) &&
-            group_mig_id = a_hash['assignment_group_migration_id']
+           group_mig_id = a_hash['assignment_group_migration_id']
           migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
         end
       end
@@ -63,7 +62,7 @@ module Importers
           obj_hash = obj_hash.with_indifferent_access
           a_hash = obj_hash["assignment"]
           if a_hash && migration.import_object?(key, obj_hash['migration_id']) &&
-              group_mig_id = a_hash['assignment_group_migration_id']
+             group_mig_id = a_hash['assignment_group_migration_id']
             # auto import the assignment group even if it's not actually in the top-level assignments list
             # and just nested inside the topic or quiz
             migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
@@ -72,9 +71,10 @@ module Importers
       end
     end
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration, item = nil)
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:assignment_groups_to_import] && !hash[:assignment_groups_to_import][hash[:migration_id]]
+
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, id: hash[:id]).first
       item ||= AssignmentGroup.where(context_id: context, context_type: context.class.to_s, migration_id: hash[:migration_id]).first if hash[:migration_id]
       item ||= match_assignment_group_by_name(context, migration, hash[:title])
@@ -101,7 +101,7 @@ module Importers
         end
       end
       if rules.blank? && context.respond_to?(:assignment_group_no_drop_assignments)
-        context.assignment_group_no_drop_assignments&.delete_if{|k, v| v == item} # don't set never_drop rules if there are no drop rules
+        context.assignment_group_no_drop_assignments&.delete_if { |k, v| v == item } # don't set never_drop rules if there are no drop rules
       end
       item.rules = rules.presence
 

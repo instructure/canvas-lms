@@ -89,6 +89,7 @@ class GraphQLController < ApplicationController
   def sdl_query?
     query = (params[:query] || '').strip
     return false unless query.starts_with?('query') || query.starts_with?('{')
+
     query = query[/{.*/] # slice off leading "query" keyword and/or query name, if any
     query.gsub!(/\s+/, '') # strip all whitespace
     query == '{_service{sdl}}'
@@ -97,7 +98,7 @@ class GraphQLController < ApplicationController
   def require_inst_access_token_auth
     unless @authenticated_with_inst_access_token
       render(
-        json: {errors: [{message: "InstAccess token auth required"}]},
+        json: { errors: [{ message: "InstAccess token auth required" }] },
         status: 401
       )
     end

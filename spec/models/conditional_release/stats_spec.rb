@@ -50,7 +50,7 @@ module ConditionalRelease
       end
 
       def get_student_ids(indexes)
-        indexes.map{|idx| get_student(idx).id}
+        indexes.map { |idx| get_student(idx).id }
       end
 
       # admittedly this is terrible but rewriting every spec would be too so just stuff the formerly "mock" data into the db
@@ -78,7 +78,7 @@ module ConditionalRelease
         expect(rollup[:ranges][0][:size]).to eq 0
         expect(rollup[:ranges][1][:size]).to eq 1
         expect(rollup[:ranges][2][:size]).to eq 2
-        expect(rollup[:ranges][2][:students].map {|s| s[:user][:id]}).to match_array get_student_ids([1, 2])
+        expect(rollup[:ranges][2][:students].map { |s| s[:user][:id] }).to match_array get_student_ids([1, 2])
       end
 
       it 'does not include trend data' do
@@ -99,7 +99,7 @@ module ConditionalRelease
       end
 
       context 'with trend data' do
-        let(:trends) { @rollup.dig(:ranges, 0, :students).map{ |s| s[:trend] } }
+        let(:trends) { @rollup.dig(:ranges, 0, :students).map { |s| s[:trend] } }
 
         it 'has trend == nil if no follow on assignments have been completed' do
           set_user_submissions(1, 'foo', [[@trigger, 32, 40]])
@@ -176,8 +176,8 @@ module ConditionalRelease
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
         expect(details.dig(:trigger_assignment, :score)).to eq 0.9
-        expect(details[:follow_on_assignments].map {|f| f[:assignment][:id]}).to match_array [@a1, @a2, @a3, @a4, @a5].map(&:id)
-        expect(details[:follow_on_assignments].map {|f| f[:score]}).to match_array [nil, nil, 0.8, nil, nil]
+        expect(details[:follow_on_assignments].map { |f| f[:assignment][:id] }).to match_array [@a1, @a2, @a3, @a4, @a5].map(&:id)
+        expect(details[:follow_on_assignments].map { |f| f[:score] }).to match_array [nil, nil, 0.8, nil, nil]
       end
 
       it 'matches assignment info and submission info' do
@@ -186,8 +186,8 @@ module ConditionalRelease
         expected_assignment_set([@student_id], @as2)
 
         details = Stats.student_details(@rule, @student_id).with_indifferent_access
-        details_by_id = details[:follow_on_assignments].each_with_object({}) {|f, acc| acc[f.dig(:assignment, :id)] = f }
-        expect(details_by_id.map {|k,v| [k, v.dig(:submission, :score)] }).to match_array [
+        details_by_id = details[:follow_on_assignments].each_with_object({}) { |f, acc| acc[f.dig(:assignment, :id)] = f }
+        expect(details_by_id.map { |k, v| [k, v.dig(:submission, :score)] }).to match_array [
           [@b1.id, 3], [@b2.id, 88], [@b3.id, nil], [@b4.id, 93], [@b5.id, nil]
         ]
       end
@@ -222,7 +222,7 @@ module ConditionalRelease
         end
 
         def check_trend(orig_score, orig_points_possible, new_score, new_points_possible, expected_trend)
-          set_assignments({ @trigger => orig_points_possible, @follow_on => new_points_possible})
+          set_assignments({ @trigger => orig_points_possible, @follow_on => new_points_possible })
           set_submissions [[@trigger, orig_score, orig_points_possible], [@follow_on, new_score, new_points_possible]]
           expected_assignment_set([@student_id], @sr.assignment_sets.first)
           details = Stats.student_details(@rule, @student_id).with_indifferent_access

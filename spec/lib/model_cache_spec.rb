@@ -54,20 +54,20 @@ describe ModelCache do
     Object.send(:remove_const, :TestModelCachePseudonym)
   end
 
-  it "should not cache by default" do
+  it "does not cache by default" do
     u1 = @pseudonym.test_model_cache_user
     expect(u1).to eql(@user)
     expect(u1).not_to equal(@user)
   end
 
   context "with_cache" do
-    it "should cache configured instance lookups" do
+    it "caches configured instance lookups" do
       ModelCache.with_cache(:test_model_cache_users => [@user]) do
         expect(@pseudonym.test_model_cache_user).to equal(@user)
       end
     end
 
-    it "should not cache any other lookups" do
+    it "does not cache any other lookups" do
       ModelCache.with_cache(:test_model_cache_users => [@user]) do
         u2 = @pseudonym.test_model_cache_user_copy
         expect(u2).to eql(@user)

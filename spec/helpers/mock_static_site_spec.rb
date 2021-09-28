@@ -24,13 +24,13 @@ describe "a mock static site" do
     WebMock.reset!
   end
 
-  it "should throw exception if static site directory doesn't exist" do
+  it "throws exception if static site directory doesn't exist" do
     expect {
       MockStaticSite.new('asdf.test', 'non_existant_location')
     }.to raise_error(NonexistentMockSiteError)
   end
 
-  it "should create a MockStaticSite if the directory does exist" do
+  it "creates a MockStaticSite if the directory does exist" do
     expect {
       MockStaticSite.new('asdf.test', 'sample_site')
     }.not_to raise_error
@@ -51,8 +51,8 @@ describe "a mock static site" do
 
     it "only blocks the specified host" do
       WebMock.enable!
-      WebMock.stub_request(:get, "http://notarealdomain-srsly.com/").
-        to_return(status: 200, body: "some other page", headers: {})
+      WebMock.stub_request(:get, "http://notarealdomain-srsly.com/")
+             .to_return(status: 200, body: "some other page", headers: {})
       MockStaticSite.new('google.com', 'sample_site')
       google_response = Net::HTTP.get('google.com', '/')
       other_response = Net::HTTP.get('notarealdomain-srsly.com', '/')

@@ -3,7 +3,7 @@
 # provides a wrapper with all the methods needed to call `api_user_content`
 # like we do in the app controllers
 module GraphQLHelpers
-  class  UserContent
+  class UserContent
     include Api
     include UrlHelpers
 
@@ -16,7 +16,6 @@ module GraphQLHelpers
       new(request: request, context: context, user: user, in_app: in_app)
         .api_user_content(content, preloaded_attachments, options)
     end
-
 
     def initialize(request:, context:, user:, in_app:)
       @request = request

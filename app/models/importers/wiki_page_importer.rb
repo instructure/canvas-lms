@@ -21,18 +21,18 @@ require_dependency 'importers'
 
 module Importers
   class WikiPageImporter < Importer
-
     self.item_class = WikiPage
 
     def self.process_migration_course_outline(data, migration)
-      outline = data['course_outline'] ? data['course_outline']: nil
+      outline = data['course_outline'] ? data['course_outline'] : nil
       return unless outline
       return unless migration.import_object?('course_outline', outline['migration_id'])
+
       to_import = migration.to_import 'outline_folders'
 
       outline['root_folder'] = true
       begin
-        self.import_from_migration(outline.merge({:outline_folders_to_import => to_import}), migration.context, migration)
+        self.import_from_migration(outline.merge({ :outline_folders_to_import => to_import }), migration.context, migration)
       rescue
         migration.add_warning("Error importing the course outline.", $!)
       end
@@ -44,7 +44,7 @@ module Importers
         migration.context.wiki.load_tag_for_master_course_import!(migration.child_subscription_id)
       end
 
-      wikis = data['wikis'] ? data['wikis']: []
+      wikis = data['wikis'] ? data['wikis'] : []
       wikis.each do |wiki|
         unless wiki
           message = "There was a nil wiki page imported for ContentMigration:#{migration.id}"
@@ -52,6 +52,7 @@ module Importers
           next
         end
         next unless wiki_page_migration?(migration, wiki)
+
         begin
           self.import_from_migration(wiki, migration.context, migration) if wiki
         rescue
@@ -66,7 +67,7 @@ module Importers
     end
     private_class_method :wiki_page_migration?
 
-    def self.import_from_migration(hash, context, migration, item=nil)
+    def self.import_from_migration(hash, context, migration, item = nil)
       hash = hash.with_indifferent_access
       item ||= WikiPage.where(wiki_id: context.wiki, id: hash[:id]).first
       item ||= WikiPage.where(wiki_id: context.wiki, migration_id: hash[:migration_id]).first
@@ -124,11 +125,13 @@ module Importers
 
       (hash[:contents] || []).each do |sub_item|
         next if sub_item[:type] == 'embedded_content'
+
         Importers::WikiPageImporter.import_from_migration(sub_item.merge({
-            :outline_folders_to_import => hash[:outline_folders_to_import]
-        }), context, migration)
+                                                                           :outline_folders_to_import => hash[:outline_folders_to_import]
+                                                                         }), context, migration)
       end
       return if hash[:type] && ['folder', 'FOLDER_TYPE'].member?(hash[:type]) && hash[:linked_resource_id]
+
       allow_save = true
       if hash[:type] == 'linked_resource' || hash[:type] == "URL_TYPE"
         allow_save = false
@@ -167,30 +170,30 @@ module Importers
 
           elsif sub_item[:type] == 'linked_resource'
             case sub_item[:linked_resource_type]
-              when 'TOC_TYPE'
-                obj = context.context_modules.not_deleted.where(migration_id: sub_item[:linked_resource_id]).first
-                contents += "  <li><a href='/courses/#{context.id}/modules'>#{obj.name}</a></li>\n" if obj
-              when 'ASSESSMENT_TYPE'
-                obj = context.quizzes.where(migration_id: sub_item[:linked_resource_id]).first
-                contents += "  <li><a href='/courses/#{context.id}/quizzes/#{obj.id}'>#{obj.title}</a></li>\n" if obj
-              when /PAGE_TYPE|WIKI_TYPE/
-                obj = context.wiki_pages.where(migration_id: sub_item[:linked_resource_id]).first
-                contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
-              when 'FILE_TYPE'
-                file = context.attachments.where(migration_id: sub_item[:linked_resource_id]).first
-                if file
-                  name = sub_item[:linked_resource_title] || file.name
-                  contents += " <li><a href=\"/courses/#{context.id}/files/#{file.id}/download\">#{name}</a></li>"
-                end
-              when 'DISCUSSION_TOPIC_TYPE'
-                obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
-                contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
-              when 'URL_TYPE'
-                if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
-                  contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
-                else
-                  contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
-                end
+            when 'TOC_TYPE'
+              obj = context.context_modules.not_deleted.where(migration_id: sub_item[:linked_resource_id]).first
+              contents += "  <li><a href='/courses/#{context.id}/modules'>#{obj.name}</a></li>\n" if obj
+            when 'ASSESSMENT_TYPE'
+              obj = context.quizzes.where(migration_id: sub_item[:linked_resource_id]).first
+              contents += "  <li><a href='/courses/#{context.id}/quizzes/#{obj.id}'>#{obj.title}</a></li>\n" if obj
+            when /PAGE_TYPE|WIKI_TYPE/
+              obj = context.wiki_pages.where(migration_id: sub_item[:linked_resource_id]).first
+              contents += "  <li><a href='/courses/#{context.id}/pages/#{obj.url}'>#{obj.title}</a></li>\n" if obj
+            when 'FILE_TYPE'
+              file = context.attachments.where(migration_id: sub_item[:linked_resource_id]).first
+              if file
+                name = sub_item[:linked_resource_title] || file.name
+                contents += " <li><a href=\"/courses/#{context.id}/files/#{file.id}/download\">#{name}</a></li>"
+              end
+            when 'DISCUSSION_TOPIC_TYPE'
+              obj = context.discussion_topics.where(migration_id: sub_item[:linked_resource_id]).first
+              contents += "  <li><a href='/courses/#{context.id}/discussion_topics/#{obj.id}'>#{obj.title}</a></li>\n" if obj
+            when 'URL_TYPE'
+              if sub_item['title'] && sub_item['description'] && sub_item['title'] != '' && sub_item['description'] != ''
+                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title']}</a><ul><li>#{sub_item['description']}</li></ul></li>\n"
+              else
+                contents += " <li><a href='#{sub_item['url']}'>#{sub_item['title'] || sub_item['description']}</a></li>\n"
+              end
             end
           end
         end
@@ -214,9 +217,9 @@ module Importers
         topic_count = 0
         hash[:topics].each do |topic|
           topic = Importers::DiscussionTopicImporter.import_from_migration(topic.merge({
-             :topics_to_import => hash[:topics_to_import],
-             :topic_entries_to_import => hash[:topic_entries_to_import]
-         }), context, migration)
+                                                                                         :topics_to_import => hash[:topics_to_import],
+                                                                                         :topic_entries_to_import => hash[:topic_entries_to_import]
+                                                                                       }), context, migration)
           if topic
             topic_count += 1
             description += "  <li><a href='/#{context.class.to_s.downcase.pluralize}/#{context.id}/discussion_topics/#{topic.id}'>#{topic.title}</a></li>\n"
@@ -226,11 +229,11 @@ module Importers
         item.body = description
         return nil if topic_count == 0
       elsif hash[:title] and hash[:text]
-        #it's an actual wiki page
+        # it's an actual wiki page
         item.title = hash[:title].presence || item.url.presence || "unnamed page"
         if item.title.length > WikiPage::TITLE_LENGTH
           migration.add_warning(t('warnings.truncated_wiki_title',
-              "The title of the following wiki page was truncated: %{title}", :title => item.title))
+                                  "The title of the following wiki page was truncated: %{title}", :title => item.title))
           item.title.splice!(0...WikiPage::TITLE_LENGTH) # truncate too-long titles
         end
 
@@ -245,7 +248,8 @@ module Importers
         if hash[:assignment].present? && context.feature_enabled?(:conditional_release)
           hash[:assignment][:title] ||= item.title
           item.assignment = Importers::AssignmentImporter.import_from_migration(
-            hash[:assignment], context, migration)
+            hash[:assignment], context, migration
+          )
         else
           item.assignment = nil
         end

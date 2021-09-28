@@ -15,10 +15,10 @@ module Interfaces::AssignmentsConnectionInterface
   def assignments_scope(course, grading_period_id, has_grading_periods = nil)
     assignments = Assignments::ScopedToUser.new(course, current_user).scope
     if grading_period_id
-      assignments.
-        joins(:submissions).
-        where(submissions: {grading_period_id: grading_period_id}).
-        distinct
+      assignments
+        .joins(:submissions)
+        .where(submissions: { grading_period_id: grading_period_id })
+        .distinct
     elsif has_grading_periods
       # this is the case where a grading_period_id was not passed *and*
       # we are outside of any grading period (so we return nothing)
@@ -29,17 +29,17 @@ module Interfaces::AssignmentsConnectionInterface
   end
 
   field :assignments_connection, ::Types::AssignmentType.connection_type,
-    <<~DOC,
-      returns a list of assignments.
+        <<~DOC,
+          returns a list of assignments.
 
-      **NOTE**: for courses with grading periods, this will only return grading
-      periods in the current course; see `AssignmentFilter` for more info.
-      In courses with grading periods that don't have students, it is necessary
-      to *not* filter by grading period to list assignments.
-    DOC
-    null: true do
-      argument :filter, AssignmentFilterInputType, required: false
-    end
+          **NOTE**: for courses with grading periods, this will only return grading
+          periods in the current course; see `AssignmentFilter` for more info.
+          In courses with grading periods that don't have students, it is necessary
+          to *not* filter by grading period to list assignments.
+        DOC
+        null: true do
+    argument :filter, AssignmentFilterInputType, required: false
+  end
 
   def assignments_connection(filter: {}, course:)
     if filter.key?(:grading_period_id)
@@ -48,7 +48,7 @@ module Interfaces::AssignmentsConnectionInterface
       )
     else
       Loaders::CurrentGradingPeriodLoader.load(course)
-        .then do |gp, has_grading_periods|
+                                         .then do |gp, has_grading_periods|
         apply_order(
           assignments_scope(course, gp&.id, has_grading_periods)
         )
@@ -64,11 +64,11 @@ module Interfaces::AssignmentsConnectionInterface
     when Types::AssignmentGroupType
       assignments.except(:order).ordered
     when Types::CourseType
-      assignments.
-        joins(:assignment_group).
+      assignments
+        .joins(:assignment_group).
         # this +select+ is necessary because the assignments scope may be DISTINCT
-        select("assignments.*, assignment_groups.position AS group_position").
-        reorder(:group_position, :position, :id)
+        select("assignments.*, assignment_groups.position AS group_position")
+        .reorder(:group_position, :position, :id)
     end
   end
   private :apply_order

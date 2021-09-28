@@ -228,8 +228,8 @@ module Lti::Ims
     def scores_params
       @_scores_params ||= begin
         update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS,
-          Lti::Result::AGS_EXT_SUBMISSION => EXTENSION_PARAMS).transform_keys do |k|
-            k.to_s.underscore
+                                      Lti::Result::AGS_EXT_SUBMISSION => EXTENSION_PARAMS).transform_keys do |k|
+          k.to_s.underscore
         end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
         update_params.merge(result_score: params[:scoreGiven], result_maximum: params[:scoreMaximum])
@@ -272,6 +272,7 @@ module Lti::Ims
 
     def verify_valid_score_maximum
       return if ignore_score?
+
       if params.key?(:scoreMaximum)
         return if params[:scoreMaximum].to_f >= 0
 
@@ -311,7 +312,7 @@ module Lti::Ims
       else
         submission = line_item.assignment.grade_student(
           user,
-          {score: submission_score, grader_id: -tool.id}
+          { score: submission_score, grader_id: -tool.id }
         ).first
       end
       submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
@@ -321,7 +322,7 @@ module Lti::Ims
     def submit_homework
       return unless line_item.assignment_line_item?
 
-      submission_opts = {submitted_at: submitted_at}
+      submission_opts = { submitted_at: submitted_at }
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission_opts[:submission_type] = submission_type
         case submission_type
@@ -373,7 +374,8 @@ module Lti::Ims
         if preflight_json[:upload_url]
           # Pt 2 of the file upload process, with InstFS enabled.
           response = CanvasHttp.post(
-            preflight_json[:upload_url], form_data: preflight_json[:upload_params], multipart: true)
+            preflight_json[:upload_url], form_data: preflight_json[:upload_params], multipart: true
+          )
 
           if response.code.to_i != 201
             raise CanvasHttp::InvalidResponseCodeError.new(response.code.to_i, response.body)
@@ -397,6 +399,7 @@ module Lti::Ims
       res_max = scores_params[:result_maximum].to_f
       # if this doesn't make sense, just don't scale
       return 1.0 if res_max.nan? || res_max == 0.0
+
       line_item.score_maximum / scores_params[:result_maximum].to_f
     end
 
@@ -436,11 +439,11 @@ module Lti::Ims
 
     def submitted_at
       submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
-      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil): nil
+      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
     end
 
     def file_content_items
-      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :content_items)&.select { |item| item[:type] == "file"} || []
+      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :content_items)&.select { |item| item[:type] == "file" } || []
     end
 
     def has_content_items?

@@ -23,7 +23,6 @@ require_dependency "alerts/ungraded_count"
 
 module Alerts
   describe UngradedCount do
-
     describe "#should_not_receive_message?" do
       before :once do
         course_with_teacher(:active_all => 1)
@@ -39,9 +38,7 @@ module Alerts
         }
       end
 
-
       it 'returns true when the student submissions are below the threshold' do
-
         @assignment.submit_homework(@user, @opts)
 
         ungraded_count = Alerts::UngradedCount.new(@course, [@student.id])
@@ -67,7 +64,7 @@ module Alerts
 
       it 'handles submissions from multiple students' do
         student_1 = @student
-        course_with_student({course: @course})
+        course_with_student({ course: @course })
         student_2 = @student
         @assignment.submit_homework(student_1, @opts)
         @assignment.submit_homework(student_2, @opts)
@@ -75,8 +72,6 @@ module Alerts
         ungraded_count = Alerts::UngradedCount.new(@course, [student_1.id, student_2.id])
         expect(ungraded_count.should_not_receive_message?(student_1.id, 2)).to eq true
       end
-
     end
-
   end
 end

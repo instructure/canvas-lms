@@ -21,7 +21,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe ScopesApiController, type: :request do
-
   before { enable_default_developer_key! }
 
   # We want to force the usage of the fallback scope mapper here, not the generated version
@@ -53,10 +52,10 @@ describe ScopesApiController, type: :request do
       it "returns expected scopes" do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", scope_params)
         expect(json).to include({
-                                  "resource"=>"oauth2",
-                                  "verb"=>"GET",
-                                  "scope"=>"/auth/userinfo",
-                                  "resource_name"=>"oauth2"
+                                  "resource" => "oauth2",
+                                  "verb" => "GET",
+                                  "scope" => "/auth/userinfo",
+                                  "resource_name" => "oauth2"
                                 })
       end
 
@@ -65,11 +64,11 @@ describe ScopesApiController, type: :request do
 
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/scopes", scope_params)
         expect(json["oauth2"]).to eq [{
-                                        "resource"=>"oauth2",
-                                        "verb"=>"GET",
-                                        "scope"=>"/auth/userinfo",
-                                        "resource_name"=>"oauth2"
-                                      }]
+          "resource" => "oauth2",
+          "verb" => "GET",
+          "scope" => "/auth/userinfo",
+          "resource_name" => "oauth2"
+        }]
       end
 
       it "returns expected scopes when flag is disabled and Setting is set" do
@@ -84,10 +83,10 @@ describe ScopesApiController, type: :request do
         )
 
         expect(json).to include({
-                                  "resource"=>"oauth2",
-                                  "verb"=>"GET",
-                                  "scope"=>"/auth/userinfo",
-                                  "resource_name"=>"oauth2"
+                                  "resource" => "oauth2",
+                                  "verb" => "GET",
+                                  "scope" => "/auth/userinfo",
+                                  "resource_name" => "oauth2"
                                 })
       end
     end

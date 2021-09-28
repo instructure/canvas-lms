@@ -38,9 +38,9 @@ class Loaders::DiscussionEntryCountsLoader < GraphQL::Batch::Loader
   def perform(objects)
     object_id = object_id_string(objects.first)
     counts = DiscussionEntry.joins(DiscussionEntry.participant_join_sql(@current_user))
-      .where(discussion_entries: object_specific_hash(objects))
-      .group("discussion_entries.#{object_id}")
-      .select(counts_sql(object_id)).index_by(&object_id.to_sym)
+                            .where(discussion_entries: object_specific_hash(objects))
+                            .group("discussion_entries.#{object_id}")
+                            .select(counts_sql(object_id)).index_by(&object_id.to_sym)
 
     objects.each do |object|
       # if we are not a root_entry, we are not returning counts

@@ -59,13 +59,14 @@ module Canvas
       if prefer_multi_cache && can_use_multi_cache_redis?
         return MultiCache.cache.redis
       end
+
       shard.activate do
         Canvas.redis.respond_to?(:node_for) ? Canvas.redis.node_for(base_key) : Canvas.redis
       end
     end
 
     def self.enabled?
-       !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled?
+      !::Rails.cache.is_a?(::ActiveSupport::Cache::NullStore) && Canvas.redis_enabled?
     end
   end
 end

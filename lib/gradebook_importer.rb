@@ -63,7 +63,7 @@ class GradebookImporter
     raise Delayed::RetriableError, "Gradebook import did not parse cleanly"
   end
 
-  def initialize(upload=nil, attachment=nil, user=nil, progress=nil)
+  def initialize(upload = nil, attachment = nil, user = nil, progress = nil)
     @upload = upload
     @context = upload.course
 
@@ -89,7 +89,7 @@ class GradebookImporter
     end
   end
 
-  CSV::Converters[:decimal_comma_to_period] = -> (field) do
+  CSV::Converters[:decimal_comma_to_period] = ->(field) do
     if field =~ /^-?[0-9.,]+%?$/
       # This field is a pure number or percentage => let's normalize it
       number_parts = field.split(/[,.]/)
@@ -108,18 +108,18 @@ class GradebookImporter
   def parse!
     # preload a ton of data that presumably we'll be querying
     @context.preload_user_roles!
-    @all_assignments = @context.assignments.
-      preload({ context: :account }).
-      published.
-      gradeable.
-      select(ASSIGNMENT_PRELOADED_FIELDS).
-      to_a
+    @all_assignments = @context.assignments
+                               .preload({ context: :account })
+                               .published
+                               .gradeable
+                               .select(ASSIGNMENT_PRELOADED_FIELDS)
+                               .to_a
 
     Assignment.preload_unposted_anonymous_submissions(@all_assignments)
     @all_assignments = @all_assignments.index_by(&:id)
     @all_students = @context.all_students
-      .select(['users.id', :name, :sortable_name, 'users.updated_at'])
-      .index_by(&:id)
+                            .select(['users.id', :name, :sortable_name, 'users.updated_at'])
+                            .index_by(&:id)
 
     @assignments = nil
     @root_accounts = {}
@@ -169,19 +169,19 @@ class GradebookImporter
     effective_due_dates = EffectiveDueDates.for_course(@context, @all_assignments.values)
 
     @original_submissions = @context.submissions
-      .preload(:grading_period, assignment: { context: :account })
-      .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, 'submissions.updated_at'])
-      .where(assignment_id: assignment_ids, user_id: user_ids)
-      .map do |submission|
-        is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
-        score = submission.excused? ? "EX" : submission.score.to_s
-        {
-          user_id: submission.user_id,
-          assignment_id: submission.assignment_id,
-          score: score,
-          gradeable: is_gradeable
-        }
-      end
+                                    .preload(:grading_period, assignment: { context: :account })
+                                    .select(['submissions.id', :assignment_id, :user_id, :grading_period_id, :score, :excused, :cached_due_date, :course_id, 'submissions.updated_at'])
+                                    .where(assignment_id: assignment_ids, user_id: user_ids)
+                                    .map do |submission|
+      is_gradeable = gradeable?(submission: submission, is_admin: is_admin)
+      score = submission.excused? ? "EX" : submission.score.to_s
+      {
+        user_id: submission.user_id,
+        assignment_id: submission.assignment_id,
+        score: score,
+        gradeable: is_gradeable
+      }
+    end
 
     # cache the score on the existing object
     original_submissions_by_student = @original_submissions.inject({}) do |r, s|
@@ -195,9 +195,9 @@ class GradebookImporter
     @students.each do |student|
       @gradebook_importer_assignments[student.id].each do |submission|
         submission_assignment_id = submission.fetch('assignment_id').to_i
-        assignment = original_submissions_by_student.
-          fetch(student.id, {}).
-          fetch(submission_assignment_id, {})
+        assignment = original_submissions_by_student
+                     .fetch(student.id, {})
+                     .fetch(submission_assignment_id, {})
         submission['original_grade'] = assignment.fetch(:score, nil)
         submission['gradeable'] = assignment.fetch(:gradable, nil)
 
@@ -216,8 +216,8 @@ class GradebookImporter
         end
       end
       @gradebook_importer_custom_columns[student.id].each do |column_id, student_custom_column_cell|
-        custom_column = custom_gradebook_columns.detect {|custom_col| custom_col.id == column_id}
-        datum = custom_column.custom_gradebook_column_data.detect {|custom_column_datum| custom_column_datum.user_id == student.id}
+        custom_column = custom_gradebook_columns.detect { |custom_col| custom_col.id == column_id }
+        datum = custom_column.custom_gradebook_column_data.detect { |custom_column_datum| custom_column_datum.user_id == student.id }
         student_custom_column_cell['current_content'] = datum&.content
       end
     end
@@ -309,15 +309,16 @@ class GradebookImporter
   def translate_pass_fail(assignments, students, gradebook_importer_assignments)
     assignments.each_with_index do |assignment, idx|
       next unless assignment.grading_type == "pass_fail"
+
       students.each do |student|
         submission = gradebook_importer_assignments.fetch(student.id)[idx]
         if submission['grade'].present? && (submission['grade'].to_s.casecmp('EX') != 0)
           gradebook_importer_assignments.fetch(student.id)[idx]['grade'] = assignment.score_to_grade(submission['grade'], \
-            submission['grade'])
+                                                                                                     submission['grade'])
         end
         if submission['original_grade'].present? && (submission['original_grade'] != 'EX')
           gradebook_importer_assignments.fetch(student.id)[idx]['original_grade'] = assignment.score_to_grade(submission['original_grade'],\
-            submission['original_grade'])
+                                                                                                              submission['original_grade'])
         end
         if submission['grade'].to_s.casecmp('EX') == 0
           submission['grade'] = 'EX'
@@ -329,6 +330,7 @@ class GradebookImporter
   def process_custom_column_headers(row)
     row.each_with_index do |header_column, index|
       next if GRADEBOOK_IMPORTER_RESERVED_NAMES.include?(header_column)
+
       gradebook_column = custom_gradebook_columns.detect { |column| column.title == header_column }
       next if gradebook_column.blank?
 
@@ -457,7 +459,7 @@ class GradebookImporter
       assignment = @all_assignments[id.to_i] if id.present?
       # backward compat
       assignment ||= @all_assignments.find { |_id, a| a.title == name_and_id }
-        .try(:last)
+                                     .try(:last)
       assignment ||= Assignment.new(:title => title || name_and_id)
       assignment.previous_id = assignment.id
       assignment.id ||= NegativeId.generate
@@ -592,7 +594,7 @@ class GradebookImporter
     assignments_visible_to_student.try(:include?, assignment_id)
   end
 
-  def as_json(_options={})
+  def as_json(_options = {})
     {
       :students => @students.map { |s| student_to_hash(s) },
       :assignments => @assignments.map { |a| assignment_to_hash(a) },
@@ -667,7 +669,6 @@ class GradebookImporter
       return true
     end
 
-
     if row[0] =~ /Points Possible/
       # this row is describing the assignment, has no student data
       process_pp(row)
@@ -703,9 +704,9 @@ class GradebookImporter
   def add_root_account_to_pseudonym_cache(root_account)
     pseudonyms = root_account.shard.activate do
       root_account.pseudonyms
-        .active
-        .select([:id, :unique_id, :sis_user_id, :user_id])
-        .where(:user_id => @all_students.values).to_a
+                  .active
+                  .select([:id, :unique_id, :sis_user_id, :user_id])
+                  .where(:user_id => @all_students.values).to_a
     end
     pseudonyms.each do |pseudonym|
       @pseudonyms_by_sis_id[[root_account.id, pseudonym.sis_user_id]] = pseudonym
@@ -744,7 +745,7 @@ class GradebookImporter
     }
   end
 
-  def valid_context?(context=nil)
+  def valid_context?(context = nil)
     context && [
       :students,
       :assignments,
@@ -752,7 +753,7 @@ class GradebookImporter
       :students=,
       :assignments=,
       :submissions=
-    ].all?{ |m| context.respond_to?(m) }
+    ].all? { |m| context.respond_to?(m) }
   end
 
   def readonly_assignment?(assignment)
@@ -776,6 +777,7 @@ class GradebookImporter
       custom_column_datum = @gradebook_importer_custom_columns[student.id][column_id]
 
       return true if custom_column_datum['current_content'].blank? && custom_column_datum['new_content'].blank?
+
       custom_column_datum['current_content'] == custom_column_datum['new_content']
     end
   end
@@ -817,17 +819,17 @@ class GradebookImporter
   end
 
   def current_override_scores_query
-    override_scores_by_grading_period_id = @gradebook_importer_override_scores.values.flatten.
-      group_by { |score| score[:grading_period_id] }
+    override_scores_by_grading_period_id = @gradebook_importer_override_scores.values.flatten
+                                                                              .group_by { |score| score[:grading_period_id] }
     return Score.none if override_scores_by_grading_period_id.blank?
 
-    base_scope = Score.active.joins(:enrollment).
-      preload(:enrollment).
-      merge(Enrollment.active).
-      where(enrollments: {course: @context})
+    base_scope = Score.active.joins(:enrollment)
+                      .preload(:enrollment)
+                      .merge(Enrollment.active)
+                      .where(enrollments: { course: @context })
 
     scopes = override_scores_by_grading_period_id.map do |grading_period_id, scores|
-      scope_for_period = base_scope.where(enrollments: {user_id: scores.map(&:student_id)})
+      scope_for_period = base_scope.where(enrollments: { user_id: scores.map(&:student_id) })
 
       if grading_period_id.nil?
         scope_for_period.where(course_score: true)

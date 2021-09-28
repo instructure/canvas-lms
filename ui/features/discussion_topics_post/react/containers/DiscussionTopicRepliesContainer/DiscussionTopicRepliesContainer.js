@@ -32,7 +32,7 @@ import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResu
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
-  const {searchTerm, setPageNumber} = useContext(SearchContext)
+  const {filter, searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
 
@@ -55,7 +55,7 @@ export const DiscussionTopicRepliesContainer = props => {
   })
 
   useEffect(() => {
-    if (discussionEntriesToUpdate.size > 0) {
+    if (discussionEntriesToUpdate.size > 0 && filter !== 'drafts') {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
@@ -110,6 +110,7 @@ export const DiscussionTopicRepliesContainer = props => {
             onOpenIsolatedView={props.onOpenIsolatedView}
             goToTopic={props.goToTopic}
             highlightEntryId={props.highlightEntryId}
+            updateDraftCache={props.updateDraftCache}
           />
         )
       })}
@@ -130,7 +131,8 @@ DiscussionTopicRepliesContainer.propTypes = {
   discussionTopic: Discussion.shape,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  highlightEntryId: PropTypes.string
+  highlightEntryId: PropTypes.string,
+  updateDraftCache: PropTypes.func
 }
 
 export default DiscussionTopicRepliesContainer

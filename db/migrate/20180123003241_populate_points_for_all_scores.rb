@@ -23,6 +23,6 @@ class PopulatePointsForAllScores < ActiveRecord::Migration[5.0]
 
   def change
     DataFixup::PopulatePointsForAllScores.delay_if_production(priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup::PopulatePointsForAllScores::Migration").run
+                                                              strand: "DataFixup::PopulatePointsForAllScores::Migration").run
   end
 end

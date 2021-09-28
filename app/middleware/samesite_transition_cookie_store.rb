@@ -46,7 +46,7 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
   # for diagnosing auth issues quickly.  Maybe rename the
   # store something else and keep it, dropping the
   # cookie accessor wrappers.
-  def unmarshal(data, options={})
+  def unmarshal(data, options = {})
     unmarshalled_data = nil
     begin
       unmarshalled_data = super(data, options)

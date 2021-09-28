@@ -43,6 +43,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
 
     @aac = AuthenticationProvider.find(jwt['aac_id'])
     raise ActiveRecord::RecordNotFound unless @aac.is_a?(AuthenticationProvider::Oauth2)
+
     debugging = @aac.debugging? && jwt['nonce'] == @aac.debug_get(:nonce)
     if debugging
       @aac.debug_set(:debugging, t("Received callback from identity provider"))

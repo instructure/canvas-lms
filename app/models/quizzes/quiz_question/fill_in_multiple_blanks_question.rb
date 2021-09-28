@@ -38,7 +38,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
     if matching_answer
       matching_answer.merge(text: response)
     else
-      {text: response, id: nil, weight: 0}
+      { text: response, id: nil, weight: 0 }
     end
   end
 
@@ -63,7 +63,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
     return nil if total_answers == 0
 
     return chosen_answers.count do |variable, answer|
-      answer ||= {:id => nil, :text => nil, :weight => 0}
+      answer ||= { :id => nil, :text => nil, :weight => 0 }
       user_answer.answer_details["answer_for_#{variable}".to_sym] = answer_text(answer)
       user_answer.answer_details["answer_id_for_#{variable}".to_sym] = answer[:id]
       answer && answer[:weight] == 100 && !variables.empty?
@@ -72,7 +72,7 @@ class Quizzes::QuizQuestion::FillInMultipleBlanksQuestion < Quizzes::QuizQuestio
 
   # TODO: remove once new stats is on for everybody
   def stats(responses)
-    stats = {:multiple_responses => true}
+    stats = { :multiple_responses => true }
 
     answer_keys = {}
     answers = []

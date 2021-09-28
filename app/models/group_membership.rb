@@ -48,8 +48,8 @@ class GroupMembership < ActiveRecord::Base
 
   scope :active, -> { where("group_memberships.workflow_state<>'deleted'") }
   scope :moderators, -> { where(:moderator => true) }
-  scope :active_for_context_and_users, -> (context, users) {
-    joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available'})
+  scope :active_for_context_and_users, ->(context, users) {
+    joins(:group).active.where(user_id: users, groups: { context_id: context, workflow_state: 'available' })
   }
 
   resolves_root_account through: :group
@@ -89,22 +89,22 @@ class GroupMembership < ActiveRecord::Base
 
     p.dispatch :group_membership_accepted
     p.to { self.user }
-    p.whenever {|record| record.changed_state(:accepted, :requested) }
+    p.whenever { |record| record.changed_state(:accepted, :requested) }
     p.data { course_broadcast_data }
 
     p.dispatch :group_membership_rejected
     p.to { self.user }
-    p.whenever {|record| record.changed_state(:rejected, :requested) }
+    p.whenever { |record| record.changed_state(:rejected, :requested) }
     p.data { course_broadcast_data }
 
     p.dispatch :new_student_organized_group
     p.to { self.group.context.participating_admins }
-    p.whenever {|record|
+    p.whenever { |record|
       record.group.context &&
-      record.group.context.is_a?(Course) &&
-      record.just_created &&
-      record.group.group_memberships.count == 1 &&
-      record.group.student_organized?
+        record.group.context.is_a?(Course) &&
+        record.just_created &&
+        record.group.group_memberships.count == 1 &&
+        record.group.student_organized?
     }
     p.data { course_broadcast_data }
   end
@@ -118,6 +118,7 @@ class GroupMembership < ActiveRecord::Base
   # accepting requests/invitations
   def auto_join
     return true if self.group.try(:group_category).try(:communities?)
+
     self.workflow_state = 'accepted' if self.group && (self.requested? || self.invited?)
     true
   end
@@ -131,6 +132,7 @@ class GroupMembership < ActiveRecord::Base
   def ensure_mutually_exclusive_membership
     return unless self.group
     return if self.deleted?
+
     peer_groups = self.group.peer_groups.map(&:id)
     GroupMembership.active.where(:group_id => peer_groups, :user_id => self.user_id).destroy_all
   end
@@ -160,6 +162,7 @@ class GroupMembership < ActiveRecord::Base
   protected :validate_within_group_limit
 
   attr_accessor :old_group_id
+
   def capture_old_group_id
     self.old_group_id = self.group_id_was if self.group_id_changed?
     true
@@ -177,16 +180,16 @@ class GroupMembership < ActiveRecord::Base
   def update_cached_due_dates
     return unless update_cached_due_dates?
 
-    assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id).
-      where(group_category_id: group.group_category_id).pluck(:id)
-    assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id).
-      where.not(:assignment_id => nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
+    assignments = Assignment.where(context_type: group.context_type, context_id: group.context_id)
+                            .where(group_category_id: group.group_category_id).pluck(:id)
+    assignments += DiscussionTopic.where(context_type: group.context_type, context_id: group.context_id)
+                                  .where.not(:assignment_id => nil).where(group_category_id: group.group_category_id).pluck(:assignment_id)
 
     DueDateCacher.recompute_users_for_course(user.id, group.context_id, assignments) if assignments.any?
   end
 
   def touch_groups
-    groups_to_touch = [ self.group_id ]
+    groups_to_touch = [self.group_id]
     groups_to_touch << self.old_group_id if self.old_group_id
     Group.where(:id => groups_to_touch).touch_all
   end
@@ -210,7 +213,7 @@ class GroupMembership < ActiveRecord::Base
   # provided enrollments
   def active_given_enrollments?(enrollments)
     accepted? && (!self.group.context.is_a?(Course) ||
-     enrollments.any?{ |e| e.user == self.user && e.course == self.group.context })
+     enrollments.any? { |e| e.user == self.user && e.course == self.group.context })
   end
 
   def invalidate_user_membership_cache

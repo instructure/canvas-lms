@@ -57,3 +57,9 @@ lti_multiple_assignment_deep_linking:
   description: |-
     If enabled, allows multiple deep link support for assignments and modules.
   applies_to: SiteAdmin
+lti_deep_linking_module_index_menu:
+  state: hidden
+  display_name: LTI Deep Linking for Module Index Menu
+  description: |-
+    If enabled, allows deep linking from the module index.
+  applies_to: SiteAdmin

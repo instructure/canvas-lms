@@ -42,7 +42,7 @@ module Api::V1::Conversation
     participants = conversation.participants(options.slice(:include_participant_contexts, :include_indirect_participants))
     explicit_participants = conversation.participants
     audience = conversation.other_participants(explicit_participants)
-    result[:messages] = options[:messages].map{ |m| conversation_message_json(m, current_user, session) } if options[:messages]
+    result[:messages] = options[:messages].map { |m| conversation_message_json(m, current_user, session) } if options[:messages]
     # this is only kept here since it is documented in controller,
     # no need to change shape on anyone.
     result[:submissions] = [] if options[:submissions]
@@ -76,8 +76,8 @@ module Api::V1::Conversation
     result = message.as_json
     result['participating_user_ids'] = message.conversation_message_participants.pluck(:user_id)
     result['media_comment'] = media_comment_json(result['media_comment']) if result['media_comment']
-    result['attachments'] = result['attachments'].map{ |attachment| attachment_json(attachment, current_user) }
-    result['forwarded_messages'] = result['forwarded_messages'].map{ |m| conversation_message_json(m, current_user, session) }
+    result['attachments'] = result['attachments'].map { |attachment| attachment_json(attachment, current_user) }
+    result['forwarded_messages'] = result['forwarded_messages'].map { |m| conversation_message_json(m, current_user, session) }
     result
   end
 
@@ -85,7 +85,7 @@ module Api::V1::Conversation
   # bulk, if not already done
   def preload_common_contexts(current_user, recipients)
     address_book = current_user.address_book
-    users = recipients.select{ |recipient| recipient.is_a?(User) && !address_book.cached?(recipient) }
+    users = recipients.select { |recipient| recipient.is_a?(User) && !address_book.cached?(recipient) }
     address_book.preload_users(users)
   end
 
@@ -94,16 +94,16 @@ module Api::V1::Conversation
   end
 
   def conversation_recipients_json(recipients, current_user, session)
-    ActiveRecord::Associations::Preloader.new.preload(recipients.select{|r| r.is_a?(User)},
-      {:pseudonym => :account}) # for avatar_url
+    ActiveRecord::Associations::Preloader.new.preload(recipients.select { |r| r.is_a?(User) },
+                                                      { :pseudonym => :account }) # for avatar_url
 
     preload_common_contexts(current_user, recipients)
     include_avatars = should_include_participant_avatars?(recipients.count)
     recipients.map do |recipient|
       if recipient.is_a?(User)
         conversation_user_json(recipient, current_user, session,
-          :include_participant_avatars => include_avatars,
-          :include_participant_contexts => true)
+                               :include_participant_avatars => include_avatars,
+                               :include_participant_contexts => true)
       else
         # contexts are already json
         recipient
@@ -119,7 +119,7 @@ module Api::V1::Conversation
     options[:include_participant_avatars] = false unless should_include_participant_avatars?(users.count)
 
     if options[:include_participant_avatars]
-      ActiveRecord::Associations::Preloader.new.preload(users, {:pseudonym => :account}) # for avatar_url
+      ActiveRecord::Associations::Preloader.new.preload(users, { :pseudonym => :account }) # for avatar_url
     end
 
     preload_common_contexts(current_user, users) if options[:include_participant_contexts]

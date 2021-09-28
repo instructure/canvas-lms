@@ -62,7 +62,7 @@ describe Mutations::DeleteOutcomeLinks do
         }
       }
     GQL
-    context = {current_user: user_executing, session: {}, deleted_models: {}}
+    context = { current_user: user_executing, session: {}, deleted_models: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 

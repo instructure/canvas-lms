@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 module Factories
-  def account_model(opts={})
+  def account_model(opts = {})
     @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
   end
 
@@ -41,17 +41,17 @@ module Factories
   def stub_common_cartridge_url
     allow(Canvas::DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(Canvas::DynamicSettings).to receive(:find).with("common_cartridge_viewer", default_ttl: 5.minutes).and_return(
-			ActiveSupport::HashWithIndifferentAccess.new({"app-host":"http://common-cartridge-viewer.netlify.com/"})
-		)
+      ActiveSupport::HashWithIndifferentAccess.new({ "app-host": "http://common-cartridge-viewer.netlify.com/" })
+    )
   end
 
-  def account_rcs_model(opts={})
+  def account_rcs_model(opts = {})
     @account = factory_with_protected_attributes(Account, valid_account_attributes.merge(opts))
   end
 
   def provision_quizzes_next(account)
     # quizzes_next feature is turned on only if a root account is provisioned
-    account.root_account.settings[:provision] = {'lti' => 'lti url'}
+    account.root_account.settings[:provision] = { 'lti' => 'lti url' }
     account.root_account.save!
   end
 
@@ -61,7 +61,7 @@ module Factories
     }
   end
 
-  def account_with_cas(opts={})
+  def account_with_cas(opts = {})
     @account = opts[:account]
     @account ||= Account.create!
     config = AuthenticationProvider::CAS.new
@@ -74,7 +74,7 @@ module Factories
     @account
   end
 
-  def account_with_saml(opts={})
+  def account_with_saml(opts = {})
     @account = opts[:account]
     @account ||= Account.create!
     config = AuthenticationProvider::SAML.new
@@ -88,7 +88,7 @@ module Factories
     @account
   end
 
-  def account_with_role_changes(opts={})
+  def account_with_role_changes(opts = {})
     account = opts[:account] || Account.default
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|

@@ -28,14 +28,14 @@ module Api::V1::User
     :methods => %w(sortable_name short_name).freeze
   }.freeze
 
-  def user_json_preloads(users, preload_email=false, opts={})
+  def user_json_preloads(users, preload_email = false, opts = {})
     # for User#account
     ActiveRecord::Associations::Preloader.new.preload(users, :pseudonym => :account) if opts.fetch(:accounts, true)
 
     # pseudonyms for SisPseudonym
     # pseudonyms account for Pseudonym#works_for_account?
     ActiveRecord::Associations::Preloader.new.preload(users, pseudonyms: :account) if opts.fetch(:accounts, true) &&
-      (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
+                                                                                      (opts.fetch(:pseudonyms, false) || user_json_is_admin?)
 
     if preload_email && (no_email_users = users.reject(&:email_cached?)).present?
       # communication_channels for User#email if it is not cached
@@ -49,12 +49,12 @@ module Api::V1::User
     end
   end
 
-  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment=nil, tool_includes: [])
+  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment = nil, tool_includes: [])
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       json[:created_at] = json[:created_at]&.iso8601
-      enrollment_json_opts = {current_grading_period_scores: includes.include?('current_grading_period_scores')}
+      enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
       if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
         course_or_section = @context if (@context.is_a?(Course) || @context.is_a?(CourseSection))
@@ -69,7 +69,6 @@ module Api::V1::User
           json.merge! :sis_user_id => pseudonym&.sis_user_id,
                       :integration_id => pseudonym&.integration_id
         end
-
 
         if !excludes.include?('pseudonym') && user_json_is_admin?(context, current_user)
           json[:sis_import_id] = pseudonym&.sis_batch_id if @domain_root_account.grants_right?(current_user, session, :manage_sis)
@@ -107,9 +106,9 @@ module Api::V1::User
       end
 
       if includes.include?('sections')
-        json[:sections] = user.enrollments.
-          map(&:course_section).compact.uniq.
-          map(&:name).join(", ")
+        json[:sections] = user.enrollments
+                              .map(&:course_section).compact.uniq
+                              .map(&:name).join(", ")
       end
 
       # make sure this only runs if user_json_preloads has
@@ -165,7 +164,6 @@ module Api::V1::User
   end
 
   def users_json(users, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [])
-
     if includes.include?('sections')
       ActiveRecord::Associations::Preloader.new.preload(users, enrollments: :course_section)
     end
@@ -179,7 +177,7 @@ module Api::V1::User
     end
     ActiveRecord::Associations::Preloader.new.preload(users, :pseudonyms)
 
-    users.map{ |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }
+    users.map { |user| user_json(user, current_user, session, includes, context, enrollments, excludes) }
   end
 
   # this mini-object is used for secondary user responses, when we just want to
@@ -197,14 +195,15 @@ module Api::V1::User
   # public profile url, regardless of @current_user permissions
   def user_display_json(user, parent_context = nil, includes = [])
     return {} unless user
+
     participant_url = case parent_context
-      when :profile
-        user_profile_url(user)
-      when nil, false
-        user_url(user)
-      else
-        polymorphic_url([parent_context, user])
-      end
+                      when :profile
+                        user_profile_url(user)
+                      when nil, false
+                        user_url(user)
+                      else
+                        polymorphic_url([parent_context, user])
+                      end
     hash = {
       id: user.id,
       display_name: user.short_name,
@@ -219,8 +218,8 @@ module Api::V1::User
 
   def anonymous_user_display_json(anonymous_id)
     {
-     anonymous_id: anonymous_id,
-     avatar_image_url: User.default_avatar_fallback
+      anonymous_id: anonymous_id,
+      avatar_image_url: User.default_avatar_fallback
     }
   end
 
@@ -228,6 +227,7 @@ module Api::V1::User
   # if a site admin is making the request or they can manage_students
   def user_json_is_admin?(context = @context, current_user = @current_user)
     return false if context.nil? || current_user.nil?
+
     @user_json_is_admin ||= {}
     @user_json_is_admin[[context.class.name, context.global_id, current_user.global_id]] ||= (
       if context.is_a?(::UserProfile)
@@ -256,8 +256,7 @@ module Api::V1::User
                               :created_at,
                               :start_at,
                               :end_at,
-                              :type
-                            ]
+                              :type]
 
   def enrollment_json(enrollment, user, session, includes: [], opts: {}, excludes: [])
     only = API_ENROLLMENT_JSON_OPTS.dup
@@ -303,12 +302,13 @@ module Api::V1::User
       end
       if includes.include?('can_be_removed')
         json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
-                                  enrollment.can_be_deleted_by(@current_user, @context, session)
+                                enrollment.can_be_deleted_by(@current_user, @context, session)
       end
     end
   end
 
   private
+
   def grades_hash(enrollment, user, includes, opts = {})
     grades = {
       html_url: course_student_grades_url(enrollment.course_id, enrollment.user_id)

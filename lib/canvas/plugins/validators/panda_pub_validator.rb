@@ -38,4 +38,3 @@ module Canvas::Plugins::Validators::PandaPubValidator
     end
   end
 end
-

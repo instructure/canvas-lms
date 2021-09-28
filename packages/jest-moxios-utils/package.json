@@ -4,14 +4,15 @@
   "main": "index.js",
   "description": "Utilities useful in testing using moxios within jest",
   "scripts": {
-    "test": "jest --color",
-    "test:coverage": "jest --coverage"
+    "test": "jest --env jsdom-fourteen --color",
+    "test:coverage": "jest --env jsdom-fourteen --coverage"
   },
   "dependencies": {
     "moxios": "^0.4"
   },
   "devDependencies": {
     "axios": "^0.21.1",
-    "jest": "^24"
+    "jest": "^24",
+    "jest-environment-jsdom-fourteen": "^0.1.0"
   }
 }

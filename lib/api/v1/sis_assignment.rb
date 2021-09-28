@@ -46,7 +46,7 @@ module Api::V1::SisAssignment
   }.freeze
 
   API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS = {
-      only: %i(user_id).freeze
+    only: %i(user_id).freeze
   }.freeze
 
   def sis_assignments_json(assignments, includes = {})
@@ -78,6 +78,7 @@ module Api::V1::SisAssignment
 
   def add_sis_assignment_group_json(assignment, json)
     return unless assignment.association(:assignment_group).loaded? && assignment.assignment_group
+
     json.merge!(assignment_group: sis_assignment_group_json(assignment.assignment_group))
   end
 
@@ -87,15 +88,18 @@ module Api::V1::SisAssignment
 
   def add_sis_course_sections_json(assignment, json)
     return unless assignment.association(:context).loaded?
+
     course_sections = active_course_sections_for(assignment.context)
     return unless course_sections
+
     json.merge!(sections: sis_assignment_course_sections_json(course_sections, assignment))
   end
 
   def assignment_user_overrides_json(assignment)
     overrides = active_assignment_overrides_for(assignment)
     raise UnloadedAssociationError if overrides.nil?
-    overrides.map {|o| assignment_user_override_json(o)}.compact
+
+    overrides.map { |o| assignment_user_override_json(o) }.compact
   end
 
   def assignment_user_override_json(override)
@@ -112,8 +116,8 @@ module Api::V1::SisAssignment
       json
     end
 
-    api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS).
-      merge({students: assignment_override_students_json})
+    api_json(override, nil, nil, API_SIS_ASSIGNMENT_OVERRIDES_JSON_OPTS)
+      .merge({ students: assignment_override_students_json })
   end
 
   def sis_assignment_course_sections_json(course_sections, assignment)
@@ -144,6 +148,7 @@ module Api::V1::SisAssignment
   def add_sis_assignment_override_json(json, assignment, course_section)
     assignment_overrides = active_assignment_overrides_for(assignment)
     return unless assignment_overrides
+
     override = assignment_overrides.detect do |assignment_override|
       assignment_override.set_type == 'CourseSection' && assignment_override.set_id == course_section.id
     end

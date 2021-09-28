@@ -45,10 +45,14 @@ beforeEach(() => {
 
 const mockProps = ({
   availableDate = '2021-03-24T00:00:00-06:00',
-  untilDate = '2021-04-03T23:59:59-06:00'
+  untilDate = '2021-04-03T23:59:59-06:00',
+  showOnMobile = false,
+  showDateWithTime = false
 } = {}) => ({
   availableDate,
-  untilDate
+  untilDate,
+  showOnMobile,
+  showDateWithTime
 })
 
 const setup = props => {
@@ -66,6 +70,13 @@ describe('AssignmentAvailabilityWindow', () => {
     it('should render availability window', () => {
       const container = setup(mockProps())
       expect(container.getByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
+    })
+
+    it('should render availability window with time', () => {
+      const container = setup(mockProps({showDateWithTime: true}))
+      expect(
+        container.getByText('Available from Mar 24 6am until Apr 4 5:59am')
+      ).toBeInTheDocument()
     })
 
     it('should render only from section', () => {
@@ -86,9 +97,14 @@ describe('AssignmentAvailabilityWindow', () => {
       }))
     })
 
-    it('should render not render availability window', () => {
+    it('should not render availability window', () => {
       const container = setup(mockProps())
       expect(container.queryByText('Available from Mar 24 until Apr 4')).toBeNull()
+    })
+
+    it('should render availability window when showOnMobile is true', () => {
+      const container = setup(mockProps({showOnMobile: true}))
+      expect(container.queryByText('Available from Mar 24 until Apr 4')).toBeInTheDocument()
     })
   })
 })

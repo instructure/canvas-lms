@@ -33,9 +33,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
   include_context "in-process server selenium tests"
 
   describe BrandableCSS do
-
     describe 'cache_for' do
-
       it 'finds the right fingerprints for normal bundles, plugins & handlebars' do
         sample_bundles = {
           'bundles/common' => false,
@@ -57,7 +55,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
           next unless includes_no_variables
 
           msg = "all variants should output the same css if a bundle doesn't pull in the variables file"
-          unique_fingerprints = fingerprints.map{ |f| f[:combinedChecksum] }.uniq
+          unique_fingerprints = fingerprints.map { |f| f[:combinedChecksum] }.uniq
           expect(unique_fingerprints.length).to eq(1), msg
         end
       end
@@ -77,7 +75,7 @@ describe 'Stuff related to how we load stuff from CDN and use brandable_css' do
     assert_tag('link', 'href', url)
   end
 
-  def check_asset(tag, asset_path, skip_rev=false)
+  def check_asset(tag, asset_path, skip_rev = false)
     unless skip_rev
       asset_path = Canvas::Cdn::RevManifest.url_for(asset_path)
       expect(asset_path).to be_present

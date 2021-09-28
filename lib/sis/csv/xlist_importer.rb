@@ -21,7 +21,6 @@
 module SIS
   module CSV
     class XlistImporter < CSVBaseImporter
-
       def self.xlist_csv?(row)
         row.include?('xlist_course_id') && row.include?('section_id')
       end
@@ -32,7 +31,7 @@ module SIS
 
       # possible columns:
       # xlist_course_id, section_id, status
-      def process(csv, index=nil, count=nil)
+      def process(csv, index = nil, count = nil)
         count = SIS::XlistImporter.new(@root_account, importer_opts).process do |importer|
           csv_rows(csv, index, count) do |row|
             begin

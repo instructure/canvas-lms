@@ -50,7 +50,7 @@ describe 'Late Policy statuses:' do
 
     it 'late submission has late penalty' do
       StudentGradesPage.show_details_button.click
-      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
+      late_penalty_value = "-" + @course.students.first.submissions.find_by(assignment_id: @a1.id).points_deducted.to_s
 
       # the data from rails and data from ui are not in the same format
       expect(StudentGradesPage.submission_late_penalty_text(@a1.id).to_f.to_s).to eq late_penalty_value
@@ -58,7 +58,7 @@ describe 'Late Policy statuses:' do
 
     it 'late submission has final grade' do
       StudentGradesPage.show_details_button.click
-      final_grade_value = @course.students.first.submissions.find_by(assignment_id:@a1.id).published_grade
+      final_grade_value = @course.students.first.submissions.find_by(assignment_id: @a1.id).published_grade
 
       expect(StudentGradesPage.late_submission_final_score_text(@a1.id)).to eq final_grade_value
     end

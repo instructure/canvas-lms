@@ -25,8 +25,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   protect_from_forgery :except => [:create, :backup, :record_answer], with: :exception
   before_action :require_context
-  before_action :require_quiz, :only => [ :index, :create, :extensions, :show, :update, :log ]
-  before_action :require_quiz_submission, :only => [ :show, :log ]
+  before_action :require_quiz, :only => [:index, :create, :extensions, :show, :update, :log]
+  before_action :require_quiz_submission, :only => [:show, :log]
   batch_jobs_in_actions :only => [:update, :create], :batch => { :priority => Delayed::LOW_PRIORITY }
 
   def index
@@ -75,6 +75,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
     if session.delete('lockdown_browser_popup')
       return render(:action => 'close_quiz_popup_window')
     end
+
     redirect_to course_quiz_url(@context, @quiz, previewing_params)
   end
 
@@ -100,7 +101,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
       if !@submission || (@quiz.ip_filter && !@quiz.valid_ip?(request.remote_ip))
       elsif is_previewing? || (@submission.temporary_user_code == temporary_user_code(false)) ||
-                              (@submission.grants_right?(@current_user, session, :update))
+            (@submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == 'record_answer'
             if last_question = params[:last_question_id]
@@ -112,21 +113,21 @@ class Quizzes::QuizSubmissionsController < ApplicationController
             return redirect_to next_page
           else
             @submission.backup_submission_data(params)
-            render :json => {:backup => true,
-                             :end_at => @submission.end_at,
-                             :time_left => @submission.time_left,
-                             :hard_end_at => @submission.end_at_without_time_limit,
-                             :hard_time_left => @submission.time_left(hard: true)}
+            render :json => { :backup => true,
+                              :end_at => @submission.end_at,
+                              :time_left => @submission.time_left,
+                              :hard_end_at => @submission.end_at_without_time_limit,
+                              :hard_time_left => @submission.time_left(hard: true) }
             return
           end
         end
       end
 
-      render :json => {:backup => false,
-                       :end_at => @submission&.end_at,
-                       :time_left => @submission&.time_left,
-                       :hard_end_at => @submission&.end_at_without_time_limit,
-                       :hard_time_left => @submission&.time_left(hard: true)}
+      render :json => { :backup => false,
+                        :end_at => @submission&.end_at,
+                        :time_left => @submission&.time_left,
+                        :hard_end_at => @submission&.end_at_without_time_limit,
+                        :hard_time_left => @submission&.time_left(hard: true) }
     end
   end
 
@@ -171,6 +172,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
       unless @quiz.visible_to_user?(@submission.user)
         return reject! t('Quiz not assigned to student'), 403
       end
+
       @submission.update_scores(params.to_unsafe_h.merge(:grader_id => @current_user.id))
       if params[:headless]
         redirect_to named_context_url(@context, :context_quiz_history_url, @quiz, :user_id => @submission.user_id, :version => (params[:submission_version_number] || @submission.version_number), :headless => 1, :score_updated => 1, :hide_student_name => params[:hide_student_name])
@@ -183,8 +185,8 @@ class Quizzes::QuizSubmissionsController < ApplicationController
   def show
     if authorized_action(@quiz_submission, @current_user, :read)
       redirect_to named_context_url(@context, :context_quiz_history_url,
-        @quiz.id,
-        user_id: @quiz_submission.user_id)
+                                    @quiz.id,
+                                    user_id: @quiz_submission.user_id)
     end
   end
 
@@ -192,6 +194,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
   def delete_session_access_key!
     return unless session[:quiz_access_code] && @quiz.access_code.present?
+
     session[:quiz_access_code].delete(@quiz.id)
   end
 
@@ -213,16 +216,16 @@ class Quizzes::QuizSubmissionsController < ApplicationController
 
           format.html do
             send_file(attachment.full_filename, {
-              :type => attachment.content_type_with_encoding,
-              :disposition => 'inline'
-            })
+                        :type => attachment.content_type_with_encoding,
+                        :disposition => 'inline'
+                      })
           end
 
           format.zip do
             send_file(attachment.full_filename, {
-              :type => attachment.content_type_with_encoding,
-              :disposition => 'inline'
-            })
+                        :type => attachment.content_type_with_encoding,
+                        :disposition => 'inline'
+                      })
           end
         else
           inline_url = authenticated_inline_url(attachment)
@@ -238,7 +241,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
           redirect_to named_context_url(context, :context_quiz_url, quiz.id)
         end
 
-        format.zip  do
+        format.zip do
           redirect_to named_context_url(context, :context_quiz_url, quiz.id)
         end
 

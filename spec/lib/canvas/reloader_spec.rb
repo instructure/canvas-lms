@@ -21,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
 describe Canvas::Reloader do
-  it "should call registered callbacks" do
+  it "calls registered callbacks" do
     callback_count = 0
     Canvas::Reloader.on_reload { callback_count += 1 }
     Canvas::Reloader.reload!

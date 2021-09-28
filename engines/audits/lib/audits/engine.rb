@@ -30,6 +30,5 @@ module Audits
         end
       end
     end
-
   end
 end

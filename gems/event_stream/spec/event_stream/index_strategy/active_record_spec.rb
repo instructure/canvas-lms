@@ -27,7 +27,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
         @_created_val ||= Time.zone.now
       end
 
-      def self.paginate(options={})
+      def self.paginate(options = {})
         self
       end
 
@@ -64,13 +64,13 @@ describe EventStream::IndexStrategy::ActiveRecord do
     before :each do
       query_options = {}
       stream = double('stream',
-                     :record_type => EventStream::Record,
-                     :active_record_type => @fake_record_type)
+                      :record_type => EventStream::Record,
+                      :active_record_type => @fake_record_type)
       ar_cls = @fake_record_type
       base_index = EventStream::Index.new(stream) do
         self.table "table"
-        self.entry_proc lambda{|a1, a2| nil}
-        self.ar_scope_proc lambda {|a1, a2| ar_cls.where({ one: a1.id, two: a2.id}) }
+        self.entry_proc lambda { |a1, a2| nil }
+        self.ar_scope_proc lambda { |a1, a2| ar_cls.where({ one: a1.id, two: a2.id }) }
       end
       @index = base_index.strategy_for(:active_record)
     end
@@ -81,7 +81,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       outcome = @index.for_ar_scope([arg1, arg2], {})
       outcome.paginate(per_page: 10)
       conditions = @fake_record_type.applied_conditions
-      expect(conditions).to include({ one: 'abc', two: 'def'})
+      expect(conditions).to include({ one: 'abc', two: 'def' })
       expect(conditions).to include("created_at DESC")
     end
 
@@ -101,7 +101,6 @@ describe EventStream::IndexStrategy::ActiveRecord do
       EventStream::IndexStrategy::ActiveRecord.pager_to_records(base_scope, pager_type.new)
     end
   end
-
 
   describe "internal Bookmarker" do
     it "just uses the created_at field for bookmarking" do

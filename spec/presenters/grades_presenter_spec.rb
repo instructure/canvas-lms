@@ -20,9 +20,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper')
 
 describe GradesPresenter do
-
   let(:presenter) { GradesPresenter.new(enrollments) }
-  let(:shard){ FakeShard.new }
+  let(:shard) { FakeShard.new }
 
   describe '#course_grade_summaries' do
     before(:once) do
@@ -54,8 +53,8 @@ describe GradesPresenter do
 
     it 'does not throw an error when there exists a user with multiple student enrollments and ' \
       'some of those enrollments have a score while others do not' do
-        @section_one_student_enrollment.scores.create!(current_score: 80.0)
-        expect { @presenter.course_grade_summaries }.not_to raise_error
+      @section_one_student_enrollment.scores.create!(current_score: 80.0)
+      expect { @presenter.course_grade_summaries }.not_to raise_error
     end
   end
 
@@ -84,7 +83,6 @@ describe GradesPresenter do
   end
 
   describe '#observed_enrollments' do
-
     let(:enrollment) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 1, :course_id => 1) }
     let(:enrollment2) { double(:state_based_on_date => :active, :is_a? => true, :associated_user_id => 2, :course_id => 2) }
     let(:enrollments) { [enrollment, enrollment2] }
@@ -157,7 +155,6 @@ describe GradesPresenter do
   end
 
   describe '#teacher_enrollments' do
-
     let(:course1) { double }
     let(:course2) { double }
     let(:instructor2) { double(:instructor? => true, :course => course1, :course_section_id => 3, :state_based_on_date => :active) }
@@ -180,7 +177,6 @@ describe GradesPresenter do
   end
 
   describe '#single_enrollment' do
-
     let(:course) { double('course') }
 
     let(:attrs) {
@@ -217,7 +213,6 @@ describe GradesPresenter do
       expect(GradesPresenter.new([]).has_single_enrollment?).to be_falsey
     end
   end
-
 end
 
 class FakeShard

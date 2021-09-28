@@ -52,15 +52,18 @@ module CyoeHelper
   def conditional_release_assignment_set(rules, id)
     result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s || rule[:trigger_assignment_id] == id }
     return if result.blank?
+
     result.slice(:locked, :assignment_sets, :selected_set_id)
   end
 
   def conditional_release_json(content_tag, user, opts = {})
     result = conditional_release_rule_for_module_item(content_tag, opts)
     return if result.blank?
+
     result[:assignment_sets].each do |as|
       associations = as[:assignment_set_associations]
       next if associations.blank?
+
       associations.each do |a|
         a[:model] = assignment_json(a[:model], user, nil) if a[:model]
       end
@@ -70,9 +73,9 @@ module CyoeHelper
 
   def show_cyoe_placeholder(mastery_paths)
     (mastery_paths[:selected_set_id].nil? && mastery_paths[:assignment_sets].present?) ||
-    mastery_paths[:awaiting_choice] ||
-    mastery_paths[:still_processing] ||
-    mastery_paths[:locked]
+      mastery_paths[:awaiting_choice] ||
+      mastery_paths[:still_processing] ||
+      mastery_paths[:locked]
   end
 
   private
@@ -88,12 +91,12 @@ module CyoeHelper
     awaiting_choice = data[:selected_set_id].nil? && data[:assignment_sets].present?
     modules_url = context_url(@context, :context_url) + '/modules'
     choose_url = modules_url + '/items/' + tag_id + '/choose'
-    modules_disabled = @context.tabs_available(@current_user).select{|tabs| tabs[:label] == "Modules" }.blank?
+    modules_disabled = @context.tabs_available(@current_user).select { |tabs| tabs[:label] == "Modules" }.blank?
     data.merge!({
-      awaiting_choice: awaiting_choice,
-      modules_url: modules_url,
-      choose_url: choose_url,
-      modules_tab_disabled: modules_disabled
-    })
+                  awaiting_choice: awaiting_choice,
+                  modules_url: modules_url,
+                  choose_url: choose_url,
+                  modules_tab_disabled: modules_disabled
+                })
   end
 end

@@ -36,17 +36,17 @@ describe ConferencesController do
   end
 
   describe "GET 'recording'" do
-    it "should require authorization" do
+    it "requires authorization" do
       @conference = @course.web_conferences.create!(:conference_type => 'BigBlueButton', :duration => 60, :user => @teacher)
-      get 'recording', params: {:course_id => @course.id, :conference_id => @conference.id, :recording_id => 'abc123-xyz'}
+      get 'recording', params: { :course_id => @course.id, :conference_id => @conference.id, :recording_id => 'abc123-xyz' }
       assert_unauthorized
     end
   end
 
   describe "DELETE 'recording'" do
-    it "should require authorization" do
+    it "requires authorization" do
       @conference = @course.web_conferences.create!(:conference_type => 'BigBlueButton', :duration => 60, :user => @teacher)
-      delete 'recording', params: {:course_id => @course.id, :conference_id => @conference.id, :recording_id => 'abc123-xyz'}
+      delete 'recording', params: { :course_id => @course.id, :conference_id => @conference.id, :recording_id => 'abc123-xyz' }
       assert_unauthorized
     end
   end

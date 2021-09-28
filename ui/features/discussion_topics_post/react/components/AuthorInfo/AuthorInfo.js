@@ -34,7 +34,7 @@ import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 
 export const AuthorInfo = props => {
-  const {searchTerm} = useContext(SearchContext)
+  const {searchTerm, filter} = useContext(SearchContext)
 
   return (
     <Responsive
@@ -57,7 +57,7 @@ export const AuthorInfo = props => {
       render={responsiveProps => (
         <Flex>
           <Flex.Item align="start">
-            {props.isUnread && (
+            {props.isUnread && filter !== 'drafts' && (
               <div
                 style={{
                   float: 'left',

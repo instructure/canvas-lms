@@ -37,7 +37,7 @@ describe GradingPeriod do
     {
       title: 'A Grading Period',
       start_date: now,
-      end_date:   1.day.from_now(now),
+      end_date: 1.day.from_now(now),
       close_date: 5.days.from_now(now)
     }
   end
@@ -74,7 +74,7 @@ describe GradingPeriod do
       grading_period_group.grading_periods.create!(
         title: "closed",
         start_date: 2.weeks.ago(now),
-        end_date:   1.week.ago(now),
+        end_date: 1.week.ago(now),
         close_date: 3.days.ago(now)
       )
     end
@@ -82,7 +82,7 @@ describe GradingPeriod do
       grading_period_group.grading_periods.create!(
         title: "another closed period",
         start_date: 4.weeks.ago(now),
-        end_date:   3.weeks.ago(now),
+        end_date: 3.weeks.ago(now),
         close_date: 2.weeks.ago(now)
       )
     end
@@ -90,7 +90,7 @@ describe GradingPeriod do
       grading_period_group.grading_periods.create!(
         title: "a period",
         start_date: 3.days.ago(now),
-        end_date:   3.days.from_now(now),
+        end_date: 3.days.from_now(now),
         close_date: 5.days.from_now(now)
       )
     end
@@ -149,9 +149,9 @@ describe GradingPeriod do
     context "one current period" do
       let!(:period) do
         grading_period_group.grading_periods.create!(
-          title:      "a period",
+          title: "a period",
           start_date: 1.day.ago(now),
-          end_date:   1.day.from_now(now),
+          end_date: 1.day.from_now(now),
           close_date: 2.days.from_now(now)
         )
       end
@@ -638,14 +638,14 @@ describe GradingPeriod do
       @course.enroll_student(student, enrollment_state: :active)
       @grading_period_group = group_helper.legacy_create_for_course(@course)
       @first_grading_period = @grading_period_group.grading_periods.create!(
-        title:      '1st period',
+        title: '1st period',
         start_date: 2.months.from_now(now),
-        end_date:   3.months.from_now(now)
+        end_date: 3.months.from_now(now)
       )
       @second_grading_period = @grading_period_group.grading_periods.create!(
-        title:      '2nd period',
+        title: '2nd period',
         start_date: 3.months.from_now(now),
-        end_date:   4.months.from_now(now)
+        end_date: 4.months.from_now(now)
       )
       @first_assignment = @course.assignments.create!(due_at: @first_grading_period.start_date + 1.minute)
       @second_assignment = @course.assignments.create!(due_at: @second_grading_period.start_date + 1.minute)
@@ -677,17 +677,17 @@ describe GradingPeriod do
 
       let(:third_grading_period) do
         @grading_period_group.grading_periods.create!(
-          title:      '3rd period',
+          title: '3rd period',
           start_date: 5.months.from_now(now),
-          end_date:   6.months.from_now(now)
+          end_date: 6.months.from_now(now)
         )
       end
 
       let(:fourth_grading_period) do
         @grading_period_group.grading_periods.create!(
-          title:      '4th period',
+          title: '4th period',
           start_date: 7.months.from_now(now),
-          end_date:   8.months.from_now(now)
+          end_date: 8.months.from_now(now)
         )
       end
 
@@ -709,16 +709,16 @@ describe GradingPeriod do
     it "returns false for a grading period in the past" do
       grading_period.assign_attributes(
         start_date: 2.months.ago(now),
-        end_date:   1.month.ago(now)
+        end_date: 1.month.ago(now)
       )
       expect(grading_period).to_not be_current
     end
 
     it "returns true if the current time falls between the start date and end date (inclusive)",
-    test_id: 2528634, priority: "2" do
+       test_id: 2528634, priority: "2" do
       grading_period.assign_attributes(
         start_date: 1.month.ago(now),
-        end_date:   1.month.from_now(now)
+        end_date: 1.month.from_now(now)
       )
       expect(grading_period).to be_current
     end
@@ -726,7 +726,7 @@ describe GradingPeriod do
     it "returns false for a grading period in the future" do
       grading_period.assign_attributes(
         start_date: 1.month.from_now(now),
-        end_date:   2.months.from_now(now)
+        end_date: 2.months.from_now(now)
       )
       expect(grading_period).to_not be_current
     end
@@ -809,9 +809,9 @@ describe GradingPeriod do
   describe ".in_date_range?" do
     subject(:period) do
       grading_period_group.grading_periods.build(
-        title:      'a period',
+        title: 'a period',
         start_date: 1.week.ago(now).change(sec: 0),
-        end_date:   2.weeks.from_now(now).change(sec: 0)
+        end_date: 2.weeks.from_now(now).change(sec: 0)
       )
     end
 
@@ -914,7 +914,6 @@ describe GradingPeriod do
         expect(period.root_account_id).to eq grading_period_group.root_account_id
       end
 
-
       it "does not modify root_account_id if it is already set" do
         second_account = account_model
         period = grading_period_group.grading_periods.create!(
@@ -923,7 +922,6 @@ describe GradingPeriod do
         expect(period.root_account_id).to eq second_account.id
       end
     end
-
 
     context "on update" do
       it "sets root_account_id to the grading period group's root_account_id if root_account_id is nil" do
@@ -953,7 +951,7 @@ describe GradingPeriod do
     end
 
     it 'creates scores for the grading period upon its creation' do
-      expect{ grading_period.save! }.to change{ Score.count }.by(1)
+      expect { grading_period.save! }.to change { Score.count }.by(1)
     end
 
     it 'updates grading period scores when the grading period end date is changed' do
@@ -964,7 +962,7 @@ describe GradingPeriod do
           end_date: day_after_assignment_is_due,
           close_date: day_after_assignment_is_due
         )
-      end.to change{
+      end.to change {
         Score.where(grading_period_id: grading_period).first.current_score
       }.from(nil).to(80.0)
     end
@@ -973,7 +971,7 @@ describe GradingPeriod do
       day_before_grading_period_starts = 1.day.ago(grading_period.start_date)
       @assignment.update!(due_at: day_before_grading_period_starts)
       grading_period.save!
-      expect{ grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change{
+      expect { grading_period.update!(start_date: 1.day.ago(@assignment.due_at)) }.to change {
         Score.where(grading_period_id: grading_period).first.current_score
       }.from(nil).to(80.0)
     end
@@ -1002,7 +1000,7 @@ describe GradingPeriod do
     it 'updates course score when the grading period weight is changed' do
       grading_period.save!
       grading_period_group.update!(weighted: true)
-      expect{ grading_period.update!(weight: 50) }.to change{
+      expect { grading_period.update!(weight: 50) }.to change {
         Score.where(grading_period_id: nil).first.updated_at
       }
     end
@@ -1010,7 +1008,7 @@ describe GradingPeriod do
     it 'does not update grading period score when the grading period weight is changed' do
       grading_period.save!
       grading_period_group.update!(weighted: true)
-      expect{ grading_period.update!(weight: 20) }.not_to change{
+      expect { grading_period.update!(weight: 20) }.not_to change {
         Score.where(grading_period_id: grading_period).first.updated_at
       }
     end
@@ -1018,10 +1016,10 @@ describe GradingPeriod do
     it 'does not update course score when weight is changed but weighted grading periods are disabled' do
       grading_period.save!
       grading_period_group.update!(weighted: false)
-      expect{ grading_period.update!(weight: 50) }.not_to change{
+      expect { grading_period.update!(weight: 50) }.not_to change {
         Score.where(grading_period_id: nil).first.updated_at
       }
-      expect{ grading_period.update!(weight: 20) }.not_to change{
+      expect { grading_period.update!(weight: 20) }.not_to change {
         Score.where(grading_period_id: grading_period).first.updated_at
       }
     end
@@ -1029,7 +1027,7 @@ describe GradingPeriod do
     it 'does not update grading period score when weight is changed but weighted grading periods are disabled' do
       grading_period.save!
       grading_period_group.update!(weighted: false)
-      expect{ grading_period.update!(weight: 20) }.not_to change{
+      expect { grading_period.update!(weight: 20) }.not_to change {
         Score.where(grading_period_id: grading_period).first.updated_at
       }
     end

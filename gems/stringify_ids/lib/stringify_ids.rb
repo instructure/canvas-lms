@@ -32,14 +32,16 @@ module StringifyIds
 
   def self.stringify_ids(value, opts = {})
     return unless value.is_a?(Hash)
+
     value.keys.each do |key|
       next unless key.is_a?(String) || key.is_a?(Symbol)
+
       if key =~ /(^|_)id$/i
         # id, foo_id, etc.
         value[key] = stringify_id(value[key], opts)
       elsif key =~ /(^|_)ids$/i && value[key].is_a?(Array)
         # ids, foo_ids, etc.
-        value[key].map!{ |id| stringify_id(id, opts) }
+        value[key].map! { |id| stringify_id(id, opts) }
       end
     end
   end

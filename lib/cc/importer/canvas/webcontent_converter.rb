@@ -42,6 +42,7 @@ module CC::Importer::Canvas
     def convert_file_metadata(file_map)
       path = @package_root.item_path(COURSE_SETTINGS_DIR, FILES_META)
       return unless File.exist? path
+
       doc = open_file_xml path
 
       if folders = doc.at_css('folders')
@@ -90,15 +91,16 @@ module CC::Importer::Canvas
       make_export_dir
       path = get_full_path(WEB_RESOURCES_FOLDER)
       return if Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).empty?
+
       Zip::File.open(zip_file, Zip::File::CREATE) do |zipfile|
         Dir.glob("#{path}/**/**", File::FNM_DOTMATCH).each do |file|
           next if File.directory?(file)
-          file_path = file.sub(path+'/', '')
+
+          file_path = file.sub(path + '/', '')
           zipfile.add(file_path, file)
         end
       end
       File.expand_path(zip_file)
     end
-
   end
 end

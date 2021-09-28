@@ -29,11 +29,11 @@ module Api::V1::GroupCategory
   }
 
   def group_category_json(group_category, user, session, options = {})
-    api_json(group_category, user, session, API_GROUP_CATEGORY_JSON_OPTS).
-      merge!(context_data(group_category)).
-      merge!(included_data(group_category, user, session, options[:include])).
-      merge!(group_category_sis(group_category, user)).
-      merge!(group_category_data(group_category, user))
+    api_json(group_category, user, session, API_GROUP_CATEGORY_JSON_OPTS)
+      .merge!(context_data(group_category))
+      .merge!(included_data(group_category, user, session, options[:include]))
+      .merge!(group_category_sis(group_category, user))
+      .merge!(group_category_data(group_category, user))
   end
 
   private

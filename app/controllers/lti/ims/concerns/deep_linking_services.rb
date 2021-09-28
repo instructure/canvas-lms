@@ -93,6 +93,7 @@ module Lti::Ims::Concerns
           standard_claim_errors(jwt_hash)
           developer_key_errors
           return if @errors.present?
+
           jwt_hash
         rescue JSON::JWT::InvalidFormat
           errors.add(:jwt, 'JWT format is invalid')
@@ -148,7 +149,7 @@ module Lti::Ims::Concerns
 
       def public_key
         @public_key ||= begin
-            public_jwk = developer_key&.public_jwk
+          public_jwk = developer_key&.public_jwk
           JSON::JWK.new(public_jwk) if public_jwk.present?
         end
       end

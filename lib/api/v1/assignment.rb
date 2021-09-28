@@ -98,7 +98,7 @@ module Api::V1::Assignment
 
   def assignments_json(assignments, user, session, opts = {})
     # check if all assignments being serialized belong to the same course
-    contexts = assignments.map {|a| [a.context_id, a.context_type] }.uniq
+    contexts = assignments.map { |a| [a.context_id, a.context_type] }.uniq
     if contexts.length == 1
       # if so, calculate their effective due dates in one go, rather than individually
       opts[:exclude_response_fields] ||= []
@@ -134,7 +134,7 @@ module Api::V1::Assignment
     if opts[:exclude_response_fields].include?('description')
       fields_copy = fields[:only].dup
       fields_copy.delete("description")
-      fields = {only: fields_copy}
+      fields = { only: fields_copy }
     end
 
     hash = api_json(assignment, user, session, fields)
@@ -309,7 +309,8 @@ module Api::V1::Assignment
         assignment.discussion_topic.context,
         user,
         session,
-        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?('description'))
+        include_assignment: false, exclude_messages: opts[:exclude_response_fields].include?('description')
+      )
     end
 
     if opts[:include_all_dates] && assignment.assignment_overrides
@@ -408,8 +409,8 @@ module Api::V1::Assignment
 
     if opts[:include_can_submit] && !assignment.quiz? && !submission.is_a?(Array)
       hash['can_submit'] = assignment.expects_submission? &&
-          assignment.rights_status(user, :submit)[:submit] &&
-          (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
+                           assignment.rights_status(user, :submit)[:submit] &&
+                           (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
     end
 
     hash
@@ -423,10 +424,10 @@ module Api::V1::Assignment
 
     ex_type = settings.delete(:exclude_type)
     settings[:exclude_small_matches_type] = case ex_type
-      when '0'; nil
-      when '1'; 'words'
-      when '2'; 'percent'
-    end
+                                            when '0'; nil
+                                            when '1'; 'words'
+                                            when '2'; 'percent'
+                                            end
 
     ex_value = settings.delete(:exclude_value)
     settings[:exclude_small_matches_value] = ex_value.present? ? ex_value.to_i : nil
@@ -511,11 +512,11 @@ module Api::V1::Assignment
       assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       response = if prepared_create[:overrides].present?
-        create_api_assignment_with_overrides(prepared_create, user)
-      else
-        prepared_create[:assignment].save!
-        :created
-      end
+                   create_api_assignment_with_overrides(prepared_create, user)
+                 else
+                   prepared_create[:assignment].save!
+                   :created
+                 end
     end
 
     calc_grades = calculate_grades ? value_to_boolean(calculate_grades) : true
@@ -542,11 +543,11 @@ module Api::V1::Assignment
 
     Assignment.suspend_due_date_caching do
       response = if prepared_update[:overrides]
-        update_api_assignment_with_overrides(prepared_update, user)
-      else
-        prepared_update[:assignment].save!
-        :ok
-      end
+                   update_api_assignment_with_overrides(prepared_update, user)
+                 else
+                   prepared_update[:assignment].save!
+                   :ok
+                 end
     end
 
     if @overrides_affected.to_i > 0 || cached_due_dates_changed
@@ -582,17 +583,19 @@ module Api::V1::Assignment
 
   def submission_types_valid?(assignment, assignment_params)
     return true if assignment_params['submission_types'].nil?
+
     assignment_params['submission_types'] = Array(assignment_params['submission_types'])
 
     if assignment_params['submission_types'].present? &&
-      !assignment_params['submission_types'].all? do |s|
-        return false if s == 'wiki_page' && !self.context.try(:feature_enabled?, :conditional_release)
-        API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == 'default_external_tool' && assignment.unpublished?)
-      end
-        assignment.errors.add('assignment[submission_types]',
-          I18n.t('assignments_api.invalid_submission_types',
-            'Invalid submission types'))
-        return false
+       !assignment_params['submission_types'].all? do |s|
+         return false if s == 'wiki_page' && !self.context.try(:feature_enabled?, :conditional_release)
+
+         API_ALLOWED_SUBMISSION_TYPES.include?(s) || (s == 'default_external_tool' && assignment.unpublished?)
+       end
+      assignment.errors.add('assignment[submission_types]',
+                            I18n.t('assignments_api.invalid_submission_types',
+                                   'Invalid submission types'))
+      return false
     end
     true
   end
@@ -830,10 +833,10 @@ module Api::V1::Assignment
   def turnitin_settings_hash(assignment_params)
     turnitin_settings = assignment_params.delete("turnitin_settings").permit(*API_ALLOWED_TURNITIN_SETTINGS)
     turnitin_settings['exclude_type'] = case turnitin_settings['exclude_small_matches_type']
-      when nil; '0'
-      when 'words'; '1'
-      when 'percent'; '2'
-    end
+                                        when nil; '0'
+                                        when 'words'; '1'
+                                        when 'percent'; '2'
+                                        end
     turnitin_settings['exclude_value'] = turnitin_settings['exclude_small_matches_value']
     turnitin_settings.to_unsafe_h
   end
@@ -843,32 +846,33 @@ module Api::V1::Assignment
     vericite_settings.to_unsafe_h
   end
 
-  def submissions_hash(include_params, assignments, submissions_for_user=nil)
+  def submissions_hash(include_params, assignments, submissions_for_user = nil)
     return {} unless include_params.include?('submission')
+
     has_observed_users = include_params.include?("observed_users")
 
     subs_list = if submissions_for_user
-      assignment_ids = assignments.map(&:id).to_set
-      submissions_for_user.select{ |s|
-        assignment_ids.include?(s.assignment_id)
-      }
-    else
-      users = current_user_and_observed(include_observed: has_observed_users)
-      @context.submissions.
-        where(:assignment_id => assignments.map(&:id)).
-        for_user(users)
-    end
+                  assignment_ids = assignments.map(&:id).to_set
+                  submissions_for_user.select { |s|
+                    assignment_ids.include?(s.assignment_id)
+                  }
+                else
+                  users = current_user_and_observed(include_observed: has_observed_users)
+                  @context.submissions
+                          .where(:assignment_id => assignments.map(&:id))
+                          .for_user(users)
+                end
 
     if has_observed_users
       # assignment id -> array. even if <2 results for a given
       # assignment, we want to consistently return an array when
       # include[]=observed_users was supplied
-      hash = Hash.new { |h,k| h[k] = [] }
+      hash = Hash.new { |h, k| h[k] = [] }
       subs_list.each { |s| hash[s.assignment_id] << s }
     else
       # assignment id -> specific submission. never return an array when
       # include[]=observed_users was _not_ supplied
-      hash = Hash[subs_list.map{|s| [s.assignment_id, s]}]
+      hash = Hash[subs_list.map { |s| [s.assignment_id, s] }]
     end
     hash
   end
@@ -903,7 +907,6 @@ module Api::V1::Assignment
       assignment.turnitin_settings = settings
     end
   end
-
 
   def prepare_assignment_create_or_update(assignment, assignment_params, user, context = assignment.context)
     raise "needs strong params" unless assignment_params.is_a?(ActionController::Parameters)
@@ -1075,12 +1078,12 @@ module Api::V1::Assignment
       assignment.submissions.having_submission.empty?
 
     API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
-      {'turnitin_settings' => strong_anything},
-      {'vericite_settings' => strong_anything},
-      {'allowed_extensions' => strong_anything},
-      {'integration_data' => strong_anything},
-      {'external_tool_tag_attributes' => strong_anything},
-      ({'submission_types' => strong_anything} if should_update_submission_types)
+      { 'turnitin_settings' => strong_anything },
+      { 'vericite_settings' => strong_anything },
+      { 'allowed_extensions' => strong_anything },
+      { 'integration_data' => strong_anything },
+      { 'external_tool_tag_attributes' => strong_anything },
+      ({ 'submission_types' => strong_anything } if should_update_submission_types)
     ].compact
   end
 
@@ -1091,7 +1094,7 @@ module Api::V1::Assignment
       require_lockdown_browser_monitor
       lockdown_browser_monitor_data
       access_code
-    ].any? {|key| assignment_params.key?(key) }
+    ].any? { |key| assignment_params.key?(key) }
   end
 
   def update_lockdown_browser_settings(assignment, assignment_params)

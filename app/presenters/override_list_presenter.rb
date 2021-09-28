@@ -18,12 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class OverrideListPresenter
-
   attr_reader :assignment, :user
 
   include TextHelper
 
-  def initialize(assignment=nil, user=nil)
+  def initialize(assignment = nil, user = nil)
     @user = user
     if assignment.present?
       @assignment = AssignmentOverrideApplicator.assignment_overridden_for(assignment, user)
@@ -49,13 +48,13 @@ class OverrideListPresenter
       return due_date[:title]
     end
 
-    multiple_due_dates? ? I18n.t('overrides.everyone_else','Everyone else') : I18n.t('overrides.everyone','Everyone')
+    multiple_due_dates? ? I18n.t('overrides.everyone_else', 'Everyone else') : I18n.t('overrides.everyone', 'Everyone')
   end
 
   def formatted_date_string(date_field, date_hash = {})
     date = date_hash[date_field]
     if date.present? && CanvasTime.is_fancy_midnight?(date_hash[date_field]) &&
-      date_field == :due_at
+       date_field == :due_at
       date_string(date, :no_words)
     else
       date.present? ? datetime_string(date) : '-'
@@ -66,11 +65,11 @@ class OverrideListPresenter
     return @adhoc_current_override_count_hash if defined?(@adhoc_current_override_count_hash)
 
     @adhoc_current_override_count_hash = if assignment
-      current_users = assignment.context.enrollments.current_and_invited.select(:user_id).distinct
-      assignment.assignment_override_students.where(user_id: current_users).group(:assignment_override_id).size
-    else
-      {}
-    end
+                                           current_users = assignment.context.enrollments.current_and_invited.select(:user_id).distinct
+                                           assignment.assignment_override_students.where(user_id: current_users).group(:assignment_override_id).size
+                                         else
+                                           {}
+                                         end
   end
 
   # Public: Determine if multiple due dates are visible to user.
@@ -86,7 +85,7 @@ class OverrideListPresenter
   # Returns an array of due date hashes.
   def visible_due_dates
     return [] unless assignment
-    
+
     assignment.dates_hash_visible_to(user).each do |due_date|
       due_date[:raw] = due_date.dup
       due_date[:lock_at] = lock_at due_date

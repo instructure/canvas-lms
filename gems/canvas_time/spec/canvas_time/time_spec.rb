@@ -20,9 +20,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CanvasTime do
-
   around do |example|
-    Timecop.freeze(Time.zone.local(2010,10,1,0,0), &example)
+    Timecop.freeze(Time.zone.local(2010, 10, 1, 0, 0), &example)
   end
 
   describe "fancy_midnight" do
@@ -39,8 +38,8 @@ describe CanvasTime do
     it "works on a daylight savings boundary" do
       Time.use_zone('Alaska') do
         time = Time.zone.parse('2013-03-10T00:00:00')
-        expect(CanvasTime.fancy_midnight(time).to_i).
-          to eq(Time.zone.parse('2013-03-10T23:59:59').to_i)
+        expect(CanvasTime.fancy_midnight(time).to_i)
+          .to eq(Time.zone.parse('2013-03-10T23:59:59').to_i)
       end
     end
 
@@ -50,7 +49,6 @@ describe CanvasTime do
   end
 
   describe "#is_fancy_midnight" do
-
     it "returns true if hour is 23 and min is 59" do
       time = Time.now.end_of_day
       expect(CanvasTime.is_fancy_midnight?(time)).to eq(true)
@@ -91,5 +89,4 @@ describe CanvasTime do
       expect(CanvasTime.try_parse("-45-45-45 12:12:12", :default)).to eq(:default)
     end
   end
-
 end

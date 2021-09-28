@@ -30,7 +30,7 @@ module Turnitin
       it 'creates an attachment' do
         expect do
           subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
-        end.to change{lti_assignment.attachments.count}.by(1)
+        end.to change { lti_assignment.attachments.count }.by(1)
       end
 
       it 'uses the filename from the tii client and replaces forward slashes with dashes' do
@@ -42,7 +42,6 @@ module Turnitin
         subject.class.create_attachment(lti_student, lti_assignment, tool, outcome_response_json)
         expect(lti_assignment.attachments.first.user).to eq lti_student
       end
-
     end
 
     describe '.update_attachment' do
@@ -52,7 +51,7 @@ module Turnitin
           attachments: [attachment],
           submission_type: 'online_upload',
         )
-        sub.turnitin_data = {attachment.asset_string => {outcome_response: outcome_response_json}}
+        sub.turnitin_data = { attachment.asset_string => { outcome_response: outcome_response_json } }
         sub.save!
         sub
       end
@@ -69,8 +68,6 @@ module Turnitin
         updated_attachment = Turnitin::AttachmentManager.update_attachment(submission, attachment)
         expect(updated_attachment.display_name).to eq "my-new-filename.txt"
       end
-
     end
-
   end
 end

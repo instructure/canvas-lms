@@ -34,7 +34,7 @@ class Mutations::DeleteDiscussionEntry < Mutations::BaseMutation
 
     entry.editor_id = current_user.id
     entry.destroy
-    {discussion_entry: entry}
+    { discussion_entry: entry }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   end

@@ -33,7 +33,7 @@ describe 'new_announcement' do
 
   context ".email" do
     let(:path_type) { :email }
-    it "should render" do
+    it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "value for title: value for name"
       expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
@@ -43,14 +43,14 @@ describe 'new_announcement' do
 
   context ".sms" do
     let(:path_type) { :sms }
-    it "should render" do
+    it "renders" do
       generate_message(notification_name, path_type, asset)
     end
   end
 
   context ".summary" do
     let(:path_type) { :summary }
-    it "should render" do
+    it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "value for title: value for name"
       expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)
@@ -60,7 +60,7 @@ describe 'new_announcement' do
 
   context ".twitter" do
     let(:path_type) { :twitter }
-    it "should render" do
+    it "renders" do
       generate_message(notification_name, path_type, asset)
       expect(@message.subject).to eq "Canvas Alert"
       expect(@message.url).to match(/\/courses\/\d+\/announcements\/\d+/)

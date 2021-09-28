@@ -37,7 +37,7 @@ describe Lti::AccountExternalToolsController do
     it_behaves_like 'lti services' do
       let(:action) { :show }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/show"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/show" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, external_tool_id: tool.id }
       end
@@ -48,7 +48,7 @@ describe Lti::AccountExternalToolsController do
     it_behaves_like 'lti services' do
       let(:action) { :index }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/list"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/list" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id }
       end
@@ -93,7 +93,7 @@ describe Lti::AccountExternalToolsController do
     it_behaves_like 'lti services' do
       let(:action) { :destroy }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/destroy"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/destroy" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, external_tool_id: tool.id }
       end
@@ -108,7 +108,7 @@ describe Lti::AccountExternalToolsController do
     it_behaves_like 'lti services' do
       let(:action) { :create }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/create"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/account_external_tools/scope/create" }
     end
 
     context 'error handling' do
@@ -171,5 +171,4 @@ describe Lti::AccountExternalToolsController do
       end
     end
   end
-
 end

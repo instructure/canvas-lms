@@ -31,7 +31,8 @@ module Canvas
       unless old_keys.empty?
         ActiveSupport::Deprecation.warn(
           "Configuration options #{old_keys.join(', ')} for #{source} are no longer supported; just configure endpoint with a full URI and/or use region to form regional endpoints",
-          caller(1))
+          caller(1)
+        )
         config = config.except(*OLD_KEYS)
       end
       unless config.key?(:region) || config.key?('region')

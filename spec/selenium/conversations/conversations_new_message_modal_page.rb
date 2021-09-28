@@ -19,7 +19,6 @@
 require_relative '../common'
 
 module ConversationsNewMessageModalPage
-
   # ---------------------- Controls ----------------------
 
   def message_recipient_input

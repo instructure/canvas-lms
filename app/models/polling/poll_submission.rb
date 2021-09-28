@@ -27,11 +27,13 @@ module Polling
 
     validates_presence_of :poll, :poll_choice, :poll_session, :user
     validates_uniqueness_of :user_id,
-      scope: :poll_session_id,
-      message: -> { t(
-        'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
-        'can only submit one choice per poll session.'
-      ) }
+                            scope: :poll_session_id,
+                            message: -> {
+                                       t(
+                                         'polling.poll_submissions.validations.user_and_poll_session_uniqueness',
+                                         'can only submit one choice per poll session.'
+                                       )
+                                     }
 
     validate :poll_choices_belong_to_poll
     validate :poll_is_published
@@ -49,11 +51,12 @@ module Polling
     end
 
     private
+
     def poll_is_published
       if self.poll_session
         unless self.poll_session.is_published?
           errors.add(:base, I18n.t('polling.poll_submissions.validations.poll_is_published',
-                                    'This poll session is not open for submissions.'))
+                                   'This poll session is not open for submissions.'))
         end
       end
     end

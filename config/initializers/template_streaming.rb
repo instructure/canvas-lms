@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MarkTemplateStreaming
-  def render_to_body(options={})
+  def render_to_body(options = {})
     @streaming_template = true if options[:stream]
     super
   end
@@ -100,7 +100,7 @@ ActionView::StreamingFlow.prepend(StreamingContentChecks) unless ::Rails.env.pro
 
 module SkipEmptyTemplateConcats
   def initialize(original_block)
-    new_block = -> (value) { original_block.call(value) if value.size > 0}
+    new_block = ->(value) { original_block.call(value) if value.size > 0 }
     super(new_block)
   end
 end

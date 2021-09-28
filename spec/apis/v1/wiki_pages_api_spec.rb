@@ -55,29 +55,29 @@ describe WikiPagesApiController, type: :request do
         }
         path[:url] = 'new-page' if @http_verb == :put
         params = { wiki_page: wiki_params }
-        api_call_as_user(user, @http_verb, @url, path, params, {}, {expected_status: expected_status})
+        api_call_as_user(user, @http_verb, @url, path, params, {}, { expected_status: expected_status })
       end
 
       context 'with the user having manage_wiki_create permission' do
         it 'succeeds' do
-          create_wiki_page(@teacher, {title: 'New Page', body: 'banana'})
+          create_wiki_page(@teacher, { title: 'New Page', body: 'banana' })
           expect(WikiPage.last.title).to eq 'New Page'
           expect(WikiPage.last.body).to eq 'banana'
         end
 
         context 'when the user also has manage_wiki_update permission' do
           it 'is not published by default' do
-            create_wiki_page(@teacher, {title: 'New Page'})
+            create_wiki_page(@teacher, { title: 'New Page' })
             expect(WikiPage.last.workflow_state).to eq 'unpublished'
           end
 
           it 'can be explictly published' do
-            create_wiki_page(@teacher, {title: 'New Page', published: true})
+            create_wiki_page(@teacher, { title: 'New Page', published: true })
             expect(WikiPage.last.workflow_state).to eq 'active'
           end
 
           it 'allows the "editing_roles" field to be set' do
-            create_wiki_page(@teacher, {title: 'New Page', editing_roles: 'public'})
+            create_wiki_page(@teacher, { title: 'New Page', editing_roles: 'public' })
             expect(WikiPage.last.editing_roles).to eq 'public'
           end
         end
@@ -94,49 +94,49 @@ describe WikiPagesApiController, type: :request do
           end
 
           it 'is published by default when created' do
-            create_wiki_page(@teacher, {title: 'New Page'})
+            create_wiki_page(@teacher, { title: 'New Page' })
             expect(WikiPage.last.workflow_state).to eq 'active'
           end
 
           it 'cannot be explictly unpublished when created' do
-            create_wiki_page(@teacher, {title: 'New Page', published: false}, 401)
+            create_wiki_page(@teacher, { title: 'New Page', published: false }, 401)
             expect(WikiPage.last).to be_nil
           end
 
           it 'does not allow the "editing_roles" field to be set' do
-            create_wiki_page(@teacher, {title: 'New Page', editing_roles: 'public'}, 401)
+            create_wiki_page(@teacher, { title: 'New Page', editing_roles: 'public' }, 401)
             expect(WikiPage.last).to be_nil
           end
         end
 
         context 'with the user not having manage_wiki_create permission' do
           it 'fails if the course does not grant create wiki page permission' do
-            create_wiki_page(@student, {title: 'New Page'}, 401)
+            create_wiki_page(@student, { title: 'New Page' }, 401)
             expect(WikiPage.last).to be_nil
           end
 
           it 'succeeds if the course grants create wiki page permission' do
-            @course.update!({default_wiki_editing_roles: 'teachers,students'})
-            create_wiki_page(@student, {title: 'New Page', body: 'banana'})
+            @course.update!({ default_wiki_editing_roles: 'teachers,students' })
+            create_wiki_page(@student, { title: 'New Page', body: 'banana' })
             expect(WikiPage.last.title).to eq 'New Page'
             expect(WikiPage.last.body).to eq 'banana'
           end
 
           it 'does not allow the "who can edit" field to be set' do
-            @course.update!({default_wiki_editing_roles: 'teachers,students'})
-            create_wiki_page(@student, {title: 'New Page', editing_roles: 'public'}, 401)
+            @course.update!({ default_wiki_editing_roles: 'teachers,students' })
+            create_wiki_page(@student, { title: 'New Page', editing_roles: 'public' }, 401)
             expect(WikiPage.last).to be_nil
           end
 
           it 'is published automatically when created' do
-            @course.update!({default_wiki_editing_roles: 'teachers,students'})
-            create_wiki_page(@student, {title: 'New Page'})
+            @course.update!({ default_wiki_editing_roles: 'teachers,students' })
+            create_wiki_page(@student, { title: 'New Page' })
             expect(WikiPage.last.workflow_state).to eq 'active'
           end
 
           it 'cannot be set as unpublished when created' do
-            @course.update!({default_wiki_editing_roles: 'teachers,students'})
-            create_wiki_page(@student, {title: 'New Page', published: false}, 401)
+            @course.update!({ default_wiki_editing_roles: 'teachers,students' })
+            create_wiki_page(@student, { title: 'New Page', published: false }, 401)
             expect(WikiPage.last).to be_nil
           end
         end
@@ -160,7 +160,7 @@ describe WikiPagesApiController, type: :request do
         course_id: @course.id.to_s,
         url: @page.url,
       }
-      api_call_as_user(user, :delete, url, path, {}, {}, {expected_status: expected_status})
+      api_call_as_user(user, :delete, url, path, {}, {}, { expected_status: expected_status })
     end
 
     it 'allows you to destroy a wiki page if you have the manage_wiki_delete permission' do
@@ -197,7 +197,7 @@ describe WikiPagesApiController, type: :request do
         course_id: @course.id.to_s,
         url: @page.url,
       }
-      api_call_as_user(user, :get, url, path, {}, {}, {expected_status: expected_status})
+      api_call_as_user(user, :get, url, path, {}, {}, { expected_status: expected_status })
     end
 
     it 'works for teachers' do
@@ -232,43 +232,43 @@ describe WikiPagesApiController, type: :request do
 
     it "returns unauthorized if not a teacher" do
       api_call_as_user(@student, :post,
-        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-        { :controller => "wiki_pages_api",
-          :action => "duplicate",
-          :format => "json",
-          :course_id => @course.id.to_s,
-          :url => @page.url },
-        {},
-        {},
-        { :expected_status => 401 })
+                       "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
+                       { :controller => "wiki_pages_api",
+                         :action => "duplicate",
+                         :format => "json",
+                         :course_id => @course.id.to_s,
+                         :url => @page.url },
+                       {},
+                       {},
+                       { :expected_status => 401 })
     end
 
     it "can duplicate wiki non-assignment if teacher" do
       json = api_call_as_user(@teacher, :post,
-        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-        { :controller => "wiki_pages_api",
-          :action => "duplicate",
-          :format => "json",
-          :course_id => @course.id.to_s,
-          :url => @page.url },
-        {},
-        {},
-        { :expected_status => 200 })
+                              "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
+                              { :controller => "wiki_pages_api",
+                                :action => "duplicate",
+                                :format => "json",
+                                :course_id => @course.id.to_s,
+                                :url => @page.url },
+                              {},
+                              {},
+                              { :expected_status => 200 })
       expect(json["title"]).to eq "Wiki Page Copy"
     end
 
     it "can duplicate wiki assignment if teacher" do
       wiki_page_assignment_model({ :title => "Assignment Wiki" })
       json = api_call_as_user(@teacher, :post,
-        "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
-        { :controller => "wiki_pages_api",
-          :action => "duplicate",
-          :format => "json",
-          :course_id => @course.id.to_s,
-          :url => @page.url },
-        {},
-        {},
-        { :expected_status => 200 })
+                              "/api/v1/courses/#{@course.id}/pages/#{@page.url}/duplicate.json",
+                              { :controller => "wiki_pages_api",
+                                :action => "duplicate",
+                                :format => "json",
+                                :course_id => @course.id.to_s,
+                                :url => @page.url },
+                              {},
+                              {},
+                              { :expected_status => 200 })
       expect(json["title"]).to eq "Assignment Wiki Copy"
     end
   end

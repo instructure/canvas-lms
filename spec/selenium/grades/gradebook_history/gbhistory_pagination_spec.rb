@@ -34,9 +34,9 @@ describe "Gradebook History Page" do
     GradeBookHistory.visit(@course)
   end
 
-  it "should show additional new rows on a new page scroll", test_id: 3308073, priority: "1" do
+  it "shows additional new rows on a new page scroll", test_id: 3308073, priority: "1" do
     GradeBookHistory.click_filter_button
-    initial_row_count=GradeBookHistory.fetch_results_table_row_count
+    initial_row_count = GradeBookHistory.fetch_results_table_row_count
     scroll_page_to_bottom
     expect { GradeBookHistory.fetch_results_table_row_count - initial_row_count }.to become > 0
   end

@@ -27,8 +27,10 @@ module DataFixup
           shard = job.current_shard
           assignment = shard ? shard.activate { Assignment.find(assmt_id) } : Assignment.find(assmt_id)
           next unless assignment.needs_auto_peer_reviews_scheduled?
+
           run_at_frd = assignment.peer_reviews_assign_at || assignment.due_at
           next unless run_at_frd
+
           if run_at_frd != job.run_at
             job.update_attribute(:run_at, run_at_frd)
           end

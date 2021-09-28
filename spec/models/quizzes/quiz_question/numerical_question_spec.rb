@@ -22,9 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 require_dependency 'quizzes/quiz_question/base'
 
 describe Quizzes::QuizQuestion::NumericalQuestion do
-
   let(:question_data) do
-    {:answers => [{:id => 1, :weight => 100, :start => 2,  :end => 3}]}
+    { :answers => [{ :id => 1, :weight => 100, :start => 2, :end => 3 }] }
   end
 
   let(:question) do
@@ -85,49 +84,49 @@ describe Quizzes::QuizQuestion::NumericalQuestion do
       end
     end
 
-    it "should not calculate margin of tolerance for answers if answer text is nil" do
-      answer_data = {:"question_#{question_id}" => nil}
+    it "does not calculate margin of tolerance for answers if answer text is nil" do
+      answer_data = { :"question_#{question_id}" => nil }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_nil
     end
 
-    it "should not calculate margin of tolerance for answers if answer text is blank" do
-      answer_data = {:"question_#{question_id}" => ""}
+    it "does not calculate margin of tolerance for answers if answer text is blank" do
+      answer_data = { :"question_#{question_id}" => "" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    it "should calculate if answer falls within start/end range" do
-      answer_data = {:"question_#{question_id}" => "2.5"}
+    it "calculates if answer falls within start/end range" do
+      answer_data = { :"question_#{question_id}" => "2.5" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_truthy
     end
 
-
-    it "should calculate if answer falls out of start/end range" do
-      answer_data = {:"question_#{question_id}" => "4"}
+    it "calculates if answer falls out of start/end range" do
+      answer_data = { :"question_#{question_id}" => "4" }
       user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
 
       expect(question.correct_answer_parts(user_answer)).to be_falsey
     end
 
-    describe 'flexible ranges' do
+    describe 'flexible ranges' do # rubocop:disable RSpec/EmptyExampleGroup
+      # RuboCop can't detect the examples that are dynamically defined
       def self.test_range(range, answer, is_correct)
         desc = "should calculate if %s falls %s (%d,%d)" % [
           answer, is_correct ? 'within' : 'out of', range[0], range[1]
         ]
 
         it desc do
-          answer_data = {:"question_#{question_id}" => "#{answer}"}
+          answer_data = { :"question_#{question_id}" => "#{answer}" }
           question = Quizzes::QuizQuestion::NumericalQuestion.new({
-            answers: [{
-              id: 1,
-              weight: 100,
-              start: range[0],
-              end: range[1]
-            }]
-          })
+                                                                    answers: [{
+                                                                      id: 1,
+                                                                      weight: 100,
+                                                                      start: range[0],
+                                                                      end: range[1]
+                                                                    }]
+                                                                  })
 
           user_answer = Quizzes::QuizQuestion::UserAnswer.new(question_id, points_possible, answer_data)
           expect(question.correct_answer_parts(user_answer)).to eq is_correct

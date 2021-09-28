@@ -36,5 +36,4 @@ module Types
     argument :field, SubmissionSearchOrderFieldInputType, required: true
     argument :direction, OrderDirectionType, required: false
   end
-
 end

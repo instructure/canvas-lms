@@ -37,7 +37,7 @@ RSpec.describe Types::SubmissionDraftType do
       body_args = "(rewriteUrls: #{body_rewrite_urls})"
     end
 
-    result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher, request: ActionDispatch::TestRequest.create})
+    result = CanvasSchema.execute(<<~GQL, context: { current_user: @teacher, request: ActionDispatch::TestRequest.create })
       query {
         assignment(id: "#{@assignment.id}") {
           submissionsConnection(filter: {states: [unsubmitted, graded, pending_review, submitted]}) {

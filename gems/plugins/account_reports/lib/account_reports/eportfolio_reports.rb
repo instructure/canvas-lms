@@ -82,8 +82,8 @@ module AccountReports
 
     def eportfolio_scope
       scope = Eportfolio.joins(user: :pseudonyms)
-        .where(pseudonyms: { account_id: root_account.id })
-        .where.not(users: {workflow_state: 'deleted'})
+                        .where(pseudonyms: { account_id: root_account.id })
+                        .where.not(users: { workflow_state: 'deleted' })
 
       scope = @include_deleted ? scope.deleted : scope.active
       scope = scope.where(no_enrollment_sql) if only_users_with_no_enrollments?

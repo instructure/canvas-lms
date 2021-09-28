@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class BrandConfigsController < ApplicationController
-
   include Api::V1::Progress
   include Api::V1::Account
 
@@ -83,7 +82,7 @@ class BrandConfigsController < ApplicationController
   def duped_brandable_vars
     BrandableCSS::BRANDABLE_VARIABLES.map do |group|
       new_group = group.deep_dup
-      new_group["group_name"] =  BrandableCSS::GROUP_NAMES[new_group['group_key']].call
+      new_group["group_name"] = BrandableCSS::GROUP_NAMES[new_group['group_key']].call
       new_group["variables"] = new_group["variables"].map(&:deep_dup)
       new_group["variables"].each do |v|
         v["human_name"] = BrandableCSS::VARIABLE_HUMAN_NAMES[v['variable_name']].call
@@ -139,10 +138,10 @@ class BrandConfigsController < ApplicationController
   def save_to_user_session
     old_md5 = session.delete(:brand_config_md5)
     session[:brand_config_md5] = if params[:brand_config_md5] == ''
-      false
-    elsif params[:brand_config_md5]
-      BrandConfig.find(params[:brand_config_md5]).md5
-    end
+                                   false
+                                 elsif params[:brand_config_md5]
+                                   BrandConfig.find(params[:brand_config_md5]).md5
+                                 end
 
     BrandConfig.destroy_if_unused(old_md5) if old_md5 != session[:brand_config_md5]
     redirect_to account_theme_editor_path(@account)
@@ -192,8 +191,10 @@ class BrandConfigsController < ApplicationController
 
   def process_variables(variables)
     return unless variables
+
     variables.to_unsafe_h.each_with_object({}) do |(key, value), memo|
       next unless value.present? && (config = BrandableCSS.variables_map[key])
+
       value = process_file(value) if config['type'] == 'image'
       memo[key] = value
     end
@@ -222,7 +223,8 @@ class BrandConfigsController < ApplicationController
                                   s3_access: 'public-read',
                                   skip_sis: true,
                                   cache_control: "Cache-Control:max-age=#{expires_in.to_i}, public",
-                                  expires: expires_in.from_now.httpdate },
+                                  expires: expires_in.from_now.httpdate
+                                },
                                 context: @account)
     attachment.uploaded_data = file
     attachment.save!

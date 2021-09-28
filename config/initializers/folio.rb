@@ -20,17 +20,17 @@
 require 'folio/core_ext/enumerable'
 
 module Folio::WillPaginate::ActiveRecord::Pagination
-  def paginate(options={})
+  def paginate(options = {})
     if !options.has_key?(:total_entries)
       scope = if ::Rails.version < '4'
-        self.scoped
-      elsif self.is_a?(::ActiveRecord::Relation)
-        self
-      elsif self < ::ActiveRecord::Base
-        self.all
-      else
-        self.scope
-      end
+                self.scoped
+              elsif self.is_a?(::ActiveRecord::Relation)
+                self
+              elsif self < ::ActiveRecord::Base
+                self.all
+              else
+                self.scope
+              end
       group_values = scope.group_values
       unless group_values.empty?
         begin

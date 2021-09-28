@@ -26,7 +26,7 @@ module AcademicBenchmarks
         number&.prefix_enhanced
       end
 
-      def build_outcomes(ratings={}, parent=nil)
+      def build_outcomes(ratings = {}, parent = nil)
         hash = {
           migration_id: guid,
           vendor_guid: guid,
@@ -41,7 +41,7 @@ module AcademicBenchmarks
           # create outcome group
           hash[:type] = 'learning_outcome_group'
           hash[:title] = build_title
-          hash[:outcomes] = children.map {|c| c.build_outcomes(ratings)}
+          hash[:outcomes] = children.map { |c| c.build_outcomes(ratings) }
         else
           # create outcome
           hash[:type] = 'learning_outcome'
@@ -69,10 +69,10 @@ module AcademicBenchmarks
         Standard.crop(description)
       end
 
-      def set_default_ratings(hash, overrides={})
-        hash[:ratings] = [{:description => "Exceeds Expectations", :points => 5},
-                          {:description => "Meets Expectations", :points => 3},
-                          {:description => "Does Not Meet Expectations", :points => 0}]
+      def set_default_ratings(hash, overrides = {})
+        hash[:ratings] = [{ :description => "Exceeds Expectations", :points => 5 },
+                          { :description => "Meets Expectations", :points => 3 },
+                          { :description => "Does Not Meet Expectations", :points => 0 }]
         hash[:mastery_points] = 3
         hash[:points_possible] = 5
         hash.merge!(overrides)

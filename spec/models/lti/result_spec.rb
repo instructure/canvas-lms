@@ -163,7 +163,7 @@ RSpec.describe Lti::Result, type: :model do
     end
 
     describe '#result_maximum' do
-      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum}
+      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum }
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 
@@ -217,7 +217,7 @@ RSpec.describe Lti::Result, type: :model do
             lti_result_model(
               line_item: line_item_model(
                 assignment: assignment_model(points_possible: 0)
-              ).tap{|li| li.update! score_maximum: 0},
+              ).tap { |li| li.update! score_maximum: 0 },
               result_maximum: 0,
               result_score: 0.5
             )
@@ -240,7 +240,7 @@ RSpec.describe Lti::Result, type: :model do
     end
 
     describe '#result_score' do
-      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum}
+      let(:result) { lti_result_model assignment: assignment, result_score: result_score, result_maximum: result_maximum }
       let(:result_score) { 10 }
       let(:result_maximum) { 10 }
 

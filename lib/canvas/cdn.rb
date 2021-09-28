@@ -23,7 +23,6 @@ require_dependency 'config_file'
 module Canvas
   module Cdn
     class << self
-
       def config
         @config ||= begin
           config = ActiveSupport::OrderedOptions.new
@@ -38,8 +37,9 @@ module Canvas
         source.start_with?('/dist/brandable_css') || Canvas::Cdn::RevManifest.include?(source)
       end
 
-      def asset_host_for(source, request=nil)
+      def asset_host_for(source, request = nil)
         return unless config.host # unless you've set a :host in the canvas_cdn.yml file, just serve normally
+
         add_brotli_to_host_if_supported(request) if should_be_in_bucket?(source)
         # Otherwise, return nil & use the same domain the page request came from, like normal.
       end
@@ -56,6 +56,7 @@ module Canvas
 
       def push_to_s3!(*args, &block)
         return unless config.bucket
+
         uploader = Canvas::Cdn::S3Uploader.new(*args)
         uploader.upload!(&block)
       end

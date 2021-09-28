@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
-  def perform(cm=nil)
+  def perform(cm = nil)
     cm ||= ContentMigration.where(id: migration_id).first
     cm.job_progress.start unless cm.skip_job_progress
     begin
@@ -43,6 +43,7 @@ class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
         if settings[:no_archive_file]
           raise ArgumentError, "converter_class required for content migration with no file"
         end
+
         settings[:archive] = Canvas::Migration::Archive.new(settings)
         converter_class = settings[:archive].get_converter
       end
@@ -64,20 +65,20 @@ class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
 
       cm.migration_settings[:worker_class] = converter_class.name
       if !cm.migration_settings[:migration_ids_to_import] || !cm.migration_settings[:migration_ids_to_import][:copy]
-        cm.migration_settings[:migration_ids_to_import] = {:copy=>{:everything => true}}
+        cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }
       end
       cm.workflow_state = :exported
       saved = cm.save
       cm.update_conversion_progress(100)
 
       if cm.import_immediately? && !cm.for_course_copy?
-         cm.import_content
-         cm.update_import_progress(100)
-         saved = cm.save
-         if converter.respond_to?(:post_process)
-           converter.post_process
-         end
-       end
+        cm.import_content
+        cm.update_import_progress(100)
+        saved = cm.save
+        if converter.respond_to?(:post_process)
+          converter.post_process
+        end
+      end
       saved
     rescue Canvas::Migration::Error, Attachment::OverQuotaError => e
       cm.fail_with_error!(e, error_message: e.message, issue_level: :warning)
@@ -92,5 +93,4 @@ class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
                          :max_attempts => 1,
                          :strand => content_migration.strand)
   end
-
 end

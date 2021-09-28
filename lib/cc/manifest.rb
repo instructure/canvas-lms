@@ -23,6 +23,7 @@ module CC
 
     attr_accessor :exporter, :weblinks, :basic_ltis
     attr_reader :options
+
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :user, :create_key, :to => :exporter
 
     def initialize(exporter, opts = {})
@@ -54,10 +55,9 @@ module CC
 
     def create_document
       @file = File.new(File.join(export_dir, MANIFEST), 'w')
-      @document = Builder::XmlMarkup.new(:target=>@file, :indent=>2)
+      @document = Builder::XmlMarkup.new(:target => @file, :indent => 2)
       @document.instruct!
-      @document.manifest({"identifier" => create_key(course, "common_cartridge_")}.merge(namespace_hash)) do |manifest_node|
-
+      @document.manifest({ "identifier" => create_key(course, "common_cartridge_") }.merge(namespace_hash)) do |manifest_node|
         manifest_node.metadata do |md|
           create_metadata(md)
         end
@@ -75,7 +75,7 @@ module CC
         rescue
           add_error(I18n.t('course_exports.errors.resources', "Failed to link some resources."), $!)
         end
-      end #manifest
+      end # manifest
 
       # write any errors to the manifest file
       if @exporter.errors.length > 0
@@ -119,33 +119,32 @@ module CC
 
     def cc_version
       @cc_version ||= case @options[:version]
-                        when "1.3"
-                          "1.3.0"
-                        else
-                          "1.1.0"
+                      when "1.3"
+                        "1.3.0"
+                      else
+                        "1.1.0"
                       end
     end
 
     def namespace_hash
       @namespace_hash ||= if cc_version == "1.3.0"
-        {
-          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1",
-          "xmlns:lom" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource",
-          "xmlns:lomimscc" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest",
-          "xmlns:cpx" => "http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2",
-          "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomresource_v1p0.xsd http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscp_v1p2_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lommanifest_v1p0.xsd http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_cpextensionv1p2_v1p0.xsd"
-        }.freeze
-      else
-        {
-          "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
-          "xmlns:lom"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
-          "xmlns:lomimscc"=>"http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest",
-          "xmlns:xsi"=>"http://www.w3.org/2001/XMLSchema-instance",
-          "xsi:schemaLocation"=>"http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p2_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
-        }.freeze
-      end
+                            {
+                              "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1",
+                              "xmlns:lom" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource",
+                              "xmlns:lomimscc" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest",
+                              "xmlns:cpx" => "http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2",
+                              "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                              "xsi:schemaLocation" => "http://ltsc.ieee.org/xsd/imsccv1p3/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lomresource_v1p0.xsd http://www.imsglobal.org/xsd/imsccv1p3/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_imscp_v1p2_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p3/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p3/LOM/ccv1p3_lommanifest_v1p0.xsd http://www.imsglobal.org/xsd/imsccv1p3/imscp_extensionv1p2 http://www.imsglobal.org/profile/cc/ccv1p3/ccv1p3_cpextensionv1p2_v1p0.xsd"
+                            }.freeze
+                          else
+                            {
+                              "xmlns" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1",
+                              "xmlns:lom" => "http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource",
+                              "xmlns:lomimscc" => "http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest",
+                              "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance",
+                              "xsi:schemaLocation" => "http://www.imsglobal.org/xsd/imsccv1p1/imscp_v1p1 http://www.imsglobal.org/profile/cc/ccv1p1/ccv1p1_imscp_v1p2_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/resource http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lomresource_v1p0.xsd http://ltsc.ieee.org/xsd/imsccv1p1/LOM/manifest http://www.imsglobal.org/profile/cc/ccv1p1/LOM/ccv1p1_lommanifest_v1p0.xsd"
+                            }.freeze
+                          end
     end
-
   end
 end

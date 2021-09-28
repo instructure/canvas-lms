@@ -50,13 +50,13 @@ module DynamicSettings
     describe '#for_prefix(key, default_ttl: nil)' do
       it 'must return a new instance populated with the sub hash found at the specified key' do
         new_proxy = proxy.for_prefix('baz')
-        expect(new_proxy.data).to eq({qux: 42}.with_indifferent_access)
+        expect(new_proxy.data).to eq({ qux: 42 }.with_indifferent_access)
       end
     end
 
     describe '#set_keys' do
       it 'merges in a hash' do
-        kvs = {foo1: 'bar1', foo2: 'bar2'}
+        kvs = { foo1: 'bar1', foo2: 'bar2' }
         proxy.set_keys(kvs)
         expect(proxy.data).to include kvs
       end

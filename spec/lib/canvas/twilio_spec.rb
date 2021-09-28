@@ -31,8 +31,7 @@ describe 'Canvas::Twilio' do
   def stub_twilio(available_phone_numbers, phone_number_countries = {})
     phone_number_objects = available_phone_numbers.map do |number|
       double("Canvas::Twilio.client.incoming_phone_numbers.list/#{number}",
-        phone_number: number
-      )
+             phone_number: number)
     end
 
     lookups = double('Canvas::Twilio.client.lookups')
@@ -50,8 +49,7 @@ describe 'Canvas::Twilio' do
     account = double('Canvas::Twilio.client.account')
     allow(account).to receive(:incoming_phone_numbers).and_return(
       double('Canvas::Twilio.client.api.account.client.incoming_phone_numbers',
-        stream: phone_number_objects
-      )
+             stream: phone_number_objects)
     )
     allow(account).to receive(:messages).and_return(double)
 
@@ -144,17 +142,18 @@ describe 'Canvas::Twilio' do
         .with(
           'notifications.twilio.message_sent_from_number.US.+18015550100',
           short_stat: 'notifications.twilio.message_sent',
-          tags: {country: 'US', number: '+18015550100'}
+          tags: { country: 'US', number: '+18015550100' }
         ).twice
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with(
           'notifications.twilio.message_sent_from_number.CA.+18015550102',
           short_stat: 'notifications.twilio.message_sent',
-          tags: {country: 'CA', number: '+18015550102'})
+          tags: { country: 'CA', number: '+18015550102' }
+        )
       expect(InstStatsd::Statsd).to have_received(:increment)
         .with('notifications.twilio.no_outbound_numbers_for.GB',
-        short_stat: 'notifications.twilio.no_outbound_numbers',
-        tags: {country: 'GB'})
+              short_stat: 'notifications.twilio.no_outbound_numbers',
+              tags: { country: 'GB' })
     end
   end
 end

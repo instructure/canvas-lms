@@ -64,7 +64,6 @@ class CommunicationChannel < ActiveRecord::Base
 
   VALID_TYPES = [TYPE_EMAIL, TYPE_SMS, TYPE_TWITTER, TYPE_PUSH, TYPE_SLACK].freeze
 
-
   RETIRE_THRESHOLD = 1
 
   def under_user_cc_limit
@@ -141,26 +140,26 @@ class CommunicationChannel < ActiveRecord::Base
       ['1',    I18n.t('Trinidad and Tobago (+1)'),     false],
       ['971',  I18n.t('United Arab Emirates (+971)'),  false],
       ['44',   I18n.t('United Kingdom (+44)'),         false],
-      ['1',    I18n.t('United States (+1)'),           true ],
+      ['1',    I18n.t('United States (+1)'),           true],
       ['598',  I18n.t('Uruguay (+598)'),               false],
       ['58',   I18n.t('Venezuela (+58)'),              false],
       ['84',   I18n.t('Vietnam (+84)'),                false]
-    ].sort_by{ |a| Canvas::ICU.collation_key(a[1]) }
+    ].sort_by { |a| Canvas::ICU.collation_key(a[1]) }
   end
 
   DEFAULT_SMS_CARRIERS = {
-      'txt.att.net' => { name: 'AT&T', country_code: 1 }.with_indifferent_access.freeze,
-      'message.alltel.com' => { name: 'Alltel', country_code: 1 }.with_indifferent_access.freeze,
-      'myboostmobile.com' => { name: 'Boost', country_code: 1 }.with_indifferent_access.freeze,
-      'cspire1.com' => { name: 'C Spire', country_code: 1 }.with_indifferent_access.freeze,
-      'cingularme.com' => { name: 'Cingular', country_code: 1 }.with_indifferent_access.freeze,
-      'mobile.celloneusa.com' => { name: 'CellularOne', country_code: 1 }.with_indifferent_access.freeze,
-      'mms.cricketwireless.net' => { name: 'Cricket', country_code: 1 }.with_indifferent_access.freeze,
-      'messaging.nextel.com' => { name: 'Nextel', country_code: 1 }.with_indifferent_access.freeze,
-      'messaging.sprintpcs.com' => { name: 'Sprint PCS', country_code: 1 }.with_indifferent_access.freeze,
-      'tmomail.net' => { name: 'T-Mobile', country_code: 1 }.with_indifferent_access.freeze,
-      'vtext.com' => { name: 'Verizon', country_code: 1 }.with_indifferent_access.freeze,
-      'vmobl.com' => { name: 'Virgin Mobile', country_code: 1 }.with_indifferent_access.freeze,
+    'txt.att.net' => { name: 'AT&T', country_code: 1 }.with_indifferent_access.freeze,
+    'message.alltel.com' => { name: 'Alltel', country_code: 1 }.with_indifferent_access.freeze,
+    'myboostmobile.com' => { name: 'Boost', country_code: 1 }.with_indifferent_access.freeze,
+    'cspire1.com' => { name: 'C Spire', country_code: 1 }.with_indifferent_access.freeze,
+    'cingularme.com' => { name: 'Cingular', country_code: 1 }.with_indifferent_access.freeze,
+    'mobile.celloneusa.com' => { name: 'CellularOne', country_code: 1 }.with_indifferent_access.freeze,
+    'mms.cricketwireless.net' => { name: 'Cricket', country_code: 1 }.with_indifferent_access.freeze,
+    'messaging.nextel.com' => { name: 'Nextel', country_code: 1 }.with_indifferent_access.freeze,
+    'messaging.sprintpcs.com' => { name: 'Sprint PCS', country_code: 1 }.with_indifferent_access.freeze,
+    'tmomail.net' => { name: 'T-Mobile', country_code: 1 }.with_indifferent_access.freeze,
+    'vtext.com' => { name: 'Verizon', country_code: 1 }.with_indifferent_access.freeze,
+    'vmobl.com' => { name: 'Virgin Mobile', country_code: 1 }.with_indifferent_access.freeze,
   }.freeze
 
   def self.sms_carriers
@@ -198,48 +197,53 @@ class CommunicationChannel < ActiveRecord::Base
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
-      (record.workflow_state == 'active' ||
-        (record.workflow_state == 'unconfirmed' and (self.user.pre_registered? || self.user.creation_pending?))) and
-      self.path_type == TYPE_EMAIL
+        (record.workflow_state == 'active' ||
+          (record.workflow_state == 'unconfirmed' and (self.user.pre_registered? || self.user.creation_pending?))) and
+        self.path_type == TYPE_EMAIL
     }
 
     p.dispatch :confirm_email_communication_channel
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
-      record.workflow_state == 'unconfirmed' and self.user.registered? and
-      self.path_type == TYPE_EMAIL
+        record.workflow_state == 'unconfirmed' and self.user.registered? and
+        self.path_type == TYPE_EMAIL
     }
-    p.data { {
-      root_account_id: @root_account.global_id,
-      from_host: HostUrl.context_host(@root_account)
-    } }
+    p.data {
+      {
+        root_account_id: @root_account.global_id,
+        from_host: HostUrl.context_host(@root_account)
+      }
+    }
 
     p.dispatch :merge_email_communication_channel
     p.to { self }
-    p.whenever {|record|
+    p.whenever { |record|
       @send_merge_notification and
-      self.path_type == TYPE_EMAIL
+        self.path_type == TYPE_EMAIL
     }
 
     p.dispatch :confirm_sms_communication_channel
     p.to { self }
     p.whenever { |record|
       @send_confirmation and
-      record.workflow_state == 'unconfirmed' and
-      (self.path_type == TYPE_SMS or self.path_type == TYPE_SLACK) and
-      !self.user.creation_pending?
+        record.workflow_state == 'unconfirmed' and
+        (self.path_type == TYPE_SMS or self.path_type == TYPE_SLACK) and
+        !self.user.creation_pending?
     }
-    p.data { {
-      root_account_id: @root_account.global_id,
-      from_host: HostUrl.context_host(@root_account)
-    } }
+    p.data {
+      {
+        root_account_id: @root_account.global_id,
+        from_host: HostUrl.context_host(@root_account)
+      }
+    }
   end
 
   def uniqueness_of_path
     return if path.nil?
     return if retired?
     return unless user_id
+
     self.shard.activate do
       # ^ if we create a new CC record while on another shard
       # and try to check the validity OUTSIDE the save path
@@ -271,6 +275,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Returns a string.
   def confirmation_url
     return "" unless path_type == TYPE_EMAIL
+
     "#{HostUrl.protocol}://#{HostUrl.context_host(context)}/register/#{confirmation_code}"
   end
 
@@ -302,6 +307,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def forgot_password!
     return if Rails.cache.read(['recent_password_reset', self.global_id].cache_key) == true
+
     @request_password = true
     Rails.cache.write(['recent_password_reset', self.global_id].cache_key, true, expires_in: Setting.get('resend_password_reset_time', 5).to_f.minutes)
     set_confirmation_code(true, Setting.get('password_reset_token_expiration_minutes', '120').to_i.minutes.from_now)
@@ -317,6 +323,7 @@ class CommunicationChannel < ActiveRecord::Base
     if self.confirmation_limit_reached || bouncing?
       return
     end
+
     self.confirmation_sent_count = self.confirmation_sent_count + 1
     @send_confirmation = true
     @root_account = root_account
@@ -363,7 +370,7 @@ class CommunicationChannel < ActiveRecord::Base
   # works.  If you are resetting the confirmation_code, call @cc.
   # set_confirmation_code(true), or just save the record to leave the old
   # confirmation code in place.
-  def set_confirmation_code(reset=false, expires_at=nil)
+  def set_confirmation_code(reset = false, expires_at = nil)
     self.confirmation_code = nil if reset
     if self.path_type == TYPE_EMAIL or self.path_type.nil?
       self.confirmation_code ||= CanvasSlug.generate(nil, 25)
@@ -400,9 +407,9 @@ class CommunicationChannel < ActiveRecord::Base
     rank_order = [TYPE_EMAIL, TYPE_SMS, TYPE_PUSH]
     # Add twitter and yo (in that order) if the user's account is setup for them.
     rank_order << TYPE_TWITTER if twitter_service
-    rank_order << TYPE_SLACK if user.associated_root_accounts.any?{|a| a.settings[:encrypted_slack_key]}
-    self.unretired.where('communication_channels.path_type IN (?)', rank_order).
-      order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
+    rank_order << TYPE_SLACK if user.associated_root_accounts.any? { |a| a.settings[:encrypted_slack_key] }
+    self.unretired.where('communication_channels.path_type IN (?)', rank_order)
+        .order(Arel.sql("#{self.rank_sql(rank_order, 'communication_channels.path_type')} ASC, communication_channels.position asc")).to_a
   end
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
@@ -478,6 +485,7 @@ class CommunicationChannel < ActiveRecord::Base
 
   def merge_candidates(break_on_first_found = false)
     return [] if path_type == 'push'
+
     shards = self.class.associated_shards(self.path) if Enrollment.cross_shard_invitations?
     shards ||= [self.shard]
     scope = CommunicationChannel.active.by_path(self.path).of_type(self.path_type)
@@ -494,6 +502,7 @@ class CommunicationChannel < ActiveRecord::Base
           merge_candidates[u.global_id] = (u.all_active_pseudonyms.length != 0)
         end
         return [u] if result && break_on_first_found
+
         result
       end
     end.uniq
@@ -584,7 +593,6 @@ class CommunicationChannel < ActiveRecord::Base
 
   def self.find_by_confirmation_code(code)
     where(confirmation_code: code).first
-
   end
 
   def self.user_can_have_more_channels?(user, domain_root_account)
@@ -608,11 +616,11 @@ class CommunicationChannel < ActiveRecord::Base
   class << self
     def trusted_confirmation_redirect?(root_account, redirect_url)
       uri = begin
-              URI.parse(redirect_url)
-            rescue URI::InvalidURIError
-              nil
-            end
-      return false unless uri && ['http','https'].include?(uri.scheme)
+        URI.parse(redirect_url)
+      rescue URI::InvalidURIError
+        nil
+      end
+      return false unless uri && ['http', 'https'].include?(uri.scheme)
 
       @redirect_trust_policies&.any? do |policy|
         policy.call(root_account, uri)

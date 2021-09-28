@@ -21,7 +21,6 @@ module Canvas::Oauth
   class Provider
     OAUTH2_OOB_URI = 'urn:ietf:wg:oauth:2.0:oob'
 
-
     attr_reader :client_id, :redirect_uri, :scopes, :purpose
 
     def initialize(client_id, redirect_uri = "", scopes = [], purpose = nil)
@@ -37,6 +36,7 @@ module Canvas::Oauth
 
     def client_id_is_valid?
       return false unless @client_id.present?
+
       begin
         !!Integer(@client_id)
       rescue ArgumentError
@@ -58,6 +58,7 @@ module Canvas::Oauth
 
     def key
       return nil unless client_id_is_valid?
+
       @key ||= DeveloperKey.find_cached(@client_id)
     rescue ActiveRecord::RecordNotFound
       nil
@@ -84,6 +85,7 @@ module Canvas::Oauth
     def token_for_refresh_token(refresh_token)
       access_token = AccessToken.authenticate_refresh_token(refresh_token)
       return nil unless access_token
+
       Token.new(key, nil, access_token)
     end
 
@@ -111,7 +113,7 @@ module Canvas::Oauth
       uri == OAUTH2_OOB_URI
     end
 
-    def self.confirmation_redirect(controller, provider, current_user, real_user=nil)
+    def self.confirmation_redirect(controller, provider, current_user, real_user = nil)
       # skip the confirmation page if access is already (or automatically) granted
       if provider.authorized_token?(current_user, real_user: real_user)
         final_redirect(controller, final_redirect_params(controller.session[:oauth2], current_user, real_user))
@@ -120,8 +122,8 @@ module Canvas::Oauth
       end
     end
 
-    def self.final_redirect_params(oauth_session, current_user, real_user=nil, options = {})
-      options = {:scopes => oauth_session&.dig(:scopes), :remember_access => options&.dig(:remember_access), :purpose => oauth_session&.dig(:purpose)}
+    def self.final_redirect_params(oauth_session, current_user, real_user = nil, options = {})
+      options = { :scopes => oauth_session&.dig(:scopes), :remember_access => options&.dig(:remember_access), :purpose => oauth_session&.dig(:purpose) }
       code = Canvas::Oauth::Token.generate_code_for(current_user.global_id, real_user&.global_id, oauth_session[:client_id], options)
       redirect_params = { :code => code }
       redirect_params[:state] = oauth_session[:state] if oauth_session[:state]

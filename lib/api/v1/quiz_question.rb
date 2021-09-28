@@ -58,13 +58,13 @@ module Api::V1::QuizQuestion
   #   the questions will be modified to use the fields found in that
   #   data. This is needed if you're rendering questions for a submission
   #   as each submission might have differen data.
-  def questions_json(questions, user, session, context=nil, includes=[], censored=false, quiz_data=nil, opts={})
+  def questions_json(questions, user, session, context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
     questions.map do |question|
       question_json(question, user, session, context, includes, censored, quiz_data, opts)
     end
   end
 
-  def question_json(question, user, session, _context=nil, includes=[], censored=false, quiz_data=nil, opts={})
+  def question_json(question, user, session, _context = nil, includes = [], censored = false, quiz_data = nil, opts = {})
     hsh = api_json(question, user, session, API_ALLOWED_QUESTION_OUTPUT_FIELDS).tap do |json|
       API_ALLOWED_QUESTION_DATA_OUTPUT_FIELDS.each do |field|
         question_data = quiz_data&.find { |data_question| data_question[:id] == question[:id] } || question.question_data
@@ -105,6 +105,7 @@ module Api::V1::QuizQuestion
 
     question_hash["answers"].each do |a|
       next unless a["html"].present?
+
       a["html"] = api_user_content(a["html"], context, user)
     end
 
@@ -126,7 +127,7 @@ module Api::V1::QuizQuestion
       assessment_question question_name question_type question_text answers matches
       formulas variables answer_tolerance formula_decimal_places
     )
-    question_data.keep_if {|k, _v| attr_whitelist.include?(k.to_s) }
+    question_data.keep_if { |k, _v| attr_whitelist.include?(k.to_s) }
 
     # only include answers for types that need it to show choices
     allow_answer_whitelist = %w(
@@ -147,11 +148,10 @@ module Api::V1::QuizQuestion
     # formula questions need variables
     if question_data[:answers]
       question_data[:answers].each do |record|
-        record.keep_if {|k, _| %w(id text html blank_id variables).include?(k.to_s) }
+        record.keep_if { |k, _| %w(id text html blank_id variables).include?(k.to_s) }
       end
     end
 
     question_data
   end
-
 end

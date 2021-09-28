@@ -67,25 +67,26 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   # 27%, middle 46%, top 27%); ties put both users in a higher bucket
   def buckets
     @buckets ||= begin
-                   bucket_defs = @options[:buckets]
-                   ranked_respondent_ids = @respondent_scores.sort_by(&:last)
-                   previous_floor = ranked_respondent_ids.length
-                   buckets = {}
-                   bucket_defs.each do |(name, cutoff)|
-                     floor = (cutoff * ranked_respondent_ids.length).round
-                     floor_score = ranked_respondent_ids[floor].try(:last)
-                     # include all tied users in this bucket
-                     floor -= 1 while floor > 0 && ranked_respondent_ids[floor - 1].last == floor_score
+      bucket_defs = @options[:buckets]
+      ranked_respondent_ids = @respondent_scores.sort_by(&:last)
+      previous_floor = ranked_respondent_ids.length
+      buckets = {}
+      bucket_defs.each do |(name, cutoff)|
+        floor = (cutoff * ranked_respondent_ids.length).round
+        floor_score = ranked_respondent_ids[floor].try(:last)
+        # include all tied users in this bucket
+        floor -= 1 while floor > 0 && ranked_respondent_ids[floor - 1].last == floor_score
 
-                     buckets[name] = ranked_respondent_ids[floor...previous_floor].map(&:first)
-                     previous_floor = floor
-                   end
-                   buckets
-                 end
+        buckets[name] = ranked_respondent_ids[floor...previous_floor].map(&:first)
+        previous_floor = floor
+      end
+      buckets
+    end
   end
 
   def mean_score_for(respondent_ids)
     return nil if respondent_ids.empty?
+
     @respondent_scores.slice(*respondent_ids).values.sum * 1.0 / respondent_ids.size
   end
 
@@ -97,9 +98,9 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
   def variance(respondent_ids = :all)
     @variance ||= {}
     @variance[respondent_ids] ||= begin
-                                    scores = (respondent_ids == :all ? @respondent_scores : @respondent_scores.slice(*respondent_ids)).values
-                                    SimpleStats.variance(scores)
-                                  end
+      scores = (respondent_ids == :all ? @respondent_scores : @respondent_scores.slice(*respondent_ids)).values
+      SimpleStats.variance(scores)
+    end
   end
 
   # population sd, not sample sd, since we have all datapoints
@@ -110,15 +111,15 @@ class Quizzes::QuizStatistics::ItemAnalysis::Summary
 
   def alpha
     @alpha ||= begin
-                 items = @items.values
-                 size = items.size
+      items = @items.values
+      size = items.size
 
-                 if size > 1 && variance != 0
-                   variance_sum = items.map(&:variance).sum
-                   size / (size - 1.0) * (1 - variance_sum / variance)
-                 else
-                   nil
-                 end
-               end
+      if size > 1 && variance != 0
+        variance_sum = items.map(&:variance).sum
+        size / (size - 1.0) * (1 - variance_sum / variance)
+      else
+        nil
+      end
+    end
   end
 end

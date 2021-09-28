@@ -22,10 +22,10 @@ class Quizzes::TakeQuizPresenter
   include ApplicationHelper
 
   attr_accessor :quiz,
-    :submission,
-    :params,
-    :submission_data,
-    :answers
+                :submission,
+                :params,
+                :submission_data,
+                :answers
 
   delegate :one_question_at_a_time?, :cant_go_back?, :require_lockdown_browser?, to: :quiz
 
@@ -156,7 +156,7 @@ class Quizzes::TakeQuizPresenter
     course_quiz_question_path(ps)
   end
 
-  def form_action(session,user)
+  def form_action(session, user)
     if one_question_at_a_time? && next_question
       next_question_form_action(session, user)
     else
@@ -171,16 +171,16 @@ class Quizzes::TakeQuizPresenter
   def next_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-        :next_question_path => next_question_path
-      })
+                                                                                :next_question_path => next_question_path
+                                                                              })
     )
   end
 
   def previous_question_form_action(session, user)
     record_answer_course_quiz_quiz_submission_path(
       quiz.context, quiz, submission, form_action_params(session, user).merge({
-        :next_question_path => previous_question_path
-      })
+                                                                                :next_question_path => previous_question_path
+                                                                              })
     )
   end
 
@@ -230,8 +230,8 @@ class Quizzes::TakeQuizPresenter
     _answers.reject! do |_, status_entries|
       # an answer must not be falsy/empty
       status_entries.any? { |status| !dataset[status].present? } ||
-      # all zeroes for an answer is a no-answer
-      status_entries.all? { |status| dataset[status] == '0' }
+        # all zeroes for an answer is a no-answer
+        status_entries.all? { |status| dataset[status] == '0' }
     end
 
     _answers

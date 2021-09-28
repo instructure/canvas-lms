@@ -21,7 +21,7 @@
 require_relative '../spec_helper'
 
 describe SessionToken do
-  it "should be valid after serialization and parsing" do
+  it "is valid after serialization and parsing" do
     token = SessionToken.new(1)
     token_string = token.to_s
     new_token = SessionToken.parse(token_string)
@@ -34,38 +34,38 @@ describe SessionToken do
     expect(new_token).to be_valid
   end
 
-  it "should preserve pseudonym_id" do
+  it "preserves pseudonym_id" do
     token = SessionToken.new(1)
     expect(SessionToken.parse(token.to_s).pseudonym_id).to eq token.pseudonym_id
   end
 
-  it "should preserve nil current_user_id" do
+  it "preserves nil current_user_id" do
     token = SessionToken.new(1)
     expect(SessionToken.parse(token.to_s).current_user_id).to be_nil
   end
 
-  it "should preserve non-nil current_user_id" do
+  it "preserves non-nil current_user_id" do
     token = SessionToken.new(1, current_user_id: 2)
     expect(SessionToken.parse(token.to_s).current_user_id).to eq token.current_user_id
   end
 
-  it "should preserve nil used_remember_me_token" do
+  it "preserves nil used_remember_me_token" do
     token = SessionToken.new(1)
     expect(SessionToken.parse(token.to_s).used_remember_me_token).to be_nil
   end
 
-  it "should preserve non-nil used_remember_me_token" do
+  it "preserves non-nil used_remember_me_token" do
     token = SessionToken.new(1, used_remember_me_token: true)
     expect(SessionToken.parse(token.to_s).used_remember_me_token).to eq token.used_remember_me_token
   end
 
-  it "should not be valid after tampering" do
+  it "is not valid after tampering" do
     token = SessionToken.new(1)
     token.pseudonym_id = 2
     expect(SessionToken.parse(token.to_s)).not_to be_valid
   end
 
-  it "should not be valid with out of bounds created_at" do
+  it "is not valid with out of bounds created_at" do
     token = SessionToken.new(1)
 
     token.created_at -= (SessionToken::VALIDITY_PERIOD + 5).seconds
@@ -81,7 +81,7 @@ describe SessionToken do
     expect(SessionToken.parse(token.to_s)).to be_valid
   end
 
-  it "should not parse with invalid syntax or contents" do
+  it "does not parse with invalid syntax or contents" do
     # bad base64
     expect(SessionToken.parse("{}")).to be_nil
 

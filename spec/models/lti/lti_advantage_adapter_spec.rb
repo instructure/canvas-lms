@@ -216,7 +216,7 @@ describe Lti::LtiAdvantageAdapter do
 
     context 'when a "launch_url" is set in the options hash' do
       let(:launch_url) { 'https://www.cool-took.com/launch?with_query_params=true' }
-      let(:opts) { {launch_url: launch_url} }
+      let(:opts) { { launch_url: launch_url } }
 
       it('uses the launch_url as the target_link_uri') do
         expect(login_message['target_link_uri']).to eq launch_url

@@ -22,7 +22,7 @@ module Lti
     class PagePresenter
       include Rails.application.routes.url_helpers
 
-      def initialize(context, user, base_url, opts={})
+      def initialize(context, user, base_url, opts = {})
         @membership_collator = MembershipCollatorFactory.collator_instance(context, user, opts)
         @base_url = base_url
         @page = IMS::LTI::Models::MembershipService::Page.new(
@@ -31,7 +31,7 @@ module Lti
         )
       end
 
-      def as_json(opts={})
+      def as_json(opts = {})
         @page.as_json(opts)
       end
 

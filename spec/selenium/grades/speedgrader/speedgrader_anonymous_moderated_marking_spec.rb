@@ -55,9 +55,9 @@ describe "SpeedGrader" do
       # Student1 & Student2 submit homework and a comment
       file_attachment = attachment_model(content_type: 'application/pdf', context: @student1)
       @submission1 = @assignment.submit_homework(@student1,
-                                  submission_type: 'online_upload',
-                                  attachments: [file_attachment],
-                                  comment: "This is Student One's comment")
+                                                 submission_type: 'online_upload',
+                                                 attachments: [file_attachment],
+                                                 comment: "This is Student One's comment")
 
       file_attachment = attachment_model(content_type: 'application/pdf', context: @student2)
       @submission1 = @assignment.submit_homework(@student2,
@@ -220,7 +220,6 @@ describe "SpeedGrader" do
 
     it "graders cannot view other grader's comments when `grader_comments_visible_to_graders = false`",
        priority: 1, test_id: 3512445 do
-
       @moderated_assignment.update!(grader_comments_visible_to_graders: false)
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_assignment.id)
@@ -235,7 +234,6 @@ describe "SpeedGrader" do
     end
 
     it "graders can view other grader's comments when `grader_comments_visible_to_graders = true`" do # test_id: 3512445
-
       @moderated_assignment.update!(grader_comments_visible_to_graders: true)
       user_session(@teacher3)
       Speedgrader.visit(@course.id, @moderated_assignment.id)

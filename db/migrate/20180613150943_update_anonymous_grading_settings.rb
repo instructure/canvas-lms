@@ -25,19 +25,19 @@ class UpdateAnonymousGradingSettings < ActiveRecord::Migration[5.1]
     # explicitly enabled
     Course.find_ids_in_ranges(batch_size: 10_000) do |start_at, end_at|
       DataFixup::UpdateAnonymousGradingSettings.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id]).
-        run_for_courses_in_range(start_at, end_at)
+                                                                    n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id])
+                                               .run_for_courses_in_range(start_at, end_at)
     end
 
     Account.find_ids_in_ranges(batch_size: 10_000) do |start_at, end_at|
       DataFixup::UpdateAnonymousGradingSettings.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id]).
-        run_for_accounts_in_range(start_at, end_at)
+                                                                    n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id])
+                                               .run_for_accounts_in_range(start_at, end_at)
     end
 
     # Get rid of the old flag on accounts where it was merely allowed
     DataFixup::UpdateAnonymousGradingSettings.delay_if_production(priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id]).
-        destroy_allowed_and_off_flags
+                                                                  n_strand: ["DataFixup::UpdateAnonymousGradingSettings", Shard.current.database_server.id])
+                                             .destroy_allowed_and_off_flags
   end
 end

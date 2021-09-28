@@ -33,35 +33,35 @@ describe UsageRightsController, type: :request do
     end
 
     describe "licenses" do
-      it "should require :read on the context" do
+      it "requires :read on the context" do
         api_call_as_user(user_model, :get, "/api/v1/courses/#{@course.id}/content_licenses",
-                 { controller: 'usage_rights', action: 'licenses', course_id: @course.to_param, format: 'json'},
-                 {}, {}, {expected_status: 401})
+                         { controller: 'usage_rights', action: 'licenses', course_id: @course.to_param, format: 'json' },
+                         {}, {}, { expected_status: 401 })
       end
 
-      it "should list licenses" do
+      it "lists licenses" do
         json = api_call(:get, "/api/v1/courses/#{@course.id}/content_licenses",
-                 { controller: 'usage_rights', action: 'licenses', course_id: @course.to_param, format: 'json'})
+                        { controller: 'usage_rights', action: 'licenses', course_id: @course.to_param, format: 'json' })
         expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
       end
     end
 
     describe "set_usage_rights" do
-      it "should require manage_files_add or manage_files_edit on the context" do
+      it "requires manage_files_add or manage_files_edit on the context" do
         student_in_course active_all: true
         api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/usage_rights",
-                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json'},
-                         {}, {}, {expected_status: 401})
+                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
+                         {}, {}, { expected_status: 401 })
       end
 
-      it "should publish on save when usage_rights & publish have been set" do
+      it "publishes on save when usage_rights & publish have been set" do
         @fileR.locked = true
         @fileR.save
         expect(@fileR.reload.locked).to be_truthy
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { file_ids: [@fileR.id], publish: true, usage_rights: {use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp'} })
+                        { file_ids: [@fileR.id], publish: true, usage_rights: { use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp' } })
 
         expect(json['message']).to eq('1 file updated')
         expect(json['file_ids']).to match_array([@fileR.id])
@@ -72,44 +72,44 @@ describe UsageRightsController, type: :request do
         expect(@fileR.locked).to be_falsey
       end
 
-      it "should not publish when usage_rights have not been set" do
+      it "does not publish when usage_rights have not been set" do
         @fileR.locked = true
         @fileR.save
         expect(@fileR.reload.locked).to be_truthy
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { file_ids: [@fileR.id], publish: true }, {}, {expected_status: 400})
+                        { file_ids: [@fileR.id], publish: true }, {}, { expected_status: 400 })
 
-        expect(json).to eql({'message' => "No 'usage_rights' object supplied"})
+        expect(json).to eql({ 'message' => "No 'usage_rights' object supplied" })
         expect(@fileR.reload.locked).to be_truthy
       end
 
-      it "should require usage_rights hash" do
-        json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
-                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                         { file_ids: [@fileR.id] }, {}, {expected_status: 400})
-        expect(json).to eql({'message' => "No 'usage_rights' object supplied"})
-      end
-
-      it "should require file_ids or folder_ids parameters" do
+      it "requires usage_rights hash" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { usage_rights: {use_justification: 'public_domain'} }, {}, {expected_status: 400})
-        expect(json).to eql({'message' => "Must supply 'file_ids' and/or 'folder_ids' parameter"})
+                        { file_ids: [@fileR.id] }, {}, { expected_status: 400 })
+        expect(json).to eql({ 'message' => "No 'usage_rights' object supplied" })
       end
 
-      it "should require valid usage_rights parameters" do
+      it "requires file_ids or folder_ids parameters" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { file_ids: [@fileR.id], usage_rights: {use_justification: 'just_because'} }, {}, {expected_status: 400})
+                        { usage_rights: { use_justification: 'public_domain' } }, {}, { expected_status: 400 })
+        expect(json).to eql({ 'message' => "Must supply 'file_ids' and/or 'folder_ids' parameter" })
+      end
+
+      it "requires valid usage_rights parameters" do
+        json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
+                        { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
+                        { file_ids: [@fileR.id], usage_rights: { use_justification: 'just_because' } }, {}, { expected_status: 400 })
         expect(json['errors']['use_justification']).not_to be_nil
       end
 
-      it "should infer a default license from the use_justification" do
+      it "infers a default license from the use_justification" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { file_ids: [@fileR.id], usage_rights: {use_justification: 'public_domain'} })
+                        { file_ids: [@fileR.id], usage_rights: { use_justification: 'public_domain' } })
 
         expect(json['message']).to eq('1 file updated')
         expect(json['file_ids']).to match_array([@fileR.id])
@@ -124,14 +124,14 @@ describe UsageRightsController, type: :request do
         expect(@fileR.usage_rights.use_justification).to eq('public_domain')
       end
 
-      it "should reuse usage_rights objects" do
+      it "reuses usage_rights objects" do
         usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
         @fileR.usage_rights = usage_rights
         @fileR.save
 
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
-                 { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                 { file_ids: [@fileR.id, @fileA1.id], usage_rights: {use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'} })
+                        { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
+                        { file_ids: [@fileR.id, @fileA1.id], usage_rights: { use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd' } })
         expect(json['message']).to eq('2 files updated')
         expect(json['file_ids']).to match_array([@fileR.id, @fileA1.id])
 
@@ -139,10 +139,10 @@ describe UsageRightsController, type: :request do
         expect(@fileA1.reload.usage_rights_id).to eq(usage_rights.id)
       end
 
-      it "should process folder contents recursively" do
+      it "processes folder contents recursively" do
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { folder_ids: [@folderA.id], usage_rights: {use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'} })
+                        { folder_ids: [@folderA.id], usage_rights: { use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd' } })
         expect(json['message']).to eq('3 files updated')
         expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
 
@@ -157,13 +157,13 @@ describe UsageRightsController, type: :request do
         expect(@fileB.reload.usage_rights_id).to eq(usage_rights.id)
       end
 
-      it "should skip deleted files and folders" do
+      it "skips deleted files and folders" do
         @fileR.destroy
         @fileA1.destroy
         @folderB.destroy
         json = api_call(:put, "/api/v1/courses/#{@course.id}/usage_rights",
                         { controller: 'usage_rights', action: 'set_usage_rights', course_id: @course.to_param, format: 'json' },
-                        { file_ids: [@fileR.id], folder_ids: [@folderA.id], usage_rights: {use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp'} })
+                        { file_ids: [@fileR.id], folder_ids: [@folderA.id], usage_rights: { use_justification: 'used_by_permission', legal_copyright: '(C) 2014 XYZ Corp' } })
         expect(json['message']).to eq('1 file updated')
         expect(json['file_ids']).to match_array([@fileA2.id])
         expect(@fileR.reload.usage_rights).to be_nil
@@ -174,19 +174,19 @@ describe UsageRightsController, type: :request do
     end
 
     describe "remove_usage_rights" do
-      it "should require manage_files_delete on the context" do
+      it "requires manage_files_delete on the context" do
         student_in_course active_all: true
         api_call_as_user(@student, :delete, "/api/v1/courses/#{@course.id}/usage_rights",
-                         { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
-                         {}, {}, {expected_status: 401})
+                         { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json' },
+                         {}, {}, { expected_status: 401 })
       end
 
-      it "should remove usage rights" do
+      it "removes usage rights" do
         usage_rights = @course.usage_rights.create! use_justification: 'creative_commons', legal_copyright: '(C) 2014 XYZ Corp', license: 'cc_by_nd'
         @course.attachments.update_all(usage_rights_id: usage_rights.id)
         json = api_call(:delete, "/api/v1/courses/#{@course.id}/usage_rights",
-                        {controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json'},
-                        {folder_ids: [@folderA.id] })
+                        { controller: 'usage_rights', action: 'remove_usage_rights', course_id: @course.to_param, format: 'json' },
+                        { folder_ids: [@folderA.id] })
         expect(json['message']).to eq("3 files updated")
         expect(json['file_ids']).to match_array([@fileA1.id, @fileA2.id, @fileB.id])
         expect(@fileR.reload.usage_rights_id).to eq(usage_rights.id)
@@ -201,16 +201,16 @@ describe UsageRightsController, type: :request do
       attachment_model(context: @user)
     end
 
-    it "should list licenses" do
+    it "lists licenses" do
       json = api_call(:get, "/api/v1/users/#{@user.id}/content_licenses",
-                      { controller: 'usage_rights', action: 'licenses', user_id: @user.to_param, format: 'json'})
+                      { controller: 'usage_rights', action: 'licenses', user_id: @user.to_param, format: 'json' })
       expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
     end
 
-    it "should set usage rights" do
+    it "sets usage rights" do
       json = api_call(:put, "/api/v1/users/#{@user.id}/usage_rights",
                       { controller: 'usage_rights', action: 'set_usage_rights', user_id: @user.to_param, format: 'json' },
-                      { file_ids: [@attachment.id], usage_rights: {use_justification: 'own_copyright', legal_copyright: '(C) 2014 XYZ Corp'} })
+                      { file_ids: [@attachment.id], usage_rights: { use_justification: 'own_copyright', legal_copyright: '(C) 2014 XYZ Corp' } })
       expect(@attachment.reload.usage_rights.use_justification).to eq('own_copyright')
     end
   end
@@ -222,16 +222,16 @@ describe UsageRightsController, type: :request do
       account_admin_user(account: @group.account)
     end
 
-    it "should list licenses" do
+    it "lists licenses" do
       json = api_call(:get, "/api/v1/groups/#{@group.id}/content_licenses",
-                      { controller: 'usage_rights', action: 'licenses', group_id: @group.to_param, format: 'json'})
+                      { controller: 'usage_rights', action: 'licenses', group_id: @group.to_param, format: 'json' })
       expect(json).to match_array(UsageRights.licenses.map { |license, data| { 'id' => license, 'name' => data[:readable_license].call, 'url' => data[:license_url] } })
     end
 
-    it "should set usage rights" do
+    it "sets usage rights" do
       json = api_call(:put, "/api/v1/groups/#{@group.id}/usage_rights",
                       { controller: 'usage_rights', action: 'set_usage_rights', group_id: @group.to_param, format: 'json' },
-                      { file_ids: [@attachment.id], usage_rights: {use_justification: 'fair_use', legal_copyright: '(C) 2014 XYZ Corp'} })
+                      { file_ids: [@attachment.id], usage_rights: { use_justification: 'fair_use', legal_copyright: '(C) 2014 XYZ Corp' } })
       expect(@attachment.reload.usage_rights.use_justification).to eq('fair_use')
     end
   end

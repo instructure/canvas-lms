@@ -146,10 +146,10 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   include ::Filters::QuizSubmissions
 
   before_action :require_user, :require_context, :require_quiz
-  before_action :require_overridden_quiz, :except => [ :index ]
-  before_action :require_quiz_submission, :except => [ :index, :submission, :create ]
-  before_action :prepare_service, :only => [ :create, :update, :complete ]
-  before_action :validate_ldb_status!, :only => [ :create, :complete ]
+  before_action :require_overridden_quiz, :except => [:index]
+  before_action :require_quiz_submission, :except => [:index, :submission, :create]
+  before_action :prepare_service, :only => [:create, :update, :complete]
+  before_action :validate_ldb_status!, :only => [:create, :complete]
 
   # @API Get all quiz submissions.
   #
@@ -171,24 +171,24 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def index
     quiz_submissions = if @context.grants_any_right?(@current_user, session, :manage_grades, :view_all_grades)
-      # teachers have access to all student submissions
-      visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
-      Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
-        self,
-        api_v1_course_quiz_submissions_url(@context, @quiz)
-    elsif @quiz.grants_right?(@current_user, session, :submit)
-      # students have access only to their own submissions, both in progress, or completed`
-      submission = @quiz.quiz_submissions.where(:user_id => @current_user).first
-      if submission
-        if submission.workflow_state == "untaken"
-          [submission]
-        else
-          submission.submitted_attempts
-        end
-      else
-        []
-      end
-    end
+                         # teachers have access to all student submissions
+                         visible_student_ids = @context.apply_enrollment_visibility(@context.student_enrollments, @current_user).pluck(:user_id)
+                         Api.paginate @quiz.quiz_submissions.where(:user_id => visible_student_ids),
+                                      self,
+                                      api_v1_course_quiz_submissions_url(@context, @quiz)
+                       elsif @quiz.grants_right?(@current_user, session, :submit)
+                         # students have access only to their own submissions, both in progress, or completed`
+                         submission = @quiz.quiz_submissions.where(:user_id => @current_user).first
+                         if submission
+                           if submission.workflow_state == "untaken"
+                             [submission]
+                           else
+                             submission.submitted_attempts
+                           end
+                         else
+                           []
+                         end
+                       end
 
     if quiz_submissions
       # trigger delayed grading job for all submission id's which needs grading
@@ -271,14 +271,14 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   #  }
   def create
     quiz_submission = if previewing?
-      @service.create_preview(@quiz, session)
-    else
-      if module_locked?
-        raise RequestError.new("you are not allowed to participate in this quiz", 400)
-      end
+                        @service.create_preview(@quiz, session)
+                      else
+                        if module_locked?
+                          raise RequestError.new("you are not allowed to participate in this quiz", 400)
+                        end
 
-      @service.create(@quiz)
-    end
+                        @service.create(@quiz)
+                      end
 
     log_asset_access(@quiz, 'quizzes', 'quizzes', 'participate')
 
@@ -348,8 +348,8 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
 
     if resource_params = resource_params[0]
       @service.update_scores(@quiz_submission,
-        resource_params[:attempt],
-        resource_params)
+                             resource_params[:attempt],
+                             resource_params)
     end
 
     serialize_and_render @quiz_submission
@@ -420,7 +420,6 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
     end
   end
 
-
   private
 
   def module_locked?
@@ -432,7 +431,7 @@ class Quizzes::QuizSubmissionsApiController < ApplicationController
   end
 
   def serialize_and_render(quiz_submissions)
-    quiz_submissions = [ quiz_submissions ] unless quiz_submissions.is_a? Array
+    quiz_submissions = [quiz_submissions] unless quiz_submissions.is_a? Array
 
     render :json => quiz_submissions_json(
       quiz_submissions,

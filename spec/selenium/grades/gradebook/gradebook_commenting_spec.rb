@@ -34,7 +34,7 @@ describe "Gradebook" do
   end
   before(:each) { user_session(@teacher) }
 
-  it "should validate posting a comment to a graded assignment", priority: "1", test_id: 210046 do
+  it "validates posting a comment to a graded assignment", priority: "1", test_id: 210046 do
     Gradebook.visit(@course)
 
     Gradebook::Cells.open_tray(@student_1, assignment)
@@ -47,7 +47,7 @@ describe "Gradebook" do
     expect(Gradebook::GradeDetailTray.comment(@comment_text)).to be_displayed
   end
 
-  it "should let you post a group comment to a group assignment", priority: "1", test_id: 210047 do
+  it "lets you post a group comment to a group assignment", priority: "1", test_id: 210047 do
     group_assignment = @course.assignments.create!({
                                                      title: 'group assignment',
                                                      due_at: (Time.zone.now + 1.week),

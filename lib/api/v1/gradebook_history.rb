@@ -24,10 +24,10 @@ module Api::V1
     include Api::V1::Submission
 
     def days_json(course, api_context)
-      day_hash = Hash.new{|hash, date| hash[date] = {:graders => {}} }
-      submissions_set(course, api_context).
-        each_with_object(day_hash) { |submission, day| update_graders_hash(day[day_string_for(submission)][:graders], submission, api_context) }.
-        each do |date, date_hash|
+      day_hash = Hash.new { |hash, date| hash[date] = { :graders => {} } }
+      submissions_set(course, api_context)
+        .each_with_object(day_hash) { |submission, day| update_graders_hash(day[day_string_for(submission)][:graders], submission, api_context) }
+        .each do |date, date_hash|
           compress(date_hash, :graders)
           date_hash[:graders].each { |grader| compress(grader, :assignments) }
         end
@@ -36,12 +36,12 @@ module Api::V1
     end
 
     def json_for_date(date, course, api_context)
-      submissions_set(course, api_context, :date => date).
-        each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }.values.
-        each { |grader| compress(grader, :assignments) }
+      submissions_set(course, api_context, :date => date)
+        .each_with_object({}) { |sub, memo| update_graders_hash(memo, sub, api_context) }.values
+        .each { |grader| compress(grader, :assignments) }
     end
 
-    def version_json(course, version, api_context, opts={})
+    def version_json(course, version, api_context, opts = {})
       submission = opts[:submission] || version.versionable
       assignment = opts[:assignment] || submission.assignment
       student = opts[:student] || submission.user
@@ -49,8 +49,8 @@ module Api::V1
 
       model = version.model
       json = model.without_versioned_attachments do
-        submission_attempt_json(model, assignment, api_context.user, api_context.session, course, params).
-          with_indifferent_access
+        submission_attempt_json(model, assignment, api_context.user, api_context.session, course, params)
+          .with_indifferent_access
       end
       grader = (json[:grader_id] && json[:grader_id] > 0 && user_cache[json[:grader_id]]) || default_grader
 
@@ -65,7 +65,7 @@ module Api::V1
       json
     end
 
-    def versions_json(course, versions, api_context, opts={})
+    def versions_json(course, versions, api_context, opts = {})
       # preload for efficiency
       unless opts[:submission]
         ActiveRecord::Associations::Preloader.new.preload(versions, :versionable)
@@ -97,18 +97,18 @@ module Api::V1
 
     def submissions_for(course, api_context, date, grader_id, assignment_id)
       assignment = ::Assignment.find(assignment_id)
-      options = {:date => date, :assignment_id => assignment_id, :grader_id => grader_id}
+      options = { :date => date, :assignment_id => assignment_id, :grader_id => grader_id }
       submissions = submissions_set(course, api_context, options)
 
       # load all versions for the given submissions and back-populate their
       # versionable associations
       submission_index = submissions.index_by(&:id)
       versions = Version.where(:versionable_type => 'Submission', :versionable_id => submissions).order(:number)
-      versions.each{ |version| version.versionable = submission_index[version.versionable_id] }
+      versions.each { |version| version.versionable = submission_index[version.versionable_id] }
 
       # convert them all to json and then group by submission
       versions = versions_json(course, versions, api_context, :assignment => assignment)
-      versions_hash = versions.group_by{ |version| version[:id] }
+      versions_hash = versions.group_by { |version| version[:id] }
 
       # populate previous_* and new_* keys and convert hash to array of objects
       versions_hash.inject([]) do |memo, (submission_id, submission_versions)|
@@ -135,6 +135,7 @@ module Api::V1
     def day_string_for(submission)
       graded_at = submission.graded_at
       return '' if graded_at.nil?
+
       graded_at.in_time_zone.to_date.as_json
     end
 
@@ -164,7 +165,6 @@ module Api::V1
       api_context.paginate(collection)
     end
 
-
     private
 
     PREVIOUS_VERSION_ATTRS = [:grade, :graded_at, :grader]
@@ -177,11 +177,11 @@ module Api::V1
     end
 
     def user_cache
-      @user_cache ||= Hash.new{ |hash, user_id| hash[user_id] = ::User.find(user_id) }
+      @user_cache ||= Hash.new { |hash, user_id| hash[user_id] = ::User.find(user_id) }
     end
 
     def assignment_cache
-      @assignment_cache ||= Hash.new{ |hash, assignment_id| hash[assignment_id] = ::Assignment.find(assignment_id) }
+      @assignment_cache ||= Hash.new { |hash, assignment_id| hash[assignment_id] = ::Assignment.find(assignment_id) }
     end
 
     def update_graders_hash(hash, submission, api_context)
@@ -201,6 +201,5 @@ module Api::V1
     def compress(hash, key)
       hash[key] = hash[key].values
     end
-
   end
 end

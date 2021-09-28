@@ -23,10 +23,10 @@ class SubmissionCommentReadLoader < GraphQL::Batch::Loader
   end
 
   def perform(submission_comments)
-    vsc = ViewedSubmissionComment.
-      where(submission_comment_id: submission_comments, user: @current_user).
-      pluck('submission_comment_id').
-      to_set
+    vsc = ViewedSubmissionComment
+          .where(submission_comment_id: submission_comments, user: @current_user)
+          .pluck('submission_comment_id')
+          .to_set
 
     submission_comments.each do |sc|
       fulfill(sc, vsc.include?(sc.id))
@@ -50,11 +50,11 @@ module Types
       # and submission will already be in the cache, as that's the graphql query
       # path to get to a submission comment, and thus costs us nothing to preload here.
       Promise.all([
-        load_association(:author),
-        load_association(:submission).then do |submission|
-          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
-        end
-      ]).then { object.author if object.grants_right?(current_user, :read_author) }
+                    load_association(:author),
+                    load_association(:submission).then do |submission|
+                      Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+                    end
+                  ]).then { object.author if object.grants_right?(current_user, :read_author) }
     end
 
     field :attachments, [Types::FileType], null: true
@@ -78,10 +78,11 @@ module Types
     def read
       load_association(:submission).then do |submission|
         Promise.all([
-          Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
-          Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
-        ]).then do
+                      Loaders::AssociationLoader.for(Submission, :content_participations).load(submission),
+                      Loaders::AssociationLoader.for(Submission, :assignment).load(submission)
+                    ]).then do
           next true if submission.read?(current_user)
+
           SubmissionCommentReadLoader.for(current_user).load(object)
         end
       end

@@ -42,7 +42,7 @@ describe Lti::Ims::NamesAndRolesController do
     let!(:student_enrollment_4) { student_in_course(course: course, active_all: true) }
     let!(:student_enrollment_5) { student_in_course(course: course, active_all: true) }
     let!(:student_enrollments) {
-      [ student_enrollment_1, student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5 ]
+      [student_enrollment_1, student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5]
     }
     let!(:enrollments) {
       super().push(student_enrollment_2, student_enrollment_3, student_enrollment_4, student_enrollment_5)
@@ -213,27 +213,27 @@ describe Lti::Ims::NamesAndRolesController do
           user.time_zone = 'Europe/Berlin'
           user.save!
           user.pseudonyms.create!({
-            account: course.account,
-            unique_id: 'user1@example.com',
-            password: 'asdfasdf',
-            password_confirmation: 'asdfasdf',
-            workflow_state: 'active',
-            sis_user_id: 'user-1-sis-user-id-1',
-            integration_id: 'user-1-sis-integration-id-1',
-          })
+                                    account: course.account,
+                                    unique_id: 'user1@example.com',
+                                    password: 'asdfasdf',
+                                    password_confirmation: 'asdfasdf',
+                                    workflow_state: 'active',
+                                    sis_user_id: 'user-1-sis-user-id-1',
+                                    integration_id: 'user-1-sis-integration-id-1',
+                                  })
           sis_email = 'sis@example.com'
           cc = user.communication_channels.email.create!(path: sis_email)
           cc.user = user
           cc.save!
           user.pseudonyms.create!({
-            account: course.account,
-            unique_id: cc.path,
-            sis_communication_channel_id: cc.id,
-            communication_channel_id: cc.id,
-            workflow_state: 'active',
-            sis_user_id: 'user-1-sis-user-id-2',
-            integration_id: 'user-1-sis-integration-id-2',
-          })
+                                    account: course.account,
+                                    unique_id: cc.path,
+                                    sis_communication_channel_id: cc.id,
+                                    communication_channel_id: cc.id,
+                                    workflow_state: 'active',
+                                    sis_user_id: 'user-1-sis-user-id-2',
+                                    integration_id: 'user-1-sis-integration-id-2',
+                                  })
           user
         end
 
@@ -241,6 +241,7 @@ describe Lti::Ims::NamesAndRolesController do
           if context.is_a?(Course)
             return be_analytics_url(controller.lti_xapi_url(Lti::AnalyticsService.create_token(tool, user, context)))
           end
+
           eq '$Canvas.xapi.url'
         end
 
@@ -248,6 +249,7 @@ describe Lti::Ims::NamesAndRolesController do
           if context.is_a?(Course)
             return be_analytics_url(controller.lti_caliper_url(Lti::AnalyticsService.create_token(tool, user, context)))
           end
+
           eq '$Caliper.url'
         end
 
@@ -479,7 +481,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS Instructor role' do
         let(:total_items) { 2 }
-        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')}
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
 
         it 'limits results to Canvas Teachers and TAs' do
           send_request
@@ -489,7 +491,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS Learner role' do
         let(:total_items) { 1 }
-        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner')}
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Learner') }
 
         it 'limits results to Canvas Students' do
           send_request
@@ -499,7 +501,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS TeachingAssistant role' do
         let(:total_items) { 1 }
-        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant')}
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership/Instructor#TeachingAssistant') }
 
         it 'limits results to Canvas TAs' do
           send_request
@@ -509,7 +511,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS Mentor role' do
         let(:total_items) { 1 }
-        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor')}
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Mentor') }
 
         it 'limits results to Canvas Observers' do
           send_request
@@ -519,7 +521,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS ContentDeveloper role' do
         let(:total_items) { 1 }
-        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper')}
+        let(:pass_thru_params) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#ContentDeveloper') }
 
         it 'limits results to Canvas Designers' do
           send_request
@@ -528,7 +530,7 @@ describe Lti::Ims::NamesAndRolesController do
       end
 
       context 'and the role param specifies an unknown value' do
-        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense') }
 
         it 'returns no course members' do
           send_request
@@ -600,7 +602,6 @@ describe Lti::Ims::NamesAndRolesController do
       # rubocop:disable RSpec/LetSetup
       # rubocop:disable RSpec/NestedGroups
       context 'and an assignment rlid param is specified' do
-
         include_context 'assignment context'
         let(:rlid_param) { rlid_param_1 }
         let!(:student_enrollment_1) { student_enrollment } # no need to create an extra enrollment
@@ -620,7 +621,6 @@ describe Lti::Ims::NamesAndRolesController do
         end
 
         context 'for an assignment assigned to everyone' do
-
           it 'returns all course members' do
             send_request
             expect_enrollment_response_page
@@ -672,12 +672,12 @@ describe Lti::Ims::NamesAndRolesController do
               it 'returns page 1' do
                 send_request
                 expect_enrollment_response_page_of([
-                  teacher_enrollment,
-                  student_enrollment_1,
-                  ta_enrollment,
-                  observer_enrollment,
-                  designer_enrollment
-                ])
+                                                     teacher_enrollment,
+                                                     student_enrollment_1,
+                                                     ta_enrollment,
+                                                     observer_enrollment,
+                                                     designer_enrollment
+                                                   ])
                 expect(response_links).to have_correct_pagination_urls
               end
             end
@@ -690,11 +690,11 @@ describe Lti::Ims::NamesAndRolesController do
               it 'returns page 2' do
                 send_request
                 expect_enrollment_response_page_of([
-                  student_enrollment_2,
-                  student_enrollment_3,
-                  student_enrollment_4,
-                  student_enrollment_5,
-                ])
+                                                     student_enrollment_2,
+                                                     student_enrollment_3,
+                                                     student_enrollment_4,
+                                                     student_enrollment_5,
+                                                   ])
                 expect(response_links).to have_correct_pagination_urls
               end
             end
@@ -784,11 +784,11 @@ describe Lti::Ims::NamesAndRolesController do
               it 'returns page 1' do
                 send_request
                 expect_enrollment_response_page_of([
-                  teacher_enrollment,
-                  student_enrollment_1,
-                  ta_enrollment,
-                  observer_enrollment,
-                ])
+                                                     teacher_enrollment,
+                                                     student_enrollment_1,
+                                                     ta_enrollment,
+                                                     observer_enrollment,
+                                                   ])
                 expect(response_links).to have_correct_pagination_urls
               end
             end
@@ -801,10 +801,10 @@ describe Lti::Ims::NamesAndRolesController do
               it 'returns page 2' do
                 send_request
                 expect_enrollment_response_page_of([
-                  designer_enrollment,
-                  student_enrollment_3,
-                  student_enrollment_5
-                ])
+                                                     designer_enrollment,
+                                                     student_enrollment_3,
+                                                     student_enrollment_5
+                                                   ])
                 expect(response_links).to have_correct_pagination_urls
               end
             end
@@ -949,7 +949,7 @@ describe Lti::Ims::NamesAndRolesController do
 
       context 'and the role param specifies the LIS Manager role' do
         let(:total_items) { 1 }
-        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager')}
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Manager') }
 
         it 'limits results to the Canvas group leader' do
           send_request
@@ -958,7 +958,7 @@ describe Lti::Ims::NamesAndRolesController do
       end
 
       context 'and the role param specifies the LIS Member role' do
-        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member')}
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Member') }
 
         it 'returns all group members' do
           send_request
@@ -967,7 +967,7 @@ describe Lti::Ims::NamesAndRolesController do
       end
 
       context 'and the role param specifies an unknown value' do
-        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense') }
 
         it 'returns no group members' do
           send_request
@@ -976,7 +976,7 @@ describe Lti::Ims::NamesAndRolesController do
       end
 
       context 'and the role param specifies a valid but non-Group LIS value' do
-        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor')}
+        let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/vocab/lis/v2/membership#Instructor') }
 
         it 'returns no group members' do
           send_request
@@ -1037,7 +1037,6 @@ describe Lti::Ims::NamesAndRolesController do
       # rubocop:disable RSpec/LetSetup
       # rubocop:disable RSpec/NestedGroups
       context 'and an assignment rlid param is specified' do
-
         include_context 'assignment context'
         let(:rlid_param) { rlid_param_1 }
         let!(:group_leadership) do
@@ -1132,7 +1131,6 @@ describe Lti::Ims::NamesAndRolesController do
         end
 
         context 'for an assignment assigned to everyone' do
-
           it 'returns all group members' do
             send_request
             expect_enrollment_response_page
@@ -1162,7 +1160,7 @@ describe Lti::Ims::NamesAndRolesController do
           end
 
           context 'and the role param specifies an unknown value' do
-            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense') }
 
             it 'returns no group members' do
               send_request
@@ -1171,7 +1169,6 @@ describe Lti::Ims::NamesAndRolesController do
           end
 
           context 'and pagination params are specified' do
-
             it_behaves_like 'returns all paginated group members'
 
             context 'and a role param is specified' do
@@ -1183,7 +1180,6 @@ describe Lti::Ims::NamesAndRolesController do
         end
 
         context 'for an assignment assigned to specific students' do
-
           # included context assigns to students 1, 3, and 5, but student 3 is not in our group
           include_context 'assignment assigned to specific students'
 
@@ -1210,7 +1206,7 @@ describe Lti::Ims::NamesAndRolesController do
           end
 
           context 'and the role param specifies an unknown value' do
-            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense')}
+            let(:params_overrides) { super().merge(role: 'http://purl.imsglobal.org/total/nonsense') }
 
             it 'returns no group members' do
               send_request
@@ -1236,7 +1232,6 @@ describe Lti::Ims::NamesAndRolesController do
             it_behaves_like 'returns assigned paginated group members'
           end
         end
-
       end
       # rubocop:enable RSpec/LetSetup
       # rubocop:enable RSpec/NestedGroups
@@ -1273,7 +1268,7 @@ describe Lti::Ims::NamesAndRolesController do
     expect(json[:members].length).to eq(count)
   end
 
-  def custom_enrollment_in_course(base_type_name, opts={})
+  def custom_enrollment_in_course(base_type_name, opts = {})
     opts[:account] ||= opts[:course].account
     opts[:role] ||= custom_role(base_type_name, "Custom#{base_type_name}", opts)
     course_with_user(base_type_name, opts)
@@ -1283,27 +1278,28 @@ describe Lti::Ims::NamesAndRolesController do
     if self.respond_to?(:rlid_param) && rlid_param.present?
       match_enrollment_for_rlid({}, *enrollment)
     elsif enrollment.first.is_a?(Enrollment)
-      be_lti_course_membership({expected: enrollment})
+      be_lti_course_membership({ expected: enrollment })
     else
-      be_lti_group_membership({expected: enrollment.first})
+      be_lti_group_membership({ expected: enrollment.first })
     end
   end
 
   def match_enrollment_for_rlid(message_matcher, *enrollment)
     opts = { message_matcher: message_matcher }
     return be_lti_course_membership(opts.merge!(expected: enrollment)) if enrollment.first.is_a?(Enrollment)
+
     be_lti_group_membership(opts.merge!(expected: enrollment.first))
   end
 
   def expect_enrollment_response_page
-    expect_enrollment_response_page_of(enrollments.
-      sort_by { |e| e.user.id }.
-      slice(effective_page_size*(rsp_page-1), effective_page_size))
+    expect_enrollment_response_page_of(enrollments
+      .sort_by { |e| e.user.id }
+      .slice(effective_page_size * (rsp_page - 1), effective_page_size))
   end
 
   def expect_enrollment_response_page_of(scoped_enrollments)
-    scoped_enrollments.each_with_index { |e,i| expect_member(e, index: i) }
-    expect_member_count([rsp_page_size,total_items].min)
+    scoped_enrollments.each_with_index { |e, i| expect_member(e, index: i) }
+    expect_member_count([rsp_page_size, total_items].min)
   end
 
   def have_correct_pagination_urls
@@ -1313,16 +1309,16 @@ describe Lti::Ims::NamesAndRolesController do
     # rubocop:disable Layout/LineLength
     expected_links = [
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page}&per_page=#{effective_page_size}>; rel=\"current\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page+1}&per_page=#{effective_page_size}>; rel=\"next\"",
-      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page-1}&per_page=#{effective_page_size}>; rel=\"prev\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page + 1}&per_page=#{effective_page_size}>; rel=\"next\"",
+      "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{rsp_page - 1}&per_page=#{effective_page_size}>; rel=\"prev\"",
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=1&per_page=#{effective_page_size}>; rel=\"first\"",
       "<http://test.host/api/lti/#{context.class.to_s.downcase}s/#{context_id}/names_and_roles?#{pass_thrus}page=#{total_pages}&per_page=#{effective_page_size}>; rel=\"last\""
     ]
 
     # rubocop:enable Layout/LineLength
-    expected_links.reject! {|el| el.include?('rel="next"')} if rsp_page == total_pages
-    expected_links.reject! {|el| el.include?('rel="prev"')} if rsp_page <= 1
-    expected_links.reject! {|el| el.include?('rel="last"')} if rsp_page > total_pages
+    expected_links.reject! { |el| el.include?('rel="next"') } if rsp_page == total_pages
+    expected_links.reject! { |el| el.include?('rel="prev"') } if rsp_page <= 1
+    expected_links.reject! { |el| el.include?('rel="last"') } if rsp_page > total_pages
     match_array(expected_links)
   end
 
@@ -1340,15 +1336,15 @@ describe Lti::Ims::NamesAndRolesController do
 
   def assignment_with_rlid(rlid)
     assignment_model({
-      course: course,
-      lti_context_id: rlid,
-      submission_types: 'external_tool',
-      external_tool_tag_attributes: {
-        url: tool.url,
-        content_type: 'context_external_tool',
-        content_id: tool.id
-      }
-    })
+                       course: course,
+                       lti_context_id: rlid,
+                       submission_types: 'external_tool',
+                       external_tool_tag_attributes: {
+                         url: tool.url,
+                         content_type: 'context_external_tool',
+                         content_id: tool.id
+                       }
+                     })
   end
 
   def assign(assignment, *users_or_user_containers)

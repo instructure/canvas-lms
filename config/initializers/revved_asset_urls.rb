@@ -22,8 +22,6 @@
 # eg: instead of '/images/whatever.png?12345', we want '/dist/images/whatever-<md5 of file>.png'.
 # There is a different method that needs to be monkeypatched for rails 3 vs rails 4
 
-
-
 require 'action_view/helpers'
 
 module RevAssetPaths

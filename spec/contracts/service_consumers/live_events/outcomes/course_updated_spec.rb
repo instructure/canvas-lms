@@ -22,7 +22,6 @@ require_relative '../live_events_pact_helper'
 
 RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
   describe 'course_updated' do
-
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'course_updated',

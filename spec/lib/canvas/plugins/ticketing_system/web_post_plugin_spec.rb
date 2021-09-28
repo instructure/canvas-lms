@@ -25,10 +25,10 @@ module Canvas::Plugins::TicketingSystem
     describe "#export_error" do
       it "posts the error_report document to the configured endpoint" do
         ticketing = double()
-        document = {key: "value", info: "data"}
+        document = { key: "value", info: "data" }
         report = double(to_document: document)
         endpoint = "http://someserver.com/some/endpoint"
-        config = {endpoint_uri: endpoint}
+        config = { endpoint_uri: endpoint }
         plugin = WebPostPlugin.new(ticketing)
         expect(HTTParty).to receive(:post).with(endpoint, include(body: document.to_json))
         plugin.export_error(report, config)

@@ -47,9 +47,9 @@ describe ProgressSerializer do
 
   subject do
     ProgressSerializer.new(progress, {
-      controller: controller,
-      scope: User.new
-    })
+                             controller: controller,
+                             scope: User.new
+                           })
   end
 
   let :json do

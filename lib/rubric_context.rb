@@ -26,10 +26,11 @@ module RubricContext
       klass.send :include, InstanceMethods
     end
   end
+
   module InstanceMethods
     # return the rubric but only if it's available in either the context or one
     # of the context's associated accounts.
-    def available_rubric(rubric_id, opts={})
+    def available_rubric(rubric_id, opts = {})
       outcome = rubrics.where(id: rubric_id).first
       return outcome if outcome
 

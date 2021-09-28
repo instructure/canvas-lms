@@ -20,7 +20,6 @@
 require_relative '../../common'
 
 module AccountContentSharePage
-  
   # ---------------------- Elements ----------------------
   def page_body
     f('body')

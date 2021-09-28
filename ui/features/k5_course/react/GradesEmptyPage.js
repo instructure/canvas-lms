@@ -29,7 +29,13 @@ import {AccessibleContent} from '@instructure/ui-a11y-content'
 import EmptyGradesUrl from '../images/empty-grades.svg'
 
 const GradesEmptyPage = ({userIsCourseAdmin, courseId, courseName}) => (
-  <Flex direction="column" alignItems="center" margin="x-large large">
+  <Flex
+    direction="column"
+    alignItems="center"
+    justifyItems="center"
+    margin="x-large large"
+    height="50vh"
+  >
     <Img src={EmptyGradesUrl} margin="0 0 medium 0" data-testid="empty-grades-panda" />
     {userIsCourseAdmin ? (
       <>

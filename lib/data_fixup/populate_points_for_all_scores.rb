@@ -31,7 +31,7 @@ module DataFixup
     def self.run
       Course.published.find_ids_in_ranges(batch_size: 100) do |min_id, max_id|
         delay_if_production(n_strand: ["DataFixup::PopulatePointsForAllScores", Shard.current.database_server.id],
-          priority: Delayed::MAX_PRIORITY).run_for_course_range(min_id, max_id)
+                            priority: Delayed::MAX_PRIORITY).run_for_course_range(min_id, max_id)
       end
     end
 

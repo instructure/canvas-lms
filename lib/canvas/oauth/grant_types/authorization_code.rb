@@ -11,8 +11,9 @@ module Canvas::Oauth
 
       def validate_type
         raise Canvas::Oauth::RequestError, :authorization_code_not_supplied unless @opts[:code]
+
         @_token = @provider.token_for(@opts[:code])
-        raise Canvas::Oauth::RequestError, :invalid_authorization_code  unless @_token.is_for_valid_code?
+        raise Canvas::Oauth::RequestError, :invalid_authorization_code unless @_token.is_for_valid_code?
         raise Canvas::Oauth::RequestError, :incorrect_client unless [@_token.key.global_id, @_token.key.id].include? @_token.client_id
       end
 

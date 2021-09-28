@@ -35,12 +35,12 @@ module Lti::Ims::Concerns
 
       def user
         @user ||= begin
-          active_user = User.
-            active.
-            where(lti_id: params[:userId]).
-            where.not(lti_id: nil).
-            or(User.where(id: user_id)).
-            take
+          active_user = User
+                        .active
+                        .where(lti_id: params[:userId])
+                        .where.not(lti_id: nil)
+                        .or(User.where(id: user_id))
+                        .take
 
           # If the user is an active user, we'll use it.
           # If the user is a deleted user, we need to check if it was a merged user.
@@ -56,6 +56,7 @@ module Lti::Ims::Concerns
 
       def verify_user_in_context
         return if context.user_is_student? user
+
         render_error('User not found in course or is not a student', :unprocessable_entity)
       end
 
@@ -81,6 +82,7 @@ module Lti::Ims::Concerns
 
         assignment = Assignment.find_by(lti_context_id: params[:resourceLinkId])
         raise ActiveRecord::RecordNotFound unless assignment
+
         if tool == ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment)
           assignment.prepare_for_ags_if_needed!(tool)
           return

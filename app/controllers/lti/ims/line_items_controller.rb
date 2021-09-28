@@ -88,7 +88,7 @@ module Lti
           logger.error(e.message)
           Lti::Errors::ErrorLogger.log_error(e)
         end
-        render json: {error: e.message}, status: :bad_request
+        render json: { error: e.message }, status: :bad_request
       end
 
       # @API Create a Line Item
@@ -213,6 +213,7 @@ module Lti
       # @returns LineItem
       def destroy
         head :unauthorized and return if line_item.coupled
+
         line_item.destroy!
         head :no_content
       end
@@ -258,15 +259,15 @@ module Lti
 
       def index_query
         rlid = params[:resource_link_id]
-        assignments = Assignment.
-          active.
-          joins(rlid.present? ? { line_items: :resource_link } : :line_items).
-          where(
-            {
-              context: context,
-              lti_line_items: { client_id: developer_key.global_id }
-            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_uuid: rlid } } : {})
-          )
+        assignments = Assignment
+                      .active
+                      .joins(rlid.present? ? { line_items: :resource_link } : :line_items)
+                      .where(
+                        {
+                          context: context,
+                          lti_line_items: { client_id: developer_key.global_id }
+                        }.merge!(rlid.present? ? { lti_resource_links: { resource_link_uuid: rlid } } : {})
+                      )
 
         {
           assignment: assignments,
@@ -282,13 +283,14 @@ module Lti
       def verify_valid_resource_link
         return unless params[:resourceLinkId]
         raise ActiveRecord::RecordNotFound if resource_link.blank?
+
         head :precondition_failed if check_for_bad_resource_link
       end
 
       def check_for_bad_resource_link
         resource_link.line_items.active.blank? ||
-        assignment&.context != context ||
-        !assignment&.active?
+          assignment&.context != context ||
+          !assignment&.active?
       end
 
       def scopes_matcher

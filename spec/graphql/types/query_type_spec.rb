@@ -38,7 +38,7 @@ describe Types::QueryType do
     expect(
       CanvasSchema.execute(
         "{ allCourses { _id } }",
-        context: {current_user: teacher}
+        context: { current_user: teacher }
       ).dig("data", "allCourses").map { |c| c["_id"] }
     ).to match_array [test_course_1, test_course_2].map(&:to_param)
   end
@@ -52,7 +52,7 @@ describe Types::QueryType do
       expect(
         CanvasSchema.execute(
           "{ outcomeCalculationMethod(id: #{@calc_method.id}) { _id } }",
-          context: {current_user: @admin}
+          context: { current_user: @admin }
         ).dig("data", "outcomeCalculationMethod", "_id")
       ).to eq @calc_method.id.to_s
     end
@@ -67,7 +67,7 @@ describe Types::QueryType do
       expect(
         CanvasSchema.execute(
           "{ outcomeProficiency(id: #{@proficiency.id}) { _id } }",
-          context: {current_user: @admin}
+          context: { current_user: @admin }
         ).dig("data", "outcomeProficiency", "_id")
       ).to eq @proficiency.id.to_s
     end
@@ -99,8 +99,8 @@ describe Types::QueryType do
       it "allows searching #{type} by sisId" do
         original_object = send(type)
         expect(
-          CanvasSchema.execute(%/{#{type}(sisId: "#{generic_sis_id}") { _id }}/, context: { current_user: admin }).
-          dig("data", type, "_id")
+          CanvasSchema.execute(%/{#{type}(sisId: "#{generic_sis_id}") { _id }}/, context: { current_user: admin })
+          .dig("data", type, "_id")
         ).to eq(original_object.id.to_s)
       end
     end

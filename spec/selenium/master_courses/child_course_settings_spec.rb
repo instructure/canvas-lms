@@ -38,7 +38,7 @@ describe "master courses - child courses - settings" do
     user_session(@teacher)
   end
 
-  it "should show the child course blueprint information modal" do
+  it "shows the child course blueprint information modal" do
     skip("Jenkins fails with no page load at line 46, though succeeds in canvas__selenium--chrome. Browser issue?")
     get "/courses/#{@minion.id}/settings"
 

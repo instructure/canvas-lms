@@ -44,6 +44,5 @@ module CanvasPartman
   end
 
   self.migrations_scope = 'partitions'
-  self.timeout_seconds = ->{ 90 }
-
+  self.timeout_seconds = -> { 90 }
 end

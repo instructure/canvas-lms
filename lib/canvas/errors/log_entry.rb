@@ -20,7 +20,6 @@
 require_relative '../errors'
 module Canvas
   class Errors
-
     # Class for formatting any error captured
     # through this subsystem as a digestable stack trace in
     # canvas debug logs.  Intended to be hooked into
@@ -33,7 +32,7 @@ module Canvas
       # which is itself a message, sometimes we assert
       # on a condition and write a message if a surprising
       # thing happens
-      def self.write(exception, data, level=:error)
+      def self.write(exception, data, level = :error)
         msg = self.new(exception, data).message
         Rails.logger.send(level, msg)
       end

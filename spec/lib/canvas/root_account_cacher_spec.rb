@@ -23,7 +23,7 @@ require_relative '../../spec_helper'
 describe Canvas::RootAccountCacher do
   specs_require_sharding
 
-  it "shouldn't get confused by the same account id on different shards" do
+  it "does not get confused by the same account id on different shards" do
     user = User.create!
     p1 = user.pseudonyms.create!(unique_id: 'p1', account: Account.default)
     a2 = nil

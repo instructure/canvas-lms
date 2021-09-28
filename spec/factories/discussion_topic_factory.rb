@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def discussion_topic_model(opts={})
+  def discussion_topic_model(opts = {})
     @context = opts[:context] || @context || course_model(:reusable => true)
     @topic = @context.discussion_topics.create!(valid_discussion_topic_attributes.merge(opts))
   end

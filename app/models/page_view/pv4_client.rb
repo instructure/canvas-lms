@@ -47,6 +47,7 @@ class PageView
 
       json = JSON.parse(response.body)
       raise response.body unless json['page_views']
+
       json['page_views'].map! do |pv|
         pv['session_id'] = pv.delete('sessionid')
         pv['url'] = "#{HostUrl.protocol}://#{pv.delete('vhost')}#{pv.delete('http_request')}"
@@ -75,10 +76,10 @@ class PageView
           newest = Time.zone.parse(end_time)
         end
         pager.replace(fetch(user_id,
-              start_time: oldest,
-              end_time: newest,
-              last_page_view_id: last_page_view_id,
-              limit: pager.per_page))
+                            start_time: oldest,
+                            end_time: newest,
+                            last_page_view_id: last_page_view_id,
+                            limit: pager.per_page))
         pager.has_more! unless pager.empty?
         pager
       end

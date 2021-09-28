@@ -28,6 +28,7 @@ module CC::Exporter::Epub
     def add_files
       files.each do |file_data|
         next unless file_data[:exists]
+
         File.open(file_data[:path_to_file]) do |file|
           file_path = file_data[:local_path]
           zip_file.add(file_path, file) { add_clone(file_path, file) }
@@ -35,7 +36,7 @@ module CC::Exporter::Epub
       end
     end
 
-    def add_clone(file_path, file, count=0)
+    def add_clone(file_path, file, count = 0)
       count += 1
       clone_name = "#{file_path} (#{count})"
       zip_file.add(clone_name, file) { add_clone(file_path, file, count) }

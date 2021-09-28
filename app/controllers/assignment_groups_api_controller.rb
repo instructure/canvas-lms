@@ -56,11 +56,11 @@ class AssignmentGroupsApiController < ApplicationController
       end
       includes.delete('assignment_visibility') unless @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
       render :json => assignment_group_json(@assignment_group, @current_user, session, includes, {
-        stringify_json_ids: stringify_json_ids?,
-        override_dates: override_dates,
-        assignments: assignments,
-        submissions: submissions
-      })
+                                              stringify_json_ids: stringify_json_ids?,
+                                              override_dates: override_dates,
+                                              assignments: assignments,
+                                              submissions: submissions
+                                            })
     end
   end
 
@@ -169,6 +169,7 @@ class AssignmentGroupsApiController < ApplicationController
   def can_update_assignment_group?(assignment_group)
     return true if @context.account_membership_allows(@current_user)
     return true unless assignment_group.group_weight_changed? || assignment_group.rules_changed?
+
     !assignment_group.any_assignment_in_closed_grading_period?
   end
 

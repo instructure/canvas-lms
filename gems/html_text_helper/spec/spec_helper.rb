@@ -31,7 +31,6 @@ rescue LoadError => e
   puts "Error: #{e} "
 end
 
-
 require 'canvas_text_helper'
 require 'html_text_helper'
 

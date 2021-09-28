@@ -38,7 +38,8 @@ module Lti
         scope = scope.where(
           " (#{name_collation_key} = #{placeholder_collation_key} AND lti_message_handlers.id #{comparison} ?) "\
           "OR #{name_collation_key} #{comparison} #{placeholder_collation_key}",
-          bookmark[0], bookmark[1], bookmark[0])
+          bookmark[0], bookmark[1], bookmark[0]
+        )
       end
       scope.order(name_collation_key, :id)
     end

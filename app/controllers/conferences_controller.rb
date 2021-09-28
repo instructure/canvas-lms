@@ -146,7 +146,7 @@ class ConferencesController < ApplicationController
   before_action :require_context, except: :for_user
   skip_before_action :load_user, :only => [:recording_ready]
 
-  add_crumb(proc{ t '#crumbs.conferences', "Conferences"}) do |c|
+  add_crumb(proc { t '#crumbs.conferences', "Conferences" }) do |c|
     if c.context.present?
       c.send(:named_context_url, c.context, :context_conferences_url)
     end
@@ -175,7 +175,8 @@ class ConferencesController < ApplicationController
     return unless authorized_action(@context, @current_user, :read)
     return unless tab_enabled?(@context.class::TAB_CONFERENCES)
     return unless @current_user
-    log_api_asset_access([ "conferences", @context ], "conferences", "other")
+
+    log_api_asset_access(["conferences", @context], "conferences", "other")
     conferences = @context.grants_right?(@current_user, :manage_content) ?
       @context.web_conferences.active :
       @current_user.web_conferences.active.shard(@context.shard).where(context_type: @context.class.to_s, context_id: @context.id)
@@ -192,6 +193,7 @@ class ConferencesController < ApplicationController
 
     def self.validate(bookmark)
       return false unless bookmark.is_a?(Array) && bookmark.length == 2
+
       bookmark.first.is_a?(ActiveSupport::TimeWithZone) && bookmark.second.is_a?(Integer)
     end
 
@@ -230,15 +232,15 @@ class ConferencesController < ApplicationController
     log_api_asset_access(["conferences"], "conferences", "other")
 
     courses_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.enrollments) do |enrollments_scope|
-      conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id)).
-        where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+      conference_scope = WebConference.active.where(context_type: "Course", context_id: enrollments_scope.active.select(:course_id))
+                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end
 
     groups_collection = ShardedBookmarkedCollection.build(UserConferencesBookmarker, @current_user.groups) do |groups_scope|
-      conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id)).
-        where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
+      conference_scope = WebConference.active.where(context_type: "Group", context_id: groups_scope.active.select(:id))
+                                      .where("EXISTS (?)", WebConferenceParticipant.where("web_conference_id = web_conferences.id AND user_id = ?", @current_user.id))
       conference_scope = conference_scope.live if params[:state] == "live"
       conference_scope.order("created_at DESC, id DESC")
     end
@@ -272,7 +274,7 @@ class ConferencesController < ApplicationController
     @new_conferences, @concluded_conferences = conferences.partition { |conference|
       conference.ended_at.nil?
     }
-    log_asset_access([ "conferences", @context ], "conferences", "other")
+    log_asset_access(["conferences", @context], "conferences", "other")
 
     GuardRail.activate(:secondary) do
       @render_alternatives = WebConference.conference_types(@context).all? { |ct| ct[:replace_with_alternatives] }
@@ -282,16 +284,16 @@ class ConferencesController < ApplicationController
         @groups = @context.active_groups
 
         @group_user_ids_map = @groups.to_a.each_with_object({}) do |group, acc|
-          acc[group.id] = group.participating_users_in_context.map{|u| u.id.to_s}
+          acc[group.id] = group.participating_users_in_context.map { |u| u.id.to_s }
           acc
         end
 
         @section_user_ids_map = @sections.to_a.each_with_object({}) do |section, acc|
-          acc[section.id] = section.participants.map{|u| u.id.to_s}
+          acc[section.id] = section.participants.map { |u| u.id.to_s }
           acc
         end
-        @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
-          order(User.sortable_name_order_by_clause).to_a
+        @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id))
+                     .order(User.sortable_name_order_by_clause).to_a
         @render_alternatives ||= @context.settings[:show_conference_alternatives].present?
       when Group
         @users = @context.participating_users_in_context.where("users.id<>?", @current_user).order(User.sortable_name_order_by_clause).to_a.uniq
@@ -307,9 +309,9 @@ class ConferencesController < ApplicationController
       concluded_conferences: ui_conferences_json(@concluded_conferences, @context, @current_user, session),
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types(@context)),
-      users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
-      groups: @groups&.map { |g| {:id => g.id, :name => g.full_name} },
-      sections: @sections&.map { |s| {:id => s.id, :name => s.display_name} },
+      users: @users.map { |u| { :id => u.id, :name => u.last_name_first } },
+      groups: @groups&.map { |g| { :id => g.id, :name => g.full_name } },
+      sections: @sections&.map { |s| { :id => s.id, :name => s.display_name } },
       group_user_ids_map: @group_user_ids_map,
       section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
@@ -345,8 +347,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => WebConference.find(@conference.id).as_json(:permissions => {:user => @current_user, :session => session},
-                                                                                :url => named_context_url(@context, :context_conference_url, @conference)) }
+          format.json {
+            render :json => WebConference.find(@conference.id).as_json(:permissions => { :user => @current_user, :session => session },
+                                                                       :url => named_context_url(@context, :context_conference_url, @conference))
+          }
         else
           format.html { render :index }
           format.json { render :json => @conference.errors, :status => :bad_request }
@@ -366,8 +370,10 @@ class ConferencesController < ApplicationController
           @conference.invite_users_from_context(member_ids)
           @conference.save
           format.html { redirect_to named_context_url(@context, :context_conference_url, @conference.id) }
-          format.json { render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
-                                                            :url => named_context_url(@context, :context_conference_url, @conference)) }
+          format.json {
+            render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
+                                                :url => named_context_url(@context, :context_conference_url, @conference))
+          }
         else
           format.html { render :edit }
           format.json { render :json => @conference.errors, :status => :bad_request }
@@ -410,7 +416,7 @@ class ConferencesController < ApplicationController
       signed_params = Canvas::Security.decode_jwt(params[:signed_parameters], [secret])
       if signed_params[:meeting_id] == @conference.conference_key
         @conference.recording_ready!
-        render  json: [], status: :accepted
+        render json: [], status: :accepted
       else
         render json: signed_id_invalid_json, status: :unprocessable_entity
       end
@@ -426,7 +432,7 @@ class ConferencesController < ApplicationController
       end
 
       if @conference.close
-        render :json => @conference.as_json(:permissions => {:user => @current_user, :session => session},
+        render :json => @conference.as_json(:permissions => { :user => @current_user, :session => session },
                                             :url => named_context_url(@context, :context_conference_url, @conference))
       else
         render :json => @conference.errors
@@ -504,13 +510,14 @@ class ConferencesController < ApplicationController
   end
 
   private
+
   def get_conference
     @conference = @context.web_conferences.find(params[:conference_id] || params[:id])
   end
 
   def conference_params
-    params.require(:web_conference).
-      permit(:title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
+    params.require(:web_conference)
+          .permit(:title, :duration, :description, :conference_type, user_settings: strong_anything, lti_settings: strong_anything)
   end
 
   def preload_recordings(conferences)

@@ -48,7 +48,7 @@ module Users
 
       it "success on an issued verifier" do
         verifier = Users::AccessVerifier.generate(user: user)
-        expect{ Users::AccessVerifier.validate(verifier) }.not_to raise_exception
+        expect { Users::AccessVerifier.validate(verifier) }.not_to raise_exception
       end
 
       it "returns verified user claim on success" do
@@ -93,14 +93,14 @@ module Users
       it "raises InvalidVerifier if too old" do
         verifier = Users::AccessVerifier.generate(user: user)
         Timecop.freeze(10.minutes.from_now) do
-          expect{ Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
+          expect { Users::AccessVerifier.validate(verifier) }.to raise_exception(Canvas::Security::TokenExpired)
         end
       end
 
       it "raises InvalidVerifier if tampered with user" do
         verifier = Users::AccessVerifier.generate(user: user)
         tampered = verifier.merge(sf_verifier: 'tampered')
-        expect{ Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
+        expect { Users::AccessVerifier.validate(tampered) }.to raise_exception(Users::AccessVerifier::InvalidVerifier)
       end
     end
   end

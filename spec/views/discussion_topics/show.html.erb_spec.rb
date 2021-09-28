@@ -21,7 +21,7 @@ require_relative '../../spec_helper'
 require_relative '../views_helper'
 
 describe "/discussion_topics/show" do
-  it "should render" do
+  it "renders" do
     course_with_teacher
     view_context(@course, @user)
     assignment_model(course: @course, submission_types: 'discussion_topic')
@@ -40,7 +40,7 @@ describe "/discussion_topics/show" do
     expect(response).to have_tag("div#discussion_subentries")
   end
 
-  it "should render in a group context" do
+  it "renders in a group context" do
     assignment_model(:submission_types => 'discussion_topic')
     rubric_association_model(:association_object => @assignment, :purpose => 'grading')
     group_model
@@ -64,7 +64,7 @@ describe "/discussion_topics/show" do
     expect(response).to have_tag("div#discussion_subentries")
   end
 
-  it "should render the student to-do date" do
+  it "renders the student to-do date" do
     assignment_model(:submission_types => 'discussion_topic')
     rubric_association_model(:association_object => @assignment, :purpose => 'grading')
     group_model

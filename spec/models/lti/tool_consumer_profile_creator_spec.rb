@@ -22,18 +22,16 @@ require_dependency "lti/tool_consumer_profile_creator"
 
 module Lti
   describe ToolConsumerProfileCreator do
-
     let(:root_account) do
       double('root account', lti_guid: 'my_guid', name: 'root_account_name', feature_enabled?: false)
     end
-    let(:account) { double('account', id: 3, root_account: root_account, class:Account) }
+    let(:account) { double('account', id: 3, root_account: root_account, class: Account) }
     let(:tcp_url) { "http://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
     let(:tcp_creator) { ToolConsumerProfileCreator.new(account, tcp_url) }
     let(:tcp_url_ssl) { "https://example.instructure.com/tcp/#{ToolConsumerProfile::DEFAULT_TCP_UUID}" }
     let(:tcp_creator_ssl) { ToolConsumerProfileCreator.new(account, tcp_url_ssl) }
 
     describe '#create' do
-
       it 'creates the tool consumer profile' do
         profile = tcp_creator.create
         expect(profile.lti_version).to eq 'LTI-2p0'
@@ -64,7 +62,6 @@ module Lti
         product_family = tcp_creator.create.product_instance.product_info.product_family
         expect(product_family.code).to eq 'canvas'
         expect(product_family.vendor).to be_a IMS::LTI::Models::Vendor
-
       end
 
       it 'creates the vendor' do
@@ -202,34 +199,30 @@ module Lti
         context "security profile" do
           it 'adds the lti_oauth_hash_message_security profile' do
             security_profiles = tcp_creator.create.security_profiles
-            profile = security_profiles.find{|p| p.security_profile_name == 'lti_oauth_hash_message_security'}
+            profile = security_profiles.find { |p| p.security_profile_name == 'lti_oauth_hash_message_security' }
             expect(profile.digest_algorithms).to match_array ['HMAC-SHA1']
           end
 
           it 'adds the oauth2_access_token_ws_security profile' do
             security_profiles = tcp_creator.create.security_profiles
-            profile = security_profiles.find{|p| p.security_profile_name == 'oauth2_access_token_ws_security'}
+            profile = security_profiles.find { |p| p.security_profile_name == 'oauth2_access_token_ws_security' }
             expect(profile).to be_present
           end
 
           it 'adds the lti_jwt_ws_security' do
             security_profiles = tcp_creator.create.security_profiles
-            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_ws_security'}
+            profile = security_profiles.find { |p| p.security_profile_name == 'lti_jwt_ws_security' }
             expect(profile.digest_algorithms).to match_array ['HS256']
           end
 
           it 'adds the lti_jwt_message_security' do
             security_profiles = tcp_creator.create.security_profiles
-            profile = security_profiles.find{|p| p.security_profile_name == 'lti_jwt_message_security'}
+            profile = security_profiles.find { |p| p.security_profile_name == 'lti_jwt_message_security' }
             expect(profile.digest_algorithms).to match_array ['HS256']
           end
-
         end
 
-
-
         context "custom Tool Consumer Profile" do
-
           let(:account) { Account.create! }
 
           let(:dev_key) do
@@ -268,7 +261,6 @@ module Lti
             expect(tcp_creator.create.guid).to eq tcp.uuid
           end
 
-
           it 'looks up the default TCP from the TCP url' do
             tcp_creator = ToolConsumerProfileCreator.new(
               account,
@@ -290,14 +282,14 @@ module Lti
           end
 
           it 'defaults to the default TCP if the developer key is not associated to the TCP' do
-             dev_key2 = DeveloperKey.create(api_key: 'test-api-key')
-             tcp_creator = ToolConsumerProfileCreator.new(
-               account,
-               tcp_url,
-               tcp_uuid: tcp.uuid,
-               developer_key: dev_key2
-             )
-             expect(tcp_creator.create.guid).to eq ToolConsumerProfile::DEFAULT_TCP_UUID
+            dev_key2 = DeveloperKey.create(api_key: 'test-api-key')
+            tcp_creator = ToolConsumerProfileCreator.new(
+              account,
+              tcp_url,
+              tcp_uuid: tcp.uuid,
+              developer_key: dev_key2
+            )
+            expect(tcp_creator.create.guid).to eq ToolConsumerProfile::DEFAULT_TCP_UUID
           end
         end
       end

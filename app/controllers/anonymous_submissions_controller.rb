@@ -76,6 +76,7 @@ class AnonymousSubmissionsController < SubmissionsBaseController
   end
 
   private
+
   def default_plagiarism_redirect_url
     speed_grader_course_gradebook_url(
       @context,

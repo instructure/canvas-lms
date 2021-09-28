@@ -42,13 +42,16 @@ module AttachmentFu # :nodoc:
         end
       end
 
-    protected
+      protected
+
       def process_attachment
         return unless super
+
         if image? && !@resized
           with_image do |img|
             max_image_size = attachment_options[:thumbnail_max_image_size_pixels]
             raise ThumbnailError.new("source image too large") if max_image_size && img[:width] * img[:height] > max_image_size
+
             resize_image_or_thumbnail! img
             self.width = img[:width] if respond_to?(:width)
             self.height = img[:height] if respond_to?(:height)
@@ -87,7 +90,7 @@ module AttachmentFu # :nodoc:
             commands.extent(size)
           # crop thumbnail, the smart way
           elsif size.is_a?(String) and size =~ /c$/
-             size = size.gsub(/c/, '')
+            size = size.gsub(/c/, '')
 
             # calculate sizes and aspect ratio
             thumb_width, thumb_height = size.split("x")
@@ -100,7 +103,7 @@ module AttachmentFu # :nodoc:
 
             # only crop if image is not smaller in both dimensions
             unless image_width < thumb_width and image_height < thumb_height
-              command = calculate_offset(image_width,image_height,image_aspect,thumb_width,thumb_height,thumb_aspect)
+              command = calculate_offset(image_width, image_height, image_aspect, thumb_width, thumb_height, thumb_aspect)
 
               # crop image
               commands.extract(command)
@@ -108,9 +111,9 @@ module AttachmentFu # :nodoc:
 
             # don not resize if image is not as height or width then thumbnail
             if image_width < thumb_width or image_height < thumb_height
-                commands.background('#ffffff')
-                commands.gravity('center')
-                commands.extent(size)
+              commands.background('#ffffff')
+              commands.gravity('center')
+              commands.extent(size)
             # resize image
             else
               commands.resize("#{size}")
@@ -123,8 +126,8 @@ module AttachmentFu # :nodoc:
         self.temp_path = img
       end
 
-      def calculate_offset(image_width,image_height,image_aspect,thumb_width,thumb_height,thumb_aspect)
-      # only crop if image is not smaller in both dimensions
+      def calculate_offset(image_width, image_height, image_aspect, thumb_width, thumb_height, thumb_aspect)
+        # only crop if image is not smaller in both dimensions
 
         # special cases, image smaller in one dimension then thumbsize
         if image_width < thumb_width
@@ -149,8 +152,6 @@ module AttachmentFu # :nodoc:
         # crop image
         command
       end
-
-
     end
   end
 end

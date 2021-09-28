@@ -23,8 +23,7 @@ describe "master courses - child courses - quiz locking" do
   include_context "in-process server selenium tests"
 
   before :once do
-
-    qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever'}.with_indifferent_access
+    qd = { question_type: "text_only_question", id: 1, question_name: 'the hardest question ever' }.with_indifferent_access
     due_date = format_date_for_view(Time.zone.now - 1.month)
     @copy_from = course_factory(:active_all => true)
     @template = MasterCourses::MasterTemplate.set_as_master_course(@copy_from)
@@ -48,11 +47,11 @@ describe "master courses - child courses - quiz locking" do
     stub_rcs_config
   end
 
-  it "should allow editing questions if content is not locked" do
+  it "allows editing questions if content is not locked" do
     # this test is here mostly to validate that the previous test is valid,
     # since it's looking "not_to contain_css('.edit_question_link')", I better
     # have a test to prove what's not supposed to be there is there when it's supposed to be
-    @tag.update_attribute(:restrictions, {:content => false, :points => true, :due_dates => true, :availability_dates => true})
+    @tag.update_attribute(:restrictions, { :content => false, :points => true, :due_dates => true, :availability_dates => true })
 
     get "/courses/#{@copy_to.id}/quizzes/#{@quiz_copy.id}/edit"
 

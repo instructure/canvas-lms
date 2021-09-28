@@ -23,10 +23,10 @@ class BookmarkedCollection::CompositeProxy < BookmarkedCollection::Proxy
 
   def initialize(collections)
     @labels = collections.map(&:first)
-    @depth = collections.map{ |(_,coll)| coll.depth }.max + 1
-    @collections = collections.map do |(label,coll)|
+    @depth = collections.map { |(_, coll)| coll.depth }.max + 1
+    @collections = collections.map do |(label, coll)|
       adjustment = @depth - 1 - coll.depth
-      adjustment.times.inject(coll) { |c,i| BookmarkedCollection.concat([label, c]) }
+      adjustment.times.inject(coll) { |c, i| BookmarkedCollection.concat([label, c]) }
     end
   end
 

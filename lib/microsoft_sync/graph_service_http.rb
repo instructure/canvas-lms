@@ -72,6 +72,7 @@ module MicrosoftSync
 
     class ExpectedErrorWrapper < StandardError
       attr_reader :wrapped_exception
+
       def initialize(wrapped_exception)
         @wrapped_exception = wrapped_exception
       end
@@ -191,8 +192,8 @@ module MicrosoftSync
 
       failed = (grouped[:error] || []) + (grouped[:throttled] || [])
       if failed.present?
-        codes = failed.map{|resp| resp['status']}
-        bodies = failed.map{|resp| resp['body'].to_s.truncate(500)}
+        codes = failed.map { |resp| resp['status'] }
+        bodies = failed.map { |resp| resp['body'].to_s.truncate(500) }
         msg = "Batch of #{failed.count}: codes #{codes}, bodies #{bodies.inspect}"
 
         raise BatchRequestThrottled.new(msg, grouped[:throttled]) if grouped[:throttled]
@@ -200,7 +201,7 @@ module MicrosoftSync
         raise BatchRequestFailed, msg
       end
 
-      grouped[:ignored]&.map{|r| r['id']} || []
+      grouped[:ignored]&.map { |r| r['id'] } || []
     end
 
     # Used mostly internally but can be useful for endpoint specifics
@@ -228,7 +229,7 @@ module MicrosoftSync
     end
 
     def intermittent_non_throttled?(error)
-      Errors::INTERMITTENT.any?{|klass| error.is_a?(klass)} && !error.is_a?(Errors::Throttled)
+      Errors::INTERMITTENT.any? { |klass| error.is_a?(klass) } && !error.is_a?(Errors::Throttled)
     end
 
     def raise_error_if_bad_response(response)
@@ -303,7 +304,7 @@ module MicrosoftSync
     def filter_clause(filter)
       filter.map do |filter_key, filter_value|
         if filter_value.is_a?(Array)
-          quoted_values = filter_value.map{|v| quote_value(v)}
+          quoted_values = filter_value.map { |v| quote_value(v) }
           "#{filter_key} in (#{quoted_values.join(', ')})"
         else
           "#{filter_key} eq #{quote_value(filter_value)}"
@@ -331,7 +332,7 @@ module MicrosoftSync
 
     def increment_batch_statsd_counters(endpoint_name, responses_grouped_by_type)
       responses_grouped_by_type.each do |type, responses|
-        responses.group_by{|c| c['status']}.transform_values(&:count).each do |code, count|
+        responses.group_by { |c| c['status'] }.transform_values(&:count).each do |code, count|
           tags = extra_statsd_tags.merge(msft_endpoint: endpoint_name, status: code)
           InstStatsd::Statsd.count("#{STATSD_PREFIX}.batch.#{type}", count, tags: tags)
         end
@@ -344,4 +345,3 @@ module MicrosoftSync
     end
   end
 end
-

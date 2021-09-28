@@ -1329,10 +1329,6 @@ const assignmentsQuizzesManagePermissions = generateActionTemplates(
       description: I18n.t('Allows user to share a quiz to Commons.')
     },
     {
-      title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to edit assignment details on individual discussions.')
-    },
-    {
       title: I18n.t('Modules'),
       description: I18n.t('Allows user to add new assignments to a module.')
     },
@@ -1382,6 +1378,12 @@ const assignmentsQuizzesManagePermissions = generateActionTemplates(
       )
     },
     {
+      title: I18n.t('Discussions'),
+      description: I18n.t(
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
+      )
+    },
+    {
       title: I18n.t('Grades'),
       description: I18n.t(
         'To moderate grades, Grades - Select final grade for moderation must also be enabled.'
@@ -1425,10 +1427,6 @@ const assignmentsQuizzesManagePermissions = generateActionTemplates(
       description: I18n.t('Allows user to share a quiz to Commons.')
     },
     {
-      title: I18n.t('Discussions'),
-      description: I18n.t('Allows user to edit assignment details on individual discussions.')
-    },
-    {
       title: I18n.t('Modules'),
       description: I18n.t('Allows user to add new assignments to a module.')
     },
@@ -1464,6 +1462,12 @@ const assignmentsQuizzesManagePermissions = generateActionTemplates(
       title: I18n.t('Course Settings'),
       description: I18n.t(
         'To import assignments and quizzes using the Course Import Tool, Course Content - add / edit / delete must be enabled.'
+      )
+    },
+    {
+      title: I18n.t('Discussions'),
+      description: I18n.t(
+        'To edit assignment details on individual discussions, Discussions - manage must also be enabled.'
       )
     },
     {
@@ -3801,8 +3805,14 @@ const discussionsModerateManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to close for comments, move, pin and unpin, edit, and delete discussion topics created by other users.'
+        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.'
       )
+    },
+    {
+      description: I18n.t('Allows user to edit discussion topics.')
+    },
+    {
+      description: I18n.t('Allows user to view all replies within a discussion topic.')
     }
   ],
   [
@@ -3831,7 +3841,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
       description: I18n.t('To view discussions in a course, Discussions - view must be enabled.')
     },
     {
-      description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.')
+      description: I18n.t('To reply to a discussion, Discussions - post must be enabled.')
     },
     {
       description: I18n.t('To edit a discussion, Discussions - moderate must also be enabled.')
@@ -3857,8 +3867,14 @@ const discussionsModerateManagePermissions = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'Allows user to close for comments, move, pin and unpin, edit, and delete discussion topics created by other users.'
+        'Allows user to close for comments, move, pin/unpin, edit, and delete discussion topics in the Discussions page.'
       )
+    },
+    {
+      description: I18n.t('Allows user to edit discussion topics.')
+    },
+    {
+      description: I18n.t('Allows user to view all replies within a discussion topic.')
     }
   ],
   [
@@ -3890,7 +3906,7 @@ const discussionsModerateManagePermissions = generateActionTemplates(
       description: I18n.t('To view discussions in a course, Discussions - view must be enabled.')
     },
     {
-      description: I18n.t('To reply to a discussion, Discussions - post must also be enabled.')
+      description: I18n.t('To reply to a discussion, Discussions - post must be enabled.')
     },
     {
       description: I18n.t('To edit a discussion, Discussions - moderate must also be enabled.')
@@ -3914,7 +3930,9 @@ const discussionPostPermissions = generateActionTemplates(
       )
     },
     {
-      description: I18n.t('To manage discussions, Discussions - moderate must be enabled.')
+      description: I18n.t(
+        'If the option requiring users to post before seeing replies is selected in a discussion, users must post a reply to view all posts unless Discussions - moderate is also enabled.'
+      )
     }
   ],
   [
@@ -3931,7 +3949,7 @@ const discussionPostPermissions = generateActionTemplates(
       )
     },
     {
-      description: I18n.t('To manage discussions, Discussions - moderate must be enabled.')
+      description: I18n.t('To manage discussions, Discussions - moderate must also be enabled.')
     }
   ]
 )

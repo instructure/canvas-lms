@@ -43,22 +43,22 @@ class ModeratePage
     end
 
     def click_page_number(page_number)
-      page_buttons.find {|e| e.text == page_number.to_s}.click
+      page_buttons.find { |e| e.text == page_number.to_s }.click
     end
 
     def enter_custom_grade(student, grade)
       grade_input(student).click
       grade_input(student).send_keys(:backspace, grade)
-      grade_input_dropdown_list(student).find {|k| k.text == "#{grade} (Custom)"}.click
+      grade_input_dropdown_list(student).find { |k| k.text == "#{grade} (Custom)" }.click
     end
 
     def click_student_link(student)
-      wait_for_new_page_load{ student_link(student).click }
+      wait_for_new_page_load { student_link(student).click }
     end
 
     def fetch_selected_final_grade_text(student)
       grade_input(student).click
-      text = grade_input_dropdown_list(student).find{|e| e.attribute('aria-selected') == "true"}.text
+      text = grade_input_dropdown_list(student).find { |e| e.attribute('aria-selected') == "true" }.text
       # close the menu
       grade_input(student).send_keys(:escape)
       text

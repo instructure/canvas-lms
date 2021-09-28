@@ -36,7 +36,7 @@ describe Submissions::DownloadsController do
         user_session(@student)
       end
 
-      it 'should set flash error' do
+      it 'sets flash error' do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -46,7 +46,7 @@ describe Submissions::DownloadsController do
         expect(flash[:error]).not_to be_nil
       end
 
-      it "should redirect to context assignment url" do
+      it "redirects to context assignment url" do
         get :show, params: {
           course_id: @context.id,
           assignment_id: @assignment.id,
@@ -72,10 +72,10 @@ describe Submissions::DownloadsController do
         }
         expect(assigns(:attachment)).to eq @attachment
         expect(response).to redirect_to(course_file_download_url(@context, @attachment, {
-          download_frd: true,
-          inline: nil,
-          verifier: @attachment.uuid
-        }))
+                                                                   download_frd: true,
+                                                                   inline: nil,
+                                                                   verifier: @attachment.uuid
+                                                                 }))
       end
 
       it "renders as json" do
@@ -86,7 +86,7 @@ describe Submissions::DownloadsController do
           id: @student.id,
           download: @submission.attachment_id
         },
-          format: :json
+                   format: :json
         expect(JSON.parse(response.body)['attachment']['id']).to eq @submission.attachment_id
       end
     end
@@ -133,7 +133,7 @@ describe Submissions::DownloadsController do
         # our factory system is broken
         @original_context = @context
         @original_student = @student
-        course_with_student(active_all:true)
+        course_with_student(active_all: true)
         submission_comment_model
         @attachment = attachment_model(context: @assignment)
         @submission_comment.attachments = [@attachment]
@@ -153,14 +153,14 @@ describe Submissions::DownloadsController do
         }
         expect(assigns(:attachment)).to eq @attachment
         expect(response).to redirect_to(file_download_url(@attachment, {
-          download_frd: true,
-          inline: nil,
-          verifier: @attachment.uuid
-        }))
+                                                            download_frd: true,
+                                                            inline: nil,
+                                                            verifier: @attachment.uuid
+                                                          }))
       end
     end
 
-    it "should redirect download requests with the download_frd parameter" do
+    it "redirects download requests with the download_frd parameter" do
       # This is because the files controller looks for download_frd to indicate a forced download
       course_with_teacher_logged_in
       assignment = assignment_model(course: @course)
@@ -172,8 +172,9 @@ describe Submissions::DownloadsController do
         submission_type: "online_upload",
         attachment_ids: att.id,
         attachments: [att],
-        user: @student)
-      get :show, params: {assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id}
+        user: @student
+      )
+      get :show, params: { assignment_id: assignment.id, course_id: @course.id, id: @user.id, download: att.id }
 
       expect(response).to be_redirect
       expect(response.headers["Location"]).to match %r{users/#{@student.id}/files/#{att.id}/download\?download_frd=true}

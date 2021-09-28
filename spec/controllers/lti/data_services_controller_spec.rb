@@ -52,7 +52,7 @@ describe Lti::DataServicesController do
     it_behaves_like 'lti services' do
       let(:action) { :create }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/create"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/create" }
       let(:params_overrides) do
         { subscription: subscription, account_id: root_account.lti_context_id }
       end
@@ -66,8 +66,7 @@ describe Lti::DataServicesController do
       end
       it 'adds OwnerId and OwnerType if passed in for a tool' do
         expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
-          hash_including(subscription.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool'))
-        )
+                                                                                 hash_including(subscription.merge(OwnerId: tool.global_id.to_s, OwnerType: 'external_tool')))
         send_request
       end
     end
@@ -80,8 +79,7 @@ describe Lti::DataServicesController do
 
       it 'adds OwnerId and OwnerType if passed in for a person' do
         expect(Services::LiveEventsSubscriptionService).to receive(:create).with(any_args,
-          hash_including(subscription.merge(OwnerId: user.global_id.to_s, OwnerType: 'person'))
-        )
+                                                                                 hash_including(subscription.merge(OwnerId: user.global_id.to_s, OwnerType: 'person')))
         send_request
       end
 
@@ -109,7 +107,7 @@ describe Lti::DataServicesController do
     it_behaves_like 'lti services' do
       let(:action) { :show }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/show" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, id: 'testid' }
       end
@@ -120,7 +118,7 @@ describe Lti::DataServicesController do
     it_behaves_like 'lti services' do
       let(:action) { :update }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/update" }
       let(:params_overrides) do
         { subscription: subscription, account_id: root_account.lti_context_id, id: 'testid' }
       end
@@ -136,8 +134,7 @@ describe Lti::DataServicesController do
 
       it 'adds UpdatedBy and UpdatedByType if passed in for a tool' do
         expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
-          hash_including(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool', Id: subId)
-        )
+                                                                                 hash_including(UpdatedBy: tool.global_id.to_s, UpdatedByType: 'external_tool', Id: subId))
         send_request
       end
     end
@@ -150,8 +147,7 @@ describe Lti::DataServicesController do
 
       it 'adds UpdatedBy and UpdatedByType if passed in for a person' do
         expect(Services::LiveEventsSubscriptionService).to receive(:update).with(any_args,
-          hash_including('UpdatedBy' => user.global_id.to_s, UpdatedByType: 'person', Id: subId)
-        )
+                                                                                 hash_including('UpdatedBy' => user.global_id.to_s, UpdatedByType: 'person', Id: subId))
         send_request
       end
 
@@ -179,7 +175,7 @@ describe Lti::DataServicesController do
     it_behaves_like 'lti services' do
       let(:action) { :index }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/list" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id }
       end
@@ -190,7 +186,7 @@ describe Lti::DataServicesController do
     it_behaves_like 'lti services' do
       let(:action) { :destroy }
       let(:expected_mime_type) { described_class::MIME_TYPE }
-      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy"}
+      let(:scope_to_remove) { "https://canvas.instructure.com/lti/data_services/scope/destroy" }
       let(:params_overrides) do
         { account_id: root_account.lti_context_id, id: 'testid' }
       end

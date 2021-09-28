@@ -24,12 +24,12 @@ module Types
     alias rules object
 
     field :drop_lowest, Integer,
-      "The lowest N assignments are not included in grade calculations",
-      null: true
+          "The lowest N assignments are not included in grade calculations",
+          null: true
 
     field :drop_highest, Integer,
-      "The highest N assignments are not included in grade calculations",
-      null: true
+          "The highest N assignments are not included in grade calculations",
+          null: true
 
     field :never_drop, [AssignmentType], null: true
     def never_drop

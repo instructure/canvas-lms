@@ -25,6 +25,7 @@ class Rubric < ActiveRecord::Base
   POINTS_POSSIBLE_PRECISION = 4
 
   attr_writer :skip_updating_points_possible
+
   belongs_to :user
   belongs_to :rubric # based on another rubric
   belongs_to :context, polymorphic: [:course, :account]
@@ -51,32 +52,32 @@ class Rubric < ActiveRecord::Base
   scope :active, -> { where.not(workflow_state: 'deleted') }
 
   set_policy do
-    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
+    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
     can :read and can :create and can :delete_associations
 
-    given {|user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)}
+    given { |user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :read and can :create and can :delete_associations
 
-    given {|user, session| self.context.grants_right?(user, session, :manage)}
+    given { |user, session| self.context.grants_right?(user, session, :manage) }
     can :read and can :create and can :delete_associations
 
-    given {|user, session| self.context.grants_right?(user, session, :read_rubrics) }
+    given { |user, session| self.context.grants_right?(user, session, :read_rubrics) }
     can :read
 
     # read_only means "associated with > 1 object for grading purposes"
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)}
+    given { |user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :update and can :delete
 
-    given {|user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_rubrics)}
+    given { |user, session| !self.read_only && self.rubric_associations.for_grading.length < 2 && self.context.grants_right?(user, session, :manage_rubrics) }
     can :update and can :delete
 
-    given {|user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit)}
+    given { |user, session| self.context.grants_any_right?(user, session, :manage_assignments, :manage_assignments_edit) }
     can :delete
 
-    given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
+    given { |user, session| self.context.grants_right?(user, session, :manage_rubrics) }
     can :delete
 
-    given {|user, session| self.context.grants_right?(user, session, :read) }
+    given { |user, session| self.context.grants_right?(user, session, :read) }
     can :read
   end
 
@@ -87,11 +88,11 @@ class Rubric < ActiveRecord::Base
 
   def self.aligned_to_outcomes
     where(
-      ContentTag.learning_outcome_alignments.
-        active.
-        where(content_type: 'Rubric').
-        where('content_tags.content_id = rubrics.id').
-        arel.exists
+      ContentTag.learning_outcome_alignments
+        .active
+        .where(content_type: 'Rubric')
+        .where('content_tags.content_id = rubrics.id')
+        .arel.exists
     )
   end
 
@@ -102,8 +103,8 @@ class Rubric < ActiveRecord::Base
       AND associations_for_count.purpose = 'grading'
       AND associations_for_count.workflow_state = 'active'
     JOINS
-      group('rubrics.id').
-      having('COUNT(rubrics.id) < 2')
+      group('rubrics.id')
+                   .having('COUNT(rubrics.id) < 2')
   end
 
   def self.unassessed
@@ -117,7 +118,7 @@ class Rubric < ActiveRecord::Base
         LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
         ON associations_for_unassessed.id = assessments_for_unassessed.rubric_association_id
       JOINS
-      where(assessments_for_unassessed: {id: nil})
+      where(assessments_for_unassessed: { id: nil })
   end
 
   def default_values
@@ -204,7 +205,7 @@ class Rubric < ActiveRecord::Base
   end
 
   def data_outcome_ids
-    (data || []).map{|c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
+    (data || []).map { |c| c[:learning_outcome_id] }.compact.map(&:to_i).uniq
   end
 
   def criteria_object
@@ -215,7 +216,7 @@ class Rubric < ActiveRecord::Base
     self.data
   end
 
-  def associate_with(association, context, opts={})
+  def associate_with(association, context, opts = {})
     if opts[:purpose] == "grading"
       res = self.rubric_associations.where(association_id: association, association_type: association.class.to_s, purpose: 'grading').first
       return res if res
@@ -246,7 +247,7 @@ class Rubric < ActiveRecord::Base
     RubricAssociation.generate(current_user, self, context, association_params) if association_params[:association_object] || association_params[:url]
   end
 
-  def unique_item_id(id=nil)
+  def unique_item_id(id = nil)
     @used_ids ||= {}
     while !id || @used_ids[id]
       id = "#{self.rubric_id || self.id}_#{rand(10000)}"
@@ -301,7 +302,7 @@ class Rubric < ActiveRecord::Base
 
     criterion[:points] = mastery_scale.points_possible
     criterion[:mastery_points] = mastery_scale.mastery_points
-    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
+    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map { |pr| criterion_rating(pr, criterion[:id]) }
   end
 
   def update_learning_outcome_criteria(outcome)
@@ -343,9 +344,11 @@ class Rubric < ActiveRecord::Base
   def will_change_with_update?(params)
     params ||= {}
     return true if params[:free_form_criterion_comments] && !!self.free_form_criterion_comments != (params[:free_form_criterion_comments] == '1')
+
     data = generate_criteria(params)
     return true if data.title != self.title || data.points_possible != self.points_possible
     return true if Rubric.normalize(data.criteria) != Rubric.normalize(self.criteria)
+
     false
   end
 
@@ -386,14 +389,14 @@ class Rubric < ActiveRecord::Base
         criterion_rating(rating_data, criterion[:id])
       end
       criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
-      criterion[:points] = criterion[:ratings].map{|r| r[:points]}.max || 0
+      criterion[:points] = criterion[:ratings].map { |r| r[:points] }.max || 0
 
       # Record both the criterion data and the original ID that was passed in
       # (we'll use the ID when we sort the criteria below)
       criteria.push([idx, criterion])
     end
-    criteria = criteria.sort_by { |criterion| criterion.first&.to_i || CanvasSort::First }.
-      map(&:second)
+    criteria = criteria.sort_by { |criterion| criterion.first&.to_i || CanvasSort::First }
+                       .map(&:second)
     points_possible = total_points_from_criteria(criteria)&.round(POINTS_POSSIBLE_PRECISION)
     CriteriaData.new(criteria, points_possible, title)
   end

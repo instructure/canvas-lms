@@ -36,7 +36,7 @@ describe MicrosoftSync::Errors do
     end
 
     def public_interpolated_values
-      {name: @name, description: @description}
+      { name: @name, description: @description }
     end
 
     def initialize(message, name, description)
@@ -52,7 +52,7 @@ describe MicrosoftSync::Errors do
     end
 
     def public_interpolated_values
-      {count: @n_problems}
+      { count: @n_problems }
     end
 
     def initialize(message, n_problems)
@@ -82,7 +82,6 @@ describe MicrosoftSync::Errors do
       end
     end
 
-
     context 'when the error is a PublicError' do
       let(:error) { MicrosoftSync::TestErrorCountInterpolation.new('foo', 123) }
 
@@ -91,8 +90,8 @@ describe MicrosoftSync::Errors do
           'class' => 'MicrosoftSync::TestErrorCountInterpolation',
           'message' => 'foo',
           'public_message' =>
-            {'one' => 'One problem happened', 'other' => '%{count} problems happened'},
-          'public_interpolated_values' => {'count' => 123}
+            { 'one' => 'One problem happened', 'other' => '%{count} problems happened' },
+          'public_interpolated_values' => { 'count' => 123 }
         )
       end
     end
@@ -243,7 +242,7 @@ describe MicrosoftSync::Errors do
         it { expect(subject.retry_after_seconds).to eq(nil) }
 
         context 'when the retry-after header is set' do
-          let(:headers) { {'Retry-After' => '12.345'} }
+          let(:headers) { { 'Retry-After' => '12.345' } }
 
           it 'sets retry_after_seconds' do
             expect(subject.retry_after_seconds).to eq(12.345)

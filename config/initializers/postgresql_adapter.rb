@@ -25,6 +25,7 @@ end
 module PostgreSQLAdapterExtensions
   def receive_timeout_wrapper
     return yield unless @config[:receive_timeout]
+
     Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout") { yield }
   end
 
@@ -36,7 +37,6 @@ module PostgreSQLAdapterExtensions
     RUBY
   end
 
-
   def explain(arel, binds = [], analyze: false)
     sql = "EXPLAIN #{"ANALYZE " if analyze}#{to_sql(arel, binds)}"
     ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
@@ -44,15 +44,16 @@ module PostgreSQLAdapterExtensions
 
   def readonly?(table = nil, column = nil)
     return @readonly unless @readonly.nil?
+
     @readonly = in_recovery?
   end
 
   def bulk_insert(table_name, records)
     keys = records.first.keys
-    quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
+    quoted_keys = keys.map { |k| quote_column_name(k) }.join(', ')
     execute "COPY #{quote_table_name(table_name)} (#{quoted_keys}) FROM STDIN"
-    raw_connection.put_copy_data records.inject(+''){ |result, record|
-                                   result << keys.map{ |k| quote_text(record[k]) }.join("\t") << "\n"
+    raw_connection.put_copy_data records.inject(+'') { |result, record|
+                                   result << keys.map { |k| quote_text(record[k]) }.join("\t") << "\n"
                                  }
     ActiveRecord::Base.connection.clear_query_cache
     raw_connection.put_copy_end
@@ -71,8 +72,8 @@ module PostgreSQLAdapterExtensions
     elsif value.is_a?(ActiveRecord::ConnectionAdapters::PostgreSQL::OID::Array::Data)
       quote_text(encode_array(value))
     else
-      hash = {"\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\"}
-      value.to_s.gsub(/[\n\r\t\\]/){ |c| hash[c] }
+      hash = { "\n" => "\\n", "\r" => "\\r", "\t" => "\\t", "\\" => "\\\\" }
+      value.to_s.gsub(/[\n\r\t\\]/) { |c| hash[c] }
     end
   end
 
@@ -102,10 +103,10 @@ module PostgreSQLAdapterExtensions
 
   def func(name, *args)
     case name
-      when :group_concat
-        "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
-      else
-        super
+    when :group_concat
+      "string_agg((#{func_arg_esc(args.first)})::text, #{quote(args[1] || ',')})"
+    else
+      super
     end
   end
 
@@ -124,15 +125,15 @@ module PostgreSQLAdapterExtensions
     schema = shard.name
 
     result = query(<<~SQL, 'SCHEMA')
-         SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
-         FROM pg_class t
-         INNER JOIN pg_index d ON t.oid = d.indrelid
-         INNER JOIN pg_class i ON d.indexrelid = i.oid
-         WHERE i.relkind = 'i'
-           AND d.indisprimary = 'f'
-           AND t.relname = '#{table_name}'
-           AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
-        ORDER BY i.relname
+       SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
+       FROM pg_class t
+       INNER JOIN pg_index d ON t.oid = d.indrelid
+       INNER JOIN pg_class i ON d.indexrelid = i.oid
+       WHERE i.relkind = 'i'
+         AND d.indisprimary = 'f'
+         AND t.relname = '#{table_name}'
+         AND t.relnamespace IN (SELECT oid FROM pg_namespace WHERE nspname = #{schema ? "'#{schema}'" : 'ANY (current_schemas(false))'} )
+      ORDER BY i.relname
     SQL
 
     result.map do |row|
@@ -153,7 +154,7 @@ module PostgreSQLAdapterExtensions
 
       # add info on sort order for columns (only desc order is explicitly specified, asc is the default)
       desc_order_columns = inddef.scan(/(\w+) DESC/).flatten
-      orders = desc_order_columns.any? ? Hash[desc_order_columns.map {|order_column| [order_column, :desc]}] : {}
+      orders = desc_order_columns.any? ? Hash[desc_order_columns.map { |order_column| [order_column, :desc] }] : {}
 
       ActiveRecord::ConnectionAdapters::IndexDefinition.new(table_name, index_name, unique, column_names, orders: orders)
     end
@@ -162,6 +163,7 @@ module PostgreSQLAdapterExtensions
   def index_exists?(_table_name, columns, _options = {})
     raise ArgumentError.new("if you're identifying an index by name only, you should use index_name_exists?") if columns.is_a?(Hash) && columns[:name]
     raise ArgumentError.new("columns should be a string, a symbol, or an array of those ") unless columns.is_a?(String) || columns.is_a?(Symbol) || columns.is_a?(Array)
+
     super
   end
 
@@ -235,6 +237,7 @@ module PostgreSQLAdapterExtensions
                                  "Specify an index name from #{matching_indexes.map(&:name).join(', ')}"
     elsif matching_indexes.none?
       return if options.is_a?(Hash) && options[:if_exists]
+
       raise ArgumentError, "No indexes found on #{table_name} with the options provided."
     else
       matching_indexes.first.name
@@ -247,11 +250,13 @@ module PostgreSQLAdapterExtensions
 
   def add_column(table_name, column_name, type, if_not_exists: false, **options)
     return if if_not_exists && column_exists?(table_name, column_name)
+
     super(table_name, column_name, type, **options)
   end
 
   def remove_column(table_name, column_name, type = nil, if_exists: false, **options)
     return if if_exists && !column_exists?(table_name, column_name)
+
     super
   end
 
@@ -289,6 +294,7 @@ module PostgreSQLAdapterExtensions
 
   def icu_collations
     return [] if postgresql_version < 120000
+
     @collations ||= select_rows <<~SQL, "SCHEMA"
       SELECT nspname, collname
       FROM pg_collation
@@ -302,6 +308,7 @@ module PostgreSQLAdapterExtensions
 
   def create_icu_collations
     return if postgresql_version < 120000
+
     original_locale = I18n.locale
 
     collation = "und-u-kn-true"
@@ -311,10 +318,13 @@ module PostgreSQLAdapterExtensions
 
     I18n.available_locales.each do |locale|
       next if locale =~ /-x-/
+
       I18n.locale = locale
       next if Canvas::ICU.collator.rules.empty?
+
       collation = "#{locale}-u-kn-true"
       next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+
       update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
     end
   ensure
@@ -346,7 +356,6 @@ module PostgreSQLAdapterExtensions
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)
-
 
 module SchemaCreationExtensions
   def set_table_context(table)

@@ -37,6 +37,7 @@ module Canvas
     end
 
     private
+
     def authenticity_token_options
       session_options = CanvasRails::Application.config.session_options
       options = session_options.slice(:domain, :secure)

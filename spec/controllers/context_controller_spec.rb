@@ -27,22 +27,22 @@ describe ContextController do
   end
 
   describe "GET 'roster'" do
-    it 'should require authorization' do
+    it 'requires authorization' do
       get 'roster', params: { course_id: @course.id }
       assert_unauthorized
     end
 
-    it 'should work when the context is a group in a course' do
+    it 'works when the context is a group in a course' do
       user_session(@student)
       @group = @course.groups.create!
       @group.add_user(@student, 'accepted')
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to eq [@student.id]
       expect(assigns[:secondary_users].each_value.first.collect(&:id)).to match_array @course.admins
-                    .map(&:id)
+                                                                                             .map(&:id)
     end
 
-    it 'should only show active group members to students' do
+    it 'only shows active group members to students' do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
       inactive_student = user_factory
@@ -54,12 +54,12 @@ describe ContextController do
       user_session(@student)
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [
-                    @student.id,
-                    active_student.id
-                  ]
+        @student.id,
+        active_student.id
+      ]
     end
 
-    it 'should only show active course instructors to students' do
+    it 'only shows active course instructors to students' do
       active_teacher = user_factory
       @course.enroll_teacher(active_teacher).accept!
       inactive_teacher = user_factory
@@ -74,7 +74,7 @@ describe ContextController do
       expect(teacher_ids & [active_teacher.id, inactive_teacher.id]).to eq [active_teacher.id]
     end
 
-    it 'should show all group members to admins' do
+    it 'shows all group members to admins' do
       active_student = user_factory
       @course.enroll_student(active_student).accept!
       inactive_student = user_factory
@@ -85,13 +85,13 @@ describe ContextController do
       user_session(@teacher)
       get 'roster', params: { group_id: @group.id }
       expect(assigns[:primary_users].each_value.first.collect(&:id)).to match_array [
-                    @student.id,
-                    active_student.id,
-                    inactive_student.id
-                  ]
+        @student.id,
+        active_student.id,
+        inactive_student.id
+      ]
     end
 
-    it "should redirect 'disabled', if disabled by the teacher" do
+    it "redirects 'disabled', if disabled by the teacher" do
       user_session(@student)
       @course.update_attribute(
         :tab_configuration,
@@ -121,12 +121,12 @@ describe ContextController do
   end
 
   describe "GET 'roster_user'" do
-    it 'should require authorization' do
+    it 'requires authorization' do
       get 'roster_user', params: { course_id: @course.id, id: @user.id }
       assert_unauthorized
     end
 
-    it 'should assign variables' do
+    it 'assigns variables' do
       user_session(@teacher)
       @enrollment = @course.enroll_student(user_factory(active_all: true))
       @enrollment.accept!
@@ -191,13 +191,13 @@ describe ContextController do
       before :once do
         @other_section = @course.course_sections.create! name: 'Other Section FRD'
         @course.enroll_teacher(@teacher, section: @other_section, allow_multiple_enrollments: true)
-          .accept!
+               .accept!
         @other_student = user_factory
         @course.enroll_student(
           @other_student,
           section: @other_section, limit_privileges_to_course_section: true
         )
-          .accept!
+               .accept!
       end
 
       it 'prevents section-limited users from seeing users in other sections' do
@@ -299,12 +299,12 @@ describe ContextController do
       @hmac = Canvas::Security.hmac_sha1(@data)
     end
 
-    it 'should require a valid HMAC' do
+    it 'requires a valid HMAC' do
       post 'object_snippet', params: { object_data: @data, s: 'DENIED' }
       assert_status(400)
     end
 
-    it 'should render given a correct HMAC' do
+    it 'renders given a correct HMAC' do
       post 'object_snippet', params: { object_data: @data, s: @hmac }
       expect(response).to be_successful
       expect(response['X-XSS-Protection']).to eq '0'
@@ -312,7 +312,7 @@ describe ContextController do
   end
 
   describe "GET '/media_objects/:id/thumbnail" do
-    it 'should redirect to kaltura even if the MediaObject does not exist' do
+    it 'redirects to kaltura even if the MediaObject does not exist' do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return(
         'http://example.com/thumbnail_redirect'
@@ -329,14 +329,14 @@ describe ContextController do
       user_session(@student)
     end
 
-    it 'should match the create_media_object route' do
+    it 'matches the create_media_object route' do
       assert_recognizes(
         { controller: 'context', action: 'create_media_object' },
         { path: 'media_objects', method: :post }
       )
     end
 
-    it 'should update the object if it already exists' do
+    it 'updates the object if it already exists' do
       @media_object = @user.media_objects.build(media_id: 'new_object')
       @media_object.media_type = 'audio'
       @media_object.title = 'original title'
@@ -359,7 +359,7 @@ describe ContextController do
       expect(@user.media_objects.count).to eq @original_count
     end
 
-    it "should create the object if it doesn't already exist" do
+    it "creates the object if it doesn't already exist" do
       @original_count = @user.media_objects.count
 
       post :create_media_object,
@@ -376,7 +376,7 @@ describe ContextController do
       expect(@media_object.title).to eq 'title'
     end
 
-    it 'should truncate the title and user_entered_title' do
+    it 'truncates the title and user_entered_title' do
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}",
@@ -390,15 +390,15 @@ describe ContextController do
       expect(@media_object.user_entered_title.size).to be <= 255
     end
 
-    it 'should return the embedded_iframe_url' do
+    it 'returns the embedded_iframe_url' do
       post :create_media_object,
            params: {
              context_code: "user_#{@user.id}", id: 'new_object', type: 'audio', title: 'title'
            }
       @media_object = @user.reload.media_objects.last
       expect(JSON.parse(response.body)['embedded_iframe_url']).to eq media_object_iframe_path(
-           @media_object.media_id
-         )
+        @media_object.media_id
+      )
     end
   end
 
@@ -409,7 +409,7 @@ describe ContextController do
       @course.student_enrollments.update_all(workflow_state: 'completed')
     end
 
-    it 'should paginate' do
+    it 'paginates' do
       get :prior_users, params: { course_id: @course.id }
       expect(response).to be_successful
       expect(assigns[:prior_users].size).to eql 20
@@ -417,7 +417,7 @@ describe ContextController do
   end
 
   describe "GET 'undelete_index'" do
-    it 'should work' do
+    it 'works' do
       user_session(@teacher)
       assignment_model(course: @course)
       @assignment.destroy
@@ -427,7 +427,7 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(@assignment)
     end
 
-    it 'should show group_categories' do
+    it 'shows group_categories' do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)
       category.destroy
@@ -437,7 +437,7 @@ describe ContextController do
       expect(assigns[:deleted_items]).to include(category)
     end
 
-    it 'should show groups' do
+    it 'shows groups' do
       user_session(@teacher)
       category = GroupCategory.student_organized_for(@course)
       g1 = category.groups.create!(context: @course, name: 'group_a')
@@ -452,18 +452,18 @@ describe ContextController do
       before(:once) do
         assignment = assignment_model(course: @course)
         rubric = rubric_model({
-          context: @course,
-          title: 'Test Rubric',
-          data: [{
-            description: 'Some criterion',
-            points: 10,
-            id: 'crit1',
-            ignore_for_scoring: true,
-            ratings: [
-              { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
-            ]
-          }]
-        })
+                                context: @course,
+                                title: 'Test Rubric',
+                                data: [{
+                                  description: 'Some criterion',
+                                  points: 10,
+                                  id: 'crit1',
+                                  ignore_for_scoring: true,
+                                  ratings: [
+                                    { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+                                  ]
+                                }]
+                              })
         @association = rubric.associate_with(assignment, @course, purpose: 'grading')
       end
 
@@ -545,18 +545,18 @@ describe ContextController do
     it 'allows undeleting rubric associations' do
       assignment = assignment_model(course: @course)
       rubric = rubric_model({
-        context: @course,
-        title: 'Test Rubric',
-        data: [{
-          description: 'Some criterion',
-          points: 10,
-          id: 'crit1',
-          ignore_for_scoring: true,
-          ratings: [
-            { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
-          ]
-        }]
-      })
+                              context: @course,
+                              title: 'Test Rubric',
+                              data: [{
+                                description: 'Some criterion',
+                                points: 10,
+                                id: 'crit1',
+                                ignore_for_scoring: true,
+                                ratings: [
+                                  { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+                                ]
+                              }]
+                            })
       association = rubric.associate_with(assignment, @course, purpose: 'grading')
       puts "association id is: #{association.id}"
       association.destroy

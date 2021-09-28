@@ -25,8 +25,9 @@ module Courses
     def visible_item_ids_for_users(item_type, user_ids)
       # return all the item ids that are visible to _any_ of the users
       raise "unknown item type" unless ITEM_TYPES.include?(item_type)
+
       cache_visibilities_for_users(item_type, user_ids)
-      user_ids.flat_map{|user_id| @cached_visibilities[item_type][user_id]}.uniq
+      user_ids.flat_map { |user_id| @cached_visibilities[item_type][user_id] }.uniq
     end
 
     def cache_item_visibilities_for_user_ids(user_ids)
@@ -55,7 +56,7 @@ module Courses
 
     def get_visibilities_for_user_ids(item_type, user_ids)
       GuardRail.activate(:secondary) do
-        opts = {user_id: user_ids, course_id: [self.id]}
+        opts = { user_id: user_ids, course_id: [self.id] }
         case item_type
         when :assignment
           AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(opts)

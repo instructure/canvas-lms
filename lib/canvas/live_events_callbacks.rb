@@ -126,7 +126,7 @@ module Canvas::LiveEventsCallbacks
     when WikiPage
       if changes["title"] || changes["body"]
         Canvas::LiveEvents.wiki_page_updated(obj, changes["title"] ? changes["title"].first : nil,
-                                                  changes["body"] ? changes["body"].first : nil)
+                                             changes["body"] ? changes["body"].first : nil)
       end
     when Assignment
       Canvas::LiveEvents.assignment_updated(obj)

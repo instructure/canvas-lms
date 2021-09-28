@@ -50,20 +50,20 @@ describe NotificationPreferencesController, type: :request do
       expect(json['notification_preferences'].length).to eq 2
       pref = json['notification_preferences'].find { |p| p['notification'] == 'new_announcement' }
       expect(pref).to eq({
-          'notification' => 'new_announcement',
-          'category' => 'announcements',
-          'frequency' => 'daily'
-      })
+                           'notification' => 'new_announcement',
+                           'category' => 'announcements',
+                           'frequency' => 'daily'
+                         })
       expect(@cc.notification_policies.count).to eq 2
     end
 
-    it "should list preferences by id" do
+    it "lists preferences by id" do
       by_id
       list_preferences
       list_preferences
     end
 
-    it "should list preference by address" do
+    it "lists preference by address" do
       by_address
       list_preferences
       list_preferences
@@ -71,7 +71,7 @@ describe NotificationPreferencesController, type: :request do
   end
 
   describe "category_index" do
-    it "should list categories" do
+    it "lists categories" do
       Notification.create!(name: 'Announcement Created By You', category: 'Announcement Created By You')
       by_category
       json = api_call(:get, @prefix, @params.merge(action: 'category_index'))
@@ -88,20 +88,20 @@ describe NotificationPreferencesController, type: :request do
       json = api_call(:get, "#{@prefix}/new_announcement", @params.merge(action: 'show', notification: 'new_announcement'))
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{
-          'notification' => 'new_announcement',
-          'category' => 'announcements',
-          'frequency' => 'daily'
+        'notification' => 'new_announcement',
+        'category' => 'announcements',
+        'frequency' => 'daily'
       }]
       expect(@cc.notification_policies.count).to eq 1
     end
 
-    it "should list a single preference by id" do
+    it "lists a single preference by id" do
       by_id
       list_preference
       list_preference
     end
 
-    it "should list a single preference by address" do
+    it "lists a single preference by address" do
       by_address
       list_preference
       list_preference
@@ -114,29 +114,29 @@ describe NotificationPreferencesController, type: :request do
       @params.delete(:user_id)
       json = api_call(:put, "#{@prefix}/new_announcement?notification_preferences[frequency]=never",
                       @params.merge(action: 'update', notification: 'new_announcement',
-                      notification_preferences: { 'frequency' => 'never' }))
+                                    notification_preferences: { 'frequency' => 'never' }))
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{
-                                                      'notification' => 'new_announcement',
-                                                      'category' => 'announcements',
-                                                      'frequency' => 'never'
-                                                  }]
+        'notification' => 'new_announcement',
+        'category' => 'announcements',
+        'frequency' => 'never'
+      }]
       expect(@cc.notification_policies.count).to eq 1
     end
 
-    it "should update a single preference by id" do
+    it "updates a single preference by id" do
       by_id
       update_preference
       update_preference
     end
 
-    it "should update a single preference by address" do
+    it "updates a single preference by address" do
       by_address
       update_preference
       update_preference
     end
 
-    it "should update a single preference JSON API style" do
+    it "updates a single preference JSON API style" do
       by_address
       # self is the only possible one
       @params.delete(:user_id)
@@ -145,10 +145,10 @@ describe NotificationPreferencesController, type: :request do
                       'notification_preferences' => [{ 'frequency' => 'never' }])
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{
-                                                      'notification' => 'new_announcement',
-                                                      'category' => 'announcements',
-                                                      'frequency' => 'never'
-                                                  }]
+        'notification' => 'new_announcement',
+        'category' => 'announcements',
+        'frequency' => 'never'
+      }]
       expect(@cc.notification_policies.count).to eq 1
     end
   end
@@ -159,24 +159,24 @@ describe NotificationPreferencesController, type: :request do
       @params.delete(:user_id)
       json = api_call(:put, "#{@prefix}/#{category}?notification_preferences[frequency]=never",
                       @params.merge(action: 'update_preferences_by_category', category: category,
-                      notification_preferences: { 'frequency' => 'never' }))
+                                    notification_preferences: { 'frequency' => 'never' }))
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{
-                                                      'notification' => notification,
-                                                      'category' => category,
-                                                      'frequency' => 'never'
-                                                  }]
+        'notification' => notification,
+        'category' => category,
+        'frequency' => 'never'
+      }]
       expect(@cc.notification_policies.count).to eq 1
     end
 
-    it "should update preferences by id and category" do
+    it "updates preferences by id and category" do
       Notification.create!(name: 'Announcement Created By You', category: 'Announcement Created By You')
       by_category
       update_preferences_by_category('announcement_created_by_you')
       update_preferences_by_category('announcement_created_by_you')
     end
 
-    it "should update preferences by category JSON API style" do
+    it "updates preferences by category JSON API style" do
       by_category
       # self is the only possible one
       @params.delete(:user_id)
@@ -185,10 +185,10 @@ describe NotificationPreferencesController, type: :request do
                       'notification_preferences' => [{ 'frequency' => 'never' }])
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences']).to eq [{
-                                                      'notification' => 'new_announcement',
-                                                      'category' => 'announcements',
-                                                      'frequency' => 'never'
-                                                  }]
+        'notification' => 'new_announcement',
+        'category' => 'announcements',
+        'frequency' => 'never'
+      }]
       expect(@cc.notification_policies.count).to eq 1
     end
   end
@@ -199,39 +199,39 @@ describe NotificationPreferencesController, type: :request do
       @params.delete(:user_id)
       json = api_call(:put, "#{@prefix}?notification_preferences[new_announcement][frequency]=never&notification_preferences[course_started][frequency]=weekly",
                       @params.merge(action: 'update_all',
-                      notification_preferences: { 'new_announcement' => { 'frequency' => 'never' }, 'course_started' => { 'frequency' => 'weekly' }}))
+                                    notification_preferences: { 'new_announcement' => { 'frequency' => 'never' }, 'course_started' => { 'frequency' => 'weekly' } }))
 
       assert_jsonapi_compliance(json, 'notification_preferences')
       expect(json['notification_preferences'].length).to eq 2
       pref = json['notification_preferences'].find { |p| p['notification'] == 'new_announcement' }
       expect(pref).to eq({
-          'notification' => 'new_announcement',
-          'category' => 'announcements',
-          'frequency' => 'never'
-      })
+                           'notification' => 'new_announcement',
+                           'category' => 'announcements',
+                           'frequency' => 'never'
+                         })
 
       pref = json['notification_preferences'].find { |p| p['notification'] == 'course_started' }
       expect(pref).to eq({
-          'notification' => 'course_started',
-          'category' => 'registration',
-          'frequency' => 'weekly'
-      })
+                           'notification' => 'course_started',
+                           'category' => 'registration',
+                           'frequency' => 'weekly'
+                         })
       expect(@cc.notification_policies.count).to eq 2
     end
 
-    it "should update multiple preferences by id" do
+    it "updates multiple preferences by id" do
       by_id
       update_preferences
       update_preferences
     end
 
-    it "should update multiple preferences by address" do
+    it "updates multiple preferences by address" do
       by_address
       update_preferences
       update_preferences
     end
 
-    it "should update multiple preferences JSON API style" do
+    it "updates multiple preferences JSON API style" do
       by_address
       # self is the only possible one
       @params.delete(:user_id)
@@ -243,17 +243,17 @@ describe NotificationPreferencesController, type: :request do
       expect(json['notification_preferences'].length).to eq 2
       pref = json['notification_preferences'].find { |p| p['notification'] == 'new_announcement' }
       expect(pref).to eq({
-          'notification' => 'new_announcement',
-          'category' => 'announcements',
-          'frequency' => 'never'
-      })
+                           'notification' => 'new_announcement',
+                           'category' => 'announcements',
+                           'frequency' => 'never'
+                         })
 
       pref = json['notification_preferences'].find { |p| p['notification'] == 'course_started' }
       expect(pref).to eq({
-          'notification' => 'course_started',
-          'category' => 'registration',
-          'frequency' => 'weekly'
-      })
+                           'notification' => 'course_started',
+                           'category' => 'registration',
+                           'frequency' => 'weekly'
+                         })
       expect(@cc.notification_policies.count).to eq 2
     end
   end

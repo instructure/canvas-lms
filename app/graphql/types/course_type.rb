@@ -64,16 +64,16 @@ module Types
       graphql_name "CourseUsersFilter"
 
       argument :user_ids, [ID],
-        "only include users with the given ids",
-        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
-        required: false
+               "only include users with the given ids",
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+               required: false
 
       argument :enrollment_states, [CourseFilterableEnrollmentWorkflowState],
-        <<~DESC,
-          only return users with the given enrollment state. defaults
-          to `invited`, `creation_pending`, `active`
-        DESC
-        required: false
+               <<~DESC,
+                 only return users with the given enrollment state. defaults
+                 to `invited`, `creation_pending`, `active`
+               DESC
+               required: false
     end
 
     implements GraphQL::Types::Relay::Node
@@ -88,8 +88,8 @@ module Types
     field :state, CourseWorkflowState, method: :workflow_state, null: false
 
     field :assignment_groups_connection, AssignmentGroupType.connection_type,
-      method: :assignment_groups,
-      null: true
+          method: :assignment_groups,
+          null: true
 
     implements Interfaces::AssignmentsConnectionInterface
     def assignments_connection(filter: {})
@@ -124,14 +124,14 @@ module Types
 
     field :sections_connection, SectionType.connection_type, null: true
     def sections_connection
-      course.active_course_sections.
-        order(CourseSection.best_unicode_collation_key('name'))
+      course.active_course_sections
+            .order(CourseSection.best_unicode_collation_key('name'))
     end
 
     field :modules_connection, ModuleType.connection_type, null: true
     def modules_connection
-      course.modules_visible_to(current_user).
-        order('name')
+      course.modules_visible_to(current_user)
+            .order('name')
     end
 
     field :users_connection, UserType.connection_type, null: true do
@@ -139,9 +139,9 @@ module Types
         Only include users with the given ids.
 
         **This field is deprecated, use `filter: {userIds}` instead.**
-        DOC
-        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
-        required: false
+      DOC
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+               required: false
 
       argument :filter, CourseUsersFilterInputType, required: false
     end
@@ -157,7 +157,7 @@ module Types
 
       user_ids = filter[:user_ids] || user_ids
       if user_ids.present?
-        scope = scope.where(users: {id: user_ids})
+        scope = scope.where(users: { id: user_ids })
       end
 
       scope
@@ -183,8 +183,8 @@ module Types
       description "all the submissions for assignments in this course"
 
       argument :student_ids, [ID], "Only return submissions for the given students.",
-        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
-        required: false
+               prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("User"),
+               required: false
       argument :order_by, [SubmissionOrderInputType], required: false
       argument :filter, SubmissionFilterInputType, required: false
     end
@@ -230,8 +230,8 @@ module Types
       # TODO: share this with accounts when groups are added there
       if course.grants_right?(current_user, session, :read_roster)
         course.groups.active
-          .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
-          .eager_load(:group_category)
+              .order(GroupCategory::Bookmarker.order_by, Group::Bookmarker.order_by)
+              .eager_load(:group_category)
       else
         nil
       end
@@ -250,7 +250,7 @@ module Types
       argument :filter, ExternalToolFilterInputType, required: false, default_value: {}
     end
     def external_tools_connection(filter:)
-      scope = ContextExternalTool.all_tools_for(course, {placements: filter.placement})
+      scope = ContextExternalTool.all_tools_for(course, { placements: filter.placement })
       filter.state.nil? ? scope : scope.where(workflow_state: filter.state)
     end
 
@@ -260,8 +260,8 @@ module Types
     end
 
     field :permissions, CoursePermissionsType,
-      "returns permission information for the current user in this course",
-      null: true
+          "returns permission information for the current user in this course",
+          null: true
     def permissions
       Loaders::PermissionsLoader.for(
         course,
@@ -272,16 +272,18 @@ module Types
     field :post_policy, PostPolicyType, "A course-specific post policy", null: true
     def post_policy
       return nil unless course.grants_right?(current_user, :manage_grades)
+
       load_association(:default_post_policy)
     end
 
     field :assignment_post_policies, PostPolicyType.connection_type,
-      <<~DOC,
-        PostPolicies for assignments within a course
-      DOC
-      null: true
+          <<~DOC,
+            PostPolicies for assignments within a course
+          DOC
+          null: true
     def assignment_post_policies
       return nil unless course.grants_right?(current_user, :manage_grades)
+
       course.assignment_post_policies
     end
 

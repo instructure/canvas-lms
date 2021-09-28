@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -26,7 +25,7 @@ describe BrandConfigHelpers do
   def setup_account_family_with_configs
     @parent_account = Account.default
     @parent_config = BrandConfig.for(
-      variables: {"ic-brand-primary" => "red"},
+      variables: { "ic-brand-primary" => "red" },
       js_overrides: nil,
       css_overrides: nil,
       mobile_js_overrides: nil,
@@ -39,7 +38,7 @@ describe BrandConfigHelpers do
 
     @child_account = Account.create!(:parent_account => @parent_account)
     @child_config = BrandConfig.for(
-      variables: {"ic-brand-global-nav-bgd" => "white"},
+      variables: { "ic-brand-global-nav-bgd" => "white" },
       parent_md5: @parent_config.md5,
       js_overrides: nil,
       css_overrides: nil,
@@ -52,7 +51,7 @@ describe BrandConfigHelpers do
 
     @grand_child_account = Account.create!(:parent_account => @child_account)
     @grand_child_config = BrandConfig.for(
-      variables: {"ic-brand-global-nav-avatar-border" => "blue"},
+      variables: { "ic-brand-global-nav-avatar-border" => "blue" },
       parent_md5: @child_config.md5,
       js_overrides: nil,
       css_overrides: nil,
@@ -69,20 +68,20 @@ describe BrandConfigHelpers do
       setup_account_family_with_configs
     end
 
-    it "should return nill without a parent" do
+    it "returns nill without a parent" do
       expect(@parent_account.first_parent_brand_config).to be_nil
     end
 
-    it "should work when parent is a root account" do
+    it "works when parent is a root account" do
       expect(@child_account.first_parent_brand_config).to eq @parent_config
     end
 
-    it "should work when parent is a not root account" do
+    it "works when parent is a not root account" do
       expect(@grand_child_account.first_parent_brand_config).to eq @child_config
     end
 
-    it "should work with site_admin" do
-      site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
+    it "works with site_admin" do
+      site_admin_config = BrandConfig.for(variables: { "ic-brand-primary" => "orange" })
       site_admin_config.save!
       BrandConfigRegenerator.process(Account.site_admin, user_factory, site_admin_config)
 

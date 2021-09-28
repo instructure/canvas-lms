@@ -22,9 +22,11 @@ module LoginAndSessionMethods
     if caller.grep(/onceler\/recorder.*record!/).present?
       raise "don't double sessions in a `before(:once)` block; do it in a `before(:each)` so the stubbing works for all examples and not just the first one"
     end
+
     @session_stubbed = true
     allow_any_instance_of(PseudonymSession).to receive(:record).and_wrap_original do |original|
       next original.call unless @session_stubbed
+
       pseudonym.reload
     end
   end
@@ -37,58 +39,58 @@ module LoginAndSessionMethods
     create_session(pseudonym(user))
   end
 
-  def user_logged_in(opts={})
-    user_with_pseudonym({:active_user => true}.merge(opts))
+  def user_logged_in(opts = {})
+    user_with_pseudonym({ :active_user => true }.merge(opts))
     create_session(@pseudonym)
   end
 
-  def course_with_teacher_logged_in(opts={})
+  def course_with_teacher_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+    course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
-  def course_with_student_logged_in(opts={})
+  def course_with_student_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_student({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+    course_with_student({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
-  def course_with_observer_logged_in(opts={})
+  def course_with_observer_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_observer({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+    course_with_observer({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
-  def course_with_ta_logged_in(opts={})
+  def course_with_ta_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_ta({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+    course_with_ta({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
-  def course_with_designer_logged_in(opts={})
+  def course_with_designer_logged_in(opts = {})
     user_logged_in(opts)
-    course_with_designer({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+    course_with_designer({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
-  def course_with_admin_logged_in(opts={})
-    account_admin_user({:active_user => true}.merge(opts))
-    user_logged_in({:user => @user}.merge(opts))
-    course_with_teacher({:user => @user, :active_course => true, :active_enrollment => true}.merge(opts))
+  def course_with_admin_logged_in(opts = {})
+    account_admin_user({ :active_user => true }.merge(opts))
+    user_logged_in({ :user => @user }.merge(opts))
+    course_with_teacher({ :user => @user, :active_course => true, :active_enrollment => true }.merge(opts))
   end
 
   def provision_quizzes_next(account)
-    account.root_account.settings[:provision] = { 'lti' => 'lti url'}
+    account.root_account.settings[:provision] = { 'lti' => 'lti url' }
     account.root_account.save!
   end
 
-  def admin_logged_in(opts={})
-    account_admin_user({:active_user => true}.merge(opts))
-    user_logged_in({:user => @user}.merge(opts))
+  def admin_logged_in(opts = {})
+    account_admin_user({ :active_user => true }.merge(opts))
+    user_logged_in({ :user => @user }.merge(opts))
   end
 
-  def site_admin_logged_in(opts={})
-    site_admin_user({:active_user => true}.merge(opts))
-    user_logged_in({:user => @user}.merge(opts))
+  def site_admin_logged_in(opts = {})
+    site_admin_user({ :active_user => true }.merge(opts))
+    user_logged_in({ :user => @user }.merge(opts))
   end
 
-  def enter_student_view(opts={})
+  def enter_student_view(opts = {})
     course = opts[:course] || @course || course(opts)
     get "/courses/#{@course.id}/users"
     driver.execute_script("$('#easy_student_view').click()")
@@ -115,6 +117,7 @@ module LoginAndSessionMethods
     if Onceler.open_transactions > 0
       raise "don't use real logins with once-ler, since a session cookie could be valid across specs if the pseudonym is shared"
     end
+
     get "/login"
     expect_new_page_load { fill_in_login_form(username, password) }
     expect_logout_link_present
@@ -130,7 +133,6 @@ module LoginAndSessionMethods
     f('#global_nav_profile_link').click
     f('[aria-label="Profile tray"] h2').text
   end
-
 
   def expect_logout_link_present
     logout_element = begin

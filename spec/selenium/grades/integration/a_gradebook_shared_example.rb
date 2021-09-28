@@ -88,7 +88,6 @@ shared_examples_for 'a gradebook' do
               expect(total_grade).to eq expected_grade[0]
             end
           end
-
         end
       end
     end

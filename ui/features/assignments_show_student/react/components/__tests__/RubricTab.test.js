@@ -136,7 +136,7 @@ describe('RubricTab', () => {
 
       it('shows possible points if the association does not hide points', async () => {
         const props = await makeProps({graded: false})
-        props.rubricAssociation = {}
+        props.rubricAssociation = {_id: '1', hide_score_total: false, use_for_grading: false}
 
         const {findByText, getByRole} = render(<RubricTab {...props} />)
         fireEvent.click(getByRole('button', {name: /View Rubric/}))
@@ -146,7 +146,12 @@ describe('RubricTab', () => {
 
       it('does not show possible points for criteria if the association hides points', async () => {
         const props = await makeProps({graded: false})
-        props.rubricAssociation = {hide_points: true}
+        props.rubricAssociation = {
+          _id: '1',
+          hide_score_total: false,
+          use_for_grading: false,
+          hide_points: true
+        }
 
         const {queryByText, getByRole} = render(<RubricTab {...props} />)
         fireEvent.click(getByRole('button', {name: /View Rubric/}))
@@ -171,7 +176,12 @@ describe('RubricTab', () => {
 
     it('hides the points for an individual criterion if the association hides points', async () => {
       const props = await makeProps({graded: true})
-      props.rubricAssociation = {hide_points: true}
+      props.rubricAssociation = {
+        _id: '1',
+        hide_score_total: false,
+        use_for_grading: false,
+        hide_points: true
+      }
 
       const {queryByText} = render(<RubricTab {...props} />)
       expect(queryByText('6 / 6 pts')).not.toBeInTheDocument()

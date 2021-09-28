@@ -59,11 +59,11 @@ class Mutations::HideAssignmentGradesForSections < Mutations::BaseMutation
       progress.process_job(
         assignment,
         :hide_submissions,
-        {preserve_method_args: true},
+        { preserve_method_args: true },
         progress: progress,
         submission_ids: submissions_scope.pluck(:id)
       )
-      return {assignment: assignment, progress: progress, sections: sections}
+      return { assignment: assignment, progress: progress, sections: sections }
     else
       raise GraphQL::ExecutionError, "Error hiding assignment grades for sections"
     end

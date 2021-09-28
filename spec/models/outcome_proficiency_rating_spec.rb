@@ -51,6 +51,6 @@ describe OutcomeProficiencyRating, type: :model do
 
     let(:proficiency) { outcome_proficiency_model(account_model) }
 
-    let(:creation_arguments) { [ { description: 'A', points: 4, mastery: true, color: '00ff00', outcome_proficiency: proficiency } ] }
+    let(:creation_arguments) { [{ description: 'A', points: 4, mastery: true, color: '00ff00', outcome_proficiency: proficiency }] }
   end
 end

@@ -302,7 +302,7 @@ it('renders the attempt select', async () => {
 
 it('does not render the attempt select if there is no submission', async () => {
   const props = await mockAssignmentAndSubmission({Submission: null})
-  props.allSubmissions = [{id: 1}]
+  props.allSubmissions = [{id: '1', _id: '1'}]
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('attemptSelect')).not.toBeInTheDocument()
 })
@@ -333,7 +333,7 @@ describe('submission workflow tracker', () => {
 
   it('is not rendered when no submission object is present', async () => {
     const props = await mockAssignmentAndSubmission({Submission: null})
-    props.allSubmissions = [{id: 1}]
+    props.allSubmissions = [{id: '1', _id: '1'}]
     const {queryByTestId} = render(<Header {...props} />)
     expect(queryByTestId('submission-workflow-tracker')).not.toBeInTheDocument()
   })
@@ -433,7 +433,7 @@ describe('Add Comment/View Feedback button', () => {
 
   it('does not render when no submission is present', async () => {
     const props = await mockAssignmentAndSubmission({Submission: null})
-    props.allSubmissions = [{id: 1}]
+    props.allSubmissions = [{id: '1', _id: '1'}]
     const {queryByText} = render(<Header {...props} />)
     expect(queryByText('View Feedback')).not.toBeInTheDocument()
     expect(queryByText('Add Comment')).not.toBeInTheDocument()

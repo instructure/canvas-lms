@@ -41,7 +41,7 @@ module MicrosoftSync
     end
 
     def list_education_classes_for_course(course)
-      graph_service.list_education_classes(filter: {externalId: course.uuid})
+      graph_service.list_education_classes(filter: { externalId: course.uuid })
     end
 
     # Returns the hash of the new course, including the 'id' key
@@ -105,7 +105,7 @@ module MicrosoftSync
 
       graph_service.list_users(
         select: ['id', remote_attribute],
-        filter: {remote_attribute => downcased_uniqued}
+        filter: { remote_attribute => downcased_uniqued }
       ).each do |user_object|
         given_forms = uluvs_downcased_to_given_forms[user_object[remote_attribute].downcase]
         if given_forms
@@ -132,7 +132,7 @@ module MicrosoftSync
         graph_service.send(
           method, group_id, select: ['id'], top: GET_GROUP_USERS_BATCH_SIZE
         ) do |users|
-          aad_ids.concat(users.map{|user| user['id']})
+          aad_ids.concat(users.map { |user| user['id'] })
         end
       end
     end

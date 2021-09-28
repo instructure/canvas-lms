@@ -24,7 +24,6 @@ require 'zlib'
 
 module CanvasCache
   class HashRing
-
     POINTS_PER_SERVER = 160 # this is the default in libmemcached
 
     attr_reader :ring, :sorted_keys, :replicas, :nodes
@@ -34,7 +33,7 @@ module CanvasCache
     # replicas are required to improve the distribution.
     # digest is the hash function to use. Either a proc, a class descended from
     # Digest::Base, or a string or symbol name of a class inside the Digest module
-    def initialize(nodes=[], replicas=nil, digest=nil)
+    def initialize(nodes = [], replicas = nil, digest = nil)
       @replicas = replicas || POINTS_PER_SERVER
       @ring = {}
       @nodes = []
@@ -79,11 +78,11 @@ module CanvasCache
     end
 
     def remove_node(node)
-      @nodes.reject!{|n| n.id == node.id}
+      @nodes.reject! { |n| n.id == node.id }
       @replicas.times do |i|
         key = @digest["#{node.id}:#{i}"]
         @ring.delete(key)
-        @sorted_keys.reject! {|k| k == key}
+        @sorted_keys.reject! { |k| k == key }
       end
     end
 
@@ -93,17 +92,19 @@ module CanvasCache
     end
 
     def get_node_pos(key)
-      return [nil,nil] if @ring.size == 0
+      return [nil, nil] if @ring.size == 0
+
       crc = @digest[key]
       idx = HashRing.binary_search(@sorted_keys, crc)
       return [@ring[@sorted_keys[idx]], idx]
     end
 
     def iter_nodes(key)
-      return [nil,nil] if @ring.size == 0
+      return [nil, nil] if @ring.size == 0
+
       _, pos = get_node_pos(key)
       @ring.size.times do |n|
-        yield @ring[@sorted_keys[(pos+n) % @ring.size]]
+        yield @ring[@sorted_keys[(pos + n) % @ring.size]]
       end
     end
 
@@ -113,7 +114,7 @@ module CanvasCache
       lower = 0
       idx = 0
 
-      while(lower <= upper) do
+      while (lower <= upper) do
         idx = (lower + upper) / 2
         comp = ary[idx] <=> value
 
@@ -136,6 +137,7 @@ module CanvasCache
 
     def unpack(string)
       return string if string.is_a?(Integer)
+
       result = 0
       string.each_byte do |byte|
         result <<= 8

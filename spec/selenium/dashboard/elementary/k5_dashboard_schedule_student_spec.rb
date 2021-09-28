@@ -114,7 +114,7 @@ describe "student k5 dashboard schedule" do
   context 'navigation' do
     it 'starts the current week on the schedule and navigates backwards and forwards' do
       [
-        ["Today assignment",@now],
+        ["Today assignment", @now],
         ["Previous Assignment", 7.days.ago(@now)],
         ["Future Assignment", 7.days.from_now(@now)]
       ].each do |assignment_info|
@@ -149,7 +149,7 @@ describe "student k5 dashboard schedule" do
   context 'missing items dropdown' do
     it 'finds no missing dropdown if there are no missing items' do
       assignment = create_dated_assignment(@subject_course, 'missing assignment', @now)
-      assignment.submit_homework(@student, {submission_type: "online_text_entry", body: "Here it is"})
+      assignment.submit_homework(@student, { submission_type: "online_text_entry", body: "Here it is" })
 
       get "/#schedule"
 
@@ -167,7 +167,6 @@ describe "student k5 dashboard schedule" do
     it 'shows missing items and count if there are missing items' do
       create_dated_assignment(@subject_course, 'missing assignment1', 1.day.ago(@now))
       create_dated_assignment(@subject_course, 'missing assignment2', 1.day.ago(@now))
-
 
       get "/#schedule"
 

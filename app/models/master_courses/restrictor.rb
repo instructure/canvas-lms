@@ -61,6 +61,7 @@ module MasterCourses::Restrictor
     module ClassMethods
       def restrict_columns(edit_type, columns)
         raise "invalid restriction type" unless MasterCourses::LOCK_TYPES.include?(edit_type)
+
         columns = Array(columns).map(&:to_s)
         current = self.restricted_column_settings[edit_type] || []
         self.restricted_column_settings[edit_type] = (current + columns).uniq
@@ -100,7 +101,7 @@ module MasterCourses::Restrictor
       end
     end
 
-   def editing_restricted?(edit_type=:all) # edit_type can be :all, :any, or a specific type: :content, :settings, :due_dates, :availability_dates, :points
+    def editing_restricted?(edit_type = :all) # edit_type can be :all, :any, or a specific type: :content, :settings, :due_dates, :availability_dates, :points
       return false unless is_child_content?
 
       restrictions = self.child_content_restrictions
@@ -109,9 +110,9 @@ module MasterCourses::Restrictor
 
       case edit_type
       when :all
-        self.class.base_class.restricted_column_settings.keys.all?{|type| restrictions[type]} # make it possible to only have restrictions on one type
+        self.class.base_class.restricted_column_settings.keys.all? { |type| restrictions[type] } # make it possible to only have restrictions on one type
       when :any
-        self.class.base_class.restricted_column_settings.keys.any?{|type| restrictions[type]}
+        self.class.base_class.restricted_column_settings.keys.any? { |type| restrictions[type] }
       when *MasterCourses::LOCK_TYPES
         !!restrictions[edit_type]
       else
@@ -124,7 +125,7 @@ module MasterCourses::Restrictor
     !self.new_record?
   end
 
-  def mark_downstream_changes(changed_columns=nil)
+  def mark_downstream_changes(changed_columns = nil)
     return if @importing_migration || @skip_downstream_changes || !is_child_content? # don't mark changes on import
 
     changed_columns ||= self.saved_changes.keys & self.class.base_class.restricted_column_settings.values.flatten
@@ -201,6 +202,7 @@ module MasterCourses::Restrictor
 
   def edit_types_locked_for_overwrite_on_import
     return [] unless @importing_migration && is_child_content?
+
     # this is just a read-only method to check whether we _can_ overwrite
     # should help on import when checking on collection items that aren't instantiated
     # e.g. assessment questions in a bank
@@ -235,7 +237,7 @@ module MasterCourses::Restrictor
       hash['master_course_restrictions'] = self.child_content_restrictions if is_restricted
     elsif course_status == :master && self.current_master_template_restrictions
       hash['is_master_course_master_content'] = true
-      is_restricted = self.current_master_template_restrictions.values.any?{|v| v}
+      is_restricted = self.current_master_template_restrictions.values.any? { |v| v }
       hash['restricted_by_master_course'] = is_restricted
       hash['master_course_restrictions'] = self.current_master_template_restrictions if is_restricted
     end
@@ -257,11 +259,11 @@ module MasterCourses::Restrictor
   # preload restrictions on the child course
   def self.preload_child_restrictions(objects)
     objects = Array(objects)
-    objects_to_load = objects.select{|obj| obj.is_child_content? && !obj.child_content_restrictions_loaded?}.index_by(&:migration_id)
+    objects_to_load = objects.select { |obj| obj.is_child_content? && !obj.child_content_restrictions_loaded? }.index_by(&:migration_id)
     migration_ids = objects_to_load.keys
     return unless migration_ids.any?
 
-    objects_to_load.values.each{|obj| obj.child_content_restrictions = {}} # default if restrictions are missing
+    objects_to_load.values.each { |obj| obj.child_content_restrictions = {} } # default if restrictions are missing
     all_restrictions = MasterCourses::MasterContentTag.where(:migration_id => migration_ids).pluck(:migration_id, :restrictions)
     all_restrictions.each do |migration_id, restrictions|
       objects_to_load[migration_id].child_content_restrictions = restrictions
@@ -275,11 +277,11 @@ module MasterCourses::Restrictor
     template = MasterCourses::MasterTemplate.full_template_for(course)
     return unless template
 
-    objects_to_load = Array(objects).select{|obj| MasterCourses::ALLOWED_CONTENT_TYPES.include?(obj.class.base_class.name)}.index_by do |obj|
+    objects_to_load = Array(objects).select { |obj| MasterCourses::ALLOWED_CONTENT_TYPES.include?(obj.class.base_class.name) }.index_by do |obj|
       template.migration_id_for(obj) # use their future migration ids because that'll actually make partial bulk-loading easier
     end
 
-    objects_to_load.values.each{|obj| obj.current_master_template_restrictions = {}} # default if restrictions are missing
+    objects_to_load.values.each { |obj| obj.current_master_template_restrictions = {} } # default if restrictions are missing
     template.master_content_tags.where(:migration_id => objects_to_load.keys).pluck(:migration_id, :restrictions).each do |migration_id, restrictions|
       objects_to_load[migration_id].current_master_template_restrictions = restrictions
     end

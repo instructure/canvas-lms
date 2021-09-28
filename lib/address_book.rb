@@ -24,7 +24,7 @@ require_relative 'address_book/messageable_user'
 # see AddressBook::Base for primary documentation of the interface
 module AddressBook
   STRATEGIES = {
-    'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda{ I18n.t('MessageableUser library') } }.freeze,
+    'messageable_user' => { implementation: AddressBook::MessageableUser, label: lambda { I18n.t('MessageableUser library') } }.freeze,
   }.freeze
   DEFAULT_STRATEGY = 'messageable_user'
 
@@ -63,8 +63,8 @@ module AddressBook
 
   def self.decompose_context(context_code)
     context_code &&
-    context_code =~ ::MessageableUser::Calculator::CONTEXT_RECIPIENT &&
-    Regexp.last_match.to_a[1..-1]
+      context_code =~ ::MessageableUser::Calculator::CONTEXT_RECIPIENT &&
+      Regexp.last_match.to_a[1..-1]
   end
 
   def self.valid_context?(context_code)
@@ -74,6 +74,7 @@ module AddressBook
   def self.load_context(context_code)
     context_type, context_id = decompose_context(context_code)
     return nil unless context_id
+
     context_class =
       case context_type
       when 'course' then Course

@@ -21,7 +21,6 @@ require "active_support/hash_with_indifferent_access"
 
 module BroadcastPolicy
   module InstanceMethods
-
     def just_created
       saved_changes? && id_before_last_save.nil?
     end
@@ -43,6 +42,7 @@ module BroadcastPolicy
 
     def with_changed_attributes_from(other)
       return yield unless other
+
       begin
         # I'm pretty sure we can stop messing with @changed_attributes once
         # we're on Rails 5.2 (CANVAS_RAILS5_1)
@@ -85,6 +85,7 @@ module BroadcastPolicy
     # helpers
     def broadcast_notifications(prior_version = nil)
       raise ArgumentError, "Broadcast Policy block not supplied for #{self.class}" unless self.class.broadcast_policy_list
+
       if prior_version
         with_changed_attributes_from(prior_version) do
           self.class.broadcast_policy_list.broadcast(self)
@@ -119,7 +120,7 @@ module BroadcastPolicy
         workflow_state_before_last_save == state.to_s
     end
 
-    def changed_state(new_state=nil, old_state=nil)
+    def changed_state(new_state = nil, old_state = nil)
       if new_state && old_state
         workflow_state == new_state.to_s &&
           workflow_state_before_last_save == old_state.to_s
@@ -136,6 +137,5 @@ module BroadcastPolicy
       policy = self.class.broadcast_policy_list.find_policy_for(notification.name)
       policy ? policy.recipient_filter.call(self, recipient) : self
     end
-
   end # InstanceMethods
 end

@@ -70,7 +70,7 @@ module Canvas::Security
     def public_keyset
       retrieve_keys.values.map do |private_jwk|
         public_jwk = private_jwk.to_key.public_key.to_jwk
-        public_jwk.merge(private_jwk.select{|k,_| %w(alg use kid).include?(k) })
+        public_jwk.merge(private_jwk.select { |k, _| %w(alg use kid).include?(k) })
       end
     end
 

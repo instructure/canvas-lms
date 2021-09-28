@@ -3,7 +3,7 @@
 namespace :canvas do
   namespace :quizzes do
     desc 'Generate events from snapshots for submissions to a quiz.'
-    task :generate_events_from_snapshots, [ :quiz_id ] => :environment do |t, args|
+    task :generate_events_from_snapshots, [:quiz_id] => :environment do |t, args|
       quiz_id = Array(args[:quiz_id])
       quiz_submission_ids = Quizzes::QuizSubmission.where(quiz_id: quiz_id)
 
@@ -11,10 +11,10 @@ namespace :canvas do
       parser = Quizzes::LogAuditing::SnapshotScraper.new
 
       model.transaction do
-        snapshots = Quizzes::QuizSubmissionSnapshot.
-          where(quiz_submission_id: quiz_submission_ids).
-          preload(:quiz_submission).
-          reject { |snapshot| snapshot.quiz_submission.nil? }
+        snapshots = Quizzes::QuizSubmissionSnapshot
+                    .where(quiz_submission_id: quiz_submission_ids)
+                    .preload(:quiz_submission)
+                    .reject { |snapshot| snapshot.quiz_submission.nil? }
 
         puts "Generating #{snapshots.length} events..."
         parser.events_from_snapshots(snapshots).map(&:save!)
@@ -23,7 +23,7 @@ namespace :canvas do
     end # task :generate_events_from_snapshots
 
     desc "Generate a JSON dump of events in a single quiz submission."
-    task :dump_events, [ :quiz_submission_id, :out ] => :environment do |t, args|
+    task :dump_events, [:quiz_submission_id, :out] => :environment do |t, args|
       require 'json'
       require 'benchmark'
 
@@ -41,9 +41,9 @@ namespace :canvas do
         parser = Quizzes::LogAuditing::SnapshotScraper.new
         quiz_submission = Quizzes::QuizSubmission.find(args[:quiz_submission_id])
         snapshots = Quizzes::QuizSubmissionSnapshot.where({
-          quiz_submission_id: quiz_submission.id,
-          attempt: quiz_submission.attempt
-        })
+                                                            quiz_submission_id: quiz_submission.id,
+                                                            attempt: quiz_submission.attempt
+                                                          })
 
         events = parser.events_from_snapshots(snapshots)
       end

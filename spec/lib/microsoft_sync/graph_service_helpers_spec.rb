@@ -32,10 +32,10 @@ describe MicrosoftSync::GraphServiceHelpers do
   describe '#list_education_classes_for_course' do
     it 'filters by externalId=course.uuid' do
       course_model
-      expect(graph_service).to receive(:list_education_classes).
-        with(filter: {externalId: @course.uuid}).
-        and_return([{abc: 123}])
-      expect(subject.list_education_classes_for_course(@course)).to eq([{abc: 123}])
+      expect(graph_service).to receive(:list_education_classes)
+        .with(filter: { externalId: @course.uuid })
+        .and_return([{ abc: 123 }])
+      expect(subject.list_education_classes_for_course(@course)).to eq([{ abc: 123 }])
     end
   end
 
@@ -132,7 +132,7 @@ describe MicrosoftSync::GraphServiceHelpers do
     end
 
     context 'when the course name is too long' do
-      let(:name) { 'c' * 128}
+      let(:name) { 'c' * 128 }
 
       before { course_model(public_description: 'great class', name: name) }
 
@@ -231,12 +231,12 @@ describe MicrosoftSync::GraphServiceHelpers do
     before do
       allow(subject.graph_service).to \
         receive(:list_users)
-        .with(select: ['id', expected_remote_attr], filter: {expected_remote_attr => requested})
+        .with(select: ['id', expected_remote_attr], filter: { expected_remote_attr => requested })
         .and_return([
-          {'id' => '789', expected_remote_attr => 'D'},
-          {'id' => '123', expected_remote_attr => 'a'},
-          {'id' => '456', expected_remote_attr => 'b'},
-        ])
+                      { 'id' => '789', expected_remote_attr => 'D' },
+                      { 'id' => '123', expected_remote_attr => 'a' },
+                      { 'id' => '456', expected_remote_attr => 'b' },
+                    ])
     end
 
     context "when the graph service sends a ULUV back that differs in case" do
@@ -297,18 +297,18 @@ describe MicrosoftSync::GraphServiceHelpers do
   describe '#get_group_users_aad_ids' do
     it 'returns ids of all pages of members' do
       expect(subject.graph_service).to receive(:list_group_members).once
-        .with('mygroupid', select: ['id'], top: 999)
-        .and_yield([{'id' => 'a'}, {'id' => 'b'}])
-        .and_yield([{'id' => 'c'}])
+                                                                   .with('mygroupid', select: ['id'], top: 999)
+                                                                   .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+                                                                   .and_yield([{ 'id' => 'c' }])
       expect(subject.get_group_users_aad_ids('mygroupid')).to eq(%w[a b c])
     end
 
     context 'when owners: true is passed in' do
       it 'returns owners' do
         expect(subject.graph_service).to receive(:list_group_owners).once
-          .with('mygroupid', select: ['id'], top: 999)
-          .and_yield([{'id' => 'a'}, {'id' => 'b'}])
-          .and_yield([{'id' => 'c'}])
+                                                                    .with('mygroupid', select: ['id'], top: 999)
+                                                                    .and_yield([{ 'id' => 'a' }, { 'id' => 'b' }])
+                                                                    .and_yield([{ 'id' => 'c' }])
         expect(subject.get_group_users_aad_ids('mygroupid', owners: true)).to eq(%w[a b c])
       end
     end

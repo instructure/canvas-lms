@@ -58,19 +58,19 @@ module Services
     end
 
     describe '.create_clone_url_executor' do
-      it 'should set the url' do
+      it 'sets the url' do
         expect(executor.url).to eq url
       end
 
-      it 'should set the duplicate_handling' do
+      it 'sets the duplicate_handling' do
         expect(executor.duplicate_handling).to eq dup_handling
       end
 
-      it 'should set the check_quota' do
+      it 'sets the check_quota' do
         expect(executor.check_quota).to eq check_quota
       end
 
-      it 'should set the opts' do
+      it 'sets the opts' do
         expect(executor.opts).to eq opts
       end
     end
@@ -86,7 +86,7 @@ module Services
         allow(worker).to receive(:attachment).and_return(attachment)
       end
 
-      it 'should clone and submit the url when submit_assignment is true' do
+      it 'clones and submit the url when submit_assignment is true' do
         expect(attachment).to receive(:clone_url).with(url, dup_handling, check_quota, opts)
         expect(service).to receive(:submit).with(eula_agreement_timestamp, comment)
         worker.perform
@@ -94,7 +94,7 @@ module Services
         expect(progress.reload.workflow_state).to eq 'completed'
       end
 
-      it 'should clone and not submit the url when submit_assignment is false' do
+      it 'clones and not submit the url when submit_assignment is false' do
         worker = described_class.submit_job(attachment, progress, eula_agreement_timestamp, comment, executor, false)
         allow(worker).to receive(:homework_service).and_return(service)
         allow(worker).to receive(:attachment).and_return(attachment)
@@ -141,19 +141,19 @@ module Services
       let(:submitted) { subject.submit(eula_agreement_timestamp, comment) }
       let(:recent_assignment) { assignment.reload }
 
-      it 'should set submitted_at to the Progress#created_at' do
+      it 'sets submitted_at to the Progress#created_at' do
         expect(submitted.submitted_at).to eq progress.created_at
       end
 
-      it 'should set attachments for the submission' do
+      it 'sets attachments for the submission' do
         expect(submitted.attachments).to eq [attachment]
       end
 
-      it 'should set assignment for the submission' do
+      it 'sets assignment for the submission' do
         expect(submitted.assignment).to eq recent_assignment
       end
 
-      it 'should submit with the comment' do
+      it 'submits with the comment' do
         expect(submitted.submission_comments.first.comment).to eq(comment)
       end
 
