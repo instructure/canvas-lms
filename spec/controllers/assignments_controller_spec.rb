@@ -364,7 +364,7 @@ describe AssignmentsController do
     end
 
     it "renders unauthorized when no moderator is selected and the user is an admin without " \
-    "'Select Final Grade for Moderation' permission" do
+       "'Select Final Grade for Moderation' permission" do
       @course.account.role_overrides.create!(role: admin_role, enabled: false, permission: :select_final_grade)
       @assignment.update!(final_grader: nil)
       user_session(account_admin_user)
@@ -380,7 +380,7 @@ describe AssignmentsController do
     end
 
     it "renders the page when no moderator is selected and the user is an admin with " \
-    "'Select Final Grade for Moderation' permission" do
+       "'Select Final Grade for Moderation' permission" do
       @assignment.update!(final_grader: nil)
       user_session(account_admin_user)
       get 'show_moderate', params: { course_id: @course.id, assignment_id: @assignment.id }

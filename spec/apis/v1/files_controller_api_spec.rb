@@ -1400,12 +1400,12 @@ describe "Files API", type: :request do
 
     it "truncates names over 255 characters" do
       overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi"
+                         "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+                         "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi"
 
       truncated_overly_long_name = "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
-        "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi..."
+                                   "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi" \
+                                   "hihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihihi..."
 
       api_call(:put, @file_path, @file_path_options, name: overly_long_name)
       updated_name = @att.reload.display_name

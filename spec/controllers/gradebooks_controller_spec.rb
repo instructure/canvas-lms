@@ -441,7 +441,7 @@ describe GradebooksController do
         end
 
         it "sorts by module position, then context module tag position, " \
-        "with those not belonging to a module sorted last" do
+           "with those not belonging to a module sorted last" do
           assignment3.context_module_tags.first.destroy!
           get 'grade_summary', params: { course_id: @course.id, id: @student.id }
           expect(assignment_ids).to eq [assignment2, assignment1, assignment3].map(&:id)

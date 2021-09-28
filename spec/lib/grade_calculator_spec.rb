@@ -1405,7 +1405,7 @@ describe GradeCalculator do
         end
 
         it 'treats grading periods with nil weights as zero when some grading period ' \
-        'weights are nil and computing current score' do
+           'weights are nil and computing current score' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: 50.0)
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
@@ -1413,7 +1413,7 @@ describe GradeCalculator do
         end
 
         it 'treats grading periods with nil weights as zero when some grading period ' \
-        'weights are nil and computing final score' do
+           'weights are nil and computing final score' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: 50.0)
           GradeCalculator.new(@student.id, @course).compute_and_save_scores
@@ -1495,7 +1495,7 @@ describe GradeCalculator do
         end
 
         it 'sets course current score to nil when all grading period current scores are nil ' \
-        'and all grading period weights are nil' do
+           'and all grading period weights are nil' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
@@ -1507,7 +1507,7 @@ describe GradeCalculator do
         end
 
         it 'sets course final score to zero when all grading period final scores are nil and all ' \
-        'grading period weights are nil' do
+           'grading period weights are nil' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on assignment that would trigger the grade calculator
@@ -1519,7 +1519,7 @@ describe GradeCalculator do
         end
 
         it 'sets course current score to zero when all grading period current scores are zero ' \
-        'and all grading period weights are zero' do
+           'and all grading period weights are zero' do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
@@ -1531,7 +1531,7 @@ describe GradeCalculator do
         end
 
         it 'sets course final score to zero when all grading period final scores are zero and ' \
-        'all grading period weights are zero' do
+           'all grading period weights are zero' do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
@@ -1543,7 +1543,7 @@ describe GradeCalculator do
         end
 
         it 'sets course current score to nil when all grading period current scores are nil and ' \
-        'all grading period weights are zero' do
+           'all grading period weights are zero' do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
@@ -1555,7 +1555,7 @@ describe GradeCalculator do
         end
 
         it 'sets course final score to zero when all grading period final scores are nil and all ' \
-        'grading period weights are zero' do
+           'grading period weights are zero' do
           @first_period.update!(weight: 0.0)
           @second_period.update!(weight: 0.0)
           # update_all to avoid callbacks on assignment that would trigger the grade calculator
@@ -1567,7 +1567,7 @@ describe GradeCalculator do
         end
 
         it 'sets course current score to zero when all grading period current scores are zero and ' \
-        'all grading period weights are nil' do
+           'all grading period weights are nil' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator
@@ -1579,7 +1579,7 @@ describe GradeCalculator do
         end
 
         it 'sets course final score to zero when all grading period final scores are zero and all ' \
-        'grading period weights are nil' do
+           'grading period weights are nil' do
           @first_period.update!(weight: nil)
           @second_period.update!(weight: nil)
           # update_all to avoid callbacks on submission that would trigger the grade calculator

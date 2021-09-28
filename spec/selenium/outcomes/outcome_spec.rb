@@ -70,9 +70,9 @@ describe "outcomes" do
           expect(f('#calculation_method')).to have_value('decaying_average')
           expect(f('#calculation_int')).to have_value('65')
           expect(f('#calculation_int_example')).to include_text("Most recent result counts as 65%"\
-                                                              " of mastery weight, average of all other results count"\
-                                                              " as 35% of weight. If there is only one result, the single score"\
-                                                              " will be returned.")
+                                                                " of mastery weight, average of all other results count"\
+                                                                " as 35% of weight. If there is only one result, the single score"\
+                                                                " will be returned.")
         end
 
         it "validates decaying average_range", priority: "2", test_id: 261708 do
@@ -102,8 +102,8 @@ describe "outcomes" do
           expect(f('#calculation_int')).to have_value('5')
           expect(f('#mastery_points')).to have_value('3')
           expect(f('#calculation_int_example')).to include_text("Must achieve mastery at least 5 times."\
-                                                              " Scores above mastery will be averaged"\
-                                                              " to calculate final score")
+                                                                " Scores above mastery will be averaged"\
+                                                                " to calculate final score")
         end
 
         it "validates n mastery_range", priority: "2", test_id: 303711 do

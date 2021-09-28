@@ -199,7 +199,7 @@ describe "Screenreader Gradebook" do
 
   it 'displays/removes warning message for resubmitted assignments', priority: '1', test_id: 164000 do
     skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+         "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     assignment = basic_percent_setup
     user_session @students[0]
     assignment.submit_homework @students[0], submission_type: 'online_text_entry', body: 'Hello!'
@@ -222,7 +222,7 @@ describe "Screenreader Gradebook" do
 
   it 'grades match default gradebook grades', priority: '1', test_id: 163994 do
     skip "Skipped because this spec fails if not run in foreground\n"\
-      "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
+         "This is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
     a1 = basic_percent_setup
     a2 = @course.assignments.create!(
       title: 'Test 2',

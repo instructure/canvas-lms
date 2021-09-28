@@ -109,7 +109,7 @@ describe CanvasSecurity do
     describe ".base64_encode" do
       it "trims off newlines" do
         input = "SuperSuperSuperSuperSuperSuperSuperSuper"\
-                 "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
+                "SuperSuperSuperSuperSuperSuperSuperSuperLongString"
         output = "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
                  "U3VwZXJTdXBlclN1cGVyU3VwZXJTdXBlclN1cGVy"\
                  "U3VwZXJTdXBlclN1cGVyU3VwZXJMb25nU3RyaW5n"

@@ -75,7 +75,7 @@ module FeatureFlags
       transitions['on'] ||= {}
       transitions['on']['message'] =
         I18n.t("Enabling the Elementary Theme will change the font in the Canvas interface and simplify "\
-        "the Course Navigation Menu for all users in your course.")
+               "the Course Navigation Menu for all users in your course.")
       transitions['on']['reload_page'] = true
       transitions['off'] ||= {}
       transitions['off']['message'] =

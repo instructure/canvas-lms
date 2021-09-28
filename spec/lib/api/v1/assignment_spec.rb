@@ -185,7 +185,7 @@ describe "Api::V1::Assignment" do
     end
 
     it "excludes needs_grading_counts when exclude_response_fields flag is " \
-    "passed and includes 'needs_grading_count'" do
+       "passed and includes 'needs_grading_count'" do
       params = { override_dates: false, exclude_response_fields: ['needs_grading_count'] }
       json = api.assignment_json(assignment, user, session, params)
       expect(json).not_to have_key "needs_grading_count"
@@ -360,7 +360,7 @@ describe "Api::V1::Assignment" do
         end
 
         it "is valid when it was not gradeable and is still not gradeable " \
-          "(!gradeable_was? && !gradeable?)" do
+           "(!gradeable_was? && !gradeable?)" do
           assignment.update!(submission_types: 'not_gradeable')
           assignment.submission_types = 'wiki_page'
           expect(api).to be_assignment_editable_fields_valid(assignment, user)

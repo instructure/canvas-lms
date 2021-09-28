@@ -1695,7 +1695,7 @@ describe AssignmentsApiController, type: :request do
 
       it "creates a new assignment with workflow_state duplicating" do
         url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
-          "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}"
+              "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}"
 
         expect {
           api_call_as_user(
@@ -1728,8 +1728,8 @@ describe AssignmentsApiController, type: :request do
 
         it "outputs quiz shell json using quizzes.next serializer" do
           url = "/api/v1/courses/#{@course.id}/assignments/#{assignment.id}/duplicate.json" \
-            "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}" \
-            "&result_type=Quiz"
+                "?target_assignment_id=#{failed_assignment.id}&target_course_id=#{course_copied.id}" \
+                "&result_type=Quiz"
 
           json = api_call_as_user(
             @teacher, :post,

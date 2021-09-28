@@ -761,7 +761,7 @@ describe MicrosoftSync::GraphService do
 
     def missing(id)
       err_msg = "Resource '12345689-1212-1212-1212-abc212121212' does not exist or one of " \
-        "its queried reference-property objects are not present."
+                "its queried reference-property objects are not present."
       { id: id, status: 404, body: { error: { code: "Request_ResourceNotFound", msg: err_msg } } }
     end
 

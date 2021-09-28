@@ -71,13 +71,13 @@ describe AcademicBenchmark do
         {
           :short_description => "SS.912.A.1.1",
           :description => "Describe the importance of historiography, which includes how historical knowledge is obtained" \
-                        " and transmitted, when interpreting events in history."
+                          " and transmitted, when interpreting events in history."
         },
       "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           :short_description => "SS.912.A.1.2",
           :description => "Utilize a variety of primary and secondary sources to identify author, historical significance," \
-                        " audience, and authenticity to understand a historical period."
+                          " audience, and authenticity to understand a historical period."
         },
       "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -88,7 +88,7 @@ describe AcademicBenchmark do
         {
           :short_description => "SS.912.A.1.4",
           :description => "Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used" \
-                        " to interpret the significance of time periods and events from the past."
+                          " to interpret the significance of time periods and events from the past."
         },
       "AF31281A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -114,7 +114,7 @@ describe AcademicBenchmark do
         {
           :short_description => "SS.912.A.3",
           :description => "Analyze the transformation of the American economy and the changing social and" \
-                        " political conditions in response to the Industrial Revolution."
+                          " political conditions in response to the Industrial Revolution."
         },
       "AF3B2A72-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
@@ -130,13 +130,13 @@ describe AcademicBenchmark do
         {
           :short_description => "SS.912.A.6",
           :description => "Understand the causes and course of World War II, the character of the war at home and abroad," \
-                        " and its reshaping of the United States role in the post-war world."
+                          " and its reshaping of the United States role in the post-war world."
         },
       "AF4B6DB0-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
           :short_description => "SS.912.A.7",
           :description => "Understand the rise and continuing international influence of the United States as a" \
-                        " world leader and the impact of contemporary social and political movements on American life."
+                          " world leader and the impact of contemporary social and political movements on American life."
         }
     }.each do |migration_id, descriptions|
       g = LearningOutcome.global.find_by(migration_id: migration_id)

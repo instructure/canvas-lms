@@ -98,7 +98,7 @@ describe "speed grader - discussion submissions" do
     end
 
     it "hides student names and shows name of grading teacher" \
-      "entries on both discussion links", priority: "2", test_id: 283747 do
+       "entries on both discussion links", priority: "2", test_id: 283747 do
       teacher = @course.teachers.first
       teacher_message = "why did the taco cross the road?"
 

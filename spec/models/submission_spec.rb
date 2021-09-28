@@ -368,7 +368,7 @@ describe Submission do
         end
 
         it "does not change if an override is added for the student and the due date is earlier" \
-        " than an existing override that applies to the student for the assignment" do
+           " than an existing override that applies to the student for the assignment" do
           section = @course.course_sections.create!(name: "My Awesome Section")
           student_in_section(section, user: @student)
           @assignment.assignment_overrides.create!(
@@ -675,7 +675,7 @@ describe Submission do
     end
 
     it "returns seconds_late_override if the submission has a late_policy_status of 'late'" \
-    " and a seconds_late_override" do
+       " and a seconds_late_override" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
@@ -684,7 +684,7 @@ describe Submission do
     end
 
     it "is not adjusted if the student resubmits and the submission has a late_policy_status of 'late'" \
-    " and a seconds_late_override" do
+       " and a seconds_late_override" do
       Timecop.freeze(@date) { @assignment.submit_homework(@student, body: "a body") }
       submission.update!(late_policy_status: "late", seconds_late_override: 90.minutes)
       Timecop.freeze(40.minutes.from_now(@date)) do
@@ -709,7 +709,7 @@ describe Submission do
     end
 
     it "is zero if it was turned in late but the teacher sets the late_policy_status to 'late'" \
-    " and sets seconds_late_override to zero" do
+       " and sets seconds_late_override to zero" do
       Timecop.freeze(@date) do
         @assignment.submit_homework(@student, body: "a body")
         submission.update!(late_policy_status: "late", seconds_late_override: 0)
@@ -2040,14 +2040,14 @@ describe Submission do
       end
 
       it 'updates the course score and grading period score if a submission ' \
-      'in a grading period is graded' do
+         'in a grading period is graded' do
         expect { @assignment.grade_student(@student, grader: @teacher, score: 5) }.to change {
           course_and_grading_period_scores.pluck(:current_score)
         }.from([nil, 80.0]).to([50.0, 65.0])
       end
 
       it 'only updates the course score (not the grading period score) if a submission ' \
-      'not in a grading period is graded' do
+         'not in a grading period is graded' do
         day_after_grading_period_ends = 1.day.from_now(@grading_period.end_date)
         @assignment.update!(due_at: day_after_grading_period_ends)
         expect { @assignment.grade_student(@student, grader: @teacher, score: 5) }.to change {

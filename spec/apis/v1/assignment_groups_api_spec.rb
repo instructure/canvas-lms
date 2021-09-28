@@ -254,7 +254,7 @@ describe AssignmentGroupsController, type: :request do
     end
 
     it "excludes the descriptions of assignments if 'description' is included " \
-    "in the exclude_response_fields param" do
+       "in the exclude_response_fields param" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
                       "include[]=assignments&exclude_response_fields[]=description",
@@ -269,7 +269,7 @@ describe AssignmentGroupsController, type: :request do
     end
 
     it "excludes the needs_grading_count of assignments if " \
-    "'needs_grading_count' is included in the exclude_response_fields param" do
+       "'needs_grading_count' is included in the exclude_response_fields param" do
       json = api_call(:get,
                       "/api/v1/courses/#{@course.id}/assignment_groups.json?" \
                       "include[]=assignments&exclude_response_fields[]=needs_grading_count",

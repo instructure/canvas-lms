@@ -54,7 +54,7 @@ class MicrosoftSync::UserMapping < ActiveRecord::Base
   class AccountSettingsChanged < MicrosoftSync::Errors::GracefulCancelError
     def self.public_message
       I18n.t 'The account-wide sync settings were changed while syncing. ' \
-        'Please attempt the sync again.'
+             'Please attempt the sync again.'
     end
   end
 

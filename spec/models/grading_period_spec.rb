@@ -759,14 +759,14 @@ describe GradingPeriod do
       end
 
       it 'is not overlapping if the start date is before the end date of an existing period ' \
-      'but they are in the same minute' do
+         'but they are in the same minute' do
         @grading_period.start_date = @existing_grading_period.end_date.change(sec: 0)
         @grading_period.end_date = 1.month.from_now(@existing_grading_period.end_date)
         expect(@grading_period).not_to be_overlapping
       end
 
       it 'is overlapping if the start date is before the end date of an existing period and ' \
-      'they are not in the same minute' do
+         'they are not in the same minute' do
         @grading_period.start_date = 1.minute.ago(@existing_grading_period.end_date)
         @grading_period.end_date = 1.month.from_now(@existing_grading_period.end_date)
         expect(@grading_period).to be_overlapping
@@ -779,14 +779,14 @@ describe GradingPeriod do
       end
 
       it 'is not overlapping if the end date is past the start date of an existing period, ' \
-      'but there are in the same minute' do
+         'but there are in the same minute' do
         @grading_period.start_date = 1.month.ago(@existing_grading_period.start_date)
         @grading_period.end_date = @existing_grading_period.start_date.change(sec: 59)
         expect(@grading_period).not_to be_overlapping
       end
 
       it 'is overlapping if the end date is past the start date of an existing period and ' \
-      'they are not in the same minute' do
+         'they are not in the same minute' do
         @grading_period.start_date = 1.month.ago(@existing_grading_period.start_date)
         @grading_period.end_date = 1.minute.from_now(@existing_grading_period.start_date)
         expect(@grading_period).to be_overlapping

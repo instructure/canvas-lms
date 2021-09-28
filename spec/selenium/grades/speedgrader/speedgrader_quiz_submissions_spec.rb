@@ -163,7 +163,7 @@ describe "speed grader - quiz submissions" do
   end
 
   it "properly displays student quiz results when the teacher also " \
-    "has a student enrollment", priority: "2", test_id: 283740 do
+     "has a student enrollment", priority: "2", test_id: 283740 do
     @course.enroll_student(@teacher).accept!
 
     @quiz.quiz_questions.create!(quiz: @quiz, question_data: {
@@ -184,7 +184,7 @@ describe "speed grader - quiz submissions" do
     end
 
     get "/courses/#{@course.id}/gradebook/speed_grader?" \
-      "assignment_id=#{@assignment.id}&student_id=#{@student.id}"
+        "assignment_id=#{@assignment.id}&student_id=#{@student.id}"
     wait_for_ajaximations
 
     in_frame('speedgrader_iframe', '.quiz-header') do

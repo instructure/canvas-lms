@@ -2606,14 +2606,14 @@ describe Assignment do
     let(:content_tag) { ContentTag.new }
 
     it "returns the context module tags for a 'normal' assignment " \
-      "(non-quiz and non-discussion topic)" do
+       "(non-quiz and non-discussion topic)" do
       assignment.submission_types = "online_text_entry"
       assignment.context_module_tags << content_tag
       expect(assignment.all_context_module_tags).to eq [content_tag]
     end
 
     it "returns the context_module_tags on the quiz if the assignment is " \
-      "associated with a quiz" do
+       "associated with a quiz" do
       quiz = assignment.build_quiz
       quiz.context_module_tags << content_tag
       assignment.submission_types = "online_quiz"
@@ -2621,7 +2621,7 @@ describe Assignment do
     end
 
     it "returns the context_module_tags on the discussion topic if the " \
-      "assignment is associated with a discussion topic" do
+       "assignment is associated with a discussion topic" do
       assignment.submission_types = "discussion_topic"
       discussion_topic = assignment.build_discussion_topic
       discussion_topic.context_module_tags << content_tag
@@ -2629,7 +2629,7 @@ describe Assignment do
     end
 
     it "doesn't return the context_module_tags on the wiki page if the " \
-      "assignment is associated with a wiki page" do
+       "assignment is associated with a wiki page" do
       assignment.submission_types = "wiki_page"
       wiki_page = assignment.build_wiki_page
       wiki_page.context_module_tags << content_tag
@@ -2644,25 +2644,25 @@ describe Assignment do
       let(:build_type) { "build_#{submission_type}".to_sym }
 
       it "returns false if an assignment does not have a submission" \
-        "or matching submission_types" do
+         "or matching submission_types" do
         is_expected.not_to send(be_type)
       end
 
       it "returns true if the assignment has an associated submission, " \
-        "and it has matching submission_types" do
+         "and it has matching submission_types" do
         assignment.submission_types = submission_type
         assignment.send(build_type)
         expect(assignment).to send(be_type)
       end
 
       it "returns false if an assignment does not have its submission_types" \
-        "set, even if it has an associated submission" do
+         "set, even if it has an associated submission" do
         assignment.send(build_type)
         expect(assignment).not_to send(be_type)
       end
 
       it "returns false if an assignment does not have an associated" \
-        "submission even if it has submission_types set" do
+         "submission even if it has submission_types set" do
         assignment.submission_types = submission_type
         expect(assignment).not_to send(be_type)
       end

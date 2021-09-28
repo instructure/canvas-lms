@@ -64,7 +64,7 @@ module MicrosoftSync
     class TenantMissingOrSyncDisabled < Errors::GracefulCancelError
       def self.public_message
         I18n.t 'Tenant missing or sync disabled. ' \
-          'Check the Microsoft sync integration settings for the course and account.'
+               'Check the Microsoft sync integration settings for the course and account.'
       end
     end
 
@@ -381,7 +381,7 @@ module MicrosoftSync
       # (generally, cheaper).
       full_sync_after = e.retry_after_seconds || STANDARD_RETRY_DELAY
       Rails.logger.info 'MicrosoftSync::SyncerSteps: partial sync throttled, ' \
-        "full sync in #{full_sync_after}"
+                        "full sync in #{full_sync_after}"
       InstStatsd::Statsd.increment("#{STATSD_NAME}.partial_into_full_throttled")
       StateMachineJob::DelayedNextStep.new(:step_full_sync_prerequisites, full_sync_after)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e

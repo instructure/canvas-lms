@@ -111,7 +111,7 @@ module Lti
     def update_workflow_state(workflow_state)
       Rails.logger.info do
         "in: ToolProxyController::update_workflow_state, tool_id: #{@tool_proxy.id}, "\
-        "old state: #{@tool_proxy.workflow_state}, new state: #{workflow_state}"
+          "old state: #{@tool_proxy.workflow_state}, new state: #{workflow_state}"
       end
       @tool_proxy.update_attribute(:workflow_state, workflow_state)
 
