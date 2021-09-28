@@ -337,7 +337,7 @@ class Attachment < ActiveRecord::Base
       if self.shard == dup.shard
         dup.root_attachment_id = self.root_attachment_id || self.id
       else
-        if existing_attachment = dup.find_existing_attachment_for_md5
+        if (existing_attachment = dup.find_existing_attachment_for_md5)
           dup.root_attachment = existing_attachment
         else
           dup.write_attribute(:filename, self.filename)
@@ -596,7 +596,7 @@ class Attachment < ActiveRecord::Base
     self.size = details[:content_length]
 
     self.shard.activate do
-      if existing_attachment = find_existing_attachment_for_md5
+      if (existing_attachment = find_existing_attachment_for_md5)
         if existing_attachment.s3object.exists?
           # deduplicate. the existing attachment's s3object should be the same as
           # that just uploaded ('cuz md5 match). delete the new copy and just
@@ -1346,7 +1346,7 @@ class Attachment < ActiveRecord::Base
         locked = { :asset_string => self.asset_string, :unlock_at => self.unlock_at }
       elsif (self.lock_at && Time.now > self.lock_at)
         locked = { :asset_string => self.asset_string, :lock_at => self.lock_at }
-      elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
+      elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { :asset_string => self.asset_string, :context_module => item.context_module.attributes }
         locked[:unlock_at] = locked[:context_module]["unlock_at"] if locked[:context_module]["unlock_at"] && locked[:context_module]["unlock_at"] > Time.now.utc
       end
@@ -2224,7 +2224,7 @@ class Attachment < ActiveRecord::Base
           new_attachment.context = to_context
           new_attachment.folder = Folder.assert_path(attachment.folder_path, to_context)
           new_attachment.namespace = new_attachment.infer_namespace
-          if existing_attachment = new_attachment.find_existing_attachment_for_md5
+          if (existing_attachment = new_attachment.find_existing_attachment_for_md5)
             new_attachment.root_attachment = existing_attachment
           else
             new_attachment.write_attribute(:filename, attachment.filename)

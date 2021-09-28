@@ -152,8 +152,8 @@ class PseudonymsController < ApplicationController
 
   def change_password
     @pseudonym = Pseudonym.find(params[:pseudonym][:id] || params[:pseudonym_id])
-    if @cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce])
-                       .where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first
+    if (@cc = @pseudonym.user.communication_channels.where(confirmation_code: params[:nonce])
+                       .where('confirmation_code_expires_at IS NULL OR confirmation_code_expires_at > ?', Time.now.utc).first)
       @pseudonym.require_password = true
       @pseudonym.password = params[:pseudonym][:password]
       @pseudonym.password_confirmation = params[:pseudonym][:password_confirmation]
@@ -329,8 +329,8 @@ class PseudonymsController < ApplicationController
   #   }
   def update
     if api_request?
-      @pseudonym          = Pseudonym.active.find(params[:id])
-      return unless @user = @pseudonym.user
+      @pseudonym = Pseudonym.active.find(params[:id])
+      return unless (@user = @pseudonym.user)
 
       params[:login] ||= {}
       params[:login][:password_confirmation] = params[:login][:password] if params[:login][:password]

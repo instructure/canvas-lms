@@ -141,7 +141,7 @@ module Importers
         if migration.import_object?("quizzes", migration_id)
           allow_update = false
           # allow update if we find an existing item based on this migration setting
-          if item_id = migration.migration_settings[:quiz_id_to_update]
+          if (item_id = migration.migration_settings[:quiz_id_to_update])
             allow_update = true
             assessment[:id] = item_id.to_i
             if assessment[:assignment]
@@ -149,7 +149,7 @@ module Importers
             end
           end
           if assessment['assignment_migration_id']
-            if assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] }
+            if (assignment = data['assignments'].find { |a| a['migration_id'] == assessment['assignment_migration_id'] })
               assignment['quiz_migration_id'] = migration_id
             end
           end
@@ -245,7 +245,7 @@ module Importers
         item.assignment = nil if item.assignment && item.assignment.quiz && item.assignment.quiz.id != item.id
         item.assignment ||= context.assignments.temp_record
         item.assignment = ::Importers::AssignmentImporter.import_from_migration(hash[:assignment], context, migration, item.assignment, item)
-      elsif !item.assignment && grading = hash[:grading]
+      elsif !item.assignment && (grading = hash[:grading])
         item.quiz_type = 'assignment'
         hash[:assignment_group_migration_id] ||= grading[:assignment_group_migration_id]
       end
@@ -294,7 +294,7 @@ module Importers
       end
 
       if hash[:assignment_group_migration_id]
-        if g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
+        if (g = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first)
           item.assignment_group = g
         end
       end
@@ -356,7 +356,7 @@ module Importers
       !migration.quizzes_next_banks_migration? && hash[:questions].each_with_index do |question, i|
         case question[:question_type]
         when "question_reference"
-          if aq = (question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
+          if (aq = question_data[:aq_data][question[:migration_id]] || question_data[:aq_data][question[:assessment_question_migration_id]])
             Importers::QuizQuestionImporter.import_from_migration(aq, question, i + 1,
                                                                   question_data[:qq_ids][item.migration_id], context, migration, item)
           end

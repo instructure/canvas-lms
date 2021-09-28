@@ -49,7 +49,7 @@ module Importers
       data['assignments']&.each do |assignment_hash|
         a_hash = assignment_hash.with_indifferent_access
         if migration.import_object?("assignments", a_hash['migration_id']) &&
-           group_mig_id = a_hash['assignment_group_migration_id']
+           (group_mig_id = a_hash['assignment_group_migration_id'])
           migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true
         end
       end
@@ -62,7 +62,7 @@ module Importers
           obj_hash = obj_hash.with_indifferent_access
           a_hash = obj_hash["assignment"]
           if a_hash && migration.import_object?(key, obj_hash['migration_id']) &&
-             group_mig_id = a_hash['assignment_group_migration_id']
+             (group_mig_id = a_hash['assignment_group_migration_id'])
             # auto import the assignment group even if it's not actually in the top-level assignments list
             # and just nested inside the topic or quiz
             migration.migration_settings[:migration_ids_to_import][:copy]['assignment_groups'][group_mig_id] = true

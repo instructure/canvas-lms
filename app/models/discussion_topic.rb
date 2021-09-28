@@ -1492,7 +1492,7 @@ class DiscussionTopic < ActiveRecord::Base
       # topic is not published
       if !published?
         next false
-      elsif is_announcement && unlock_at = available_from_for(user)
+      elsif is_announcement && (unlock_at = available_from_for(user))
         # unlock date exists and has passed
         next unlock_at < Time.now.utc
       # everything else
@@ -1525,13 +1525,13 @@ class DiscussionTopic < ActiveRecord::Base
         locked = { object: self, unlock_at: delayed_post_at }
       elsif (self.lock_at && self.lock_at < Time.now)
         locked = { object: self, lock_at: lock_at, can_view: true }
-      elsif !opts[:skip_assignment] && (assignment && l = assignment.low_level_locked_for?(user, opts))
+      elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
         locked = l
-      elsif self.could_be_locked && item = locked_by_module_item?(user, opts)
+      elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
       elsif self.locked? # nothing more specific, it's just locked
         locked = { object: self, can_view: true }
-      elsif (root_topic && l = root_topic.low_level_locked_for?(user, opts))
+      elsif root_topic && (l = root_topic.low_level_locked_for?(user, opts))
         locked = l
       end
       locked

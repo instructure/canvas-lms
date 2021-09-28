@@ -45,7 +45,7 @@ module Importers
       hash = hash.with_indifferent_access
       return nil if hash[:migration_id] && hash[:external_tools_to_import] && !hash[:external_tools_to_import][hash[:migration_id]]
 
-      if !item && migration && item = check_for_compatible_tool_translation(hash, migration)
+      if !item && migration && (item = check_for_compatible_tool_translation(hash, migration))
         return item
       end
 
@@ -90,7 +90,7 @@ module Importers
         hash[:extensions].each do |ext|
           next unless ext[:custom_fields].is_a? Hash
 
-          if existing = settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] }
+          if (existing = settings[:vendor_extensions].find { |ve| ve[:platform] == ext[:platform] })
             existing[:custom_fields] ||= {}
             existing[:custom_fields].merge! ext[:custom_fields]
           else

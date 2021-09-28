@@ -317,7 +317,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     res.results[:skipped] = import_migration.skipped_master_course_items.to_a if import_migration.skipped_master_course_items
     res.save!
     if state == 'completed' && res.import_type == 'full'
-      if sub = self.master_template.child_subscriptions.active.where(:id => res.child_subscription_id, :use_selective_copy => false).first
+      if (sub = self.master_template.child_subscriptions.active.where(:id => res.child_subscription_id, :use_selective_copy => false).first)
         sub.update_attribute(:use_selective_copy, true) # mark subscription as up-to-date
       end
     end

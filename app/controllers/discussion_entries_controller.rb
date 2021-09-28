@@ -206,7 +206,7 @@ class DiscussionEntriesController < ApplicationController
   #
   # Returns a boolean.
   def can_attach?(min_filesize = 0)
-    return false unless attachment = params[:attachment]
+    return false unless (attachment = params[:attachment])
 
     attachment[:uploaded_data].try(:size).to_i > min_filesize &&
       @entry.grants_right?(@current_user, session, :attach)

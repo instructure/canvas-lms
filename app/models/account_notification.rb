@@ -158,7 +158,7 @@ class AccountNotification < ActiveRecord::Base
         # and the user isn't in the set of users to display it to this month (based
         # on user id)
         current.reject! do |announcement|
-          if months_in_period = announcement.months_in_display_cycle
+          if (months_in_period = announcement.months_in_display_cycle)
             !self.display_for_user?(user.id, months_in_period)
           end
         end

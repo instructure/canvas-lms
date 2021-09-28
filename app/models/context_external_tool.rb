@@ -156,7 +156,7 @@ class ContextExternalTool < ActiveRecord::Base
       :target_link_uri
     ]
 
-    if custom_keys = CUSTOM_EXTENSION_KEYS[type]
+    if (custom_keys = CUSTOM_EXTENSION_KEYS[type])
       extension_keys += custom_keys
     end
     extension_keys += {

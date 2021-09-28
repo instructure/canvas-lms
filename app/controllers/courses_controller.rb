@@ -1822,7 +1822,7 @@ class CoursesController < ApplicationController
   def check_enrollment(ignore_restricted_courses = false)
     return false if @pending_enrollment
 
-    if enrollment = fetch_enrollment
+    if (enrollment = fetch_enrollment)
       if enrollment.state_based_on_date == :inactive && !ignore_restricted_courses
         flash[:notice] = t('notices.enrollment_not_active', 'Your membership in the course, %{course}, is not yet activated', :course => @context.name)
         return !!redirect_to(enrollment.workflow_state == 'invited' ? courses_url : dashboard_url)
@@ -1854,7 +1854,7 @@ class CoursesController < ApplicationController
     end
 
     if session[:accepted_enrollment_uuid].present? &&
-       enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first
+       (enrollment = @context.enrollments.where(uuid: session[:accepted_enrollment_uuid]).first)
 
       success = false
       if enrollment.invited?
@@ -2934,7 +2934,7 @@ class CoursesController < ApplicationController
         end
       end
       params[:course][:sis_source_id] = params[:course].delete(:sis_course_id) if api_request?
-      if sis_id = params[:course].delete(:sis_source_id)
+      if (sis_id = params[:course].delete(:sis_source_id))
         if sis_id != @course.sis_source_id && @course.root_account.grants_right?(@current_user, session, :manage_sis)
           if sis_id == ''
             @course.sis_source_id = nil
@@ -3570,7 +3570,7 @@ class CoursesController < ApplicationController
     get_context
     return unless authorized_action(@context, @current_user, :manage_content)
 
-    if progress = CourseLinkValidator.current_progress(@context)
+    if (progress = CourseLinkValidator.current_progress(@context))
       render :json => progress_json(progress, @current_user, session)
     else
       render :json => {}

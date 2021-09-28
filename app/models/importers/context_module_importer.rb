@@ -56,7 +56,7 @@ module Importers
           if item['type'] == 'submodule'
             # recursively select content in submodules
             self.select_linked_module_items(item, migration, true)
-          elsif resource_class = linked_resource_type_class(item['linked_resource_type'])
+          elsif (resource_class = linked_resource_type_class(item['linked_resource_type']))
             migration.import_object!(resource_class.table_name, item['linked_resource_id'])
           end
         end
@@ -150,7 +150,7 @@ module Importers
         preqs = []
         hash[:prerequisites].each do |prereq|
           if prereq[:module_migration_id]
-            if ref_mod = ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: prereq[:module_migration_id]).first
+            if (ref_mod = ContextModule.where(context_type: context.class.to_s, context_id: context, migration_id: prereq[:module_migration_id]).first)
               preqs << { :type => "context_module", :name => ref_mod.name, :id => ref_mod.id }
             end
           end
@@ -186,7 +186,7 @@ module Importers
       if hash[:completion_requirements]
         c_reqs = []
         hash[:completion_requirements].each do |req|
-          if item_ref = item_map[req[:item_migration_id]]
+          if (item_ref = item_map[req[:item_migration_id]])
             req[:id] = item_ref.id
             req.delete :item_migration_id
             c_reqs << req
@@ -257,7 +257,7 @@ module Importers
                                        }, existing_item, :position => context_module.migration_position)
       elsif hash[:linked_resource_type] =~ /url/i
         # external url
-        if url = hash[:url]
+        if (url = hash[:url])
           if (CanvasHttp.validate_url(hash[:url]) rescue nil)
             url = migration.process_domain_substitutions(url)
 
@@ -278,13 +278,13 @@ module Importers
 
         if hash[:linked_resource_global_id] && (!migration || !migration.cross_institution?)
           external_tool_id = hash[:linked_resource_global_id]
-        elsif arr = migration.find_external_tool_translation(hash[:linked_resource_id])
+        elsif (arr = migration.find_external_tool_translation(hash[:linked_resource_id]))
           external_tool_id = arr[0]
           custom_fields = arr[1]
           if custom_fields.present?
             external_tool_url = add_custom_fields_to_url(hash[:url], custom_fields) || hash[:url]
           end
-        elsif hash[:linked_resource_id] && et = context_module.context.context_external_tools.active.where(migration_id: hash[:linked_resource_id]).first
+        elsif hash[:linked_resource_id] && (et = context_module.context.context_external_tools.active.where(migration_id: hash[:linked_resource_id]).first)
           external_tool_id = et.id
         end
 
@@ -378,7 +378,7 @@ module Importers
     end
 
     def self.add_custom_fields_to_url(original_url, custom_fields)
-      return nil unless uri = URI.parse(original_url)
+      return nil unless (uri = URI.parse(original_url))
 
       custom_fields_query = custom_fields.map { |k, v| "custom_#{CGI.escape(k)}=#{CGI.escape(v)}" }.join("&")
       uri.query = uri.query.present? ? ([uri.query, custom_fields_query].join("&")) : custom_fields_query

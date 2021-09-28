@@ -86,7 +86,7 @@ class BrandConfigsController < ApplicationController
       new_group["variables"] = new_group["variables"].map(&:deep_dup)
       new_group["variables"].each do |v|
         v["human_name"] = BrandableCSS::VARIABLE_HUMAN_NAMES[v['variable_name']].call
-        if helper_text_proc = BrandableCSS::HELPER_TEXTS[v['variable_name']]
+        if (helper_text_proc = BrandableCSS::HELPER_TEXTS[v['variable_name']])
           v["helper_text"] = helper_text_proc.call
         end
       end

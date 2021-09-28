@@ -194,7 +194,7 @@ class Quizzes::QuizzesController < ApplicationController
         return unless check_lockdown_browser(:medium, named_context_url(@context, 'context_quiz_url', @quiz.to_param, :viewing => "1"))
       end
 
-      if @quiz.require_lockdown_browser? && refresh_ldb = value_to_boolean(params.delete(:refresh_ldb))
+      if @quiz.require_lockdown_browser? && value_to_boolean(params.delete(:refresh_ldb))
         return render(:action => "refresh_quiz_after_popup")
       end
 
@@ -318,7 +318,7 @@ class Quizzes::QuizzesController < ApplicationController
       student_ids = @context.student_ids
       @banks_hash = get_banks(@quiz)
 
-      if @has_student_submissions = @quiz.has_student_submissions?
+      if (@has_student_submissions = @quiz.has_student_submissions?)
         flash[:notice] = t('notices.has_submissions_already', "Keep in mind, some students have already taken or started taking this quiz")
       end
 
@@ -686,7 +686,7 @@ class Quizzes::QuizzesController < ApplicationController
         user_id = params[:user_id].presence || @current_user&.id
         @submission = @quiz.quiz_submissions.where(user_id: user_id).order(:created_at).first
       end
-      if @submission && !@submission.user_id && logged_out_index = params[:u_index]
+      if @submission && !@submission.user_id && (logged_out_index = params[:u_index])
         @logged_out_user_index = logged_out_index
       end
       @submission = nil if @submission && @submission.settings_only?
@@ -900,7 +900,7 @@ class Quizzes::QuizzesController < ApplicationController
     elsif !plugin.authorized?(self)
       redirect_to(:action => 'lockdown_browser_required', :quiz_id => @quiz.id)
       return false
-    elsif !session['lockdown_browser_popup'] && @query_params = plugin.popup_window(self, security_level)
+    elsif !session['lockdown_browser_popup'] && (@query_params = plugin.popup_window(self, security_level))
       @security_level = security_level
       session['lockdown_browser_popup'] = true
       render(:action => 'take_quiz_in_popup')

@@ -162,7 +162,7 @@ class ContextModule < ActiveRecord::Base
   def infer_position
     if !self.position
       positions = ContextModule.module_positions(self.context)
-      if max = positions.values.max
+      if (max = positions.values.max)
         self.position = max + 1
       else
         self.position = 1
@@ -459,7 +459,7 @@ class ContextModule < ActiveRecord::Base
       pres = prereqs.split(",")
       pre_regex = /module_(\d+)/
       pres.each do |pre|
-        next unless match = pre_regex.match(pre)
+        next unless (match = pre_regex.match(pre))
 
         id = match[1].to_i
         if module_names.has_key?(id)
@@ -790,7 +790,7 @@ class ContextModule < ActiveRecord::Base
   def update_for(user, action, tag, points = nil)
     retry_count = 0
     return nil unless self.context.grants_right?(user, :participate_as_student)
-    return nil unless progression = self.evaluate_for(user)
+    return nil unless (progression = self.evaluate_for(user))
     return nil if progression.locked?
 
     progression.update_requirement_met!(action, tag, points)

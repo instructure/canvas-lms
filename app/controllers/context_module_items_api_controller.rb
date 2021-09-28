@@ -393,8 +393,8 @@ class ContextModuleItemsApiController < ApplicationController
       item_params = params[:module_item].slice(:title, :type, :indent, :new_tab)
       item_params[:id] = params[:module_item][:content_id]
       if ['Page', 'WikiPage'].include?(item_params[:type])
-        if page_url = params[:module_item][:page_url]
-          if wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first
+        if (page_url = params[:module_item][:page_url])
+          if (wiki_page = @context.wiki_pages.not_deleted.where(url: page_url).first)
             item_params[:id] = wiki_page.id
           else
             return render :json => { :message => "invalid page_url parameter" }, :status => :bad_request
@@ -482,7 +482,7 @@ class ContextModuleItemsApiController < ApplicationController
         old_module = @context.context_modules.find(@tag.context_module_id)
         @tag.remove_from_list
         @tag.context_module = target_module
-        if req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id }
+        if (req_index = old_module.completion_requirements.find_index { |req| req[:id] == @tag.id })
           old_module.completion_requirements_will_change!
           req = old_module.completion_requirements.delete_at(req_index)
           old_module.save!

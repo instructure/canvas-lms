@@ -372,10 +372,9 @@ class ContentMigrationsController < ApplicationController
       end
     end
     source_course = lookup_sis_source_course
-    if validator = settings[:required_options_validator]
-      if res = validator.has_error(params[:settings], @current_user, @context)
-        return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
-      end
+    if (validator = settings[:required_options_validator]) &&
+       (res = validator.has_error(params[:settings], @current_user, @context))
+      return render(:json => { :message => res.respond_to?(:call) ? res.call : res }, :status => :bad_request)
     end
 
     @content_migration = @context.content_migrations.build(

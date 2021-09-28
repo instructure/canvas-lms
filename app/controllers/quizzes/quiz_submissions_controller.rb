@@ -104,7 +104,7 @@ class Quizzes::QuizSubmissionsController < ApplicationController
             (@submission.grants_right?(@current_user, session, :update))
         if !@submission.completed? && (!@submission.overdue? || is_previewing?)
           if params[:action] == 'record_answer'
-            if last_question = params[:last_question_id]
+            if (last_question = params[:last_question_id])
               params[:"_question_#{last_question}_read"] = true
             end
 

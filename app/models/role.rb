@@ -68,7 +68,9 @@ class Role < ActiveRecord::Base
   validate :ensure_non_built_in_name
 
   def role_for_root_account_id(target_root_account_id)
-    if self.built_in? && self.root_account_id != target_root_account_id && target_role = Role.get_built_in_role(self.name, root_account_id: target_root_account_id)
+    if self.built_in? &&
+       self.root_account_id != target_root_account_id &&
+       (target_role = Role.get_built_in_role(self.name, root_account_id: target_root_account_id))
       target_role
     else
       self

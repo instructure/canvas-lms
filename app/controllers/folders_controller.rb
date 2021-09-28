@@ -332,7 +332,7 @@ class FoldersController < ApplicationController
           folder_params[:locked] = false
           folder_params[:hidden] = true
         end
-        if parent_folder_id = folder_params.delete(:parent_folder_id)
+        if (parent_folder_id = folder_params.delete(:parent_folder_id))
           parent_folder = @context.folders.active.find(parent_folder_id)
           return unless authorized_action(parent_folder, @current_user, :manage_contents)
 

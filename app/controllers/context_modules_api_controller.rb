@@ -346,7 +346,7 @@ class ContextModulesApiController < ApplicationController
 
       @module = @context.context_modules.build(module_parameters)
 
-      if ids = params[:module][:prerequisite_module_ids]
+      if (ids = params[:module][:prerequisite_module_ids])
         @module.prerequisites = ids.map { |id| "module_#{id}" }.join(',')
       end
       @module.workflow_state = 'unpublished'
@@ -405,7 +405,7 @@ class ContextModulesApiController < ApplicationController
 
       module_parameters = params.require(:module).permit(:name, :unlock_at, :require_sequential_progress, :publish_final_grade)
 
-      if ids = params[:module][:prerequisite_module_ids]
+      if (ids = params[:module][:prerequisite_module_ids])
         if ids.blank?
           module_parameters[:prerequisites] = []
         else

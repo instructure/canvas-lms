@@ -43,7 +43,7 @@ class Profile < ActiveRecord::Base
 
     path = base_path = title.downcase.gsub(/[^a-z0-9]+/, '-').gsub(/\A\-+|\-+\z/, '')
     count = 0
-    while profile = Profile.where(root_account_id: root_account_id, path: path).first
+    while (profile = Profile.where(root_account_id: root_account_id, path: path).first)
       break if profile.id == id
 
       path = "#{base_path}-#{count += 1}"

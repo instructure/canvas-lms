@@ -414,7 +414,7 @@ class Course < ActiveRecord::Base
   end
 
   def module_items_visible_to(user)
-    if user_is_teacher = self.grants_right?(user, :view_unpublished_items)
+    if (user_is_teacher = self.grants_right?(user, :view_unpublished_items))
       tags = self.context_module_tags.not_deleted.joins(:context_module).where("context_modules.workflow_state <> 'deleted'")
     else
       tags = self.context_module_tags.active.joins(:context_module).where(:context_modules => { :workflow_state => 'active' })
@@ -2580,7 +2580,7 @@ class Course < ActiveRecord::Base
               final_new_folders = []
               parent_folder = Folder.root_folders(self).first
               old_folders.each_with_index do |folder, idx|
-                if f = parent_folder.active_sub_folders.where(name: folder.name).first
+                if (f = parent_folder.active_sub_folders.where(name: folder.name).first)
                   final_new_folders << f
                 else
                   final_new_folders << new_folders[idx]

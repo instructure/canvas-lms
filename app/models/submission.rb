@@ -2471,7 +2471,7 @@ class Submission < ActiveRecord::Base
     # This should always be called in the context of a delayed job
     return unless CutyCapt.enabled?
 
-    if attachment = CutyCapt.snapshot_attachment_for_url(self.url)
+    if (attachment = CutyCapt.snapshot_attachment_for_url(self.url))
       attachment.context = self
       attachment.save!
       attach_screenshot(attachment)
@@ -2769,7 +2769,7 @@ class Submission < ActiveRecord::Base
                 comment
               ).with_indifferent_access
 
-              if file_ids = user_data[:file_ids]
+              if (file_ids = user_data[:file_ids])
                 attachments = Attachment.where(id: file_ids).to_a.select { |a|
                   a.grants_right?(grader, :attach_to_submission_comment)
                 }

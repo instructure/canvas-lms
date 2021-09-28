@@ -179,7 +179,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
           entry_lookup[entry.id] = json
           user_ids << entry.user_id
           user_ids << entry.editor_id if entry.editor_id
-          if parent = entry_lookup[entry.parent_id]
+          if (parent = entry_lookup[entry.parent_id])
             parent['replies'] ||= []
             parent['replies'] << json
           else

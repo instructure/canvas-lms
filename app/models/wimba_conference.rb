@@ -36,7 +36,7 @@ class WimbaConference < WebConference
           logger.error "wimba error reading archive list"
           break
         end
-        if date_info = data[:longname].match(Regexp.new(" - (\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2})\\z"))
+        if (date_info = data[:longname].match(Regexp.new(" - (\\d{2}/\\d{2}/\\d{4} \\d{2}:\\d{2})\\z")))
           # convert from wimba's local time to the user's local time
           tz       = ActiveSupport::TimeZone[config[:timezone] || config[:plugin].default_settings[:timezone]]
           new_date = nil
@@ -217,7 +217,7 @@ class WimbaConference < WebConference
 
   def conference_status
     active = nil
-    if res = send_request('statusClass', { 'target' => wimba_id })
+    if (res = send_request('statusClass', { 'target' => wimba_id }))
       res.split(/\r?\n/).each do |str|
         key, value = str.strip.split(/=/, 2)
         if key == 'num_users'

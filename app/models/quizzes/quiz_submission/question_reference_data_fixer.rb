@@ -195,15 +195,14 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
     # Adjust the "last_question_id" entry for OQAAT quizzes that have
     # the Can't Go Back option on. This is an ID entry that may be a string
     # or an integer.
-    if last_question_id = submission_data["last_question_id"]
-      if mapped_last_question_id = id_map[last_question_id.to_i]
-        # don't change the type.. if it was a string, keep it that way
-        submission_data["last_question_id"] = if last_question_id.is_a?(String)
-                                                "#{mapped_last_question_id}"
-                                              else
-                                                mapped_last_question_id
-                                              end
-      end
+    if (last_question_id = submission_data["last_question_id"]) &&
+       (mapped_last_question_id = id_map[last_question_id.to_i])
+      # don't change the type.. if it was a string, keep it that way
+      submission_data["last_question_id"] = if last_question_id.is_a?(String)
+                                              mapped_last_question_id.to_s
+                                            else
+                                              mapped_last_question_id
+                                            end
     end
   end
 end

@@ -684,7 +684,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     exceptions = {}
     subscriptions.each do |sub|
-      next unless result = results[sub.id]
+      next unless (result = results[sub.id])
 
       skipped_items = result[:skipped]
       next unless skipped_items.present?

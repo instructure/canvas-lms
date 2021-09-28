@@ -84,7 +84,7 @@ module Importers
 
         if !question_bank
           question_bank = migration.context.assessment_question_banks.temp_record
-          if bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == bank_mig_id }
+          if (bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == bank_mig_id })
             question_bank.title = bank_hash['title']
             if question_bank.title && question_bank.title.length > ActiveRecord::Base.maximum_string_length
               migration.add_warning(t("The title of the following question bank was truncated: \"%{title}\"", :title => question_bank.title))
@@ -94,7 +94,7 @@ module Importers
           question_bank.title ||= default_title
           question_bank.migration_id = bank_mig_id
         elsif data['assessment_question_banks']
-          if bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == question_bank.migration_id }
+          if (bank_hash = data['assessment_question_banks'].detect { |qb_hash| qb_hash['migration_id'] == question_bank.migration_id })
             question_bank.title = bank_hash['title'] # we should update the title i guess?
           end
         end
@@ -143,14 +143,14 @@ module Importers
       self.prep_for_import(hash, migration, :assessment_question)
 
       import_warnings = hash.delete(:import_warnings) || []
-      if error = hash.delete(:import_error)
+      if (error = hash.delete(:import_error))
         import_warnings << error
       end
-      if error = hash.delete(:qti_error)
+      if (error = hash.delete(:qti_error))
         import_warnings << error
       end
 
-      if id = hash['assessment_question_id']
+      if (id = hash['assessment_question_id'])
         AssessmentQuestion.where(id: id).update_all(name: hash[:question_name], question_data: hash,
                                                     workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
                                                     assessment_question_bank_id: bank.id)

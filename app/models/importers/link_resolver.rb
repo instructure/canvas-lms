@@ -39,15 +39,15 @@ module Importers
     def resolve_link!(link)
       case link[:link_type]
       when :wiki_page
-        if linked_wiki_url = context.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first
+        if (linked_wiki_url = context.wiki_pages.where(migration_id: link[:migration_id]).limit(1).pluck(:url).first)
           link[:new_value] = "#{context_path}/pages/#{linked_wiki_url}#{link[:query]}"
         end
       when :discussion_topic
-        if linked_topic_id = context.discussion_topics.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first
+        if (linked_topic_id = context.discussion_topics.where(migration_id: link[:migration_id]).limit(1).pluck(:id).first)
           link[:new_value] = "#{context_path}/discussion_topics/#{linked_topic_id}#{link[:query]}"
         end
       when :module_item
-        if tag_id = context.context_module_tags.where(:migration_id => link[:migration_id]).limit(1).pluck(:id).first
+        if (tag_id = context.context_module_tags.where(:migration_id => link[:migration_id]).limit(1).pluck(:id).first)
           link[:new_value] = "#{context_path}/modules/items/#{tag_id}#{link[:query]}"
         end
       when :object
@@ -61,16 +61,15 @@ module Importers
           query = resolve_module_item_query(context, link[:query])
           link[:new_value] = "#{context_path}/pages/#{migration_id}#{query}"
         elsif type == 'attachments'
-          if att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first
+          if (att_id = context.attachments.where(migration_id: migration_id).limit(1).pluck(:id).first)
             link[:new_value] = "#{context_path}/files/#{att_id}/preview"
           end
         elsif context.respond_to?(type) && context.send(type).respond_to?(:scope)
           scope = context.send(type).scope
-          if scope.klass.columns_hash['migration_id']
-            if object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first
-              query = resolve_module_item_query(context, link[:query])
-              link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}#{query}"
-            end
+          if scope.klass.columns_hash['migration_id'] &&
+             (object_id = scope.where(migration_id: migration_id).limit(1).pluck(:id).first)
+            query = resolve_module_item_query(context, link[:query])
+            link[:new_value] = "#{context_path}/#{type_for_url}/#{object_id}#{query}"
           end
         end
       when :media_object
@@ -166,7 +165,7 @@ module Importers
       # e.g. start with "a/b/c.txt" then try "b/c.txt" then try "c.txt"
       while new_url.nil? && rel_path_parts.length > 0
         sub_path = File.join(rel_path_parts)
-        if file = find_file_in_context(sub_path)
+        if (file = find_file_in_context(sub_path))
           new_url = "#{context_path}/files/#{file.id}"
           # support other params in the query string, that were exported from the
           # original path components and query string. see
@@ -201,7 +200,7 @@ module Importers
     end
 
     def resolve_media_comment_data(node, rel_path)
-      if file = find_file_in_context(rel_path[/^[^?]+/]) # strip query string for this search
+      if (file = find_file_in_context(rel_path[/^[^?]+/])) # strip query string for this search
         media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
         if media_id && media_id != 'maybe'
           if node.name == 'iframe'
