@@ -222,25 +222,25 @@ export function enhanceUserContent() {
       const $span = $(
         "<span class='instructure_file_holder link_holder instructure_file_link_holder'/>"
       )
-      if (ENV.FEATURES?.rce_better_file_downloading) {
-        const qs = href.searchParams
-        qs.delete('wrap')
-        qs.append('download_frd', '1')
-        const download_url = `${href.origin}${href.pathname.replace(
-          /(?:\/(download|preview))?$/,
-          '/download'
-        )}?${qs}`
-        $download_btn = $(
-          `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px; text-decoration: none;" href="${htmlEscape(
-            download_url
-          )}">
-              <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
-              <span class="screenreader-only">
-                ${htmlEscape(I18n.t('Download %{filename}', {filename}))}
-              </span>
-            </a>`
-        )
-      }
+
+      const qs = href.searchParams
+      qs.delete('wrap')
+      qs.append('download_frd', '1')
+      const download_url = `${href.origin}${href.pathname.replace(
+        /(?:\/(download|preview))?$/,
+        '/download'
+      )}?${qs}`
+      $download_btn = $(
+        `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px; text-decoration: none;" href="${htmlEscape(
+          download_url
+        )}">
+            <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
+            <span class="screenreader-only">
+              ${htmlEscape(I18n.t('Download %{filename}', {filename}))}
+            </span>
+          </a>`
+      )
+
       if ($link.hasClass('instructure_scribd_file')) {
         if (ENV.FEATURES?.rce_better_file_previewing) {
           if ($link.hasClass('inline_disabled')) {
