@@ -75,10 +75,15 @@ describe Types::DiscussionEntryType do
     end
 
     it 'returns the reply preview data' do
-      sub_entry.update!(message: "<div data-discussion-reply-preview='23'></div><p>only this should stay</p>", include_reply_preview: true)
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { author { shortName } }')).to eq parent.user.short_name
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { createdAt }')).to eq parent.created_at.iso8601
-      expect(GraphQLTypeTester.new(sub_entry, current_user: @teacher).resolve('quotedEntry { previewMessage }')).to eq parent.summary
+      message = "<p>Hey I am a pretty long message with <strong>bold text</strong>. </p>" # .length => 71
+      parent.message = message * 5 # something longer than the default 150 chars
+      parent.save
+      type = GraphQLTypeTester.new(sub_entry, current_user: @teacher)
+      sub_entry.update!(include_reply_preview: true)
+      expect(type.resolve('quotedEntry { author { shortName } }')).to eq parent.user.short_name
+      expect(type.resolve('quotedEntry { createdAt }')).to eq parent.created_at.iso8601
+      expect(type.resolve('quotedEntry { previewMessage }')).to eq parent.summary(500) # longer than the message
+      expect(type.resolve('quotedEntry { previewMessage }').length).to eq 235
     end
   end
 

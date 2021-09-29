@@ -49,7 +49,7 @@ module Types
 
     field :preview_message, String, null: true
     def preview_message
-      object.deleted? ? nil : object.summary
+      object.deleted? ? nil : object.summary(ActiveRecord::Base.maximum_text_length)
     end
 
     field :quoted_entry, Types::DiscussionEntryType, null: true

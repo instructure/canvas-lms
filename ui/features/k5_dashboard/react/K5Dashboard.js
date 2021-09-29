@@ -165,8 +165,7 @@ export const K5Dashboard = ({
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
-  const observerMode =
-    parentSupportEnabled && currentUserRoles.includes('observer') && observedUserId
+  const observerMode = parentSupportEnabled && currentUserRoles.includes('observer')
 
   // If the view width increases while the tray is open, change the state to close the tray
   if (trayOpen && !useImportantDatesTray) {
@@ -191,7 +190,7 @@ export const K5Dashboard = ({
   }
 
   useEffect(() => {
-    if (!cards) {
+    if (!cards && ((observerMode && observedUserId) || !observerMode)) {
       loadCardDashboard(loadCardDashboardCallBack, observerMode ? observedUserId : undefined)
     } else if (observerMode) {
       const cachedCards = observedUsersCards[observedUserId]
@@ -204,7 +203,7 @@ export const K5Dashboard = ({
         loadCardDashboard(loadCardDashboardCallBack, observedUserId)
       }
     }
-  }, [cards, observedUserId, observedUsersCards]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [cards, observedUserId, observedUsersCards, observerMode]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useFetchApi({
     path: '/api/v1/announcements',

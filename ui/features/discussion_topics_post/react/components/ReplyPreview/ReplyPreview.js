@@ -25,6 +25,7 @@ import {responsiveQuerySizes} from '../../utils'
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
 import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
 import {View} from '@instructure/ui-view'
 
 export const ReplyPreview = ({...props}) => {
@@ -68,7 +69,9 @@ export const ReplyPreview = ({...props}) => {
               </View>
             </Flex.Item>
             <Flex.Item margin="small 0 0 0">
-              <Text size={responsiveProps.textSize}>{message}</Text>
+              <TruncateText maxLines={2} truncate="word" ellipsis=" ...">
+                <Text size={responsiveProps.textSize}>{message}</Text>
+              </TruncateText>
             </Flex.Item>
           </Flex>
         </View>
