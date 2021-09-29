@@ -35,7 +35,6 @@ export const DELETE_DISCUSSION_TOPIC = gql`
   ${Error.fragment}
 `
 
-// TODO: Support read state
 export const UPDATE_DISCUSSION_ENTRY_PARTICIPANT = gql`
   mutation UpdateDiscussionEntryParticipant(
     $discussionEntryId: ID!

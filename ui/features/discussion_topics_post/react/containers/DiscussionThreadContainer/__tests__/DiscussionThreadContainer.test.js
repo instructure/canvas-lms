@@ -278,7 +278,17 @@ describe('DiscussionThreadContainer', () => {
   describe('Unread Badge', () => {
     describe('should find unread badge', () => {
       it('root is read and child reply is unread', () => {
-        const container = setup(defaultProps())
+        const container = setup(
+          defaultProps({
+            discussionEntryOverrides: {
+              rootEntryParticipantCounts: {
+                unreadCount: 1,
+                repliesCount: 1,
+                __typename: 'DiscussionEntryCounts'
+              }
+            }
+          })
+        )
         expect(container.getByTestId('is-unread')).toBeTruthy()
       })
 
@@ -359,7 +369,17 @@ describe('DiscussionThreadContainer', () => {
     })
 
     it('pluralizes reply message correctly when there is only a single reply', async () => {
-      const {getAllByText} = setup(defaultProps())
+      const {getAllByText} = setup(
+        defaultProps({
+          discussionEntryOverrides: {
+            rootEntryParticipantCounts: {
+              unreadCount: 1,
+              repliesCount: 1,
+              __typename: 'DiscussionEntryCounts'
+            }
+          }
+        })
+      )
       expect(getAllByText('1 reply, 1 unread').length).toBe(2)
     })
 
