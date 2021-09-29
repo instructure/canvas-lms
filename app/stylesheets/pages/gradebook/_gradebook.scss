@@ -813,13 +813,17 @@ $gradebook_checkbox_size: 16px;
 
 // STUFF FOR HEADER
 #gradebook-toolbar {
+  display: flex;
+  flex-direction: row;
   position: relative;
   padding: $ic-sp 0;
   border-top: none;
   @include breakpoint(desktop) {
-    display: flex;
     align-items: center;
     justify-content: space-between;
+  }
+  @include mobile-only {
+    flex-direction: column;
   }
 }
 
@@ -829,19 +833,12 @@ $gradebook_checkbox_size: 16px;
 
 .gradebook-menus {
   display: inline-block;
-  flex: 0 1 auto;
+  white-space: nowrap;
 }
 
 #gradebook-actions {
-  display: flex;
-  flex: 1 1 auto;
-  flex-direction: row;
-  justify-content: flex-end;
-
-  @include mobile-only {
-    flex-direction: column;
-    align-items: flex-end;
-  }
+  display: inline-block;
+  white-space: nowrap;
 }
 
 .gradebook-filter-container {
@@ -866,13 +863,8 @@ $gradebook_checkbox_size: 16px;
 }
 
 .gradebook_menu {
+  display: inline-block;
   margin-#{direction(left)}: $ic-sp*0.5;
-  flex: 0 1 auto;
-
-  @include breakpoint(desktop) {
-    white-space: nowrap;
-    text-align: direction(right);
-  }
 }
 
 @mixin gradebook_menu_label($fontsize) {
