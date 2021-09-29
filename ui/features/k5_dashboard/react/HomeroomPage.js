@@ -33,7 +33,7 @@ import {createDashboardCards} from '@canvas/dashboard-card'
 import HomeroomAnnouncementsLayout from './HomeroomAnnouncementsLayout'
 import LoadingSkeleton from '@canvas/k5/react/LoadingSkeleton'
 import LoadingWrapper from '@canvas/k5/react/LoadingWrapper'
-import {CreateCourseModal} from './CreateCourseModal'
+import {CreateCourseModal} from '@canvas/create-course-modal/react/CreateCourseModal'
 import EmptyDashboardState from '@canvas/k5/react/EmptyDashboardState'
 
 const HomeroomPage = ({
@@ -132,6 +132,7 @@ const HomeroomPage = ({
           isModalOpen={courseModalOpen}
           setModalOpen={setCourseModalOpen}
           permissions={createPermissions}
+          isK5User
         />
       )}
     </section>

@@ -107,6 +107,8 @@ RSpec/MessageSpies:
   Enabled: false # we don't use spies
 RSpec/MultipleExpectations:
   Enabled: false # we don't write specs in this style
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false # complicated setup is sometimes necessary
 RSpec/NestedGroups:
   Enabled: false # legacy code
 RSpec/RepeatedDescription:

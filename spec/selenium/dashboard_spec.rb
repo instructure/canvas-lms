@@ -429,5 +429,31 @@ describe "dashboard" do
         expect(f("#content")).not_to contain_css('.to-do-list > li')
       end
     end
+
+    context "start course button" do
+      before :once do
+        course_with_teacher(active_all: true)
+        Account.default.settings[:teachers_can_create_courses] = true
+        Account.default.save!
+      end
+
+      before :each do
+        user_session(@teacher)
+      end
+
+      it "launches classic new course modal" do
+        get "/"
+        f('#start_new_course').click
+        expect(fj('.ui-dialog-title:contains("Start a New Course")')).to be_displayed
+      end
+
+      it "launches improved new course modal if create_course_subaccount_picker is enabled" do
+        Account.default.enable_feature!(:create_course_subaccount_picker)
+
+        get "/"
+        f('#start_new_course').click
+        expect(fj('h2:contains("Create Course")')).to be_displayed
+      end
+    end
   end
 end

@@ -33,9 +33,9 @@ import Modal from '@canvas/instui-bindings/react/InstuiModal'
 import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import useFetchApi from '@canvas/use-fetch-api-hook'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
-import {createNewCourse, getAccountsFromEnrollments} from '@canvas/k5/react/utils'
+import {createNewCourse, getAccountsFromEnrollments} from './utils'
 
-export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
+export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions, isK5User}) => {
   const [loading, setLoading] = useState(true)
   const [allAccounts, setAllAccounts] = useState([])
   const [allHomerooms, setAllHomerooms] = useState([])
@@ -44,6 +44,19 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
   const [selectedAccount, setSelectedAccount] = useState(null)
   const [accountSearchTerm, setAccountSearchTerm] = useState('')
   const [courseName, setCourseName] = useState('')
+
+  const errorMessage = isK5User
+    ? I18n.t('Error creating new subject')
+    : I18n.t('Error creating new course')
+  const modalLabel = isK5User ? I18n.t('Create Subject') : I18n.t('Create Course')
+  const loadingMessage = isK5User
+    ? I18n.t('Creating new subject...')
+    : I18n.t('Creating new course...')
+  const courseNameLabel = isK5User ? I18n.t('Subject Name') : I18n.t('Course Name')
+  const accountLabel = isK5User
+    ? I18n.t('Which account will this subject be associated with?')
+    : I18n.t('Which account will this course be associated with?')
+  const formDescription = isK5User ? I18n.t('Subject Details') : I18n.t('Course Details')
 
   const clearModal = () => {
     setSelectedAccount(null)
@@ -59,7 +72,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
       .then(course => (window.location.href = `/courses/${course.id}/settings`))
       .catch(err => {
         setLoading(false)
-        showFlashError(I18n.t('Error creating new subject'))(err)
+        showFlashError(errorMessage)(err)
       })
   }
 
@@ -171,28 +184,24 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
   const hideAccountSelect = permissions === 'teacher' && allAccounts?.length === 1
 
   return (
-    <Modal label={I18n.t('Create Subject')} open={isModalOpen} size="small" onDismiss={clearModal}>
+    <Modal label={modalLabel} open={isModalOpen} size="small" onDismiss={clearModal}>
       <Modal.Body>
         {loading ? (
           <View as="div" textAlign="center">
             <Spinner
-              renderTitle={
-                allAccounts.length
-                  ? I18n.t('Creating new subject...')
-                  : I18n.t('Loading accounts...')
-              }
+              renderTitle={allAccounts.length ? loadingMessage : I18n.t('Loading accounts...')}
             />
           </View>
         ) : (
           <FormFieldGroup
-            description={<ScreenReaderContent>{I18n.t('Subject Details')}</ScreenReaderContent>}
+            description={<ScreenReaderContent>{formDescription}</ScreenReaderContent>}
             layout="stacked"
             rowSpacing="medium"
           >
             {!hideAccountSelect && (
               <CanvasAsyncSelect
                 inputValue={accountSearchTerm}
-                renderLabel={I18n.t('Which account will this subject be associated with?')}
+                renderLabel={accountLabel}
                 placeholder={I18n.t('Begin typing to search')}
                 noOptionsLabel={I18n.t('No Results')}
                 onInputChange={e => setAccountSearchTerm(e.target.value)}
@@ -201,13 +210,15 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
                 {accountOptions}
               </CanvasAsyncSelect>
             )}
-            <Checkbox
-              label={I18n.t('Sync enrollments and course start/end dates from homeroom')}
-              value="syncHomeroomEnrollments"
-              checked={syncHomeroomEnrollments}
-              onChange={event => setSyncHomeroomEnrollments(event.target.checked)}
-            />
-            {syncHomeroomEnrollments && (
+            {isK5User && (
+              <Checkbox
+                label={I18n.t('Sync enrollments and course start/end dates from homeroom')}
+                value="syncHomeroomEnrollments"
+                checked={syncHomeroomEnrollments}
+                onChange={event => setSyncHomeroomEnrollments(event.target.checked)}
+              />
+            )}
+            {isK5User && syncHomeroomEnrollments && (
               <SimpleSelect
                 data-testid="homeroom-select"
                 renderLabel={I18n.t('Select a homeroom')}
@@ -218,7 +229,7 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
               </SimpleSelect>
             )}
             <TextInput
-              renderLabel={I18n.t('Subject Name')}
+              renderLabel={courseNameLabel}
               placeholder={I18n.t('Name...')}
               value={courseName}
               onChange={e => setCourseName(e.target.value)}
@@ -254,5 +265,6 @@ export const CreateCourseModal = ({isModalOpen, setModalOpen, permissions}) => {
 CreateCourseModal.propTypes = {
   isModalOpen: PropTypes.bool.isRequired,
   setModalOpen: PropTypes.func.isRequired,
-  permissions: PropTypes.oneOf(['admin', 'teacher']).isRequired
+  permissions: PropTypes.oneOf(['admin', 'teacher']).isRequired,
+  isK5User: PropTypes.bool.isRequired
 }

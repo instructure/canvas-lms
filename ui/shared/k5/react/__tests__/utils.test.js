@@ -26,10 +26,8 @@ import {
   readableRoleName,
   fetchCourseApps,
   sendMessage,
-  createNewCourse,
   getAssignmentGroupTotals,
   getAssignmentGrades,
-  getAccountsFromEnrollments,
   getTotalGradeStringFromEnrollments,
   fetchImportantInfos,
   parseAnnouncementDetails,
@@ -48,8 +46,6 @@ const USERS_URL =
   '/api/v1/courses/test/users?enrollment_type[]=teacher&enrollment_type[]=ta&include[]=avatar_url&include[]=bio&include[]=enrollments'
 const APPS_URL = '/api/v1/external_tools/visible_course_nav_tools?context_codes[]=course_test'
 const CONVERSATIONS_URL = '/api/v1/conversations'
-const NEW_COURSE_URL =
-  '/api/v1/accounts/15/courses?course[name]=Science&course[sync_enrollments_from_homeroom]=true&course[homeroom_course_id]=14&enroll_me=true'
 const getSyllabusUrl = courseId => encodeURI(`/api/v1/courses/${courseId}?include[]=syllabus_body`)
 
 afterEach(() => {
@@ -369,14 +365,6 @@ describe('sendMessage', () => {
   })
 })
 
-describe('createNewCourse', () => {
-  it('posts to the new course endpoint and returns the new id', async () => {
-    fetchMock.post(encodeURI(NEW_COURSE_URL), {id: '56'})
-    const result = await createNewCourse(15, 'Science', true, 14)
-    expect(result.id).toBe('56')
-  })
-})
-
 describe('getAssignmentGroupTotals', () => {
   it('returns an array of objects that have id, name, and score', () => {
     const data = [
@@ -574,64 +562,6 @@ describe('getAssignmentGrades', () => {
     expect(totals.find(({id}) => id === 149).hasComments).toBe(true)
     expect(totals.find(({id}) => id === 150).hasComments).toBe(false)
     expect(totals.find(({id}) => id === 151).hasComments).toBe(false)
-  })
-})
-
-describe('getAccountsFromEnrollments', () => {
-  it('returns array of objects containing id and name', () => {
-    const enrollments = [
-      {
-        name: 'Algebra',
-        account: {
-          id: 6,
-          name: 'Elementary',
-          workflow_state: 'active'
-        }
-      }
-    ]
-    const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
-    expect(accounts[0].id).toBe(6)
-    expect(accounts[0].name).toBe('Elementary')
-    expect(accounts[0].workflow_state).toBeUndefined()
-  })
-
-  it('removes duplicate accounts from list', () => {
-    const enrollments = [
-      {
-        account: {
-          id: 12,
-          name: 'FFES'
-        }
-      },
-      {
-        account: {
-          id: 12,
-          name: 'FFES'
-        }
-      }
-    ]
-    const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
-  })
-
-  it('ignores enrollments without an account property', () => {
-    const enrollments = [
-      {
-        id: 10,
-        account: {
-          id: 1,
-          name: 'School'
-        }
-      },
-      {
-        id: 11,
-        access_restricted_by_date: true
-      }
-    ]
-    const accounts = getAccountsFromEnrollments(enrollments)
-    expect(accounts.length).toBe(1)
-    expect(accounts[0].id).toBe(1)
   })
 })
 
