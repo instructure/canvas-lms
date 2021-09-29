@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class PacePlansController < ApplicationController
-  before_action :require_context
+  before_action :load_context
+  before_action :load_course
   before_action :require_feature_flag
   before_action :authorize_action
   before_action :load_pace_plan, only: [:api_show, :update]
@@ -74,6 +75,38 @@ class PacePlansController < ApplicationController
     end
   end
 
+  def latest_draft_for
+    @pace_plan = case @context
+                 when Course
+                   @context.pace_plans.primary.unpublished.take
+                 when CourseSection
+                   @course.pace_plans.unpublished.for_section(@context).take
+                 when Enrollment
+                   @course.pace_plans.unpublished.for_user(@context.user).take
+                 end
+    if @pace_plan.nil?
+      params = case @context
+               when Course
+                 { course_section_id: nil, user_id: nil }
+               when CourseSection
+                 { course_section_id: @context }
+               when Enrollment
+                 { user_id: @context.user }
+               end
+      # Duplicate a published plan if one exists for the plan or for the course
+      published_pace_plan = @course.pace_plans.published.where(params).take || @course.pace_plans.primary.published.take
+      if published_pace_plan
+        @pace_plan = published_pace_plan.duplicate(params)
+      else
+        @pace_plan = @course.pace_plans.create!(params)
+        @course.context_module_tags.not_deleted.each do |module_item|
+          @pace_plan.pace_plan_module_items.create module_item: module_item, duration: 0
+        end
+      end
+    end
+    render json: { pace_plan: PacePlanPresenter.new(@pace_plan).as_json }
+  end
+
   private
 
   def enrollments_json(course)
@@ -105,15 +138,27 @@ class PacePlansController < ApplicationController
   end
 
   def authorize_action
-    authorized_action(@context, @current_user, :manage_content)
+    authorized_action(@course, @current_user, :manage_content)
   end
 
   def require_feature_flag
-    not_found unless @context.account.feature_enabled?(:pace_plans) && @context.enable_pace_plans
+    not_found unless @course.account.feature_enabled?(:pace_plans) && @course.enable_pace_plans
   end
 
   def load_pace_plan
     @pace_plan = @context.pace_plans.find(params[:id])
+  end
+
+  def load_context
+    if params[:enrollment_id]
+      @context = Enrollment.find(params[:enrollment_id])
+    else
+      require_context
+    end
+  end
+
+  def load_course
+    @course = @context.respond_to?(:course) ? @context.course : @context
   end
 
   def update_params

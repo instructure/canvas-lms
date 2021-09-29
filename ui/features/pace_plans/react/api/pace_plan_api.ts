@@ -110,11 +110,15 @@ export const load = async (pacePlanId: string) =>
   (await doFetchApi({path: `/api/v1/pace_plans/${pacePlanId}`})).json
 
 export const getLatestDraftFor = async (context: PlanContextTypes, contextId: string) =>
-  (
-    await doFetchApi<{pace_plan: PacePlan}>({
-      path: `/api/v1/pace_plans/latest_draft_for?context_type=${context}&context_id=${contextId}`
-    })
-  ).json
+{
+  let url = `/api/v1/pace_plans/latest_draft_for?course_id=${contextId}`
+  if (context === 'Section') {
+    url = `/api/v1/pace_plans/latest_draft_for?course_section_id=${contextId}`
+  } else if (context === 'Enrollment') {
+    url = `/api/v1/pace_plans/latest_draft_for?enrollment_id=${contextId}`
+  }
+  return (await doFetchApi<{pace_plan: PacePlan}>({ path: url })).json
+}
 
 export const republishAllPlansForCourse = async (courseId: string) =>
   (

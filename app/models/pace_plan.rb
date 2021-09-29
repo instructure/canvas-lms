@@ -41,6 +41,8 @@ class PacePlan < ActiveRecord::Base
   scope :for_section, ->(section) { where(course_section_id: section) }
   scope :for_user, ->(user) { where(user_id: user) }
   scope :not_deleted, -> { where.not(workflow_state: 'deleted') }
+  scope :unpublished, -> { where(workflow_state: 'unpublished') }
+  scope :published, -> { where(workflow_state: 'active').where.not(published_at: nil) }
 
   workflow do
     state :unpublished
@@ -52,5 +54,25 @@ class PacePlan < ActiveRecord::Base
     if course_section_id.present? && user_id.present?
       self.errors.add(:base, "Only one of course_section_id and user_id can be given")
     end
+  end
+
+  def duplicate(opts = {})
+    default_opts = {
+      course_section_id: nil,
+      user_id: nil,
+      published_at: nil,
+      workflow_state: 'unpublished'
+    }
+    pace_plan = self.dup
+    pace_plan.attributes = default_opts.merge(opts)
+    pace_plan.save!
+
+    self.pace_plan_module_items.each do |module_item|
+      pace_plan_module_item = module_item.dup
+      pace_plan_module_item.pace_plan_id = pace_plan
+      pace_plan_module_item.save
+    end
+
+    pace_plan
   end
 end

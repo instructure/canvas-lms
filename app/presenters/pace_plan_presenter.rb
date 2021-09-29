@@ -92,7 +92,10 @@ class PacePlanPresenter
   end
 
   def pace_plan_module_items
-    @pace_plan_module_items ||= pace_plan.pace_plan_module_items.preload(module_item: [:context_module])
+    @pace_plan_module_items ||= pace_plan.pace_plan_module_items.joins(:module_item)
+                                         .preload(module_item: [:context_module])
+                                         .order('content_tags.position ASC')
                                          .group_by { |ppmi| ppmi.module_item.context_module }
+                                         .sort_by { |context_module, _items| context_module.position }
   end
 end
