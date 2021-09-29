@@ -212,7 +212,16 @@ class InfoController < ApplicationController
           component_check(thread, true)
         end
         critical_checks = {
-          default_shard: check.call { Shard.connection.active? }
+          default_shard: check.call { Shard.connection.active? },
+          rich_content_service: check.call do
+            CanvasHttp
+              .get(
+                URI::HTTPS.build(
+                  host: DynamicSettings.find('rich-content-service')['app-host'],
+                  path: '/readiness'
+                ).to_s
+              ).is_a?(Net::HTTPSuccess)
+          end
         }
         secondary_checks = {} # can be manually or conditionally added
 

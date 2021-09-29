@@ -135,9 +135,9 @@ describe InfoController do
   end
 
   describe "GET 'deep'" do
-    let(:canvas_http) { class_double(CanvasHttp) }
+    let(:success_response) { Net::HTTPSuccess.new(Net::HTTPOK, '200', 'OK') }
 
-    before(:each) do
+    before do
       allow(Account.connection).to receive(:active?).and_return(true)
       allow(MultiCache.cache).to receive(:fetch).and_call_original
       allow(MultiCache.cache).to receive(:fetch).with('readiness').and_return(nil)
@@ -150,6 +150,11 @@ describe InfoController do
       allow(ConfigFile).to receive(:load).and_call_original
       allow(ConfigFile).to receive(:load)
         .with('pv4').and_return({ 'uri' => 'https://pv4.instructure.com/api/123/' })
+      allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
+      allow(DynamicSettings).to receive(:find)
+        .with('rich-content-service')
+        .and_return(DynamicSettings::FallbackProxy.new('app-host' => 'rce.instructure.com'))
+      allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
     end
 
     it 'renders readiness check within json response' do
@@ -177,9 +182,11 @@ describe InfoController do
     end
 
     it 'catches any secondary dependency check exceptions without failing the deep check' do
-      allow(CanvasHttp).to receive(:get).and_raise(Timeout::Error)
+      allow(CanvasHttp).to receive(:get)
+        .with('https://canvadocs.instructure.com/readiness')
+        .and_raise(Timeout::Error)
       expect(Canvas::Errors).to receive(:capture_exception)
-        .at_least(:twice)
+        .once
         .with(:deep_health_check, 'Timeout::Error', :warn)
       get 'deep'
       expect(response.code).to eq '200'
@@ -210,7 +217,6 @@ describe InfoController do
     end
 
     it 'returns secondary dependencies in json response' do
-      allow(canvas_http).to receive(:get).and_return(Net::HTTPSuccess)
       get 'deep'
       expect(response).to be_successful
       secondary = JSON.parse(response.body)['secondary']
@@ -223,7 +229,6 @@ describe InfoController do
     it 'returns secondary dependencies in json response only if enabled' do
       allow(Canvadocs).to receive(:enabled?).and_return(false)
       allow(PageView).to receive(:pv4?).and_return(false)
-      allow(canvas_http).to receive(:get).and_return(Net::HTTPSuccess)
       get 'deep'
       expect(response).to be_successful
       secondary = JSON.parse(response.body)['secondary']
