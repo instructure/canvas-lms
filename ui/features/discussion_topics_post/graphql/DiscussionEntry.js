@@ -109,8 +109,8 @@ export const DiscussionEntry = {
   }),
 
   mock: ({
-    id = '3',
-    _id = '3',
+    id = 'RGlzY3Vzc2lvbkVudHJ5LTE=',
+    _id = '1',
     createdAt = '2021-02-08T13:35:56-07:00',
     updatedAt = '2021-04-13T10:00:20-06:00',
     deleted = false,
@@ -127,7 +127,7 @@ export const DiscussionEntry = {
       __typename: 'EntryParticipant'
     },
     rootEntryParticipantCounts = {
-      unreadCount: 1,
+      unreadCount: 0,
       repliesCount: 1,
       __typename: 'DiscussionEntryCounts'
     },
@@ -167,26 +167,5 @@ export const DiscussionEntry = {
     parentId,
     quotedEntry,
     __typename: 'DiscussionEntry'
-  })
-}
-
-export const DefaultMocks = {
-  DiscussionEntry: () => ({
-    _id: '1',
-    createdAt: '2021-03-25T13:22:24-06:00',
-    updatedAt: '2021-03-25T13:22:24-06:00',
-    deleted: false,
-    message: 'Howdy Partner, this is a message!',
-    ratingCount: 5,
-    ratingSum: 5,
-    entryParticipant: {
-      rating: true,
-      read: true,
-      forcedReadState: false
-    },
-    subentriesCount: 5,
-    lastReply: {
-      createdAt: '2021-03-25T13:22:24-06:00'
-    }
   })
 }

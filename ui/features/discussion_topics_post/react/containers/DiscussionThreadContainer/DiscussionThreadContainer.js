@@ -183,7 +183,7 @@ export const DiscussionThreadContainer = props => {
       variables: {
         discussionEntryId: props.discussionEntry._id,
         read: !props.discussionEntry.entryParticipant?.read,
-        forcedReadState: props.discussionEntry.entryParticipant?.forcedReadState || null
+        forcedReadState: true
       }
     })
   }
