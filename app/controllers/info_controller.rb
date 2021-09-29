@@ -204,44 +204,16 @@ class InfoController < ApplicationController
     #
     deep_check =
       Rails.cache.fetch(:deep_health_check, expires_in: 60.seconds) do
-        check = ->(&proc) do
-          thread = Thread.new do
-            Thread.current.report_on_exception = false
-            proc.call
-          end
-          component_check(thread, true)
-        end
-        critical_checks = {
-          default_shard: check.call { Shard.connection.active? },
-          rich_content_service: check.call do
-            CanvasHttp
-              .get(
-                URI::HTTPS.build(
-                  host: DynamicSettings.find('rich-content-service')['app-host'],
-                  path: '/readiness'
-                ).to_s
-              ).is_a?(Net::HTTPSuccess)
-          end
+        {
+          critical:
+            critical_checks
+              .transform_values { |v| execute_deep_check(v) }
+              .transform_values { |v| component_check(v, true) },
+          secondary:
+            secondary_checks
+              .transform_values { |v| execute_deep_check(v) }
+              .transform_values { |v| component_check(v, true) }
         }
-        secondary_checks = {} # can be manually or conditionally added
-
-        if Canvadocs.enabled?
-          secondary_checks[:canvadocs] = check.call do
-            CanvasHttp
-              .get(URI.join(Canvadocs.config['base_url'], '/readiness').to_s)
-              .is_a?(Net::HTTPSuccess)
-          end
-        end
-
-        if PageView.pv4?
-          secondary_checks[:pv4] = check.call do
-            CanvasHttp
-              .get(URI.join(ConfigFile.load('pv4')['uri'], '/health_check').to_s)
-              .is_a?(Net::HTTPSuccess)
-          end
-        end
-
-        { critical: critical_checks, secondary: secondary_checks }
       end
 
     failed = deep_check[:critical].reject { |_k, v| v[:status] }.map(&:first)
@@ -249,6 +221,104 @@ class InfoController < ApplicationController
   end
 
   private
+
+  def execute_deep_check(proc)
+    Thread.new do
+      Thread.current.report_on_exception = false
+      proc.call
+    end
+  end
+
+  def critical_checks
+    ret = {
+      default_shard: -> { Shard.connection.active? }
+    }
+
+    if Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST]
+      ret['rich_content_service'] = -> do
+        CanvasHttp
+          .get(
+            URI::HTTPS.build(
+              host: Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST],
+              path: '/readiness'
+            ).to_s
+          ).is_a?(Net::HTTPSuccess)
+      end
+    end
+
+    if MathMan.use_for_svg?
+      ret[:mathman] = -> do
+        CanvasHttp
+          .get(MathMan.url_for(latex: 'x', target: :svg))
+          .is_a?(Net::HTTPSuccess)
+      end
+    end
+
+    if LiveEvents::Client.config
+      ret[:live_events] = -> do
+        !LiveEvents.send(:client).stream_client.put_records(
+          records: [
+            {
+              data: {
+                attributes: {
+                  event_name: 'noop',
+                  event_time: Time.now.utc.iso8601(3)
+                },
+                body: {}
+              }.to_json,
+              partition_key: rand(1000).to_s
+            }
+          ],
+          stream_name: LiveEvents.send(:client).stream_name
+        ).nil?
+      end
+    end
+    ret
+  end
+
+  def secondary_checks
+    ret = {}
+    if PageView.pv4?
+      ret[:pv4] = -> do
+        CanvasHttp
+          .get(URI.join(ConfigFile.load('pv4')['uri'], '/health_check').to_s)
+          .is_a?(Net::HTTPSuccess)
+      end
+    end
+
+    if Canvadocs.enabled?
+      ret[:canvadocs] = -> do
+        CanvasHttp
+          .get(URI.join(Canvadocs.config['base_url'], '/readiness').to_s)
+          .is_a?(Net::HTTPSuccess)
+      end
+    end
+
+    if CutyCapt.enabled? && CutyCapt.screencap_service
+      ret[:screencap] = -> do
+        Tempfile.create('example.png', :encoding => 'ascii-8bit') do |f|
+          CutyCapt.screencap_service.snapshot_url_to_file("about:blank", f)
+        end
+      end
+    end
+
+    if Account.site_admin.feature_enabled?(:notification_service)
+      ret[:notification_queue] = -> do
+        !Services::NotificationService.process(Account.site_admin.global_id, nil, 'noop', 'nobody').nil?
+      end
+    end
+
+    if ReleaseNote.enabled?
+      ret[:release_notes] = -> do
+        !ReleaseNote.ddb_client.update_item(
+          table_name: ReleaseNote.ddb_table_name,
+          key: { 'PartitionKey' => "healthcheck",
+                 'RangeKey' => "canvas" }
+        ).nil?
+      end
+    end
+    ret
+  end
 
   def component_check(component, is_deep_check)
     status = false
