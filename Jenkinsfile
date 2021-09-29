@@ -330,7 +330,7 @@ pipeline {
           ]
 
           // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
-          if (rspecStage.useRspecQ(10)) {
+          if (rspecStage.useRspecQ(50)) {
             env.RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
           } else {
             env.RSPEC_PROCESSES = configuration.getInteger('rspec-processes')
