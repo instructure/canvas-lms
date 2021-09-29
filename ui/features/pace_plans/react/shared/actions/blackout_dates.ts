@@ -57,8 +57,7 @@ const thunkActions = {
 
       BlackoutDatesApi.create(blackoutDateWithTempId)
         .then(response => {
-          const savedBlackoutDate: BlackoutDate = response.data.blackout_date
-          dispatch(actions.addBackendId(tempId, savedBlackoutDate.id as number))
+          dispatch(actions.addBackendId(tempId, response.blackout_date.id as number))
         })
         .catch(error => {
           console.error(error) // eslint-disable-line no-console

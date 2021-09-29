@@ -21,22 +21,31 @@ import getCookie from 'get-cookie'
 import parseLinkHeader from 'parse-link-header'
 import {defaultFetchOptions} from '@instructure/js-utils'
 
-function constructRelativeUrl({path, params}) {
+function constructRelativeUrl({path, params}: {path: string; params: {[k: string]: any}}) {
   const queryString = $.param(params)
   if (!queryString.length) return path
   return `${path}?${queryString}`
 }
 
+export type DoFetchApiOpts = {
+  path: string
+  method?: string
+  headers?: {[k: string]: string}
+  params?: {[k: string]: any}
+  body?: any
+  fetchOpts?: RequestInit
+}
+
 // NOTE: we do NOT deep-merge customFetchOptions.headers, they should be passed
 // in the headers arg instead.
-export default async function doFetchApi({
+export default async function doFetchApi<T = any>({
   path,
   method = 'GET',
   headers = {},
   params = {},
   body,
   fetchOpts = {}
-}) {
+}: DoFetchApiOpts) {
   const finalFetchOptions = {...defaultFetchOptions}
   finalFetchOptions.headers['X-CSRF-Token'] = getCookie('_csrf_token')
 
@@ -53,11 +62,12 @@ export default async function doFetchApi({
     const err = new Error(
       `doFetchApi received a bad response: ${response.status} ${response.statusText}`
     )
-    err.response = response // in case anyone wants to check it for something
+    Object.assign(err, {response}) // in case anyone wants to check it for something
     throw err
   }
-  const link = parseLinkHeader(response.headers.get('Link'))
+  const linkHeader = response.headers.get('Link')
+  const link = linkHeader ? parseLinkHeader(linkHeader) : null
   const text = await response.text()
-  const json = text.length > 0 ? JSON.parse(text) : null
+  const json = text.length > 0 ? (JSON.parse(text) as T) : null
   return {json, response, link}
 }

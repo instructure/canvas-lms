@@ -16,9 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios, {AxiosPromise} from '@canvas/axios'
-
 import {PacePlan, PlanContextTypes, WorkflowStates, PublishOptions} from '../types'
+import doFetchApi from '@canvas/do-fetch-api-effect'
 
 /* API helpers */
 
@@ -51,66 +50,96 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
 
 /* API methods */
 
-export const update = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.put(`/api/v1/courses/${pacePlan.course_id}/pace_plans/${pacePlan.id}`, {
-    ...extraSaveParams,
-    pace_plan: transformPacePlanForApi(pacePlan)
-  })
-}
+export const update = async (pacePlan: PacePlan, extraSaveParams = {}) =>
+  (
+    await doFetchApi<PacePlan>({
+      path: `/api/v1/courses/${pacePlan.course_id}/pace_plans/${pacePlan.id}`,
+      method: 'PUT',
+      body: {
+        ...extraSaveParams,
+        pace_plan: transformPacePlanForApi(pacePlan)
+      }
+    })
+  ).json
 
-export const create = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.post(`/api/v1/courses/${pacePlan.course_id}/pace_plans`, {
-    ...extraSaveParams,
-    pace_plan: transformPacePlanForApi(pacePlan)
-  })
-}
+export const create = async (pacePlan: PacePlan, extraSaveParams = {}) =>
+  (
+    await doFetchApi<PacePlan>({
+      path: `/api/v1/courses/${pacePlan.course_id}/pace_plans`,
+      method: 'POST',
+      body: {
+        ...extraSaveParams,
+        pace_plan: transformPacePlanForApi(pacePlan)
+      }
+    })
+  ).json
 
-export const publish = (
+export const publish = async (
   plan: PacePlan,
   publishForOption: PublishOptions,
   publishForSectionIds: Array<string>,
   publishForEnrollmentIds: Array<string>
-): AxiosPromise => {
-  return axios.post(`/api/v1/courses/${plan.course_id}/pace_plans/publish`, {
-    context_type: plan.context_type,
-    context_id: plan.context_id,
-    publish_for_option: publishForOption,
-    publish_for_section_ids: publishForSectionIds,
-    publish_for_enrollment_ids: publishForEnrollmentIds
-  })
-}
+) =>
+  (
+    await doFetchApi<{new_draft_plan: PacePlan}>({
+      path: `/api/v1/courses/${plan.course_id}/pace_plans/publish`,
+      method: 'POST',
+      body: {
+        context_type: plan.context_type,
+        context_id: plan.context_id,
+        publish_for_option: publishForOption,
+        publish_for_section_ids: publishForSectionIds,
+        publish_for_enrollment_ids: publishForEnrollmentIds
+      }
+    })
+  ).json
 
-export const resetToLastPublished = (
-  contextType: PlanContextTypes,
-  contextId: string
-): AxiosPromise => {
-  return axios.post(`/api/v1/pace_plans/reset_to_last_published`, {
-    context_type: contextType,
-    context_id: contextId
-  })
-}
+export const resetToLastPublished = async (contextType: PlanContextTypes, contextId: string) =>
+  (
+    await doFetchApi<{pace_plan: PacePlan}>({
+      path: `/api/v1/pace_plans/reset_to_last_published`,
+      method: 'POST',
+      body: {
+        context_type: contextType,
+        context_id: contextId
+      }
+    })
+  ).json
 
-export const load = (pacePlanId: string) => {
-  return axios.get(`/api/v1/pace_plans/${pacePlanId}`)
-}
+export const load = async (pacePlanId: string) =>
+  (await doFetchApi({path: `/api/v1/pace_plans/${pacePlanId}`})).json
 
-export const getLatestDraftFor = (context: PlanContextTypes, contextId: string) => {
-  return axios.get(
-    `/api/v1/pace_plans/latest_draft_for?context_type=${context}&context_id=${contextId}`
-  )
-}
+export const getLatestDraftFor = async (context: PlanContextTypes, contextId: string) =>
+  (
+    await doFetchApi<{pace_plan: PacePlan}>({
+      path: `/api/v1/pace_plans/latest_draft_for?context_type=${context}&context_id=${contextId}`
+    })
+  ).json
 
-export const republishAllPlansForCourse = (courseId: string) => {
-  return axios.post(`/api/v1/pace_plans/republish_all_plans`, {course_id: courseId})
-}
+export const republishAllPlansForCourse = async (courseId: string) =>
+  (
+    await doFetchApi({
+      path: `/api/v1/pace_plans/republish_all_plans`,
+      method: 'POST',
+      body: {course_id: courseId}
+    })
+  ).json
 
-export const republishAllPlans = () => {
-  return axios.post(`/api/v1/pace_plans/republish_all_plans`)
-}
+export const republishAllPlans = async () =>
+  (
+    await doFetchApi({
+      path: `/api/v1/pace_plans/republish_all_plans`,
+      method: 'POST'
+    })
+  ).json
 
-export const relinkToParentPlan = (planId: string) => {
-  return axios.post(`/api/v1/pace_plans/${planId}/relink_to_parent_plan`)
-}
+export const relinkToParentPlan = async (planId: string) =>
+  (
+    await doFetchApi<{pace_plan: PacePlan}>({
+      path: `/api/v1/pace_plans/${planId}/relink_to_parent_plan`,
+      method: 'POST'
+    })
+  ).json
 
 /* API transformers
  * functions and interfaces to transform the frontend formatted objects
