@@ -452,7 +452,11 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                           }
                           author={props.discussionTopic.author}
                           title={props.discussionTopic.title}
-                          message={props.discussionTopic.message}
+                          message={
+                            props.discussionTopic?.permissions?.read
+                              ? props.discussionTopic.message
+                              : ''
+                          }
                           isIsolatedView={false}
                           editor={props.discussionTopic.editor}
                           timingDisplay={DateHelper.formatDatetimeForDiscussions(

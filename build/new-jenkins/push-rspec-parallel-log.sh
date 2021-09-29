@@ -27,4 +27,4 @@ git add log/parallel-runtime-rspec.log
 # commit with message
 git commit -m "Update parallel_runtime_rspec.log from build $BUILD_NUMBER"
 # Push to gerrit with reviewers
-GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"' git push origin "new_parallel_log-tmp:refs/for/master%$REVIEWERS"
+GIT_SSH_COMMAND='ssh -i $SSH_KEY_PATH -l $SSH_USERNAME' git push origin "new_parallel_log-tmp:refs/for/master%$REVIEWERS"

@@ -105,7 +105,7 @@ def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
   def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${env.TEST_QUEUE_HOST}:6379"
+  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
@@ -119,8 +119,8 @@ def tearDownNode(prefix) {
   sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
 
   if (configuration.getBoolean('upload-docker-logs', 'false')) {
-    sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log"
-    archiveArtifacts(artifacts: "tmp/docker-${prefix}-${env.CI_NODE_INDEX}.log")
+    sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${CI_NODE_INDEX}.log"
+    archiveArtifacts(artifacts: "tmp/docker-${prefix}-${CI_NODE_INDEX}.log")
   }
 
   if (env.ENABLE_AXE_SELENIUM == '1') {
@@ -170,8 +170,8 @@ def runRspecqSuite() {
     def rspecProcesses = env.RSPEC_PROCESSES.toInteger()
 
     rspecProcesses.times { index ->
-      def workerName = "${JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
-      workers[workerName] = { ->
+      env.WORKER_NAME = "${JOB_NAME}_worker${CI_NODE_INDEX}-${index}"
+      workers[env.WORKER_NAME] = { ->
         def workerStartTime = System.currentTimeMillis()
         sh(script: "docker-compose exec -e ENABLE_AXE_SELENIUM \
                                         -e RSPECQ_ENABLED \
@@ -180,7 +180,7 @@ def runRspecqSuite() {
                                         -e RSPECQ_UPDATE_TIMINGS \
                                         -T canvas bundle exec rspecq \
                                           --build ${JOB_NAME}_build${BUILD_NUMBER} \
-                                          --worker ${workerName} \
+                                          --worker ${WORKER_NAME} \
                                           --include-pattern '${TEST_PATTERN}'  \
                                           --exclude-pattern '${EXCLUDE_TESTS}' \
                                           --junit-output log/results/junit{{JOB_INDEX}}-${index}.xml \
@@ -192,10 +192,11 @@ def runRspecqSuite() {
         def workerEndTime = System.currentTimeMillis()
 
         //To Do: remove once data gathering exercise is complete and RspecQ is enabled by default.
-        def specCount = sh(script: "docker-compose exec -e $RSPECQ_REDIS_PASSWORD -T redis redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:${workerName}", returnStdout: true).trim()
+        /* groovylint-disable-next-line GStringExpressionWithinString */
+        def specCount = sh(script: 'docker-compose exec -e $RSPECQ_REDIS_PASSWORD -T redis redis-cli -h $TEST_QUEUE_HOST -p 6379 llen ${JOB_NAME}_build${BUILD_NUMBER}:queue:jobs_per_worker:$WORKER_NAME', returnStdout: true).trim()
 
         reportToSplunk('test_queue_worker_ended', [
-            'workerName': workerName,
+            'workerName': env.WORKER_NAME,
             'workerRunTime': workerEndTime - workerStartTime,
             'wokerSpecCount' : specCount,
         ])
@@ -240,9 +241,9 @@ def runLegacySuite() {
 def runReporter() {
   try {
     sh(script: "docker-compose exec -e SENTRY_DSN -T canvas bundle exec rspecq \
-                                            --build=${env.JOB_NAME}_build${BUILD_NUMBER} \
+                                            --build=${JOB_NAME}_build${BUILD_NUMBER} \
                                             --queue-wait-timeout 120 \
-                                            --redis-url ${env.RSPECQ_REDIS_URL} \
+                                            --redis-url $RSPECQ_REDIS_URL \
                                             --report", label: 'Reporter')
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
