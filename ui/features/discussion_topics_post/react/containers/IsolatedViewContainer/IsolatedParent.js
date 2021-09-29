@@ -227,6 +227,7 @@ export const IsolatedParent = props => {
                       props.discussionEntry.author
                     )}
                     updateDraftCache={props.updateDraftCache}
+                    attachment={props.discussionEntry.attachment}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">

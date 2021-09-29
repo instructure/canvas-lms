@@ -52,7 +52,6 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconEditLine} from '@instructure/ui-icons'
-import {Link} from '@instructure/ui-link'
 import {View} from '@instructure/ui-view'
 import {Text} from '@instructure/ui-text'
 import {Responsive} from '@instructure/ui-responsive/lib/Responsive'
@@ -466,14 +465,8 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                             props.discussionTopic.updatedAt
                           )}
                           isTopicAuthor
+                          attachment={props.discussionTopic.attachment}
                         >
-                          {props.discussionTopic.attachment && (
-                            <View as="div" padding="small none none">
-                              <Link href={props.discussionTopic.attachment.url}>
-                                {props.discussionTopic.attachment.displayName}
-                              </Link>
-                            </View>
-                          )}
                           {props.discussionTopic.permissions?.reply && !expandedReply && (
                             <View as="div" padding="small none none">
                               <Button

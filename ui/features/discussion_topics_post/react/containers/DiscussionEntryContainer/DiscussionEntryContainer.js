@@ -25,11 +25,14 @@ import {PostMessage} from '../../components/PostMessage/PostMessage'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {responsiveQuerySizes} from '../../utils'
+import {Attachment} from '../../../graphql/Attachment'
 import {User} from '../../../graphql/User'
 import {useMutation} from 'react-apollo'
 
 import {Flex} from '@instructure/ui-flex'
 import {Responsive} from '@instructure/ui-responsive'
+import {Link} from '@instructure/ui-link'
+import {View} from '@instructure/ui-view'
 import {ReplyPreview} from '../../components/ReplyPreview/ReplyPreview'
 
 export const DiscussionEntryContainer = props => {
@@ -172,6 +175,11 @@ export const DiscussionEntryContainer = props => {
                 })
               }
             >
+              {props.attachment && (
+                <View as="div" padding="small none none">
+                  <Link href={props.attachment.url}>{props.attachment.displayName}</Link>
+                </View>
+              )}
               {props.children}
             </PostMessage>
           </Flex.Item>
@@ -203,7 +211,8 @@ DiscussionEntryContainer.propTypes = {
   deleted: PropTypes.bool,
   isTopicAuthor: PropTypes.bool,
   updateDraftCache: PropTypes.func,
-  quotedEntry: PropTypes.object
+  quotedEntry: PropTypes.object,
+  attachment: Attachment.shape
 }
 
 DiscussionEntryContainer.defaultProps = {

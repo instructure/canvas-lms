@@ -22,6 +22,7 @@ import React from 'react'
 import {render} from '@testing-library/react'
 import {responsiveQuerySizes} from '../../../utils'
 import {User} from '../../../../graphql/User'
+import {Attachment} from '../../../../graphql/Attachment'
 
 jest.mock('../../../utils')
 
@@ -73,7 +74,8 @@ describe('DiscussionEntryContainer', () => {
     timingDisplay = 'Jan 1 1:00pm',
     editedTimingDisplay = 'Feb 2 2:00pm',
     lastReplyAtDisplay = null,
-    quotedEntry = null
+    quotedEntry = null,
+    attachment = null
   } = {}) => ({
     isTopic,
     postUtilities,
@@ -91,7 +93,8 @@ describe('DiscussionEntryContainer', () => {
     timingDisplay,
     editedTimingDisplay,
     lastReplyAtDisplay,
-    quotedEntry
+    quotedEntry,
+    attachment
   })
 
   const setup = props => {
@@ -152,6 +155,16 @@ describe('DiscussionEntryContainer', () => {
         })
       )
       expect(container.getByTestId('reply-preview')).toBeInTheDocument()
+    })
+
+    it('should render the attachment when it exists', () => {
+      const container = setup(defaultProps({attachment: Attachment.mock()}))
+      expect(container.getByText('288777.jpeg')).toBeInTheDocument()
+    })
+
+    it('should not render the attachment when it does not exist', () => {
+      const container = setup(defaultProps())
+      expect(container.queryByText('288777.jpeg')).not.toBeInTheDocument()
     })
   })
 })
