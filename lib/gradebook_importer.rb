@@ -231,6 +231,7 @@ class GradebookImporter
       @assignments.each_with_index do |assignment, idx|
         next if assignment.changed? && !readonly_assignment?(assignment)
 
+        # rubocop:disable Lint/AssignmentInCondition https://github.com/rubocop/rubocop/issues/10136
         indexes_to_delete << idx if readonly_assignment?(assignment) || @students.all? do |student|
           submission = @gradebook_importer_assignments[student.id][idx]
 
@@ -243,6 +244,7 @@ class GradebookImporter
 
           no_change || !submission['gradeable']
         end
+        # rubocop:enable Lint/AssignmentInCondition
       end
 
       custom_column_ids_to_skip_on_import = []

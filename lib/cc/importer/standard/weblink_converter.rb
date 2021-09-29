@@ -34,7 +34,7 @@ module CC::Importer::Standard
           title = get_node_val(doc, 'webLink title')
           url = get_node_att(doc, 'webLink url', 'href')
         end
-      elsif doc = get_node_or_open_file(resource, 'webLink')
+      elsif (doc = get_node_or_open_file(resource, 'webLink'))
         title = get_node_val(doc, 'title')
         url = get_node_att(doc, 'url', 'href')
       end

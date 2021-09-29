@@ -37,17 +37,17 @@ module Qti
 
     def get_answer_values
       answer = { :weight => 100, :comments => "", :id => unique_local_id }
-      if gte = @doc.at_css('responseCondition gte baseValue')
+      if (gte = @doc.at_css('responseCondition gte baseValue'))
         answer[:start] = gte.text.to_f
       end
-      if lte = @doc.at_css('responseCondition lte baseValue')
+      if (lte = @doc.at_css('responseCondition lte baseValue'))
         answer[:end] = lte.text.to_f
       end
 
       if (answer[:start] && answer[:end])
         answer[:numerical_answer_type] = "range_answer"
         @question[:answers] << answer
-      elsif equal = @doc.at_css('responseCondition equal baseValue')
+      elsif (equal = @doc.at_css('responseCondition equal baseValue'))
         answer[:exact] = equal.text.to_f
         answer[:numerical_answer_type] = "exact_answer"
         @question[:answers] << answer
@@ -61,7 +61,7 @@ module Qti
         answer[:id] = get_or_generate_answer_id(bv && bv['identifier'])
         answer[:feedback_id] = get_feedback_id(r_if)
 
-        if or_node = r_if.at_css('or')
+        if (or_node = r_if.at_css('or'))
           # exact answer
           exact_node = or_node.at_css('stringMatch baseValue')
           next unless exact_node
@@ -91,7 +91,7 @@ module Qti
           unless is_precision
             answer[:numerical_answer_type] = 'exact_answer'
             answer[:exact] = exact.to_f
-            if upper = or_node.at_css('and customOperator[class=varlte] baseValue')
+            if (upper = or_node.at_css('and customOperator[class=varlte] baseValue'))
               # do margin computation with BigDecimal to avoid rounding errors
               # (this is also used when _scoring_ numeric range questions)
               margin = BigDecimal(upper.text) - BigDecimal(exact) rescue "0.0"
@@ -99,13 +99,13 @@ module Qti
             end
           end
           @question[:answers] << answer
-        elsif and_node = r_if.at_css('and')
+        elsif (and_node = r_if.at_css('and'))
           # range answer
           answer[:numerical_answer_type] = 'range_answer'
-          if lower = and_node.at_css('customOperator[class=vargte] baseValue')
+          if (lower = and_node.at_css('customOperator[class=vargte] baseValue'))
             answer[:start] = lower.text.to_f rescue 0.0
           end
-          if upper = and_node.at_css('customOperator[class=varlte] baseValue')
+          if (upper = and_node.at_css('customOperator[class=varlte] baseValue'))
             answer[:end] = upper.text.to_f rescue 0.0
           end
           if upper || lower

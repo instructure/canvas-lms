@@ -203,7 +203,7 @@ module ConversationsCommon
   end
 
   def run_progress_job
-    return unless progress = Progress.where(tag: 'conversation_batch_update').first
+    return unless (progress = Progress.where(tag: 'conversation_batch_update').first)
 
     job = Delayed::Job.find(progress.delayed_job_id)
     job.invoke_job

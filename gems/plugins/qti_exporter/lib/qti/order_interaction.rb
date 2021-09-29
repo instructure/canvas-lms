@@ -28,7 +28,7 @@ module Qti
     def parse_question_data
       match_map = {}
       get_all_matches(match_map)
-      if node = @doc.at_css('correctResponse')
+      if (node = @doc.at_css('correctResponse'))
         get_correct_responses(match_map)
       else
         get_all_answers(match_map)
@@ -38,7 +38,7 @@ module Qti
     end
 
     def get_all_matches(match_map)
-      if matches = @doc.at_css('orderInteraction')
+      if (matches = @doc.at_css('orderInteraction'))
         matches.css('simpleChoice').each do |sc|
           match = {}
           @question[:matches] << match
@@ -57,7 +57,7 @@ module Qti
         answer[:id] = unique_local_id
         answer[:comments] = ""
 
-        if option = a.at_css('baseValue')
+        if (option = a.at_css('baseValue'))
           answer[:match_id] = match_map[option.text.strip]
         end
       end
@@ -72,7 +72,7 @@ module Qti
         answer[:comments] = ""
 
         match_id = answ.text.strip
-        if m = match_map[match_id]
+        if (m = match_map[match_id])
           answer[:match_id] = m
         end
       end

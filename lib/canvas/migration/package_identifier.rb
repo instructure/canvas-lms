@@ -116,7 +116,7 @@ module Canvas::Migration
     end
 
     def find_converter
-      if plugin = Canvas::Plugin.all_for_tag(:export_system).find { |p| p.settings[:provides] && p.settings[:provides][@type] }
+      if (plugin = Canvas::Plugin.all_for_tag(:export_system).find { |p| p.settings[:provides] && p.settings[:provides][@type] })
         return plugin.settings[:provides][@type]
       end
 

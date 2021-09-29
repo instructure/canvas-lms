@@ -68,7 +68,7 @@ module ModelCache
 
   module InstanceMethods
     def add_to_caches
-      return unless cache = ModelCache[self.class.name.underscore.pluralize.to_sym]
+      return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
       cache.keys.each do |key|
         cache[key][send(key)] = self
@@ -76,7 +76,7 @@ module ModelCache
     end
 
     def update_in_caches
-      return unless cache = ModelCache[self.class.name.underscore.pluralize.to_sym]
+      return unless (cache = ModelCache[self.class.name.underscore.pluralize.to_sym])
 
       cache.keys.each do |key|
         if saved_change_to_attribute?(key)

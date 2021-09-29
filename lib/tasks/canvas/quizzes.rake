@@ -27,7 +27,7 @@ namespace :canvas do
       require 'json'
       require 'benchmark'
 
-      unless out_path = args[:out]
+      unless (out_path = args[:out])
         raise "Missing path to output file."
       end
 

@@ -33,7 +33,7 @@ module CC::Importer::Standard
         id = res[:migration_id]
 
         if path.nil? # inline qti
-          next unless res_node = @resource_nodes_for_flat_manifest[id]
+          next unless (res_node = @resource_nodes_for_flat_manifest[id])
 
           qti_node = res_node.elements.first
           path = "#{id}_qti.xml"
@@ -45,10 +45,10 @@ module CC::Importer::Standard
           qti_converted_dir = File.join(conversion_dir, id)
           if run_qti_converter(full_path, qti_converted_dir, id)
             # get quizzes/questions
-            if q_list = convert_questions(qti_converted_dir, id)
+            if (q_list = convert_questions(qti_converted_dir, id))
               questions += q_list
             end
-            if quiz = convert_assessment(qti_converted_dir, id)
+            if (quiz = convert_assessment(qti_converted_dir, id))
               quizzes << quiz
             end
           end
@@ -102,7 +102,7 @@ module CC::Importer::Standard
         manifest_file = File.join(out_folder, Qti::Converter::MANIFEST_FILE)
         quizzes = Qti.convert_assessments(manifest_file, :flavor => Qti::Flavors::COMMON_CARTRIDGE)
         ::Canvas::Migration::MigratorHelper.prepend_id_to_assessments(quizzes, resource_id)
-        if quiz = quizzes.first
+        if (quiz = quizzes.first)
           quiz[:migration_id] = resource_id
         end
       rescue

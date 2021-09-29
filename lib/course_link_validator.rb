@@ -214,7 +214,7 @@ class CourseLinkValidator
   def find_invalid_link(url)
     return if url.start_with?('mailto:')
 
-    unless result = self.visited_urls[url]
+    unless (result = self.visited_urls[url])
       begin
         if ImportedHtmlConverter.relative_url?(url) || (self.domain_regex && url.match(self.domain_regex))
           if valid_route?(url)

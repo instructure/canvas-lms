@@ -66,7 +66,7 @@ module Moodle
 
     def add_warnings_to_map(warning_map)
       warning_map.values.each do |warnings|
-        if hashes = warnings['multiple_dropdowns_question']
+        if (hashes = warnings['multiple_dropdowns_question'])
           if hashes.count > 2
             q_hash = hashes.first
             q_hash['import_warnings'] ||= []
@@ -82,7 +82,7 @@ module Moodle
           end
         end
 
-        if hashes = warnings['calculated_question']
+        if (hashes = warnings['calculated_question'])
           if hashes.count > 2
             q_hash = hashes.first
             q_hash['import_warnings'] ||= []

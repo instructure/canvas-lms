@@ -126,25 +126,21 @@ class MessageableUser < User
   # common_groups
   def populate_common_contexts
     @global_common_courses = {}
-    if common_courses = read_attribute(:common_courses)
-      common_courses.to_s.split(',').each do |common_course|
-        course_id, role = common_course.split(':')
-        course_id = course_id.to_i
-        # a course id of 0 indicates admin visibility without an actual shared
-        # course; don't "globalize" it
-        course_id = Shard.global_id_for(course_id) unless course_id.zero?
-        @global_common_courses[course_id] ||= []
-        @global_common_courses[course_id] << role
-      end
+    read_attribute(:common_courses)&.to_s&.split(',')&.each do |common_course|
+      course_id, role = common_course.split(':')
+      course_id = course_id.to_i
+      # a course id of 0 indicates admin visibility without an actual shared
+      # course; don't "globalize" it
+      course_id = Shard.global_id_for(course_id) unless course_id.zero?
+      @global_common_courses[course_id] ||= []
+      @global_common_courses[course_id] << role
     end
 
     @global_common_groups = {}
-    if common_groups = read_attribute(:common_groups)
-      common_groups.to_s.split(',').each do |group_id|
-        group_id = Shard.global_id_for(group_id.to_i)
-        @global_common_groups[group_id] ||= []
-        @global_common_groups[group_id] << 'Member'
-      end
+    read_attribute(:common_groups)&.to_s&.split(',')&.each do |group_id|
+      group_id = Shard.global_id_for(group_id.to_i)
+      @global_common_groups[group_id] ||= []
+      @global_common_groups[group_id] << 'Member'
     end
   end
   after_find :populate_common_contexts

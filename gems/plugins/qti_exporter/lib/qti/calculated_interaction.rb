@@ -50,10 +50,12 @@ module Qti
       get_feedback()
       get_formulas()
 
-      if !@question[:answer_tolerance] && tolerance = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_tolerance]', 'value')
+      if !@question[:answer_tolerance] &&
+         (tolerance = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_tolerance]', 'value'))
         @question[:answer_tolerance] = tolerance
       end
-      if !@question[:formula_decimal_places] && precision = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_precision]', 'value')
+      if !@question[:formula_decimal_places] &&
+         (precision = get_node_att(@doc, 'instructureMetadata instructureField[name=formula_precision]', 'value'))
         @question[:formula_decimal_places] = precision.to_i
       end
 
@@ -101,7 +103,7 @@ module Qti
 
     def get_formulas
       @question[:formulas] = []
-      if formulas_node = @doc.at_css('formulas')
+      if (formulas_node = @doc.at_css('formulas'))
         @question[:formula_decimal_places] = formulas_node['decimal_places'].to_i
         formulas_node.css('formula').each do |f_node|
           formula = {}

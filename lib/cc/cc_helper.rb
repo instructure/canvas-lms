@@ -143,7 +143,7 @@ module CC
     def get_html_title_and_body_and_meta_fields(doc)
       meta_fields = {}
       doc.css('html head meta').each do |meta_node|
-        if key = meta_node['name']
+        if (key = meta_node['name'])
           meta_fields[key] = meta_node['content']
         end
       end
@@ -232,7 +232,7 @@ module CC
         end
         @rewriter.set_handler('files') do |match|
           if match.obj_id.nil?
-            if match_data = match.url.match(%r{/files/folder/(.*)})
+            if (match_data = match.url.match(%r{/files/folder/(.*)}))
               # this might not be the best idea but let's keep going and see what happens
               "#{COURSE_TOKEN}/files/folder/#{match_data[1]}"
             elsif match.prefix.present?
@@ -348,7 +348,7 @@ module CC
 
           media_id = anchor['id'].gsub(/^media_comment_/, '')
           obj = MediaObject.active.by_media_id(media_id).first
-          if obj && migration_id = @key_generator.create_key(obj)
+          if obj && (migration_id = @key_generator.create_key(obj))
             @used_media_objects << obj
             info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
             @media_object_infos[obj.id] = info
@@ -360,7 +360,7 @@ module CC
         doc.css('iframe[data-media-id]').each do |iframe|
           media_id = iframe['data-media-id']
           obj = MediaObject.active.by_media_id(media_id).take
-          if obj && migration_id = @key_generator.create_key(obj)
+          if obj && (migration_id = @key_generator.create_key(obj))
             @used_media_objects << obj
             info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
             @media_object_infos[obj.id] = info

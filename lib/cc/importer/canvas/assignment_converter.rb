@@ -26,7 +26,7 @@ module CC::Importer::Canvas
       assignments = convert_cc_assignments
 
       @manifest.css('resource[type$=learning-application-resource]').each do |res|
-        if meta_path = res.at_css('file[href$="assignment_settings.xml"]')
+        if (meta_path = res.at_css('file[href$="assignment_settings.xml"]'))
           meta_path = @package_root.item_path meta_path['href']
           html_path = @package_root.item_path res.at_css('file[href$="html"]')['href']
 

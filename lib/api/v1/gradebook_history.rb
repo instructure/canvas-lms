@@ -149,11 +149,11 @@ module Api::V1
         collection = collection.where("graded_at IS NOT NULL")
       end
 
-      if assignment_id = options[:assignment_id]
+      if (assignment_id = options[:assignment_id])
         collection = collection.where(assignment_id: assignment_id)
       end
 
-      if grader_id = options[:grader_id]
+      if (grader_id = options[:grader_id])
         if grader_id.to_s == '0'
           # yes, this is crazy.  autograded submissions have the grader_id of (quiz_id x -1)
           collection = collection.where("submissions.grader_id<=0")

@@ -63,7 +63,7 @@ module CC::Exporter::Epub::Converters
         topic[:identifier] = get_node_val(meta_doc, 'topic_id')
         topic[:href] = "topics.xhtml##{topic[:identifier]}"
 
-        if asmnt_node = meta_doc.at_css('assignment')
+        if (asmnt_node = meta_doc.at_css('assignment'))
           topic[:assignment] = assignment_data(asmnt_node)
         end
       end

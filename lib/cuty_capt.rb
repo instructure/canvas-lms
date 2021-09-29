@@ -119,7 +119,7 @@ class CutyCapt
   end
 
   def self.snapshot_url(url, &block)
-    return nil unless config = self.config
+    return nil unless (config = self.config)
     return nil unless self.verify_url(url)
 
     format = "png"

@@ -133,7 +133,7 @@ module CC
           end
         end
 
-        if item.data && criterion = item.data[:rubric_criterion]
+        if item.data && (criterion = item.data[:rubric_criterion])
           out_node.points_possible criterion[:points_possible] if criterion[:points_possible]
           out_node.mastery_points criterion[:mastery_points] if criterion[:mastery_points]
           if criterion[:ratings] && criterion[:ratings].length > 0

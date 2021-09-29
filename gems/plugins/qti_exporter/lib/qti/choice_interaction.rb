@@ -113,7 +113,7 @@ module Qti
           answer[:migration_id] = choice['identifier']
           answer[:id] = get_or_generate_answer_id(answer[:migration_id])
 
-          if feedback = choice.at_css('feedbackInline')
+          if (feedback = choice.at_css('feedbackInline'))
             # weird Angel feedback
             answer[:text] = choice.children.first.text.strip
             answer[:comments] = feedback.text.strip
@@ -238,7 +238,7 @@ module Qti
       # Check if there are correct answers explicitly specified
       @doc.css('correctResponse > value, correctResponse > Value').each do |correct_id|
         correct_id = correct_id.text if correct_id
-        if correct_id && answer = answers_hash[correct_id]
+        if correct_id && (answer = answers_hash[correct_id])
           answer[:weight] = DEFAULT_CORRECT_WEIGHT
         end
       end
@@ -248,16 +248,12 @@ module Qti
     def get_response_weight(cond)
       weight = AssessmentItemConverter::DEFAULT_INCORRECT_WEIGHT
 
-      if sum = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')
+      if (base = cond.at_css('setOutcomeValue[identifier=SCORE] sum baseValue[baseType]')) ||
+         (base = cond.at_css('setOutcomeValue[identifier=D2L_CORRECT] sum baseValue[baseType]')) ||
+         (base = cond.at_css('setOutcomeValue[identifier=SCORE] > baseValue[baseType]')) ||
+         (base = cond.at_css('setOutcomeValue[identifier^=SCORE] baseValue[baseType]')) ||
+         (base = cond.at_css('setOutcomeValue[identifier$=SCORE] baseValue[baseType]'))
         # it'll only be true if the score is a sum > 0
-        weight = get_base_value(sum)
-      elsif sum = cond.at_css('setOutcomeValue[identifier=D2L_CORRECT] sum baseValue[baseType]')
-        weight = get_base_value(sum)
-      elsif base = cond.at_css('setOutcomeValue[identifier=SCORE] > baseValue[baseType]')
-        weight = get_base_value(base)
-      elsif base = cond.at_css('setOutcomeValue[identifier^=SCORE] baseValue[baseType]')
-        weight = get_base_value(base)
-      elsif base = cond.at_css('setOutcomeValue[identifier$=SCORE] baseValue[baseType]')
         weight = get_base_value(base)
       end
 

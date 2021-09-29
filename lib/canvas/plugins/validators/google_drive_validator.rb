@@ -29,7 +29,7 @@ module Canvas::Plugins::Validators::GoogleDriveValidator
         :token_uri => '',
         :client_secret_json => ''
       }
-    elsif res = check_json(settings)
+    elsif (res = check_json(settings))
       plugin_setting.errors.add(:base, res)
       false
     else

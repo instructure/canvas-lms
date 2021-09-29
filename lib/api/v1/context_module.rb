@@ -142,7 +142,7 @@ module Api::V1::ContextModule
     end
 
     # add completion requirements
-    if criterion = context_module.completion_requirements && context_module.completion_requirements.detect { |r| r[:id] == content_tag.id }
+    if (criterion = context_module.completion_requirements&.detect { |r| r[:id] == content_tag.id })
       ch = { 'type' => criterion[:type] }
       ch['min_score'] = criterion[:min_score] if criterion[:type] == 'min_score'
       ch['completed'] = !!(progression.requirements_met.present? && progression.requirements_met.detect { |r| r[:type] == criterion[:type] && r[:id] == content_tag.id }) if progression
@@ -175,7 +175,7 @@ module Api::V1::ContextModule
     attrs = [:usage_rights, :locked, :hidden, :lock_explanation, :display_name, :due_at, :unlock_at, :lock_at, :points_possible]
 
     attrs.each do |attr|
-      if item.respond_to?(attr) && val = item.try(attr)
+      if (val = item.try(attr))
         details[attr] = val
       end
     end

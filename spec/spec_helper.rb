@@ -662,7 +662,7 @@ RSpec.configure do |config|
 
     def as(ancestor)
       @__as ||= {}
-      unless r = @__as[ancestor]
+      unless (r = @__as[ancestor])
         r = (@__as[ancestor] = As.new(self, ancestor))
       end
       r
@@ -723,12 +723,12 @@ RSpec.configure do |config|
   end
 
   def run_jobs
-    while job = Delayed::Job.get_and_lock_next_available(
+    while (job = Delayed::Job.get_and_lock_next_available(
       'spec run_jobs',
       Delayed::Settings.queue,
       0,
       Delayed::MAX_PRIORITY
-    )
+    ))
       run_job(job)
     end
   end

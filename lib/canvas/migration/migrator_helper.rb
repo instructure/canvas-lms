@@ -71,7 +71,7 @@ module Canvas::Migration
 
     def unique_quiz_dir
       if content_migration
-        if a = content_migration.attachment
+        if (a = content_migration.attachment)
           key = "#{a.filename.gsub(/\..*/, '')}_#{content_migration.id}"
         else
           key = content_migration.id.to_s
@@ -186,7 +186,7 @@ module Canvas::Migration
       assessments.each do |a|
         if a[:migration_id].present? && should_prepend?(:assessments, a[:migration_id], existing_ids)
           a[:migration_id] = prepend_id(a[:migration_id], prepend_value)
-          if h = a[:assignment]
+          if (h = a[:assignment])
             h[:migration_id] = prepend_id(h[:migration_id], prepend_value)
           end
         end
@@ -274,7 +274,7 @@ module Canvas::Migration
       @overview[:start_timestamp] = nil
       @overview[:end_timestamp] = nil
       dates = []
-      if @overview[:course] = @course[:course]
+      if (@overview[:course] = @course[:course])
         @overview[:start_timestamp] = @course[:course][:start_timestamp] || @course[:course][:start_at]
         @overview[:end_timestamp] = @course[:course][:end_timestamp] || @course[:course][:conclude_at]
       end
@@ -398,7 +398,7 @@ module Canvas::Migration
           topic[:title] = t[:title]
           topic[:migration_id] = t[:migration_id]
           topic[:error_message] = t[:error_message] if t[:error_message]
-          if t[:assignment] && a_mig_id = t[:assignment][:migration_id]
+          if t[:assignment] && (a_mig_id = t[:assignment][:migration_id])
             topic[:assignment_migration_id] = a_mig_id
             ensure_linked_assignment(t[:assignment], topic_migration_id: t[:migration_id])
           end
@@ -431,7 +431,7 @@ module Canvas::Migration
           @overview[:wikis] << wiki
           wiki[:migration_id] = w[:migration_id]
           wiki[:title] = w[:title]
-          if w[:assignment] && a_mig_id = w[:assignment][:migration_id]
+          if w[:assignment] && (a_mig_id = w[:assignment][:migration_id])
             wiki[:assignment_migration_id] = a_mig_id
             ensure_linked_assignment(w[:assignment], page_migration_id: w[:migration_id])
           end

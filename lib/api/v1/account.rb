@@ -28,7 +28,7 @@ module Api::V1::Account
   # which should act similarly to the account_json method, but include a parameter 'hash'
   # which will have the current account json (to which the method is expected to change and return)
   def self.register_extension(extension)
-    if result = extension.respond_to?(:extend_account_json)
+    if (result = extension.respond_to?(:extend_account_json))
       @@extensions << extension
     end
     result

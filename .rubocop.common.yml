@@ -37,6 +37,8 @@ Lint/AmbiguousOperatorPrecedence:
   Severity: error
 Lint/AmbiguousRegexpLiteral:
   Severity: error
+Lint/AssignmentInCondition:
+  Severity: error
 Lint/Debugger:
   Severity: error
 Lint/DeprecatedClassMethods:

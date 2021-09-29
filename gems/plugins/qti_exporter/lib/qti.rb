@@ -39,7 +39,7 @@ module Qti
   end
 
   def self.qti_enabled?
-    if plugin = Canvas::Plugin.find(:qti_converter)
+    if (plugin = Canvas::Plugin.find(:qti_converter))
       return plugin.settings[:enabled].to_s == 'true'
     end
 
@@ -54,7 +54,7 @@ module Qti
   end
 
   def self.convert_questions(manifest_path, opts = {})
-    if path_map = opts[:file_path_map]
+    if (path_map = opts[:file_path_map])
       # used when searching for matching file paths to help find the best matching path
       sorted_paths = path_map.keys.sort_by { |v| v.length }
     else

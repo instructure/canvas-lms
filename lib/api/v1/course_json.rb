@@ -64,7 +64,7 @@ module Api::V1
       @hash['workflow_state'] = @course.api_state
       @hash['course_format'] = @course.course_format if @course.course_format.present?
       @hash['restrict_enrollments_to_course_dates'] = !!@course.restrict_enrollments_to_course_dates
-      if visibility = @course.overridden_course_visibility
+      if (visibility = @course.overridden_course_visibility)
         @hash['overridden_course_visibility'] = visibility
       end
       if @includes.include?(:current_grading_period_scores)

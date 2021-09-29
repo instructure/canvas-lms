@@ -62,7 +62,7 @@ module Qti
         # the python tool "fixes" IDs that aren't quite legal QTI (e.g., "1a" becomes "RESPONSE_1a")
         # but does not update the question text, breaking fill-in-multiple-blanks questions.
         # fortunately it records what it does in an XML comment at the top of the doc, so we can undo it.
-        if comment = @doc.children.find { |el| el.class == Nokogiri::XML::Comment }
+        if (comment = @doc.children.find { |el| el.class == Nokogiri::XML::Comment })
           regex = /Warning: replacing bad NMTOKEN "([^"]+)" with "([^"]+)"/
           match_data = regex.match(comment.text)
           while match_data
@@ -77,18 +77,18 @@ module Qti
           text = get_node_val(match, 'baseValue[baseType=string]')
           text ||= get_node_val(match, 'baseValue[baseType=identifier]')
           existing = false
-          if @question[:question_type] != 'fill_in_multiple_blanks_question' and answer = @question[:answers].find { |a| a[:text] == text }
+          if @question[:question_type] != 'fill_in_multiple_blanks_question' &&
+             (answer = @question[:answers].find { |a| a[:text] == text })
             existing = true
           else
             answer = {}
           end
           answer[:text] ||= text
-          unless answer[:feedback_id]
-            if f_id = get_feedback_id(cond)
-              answer[:feedback_id] = f_id
-            end
+          if !answer[:feedback_id] && (f_id = get_feedback_id(cond))
+            answer[:feedback_id] = f_id
           end
-          if @question[:question_type] == 'fill_in_multiple_blanks_question' and id = get_node_att(match, 'variable', 'identifier')
+          if @question[:question_type] == 'fill_in_multiple_blanks_question' &&
+             (id = get_node_att(match, 'variable', 'identifier'))
             id = id.strip
             answer[:blank_id] = fib_map[id] || id
             # strip illegal characters from blank ids

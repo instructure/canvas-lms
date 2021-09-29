@@ -119,7 +119,7 @@ class BrandConfigRegenerator
     total += five_percent
     @progress.calculate_completion!(five_percent, total)
     # take things off the queue from front-to-back
-    while thing = things_left_to_process.shift
+    while (thing = things_left_to_process.shift)
       # if for some reason this one isn't ready (it _should_ be by default,
       # because we get higher tiers first) put it back on the queue to try
       # again later

@@ -45,7 +45,7 @@ module CC
       def add_ref_or_question(node, question)
         aq = nil
         unless question[:assessment_question_id].blank?
-          if aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first
+          if (aq = AssessmentQuestion.where(id: question[:assessment_question_id]).first)
             if aq.deleted? ||
                !aq.assessment_question_bank ||
                aq.assessment_question_bank.deleted? ||
@@ -440,7 +440,7 @@ module CC
         correct_points = "%.2f" % correct_points
 
         groups.each_pair do |id, answers|
-          if answer = answers.find { |a| a['weight'].to_i > 0 }
+          if (answer = answers.find { |a| a['weight'].to_i > 0 })
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
                 c_node.varequal(answer['id'], :respident => "response_#{id}")

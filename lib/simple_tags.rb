@@ -20,11 +20,7 @@
 module SimpleTags
   module ReaderInstanceMethods
     def tags
-      @tag_array ||= if tags = read_attribute(:tags)
-                       tags.split(',')
-                     else
-                       []
-                     end
+      @tag_array ||= read_attribute(:tags)&.split(',') || []
     end
 
     def serialized_tags(tags = self.tags)

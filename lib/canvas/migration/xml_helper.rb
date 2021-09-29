@@ -29,7 +29,7 @@ module Canvas::Migration
     end
 
     def get_node_att(node, selector, attribute, default = nil)
-      if node = node.at_css(selector)
+      if (node = node.at_css(selector))
         return node[attribute]
       end
 
@@ -44,7 +44,7 @@ module Canvas::Migration
     # descendants of the current node, so you have to iterate
     # over the children and see if it's there.
     def get_val_if_child(node, name)
-      if child = node.children.find { |c| c.name == name }
+      if (child = node.children.find { |c| c.name == name })
         return child.text
       end
 

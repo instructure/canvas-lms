@@ -118,7 +118,7 @@ module CC::Importer::Standard
 
     def get_canvas_att_replacement_url(path, resource_dir = nil)
       if path.start_with?('../')
-        if url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir)
+        if (url = get_canvas_att_replacement_url(path.sub('../', ''), resource_dir))
           return url
         end
       end
@@ -131,7 +131,7 @@ module CC::Importer::Standard
 
       unless mig_id
         path = path.gsub(%r{\$[^$]*\$|\.\./}, '')
-        if key = @file_path_migration_id.keys.detect { |k| k.end_with?(path) }
+        if (key = @file_path_migration_id.keys.detect { |k| k.end_with?(path) })
           mig_id = @file_path_migration_id[key]
         end
       end
@@ -170,7 +170,7 @@ module CC::Importer::Standard
             begin
               if val =~ FILEBASE_REGEX
                 val.gsub!(FILEBASE_REGEX, '')
-                if new_url = get_canvas_att_replacement_url(val, resource_dir)
+                if (new_url = get_canvas_att_replacement_url(val, resource_dir))
                   node[attr] = URI::escape(new_url)
 
                   if node.text.strip.blank? && !node.at_css("img") # add in the filename if the link is blank and doesn't have something visible like an image
@@ -179,7 +179,7 @@ module CC::Importer::Standard
                 end
               else
                 if ImportedHtmlConverter.relative_url?(val)
-                  if new_url = get_canvas_att_replacement_url(val)
+                  if (new_url = get_canvas_att_replacement_url(val))
                     node[attr] = URI::escape(new_url)
                   end
                 end
@@ -200,7 +200,7 @@ module CC::Importer::Standard
     def convert_blti_links_with_flat(lti_converter)
       tools = []
       resources_by_type("imsbasiclti").each do |res|
-        if doc = get_node_or_open_file(res)
+        if (doc = get_node_or_open_file(res))
           tool = lti_converter.convert_blti_link(doc)
           tool[:migration_id] = res[:migration_id]
           res[:url] = tool[:url] # for the organization item to reference

@@ -237,7 +237,7 @@ class UserMerge
         end
       end
 
-      if existing_record = target_values[[key, sub_key]]
+      if (existing_record = target_values[[key, sub_key]])
         existing_record_updates[existing_record] = value
       else
         new_record_hashes << { :user_id => target_user.id, :key => key, :sub_key => sub_key&.to_json, :value => value.to_yaml }
@@ -389,7 +389,7 @@ class UserMerge
       if from_user.shard != target_user.shard
         User.clone_communication_channel(source_cc, target_user, max_position)
       end
-    elsif to_retire = source_cc
+    elsif (to_retire = source_cc)
       # retired, retired
     end
     to_retire

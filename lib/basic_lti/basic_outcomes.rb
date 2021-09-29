@@ -281,7 +281,7 @@ module BasicLTI
           self.description = error_message
         elsif assignment.grading_type != "pass_fail" && (assignment.points_possible.nil?)
 
-          unless submission = existing_submission
+          unless (submission = existing_submission)
             submission = Submission.create!(submission_hash.merge(:user => user,
                                                                   :assignment => assignment))
           end
@@ -410,7 +410,7 @@ module BasicLTI
         def to_xml
           xml = LtiResponse::Legacy.envelope.dup
           xml.at_css('message_response > statusinfo > codemajor').content = code_major.capitalize
-          if score = submission_score
+          if (score = submission_score)
             xml.at_css('message_response > result > sourcedid').content = sourcedid
             xml.at_css('message_response > result > resultscore > textstring').content = score
           else

@@ -40,7 +40,7 @@ module Qti
       @doc = nil
       @flavor = opts[:flavor]
       @opts = opts
-      if @path_map = opts[:file_path_map]
+      if (@path_map = opts[:file_path_map])
         @sorted_paths = opts[:sorted_file_paths]
         @sorted_paths ||= @path_map.keys.sort_by { |v| v.length }
       end
@@ -49,7 +49,8 @@ module Qti
         @package_root = PackageRoot.new(opts[:base_dir])
         @identifier = @manifest_node['identifier']
         @href = @package_root.item_path(@manifest_node['href'])
-        if title = @manifest_node.at_css('title langstring') || title = @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::Converter::IMS_MD)
+        if (title = @manifest_node.at_css('title langstring') ||
+           @manifest_node.at_css('xmlns|title xmlns|langstring', 'xmlns' => Qti::Converter::IMS_MD))
           @title = title.text
         end
       else
@@ -133,10 +134,13 @@ module Qti
           end
         elsif @doc.at_css('itemBody associateInteraction prompt')
           @question[:question_text] = "" # apparently they deliberately had a blank question?
-        elsif text = @doc.at_css('itemBody div:first-child') || @doc.at_css('itemBody p:first-child') || @doc.at_css('itemBody div') || @doc.at_css('itemBody p')
+        elsif (text = @doc.at_css('itemBody div:first-child') ||
+           @doc.at_css('itemBody p:first-child') ||
+            @doc.at_css('itemBody div') ||
+             @doc.at_css('itemBody p'))
           @question[:question_text] = sanitize_html!(text)
         elsif @doc.at_css('itemBody')
-          if text = @doc.at_css('itemBody').children.find { |c| c.text.strip != '' }
+          if (text = @doc.at_css('itemBody').children.find { |c| c.text.strip != '' })
             @question[:question_text] = sanitize_html_string(text.text)
           end
         end
@@ -171,32 +175,32 @@ module Qti
     }
 
     def parse_instructure_metadata
-      if meta = @doc.at_css('instructureMetadata')
-        if bank =  get_node_att(meta, 'instructureField[name=question_bank]', 'value')
+      if (meta = @doc.at_css('instructureMetadata'))
+        if (bank = get_node_att(meta, 'instructureField[name=question_bank]', 'value'))
           @question[:question_bank_name] = bank
         end
-        if bank = get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value')
+        if (bank = get_node_att(meta, 'instructureField[name=question_bank_iden]', 'value'))
           @question[:question_bank_id] = bank
-          if bb_bank = get_node_att(meta, 'instructureField[name=bb_question_bank_iden]', 'value')
+          if (bb_bank = get_node_att(meta, 'instructureField[name=bb_question_bank_iden]', 'value'))
             @question[:bb_question_bank_id] = bb_bank
           end
         end
-        if score = get_node_att(meta, 'instructureField[name=max_score]', 'value')
+        if (score = get_node_att(meta, 'instructureField[name=max_score]', 'value'))
           @question[:points_possible] = [score.to_f, 0.0].max
         end
-        if score = get_node_att(meta, 'instructureField[name=points_possible]', 'value')
+        if (score = get_node_att(meta, 'instructureField[name=points_possible]', 'value'))
           @question[:points_possible] = [score.to_f, 0.0].max
         end
-        if ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value')
+        if (ref = get_node_att(meta, 'instructureField[name=assessment_question_identifierref]', 'value'))
           @question[:assessment_question_migration_id] = ref
         end
-        if ref = get_node_att(meta, 'instructureField[name=original_answer_ids]', 'value')
+        if (ref = get_node_att(meta, 'instructureField[name=original_answer_ids]', 'value'))
           @original_answer_ids = ref.split(",")
         end
         if get_node_att(meta, 'instructureField[name=cc_profile]', 'value') == 'cc.pattern_match.v0p1'
           @question[:is_cc_pattern_match] = true
         end
-        if type =  get_node_att(meta, 'instructureField[name=bb_question_type]', 'value')
+        if (type = get_node_att(meta, 'instructureField[name=bb_question_type]', 'value'))
           @migration_type = type
           case @migration_type
           when 'True/False'
@@ -218,7 +222,7 @@ module Qti
           when 'Essay'
             @question[:question_type] = 'essay_question'
           end
-        elsif type = get_node_att(meta, 'instructureField[name=question_type]', 'value')
+        elsif (type = get_node_att(meta, 'instructureField[name=question_type]', 'value'))
           @migration_type = type
           QUESTION_TYPE_MAPPING.each do |k, v|
             @migration_type = v if k === @migration_type
@@ -273,7 +277,7 @@ module Qti
         elsif (@flavor == Qti::Flavors::D2L && f.text.present?) || id =~ /general_|_all/i
           extract_feedback!(@question, :neutral_comments, f)
         elsif id =~ /feedback_(\d*)_fb/i
-          if answer = @question[:answers].find { |a| a[:migration_id] == "RESPONSE_#{$1}" }
+          if (answer = @question[:answers].find { |a| a[:migration_id] == "RESPONSE_#{$1}" })
             extract_feedback!(answer, :comments, f)
           end
         end
@@ -309,13 +313,13 @@ module Qti
       manifest_node = opts[:manifest_node]
 
       if manifest_node
-        if type = get_interaction_type(manifest_node)
+        if (type = get_interaction_type(manifest_node))
           opts[:interaction_type] ||= type.text.downcase
         end
-        if type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=bb_question_type]', 'value')
+        if (type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=bb_question_type]', 'value'))
           opts[:custom_type] ||= type.downcase
         end
-        if type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=question_type]', 'value')
+        if (type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=question_type]', 'value'))
           type = type.downcase
           opts[:custom_type] ||= type
           if type == 'matching_question'
@@ -396,9 +400,9 @@ module Qti
     def get_feedback_id(cond)
       id = nil
 
-      if feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]')
+      if (feedback = cond.at_css('setOutcomeValue[identifier=FEEDBACK]'))
         if feedback.at_css('variable[identifier=FEEDBACK]')
-          if feedback = feedback.at_css('baseValue[baseType=identifier]')
+          if (feedback = feedback.at_css('baseValue[baseType=identifier]'))
             id = feedback.text.strip
           end
         end

@@ -81,7 +81,7 @@ module Qti
     def process_canvas
       answer_hash = {}
       @doc.css('choiceInteraction').each do |ci|
-        if blank_id = ci['responseIdentifier']
+        if (blank_id = ci['responseIdentifier'])
           blank_id.gsub!(/^response_/, '')
         end
         ci.search('simpleChoice').each do |choice|
@@ -100,7 +100,7 @@ module Qti
         @doc.css('responseProcessing responseCondition responseIf,responseElseIf').each do |if_node|
           if if_node.at_css('setOutcomeValue[identifier=SCORE] sum')
             id = if_node.at_css('match baseValue[baseType=identifier]').text
-            if answer = answer_hash[id]
+            if (answer = answer_hash[id])
               answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
             end
           end
@@ -118,7 +118,7 @@ module Qti
       @doc.css('responseDeclaration').each do |res_node|
         res_id = res_node['identifier']
         res_node.css('correctResponse value').each do |correct_id|
-          if answer = (answer_hash[res_id] && answer_hash[res_id][correct_id.text])
+          if (answer = (answer_hash[res_id] && answer_hash[res_id][correct_id.text]))
             answer[:weight] = AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT
           end
         end
@@ -151,7 +151,7 @@ module Qti
 
     def process_d2l
       @question[:question_text] = ''
-      if body = @doc.at_css('itemBody')
+      if (body = @doc.at_css('itemBody'))
         body.children.each do |node|
           next if node.name == 'text'
 
@@ -167,7 +167,7 @@ module Qti
       end
 
       @doc.css('responseCondition stringMatch').each do |match|
-        if blank_id = get_node_att(match, 'variable', 'identifier')
+        if (blank_id = get_node_att(match, 'variable', 'identifier'))
           text = get_node_val(match, 'baseValue')
           answer = { :id => unique_local_id, :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT }
           answer[:migration_id] = blank_id
@@ -180,7 +180,7 @@ module Qti
 
     def process_respondus
       @doc.css('responseCondition stringMatch baseValue[baseType=string]').each do |val_node|
-        if blank_id = val_node['identifier']
+        if (blank_id = val_node['identifier'])
           blank_id = blank_id.sub(%r{^RESPONSE_-([^-]*)-}, '\1')
           @question[:answers] << {
             :weight => AssessmentItemConverter::DEFAULT_CORRECT_WEIGHT,

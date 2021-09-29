@@ -62,7 +62,7 @@ module Canvas::Migration
           cm.update_conversion_progress(100)
 
           cm.migration_settings[:migration_ids_to_import] = { :copy => { :everything => true } }.merge(cm.migration_settings[:migration_ids_to_import] || {})
-          if path = converter.course[:files_import_root_path]
+          if (path = converter.course[:files_import_root_path])
             cm.migration_settings[:files_import_root_path] = path
           end
           cm.save

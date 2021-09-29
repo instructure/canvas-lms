@@ -226,7 +226,7 @@ module UserContent
           end
         end
 
-        if module_item = rest.try(:match, %r{/items/(\d+)})
+        if (module_item = rest.try(:match, %r{/items/(\d+)}))
           type   = 'items'
           obj_id = module_item[1].to_i
         end

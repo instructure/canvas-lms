@@ -130,7 +130,7 @@ module Canvas::Migration
         r_node.css('dependency').each do |d_node|
           resource[:dependencies] << d_node[:identifierref]
         end
-        if variant = r_node.at_css('variant')
+        if (variant = r_node.at_css('variant'))
           resource[:preferred_resource_id] = variant['identifierref']
         end
         @resources[id] = resource
@@ -158,20 +158,20 @@ module Canvas::Migration
       doc = open_rel_path(resource[:href])
       if !doc && resource[:files]
         resource[:files].each do |file|
-          break if doc = open_rel_path(file[:href])
+          break if (doc = open_rel_path(file[:href]))
         end
       end
 
-      if !doc && node = @resource_nodes_for_flat_manifest[resource[:migration_id]]
+      if !doc && (node = @resource_nodes_for_flat_manifest[resource[:migration_id]])
         # check for in-line node
-        if node_name
-          doc = node.children.find { |c| c.name == node_name }
-        else
-          doc = node
-        end
+        doc = if node_name
+                node.children.find { |c| c.name == node_name }
+              else
+                node
+              end
       end
 
-      doc.remove_namespaces! if doc && doc.respond_to?('remove_namespaces!')
+      doc.remove_namespaces! if doc.respond_to?('remove_namespaces!')
       doc
     end
   end

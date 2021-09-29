@@ -64,7 +64,7 @@ module Canvas::Plugins::TicketingSystem
     end
 
     def sub_account_tag(asset_manager = ::Context, expected_type = Course)
-      if context_string = self.data['context_asset_string']
+      if (context_string = self.data['context_asset_string'])
         context = asset_manager.find_by_asset_string(context_string)
         if context.is_a? expected_type
           "subaccount_#{context.account_id}"

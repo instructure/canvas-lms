@@ -51,7 +51,8 @@ module Api::V1::ContentMigration
     end
 
     if migration.for_course_copy?
-      if source = migration.source_course || (migration.migration_settings[:source_course_id] && Course.find(migration.migration_settings[:source_course_id]))
+      if (source = migration.source_course ||
+         (migration.migration_settings[:source_course_id] && Course.find(migration.migration_settings[:source_course_id])))
         json[:settings] = {}
         json[:settings][:source_course_id] = source.id
         json[:settings][:source_course_name] = source.name
@@ -62,7 +63,7 @@ module Api::V1::ContentMigration
     if migration.job_progress
       json['progress_url'] = polymorphic_url([:api_v1, migration.job_progress])
     end
-    if plugin = Canvas::Plugin.find(migration.migration_type)
+    if (plugin = Canvas::Plugin.find(migration.migration_type))
       if plugin.meta[:display_name] && plugin.meta[:display_name].respond_to?(:call)
         json['migration_type_title'] = plugin.meta[:display_name].call
       elsif plugin.meta[:name] && plugin.meta[:name].respond_to?(:call)

@@ -94,11 +94,11 @@ module Reporting
     private
 
     def save_detailed_progressive(account, data)
-      if snapshot = account.report_snapshots.progressive.last
-        progressive = snapshot.data.with_indifferent_access
-      else
-        progressive = new_progressive_hash.with_indifferent_access
-      end
+      progressive = if (snapshot = account.report_snapshots.progressive.last)
+                      snapshot.data.with_indifferent_access
+                    else
+                      new_progressive_hash.with_indifferent_access
+                    end
       progressive[:generated_at] = @timestamp
       create_progressive_hashes(progressive, data)
 

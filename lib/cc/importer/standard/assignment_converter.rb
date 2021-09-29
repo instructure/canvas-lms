@@ -23,7 +23,7 @@ module CC::Importer::Standard
 
     def convert_cc_assignments(asmnts = [])
       resources_by_type("assignment", "assignment_xmlv1p0").each do |res|
-        if doc = get_node_or_open_file(res, 'assignment')
+        if (doc = get_node_or_open_file(res, 'assignment'))
           path = res[:href] || (res[:files] && res[:files].first && res[:files].first[:href])
           resource_dir = File.dirname(path) if path
 
@@ -35,7 +35,7 @@ module CC::Importer::Standard
 
           # FIXME check the XML namespace to make sure it's actually a canvas assignment
           # (blocked by remove_namespaces! in lib/canvas/migration/migrator.rb)
-          if assgn_node = doc.at_css('extensions > assignment')
+          if (assgn_node = doc.at_css('extensions > assignment'))
             parse_canvas_assignment_data(assgn_node, nil, asmnt)
           end
 
@@ -52,7 +52,7 @@ module CC::Importer::Standard
       asmnt[:instructor_description] = get_node_val(doc, 'instructor_text')
       asmnt[:title] = get_node_val(doc, 'title')
       asmnt[:gradable] = get_bool_val(doc, 'gradable')
-      if points_possible = get_node_att(doc, 'gradable', 'points_possible')
+      if (points_possible = get_node_att(doc, 'gradable', 'points_possible'))
         asmnt[:grading_type] = 'points'
         asmnt[:points_possible] = points_possible.to_f
       end

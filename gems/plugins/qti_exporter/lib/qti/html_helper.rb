@@ -54,7 +54,7 @@ module Qti
                 # So check for the file starting with the full relative path, going down to just the file name
                 paths = val.split("/")
                 paths.length.times do |i|
-                  if mig_id = find_best_path_match(paths[i..-1].join('/'))
+                  if (mig_id = find_best_path_match(paths[i..-1].join('/')))
                     subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
                     break
                   end
@@ -62,7 +62,7 @@ module Qti
               else
                 val.gsub!(/\$[A-Z_]*\$/, '') # remove any path tokens like $TOKEN_EH$
                 # try to find the file by exact path match. If not found, try to find best match
-                if mig_id = find_best_path_match(val)
+                if (mig_id = find_best_path_match(val))
                   subnode[attr] = "#{CC::CCHelper::OBJECT_TOKEN}/attachments/#{mig_id}"
                 end
               end
@@ -140,7 +140,7 @@ module Qti
     # returns a tuple of [text, html]
     # html is null if it's not an html blob
     def detect_html(node)
-      if text_node = node.at_css('div.text')
+      if (text_node = node.at_css('div.text'))
         return [text_node.text.strip, nil]
       end
 

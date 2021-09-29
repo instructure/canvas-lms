@@ -227,7 +227,7 @@ module DatesOverridable
       hash.merge!({ :all_day => assignment.all_day, :all_day_date => assignment.all_day_date })
     end
 
-    if @applied_overrides && override = @applied_overrides.find { |o| o.due_at == due_at }
+    if @applied_overrides && (override = @applied_overrides.find { |o| o.due_at == due_at })
       hash[:override] = override
       hash[:title] = override.title
       hash[:set_type] = override.set_type
@@ -255,7 +255,7 @@ module DatesOverridable
       elsif self.multiple_due_dates_apply_to?(user)
         hash[:vdd_tooltip] = OverrideTooltipPresenter.new(self, user).as_json
       else
-        if due_date = self.overridden_for(user).due_at
+        if (due_date = self.overridden_for(user).due_at)
           hash[:due_date] = due_date
         elsif user_is_admin && (due_date = all_due_dates.dig(0, :due_at))
           hash[:due_date] = due_date

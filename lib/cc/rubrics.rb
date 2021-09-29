@@ -94,7 +94,7 @@ module CC
         c_node.long_description criterion[:long_description] if criterion[:long_description].present?
         c_node.criterion_use_range criterion[:criterion_use_range] if criterion[:criterion_use_range].present?
         if criterion[:learning_outcome_id].present?
-          if lo = @course.available_outcome(criterion[:learning_outcome_id])
+          if (lo = @course.available_outcome(criterion[:learning_outcome_id]))
             if lo.context_type == "Course" && lo.context_id == @course.id
               c_node.learning_outcome_identifierref create_key(lo)
             else

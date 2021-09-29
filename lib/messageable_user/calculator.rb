@@ -295,7 +295,7 @@ class MessageableUser
 
       # skipping messageability constraints, do I see the user in that specific
       # course, and if so with which enrollment type(s)?
-      if include_course_id && course = Course.where(id: include_course_id).first
+      if include_course_id && (course = Course.where(id: include_course_id).first)
         missing_users = users.reject { |user| user.global_common_courses.keys.include?(course.global_id) }
         if missing_users.present?
           course.shard.activate do
@@ -348,7 +348,7 @@ class MessageableUser
 
       # skipping messageability constraints, do I see the user in that specific
       # group?
-      if include_group_id && group = Group.where(id: include_group_id).first
+      if include_group_id && (group = Group.where(id: include_group_id).first)
         missing_users = users.reject { |user| user.global_common_groups.keys.include?(group.global_id) }
         if missing_users.present?
           group.shard.activate do
@@ -427,7 +427,7 @@ class MessageableUser
 
       course.shard.activate do
         # make sure the course is recognized
-        return unless options[:admin_context] || course = course_index[course.id]
+        return unless options[:admin_context] || (course = course_index[course.id])
 
         scope = enrollment_scope(options.merge(
                                    :include_concluded_students => false,

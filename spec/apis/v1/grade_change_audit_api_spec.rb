@@ -56,29 +56,29 @@ describe "GradeChangeAudit API", type: :request do
     end
 
     def fetch_for_context(context, options = {})
-      type = context.class.to_s.downcase unless type = options.delete(:type)
+      type = context.class.to_s.downcase unless (type = options.delete(:type))
       user = options.delete(:user) || @viewing_user
       id = Shard.global_id_for(context).to_s
 
       arguments = { controller: :grade_change_audit_api, action: "for_#{type}", "#{type}_id": id, format: :json }
       query_string = []
 
-      if per_page = options.delete(:per_page)
+      if (per_page = options.delete(:per_page))
         arguments[:per_page] = per_page.to_s
         query_string << "per_page=#{arguments[:per_page]}"
       end
 
-      if start_time = options.delete(:start_time)
+      if (start_time = options.delete(:start_time))
         arguments[:start_time] = start_time.iso8601
         query_string << "start_time=#{arguments[:start_time]}"
       end
 
-      if end_time = options.delete(:end_time)
+      if (end_time = options.delete(:end_time))
         arguments[:end_time] = end_time.iso8601
         query_string << "end_time=#{arguments[:end_time]}"
       end
 
-      if account = options.delete(:account)
+      if (account = options.delete(:account))
         arguments[:account_id] = Shard.global_id_for(account).to_s
         query_string << "account_id=#{arguments[:account_id]}"
       end

@@ -260,9 +260,7 @@ describe "users" do
     end
 
     it "requires terms if configured to do so" do
-      if terms = Account.default.terms_of_service
-        terms.update(passive: false)
-      end
+      Account.default.terms_of_service&.update(passive: false)
 
       get "/register"
 
@@ -279,9 +277,7 @@ describe "users" do
     end
 
     it "registers a student with a join code" do
-      if terms = Account.default.terms_of_service
-        terms.update(passive: false)
-      end
+      Account.default.terms_of_service&.update(passive: false)
 
       Account.default.allow_self_enrollment!
       course_factory(active_all: true)
@@ -305,9 +301,7 @@ describe "users" do
     end
 
     it "registers a teacher" do
-      if terms = Account.default.terms_of_service
-        terms.update(passive: false)
-      end
+      Account.default.terms_of_service&.update(passive: false)
 
       get '/register'
       f('#signup_teacher').click
@@ -338,9 +332,7 @@ describe "users" do
     end
 
     it "registers an observer" do
-      if terms = Account.default.terms_of_service
-        terms.update(passive: false)
-      end
+      Account.default.terms_of_service&.update(passive: false)
 
       user = user_with_pseudonym(:active_all => true, :password => 'lolwut12')
       pairing_code = user.generate_observer_pairing_code

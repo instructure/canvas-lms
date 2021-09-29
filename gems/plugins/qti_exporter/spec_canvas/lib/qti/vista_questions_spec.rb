@@ -60,16 +60,16 @@ if Qti.migration_executable
       expect(manifest_node.at_css("instructureMetadata")).to eq manifest_node
       expect(manifest_node['identifier']).to eq nil
       expect(manifest_node['href']).to eq 'multiple_choice.xml'
-      if title = manifest_node.at_css('title langstring')
+      if (title = manifest_node.at_css('title langstring'))
         expect(title.text).to eq nil
       end
-      if type = manifest_node.at_css('interactiontype')
+      if (type = manifest_node.at_css('interactiontype'))
         expect(type.text.downcase).to eq 'extendedtextinteraction'
       end
-      if type = manifest_node.at_css('instructureMetadata instructureField[name=quiz_type]')
+      if (type = manifest_node.at_css('instructureMetadata instructureField[name=quiz_type]'))
         expect(type['value'].downcase).to eq 'calculated'
       end
-      if type = manifest_node.at_css('instructureField[name=bb8_assessment_type]')
+      if (type = manifest_node.at_css('instructureField[name=bb8_assessment_type]'))
         expect(type['value'].downcase).to eq 'calculated'
       end
     end

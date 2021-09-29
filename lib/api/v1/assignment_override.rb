@@ -204,7 +204,7 @@ module Api::V1::AssignmentOverride
         if data[field].blank?
           # override value of nil/'' is meaningful
           override_data[field] = nil
-        elsif value = Time.zone.parse(data[field].to_s)
+        elsif (value = Time.zone.parse(data[field].to_s))
           override_data[field] = value
         else
           errors << "invalid #{field} #{data[field].inspect}"

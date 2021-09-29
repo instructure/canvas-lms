@@ -39,7 +39,7 @@ module CC::Importer::Canvas
 
     def convert_all_course_settings
       @course[:course] = convert_course_settings(settings_doc(COURSE_SETTINGS))
-      if doc = settings_doc(SYLLABUS, true)
+      if (doc = settings_doc(SYLLABUS, true))
         @course[:course][:syllabus_body] = convert_syllabus(doc)
       end
       @course[:assignment_groups] = convert_assignment_groups(settings_doc(ASSIGNMENT_GROUPS))
@@ -87,11 +87,11 @@ module CC::Importer::Canvas
         course[date_type] = val
       end
       ['grading_standard_id', 'home_page_announcement_limit'].each do |int_val|
-        if val = get_int_val(doc, int_val)
+        if (val = get_int_val(doc, int_val))
           course[int_val] = val
         end
       end
-      if nav = get_node_val(doc, 'tab_configuration')
+      if (nav = get_node_val(doc, 'tab_configuration'))
         begin
           nav = JSON.parse(nav)
           # Validate the format a little bit

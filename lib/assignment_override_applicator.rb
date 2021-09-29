@@ -366,7 +366,7 @@ module AssignmentOverrideApplicator
     applicable_overrides = overrides.select(&:due_at_overridden)
     if applicable_overrides.empty?
       assignment_or_quiz
-    elsif override = applicable_overrides.detect { |o| o.due_at.nil? }
+    elsif (override = applicable_overrides.detect { |o| o.due_at.nil? })
       override
     else
       applicable_overrides.sort_by(&:due_at).last

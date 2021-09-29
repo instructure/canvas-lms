@@ -30,7 +30,7 @@ module CC::Importer::Canvas
       @manifest.css('resource[type$="learning-application-resource"]').each do |res|
         res.css('file').select { |f| f['href'].to_s.end_with?(ASSESSMENT_META) }.each do |file|
           meta_path = file['href']
-          if quiz = quiz_map[meta_path]
+          if (quiz = quiz_map[meta_path])
             doc = open_file_xml(@package_root.item_path(meta_path))
             get_quiz_meta(doc, quiz)
           end
@@ -74,7 +74,7 @@ module CC::Importer::Canvas
         quiz[bool_val] = val unless val.nil?
       end
 
-      if asmnt_node = doc.at_css('assignment')
+      if (asmnt_node = doc.at_css('assignment'))
         quiz['assignment'] = parse_canvas_assignment_data(asmnt_node)
       end
 

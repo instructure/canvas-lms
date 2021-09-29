@@ -42,7 +42,7 @@ module Lti
     end
 
     def authenticate_body_hash
-      if body_hash = OAuth::Helper.parse_header(request.authorization)['oauth_body_hash']
+      if (body_hash = OAuth::Helper.parse_header(request.authorization)['oauth_body_hash'])
         request.body.rewind
         generated_hash = Digest::SHA1.base64digest(request.body.read)
         request.body.rewind # Be Kind Rewind

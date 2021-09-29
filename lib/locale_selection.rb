@@ -41,7 +41,7 @@ module LocaleSelection
       -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
       -> {
-        if accept_language && locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases)
+        if accept_language && (locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases))
           GuardRail.activate(:primary) do
             user.update_attribute(:browser_locale, locale) if user && user.browser_locale != locale
           end
@@ -84,7 +84,7 @@ module LocaleSelection
     #                           en-US range is a longer match, so it loses)
 
     best_locales = supported_locales.inject([]) { |ary, locale|
-      if best_range = ranges.detect { |r, q| r + '-' == (locale.downcase + '-')[0..r.size] || r == '*' }
+      if (best_range = ranges.detect { |r, q| r + '-' == (locale.downcase + '-')[0..r.size] || r == '*' })
         ary << [locale, best_range.last, ranges.index(best_range)] unless best_range.last == 0
       end
       ary

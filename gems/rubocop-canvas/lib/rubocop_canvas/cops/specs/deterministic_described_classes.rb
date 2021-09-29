@@ -129,7 +129,7 @@ module RuboCop
           mod_name_parts = mod_name.to_a
           result = [mod_name_parts[1]]
           top_level = false
-          if parent = mod_name_parts[0]
+          if (parent = mod_name_parts[0])
             if parent.cbase_type?
               top_level = true
             elsif parent.const_type?

@@ -158,7 +158,7 @@ module Factories
     if options[:account_associations]
       create_records(CourseAccountAssociation, course_ids.map { |id| { account_id: account.id, course_id: id, depth: 0, root_account_id: account.resolved_root_account_id, created_at: now, updated_at: now } })
     end
-    if user = options[:enroll_user]
+    if (user = options[:enroll_user])
       section_ids = create_records(CourseSection, course_ids.map { |id| { course_id: id, root_account_id: account.id, name: "Default Section", default_section: true, created_at: now, updated_at: now } })
       type = options[:enrollment_type] || "TeacherEnrollment"
       role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id

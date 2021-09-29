@@ -139,7 +139,7 @@ module CC
             if tab['id'].is_a?(String)
               # it's an external tool, so translate the id to a migration_id
               tool_id = tab['id'].sub('context_external_tool_', '')
-              if tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation, false)
+              if (tool = ContextExternalTool.find_for(tool_id, @course, :course_navigation, false))
                 tab['id'] = "context_external_tool_#{create_key(tool)}"
               end
             end
@@ -156,7 +156,7 @@ module CC
         if @course.image_url.present?
           atts << :image_url
         elsif @course.image_id.present?
-          if image_att = @course.attachments.active.where(id: @course.image_id).first
+          if (image_att = @course.attachments.active.where(id: @course.image_id).first)
             c.image_identifier_ref(create_key(image_att))
           end
         end

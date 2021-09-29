@@ -218,7 +218,7 @@ module Api::V1::Course
       teacher_counts = Enrollment.from("(#{scope.to_sql}) AS t").group("t.course_id").count
       to_preload = []
       courses.each do |course|
-        next unless count = teacher_counts[course.id]
+        next unless (count = teacher_counts[course.id])
 
         if count > threshold
           course.teacher_count = count

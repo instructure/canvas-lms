@@ -93,7 +93,7 @@ module Factories
     if opts[:role_changes]
       opts[:role_changes].each_pair do |permission, enabled|
         role = opts[:role] || admin_role
-        if ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first
+        if (ro = account.role_overrides.where(:permission => permission.to_s, :role_id => role.id).first)
           ro.update_attribute(:enabled, enabled)
         else
           account.role_overrides.create(:permission => permission.to_s, :enabled => enabled, :role => role)

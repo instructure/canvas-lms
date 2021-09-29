@@ -142,7 +142,7 @@ module CC
       end
       node.submission_formats do |fmt|
         assignment.submission_types.split(',').each do |st|
-          if cc_type = SUBMISSION_TYPE_MAP[st]
+          if (cc_type = SUBMISSION_TYPE_MAP[st])
             fmt.format(:type => cc_type)
           end
         end

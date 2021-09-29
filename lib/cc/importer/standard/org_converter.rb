@@ -31,7 +31,7 @@ module CC::Importer::Standard
       doc.css('organizations organization > item > item').each do |item_node|
         if item_node['identifierref']
           # item points to a single item
-          if item = process_item(item_node, 0)
+          if (item = process_item(item_node, 0))
             if !misc_module
               misc_module = { :title => "Misc Module", :migration_id => "misc_module_top_level_items", :items => [] }
               modules << misc_module
@@ -69,7 +69,7 @@ module CC::Importer::Standard
             else
               add_children(item_node, mod, indent + 1)
             end
-          elsif item = process_item(item_node, indent)
+          elsif (item = process_item(item_node, indent))
             mod[:items] << item
           end
         end
@@ -78,7 +78,7 @@ module CC::Importer::Standard
 
     def process_item(item_node, indent)
       item = nil
-      if resource = @resources[item_node['identifierref']]
+      if (resource = @resources[item_node['identifierref']])
         case resource[:type]
         when /assessment\z/
           item = {
@@ -101,7 +101,7 @@ module CC::Importer::Standard
           item[:linked_resource_title] ||= title
           item = nil if item[:url].blank?
         when /\Aimsbasiclti/
-          if asmnt = find_assignment(resource[:migration_id])
+          if (asmnt = find_assignment(resource[:migration_id]))
             item = {
               :indent => indent,
               :linked_resource_type => 'ASSIGNMENT',

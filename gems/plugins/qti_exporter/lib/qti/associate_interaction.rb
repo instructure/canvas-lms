@@ -35,13 +35,13 @@ module Qti
       if @doc.at_css('associateInteraction')
         match_map = {}
         get_all_matches_with_interaction(match_map)
-        if pair_node = @doc.at_css('responseDeclaration[baseType=pair][cardinality=multiple]')
+        if (pair_node = @doc.at_css('responseDeclaration[baseType=pair][cardinality=multiple]'))
           get_answers_from_matching_pairs(pair_node, match_map)
         else
           get_all_answers_with_interaction(match_map)
           check_for_meta_matches
         end
-      elsif node = @doc.at_css('matchInteraction')
+      elsif (node = @doc.at_css('matchInteraction'))
         get_all_match_interaction(node)
       elsif @custom_type == 'respondus_matching'
         get_respondus_answers
@@ -71,10 +71,10 @@ module Qti
       @question[:answers].each do |answer|
         answer[:left] = answer[:text] if answer[:text].present?
         answer[:left_html] = answer[:html] if answer[:html].present?
-        if answer[:match_id]
-          if @question[:matches] && match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] }
-            answer[:right] = match[:text]
-          end
+        if answer[:match_id] &&
+           @question[:matches] &&
+           (match = @question[:matches].find { |m| m[:match_id] == answer[:match_id] })
+          answer[:right] = match[:text]
         end
       end
 
@@ -110,18 +110,16 @@ module Qti
     end
 
     def get_canvas_matches(match_map)
-      if ci = @doc.at_css('choiceInteraction')
-        ci.css('simpleChoice').each do |sc|
-          match = {}
-          @question[:matches] << match
-          match_map[sc['identifier']] = match
-          if sc['identifier'] =~ /(\d+)/
-            match[:match_id] = $1.to_i
-          else
-            match[:match_id] = unique_local_id
-          end
-          match[:text] = sc.text.strip
+      @doc.at_css('choiceInteraction')&.css('simpleChoice')&.each do |sc|
+        match = {}
+        @question[:matches] << match
+        match_map[sc['identifier']] = match
+        if sc['identifier'] =~ /(\d+)/
+          match[:match_id] = $1.to_i
+        else
+          match[:match_id] = unique_local_id
         end
+        match[:text] = sc.text.strip
       end
     end
 
@@ -139,13 +137,13 @@ module Qti
       @doc.css('responseIf, responseElseIf').each do |r_if|
         answer_mig_id = nil
         match_mig_id = nil
-        if match = r_if.at_css('match')
+        if (match = r_if.at_css('match'))
           answer_mig_id = get_node_att(match, 'variable', 'identifier')
           match_mig_id = match.at_css('baseValue[baseType=identifier]').text rescue nil
         end
-        if answer = answer_map[answer_mig_id]
+        if (answer = answer_map[answer_mig_id])
           answer[:feedback_id] = get_feedback_id(r_if)
-          if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && match = match_map[match_mig_id]
+          if r_if.at_css('setOutcomeValue[identifier=SCORE] sum') && (match = match_map[match_mig_id])
             answer[:match_id] = match[:match_id]
           end
         end
@@ -190,7 +188,7 @@ module Qti
     end
 
     def get_all_matches_from_body
-      if matches = @doc.at_css('div.RIGHT_MATCH_BLOCK')
+      if (matches = @doc.at_css('div.RIGHT_MATCH_BLOCK'))
         matches.css('div').each do |m|
           match = {}
           @question[:matches] << match
@@ -260,7 +258,7 @@ module Qti
           match = {}
           extract_answer!(match, m)
 
-          if other_match = @question[:matches].detect { |om| match[:text].to_s.strip == om[:text].to_s.strip && match[:html].to_s.strip == om[:html].to_s.strip }
+          if (other_match = @question[:matches].detect { |om| match[:text].to_s.strip == om[:text].to_s.strip && match[:html].to_s.strip == om[:html].to_s.strip })
             match_map[m['identifier']] = other_match[:match_id]
           else
             @question[:matches] << match
@@ -281,9 +279,9 @@ module Qti
         answer[:id] = unique_local_id
         answer[:comments] = ""
 
-        if option = a.at_css('simpleAssociableChoice[identifier^=MATCH]')
+        if (option = a.at_css('simpleAssociableChoice[identifier^=MATCH]'))
           answer[:match_id] = match_map[option.text.strip]
-        elsif resp_id = a['responseIdentifier']
+        elsif (resp_id = a['responseIdentifier'])
           @doc.css("match variable[identifier=#{resp_id}]").each do |variable|
             match = variable.parent
             response_if = match.parent
@@ -314,7 +312,7 @@ module Qti
 
     # Replaces the matches with their full-text instead of a,b,c/1,2,3/etc.
     def check_for_meta_matches
-      if long_matches = @doc.search('instructureMetadata matchingMatch')
+      if (long_matches = @doc.search('instructureMetadata matchingMatch'))
         @question[:matches].each_with_index do |match, i|
           match[:text] = long_matches[i].text.strip.gsub(/ +/, " ") if long_matches[i]
         end
@@ -348,7 +346,7 @@ module Qti
       # Check if there are correct answers explicitly specified
       @doc.css('correctResponse > value').each do |match|
         answer_id, match_id = match.text.split
-        if answer = answer_map[answer_id.strip] and m = match_map[match_id.strip]
+        if (answer = answer_map[answer_id.strip]) && (m = match_map[match_id.strip])
           answer[:match_id] = m[:match_id]
         end
       end

@@ -95,7 +95,7 @@ module Canvas::Migration::Helpers
                             @migration.context.root_account.feature_enabled?(:selectable_outcomes_in_course_copy)
       content_list = []
       if type
-        if match_data = type.match(/submodules_(.*)/)
+        if (match_data = type.match(/submodules_(.*)/))
           (submodule_data(course_data['context_modules'], match_data[1]) || []).each do |item|
             content_list << item_hash('context_modules', item)
           end
@@ -220,9 +220,11 @@ module Canvas::Migration::Helpers
         hash[:title] = item['file_name']
       when 'assessment_question_banks'
         if hash[:title].blank? && @migration && @migration.context.respond_to?(:assessment_question_banks)
-          if hash[:migration_id] && bank = @migration.context.assessment_question_banks.where(migration_id: hash[:migration_id]).first
+          if hash[:migration_id] &&
+             (bank = @migration.context.assessment_question_banks.where(migration_id: hash[:migration_id]).first)
             hash[:title] = bank.title
-          elsif @migration.question_bank_id && default_bank = @migration.context.assessment_question_banks.where(id: @migration.question_bank_id).first
+          elsif @migration.question_bank_id &&
+                (default_bank = @migration.context.assessment_question_banks.where(id: @migration.question_bank_id).first)
             hash[:title] = default_bank.title
           end
           hash[:title] ||= @migration.question_bank_name || AssessmentQuestionBank.default_imported_title
@@ -241,14 +243,15 @@ module Canvas::Migration::Helpers
 
     def add_linked_resource(type, item, hash)
       if type == 'assignments'
-        if mig_id = item['quiz_migration_id']
+        if (mig_id = item['quiz_migration_id'])
           hash[:linked_resource] = { :type => 'quizzes', :migration_id => mig_id }
-        elsif mig_id = item['topic_migration_id']
+        elsif (mig_id = item['topic_migration_id'])
           hash[:linked_resource] = { :type => 'discussion_topics', :migration_id => mig_id }
-        elsif mig_id = item['page_migration_id']
+        elsif (mig_id = item['page_migration_id'])
           hash[:linked_resource] = { :type => 'wiki_pages', :migration_id => mig_id }
         end
-      elsif ['discussion_topics', 'quizzes', 'wiki_pages'].include?(type) && mig_id = item['assignment_migration_id']
+      elsif ['discussion_topics', 'quizzes', 'wiki_pages'].include?(type) &&
+            (mig_id = item['assignment_migration_id'])
         hash[:linked_resource] = { :type => 'assignments', :migration_id => mig_id }
       end
       hash
@@ -449,7 +452,7 @@ module Canvas::Migration::Helpers
     end
 
     def submodule_data(modules, parent_mig_id)
-      if mod = modules.detect { |m| m['migration_id'] == parent_mig_id }
+      if (mod = modules.detect { |m| m['migration_id'] == parent_mig_id })
         mod['submodules']
       else
         modules.each do |mod|

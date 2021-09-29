@@ -285,7 +285,8 @@ module Api::V1::Assignment
             rating_hash["long_description"] = c[:long_description] || ""
             rating_hash
           end
-          if row[:learning_outcome_id] && outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first
+          if row[:learning_outcome_id] &&
+             (outcome = LearningOutcome.where(id: row[:learning_outcome_id]).first)
             row_hash["outcome_id"] = outcome.id
             row_hash["vendor_guid"] = outcome.vendor_guid
           end
@@ -357,7 +358,7 @@ module Api::V1::Assignment
       hash['assignment_visibility'] = (opts[:assignment_visibilities] || assignment.students_with_visibility.pluck(:id).uniq).map(&:to_s)
     end
 
-    if submission = opts[:submission]
+    if (submission = opts[:submission])
       should_show_statistics = opts[:include_score_statistics] && assignment.can_view_score_statistics?(user)
 
       if submission.is_a?(Array)

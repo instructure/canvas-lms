@@ -25,7 +25,7 @@ module CC::Importer::Canvas
       track_map = {}
       return track_map unless doc
 
-      if media_tracks = doc.at_css('media_tracks')
+      if (media_tracks = doc.at_css('media_tracks'))
         media_tracks.css('media').each do |media|
           file_migration_id = media['identifierref']
           tracks = []
