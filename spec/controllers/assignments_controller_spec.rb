@@ -874,6 +874,51 @@ describe AssignmentsController do
           expect(assigns[:js_env][:belongs_to_unpublished_module]).to eq(true)
         end
       end
+
+      context "when logged in as an observer" do
+        let(:observer) do
+          observer = User.create!
+          @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "active", associated_user_id: @student.id)
+
+          observer
+        end
+
+        before(:each) do
+          user_session(observer)
+        end
+
+        it "shows the old assignments page if the assignments_2_observer_view setting is off" do
+          get 'show', params: { course_id: @course.id, id: @assignment.id }
+          expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
+        end
+
+        context "when the assignments_2_observer_view setting is on" do
+          before(:each) { Setting.set("assignments_2_observer_view", "true") }
+
+          it "shows data for the first observed student, by sortable name" do
+            allow(CanvasSchema).to receive(:id_from_object) { |submission| submission.user_id.to_s }
+
+            @student.update!(name: "Zzzzz")
+
+            prior_student = User.create!(name: "Aaaaa")
+            @course.enroll_student(prior_student, enrollment_state: "active")
+            @course.enroll_user(observer, "ObserverEnrollment", enrollment_state: "pending", associated_user_id: prior_student.id)
+
+            get 'show', params: { course_id: @course.id, id: @assignment.id }
+            aggregate_failures do
+              expect(assigns[:js_env][:SUBMISSION_ID]).to eq prior_student.id.to_s
+              expect(assigns[:js_env][:enrollment_state]).to eq :invited
+            end
+          end
+
+          it "shows the old assignments page if this user is not observing any students" do
+            observer.observer_enrollments.first.update!(associated_user: nil)
+
+            get 'show', params: { course_id: @course.id, id: @assignment.id }
+            expect(assigns[:js_env]).not_to have_key(:SUBMISSION_ID)
+          end
+        end
+      end
     end
 
     it "does not show locked external tool assignments" do
