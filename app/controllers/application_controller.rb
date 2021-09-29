@@ -652,6 +652,11 @@ class ApplicationController < ActionController::Base
     headers['X-Canvas-Real-User-Id'] ||= @real_current_user.global_id.to_s if @real_current_user
   end
 
+  def append_to_header(header, value)
+    headers[header] = (headers[header] || "") + value
+    headers[header]
+  end
+
   # make things requested from jQuery go to the "format.js" part of the "respond_to do |format|" block
   # see http://codetunes.com/2009/01/31/rails-222-ajax-and-respond_to/ for why
   def fix_xhr_requests
@@ -683,7 +688,15 @@ class ApplicationController < ActionController::Base
     # are typically embedded in an iframe in canvas, but the hostname is
     # different
     if !files_domain? && Setting.get('block_html_frames', 'true') == 'true' && !@embeddable
-      headers['X-Frame-Options'] = 'SAMEORIGIN'
+      #
+      # Allow iframing on all vanity domains as well as the canonical one
+      #
+      equivalent_domains = []
+      unless @domain_root_account.nil?
+        equivalent_domains = HostUrl.context_hosts(@domain_root_account, request.host)
+      end
+
+      append_to_header("Content-Security-Policy", "frame-ancestors 'self' #{equivalent_domains.join(' ')};")
     end
     headers['Strict-Transport-Security'] = 'max-age=31536000' if request.ssl?
     RequestContext::Generator.store_request_meta(request, @context)
