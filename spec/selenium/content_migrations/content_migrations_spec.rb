@@ -237,10 +237,10 @@ describe "content migrations", :non_parallel do
       fill_migration_form
       f('#dateAdjustCheckbox').click
       ff('[name=selective_import]')[0].click
-      set_value f('#oldStartDate'), '7/1/2014'
-      set_value f('#oldEndDate'), 'Jul 11, 2014'
-      set_value f('#newStartDate'), '8-5-2014'
-      set_value f('#newEndDate'), 'Aug 15, 2014'
+      replace_and_proceed(f('#oldStartDate'), '7/1/2014')
+      replace_and_proceed(f('#oldEndDate'), 'Jul 11, 2014')
+      replace_and_proceed(f('#newStartDate'), '8-5-2014')
+      replace_and_proceed(f('#newEndDate'), 'Aug 15, 2014')
       2.times { f('#addDaySubstitution').click }
       click_option('#daySubstitution ul > div:nth-child(1) .currentDay', "1", :value)
       click_option('#daySubstitution ul > div:nth-child(1) .subDay', "2", :value)

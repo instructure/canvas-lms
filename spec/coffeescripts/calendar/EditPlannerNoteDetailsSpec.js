@@ -17,18 +17,15 @@
  */
 
 import $ from 'jquery'
-import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails.js'
-import timezone from 'timezone'
-import tz from '@canvas/timezone'
+import EditPlannerNoteDetails from 'ui/features/calendar/backbone/views/EditPlannerNoteDetails'
 import tzInTest from '@canvas/timezone/specHelpers'
-import french from 'timezone/fr_FR'
 import fakeENV from 'helpers/fakeENV'
 import commonEventFactory from '@canvas/calendar/jquery/CommonEvent/index'
 
 const fixtures = $('#fixtures')
 const note = {
   id: '5',
-  todo_date: '2017-07-22T00:00',
+  todo_date: '2017-07-22T00:00:00-05',
   title: 'A To Do',
   details: 'the deets',
   user_id: '1',
@@ -39,10 +36,10 @@ const note = {
   all_context_codes: 'user_1'
 }
 
-QUnit.module('EditAssignmentDetails', {
+QUnit.module('EditPlannerNoteDetails', {
   setup() {
     this.$holder = $('<table />').appendTo(document.getElementById('fixtures'))
-    fakeENV.setup()
+    fakeENV.setup({TIMEZONE: 'America/Chicago'})
   },
   teardown() {
     this.$holder.detach()
@@ -51,30 +48,20 @@ QUnit.module('EditAssignmentDetails', {
     tzInTest.restore()
   }
 })
-const createView = function(event = note) {
+const createView = function (event = note) {
   return new EditPlannerNoteDetails(fixtures, event, null, null)
 }
 const commonEvent = () => commonEventFactory(note, [{asset_string: 'user_1'}])
 
 test('should initialize input with start date', () => {
   const view = createView(commonEvent())
-  equal(view.$('.date_field').val(), 'Jul 22, 2017')
+  equal(view.$('.date_field').val(), 'Sat, Jul 22, 2017')
 })
 
 test('should localize start date', () => {
-  tzInTest.configureAndRestoreLater({
-    tz: timezone(french, 'fr_FR'),
-    momentLocale: 'fr',
-    formats: {
-      'date.formats.full_with_weekday': '%a %-d %b %Y %-k:%M',
-      'date.formats.medium_with_weekday': '%a %-d %b %Y',
-      'date.formats.medium': '%-d %b %Y',
-      'date.month_names': ['août'],
-      'date.abbr_month_names': ['août']
-    }
-  })
+  ENV.LOCALE = 'fr' // fakeENV.teardown() will clean this up
   const view = createView(commonEvent())
-  equal(view.$('.date_field').val(), '22 juil. 2017')
+  equal(view.$('.date_field').val(), 'sam. 22 juil. 2017')
 })
 
 test('requires name to save assignment note', () => {

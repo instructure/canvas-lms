@@ -90,8 +90,8 @@ describe "course sections" do
 
     f('.edit_section_link').click
     edit_form = f('#edit_section_form')
-    replace_content(edit_form.find_element(:id, 'course_section_start_at'), '1/2/15')
-    replace_content(edit_form.find_element(:id, 'course_section_end_at'), '04 Mar 2015')
+    replace_and_proceed(edit_form.find_element(:id, 'course_section_start_at'), '1/2/15')
+    replace_and_proceed(edit_form.find_element(:id, 'course_section_end_at'), '04 Mar 2015')
     submit_form(edit_form)
     wait_for_ajax_requests
     @section.reload

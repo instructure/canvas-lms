@@ -17,19 +17,19 @@
  */
 
 import React from 'react'
-import PropTypes from 'prop-types'
+import {bool, func, object, string} from 'prop-types'
 import DueDateCalendarPicker from './DueDateCalendarPicker'
 import I18n from 'i18n!DueDateCalendars'
 import cx from 'classnames'
 
 class DueDateCalendars extends React.Component {
   static propTypes = {
-    dates: PropTypes.object.isRequired,
-    rowKey: PropTypes.string.isRequired,
-    overrides: PropTypes.array.isRequired,
-    replaceDate: PropTypes.func.isRequired,
-    sections: PropTypes.object.isRequired,
-    disabled: PropTypes.bool.isRequired
+    dates: object.isRequired,
+    rowKey: string.isRequired,
+    replaceDate: func.isRequired,
+    disabled: bool.isRequired,
+    dueDatesReadonly: bool.isRequired,
+    availabilityDatesReadonly: bool.isRequired
   }
 
   // -------------------

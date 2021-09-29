@@ -82,7 +82,7 @@ $.datepicker._selectDay = function (id, month, year, td) {
   }
 }
 $.fn.datepicker = function (options) {
-  options = $.extend({}, options)
+  options = {...options}
   options.prevOnSelect = options.onSelect
   options.onSelect = function (text, picker) {
     if (options.prevOnSelect) {
@@ -101,7 +101,7 @@ $.fn.datepicker = function (options) {
     picker.input.val(text).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
-    $(document).delegate('.ui-datepicker-ok', 'click', event => {
+    $(document).delegate('.ui-datepicker-ok', 'click', () => {
       const cur = $.datepicker._curInst
       const inst = cur
       const sel = $(
@@ -138,14 +138,14 @@ $.fn.datepicker = function (options) {
           cur.input.data('time-hour', val)
         }
       })
-      .delegate('.ui-datepicker-time-minute', 'change keypress focus blur', function (event) {
+      .delegate('.ui-datepicker-time-minute', 'change keypress focus blur', function () {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
           cur.input.data('time-minute', val)
         }
       })
-      .delegate('.ui-datepicker-time-ampm', 'change keypress focus blur', function (event) {
+      .delegate('.ui-datepicker-time-ampm', 'change keypress focus blur', function () {
         const cur = $.datepicker._curInst
         if (cur) {
           const val = $(this).val()
@@ -155,7 +155,7 @@ $.fn.datepicker = function (options) {
     $(document).delegate(
       '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       'mousedown',
-      function (event) {
+      function () {
         $(this).focus()
       }
     )
@@ -163,7 +163,7 @@ $.fn.datepicker = function (options) {
       '.ui-datepicker-time-hour,.ui-datepicker-time-minute,.ui-datepicker-time-ampm',
       'change keypress focus blur',
       event => {
-        if (event.keyCode && event.keyCode == 13) {
+        if (event.keyCode && event.keyCode === 13) {
           const cur = $.datepicker._curInst
           const inst = cur
           const sel = $(
@@ -189,23 +189,23 @@ $.fn.datepicker = function (options) {
   return this
 }
 $.fn.date_field = function (options) {
-  options = $.extend({}, options)
+  options = {...options}
   options.dateOnly = true
   this.datetime_field(options)
   return this
 }
 $.fn.time_field = function (options) {
-  options = $.extend({}, options)
+  options = {...options}
   options.timeOnly = true
   this.datetime_field(options)
   return this
 }
 
 // add bootstrap's .btn class to the button that opens a datepicker
-$.datepicker._triggerClass = $.datepicker._triggerClass + ' btn'
+$.datepicker._triggerClass += ' btn'
 
 $.fn.datetime_field = function (options) {
-  options = $.extend({}, options)
+  options = {...options}
   this.each(function () {
     const $field = $(this)
     if (!$field.hasClass('datetime_field_enabled')) {

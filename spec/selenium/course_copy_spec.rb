@@ -77,12 +77,10 @@ describe "course copy" do
 
     f('#dateAdjustCheckbox').click
 
-    f('#oldStartDate').clear
-    f('#oldStartDate').send_keys('7/1/2012')
-    f('#oldEndDate').send_keys('Jul 11, 2012')
-    f('#newStartDate').clear
-    f('#newStartDate').send_keys('8-5-2012')
-    f('#newEndDate').send_keys('Aug 15, 2012')
+    replace_and_proceed(f('#oldStartDate'), '7/1/2012')
+    replace_and_proceed(f('#oldEndDate'), 'Jul 11, 2012')
+    replace_and_proceed(f('#newStartDate'), '8-5-2012')
+    replace_and_proceed(f('#newEndDate'), 'Aug 15, 2012')
 
     f('#addDaySubstitution').click
     click_option('#daySubstitution ul > div:nth-child(1) .currentDay', "1", :value)
@@ -142,12 +140,12 @@ describe "course copy" do
     get "/courses/#{@course.id}/copy"
 
     replace_content(f('#course_start_at'), 'Aug 15, 2012')
-    replace_content(f('#course_conclude_at'), 'Jul 11, 2012', :tab_out => true)
+    replace_and_proceed(f('#course_conclude_at'), 'Jul 11, 2012')
 
     button = f('button.btn-primary')
     expect(button).to be_disabled
 
-    replace_content(f('#course_conclude_at'), 'Aug 30, 2012', :tab_out => true)
+    replace_and_proceed(f('#course_conclude_at'), 'Aug 30, 2012')
 
     expect(button).not_to be_disabled
   end

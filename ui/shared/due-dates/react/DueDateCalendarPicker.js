@@ -17,167 +17,149 @@
  */
 
 import $ from 'jquery'
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, {useEffect, useRef} from 'react'
+import {string, func, bool, instanceOf, oneOfType} from 'prop-types'
 import accessibleDateFormat from '@canvas/datetime/accessibleDateFormat'
 import shortId from 'shortid'
 import tz from '@canvas/timezone'
+import useDateTimeFormat from '@canvas/use-date-time-format-hook'
 import '@canvas/forms/jquery/jquery.instructure_forms'
 import cx from 'classnames'
 
-const {string, func, bool, instanceOf, oneOfType} = PropTypes
+function DueDateCalendarPicker(props) {
+  const dateInput = useRef(null)
+  const uniqueId = useRef(shortId())
+  const oldDate = useRef(props.dateValue)
+  const formatDate = useDateTimeFormat('date.formats.full')
 
-class DueDateCalendarPicker extends React.Component {
-  static propTypes = {
-    dateType: string.isRequired,
-    handleUpdate: func.isRequired,
-    rowKey: string.isRequired,
-    labelledBy: string.isRequired,
-    inputClasses: string.isRequired,
-    disabled: bool.isRequired,
-    isFancyMidnight: bool.isRequired,
-    defaultToEndOfMinute: bool,
-    dateValue: oneOfType([instanceOf(Date), string]).isRequired,
-    labelText: string.isRequired,
-    labelClasses: string,
-    name: string,
-    readonly: bool
-  }
-
-  static defaultProps = {
-    readonly: false,
-    defaultToEndOfMinute: false,
-    labelClasses: ''
-  }
-
-  constructor(props) {
-    super(props)
-    this.uniqueId = shortId()
-    this.state = {}
-  }
-
-  // ---------------
-  //    Lifecycle
-  // ---------------
-
-  componentDidMount() {
-    const dateInput = this.refs.dateInput
-
-    $(dateInput)
-      .datetime_field()
+  useEffect(() => {
+    const field = $(dateInput.current)
+    field
+      .data('inputdate', props.dateValue)
+      .datetime_field({contextLabel: props.contextLabel})
       .change(e => {
         const trimmedInput = $.trim(e.target.value)
 
-        let newDate = $(dateInput).data('unfudged-date')
+        let newDate = field.data('unfudged-date')
         newDate = trimmedInput === '' ? null : newDate
-        newDate = this.changeToFancyMidnightIfNeeded(newDate)
-        newDate = this.setToEndOfMinuteIfNeeded(newDate)
+        newDate = changeToFancyMidnightIfNeeded(newDate)
+        newDate = setToEndOfMinuteIfNeeded(newDate)
 
-        this.props.handleUpdate(newDate)
+        field.data('inputdate', props.dateValue).val(formatDate(props.dateValue))
+        props.handleUpdate(newDate)
       })
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
-  // ensure jquery UI updates (as react doesn't know about it)
-  componentDidUpdate() {
-    const dateInput = this.refs.dateInput
-    $(dateInput).val(this.formattedDate())
-  }
+  useEffect(() => {
+    if (props.dateValue === oldDate.current) return
+    oldDate.current = props.dateValue
+    $(dateInput.current).data('inputdate', props.dateValue).val(formatDate(props.dateValue))
+  }, [formatDate, props.dateValue])
 
-  changeToFancyMidnightIfNeeded = date => {
-    if (this.props.isFancyMidnight && tz.isMidnight(date)) {
+  function changeToFancyMidnightIfNeeded(date) {
+    if (props.isFancyMidnight && tz.isMidnight(date)) {
       return tz.changeToTheSecondBeforeMidnight(date)
     }
-
     return date
   }
 
-  setToEndOfMinuteIfNeeded = date => {
-    if (this.props.defaultToEndOfMinute && tz.format(date, '%S') === '00') {
+  function setToEndOfMinuteIfNeeded(date) {
+    if (props.defaultToEndOfMinute && tz.format(date, '%S') === '00') {
       return tz.setToEndOfMinute(date)
     }
-
     return date
   }
 
-  // ---------------
-  //    Rendering
-  // ---------------
+  const wrapperClassName = () =>
+    props.dateType === 'due_at' ? 'DueDateInput__Container' : 'DueDateRow__LockUnlockInput'
 
-  formattedDate = () => {
-    // make this match the format used by the datepicker
-    const dateStr = $.dateString(this.props.dateValue)
-    const timeStr = $.timeString(this.props.dateValue)
-    return `${dateStr} ${timeStr}`
-  }
-
-  wrapperClassName = () =>
-    this.props.dateType == 'due_at' ? 'DueDateInput__Container' : 'DueDateRow__LockUnlockInput'
-
-  render() {
-    if (this.props.disabled || this.props.readonly) {
-      const className = cx('ic-Form-control', {readonly: this.props.readonly})
-      return (
-        <div className={className}>
-          <label className={`${this.props.labelClasses} ic-Label`} htmlFor={this.props.dateType}>
-            {this.props.labelText}
-          </label>
-          <div className="ic-Input-group">
-            <input
-              id={this.props.dateType}
-              name={this.props.name}
-              readOnly
-              type="text"
-              className={`ic-Input ${this.props.inputClasses}`}
-              defaultValue={this.formattedDate()}
-            />
-            {this.props.readonly ? null : (
-              <div
-                className="ic-Input-group__add-on"
-                role="presentation"
-                aria-hidden="true"
-                tabIndex="-1"
-              >
-                <button
-                  className="Button Button--icon-action disabled"
-                  aria-disabled="true"
-                  type="button"
-                >
-                  <i className="icon-calendar-month" role="presentation" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
-      )
-    }
-
+  if (props.disabled || props.readonly) {
+    const className = cx('ic-Form-control', {readonly: props.readonly})
     return (
-      <div>
-        <label
-          id={this.props.labelledBy}
-          className={`${this.props.labelClasses} Date__label`}
-          htmlFor={this.uniqueId}
-        >
-          {this.props.labelText}
+      <div className={className}>
+        <label className={`${props.labelClasses} ic-Label`} htmlFor={props.dateType}>
+          {props.labelText}
         </label>
-        <div ref="datePickerWrapper" className={this.wrapperClassName()}>
+        <div className="ic-Input-group">
           <input
-            id={this.uniqueId}
-            name={this.props.name}
+            id={props.dateType}
+            name={props.name}
+            readOnly
             type="text"
-            ref="dateInput"
-            title={accessibleDateFormat()}
-            data-tooltip=""
-            className={this.props.inputClasses}
-            aria-labelledby={this.props.labelledBy}
-            data-row-key={this.props.rowKey}
-            data-date-type={this.props.dateType}
-            defaultValue={this.formattedDate()}
+            className={`ic-Input ${props.inputClasses}`}
+            defaultValue={formatDate(props.dateValue)}
           />
+          {props.readonly ? null : (
+            <div
+              className="ic-Input-group__add-on"
+              role="presentation"
+              aria-hidden="true"
+              tabIndex="-1"
+            >
+              <button
+                className="Button Button--icon-action disabled"
+                aria-disabled="true"
+                type="button"
+              >
+                <i className="icon-calendar-month" role="presentation" />
+              </button>
+            </div>
+          )}
         </div>
       </div>
     )
   }
+
+  return (
+    <div>
+      <label
+        id={props.labelledBy}
+        className={`${props.labelClasses} Date__label`}
+        htmlFor={uniqueId.current}
+      >
+        {props.labelText}
+      </label>
+      <div className={wrapperClassName()}>
+        <input
+          id={uniqueId.current}
+          name={props.name}
+          type="text"
+          ref={dateInput}
+          title={accessibleDateFormat()}
+          data-tooltip=""
+          className={props.inputClasses}
+          aria-labelledby={props.labelledBy}
+          data-row-key={props.rowKey}
+          data-date-type={props.dateType}
+          defaultValue={formatDate(props.dateValue)}
+        />
+      </div>
+    </div>
+  )
+}
+
+DueDateCalendarPicker.propTypes = {
+  dateType: string.isRequired,
+  handleUpdate: func.isRequired,
+  rowKey: string.isRequired,
+  labelledBy: string.isRequired,
+  inputClasses: string.isRequired,
+  disabled: bool.isRequired,
+  isFancyMidnight: bool.isRequired,
+  defaultToEndOfMinute: bool,
+  dateValue: oneOfType([instanceOf(Date), string]),
+  contextLabel: string,
+  labelText: string,
+  labelClasses: string,
+  name: string,
+  readonly: bool
+}
+
+DueDateCalendarPicker.defaultProps = {
+  readonly: false,
+  defaultToEndOfMinute: false,
+  labelClasses: ''
 }
 
 export default DueDateCalendarPicker
