@@ -18,9 +18,11 @@
 import React from 'react'
 import {shallow, mount} from 'enzyme'
 import moment from 'moment-timezone'
+import MockDate from 'mockdate'
 import {PlannerItem} from '../index'
 
-const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', 'America/Los_Angeles')
+const MY_TIMEZONE = 'America/Los_Angeles'
+const DEFAULT_DATE = moment.tz('2011-12-17T03:30:00', MY_TIMEZONE)
 const user = {id: '1', displayName: 'Jane', avatarUrl: '/picture/is/here', color: '#00AC18'}
 
 function defaultProps(option = {}) {
@@ -747,6 +749,17 @@ describe('with simplifiedControls', () => {
     })
 
     describe('as active', () => {
+      beforeAll(() => {
+        moment.tz.setDefault(MY_TIMEZONE)
+        const tzoffset = moment.tz(MY_TIMEZONE).format('Z')
+        MockDate.set(`2021-09-01T13:00:00${tzoffset}`)
+      })
+
+      afterAll(() => {
+        MockDate.reset()
+        moment.tz.setDefault()
+      })
+
       it('for all day events today', () => {
         const today = moment()
         const wrapper = shallow(

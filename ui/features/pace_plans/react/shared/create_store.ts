@@ -19,8 +19,9 @@
 import {createStore, applyMiddleware} from 'redux'
 import {composeWithDevTools} from 'redux-devtools-extension/developmentOnly'
 import thunkMiddleware from 'redux-thunk'
+import defaultReducers from '../reducers/reducers'
 
-export default reducers => {
+export default (reducers = defaultReducers) => {
   const middlewares: any[] = [thunkMiddleware]
 
   if (process.env.NODE_ENV === `development`) {

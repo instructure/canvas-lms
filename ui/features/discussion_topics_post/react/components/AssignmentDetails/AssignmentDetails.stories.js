@@ -21,6 +21,7 @@
 import {AssignmentDetails} from './AssignmentDetails'
 
 import React from 'react'
+import {Assignment} from '../../../graphql/Assignment'
 
 export default {
   title: 'Examples/Discussion Posts/Components/AssignmentDetails',
@@ -32,10 +33,9 @@ const Template = args => <AssignmentDetails {...args} />
 
 export const SingleDueDate = Template.bind({})
 SingleDueDate.args = {
-  assignmentOverrides: [],
-  canSeeMultipleDueDates: false,
   pointsPossible: 5,
-  dueAtDisplayText: 'Jan 26 11:49pm'
+  assignment: Assignment.mock(),
+  isAdmin: true
 }
 
 export const MultipleDueDates = Template.bind({})

@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Bardzo udana dyskusja" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Wspaniałe zadanie" },
   "add_to_do_7537af64": { "message": "Dodaj listę zadań" },
   "add_to_do_7def3c37": { "message": "Dodaj do listy zadań" },
   "address_3159962f": { "message": "Adres:" },
   "all_day_fb42c4fc": { "message": "Cały dzień" },
   "all_items_loaded_aa256183": { "message": "Wszystkie elementy wczytane" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Cudowne zadanie dyskusji"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Podczas odrzucania okazji wystąpił błąd."
   },
@@ -102,6 +107,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Błąd podczas wczytywania wcześniejszych elementów"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Ekscytująca dyskusja" },
   "excused_cf8792eb": { "message": "Usprawiedliwiony" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Nie udało się zaglądnąć w Twoją przyszłość"
@@ -126,6 +132,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "Nie udało się zapisać do" },
   "feedback_6dcc1991": { "message": "Informacje zwrotne" },
+  "fun_quiz_47ab0b0": { "message": "Fajny test" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Przejdź do panelu nawigacyjnego widoku karty"
   },
@@ -135,10 +142,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
   },
+  "join_6cafecca": { "message": "Dołącz" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "Dołącz do aktywnego spotkania online"
+  },
+  "join_online_meeting_b1725843": { "message": "Dołącz do spotkania online" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Przeskocz do paska nawigacji"
   },
   "jump_to_today_254ccf41": { "message": "Przejdź do dnia dzisiejszego" },
+  "language_arts_35b79a8b": { "message": "Języki obce" },
   "late_2be42b88": { "message": "Późno" },
   "load_more_a36f9cf9": { "message": "Załaduj więcej" },
   "load_prior_dates_f2b0f6f0": { "message": "Wczytaj wcześniejsze daty" },
@@ -158,6 +171,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Wygląda na to, że nic tu nie ma"
   },
+  "math_ede93050": { "message": "Matematyka" },
   "missing_1a256b3b": { "message": "Brak" },
   "missing_items_for_title_516511f8": {
     "message": "Brak elementów dla { title }"
@@ -213,6 +227,7 @@
   "replies_4a8577c8": { "message": "Odpowiedzi" },
   "save_11a80ec3": { "message": "Zapisz" },
   "schedule_preview_3bcda153": { "message": "Zaplanuj podgląd" },
+  "science_8d92214a": { "message": "Przyroda / Biologia" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Przewiń w górę, aby wyświetlić historię!"
   },
@@ -221,6 +236,7 @@
   },
   "show_all_ae37d610": { "message": "Pokaż wszystko" },
   "show_my_grades_ebd08684": { "message": "Pokaż moje oceny" },
+  "social_studies_13fa30c7": { "message": "Nauki społeczne" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } do { endDate }"
   },
@@ -238,6 +254,7 @@
     "message": "Zakończono powodzeniem: Utworzono zadanie"
   },
   "task_16b0ef38": { "message": "Zadanie" },
+  "the_best_assignment_15e98be1": { "message": "Najlepsze zadanie" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Minęły już termin i godzina na wykonanie tego zadania"
   },

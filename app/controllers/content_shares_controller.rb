@@ -129,7 +129,7 @@ class ContentSharesController < ApplicationController
   # @returns ContentShare
   def create
     create_params = params.permit(:content_type, :content_id)
-    allowed_types = ['assignment', 'discussion_topic', 'page', 'quiz', 'module', 'module_item']
+    allowed_types = ['assignment', 'attachment', 'discussion_topic', 'page', 'quiz', 'module', 'module_item']
     unless create_params[:content_type] && create_params[:content_id]
       return render(json: { message: 'Content type and id required'}, status: :bad_request)
     end

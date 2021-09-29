@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "Eine großartige Diskussion"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "Eine wundervolle Aufgabe"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "Auf Pretty HTML-Editor zugreifen"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "Altern. Text"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "Eine erstaunliche Diskussionsaufgabe"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "Fehler beim Lesen der Datei"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "Gleichung bearbeiten"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "Vorhandene/s Schaltfläche/Symbol bearbeiten"
+    },
     "edit_link_7f53bebb": {
         "message": "Link bearbeiten"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "Fehler beim Laden bisheriger Objekte"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "Spannende Diskussion"
     },
     "excused_cf8792eb": {
         "message": "Entschuldigt"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "Vollbild"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "Spaßquiz"
     },
     "generating_preview_45b53be0": {
         "message": "Vorschau wird erzeugt ..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } Abgeschlossen { items, plural,\n     =1 { Element}\n  other { Elemente}\n}"
     },
+    "join_6cafecca": {
+        "message": "Beitreten"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "An aktivem Online-Treffen teilnehmen"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "An Online-Treffen teilnehmen"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "Zu Navigations-Symbolleiste gehen"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Tastenkombinationen"
+    },
+    "language_arts_35b79a8b": {
+        "message": "Sprache"
     },
     "large_9c5e80e7": {
         "message": "Groß"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "Sieht so aus, als wäre hier nichts."
+    },
+    "math_ede93050": {
+        "message": "Mathe"
     },
     "media_af190855": {
         "message": "Medien"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "Zeitplan-Vorschau"
     },
+    "science_8d92214a": {
+        "message": "Naturwissenschaften"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "Blättern Sie hoch, um Ihren Verlauf zu sehen!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "Klein"
+    },
+    "social_studies_13fa30c7": {
+        "message": "Sozialstudien"
     },
     "something_went_wrong_89195131": {
         "message": "Etwas ging schief."
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "Textgröße"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "Die beste Aufgabe"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Datum und Uhrzeit dieser Aufgabe sind fällig"

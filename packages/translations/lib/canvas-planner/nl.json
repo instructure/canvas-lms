@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Een fantastische discussie" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Een prachtige opdracht" },
   "add_to_do_7537af64": { "message": "To-do-lijst toevoegen" },
   "add_to_do_7def3c37": { "message": "To-do lijst toevoegen" },
   "address_3159962f": { "message": "Adres:" },
   "all_day_fb42c4fc": { "message": "De hele dag" },
   "all_items_loaded_aa256183": { "message": "Alle items geladen" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Een geweldige discussieopdracht"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Er is een fout opgetreden bij het afwijzen van de mogelijkheid."
   },
@@ -100,6 +105,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Fout bij het laden van eerdere items"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Spannende discussie" },
   "excused_cf8792eb": { "message": "Vrijgesteld" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Gluren in de toekomst is mislukt"
@@ -126,6 +132,7 @@
     "message": "Kan To Do-lijst niet opslaan"
   },
   "feedback_6dcc1991": { "message": "Feedback" },
+  "fun_quiz_47ab0b0": { "message": "Leuke toets" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Ga naar dashboard Kaartweergave"
   },
@@ -135,10 +142,18 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } voltooid(e) { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
+  "join_6cafecca": { "message": "Deelnemen" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "deelnemen aan actieve online vergadering"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "deelnemen aan online vergadering"
+  },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Naar navigatiewerkbalk springen"
   },
   "jump_to_today_254ccf41": { "message": "Naar vandaag springen" },
+  "language_arts_35b79a8b": { "message": "Talen" },
   "late_2be42b88": { "message": "Te laat" },
   "load_more_a36f9cf9": { "message": "Meer laden" },
   "load_prior_dates_f2b0f6f0": { "message": "Eerdere datums laden" },
@@ -154,6 +169,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Het lijkt erop dat er hier niets is"
   },
+  "math_ede93050": { "message": "Wiskunde" },
   "missing_1a256b3b": { "message": "Ontbrekend" },
   "missing_items_for_title_516511f8": {
     "message": "Ontbrekende items voor { title }"
@@ -209,6 +225,7 @@
   "replies_4a8577c8": { "message": "Antwoorden" },
   "save_11a80ec3": { "message": "Opslaan" },
   "schedule_preview_3bcda153": { "message": "Planningsvoorbeeld" },
+  "science_8d92214a": { "message": "Natuurwetenschappen" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Scroll omhoog om je geschiedenis weer te geven!"
   },
@@ -217,6 +234,7 @@
   },
   "show_all_ae37d610": { "message": "Alles tonen" },
   "show_my_grades_ebd08684": { "message": "Mijn cijfers tonen" },
+  "social_studies_13fa30c7": { "message": "Sociale wetenschappen" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } tot { endDate }"
   },
@@ -232,6 +250,7 @@
   "submitted_318fad53": { "message": "Ingediend" },
   "success_to_do_created_e34ed395": { "message": "Gelukt: To Do gemaakt" },
   "task_16b0ef38": { "message": "Taak" },
+  "the_best_assignment_15e98be1": { "message": "De beste opdracht" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "De datum en tijd om dat te doen is verlopen"
   },

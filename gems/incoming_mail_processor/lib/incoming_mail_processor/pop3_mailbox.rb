@@ -42,7 +42,7 @@ module IncomingMailProcessor
     def connect
       @pop = with_timeout { Net::POP3.new(server, port) }
       wrap_with_timeout(@pop, UsedPopMethods)
-      @pop.enable_ssl(OpenSSL::SSL::VERIFY_NONE) if ssl
+      @pop.enable_ssl(OpenSSL::SSL::VERIFY_PEER) if ssl
       @pop.start(username, password)
     end
 

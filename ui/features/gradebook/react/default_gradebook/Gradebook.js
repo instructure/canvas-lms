@@ -152,8 +152,9 @@ export function Portal({node, children}) {
 }
 
 class Gradebook extends React.Component {
-  constructor(options1) {
-    super(options1)
+  constructor(props) {
+    super(props)
+    this.state = {gridColors: statusColors(props.colors)}
     this.gradebookSettingsModalButton = React.createRef()
     this.getAssignmentOrder = this.getAssignmentOrder.bind(this)
     this.setInitialState = this.setInitialState.bind(this)
@@ -247,7 +248,6 @@ class Gradebook extends React.Component {
     this.getActionMenuProps = this.getActionMenuProps.bind(this)
     this.renderActionMenu = this.renderActionMenu.bind(this)
     this.renderFilters = this.renderFilters.bind(this)
-    this.renderGridColor = this.renderGridColor.bind(this)
     this.renderGradebookSettingsModal = this.renderGradebookSettingsModal.bind(this)
     this.renderStatusesModal = this.renderStatusesModal.bind(this)
     this.weightedGroups = this.weightedGroups.bind(this)
@@ -392,8 +392,6 @@ class Gradebook extends React.Component {
     this.setSortRowsBySetting = this.setSortRowsBySetting.bind(this)
     this.getSortRowsBySetting = this.getSortRowsBySetting.bind(this)
     this.updateGridColors = this.updateGridColors.bind(this)
-    this.setGridColors = this.setGridColors.bind(this)
-    this.getGridColors = this.getGridColors.bind(this)
     this.listAvailableViewOptionsFilters = this.listAvailableViewOptionsFilters.bind(this)
     this.setSelectedViewOptionsFilters = this.setSelectedViewOptionsFilters.bind(this)
     this.listSelectedViewOptionsFilters = this.listSelectedViewOptionsFilters.bind(this)
@@ -450,7 +448,7 @@ class Gradebook extends React.Component {
     // aspect of their presence here.
     this._gridHasRendered = this._gridHasRendered.bind(this)
     this._updateEssentialDataLoaded = this._updateEssentialDataLoaded.bind(this)
-    this.options = options1
+    this.options = props
     this.course = getCourseFromOptions(this.options)
     this.courseFeatures = getCourseFeaturesFromOptions(this.options)
     this.courseSettings = new CourseSettings(this, {
@@ -500,7 +498,7 @@ class Gradebook extends React.Component {
     this.gradebookContent = getInitialGradebookContent(this.options)
     this.gridDisplaySettings = getInitialGridDisplaySettings(
       this.options.settings,
-      this.options.colors
+      this.props.colors
     )
     this.contentLoadStates = getInitialContentLoadStates(this.options)
     this.actionStates = getInitialActionStates()
@@ -518,7 +516,7 @@ class Gradebook extends React.Component {
     this.calculatedGradesByStudentId = {}
     this.initPostGradesStore()
     this.initPostGradesLtis()
-    return this.checkForUploadComplete()
+    this.checkForUploadComplete()
   }
 
   loadSettings() {
@@ -1912,7 +1910,7 @@ class Gradebook extends React.Component {
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
-      onSelectViewUngradedAsZero: async () => {
+      onSelectViewUngradedAsZero: () => {
         confirmViewUngradedAsZero({
           currentValue: this.gridDisplaySettings.viewUngradedAsZero,
           onAccepted: () => {
@@ -1926,9 +1924,7 @@ class Gradebook extends React.Component {
   }
 
   renderViewOptionsMenu() {
-    // TODO: if enhanced_gradebook_filters is enabled, we can skip rendering
-    // this menu when we have the filters in place. Until then, keep rendering
-    // it so we can still filter when we have the flag on.
+    // TODO: if enhanced_gradebook_filters is on, don't render the menu at all
 
     const mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
     return (this.viewOptionsMenu = renderComponent(
@@ -2018,14 +2014,6 @@ class Gradebook extends React.Component {
     this.renderAssignmentSearchFilter(this.assignments)
   }
 
-  renderGridColor() {
-    const gridColorMountPoint = document.querySelector('[data-component="GridColor"]')
-    const gridColorProps = {
-      colors: this.getGridColors()
-    }
-    return renderComponent(GridColor, gridColorMountPoint, gridColorProps)
-  }
-
   renderGradebookSettingsModal() {
     this.gradebookSettingsModal = React.createRef(null)
     const props = {
@@ -2066,170 +2054,16 @@ class Gradebook extends React.Component {
     return {
       allowSortingByModules: modulesEnabled,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero,
-      onViewOptionsUpdated: this.handleViewOptionsUpdated,
+      // TODO: actually save the updated settings
+      onViewOptionsUpdated: () => Promise.resolve(),
       viewOptions: {
         columnSortSettings: {criterion, direction},
         showNotes: this.isTeacherNotesColumnShown(),
         showUnpublishedAssignments,
-        statusColors: this.getGridColors(),
+        statusColors: this.state.gridColors,
         viewUngradedAsZero
       }
     }
-  }
-
-  handleViewOptionsUpdated = ({
-    columnSortSettings: {criterion, direction} = {},
-    showNotes,
-    showUnpublishedAssignments,
-    statusColors: colors,
-    viewUngradedAsZero
-  }) => {
-    // We may have to save changes to more than one endpoint, depending on
-    // which options have changed. Additionally, a couple options require us to
-    // update the grid when they change. Let's sort out which endpoints we
-    // actually need to call and return a single promise encapsulating all of
-    // them.
-    const promises = []
-
-    // Column sort settings have their own endpoint.
-    const {criterion: oldCriterion, direction: oldDirection} =
-      this.getColumnSortSettingsViewOptionsMenuProps()
-    const columnSortSettingsChanged = criterion !== oldCriterion || direction !== oldDirection
-    if (columnSortSettingsChanged) {
-      promises.push(this.saveUpdatedColumnOrder({criterion, direction}))
-    }
-
-    // We save changes to the notes column using the custom column API.
-    if (showNotes !== this.isTeacherNotesColumnShown()) {
-      promises.push(this.saveUpdatedTeacherNotesSetting({showNotes}))
-    }
-
-    // Finally, the remaining options are saved to the user's settings.
-    const {
-      showUnpublishedAssignments: oldShowUnpublished,
-      viewUngradedAsZero: oldViewUngradedAsZero
-    } = this.gridDisplaySettings
-
-    const viewUngradedAsZeroChanged =
-      this.courseFeatures.allowViewUngradedAsZero && oldViewUngradedAsZero !== viewUngradedAsZero
-    const showUnpublishedChanged = oldShowUnpublished !== showUnpublishedAssignments
-    const colorsChanged = !_.isEqual(this.getGridColors(), colors)
-
-    if (colorsChanged || showUnpublishedChanged || viewUngradedAsZeroChanged) {
-      const changedSettings = {
-        colors: colorsChanged ? colors : undefined,
-        showUnpublishedAssignments: showUnpublishedChanged ? showUnpublishedAssignments : undefined,
-        viewUngradedAsZero: viewUngradedAsZeroChanged ? viewUngradedAsZero : undefined
-      }
-      promises.push(this.saveUpdatedUserSettings(changedSettings))
-    }
-
-    return Promise.all(promises)
-      .catch(FlashAlert.showFlashError(I18n.t('There was an error updating view options.')))
-      .finally(() => {
-        // Regardless of which options we changed, we most likely need to
-        // update the columns and grid.
-        this.updateColumns()
-        this.updateGrid()
-      })
-  }
-
-  saveUpdatedColumnOrder = ({criterion, direction}) => {
-    const newSortOrder = {direction, sortType: criterion}
-    const {freezeTotalGrade} = this.getColumnOrder()
-
-    return GradebookApi.updateColumnOrder(this.options.context_id, {
-      ...newSortOrder,
-      freezeTotalGrade
-    }).then(() => {
-      this.setColumnOrder(newSortOrder)
-      const columns = this.gridData.columns.scrollable.map(
-        columnId => this.gridData.columns.definitions[columnId]
-      )
-      columns.sort(this.makeColumnSortFn(newSortOrder))
-      this.gridData.columns.scrollable = columns.map(column => column.id)
-    })
-  }
-
-  saveUpdatedUserSettings = ({colors, showUnpublishedAssignments, viewUngradedAsZero}) => {
-    return this.saveSettings({
-      colors,
-      showUnpublishedAssignments,
-      viewUngradedAsZero
-    }).then(() => {
-      // Make various updates to the grid depending on what changed.  These
-      // triple-equals checks are deliberate: null could be an actual value for
-      // the setting, so we use undefined to indicate that the setting hasn't
-      // changed and hence we don't need to update it.
-
-      if (colors !== undefined) {
-        this.setGridColors(colors)
-        this.renderGridColor()
-      }
-
-      if (showUnpublishedAssignments !== undefined) {
-        this.gridDisplaySettings.showUnpublishedAssignments = showUnpublishedAssignments
-      }
-
-      if (viewUngradedAsZero !== undefined) {
-        this.gridDisplaySettings.viewUngradedAsZero = viewUngradedAsZero
-        this.courseContent.students.listStudents().forEach(student => {
-          this.calculateStudentGrade(student, true)
-        })
-        this.updateAllTotalColumns()
-      }
-    })
-  }
-
-  saveUpdatedTeacherNotesSetting = ({showNotes}) => {
-    let promise
-
-    const existingColumn = this.getTeacherNotesColumn()
-    if (existingColumn != null) {
-      promise = GradebookApi.updateTeacherNotesColumn(this.options.context_id, existingColumn.id, {
-        hidden: !showNotes
-      })
-    } else {
-      promise = GradebookApi.createTeacherNotesColumn(this.options.context_id).then(response => {
-        this.gradebookContent.customColumns.push(response.data)
-        const teacherNotesColumn = this.buildCustomColumn(response.data)
-        this.gridData.columns.definitions[teacherNotesColumn.id] = teacherNotesColumn
-      })
-    }
-
-    return promise.then(() => {
-      if (showNotes) {
-        this.showNotesColumn()
-        this.reorderCustomColumns(this.gradebookContent.customColumns.map(c => c.id))
-      } else {
-        this.hideNotesColumn()
-      }
-    })
-  }
-
-  renderSettingsButton() {
-    const iconSettingsSolid = React.createElement(IconSettingsSolid)
-    const buttonMountPoint = document.getElementById('gradebook-settings-modal-button-container')
-    const buttonProps = {
-      icon: iconSettingsSolid,
-      id: 'gradebook-settings-button',
-      variant: 'icon',
-      onClick: () => {
-        let ref1
-        return (ref1 = this.gradebookSettingsModal.current) != null ? ref1.open() : undefined
-      }
-    }
-    const screenReaderContent = React.createElement(
-      ScreenReaderContent,
-      {},
-      I18n.t('Gradebook Settings')
-    )
-    return (this.gradebookSettingsModalButton = renderComponent(
-      Button,
-      buttonMountPoint,
-      buttonProps,
-      screenReaderContent
-    ))
   }
 
   renderStatusesModal() {
@@ -2238,7 +2072,7 @@ class Gradebook extends React.Component {
       onClose: () => {
         return this.viewOptionsMenu.focus()
       },
-      colors: this.getGridColors(),
+      colors: this.state.gridColors,
       afterUpdateStatusColors: this.updateGridColors
     }
     return (this.statusesModal = renderComponent(
@@ -2565,8 +2399,7 @@ class Gradebook extends React.Component {
     this.gridData.columns.definitions[totalGradeColumn.id] = totalGradeColumn
     const totalGradeOverrideColumn = this.buildTotalGradeOverrideColumn()
     this.gridData.columns.definitions[totalGradeOverrideColumn.id] = totalGradeOverrideColumn
-    this.renderGridColor()
-    return this.createGrid()
+    this.createGrid()
   }
 
   addAssignmentColumnDefinition(assignment) {
@@ -2749,7 +2582,7 @@ class Gradebook extends React.Component {
       studentColumnSecondaryInfo = this.getSelectedSecondaryInfo(),
       sortRowsBy = this.getSortRowsBySetting(),
       viewUngradedAsZero = this.gridDisplaySettings.viewUngradedAsZero,
-      colors = this.getGridColors()
+      colors = this.state.gridColors
     } = {},
     successFn,
     errorFn
@@ -2775,12 +2608,7 @@ class Gradebook extends React.Component {
         colors
       }
     }
-
-    if (this.options.enhanced_gradebook_filters) {
-      return GradebookApi.saveUserSettings(this.options.context_id, data.gradebook_settings)
-    } else {
-      return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
-    }
+    return $.ajaxJSON(this.options.settings_update_url, 'PUT', data, successFn, errorFn)
   }
 
   // # Grid Sorting Methods
@@ -3340,7 +3168,7 @@ class Gradebook extends React.Component {
       this.assignmentGroups[assignment.assignment_group_id].group_weight === 0
     return {
       assignment: camelize(assignment),
-      colors: this.getGridColors(),
+      colors: this.state.gridColors,
       comments,
       courseId: this.options.context_id,
       currentUserId: this.options.currentUserId,
@@ -3883,19 +3711,11 @@ class Gradebook extends React.Component {
 
   updateGridColors(colors, successFn, errorFn) {
     const setAndRenderColors = () => {
-      this.setGridColors(colors)
-      this.renderGridColor()
+      this.gridDisplaySettings.colors = colors
+      this.setState({gridColors: statusColors(this.gridDisplaySettings.colors)})
       return successFn()
     }
     return this.saveSettings({colors}, setAndRenderColors, errorFn)
-  }
-
-  setGridColors(colors) {
-    return (this.gridDisplaySettings.colors = colors)
-  }
-
-  getGridColors() {
-    return statusColors(this.gridDisplaySettings.colors)
   }
 
   listAvailableViewOptionsFilters() {
@@ -4437,6 +4257,9 @@ class Gradebook extends React.Component {
             learningMasteryEnabled={this.options.outcome_gradebook_enabled}
             variant="DefaultGradebook"
           />
+        </Portal>
+        <Portal node={this.props.gridColorNode}>
+          <GridColor colors={this.state.gridColors} />
         </Portal>
       </>
     )

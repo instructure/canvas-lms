@@ -1917,6 +1917,12 @@ class User < ActiveRecord::Base
     cached_active_emails.map { |email| Enrollment.cached_temporary_invitations(email).dup.reject { |e| e.user_id == self.id } }.flatten
   end
 
+  def active_k5_enrollments?
+    account_ids =
+      self.enrollments.shard(in_region_associated_shards).current.active_by_date.distinct.pluck(:account_id)
+    Account.where(id: account_ids).any?(&:enable_as_k5_account?)
+  end
+
    # http://github.com/seamusabshere/cacheable/blob/master/lib/cacheable.rb from the cacheable gem
    # to get a head start
 

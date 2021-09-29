@@ -130,6 +130,7 @@ const locale = {
   "quizzes_7e598f57": { "message": "آزمون ها" },
   "record_7c9448b": { "message": "ضبط کردن" },
   "rich_content_editor_2708ef21": { "message": "ویرایشگر محتوای غنی" },
+  "save_11a80ec3": { "message": "ذخیره سازی" },
   "search_280d00bd": { "message": "جستجو" },
   "select_language_7c93a900": { "message": "انتخاب زبان" },
   "selected_274ce24f": { "message": "انتخاب شده" },

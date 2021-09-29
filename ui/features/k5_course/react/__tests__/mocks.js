@@ -56,6 +56,12 @@ export const MOCK_COURSE_TABS = [
     hidden: true
   },
   {
+    id: 'groups',
+    html_url: '/courses/30/groups',
+    label: 'Groups',
+    visibility: 'public'
+  },
+  {
     id: 'settings',
     html_url: '/courses/30/settings',
     label: 'Settings',
@@ -141,5 +147,47 @@ export const MOCK_ENROLLMENTS = [
     grades: {
       current_score: 89.39
     }
+  }
+]
+
+export const MOCK_GROUPS = [
+  {
+    id: '17',
+    group_category_id: '5',
+    name: 'Fight Club',
+    created_at: '2021-09-07T18:18:30Z',
+    max_membership: null,
+    is_public: false,
+    join_level: 'invitation_only',
+    description: null,
+    members_count: 0,
+    storage_quota_mb: 50,
+    permissions: {
+      create_discussion_topic: false,
+      join: false,
+      create_announcement: false
+    },
+    context_type: 'Course',
+    course_id: '30',
+    avatar_url: null,
+    role: null,
+    leader: null,
+    users: [],
+    group_category: {
+      id: '5',
+      role: null,
+      name: 'Student Clubs',
+      self_signup: null,
+      group_limit: null,
+      auto_leader: null,
+      created_at: '2021-09-07T16:51:09Z',
+      context_type: 'Course',
+      course_id: '30',
+      protected: false,
+      allows_multiple_memberships: false,
+      is_member: false
+    },
+    has_submission: false,
+    concluded: false
   }
 ]

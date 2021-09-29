@@ -875,7 +875,7 @@ describe Course do
       @role2 = custom_account_role('managesis', :account => Account.default)
       account_admin_user_with_role_changes(role: @role1, role_changes: {manage_courses_delete: true})
       @admin1 = @admin
-      account_admin_user_with_role_changes(role: @role2, role_changes: {manage_sis: true, manage_courses_delete: true})
+      account_admin_user_with_role_changes(role: @role2, role_changes: {manage_courses_delete: false})
       @admin2 = @admin
       course_with_teacher(:active_all => true)
       @designer = user_factory(active_all: true)
@@ -888,7 +888,7 @@ describe Course do
       expect(@course.grants_right?(@designer, :delete)).to be_falsey
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
       expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
 
       ro = Account.default.role_overrides.create!(role: teacher_role, permission: :manage_courses_delete, enabled: true)
       clear_permissions_cache
@@ -904,8 +904,8 @@ describe Course do
       expect(@course.grants_right?(@teacher, :delete)).to be_falsey
       expect(@course.grants_right?(@designer, :delete)).to be_falsey
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
-      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
 
       # completed, non-sis course
       @course.sis_source_id = nil
@@ -917,7 +917,7 @@ describe Course do
       expect(@course.grants_right?(@designer, :delete)).to be_falsey
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
       expect(@course.grants_right?(@admin1, :delete)).to be_truthy
-      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
       @course.clear_permissions_cache(@user)
 
       # completed, sis course
@@ -929,8 +929,8 @@ describe Course do
       expect(@course.grants_right?(@teacher, :delete)).to be_falsey
       expect(@course.grants_right?(@designer, :delete)).to be_falsey
       expect(@course.grants_right?(@ta, :delete)).to be_falsey
-      expect(@course.grants_right?(@admin1, :delete)).to be_falsey
-      expect(@course.grants_right?(@admin2, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin1, :delete)).to be_truthy
+      expect(@course.grants_right?(@admin2, :delete)).to be_falsey
     end
 
     # :change_course_state is deprecated
@@ -2867,10 +2867,17 @@ describe Course, "tabs_available" do
                 { id: Course::TAB_ANNOUNCEMENTS },
                 { id: Course::TAB_MODULES },
                 { id: Course::TAB_GRADES },
-                { id: Course::TAB_SETTINGS }
+                { id: Course::TAB_SETTINGS },
+                { id: Course::TAB_GROUPS },
             ]
             available_tabs = @course.tabs_available(@user, course_subject_tabs: true).map { |tab| tab[:id] }
-            expected_tabs = [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+            expected_tabs = [
+              Course::TAB_HOME,
+              Course::TAB_SCHEDULE,
+              Course::TAB_MODULES,
+              Course::TAB_GRADES,
+              Course::TAB_GROUPS
+            ]
 
             expect(available_tabs).to eq expected_tabs
           end
@@ -2906,6 +2913,45 @@ describe Course, "tabs_available" do
             course_with_student_logged_in(:active_all => true)
             tab_ids = @course.tabs_available(@student, course_subject_tabs: true).map{ |t| t[:id] }
             expect(tab_ids).to eq [Course::TAB_HOME, Course::TAB_SCHEDULE, Course::TAB_MODULES, Course::TAB_GRADES]
+          end
+
+          it "includes groups if the user is a student and there are active groups" do
+            course_with_student_logged_in(:active_all => true)
+            @course.groups.create!
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).to include Course::TAB_GROUPS
+          end
+
+          it "doesn't include groups if the user is a student and there are no active groups" do
+            course_with_student_logged_in(:active_all => true)
+            tab_ids = @course.tabs_available(@student, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).not_to include Course::TAB_GROUPS
+          end
+
+          it "includes groups if the user is a teacher, even if there are no active groups" do
+            tab_ids = @course.tabs_available(@teacher, course_subject_tabs: true).pluck(:id)
+            expect(tab_ids).to include Course::TAB_GROUPS
+          end
+
+          it "places groups after external items when it is not re-ordered" do
+            @course.context_external_tools.create!(name: "bob",
+                                                   consumer_key: "🔑",
+                                                   shared_secret: "🤫",
+                                                   domain: "example.com",
+                                                   course_navigation: { text: "Blah", url: "https://google.com" })
+            last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+            expect(last_tab_id).to equal Course::TAB_GROUPS
+          end
+
+          it "does not place groups after external items when it has been re-ordered" do
+            @course.context_external_tools.create!(name: "bob",
+                                                   consumer_key: "🔑",
+                                                   shared_secret: "🤫",
+                                                   domain: "example.com",
+                                                   course_navigation: { text: "Blah", url: "https://google.com" })
+            @course.tab_configuration = [{id: Course::TAB_GROUPS}]
+            last_tab_id = @course.tabs_available(@user, course_subject_tabs: true, include_external: true).last[:id]
+            expect(last_tab_id).to start_with 'context_external_tool_'
           end
         end
       end
@@ -3218,7 +3264,7 @@ describe Course, 'grade_publishing' do
     before(:each) do
       @plugin_settings = Canvas::Plugin.find!("grade_export").default_settings.clone
       @plugin = double()
-      allow(Canvas::Plugin).to receive("find!".to_sym).with('grade_export').and_return(@plugin)
+      allow(Canvas::Plugin).to receive(:find!).with('grade_export').and_return(@plugin)
       allow(@plugin).to receive(:settings).and_return(@plugin_settings)
     end
 
@@ -3886,7 +3932,7 @@ describe Course, 'grade_publishing' do
         @course.assignment_groups.create(:name => "Assignments")
         a1 = @course.assignments.create!(:title => "A1", :points_possible => 10)
         a2 = @course.assignments.create!(:title => "A2", :points_possible => 10)
-        @course.enroll_teacher(@user).tap{|e| e.workflow_state = 'active'; e.save!}
+        @course.enroll_teacher(@user).tap { |e| e.update!(workflow_state: 'active') }
         @ase = @course.student_enrollments.active
 
         add_pseudonym(@ase[2], Account.default, "student2", nil)
@@ -4026,6 +4072,41 @@ describe Course, 'grade_publishing' do
                 "#{@user.id},U1,#{@course.id},,#{@ase[7].course_section_id},,#{@ase[7].user.id},student7b,#{@ase[7].id},active,85.0,B\n"),
            "text/csv"]
         ]
+      end
+
+      context 'sharding' do
+        specs_require_sharding
+
+        it 'should generate valid csv with a sis_user_id from out-of-shard' do
+          u = @shard1.activate { User.create! }
+          @course.root_account.pseudonyms.create!(user: u, unique_id: 'user', sis_user_id: 'sis_id')
+          enrollment = @course.enroll_student(u, enrollment_state: 'active')
+          ase = @ase.to_a << enrollment
+          @course.assignments.first.grade_student(u, { grade: '10', grader: @user })
+          @course.recompute_student_scores_without_send_later
+
+          expect(@course.generate_grade_publishing_csv_output(ase, @user, @pseudonym)).to eq [
+               [
+                 ase.map(&:id),
+                 (
+                   'publisher_id,publisher_sis_id,course_id,course_sis_id,section_id,section_sis_id,' +
+                     'student_id,student_sis_id,enrollment_id,enrollment_status,' + "score\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[0].course_section_id},,#{ase[0].user.id},,#{ase[0].id},active,95.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[1].course_section_id},,#{ase[1].user.id},,#{ase[1].id},active,65.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[2].course_section_id},,#{ase[2].user.id},,#{ase[2].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[3].course_section_id},,#{ase[3].user.id},student3,#{ase[3].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[4].course_section_id},,#{ase[4].user.id},student4a,#{ase[4].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[4].course_section_id},,#{ase[4].user.id},student4b,#{ase[4].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[5].course_section_id},,#{ase[5].user.id},,#{ase[5].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[6].course_section_id},,#{ase[6].user.id},,#{ase[6].id},active,0.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[7].course_section_id},,#{ase[7].user.id},student7a,#{ase[7].id},active,85.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[7].course_section_id},,#{ase[7].user.id},student7b,#{ase[7].id},active,85.0\n" +
+                     "#{@user.id},U1,#{@course.id},,#{ase[8].course_section_id},,#{ase[8].user.id},sis_id,#{ase[8].id},active,50.0\n"
+                 ),
+                 'text/csv'
+               ]
+             ]
+        end
       end
 
       context "when including final grade overrides" do
@@ -5006,11 +5087,11 @@ describe Course, "section_visibility" do
 
   context "require_message_permission" do
     it "should check the message permission" do
-      expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), true)).to eql :full
-      expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), true)).to eql :restricted
+      expect(@course.enrollment_visibility_level_for(@teacher, @course.section_visibilities_for(@teacher), require_message_permission: true)).to eql :full
+      expect(@course.enrollment_visibility_level_for(@observer, @course.section_visibilities_for(@observer), require_message_permission: true)).to eql :restricted
       RoleOverride.create!(:context => @course.account, :permission => 'send_messages',
                            :role => student_role, :enabled => false)
-      expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), true)).to eql :restricted
+      expect(@course.enrollment_visibility_level_for(@student1, @course.section_visibilities_for(@student1), require_message_permission: true)).to eql :restricted
     end
   end
 end

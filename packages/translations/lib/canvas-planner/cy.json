@@ -1,9 +1,14 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "Trafodaeth wych" },
+  "a_wonderful_assignment_d3139d9b": { "message": "Aseiniad gwych" },
   "add_to_do_7537af64": { "message": "Ychwanegu Tasg i’w Gwneud" },
   "add_to_do_7def3c37": { "message": "Ychwanegu Tasg i’w Gwneud" },
   "address_3159962f": { "message": "Cyfeiriad:" },
   "all_day_fb42c4fc": { "message": "Drwy’r Dydd" },
   "all_items_loaded_aa256183": { "message": "Pob eitem wedi’i llwytho" },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "Aseiniad trafodaeth gwych"
+  },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "Gwall wrth geisio gwrthod y cyfle."
   },
@@ -100,6 +105,7 @@
   "error_loading_past_items_2881dbb1": {
     "message": "Gwall wrth lwytho eitemau blaenorol"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Trafodaeth gyffrous" },
   "excused_cf8792eb": { "message": "Wedi esgusodi" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "Wedi methu cael cipolwg i’ch dyfodol"
@@ -124,6 +130,7 @@
     "message": "Wedi methu cadw tasg i’w gwneud"
   },
   "feedback_6dcc1991": { "message": "Adborth" },
+  "fun_quiz_47ab0b0": { "message": "Cwis hwyliog" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Mynd i’r Dangosfwrdd Gwedd Cerdyn"
   },
@@ -133,10 +140,16 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } eitem { items, plural,\n     =1 {wedi’i chwblhau}\n  other {eitem}\n} wedi’i chwblhau"
   },
+  "join_6cafecca": { "message": "Ymuno" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "ymunwch â chyfarfod gweithredol ar-lein"
+  },
+  "join_online_meeting_b1725843": { "message": "ymunwch â chyfarfod ar-lein" },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "Neidio i’r bar offer llywio"
   },
   "jump_to_today_254ccf41": { "message": "Neidio i Heddiw" },
+  "language_arts_35b79a8b": { "message": "Celfyddydau Iaith" },
   "late_2be42b88": { "message": "Yn Hwyr" },
   "load_more_a36f9cf9": { "message": "Llwytho mwy" },
   "load_prior_dates_f2b0f6f0": { "message": "Llwytho dyddiadau blaenorol" },
@@ -154,6 +167,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Does dim byd yma yn ôl pob golwg"
   },
+  "math_ede93050": { "message": "Mathemateg" },
   "missing_1a256b3b": { "message": "Ar goll" },
   "missing_items_for_title_516511f8": {
     "message": "Eitemau ar goll ar gyfer { title }"
@@ -211,6 +225,7 @@
   "replies_4a8577c8": { "message": "Ateb" },
   "save_11a80ec3": { "message": "Cadw" },
   "schedule_preview_3bcda153": { "message": "Trefnu Rhagolwg" },
+  "science_8d92214a": { "message": "Gwyddoniaeth" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Sgroliwch i fyny i weld eich hanes!"
   },
@@ -219,6 +234,7 @@
   },
   "show_all_ae37d610": { "message": "Dangos y Cyfan" },
   "show_my_grades_ebd08684": { "message": "Dangos Fy Ngraddau" },
+  "social_studies_13fa30c7": { "message": "Astudiaethau Cymdeithasol" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } i { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -232,6 +248,7 @@
     "message": "Wedi llwyddo: Wedi creu rhestr o dasgau i’w gwneud"
   },
   "task_16b0ef38": { "message": "Tasg" },
+  "the_best_assignment_15e98be1": { "message": "Yr aseiniad gorau" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Wedi cyrraedd dyddiad ac amser cyflwyno’r dasg hon"
   },

@@ -51,7 +51,7 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("_id")).to eq @outcome_group.id.to_s
     expect(outcome_group_type.resolve("title")).to eq @outcome_group.title
     expect(outcome_group_type.resolve("description")).to eq @outcome_group.description
-    expect(outcome_group_type.resolve("contextId")).to eq @outcome_group.context_id
+    expect(outcome_group_type.resolve("contextId")).to eq @outcome_group.context_id.to_s
     expect(outcome_group_type.resolve("contextType")).to eq @outcome_group.context_type
     expect(outcome_group_type.resolve("vendorGuid")).to eq @outcome_group.vendor_guid
     expect(outcome_group_type.resolve("childGroupsCount")).to eq 2

@@ -25,7 +25,8 @@ import {
   DELETE_OUTCOME_LINKS,
   MOVE_OUTCOME_LINKS,
   UPDATE_LEARNING_OUTCOME_GROUP,
-  IMPORT_OUTCOMES
+  IMPORT_OUTCOMES,
+  CREATE_LEARNING_OUTCOME_GROUP
 } from '../graphql/Management'
 
 export const accountMocks = ({childGroupsCount = 10, accountId = '1'} = {}) => [
@@ -94,7 +95,27 @@ export const courseMocks = ({childGroupsCount = 1, courseId = '2'} = {}) => [
   }
 ]
 
-export const groupMocks = ({groupId, childGroupsCount = 1, childGroupOffset = 300} = {}) => [
+const buildGroup = (_id, title) => {
+  if (!_id && !title) {
+    return null
+  }
+
+  return {
+    __typename: 'LearningOutcomeGroup',
+    _id,
+    title
+  }
+}
+
+export const groupMocks = ({
+  groupId,
+  childGroupsCount = 1,
+  childGroupOffset = 300,
+  title = `Group ${groupId}`,
+  parentOutcomeGroupId,
+  parentOutcomeGroupTitle,
+  childGroupTitlePrefix = `Group ${groupId} folder`
+} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -108,12 +129,14 @@ export const groupMocks = ({groupId, childGroupsCount = 1, childGroupOffset = 30
         context: {
           __typename: 'LearningOutcomeGroup',
           _id: groupId,
+          title,
+          parentOutcomeGroup: buildGroup(parentOutcomeGroupId, parentOutcomeGroupTitle),
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({
               __typename: 'LearningOutcomeGroup',
               _id: (childGroupOffset + i).toString(),
-              title: `Group ${groupId} folder ${i}`
+              title: `${childGroupTitlePrefix} ${i}`
             }))
           }
         }
@@ -1755,11 +1778,135 @@ export const importGroupMocks = ({
   ]
 }
 
-export const smallOutcomeTree = () => [
+export const createOutcomeGroupMocks = ({
+  id = '101',
+  title = 'New Group',
+  description = null,
+  vendorGuid = null,
+  parentOutcomeGroupId = '100',
+  parentOutcomeGroupTitle = 'Parent Outcome Group',
+  failResponse = false,
+  failMutation = false,
+  failMutationNoErrMsg = false
+} = {}) => {
+  const successfulResponse = {
+    data: {
+      createLearningOutcomeGroup: {
+        learningOutcomeGroup: {
+          _id: id,
+          title,
+          description,
+          vendorGuid,
+          parentOutcomeGroup: {
+            _id: parentOutcomeGroupId,
+            title: parentOutcomeGroupTitle,
+            __typename: 'LearningOutcomeGroup'
+          },
+          __typename: 'LearningOutcomeGroup'
+        },
+        errors: null,
+        __typename: 'CreateLearningOutcomeGroupPayload'
+      }
+    }
+  }
+
+  const failedResponse = {
+    __typename: 'ErrorResponse',
+    data: null,
+    errors: [
+      {
+        attribute: id,
+        message: 'Network error',
+        __typename: 'Error'
+      }
+    ]
+  }
+
+  const failedMutation = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: 'Mutation failed',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  const failedMutationNoErrMsg = {
+    data: {
+      createLearningOutcomeGroup: {
+        __typename: 'CreateLearningOutcomeGroupPayload',
+        learningOutcomeGroup: null,
+        errors: [
+          {
+            attribute: 'message',
+            message: '',
+            __typename: 'Error'
+          }
+        ]
+      }
+    }
+  }
+
+  let result = successfulResponse
+  if (failResponse) {
+    result = failedResponse
+  } else if (failMutation) {
+    result = failedMutation
+  } else if (failMutationNoErrMsg) {
+    result = failedMutationNoErrMsg
+  }
+
+  const input = {
+    id: parentOutcomeGroupId,
+    title
+  }
+  if (description) input.description = description
+  if (vendorGuid) input.vendorGuid = vendorGuid
+
+  return [
+    {
+      request: {
+        query: CREATE_LEARNING_OUTCOME_GROUP,
+        variables: {
+          input
+        }
+      },
+      result
+    }
+  ]
+}
+
+export const smallOutcomeTree = ({group100childCounts = 1} = {}) => [
   ...accountMocks({childGroupsCount: 2}),
-  ...groupMocks({groupId: '100', childGroupOffset: 400}),
-  ...groupMocks({groupId: '101', childGroupsCount: 0}),
-  ...groupMocks({groupId: '400', childGroupsCount: 0}),
+  ...groupMocks({
+    groupId: '100',
+    childGroupOffset: 400,
+    parentOutcomeGroupId: '1',
+    childGroupsCount: group100childCounts,
+    title: 'Account folder 0',
+    parentOutcomeGroupTitle: 'Root account folder'
+  }),
+  ...groupMocks({
+    groupId: '101',
+    childGroupsCount: 0,
+    parentOutcomeGroupId: '1',
+    title: 'Account folder 1',
+    parentOutcomeGroupTitle: 'Root account folder'
+  }),
+  ...groupMocks({
+    groupId: '400',
+    childGroupsCount: 0,
+    parentOutcomeGroupId: '100',
+    parentOutcomeGroupTitle: 'Account folder 0',
+    title: 'Group 100 folder 0'
+  }),
   ...groupDetailMocks({groupId: '100'}),
   ...groupDetailMocks({groupId: '101'}),
   ...groupDetailMocks({groupId: '400'})

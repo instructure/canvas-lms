@@ -476,7 +476,9 @@ describe('sources/api', () => {
 
       beforeEach(() => {
         fetchButtonsAndIconsFolderPromise = Promise.resolve(folderResponseBody)
-        sinon.stub(apiSource, 'fetchButtonsAndIconsFolder').returns(promise)
+        sinon
+          .stub(apiSource, 'fetchButtonsAndIconsFolder')
+          .returns(fetchButtonsAndIconsFolderPromise)
       })
 
       afterEach(() => {
@@ -545,6 +547,15 @@ describe('sources/api', () => {
     const uri = '/api/upload'
     const fileProps = {}
     const apiProps = {}
+
+    it('includes "onDuplicate"', () => {
+      fetchMock.mock(uri, '{}')
+
+      return apiSource.preflightUpload({onDuplicate: 'overwrite'}, apiProps).then(() => {
+        const body = JSON.parse(fetchMock.lastOptions(uri).body)
+        assert.equal(body.onDuplicate, 'overwrite')
+      })
+    })
 
     it('includes jwt in Authorization header', () => {
       fetchMock.mock(uri, '{}')

@@ -1,10 +1,15 @@
 {
+  "a_great_discussion_6526a6d9": { "message": "優れたディスカッション" },
+  "a_wonderful_assignment_d3139d9b": { "message": "すばらしい課題" },
   "add_to_do_7537af64": { "message": "タスクを追加" },
   "add_to_do_7def3c37": { "message": "タスクに追加" },
   "address_3159962f": { "message": "住所:" },
   "all_day_fb42c4fc": { "message": "全日" },
   "all_items_loaded_aa256183": {
     "message": "すべてのアイテムがロードされました"
+  },
+  "an_amazing_discussion_assignment_e5c8bd6b": {
+    "message": "凄いディスカッションの課題"
   },
   "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
     "message": "案件を却下しようとした際にエラーが発生しました。"
@@ -102,6 +107,9 @@
   "error_loading_past_items_2881dbb1": {
     "message": "過去のアイテムの読み込み中にエラーが発生しました"
   },
+  "exciting_discussion_9f67bd0a": {
+    "message": "エキサイティングなディスカッション"
+  },
   "excused_cf8792eb": { "message": "免除" },
   "failed_peeking_into_your_future_e95b9306": {
     "message": "あなたの未来を覗くことに失敗しました"
@@ -126,6 +134,7 @@
   },
   "failed_to_save_to_do_ddc7503b": { "message": "タスクの保存に失敗しました" },
   "feedback_6dcc1991": { "message": "フィードバック" },
+  "fun_quiz_47ab0b0": { "message": "楽しいクイズ" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "カードビューダッシュボードに進みます。"
   },
@@ -135,10 +144,18 @@
   "items_completed_items_plural_1_item_other_items_717d579f": {
     "message": "{ items } 完了した{ items, plural,\n     =1 {項目}\n  other {項目}\n}"
   },
+  "join_6cafecca": { "message": "参加する" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "アクティブなオンラインミーティングに参加する"
+  },
+  "join_online_meeting_b1725843": {
+    "message": "オンラインミーティングに参加する"
+  },
   "jump_to_navigation_toolbar_2952cd8b": {
     "message": "ナビゲーションツールバーへジャンプ"
   },
   "jump_to_today_254ccf41": { "message": "本日に移動" },
+  "language_arts_35b79a8b": { "message": "国語" },
   "late_2be42b88": { "message": "遅れている" },
   "load_more_a36f9cf9": { "message": "もっと読み込む" },
   "load_prior_dates_f2b0f6f0": { "message": "以前のデータを読み込む" },
@@ -156,6 +173,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "ここに何もないようです"
   },
+  "math_ede93050": { "message": "数学" },
   "missing_1a256b3b": { "message": "欠如" },
   "missing_items_for_title_516511f8": {
     "message": "{ title }に不足しているアイテム"
@@ -207,6 +225,7 @@
   "replies_4a8577c8": { "message": "返信" },
   "save_11a80ec3": { "message": "保存" },
   "schedule_preview_3bcda153": { "message": "スケジュールプレビュー" },
+  "science_8d92214a": { "message": "科学" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "スクロールアップして履歴を見る！"
   },
@@ -215,6 +234,7 @@
   },
   "show_all_ae37d610": { "message": "すべて表示する" },
   "show_my_grades_ebd08684": { "message": "私の成績を表示" },
+  "social_studies_13fa30c7": { "message": "社会科" },
   "startdate_to_enddate_d245175b": { "message": "{ startDate } - { endDate }" },
   "startdatetime_enddatetime_20abc10e": {
     "message": "{ startDateTime } - { endDateTime }"
@@ -226,6 +246,7 @@
   "submitted_318fad53": { "message": "タスクの成績を送信" },
   "success_to_do_created_e34ed395": { "message": "成功：タスクが作成" },
   "task_16b0ef38": { "message": "タスク" },
+  "the_best_assignment_15e98be1": { "message": "最高の課題" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "これを行う日時が期限を過ぎています"
   },

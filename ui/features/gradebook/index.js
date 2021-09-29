@@ -27,12 +27,14 @@ const gradebookMenuNode = document.querySelector('[data-component="GradebookMenu
 const settingsModalButtonContainer = document.getElementById(
   'gradebook-settings-modal-button-container'
 )
+const gridColorNode = document.querySelector('[data-component="GridColor"]')
 
 const props = {
   ...ENV.GRADEBOOK_OPTIONS,
   currentUserId: ENV.current_user_id,
   locale: ENV.LOCALE,
   gradebookMenuNode,
+  gridColorNode,
   settingsModalButtonContainer
 }
 

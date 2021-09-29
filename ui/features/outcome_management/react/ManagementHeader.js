@@ -34,7 +34,12 @@ import CreateOutcomeModal from './CreateOutcomeModal'
 import useCanvasContext from '@canvas/outcomes/react/hooks/useCanvasContext'
 import useModal from '@canvas/outcomes/react/hooks/useModal'
 
-const ManagementHeader = ({handleFileDrop, handleAddOutcomes, onSuccessfulCreateOutcome}) => {
+const ManagementHeader = ({
+  handleFileDrop,
+  handleAddOutcomes,
+  onSuccessfulCreateOutcome,
+  lhsGroupId
+}) => {
   const [isFindOutcomeModalOpen, openFindOutcomeModal, closeFindOutcomeModal] = useModal()
   const [isCreateOutcomeModalOpen, openCreateOutcomeModal, closeCreateOutcomeModal] = useModal()
   const {isMobileView, canManage, canImport} = useCanvasContext()
@@ -109,11 +114,14 @@ const ManagementHeader = ({handleFileDrop, handleAddOutcomes, onSuccessfulCreate
         </View>
       </Flex>
       <FindOutcomesModal open={isFindOutcomeModalOpen} onCloseHandler={handleCloseFindModal} />
-      <CreateOutcomeModal
-        isOpen={isCreateOutcomeModalOpen}
-        onCloseHandler={closeCreateOutcomeModal}
-        onSuccess={onSuccessfulCreateOutcome}
-      />
+      {isCreateOutcomeModalOpen && (
+        <CreateOutcomeModal
+          isOpen
+          onCloseHandler={closeCreateOutcomeModal}
+          onSuccess={onSuccessfulCreateOutcome}
+          starterGroupId={lhsGroupId}
+        />
+      )}
     </div>
   )
 }
@@ -125,7 +133,8 @@ ManagementHeader.defaultProps = {
 ManagementHeader.propTypes = {
   handleFileDrop: PropTypes.func.isRequired,
   handleAddOutcomes: PropTypes.func.isRequired,
-  onSuccessfulCreateOutcome: PropTypes.func
+  onSuccessfulCreateOutcome: PropTypes.func,
+  lhsGroupId: PropTypes.string
 }
 
 export default ManagementHeader

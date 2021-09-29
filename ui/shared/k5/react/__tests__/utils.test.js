@@ -130,6 +130,7 @@ describe('fetchGrades', () => {
     course_color: '#ace',
     has_grading_periods: true,
     homeroom_course: false,
+    hide_final_grades: false,
     enrollments: [
       {
         current_grading_period_id: '1',
@@ -138,7 +139,8 @@ describe('fetchGrades', () => {
         current_period_computed_current_score: 80,
         current_period_computed_current_grade: 'B-',
         computed_current_score: 89,
-        computed_current_grade: 'B+'
+        computed_current_grade: 'B+',
+        type: 'student'
       }
     ],
     grading_periods: [
@@ -164,6 +166,8 @@ describe('fetchGrades', () => {
         courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
+        enrollmentType: 'student',
+        finalGradesHidden: false,
         gradingPeriods: [
           {
             id: '1',
@@ -180,7 +184,19 @@ describe('fetchGrades', () => {
         isHomeroom: false,
         showTotalsForAllGradingPeriods: false,
         totalGradeForAllGradingPeriods: null,
-        totalScoreForAllGradingPeriods: null
+        totalScoreForAllGradingPeriods: null,
+        enrollments: [
+          {
+            current_grading_period_id: '1',
+            current_grading_period_title: 'The first one',
+            totals_for_all_grading_periods_option: false,
+            current_period_computed_current_score: 80,
+            current_period_computed_current_grade: 'B-',
+            computed_current_score: 89,
+            computed_current_grade: 'B+',
+            type: 'student'
+          }
+        ]
       }
     ])
   })
@@ -196,6 +212,8 @@ describe('fetchGrades', () => {
         courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
+        enrollmentType: 'student',
+        finalGradesHidden: false,
         gradingPeriods: [],
         hasGradingPeriods: false,
         score: 89,
@@ -203,7 +221,19 @@ describe('fetchGrades', () => {
         isHomeroom: false,
         showTotalsForAllGradingPeriods: false,
         totalGradeForAllGradingPeriods: null,
-        totalScoreForAllGradingPeriods: null
+        totalScoreForAllGradingPeriods: null,
+        enrollments: [
+          {
+            current_grading_period_id: '1',
+            current_grading_period_title: 'The first one',
+            totals_for_all_grading_periods_option: false,
+            current_period_computed_current_score: 80,
+            current_period_computed_current_grade: 'B-',
+            computed_current_score: 89,
+            computed_current_grade: 'B+',
+            type: 'student'
+          }
+        ]
       }
     ])
   })
@@ -222,7 +252,8 @@ describe('fetchGrades', () => {
               current_period_computed_current_score: 80,
               current_period_computed_current_grade: 'B-',
               computed_current_score: 89,
-              computed_current_grade: 'B+'
+              computed_current_grade: 'B+',
+              type: 'student'
             }
           ]
         }
@@ -238,6 +269,8 @@ describe('fetchGrades', () => {
         courseColor: '#ace',
         currentGradingPeriodId: '1',
         currentGradingPeriodTitle: 'The first one',
+        enrollmentType: 'student',
+        finalGradesHidden: false,
         gradingPeriods: [
           {
             id: '1',
@@ -254,7 +287,19 @@ describe('fetchGrades', () => {
         isHomeroom: false,
         showTotalsForAllGradingPeriods: true,
         totalGradeForAllGradingPeriods: 'B+',
-        totalScoreForAllGradingPeriods: 89
+        totalScoreForAllGradingPeriods: 89,
+        enrollments: [
+          {
+            current_grading_period_id: '1',
+            current_grading_period_title: 'The first one',
+            totals_for_all_grading_periods_option: true,
+            current_period_computed_current_score: 80,
+            current_period_computed_current_grade: 'B-',
+            computed_current_score: 89,
+            computed_current_grade: 'B+',
+            type: 'student'
+          }
+        ]
       }
     ])
   })

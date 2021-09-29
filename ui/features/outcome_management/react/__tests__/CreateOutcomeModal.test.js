@@ -51,10 +51,11 @@ describe('CreateOutcomeModal', () => {
       contextId = '1',
       friendlyDescriptionFF = true,
       mocks = accountMocks({childGroupsCount: 0}),
-      isMobileView = false
+      isMobileView = false,
+      renderer = rtlRender
     } = {}
   ) => {
-    return rtlRender(
+    return renderer(
       <OutcomesContext.Provider
         value={{env: {contextType, contextId, friendlyDescriptionFF, isMobileView}}}
       >
@@ -147,7 +148,7 @@ describe('CreateOutcomeModal', () => {
 
       it('calls onCloseHandler & onSuccess on Create button click', async () => {
         const {getByLabelText, getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree('Account')]
+          mocks: [...smallOutcomeTree()]
         })
         await act(async () => jest.runOnlyPendingTimers())
         fireEvent.change(getByLabelText('Name'), {target: {value: 'Outcome 123'}})
@@ -158,7 +159,7 @@ describe('CreateOutcomeModal', () => {
 
       it('displays the root group and its subgroups in the group selection drill down', async () => {
         const {getByText} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree('Account')],
+          mocks: [...smallOutcomeTree()],
           isMobileView: true
         })
         await act(async () => jest.runOnlyPendingTimers())
@@ -166,9 +167,21 @@ describe('CreateOutcomeModal', () => {
         expect(getByText('Account folder 0')).toBeInTheDocument()
       })
 
+      it('displays the lsh group and its subgroups in the group selection drill down if starterGroupId is provided', async () => {
+        const starterGroupId = '100'
+        const {queryByText} = render(<CreateOutcomeModal {...defaultProps({starterGroupId})} />, {
+          mocks: [...smallOutcomeTree()],
+          isMobileView: true
+        })
+        await act(async () => jest.runOnlyPendingTimers())
+        expect(queryByText('Root account folder')).not.toBeInTheDocument()
+        expect(queryByText('Account folder 0')).toBeInTheDocument()
+        expect(queryByText('Group 100 folder 0')).toBeInTheDocument()
+      })
+
       it('enables Create button when name is entered and group is selected', async () => {
         const {getByLabelText, getByRole} = render(<CreateOutcomeModal {...defaultProps()} />, {
-          mocks: [...smallOutcomeTree('Account')]
+          mocks: [...smallOutcomeTree()]
         })
         await act(async () => jest.runOnlyPendingTimers())
         expect(within(getByRole('dialog')).getByText('Create').closest('button')).toBeDisabled()
@@ -212,7 +225,7 @@ describe('CreateOutcomeModal', () => {
         const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
-            ...smallOutcomeTree('Account'),
+            ...smallOutcomeTree(),
             setFriendlyDescriptionOutcomeMock({
               inputDescription: 'Friendly Description value'
             }),
@@ -244,7 +257,7 @@ describe('CreateOutcomeModal', () => {
         const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
-            ...smallOutcomeTree('Account'),
+            ...smallOutcomeTree(),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
@@ -271,7 +284,7 @@ describe('CreateOutcomeModal', () => {
         const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
-            ...smallOutcomeTree('Account'),
+            ...smallOutcomeTree(),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
@@ -298,7 +311,7 @@ describe('CreateOutcomeModal', () => {
         const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
-            ...smallOutcomeTree('Account'),
+            ...smallOutcomeTree(),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
@@ -352,7 +365,7 @@ describe('CreateOutcomeModal', () => {
         const showFlashAlertSpy = jest.spyOn(FlashAlert, 'showFlashAlert')
         const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
           mocks: [
-            ...smallOutcomeTree('Account'),
+            ...smallOutcomeTree(),
             createLearningOutcomeMock({
               title: 'Outcome 123',
               displayName: 'Display name',
@@ -397,7 +410,7 @@ describe('CreateOutcomeModal', () => {
           const {getByText, getByLabelText} = render(<CreateOutcomeModal {...defaultProps()} />, {
             friendlyDescriptionFF: false,
             mocks: [
-              ...smallOutcomeTree('Account'),
+              ...smallOutcomeTree(),
               createLearningOutcomeMock({
                 title: 'Outcome 123',
                 displayName: 'Display name',

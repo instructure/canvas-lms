@@ -19,7 +19,12 @@ import gql from 'graphql-tag'
 
 export const COURSE_NOTIFICATIONS_QUERY = gql`
   query GetNotificationPreferences($courseId: ID!, $userId: ID!) {
-    legacyNode(_id: $userId, type: User) {
+    courseLegacyNode: legacyNode(_id: $courseId, type: Course) {
+      ... on Course {
+        name
+      }
+    }
+    userLegacyNode: legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
         notificationPreferencesEnabled(contextType: Course, courseId: $courseId)

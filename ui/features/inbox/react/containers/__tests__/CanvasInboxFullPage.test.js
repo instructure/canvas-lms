@@ -20,14 +20,20 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import CanvasInbox from '../CanvasInbox'
 import {ApolloProvider} from 'react-apollo'
 import React from 'react'
-import {render, fireEvent} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import {mswClient} from '../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../shared/msw/mswServer'
 import {handlers} from '../../../graphql/mswHandlers'
 import waitForApolloLoading from '../../../util/waitForApolloLoading'
+import {graphql} from 'msw'
+import {ConversationParticipant} from '../../../graphql/ConversationParticipant'
+import {Conversation} from '../../../graphql/Conversation'
 
 describe('CanvasInbox Full Page', () => {
   const server = mswServer(handlers)
+  const setOnFailure = jest.fn()
+  const setOnSuccess = jest.fn()
+
   beforeAll(() => {
     // eslint-disable-next-line no-undef
     fetchMock.dontMock()
@@ -39,8 +45,14 @@ describe('CanvasInbox Full Page', () => {
     }
   })
 
+  beforeEach(() => {
+    mswClient.cache.reset()
+  })
+
   afterEach(() => {
     server.resetHandlers()
+    setOnFailure.mockClear()
+    setOnSuccess.mockClear()
   })
 
   afterAll(() => {
@@ -52,7 +64,7 @@ describe('CanvasInbox Full Page', () => {
   const setup = () => {
     return render(
       <ApolloProvider client={mswClient}>
-        <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <CanvasInbox />
         </AlertManagerContext.Provider>
       </ApolloProvider>
@@ -104,5 +116,69 @@ describe('CanvasInbox Full Page', () => {
     const markAsReadButton = await container.findByText('Mark as read')
     fireEvent.click(markAsReadButton)
     expect(container.queryByTestId('unread-badge')).toBeFalsy()
+  })
+
+  it('Successfully star selected conversation', async () => {
+    const {findAllByTestId, findByTestId, getByText} = setup()
+
+    const checkboxes = await findAllByTestId('messageListItem-Checkbox')
+    expect(checkboxes.length).toBe(1)
+    fireEvent.click(checkboxes[0])
+
+    const settingsCog = await findByTestId('settings')
+    fireEvent.click(settingsCog)
+
+    const star = getByText('Star')
+    fireEvent.click(star)
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The conversation has been successfully starred.')
+    )
+  })
+
+  it('Successfully star selected conversations', async () => {
+    server.use(
+      graphql.query('GetConversationsQuery', (req, res, ctx) => {
+        const data = {
+          legacyNode: {
+            _id: '9',
+            id: 'VXNlci05',
+            conversationsConnection: {
+              nodes: [
+                {
+                  ...ConversationParticipant.mock({_id: 251}),
+                  conversation: Conversation.mock()
+                },
+                {
+                  ...ConversationParticipant.mock({_id: 252}),
+                  conversation: Conversation.mock()
+                }
+              ],
+              __typename: 'ConversationParticipantConnection'
+            },
+            __typename: 'User'
+          }
+        }
+
+        return res.once(ctx.data(data))
+      })
+    )
+
+    const {findAllByTestId, findByTestId, getByText} = setup()
+
+    const checkboxes = await findAllByTestId('messageListItem-Checkbox')
+    expect(checkboxes.length).toBe(2)
+    fireEvent.click(checkboxes[0])
+    fireEvent.click(checkboxes[1])
+
+    const settingsCog = await findByTestId('settings')
+    fireEvent.click(settingsCog)
+
+    const star = getByText('Star')
+    fireEvent.click(star)
+
+    await waitFor(() =>
+      expect(setOnSuccess).toHaveBeenCalledWith('The conversations has been successfully starred.')
+    )
   })
 })

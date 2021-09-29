@@ -17,7 +17,10 @@
  */
 
 import {arrayOf, shape} from 'prop-types'
-import {Assignment, AssignmentSubmissionsConnection} from '@canvas/assignments/graphql/student/Assignment'
+import {
+  Assignment,
+  AssignmentSubmissionsConnection
+} from '@canvas/assignments/graphql/student/Assignment'
 import React from 'react'
 import StudentContent from './StudentContent'
 import StudentViewContext from './Context'
@@ -32,6 +35,7 @@ function makeDummyNextSubmission(submission) {
     attempt: submission.attempt + 1,
     deductedPoints: null,
     enteredGrade: null,
+    feedbackForCurrentAttempt: submission.attempt === 0 && submission.feedbackForCurrentAttempt,
     grade: null,
     gradingStatus: null,
     latePolicyStatus: null,

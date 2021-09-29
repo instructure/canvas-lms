@@ -313,6 +313,7 @@ describe Message do
     end
 
     it "logs stats on deliver" do
+      allow(InstStatsd::Statsd).to receive(:increment)
       account = account_model
       @message = message_model(dispatch_at: Time.now - 1,
                                notification_name: 'my_name',
@@ -322,19 +323,23 @@ describe Message do
                                path_type: 'email',
                                user: @user,
                                root_account: account)
-
-
-      expect(InstStatsd::Statsd).to receive(:increment).with("feature_flag_check", any_args).at_least(:once)
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.my_name",
-                                                             {short_stat: "message.deliver",
-                                                              tags: {path_type: "email", notification_name: 'my_name'}})
-
-      expect(InstStatsd::Statsd).to receive(:increment).with("message.deliver.email.#{@message.root_account.global_id}",
-                                                             {short_stat: "message.deliver_per_account",
-                                                              tags: {path_type: "email", root_account_id: @message.root_account.global_id}})
-
       expect(@message).to receive(:dispatch).and_return(true)
       @message.deliver
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
+        "message.deliver.email.my_name",
+        {
+          short_stat: "message.deliver",
+          tags: {path_type: "email", notification_name: 'my_name'}
+        }
+      )
+
+      expect(InstStatsd::Statsd).to have_received(:increment).with(
+        "message.deliver.email.#{@message.root_account.global_id}",
+        {
+          short_stat: "message.deliver_per_account",
+          tags: {path_type: "email", root_account_id: @message.root_account.global_id}
+        }
+      )
     end
 
     context 'push' do

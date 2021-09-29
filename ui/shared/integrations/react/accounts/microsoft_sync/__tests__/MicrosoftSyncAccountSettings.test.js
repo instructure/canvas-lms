@@ -115,7 +115,7 @@ describe('MicrosoftSyncAccountSettings', () => {
       expect(container.error).toBeFalsy()
     })
 
-    it('loads the login attribute selector with the value from the API', async () => {
+    it('loads the login attribute selector with the value from the API', () => {
       const container = setup(({loading, success}) => {
         loading(false)
         success({
@@ -125,6 +125,30 @@ describe('MicrosoftSyncAccountSettings', () => {
         })
       })
       expect(getLoginAttributeSelector(container).title).toMatch(/sis user id/i)
+    })
+
+    it('loads the remote login attribute selector with the value from the API', () => {
+      const container = setup(({loading, success}) => {
+        loading(false)
+        success({
+          microsoft_sync_tenant: 'testtenant.com',
+          microsoft_sync_remote_attribute: 'mailNickname',
+          microsoft_sync_enabled: true
+        })
+      })
+      expect(getLookupFieldSelector(container).title).toMatch(/email alias/i)
+    })
+
+    it('loads the login attribute suffix with the value from the API', () => {
+      const container = setup(({loading, success}) => {
+        loading(false)
+        success({
+          microsoft_sync_tenant: 'testtenant.com',
+          microsoft_sync_login_attribute_suffix: '@hello.example.com',
+          microsoft_sync_enabled: true
+        })
+      })
+      expect(getSuffixInput(container).value).toEqual('@hello.example.com')
     })
   })
 

@@ -525,6 +525,11 @@ class UsersController < ApplicationController
                           .any?{|t| t[:id] == UserProfile::TAB_OBSERVEES }
       })
 
+      # prefetch dashboard cards with the right observer url param
+      if Account.site_admin.feature_enabled?(:k5_parent_support) && @current_user.roles(@domain_root_account).include?('observer')
+        @cards_prefetch_observer_param = @selected_observed_user&.id
+      end
+
       css_bundle :k5_common, :k5_dashboard, :dashboard_card
       js_bundle :k5_dashboard
     else

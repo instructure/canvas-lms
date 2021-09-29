@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import _ from 'underscore'
 import SyllabusBehaviors from '@canvas/syllabus/backbone/behaviors/SyllabusBehaviors'
+import I18n from 'i18n!syllabus'
 import SyllabusCollection from './backbone/collections/SyllabusCollection'
 import SyllabusCalendarEventsCollection from './backbone/collections/SyllabusCalendarEventsCollection'
 import SyllabusAppointmentGroupsCollection from './backbone/collections/SyllabusAppointmentGroupsCollection'
@@ -78,6 +79,33 @@ const view = new SyllabusView({
   can_read: ENV.CAN_READ,
   is_valid_user: !!ENV.current_user_id
 })
+
+// Attach the immersive reader button if enabled
+const immersive_reader_mount_point = document.getElementById('immersive_reader_mount_point')
+const immersive_reader_mobile_mount_point = document.getElementById(
+  'immersive_reader_mobile_mount_point'
+)
+if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
+  import('../../shared/immersive-reader/ImmersiveReader')
+    .then(ImmersiveReader => {
+      const content = document.querySelector('#course_syllabus').innerHTML
+      const title = I18n.t('Course Syllabus')
+
+      if (immersive_reader_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mount_point, {content, title})
+      }
+
+      if (immersive_reader_mobile_mount_point) {
+        ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
+          content,
+          title
+        })
+      }
+    })
+    .catch(e => {
+      console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
+    })
+}
 
 // When all of the fetches have completed, render the view and bind behaviors
 $.when.apply(this, deferreds).then(() => {

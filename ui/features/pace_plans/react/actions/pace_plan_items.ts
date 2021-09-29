@@ -26,12 +26,12 @@ export enum Constants {
 /* Action creators */
 
 export const actions = {
-  setPlanItemDuration: (planItemId: number, duration: number) =>
+  setPlanItemDuration: (planItemId: string, duration: number) =>
     createAction(Constants.SET_PLAN_ITEM_DURATION, {planItemId, duration})
 }
 
 export const autoSavingActions = {
-  setPlanItemDuration: (planItemId: number, duration: number, extraSaveParams = {}) => {
+  setPlanItemDuration: (planItemId: string, duration: number, extraSaveParams = {}) => {
     return createAutoSavingAction(
       actions.setPlanItemDuration(planItemId, duration),
       true,

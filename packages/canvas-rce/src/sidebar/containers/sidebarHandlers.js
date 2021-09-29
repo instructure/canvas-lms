@@ -55,8 +55,8 @@ export default function propsFromDispatch(dispatch) {
     toggleFlickrForm: () => dispatch(openOrCloseFlickrForm()),
     toggleUploadForm: () => dispatch(openOrCloseUploadForm()),
     toggleNewPageForm: () => dispatch(openOrCloseNewPageForm()),
-    startButtonsAndIconsUpload: fileMetaProps =>
-      dispatch(uploadToButtonsAndIconsFolder(fileMetaProps)),
+    startButtonsAndIconsUpload: (fileMetaProps, uploadSettings) =>
+      dispatch(uploadToButtonsAndIconsFolder(fileMetaProps, uploadSettings)),
     startMediaUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadToMediaFolder(tabContext, fileMetaProps)),
     createMediaServerSession: () => dispatch(createMediaServerSession()),

@@ -38,7 +38,7 @@ that have been disabled because they're just too much noise.
 
 #### Add my own cop!
 Have you discovered some new thing that we should try to detect automatically
-from now on?  Have a look at "freeze_constants.rb" in this project, you could
+from now on?  Have a look at "no_sleep.rb" in this project, you could
 build something similar for whatever it is you need.  Checkout
 all the callbacks that are available for Cops at https://github.com/bbatsov/rubocop,
 don't forget to write specs!

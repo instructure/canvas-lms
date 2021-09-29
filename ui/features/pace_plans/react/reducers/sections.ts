@@ -17,6 +17,8 @@
  */
 
 import {Sections, Section, StoreState} from '../types'
+import {createSelector} from 'reselect'
+import natcompare from '@canvas/util/natcompare'
 
 export const sectionsInitialState: Sections = (window.ENV.SECTIONS || []) as Sections
 
@@ -24,6 +26,12 @@ export const sectionsInitialState: Sections = (window.ENV.SECTIONS || []) as Sec
 
 export const getSections = (state: StoreState): Sections => state.sections
 export const getSection = (state: StoreState, id: number): Section => state.sections[id]
+
+export const getSortedSections = createSelector(getSections, (sections: Sections): Section[] => {
+  const sortedSections = Object.values(sections)
+  sortedSections.sort(natcompare.byKey('name'))
+  return sortedSections
+})
 
 /* Reducers */
 

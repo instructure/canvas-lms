@@ -16,10 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import AlertManager from '@canvas/alerts/react/AlertManager'
 import {ApolloProvider, createClient} from '@canvas/apollo'
-import AccountNotificationSettingsQuery from './AccountNotificationSettingsQuery'
 import React from 'react'
+import AccountNotificationSettingsView from './AccountNotificationSettingsView'
 
 export default function NotificationSettings(options = {}) {
   const apolloClientOpts = {}
@@ -30,12 +29,11 @@ export default function NotificationSettings(options = {}) {
   const client = createClient(apolloClientOpts)
   return (
     <ApolloProvider client={client}>
-      <AlertManager>
-        <AccountNotificationSettingsQuery
-          accountId={envDict.DOMAIN_ROOT_ACCOUNT_ID}
-          userId={envDict.current_user_id}
-        />
-      </AlertManager>
+      <AccountNotificationSettingsView
+        courseSelectorEnabled={envDict.NOTIFICATION_PREFERENCES_OPTIONS?.enable_course_selector}
+        accountId={envDict.DOMAIN_ROOT_ACCOUNT_ID}
+        userId={envDict.current_user_id}
+      />
     </ApolloProvider>
   )
 }

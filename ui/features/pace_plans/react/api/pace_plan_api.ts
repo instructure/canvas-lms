@@ -52,14 +52,14 @@ export const waitForActionCompletion = (actionInProgress: () => boolean, waitTim
 /* API methods */
 
 export const update = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.put(`/api/v1/pace_plans/${pacePlan.id}`, {
+  return axios.put(`/api/v1/courses/${pacePlan.course_id}/pace_plans/${pacePlan.id}`, {
     ...extraSaveParams,
     pace_plan: transformPacePlanForApi(pacePlan)
   })
 }
 
 export const create = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise => {
-  return axios.post(`/api/v1/pace_plans`, {
+  return axios.post(`/api/v1/courses/${pacePlan.course_id}/pace_plans`, {
     ...extraSaveParams,
     pace_plan: transformPacePlanForApi(pacePlan)
   })
@@ -68,10 +68,10 @@ export const create = (pacePlan: PacePlan, extraSaveParams = {}): AxiosPromise =
 export const publish = (
   plan: PacePlan,
   publishForOption: PublishOptions,
-  publishForSectionIds: Array<number | string>,
-  publishForEnrollmentIds: Array<number | string>
+  publishForSectionIds: Array<string>,
+  publishForEnrollmentIds: Array<string>
 ): AxiosPromise => {
-  return axios.post(`/api/v1/pace_plans/publish`, {
+  return axios.post(`/api/v1/courses/${plan.course_id}/pace_plans/publish`, {
     context_type: plan.context_type,
     context_id: plan.context_id,
     publish_for_option: publishForOption,
@@ -82,7 +82,7 @@ export const publish = (
 
 export const resetToLastPublished = (
   contextType: PlanContextTypes,
-  contextId: number | string
+  contextId: string
 ): AxiosPromise => {
   return axios.post(`/api/v1/pace_plans/reset_to_last_published`, {
     context_type: contextType,
@@ -90,17 +90,17 @@ export const resetToLastPublished = (
   })
 }
 
-export const load = (pacePlanId: number | string) => {
+export const load = (pacePlanId: string) => {
   return axios.get(`/api/v1/pace_plans/${pacePlanId}`)
 }
 
-export const getLatestDraftFor = (context: PlanContextTypes, contextId: number | string) => {
+export const getLatestDraftFor = (context: PlanContextTypes, contextId: string) => {
   return axios.get(
     `/api/v1/pace_plans/latest_draft_for?context_type=${context}&context_id=${contextId}`
   )
 }
 
-export const republishAllPlansForCourse = (courseId: string | number) => {
+export const republishAllPlansForCourse = (courseId: string) => {
   return axios.post(`/api/v1/pace_plans/republish_all_plans`, {course_id: courseId})
 }
 
@@ -108,7 +108,7 @@ export const republishAllPlans = () => {
   return axios.post(`/api/v1/pace_plans/republish_all_plans`)
 }
 
-export const relinkToParentPlan = (planId: string | number) => {
+export const relinkToParentPlan = (planId: string) => {
   return axios.post(`/api/v1/pace_plans/${planId}/relink_to_parent_plan`)
 }
 
@@ -122,18 +122,18 @@ export const relinkToParentPlan = (planId: string | number) => {
  */
 
 interface ApiPacePlanModuleItemsAttributes {
-  readonly id: number
+  readonly id: string
   readonly duration: number
-  readonly module_item_id: number
+  readonly module_item_id: string
 }
 
 interface ApiFormattedPacePlan {
-  readonly start_date: string
-  readonly end_date: string
+  readonly start_date?: string
+  readonly end_date?: string
   readonly workflow_state: WorkflowStates
   readonly exclude_weekends: boolean
   readonly context_type: PlanContextTypes
-  readonly context_id: string | number
+  readonly context_id: string
   readonly hard_end_dates: boolean
   readonly pace_plan_module_items_attributes: ApiPacePlanModuleItemsAttributes[]
 }

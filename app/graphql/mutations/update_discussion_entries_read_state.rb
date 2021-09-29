@@ -34,10 +34,9 @@ class Mutations::UpdateDiscussionEntriesReadState < Mutations::BaseMutation
       raise GraphQL::ExecutionError, 'not found' unless entry.grants_right?(current_user, session, :read)
     end
 
-    entries.each do |entry|
-      input[:read] ? entry.change_read_state('read', current_user) : entry.change_read_state('unread', current_user)
-      entry.reload
-    end
+    entry = entries.first
+    state = input[:read] ? :read : :unread
+    DiscussionEntryParticipant.upsert_for_entries(entry, current_user, batch: entries, new_state: state, forced: true)
 
     {
       discussion_entries: entries

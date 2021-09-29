@@ -24,9 +24,9 @@ import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import {CHILD_GROUPS_QUERY, groupFields} from '../graphql/Management'
 import {FIND_GROUPS_QUERY} from '../graphql/Outcomes'
 import useSearch from './hooks/useSearch'
+import useGroupCreate from './hooks/useGroupCreate'
 import useCanvasContext from './hooks/useCanvasContext'
 import {gql} from '@canvas/apollo'
-import {addOutcomeGroup} from '@canvas/outcomes/graphql/Management'
 
 const structFromGroup = g => ({
   id: g._id,
@@ -37,12 +37,12 @@ const structFromGroup = g => ({
 })
 
 const formatNewGroup = g => ({
-  _id: g.id,
+  _id: g._id,
   title: g.title,
   description: g.description,
   isRootGroup: false,
   parentOutcomeGroup: {
-    _id: g.parent_outcome_group.id,
+    _id: g.parentOutcomeGroup._id,
     __typename: 'LearningOutcomeGroup'
   },
   __typename: 'LearningOutcomeGroup'
@@ -174,7 +174,7 @@ const useTreeBrowser = queryVariables => {
 
   const queryCollections = ({
     id,
-    parentGroupId = collections[id].parentGroupId,
+    parentGroupId = collections[id]?.parentGroupId,
     shouldLoad = true
   }) => {
     setSelectedGroupId(id)
@@ -209,6 +209,7 @@ const useTreeBrowser = queryVariables => {
         }
       })
       .then(({data}) => {
+        setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
         addGroups(extractGroups(data.context))
         addLoadedGroups([id])
       })
@@ -252,11 +253,12 @@ const useTreeBrowser = queryVariables => {
     clearCache,
     loadedGroups,
     addNewGroup,
-    removeGroup
+    removeGroup,
+    setSelectedParentGroupId
   }
 }
 
-export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
+export const useManageOutcomes = ({collection, initialGroupId, importNumber = 0} = {}) => {
   const {contextId, contextType} = useCanvasContext()
   const client = useApolloClient()
   const {
@@ -276,10 +278,12 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
     clearCache: clearTreeBrowserCache,
     addNewGroup,
     removeGroup,
-    loadedGroups
+    loadedGroups,
+    setSelectedParentGroupId
   } = useTreeBrowser({
     collection
   })
+  const {createGroup: graphqlGroupCreate} = useGroupCreate()
 
   const {data: contextGroupLoadedData} = useQuery(CONTEXT_GROUPS_QUERY, {
     fetchPolicy: 'cache-only',
@@ -320,11 +324,12 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   useEffect(() => {
     if (
       isLoading &&
-      ((Object.keys(collections).length > 0 && loadedGroups.includes(rootId)) || error)
+      ((Object.keys(collections).length > 0 && loadedGroups.includes(initialGroupId || rootId)) ||
+        error)
     ) {
       setIsLoading(false)
     }
-  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading])
+  }, [collections, rootId, loadedGroups, error, isLoading, setIsLoading, initialGroupId])
 
   const saveRootGroupId = id => {
     addLoadedGroups([id])
@@ -332,37 +337,59 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   }
 
   const fetchContextGroups = () => {
-    client
-      .query({
-        query: CHILD_GROUPS_QUERY,
-        variables: {
-          id: contextId,
-          type: contextType
-        },
-        fetchPolicy: 'network-only'
-      })
-      .then(({data}) => {
-        const rootGroup = data.context.rootOutcomeGroup
-        client.writeQuery({
-          query: CONTEXT_GROUPS_QUERY,
+    if (initialGroupId) {
+      setSelectedGroupId(initialGroupId)
+
+      client
+        .query({
+          query: CHILD_GROUPS_QUERY,
           variables: {
-            contextId,
-            contextType
+            id: initialGroupId,
+            type: 'LearningOutcomeGroup'
           },
-          data: {
-            rootGroupId: rootGroup._id
-          }
+          fetchPolicy: 'network-only'
         })
-        saveRootGroupId(rootGroup._id)
-        addGroups(extractGroups({...rootGroup, isRootGroup: true}))
-      })
-      .catch(err => {
-        setError(err.message)
-      })
+        .then(({data}) => {
+          setSelectedParentGroupId(data.context.parentOutcomeGroup?._id)
+          addGroups(extractGroups(data.context))
+          addLoadedGroups([initialGroupId])
+        })
+        .catch(err => {
+          setError(err.message)
+        })
+    } else {
+      client
+        .query({
+          query: CHILD_GROUPS_QUERY,
+          variables: {
+            id: contextId,
+            type: contextType
+          },
+          fetchPolicy: 'network-only'
+        })
+        .then(({data}) => {
+          const rootGroup = data.context.rootOutcomeGroup
+          client.writeQuery({
+            query: CONTEXT_GROUPS_QUERY,
+            variables: {
+              contextId,
+              contextType
+            },
+            data: {
+              rootGroupId: rootGroup._id
+            }
+          })
+          saveRootGroupId(rootGroup._id)
+          addGroups(extractGroups({...rootGroup, isRootGroup: true}))
+        })
+        .catch(err => {
+          setError(err.message)
+        })
+    }
   }
 
   useEffect(() => {
-    if (importNumber === 0 && rootGroupId) {
+    if (!initialGroupId && importNumber === 0 && rootGroupId) {
       saveRootGroupId(rootGroupId)
     } else {
       fetchContextGroups()
@@ -371,26 +398,10 @@ export const useManageOutcomes = (collection, {importNumber = 0} = {}) => {
   }, [importNumber])
 
   const createGroup = async (groupName, parentGroupId = rootId) => {
-    try {
-      const newGroup = await addOutcomeGroup(contextType, contextId, parentGroupId, groupName)
-      addNewGroup(newGroup.data)
-      showFlashAlert({
-        message: I18n.t('"%{groupName}" has been created.', {groupName}),
-        type: 'success'
-      })
-      return structFromGroup(formatNewGroup(newGroup.data))
-    } catch (err) {
-      showFlashAlert({
-        message: err.message
-          ? I18n.t('An error occurred adding group "%{groupName}": %{message}.', {
-              groupName,
-              message: err.message
-            })
-          : I18n.t('An error occurred adding group "%{groupName}".', {
-              groupName
-            }),
-        type: 'error'
-      })
+    const newGroup = await graphqlGroupCreate(groupName, parentGroupId)
+    if (newGroup?._id) {
+      addNewGroup(newGroup)
+      return structFromGroup(formatNewGroup(newGroup))
     }
   }
 
@@ -565,37 +576,19 @@ export const useFindOutcomeModal = open => {
   }
 }
 
-export const useTargetGroupSelector = groupId => {
-  const {
-    error,
-    isLoading,
-    collections,
-    rootId,
-    queryCollections: treeBrowserQueryCollection,
-    addNewGroup,
-    selectedGroupId,
-    selectedParentGroupId,
-    loadedGroups,
-    createGroup
-  } = useManageOutcomes('OutcomeManagementPanel')
+export const useTargetGroupSelector = ({skipGroupId, initialGroupId}) => {
+  const {queryCollections: treeBrowserQueryCollection, ...useManageOutcomesProps} =
+    useManageOutcomes({collection: 'OutcomeManagementPanel', initialGroupId})
 
   const queryCollections = ({id, parentGroupId, shouldLoad}) => {
     // Do not query for more collections if the groupId is the same as the id passed
-    if (id !== groupId) {
+    if (id !== skipGroupId) {
       treeBrowserQueryCollection({id, parentGroupId, shouldLoad})
     }
   }
 
   return {
-    error,
-    isLoading,
-    collections,
-    queryCollections,
-    rootId,
-    addNewGroup,
-    selectedGroupId,
-    selectedParentGroupId,
-    loadedGroups,
-    createGroup
+    ...useManageOutcomesProps,
+    queryCollections
   }
 }

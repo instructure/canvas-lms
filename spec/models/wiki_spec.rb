@@ -184,6 +184,12 @@ describe Wiki do
     end
   end
 
+  it '#context_loaded?' do
+    group
+    wiki = @group.wiki
+    expect(wiki.reload.context_loaded?).to be_falsey
+  end
+
   context "sharding" do
     specs_require_sharding
 

@@ -628,8 +628,8 @@ describe NotificationMessageCreator do
     end
 
     it "should respect user locales" do
-      I18n.backend.stub(shouty: {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
-        @user.locale = 'shouty'
+      I18n.backend.stub(:'en-SHOUTY' => {messages: {test_name: {email: {subject: "THIS IS *5*!!!!?!11eleventy1"}}}}) do
+        @user.locale = 'en-SHOUTY'
         @user.save(validate: false)
         messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
         messages.each {|m| expect(m.subject).to eql("THIS IS *5*!!!!?!11eleventy1")}

@@ -40,6 +40,7 @@ async function makeProps(opts = {}) {
   return {
     createSubmissionDraft: jest.fn(),
     editingDraft: opts.editingDraft || false,
+    focusOnInit: false,
     readOnly: opts.readOnly || false,
     onContentsChanged: jest.fn(),
     submission: mockedSubmission,

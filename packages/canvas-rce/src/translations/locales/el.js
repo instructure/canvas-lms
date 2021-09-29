@@ -125,6 +125,7 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Επεξεργαστής Πλούσιου Περιεχομένου-rich content"
   },
+  "save_11a80ec3": { "message": "Αποθήκευση" },
   "search_280d00bd": { "message": "Αναζήτηση" },
   "size_b30e1077": { "message": "Μέγεθος" },
   "star_8d156e09": { "message": " " },

@@ -183,6 +183,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Срок: { when }" },
   "edit_c5fbea07": { "message": "Редактировать" },
   "edit_equation_f5279959": { "message": "Редактировать уравнение" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Редактировать существующую кнопку / значок"
+  },
   "edit_link_7f53bebb": { "message": "Редактировать ссылку" },
   "editor_statusbar_26ac81fc": { "message": "Панель состояния редактора" },
   "embed_828fac4a": { "message": "Вставить" },
@@ -376,6 +379,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "К сожалению, возможность доступа к редактору Pretty HTML с клавиатуры отсутствует. Обратитесь к редактору Raw HTML здесь."
   },
+  "save_11a80ec3": { "message": "Сохранить" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Сохраненные кнопки и пиктограммы"
   },

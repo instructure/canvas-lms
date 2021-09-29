@@ -24,7 +24,7 @@ if CANVAS_RAILS6_0
     gem 'tzinfo', '1.2.7'
   gem 'switchman', '2.2.1'
     gem 'guardrail', '2.0.1'
-  gem 'switchman-inst-jobs', '3.1.2'
+  gem 'switchman-inst-jobs', '3.2.2'
 else
   gem 'rails', '6.1.4.1'
     gem 'tzinfo', '2.0.4'
@@ -39,7 +39,7 @@ gem 'academic_benchmarks', '1.1.1', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
-gem 'activerecord-pg-extensions', '0.2.3'
+gem 'activerecord-pg-extensions', '0.3.0'
 gem 'addressable', '2.7.0', require: false
 gem 'after_transaction_commit', '2.2.2'
 gem 'authlogic', '6.4.1'
@@ -86,7 +86,7 @@ gem 'inst_statsd', '2.2.0'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.8.2'
-gem 'inst-jobs', '2.3.3'
+gem 'inst-jobs', '2.4.10'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.1.0'
@@ -112,7 +112,7 @@ gem 'nokogumbo', '2.0.4'
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.16'
-gem 'outrigger', '2.1.1'
+gem 'outrigger', '3.0.0'
 gem 'parallel', '1.20.0', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'

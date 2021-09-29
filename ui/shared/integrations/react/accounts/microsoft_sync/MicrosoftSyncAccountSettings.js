@@ -184,7 +184,7 @@ export default function MicrosoftSyncAccountSettings() {
                       payload: {microsoft_sync_remote_attribute: value}
                     })
                   }}
-                  selectedRemoteLookupField={state.microsoft_sync_remote_attribute}
+                  selectedLookupField={state.microsoft_sync_remote_attribute}
                 />
               </Table.Cell>
             </Table.Row>

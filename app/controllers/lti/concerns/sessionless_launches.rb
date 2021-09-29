@@ -98,18 +98,18 @@ module Lti::Concerns
     #
     # For an explanation of each type please review the documentation
     # for the generate_sessionless_launch endpoint.
-    def sessionless_launch_url(options, context, tool, session_token)
+    def sessionless_launch_link(options, context, tool, session_token)
       if options[:assignment].present?
         assignment = options[:assignment]
         assignment.prepare_for_ags_if_needed!(tool)
-        return assignment_launch_url(assignment, session_token)
+        return assignment_launch_link(assignment, session_token)
       end
 
-      return module_item_url(options[:module_item], session_token) if options[:module_item].present?
-      course_or_account_launch_url(context, tool, session_token)
+      return module_item_link(options[:module_item], session_token) if options[:module_item].present?
+      course_or_account_launch_link(context, tool, session_token, options[:launch_url])
     end
 
-    def module_item_url(module_item, session_token)
+    def module_item_link(module_item, session_token)
       course_context_modules_item_redirect_url(
         course_id: module_item.context.id,
         id: module_item.id,
@@ -118,7 +118,7 @@ module Lti::Concerns
       )
     end
 
-    def assignment_launch_url(assignment, session_token)
+    def assignment_launch_link(assignment, session_token)
       course_assignment_url(
         course_id: assignment.course.id,
         id: assignment.id,
@@ -127,14 +127,15 @@ module Lti::Concerns
       )
     end
 
-    def course_or_account_launch_url(context, tool, session_token)
+    def course_or_account_launch_link(context, tool, session_token, launch_url)
       context_type = context.class.to_s.downcase
       self.send(
         "#{context_type}_external_tool_url",
         context.id,
         id: tool.id,
         display: :borderless,
-        session_token: session_token
+        session_token: session_token,
+        launch_url: launch_url
       )
     end
   end

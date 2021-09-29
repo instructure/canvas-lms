@@ -33,6 +33,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import TakePhotoUrl from '../../../../images/TakePhoto.svg'
 import {Text} from '@instructure/ui-text'
 import WebcamCapture from './WebcamCapture'
+import WithBreakpoints, {breakpointsShape} from 'with-breakpoints'
 
 import {View} from '@instructure/ui-view'
 
@@ -286,7 +287,14 @@ function WebcamPhotoUpload({onPhotoTaken}) {
   )
 }
 
-function MoreOptions({assignmentID, courseID, handleCanvasFiles, handleWebcamPhotoUpload, userID}) {
+function MoreOptions({
+  assignmentID,
+  breakpoints,
+  courseID,
+  handleCanvasFiles,
+  handleWebcamPhotoUpload,
+  userID
+}) {
   const {loading, error, data} = useQuery(EXTERNAL_TOOLS_QUERY, {
     variables: {courseID}
   })
@@ -316,20 +324,22 @@ function MoreOptions({assignmentID, courseID, handleCanvasFiles, handleWebcamPho
       assignmentID
     )}`
 
+  const itemMargin = breakpoints.desktopOnly ? '0 x-small' : 'xx-small xxx-small'
+
   return (
     <Flex direction="row" justifyItems="center" wrap="wrap">
       {handleWebcamPhotoUpload && (
-        <Flex.Item margin="0 x-small">
+        <Flex.Item margin={itemMargin}>
           <WebcamPhotoUpload onPhotoTaken={handleWebcamPhotoUpload} />
         </Flex.Item>
       )}
       {handleCanvasFiles && (
-        <Flex.Item margin="0 x-small">
+        <Flex.Item margin={itemMargin}>
           <CanvasFileChooser courseID={courseID} userID={userID} onFileSelect={handleCanvasFiles} />
         </Flex.Item>
       )}
       {externalTools.map(tool => (
-        <Flex.Item key={tool._id} margin="0 x-small">
+        <Flex.Item key={tool._id} margin={itemMargin}>
           <ExternalTool launchUrl={buildLaunchUrl(tool)} tool={tool} />
         </Flex.Item>
       ))}
@@ -339,10 +349,11 @@ function MoreOptions({assignmentID, courseID, handleCanvasFiles, handleWebcamPho
 
 MoreOptions.propTypes = {
   assignmentID: string.isRequired,
+  breakpoints: breakpointsShape,
   courseID: string.isRequired,
   handleCanvasFiles: func,
   handleWebcamPhotoUpload: func,
   userID: string
 }
 
-export default MoreOptions
+export default WithBreakpoints(MoreOptions)

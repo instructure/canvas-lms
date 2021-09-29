@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {MARKER_ID} from './constants'
+import {MARKER_ID, TRIGGER_CHAR} from './constants'
 
 // characters allowed to proceed an "inline" @mention
 export const spaceCharacters = [' ', '\u00A0', '\uFEFF']
@@ -26,11 +26,10 @@ export const spaceCharacters = [' ', '\u00A0', '\uFEFF']
  * returns false.
  *
  * @param {Selection} selection the selection object (tinymce Selection.getSel())
- * @param {string} triggerChar (defaults to "@")
  *
  * @returns {boolean} Was a mention triggered?
  */
-export default function mentionWasInitiated(selection, selectedNode, triggerChar = '@') {
+export default function mentionWasInitiated(selection, selectedNode) {
   const {anchorOffset, anchorNode} = selection
   const {wholeText} = anchorNode
 
@@ -38,7 +37,7 @@ export default function mentionWasInitiated(selection, selectedNode, triggerChar
   if (selectedNode?.id === MARKER_ID) return false
 
   // Is the trigger character being entered at the first position in a node?
-  if (anchorOffset === 1 && anchorNode?.wholeText?.charAt(0) === triggerChar) return true
+  if (anchorOffset === 1 && anchorNode?.wholeText?.charAt(0) === TRIGGER_CHAR) return true
 
   // Check if it's possible that we have an "inline" mention. Return false if not
   if (!wholeText || anchorOffset < 2) return false
@@ -47,5 +46,5 @@ export default function mentionWasInitiated(selection, selectedNode, triggerChar
   const typedChar = wholeText[anchorOffset - 1] // The char just typed in
   const proceedingChar = wholeText[anchorOffset - 2]
 
-  return typedChar === triggerChar && spaceCharacters.includes(proceedingChar)
+  return typedChar === TRIGGER_CHAR && spaceCharacters.includes(proceedingChar)
 }

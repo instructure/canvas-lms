@@ -58,7 +58,7 @@ describe Types::OutcomeCalculationMethodType do
     it 'context_id' do
       expect(
         account_type.resolve('outcomeCalculationMethod { contextId }')
-      ).to eq account.outcome_calculation_method.context_id
+      ).to eq account.outcome_calculation_method.context_id.to_s
     end
   end
 end

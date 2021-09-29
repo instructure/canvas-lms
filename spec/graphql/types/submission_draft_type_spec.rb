@@ -31,7 +31,12 @@ RSpec.describe Types::SubmissionDraftType do
     @media_object = factory_with_protected_attributes(MediaObject, :media_id => 'm-123456', :title => 'CreedThoughts')
   end
 
-  def resolve_submission_draft
+  def resolve_submission_draft(body_rewrite_urls: nil)
+    body_args = ""
+    unless body_rewrite_urls.nil?
+      body_args = "(rewriteUrls: #{body_rewrite_urls})"
+    end
+
     result = CanvasSchema.execute(<<~GQL, context: {current_user: @teacher, request: ActionDispatch::TestRequest.create})
       query {
         assignment(id: "#{@assignment.id}") {
@@ -44,7 +49,7 @@ RSpec.describe Types::SubmissionDraftType do
                   _id
                   displayName
                 }
-                body
+                body#{body_args}
                 mediaObject {
                   _id
                   title
@@ -88,6 +93,22 @@ RSpec.describe Types::SubmissionDraftType do
 
     submission_draft = resolve_submission_draft
     expect(submission_draft['body']).to eq('some text')
+  end
+
+  it 'rewrites URLs in the draft body' do
+    @submission_draft.body = '<a href="/somewhere">Somewhere</a>'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft
+    expect(submission_draft['body']).to eq('<a href="http://test.host/somewhere">Somewhere</a>')
+  end
+
+  it 'does not rewrite URLs in the draft body when requested not to' do
+    @submission_draft.body = '<a href="/somewhere">Somewhere</a>'
+    @submission_draft.save!
+
+    submission_draft = resolve_submission_draft body_rewrite_urls: false
+    expect(submission_draft['body']).to eq('<a href="/somewhere">Somewhere</a>')
   end
 
   it 'returns the meetsAssignmentCriteria field' do

@@ -56,12 +56,12 @@ describe('ManageOutcomesFooter', () => {
     it('# of selected outcomes is enabled when selected props provided and ge 0 ', () => {
       const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps()} />)
       expect(getByText('2 Outcomes Selected')).toBeInTheDocument()
-      expect(getByText('2 Outcomes Selected').hasAttribute('aria-disabled')).toBe(false)
+      expect(getByText('2 Outcomes Selected').closest('button')).toBeEnabled()
     })
 
     it('# selected outcomes is disabled when selected props provided and eq 0', () => {
       const {getByText} = renderWithContext(<ManageOutcomesFooter {...defaultProps(0)} />)
-      expect(getByText(`0 Outcomes Selected`).hasAttribute('aria-disabled')).toBe(true)
+      expect(getByText(`0 Outcomes Selected`).closest('button')).toBeDisabled()
     })
 
     describe('Buttons and click handlers', () => {

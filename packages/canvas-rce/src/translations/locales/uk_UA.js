@@ -161,6 +161,7 @@ const locale = {
   "rich_content_editor_2708ef21": {
     "message": "Редактор збагаченого контенту"
   },
+  "save_11a80ec3": { "message": "Зберегти" },
   "search_280d00bd": { "message": "Пошук" },
   "selected_274ce24f": { "message": "Обраний" },
   "size_b30e1077": { "message": "Розмір" },

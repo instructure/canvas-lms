@@ -12,9 +12,9 @@ module GraphQLHelpers
     # NOTE: context here is *not* referring to graphql context, it is
     # referring to a canvas context (typically a course)
     def self.process(content, request:, context:, user:, in_app:,
-                     preloaded_attachments: {})
+                     preloaded_attachments: {}, options: {})
       new(request: request, context: context, user: user, in_app: in_app)
-      .api_user_content(content, preloaded_attachments)
+        .api_user_content(content, preloaded_attachments, options)
     end
 
 
@@ -25,8 +25,8 @@ module GraphQLHelpers
       @in_app = in_app
     end
 
-    def api_user_content(html, preloaded_attachments = {})
-      super(html, context, user, preloaded_attachments)
+    def api_user_content(html, preloaded_attachments = {}, options = {})
+      super(html, context, user, preloaded_attachments, options)
     end
 
     def in_app?

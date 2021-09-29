@@ -497,7 +497,7 @@ describe AccountNotification do
         an = account_notification(:account => Account.default, :send_message => true,
           :start_at => 1.day.from_now, :end_at => 2.days.from_now)
         job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
-        expect(job.strand).to include(an.global_id.to_s)
+        expect(job.singleton).to include(an.global_id.to_s)
         expect(job.run_at.to_i).to eq an.start_at.to_i
       end
 

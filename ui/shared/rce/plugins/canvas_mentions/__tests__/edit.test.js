@@ -104,7 +104,7 @@ describe('insertMentionFor()', () => {
 
   it('inserts the content into the editor with correct username', () => {
     subject()
-    expect(editor.getContainer().querySelector('.mention').innerHTML).toEqual('Test User')
+    expect(editor.getContainer().querySelector('.mention').innerHTML).toEqual('@Test User')
   })
 
   it('inserts the content into the editor with correct mentions user id', () => {
@@ -112,5 +112,11 @@ describe('insertMentionFor()', () => {
     expect(editor.getContainer().querySelector('.mention').getAttribute('data-mention')).toEqual(
       '123'
     )
+  })
+
+  it('removes the trigger char from the editor body', () => {
+    subject()
+    expect(editor.getContent()).not.toContain('@<')
+    expect(editor.getContent().match(/@/g).length).toEqual(1)
   })
 })

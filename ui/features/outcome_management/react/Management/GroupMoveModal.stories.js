@@ -30,7 +30,10 @@ export default {
     isOpen: true,
     groupId: '100',
     groupTitle: 'Outcome Group 1',
-    parentGroupId: '0'
+    parentGroup: {
+      id: '0',
+      title: 'Root Outcome Group'
+    }
   },
   argTypes: {
     onCloseHandler: {action: 'closed'}
@@ -40,9 +43,9 @@ export default {
 const Template = args => {
   return (
     <OutcomesContext.Provider
-      value={{env: {contextType: 'Account', contextId: '1', rootOutcomeGroup: {id: '100'}}}}
+      value={{env: {contextType: 'Account', contextId: '1', rootOutcomeGroup: {id: '0'}}}}
     >
-      <MockedProvider mocks={smallOutcomeTree('Account')} cache={createCache()}>
+      <MockedProvider mocks={smallOutcomeTree()} cache={createCache()}>
         <GroupMoveModal {...args} />
       </MockedProvider>
     </OutcomesContext.Provider>

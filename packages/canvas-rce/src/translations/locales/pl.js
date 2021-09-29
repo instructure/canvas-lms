@@ -179,6 +179,9 @@ const locale = {
   "due_when_7eed10c6": { "message": "Termin: { when }" },
   "edit_c5fbea07": { "message": "Edytuj" },
   "edit_equation_f5279959": { "message": "Edytuj równanie" },
+  "edit_existing_button_icon_3d0277bd": {
+    "message": "Edytuj istniejący przycisk / ikonę"
+  },
   "edit_link_7f53bebb": { "message": "Edytuj łącze" },
   "editor_statusbar_26ac81fc": { "message": "Pasek stanu edytora" },
   "embed_828fac4a": { "message": "Osadź" },
@@ -362,6 +365,7 @@ const locale = {
   "sadly_the_pretty_html_editor_is_not_keyboard_acces_50da7665": {
     "message": "Niestety ulepszony edytor HTML nie jest dostępny z poziomu klawiatury. Tutaj możesz uzyskać dostęp do edytor HTML bez formatowania."
   },
+  "save_11a80ec3": { "message": "Zapisz" },
   "saved_buttons_and_icons_8278eed2": {
     "message": "Zapisane Przycisk i ikony"
   },

@@ -45,7 +45,7 @@ describe DiscussionTopic::MaterializedView do
     it "should return nil and schedule a job if no view" do
       DiscussionTopic::MaterializedView.for(@topic).destroy
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to eq nil
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
     end
 
     it "should return the view if it exists but is out of date" do
@@ -57,7 +57,7 @@ describe DiscussionTopic::MaterializedView do
       expect(json).to be_present
       expect(entries).not_to be_include(reply.id)
       # since the view was out of date, it's returned but a job is queued
-      expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
+      expect(Delayed::Job.where(singleton: "materialized_discussion:#{@topic.id}").count).to eq 1
       # after updating, the view should include the new entry
       @view.update_materialized_view(synchronous: true)
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
@@ -71,7 +71,7 @@ describe DiscussionTopic::MaterializedView do
     view.update_materialized_view
     allow(DiscussionTopic::MaterializedView).to receive(:wait_for_replication).and_return(false)
     run_jobs
-    job = Delayed::Job.where(:strand => "materialized_discussion:#{view.id}").first
+    job = Delayed::Job.where(singleton: "materialized_discussion:#{view.id}").first
     expect(job.run_at > 1.minute.from_now).to be_truthy
     expect(view.reload.entry_ids_array).to be_empty
 

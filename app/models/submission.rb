@@ -2257,6 +2257,15 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  # true if there is a comment by user other than submitter on the current attempt
+  # comments prior to first attempt will count as current until a second attempt is started
+  def feedback_for_current_attempt?
+    visible_submission_comments.any? do |comment|
+      comment.author_id != self.user_id &&
+        ((comment.attempt&.nonzero? ? comment.attempt : 1) == (self.attempt || 1))
+    end
+  end
+
   def assessment_request_count
     @assessment_requests_count ||= self.assessment_requests.length
   end

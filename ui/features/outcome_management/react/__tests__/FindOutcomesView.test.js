@@ -47,7 +47,7 @@ describe('FindOutcomesView', () => {
     outcomesGroup: {
       title: 'State Standards',
       _id: '1',
-      contextId: 1,
+      contextId: '1',
       contextType: 'Account',
       outcomesCount: 3,
       outcomes: {

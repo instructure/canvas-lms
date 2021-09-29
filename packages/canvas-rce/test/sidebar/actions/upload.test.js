@@ -216,7 +216,8 @@ describe('Upload data actions', () => {
       const fileMetaProps = {
         file: {name: svg.name, type: 'image/svg+xml'},
         name: svg.name,
-        parentFolderId: 2
+        parentFolderId: 2,
+        onDuplicate: undefined
       }
 
       const canvasProps = {
@@ -240,6 +241,36 @@ describe('Upload data actions', () => {
         assert.deepEqual(baseState.source.uploadFRD.firstCall.args, [
           new File([svg.domElement.outerHTML], svg.name, {type: 'image/svg+xml'}),
           results
+        ])
+      })
+    })
+
+    describe('with "onDuplicate" upload setting set', () => {
+      let uploadSettings, store
+
+      beforeEach(() => {
+        store = spiedStore(baseState)
+        uploadSettings = {onDuplicate: 'overwrite'}
+      })
+
+      it('includes the specified duplicate strategy setting', async () => {
+        await store.dispatch(actions.uploadToButtonsAndIconsFolder(svg, uploadSettings))
+
+        assert.deepEqual(baseState.source.preflightUpload.lastCall.args, [
+          {
+            file: {
+              name: 'button.svg',
+              type: 'image/svg+xml'
+            },
+            name: 'button.svg',
+            onDuplicate: 'overwrite',
+            parentFolderId: 2
+          },
+          {
+            contextId: 101,
+            contextType: 'course',
+            host: 'http://host:port'
+          }
         ])
       })
     })

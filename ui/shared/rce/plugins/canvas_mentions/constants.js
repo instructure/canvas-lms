@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const TRIGGER_CHAR = '@'
 export const MARKER_ID = 'mentions-marker'
 export const MARKER_SELECTOR = `span#${MARKER_ID}`
 export const MENTION_MENU_ID = 'mention-menu'

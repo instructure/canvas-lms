@@ -20,7 +20,7 @@ import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import I18n from 'i18n!courses'
 import {useMutation} from 'react-apollo'
 import NotificationPreferences from '@canvas/notification-preferences'
-import NotificationPreferencesShape from '@canvas/notification-preferences/react/Shape'
+import {NotificationPreferencesShape} from '@canvas/notification-preferences/react/Shape'
 import React, {useContext} from 'react'
 import {string} from 'prop-types'
 import {UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES} from '../graphql/Mutations'
@@ -61,11 +61,13 @@ export default function AccountNotificationSettingsManager(props) {
         })
       }
       notificationPreferences={props.notificationPreferences}
+      userId={props.userId}
     />
   )
 }
 
 AccountNotificationSettingsManager.propTypes = {
   accountId: string.isRequired,
-  notificationPreferences: NotificationPreferencesShape
+  notificationPreferences: NotificationPreferencesShape,
+  userId: string.isRequired
 }

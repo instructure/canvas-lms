@@ -19,8 +19,11 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
+import {cleanup, render} from '@testing-library/react'
+import fetchMock from 'fetch-mock'
 import $ from 'jquery'
 import ItemCog from 'ui/features/files/react/components/ItemCog.js'
+import File from '@canvas/files/backbone/models/File.coffee'
 import Folder from '@canvas/files/backbone/models/Folder'
 
 const {Simulate} = TestUtils
@@ -61,7 +64,13 @@ const buttonsEnabled = (itemCog, config) => {
   return valid
 }
 
-const sampleProps = (canAddFiles = false, canEditFiles = false, canDeleteFiles = false) => ({
+const sampleProps = (
+  canAddFiles = false,
+  canEditFiles = false,
+  canDeleteFiles = false,
+  canRestrictFiles = false
+) => ({
+  externalToolsForContext: [],
   model: new Folder({id: 999}),
   modalOptions: {
     closeModal() {},
@@ -71,6 +80,7 @@ const sampleProps = (canAddFiles = false, canEditFiles = false, canDeleteFiles =
   userCanAddFilesForContext: canAddFiles,
   userCanEditFilesForContext: canEditFiles,
   userCanDeleteFilesForContext: canDeleteFiles,
+  userCanRestrictFilesForContext: canRestrictFiles,
   usageRightsRequiredForContext: true
 })
 
@@ -148,7 +158,7 @@ test('downloading a file returns focus back to the item cog', () => {
 
 test('deleting a file returns focus to the previous item cog when there are more items', () => {
   const props = sampleProps(true, true, true)
-  props.model.destroy = function() {
+  props.model.destroy = function () {
     return true
   }
   sinon.stub(window, 'confirm').returns(true)
@@ -179,7 +189,7 @@ test('deleting a file returns focus to the previous item cog when there are more
 test('deleting a file returns focus to the name column header when there are no items left', () => {
   $('#fixtures').empty()
   const props = sampleProps(true, true, true)
-  props.model.destroy = function() {
+  props.model.destroy = function () {
     return true
   }
   sinon.stub(window, 'confirm').returns(true)
@@ -205,4 +215,100 @@ test('deleting a file returns focus to the name column header when there are no 
   equal(document.activeElement, $('.someFakeLink')[0], 'the name column has focus')
   window.confirm.restore()
   ReactDOM.unmountComponentAtNode(document.getElementById('fixtures'))
+})
+
+QUnit.module('Send To menu item', hooks => {
+  const oldEnv = window.ENV
+
+  hooks.beforeEach(() => {
+    $('#fixtures').empty()
+    $('#fixtures').append(`
+      <div role="alert" id="flash_screenreader_holder"></div>
+      <div id="direct-share-user-mount-point"></div>
+    `)
+    window.ENV.COURSE_ID = '101'
+  })
+
+  hooks.afterEach(() => {
+    cleanup()
+    window.ENV = oldEnv
+  })
+
+  test('is present when the item is a file', () => {
+    const props = {...sampleProps(), model: new File({id: '1'}), userCanEditFilesForContext: true}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    ok(queryByRole('menuitem', {hidden: true, name: 'Send To...'}))
+  })
+
+  test('is not present when the item is a folder', () => {
+    const props = {...sampleProps(), userCanEditFilesForContext: true}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    notOk(queryByRole('menuitem', {hidden: true, name: 'Send To...'}))
+  })
+
+  test('is not present when the user does not have edit files permissions', () => {
+    const props = {...sampleProps(), model: new File({id: '1'})}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    notOk(queryByRole('menuitem', {hidden: true, name: 'Send To...'}))
+  })
+
+  test('calls onSendToClick when clicked', () => {
+    const onSendToClickStub = sinon.stub()
+    const props = {
+      ...sampleProps(),
+      model: new File({id: '1'}),
+      onSendToClick: onSendToClickStub,
+      userCanEditFilesForContext: true
+    }
+    const {queryByRole} = render(<ItemCog {...props} />)
+    queryByRole('menuitem', {hidden: true, name: 'Send To...'}).click()
+    strictEqual(onSendToClickStub.callCount, 1)
+  })
+})
+
+QUnit.module('Copy To menu item', hooks => {
+  hooks.beforeEach(() => {
+    fetchMock.get('/users/self/manageable_courses?include=', 200)
+    $('#fixtures').empty()
+    $('#fixtures').append(`
+      <div role="alert" id="flash_screenreader_holder"></div>
+      <div id="direct-share-course-mount-point"></div>
+    `)
+  })
+
+  hooks.afterEach(() => {
+    cleanup()
+    fetchMock.restore()
+  })
+
+  test('is present when the item is a file', () => {
+    const props = {...sampleProps(), model: new File({id: 1}), userCanEditFilesForContext: true}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    ok(queryByRole('menuitem', {hidden: true, name: 'Copy To...'}))
+  })
+
+  test('is not present when the item is a folder', () => {
+    const props = {...sampleProps(), userCanEditFilesForContext: true}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    notOk(queryByRole('menuitem', {hidden: true, name: 'Copy To...'}))
+  })
+
+  test('is not present when the user does not have edit files permissions', () => {
+    const props = {...sampleProps(), model: new File({id: '1'})}
+    const {queryByRole} = render(<ItemCog {...props} />)
+    notOk(queryByRole('menuitem', {hidden: true, name: 'Copy To...'}))
+  })
+
+  test('calls onCopyToClick when clicked', () => {
+    const onCopyToClickStub = sinon.stub()
+    const props = {
+      ...sampleProps(),
+      model: new File({id: '1'}),
+      onCopyToClick: onCopyToClickStub,
+      userCanEditFilesForContext: true
+    }
+    const {queryByRole} = render(<ItemCog {...props} />)
+    queryByRole('menuitem', {hidden: true, name: 'Copy To...'}).click()
+    strictEqual(onCopyToClickStub.callCount, 1)
+  })
 })

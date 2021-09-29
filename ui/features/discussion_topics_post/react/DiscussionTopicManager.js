@@ -19,8 +19,8 @@
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
 import {CREATE_DISCUSSION_ENTRY} from '../graphql/Mutations'
 import {DISCUSSION_QUERY} from '../graphql/Queries'
-import {DiscussionPostToolbarContainer} from './containers/DiscussionPostToolbarContainer/DiscussionPostToolbarContainer'
-import {DiscussionThreadsContainer} from './containers/DiscussionThreadsContainer/DiscussionThreadsContainer'
+import {DiscussionTopicToolbarContainer} from './containers/DiscussionTopicToolbarContainer/DiscussionTopicToolbarContainer'
+import {DiscussionTopicRepliesContainer} from './containers/DiscussionTopicRepliesContainer/DiscussionTopicRepliesContainer'
 import {DiscussionTopicContainer} from './containers/DiscussionTopicContainer/DiscussionTopicContainer'
 import errorShipUrl from '@canvas/images/ErrorShip.svg'
 import GenericErrorPage from '@canvas/generic-error-page'
@@ -167,7 +167,7 @@ const DiscussionTopicManager = props => {
 
   return (
     <SearchContext.Provider value={searchContext}>
-      <DiscussionPostToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
+      <DiscussionTopicToolbarContainer discussionTopic={discussionTopicQuery.data.legacyNode} />
       <DiscussionTopicContainer
         discussionTopic={discussionTopicQuery.data.legacyNode}
         createDiscussionEntry={text => {
@@ -185,7 +185,7 @@ const DiscussionTopicManager = props => {
       (searchTerm || filter === 'unread') ? (
         <NoResultsFound />
       ) : (
-        <DiscussionThreadsContainer
+        <DiscussionTopicRepliesContainer
           discussionTopic={discussionTopicQuery.data.legacyNode}
           onOpenIsolatedView={(
             discussionEntryId,

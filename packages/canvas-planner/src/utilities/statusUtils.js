@@ -65,6 +65,7 @@ export function getBadgesForItem(item) {
   let badges = []
   if (item.status) {
     badges = Object.keys(item.status)
+      .filter((key, _index, _all) => !(!item.status.posted_at && key === 'graded')) // if no posted_at, ignore graded
       .filter((key, _index, _all) => !(item.status.excused && key === 'graded')) // if excused, ignore graded
       .filter((key, _index, _all) => !(item.status.graded && key === 'submitted')) // if graded, ignore submitted
       .filter((key, _index, _all) => !(item.status.redo_request && key === 'submitted')) // if redo requested, ignore submitted

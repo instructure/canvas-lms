@@ -41,6 +41,8 @@ describe('ManageOutcomeItem', () => {
     linkId: '2',
     title: 'Outcome Title',
     description: 'Outcome Description',
+    outcomeContextType: 'Account',
+    outcomeContextId: 1,
     isChecked: false,
     canManageOutcome: true,
     canUnlink: true,
@@ -88,9 +90,8 @@ describe('ManageOutcomeItem', () => {
   })
 
   it('displays down pointing caret when description is expanded', () => {
-    const {queryByTestId, getByTestId} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const descTruncated = getByTestId('description-truncated')
-    fireEvent.click(descTruncated)
+    const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+    fireEvent.click(getByText('Expand outcome description'))
     expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
   })
 

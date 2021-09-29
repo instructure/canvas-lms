@@ -18,7 +18,7 @@
 import {func} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
 import NotificationPreferencesSetting from './Setting'
-import NotificationPreferencesShape from './Shape'
+import {NotificationPreferencesShape} from './Shape'
 import React, {useState} from 'react'
 
 import {Checkbox} from '@instructure/ui-checkbox'

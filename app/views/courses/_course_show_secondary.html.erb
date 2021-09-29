@@ -86,12 +86,12 @@
     </div>
     <% end %>
 
-    <% if @context.available? && @context.self_enrollment_enabled? && @context.open_enrollment && (!@context_enrollment || !@context_enrollment.active?) %>
+    <% if visible_self_enrollment_option == :enroll %>
     <a href="<%= enroll_url(@context.self_enrollment_code) %>" class="btn button-sidebar-wide self_enrollment_link">
       <i class="icon-user-add"></i>
       <%= t('links.join_course', %{Join this Course}) %>
     </a>
-    <% elsif @context_enrollment && @context_enrollment.self_enrolled && @context_enrollment.active? %>
+    <% elsif visible_self_enrollment_option == :unenroll %>
     <a href="#" class="btn button-sidebar-wide self_unenrollment_link">
       <i class="icon-end"></i>
       <%= t('links.drop_course', %{Drop this Course}) %>

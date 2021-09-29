@@ -53,7 +53,7 @@ module Types
 
     global_id_field :id
 
-    field :context_id, Integer, null: true
+    field :context_id, ID, null: true
     field :context_type, String, null: true
     field :title, String, null: false
     field :description, String, null: true

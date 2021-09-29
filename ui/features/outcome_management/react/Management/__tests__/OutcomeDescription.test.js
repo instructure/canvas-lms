@@ -17,23 +17,20 @@
  */
 
 import React from 'react'
-import {render as rtlRender, fireEvent} from '@testing-library/react'
+import {render as rtlRender} from '@testing-library/react'
 import OutcomeDescription from '../OutcomeDescription'
 import OutcomesContext from '@canvas/outcomes/react/contexts/OutcomesContext'
 
 describe('OutcomeDescription', () => {
-  let onClickHandlerMock
   const empty = ''
   const truncatedTestId = 'description-truncated'
   const truncatedTestContentId = 'description-truncated-content'
   const expandedTestId = 'description-expanded'
   const friendlyExpandedTestId = 'friendly-description-expanded'
   const defaultProps = (props = {}) => ({
-    withExternalControl: true,
-    truncate: true,
+    truncated: true,
     description: 'Description',
     friendlyDescription: '',
-    onClickHandler: onClickHandlerMock,
     ...props
   })
 
@@ -45,102 +42,34 @@ describe('OutcomeDescription', () => {
     )
   }
 
-  beforeEach(() => {
-    onClickHandlerMock = jest.fn()
+  it('renders truncated Description when description prop provided and truncated prop true', () => {
+    const {queryByTestId} = render(<OutcomeDescription {...defaultProps()} />)
+    expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
+    expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
+  it('renders expanded Description when description prop provided and truncated prop false', () => {
+    const {queryByTestId} = render(<OutcomeDescription {...defaultProps({truncated: false})} />)
+    expect(queryByTestId(expandedTestId)).toBeInTheDocument()
   })
 
-  describe('with External Control', () => {
-    it('renders truncated Description when description prop provided and truncate prop true', () => {
-      const {queryByTestId} = render(<OutcomeDescription {...defaultProps()} />)
-      expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-      expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
-    })
-
-    it('renders expanded Description when description prop provided and truncate prop false', () => {
-      const {queryByTestId} = render(<OutcomeDescription {...defaultProps({truncate: false})} />)
-      expect(queryByTestId(expandedTestId)).toBeInTheDocument()
-    })
-
-    it('does not render Description when description prop not provided/null', () => {
-      const {queryByTestId} = render(<OutcomeDescription {...defaultProps({description: null})} />)
-      expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
-    })
-
-    it('does not render Description when description prop is empty', () => {
-      const {queryByTestId} = render(<OutcomeDescription {...defaultProps({description: empty})} />)
-      expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
-    })
-
-    it('calls click handler when user clicks on truncated description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps()} />)
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.click(descTruncated)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
-
-    it('calls click handler when user clicks on expanded description', () => {
-      const {getByTestId} = render(<OutcomeDescription {...defaultProps({truncate: false})} />)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.click(descExpanded)
-      expect(onClickHandlerMock).toHaveBeenCalledTimes(1)
-    })
+  it('does not render Description when description prop not provided/null', () => {
+    const {queryByTestId} = render(<OutcomeDescription {...defaultProps({description: null})} />)
+    expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
   })
 
-  describe('with Internal Control', () => {
-    it('renders truncated Description when description prop provided', () => {
-      const {queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-      expect(queryByTestId(truncatedTestContentId)).toHaveStyle('text-overflow: ellipsis')
-    })
-
-    it('does not render Description when description prop not provided/null', () => {
-      const {queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false, description: null})} />
-      )
-      expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
-    })
-
-    it('does not render Description when description prop is empty', () => {
-      const {queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false, description: empty})} />
-      )
-      expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
-    })
-
-    it('expands description when when user clicks on truncated description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.click(descTruncated)
-      expect(queryByTestId(expandedTestId)).toBeInTheDocument()
-    })
-
-    it('truncates description when when user clicks on expanded description', () => {
-      const {getByTestId, queryByTestId} = render(
-        <OutcomeDescription {...defaultProps({withExternalControl: false})} />
-      )
-      const descTruncated = getByTestId(truncatedTestId)
-      fireEvent.click(descTruncated)
-      const descExpanded = getByTestId(expandedTestId)
-      fireEvent.click(descExpanded)
-      expect(queryByTestId(truncatedTestId)).toBeInTheDocument()
-    })
+  it('does not render Description when description prop is empty', () => {
+    const {queryByTestId} = render(<OutcomeDescription {...defaultProps({description: empty})} />)
+    expect(queryByTestId(truncatedTestId)).not.toBeInTheDocument()
   })
 
   describe('with friendly description', () => {
     describe('feature flag enabled', () => {
       it('displays the friendly description when expanded', () => {
-        const {getByTestId, queryByTestId} = render(
+        const {queryByTestId} = render(
           <OutcomeDescription
             {...defaultProps({
-              withExternalControl: false,
+              truncated: false,
               friendlyDescription: 'Friendly Description'
             })}
           />,
@@ -148,16 +77,14 @@ describe('OutcomeDescription', () => {
             friendlyDescriptionFF: true
           }
         )
-        const descTruncated = getByTestId(truncatedTestId)
-        fireEvent.click(descTruncated)
         expect(queryByTestId(friendlyExpandedTestId)).toBeInTheDocument()
       })
 
       it('displays the friendly description as the description if the user is a student', () => {
-        const {getByTestId, queryByTestId, getByText} = render(
+        const {queryByTestId, getByText} = render(
           <OutcomeDescription
             {...defaultProps({
-              withExternalControl: false,
+              truncated: false,
               friendlyDescription: 'Friendly Description'
             })}
           />,
@@ -166,17 +93,15 @@ describe('OutcomeDescription', () => {
             isStudent: true
           }
         )
-        const descTruncated = getByTestId(truncatedTestId)
-        fireEvent.click(descTruncated)
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
         expect(getByText('Friendly Description')).toBeInTheDocument()
       })
 
       it('displays the friendly description as the description if there is no description', () => {
-        const {getByTestId, queryByTestId, getByText} = render(
+        const {queryByTestId, getByText} = render(
           <OutcomeDescription
             {...defaultProps({
-              withExternalControl: false,
+              truncated: false,
               friendlyDescription: 'Very Friendly Text',
               description: ''
             })}
@@ -185,8 +110,6 @@ describe('OutcomeDescription', () => {
             friendlyDescriptionFF: true
           }
         )
-        const descTruncated = getByTestId(truncatedTestId)
-        fireEvent.click(descTruncated)
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
         expect(queryByTestId('Description')).not.toBeInTheDocument()
         expect(getByText('Very Friendly Text')).toBeInTheDocument()
@@ -195,16 +118,14 @@ describe('OutcomeDescription', () => {
 
     describe('feature flag disabled', () => {
       it('does not display the friendly description', () => {
-        const {getByTestId, queryByTestId} = render(
+        const {queryByTestId} = render(
           <OutcomeDescription
             {...defaultProps({
-              withExternalControl: false,
+              truncated: false,
               friendlyDescription: 'Friendly Description'
             })}
           />
         )
-        const descTruncated = getByTestId(truncatedTestId)
-        fireEvent.click(descTruncated)
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
       })
 
@@ -212,7 +133,7 @@ describe('OutcomeDescription', () => {
         const {getByTestId, queryByTestId, queryByText} = render(
           <OutcomeDescription
             {...defaultProps({
-              withExternalControl: false,
+              truncated: false,
               friendlyDescription: 'Friendly Description'
             })}
           />,
@@ -220,8 +141,6 @@ describe('OutcomeDescription', () => {
             isStudent: true
           }
         )
-        const descTruncated = getByTestId(truncatedTestId)
-        fireEvent.click(descTruncated)
         expect(getByTestId(expandedTestId)).toBeInTheDocument()
         expect(queryByTestId(friendlyExpandedTestId)).not.toBeInTheDocument()
         expect(queryByText('Friendly Description')).not.toBeInTheDocument()

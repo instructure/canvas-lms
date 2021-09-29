@@ -339,7 +339,7 @@ describe ProfileController do
       it "sets the appropriate page title" do
         user_session(@user)
         get "communication"
-        expect(response.body).to include "<title>Account Notification Settings</title>"
+        expect(response.body).to include "<title>Notification Settings</title>"
       end
     end
   end

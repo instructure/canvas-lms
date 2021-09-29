@@ -114,7 +114,7 @@ export default class WikiPageView extends Backbone.View {
       'immersive_reader_mobile_mount_point'
     )
     if (immersive_reader_mount_point || immersive_reader_mobile_mount_point) {
-      import('../../react/ImmersiveReader')
+      import('../../../../shared/immersive-reader/ImmersiveReader')
         .then(ImmersiveReader => {
           const content = document.querySelector('.show-content').innerHTML
           const title = document.querySelector('.page-title').textContent
@@ -125,7 +125,8 @@ export default class WikiPageView extends Backbone.View {
 
           if (immersive_reader_mobile_mount_point) {
             ImmersiveReader.initializeReaderButton(immersive_reader_mobile_mount_point, {
-              content, title
+              content,
+              title
             })
           }
         })
@@ -271,6 +272,7 @@ export default class WikiPageView extends Backbone.View {
     json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
     json.CAN.VIEW_TOOLBAR =
+      json.course_home ||
       json.CAN.VIEW_ALL_PAGES ||
       json.CAN.PUBLISH ||
       json.CAN.UPDATE_CONTENT ||

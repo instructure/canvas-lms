@@ -39,7 +39,7 @@ module CanvasPartman
     attr_accessor :migrations_scope, :timeout_seconds
 
     def timeout_value
-      timeout_seconds.call * 1000
+      timeout_seconds.call
     end
   end
 

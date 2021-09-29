@@ -45,7 +45,8 @@ const makeProps = async overrides => {
     ...assignmentAndSubmission,
     createSubmissionDraft: jest.fn(),
     updateUploadingFiles: jest.fn(),
-    uploadingFiles: false
+    uploadingFiles: false,
+    focusOnInit: false
   }
 }
 
@@ -61,10 +62,17 @@ describe.skip('MediaAttempt', () => {
       expect(getByText('Add Media')).toBeInTheDocument()
     })
 
-    it('moves focus to the media modal button after render', async () => {
+    it('moves focus to the media modal button after render if focusOnInit is true', async () => {
       const props = await makeProps()
+      props.focusOnInit = true
       const {getByTestId} = render(<MediaAttempt {...props} />)
       expect(getByTestId('media-modal-launch-button')).toHaveFocus()
+    })
+
+    it('does not move focus to the media modal button after render if focusOnInit is false', async () => {
+      const props = await makeProps()
+      const {getByTestId} = render(<MediaAttempt {...props} />)
+      expect(getByTestId('media-modal-launch-button')).not.toHaveFocus()
     })
 
     it('renders the current submission draft', async () => {

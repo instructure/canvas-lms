@@ -1124,7 +1124,8 @@ class Assignment < ActiveRecord::Base
           )
         )
 
-        line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
+        li = line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
+        create_results_from_prior_grades(li)
       elsif saved_change_to_title? || saved_change_to_points_possible?
         line_items.
           find(&:assignment_line_item?)&.
@@ -1150,6 +1151,27 @@ class Assignment < ActiveRecord::Base
     end
   end
   protected :update_line_items
+
+  # This should only be called once, upon line item creation.
+  # It ensures that any prior scores are reflected in the AGS Results API,
+  # and creates results like they are created in the AGS Scores API.
+  # It ignores any previous submission versions in favor of the most recent.
+  def create_results_from_prior_grades(line_item)
+    self.submissions.where.not(score: nil).each do |sub|
+      line_item.results.create!(
+        submission: sub,
+        user: sub.user,
+        created_at: Time.zone.now,
+        updated_at: sub.graded_at,
+        result_score: sub.score,
+        result_maximum: self.points_possible || 0,
+        extensions: {
+          Lti::Result::AGS_EXT_SUBMISSION => { submitted_at: sub.submitted_at }
+        }
+      )
+    end
+  end
+  protected :create_results_from_prior_grades
 
   def validate_resource_link_custom_params
     Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link_custom_params)

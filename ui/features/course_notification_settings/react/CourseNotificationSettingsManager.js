@@ -21,11 +21,11 @@ import {bool, string} from 'prop-types'
 import I18n from 'i18n!courses'
 import {useMutation} from 'react-apollo'
 import NotificationPreferences from '@canvas/notification-preferences'
-import NotificationPreferencesShape from '@canvas/notification-preferences/react/Shape'
+import {NotificationPreferencesShape} from '@canvas/notification-preferences/react/Shape'
 import React, {useContext} from 'react'
 import {UPDATE_COURSE_NOTIFICATION_PREFERENCES} from '../graphql/Mutations'
 
-export default function CourseNotifcationSettingsManager(props) {
+export default function CourseNotificationSettingsManager(props) {
   const {setOnSuccess, setOnFailure} = useContext(AlertManagerContext)
   const [updatePreference] = useMutation(UPDATE_COURSE_NOTIFICATION_PREFERENCES, {
     onCompleted(data) {
@@ -62,13 +62,15 @@ export default function CourseNotifcationSettingsManager(props) {
         })
       }
       notificationPreferences={props.notificationPreferences}
+      userId={props.userId}
     />
   )
 }
 
-CourseNotifcationSettingsManager.propTypes = {
+CourseNotificationSettingsManager.propTypes = {
   courseId: string.isRequired,
   courseName: string.isRequired,
   enabled: bool.isRequired,
-  notificationPreferences: NotificationPreferencesShape
+  notificationPreferences: NotificationPreferencesShape,
+  userId: string.isRequired
 }

@@ -149,6 +149,9 @@ class SplitUsers
   end
 
   def check_and_update_local_ids(records)
+    # if both users have the same local id, this isn't a safe guess to make
+    return records if source_user.local_id == restored_user.local_id
+
     if records.where("previous_user_id<?", Shard::IDS_PER_SHARD).where(previous_user_id: restored_user.local_id).exists?
       records.where(previous_user_id: restored_user.local_id).update_all(previous_user_id: restored_user.global_id)
     end

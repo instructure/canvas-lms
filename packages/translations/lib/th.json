@@ -1,4 +1,10 @@
 {
+    "a_great_discussion_6526a6d9": {
+        "message": "การพูดคุยที่ดีเยี่ยม"
+    },
+    "a_wonderful_assignment_d3139d9b": {
+        "message": "ภารกิจที่น่าชื่นชม"
+    },
     "access_the_pretty_html_editor_37168efe": {
         "message": "เข้าไปยัง HTML Editor ที่สวยงาม"
     },
@@ -58,6 +64,9 @@
     },
     "alt_text_611fb322": {
         "message": "ข้อความเผื่อเลือก"
+    },
+    "an_amazing_discussion_assignment_e5c8bd6b": {
+        "message": "ภารกิจการพูดคุยที่น่าจดจำ"
     },
     "an_error_occured_reading_the_file_ff48558b": {
         "message": "เกิดข้อผิดพลาดขณะอ่านไฟล์"
@@ -437,6 +446,9 @@
     "edit_equation_f5279959": {
         "message": "แก้ไขสมการ"
     },
+    "edit_existing_button_icon_3d0277bd": {
+        "message": "แก้ไขปุ่ม/ไอคอนในปัจจุบัน"
+    },
     "edit_link_7f53bebb": {
         "message": "แก้ไขลิงค์"
     },
@@ -484,6 +496,9 @@
     },
     "error_loading_past_items_2881dbb1": {
         "message": "มีข้อผิดพลาดในการโหลดรายการในอดีต"
+    },
+    "exciting_discussion_9f67bd0a": {
+        "message": "การพูดคุยที่น่าตื่นเต้น"
     },
     "excused_cf8792eb": {
         "message": "ได้รับการยกเว้น"
@@ -571,6 +586,9 @@
     },
     "fullscreen_873bf53f": {
         "message": "เต็มหน้าจอ"
+    },
+    "fun_quiz_47ab0b0": {
+        "message": "แบบทดสอบสนุก ๆ"
     },
     "generating_preview_45b53be0": {
         "message": "กำลังจัดทำตัวอย่างจัดแสดง..."
@@ -695,6 +713,15 @@
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } เสร็จสิ้น { items, plural,\n     =1 {รายการ}\n  other {รายการ}\n}"
     },
+    "join_6cafecca": {
+        "message": "เข้าร่วม"
+    },
+    "join_active_online_meeting_d9d892b2": {
+        "message": "เข้าร่วมการประชุมออนไลน์แบบแอคทีฟ"
+    },
+    "join_online_meeting_b1725843": {
+        "message": "เข้าร่วมการประชุมออนไลน์"
+    },
     "jump_to_navigation_toolbar_2952cd8b": {
         "message": "ข้ามไปที่แถบเครื่องมือสืบค้นเนื้อหา"
     },
@@ -703,6 +730,9 @@
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "ชอร์ตคัทแป้นพิมพ์"
+    },
+    "language_arts_35b79a8b": {
+        "message": "ศิลปศาสตร์ด้านภาษา"
     },
     "large_9c5e80e7": {
         "message": "ใหญ่"
@@ -775,6 +805,9 @@
     },
     "looks_like_there_isn_t_anything_here_d9bcef49": {
         "message": "ดูเหมือนจะไม่มีอะไรที่นี่"
+    },
+    "math_ede93050": {
+        "message": "คณิตศาสตร์"
     },
     "media_af190855": {
         "message": "มีเดีย"
@@ -1028,6 +1061,9 @@
     "schedule_preview_3bcda153": {
         "message": "กำหนดเวลาแสดงตัวอย่าง"
     },
+    "science_8d92214a": {
+        "message": "วิทยาศาสตร์"
+    },
     "scroll_up_to_see_your_history_19b14cad": {
         "message": "เลื่อนขึ้นเพื่อดูประวัติของคุณ!"
     },
@@ -1075,6 +1111,9 @@
     },
     "small_b070434a": {
         "message": "เล็ก"
+    },
+    "social_studies_13fa30c7": {
+        "message": "สังคมศึกษา"
     },
     "something_went_wrong_89195131": {
         "message": "มีบางอย่างผิดปกติ"
@@ -1168,6 +1207,9 @@
     },
     "text_size_887c2f6": {
         "message": "ขนาดข้อความ"
+    },
+    "the_best_assignment_15e98be1": {
+        "message": "ภารกิจที่ดีที่สุด"
     },
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "วันที่และเวลาครบกำหนดสำหรับสิ่งที่ต้องทำนี้"

@@ -100,12 +100,6 @@ QUnit.module('Gradebook', suiteHooks => {
         resubmitted: '#E5F7E5'
       })
 
-      test('is set using the current setting from Gradebook', async () => {
-        gradebook.setGridColors(colors)
-        await saveSettings()
-        deepEqual(getSavedSettings().colors, colors)
-      })
-
       test('can be set using an argument', async () => {
         await saveSettings({colors})
         deepEqual(getSavedSettings().colors, colors)
