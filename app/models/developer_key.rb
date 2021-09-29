@@ -69,16 +69,16 @@ class DeveloperKey < ActiveRecord::Base
   scope :not_active, -> { where("workflow_state<>'active'") } # search for deleted & inactive keys
   scope :visible, -> { where(visible: true) }
   scope :site_admin, -> { where(account_id: nil) } # site_admin keys have a nil account_id
-  scope :site_admin_lti, -> (key_ids) do
+  scope :site_admin_lti, ->(key_ids) do
     # Select site admin shard developer key ids
     site_admin_key_ids = key_ids.select do |id|
       Shard.local_id_for(id).second == Account.site_admin.shard
     end
 
     Account.site_admin.shard.activate do
-      lti_key_ids = Lti::ToolConfiguration.joins(:developer_key).
-        where(developer_keys: { id: site_admin_key_ids }).
-        pluck(:developer_key_id)
+      lti_key_ids = Lti::ToolConfiguration.joins(:developer_key)
+                                          .where(developer_keys: { id: site_admin_key_ids })
+                                          .pluck(:developer_key_id)
       self.where(id: lti_key_ids)
     end
   end
@@ -103,7 +103,8 @@ class DeveloperKey < ActiveRecord::Base
 
   def usable?
     return false if DeveloperKey.test_cluster_checks_enabled? &&
-      test_cluster_only? && !ApplicationController.test_cluster?
+                    test_cluster_only? && !ApplicationController.test_cluster?
+
     active?
   end
 
@@ -139,12 +140,13 @@ class DeveloperKey < ActiveRecord::Base
     self.icon_url = nil if icon_url.blank?
   end
 
-  def generate_api_key(overwrite=false)
+  def generate_api_key(overwrite = false)
     self.api_key = CanvasSlug.generate(nil, 64) if overwrite || !self.api_key
   end
 
   def generate_rsa_keypair!(overwrite: false)
     return if public_jwk.present? && !overwrite
+
     key_pair = Canvas::Security::RSAKeyPair.new
     @private_jwk = key_pair.to_jwk
     self.public_jwk = key_pair.public_jwk.to_h
@@ -174,10 +176,12 @@ class DeveloperKey < ActiveRecord::Base
 
         key = @special_keys[default_key_name]
         return key if key
+
         if (key_id = Setting.get("#{default_key_name}_developer_key_id", nil)) && key_id.present?
           key = DeveloperKey.where(id: key_id).first
         end
         return @special_keys[default_key_name] = key if key
+
         key = DeveloperKey.create!(:name => default_key_name)
         key.developer_key_account_bindings.update_all(workflow_state: 'on')
         Setting.set("#{default_key_name}_developer_key_id", key.id)
@@ -233,6 +237,7 @@ class DeveloperKey < ActiveRecord::Base
     return false unless binding_on_in_account?(target_account)
     return true if account_id.blank?
     return true if target_account.id == account_id
+
     target_account.account_chain_ids.include?(account_id)
   end
 
@@ -255,8 +260,8 @@ class DeveloperKey < ActiveRecord::Base
     other_uri = URI.parse(redirect_uri)
     other_domain = other_uri.host
     result = self_domain.present? && other_domain.present? &&
-       self_uri.scheme == other_uri.scheme &&
-       (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+             self_uri.scheme == other_uri.scheme &&
+             (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
     if result && redirect_uri != self.redirect_uri
       Rails.logger.info("Allowed lenient OAuth redirect uri #{redirect_uri} on developer key #{global_id}")
     end
@@ -345,6 +350,7 @@ class DeveloperKey < ActiveRecord::Base
   def validate_lti_fields
     return unless self.is_lti_key?
     return if self.public_jwk.present? || self.public_jwk_url.present?
+
     errors.add(:lti_key, "developer key must have public jwk or public jwk url")
   end
 
@@ -363,8 +369,8 @@ class DeveloperKey < ActiveRecord::Base
 
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
-      delay(**enqueue_args).
-        manage_external_tools_multi_shard(enqueue_args, method, affected_account)
+      delay(**enqueue_args)
+        .manage_external_tools_multi_shard(enqueue_args, method, affected_account)
     else
       delay(**enqueue_args).__send__(method, affected_account)
     end
@@ -435,6 +441,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def restore_tools_on_active_shard!(_binding_account)
     return if tool_configuration.blank?
+
     Account.root_accounts.each do |root_account|
       next if root_account.site_admin?
 
@@ -455,6 +462,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def disable_tools_on_active_shard!(binding_account)
     return if tool_configuration.blank?
+
     set_tool_workflow_state_on_active_shard!(
       ContextExternalTool::DISABLED_STATE,
       ContextExternalTool.active,
@@ -464,6 +472,7 @@ class DeveloperKey < ActiveRecord::Base
 
   def enable_tools_on_active_shard!(binding_account)
     return if tool_configuration.blank?
+
     set_tool_workflow_state_on_active_shard!(
       tool_configuration.privacy_level,
       ContextExternalTool.disabled,
@@ -483,6 +492,7 @@ class DeveloperKey < ActiveRecord::Base
   def invalidate_access_tokens_if_scopes_removed!
     return unless saved_change_to_scopes?
     return if (scopes_before_last_save - scopes).blank?
+
     delay_if_production.invalidate_access_tokens!
   end
 
@@ -501,8 +511,10 @@ class DeveloperKey < ActiveRecord::Base
 
   def validate_scopes!
     return true if self.scopes.empty?
+
     invalid_scopes = self.scopes - TokenScopes.all_scopes
     return true if invalid_scopes.empty?
+
     self.errors[:scopes] << "cannot contain #{invalid_scopes.join(', ')}"
   end
 

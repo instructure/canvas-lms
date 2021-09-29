@@ -28,26 +28,26 @@ describe "API Error Handling", type: :request do
   end
 
   describe "ActiveRecord Error JSON override" do
-    it "should not return the base object in ErrorMessage.to_json" do
+    it "does not return the base object in ErrorMessage.to_json" do
       err = ActiveModel::BetterErrors::ErrorMessage.new(@user, :name, :invalid, "invalid name")
       expect(JSON.parse(err.to_json)).to eq({ 'attribute' => 'name', 'type' => 'invalid', 'message' => 'invalid name', 'options' => {} })
     end
 
-    it "should not return the base object in ActiveRecord::Errors.to_json" do
+    it "does not return the base object in ActiveRecord::Errors.to_json" do
       assmt = Assignment.new
       expect(assmt.valid?).to be_falsey
       errors = assmt.errors.to_json
       parsed = JSON.parse(errors)['errors']
       expect(parsed.size).to be > 0
       expect(errors).not_to match(/blah blah/)
-      parsed.each { |k,v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
+      parsed.each { |k, v| v.each { |i| expect(i.keys.sort).to eq ['attribute', 'message', 'type'] } }
     end
   end
 
-  it "should respond not_found for 404 errors" do
+  it "responds not_found for 404 errors" do
     get "/api/v1/courses/54321", headers: { 'Authorization' => "Bearer #{@token.full_token}" }
     expect(response.response_code).to eq 404
     json = JSON.parse(response.body)
-    expect(json['errors']).to eq [{'message' => 'The specified resource does not exist.'}]
+    expect(json['errors']).to eq [{ 'message' => 'The specified resource does not exist.' }]
   end
 end

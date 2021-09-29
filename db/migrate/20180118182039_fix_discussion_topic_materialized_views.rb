@@ -21,9 +21,9 @@ class FixDiscussionTopicMaterializedViews < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::FixDiscussionTopicMaterializedViews.
-      delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').
-      run
+    DataFixup::FixDiscussionTopicMaterializedViews
+      .delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups')
+      .run
   end
 
   def down

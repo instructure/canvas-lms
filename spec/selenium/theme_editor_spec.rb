@@ -27,11 +27,10 @@ describe 'Theme Editor' do
   include ThemeEditorCommon
 
   before(:each) do
-
     course_with_admin_logged_in
   end
 
-  it 'should open theme index from the admin page', priority: "1", test_id: 244225 do
+  it 'opens theme index from the admin page', priority: "1", test_id: 244225 do
     get "/accounts/#{Account.default.id}"
 
     f('#left-side #section-tabs .brand_configs').click
@@ -39,7 +38,7 @@ describe 'Theme Editor' do
   end
 
   it 'theme index renders shared themes' do
-    brand_config = BrandConfig.create!(variables: {"ic-brand-primary" => "#321"})
+    brand_config = BrandConfig.create!(variables: { "ic-brand-primary" => "#321" })
     shared_themes = 2.times.map do |i|
       Account.default.shared_brand_configs.create!(
         name: "shared theme #{i}",
@@ -54,13 +53,13 @@ describe 'Theme Editor' do
     end
   end
 
-  it 'should open theme editor', priority: "1", test_id: 239980 do
+  it 'opens theme editor', priority: "1", test_id: 239980 do
     open_theme_editor(Account.default.id)
 
     expect(driver.title).to include 'Theme Editor'
   end
 
-  it 'should close theme editor on cancel and redirect to /accounts/x', priority: "1", test_id: 239981 do
+  it 'closes theme editor on cancel and redirect to /accounts/x', priority: "1", test_id: 239981 do
     skip_if_safari(:alert)
     open_theme_editor(Account.default.id)
 
@@ -75,7 +74,7 @@ describe 'Theme Editor' do
     expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
-  it 'should close after preview (no changes saved)', priority: "1", test_id: 239984 do
+  it 'closes after preview (no changes saved)', priority: "1", test_id: 239984 do
     skip_if_safari(:alert)
     open_theme_editor(Account.default.id)
 
@@ -97,7 +96,7 @@ describe 'Theme Editor' do
     expect(f('#left-side #section-tabs .brand_configs').text).to eq 'Themes'
   end
 
-  it 'should display the preview button when valid change is made', priority: "1", test_id: 239984 do
+  it 'displays the preview button when valid change is made', priority: "1", test_id: 239984 do
     open_theme_editor(Account.default.id)
 
     # verifies theme editor is open
@@ -108,7 +107,7 @@ describe 'Theme Editor' do
     expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
-  it 'should accept valid Hex IDs', priority: "1", test_id: 239986 do
+  it 'accepts valid Hex IDs', priority: "1", test_id: 239986 do
     open_theme_editor(Account.default.id)
     click_global_branding
 
@@ -121,7 +120,7 @@ describe 'Theme Editor' do
     expect(f("body")).not_to contain_css(warning_message_css)
   end
 
-  it 'should accept valid shortened Hex IDs', priority: "2", test_id: 240455 do
+  it 'accepts valid shortened Hex IDs', priority: "2", test_id: 240455 do
     open_theme_editor(Account.default.id)
     click_global_branding
 
@@ -133,7 +132,7 @@ describe 'Theme Editor' do
     expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
-  it 'should accept valid color names', priority: "2", test_id: 240233 do
+  it 'accepts valid color names', priority: "2", test_id: 240233 do
     open_theme_editor(Account.default.id)
     click_global_branding
 
@@ -145,7 +144,7 @@ describe 'Theme Editor' do
     expect(f('.Theme__preview-button-text')).to include_text 'Preview Your Changes'
   end
 
-  it 'should not accept invalid hex IDs', priority: "1", test_id: 239987 do
+  it 'does not accept invalid hex IDs', priority: "1", test_id: 239987 do
     open_theme_editor(Account.default.id)
     click_global_branding
 
@@ -162,7 +161,7 @@ describe 'Theme Editor' do
 
   it 'K12 Theme should be automatically set when K12 Feature Flag is turned on', priority: "1", test_id: 240001
 
-  it 'should preview should display a progress bar when generating preview', priority: "1", test_id: 239990 do
+  it 'previews should display a progress bar when generating preview', priority: "1", test_id: 239990 do
     open_theme_editor(Account.default.id)
     f('.Theme__editor-color-block_input-text').send_keys(random_hex_color)
 
@@ -171,7 +170,7 @@ describe 'Theme Editor' do
     expect(f('div.progress-bar__bar-container')).to be
   end
 
-  it 'should have validation for every text field', priority: "2", test_id: 241992 do
+  it 'has validation for every text field', priority: "2", test_id: 241992 do
     skip('Broken after upgrade to webdriver 2.53 - seems to be a timing issue on jenkins, passes locally')
     open_theme_editor(Account.default.id)
 
@@ -185,7 +184,7 @@ describe 'Theme Editor' do
     expect(all_warning_messages.length).to eq 15
   end
 
-  it 'should allow fields to be changed after colors are unlinked', priority: 3, test_id: 3470985 do
+  it 'allows fields to be changed after colors are unlinked', priority: 3, test_id: 3470985 do
     bc = BrandConfig.create(variables: {
                               'ic-brand-primary' => '#999',
                               'ic-brand-button--primary-bgd' => '#888'
@@ -203,7 +202,7 @@ describe 'Theme Editor' do
     expect(color_labels[1].attribute('style')).to include('background-color: rgb(0, 0, 0)')
   end
 
-  it 'should only store modified values to the database' do
+  it 'only stores modified values to the database' do
     open_theme_editor(Account.default.id)
     ff('.Theme__editor-color-block_input-text')[1].send_keys('#000') # main text color
     expect_new_page_load do
@@ -211,10 +210,10 @@ describe 'Theme Editor' do
       run_jobs
     end
     brand_config_md5 = driver.execute_script "return ENV.brandConfig.md5"
-    expect(BrandConfig.find(brand_config_md5).variables).to eq({"ic-brand-font-color-dark"=>"#000"})
+    expect(BrandConfig.find(brand_config_md5).variables).to eq({ "ic-brand-font-color-dark" => "#000" })
   end
 
-  it 'should apply the theme to the account' do
+  it 'applies the theme to the account' do
     open_theme_editor(Account.default.id)
     f('input[id="brand_config[variables][ic-brand-primary]"]').send_keys('#639')
     f('input[id="brand_config[variables][ic-link-color]"]').send_keys('#ff00ff')

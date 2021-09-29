@@ -40,6 +40,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
   def show
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
     return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
+
     render json: observer_alert_threshold_json(threshold, @current_user, session)
   end
 
@@ -48,7 +49,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
     begin
       user = api_find(User, attrs[:user_id])
     rescue
-      return render json: {errors: ['user_id is invalid']}, status: :bad_request
+      return render json: { errors: ['user_id is invalid'] }, status: :bad_request
     end
 
     threshold = ObserverAlertThreshold.where(observer: @current_user, student: attrs[:user_id], alert_type: attrs[:alert_type]).take
@@ -70,6 +71,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
   def update
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
     return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
+
     threshold.update(threshold: params[:threshold])
     render json: observer_alert_threshold_json(threshold, @current_user, session)
   end
@@ -77,6 +79,7 @@ class ObserverAlertThresholdsApiController < ApplicationController
   def destroy
     threshold = ObserverAlertThreshold.active.find(params[:observer_alert_threshold_id])
     return render_unauthorized_action unless threshold.observer_id == @current_user.id && threshold.users_are_still_linked?
+
     threshold.destroy
     render json: observer_alert_threshold_json(threshold, @current_user, session)
   end

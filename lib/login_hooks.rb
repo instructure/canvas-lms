@@ -21,6 +21,7 @@
 class LoginHooks
   def self.on_login(&block)
     raise ArgumentError unless block.arity == 1
+
     @hooks ||= []
     @hooks << block
   end

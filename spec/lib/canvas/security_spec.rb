@@ -24,7 +24,6 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 # we won't need this shim anymore, and can drop this test verifying it.
 describe Canvas::Security do
   describe '.config' do
-
     it 'shim works' do
       expect(Canvas::Security.config).to_not be_nil
     end

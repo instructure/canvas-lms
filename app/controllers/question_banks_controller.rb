@@ -34,11 +34,11 @@ class QuestionBanksController < ApplicationController
       if params[:inherited] == '1' && @context != @current_user
         @question_banks += @context.inherited_assessment_question_banks.active
       end
-      @question_banks = @question_banks.select{|b| b.grants_right?(@current_user, :manage) } if params[:managed] == '1'
+      @question_banks = @question_banks.select { |b| b.grants_right?(@current_user, :manage) } if params[:managed] == '1'
       @question_banks = Canvas::ICU.collate_by(@question_banks.uniq) { |b| b.title || CanvasSort::Last }
       respond_to do |format|
         format.html
-        format.json { render :json => @question_banks.map{ |b| b.as_json(methods: [:cached_context_short_name, :assessment_question_count]) }}
+        format.json { render :json => @question_banks.map { |b| b.as_json(methods: [:cached_context_short_name, :assessment_question_count]) } }
       end
     end
   end
@@ -48,7 +48,7 @@ class QuestionBanksController < ApplicationController
       @questions = @bank.assessment_questions.active
       url = polymorphic_url([@context, :question_bank_questions], :question_bank_id => @bank)
       @questions = Api.paginate(@questions, self, url, default_per_page: 50)
-      render :json => {:pages => @questions.total_pages, :questions => @questions}
+      render :json => { :pages => @questions.total_pages, :questions => @questions }
     end
   end
 
@@ -56,7 +56,7 @@ class QuestionBanksController < ApplicationController
     @bank = @context.assessment_question_banks.find(params[:question_bank_id])
     if authorized_action(@bank, @current_user, :update)
       @bank.assessment_questions.active.first.update_order(params[:order].split(','))
-      render :json => {:reorder => true}
+      render :json => { :reorder => true }
     end
   end
 
@@ -93,6 +93,7 @@ class QuestionBanksController < ApplicationController
       unless params[:questions].present?
         return render json: { error: "must specify questions to move" }, status: :unprocessable_entity
       end
+
       ids = []
       params[:questions].each do |key, value|
         ids << key.to_i if value != '0' && key.to_i != 0
@@ -104,13 +105,14 @@ class QuestionBanksController < ApplicationController
         attributes = attributes.map { |attr| connection.quote_column_name(attr) }
         now = connection.quote(Time.now.utc)
         connection.insert(
-            "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
-            @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql)
+          "INSERT INTO #{AssessmentQuestion.quoted_table_name} (#{(%w{assessment_question_bank_id created_at updated_at} + attributes).join(', ')})" +
+          @questions.select(([@new_bank.id, now, now] + attributes).join(', ')).to_sql
+        )
       else
         @questions.update_all(:assessment_question_bank_id => @new_bank.id)
       end
 
-      [ @bank, @new_bank ].each(&:touch)
+      [@bank, @new_bank].each(&:touch)
 
       render :json => {}
     end
@@ -149,7 +151,7 @@ class QuestionBanksController < ApplicationController
     if authorized_action(@bank, @current_user, :update)
       if @bank.update(bank_params)
         @bank.reload
-        render :json => @bank.as_json(:include => {:learning_outcome_alignments => {:include => {:learning_outcome => {:include_root => false}}}})
+        render :json => @bank.as_json(:include => { :learning_outcome_alignments => { :include => { :learning_outcome => { :include_root => false } } } })
       else
         render :json => @bank.errors, :status => :bad_request
       end

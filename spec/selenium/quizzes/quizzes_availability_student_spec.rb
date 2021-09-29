@@ -40,7 +40,7 @@ describe 'Taking a quiz as a student' do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation')).to include_text "This quiz is locked " \
-        "until #{format_time_for_view(@quiz.unlock_at)}"
+                                                     "until #{format_time_for_view(@quiz.unlock_at)}"
     end
   end
 
@@ -56,14 +56,14 @@ describe 'Taking a quiz as a student' do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
       expect(f("#content")).not_to contain_css('#take_quiz_link')
       expect(f('.lock_explanation')).to include_text "This quiz was locked " \
-        "#{format_time_for_view(@quiz.lock_at)}"
+                                                     "#{format_time_for_view(@quiz.lock_at)}"
     end
   end
 
   context 'when the due date is in the past' do
     before(:each) do
       create_quiz_with_due_date(
-        due_at: default_time_for_due_date(Time.zone.now.advance(days:-1))
+        due_at: default_time_for_due_date(Time.zone.now.advance(days: -1))
       )
     end
 

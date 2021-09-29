@@ -26,6 +26,7 @@ module CC
           "tool_profile_#{id}"
         end
         next unless export_object?(tool_proxy, 'tool_profiles')
+
         migration_id = create_key(tool_proxy)
 
         file_name = "#{migration_id}.json"

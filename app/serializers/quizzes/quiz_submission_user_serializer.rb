@@ -26,7 +26,7 @@ module Quizzes
 
     # For Api::V1::User#user_json
     def_delegators :@controller,
-      :service_enabled?
+                   :service_enabled?
 
     attributes :id
 
@@ -64,7 +64,7 @@ module Quizzes
       end
     end
 
-    def serializable_object(options={})
+    def serializable_object(options = {})
       super.merge!(
         user_json(object, current_user, session, sideloads)
       )

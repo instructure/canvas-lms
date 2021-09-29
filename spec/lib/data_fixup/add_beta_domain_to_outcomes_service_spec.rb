@@ -36,7 +36,7 @@ describe DataFixup::AddBetaDomainToOutcomesService do
         domain: 'test.outcomes-iad-prod.instructure.com',
         consumer_key: 'blah',
         jwt_secret: 'woo'
-      }}
+      } }
       @account.save!
       allow(ApplicationController).to receive(:test_cluster_name).and_return('beta')
       expect(@account.settings[:provision]['outcomes'][:beta_domain]).to eq(nil)
@@ -49,7 +49,7 @@ describe DataFixup::AddBetaDomainToOutcomesService do
         domain: 'test-prod.instructure.com.outcomes-iad-prod.instructure.com',
         consumer_key: 'blah',
         jwt_secret: 'woo'
-      }}
+      } }
       @account.save!
       allow(ApplicationController).to receive(:test_cluster_name).and_return('beta')
       expect(@account.settings[:provision]['outcomes'][:beta_domain]).to eq(nil)

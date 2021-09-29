@@ -9,7 +9,7 @@
 # the terms of the GNU Affero General Public License as publishe
 # Software Foundation, version 3 of the License.
 #
-# Canvas is distributed in the hope that it will be useful, but 
+# Canvas is distributed in the hope that it will be useful, but
 # WARRANTY; without even the implied warranty of MERCHANTABILITY
 # A PARTICULAR PURPOSE. See the GNU Affero General Public Licens
 # details.

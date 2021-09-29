@@ -200,7 +200,7 @@ describe GradeSummaryPresenter do
     it 'filters out test students and inactive enrollments' do
       s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -248,7 +248,7 @@ describe GradeSummaryPresenter do
       teacher_in_course
       s1, s2, s3, removed_student = all_students = n_students_in_course(4, course: @course)
 
-      fake_student = course_with_user('StudentViewEnrollment', {:course => @course}).user
+      fake_student = course_with_user('StudentViewEnrollment', { :course => @course }).user
       fake_student.preferences[:fake_student] = true
 
       a = @course.assignments.create! points_possible: 10
@@ -305,9 +305,7 @@ describe GradeSummaryPresenter do
       expect(@presenter.observed_students).to include(@student => [@student_enrollment])
       expect(@presenter.observed_students).to include(@student2 => [@student_enrollment2])
     end
-
   end
-
 
   describe '#submissions' do
     before(:once) do
@@ -382,14 +380,14 @@ describe GradeSummaryPresenter do
     end
 
     it "does not return 'Assignment Group' as an option if all of the " \
-    "assignments belong to the same assignment group" do
+       "assignments belong to the same assignment group" do
       @course.assignments.create!(title: "Math Assignment")
       @course.assignments.create!(title: "Science Assignment")
       expect(presenter.sort_options).to_not include assignment_group_option
     end
 
     it "returns 'Assignment Group' as an option if there are " \
-    "assignments that belong to different assignment groups" do
+       "assignments that belong to different assignment groups" do
       @course.assignments.create!(title: "Math Assignment")
       science_group = @course.assignment_groups.create!(name: "Science Assignments")
       @course.assignments.create!(title: "Science Assignment", assignment_group: science_group)
@@ -528,7 +526,7 @@ describe GradeSummaryPresenter do
           end
 
           it "sorts by module position, then context module tag position, " \
-          "with those not belonging to a module sorted last" do
+             "with those not belonging to a module sorted last" do
             assignment3.context_module_tags.first.destroy!
             expected_id_order = [assignment2.id, assignment1.id, assignment3.id]
             expect(ordered_assignment_ids).to eq(expected_id_order)
@@ -601,11 +599,11 @@ describe GradeSummaryPresenter do
     end
 
     let(:teacher) do
-      teacher_in_course({course: gspcourse}).user
+      teacher_in_course({ course: gspcourse }).user
     end
 
     let(:inactive_student_enrollment) do
-      enrollment = course_with_user('StudentEnrollment', {course: gspcourse})
+      enrollment = course_with_user('StudentEnrollment', { course: gspcourse })
       enrollment.workflow_state = 'inactive'
       enrollment.save!
       enrollment
@@ -616,7 +614,7 @@ describe GradeSummaryPresenter do
     end
 
     let(:other_student_enrollment) do
-      course_with_user('StudentEnrollment', {course: gspcourse})
+      course_with_user('StudentEnrollment', { course: gspcourse })
     end
 
     let(:other_student) do

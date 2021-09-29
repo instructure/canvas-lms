@@ -108,7 +108,7 @@ describe UserContent::FilesHandler do
       context 'when attachment does not support relative paths' do
         let(:attachment) { attachment_with_context(submission_model) }
 
-        it 'should not include context name' do
+        it 'does not include context name' do
           expect(processed_url).not_to match(/#{attachment.context_type.tableize}/)
         end
       end

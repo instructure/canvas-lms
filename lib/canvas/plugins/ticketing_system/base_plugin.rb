@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Plugins::TicketingSystem
-
   # This isn't a class intended to be used on it's own.  It's an abstract
   # base class for all ticketing system connectors to inherit from.
   #
@@ -75,5 +74,4 @@ module Canvas::Plugins::TicketingSystem
       raise "MUST OVERRIDE WITH A SETTINGS HASH FOR PLUGIN REGISTRATION"
     end
   end
-
 end

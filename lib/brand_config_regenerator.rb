@@ -20,7 +20,6 @@
 # This is what is in charge of regenerating all of the child
 # brand configs when an account saves theirs in the theme editor
 class BrandConfigRegenerator
-
   attr_reader :progresses
 
   class << self
@@ -34,9 +33,9 @@ class BrandConfigRegenerator
       progress.reset!
       new_brand_config.save! if new_brand_config&.changed?
       progress.process_job(BrandConfigRegenerator,
-        :process_sync,
-        { priority: Delayed::HIGH_PRIORITY, singleton: progress.tag.to_s },
-        account, new_brand_config)
+                           :process_sync,
+                           { priority: Delayed::HIGH_PRIORITY, singleton: progress.tag.to_s },
+                           account, new_brand_config)
       progress
     end
 
@@ -97,7 +96,8 @@ class BrandConfigRegenerator
   def regenerate(thing)
     config = thing.brand_config
     return unless config
-    new_parent_md5 = config.parent_md5 && @new_configs[config.parent_md5].try(:md5) || @account.brand_config_md5
+
+    new_parent_md5 = (config.parent_md5 && @new_configs[config.parent_md5].try(:md5)) || @account.brand_config_md5
     new_config = config.clone_with_new_parent(new_parent_md5)
     new_config.save_unless_dup!
 
@@ -119,7 +119,7 @@ class BrandConfigRegenerator
     total += five_percent
     @progress.calculate_completion!(five_percent, total)
     # take things off the queue from front-to-back
-    while thing = things_left_to_process.shift
+    while (thing = things_left_to_process.shift)
       # if for some reason this one isn't ready (it _should_ be by default,
       # because we get higher tiers first) put it back on the queue to try
       # again later
@@ -130,5 +130,4 @@ class BrandConfigRegenerator
       regenerate(thing)
     end
   end
-
 end

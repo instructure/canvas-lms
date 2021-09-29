@@ -22,10 +22,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/gradebooks/blank_submission" do
-  it "should render" do
+  it "renders" do
     render "gradebooks/blank_submission"
     expect(response).not_to be_nil
   end
 end
-
-

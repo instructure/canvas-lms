@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def outcome_model(opts={})
+  def outcome_model(opts = {})
     global = opts.delete(:global)
     if global
       outcome_group = opts.delete(:outcome_group) || LearningOutcomeGroup.find_or_create_root(nil, true)
@@ -54,7 +54,7 @@ module Factories
     }
   end
 
-  def outcome_group_model(opts={})
+  def outcome_group_model(opts = {})
     context = opts[:context] || @context
     @parent_outcome_group =
       if opts[:outcome_group_id]
@@ -74,7 +74,7 @@ module Factories
     }
   end
 
-  def outcome_with_rubric(opts={})
+  def outcome_with_rubric(opts = {})
     context = opts[:context] || opts[:course] || @course
     @outcome_group ||= context.root_outcome_group
     @outcome = opts[:outcome] || outcome_model(context: context,
@@ -89,46 +89,46 @@ module Factories
     end
 
     rubric_params = {
-        :title => opts[:title] || 'My Rubric',
-        :hide_score_total => false,
-        :criteria => {
+      :title => opts[:title] || 'My Rubric',
+      :hide_score_total => false,
+      :criteria => {
+        "0" => {
+          :points => 3,
+          :mastery_points => opts[:mastery_points] || 0,
+          :description => "Outcome row",
+          :long_description => @outcome.description,
+          :ratings => {
             "0" => {
-                :points => 3,
-                :mastery_points => opts[:mastery_points] || 0,
-                :description => "Outcome row",
-                :long_description => @outcome.description,
-                :ratings => {
-                    "0" => {
-                        :points => 3,
-                        :description => "Rockin'",
-                    },
-                    "1" => {
-                        :points => 0,
-                        :description => "Lame",
-                    }
-                },
-                :learning_outcome_id => @outcome.id
+              :points => 3,
+              :description => "Rockin'",
             },
             "1" => {
-                :points => 5,
-                :description => "no outcome row",
-                :long_description => 'non outcome criterion',
-                :ratings => {
-                    "0" => {
-                        :points => 5,
-                        :description => "Amazing",
-                    },
-                    "1" => {
-                        :points => 3,
-                        :description => "not too bad",
-                    },
-                    "2" => {
-                        :points => 0,
-                        :description => "no bueno",
-                    }
-                }
+              :points => 0,
+              :description => "Lame",
             }
+          },
+          :learning_outcome_id => @outcome.id
+        },
+        "1" => {
+          :points => 5,
+          :description => "no outcome row",
+          :long_description => 'non outcome criterion',
+          :ratings => {
+            "0" => {
+              :points => 5,
+              :description => "Amazing",
+            },
+            "1" => {
+              :points => 3,
+              :description => "not too bad",
+            },
+            "2" => {
+              :points => 0,
+              :description => "no bueno",
+            }
+          }
         }
+      }
     }
 
     @rubric = context.rubrics.build

@@ -24,8 +24,7 @@ require_dependency "api/html/media_tag"
 module Api
   module Html
     describe MediaTag do
-
-      let(:doc){ double() }
+      let(:doc) { double() }
 
       describe "#has_media_comment?" do
         def media_tag(tag, attr, val)
@@ -34,7 +33,7 @@ module Api
         end
 
         describe "for anchor tags" do
-          let(:a_tag){ double(name: 'a') }
+          let(:a_tag) { double(name: 'a') }
 
           it "is true with a media_comment id" do
             expect(media_tag(a_tag, 'id', 'media_comment_123').has_media_comment?).to be(true)
@@ -50,7 +49,7 @@ module Api
         end
 
         describe "for media tags" do
-          let(:tag){ double(name: 'video') }
+          let(:tag) { double(name: 'video') }
 
           it "is true with a data-media_comment id" do
             expect(media_tag(tag, 'data-media_comment_id', '123').has_media_comment?).to be(true)
@@ -64,11 +63,13 @@ module Api
       end
 
       describe '#as_html5_node' do
-        let(:url_helper){ double({
-          media_object_thumbnail_url: "/media/object/thumbnail",
-          media_redirect_url: "/media/redirect",
-          show_media_tracks_url: 'media/track/vtt'
-        }) }
+        let(:url_helper) {
+          double({
+                   media_object_thumbnail_url: "/media/object/thumbnail",
+                   media_redirect_url: "/media/redirect",
+                   show_media_tracks_url: 'media/track/vtt'
+                 })
+        }
 
         describe 'transforming a video node' do
           let(:media_comment_id) { '42' }
@@ -83,20 +84,20 @@ module Api
           let(:media_tag) do
             MediaTag.new(base_tag, doc, StubbedNode)
           end
-          let(:html5_node){
+          let(:html5_node) {
             media_tag.as_html5_node(url_helper)
           }
 
-          specify{ expect(html5_node['preload']).to eq('none') }
-          specify{ expect(html5_node['class']).to eq('instructure_inline_media_comment') }
-          specify{ expect(html5_node['data-media_comment_id']).to eq('42') }
-          specify{ expect(html5_node['data-media_comment_type']).to eq('video') }
-          specify{ expect(html5_node['controls']).to eq('controls') }
-          specify{ expect(html5_node['poster']).to eq(url_helper.media_object_thumbnail_url)}
-          specify{ expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
-          specify{ expect(html5_node.inner_html).to eq(base_tag.inner_html) }
-          specify{ expect(html5_node.tag_name).to eq('video') }
-          specify{ expect(html5_node['data-alt']).to eq(alt_text) }
+          specify { expect(html5_node['preload']).to eq('none') }
+          specify { expect(html5_node['class']).to eq('instructure_inline_media_comment') }
+          specify { expect(html5_node['data-media_comment_id']).to eq('42') }
+          specify { expect(html5_node['data-media_comment_type']).to eq('video') }
+          specify { expect(html5_node['controls']).to eq('controls') }
+          specify { expect(html5_node['poster']).to eq(url_helper.media_object_thumbnail_url) }
+          specify { expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
+          specify { expect(html5_node.inner_html).to eq(base_tag.inner_html) }
+          specify { expect(html5_node.tag_name).to eq('video') }
+          specify { expect(html5_node['data-alt']).to eq(alt_text) }
 
           context 'when media object has subtitle tracks' do
             let(:media_object) do
@@ -127,9 +128,9 @@ module Api
 
         describe 'transforming a audio node' do
           let(:alt_text) { 'media alt text' }
-          let(:base_tag){ double(name: 'audio', inner_html: "inner_html") }
+          let(:base_tag) { double(name: 'audio', inner_html: "inner_html") }
 
-          let(:html5_node){
+          let(:html5_node) {
             tag = base_tag
             allow(tag).to receive(:[]).with('class').and_return('audio_comment')
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return('24')
@@ -138,25 +139,24 @@ module Api
             media_tag.as_html5_node(url_helper)
           }
 
-          specify{ expect(html5_node['preload']).to eq('none') }
-          specify{ expect(html5_node['class']).to eq('instructure_inline_media_comment') }
-          specify{ expect(html5_node['data-media_comment_id']).to eq('24') }
-          specify{ expect(html5_node['data-media_comment_type']).to eq('audio') }
-          specify{ expect(html5_node['controls']).to eq('controls') }
-          specify{ expect(html5_node['poster']).to be(nil) }
-          specify{ expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
-          specify{ expect(html5_node.inner_html).to eq(base_tag.inner_html) }
-          specify{ expect(html5_node.tag_name).to eq('audio') }
-          specify{ expect(html5_node['data-alt']).to eq(alt_text) }
+          specify { expect(html5_node['preload']).to eq('none') }
+          specify { expect(html5_node['class']).to eq('instructure_inline_media_comment') }
+          specify { expect(html5_node['data-media_comment_id']).to eq('24') }
+          specify { expect(html5_node['data-media_comment_type']).to eq('audio') }
+          specify { expect(html5_node['controls']).to eq('controls') }
+          specify { expect(html5_node['poster']).to be(nil) }
+          specify { expect(html5_node['src']).to eq(url_helper.media_redirect_url) }
+          specify { expect(html5_node.inner_html).to eq(base_tag.inner_html) }
+          specify { expect(html5_node.tag_name).to eq('audio') }
+          specify { expect(html5_node['data-alt']).to eq(alt_text) }
         end
-
       end
 
       describe '#as_anchor_node' do
         describe 'from anchor tag' do
-          let(:base_tag){ double(name: 'a', attributes: {'a'=>'b', 'key'=>'val', 'class' => 'someclass'}) }
+          let(:base_tag) { double(name: 'a', attributes: { 'a' => 'b', 'key' => 'val', 'class' => 'someclass' }) }
 
-          let(:anchor_node){
+          let(:anchor_node) {
             tag = base_tag
             allow(tag).to receive(:[]).with('id').and_return("media_comment_911")
             allow(tag).to receive(:[]).with('class').and_return("none")
@@ -172,17 +172,17 @@ module Api
             allow(MediaObject).to receive_messages(active: mo)
           end
 
-          specify{ expect(anchor_node.tag_name).to eq('a') }
-          specify{ expect(anchor_node['href']).to eq("/media_objects/911") }
-          specify{ expect(anchor_node['a']).to eq("b") }
-          specify{ expect(anchor_node['key']).to eq("val") }
-          specify{ expect(anchor_node['class']).to eq("someclass special_comment") }
+          specify { expect(anchor_node.tag_name).to eq('a') }
+          specify { expect(anchor_node['href']).to eq("/media_objects/911") }
+          specify { expect(anchor_node['a']).to eq("b") }
+          specify { expect(anchor_node['key']).to eq("val") }
+          specify { expect(anchor_node['class']).to eq("someclass special_comment") }
         end
 
         describe 'from non-anchor tag' do
-          let(:base_tag){ double(name: 'video', attributes: {'a'=>'b', 'key'=>'val'}) }
+          let(:base_tag) { double(name: 'video', attributes: { 'a' => 'b', 'key' => 'val' }) }
 
-          let(:anchor_node){
+          let(:anchor_node) {
             tag = base_tag
             allow(tag).to receive(:[]).with('data-media_comment_id').and_return("119")
             allow(tag).to receive(:[]).with('class').and_return("video")
@@ -190,10 +190,10 @@ module Api
             media_tag.as_anchor_node
           }
 
-          specify{ expect(anchor_node.tag_name).to eq('a') }
-          specify{ expect(anchor_node['href']).to eq("/media_objects/119") }
-          specify{ expect(anchor_node['class']).to eq("instructure_inline_media_comment video_comment") }
-          specify{ expect(anchor_node['id']).to eq("media_comment_119") }
+          specify { expect(anchor_node.tag_name).to eq('a') }
+          specify { expect(anchor_node['href']).to eq("/media_objects/119") }
+          specify { expect(anchor_node['class']).to eq("instructure_inline_media_comment video_comment") }
+          specify { expect(anchor_node['id']).to eq("media_comment_119") }
         end
       end
 
@@ -215,7 +215,6 @@ module Api
           @attrs[key]
         end
       end
-
     end
   end
 end

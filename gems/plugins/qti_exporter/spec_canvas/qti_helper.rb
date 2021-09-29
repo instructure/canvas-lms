@@ -33,20 +33,20 @@ unless defined? BASE_FIXTURE_DIR
 end
 require 'pp'
 
-def get_question_hash(dir, name, delete_answer_ids=true, opts={})
+def get_question_hash(dir, name, delete_answer_ids = true, opts = {})
   hash = get_quiz_data(dir, name, opts).first.first
-  hash[:answers].each {|a|a.delete(:id)} if delete_answer_ids
+  hash[:answers].each { |a| a.delete(:id) } if delete_answer_ids
   hash
 end
 
-def get_quiz_data(dir, name, opts={})
+def get_quiz_data(dir, name, opts = {})
   File.open(File.join(dir, '%s.xml' % name), 'r') do |file|
     Qti.convert_xml(file.read, opts)
   end
 end
 
-def get_manifest_node(question, opts={})
-  manifest_node = {'identifier'=>nil, 'href'=>"#{question}.xml"}
+def get_manifest_node(question, opts = {})
+  manifest_node = { 'identifier' => nil, 'href' => "#{question}.xml" }
   allow(manifest_node).to receive(:at_css).and_return(nil)
   allow(manifest_node).to receive(:at_css).with('instructureMetadata').and_return(manifest_node)
 
@@ -58,14 +58,14 @@ def get_manifest_node(question, opts={})
   allow(s).to receive(:text).and_return('237.0')
   s["value"] = '237.0'
   allow(manifest_node).to receive(:at_css).with('instructureField[name=max_score]').and_return(s)
-  
+
   it = nil
   if opts[:interaction_type]
     it = Object.new
     allow(it).to receive(:text).and_return(opts[:interaction_type])
   end
   allow(manifest_node).to receive(:at_css).with(('interactionType')).and_return(it)
-  
+
   bbqt = nil
   if opts[:bb_question_type]
     bbqt = {}
@@ -81,7 +81,7 @@ def get_manifest_node(question, opts={})
     qt["value"] = opts[:question_type]
   end
   allow(manifest_node).to receive(:at_css).with(('instructureMetadata instructureField[name=question_type]')).and_return(qt)
-  
+
   bb8a = nil
   if opts[:quiz_type]
     bb8a = {}
@@ -89,7 +89,7 @@ def get_manifest_node(question, opts={})
     bb8a["value"] = opts[:quiz_type]
   end
   allow(manifest_node).to receive(:at_css).with(('instructureField[name=bb8_assessment_type]')).and_return(bb8a)
-  
+
   manifest_node
 end
 
@@ -128,4 +128,3 @@ end
 def html_sanitization_question_dir(type)
   File.join(HTML_SANITIZATION_FIXTURE_DIR, "questions", type)
 end
-

@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def enrollment_model(opts={})
+  def enrollment_model(opts = {})
     @enrollment = factory_with_protected_attributes(StudentEnrollment, valid_enrollment_attributes.merge(opts))
   end
 
@@ -30,22 +30,22 @@ module Factories
     }
   end
 
-  def multiple_student_enrollment(user, section, opts={})
+  def multiple_student_enrollment(user, section, opts = {})
     course = opts[:course] || @course || course(opts)
     @enrollment = course.enroll_student(user,
-                                         :enrollment_state => "active",
-                                         :section => section,
-                                         :allow_multiple_enrollments => true)
+                                        :enrollment_state => "active",
+                                        :section => section,
+                                        :allow_multiple_enrollments => true)
   end
 
   def create_enrollment_states(enrollment_ids, options)
     enrollment_ids = enrollment_ids.map(&:id) unless enrollment_ids.first.is_a? Integer
-    create_records(EnrollmentState, enrollment_ids.map { |id| options.merge({ enrollment_id: id}) }, :nil)
+    create_records(EnrollmentState, enrollment_ids.map { |id| options.merge({ enrollment_id: id }) }, :nil)
   end
 
   # quickly create an enrollment, bypassing all that AR crap
   def create_enrollment(course, user, options = {})
-    create_enrollments(course, [user], {return_type: :record}.merge(options))[0]
+    create_enrollments(course, [user], { return_type: :record }.merge(options))[0]
   end
 
   def create_enrollments(course, users, options = {})
@@ -59,7 +59,7 @@ module Factories
 
     now = Time.now.utc
     if options[:account_associations]
-      create_records(UserAccountAssociation, user_ids.map{ |id| {account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id, created_at: now, updated_at: now}})
+      create_records(UserAccountAssociation, user_ids.map { |id| { account_id: course.account_id, user_id: id, depth: 0, root_account_id: course.root_account_id, created_at: now, updated_at: now } })
     end
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
@@ -81,7 +81,7 @@ module Factories
         updated_at: now
       }
     }, options[:return_type])
-    create_enrollment_states(result, {state: enrollment_state, root_account_id: course.root_account_id})
+    create_enrollment_states(result, { state: enrollment_state, root_account_id: course.root_account_id })
     result
   end
 end

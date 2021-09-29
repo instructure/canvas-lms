@@ -44,9 +44,9 @@ describe 'Speedgrader' do
         points: 10,
         id: 'crit1',
         ratings: [
-          {description: 'Much Awesome', points: 10, id: 'rat1'},
-          {description: 'So Awesome', points: 5, id: 'rat2'},
-          {description: 'Lame', points: 0, id: 'rat3'}
+          { description: 'Much Awesome', points: 10, id: 'rat1' },
+          { description: 'So Awesome', points: 5, id: 'rat2' },
+          { description: 'Lame', points: 0, id: 'rat3' }
         ]
       },
       {
@@ -54,9 +54,9 @@ describe 'Speedgrader' do
         points: 10,
         id: 'crit2',
         ratings: [
-          {description: 'Much Wow', points: 10, id: 'rat4'},
-          {description: 'So Wow', points: 5, id: 'rat5'},
-          {description: 'Wow... not', points: 0, id: 'rat6'}
+          { description: 'Much Wow', points: 10, id: 'rat4' },
+          { description: 'So Wow', points: 5, id: 'rat5' },
+          { description: 'Wow... not', points: 0, id: 'rat6' }
         ]
       }
     ]
@@ -104,30 +104,30 @@ describe 'Speedgrader' do
         Speedgrader.visit(@course.id, @quiz.assignment_id)
       end
 
-      it "page should load in acceptable time ", priority:"1" do
+      it "page should load in acceptable time ", priority: "1" do
         page_load_time = Benchmark.measure do
-          Speedgrader.visit(@course.id,@quiz.assignment_id)
+          Speedgrader.visit(@course.id, @quiz.assignment_id)
           Speedgrader.wait_for_grade_input
         end
         Rails.logger.debug "SpeedGrader for course #{@course.id} and assignment"\
-                             " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
+                           " #{@quiz.assignment_id} loaded in #{page_load_time.real} seconds"
         expect(page_load_time.real).to be > 0.0
       end
 
-      it 'should display needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
+      it 'displays needs review alert on non-autograde questions', priority: "1", test_id: 441360 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_alerts[0]).to include_text('The following questions need review:')
         end
       end
 
-      it 'should only display needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
+      it 'only displays needs review for file_upload and essay questions', priority: "2", test_id: 452539 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_questions_need_review[0]).to include_text('Question 2')
           expect(Speedgrader.quiz_questions_need_review[1]).to include_text('Question 3')
         end
       end
 
-      it 'should not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
+      it 'does not display review warning on text only quiz questions', priority: "1", test_id: 377664 do
         in_frame 'speedgrader_iframe', '.quizzes-speedgrader' do
           expect(Speedgrader.quiz_alerts[0]).not_to include_text('Question 4')
         end
@@ -156,12 +156,12 @@ describe 'Speedgrader' do
         expect(Speedgrader.grade_input).to have_value 'incomplete'
       end
 
-      it 'should allow pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
+      it 'allows pass grade on assignments worth 0 points', priority: "1", test_id: 400127 do
         expect(Speedgrader.grade_input).to have_value('complete')
         expect(Speedgrader.points_possible_label).to include_text('(0 / 0)')
       end
 
-      it 'should display pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
+      it 'displays pass/fail correctly when total points possible is changed', priority: "1", test_id: 419289 do
         @assignment.update(points_possible: 1)
         refresh_page
         expect(Speedgrader.grade_input).to have_value('complete')
@@ -362,7 +362,7 @@ describe 'Speedgrader' do
         user_session(@teacher)
       end
 
-      it 'should display correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
+      it 'displays correct grades for student with proper selected ratings', priority: "1", test_id: 164205 do
         rubric = outcome_with_rubric
         @assignment = @course.assignments.create!(name: 'assignment with rubric', points_possible: 10)
         @association = rubric.associate_with(
@@ -693,7 +693,7 @@ describe 'Speedgrader' do
           moderated_grading: true,
           points_possible: 10,
           submission_types: :online_text_entry,
-          title:'Moderated Assignment'
+          title: 'Moderated Assignment'
         )
 
         @moderated_assignment.submit_homework(
@@ -775,7 +775,7 @@ describe 'Speedgrader' do
   end
 
   context 'assignment group' do
-    it 'should update grades for all students in group', priority: "1", test_id: 164017 do
+    it 'updates grades for all students in group', priority: "1", test_id: 164017 do
       skip "Skipped because this spec fails if not run in foreground\nThis is believed to be the issue: https://code.google.com/p/selenium/issues/detail?id=7346"
       init_course_with_students 5
       user_session(@teacher)
@@ -872,7 +872,7 @@ describe 'Speedgrader' do
         # after_fudge_points_total is updated, even before update button is clicked
         expect(Speedgrader.quiz_after_fudge_total).to include_text '8'
 
-        expect_new_page_load {Speedgrader.quiz_update_scores_button.click}
+        expect_new_page_load { Speedgrader.quiz_update_scores_button.click }
         expect(Speedgrader.quiz_after_fudge_total).to include_text '8'
       end
     end
@@ -931,7 +931,7 @@ describe 'Speedgrader' do
 
     it 'list all students', priority: "1", test_id: 164206 do
       Speedgrader.click_students_dropdown
-      (0..2).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name)}
+      (0..2).each { |num| expect(Speedgrader.student_dropdown_menu).to include_text(@students[num].name) }
     end
 
     it 'list alias when hide student name is selected', priority: "2", test_id: 164208 do
@@ -941,7 +941,7 @@ describe 'Speedgrader' do
 
       expect_new_page_load { fj('.ui-dialog-buttonset .ui-button:visible:last').click }
       Speedgrader.click_students_dropdown
-      (1..3).each{|num| expect(Speedgrader.student_dropdown_menu).to include_text("Student #{num}")}
+      (1..3).each { |num| expect(Speedgrader.student_dropdown_menu).to include_text("Student #{num}") }
     end
 
     # speedgrader student dropdown shows assignment submission status symbols next to student names
@@ -960,10 +960,10 @@ describe 'Speedgrader' do
 
         refresh_page
         Speedgrader.click_students_dropdown
-        student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name:'li')
+        student_options = Speedgrader.student_dropdown_menu.find_elements(tag_name: 'li')
 
-        graded = ["resubmitted","graded","not_submitted"]
-        (0..2).each{|num| expect(student_options[num]).to have_class(graded[num])}
+        graded = ["resubmitted", "graded", "not_submitted"]
+        (0..2).each { |num| expect(student_options[num]).to have_class(graded[num]) }
       end
     end
   end
@@ -1011,7 +1011,7 @@ describe 'Speedgrader' do
       expect(SubmissionDetails.comment_list_div).not_to contain_css("#submission_comment_#{@comment.id}")
     end
 
-    it 'should display the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
+    it 'displays the correct file submission in the right sidebar', priority: "1", test_id: 525188 do
       submit_with_attachment
       user_session(@teacher)
 
@@ -1019,7 +1019,7 @@ describe 'Speedgrader' do
       expect(Speedgrader.submission_file_name.text).to eq @attachment.filename
     end
 
-    it 'should display submissions in order in the submission dropdown', priority: "1", test_id: 525189 do
+    it 'displays submissions in order in the submission dropdown', priority: "1", test_id: 525189 do
       Timecop.freeze(1.hour.ago) { submit_with_attachment }
       resubmit_with_text
       user_session(@teacher)
@@ -1058,7 +1058,7 @@ describe 'Speedgrader' do
 
     it 'navigates to gradebook via link' do
       # make sure gradebook link works
-      expect_new_page_load {Speedgrader.gradebook_link.click}
+      expect_new_page_load { Speedgrader.gradebook_link.click }
       expect(Gradebook.grid).to be_displayed
     end
   end

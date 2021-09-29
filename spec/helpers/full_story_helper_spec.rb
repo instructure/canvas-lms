@@ -31,7 +31,7 @@ describe "fullstory" do
   context "with feature enabled" do
     it 'is enabled if login is sampled' do
       allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+      override_dynamic_settings(config: { canvas: { fullstory: { sampling_rate: 1, app_key: '12345' } } }) do
         fullstory_init(@site_admin_account, @session)
         expect(fullstory_app_key).to eql('12345')
         expect(@session[:fullstory_enabled]).to be_truthy
@@ -41,7 +41,7 @@ describe "fullstory" do
 
     it 'is disabled if login is not sampled' do
       allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 0, app_key: '12345'} } }) do
+      override_dynamic_settings(config: { canvas: { fullstory: { sampling_rate: 0, app_key: '12345' } } }) do
         fullstory_init(@site_admin_account, @session)
         expect(fullstory_app_key).to eql('12345')
         expect(@session[:fullstory_enabled]).to be_falsey
@@ -55,7 +55,7 @@ describe "fullstory" do
       allow(account).to receive(:settings).and_return({ enable_fullstory: false })
       allow(FullStoryHelper).to receive(:rand).and_return(0.5)
 
-      override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+      override_dynamic_settings(config: { canvas: { fullstory: { sampling_rate: 1, app_key: '12345' } } }) do
         fullstory_init(account, @session)
         expect(@session[:fullstory_enabled]).to be_falsey
       end
@@ -63,7 +63,7 @@ describe "fullstory" do
 
     it "doesn't explode if the dynamic settings are missing" do
       allow(FullStoryHelper).to receive(:rand).and_return(0.5)
-      override_dynamic_settings(config: {canvas: { fullstory: nil } }) do
+      override_dynamic_settings(config: { canvas: { fullstory: nil } }) do
         fullstory_init(@site_admin_account, @session)
         expect(fullstory_app_key).to be_nil
         expect(@session[:fullstory_enabled]).to be_falsey

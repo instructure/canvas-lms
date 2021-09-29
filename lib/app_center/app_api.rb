@@ -40,7 +40,7 @@ module AppCenter
       base_url = @app_center.settings['base_url']
       page = page.to_i
       per_page = per_page.to_i
-      offset = ( page - 1 ) * per_page
+      offset = (page - 1) * per_page
       access_token = @app_center.settings['token']
 
       begin
@@ -52,7 +52,7 @@ module AppCenter
         end
 
         json = JSON.parse(response)
-        json['meta']['next_page'] = page + 1  if (json['meta'] && json['meta']['next']) || (json['objects'] && json['objects'].size > per_page)
+        json['meta']['next_page'] = page + 1 if (json['meta'] && json['meta']['next']) || (json['objects'] && json['objects'].size > per_page)
         json['objects'] = json['objects'][0, per_page] if json['objects']
       rescue
         json = {}
@@ -76,19 +76,19 @@ module AppCenter
           app.delete('tags').each do |tag|
             context = 'custom_tags'
             case tag['context']
-              when "category"
-                context = 'categories'
-              when "extension"
-                context = 'extensions'
-              when "education_level"
-                context = 'levels'
+            when "category"
+              context = 'categories'
+            when "extension"
+              context = 'extensions'
+            when "education_level"
+              context = 'levels'
             end
             app[context] ||= []
             app[context] << tag['name']
           end
         end
       elsif json['objects']
-        #mapping for backwards compatibility with edu-apps v1
+        # mapping for backwards compatibility with edu-apps v1
         apps = json.delete('objects')
         apps.each do |app|
           app['short_description'] = app['description']
@@ -118,7 +118,7 @@ module AppCenter
 
       if app_details['config_xml_url']
         user_query_string = ''
-        user_query_string = config_settings.map {|k, v| "#{k}=#{v}"}.join('&') if config_settings
+        user_query_string = config_settings.map { |k, v| "#{k}=#{v}" }.join('&') if config_settings
 
         response_config_url = app_details['config_xml_url']
 
@@ -139,8 +139,8 @@ module AppCenter
       context = @context.is_a?(Account) ? @context : @context.account
 
       context.settings[:app_center_access_token].presence ||
-      context.calculate_inherited_setting(:app_center_access_token)[:value] ||
-      @app_center.settings['token']
+        context.calculate_inherited_setting(:app_center_access_token)[:value] ||
+        @app_center.settings['token']
     end
   end
 end

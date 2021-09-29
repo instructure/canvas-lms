@@ -134,10 +134,10 @@ module Lti::Ims
       end
 
       if tool !=
-           ContextExternalTool.from_content_tag(
-             progress.context.external_tool_tag,
-             progress.context
-           )
+         ContextExternalTool.from_content_tag(
+           progress.context.external_tool_tag,
+           progress.context
+         )
         render_error "Progress associated with Assignment that isn't linked to this Tool",
                      :unprocessable_entity
       end

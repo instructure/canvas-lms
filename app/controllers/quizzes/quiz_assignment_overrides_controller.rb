@@ -96,8 +96,8 @@
 class Quizzes::QuizAssignmentOverridesController < ApplicationController
   include ::Filters::Quizzes
 
-  before_action :require_course, only: [ :index, :new_quizzes ]
-  skip_around_action :set_locale, only: [ :index, :new_quizzes ]
+  before_action :require_course, only: [:index, :new_quizzes]
+  skip_around_action :set_locale, only: [:index, :new_quizzes]
 
   # @API Retrieve assignment-overridden dates for Classic Quizzes
   #
@@ -171,12 +171,12 @@ class Quizzes::QuizAssignmentOverridesController < ApplicationController
     quizzes = Api.paginate(scope, self, api_route)
 
     render({
-      json: {
-        quiz_assignment_overrides: quizzes.map do |quiz|
-          serialize_overrides(quiz, @current_user, can_manage)
-        end
-      }
-    })
+             json: {
+               quiz_assignment_overrides: quizzes.map do |quiz|
+                 serialize_overrides(quiz, @current_user, can_manage)
+               end
+             }
+           })
   end
 
   def serialize_overrides(quiz, user, include_all_dates)

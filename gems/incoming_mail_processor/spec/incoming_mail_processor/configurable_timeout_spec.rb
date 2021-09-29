@@ -29,18 +29,17 @@ describe IncomingMailProcessor::ConfigurableTimeout do
     def foo(arg)
       arg
     end
-
   end
 
   before do
     @tester = TimeoutTester.new
   end
 
-  it "should provide a default timeout" do
+  it "provides a default timeout" do
     expect { @tester.with_timeout { sleep 1 } }.to raise_error(Timeout::Error)
   end
 
-  it "should use the provided timeout method" do
+  it "uses the provided timeout method" do
     method_called = false
     block_called = false
     # use an explicit block param because yield scoping is weird
@@ -53,27 +52,26 @@ describe IncomingMailProcessor::ConfigurableTimeout do
     expect(block_called).to be_truthy
   end
 
-  it "should return what the timeout method returns" do
+  it "returns what the timeout method returns" do
     @tester.set_timeout_method { 42 }
     expect(@tester.with_timeout).to equal 42
   end
 
-  it "should raise what the timeout method raises" do
+  it "raises what the timeout method raises" do
     @tester.set_timeout_method { raise ArgumentError }
     expect { @tester.with_timeout { 42 } }.to raise_error(ArgumentError)
   end
 
-  it "should raise what the target method raises" do
+  it "raises what the target method raises" do
     expect { @tester.with_timeout { raise ArgumentError } }.to raise_error(ArgumentError)
   end
 
-  it "should allow easy wrapping of methods" do
+  it "allows easy wrapping of methods" do
     @tester.wrap_with_timeout(@tester, [:foo])
     @tester.set_timeout_method { raise ArgumentError }
     expect { @tester.foo(42) }.to raise_error(ArgumentError)
     expect(@tester.untimed_foo(42)).to equal 42
-    @tester.set_timeout_method {|&block| block.call }
+    @tester.set_timeout_method { |&block| block.call }
     expect(@tester.foo(42)).to equal 42
   end
-
 end

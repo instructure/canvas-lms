@@ -10,7 +10,7 @@ class AddUserObserverForeignKeyAgain < ActiveRecord::Migration[5.0]
         observer_ids = uos.map(&:observer_id).uniq
         missing_ids = observer_ids - User.where("id IN (?)", observer_ids).pluck(:id)
         if missing_ids.any?
-          uos.select{|uo| missing_ids.include?(uo.observer_id)}.each do |uo|
+          uos.select { |uo| missing_ids.include?(uo.observer_id) }.each do |uo|
             uo.observer.associate_with_shard(Shard.current, :shadow)
           end
         end

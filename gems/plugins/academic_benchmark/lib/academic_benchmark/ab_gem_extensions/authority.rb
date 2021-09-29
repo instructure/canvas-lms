@@ -27,12 +27,12 @@ module AcademicBenchmarks
         @publication_cache ||= {}
       end
 
-      def build_outcomes(ratings={}, _parent=nil)
+      def build_outcomes(ratings = {}, _parent = nil)
         publication_cache.clear
         build_common_outcomes(ratings).merge!({
-          title: description,
-          description: "#{code} - #{description}",
-        })
+                                                title: description,
+                                                description: "#{code} - #{description}",
+                                              })
       end
     end
   end

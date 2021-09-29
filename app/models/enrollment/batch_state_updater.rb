@@ -47,11 +47,12 @@ class Enrollment::BatchStateUpdater
   # re-cache their scores for (presumably the caller already queued one of their own)
   def self.destroy_batch(batch, sis_batch: nil, batch_mode: false, ignore_due_date_caching_for: {})
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1000
+
     Enrollment.transaction do
       # cache some data before the destroy that is needed after the destroy
       @invited_user_ids = Enrollment.where(id: batch, workflow_state: 'invited').distinct.pluck(:user_id)
-      @students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
-      @students.each{|e| e.workflow_state = 'deleted'; e.readonly!}
+      @students = Enrollment.of_student_type.where(id: batch).preload({ user: :linked_observers }, :root_account).to_a
+      @students.each { |e| e.workflow_state = 'deleted'; e.readonly! }
       @user_course_tuples = Enrollment.where(id: batch).active.select(%i(user_id course_id)).distinct.to_a
       @user_ids = Enrollment.where(id: batch).order(:user_id).distinct.pluck(:user_id)
       @courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
@@ -90,7 +91,7 @@ class Enrollment::BatchStateUpdater
   # and assigns sis_batch_id if there is a sis_batch.
   def self.mark_enrollments_as_state(batch, workflow_state:, sis_batch: nil, batch_mode: false)
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: batch, updated_state: workflow_state, batch_mode_delete: batch_mode)
-    updates = {workflow_state: workflow_state, updated_at: Time.now.utc}
+    updates = { workflow_state: workflow_state, updated_at: Time.now.utc }
     updates[:sis_batch_id] = sis_batch.id if sis_batch
     Enrollment.where(id: batch).update_all_locked_in_order(updates)
     data
@@ -105,17 +106,18 @@ class Enrollment::BatchStateUpdater
   def self.remove_group_memberships(batch, courses, user_ids, sis_batch: nil, batch_mode: false)
     data = []
     courses.each do |c|
-      gms = GroupMembership.active.joins(:group).
-        where(groups: {context_type: 'Course', context_id: c},
-              user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
+      gms = GroupMembership.active.joins(:group)
+                           .where(groups: { context_type: 'Course', context_id: c },
+                                  user_id: user_ids).where.not(user_id: c.enrollments.where.not(id: batch).pluck(:user_id))
       next unless gms.exists?
+
       rollback = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: gms, updated_state: 'deleted', batch_mode_delete: batch_mode)
       data.push(*rollback)
       GroupMembership.where(id: gms).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
-      leader_change_groups = Group.joins(:group_memberships).where(group_memberships: {id: gms}, leader_id: user_ids)
+      leader_change_groups = Group.joins(:group_memberships).where(group_memberships: { id: gms }, leader_id: user_ids)
       leader_change_groups.update_all(leader_id: nil, updated_at: Time.zone.now)
       leader_change_groups.each(&:auto_reassign_leader)
-      Group.joins(:group_memberships).where(group_memberships: {id: gms}).touch_all
+      Group.joins(:group_memberships).where(group_memberships: { id: gms }).touch_all
     end
     data
   end
@@ -125,10 +127,10 @@ class Enrollment::BatchStateUpdater
       emails = CommunicationChannel.email.unretired.where(user_id: shard_invited_users).distinct.pluck(:path)
       if Enrollment.cross_shard_invitations?
         Shard.birth.activate do
-          emails.each {|path| Rails.cache.delete([path, 'all_invited_enrollments2'].cache_key)}
+          emails.each { |path| Rails.cache.delete([path, 'all_invited_enrollments2'].cache_key) }
         end
       else
-        emails.each {|path| Rails.cache.delete([path, 'invited_enrollments2'].cache_key)}
+        emails.each { |path| Rails.cache.delete([path, 'invited_enrollments2'].cache_key) }
       end
     end
   end
@@ -137,23 +139,24 @@ class Enrollment::BatchStateUpdater
     courses.each do |c|
       user_ids -= c.all_enrollments.active.where(user_id: user_ids).pluck(:user_id)
       next if user_ids.empty?
-      c.appointment_participants.active.current.
-        where(context_id: user_ids, context_type: 'User').
-        update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
+
+      c.appointment_participants.active.current
+       .where(context_id: user_ids, context_type: 'User')
+       .update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     end
   end
 
   def self.disassociate_cross_shard_users(user_ids); end
 
   def self.update_linked_enrollments(students, restore: false)
-    students.each{|e| e.update_linked_enrollments(restore: restore)}
+    students.each { |e| e.update_linked_enrollments(restore: restore) }
   end
 
   def self.touch_all_graders_if_needed(students)
     courses_to_touch_admins = students.map(&:course_id).uniq
     admin_ids = Enrollment.where(course_id: courses_to_touch_admins,
-      type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']).
-      active.distinct.order(:user_id).pluck(:user_id)
+                                 type: ['TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment'])
+                          .active.distinct.order(:user_id).pluck(:user_id)
     User.clear_cache_keys(admin_ids, :todo_list)
   end
 
@@ -167,12 +170,13 @@ class Enrollment::BatchStateUpdater
     courses.each do |c|
       assignment_ids = Assignment.where(context_id: c, context_type: 'Course').pluck(:id)
       next unless assignment_ids
+
       # this is handled in :update_cached_due_dates
       AssignmentOverrideStudent.suspend_callbacks(:update_cached_due_dates) do
-        AssignmentOverrideStudent.
-          where(user_id: user_ids, assignment_id: assignment_ids).
-          where.not(user_id: c.enrollments.where(user_id: user_ids).
-          where.not(id: batch).select(:user_id)).each(&:destroy)
+        AssignmentOverrideStudent
+          .where(user_id: user_ids, assignment_id: assignment_ids)
+          .where.not(user_id: c.enrollments.where(user_id: user_ids)
+          .where.not(id: batch).select(:user_id)).each(&:destroy)
       end
     end
   end
@@ -214,11 +218,12 @@ class Enrollment::BatchStateUpdater
   def self.run_call_backs_for(batch, root_account:, n_strand_root: "restore_states_enrollment_states")
     raise ArgumentError, 'Cannot call with more than 1000 enrollments' if batch.count > 1_000
     return if batch.empty?
+
     EnrollmentState.delay_if_production(run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
-       n_strand: [n_strand_root, root_account.global_id],
-       max_attempts: 2).
-      force_recalculation(batch)
-    students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
+                                        n_strand: [n_strand_root, root_account.global_id],
+                                        max_attempts: 2)
+                   .force_recalculation(batch)
+    students = Enrollment.of_student_type.where(id: batch).preload({ user: :linked_observers }, :root_account).to_a
     user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
     courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a
     touch_and_update_associations(user_ids)

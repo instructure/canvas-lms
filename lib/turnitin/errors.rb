@@ -19,5 +19,6 @@
 
 module Turnitin::Errors
   class SubmissionNotScoredError < StandardError; end
+
   class ScoreStillPendingError < StandardError; end
 end

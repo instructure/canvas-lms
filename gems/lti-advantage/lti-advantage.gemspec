@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
     spec.metadata["allowed_push_host"] = "TODO: Set to 'http://mygemserver.com'"
   else
     raise "RubyGems 2.0 or newer is required to protect against " \
-      "public gem pushes."
+          "public gem pushes."
   end
 
   spec.files         = Dir.glob("{lib,spec}/**/*") + %w(test.sh)
@@ -28,11 +28,11 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency 'json-jwt', '~> 1.5'
   spec.add_runtime_dependency "activemodel", ">= 5.1"
+  spec.add_runtime_dependency 'json-jwt', '~> 1.5'
 
-  spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "bundler", "~> 2.2"
   spec.add_development_dependency "rake", "~> 10.0"
+  spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "rspec", "~> 3.0"
 end

@@ -207,7 +207,8 @@ class CustomDataController < ApplicationController
     end
 
     data = params[:data]
-    render(json: {message: 'no data specified'}, status: :bad_request) and return if data.nil?
+    render(json: { message: 'no data specified' }, status: :bad_request) and return if data.nil?
+
     data = data.to_unsafe_h if data.is_a?(ActionController::Parameters)
 
     saved = false
@@ -221,7 +222,7 @@ class CustomDataController < ApplicationController
     end
 
     if saved
-      render(json: {data: cd.get_data(@scope)},
+      render(json: { data: cd.get_data(@scope) },
              status: (overwrite ? :ok : :created))
     else
       render(json: cd.errors, status: :bad_request)
@@ -261,9 +262,9 @@ class CustomDataController < ApplicationController
     begin
       data = @cd.get_data @scope
     rescue ArgumentError => e
-      render(json: {message: e.message}, status: :bad_request) and return
+      render(json: { message: e.message }, status: :bad_request) and return
     end
-    render(json: {data: data})
+    render(json: { data: data })
   end
 
   # @API Delete custom data
@@ -395,11 +396,11 @@ class CustomDataController < ApplicationController
         ret = @cd.delete_data(@scope)
       end
     rescue ArgumentError => e
-      render(json: {message: e.message}, status: :bad_request) and return
+      render(json: { message: e.message }, status: :bad_request) and return
     end
 
     if saved
-      render(json: {data: ret})
+      render(json: { data: ret })
     else
       render(json: @cd.errors, status: :bad_request)
     end
@@ -418,7 +419,6 @@ class CustomDataController < ApplicationController
 
   def require_custom_data
     @cd = CustomData.where(user_id: @context.id, namespace: @namespace).first or
-        render(json: { message: "no data for scope" }, status: :bad_request)
+      render(json: { message: "no data for scope" }, status: :bad_request)
   end
-
 end

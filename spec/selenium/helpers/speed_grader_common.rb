@@ -21,9 +21,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../common')
 require_relative "../grades/pages/speedgrader_page"
 
 module SpeedGraderCommon
-
   def student_submission(options = {})
-    submission_model({:assignment => @assignment, :body => "first student submission text"}.merge(options))
+    submission_model({ :assignment => @assignment, :body => "first student submission text" }.merge(options))
   end
 
   def goto_student(student_name)
@@ -32,6 +31,7 @@ module SpeedGraderCommon
       option.text.strip == student_name if option.text
     end
     raise ArgumentError, "There is no student named #{student_name}" unless student_selection
+
     student_selection.click
   end
 

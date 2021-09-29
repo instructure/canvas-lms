@@ -186,7 +186,6 @@ describe 'Late Policies:' do
 
       expect(@course.late_policy.missing_submission_deduction_enabled).to be true
       expect(@course.late_policy.missing_submission_deduction.to_i).to be percentage
-
     end
 
     it 'saves late policy with floor', test_id: 3196971, priority: '1' do

@@ -46,7 +46,7 @@ module CanvasQuizStatistics::Analyzers
     # Number of students who have made at least one matching.
     #
     # @return [Integer]
-    metric :responses => [ :answers ] do |responses, answers|
+    metric :responses => [:answers] do |responses, answers|
       responses.select do |response|
         answers.any? do |answer|
           answer_present?(response, answer[:id])
@@ -57,7 +57,7 @@ module CanvasQuizStatistics::Analyzers
     # Number of students who matched everything, even if incorrectly.
     #
     # @return [Integer]
-    metric :answered => [ :answers ] do |responses, answers|
+    metric :answered => [:answers] do |responses, answers|
       responses.select do |response|
         answers.all? do |answer|
           answer_present?(response, answer[:id])
@@ -111,12 +111,12 @@ module CanvasQuizStatistics::Analyzers
     #     }
     #   ]
     # }
-    metric :answer_sets => [ :answers, :matches ] do |responses, answers, matches|
+    metric :answer_sets => [:answers, :matches] do |responses, answers, matches|
       answer_sets = parse_answers do |answer, stats|
         stats[:answers] = matches.map do |match|
           build_answer(match[:match_id],
-            match[:text],
-            answer[:match_id].to_s == match[:match_id].to_s)
+                       match[:text],
+                       answer[:match_id].to_s == match[:match_id].to_s)
         end
       end
 

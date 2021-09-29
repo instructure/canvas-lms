@@ -22,6 +22,6 @@ class FixGraderVisibilityData < ActiveRecord::Migration[5.0]
 
   def self.up
     DataFixup::FixGraderVisibilityData.delay_if_production(priority: Delayed::LOW_PRIORITY,
-        n_strand: ["DataFixup::FixGraderVisibilityData", Shard.current.database_server.id]).run
+                                                           n_strand: ["DataFixup::FixGraderVisibilityData", Shard.current.database_server.id]).run
   end
 end

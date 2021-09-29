@@ -28,7 +28,7 @@ class AuthenticationProvider::Clever < AuthenticationProvider::Oauth2
   end
 
   def self.recognized_params
-    super + [ :login_attribute, :district_id, :jit_provisioning ].freeze
+    super + [:login_attribute, :district_id, :jit_provisioning].freeze
   end
 
   def self.login_attributes
@@ -56,6 +56,7 @@ class AuthenticationProvider::Clever < AuthenticationProvider::Oauth2
       # this check is just an extra precaution
       raise "Non-matching district: #{data['district'].inspect}"
     end
+
     data[login_attribute]
   end
 
@@ -80,10 +81,10 @@ class AuthenticationProvider::Clever < AuthenticationProvider::Oauth2
 
   def client_options
     {
-        site: 'https://api.clever.com'.freeze,
-        authorize_url: 'https://clever.com/oauth/authorize',
-        token_url: 'https://clever.com/oauth/tokens'.freeze,
-        auth_scheme: :basic_auth,
+      site: 'https://api.clever.com'.freeze,
+      authorize_url: 'https://clever.com/oauth/authorize',
+      token_url: 'https://clever.com/oauth/tokens'.freeze,
+      auth_scheme: :basic_auth,
     }
   end
 

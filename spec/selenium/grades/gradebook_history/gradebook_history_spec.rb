@@ -36,13 +36,12 @@ describe "Gradebook History Page" do
   end
 
   context "shows the results table for a valid search" do
-
     it "with student name input and typeahead selection", test_id: %w(3308073 3308054), priority: "1" do
-        student_name=@course.students.first.name
-        GradeBookHistory.search_with_student_name(
-          student_name[0...3], student_name
-        )
-        expect(GradeBookHistory.check_table_for_student_name(student_name)).to be true
+      student_name = @course.students.first.name
+      GradeBookHistory.search_with_student_name(
+        student_name[0...3], student_name
+      )
+      expect(GradeBookHistory.check_table_for_student_name(student_name)).to be true
     end
 
     it "with grader name input and typeahead selection", test_id: %w(3308073 3308054), priority: "1" do
@@ -60,7 +59,7 @@ describe "Gradebook History Page" do
     end
 
     it "and the current grade column has the same grade as related grade history rows", test_id: 3308871, priority: "1" do
-        expect(GradeBookHistory.check_current_col_for_history('assignment two')).to be true
+      expect(GradeBookHistory.check_current_col_for_history('assignment two')).to be true
     end
   end
 end

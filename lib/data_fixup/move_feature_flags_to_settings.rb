@@ -60,7 +60,7 @@ module DataFixup::MoveFeatureFlagsToSettings
 
   def self.figure_setting_from_override(context, feature_flag_name, setting_name, inherited:)
     override = context.feature_flags.loaded? ?
-      context.feature_flags.detect{|ff| ff.feature == feature_flag_name.to_s} :
+      context.feature_flags.detect { |ff| ff.feature == feature_flag_name.to_s } :
       context.feature_flags.where(:feature => feature_flag_name.to_s).take
     override_value = nil
     if override
@@ -73,13 +73,13 @@ module DataFixup::MoveFeatureFlagsToSettings
         override_value = false
       else
         Rails.logger.warn("DataFixup::MoveFeatureFlagsToSettings => unable to handle override state for context "\
-                            "#{context.asset_string} of feature #{override.id} with state #{override.state}")
+                          "#{context.asset_string} of feature #{override.id} with state #{override.state}")
       end
     end
 
     unless override_value.nil?
       if context.is_a?(Account)
-        context.settings[setting_name] = inherited ? {:locked => true, :value => override_value} : override_value
+        context.settings[setting_name] = inherited ? { :locked => true, :value => override_value } : override_value
       else
         context.settings_frd[setting_name] = override_value
       end

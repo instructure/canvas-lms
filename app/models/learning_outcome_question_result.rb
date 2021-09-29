@@ -26,7 +26,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
 
   simply_versioned
 
-  scope :for_associated_asset, lambda {|associated_asset|
+  scope :for_associated_asset, lambda { |associated_asset|
     where(:associated_asset_type => associated_asset.class.to_s, :associated_asset_id => associated_asset.id)
   }
 
@@ -45,6 +45,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
 
   def set_root_account_id
     return if self.root_account_id.present?
+
     self.root_account_id = self.learning_outcome_result.root_account_id
   end
 
@@ -61,7 +62,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
     else
       current_version = self.versions.current.model
       if current_version.attempt && attempt < current_version.attempt
-        versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
+        versions = self.versions.sort_by(&:created_at).reverse.select { |v| v.model.attempt == attempt }
         unless versions.empty?
           versions.all? do |version|
             update_version_data(version)
@@ -74,6 +75,7 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
   end
 
   private
+
   def update_version_data(version)
     version_data = YAML::load(version.yaml)
     version_data["score"] = self.score
@@ -84,5 +86,4 @@ class LearningOutcomeQuestionResult < ActiveRecord::Base
     version.yaml = version_data.to_yaml
     version.save
   end
-
 end

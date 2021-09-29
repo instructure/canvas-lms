@@ -27,17 +27,17 @@ module Lti
       custom = JSON.parse(custom) if custom.is_a?(String)
       return nil unless custom.is_a?(Hash)
 
-      custom.
-        select{|k, _v| k.is_a?(String) || k.is_a?(Symbol)}.
-        select{|_k, v| valid_custom_params_value?(v)}.
-        stringify_keys
+      custom
+        .select { |k, _v| k.is_a?(String) || k.is_a?(Symbol) }
+        .select { |_k, v| valid_custom_params_value?(v) }
+        .stringify_keys
     rescue JSON::ParserError
       nil
     end
 
     def valid_custom_params?(custom)
       custom = JSON.parse(custom) if custom.is_a?(String)
-      custom.is_a?(Hash) && custom.all? {|_, value| valid_custom_params_value?(value) }
+      custom.is_a?(Hash) && custom.all? { |_, value| valid_custom_params_value?(value) }
     rescue JSON::ParserError
       false
     end

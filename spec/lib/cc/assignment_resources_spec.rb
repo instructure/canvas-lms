@@ -47,7 +47,7 @@ describe CC::AssignmentResources do
       end
 
       let(:course) { course_model }
-      let(:custom_params) { { foo: 'bar '} }
+      let(:custom_params) { { foo: 'bar ' } }
       let(:developer_key) { DeveloperKey.create!(account: course.root_account) }
       let(:tag) { ContentTag.create!(context: assignment, content: tool, url: tool.url) }
       let(:tool) { external_tool_model(context: course, opts: { use_1_3: true }) }

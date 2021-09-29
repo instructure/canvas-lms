@@ -150,23 +150,23 @@ module AssignmentsIndexPage
 
   def visit_assignments_index_page(course_id)
     get "/courses/#{course_id}/assignments"
-    wait_for(method: nil, timeout: 1) { assignment_group_loading_spinner.displayed? == false}
+    wait_for(method: nil, timeout: 1) { assignment_group_loading_spinner.displayed? == false }
   end
 
   def goto_bulk_edit_view
     course_assignments_settings_button.click
     bulk_edit_dates_menu.click
-    wait_for(method: nil, timeout: 5) { bulk_edit_loading_spinner.displayed? == false}
+    wait_for(method: nil, timeout: 5) { bulk_edit_loading_spinner.displayed? == false }
   end
 
   def save_bulk_edited_dates
     bulk_edit_save_button.click
     run_jobs
-    wait_for(method: nil, timeout: 5) { saving_dates_button.displayed? == false}
+    wait_for(method: nil, timeout: 5) { saving_dates_button.displayed? == false }
   end
 
   def open_batch_edit_dialog
     batch_edit_button.click
-    wait_for(method: nil, timeout: 3) { batch_edit_dialog.displayed? == true}
+    wait_for(method: nil, timeout: 3) { batch_edit_dialog.displayed? == true }
   end
 end

@@ -63,8 +63,7 @@ class DiscussionTopicsApiController < ApplicationController
                                             include_all_dates: include_params.include?('all_dates'),
                                             :include_sections => include_params.include?('sections'),
                                             :include_sections_user_count => include_params.include?('sections_user_count'),
-                                            :include_overrides => include_params.include?('overrides'),
-                                           ).first)
+                                            :include_overrides => include_params.include?('overrides'),).first)
   end
 
   # @API Get the full topic
@@ -124,6 +123,7 @@ class DiscussionTopicsApiController < ApplicationController
   #   }
   def view
     return unless authorized_action(@topic, @current_user, :read_replies)
+
     log_asset_access(@topic, 'topics', 'topics')
 
     mobile_brand_config = !in_app? && @context.account.effective_brand_config
@@ -147,7 +147,7 @@ class DiscussionTopicsApiController < ApplicationController
       if new_entries
         new_entries.each do |e|
           e["message"] = resolve_placeholders(e["message"]) if e["message"]
-          e["attachments"].each {|att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
+          e["attachments"].each { |att| att["url"] = resolve_placeholders(att["url"]) if att["url"] } if e["attachments"]
         end
       end
 
@@ -155,14 +155,14 @@ class DiscussionTopicsApiController < ApplicationController
         # Preload accounts because they're needed to figure out if a user's avatar should be shown in
         # AvatarHelper#avatar_url_for_user, which is used by user_display_json. We get an N+1 on the
         # number of discussion participants if we don't do this.
-        User.where(id: shard_ids).preload({pseudonym: :account}).to_a
+        User.where(id: shard_ids).preload({ pseudonym: :account }).to_a
       end
 
       include_context_card_info = value_to_boolean(
         params[:include_context_card_info]
       )
       include_enrollment_state = params[:include_enrollment_state] && (@context.is_a?(Course) || @context.is_a?(Group)) &&
-        @context.grants_right?(@current_user, session, :read_as_admin)
+                                 @context.grants_right?(@current_user, session, :read_as_admin)
       enrollments = nil
       if include_enrollment_state || include_context_card_info
         enrollment_context = @context.is_a?(Course) ? @context : @context.context
@@ -207,10 +207,10 @@ class DiscussionTopicsApiController < ApplicationController
       fragments = {
         :unread_entries => unread_entries.to_json,
         :forced_entries => forced_entries.to_json,
-        :entry_ratings  => entry_ratings.to_json,
-        :participants   => json_cast(participant_info).to_json,
-        :view           => structure,
-        :new_entries    => json_cast(new_entries).to_json,
+        :entry_ratings => entry_ratings.to_json,
+        :participants => json_cast(participant_info).to_json,
+        :view => structure,
+        :new_entries => json_cast(new_entries).to_json,
       }
       fragments = fragments.map { |k, v| %("#{k}": #{v}) }
       render :json => "{ #{fragments.join(', ')} }"
@@ -274,15 +274,15 @@ class DiscussionTopicsApiController < ApplicationController
     end
     if new_topic.save!
       result = discussion_topic_api_json(new_topic, @context, @current_user, session,
-        :include_sections => true)
+                                         :include_sections => true)
       # If pinned, make the new topic show up just below the old one
       if new_topic.pinned
         new_topic.insert_at(@topic.position + 1)
         # Pass the new positions to the backend so the frontend can stay consistent
         # with the backend.  Rails doesn't like topic.context.discussion_topics.select(...).
         # We only care about the id and position here, so don't pull everything else up
-        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context).
-          active.where(:pinned => true).map { |t| [t.id, t.position] }
+        positions_array = DiscussionTopic.select(:id, :position).where(:context => @context)
+                                         .active.where(:pinned => true).map { |t| [t.id, t.position] }
         result[:new_positions] = positions_array.to_h
       end
       if new_topic.assignment
@@ -673,6 +673,7 @@ class DiscussionTopicsApiController < ApplicationController
   end
 
   protected
+
   def require_topic
     @topic = @context.all_discussion_topics.active.find(params[:topic_id])
     return authorized_action(@topic, @current_user, :read)
@@ -699,9 +700,10 @@ class DiscussionTopicsApiController < ApplicationController
 
   def save_entry
     has_attachment = params[:attachment].present? && params[:attachment].size > 0 &&
-      @entry.grants_right?(@current_user, session, :attach)
+                     @entry.grants_right?(@current_user, session, :attach)
     return if has_attachment && !@topic.for_assignment? && params[:attachment].size > 1.kilobytes &&
-      quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+              quota_exceeded(@current_user, named_context_url(@context, :context_discussion_topic_url, @topic.id))
+
     if @entry.save
       log_asset_access(@topic, 'topics', 'topics', 'participate')
 
@@ -741,7 +743,7 @@ class DiscussionTopicsApiController < ApplicationController
       groups = topic.group_category.groups.active.select do |group|
         group.grants_right?(@current_user, session, :read)
       end
-      topic.child_topics.each{ |t| topics << t if groups.include?(t.context) }
+      topic.child_topics.each { |t| topics << t if groups.include?(t.context) }
     end
     topics
   end

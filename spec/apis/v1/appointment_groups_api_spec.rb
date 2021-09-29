@@ -42,7 +42,7 @@ describe AppointmentGroupsController, type: :request do
     'sub_context_codes', 'title', 'updated_at', 'url', 'workflow_state'
   ]
 
-  it 'should return manageable appointment groups' do
+  it 'returns manageable appointment groups' do
     ag1 = AppointmentGroup.create!(:title => "something", :contexts => [@course1])
     cat = @course1.group_categories.create(name: "foo")
     ag2 = AppointmentGroup.create!(:title => "another", :contexts => [@course1], :sub_context_codes => [cat.asset_string])
@@ -50,34 +50,38 @@ describe AppointmentGroupsController, type: :request do
     ag4 = AppointmentGroup.create!(:title => "past", :contexts => [@course1, @course2], :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
-                    :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'
+                    })
     expect(json.size).to eql 2
     expect(json.first.keys.sort).to eql expected_fields
-    expect(json.first.slice('id', 'title', 'participant_type')).to eql({'id' => ag1.id, 'title' => 'something', 'participant_type' => 'User'})
-    expect(json.last.slice('id', 'title', 'participant_type')).to eql({'id' => ag2.id, 'title' => 'another', 'participant_type' => 'Group'})
+    expect(json.first.slice('id', 'title', 'participant_type')).to eql({ 'id' => ag1.id, 'title' => 'something', 'participant_type' => 'User' })
+    expect(json.last.slice('id', 'title', 'participant_type')).to eql({ 'id' => ag2.id, 'title' => 'another', 'participant_type' => 'Group' })
   end
 
-  it "should return past manageable appointment groups, if requested" do
+  it "returns past manageable appointment groups, if requested" do
     ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include_past_appointments=1", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include_past_appointments => '1'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include_past_appointments => '1'
+                    })
     expect(json.size).to eql 1
   end
 
-  it "should restrict manageable appointment groups by context_codes" do
+  it "restricts manageable appointment groups by context_codes" do
     ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course1])
     ag2 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course2])
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable", {
-        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable'
+                    })
     expect(json.size).to eql 2
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&context_codes[]=course_#{@course2.id}", {
-        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :context_codes => ["course_#{@course2.id}"]})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :context_codes => ["course_#{@course2.id}"]
+                    })
     expect(json.size).to eql 1
   end
 
-  it 'should return reservable appointment groups' do
+  it 'returns reservable appointment groups' do
     ag1 = AppointmentGroup.create!(:title => "can't reserve", :contexts => [@course])
     ag1.publish!
     ag2 = AppointmentGroup.create!(:title => "me neither", :contexts => [Course.create!])
@@ -116,22 +120,24 @@ describe AppointmentGroupsController, type: :request do
     ag9.publish!
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'
+                    })
     expect(json.size).to eql 2
     expect(json.first.keys.sort).to eql expected_fields
-    expect(json.first.slice('id', 'title', 'participant_type')).to eql({'id' => ag6.id, 'title' => 'yay', 'participant_type' => 'User'})
-    expect(json.last.slice('id', 'title', 'participant_type')).to eql({'id' => ag7.id, 'title' => 'double yay', 'participant_type' => 'Group'})
+    expect(json.first.slice('id', 'title', 'participant_type')).to eql({ 'id' => ag6.id, 'title' => 'yay', 'participant_type' => 'User' })
+    expect(json.last.slice('id', 'title', 'participant_type')).to eql({ 'id' => ag7.id, 'title' => 'double yay', 'participant_type' => 'Group' })
 
     [user_in_c1s2, user_in_c2s2].each do |user|
       @user = user
       json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
-                        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+                        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'
+                      })
       expect(json.size).to eql 1
       expect(json.first['id']).to eql ag9.id
     end
   end
 
-  it "should restrict reservable appointment groups by context_codes" do
+  it "restricts reservable appointment groups by context_codes" do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag1 = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag1.publish!
@@ -141,49 +147,56 @@ describe AppointmentGroupsController, type: :request do
     ag2.publish!
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable", {
-        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable'
+                    })
     expect(json.size).to eql 2
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&context_codes[]=course_#{@course.id}", {
-        :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :context_codes => ["course_#{@course.id}"]})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :context_codes => ["course_#{@course.id}"]
+                    })
     expect(json.size).to eql 1
   end
 
-  it "should return past reservable appointment groups, if requested" do
+  it "returns past reservable appointment groups, if requested" do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "past", :new_appointments => [["#{Time.now.year - 1}-01-01 12:00:00", "#{Time.now.year - 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
     json = api_call(:get, "/api/v1/appointment_groups?scope=reservable&include_past_appointments=1", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :include_past_appointments => '1'})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'reservable', :include_past_appointments => '1'
+                    })
     expect(json.size).to eql 1
   end
 
-  it 'should paginate appointment groups' do
+  it 'paginates appointment groups' do
     ids = 5.times.map { |i| AppointmentGroup.create!(:title => "#{i}".object_id, :contexts => [@course]) }
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
-                      :scope => 'manageable', :per_page => '2'})
+                      :scope => 'manageable', :per_page => '2'
+                    })
     expect(json.size).to eql 2
     expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&per_page=2&page=3", {
                       :controller => 'appointment_groups', :action => 'index', :format => 'json',
-                      :scope => 'manageable', :per_page => '2', :page => '3'})
+                      :scope => 'manageable', :per_page => '2', :page => '3'
+                    })
     expect(json.size).to eql 1
     expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/appointment_groups\?.*page=2.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups\?.*page=3.*>; rel="last"})
   end
 
-  it 'should include appointments and child_events, if requested' do
+  it 'includes appointments and child_events, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.appointments.first.reserve_for @student1, @me
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=appointments", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['appointments']})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['appointments']
+                    })
     expect(json.size).to eql 1
     expect(json.first.keys.sort).to eql((expected_fields + ['appointments']).sort)
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=appointments&include[]=child_events", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['appointments', 'child_events']})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['appointments', 'child_events']
+                    })
     expect(json.size).to eql 1
     expect(json.first.keys.sort).to eql((expected_fields + ['appointments']).sort)
     ajson = json.first['appointments']
@@ -193,22 +206,24 @@ describe AppointmentGroupsController, type: :request do
     expect(cjson.first['user']['id']).to eql @student1.id
   end
 
-  it 'should include all associated context codes, if requested' do
+  it 'includes all associated context codes, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}?include[]=all_context_codes", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['all_context_codes']})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['all_context_codes']
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['all_context_codes', 'appointments']).sort)
     expect(json['id']).to eql ag.id
     ccs = json['all_context_codes']
     expect(ccs).to eql [@course.asset_string]
   end
 
-  it 'should get a manageable appointment group' do
+  it 'gets a manageable appointment group' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_falsey
@@ -217,12 +232,13 @@ describe AppointmentGroupsController, type: :request do
     expect(json['appointments'].first.keys).not_to include('child_events')
   end
 
-  it 'should include child_events, if requested' do
+  it 'includes child_events, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     ag.appointments.first.reserve_for @student1, @me
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}?include[]=child_events", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['child_events']})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s, :include => ['child_events']
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_falsey
@@ -233,46 +249,49 @@ describe AppointmentGroupsController, type: :request do
     expect(cjson.first['user']['id']).to eql @student1.id
   end
 
-  it 'should get a reservable appointment group' do
+  it 'gets a reservable appointment group' do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :contexts => [@course])
     ag.publish!
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_falsey
   end
 
-  it "should return the correct context for appointment slots with existing signups in a different course" do
+  it "returns the correct context for appointment slots with existing signups in a different course" do
     course1 = course_with_teacher(:active_all => true).course
     student1 = student_in_course(:course => course1, :active_all => true).user
     course2 = course_with_teacher(:active_all => true, :user => @teacher).course
     student2 = student_in_course(:course => course2, :active_all => true).user
     ag = AppointmentGroup.create!(:title => 'bleh',
-                             :participants_per_appointment => 2,
-                             :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
-                                                   ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]],
-                             :contexts => [course1, course2])
+                                  :participants_per_appointment => 2,
+                                  :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"],
+                                                        ["#{Time.now.year + 1}-01-01 13:00:00", "#{Time.now.year + 1}-01-01 14:00:00"]],
+                                  :contexts => [course1, course2])
     ag.publish!
     ag.appointments.first.reserve_for(student1, @teacher)
     json = api_call_as_user(student2, :get, "/api/v1/appointment_groups/#{ag.id}?include[]=child_events", {
-      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.to_param, :include => ['child_events'] })
+                              :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.to_param, :include => ['child_events']
+                            })
     appointments = json['appointments']
     expect(appointments.length).to eq 2
     expect(appointments[0]['context_code']).to eq course2.asset_string
     expect(appointments[1]['context_code']).to eq course2.asset_string
   end
 
-  it 'should require action until the min has been met' do
+  it 'requires action until the min has been met' do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "yay", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00", "#{Time.now.year + 1}-01-01 13:00:00"]], :min_appointments_per_participant => 1, :contexts => [@course])
     ag.publish!
     appt = ag.appointments.first
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_truthy
@@ -280,7 +299,8 @@ describe AppointmentGroupsController, type: :request do
     appt.reserve_for(@me, @me)
 
     json = api_call(:get, "/api/v1/appointment_groups/#{ag.id}", {
-                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s})
+                      :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => ag.id.to_s
+                    })
     expect(json.keys.sort).to eql((expected_fields + ['appointments']).sort)
     expect(json['id']).to eql ag.id
     expect(json['requiring_action']).to be_falsey
@@ -297,29 +317,29 @@ describe AppointmentGroupsController, type: :request do
 
     it 'returns past appointment slots for teachers' do
       json = api_call_as_user(@teacher, :get, "/api/v1/appointment_groups/#{@ag.id}",
-              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param})
+                              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param })
       expect(json['appointments'].size).to eq 2
     end
 
     it 'does not return past appointment slots for students' do
       json = api_call_as_user(@student, :get, "/api/v1/appointment_groups/#{@ag.id}",
-              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param})
+                              { :controller => 'appointment_groups', :action => 'show', :format => 'json', :id => @ag.to_param })
       expect(json['appointments'].size).to eq 1
     end
   end
 
-  it 'should enforce create permissions' do
+  it 'enforces create permissions' do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     raw_api_call(:post, "/api/v1/appointment_groups",
-                      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai"} })
+                 { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                 { :appointment_group => { :context_codes => [@course.asset_string], :title => "ohai" } })
     expect(JSON.parse(response.body)['status']).to eq 'unauthorized'
   end
 
-  it 'should create a new appointment group' do
+  it 'creates a new appointment group' do
     json = api_call(:post, "/api/v1/appointment_groups",
-                      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}} })
+                    { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                    { :appointment_group => { :context_codes => [@course.asset_string], :title => "ohai", :new_appointments => { '0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] } } })
     expect(json.keys.sort).to eql((expected_fields + ['new_appointments']).sort)
     expect(json['start_at']).to eql "2012-01-01T12:00:00Z"
     expect(json['end_at']).to eql "2012-01-01T13:00:00Z"
@@ -333,14 +353,14 @@ describe AppointmentGroupsController, type: :request do
     it "creates an appointment group in the contexts' shard" do
       json = @shard1.activate do
         api_call(:post, "/api/v1/appointment_groups",
-                 {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                 {:appointment_group => {:context_codes => [@course.asset_string], :title => 'over there', :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}}})
+                 { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                 { :appointment_group => { :context_codes => [@course.asset_string], :title => 'over there', :new_appointments => { '0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] } } })
       end
       expect(AppointmentGroup.find(json['id']).title).to eq 'over there'
     end
   end
 
-  it 'should forbid creating an appointment group for a concluded course' do
+  it 'forbids creating an appointment group for a concluded course' do
     course1 = course_factory(active_all: true)
     course1.save!
     course2 = course_factory(active_all: true)
@@ -351,80 +371,79 @@ describe AppointmentGroupsController, type: :request do
       :appointment_group => {
         :context_codes => [course1.asset_string, course2.asset_string],
         :title => "bad appointment group",
-        :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }
+        :new_appointments => { '0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }
       }
     }
     json = api_call(:post, "/api/v1/appointment_groups",
-      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-      appointment_group_params, {}, :expected_status => 400)
+                    { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                    appointment_group_params, {}, :expected_status => 400)
     expect(json['error']).to eql "cannot create an appointment group for a concluded course"
   end
 
-
-  it 'should create a new appointment group with a sub_context' do
+  it 'creates a new appointment group with a sub_context' do
     json = api_call(:post, "/api/v1/appointment_groups",
-                      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_codes => [@course.asset_string], :sub_context_codes => [@course.default_section.asset_string], :title => "ohai"} })
+                    { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                    { :appointment_group => { :context_codes => [@course.asset_string], :sub_context_codes => [@course.default_section.asset_string], :title => "ohai" } })
     expect(json.keys.sort).to eql expected_fields
     expect(json['workflow_state']).to eql 'pending'
     expect(json['sub_context_codes']).to eql [@course.default_section.asset_string]
   end
 
-  it 'should enforce update permissions' do
+  it 'enforces update permissions' do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:title => "lol"} })
+                 { :controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s },
+                 { :appointment_group => { :title => "lol" } })
     expect(JSON.parse(response.body)['status']).to eq 'unauthorized'
   end
 
-  it 'should update an appointment group' do
+  it 'updates an appointment group' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:title => "lol"} })
+                    { :controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s },
+                    { :appointment_group => { :title => "lol" } })
     expect(json.keys.sort).to eql expected_fields
     expect(json['title']).to eql 'lol'
   end
 
-  it 'should publish an appointment group in an update through the api' do
+  it 'publishes an appointment group in an update through the api' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     expect(ag.workflow_state).to eq 'pending'
     json = api_call(:put, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s},
-                      {:appointment_group => {:publish => '1'} })
+                    { :controller => 'appointment_groups', :action => 'update', :format => 'json', :id => ag.id.to_s },
+                    { :appointment_group => { :publish => '1' } })
     ag.reload
     expect(ag.workflow_state).to eq 'active'
   end
 
-  it 'should publish an appointment group when creating through the api when requested' do
+  it 'publishes an appointment group when creating through the api when requested' do
     json = api_call(:post, "/api/v1/appointment_groups",
-                      {:controller => 'appointment_groups', :action => 'create', :format => 'json'},
-                      {:appointment_group => {:context_codes => [@course.asset_string], :title => "ohai", :new_appointments => {'0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"]}, :publish => '1'} })
+                    { :controller => 'appointment_groups', :action => 'create', :format => 'json' },
+                    { :appointment_group => { :context_codes => [@course.asset_string], :title => "ohai", :new_appointments => { '0' => ["2012-01-01 12:00:00", "2012-01-01 13:00:00"] }, :publish => '1' } })
     expect(json['workflow_state']).to eql 'active'
     expect(AppointmentGroup.find(json['id']).workflow_state).to eql 'active'
   end
 
-  it 'should enforce delete permissions' do
+  it 'enforces delete permissions' do
     student_in_course :course => course_factory(active_all: true), :user => @me, :active_all => true
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     raw_api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
+                 { :controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s })
     expect(JSON.parse(response.body)['status']).to eq 'unauthorized'
   end
 
-  it 'should delete an appointment group' do
+  it 'deletes an appointment group' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["2012-01-01 12:00:00", "2012-01-01 13:00:00"]], :contexts => [@course])
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
+                    { :controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s })
     expect(response).to be_successful
     expect(json.keys.sort).to eql expected_fields
     expect(json['workflow_state']).to eql 'deleted'
     expect(ag.reload).to be_deleted
   end
 
-  it 'should delete an appointment group with appointments' do
+  it 'deletes an appointment group with appointments' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00",
                                                                                 "#{Time.now.year + 1}-01-01 13:00:00"],
                                                                                ["#{Time.now.year + 1}-01-01 13:00:00",
@@ -436,7 +455,7 @@ describe AppointmentGroupsController, type: :request do
     @user = @me
 
     json = api_call(:delete, "/api/v1/appointment_groups/#{ag.id}",
-                      {:controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s})
+                    { :controller => 'appointment_groups', :action => 'destroy', :format => 'json', :id => ag.id.to_s })
 
     expect(response).to be_successful
     expect(json.keys.sort).to eql expected_fields
@@ -444,7 +463,7 @@ describe AppointmentGroupsController, type: :request do
     expect(ag.reload).to be_deleted
   end
 
-  it 'should include participant count, if requested' do
+  it 'includes participant count, if requested' do
     ag = AppointmentGroup.create!(:title => "something", :new_appointments => [["#{Time.now.year + 1}-01-01 12:00:00",
                                                                                 "#{Time.now.year + 1}-01-01 13:00:00"],
                                                                                ["#{Time.now.year + 1}-01-01 13:00:00",
@@ -457,13 +476,14 @@ describe AppointmentGroupsController, type: :request do
     @user = @me
 
     json = api_call(:get, "/api/v1/appointment_groups?scope=manageable&include[]=participant_count", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['participant_count']})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :scope => 'manageable', :include => ['participant_count']
+                    })
     expect(json.size).to eql 1
     expect(json.first.keys.sort).to eql((expected_fields + ['participant_count']).sort)
     expect(json.first['participant_count']).to eql(2)
   end
 
-  it "should include the user's reserved times, if requested" do
+  it "includes the user's reserved times, if requested" do
     year = Time.now.year + 1
     appointment_times = [["#{year}-01-01T12:00:00Z", "#{year}-01-01T13:00:00Z"],
                          ["#{year}-01-01T13:00:00Z", "#{year}-01-01T14:00:00Z"]]
@@ -471,17 +491,18 @@ describe AppointmentGroupsController, type: :request do
     ag.publish!
     student_in_course(:course => @course, :active_all => true)
     child_events = []
-    ag.appointments.each {|appt| child_events << appt.reserve_for(@student, @me)}
+    ag.appointments.each { |appt| child_events << appt.reserve_for(@student, @me) }
 
     @user = @student
 
     json = api_call(:get, "/api/v1/appointment_groups?include[]=reserved_times", {
-                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :include => ['reserved_times']})
+                      :controller => 'appointment_groups', :action => 'index', :format => 'json', :include => ['reserved_times']
+                    })
     expect(json.size).to eql 1
     expect(json.first.keys.sort).to eql((expected_fields + ['reserved_times']).sort)
     expect(json.first['reserved_times'].length).to eql(child_events.length)
     child_events.each do |event|
-      expect(json.first['reserved_times']).to include({"id" => event.id, "start_at" => event.start_at.iso8601, "end_at" => event.end_at.iso8601})
+      expect(json.first['reserved_times']).to include({ "id" => event.id, "start_at" => event.start_at.iso8601, "end_at" => event.end_at.iso8601 })
     end
   end
 
@@ -506,51 +527,57 @@ describe AppointmentGroupsController, type: :request do
     context "#{type.singularize}-level appointment groups" do
       before :once, &block
 
-      it "should return all #{type}" do
+      it "returns all #{type}" do
         skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
-                          :format => 'json'})
+                          :format => 'json'
+                        })
         expect(json.size).to eql 2
-        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants.map(&:id)
+        expect(json.map { |j| j['id'] }).to eql @ag.possible_participants.map(&:id)
       end
 
-      it "should paginate #{type}" do
+      it "paginates #{type}" do
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
-                          :format => 'json', :per_page => '1'})
+                          :format => 'json', :per_page => '1'
+                        })
         expect(json.size).to eql 1
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="next",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
 
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?per_page=1&page=2", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
-                          :format => 'json', :per_page => '1', :page => '2'})
+                          :format => 'json', :per_page => '1', :page => '2'
+                        })
         expect(json.size).to eql 1
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/appointment_groups/#{@ag.id}/#{type}\?.*page=2.*>; rel="last"})
       end
 
-      it "should return registered #{type}" do
+      it "returns registered #{type}" do
         skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=registered", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
-                          :registration_status => 'registered', :format => 'json'})
+                          :registration_status => 'registered', :format => 'json'
+                        })
         expect(json.size).to eql 1
-        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'registered').map(&:id)
+        expect(json.map { |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'registered').map(&:id)
       end
 
-      it "should return unregistered #{type}" do
+      it "returns unregistered #{type}" do
         skip('LS-2567 to skip and fix')
         json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{type}?registration_status=unregistered", {
                           :controller => 'appointment_groups', :id => @ag.id.to_s, :action => type,
-                          :registration_status => 'unregistered', :format => 'json'})
+                          :registration_status => 'unregistered', :format => 'json'
+                        })
         expect(json.size).to eql 1
-        expect(json.map{ |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'unregistered').map(&:id)
+        expect(json.map { |j| j['id'] }).to eql @ag.possible_participants(registration_status: 'unregistered').map(&:id)
       end
 
-      it "should not return non-#{type.singularize} participants" do
+      it "does not return non-#{type.singularize} participants" do
         (types.keys - [type]).each do |other_type|
           json = api_call(:get, "/api/v1/appointment_groups/#{@ag.id}/#{other_type}", {
-                            :controller => 'appointment_groups', :id => @ag.id.to_s, :action => other_type, :format => 'json'})
+                            :controller => 'appointment_groups', :id => @ag.id.to_s, :action => other_type, :format => 'json'
+                          })
           expect(json).to be_empty
         end
       end
@@ -597,10 +624,10 @@ describe AppointmentGroupsController, type: :request do
 
     it 'doesnt get confused by appointment groups with both past and future' do
       ag3 = AppointmentGroup.create!(:title => "past and future", :contexts => [@course2],
-        :new_appointments => [
-          [1.month.ago, 1.month.ago + 30.minutes],
-          [1.month.from_now, 1.month.from_now + 30.minutes]
-        ])
+                                     :new_appointments => [
+                                       [1.month.ago, 1.month.ago + 30.minutes],
+                                       [1.month.from_now, 1.month.from_now + 30.minutes]
+                                     ])
       ag3.publish!
       @path += "&appointment_group_ids[]=#{ag3.to_param}"
       @params[:appointment_group_ids].push(ag3.to_param)

@@ -67,22 +67,22 @@ describe "assignment batch edit" do
       )
       # add some overrides for Assignment1
       @override1 = create_adhoc_override_for_assignment(@assignment1,
-      [@student1],
-      {title: 'override1', due_at: @date - 1.day,
-      lock_at: @date + 4.days,
-      unlock_at: @date - 4.days})
+                                                        [@student1],
+                                                        { title: 'override1', due_at: @date - 1.day,
+                                                          lock_at: @date + 4.days,
+                                                          unlock_at: @date - 4.days })
       @override2 = create_adhoc_override_for_assignment(@assignment1,
-      [@student2],
-      {title: 'override2',
-      due_at: @date - 10.days,
-      lock_at: @date + 10.days,
-      unlock_at: @date - 10.days})
+                                                        [@student2],
+                                                        { title: 'override2',
+                                                          due_at: @date - 10.days,
+                                                          lock_at: @date + 10.days,
+                                                          unlock_at: @date - 10.days })
       @override2 = create_adhoc_override_for_assignment(@assignment1,
-      [@student3],
-      {title: 'override3',
-      due_at: @date + 10.days,
-      lock_at: @date + 20.days,
-      unlock_at: @date})
+                                                        [@student3],
+                                                        { title: 'override3',
+                                                          due_at: @date + 10.days,
+                                                          lock_at: @date + 20.days,
+                                                          unlock_at: @date })
     end
 
     context "bulk edit feature" do
@@ -131,18 +131,18 @@ describe "assignment batch edit" do
         batch_edit_dialog_ok_button.click
         date_inputs = assignment_dates_inputs(@assignment1.title)
         save_bulk_edited_dates
-        expect(date_inputs[0].attribute('value')).to eq (@date+3.days).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[0].attribute('value')).to eq (@date + 3.days).strftime("%a %-b %-d, %Y")
         # unlock_at was today-3.days
-        expect(date_inputs[1].attribute('value')).to eq (@date-1.day).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[1].attribute('value')).to eq (@date - 1.day).strftime("%a %-b %-d, %Y")
         # lock_at date was today+3days
-        expect(date_inputs[2].attribute('value')).to eq (@date+5.days).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[2].attribute('value')).to eq (@date + 5.days).strftime("%a %-b %-d, %Y")
         date_inputs = assignment_dates_inputs(@override1.title)
         # Override1 due date was today-1.day
-        expect(date_inputs[0].attribute('value')).to eq (@date+1.day).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[0].attribute('value')).to eq (@date + 1.day).strftime("%a %-b %-d, %Y")
         # Override1 unlock_at date was today-4.days
-        expect(date_inputs[1].attribute('value')).to eq (@date-2.days).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[1].attribute('value')).to eq (@date - 2.days).strftime("%a %-b %-d, %Y")
         # Override1 lock_at date was today+4days
-        expect(date_inputs[2].attribute('value')).to eq (@date+6.days).strftime("%a %-b %-d, %Y")
+        expect(date_inputs[2].attribute('value')).to eq (@date + 6.days).strftime("%a %-b %-d, %Y")
       end
 
       it 'allows clearing dates', custom_timeout: 30 do

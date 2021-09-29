@@ -73,7 +73,7 @@ describe EventStream::Backend::Cassandra do
   end
 
   describe "executing operations" do
-    let(:backend){ EventStream::Backend::Cassandra.new(stream) }
+    let(:backend) { EventStream::Backend::Cassandra.new(stream) }
 
     it "proxies calls through provided cassandra db" do
       backend.execute(:insert, event_record)

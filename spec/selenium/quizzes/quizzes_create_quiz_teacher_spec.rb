@@ -99,7 +99,7 @@ describe 'creating a quiz' do
       save_settings
 
       expect(ffj('div.error_text', 'div.error_box.errorBox')[1].text).to eq 'You ' \
-        'must have a student or section selected'
+                                                                            'must have a student or section selected'
     end
 
     it 'saves and publishes a new quiz', :xbrowser, priority: "1", test_id: 193785, custom_timeout: 30 do
@@ -108,7 +108,7 @@ describe 'creating a quiz' do
 
       expect(f('#quiz-draft-state')).to be_displayed
 
-      expect_new_page_load {f('.save_and_publish').click}
+      expect_new_page_load { f('.save_and_publish').click }
       expect(f('#quiz-publish-link.btn-published')).to be_displayed
 
       # Check that the list of quizzes is also updated
@@ -130,7 +130,7 @@ describe 'creating a quiz' do
       it 'creates a quiz directly from the index page', priority: "1", test_id: 210055 do
         expect do
           create_new_quiz
-        end.to change{ Quizzes::Quiz.count }.by(1)
+        end.to change { Quizzes::Quiz.count }.by(1)
       end
 
       it 'redirects to the correct quiz edit form', priority: "2", test_id: 399887 do
@@ -167,8 +167,8 @@ describe 'creating a quiz' do
       course_with_teacher_logged_in(:active_all => true, :account => @account)
     end
 
-    it "should default to post grades if account setting is enabled", custom_timeout: 30 do
-      @account.settings[:sis_default_grade_export] = {:locked => false, :value => true}
+    it "defaults to post grades if account setting is enabled", custom_timeout: 30 do
+      @account.settings[:sis_default_grade_export] = { :locked => false, :value => true }
       @account.save!
 
       get "/courses/#{@course.id}/quizzes"
@@ -177,7 +177,7 @@ describe 'creating a quiz' do
       expect(is_checked('#quiz_post_to_sis')).to be_truthy
     end
 
-    it "should not default to post grades if account setting is not enabled", custom_timeout: 30 do
+    it "does not default to post grades if account setting is not enabled", custom_timeout: 30 do
       get "/courses/#{@course.id}/quizzes"
       expect_new_page_load { f('.new-quiz-link').click }
       expect(is_checked('#quiz_post_to_sis')).to be_falsey
@@ -221,11 +221,11 @@ describe 'creating a quiz' do
 
       before do
         turn_on_sis_settings(@account)
-        @account.settings[:sis_require_assignment_due_date] = { value: true}
+        @account.settings[:sis_require_assignment_due_date] = { value: true }
         @account.save!
       end
 
-      it 'should block with only overrides' do
+      it 'blocks with only overrides' do
         @course.course_sections.create!(name: section_to_set)
         new_quiz
         assign_quiz_to_no_one
@@ -235,13 +235,13 @@ describe 'creating a quiz' do
       end
 
       context 'with due dates' do
-        it 'should not block' do
+        it 'does not block' do
           new_quiz
           submit_page
         end
 
         describe 'and differentiated' do
-          it 'should not block with base due date and override' do
+          it 'does not block with base due date and override' do
             @course.course_sections.create!(name: section_to_set)
             new_quiz
             add_override
@@ -252,7 +252,7 @@ describe 'creating a quiz' do
       end
 
       context 'without due dates' do
-        it 'should block when enabled' do
+        it 'blocks when enabled' do
           @course.course_sections.create!(name: section_to_set)
           new_quiz
           select_last_override_section(section_to_set)
@@ -260,13 +260,13 @@ describe 'creating a quiz' do
           submit_blocked_with_errors
         end
 
-        it 'should not block when disabled' do
+        it 'does not block when disabled' do
           new_quiz
           set_value(sync_sis_button, false)
           submit_page
         end
 
-        it 'should block with base set with override not' do
+        it 'blocks with base set with override not' do
           @course.course_sections.create!(name: section_to_set)
           new_quiz
           Timecop.freeze(7.days.from_now) do

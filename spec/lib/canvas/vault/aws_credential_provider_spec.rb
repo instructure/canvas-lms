@@ -19,15 +19,14 @@
 
 require 'spec_helper'
 
-
 describe Canvas::Vault::AwsCredentialProvider do
   it "is a very slim wrapper around vault" do
     cred_path = "sts/testaccount/sts/some-vault-assumable-role"
     allow(::Canvas::Vault).to receive(:read).with(cred_path).and_return({
-      access_key: "AZ12345",
-      secret_key: "super-sekret-asjdfblkadfbvlasdf",
-      security_token: "asdfasdfasdfasdfasdfasdf"
-    })
+                                                                          access_key: "AZ12345",
+                                                                          secret_key: "super-sekret-asjdfblkadfbvlasdf",
+                                                                          security_token: "asdfasdfasdfasdfasdfasdf"
+                                                                        })
     creds = Canvas::Vault::AwsCredentialProvider.new(cred_path).credentials
     expect(creds.class).to eq(::Aws::Credentials)
     expect(creds.access_key_id).to eq("AZ12345")

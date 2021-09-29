@@ -22,14 +22,14 @@ module CopyAuthorizedLinks
   module CopyAuthorizedLinksClassMethods
     attr_reader :copy_authorized_links_block
     attr_reader :copy_authorized_links_columns
- 
+
     def copy_authorized_links(column_names, &block)
       @copy_authorized_links_block = block
       @copy_authorized_links_columns = Array(column_names)
       before_save :copy_authorized_links_to_context
     end
   end
- 
+
   module CopyAuthorizedLinksInstanceMethods
     def repair_malformed_links(user)
       block = self.class.copy_authorized_links_block rescue nil
@@ -56,7 +56,7 @@ module CopyAuthorizedLinks
       end
       self.save
     end
-    
+
     def copy_authorized_links_to_context
       block = self.class.copy_authorized_links_block rescue nil
       columns = (self.class.copy_authorized_links_columns || []).compact

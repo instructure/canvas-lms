@@ -26,12 +26,12 @@ class Thumbnail < ActiveRecord::Base
   # support -strip. you'd get something like:
   # MiniMagick::Error (Command ("mogrify -strip -resize \"200x50\" \"/tmp/mini_magick23816-1\"") failed: {:status_code=>1, :output=>"mogrify: Unrecognized option (-strip).\n"}):#012
   has_attachment(
-      :content_type => :image,
-      :storage => (Attachment.local_storage? ? :file_system : :s3),
-      :path_prefix => Attachment.file_store_config['path_prefix'],
-      :s3_access => 'private',
-      :keep_profile => true,
-      :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000).to_i
+    :content_type => :image,
+    :storage => (Attachment.local_storage? ? :file_system : :s3),
+    :path_prefix => Attachment.file_store_config['path_prefix'],
+    :s3_access => 'private',
+    :keep_profile => true,
+    :thumbnail_max_image_size_pixels => Setting.get('thumbnail_max_image_size_pixels', 100_000_000).to_i
   )
 
   before_save :set_namespace

@@ -32,13 +32,13 @@ describe ConversationBatch do
   end
 
   context "generate" do
-    it "should create an async batch" do
+    it "creates an async batch" do
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       expect(batch).to be_created
       expect(batch.completion).to be < 1
     end
 
-    it "should create a sync batch and run it" do
+    it "creates a sync batch and run it" do
       start_count = ConversationMessage.count
       batch = ConversationBatch.generate(@message, [@user2, @user3], :sync)
       expect(batch).to be_sent
@@ -53,7 +53,7 @@ describe ConversationBatch do
   end
 
   context "deliver" do
-    it "should be sent to all recipients" do
+    it "is sent to all recipients" do
       start_count = ConversationMessage.count
       batch = ConversationBatch.generate(@message, [@user2, @user3], :async)
       batch.deliver
@@ -68,7 +68,7 @@ describe ConversationBatch do
       expect(@user3.reload.unread_conversations_count).to eql 1
     end
 
-    it "should apply the tags to each conversation" do
+    it "applies the tags to each conversation" do
       start_count = ConversationMessage.count
       g = @course.groups.create
       g.users << @user1 << @user2
@@ -84,7 +84,7 @@ describe ConversationBatch do
       expect(@user3.conversations.first.tags).to eql [@course.asset_string] # not in group, so it falls back to common contexts
     end
 
-    it "should copy the attachment(s) to each conversation" do
+    it "copies the attachment(s) to each conversation" do
       start_count = ConversationMessage.count
       attachment = attachment_model(:context => @user1, :folder => @user1.conversation_attachments_folder)
       @message = Conversation.build_message @user1, "hi all", :attachment_ids => [attachment.id]
@@ -98,7 +98,7 @@ describe ConversationBatch do
       end
     end
 
-    it "should send group messages" do
+    it "sends group messages" do
       start_count = Conversation.count
       batch = ConversationBatch.generate(@message, [@user, @user3], :async, group: true)
       batch.deliver
@@ -109,7 +109,7 @@ describe ConversationBatch do
     context "sharding" do
       specs_require_sharding
 
-      it "should reuse existing private conversations" do
+      it "reuses existing private conversations" do
         @shard1.activate { @user4 = user_factory }
         conversation = @user1.initiate_conversation([@user4]).conversation
         conversation.add_message(@user1, "hello")

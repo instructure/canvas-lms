@@ -52,7 +52,7 @@ describe "student planner" do
   it "shows and navigates to announcements page from student planner", priority: "1", test_id: 3259302 do
     announcement = @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
     go_to_list_view
-    validate_object_displayed(@course.name,'Announcement')
+    validate_object_displayed(@course.name, 'Announcement')
     validate_link_to_url(announcement, 'discussion_topics')
   end
 
@@ -61,7 +61,7 @@ describe "student planner" do
     event.context = @course
     event.save!
     go_to_list_view
-    validate_object_displayed(@course.name,'Calendar Event')
+    validate_object_displayed(@course.name, 'Calendar Event')
     validate_link_to_calendar(event)
   end
 
@@ -74,18 +74,16 @@ describe "student planner" do
     @course.save!
     @course.announcements.create!(title: 'Hi there!', message: 'Announcement time!')
     go_to_list_view
-    validate_object_displayed(@course.name,'Announcement')
+    validate_object_displayed(@course.name, 'Announcement')
     elem = f("a[href='/courses/#{@course.id}']")
     url = driver.current_url
     # validate the background image url
-    expect(elem[:style]).
-      to include("#{url}courses/#{@course.id}/files/#{@course_attachment.id}/download?verifier=#{@course_attachment.uuid}")
-
+    expect(elem[:style])
+      .to include("#{url}courses/#{@course.id}/files/#{@course_attachment.id}/download?verifier=#{@course_attachment.uuid}")
   end
 
   context "responsive layout" do
     it "changes layout on browser resize" do
-
       go_to_list_view
 
       expect(f('.large.ic-Dashboard-header__layout')).to be_present
@@ -99,13 +97,12 @@ describe "student planner" do
       driver.manage.window.resize_to(500, dimension.height)
       expect(f('.small.ic-Dashboard-header__layout')).to be_present
       expect(f('.small.PlannerApp')).to be_present
-
     end
   end
 
   context "wiki_pages" do
     before :once do
-      @wiki_page = @course.wiki_pages.create!(title: 'Page1', todo_date: DateTime.current.change({min: 5}) + 2.days)
+      @wiki_page = @course.wiki_pages.create!(title: 'Page1', todo_date: DateTime.current.change({ min: 5 }) + 2.days)
     end
 
     it 'shows the date in the index page' do
@@ -131,35 +128,35 @@ describe "student planner" do
 
     it "shows and navigates to quizzes page from student planner", priority: "1", test_id: 3259303 do
       go_to_list_view
-      validate_object_displayed(@course.name,'Quiz')
+      validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
     it "shows and navigates to graded surveys with due dates", priority: "1", test_id: 3282673 do
       @quiz.update(quiz_type: "graded_survey")
       go_to_list_view
-      validate_object_displayed(@course.name,'Quiz')
+      validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
     it "shows and navigates to ungraded surveys with due dates", priority: "1", test_id: 3282674 do
       @quiz.update(quiz_type: "survey")
       go_to_list_view
-      validate_object_displayed(@course.name,'Quiz')
+      validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
 
     it "shows and navigates to practice quizzes with due dates", priority: "1", test_id: 3284242 do
       @quiz.update(quiz_type: "practice_quiz")
       go_to_list_view
-      validate_object_displayed(@course.name,'Quiz')
+      validate_object_displayed(@course.name, 'Quiz')
       validate_link_to_url(@quiz, 'quizzes')
     end
   end
 
   context "Peer Reviews" do
     before :once do
-      @reviewee= user_factory(:active_all => true)
+      @reviewee = user_factory(:active_all => true)
       @course.enroll_student(@reviewee).accept!
       @assignment = @course.assignments.create({
                                                  name: 'Peer Review Assignment',
@@ -174,7 +171,7 @@ describe "student planner" do
     it "shows peer review submissions" do
       go_to_list_view
 
-      validate_object_displayed(@course.name,'Peer Review')
+      validate_object_displayed(@course.name, 'Peer Review')
       expect(list_view_planner_item("Planner Course Peer Review")).to contain_css(peer_review_icon_selector)
       expect(list_view_planner_item("Planner Course Peer Review")).to contain_jqcss(peer_review_reminder_selector)
       expect(list_view_planner_item("Planner Course Assignment")).not_to contain_css(peer_review_icon_selector)
@@ -342,10 +339,10 @@ describe "student planner" do
 
     it "groups the to-do item with other course items", priority: "1", test_id: 3482560 do
       @assignment = @course.assignments.create({
-        name: 'Assignment 1',
-        due_at: Time.zone.now + 1.day,
-        submission_types: 'online_text_entry'
-      })
+                                                 name: 'Assignment 1',
+                                                 due_at: Time.zone.now + 1.day,
+                                                 submission_types: 'online_text_entry'
+                                               })
       @student1.planner_notes.create!(todo_date: 1.day.from_now, title: "Title Text", course_id: @course.id)
       go_to_list_view
       course_group = f('ol', planner_app_div)
@@ -434,16 +431,16 @@ describe "student planner" do
   it "shows and navigates to wiki pages with todo dates from student planner", priority: "1", test_id: 3259304 do
     page = @course.wiki_pages.create!(title: 'Page1', todo_date: Time.zone.now + 2.days)
     go_to_list_view
-    validate_object_displayed(@course.name,'Page')
+    validate_object_displayed(@course.name, 'Page')
     validate_link_to_url(page, 'pages')
   end
 
   context "with existing assignment, open opportunities" do
     before :once do
       @assignment_opportunity = @course.assignments.create!(name: 'assignmentThatHasToBeDoneNow',
-                                  description: 'This will take a long time',
-                                  submission_types: 'online_text_entry',
-                                  due_at: Time.zone.now - 2.days)
+                                                            description: 'This will take a long time',
+                                                            submission_types: 'online_text_entry',
+                                                            due_at: Time.zone.now - 2.days)
     end
 
     it "closes the opportunities dropdown.", priority: "1", test_id: 3281711 do
@@ -502,11 +499,11 @@ describe "student planner" do
 
       next_item_y = item_top_position(1)
       new_activity_button.click
-      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
+      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
 
       next_item_y = item_top_position(0)
       new_activity_button.click
-      expect{header_bottom_position}.to become_between next_item_y - 2, next_item_y + 2
+      expect { header_bottom_position }.to become_between next_item_y - 2, next_item_y + 2
     end
 
     it "shows any new activity above the current scroll position", priority: "1", test_id: 3468775 do
@@ -547,7 +544,7 @@ describe "student planner" do
         f('#student_planner_checkbox').click
         wait_for_ajaximations
         f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
-        expect_new_page_load{fj('button:contains("Save")').click}
+        expect_new_page_load { fj('button:contains("Save")').click }
         get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
         expect(get_value('input[name="student_todo_at"]')).to eq "#{format_date_for_view(Time.zone.today)} 11:59pm"
       end
@@ -556,7 +553,7 @@ describe "student planner" do
     it "allows account admins with content management rights to add todo dates" do
       @course.root_account.disable_feature!(:granular_permissions_manage_courses)
       @wiki = @course.wiki_pages.create!(title: 'Default Time Wiki Page')
-      admin = account_admin_user_with_role_changes(:role_changes => {:manage_courses => false})
+      admin = account_admin_user_with_role_changes(:role_changes => { :manage_courses => false })
       user_session(admin)
 
       expect(@course.grants_right?(admin, :manage)).to eq false # sanity check
@@ -566,7 +563,7 @@ describe "student planner" do
       f('#student_planner_checkbox').click
       wait_for_ajaximations
       f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
-      expect_new_page_load{fj('button:contains("Save")').click}
+      expect_new_page_load { fj('button:contains("Save")').click }
       expect(@wiki.reload.todo_date).to be_present
     end
 
@@ -582,7 +579,7 @@ describe "student planner" do
       get("/courses/#{@course.id}/pages/#{@wiki.id}/edit")
       f('#student_planner_checkbox').click
       f('input[name="student_todo_at"]').send_keys(format_date_for_view(Time.zone.now).to_s)
-      expect_new_page_load{fj('button:contains("Save")').click}
+      expect_new_page_load { fj('button:contains("Save")').click }
       expect(@wiki.reload.todo_date).to be_present
     end
 

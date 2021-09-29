@@ -49,10 +49,10 @@ module Canvas
     #   passed around with every request in the service workflow.
     #
     register(:rich_content) do |context, user|
-      tool_context = context&.is_a?(Group) ? context.context : context
+      tool_context = context.is_a?(Group) ? context.context : context
       {
         usage_rights_required: (
-          tool_context&.respond_to?(:usage_rights_required?) &&
+          tool_context.respond_to?(:usage_rights_required?) &&
           tool_context&.usage_rights_required?
         ) || false,
         can_upload_files: (

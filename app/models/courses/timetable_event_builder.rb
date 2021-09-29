@@ -22,8 +22,10 @@ module Courses
     # builds calendar events for a course (or course sections) according to a timetable
 
     attr_reader :course, :course_section, :event_context, :errors
+
     def initialize(course: nil, course_section: nil)
       raise "require course" unless course
+
       @course = course
       @course_section = course_section
       @event_context = course_section ? course_section : course
@@ -56,7 +58,7 @@ module Courses
             event_end_at = time_zone.parse("#{current_date} #{timetable_hash[:end_time]}")
 
             if event_start_at > course_start_at && event_end_at < course_end_at
-              event_hash = {:start_at => event_start_at, :end_at => event_end_at}
+              event_hash = { :start_at => event_start_at, :end_at => event_end_at }
               event_hash[:location_name] = location_name if location_name
               event_hashes << event_hash
             end
@@ -73,12 +75,12 @@ module Courses
     # :code can be used to give it a unique identifier for syncing (otherwise will be generated based on the times)
     # :title can be used to give a title to the event (otherwise a the name of the associated course will be used)
     def create_or_update_events(event_hashes)
-      timetable_codes = event_hashes.map{|h| h[:code]}
+      timetable_codes = event_hashes.map { |h| h[:code] }
       raise "timetable codes can't be blank" if timetable_codes.any?(&:blank?)
 
       # destroy unused events
-      event_context.calendar_events.active.for_timetable.where.not(:timetable_code => timetable_codes).
-        update_all(:workflow_state => 'deleted', :deleted_at => Time.now.utc)
+      event_context.calendar_events.active.for_timetable.where.not(:timetable_code => timetable_codes)
+                   .update_all(:workflow_state => 'deleted', :deleted_at => Time.now.utc)
 
       existing_events = event_context.calendar_events.where(:timetable_code => timetable_codes).to_a.index_by(&:timetable_code)
       event_hashes.each do |event_hash|
@@ -96,10 +98,10 @@ module Courses
       timetable_hashes.each do |hash|
         hash.slice!(*ALLOWED_TIMETABLE_KEYS)
       end
-      unless timetable_hashes.all?{|hash|  Time.parse(hash[:start_time]) rescue nil}
+      unless timetable_hashes.all? { |hash| Time.parse(hash[:start_time]) rescue nil }
         add_error("invalid start time(s)") # i'm too lazy to be more specific
       end
-      unless timetable_hashes.all?{|hash| Time.parse(hash[:end_time]) rescue nil}
+      unless timetable_hashes.all? { |hash| Time.parse(hash[:end_time]) rescue nil }
         add_error("invalid end time(s)")
       end
 
@@ -111,17 +113,17 @@ module Courses
         hash[:course_end_at] ||= default_end_at
         hash[:weekdays] = standardize_weekdays_string(hash[:weekdays])
       end
-      add_error("no start date found") unless timetable_hashes.all?{|hash| hash[:course_start_at]}
-      add_error("no end date found") unless timetable_hashes.all?{|hash| hash[:course_end_at]}
+      add_error("no start date found") unless timetable_hashes.all? { |hash| hash[:course_start_at] }
+      add_error("no end date found") unless timetable_hashes.all? { |hash| hash[:course_end_at] }
     end
 
     def process_and_validate_event_hashes(event_hashes)
-      add_error("start_at and end_at are required") unless event_hashes.all?{|h| h[:start_at] && h[:end_at]}
+      add_error("start_at and end_at are required") unless event_hashes.all? { |h| h[:start_at] && h[:end_at] }
 
       event_hashes.each do |event_hash|
         event_hash[:code] ||= generate_timetable_code_for(event_hash) # ensure timetable codes
       end
-      timetable_codes = event_hashes.map{|h| h[:code]}
+      timetable_codes = event_hashes.map { |h| h[:code] }
       add_error("events (or codes) are not unique") unless timetable_codes.uniq.count == timetable_codes.count # too lazy to be specific here too
     end
 
@@ -137,7 +139,7 @@ module Courses
         str = str.strip.downcase
         WEEKDAY_STR_MAP[str] || str.capitalize
       end
-      if weekday_strs.any?{|s| !WEEKDAY_TO_INT_MAP[s]}
+      if weekday_strs.any? { |s| !WEEKDAY_TO_INT_MAP[s] }
         add_error("weekdays are not valid")
         nil
       else
@@ -150,7 +152,7 @@ module Courses
     }.freeze
     def parse_weekdays_string(weekdays_string)
       # turn our standard string (e.g. "Tue,Thu") into an array of our special numbers
-      weekdays_string.split(",").map{|s| WEEKDAY_TO_INT_MAP[s]}
+      weekdays_string.split(",").map { |s| WEEKDAY_TO_INT_MAP[s] }
     end
 
     def create_new_event(event_hash)

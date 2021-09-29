@@ -24,7 +24,7 @@
 module Lti::Errors
   module ErrorLogger
     def self.log_error(e)
-      ErrorReport.log_error(e.class, {message: e.message, exception_message: e.message + "\n\n#{e.backtrace.join("\n")}"})
+      ErrorReport.log_error(e.class, { message: e.message, exception_message: e.message + "\n\n#{e.backtrace.join("\n")}" })
     end
   end
 end

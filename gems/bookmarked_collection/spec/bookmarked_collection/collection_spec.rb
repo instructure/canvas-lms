@@ -28,21 +28,21 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "bookmark accessors" do
-    it "should support current_bookmark" do
+    it "supports current_bookmark" do
       value = 5
       expect(@collection.current_bookmark).to be_nil
       @collection.current_bookmark = value
       expect(@collection.current_bookmark).to eq(value)
     end
 
-    it "should support next_bookmark" do
+    it "supports next_bookmark" do
       value = 5
       expect(@collection.next_bookmark).to be_nil
       @collection.next_bookmark = value
       expect(@collection.next_bookmark).to eq(value)
     end
 
-    it "should support include_bookmark" do
+    it "supports include_bookmark" do
       value = true
       expect(@collection.include_bookmark).to be_nil
       @collection.include_bookmark = value
@@ -51,17 +51,17 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#current_page" do
-    it "should be first_page if current_bookmark is nil" do
+    it "is first_page if current_bookmark is nil" do
       @collection.current_bookmark = nil
       expect(@collection.current_page).to eq(@collection.first_page)
     end
 
-    it "should lead with a 'bookmark:' prefix otherwise" do
+    it "leads with a 'bookmark:' prefix otherwise" do
       @collection.current_bookmark = "some value"
       expect(@collection.current_page).to match(/^bookmark:/)
     end
 
-    it "should change with current_bookmark" do
+    it "changes with current_bookmark" do
       @collection.current_bookmark = "bookmark1"
       page1 = @collection.current_page
       expect(page1).not_to be_nil
@@ -77,17 +77,17 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#next_page" do
-    it "should be nil if next_bookmark is nil" do
+    it "is nil if next_bookmark is nil" do
       @collection.next_bookmark = nil
       expect(@collection.next_page).to be_nil
     end
 
-    it "should lead with a 'bookmark:' prefix otherwise" do
+    it "leads with a 'bookmark:' prefix otherwise" do
       @collection.next_bookmark = "some value"
       expect(@collection.next_page).to match(/^bookmark:/)
     end
 
-    it "should change with next_bookmark" do
+    it "changes with next_bookmark" do
       @collection.next_bookmark = "bookmark1"
       page1 = @collection.next_page
       expect(page1).not_to be_nil
@@ -121,24 +121,24 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#current_page=" do
-    it "should set current_bookmark to nil if nil" do
+    it "sets current_bookmark to nil if nil" do
       @collection.current_bookmark = "some value"
       @collection.current_page = nil
       expect(@collection.current_bookmark).to be_nil
     end
 
-    it "should go to nil if missing 'bookmark:' prefix" do
+    it "goes to nil if missing 'bookmark:' prefix" do
       @collection.current_page = "invalid bookmark"
       expect(@collection.current_bookmark).to be_nil
     end
 
-    it "should go to nil if can't deserialize bookmark" do
+    it "goes to nil if can't deserialize bookmark" do
       # "W1td" is the base64 encoding of "[[]", which should fail to parse as JSON
       @collection.current_page = "bookmark:W1td"
       expect(@collection.current_bookmark).to be_nil
     end
 
-    it "should preserve bookmark value through serialization" do
+    it "preserves bookmark value through serialization" do
       bookmark = "bookmark value"
       @collection.current_bookmark = bookmark
       page = @collection.current_page
@@ -150,11 +150,11 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "#first_page" do
-    it "should not be nil" do
+    it "is not nil" do
       expect(@collection.first_page).not_to be_nil
     end
 
-    it "should set bookmark to nil when used to set page" do
+    it "sets bookmark to nil when used to set page" do
       @collection.current_bookmark = "some value"
       @collection.current_page = @collection.first_page
       expect(@collection.current_bookmark).to be_nil
@@ -168,7 +168,7 @@ describe "BookmarkedCollection::Collection" do
       @bookmark = double('bookmark')
     end
 
-    it "should use the bookmarker on the last item" do
+    it "uses the bookmarker on the last item" do
       expect(@bookmarker).to receive(:bookmark_for).once.with(@item).and_return(@bookmark)
       @collection.has_more!
       expect(@collection.next_bookmark).to eq(@bookmark)
@@ -176,13 +176,13 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "last_page" do
-    it "should assume the current_page is the last_page if there's no next_page" do
+    it "assumes the current_page is the last_page if there's no next_page" do
       @collection.current_bookmark = "bookmark1"
       @collection.next_bookmark = nil
       expect(@collection.last_page).to eq(@collection.current_page)
     end
 
-    it "should assume the last_page is unknown if there's a next_page" do
+    it "assumes the last_page is unknown if there's a next_page" do
       @collection.current_bookmark = "bookmark1"
       @collection.next_bookmark = "bookmark2"
       expect(@collection.last_page).to be_nil
@@ -190,25 +190,25 @@ describe "BookmarkedCollection::Collection" do
   end
 
   describe "remaining will_paginate support" do
-    it "should support per_page" do
+    it "supports per_page" do
       value = 5
       expect(@collection.per_page).to eq(Folio.per_page)
       @collection.per_page = value
       expect(@collection.per_page).to eq(value)
     end
 
-    it "should support total_entries" do
+    it "supports total_entries" do
       value = 5
       expect(@collection.total_entries).to be_nil
       @collection.total_entries = value
       expect(@collection.total_entries).to eq(value)
     end
 
-    it "should support reading empty previous_page" do
+    it "supports reading empty previous_page" do
       expect(@collection.previous_page).to be_nil
     end
 
-    it "should support reading empty total_pages" do
+    it "supports reading empty total_pages" do
       expect(@collection.total_pages).to be_nil
     end
   end

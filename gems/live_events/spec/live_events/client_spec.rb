@@ -24,11 +24,11 @@ require 'aws-sdk-kinesis'
 describe LiveEvents::Client do
   def stub_config(opts = {})
     allow(LiveEvents::Client).to receive(:config).and_return({
-      'kinesis_stream_name' => 'stream',
-      'aws_access_key_id' => 'access_key',
-      'aws_secret_access_key_dec' => 'secret_key',
-      'aws_region' => 'us-east-1'
-    })
+                                                               'kinesis_stream_name' => 'stream',
+                                                               'aws_access_key_id' => 'access_key',
+                                                               'aws_secret_access_key_dec' => 'secret_key',
+                                                               'aws_region' => 'us-east-1'
+                                                             })
   end
 
   class FakeStreamClient
@@ -82,33 +82,33 @@ describe LiveEvents::Client do
   describe ".aws_config" do
     before { prep_client_and_worker }
 
-    it "should correctly parse the endpoint" do
+    it "correctlies parse the endpoint" do
       res = LiveEvents::Client.aws_config({
-        "aws_endpoint" => "http://example.com:6543/"
-      })
+                                            "aws_endpoint" => "http://example.com:6543/"
+                                          })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
       LiveEvents.worker.stop!
     end
 
-    it "should ignore invalid endpoints" do
+    it "ignores invalid endpoints" do
       res = LiveEvents::Client.aws_config({
-        "aws_endpoint" => "example.com:6543/"
-      })
+                                            "aws_endpoint" => "example.com:6543/"
+                                          })
 
       expect(res.key?(:endpoint)).to eq false
       LiveEvents.worker.stop!
     end
 
-    it "should load custom creds" do
-      LiveEvents.aws_credentials = -> (settings) {
+    it "loads custom creds" do
+      LiveEvents.aws_credentials = ->(settings) {
         settings['value_to_return']
       }
 
       res = LiveEvents::Client.aws_config({
-        'custom_aws_credentials' => 'true',
-        'value_to_return' => 'a_value'
-      })
+                                            'custom_aws_credentials' => 'true',
+                                            'value_to_return' => 'a_value'
+                                          })
 
       expect(res[:credentials]).to eq('a_value')
       LiveEvents.worker.stop!
@@ -164,45 +164,45 @@ describe LiveEvents::Client do
   describe "post_event" do
     before { prep_client_and_worker }
 
-    it "should call put_records on the kinesis stream" do
+    it "calls put_records on the kinesis stream" do
       now = Time.now
 
       @client.post_event('event', {}, now, {}, "123")
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3)
-          },
-          "body" => {}
-        },
-        partition_key: "123"
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3)
+                             },
+                             "body" => {}
+                           },
+                           partition_key: "123"
+                         }])
     end
 
-    it "should include attributes when supplied via ctx" do
+    it "includes attributes when supplied via ctx" do
       now = Time.now
 
       @client.post_event('event', {}, now, { user_id: 123, real_user_id: 321, login: 'loginname', user_agent: 'agent' }, 'pkey')
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123,
-            "real_user_id" => 321,
-            "login" => 'loginname',
-            "user_agent" => 'agent'
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123,
+                               "real_user_id" => 321,
+                               "login" => 'loginname',
+                               "user_agent" => 'agent'
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
 
-    it "should not send blacklisted conxted attributes" do
+    it "does not send blacklisted conxted attributes" do
       now = Time.now
       @client.post_event(
         'event',
@@ -213,26 +213,26 @@ describe LiveEvents::Client do
       )
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123,
-            "real_user_id" => 321,
-            "login" => 'loginname',
-            "user_agent" => 'agent'
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123,
+                               "real_user_id" => 321,
+                               "login" => 'loginname',
+                               "user_agent" => 'agent'
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
   end
 
   describe "LiveEvents helper" do
     before { prep_client_and_worker }
 
-    it "should set context info via set_context and send it with events" do
+    it "sets context info via set_context and send it with events" do
       LiveEvents.set_context({ user_id: 123 })
 
       now = Time.now
@@ -245,19 +245,19 @@ describe LiveEvents::Client do
       )
       LiveEvents.worker.stop!
       expect_put_records([{
-        data: {
-          "attributes" => {
-            "event_name" => 'event',
-            "event_time" => now.utc.iso8601(3),
-            "user_id" => 123
-          },
-          "body" => {}
-        },
-        partition_key: 'pkey'
-      }])
+                           data: {
+                             "attributes" => {
+                               "event_name" => 'event',
+                               "event_time" => now.utc.iso8601(3),
+                               "user_id" => 123
+                             },
+                             "body" => {}
+                           },
+                           partition_key: 'pkey'
+                         }])
     end
 
-    it "should clear context on clear_context!" do
+    it "clears context on clear_context!" do
       LiveEvents.set_context({ user_id: 123 })
       LiveEvents.clear_context!
 
@@ -289,7 +289,7 @@ describe LiveEvents::Client do
     context do
       let(:test_stream_name) { 'custom_stream_name' }
 
-      it "should use custom stream client when defined" do
+      it "uses custom stream client when defined" do
         fake_stream_client = FakeStreamClient.new test_stream_name
         LiveEvents.stream_client = fake_stream_client
 

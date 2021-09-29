@@ -21,10 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
 describe SIS::CSV::EnrollmentImporter do
-
   before { account_model }
 
-  it 'should skip bad content' do
+  it 'skips bad content' do
     course_model(:account => @account, :sis_source_id => 'C001')
     @course.course_sections.create.update_attribute(:sis_source_id, '1B')
     user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
@@ -44,13 +43,13 @@ describe SIS::CSV::EnrollmentImporter do
     # rejected immediately on parse like the others; that's why the warning
     # comes out of order with the source data
     expect(errors).to eq ["No course_id or section_id given for an enrollment",
-                      "No user_id given for an enrollment",
-                      "Improper status \"semi-active\" for an enrollment",
-                      "Improper role \"cheater\" for an enrollment",
-                      "An enrollment referenced a non-existent associated user NONEXISTENT"]
+                          "No user_id given for an enrollment",
+                          "Improper status \"semi-active\" for an enrollment",
+                          "Improper role \"cheater\" for an enrollment",
+                          "An enrollment referenced a non-existent associated user NONEXISTENT"]
   end
 
-  it 'should warn about inconsistent data' do
+  it 'warns about inconsistent data' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "C001,TC 101,Test Course 101,,,active",
@@ -68,15 +67,16 @@ describe SIS::CSV::EnrollmentImporter do
       "course_id,user_id,role,section_id,status",
       "NONEXISTENT,U001,student,1B,active",
       "C001,U001,student,NONEXISTENT,active",
-      "C002,U001,student,1B,active")
+      "C002,U001,student,1B,active"
+    )
     errors = importer.errors.map(&:last)
     expect(errors).to eq ["An enrollment referenced a non-existent course NONEXISTENT",
-                            "An enrollment referenced a non-existent section NONEXISTENT",
-                            "An enrollment listed a section (1B) and a course (C002) that are unrelated for user (U001)"]
+                          "An enrollment referenced a non-existent section NONEXISTENT",
+                          "An enrollment listed a section (1B) and a course (C002) that are unrelated for user (U001)"]
   end
 
-  it "should not fail for really long course names" do
-    #create course, users, and sections
+  it "does not fail for really long course names" do
+    # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -91,13 +91,15 @@ describe SIS::CSV::EnrollmentImporter do
       "S001,test_1,#{name},active,,"
     )
     # the enrollments
-    expect {process_csv_data_cleanly(
-      "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-      "test_1,user_1,teacher,S001,active,,,"
-    )}.not_to raise_error
+    expect {
+      process_csv_data_cleanly(
+        "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
+        "test_1,user_1,teacher,S001,active,,,"
+      )
+    }.not_to raise_error
   end
 
-  it "should enroll users" do
+  it "enrolls users" do
     # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -145,7 +147,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(siete.end_at).to eq DateTime.new(2011, 8, 29)
   end
 
-  it "should enroll users by integration id" do
+  it "enrolls users by integration id" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "course_sis_id,TC 101,Test Course 101,,,active"
@@ -165,7 +167,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.sis_source_id).to eq 'course_sis_id'
   end
 
-  it "should support sis stickiness" do
+  it "supports sis stickiness" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -201,7 +203,7 @@ describe SIS::CSV::EnrollmentImporter do
     end
   end
 
-  it "should not try looking up a section to enroll into if the section name is empty" do
+  it "does not try looking up a section to enroll into if the section name is empty" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active",
@@ -222,8 +224,8 @@ describe SIS::CSV::EnrollmentImporter do
     expect(good_course.teachers.first.name).to eq "User Uno"
   end
 
-  it "should properly handle repeated courses and sections" do
-    #create course, users, and sections
+  it "properly handles repeated courses and sections" do
+    # create course, users, and sections
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active",
@@ -337,7 +339,7 @@ describe SIS::CSV::EnrollmentImporter do
     )
   end
 
-  it "should resurrect deleted enrollments" do
+  it "resurrects deleted enrollments" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -366,7 +368,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@enrollment.reload).to be_active
   end
 
-  it 'should not update an enrollment that is deleted and pseudonym is deleted' do
+  it 'does not update an enrollment that is deleted and pseudonym is deleted' do
     # course
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -390,7 +392,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(importer.batch.roll_back_data.count).to eq 0
   end
 
-  it "should count re-deletions" do
+  it "counts re-deletions" do
     # because people get confused otherwise
     course_model(:account => @account, :sis_source_id => 'C001')
     user_with_managed_pseudonym(:account => @account, :sis_user_id => 'U001')
@@ -406,7 +408,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(importer.batch.data[:counts][:enrollments]).to eq 1
   end
 
-  it "should always update sis_batch_id" do
+  it "always updates sis_batch_id" do
     # because people get confused otherwise
     course = course_model(account: @account, sis_source_id: 'C001')
     user = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -429,7 +431,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(enrollment.reload.sis_batch_id).to eq importer.batch.id
   end
 
-  it "should allow one user multiple enrollment types in the same section" do
+  it "allows one user multiple enrollment types in the same section" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -449,7 +451,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@course.enrollments.map(&:user)).to eq [@user, @user]
   end
 
-  it "should set limit_section_privileges" do
+  it "sets limit_section_privileges" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -480,7 +482,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(course.enrollments.where(user_id: user1).first.limit_privileges_to_course_section).to eq true
   end
 
-  it "should allow one user to observe multiple students" do
+  it "allows one user to observe multiple students" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -507,7 +509,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@course.observer_enrollments.map(&:associated_user_id).sort).to eq [@user1.id, @user2.id].sort
   end
 
-  it "should find manually xlisted sections when enrolling by course id" do
+  it "finds manually xlisted sections when enrolling by course id" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active",
@@ -537,22 +539,22 @@ describe SIS::CSV::EnrollmentImporter do
     expect(@course1.enrollments.count).to eq 0
   end
 
-  it "should not recycle an observer's associated user id in subsequent student enrollments" do
+  it "does not recycle an observer's associated user id in subsequent student enrollments" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active",
-        "user_2,user2,User,Dos,user2@example.com,active",
-        "observer_1,observer1,Observer,Uno,observer1@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "user_2,user2,User,Dos,user2@example.com,active",
+      "observer_1,observer1,Observer,Uno,observer1@example.com,active"
     )
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,student,,active,",
-        "test_1,observer_1,observer,,active,user_1",
-        "test_1,user_2,student,,active,"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,",
+      "test_1,observer_1,observer,,active,user_1",
+      "test_1,user_2,student,,active,"
     )
     @course = Course.where(sis_source_id: 'test_1').first
     expect(@course.enrollments.count).to eq 3
@@ -571,29 +573,29 @@ describe SIS::CSV::EnrollmentImporter do
     expect(user2_enrollment.associated_user_id).to be_nil
   end
 
-  it "should find observed user who is deleted and clear observer correctly" do
+  it "finds observed user who is deleted and clear observer correctly" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active",
-        "observer_1,observer1,Observer,Uno,observer1@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user1@example.com,active",
+      "observer_1,observer1,Observer,Uno,observer1@example.com,active"
     )
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,student,,active,",
-        "test_1,observer_1,observer,,active,user_1"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,",
+      "test_1,observer_1,observer,,active,user_1"
     )
 
     @observer = Pseudonym.where(sis_user_id: 'observer_1').first.user
     expect(@observer.enrollments.count).to eq 1
 
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,student,,completed,",
-        "test_1,observer_1,observer,,completed,user_1"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,completed,",
+      "test_1,observer_1,observer,,completed,user_1"
     )
 
     @observer.reload
@@ -603,7 +605,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.completed_at).to be_present
   end
 
-  it 'should only queue up one DueDateCacher job per course' do
+  it 'only queues up one DueDateCacher job per course' do
     course1 = course_model(account: @account, sis_source_id: 'C001')
     course2 = course_model(account: @account, sis_source_id: 'C002')
     user1 = user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
@@ -613,8 +615,8 @@ describe SIS::CSV::EnrollmentImporter do
     # there are no assignments so this will just return, but we just want to see
     # that it gets called correctly and for the users that wre imported
     expect(DueDateCacher).to receive(:recompute_users_for_course).with([user1.id], course1.id, nil, update_grades: true)
-    expect(DueDateCacher).to receive(:recompute_users_for_course).
-      with([user1.id, user2.id], course2.id, nil, update_grades: true)
+    expect(DueDateCacher).to receive(:recompute_users_for_course)
+      .with([user1.id, user2.id], course2.id, nil, update_grades: true)
     process_csv_data_cleanly(
       'course_id,user_id,role,status',
       'C001,U001,student,active',
@@ -633,7 +635,7 @@ describe SIS::CSV::EnrollmentImporter do
     end
   end
 
-  it 'should only queue up one recache_grade_distribution job per course' do
+  it 'only queues up one recache_grade_distribution job per course' do
     Course.create!(account: @account, sis_source_id: 'C001', workflow_state: 'available')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U002')
@@ -655,53 +657,53 @@ describe SIS::CSV::EnrollmentImporter do
         @role2 = custom_role('StudentEnrollment', 'insufferable know-it-all')
       end
 
-      it "should enroll with a custom role" do
+      it "enrolls with a custom role" do
         process_csv_data_cleanly(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,student,,active,",
-            "TehCourse,user2,cheater,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,student,,active,",
+          "TehCourse,user2,cheater,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
-        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'cheater']]
+        expect(@user1.enrollments.map { |e| [e.type, e.role.name] }).to eq [['StudentEnrollment', 'StudentEnrollment']]
+        expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [['StudentEnrollment', 'cheater']]
       end
 
-      it "should not enroll with an inactive role" do
+      it "does not enroll with an inactive role" do
         @role.deactivate!
         importer = process_csv_data(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,cheater,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,cheater,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
         expect(importer.errors.map(&:last)).to eq ["Improper role \"cheater\" for an enrollment"]
       end
 
-      it "should not enroll with a nonexistent role" do
+      it "does not enroll with a nonexistent role" do
         importer = process_csv_data(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,basketweaver,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,basketweaver,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
         expect(importer.errors.map(&:last)).to eq ["Improper role \"basketweaver\" for an enrollment"]
       end
 
-      it "should create multiple enrollments with different roles having the same base type" do
+      it "creates multiple enrollments with different roles having the same base type" do
         process_csv_data_cleanly(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,cheater,,active,",
-            "TehCourse,user1,insufferable know-it-all,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,cheater,,active,",
+          "TehCourse,user1,insufferable know-it-all,,active,"
         )
         expect(@user1.enrollments.sort_by(&:id).map(&:role).map(&:name)).to eq ['cheater', 'insufferable know-it-all']
       end
 
-      it "should find by role_id" do
+      it "finds by role_id" do
         process_csv_data_cleanly(
-            "course_id,user_id,section_id,status,associated_user_id,role_id",
-            "TehCourse,user1,,active,,#{@role.id}"
+          "course_id,user_id,section_id,status,associated_user_id,role_id",
+          "TehCourse,user1,,active,,#{@role.id}"
         )
         expect(@user1.enrollments.first.role).to eq @role
       end
 
-      it "should associate users for custom observer roles" do
+      it "associates users for custom observer roles" do
         custom_role('ObserverEnrollment', 'step mom')
         process_csv_data_cleanly(
           "course_id,user_id,role,section_id,status,associated_user_id",
@@ -724,71 +726,71 @@ describe SIS::CSV::EnrollmentImporter do
         @course = course_model(:account => @sub_account, :name => 'Battle Axe Lessons', :sis_source_id => 'TehCourse')
       end
 
-      it "should enroll with an inherited custom role" do
+      it "enrolls with an inherited custom role" do
         process_csv_data_cleanly(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,instruc-TOR,,active,",
-            "TehCourse,user2,student,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,instruc-TOR,,active,",
+          "TehCourse,user2,student,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
-        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
+        expect(@user1.enrollments.map { |e| [e.type, e.role.name] }).to eq [['TeacherEnrollment', 'instruc-TOR']]
+        expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [['StudentEnrollment', 'StudentEnrollment']]
       end
 
-      it "should not enroll with an inactive inherited role" do
+      it "does not enroll with an inactive inherited role" do
         @role.deactivate!
         importer = process_csv_data(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,instruc-TOR,,active,",
-            "TehCourse,user2,student,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,instruc-TOR,,active,",
+          "TehCourse,user2,student,,active,"
         )
         expect(@user1.enrollments.size).to eq 0
-        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
+        expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [['StudentEnrollment', 'StudentEnrollment']]
         expect(importer.errors.map(&:last)).to eq ["Improper role \"instruc-TOR\" for an enrollment"]
       end
 
-      it "should enroll with a custom role that overrides an inactive inherited role" do
+      it "enrolls with a custom role that overrides an inactive inherited role" do
         @role.deactivate!
         sub_role = @sub_account.roles.build :name => 'instruc-TOR'
         sub_role.base_role_type = 'TeacherEnrollment'
         sub_role.save!
         process_csv_data_cleanly(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,instruc-TOR,,active,",
-            "TehCourse,user2,student,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,instruc-TOR,,active,",
+          "TehCourse,user2,student,,active,"
         )
-        expect(@user1.enrollments.map{|e|[e.type, e.role.name]}).to eq [['TeacherEnrollment', 'instruc-TOR']]
-        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['StudentEnrollment', 'StudentEnrollment']]
+        expect(@user1.enrollments.map { |e| [e.type, e.role.name] }).to eq [['TeacherEnrollment', 'instruc-TOR']]
+        expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [['StudentEnrollment', 'StudentEnrollment']]
       end
 
-      it "should not enroll with a custom role defined in a sibling account" do
+      it "does not enroll with a custom role defined in a sibling account" do
         other_account = @account.sub_accounts.create!
         other_role = other_account.roles.build :name => 'Pixel Pusher'
         other_role.base_role_type = 'DesignerEnrollment'
         other_role.save!
         course_model(:account => other_account, :sis_source_id => 'OtherCourse')
         importer = process_csv_data(
-            "course_id,user_id,role,section_id,status,associated_user_id",
-            "TehCourse,user1,Pixel Pusher,,active,",
-            "OtherCourse,user2,Pixel Pusher,,active,"
+          "course_id,user_id,role,section_id,status,associated_user_id",
+          "TehCourse,user1,Pixel Pusher,,active,",
+          "OtherCourse,user2,Pixel Pusher,,active,"
         )
         expect(importer.errors.map(&:last)).to eq ["Improper role \"Pixel Pusher\" for an enrollment"]
         expect(@user1.enrollments.size).to eq 0
-        expect(@user2.enrollments.map{|e|[e.type, e.role.name]}).to eq [['DesignerEnrollment', 'Pixel Pusher']]
+        expect(@user2.enrollments.map { |e| [e.type, e.role.name] }).to eq [['DesignerEnrollment', 'Pixel Pusher']]
       end
     end
   end
 
-  it "should allow cross-account imports" do
-    #create course, users, and sections
+  it "allows cross-account imports" do
+    # create course, users, and sections
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     account2 = Account.create!
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active",
-        account: account2
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).and_return(user.pseudonyms.first)
@@ -800,24 +802,24 @@ describe SIS::CSV::EnrollmentImporter do
 
     # the enrollments
     process_csv_data_cleanly(
-        "course_id,root_account,user_id,role,status",
-        "test_1,account2,user_1,teacher,active",
+      "course_id,root_account,user_id,role,status",
+      "test_1,account2,user_1,teacher,active",
     )
     course = @account.courses.where(sis_source_id: 'test_1').first
     expect(course.teachers.map(&:name)).to eq ['User Uno']
   end
 
-  it "should check for a usable login for cross-account imports" do
-    #create course, users, and sections
+  it "checks for a usable login for cross-account imports" do
+    # create course, users, and sections
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     account2 = Account.create!
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active",
-        account: account2
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).once.and_return(nil)
@@ -828,25 +830,25 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     process_csv_data(
-        "course_id,root_account,user_id,role,status",
-        "test_1,account2,user_1,teacher,active",
+      "course_id,root_account,user_id,role,status",
+      "test_1,account2,user_1,teacher,active",
     )
     expect(warnings.first.message).to eq "User account2:user_1 does not have a usable login for this account"
     course = @account.courses.where(sis_source_id: 'test_1').first
     expect(course.teachers.to_a).to be_empty
   end
 
-  it "should skip cross-account imports that can't be found" do
-    #create course, users, and sections
+  it "skips cross-account imports that can't be found" do
+    # create course, users, and sections
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     account2 = Account.create!
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active",
-        account: account2
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active",
+      account: account2
     )
     user = account2.pseudonyms.where(sis_user_id: 'user_1').first.user
     expect(SisPseudonym).to receive(:for).with(user, @account, type: :implicit, require_sis: false).never
@@ -857,21 +859,21 @@ describe SIS::CSV::EnrollmentImporter do
     expect(SIS::EnrollmentImporter::Work).to receive(:new).with(any_args).and_return(work)
     # the enrollments
     importer = process_csv_data_cleanly(
-        "course_id,root_account,user_id,role,status",
-        "test_1,account2,user_1,teacher,active",
+      "course_id,root_account,user_id,role,status",
+      "test_1,account2,user_1,teacher,active",
     )
     course = @account.courses.where(sis_source_id: 'test_1').first
     expect(course.teachers.to_a).to be_empty
   end
 
-  it "should link with observer enrollments" do
+  it "links with observer enrollments" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_1,user1,User,Uno,user@example.com,active"
     )
     course = Course.where(sis_source_id: 'test_1').first
     course.offer!
@@ -882,8 +884,8 @@ describe SIS::CSV::EnrollmentImporter do
     add_linked_observer(student, observer, root_account: @account)
 
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,user_1,student,,active,"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,user_1,student,,active,"
     )
 
     expect(observer.observer_enrollments.count).to eq 1
@@ -898,20 +900,20 @@ describe SIS::CSV::EnrollmentImporter do
     expect(e.reload).to be_deleted
   end
 
-  it "should delete observer enrollments when the student enrollment is already deleted" do
+  it "deletes observer enrollments when the student enrollment is already deleted" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "student_user,user1,User,Uno,user@example.com,active",
-        "observer_user,user2,User,Two,user2@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active",
+      "observer_user,user2,User,Two,user2@example.com,active"
     )
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,student_user,student,,active,",
-        "test_1,observer_user,observer,,active,student_user"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,active,",
+      "test_1,observer_user,observer,,active,student_user"
     )
 
     student = Pseudonym.where(:sis_user_id => "student_user").first.user
@@ -921,15 +923,15 @@ describe SIS::CSV::EnrollmentImporter do
     expect(observer.enrollments.first.associated_user_id).to eq student.id
 
     process_csv_data_cleanly(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,student_user,student,,deleted,",
-        "test_1,observer_user,observer,,deleted,student_user"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,deleted,",
+      "test_1,observer_user,observer,,deleted,student_user"
     )
     expect(observer.enrollments.count).to eq 1
     expect(observer.enrollments.first.workflow_state).to eq 'deleted'
   end
 
-  it 'should create rollback data' do
+  it 'creates rollback data' do
     batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
@@ -964,22 +966,22 @@ describe SIS::CSV::EnrollmentImporter do
     expect(g.group_memberships.active.count).to eq 1
   end
 
-  it "should not create enrollments for deleted users" do
+  it "does not create enrollments for deleted users" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "student_user,user1,User,Uno,user@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "student_user,user1,User,Uno,user@example.com,deleted"
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,deleted"
     )
     importer = process_csv_data(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,student_user,student,,active,",
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,active,",
     )
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["Attempted enrolling of deleted user student_user in course test_1"]
@@ -991,22 +993,22 @@ describe SIS::CSV::EnrollmentImporter do
 
   it "do not create enrollments for deleted pseudonyms except when they have an active pseudonym too" do
     process_csv_data_cleanly(
-        "course_id,short_name,long_name,account_id,term_id,status",
-        "test_1,TC 101,Test Course 101,,,active"
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,,,active"
     )
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "student_user,user1,User,Uno,user@example.com,active"
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,active"
     )
     p = Pseudonym.where(sis_user_id: "student_user").first
     p.user.pseudonyms.create(account: p.account, sis_user_id: 'second_sis', unique_id: 'second_sis')
     process_csv_data_cleanly(
-        "user_id,login_id,first_name,last_name,email,status",
-        "student_user,user1,User,Uno,user@example.com,deleted"
+      "user_id,login_id,first_name,last_name,email,status",
+      "student_user,user1,User,Uno,user@example.com,deleted"
     )
     importer = process_csv_data(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "test_1,student_user,student,,active,",
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "test_1,student_user,student,,active,",
     )
     errors = importer.errors.map { |r| r.last }
     expect(errors).to eq ["Enrolled a user student_user in course test_1, but referenced a deleted sis login"]
@@ -1016,7 +1018,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.first).to be_active
   end
 
-  it "should not enroll users into deleted sections" do
+  it "does not enroll users into deleted sections" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -1037,7 +1039,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(errors.first).to include("not a valid section")
   end
 
-  it "should still work when creating a completed enrollment" do
+  it "still works when creating a completed enrollment" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -1055,7 +1057,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(student.enrollments.first).to be_completed
   end
 
-  it "should complete last and delete the rest" do
+  it "completes last and delete the rest" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -1081,7 +1083,7 @@ describe SIS::CSV::EnrollmentImporter do
     expect(Enrollment.where(user: student, workflow_state: 'deleted').count).to eq 2
   end
 
-  it "should delete enrollments if active exists" do
+  it "deletes enrollments if active exists" do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "test_1,TC 101,Test Course 101,,,active"
@@ -1130,18 +1132,18 @@ describe SIS::CSV::EnrollmentImporter do
       "u0,user0,User,Uno,user@example.com,active",
     )
     importer = process_csv_data(
-                 "course_id,user_id,role,section_id,status",
-                 "c1,u1,student,s1,active",
-                 "c1,u2,student,s1,active",
-                 "c1,u3,student,s1,active",
-                 "c1,u4,student,s1,active",
-                 "c1,u5,student,s1,active",
-                 "c1,u6,student,s1,active",
-                 "c1,u7,student,s1,active",
-                 "c1,u8,student,s1,active",
-                 "c1,u9,student,s1,active",
-                 "c1,u0,student,s1,active",
-                 "c1,u1,student,s2,active",
+      "course_id,user_id,role,section_id,status",
+      "c1,u1,student,s1,active",
+      "c1,u2,student,s1,active",
+      "c1,u3,student,s1,active",
+      "c1,u4,student,s1,active",
+      "c1,u5,student,s1,active",
+      "c1,u6,student,s1,active",
+      "c1,u7,student,s1,active",
+      "c1,u8,student,s1,active",
+      "c1,u9,student,s1,active",
+      "c1,u0,student,s1,active",
+      "c1,u1,student,s2,active",
     )
     errors = importer.errors.map { |r| r.last }
     expect(errors.first).to include("non-existent section")
@@ -1193,7 +1195,7 @@ describe SIS::CSV::EnrollmentImporter do
       "c3,s3,v1,student,active", # invalid course_id
       "c2,s2,v1,student,active",
     )
-    errors = importer.errors.map &:last
+    errors = importer.errors.map(&:last)
     expect(errors).to eq ["An enrollment referenced a non-existent course c3"]
     a1 = @account.sub_accounts.find_by(sis_source_id: 'a1')
     a2 = @account.sub_accounts.find_by(sis_source_id: 'a2')
@@ -1209,9 +1211,9 @@ describe SIS::CSV::EnrollmentImporter do
     @student = user_with_managed_pseudonym(:account => @account, :sis_user_id => 'dee')
     MasterCourses::MasterTemplate.set_as_master_course(@course)
     importer = process_csv_data(
-        "course_id,user_id,role,section_id,status,associated_user_id",
-        "blue,daba,teacher,,active,",
-        "blue,dee,student,,active,"
+      "course_id,user_id,role,section_id,status,associated_user_id",
+      "blue,daba,teacher,,active,",
+      "blue,dee,student,,active,"
     )
     expect(@teacher.enrollments.size).to eq 1
     expect(@student.enrollments.size).to eq 0

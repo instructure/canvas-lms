@@ -23,6 +23,7 @@ module LtiOutbound
 
     def self.proc_accessor(*methods)
       attr_writer(*methods)
+
       proc_writer(*methods)
     end
 

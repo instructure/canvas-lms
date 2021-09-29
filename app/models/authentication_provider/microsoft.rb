@@ -23,7 +23,7 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   self.plugin = :microsoft
   plugin_settings :application_id, application_secret: :application_secret_dec
 
-  SENSITIVE_PARAMS = [ :application_secret ].freeze
+  SENSITIVE_PARAMS = [:application_secret].freeze
 
   def self.singleton?
     false
@@ -94,5 +94,4 @@ class AuthenticationProvider::Microsoft < AuthenticationProvider::OpenIDConnect
   def tenant_value
     tenant.presence || 'common'
   end
-
 end

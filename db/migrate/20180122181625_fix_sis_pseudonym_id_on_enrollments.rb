@@ -21,7 +21,7 @@ class FixSisPseudonymIdOnEnrollments < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    remove_column :enrollments, :pseudonym_id if column_exists?(:enrollments, :pseudonym_id)
+    remove_column :enrollments, :pseudonym_id if column_exists?(:enrollments, :pseudonym_id) # rubocop:disable Migration/RemoveColumn
     add_index :enrollments, :sis_pseudonym_id
   end
 end

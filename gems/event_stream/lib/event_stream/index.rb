@@ -61,5 +61,4 @@ class EventStream::Index
       raise "Unknown Indexing Strategy: #{strategy_name}"
     end
   end
-
 end

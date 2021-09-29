@@ -171,7 +171,7 @@ RSpec::Matchers.define :have_attribute do |*args|
   expected_specified = args.size > 1
   expected = args[1]
 
-  attribute_matcher = -> (actual) do
+  attribute_matcher = ->(actual) do
     if expected_specified
       actual.respond_to?(:match) ? actual.match(expected) : actual == expected
     else
@@ -375,7 +375,6 @@ RSpec::Matchers.define :meet_contrast_ratio do |ratio = 3.5|
   end
 end
 
-
 # assert whether or not an element is displayed. will wait up to
 # TIMEOUTS[:finder] seconds
 RSpec::Matchers.define :be_displayed do
@@ -436,6 +435,7 @@ RSpec::Matchers.define :become do |size|
 
   match do |actual|
     raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
+
     wait_for(method: :become) do
       disable_implicit_wait do
         unless defined? @operator
@@ -455,6 +455,7 @@ RSpec::Matchers.define :become_between do |min, max|
 
   match do |actual|
     raise "The `become` matcher expects a block, e.g. `expect { actual }.to become(value)`, NOT `expect(actual).to become(value)`" unless actual.is_a? Proc
+
     wait_for(method: :become) do
       disable_implicit_wait { a = actual.call; min < a && a < max }
     end

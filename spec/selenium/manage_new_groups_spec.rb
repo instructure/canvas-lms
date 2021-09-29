@@ -19,8 +19,6 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/helpers/manage_groups_common')
-require 'thread'
-
 describe "manage groups" do
   include_context "in-process server selenium tests"
   include ManageGroupsCommon
@@ -31,7 +29,7 @@ describe "manage groups" do
 
   context "2.0" do
     describe "group category creation" do
-      it "should auto-split students into groups" do
+      it "auto-splits students into groups" do
         groups_student_enrollment 4
         get "/courses/#{@course.id}/groups"
 
@@ -54,7 +52,7 @@ describe "manage groups" do
       end
     end
 
-    it "should allow a teacher to create a group set, a group, and add a user" do
+    it "allows a teacher to create a group set, a group, and add a user" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
       student_in_course
@@ -101,7 +99,7 @@ describe "manage groups" do
       expect(ff("div[data-view='unassignedUsers'] .assign-to-group").length).to eq 2
     end
 
-    it "should allow a teacher to drag and drop a student among groups" do
+    it "allows a teacher to drag and drop a student among groups" do
       students = groups_student_enrollment 5
       group_categories = create_categories(@course, 1)
       groups = add_groups_in_category(group_categories[0])
@@ -130,8 +128,8 @@ describe "manage groups" do
       expect(f("#content")).not_to contain_css(group1_users_selector)
       expect(f("#content")).not_to contain_css(group2_users_selector)
 
-      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
-      drag_and_drop_element( fj(first_unassigned_user), fj(group1_selector) )
+      drag_and_drop_element(fj(first_unassigned_user), fj(group1_selector))
+      drag_and_drop_element(fj(first_unassigned_user), fj(group1_selector))
       # assert there are 3 students in unassigned
       # assert there is 2 student in group 0
       # assert there is still 0 students in group 1
@@ -139,8 +137,8 @@ describe "manage groups" do
       expect(ff(group1_users_selector).size).to eq 2
       expect(f("#content")).not_to contain_css(group2_users_selector)
 
-      drag_and_drop_element( fj(first_group1_user), fj(unassigned_group_selector) )
-      drag_and_drop_element( fj(first_group1_user), fj(group2_selector) )
+      drag_and_drop_element(fj(first_group1_user), fj(unassigned_group_selector))
+      drag_and_drop_element(fj(first_group1_user), fj(group2_selector))
       # assert there are 4 students in unassigned
       # assert there are 0 students in group 0
       # assert there is 1 student in group 1
@@ -149,7 +147,7 @@ describe "manage groups" do
       expect(ff(group2_users_selector).size).to eq 1
     end
 
-    it "should support student-organized groups" do
+    it "supports student-organized groups" do
       course_with_teacher_logged_in(:active_all => true)
       student_in_course
       student_in_course
@@ -173,11 +171,11 @@ describe "manage groups" do
       end
     end
 
-    it "should allow a teacher to reassign a student with an accessible modal dialog" do
+    it "allows a teacher to reassign a student with an accessible modal dialog" do
       skip('KNO-190')
       students = groups_student_enrollment 2
       group_categories = create_categories(@course, 1)
-      groups = add_groups_in_category(group_categories[0],2)
+      groups = add_groups_in_category(group_categories[0], 2)
       get "/courses/#{@course.id}/groups"
       wait_for_ajaximations
 
@@ -220,7 +218,7 @@ describe "manage groups" do
       expect(fj(".group-summary:visible:last").text).to eq "0 students"
     end
 
-    it "should give a teacher the option to assign unassigned students to groups" do
+    it "gives a teacher the option to assign unassigned students to groups" do
       group_category, _ = create_categories(@course, 1)
       group, _ = add_groups_in_category(group_category, 1)
       student_in_course
@@ -252,7 +250,7 @@ describe "manage groups" do
     end
   end
 
-  it "should let students create groups and invite other users" do
+  it "lets students create groups and invite other users" do
     course_with_student_logged_in(:active_all => true)
     student_in_course(:course => @course, :active_all => true, :name => "other student")
     other_student = @student

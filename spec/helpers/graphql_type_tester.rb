@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-
 ##
 # = Convenience class for testing graphql types.
 #
@@ -52,8 +51,8 @@ class GraphQLTypeTester
   end
 
   attr_accessor :extract_result
-  # _extract_result_ is an boolean to call extract_result function or return raw result.
 
+  # _extract_result_ is an boolean to call extract_result function or return raw result.
 
   # returns the value (or list of values) for the resolved field.  This can be
   # any fragment of graphql, but ultimately should only select a single scalar
@@ -109,11 +108,13 @@ class GraphQLTypeTester
     if !field || !type.fields[field]
       raise "couldn't find field #{field} for #{type}"
     end
+
     field
   end
 
   def extract_results(result)
     return result unless result.respond_to?(:reduce)
+
     result.reduce(nil) do |result, (k, v)|
       case v
       when Hash then extract_results(v)

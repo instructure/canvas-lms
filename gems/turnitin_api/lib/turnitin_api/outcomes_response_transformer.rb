@@ -21,12 +21,12 @@ require 'simple_oauth'
 
 module TurnitinApi
   class OutcomesResponseTransformer
-
     # key
     # secret
     # turnitin_api response
 
     attr_accessor :outcomes_response_json, :key, :lti_params
+
     def initialize(key, secret, lti_params, outcomes_response_json)
       @key = key
       @secret = secret
@@ -49,7 +49,7 @@ module TurnitinApi
     end
 
     def originality_data
-      response.body['outcome_originalityreport'].select {|k, _| %w(breakdown numeric).include?(k)}
+      response.body['outcome_originalityreport'].select { |k, _| %w(breakdown numeric).include?(k) }
     end
 
     def uploaded_at
@@ -74,16 +74,15 @@ module TurnitinApi
 
     def make_call(url)
       default_params = {
-          'roles' => 'Learner',
-          'lti_message_type' => 'basic-lti-launch-request',
-          'lti_version' => 'LTI-1p0',
-          'resource_link_id' => SecureRandom.hex(32),
+        'roles' => 'Learner',
+        'lti_message_type' => 'basic-lti-launch-request',
+        'lti_version' => 'LTI-1p0',
+        'resource_link_id' => SecureRandom.hex(32),
       }
       params = default_params.merge(lti_params)
       header = SimpleOAuth::Header.new(:post, url, params, consumer_key: @key, consumer_secret: @secret,
-                                       callback: 'about:blank')
+                                                           callback: 'about:blank')
       connection.post url, params.merge(header.signed_attributes)
     end
-
   end
 end

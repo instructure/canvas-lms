@@ -34,12 +34,12 @@ describe 'course wiki pages' do
       @page.update(workflow_state: 'deleted')
     end
 
-    it "should display a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
+    it "displays a warning alert to a student when accessing a deleted page", priority: "1", test_id: 126839 do
       visit_wiki_page_view(@course.id, @page.title)
       expect_flash_message :warning
     end
 
-    it "should display a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
+    it "displays a warning alert when accessing a non-existant page", priority: "1", test_id: 126841 do
       visit_wiki_page_view(@course.id, "non-existant")
       expect_flash_message :warning
     end

@@ -24,14 +24,15 @@ class AuthenticationProvider::SAML::MetadataRefresher
   class << self
     def refresh_providers(shard_scope: Shard.current, providers: nil)
       federations = AuthenticationProvider::SAML::Federation.descendants.map { |federation| federation::URN }
-      providers ||= AuthenticationProvider::SAML.active.
-        where.not(metadata_uri: [nil, ""] + federations).
-        shard(shard_scope)
+      providers ||= AuthenticationProvider::SAML.active
+                                                .where.not(metadata_uri: [nil, ""] + federations)
+                                                .shard(shard_scope)
 
       providers.each do |provider|
         begin
           new_data = refresh_if_necessary(provider.global_id, provider.metadata_uri)
           next unless new_data
+
           provider.populate_from_metadata_xml(new_data)
           provider.save! if provider.changed?
         rescue => e
@@ -54,6 +55,7 @@ class AuthenticationProvider::SAML::MetadataRefresher
         if response.is_a?(Net::HTTPNotModified)
           return false
         end
+
         # raise on non-success
         response.value
         # store new data

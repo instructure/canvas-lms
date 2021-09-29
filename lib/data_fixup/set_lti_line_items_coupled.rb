@@ -46,13 +46,13 @@ module DataFixup::SetLtiLineItemsCoupled
         item.extensions.blank? && item.lti_resource_link_id.present?
       end
       rl_ids = maybe_coupled.map(&:lti_resource_link_id).uniq
-      assignment_line_item_ids = Lti::LineItem.where(lti_resource_link_id: rl_ids).
-        pluck(:lti_resource_link_id, :created_at, :id).
-        group_by(&:first).  # hash from r_l_id -> array of [r_l_id, created_at, id]
-        transform_values(&:sort). # each one sorted by created_at (first sorted by r_l_id but it's the same for each group)
-        transform_values(&:first). # [r_l_id, created_at, id] for first line item of each rl
-        transform_values(&:last). # id for first line item of each rl
-        values
+      assignment_line_item_ids = Lti::LineItem.where(lti_resource_link_id: rl_ids)
+                                              .pluck(:lti_resource_link_id, :created_at, :id)
+                                              .group_by(&:first) # hash from r_l_id -> array of [r_l_id, created_at, id]
+                                              .transform_values(&:sort) # each one sorted by created_at (first sorted by r_l_id but it's the same for each group)
+                                              .transform_values(&:first) # [r_l_id, created_at, id] for first line item of each rl
+                                              .transform_values(&:last) # id for first line item of each rl
+                                              .values
       coupled_ids = maybe_coupled.map(&:id) & assignment_line_item_ids
 
       uncoupled_ids = line_items.map(&:id) - coupled_ids

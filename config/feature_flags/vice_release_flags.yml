@@ -30,6 +30,15 @@ react_discussions_post:
       in the Canvas Community
   applies_to: Course
 
+draft_discussions:
+  state: hidden
+  beta: false
+  display_name: Draft Discussion Entries
+  description: |-
+    Will allow for saving drafts as students type their replies to a discussion topic
+    in the discussions redesign
+  applies_to: SiteAdmin
+
 isolated_view:
   state: hidden
   beta: true
@@ -58,4 +67,11 @@ show_push_notification_account_setting:
   display_name: Allow push notification opt-out
   description: |-
     Enable an account setting which toggles push notifications for that account
+  applies_to: SiteAdmin
+
+apollo_caching:
+  state: hidden
+  display_name: Apollo caching
+  description: |-
+    Allow for Apollo to cache graphQL queries on a users browser to speed up their experience
   applies_to: SiteAdmin

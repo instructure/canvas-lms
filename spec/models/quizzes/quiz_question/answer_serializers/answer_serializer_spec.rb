@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../../spec_helper.rb')
 
 describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
-
   ASes = Quizzes::QuizQuestion::AnswerSerializers
 
   it 'automatically registers answer serializers' do
@@ -42,6 +41,6 @@ describe Quizzes::QuizQuestion::AnswerSerializers::AnswerSerializer do
   end
 
   it 'has Error constant' do
-    expect{Quizzes::QuizQuestion::AnswerSerializers::Error.new('message')}.to_not raise_error
+    expect { Quizzes::QuizQuestion::AnswerSerializers::Error.new('message') }.to_not raise_error
   end
 end

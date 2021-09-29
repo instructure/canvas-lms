@@ -23,7 +23,7 @@ class UpdateMasteryConnectToolConfig < ActiveRecord::Migration[5.2]
 
   def up
     DataFixup::UpdateMasteryConnectToolConfig.delay_if_production(priority: Delayed::LOWER_PRIORITY,
-      strand: "mc_tool_config_update_#{Shard.current.database_server.id}").run
+                                                                  strand: "mc_tool_config_update_#{Shard.current.database_server.id}").run
   end
 
   def down; end

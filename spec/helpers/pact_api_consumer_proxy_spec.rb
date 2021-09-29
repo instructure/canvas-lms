@@ -21,9 +21,7 @@ require_relative '../spec_helper'
 require_relative '../contracts/service_consumers/api/proxy_app'
 
 describe PactApiConsumerProxy do
-
   context 'Authorization header' do
-
     subject(:proxy) { PactApiConsumerProxy.new }
 
     before :each do

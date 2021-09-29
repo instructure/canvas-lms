@@ -42,7 +42,7 @@ class SetDefaultValuesForAssignments < ActiveRecord::Migration[4.2]
       :copied, :only_visible_to_overrides, :post_to_sis
     ]
     fields_with_null_constraints = fields_with_defaults +
-      [:peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews]
+                                   [:peer_reviews_assigned, :peer_reviews, :automatic_peer_reviews, :muted, :intra_group_peer_reviews]
     fields_with_null_constraints.each { |field| change_column_null(:assignments, field, true) }
     fields_with_defaults.each { |field| change_column_default(:assignments, field, nil) }
   end

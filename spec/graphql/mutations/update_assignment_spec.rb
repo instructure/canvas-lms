@@ -31,7 +31,7 @@ describe Mutations::UpdateAssignment do
     @course.enable_feature!(:anonymous_marking)
   end
 
-  def execute_with_input(update_input, user_executing=@teacher)
+  def execute_with_input(update_input, user_executing = @teacher)
     mutation_command = <<~GQL
       mutation {
         updateAssignment(input: {
@@ -91,7 +91,7 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {}}
+    context = { current_user: user_executing, request: ActionDispatch::TestRequest.create, session: {} }
     CanvasSchema.execute(mutation_command, context: context)
   end
 
@@ -104,10 +104,11 @@ describe Mutations::UpdateAssignment do
   def get_assignment_module_ids
     assignment = Assignment.find(@assignment_id)
     return [] if assignment.context_module_tag_ids.empty?
+
     ContentTag.find(assignment.context_module_tag_ids).map(&:context_module_id).sort
   end
 
-  def run_single_value_update_test(graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result=graphql_result)
+  def run_single_value_update_test(graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result = graphql_result)
     expect(Assignment.find(@assignment_id).send(assignment_name)).to eq initial_value
     result = execute_with_input <<~GQL
       id: "#{@assignment_id}"
@@ -128,10 +129,10 @@ describe Mutations::UpdateAssignment do
     ["position", :position, 1, 2, 2],
     ["pointsPossible", :points_possible, nil, 100, 100],
     ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
-    ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', [ "docs", "blah" ]],
+    ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', ["docs", "blah"]],
     ["allowedAttempts", :allowed_attempts, nil, 10, 10],
     ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
-    ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', [ "discussion_topic", "not_graded" ], "discussion_topic,not_graded"],
+    ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', ["discussion_topic", "not_graded"], "discussion_topic,not_graded"],
     ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
     ["omitFromFinalGrade", :omit_from_final_grade, false, true, true],
     ["anonymousInstructorAnnotations", :anonymous_instructor_annotations, false, true, true],
@@ -529,7 +530,7 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: @teacher, request: ActionDispatch::TestRequest.create}
+    context = { current_user: @teacher, request: ActionDispatch::TestRequest.create }
     result = CanvasSchema.execute(mutation_command, context: context)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'changeName', 'errors')).to be_nil
@@ -579,7 +580,7 @@ describe Mutations::UpdateAssignment do
         }
       }
     GQL
-    context = {current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {}}
+    context = { current_user: @teacher, request: ActionDispatch::TestRequest.create, session: {} }
     result = CanvasSchema.execute(mutation_command, context: context)
     expect(result.dig('errors')).to be_nil
     expect(result.dig('data', 'updateAssignment', 'assignment')).to be_nil
@@ -588,7 +589,7 @@ describe Mutations::UpdateAssignment do
 
   it "cannot update without correct permissions" do
     # bad student! dont delete the assignment
-    result = execute_with_input(<<~GQL, user_executing=@student)
+    result = execute_with_input(<<~GQL, user_executing = @student)
       id: "#{@assignment_id}"
       state: deleted
     GQL
@@ -597,5 +598,4 @@ describe Mutations::UpdateAssignment do
     expect(errors.length).to be 1
     expect(errors[0]["message"]).to eq "insufficient permission"
   end
-
 end

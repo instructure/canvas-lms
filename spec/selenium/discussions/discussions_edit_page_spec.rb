@@ -24,16 +24,18 @@ describe "discussions" do
   include_context "in-process server selenium tests"
   include DiscussionsCommon
 
-  let(:course) { course_model.tap{|course| course.offer!} }
+  let(:course) { course_model.tap { |course| course.offer! } }
   let(:teacher) { teacher_in_course(course: course, name: 'teacher', active_all: true).user }
   let(:teacher_topic) { course.discussion_topics.create!(user: teacher, title: 'teacher topic title', message: 'teacher topic message') }
   let(:assignment_group) { course.assignment_groups.create!(name: 'assignment group') }
   let(:group_category) { course.group_categories.create!(name: 'group category') }
-  let(:assignment) { course.assignments.create!(
+  let(:assignment) {
+    course.assignments.create!(
       name: 'assignment',
-      #submission_types: 'discussion_topic',
+      # submission_types: 'discussion_topic',
       assignment_group: assignment_group
-  ) }
+    )
+  }
   let(:assignment_topic) do
     course.discussion_topics.create!(user: teacher,
                                      title: 'assignment topic title',
@@ -59,7 +61,7 @@ describe "discussions" do
       context "graded" do
         let(:topic) { assignment_topic }
 
-        it "should allow editing the assignment group", priority: "1", test_id: 270913 do
+        it "allows editing the assignment group", priority: "1", test_id: 270913 do
           assign_group_2 = course.assignment_groups.create!(:name => "Group 2")
 
           get url
@@ -71,7 +73,7 @@ describe "discussions" do
           expect(topic.reload.assignment.assignment_group_id).to eq assign_group_2.id
         end
 
-        it "should allow editing the grading type", priority: "1", test_id: 270914 do
+        it "allows editing the grading type", priority: "1", test_id: 270914 do
           get url
           wait = Selenium::WebDriver::Wait.new(timeout: 5)
           wait.until { f("#assignment_grading_type").present? }
@@ -81,7 +83,7 @@ describe "discussions" do
           expect(topic.reload.assignment.grading_type).to eq "letter_grade"
         end
 
-        it "should allow editing the group category", priority: "1", test_id: 270915 do
+        it "allows editing the group category", priority: "1", test_id: 270915 do
           group_cat = course.group_categories.create!(:name => "Groupies")
           get url
 
@@ -92,7 +94,7 @@ describe "discussions" do
           expect(topic.reload.group_category_id).to eq group_cat.id
         end
 
-        it "should allow editing the peer review", priority: "1", test_id: 270916 do
+        it "allows editing the peer review", priority: "1", test_id: 270916 do
           get url
 
           f("#assignment_peer_reviews").click
@@ -101,7 +103,7 @@ describe "discussions" do
           expect(topic.reload.assignment.peer_reviews).to eq true
         end
 
-        it "should allow editing the due dates", priority: "1", test_id: 270917 do
+        it "allows editing the due dates", priority: "1", test_id: 270917 do
           get url
           wait_for_tiny(f('textarea[name=message]'))
 
@@ -123,7 +125,7 @@ describe "discussions" do
           expect(a.lock_at.to_date).to eq lock_at.to_date
         end
 
-        it "should add an attachment to a graded topic", priority: "1", test_id: 270918 do
+        it "adds an attachment to a graded topic", priority: "1", test_id: 270918 do
           get url
           wait_for_tiny(f('textarea[name=message]'))
 
@@ -135,7 +137,7 @@ describe "discussions" do
           expect(assignment.points_possible).to eq 123
         end
 
-        it "should return focus to add attachment when removed" do
+        it "returns focus to add attachment when removed" do
           get url
           add_attachment_and_validate
           get url
@@ -144,7 +146,7 @@ describe "discussions" do
           check_element_has_focus(f('input[name=attachment]'))
         end
 
-        it "should warn user when leaving page unsaved", priority: "1", test_id: 270919 do
+        it "warns user when leaving page unsaved", priority: "1", test_id: 270919 do
           skip_if_safari(:alert)
           title = 'new title'
           get url
@@ -171,7 +173,7 @@ describe "discussions" do
         it "group discussions with entries should lock and display the group name", priority: "1", test_id: 270920 do
           topic.group_category = @gc
           topic.save!
-          topic.child_topics[0].reply_from({:user => @student, :text => "I feel pretty"})
+          topic.child_topics[0].reply_from({ :user => @student, :text => "I feel pretty" })
           @gc.destroy
           get url
 
@@ -179,7 +181,7 @@ describe "discussions" do
           expect(get_value("#assignment_group_category_id")).to eq topic.group_category.id.to_s
         end
 
-        it "should prompt for creating a new group category if original group is deleted with no submissions", priority: "1", test_id: 270921 do
+        it "prompts for creating a new group category if original group is deleted with no submissions", priority: "1", test_id: 270921 do
           topic.group_category = @gc
           topic.save!
           @gc.destroy
@@ -190,10 +192,10 @@ describe "discussions" do
 
         context "graded" do
           let(:topic) { assignment_topic }
-          it "should lock and display the group name", priority: "1", test_id: 270922 do
+          it "locks and display the group name", priority: "1", test_id: 270922 do
             topic.group_category = @gc
             topic.save!
-            topic.reply_from({:user => @student, :text => "I feel pretty"})
+            topic.reply_from({ :user => @student, :text => "I feel pretty" })
             @gc.destroy
             get url
 
@@ -203,7 +205,7 @@ describe "discussions" do
         end
       end
 
-      it "should save and display all changes", priority: "2", test_id: 270923 do
+      it "saves and display all changes", priority: "2", test_id: 270923 do
         course.require_assignment_group
 
         confirm(:off)
@@ -211,7 +213,7 @@ describe "discussions" do
         confirm(:on)
       end
 
-      it "should show correct date when saving" do
+      it "shows correct date when saving" do
         Timecop.freeze do
           topic.lock_at = Time.zone.now - 5.days
           topic.save!
@@ -224,7 +226,7 @@ describe "discussions" do
         end
       end
 
-      it "should toggle checkboxes when clicking their labels", priority: "1", test_id: 270924 do
+      it "toggles checkboxes when clicking their labels", priority: "1", test_id: 270924 do
         get url
 
         expect(is_checked('input[type=checkbox][name=threaded]')).not_to be_truthy
@@ -233,7 +235,7 @@ describe "discussions" do
       end
 
       context "locking" do
-        it "should set as active when removing existing delayed_post_at and lock_at dates", priority: "1", test_id: 270925 do
+        it "sets as active when removing existing delayed_post_at and lock_at dates", priority: "1", test_id: 270925 do
           topic.delayed_post_at = 10.days.ago
           topic.lock_at         = 5.days.ago
           topic.locked          = true
@@ -256,7 +258,7 @@ describe "discussions" do
           expect(topic.locked?).to be_falsey
         end
 
-        it "should be locked when delayed_post_at and lock_at are in past", priority: "2", test_id: 270926 do
+        it "is locked when delayed_post_at and lock_at are in past", priority: "2", test_id: 270926 do
           topic.delayed_post_at = nil
           topic.lock_at         = nil
           topic.workflow_state  = 'active'
@@ -280,7 +282,7 @@ describe "discussions" do
           expect(topic.locked?).to be_truthy
         end
 
-        it "should set workflow to active when delayed_post_at in past and lock_at in future", priority: "2", test_id: 270927 do
+        it "sets workflow to active when delayed_post_at in past and lock_at in future", priority: "2", test_id: 270927 do
           topic.delayed_post_at = 5.days.from_now
           topic.lock_at         = 10.days.from_now
           topic.workflow_state  = 'active'
@@ -311,7 +313,7 @@ describe "discussions" do
           course.update!(usage_rights_required: true)
         end
 
-        it "should validate that usage rights are set" do
+        it "validates that usage rights are set" do
           get url
           _filename, fullpath, _data = get_file("testfile5.zip")
           f('input[name=attachment]').send_keys(fullpath)

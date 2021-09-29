@@ -41,13 +41,13 @@ class SubmissionsBaseController < ApplicationController
         rubric_association_json = rubric_association&.as_json
         rubric = rubric_association&.rubric
         js_env({
-          nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
-          outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
-          rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
-          rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
-          outcome_proficiency: outcome_proficiency,
-          media_comment_asset_string: @current_user.asset_string
-        })
+                 nonScoringRubrics: @domain_root_account.feature_enabled?(:non_scoring_rubrics),
+                 outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
+                 rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
+                 rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
+                 outcome_proficiency: outcome_proficiency,
+                 media_comment_asset_string: @current_user.asset_string
+               })
 
         js_bundle :submissions
         css_bundle :submission
@@ -65,8 +65,8 @@ class SubmissionsBaseController < ApplicationController
         submission_json_exclusions = []
 
         if @submission.submission_type == "online_quiz" &&
-            @submission.hide_grade_from_student? &&
-            !@assignment.grants_right?(@current_user, :grade)
+           @submission.hide_grade_from_student? &&
+           !@assignment.grants_right?(@current_user, :grade)
           submission_json_exclusions << :body
         end
 
@@ -76,13 +76,13 @@ class SubmissionsBaseController < ApplicationController
           Submission.json_serialization_full_parameters(
             except: %i(quiz_submission submission_history)
           ).merge({
-            except: submission_json_exclusions,
-            permissions: {
-              user: @current_user,
-              session: session,
-              include_permissions: false
-            }
-          })
+                    except: submission_json_exclusions,
+                    permissions: {
+                      user: @current_user,
+                      session: session,
+                      include_permissions: false
+                    }
+                  })
         )
       end
     end
@@ -98,8 +98,8 @@ class SubmissionsBaseController < ApplicationController
     end
 
     if @submission.submission_type == "online_quiz" &&
-        @submission.hide_grade_from_student? &&
-        !@assignment.grants_right?(@current_user, :grade)
+       @submission.hide_grade_from_student? &&
+       !@assignment.grants_right?(@current_user, :grade)
 
       submission_json_exclusions << :body
     end
@@ -153,7 +153,7 @@ class SubmissionsBaseController < ApplicationController
       end
       respond_to do |format|
         if @submissions
-          @submissions = @submissions.select{|s| s.grants_right?(@current_user, session, :read) }
+          @submissions = @submissions.select { |s| s.grants_right?(@current_user, session, :read) }
           is_final = provisional && params[:submission][:final] && @assignment.permits_moderation?(@current_user)
           @submissions.each do |s|
             s.limit_comments(@current_user, session) unless @submission.grants_right?(@current_user, session, :submit)
@@ -165,8 +165,8 @@ class SubmissionsBaseController < ApplicationController
           format.html { redirect_to course_assignment_url(@context, @assignment) }
 
           json_args = Submission.json_serialization_full_parameters({
-            except: [:quiz_submission, :submission_history]
-          }).merge(except: submission_json_exclusions, permissions: permissions)
+                                                                      except: [:quiz_submission, :submission_history]
+                                                                    }).merge(except: submission_json_exclusions, permissions: permissions)
           json_args[:methods] << :provisional_grade_id if provisional
 
           submissions_json = @submissions.map do |submission|
@@ -188,13 +188,13 @@ class SubmissionsBaseController < ApplicationController
           @error_message = t('errors_update_failed', "Update Failed")
           flash[:error] = @error_message
 
-          error_json = {base: @error_message}
+          error_json = { base: @error_message }
           error_json[:error_code] = error.error_code if error
           error_status = error&.status_code || :bad_request
 
           format.html { render :show, id: @assignment.context.id }
-          format.json { render json: {errors: error_json}, status: error_status }
-          format.text { render json: {errors: error_json}, status: error_status }
+          format.json { render json: { errors: error_json }, status: error_status }
+          format.text { render json: { errors: error_json }, status: error_status }
         end
       end
     end
@@ -256,7 +256,7 @@ class SubmissionsBaseController < ApplicationController
     plag_data = type == 'vericite' ? submission.vericite_data : submission.turnitin_data
 
     if plag_data.dig(asset_string, :report_url).present?
-      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display:'borderless')
+      polymorphic_url([:retrieve, @context, :external_tools], url: plag_data[asset_string][:report_url], display: 'borderless')
     elsif type == 'vericite'
       # VeriCite URL
       submission.vericite_report_url(asset_string, @current_user, session)
@@ -270,16 +270,17 @@ class SubmissionsBaseController < ApplicationController
   end
 
   protected
+
   def plagiarism_report(type)
     return head(:bad_request) if @submission.blank?
 
     @asset_string = params[:asset_string]
     if authorized_action(@submission, @current_user, :read)
       url = if type == 'originality_report'
-        @submission.originality_report_url(@asset_string, @current_user, params[:attempt])
-      else
-        legacy_plagiarism_report(@submission, @asset_string, type)
-      end
+              @submission.originality_report_url(@asset_string, @current_user, params[:attempt])
+            else
+              legacy_plagiarism_report(@submission, @asset_string, type)
+            end
 
       if url
         redirect_to url

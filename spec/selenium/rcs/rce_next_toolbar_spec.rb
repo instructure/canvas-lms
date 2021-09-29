@@ -116,7 +116,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         expect(link_count).to eq(0)
       end
 
-      it 'should show links popup toolbar' do
+      it 'shows links popup toolbar' do
         skip "routinely fails flakey spec catcher 1/10 times with 'no such window', but passes flakey spec catcher locally"
         rce_wysiwyg_state_setup(@course, 'this is <a href="http://example.com">a link</a>.', html: true)
 
@@ -130,7 +130,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'list types' do
-      it 'should add bullet lists' do
+      it 'adds bullet lists' do
         rce_wysiwyg_state_setup(@course)
 
         click_list_toggle_button
@@ -141,7 +141,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should remove bullet lists' do
+      it 'removes bullet lists' do
         text = '<ul><li>1</li><li>2</li><li>3</li></ul>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 
@@ -153,7 +153,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should add numbered lists', priority: '1', test_id: 307_625 do
+      it 'adds numbered lists', priority: '1', test_id: 307_625 do
         rce_wysiwyg_state_setup(@course)
 
         click_list_toggle_button
@@ -164,7 +164,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should remove numbered lists', priority: '1', test_id: 537_619 do
+      it 'removes numbered lists', priority: '1', test_id: 537_619 do
         text = '<ol><li>1</li><li>2</li><li>3</li></ol>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 
@@ -178,7 +178,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'indent and outdent' do
-      it 'should indent and remove indentation for embedded images' do
+      it 'indents and remove indentation for embedded images' do
         title = 'email.png'
         @root_folder = Folder.root_folders(@course).first
         @image = @root_folder.attachments.build(context: @course)
@@ -202,7 +202,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib_empty('p')
       end
 
-      it 'should indent and remove indentation for text' do
+      it 'indents and remove indentation for text' do
         rce_wysiwyg_state_setup(@course, 'test')
 
         click_indent_button
@@ -216,7 +216,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'super and sub script' do
-      it 'should make text superscript in rce' do
+      it 'makes text superscript in rce' do
         rce_wysiwyg_state_setup(@course)
 
         click_superscript_button
@@ -226,7 +226,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should remove superscript from text in rce' do
+      it 'removes superscript from text in rce' do
         text = '<p><sup>This is my text</sup></p>'
 
         rce_wysiwyg_state_setup(@course, text, html: true)
@@ -238,7 +238,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should make text subscript in rce' do
+      it 'makes text subscript in rce' do
         rce_wysiwyg_state_setup(@course)
 
         click_super_toggle_button
@@ -249,7 +249,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         end
       end
 
-      it 'should remove subscript from text in rce' do
+      it 'removes subscript from text in rce' do
         text = '<p><sub>This is my text</sub></p>'
         rce_wysiwyg_state_setup(@course, text, html: true)
         select_in_tiny(f('#wiki_page_body'), 'sub')
@@ -262,7 +262,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     end
 
     context 'text alignment' do
-      it 'should align text to the left' do
+      it 'aligns text to the left' do
         rce_wysiwyg_state_setup(@course, 'text to align')
 
         click_align_toggle_button
@@ -270,7 +270,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib('text-align', 'left', 'p')
       end
 
-      it 'should remove left align from text' do
+      it 'removes left align from text' do
         text = '<p style="text-align: left;">1</p>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 
@@ -279,7 +279,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib_empty('p')
       end
 
-      it 'should align text to the center' do
+      it 'aligns text to the center' do
         rce_wysiwyg_state_setup(@course, 'text to align')
 
         click_align_toggle_button
@@ -287,7 +287,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib('text-align', 'center', 'p')
       end
 
-      it 'should remove center align from text' do
+      it 'removes center align from text' do
         text = '<p style="text-align: center;">1</p>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 
@@ -296,7 +296,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib_empty('p')
       end
 
-      it 'should align text to the right' do
+      it 'aligns text to the right' do
         rce_wysiwyg_state_setup(@course, 'text to align')
 
         click_align_toggle_button
@@ -304,7 +304,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         rce_validate_wiki_style_attrib('text-align', 'right', 'p')
       end
 
-      it 'should remove right align from text' do
+      it 'removes right align from text' do
         text = '<p style="text-align: right;">1</p>'
         rce_wysiwyg_state_setup(@course, text, html: true)
 
@@ -314,7 +314,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should change text to right-to-left in the rce' do
+    it 'changes text to right-to-left in the rce' do
       rce_wysiwyg_state_setup(@course, text = 'rtl')
       click_rtl
       in_frame rce_page_body_ifr_id do
@@ -322,7 +322,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should change text to left-to-right in the rce' do
+    it 'changes text to left-to-right in the rce' do
       text = '<p dir="rtl">This is my text</p>'
       rce_wysiwyg_state_setup(@course, text, html: true)
       click_ltr
@@ -331,13 +331,13 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should verify the rce-next toolbar is one row' do
+    it 'verifies the rce-next toolbar is one row' do
       visit_front_page_edit(@course)
 
       expect(rce_next_toolbar.size.height).to be 39
     end
 
-    it 'should verify selecting Header from dropdown sets H2' do
+    it 'verifies selecting Header from dropdown sets H2' do
       page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
@@ -351,7 +351,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should verify selecting subeader from dropdown sets H3' do
+    it 'verifies selecting subeader from dropdown sets H3' do
       page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
@@ -365,7 +365,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should verify selecting small header from dropdown sets H4' do
+    it 'verifies selecting small header from dropdown sets H4' do
       page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
@@ -379,7 +379,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'should verify selecting preformatted from dropdown sets pre' do
+    it 'verifies selecting preformatted from dropdown sets pre' do
       page_title = 'header'
       create_wiki_page_with_text(page_title)
       visit_existing_wiki_edit(@course, page_title)
@@ -447,7 +447,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         driver.manage.window.resize_to(1_000, 800)
       end
 
-      it 'should close on executing any command' do
+      it 'closes on executing any command' do
         more_toolbar_button.click
         expect(overflow_toolbar).to be_displayed
         click_list_toggle_button
@@ -455,7 +455,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         expect(f('body')).not_to contain_css(overflow_toolbar_selector)
       end
 
-      it 'should close on losing focus' do
+      it 'closes on losing focus' do
         in_frame rce_page_body_ifr_id do
           f('#tinymce').send_keys('') # focus
         end
@@ -526,7 +526,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         JS
       end
 
-      it 'should be disabled in toolbar when linking is invalid' do
+      it 'is disabled in toolbar when linking is invalid' do
         driver.manage.window.resize_to(1_350, 800) # wide enough to display the insert buttons
 
         # nothing selected, insert buttons are enabled
@@ -542,7 +542,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         assert_insert_buttons_enabled(false)
       end
 
-      it 'should be disabled in floating toolbar if linking is invalid' do
+      it 'is disabled in floating toolbar if linking is invalid' do
         driver.execute_script('window.selectNodeById("ifr")')
         driver.manage.window.resize_to(800, 800) # small enough that the insert buttons are hidden in the overflow
         assert_insert_buttons_enabled(false) # buttons should still be disabled without selecting anything else

@@ -18,7 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class Attachments::LocalStorage
-
   attr_reader :attachment
 
   def self.key
@@ -30,11 +29,12 @@ class Attachments::LocalStorage
   end
 
   def exists?
-    File.exists?(attachment.full_filename)
+    File.exist?(attachment.full_filename)
   end
 
   def change_namespace(old_full_filename)
     return if old_full_filename == attachment.full_filename
+
     FileUtils.mv old_full_filename, attachment.full_filename
   end
 

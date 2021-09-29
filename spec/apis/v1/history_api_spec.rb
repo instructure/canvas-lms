@@ -44,57 +44,57 @@ describe HistoryController, type: :request do
     context 'history information' do
       it "returns information about assets and index pages in descending order by date" do
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
-        expect(json).to eq([{"asset_code" => "roster:#{@course.asset_string}",
-                             "context_id" => @course.id,
-                             "context_type" => "Course",
-                             "visited_at" => @dates[0].iso8601,
-                             "visited_url" => "http://example.com/courses/X/users",
-                             "interaction_seconds" => 5.0,
-                             "asset_icon" => "icon-user",
-                             "asset_readable_category" => "People",
-                             "asset_name" => "Course People",
-                             "context_name" => "Something 101"},
-                            {"asset_code" => "pages:#{@group.asset_string}",
-                             "context_id" => @group.id,
-                             "context_type" => "Group",
-                             "visited_at" => @dates[1].iso8601,
-                             "visited_url" => "http://example.com/groups/Z/pages",
-                             "interaction_seconds" => 5.0,
-                             "asset_icon" => "icon-document",
-                             "asset_readable_category" => "Page",
-                             "asset_name" => "Group Pages",
-                             "context_name" => "A Group"},
-                            {"asset_code" => @assignment.asset_string,
-                             "context_id" => @course.id,
-                             "context_type" => "Course",
-                             "visited_at" => @dates[2].iso8601,
-                             "visited_url" => "http://example.com/courses/X/assignments/Y",
-                             "interaction_seconds" => 5.0,
-                             "asset_icon" => "icon-assignment",
-                             "asset_readable_category" => "Assignment",
-                             "asset_name" => "Assign 1",
-                             "context_name" => "Something 101"}])
+                                                            format: 'json', user_id: 'self')
+        expect(json).to eq([{ "asset_code" => "roster:#{@course.asset_string}",
+                              "context_id" => @course.id,
+                              "context_type" => "Course",
+                              "visited_at" => @dates[0].iso8601,
+                              "visited_url" => "http://example.com/courses/X/users",
+                              "interaction_seconds" => 5.0,
+                              "asset_icon" => "icon-user",
+                              "asset_readable_category" => "People",
+                              "asset_name" => "Course People",
+                              "context_name" => "Something 101" },
+                            { "asset_code" => "pages:#{@group.asset_string}",
+                              "context_id" => @group.id,
+                              "context_type" => "Group",
+                              "visited_at" => @dates[1].iso8601,
+                              "visited_url" => "http://example.com/groups/Z/pages",
+                              "interaction_seconds" => 5.0,
+                              "asset_icon" => "icon-document",
+                              "asset_readable_category" => "Page",
+                              "asset_name" => "Group Pages",
+                              "context_name" => "A Group" },
+                            { "asset_code" => @assignment.asset_string,
+                              "context_id" => @course.id,
+                              "context_type" => "Course",
+                              "visited_at" => @dates[2].iso8601,
+                              "visited_url" => "http://example.com/courses/X/assignments/Y",
+                              "interaction_seconds" => 5.0,
+                              "asset_icon" => "icon-assignment",
+                              "asset_readable_category" => "Assignment",
+                              "asset_name" => "Assign 1",
+                              "context_name" => "Something 101" }])
       end
 
       it "respects course nicknames" do
         @student.set_preference(:course_nicknames, @course.id, 'Terribad')
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
         expect(json[0]['context_name']).to eq 'Terribad'
       end
 
       it "deals with a missing asset_user_access" do
         AssetUserAccess.where(asset_code: "pages:#{@group.asset_string}").delete_all
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
         expect(json.map { |item| item['asset_name'] }).to eq(['Course People', 'Assign 1'])
       end
 
       it "gracefully handles a pv4 timeout" do
         allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self', expected_status: :bad_gateway)
+                                                            format: 'json', user_id: 'self', expected_status: :bad_gateway)
         expect(json['error']).to_not be_nil
       end
 
@@ -102,7 +102,7 @@ describe HistoryController, type: :request do
         page_view_for url: 'http://example.com/courses/X/files/A/file_preview?annotate=B&verifier=C', context: @course, created_at: @dates[3],
                       asset_category: 'files', asset_code: "attachment_1"
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                       format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
         expect(json[3]['visited_url']).to eq 'http://example.com/courses/X/files/A/file_preview?annotate=B'
       end
     end
@@ -111,33 +111,33 @@ describe HistoryController, type: :request do
       it "requires a user to be logged in" do
         @user = nil
         api_call(:get, "/api/v1/users/self/history",
-                 {controller: 'history', action: 'index', format: 'json', user_id: 'self'},
-                 {}, {}, {expected_status: 401})
+                 { controller: 'history', action: 'index', format: 'json', user_id: 'self' },
+                 {}, {}, { expected_status: 401 })
       end
 
       it "allows a user to view an observee's history" do
         observer = user_with_pseudonym
         api_call_as_user(observer, :get, "/api/v1/users/#{@student.id}/history",
-                         {controller: 'history', action: 'index', format: 'json', user_id: @student.to_param},
-                         {}, {}, {expected_status: 401})
+                         { controller: 'history', action: 'index', format: 'json', user_id: @student.to_param },
+                         {}, {}, { expected_status: 401 })
         UserObservationLink.create_or_restore(observer: observer, student: @student, root_account: Account.default)
         api_call_as_user(observer, :get, "/api/v1/users/#{@student.id}/history",
-                         {controller: 'history', action: 'index', format: 'json', user_id: @student.to_param},
-                         {}, {}, {expected_status: 200})
+                         { controller: 'history', action: 'index', format: 'json', user_id: @student.to_param },
+                         {}, {}, { expected_status: 200 })
       end
 
       it "allows an admin to view a user's history" do
         @student.set_preference(:course_nicknames, @course.id, 'lol not applicable to you')
         json = api_call_as_user(@admin, :get, "/api/v1/users/#{@student.id}/history",
-                                {controller: 'history', action: 'index', format: 'json', user_id: @student.to_param},
-                                {}, {}, {expected_status: 200})
+                                { controller: 'history', action: 'index', format: 'json', user_id: @student.to_param },
+                                {}, {}, { expected_status: 200 })
         expect(json[0]['context_name']).to eq 'Something 101'
       end
 
       it "does not allow a teacher to view a student's history" do
         api_call_as_user(@teacher, :get, "/api/v1/users/#{@student.id}/history",
-                         {controller: 'history', action: 'index', format: 'json', user_id: @student.to_param},
-                         {}, {}, {expected_status: 401})
+                         { controller: 'history', action: 'index', format: 'json', user_id: @student.to_param },
+                         {}, {}, { expected_status: 401 })
       end
     end
 
@@ -161,7 +161,7 @@ describe HistoryController, type: :request do
       it "does not show the target user the masquerader's actions" do
         @user = @student
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
         expect(json.map { |e| e['asset_name'] }).to match_array(['Group Pages', 'Course People', 'Assign 1'])
       end
     end
@@ -177,7 +177,7 @@ describe HistoryController, type: :request do
 
         @user = @student
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
 
         asset_codes = json.map { |e| e['asset_code'] }
         expect(asset_codes).not_to include a1.asset_string
@@ -194,7 +194,7 @@ describe HistoryController, type: :request do
 
         @user = @student
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
 
         asset_codes = json.map { |e| e['asset_code'] }
         expect(asset_codes).not_to include "modules:#{@course.asset_string}"
@@ -212,14 +212,12 @@ describe HistoryController, type: :request do
 
         @user = @student
         json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
-                        format: 'json', user_id: 'self')
+                                                            format: 'json', user_id: 'self')
 
         asset_codes = json.map { |e| e['asset_code'] }
         expect(asset_codes).not_to include page1.asset_string
         expect(asset_codes).to include page2.asset_string
       end
-
     end
   end
 end
-

@@ -75,7 +75,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
 
     context 'when the user has the update permission but not manage_students' do
       before do
-        account_with_role_changes(role: teacher_role, role_changes: {manage_students: false})
+        account_with_role_changes(role: teacher_role, role_changes: { manage_students: false })
         user_session(teacher)
       end
 
@@ -92,7 +92,7 @@ describe MicrosoftSync::GroupsController, type: :controller do
   end
 
   shared_examples_for 'endpoints that return an existing group' do
-    before { group.reload.update!(job_state: {step: 'abc'}, last_error_report_id: 123) }
+    before { group.reload.update!(job_state: { step: 'abc' }, last_error_report_id: 123) }
 
     specify { expect(subject.parsed_body).to_not include('job_state') }
     specify { expect(subject.parsed_body).to_not include('last_error_report_id') }

@@ -38,12 +38,12 @@ describe "/quizzes/quizzes/moderate" do
     assign(:submissions, [])
   end
 
-  it "should render" do
+  it "renders" do
     render "quizzes/quizzes/moderate"
     expect(response).not_to be_nil
   end
 
-  it "should have filter options" do
+  it "has filter options" do
     render "quizzes/quizzes/moderate"
     expect(response.inspect).to include 'Search people. As you type in this field, the list of people will be automatically filtered to only include those whose names match your input.'
   end

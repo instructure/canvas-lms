@@ -140,6 +140,5 @@ module LtiAdvantage::Messages
         ]
       end
     end
-
   end
 end

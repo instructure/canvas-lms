@@ -27,7 +27,7 @@ describe "courses" do
   context "as a teacher" do
     before(:each) do
       account = Account.default
-      account.settings = {:open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true}
+      account.settings = { :open_registration => true, :no_enrollments_can_create_courses => true, :teachers_can_create_courses => true }
       account.save!
       allow_any_instance_of(Account).to receive(:feature_enabled?).and_call_original
       allow_any_instance_of(Account).to receive(:feature_enabled?).with(:new_user_tutorial).and_return(false)
@@ -40,23 +40,23 @@ describe "courses" do
         @course.save
       end
 
-      it "should allow unpublishing of the course if submissions have no score or grade" do
+      it "allows unpublishing of the course if submissions have no score or grade" do
         visit_course(@course)
         unpublish_btn.click
-        
+
         wait_for(method: nil, timeout: 5) {
           assert_flash_notice_message('successfully updated')
         }
         expect(unpublish_btn).to have_class('disabled')
       end
 
-      it "should load the users page using ajax", custom_timeout: 30 do
+      it "loads the users page using ajax", custom_timeout: 30 do
         # Set up the course with > 50 users (to test scrolling)
         create_users_in_course @course, 60
         @course.enroll_user(user_factory, 'TaEnrollment')
         visit_course_people(@course)
         wait_for_ajaximations
-        
+
         expect_no_flash_message :error
         expect(course_user_list.length).to eq 50
       end
@@ -64,14 +64,14 @@ describe "courses" do
   end
 
   context "as a student" do
-    before (:each) do
+    before(:each) do
       course_with_teacher(:active_all => true, :name => 'discussion course')
-      @student = User.create!(:name => "First Student")  
+      @student = User.create!(:name => "First Student")
       en = @course.enroll_student(@student)
-      user_session(@student)  
+      user_session(@student)
     end
 
-    it "should auto-accept the course invitation if previews are not allowed", custom_timeout: 20 do
+    it "auto-accepts the course invitation if previews are not allowed", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = false
       Account.default.save!
       visit_course(@course)
@@ -81,7 +81,7 @@ describe "courses" do
       expect(course_page_content).not_to contain_css(accept_enrollment_alert_selector)
     end
 
-    it "should accept the course invitation", custom_timeout: 20 do
+    it "accepts the course invitation", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = true
       Account.default.save!
       visit_course(@course)
@@ -91,7 +91,7 @@ describe "courses" do
       assert_flash_notice_message "Invitation accepted!"
     end
 
-    it "should reject a course invitation", custom_timeout: 20 do
+    it "rejects a course invitation", custom_timeout: 20 do
       Account.default.settings[:allow_invitation_previews] = true
       Account.default.save!
       visit_course(@course)

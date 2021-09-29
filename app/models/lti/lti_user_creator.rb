@@ -21,13 +21,13 @@ module Lti
   class LtiUserCreator
     # deprecated mapping
     ENROLLMENT_MAP = {
-        StudentEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER,
-        TeacherEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR,
-        TaEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT,
-        DesignerEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER,
-        ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
-        AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
-        StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
+      StudentEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER,
+      TeacherEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::INSTRUCTOR,
+      TaEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::TEACHING_ASSISTANT,
+      DesignerEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::CONTENT_DEVELOPER,
+      ObserverEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::OBSERVER,
+      AccountUser => LtiOutbound::LTIRoles::Institution::ADMIN,
+      StudentViewEnrollment => LtiOutbound::LTIRoles::ContextNotNamespaced::LEARNER
     }
 
     def initialize(canvas_user, canvas_root_account, canvas_tool, canvas_context)
@@ -60,6 +60,7 @@ module Lti
     end
 
     private
+
     def pseudonym
       @pseudonym ||= SisPseudonym.for(@canvas_user, @canvas_context, type: :trusted, require_sis: false, root_account: @canvas_root_account)
     end
@@ -89,11 +90,11 @@ module Lti
     def current_course_observee_lti_context_ids
       return [] unless @canvas_context.is_a?(Course)
 
-      @current_course_observee_lti_context_ids ||= @canvas_user.observer_enrollments.
-        current.
-        where(course_id: @canvas_context).
-        preload(:associated_user).
-        map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+      @current_course_observee_lti_context_ids ||= @canvas_user.observer_enrollments
+                                                               .current
+                                                               .where(course_id: @canvas_context)
+                                                               .preload(:associated_user)
+                                                               .map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
     end
 
     def current_account_enrollments()
@@ -109,7 +110,7 @@ module Lti
 
     def concluded_course_enrollments
       @concluded_course_enrollments ||=
-          @canvas_context.is_a?(Course) ? @canvas_user.enrollments.concluded.where(course_id: @canvas_context).to_a : []
+        @canvas_context.is_a?(Course) ? @canvas_user.enrollments.concluded.where(course_id: @canvas_context).to_a : []
     end
   end
 end

@@ -74,6 +74,7 @@ class UserProfile < ActiveRecord::Base
   set_policy do
     given do |user, account|
       return unless user
+
       user_roles = Lti::SubstitutionsHelper.new(account, account.root_account, user).all_roles
       user_roles.include?('urn:lti:instrole:ims/lis/Administrator')
     end
@@ -145,7 +146,7 @@ class UserProfile < ActiveRecord::Base
   def insert_lti_tool_tabs(tabs, user, opts)
     tools =
       opts[:root_account].context_external_tools.active.having_setting('user_navigation')
-        .select { |t| t.permission_given?(:user_navigation, user, opts[:root_account]) }
+                         .select { |t| t.permission_given?(:user_navigation, user, opts[:root_account]) }
     tabs.concat(
       Lti::ExternalToolTab.new(user, :user_navigation, tools, opts[:language]).tabs
         .find_all { |tab| show_lti_tab?(tab, user, opts[:root_account]) }
@@ -190,7 +191,7 @@ class UserProfile < ActiveRecord::Base
           label: I18n.t('#tabs.past_global_announcements', 'Global Announcements'),
           css_class: 'past_global_announcements',
           href: :account_notifications_path,
-          no_args: {include_past: true}
+          no_args: { include_past: true }
         }
     end
   end

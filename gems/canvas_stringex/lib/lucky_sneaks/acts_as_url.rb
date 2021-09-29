@@ -54,6 +54,7 @@ module LuckySneaks
         self.class_eval do
           def only_when_blank
             return @only_when_blank unless @only_when_blank.nil? # can override only_when_blank temporarily
+
             self.class.only_when_blank
           end
         end
@@ -86,11 +87,12 @@ module LuckySneaks
     end
 
     private
+
     def ensure_unique_url
       url_attribute = self.class.url_attribute
       base_url = self.send(url_attribute)
       base_url = self.send(self.class.attribute_to_urlify).to_s.to_url if base_url.blank? || !self.only_when_blank
-      conditions = [+"#{url_attribute} LIKE ?", base_url+'%']
+      conditions = [+"#{url_attribute} LIKE ?", base_url + '%']
       unless new_record?
         conditions.first << " and id != ?"
         conditions << id

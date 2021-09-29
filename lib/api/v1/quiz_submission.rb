@@ -58,17 +58,17 @@ module Api::V1::QuizSubmission
     context ||= quiz.context
 
     hash = api_json(qs, user, session, {
-      only: QUIZ_SUBMISSION_JSON_FIELDS,
-      methods: QUIZ_SUBMISSION_JSON_FIELD_METHODS.dup
-    })
+                      only: QUIZ_SUBMISSION_JSON_FIELDS,
+                      methods: QUIZ_SUBMISSION_JSON_FIELD_METHODS.dup
+                    })
 
     hash.merge!({
-      html_url: course_quiz_quiz_submission_url(context, quiz, qs)
-    })
+                  html_url: course_quiz_quiz_submission_url(context, quiz, qs)
+                })
 
     hash.merge!({
-      result_url: course_quiz_history_url(context, quiz, quiz_submission_id: qs.id, version: qs.version_number)
-    }) if qs.completed? || qs.needs_grading?
+                  result_url: course_quiz_history_url(context, quiz, quiz_submission_id: qs.id, version: qs.version_number)
+                }) if qs.completed? || qs.needs_grading?
 
     hash
   end
@@ -92,7 +92,7 @@ module Api::V1::QuizSubmission
     # see each quiz submission's score
     ActiveRecord::Associations::Preloader.new.preload(quiz_submissions, :submission)
 
-    hash[:quiz_submissions] = [ quiz_submissions ].flatten.map do |qs|
+    hash[:quiz_submissions] = [quiz_submissions].flatten.map do |qs|
       quiz_submission_json(qs, quiz, user, session, context)
     end
 

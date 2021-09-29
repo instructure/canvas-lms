@@ -23,7 +23,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/assignments/_syllabus_content" do
   context 'js_env CAN_READ' do
-    def setup_and_render_context(type, opts={})
+    def setup_and_render_context(type, opts = {})
       case type
       when :anonymous
         course_factory :active_all => true

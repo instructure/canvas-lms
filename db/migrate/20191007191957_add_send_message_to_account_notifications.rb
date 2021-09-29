@@ -24,10 +24,10 @@ class AddSendMessageToAccountNotifications < ActiveRecord::Migration[5.2]
   def up
     if Shard.current.default? && !::Rails.env.test?
       Canvas::MessageHelper.create_notification({
-        name: 'Account Notification',
-        delay_for: 0,
-        category: 'Account Notification'
-      })
+                                                  name: 'Account Notification',
+                                                  delay_for: 0,
+                                                  category: 'Account Notification'
+                                                })
     end
 
     add_column :account_notifications, :send_message, :boolean

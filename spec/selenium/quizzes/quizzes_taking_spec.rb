@@ -29,7 +29,7 @@ describe 'quiz taking' do
     @quiz = quiz_with_new_questions(!:goto_edit)
   end
 
-  it 'should allow toggling between RCE and HTML entry on essay questions', custom_timeout: 25 do
+  it 'allows toggling between RCE and HTML entry on essay questions', custom_timeout: 25 do
     @quiz = quiz_with_multiple_type_questions
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect_new_page_load { f('#take_quiz_link').click }
@@ -43,7 +43,7 @@ describe 'quiz taking' do
     expect(rce_editor_link).to be_displayed
   end
 
-  it 'should toggle only the essay question that was toggled leaving others on the page alone',
+  it 'toggles only the essay question that was toggled leaving others on the page alone',
      custom_timeout: 30 do
     @quiz = quiz_with_essay_questions
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
@@ -73,7 +73,7 @@ describe 'quiz taking' do
     expect(links[1]).to be_displayed
   end
 
-  it 'should allow to take the quiz as long as there are attempts left',
+  it 'allows to take the quiz as long as there are attempts left',
      :xbrowser,
      priority: '1',
      test_id: 140_606,
@@ -89,13 +89,13 @@ describe 'quiz taking' do
     expect(f('#content')).not_to contain_css('#take_quiz_link')
   end
 
-  it 'should show take quiz button for admins enrolled as a student' do
+  it 'shows take quiz button for admins enrolled as a student' do
     course_with_teacher(user: @student, course: @course)
     get "/courses/#{@course.id}/quizzes/#{@quiz.id}"
     expect(f('#take_quiz_link')).to be_present
   end
 
-  it 'should show a prompt when attempting to submit with unanswered questions',
+  it 'shows a prompt when attempting to submit with unanswered questions',
      priority: '1',
      test_id: 140_608 do
     skip_if_safari(:alert)
@@ -118,7 +118,7 @@ describe 'quiz taking' do
 
   it 'should not restrict whitelisted ip addresses', priority: '1', test_id: 338_082
 
-  it 'should account for question group settings', priority: '1', test_id: 140_591 do
+  it 'accounts for question group settings', priority: '1', test_id: 140_591 do
     skip_if_chrome('research')
     quiz = quiz_model
     bank = AssessmentQuestionBank.create!(context: @course)

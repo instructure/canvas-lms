@@ -32,7 +32,7 @@ describe "/errors/index" do
     )])
   end
 
-  it "should render" do
+  it "renders" do
     render 'errors/index'
     expect(response).not_to be_nil
   end

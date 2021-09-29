@@ -16,20 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useEffect, useRef, useState} from 'react'
-import qs from 'qs'
+import {useCallback, useEffect, useRef, useState} from 'react'
+import {useHash} from 'react-use'
 
-export const getInitialTab = (defaultTab, tabs) => {
-  if (window.location.hash) {
-    const newTab = window.location.hash.replace('#', 'tab-')
-    if (tabs.find(({id}) => id === newTab)) {
-      return newTab
-    }
+export const getTabFromHash = (hash, tabs) => {
+  const tab = hash.replace('#', 'tab-')
+  if (tabs.find(({id}) => id === tab)) {
+    return tab
   }
-  if (!defaultTab && tabs?.length) {
-    return tabs[0].id
-  }
-  return defaultTab
 }
 
 /**
@@ -52,28 +46,28 @@ export const getInitialTab = (defaultTab, tabs) => {
  * @returns {useTabStateReturnVal} - See {@link useTabStateReturnVal}
  */
 export default function useTabState(defaultTab, tabs = []) {
+  const [hash, setHash] = useHash()
+
+  const findCurrentTab = useCallback(
+    () => getTabFromHash(hash, tabs) || defaultTab || tabs[0]?.id,
+    [defaultTab, hash, tabs]
+  )
   // This ref is used to pass the current tab to the planner's getActiveApp()
   // function-- we can't use currentTab directly because that gets stuck in
   // a stale closure within the effect where it is referenced.
   const activeTab = useRef()
-  const [currentTab, setCurrentTab] = useState(() => getInitialTab(defaultTab, tabs))
+  const [currentTab, setCurrentTab] = useState(findCurrentTab)
+
+  useEffect(() => setCurrentTab(findCurrentTab()), [findCurrentTab])
 
   useEffect(() => {
     activeTab.current = currentTab
   }, [currentTab])
 
-  const handleTabChange = (id, focusTarget = '') => {
+  const handleTabChange = id => {
     if (!tabs.some(tab => tab.id === id)) return
     setCurrentTab(id)
-    const {protocol, host, pathname, search} = window.location
-    if (window.history.replaceState) {
-      const queryParams = qs.parse(search.substring(1))
-      queryParams.focusTarget = focusTarget || undefined
-      let query = qs.stringify(queryParams)
-      query = query ? `?${query}` : ''
-      const newUrl = `${protocol}//${host}${pathname}${query}#${id.replace('tab-', '')}`
-      window.history.replaceState({id}, null, newUrl)
-    }
+    setHash(id.replace('tab-', ''))
   }
 
   return {currentTab, activeTab, handleTabChange}

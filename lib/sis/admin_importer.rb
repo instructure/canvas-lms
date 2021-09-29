@@ -20,7 +20,6 @@
 
 module SIS
   class AdminImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
 
@@ -77,6 +76,7 @@ module SIS
 
         the_root_account = root_account_from_id(root_account) if root_account
         raise ImportError, "Invalid or unknown user_id '#{user_id}' for admin" if root_account && !the_root_account
+
         the_root_account ||= @root_account
 
         user = get_user(user_id, the_root_account)
@@ -91,13 +91,13 @@ module SIS
       end
 
       def create_or_find_admin(user, state)
-
         if state == 'active'
           admin = @account.account_users.where(user: user, role: @role).first_or_initialize
           admin.workflow_state = state
         elsif state == 'deleted'
           admin = @account.account_users.where(user: user, role: @role).where.not(sis_batch_id: nil).take
           return unless admin
+
           admin.workflow_state = state
         end
 
@@ -131,8 +131,8 @@ module SIS
         @account_roles_by_account_id[@account.id] ||= @account.available_account_roles
 
         @role = nil
-        @role = @account_roles_by_account_id[@account.id].detect {|r| r.id.to_s == role_id} if role_id
-        @role ||= @account_roles_by_account_id[@account.id].detect {|r| r.name == role}
+        @role = @account_roles_by_account_id[@account.id].detect { |r| r.id.to_s == role_id } if role_id
+        @role ||= @account_roles_by_account_id[@account.id].detect { |r| r.name == role }
       end
     end
   end

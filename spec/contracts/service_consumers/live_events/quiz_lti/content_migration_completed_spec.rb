@@ -22,7 +22,6 @@ require_relative '../live_events_pact_helper'
 
 RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
   describe 'content_migration_completed' do
-
     let(:live_event) do
       LiveEvents::PactHelper::Event.new(
         event_name: 'content_migration_completed',
@@ -44,7 +43,7 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
         }
         account = Account.default
         account.context_external_tools.create!(params)
-        account.settings[:provision] = {'lti' => 'lti url'}
+        account.settings[:provision] = { 'lti' => 'lti url' }
         account.lti_context_id = '1'
         account.enable_feature!(:quizzes_next)
         account.save!

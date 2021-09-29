@@ -3,13 +3,233 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "39e7cf18fc30e291caf214390683dbf5b0d247b0682c18d9ec84f6c5754cbbc1",
+      "fingerprint": "004796896cde893b006bf1856f61eba560b7329e370bd5cf0a071d019acfb05c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/resend_plagiarism_events.rb",
+      "line": 66,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"id in (#{(errors_report_scope(all_configured_submissions(start_time, end_time).select(:id).order(:submitted_at => :desc).limit(limit)) or missing_report_scope(all_configured_submissions(start_time, end_time).select(:id).order(:submitted_at => :desc).limit(limit)))})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::ResendPlagiarismEvents",
+        "method": "s(:self).resend_scope"
+      },
+      "user_input": "errors_report_scope(all_configured_submissions(start_time, end_time).select(:id).order(:submitted_at => :desc).limit(limit))",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "00ac66435814833ba7fd15636edce41d40f6587400cf2e86381310d660409149",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/grade_change_audit_api_controller.rb",
+      "line": 461,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.active.joins(:enrollment).preload(:enrollment).where(:course_score => true).where(\"(enrollments.course_id, enrollments.user_id) IN (#{events.reject(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id).join(\",\")})\"\n end.join(\", \")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeChangeAuditApiController",
+        "method": "current_override_scores_query"
+      },
+      "user_input": "events.reject(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id).join(\",\")})\"\n end.join(\", \")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "048aa319dfb0b3ab6ef403f0a578884c6b6c7eaf62ed315083f22cc0f740b35b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/score_statistics_generator.rb",
+      "line": 53,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreStatistic.connection.select_all(\"WITH want_assignments AS (\\n  SELECT a.id, a.created_at\\n  FROM #{Assignment.quoted_table_name} a\\n  WHERE a.context_id = #{course_id} AND a.context_type = 'Course' AND a.workflow_state = 'published'\\n), interesting_submissions AS (\\n  SELECT s.assignment_id, s.user_id, s.score, a.created_at\\n  FROM #{Submission.quoted_table_name} s\\n  JOIN want_assignments a ON s.assignment_id = a.id\\n  WHERE\\n    s.excused IS NOT true\\n    AND s.score IS NOT NULL\\n    AND s.workflow_state = 'graded'\\n), want_users AS (\\n  SELECT e.user_id\\n  FROM #{Enrollment.quoted_table_name} e\\n  WHERE e.type = 'StudentEnrollment' AND e.course_id = #{course_id} AND e.workflow_state NOT IN ('rejected', 'completed', 'deleted', 'inactive')\\n)\\nSELECT\\n  s.assignment_id AS id,\\n  MAX(s.score) AS max,\\n  MIN(s.score) AS min,\\n  AVG(s.score) AS avg,\\n  COUNT(*) AS count\\nFROM\\n  interesting_submissions s\\nWHERE\\n  s.user_id IN (SELECT user_id FROM want_users)\\nGROUP BY s.assignment_id\\nORDER BY MIN(s.created_at)\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScoreStatisticsGenerator",
+        "method": "s(:self).update_assignment_score_statistics"
+      },
+      "user_input": "course_id",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "062ab81b8ec3415929ef0be9788a806bd2cfed07953945c5bb3ce5c38854375c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/user.rb",
+      "line": 348,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "self.all.select(\"users.*\").select(\"MIN(#{Enrollment.type_rank_sql(:student)}) AS enrollment_rank\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "User",
+        "method": "User.by_top_enrollment"
+      },
+      "user_input": "Enrollment.type_rank_sql(:student)",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "0e15b8a6ab3d2158a04d098f25c49a631614b1fe6fea57e98d52dbe9052e3e80",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/quizzes/quiz.rb",
+      "line": 1342,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Quizzes::QuizSubmission.from(\"( VALUES #{quizzes.map do\n \"(#{q.id})\"\n end.join(\", \")} ) AS s(quiz_id)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Quizzes::Quiz",
+        "method": "Quizzes::Quiz.preload_can_unpublish"
+      },
+      "user_input": "quizzes.map do\n \"(#{q.id})\"\n end.join(\", \")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1086c770014840a3614b0b3305186dc1021045a449f75afbaba15a1b2ea22e96",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/populate_root_account_ids_on_users.rb",
+      "line": 83,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "User.where(:id => user_id).update_all(\"root_account_ids=(#{\"SELECT ARRAY(SELECT DISTINCT e FROM unnest(array_cat(root_account_ids, ('{#{root_accounts_for_user[(1..-1)].split(\",\").map(&:to_i).map do\n Shard.relative_id_for(id, Shard.current, Shard.lookup((User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id) / Shard::IDS_PER_SHARD)))\n end.join(\",\")}}'))) AS a(e) ORDER BY e)\"})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::PopulateRootAccountIdsOnUsers",
+        "method": "s(:self).populate_table"
+      },
+      "user_input": "User.where(\"id>?\", Shard::IDS_PER_SHARD).minimum(:id)",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "113ccdd673061935b7a5ef6c1e6683d843514d6719553a87a515d0fc2dd5c446",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/grade_change_audit_api_controller.rb",
+      "line": 449,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Score.active.joins(:enrollment).preload(:enrollment).where(\"(enrollments.course_id, enrollments.user_id, scores.grading_period_id) IN (#{events.select(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")})\"\n end.join(\", \")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeChangeAuditApiController",
+        "method": "current_override_scores_query"
+      },
+      "user_input": "events.select(&:in_grading_period?).map do\n key = key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")\n\"(#{key_from_ids(event.context_id, event.student_id, event.grading_period_id).join(\",\")})\"\n end.join(\", \")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1481a5e5e16040b087f656003b867791bed506d85aab9b97e52e7f423e94636f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 317,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "current_cached_due_dates"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "1b10613dd15b63274e7b0fb7bfd5d229d36e2a66a07100f09eb15a4725f0df4a",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/assignments_api_controller.rb",
+      "line": 819,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"user_due_date, #{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AssignmentsApiController",
+        "method": "get_assignments"
+      },
+      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "1cfe984723e00196cfea88b92c2967adfffe747d43508a73aaf045607ad3a241",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `const_get` called with model attribute",
+      "file": "lib/sis/csv/import_refactored.rb",
+      "line": 231,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "SIS::CSV.const_get(((id or ParallelImporter.find(id)).importer_type.to_sym.to_s.camelcase + \"Importer\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SIS::CSV::ImportRefactored",
+        "method": "run_parallel_importer"
+      },
+      "user_input": "ParallelImporter.find(id)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "20b8d23d190696275c75e615ce298a65e6e199f6d783cd7dc415be3756fe8eb0",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/import_instfs_attachments.rb",
+      "line": 111,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Attachment.connection.execute(\"UPDATE attachments SET instfs_uuid=trim('\\\"' FROM batch.value::text) FROM json_each('#{line}'::json) AS batch WHERE CAST(batch.key AS BIGINT)=attachments.id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::ImportInstfsAttachments",
+        "method": "import_line"
+      },
+      "user_input": "line",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "21d0ae73645443aa868f42d8f6a640b31ac3b483c58786bfe76dc0a9864fa455",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/grade_calculator.rb",
-      "line": 703,
+      "line": 686,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name} (\\n        enrollment_id, assignment_group_id,\\n        #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n        course_score, root_account_id, created_at, updated_at\\n      )\\n        SELECT\\n          val.enrollment_id AS enrollment_id,\\n          val.assignment_group_id as assignment_group_id,\\n          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n          FALSE AS course_score,\\n          #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM (VALUES #{score_values}) val\\n          (\\n            enrollment_id,\\n            assignment_group_id,\\n            #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")}\\n          )\\n      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\n      DO UPDATE SET\\n        #{assignment_group_columns_to_insert_or_update[:update_columns].join(\", \")},\\n        updated_at = excluded.updated_at,\\n        root_account_id = #{(course or Course.find(course)).root_account_id},\\n        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
+      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name} (\\n        enrollment_id, assignment_group_id,\\n        #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")},\\n        course_score, root_account_id, created_at, updated_at\\n      )\\n        SELECT\\n          val.enrollment_id AS enrollment_id,\\n          val.assignment_group_id as assignment_group_id,\\n          #{assignment_group_columns_to_insert_or_update[:insert_columns].join(\", \")},\\n          FALSE AS course_score,\\n          #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM (VALUES #{score_values}) val\\n          (\\n            enrollment_id,\\n            assignment_group_id,\\n            #{assignment_group_columns_to_insert_or_update[:value_names].join(\", \")}\\n          )\\n        ORDER BY assignment_group_id, enrollment_id\\n      ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL\\n      DO UPDATE SET\\n        #{assignment_group_columns_to_insert_or_update[:update_columns].join(\", \")},\\n        updated_at = excluded.updated_at,\\n        root_account_id = #{(course or Course.find(course)).root_account_id},\\n        workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
       "render_path": null,
       "location": {
         "type": "method",
@@ -18,7 +238,383 @@
       },
       "user_input": "assignment_group_columns_to_insert_or_update[:value_names].join(\", \")",
       "confidence": "Medium",
-      "note": "values being inserted do not come from user input."
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "233c6deb92fd272c8b319e749dd9a31fb5e48ae92b7847be7cb042cfafdd76b7",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/messageable_user.rb",
+      "line": 225,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "scope.where([\"#{User.sortable_name_order_by_clause} > ? OR\\n#{User.sortable_name_order_by_clause} = ? AND users.id > ?\\n\", MessageableUser.connection.escape_bytea(name), MessageableUser.connection.escape_bytea(name), Shard.relative_id_for(id, Shard.current, scope.shard_value)])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "MessageableUser::MessageableUser::Bookmarker",
+        "method": "s(:self).restrict_scope"
+      },
+      "user_input": "User.sortable_name_order_by_clause",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Dangerous Send",
+      "warning_code": 23,
+      "fingerprint": "2734ed0a9a2d2604962cd8232b217636b6aaeaf45f43369a4876197a03387cbc",
+      "check_name": "Send",
+      "message": "User controlled method execution",
+      "file": "app/controllers/appointment_groups_controller.rb",
+      "line": 581,
+      "link": "https://brakemanscanner.org/docs/warning_types/dangerous_send/",
+      "code": "send(\"api_v1_appointment_group_#{params[:action]}_url\", @group)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AppointmentGroupsController",
+        "method": "participants"
+      },
+      "user_input": "params[:action]",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "27707fea91eb9f4909d3ecda0ab5deadbf9ffc980a7d0e5876ccc7ce8d4ecb33",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 525,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{column} IS#{\" NOT\" unless (first_or_last == :last)} NULL, #{column} #{direction.to_s.upcase}\".strip)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "nulls"
+      },
+      "user_input": "column",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 24,
+      "fingerprint": "2887b918400cce2b4b71a393a03e681e95ad26fc0c99ebe5b9393a66315b1bdb",
+      "check_name": "UnsafeReflection",
+      "message": "Unsafe reflection method `constantize` called with model attribute",
+      "file": "gems/plugins/account_reports/spec_canvas/report_spec_helper.rb",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "ErrorReport.last.category.constantize",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ReportSpecHelper",
+        "method": "read_report"
+      },
+      "user_input": "ErrorReport.last.category",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "2af8751396bfed9b357d4fdc61db83ca662dfd78ab00bb8141cb9211703f793e",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/api/v1/assignment_group.rb",
+      "line": 132,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.select_all(\"      SELECT DISTINCT ON (assignment_id) assignment_id, user_id\\n      FROM #{Submission.quoted_table_name}\\n      WHERE\\n        assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n        grading_period_id IN (#{GradingPeriodGroup.for_course(context).grading_periods.closed.pluck(:id).join(\",\")}) AND\\n        workflow_state <> 'deleted'\\n\\n      UNION\\n\\n      SELECT DISTINCT ON (assignment_id) assignment_id, user_id\\n      FROM #{Submission.quoted_table_name}\\n      WHERE\\n        assignment_id IN (#{assignments.pluck(:id).join(\",\")}) AND\\n        grading_period_id IS NULL AND NOW() > '#{GradingPeriodGroup.for_course(context).grading_periods.order(:end_date => :desc).first.close_date}'::timestamptz AND\\n        workflow_state <> 'deleted'\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Api::V1::AssignmentGroup",
+        "method": "in_closed_grading_period_hash"
+      },
+      "user_input": "assignments.pluck(:id).join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "2ce26e430fd610fdc0aa93466acf40a41df644710027fc60dc84e9baf5dced5b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/copy_built_in_roles_by_root_account.rb",
+      "line": 61,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AccountNotificationRole.where(:id => ((min_id..max_id)), :role_id => Role.where(:workflow_state => \"built_in\", :root_account_id => nil).pluck(:id)).joins(:role).joins(:account_notification => :account).joins(\"INNER JOIN #{Role.quoted_table_name} AS new_roles\\nON new_roles.base_role_type=roles.base_role_type\\nAND new_roles.workflow_state='built_in'\\nAND new_roles.root_account_id=#{Account.resolved_root_account_id_sql}\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::CopyBuiltInRolesByRootAccount",
+        "method": "s(:self).run"
+      },
+      "user_input": "Account.resolved_root_account_id_sql",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 114,
+      "fingerprint": "2f29324268f96b4e21c0299738b67bc86028ddc1940f69cbf50c623cc3a4b87e",
+      "check_name": "JSONEntityEscape",
+      "message": "HTML entities in JSON are not escaped by default",
+      "file": "config/environments/production.rb",
+      "line": 738,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross-site_scripting/",
+      "code": "ActiveSupport.escape_html_entities_in_json = false",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ContextModuleItemsApiController",
+        "method": "disable_escape_html_entities"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "35a758f59effc295ad586a96edf4b8faea974e08bee9d46fff2d0d08e285e1e5",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 506,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "find_by_sql((((+\"\" << \"SELECT NULL AS #{column.to_s} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column.to_s} IS NULL) UNION ALL (\") << \"WITH RECURSIVE t AS (\\n  SELECT MIN(#{column.to_s}) AS #{column.to_s} FROM #{quoted_table_name}\\n  UNION ALL\\n  SELECT (SELECT MIN(#{column.to_s}) FROM #{quoted_table_name} WHERE #{column.to_s} > t.#{column.to_s})\\n  FROM t\\n  WHERE t.#{column.to_s} IS NOT NULL\\n)\\nSELECT #{column.to_s} FROM t WHERE #{column.to_s} IS NOT NULL\\n\") << \")\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "distinct_values"
+      },
+      "user_input": "column",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "3776abfd979c8834f3ec52fa7e9fbdc374df1042a90fce68eb4ec435af42d119",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/assignments_api_controller.rb",
+      "line": 817,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"latest_due_date, #{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AssignmentsApiController",
+        "method": "get_assignments"
+      },
+      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "3eaff243d053ea3fc947043dbc45d2fa3e8f0f7b3be372c9c304892afc5766b9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/conversation_participant.rb",
+      "line": 74,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where((\"conversation_participants.root_account_ids <> '' AND \" + like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)), ((\"[\" + Shard.birth.activate do\n accts = (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end\n((masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:id) + (masquerading_user.associated_root_accounts.shard(masquerading_user.in_region_associated_shards).to_a + user_being_viewed.associated_root_accounts.shard(user_being_viewed.in_region_associated_shards).to_a).uniq.select do\n a.grants_right?(masquerading_user, :become_user)\n end.map(&:global_id))\n\n end.join(\"][\")) + \"]\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ConversationParticipant",
+        "method": "for_masquerading_user"
+      },
+      "user_input": "like_condition(\"?\", \"'%[' || REPLACE(conversation_participants.root_account_ids, ',', ']%[') || ']%'\", false)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Remote Code Execution",
+      "warning_code": 119,
+      "fingerprint": "42acb42096367d73efe3943f3456226d3d664227e85cf7514c6c8a72b34d8a3e",
+      "check_name": "UnsafeReflectionMethods",
+      "message": "Unsafe reflection method `method` called with model attribute",
+      "file": "app/controllers/grading_periods_controller.rb",
+      "line": 174,
+      "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
+      "code": "method(\"#{Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id])).take.class.to_s.downcase}_batch_update\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradingPeriodsController",
+        "method": "batch_update"
+      },
+      "user_input": "Account.active.where(:id => GradingPeriodGroup.active.select(:account_id).where(:id => params[:set_id]))",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "4b312d5a4ecbd76ab744f06c5cf297477fa9bf39dd2c4a6ecf403c251b8bf874",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 841,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DECLARE #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"} CURSOR FOR #{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "4c67646bec3e639823b3189c3db1aa66b8d4b2cf68851d3057f1b957e10da651",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 434,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.connection.execute(\"UPDATE #{Submission.quoted_table_name}\\n  SET\\n    cached_due_date = vals.due_date::timestamptz,\\n    grading_period_id = vals.grading_period_id::integer,\\n    workflow_state = COALESCE(NULLIF(workflow_state, 'deleted'), (\\n      #{\"CASE\\nWHEN grade IS NOT NULL OR excused IS TRUE THEN\\n  'graded'\\nWHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN\\n  'pending_review'\\nWHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN\\n  'submitted'\\nELSE\\n  'unsubmitted'\\nEND\\n\"}\\n    )),\\n    anonymous_id = COALESCE(submissions.anonymous_id, vals.anonymous_id),\\n    cached_quiz_lti = vals.cached_quiz_lti,\\n    updated_at = now() AT TIME ZONE 'UTC'\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  WHERE submissions.user_id = vals.student_id AND\\n        submissions.assignment_id = vals.assignment_id AND\\n        (\\n          (submissions.cached_due_date IS DISTINCT FROM vals.due_date::timestamptz) OR\\n          (submissions.grading_period_id IS DISTINCT FROM vals.grading_period_id::integer) OR\\n          (submissions.workflow_state <> COALESCE(NULLIF(submissions.workflow_state, 'deleted'),\\n            (#{\"CASE\\nWHEN grade IS NOT NULL OR excused IS TRUE THEN\\n  'graded'\\nWHEN submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL THEN\\n  'pending_review'\\nWHEN submission_type IS NOT NULL AND submitted_at IS NOT NULL THEN\\n  'submitted'\\nELSE\\n  'unsubmitted'\\nEND\\n\"})\\n          )) OR\\n          (submissions.anonymous_id IS DISTINCT FROM COALESCE(submissions.anonymous_id, vals.anonymous_id)) OR\\n          (submissions.cached_quiz_lti IS DISTINCT FROM vals.cached_quiz_lti)\\n        );\\nINSERT INTO #{Submission.quoted_table_name}\\n  (assignment_id, user_id, workflow_state, created_at, updated_at, course_id,\\n  cached_due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  SELECT\\n    assignments.id, vals.student_id, 'unsubmitted',\\n    now() AT TIME ZONE 'UTC', now() AT TIME ZONE 'UTC',\\n    assignments.context_id, vals.due_date::timestamptz, vals.grading_period_id::integer,\\n    vals.anonymous_id,\\n    vals.cached_quiz_lti,\\n    vals.root_account_id\\n  FROM (VALUES #{batch_values.join(\",\")})\\n    AS vals(assignment_id, student_id, due_date, grading_period_id, anonymous_id, cached_quiz_lti, root_account_id)\\n  INNER JOIN #{Assignment.quoted_table_name} assignments\\n    ON assignments.id = vals.assignment_id\\n  LEFT OUTER JOIN #{Submission.quoted_table_name} submissions\\n    ON submissions.assignment_id = assignments.id\\n    AND submissions.user_id = vals.student_id\\n  WHERE submissions.id IS NULL;\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "perform_submission_upsert"
+      },
+      "user_input": "batch_values.join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "4faeb853ee26547af65f8bfbebb21f30758e9eb1366cd0da5ab8c5c4a475d9df",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/assignments_api_controller.rb",
+      "line": 814,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{Assignment.best_unicode_collation_key(\"assignments.title\")}, assignment_groups.position, assignments.position, assignments.id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AssignmentsApiController",
+        "method": "get_assignments"
+      },
+      "user_input": "Assignment.best_unicode_collation_key(\"assignments.title\")",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "509d814a7e78909f05090e6c2c5a463b09806410b4c30b4699f9e8f867054153",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/account.rb",
+      "line": 987,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Account.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT id FROM t\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Account",
+        "method": "Account.account_chain_ids"
+      },
+      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "51d6d3178f4c3f59ab68bc3a703d086c21291e4ee1004e1fae5964745938a403",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/enrollment.rb",
+      "line": 176,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(:user_id => user_id).where(\"assignment_id=assignments.id\").where(\"#{Submission.needs_grading_conditions} OR\\n            (workflow_state = 'deleted' AND submission_type IS NOT NULL AND\\n            (score IS NULL OR NOT grade_matches_current_submission OR\\n            (submission_type = 'online_quiz' AND quiz_submission_id IS NOT NULL)))\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Enrollment",
+        "method": "clear_needs_grading_count_cache"
+      },
+      "user_input": "Submission.needs_grading_conditions",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "Mass Assignment",
+      "warning_code": 70,
+      "fingerprint": "58ed5eb1b2c3a696a4c3d567b80b70a85f2feb5dadd4a202465778353c843211",
+      "check_name": "MassAssignment",
+      "message": "Specify exact keys allowed for mass assignment instead of using `permit!` which allows any keys",
+      "file": "app/controllers/gradebook_settings_controller.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/mass_assignment/",
+      "code": "params.require(:gradebook_settings).permit({ :filter_columns_by => ([:context_module_id, :grading_period_id, :assignment_group_id]), :filter_rows_by => ([:section_id, :student_group_id]), :selected_view_options_filters => ([]) }, :enter_grades_as, :show_concluded_enrollments, :show_inactive_enrollments, :show_unpublished_assignments, :student_column_display_as, :student_column_secondary_info, :sort_rows_by_column_id, :sort_rows_by_setting_key, :sort_rows_by_direction, :view_ungraded_as_zero, :colors => ([:late, :missing, :resubmitted, :dropped, :excused])).permit!",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradebookSettingsController",
+        "method": "gradebook_settings_params"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "596653631ef96aa94d15829ede5c50718351c7b9279fbd2bf9b0a139cf06eb31",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/reclaim_instfs_attachments.rb",
+      "line": 99,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "scope.where(\"#{Account.resolved_root_account_id_sql} IN (?)\", root_accounts.map(&:id))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::ReclaimInstfsAttachments",
+        "method": "s(:self).instfs_attachments_for_root_accounts"
+      },
+      "user_input": "Account.resolved_root_account_id_sql",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "5e52e4ee5c1ebad034509e60cd081ee7efab6b30fc41db4f01a3a6f872be7462",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/account.rb",
+      "line": 1009,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Account.connection.select_values(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(\", \")})\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT id FROM t\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Account",
+        "method": "Account.multi_account_chain_ids"
+      },
+      "user_input": "sliced_acc_ids.join(\", \")",
+      "confidence": "Medium",
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
@@ -27,7 +623,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/outcome_results_controller.rb",
-      "line": 596,
+      "line": 623,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Arel.sql((User.sortable_name_order_by_clause(User.quoted_table_name) or \"#{User.sortable_name_order_by_clause(User.quoted_table_name)} DESC\"))",
       "render_path": null,
@@ -43,13 +639,53 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "6cf45dc47f15a06b8f69c3df2521c24ef83016b18b2c4b9a348c98517d9fa6eb",
+      "fingerprint": "6c7dde08a0537e5a69ebd2bca05afd976d613743e229f81125540f5ac78c7f81",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/data_fixup/populate_root_account_ids_on_learning_outcomes.rb",
+      "line": 54,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "LearningOutcome.where(:id => ((batch_min..batch_max))).where(\"root_account_ids IS NULL OR root_account_ids = ?\", \"{}\").joins(:account).update_all(\"root_account_ids=ARRAY[#{Account.resolved_root_account_id_sql}]\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DataFixup::PopulateRootAccountIdsOnLearningOutcomes",
+        "method": "s(:self).populate"
+      },
+      "user_input": "Account.resolved_root_account_id_sql",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "6db9911a91c84a4b00b6de3ab8e145484f50f33c6702139317ea9d21b4264a03",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/users_controller.rb",
+      "line": 2698,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "course.submissions.where.not(:assignments => ({ :workflow_state => \"deleted\" })).eager_load(:assignment).where(\"user_id IN (?) AND #{Submission.needs_grading_conditions}\", student_enrollments.map(&:user_id))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UsersController",
+        "method": "teacher_activity_report"
+      },
+      "user_input": "Submission.needs_grading_conditions",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "75559f0034b6f8abb456a8ea6eb2b44350e53207bfbeb46330a44494e55516a0",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/grade_calculator.rb",
-      "line": 739,
+      "line": 723,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreMetadata.connection.execute(\"\\n        INSERT INTO #{ScoreMetadata.quoted_table_name}\\n          (score_id, calculation_details, created_at, updated_at)\\n          SELECT\\n            scores.id AS score_id,\\n            CAST(val.calculation_details as json) AS calculation_details,\\n            #{updated_at} AS created_at,\\n            #{updated_at} AS updated_at\\n          FROM (VALUES #{dropped_values}) val\\n            (enrollment_id, assignment_group_id, calculation_details)\\n          LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n            scores.enrollment_id = val.enrollment_id AND\\n            scores.assignment_group_id = val.assignment_group_id\\n        ON CONFLICT (score_id)\\n        DO UPDATE SET\\n          calculation_details = excluded.calculation_details,\\n          updated_at = excluded.updated_at\\n        ;\\n      \")",
+      "code": "ScoreMetadata.connection.execute(\"\\n        INSERT INTO #{ScoreMetadata.quoted_table_name}\\n          (score_id, calculation_details, created_at, updated_at)\\n          SELECT\\n            scores.id AS score_id,\\n            CAST(val.calculation_details as json) AS calculation_details,\\n            #{updated_at} AS created_at,\\n            #{updated_at} AS updated_at\\n          FROM (VALUES #{dropped_values}) val\\n            (enrollment_id, assignment_group_id, calculation_details)\\n          LEFT OUTER JOIN #{Score.quoted_table_name} scores ON\\n            scores.enrollment_id = val.enrollment_id AND\\n            scores.assignment_group_id = val.assignment_group_id\\n          ORDER BY score_id\\n        ON CONFLICT (score_id)\\n        DO UPDATE SET\\n          calculation_details = excluded.calculation_details,\\n          updated_at = excluded.updated_at\\n        ;\\n      \")",
       "render_path": null,
       "location": {
         "type": "method",
@@ -58,7 +694,68 @@
       },
       "user_input": "updated_at",
       "confidence": "Medium",
-      "note": "values being inserted do not come from user input."
+      "note": ""
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 2,
+      "fingerprint": "781bcd475f1cc9f734536572daca9d75fb12c7a0a6140708522d93126b6e9712",
+      "check_name": "CrossSiteScripting",
+      "message": "Unescaped model attribute",
+      "file": "app/views/shared/_maintenance_window.html.erb",
+      "line": 11,
+      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
+      "code": "Setting.get(\"global_maintenance_notice\", \"\")",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "ProfileController",
+          "method": "settings",
+          "line": 227,
+          "file": "app/controllers/profile_controller.rb",
+          "rendered": {
+            "name": "profile/profile",
+            "file": "app/views/profile/profile.html.erb"
+          }
+        },
+        {
+          "type": "template",
+          "name": "profile/profile",
+          "line": 163,
+          "file": "app/views/profile/profile.html.erb",
+          "rendered": {
+            "name": "shared/_maintenance_window",
+            "file": "app/views/shared/_maintenance_window.html.erb"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "shared/_maintenance_window"
+      },
+      "user_input": null,
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "78b44fda25df90708f28d0f2c95bfffb48dfb1d609937747cda30fb34461903e",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/graphql/graphql_postgres_timeout.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.execute(\"SET statement_timeout = #{Integer(Setting.get(\"graphql_statement_timeout\", \"60_000\"))}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GraphQLPostgresTimeout",
+        "method": "s(:self).wrap"
+      },
+      "user_input": "Setting.get(\"graphql_statement_timeout\", \"60_000\")",
+      "confidence": "High",
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
@@ -67,7 +764,7 @@
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "app/controllers/lti/ims/providers/memberships_provider.rb",
-      "line": 79,
+      "line": 81,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
       "code": "Submission.active.for_assignment(assignment).where(\"#{outer_user_id_column} = submissions.user_id\")",
       "render_path": null,
@@ -81,13 +778,385 @@
       "note": "No user input is passed in"
     },
     {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "7a508e1af8899d8b5e2727fdf138717ab1ca1ec71ab4f8544f1acd5fc9078f71",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/unzip_attachment.rb",
+      "line": 151,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Attachment.where(:id => id_positions.keys).update_all(\"position=CASE #{id_positions.inject([]) do\n memo.tap do\n (m << \"WHEN id=#{id} THEN #{position}\") if id and position\n end\n end.join(\" \")} ELSE position END\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "UnzipAttachment",
+        "method": "update_attachment_positions"
+      },
+      "user_input": "id_positions.inject([]) do\n memo.tap do\n (m << \"WHEN id=#{id} THEN #{position}\") if id and position\n end\n end.join(\" \")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "7abc21a22f955b8d5b6d47f5332873d49efbc8f4eba5e341055efa175ee14977",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "gems/plugins/simply_versioned/lib/simply_versioned/version.rb",
+      "line": 97,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "self.connection.select_rows(\"SELECT (SELECT max (vo.number) FROM #{Version.quoted_table_name} vo WHERE vo.versionable_id = v.versionable_id AND vo.versionable_type = v.versionable_type)\\n            AS maximum_number, v.versionable_type, v.versionable_id FROM (VALUES #{sliced_objs.map do\n \"(#{o.id}, '#{o.class.base_class.name}')\"\n end.join(\",\")}) AS v (versionable_id, versionable_type)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Version",
+        "method": "Version.preload_version_number"
+      },
+      "user_input": "sliced_objs.map do\n \"(#{o.id}, '#{o.class.base_class.name}')\"\n end.join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "81514c737b5457d2e4c4073402b332ef084d687b5c9cd891518a9392cd92e50b",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 851,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.select_values(\"FETCH FORWARD #{of} FROM #{\"#{table_name}_in_batches_cursor_#{apply_limits(clone, start, finish).except(:select).select(primary_key).to_sql.hash.abs.to_s(36)}\"}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "of",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "816a81c5f19187c4a3855a2d49727ffd2f07c31284f44ba2621ae92b83576bdc",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/cc/importer/canvas/quiz_converter.rb",
+      "line": 46,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{Qti.get_conversion_command(File.join(qti_folder, \"qti_2_1\"), qti_folder)}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CC::Importer::Canvas::QuizConverter",
+        "method": "run_qti_converter"
+      },
+      "user_input": "Qti.get_conversion_command(File.join(qti_folder, \"qti_2_1\"), qti_folder)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "8338cbe3c3812437b3387b3d7b90a4795bd5ee5a5620cb8586be9ef53f6b7758",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/active_support/cache/safe_redis_race_condition.rb",
+      "line": 50,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"lock:#{key}\", options)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
+        "method": "handle_expired_entry"
+      },
+      "user_input": "key",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "8338cbe3c3812437b3387b3d7b90a4795bd5ee5a5620cb8586be9ef53f6b7758",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/active_support/cache/safe_redis_race_condition.rb",
+      "line": 62,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "lock(\"lock:#{key}\", options)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveSupport::Cache::SafeRedisRaceCondition",
+        "method": "handle_expired_entry"
+      },
+      "user_input": "key",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "871762919d635836a40277367e84b1427e48755b97056fc79f826168f35ffcbc",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/conversation.rb",
+      "line": 790,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "self.class.where([\"(#{col} IS NULL OR #{col} < ?)\", val])",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Conversation",
+        "method": "maybe_update_timestamp"
+      },
+      "user_input": "col",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "900c2723d5ca97db73fcbbdfa93ee42aff78549a2f141f25026fca7bc05784e0",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/score_statistics_generator.rb",
+      "line": 103,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreStatistic.connection.execute(\"INSERT INTO #{ScoreStatistic.quoted_table_name}\\n  (assignment_id, maximum, minimum, mean, count, created_at, updated_at, root_account_id)\\nVALUES #{bulk_slice.join(\",\")}\\nON CONFLICT (assignment_id)\\nDO UPDATE SET\\n   minimum = excluded.minimum,\\n   maximum = excluded.maximum,\\n   mean = excluded.mean,\\n   count = excluded.count,\\n   updated_at = excluded.updated_at,\\n   root_account_id = #{root_account_id}\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ScoreStatisticsGenerator",
+        "method": "s(:self).update_assignment_score_statistics"
+      },
+      "user_input": "bulk_slice.join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "91d4c856e15750b2bc532dd5e213b913f10f751e1ff23378523c44d8e130de3d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "gems/plugins/account_reports/lib/account_reports/sis_exporter.rb",
+      "line": 969,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AccountUser.select(\"account_users.*,\\n                  a.sis_source_id AS account_sis_id,\\n                  r.name AS role_name,\\n                  u.name AS user_name\").joins(\"INNER JOIN #{Account.quoted_table_name} a ON account_users.account_id=a.id\\n                 INNER JOIN #{User.quoted_table_name} u ON account_users.user_id=u.id\\n                 INNER JOIN #{Role.quoted_table_name} r ON account_users.role_id=r.id\").where(\"account_users.account_id IN (#{Account.sub_account_ids_recursive_sql(account.id)})\\n                 OR account_users.account_id= :account_id\", :account_id => account.id)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountReports::SisExporter",
+        "method": "admins"
+      },
+      "user_input": "Account.sub_account_ids_recursive_sql(account.id)",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9a056ab1dd378ca2b48c03d247f078f182dcd9bf97e1b6523000bc6c19c2069d",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/accounts_controller.rb",
+      "line": 1158,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AccountReport.from(\"unnest('{#{AccountReport.available_reports.keys.join(\",\")}}'::text[]) report_types (name),\\n                LATERAL (#{@account.account_reports.active.where(\"report_type=name\").most_recent.to_sql}) account_reports \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountsController",
+        "method": "reports_tab"
+      },
+      "user_input": "AccountReport.available_reports.keys",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9a6b6fc9cd26ea7f2aad82b855ef41aa7da0d90fb2209a362a9e686a4f8fc3bd",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/grade_calculator.rb",
+      "line": 624,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ScoreMetadata.connection.execute(\"\\n      INSERT INTO #{ScoreMetadata.quoted_table_name}\\n        (score_id, calculation_details, created_at, updated_at)\\n        SELECT\\n          scores.id AS score_id,\\n          CASE enrollments.user_id\\n            #{{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")}\\n            ELSE NULL\\n          END AS calculation_details,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM #{Score.quoted_table_name} scores\\n        INNER JOIN #{Enrollment.quoted_table_name} enrollments ON\\n          enrollments.id = scores.enrollment_id\\n        LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON\\n          metadata.score_id = scores.id\\n        WHERE\\n          scores.enrollment_id IN (#{joined_enrollment_ids}) AND\\n          scores.assignment_group_id IS NULL AND\\n          #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"scores.grading_period_id = #{opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id}\"\nelse\n  \"scores.course_score IS TRUE\"\nend}\\n        ORDER BY enrollment_id\\n      ON CONFLICT (score_id)\\n      DO UPDATE SET\\n        calculation_details = excluded.calculation_details,\\n        updated_at = excluded.updated_at\\n      ;\\n    \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "GradeCalculator",
+        "method": "save_course_and_grading_period_metadata"
+      },
+      "user_input": "{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "9e213c3440080230acd65f00562b9bd0d1c1c2c673fd32a020d1ca3c6e2cdb82",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/assignment_override.rb",
+      "line": 280,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where(\"#{field}_overridden\" => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AssignmentOverride",
+        "method": "AssignmentOverride.override"
+      },
+      "user_input": "field",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a2175691417074dac6b528cf37d57f8f7ae4b3e8232bf1da9fd970f6b0410dcd",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/effective_due_dates.rb",
+      "line": 194,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "ActiveRecord::Base.connection.select_all(\"          -- fetch the assignment itself\\n          WITH models AS (\\n            SELECT *\\n            FROM #{Assignment.quoted_table_name}\\n            WHERE\\n              id IN (#{([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql.join(\",\")}) AND\\n              workflow_state <> 'deleted' AND\\n              context_id = #{context.id} AND context_type = 'Course'\\n          ),\\n\\n          -- fetch all overrides for this assignment\\n          overrides AS (\\n            SELECT\\n              o.id,\\n              o.assignment_id,\\n              o.set_type,\\n              o.set_id,\\n              o.due_at_overridden,\\n              CASE WHEN o.due_at_overridden IS TRUE THEN o.due_at ELSE a.due_at END AS due_at\\n            FROM\\n              models a\\n            INNER JOIN #{AssignmentOverride.quoted_table_name} o ON o.assignment_id = a.id\\n            WHERE\\n              o.workflow_state = 'active'\\n          ),\\n\\n          -- fetch all students affected by adhoc overrides\\n          override_adhoc_students AS (\\n            SELECT\\n              os.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{AssignmentOverrideStudent.quoted_table_name} os ON os.assignment_override_id = o.id AND\\n              os.workflow_state = 'active'\\n            WHERE\\n              o.set_type = 'ADHOC'\\n              #{filter_students_sql(\"os\")}\\n          ),\\n\\n          -- fetch all students affected by group overrides\\n          override_groups_students AS (\\n            SELECT\\n              gm.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{Group.quoted_table_name} g ON g.id = o.set_id\\n            INNER JOIN #{GroupMembership.quoted_table_name} gm ON gm.group_id = g.id\\n            WHERE\\n              o.set_type = 'Group' AND\\n              g.workflow_state <> 'deleted' AND\\n              gm.workflow_state = 'accepted'\\n              #{filter_students_sql(\"gm\")}\\n          ),\\n\\n          -- fetch all students affected by section overrides\\n          override_sections_students AS (\\n            SELECT\\n              e.user_id AS student_id,\\n              o.assignment_id,\\n              o.id AS override_id,\\n              date_trunc('minute', o.due_at) AS trunc_due_at,\\n              o.due_at,\\n              o.set_type AS override_type,\\n              o.due_at_overridden,\\n              1 AS priority\\n            FROM\\n              overrides o\\n            INNER JOIN #{CourseSection.quoted_table_name} s ON s.id = o.set_id\\n            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_section_id = s.id\\n            WHERE\\n              o.set_type = 'CourseSection' AND\\n              s.workflow_state <> 'deleted' AND\\n              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND\\n              e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n              #{filter_students_sql(\"e\")}\\n          ),\\n\\n          -- fetch all students who have an 'Everyone Else'\\n          -- due date applied to them from the assignment\\n          override_everyonelse_students AS (\\n            SELECT\\n              e.user_id AS student_id,\\n              a.id as assignment_id,\\n              NULL::integer AS override_id,\\n              date_trunc('minute', a.due_at) AS trunc_due_at,\\n              a.due_at,\\n              'Everyone Else'::varchar AS override_type,\\n              FALSE AS due_at_overridden,\\n              2 AS priority\\n            FROM\\n              models a\\n            INNER JOIN #{Enrollment.quoted_table_name} e ON e.course_id = a.context_id\\n            WHERE\\n              e.workflow_state NOT IN ('rejected', 'deleted') AND\\n              e.type IN ('StudentEnrollment', 'StudentViewEnrollment') AND\\n              a.only_visible_to_overrides IS NOT TRUE\\n              #{filter_students_sql(\"e\")}\\n          ),\\n\\n          -- join all these students together into a single table\\n          override_all_students AS (\\n            SELECT * FROM override_adhoc_students\\n            UNION ALL\\n            SELECT * FROM override_groups_students\\n            UNION ALL\\n            SELECT * FROM override_sections_students\\n            UNION ALL\\n            SELECT * FROM override_everyonelse_students\\n          ),\\n\\n          -- and pick the latest override date as the effective due date\\n          calculated_overrides AS (\\n            SELECT DISTINCT ON (student_id, assignment_id)\\n              *\\n            FROM override_all_students\\n            ORDER BY student_id ASC, assignment_id ASC, priority ASC, due_at_overridden DESC, due_at DESC NULLS FIRST\\n          ),\\n\\n          -- now find all grading periods, including both\\n          -- legacy course periods and newer account-level periods\\n          course_and_account_grading_periods AS (\\n              SELECT DISTINCT ON (gp.id)\\n                gp.id,\\n                date_trunc('minute', gp.start_date) AS start_date,\\n                date_trunc('minute', gp.end_date) AS end_date,\\n                date_trunc('minute', gp.close_date) AS close_date,\\n                gpg.course_id,\\n                gpg.account_id\\n              FROM\\n                models a\\n              INNER JOIN #{Course.quoted_table_name} c ON c.id = a.context_id\\n              INNER JOIN #{EnrollmentTerm.quoted_table_name} term ON c.enrollment_term_id = term.id\\n              LEFT OUTER JOIN #{GradingPeriodGroup.quoted_table_name} gpg ON\\n                  gpg.course_id = c.id OR gpg.id = term.grading_period_group_id\\n              LEFT OUTER JOIN #{GradingPeriod.quoted_table_name} gp ON gp.grading_period_group_id = gpg.id\\n              WHERE\\n                gpg.workflow_state = 'active' AND\\n                gp.workflow_state = 'active'\\n          ),\\n\\n          -- then filter down to the grading periods we care about:\\n          -- if legacy periods exist, only return those. Otherwise,\\n          -- return the account-level periods.\\n          applied_grading_periods AS (\\n            SELECT *\\n            FROM course_and_account_grading_periods\\n            WHERE\\n              EXISTS (\\n                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n              ) AND course_id IS NOT NULL\\n            UNION ALL\\n            SELECT *\\n            FROM course_and_account_grading_periods\\n            WHERE\\n              NOT EXISTS (\\n                SELECT 1 FROM course_and_account_grading_periods WHERE course_id IS NOT NULL\\n              ) AND account_id IS NOT NULL\\n          ),\\n\\n          -- infinite due dates are put in the last grading period.\\n          -- better to fetch it once since we'll likely reference it multiple times below\\n          last_period AS (\\n            SELECT id, close_date FROM applied_grading_periods ORDER BY end_date DESC LIMIT 1\\n          )\\n\\n          -- finally bring it all together!\\n          SELECT\\n            overrides.assignment_id,\\n            overrides.student_id,\\n            overrides.due_at,\\n            overrides.override_type,\\n            overrides.override_id,\\n            CASE\\n              -- check whether or not this due date falls in a closed grading period\\n              WHEN overrides.due_at IS NOT NULL AND '#{Time.zone.now.iso8601}'::timestamptz >= periods.close_date THEN TRUE\\n              -- when no explicit due date is provided, we treat it as if it's in the latest grading period\\n              WHEN overrides.due_at IS NULL AND\\n                  overrides.override_type <> 'Submission' AND\\n                  '#{Time.zone.now.iso8601}'::timestamptz >= (SELECT close_date FROM last_period) THEN TRUE\\n              ELSE FALSE\\n            END AS closed,\\n            CASE\\n              -- if infinite due date, put it in the last grading period\\n              WHEN overrides.due_at IS NULL AND\\n                  overrides.override_type <> 'Submission' THEN (SELECT id FROM last_period)\\n              -- otherwise, put it in whatever grading period id we found for it\\n              ELSE periods.id\\n            END AS grading_period_id\\n          FROM calculated_overrides overrides\\n          -- match the effective due date with its grading period\\n          LEFT OUTER JOIN applied_grading_periods periods ON\\n              periods.start_date < overrides.trunc_due_at AND overrides.trunc_due_at <= periods.end_date\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "EffectiveDueDates",
+        "method": "query"
+      },
+      "user_input": "([context.active_assignments] or assignment_collection).first.except(:order).select(:id).to_sql.join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a24eb960bc19ce612f38bed5022568261cf9a01c07a5347c200a5d71536556bc",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/account_notification.rb",
+      "line": 210,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AccountNotification.where(\"account_id IN (?) AND start_at <=? AND end_at >=?\", slice_account_ids, (Time.now.utc or Time.now.utc.end_of_day), (Time.now.utc or Time.now.utc.end_of_day).beginning_of_day).order(\"start_at DESC\").preload({ :account => :root_account }, :account_notification_roles => :role).joins(:account).where(\"domain_specific=? OR #{Account.resolved_root_account_id_sql}=?\", false, root_account.id)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountNotification",
+        "method": "AccountNotification.for_account"
+      },
+      "user_input": "Account.resolved_root_account_id_sql",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a7c54d7aabe9ba605ec006106ba7687b01f3d543d69f955909302caeb8382c1e",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1043,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"DROP TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "a9c106436f1f0f796335bb0952b9b05bf45319797fa4d093e95207eff71ce990",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/submission_search.rb",
+      "line": 112,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"#{User.sortable_name_order_by_clause(\"users\")} #{(\"DESC NULLS LAST\" or \"ASC\")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SubmissionSearch",
+        "method": "add_order_bys"
+      },
+      "user_input": "User.sortable_name_order_by_clause(\"users\")",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "acb766c09a1b84e9ea08d27d1677bf0c0cce0c66003733bb303d7ac71a89ee82",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/controllers/accounts_controller.rb",
+      "line": 1153,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "AccountReport.from(\"unnest('{#{AccountReport.available_reports.keys.join(\",\")}}'::text[]) report_types (name),\\n                LATERAL (#{@account.account_reports.active.where(\"report_type=name\").most_recent.complete.to_sql}) account_reports \")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountsController",
+        "method": "reports_tab"
+      },
+      "user_input": "AccountReport.available_reports.keys",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "b257d87ee5c0d939c2ff19f8701aed3f20770c75e85c6ed9922956144b45d629",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "gems/plugins/qti_exporter/lib/qti/converter.rb",
+      "line": 100,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{Qti.get_conversion_command(Dir.mktmpdir(\"qti_2_1\"), @package_root.root_path)}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Qti::Converter",
+        "method": "run_qti_converter"
+      },
+      "user_input": "Qti.get_conversion_command(Dir.mktmpdir(\"qti_2_1\"), @package_root.root_path)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "b301f09e1b31d56ea2fe657639f7ef7485dc1a77426adcc2346e68b853f70819",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/user.rb",
+      "line": 1900,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Course.active.select(\"courses.*, enrollments.type AS primary_enrollment,\\n                  #{Enrollment.type_rank_sql} AS primary_enrollment_rank,\\n                  enrollments.workflow_state AS primary_enrollment_state,\\n                  enrollments.created_at AS primary_enrollment_date\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "User",
+        "method": "courses_with_primary_enrollment"
+      },
+      "user_input": "Enrollment.type_rank_sql",
+      "confidence": "High",
+      "note": ""
+    },
+    {
       "warning_type": "Remote Code Execution",
       "warning_code": 24,
       "fingerprint": "b5ba030e599093d2a5047494736d8a61807935ee92704d7f289da07646c862e4",
       "check_name": "UnsafeReflection",
       "message": "Unsafe reflection method `const_get` called with parameter value",
       "file": "app/controllers/files_controller.rb",
-      "line": 879,
+      "line": 894,
       "link": "https://brakemanscanner.org/docs/warning_types/remote_code_execution/",
       "code": "Object.const_get(params[:context_type])",
       "render_path": null,
@@ -103,13 +1172,149 @@
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "d4f9e6a8ce7a250aada977714592207aa2f5edeed50a0c63a05fdbfa5bba54f6",
+      "fingerprint": "bfc5aa37d94de3fb455b8e59b7711d52a2b537fc8f4b183c459ad3dcb41aecea",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/course.rb",
+      "line": 799,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql(\"CASE WHEN courses.workflow_state='available' THEN 0 ELSE 1 END, #{best_unicode_collation_key(\"name\")}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Course",
+        "method": null
+      },
+      "user_input": "best_unicode_collation_key(\"name\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "c890ecf49f56bc04f77b5c49645f28eb3dc83c6da9ba94971b9bb8dbb7753c7f",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 479,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql((ary.each_with_index.inject(+\"CASE \") do\n (((string << \"WHEN #{col} IN (\") << Array(values).map do\n connection.quote(value)\n end.join(\", \")) << \") THEN #{i} \")\n end << \"ELSE #{ary.size} END\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "rank_sql"
+      },
+      "user_input": "ary.size",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cc5a72dd9261fe1cb32c539c0643976134aeb37ed032c358399d403f3d3225c9",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "gems/plugins/qti_exporter/lib/qti.rb",
+      "line": 92,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{Qti.get_conversion_command(File.join(dirname, \"qti_2_1\"), dirname)}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Qti",
+        "method": "s(:self).convert_xml"
+      },
+      "user_input": "Qti.get_conversion_command(File.join(dirname, \"qti_2_1\"), dirname)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "cd7537cc78c1ff7dacdfdb9318a6ae971bfcf9dca4785ffcf4a099b84dc0c0b8",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/assignments/needs_grading_count_query.rb",
+      "line": 144,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "joined_submissions.where(\"submissions.assignment_id = ?\\n  AND e.course_id = ?\\n  AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')\\n  AND e.workflow_state = 'active'\\n  AND #{Submission.needs_grading_conditions}\\n\", assignment, course)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Assignments::NeedsGradingCountQuery",
+        "method": "all_submissions"
+      },
+      "user_input": "Submission.needs_grading_conditions",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ce13d83a3a4c6b0fa37a16693db492fa88bb2470633f7c47228b9f5c19664cea",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1012,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"ALTER TABLE #{\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]} ADD temp_primary_key SERIAL PRIMARY KEY\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)]",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "cec8031bba49b8646b56c280ca44ed94a1faf8c9acb2bfee6ddcbbc3b8624df4",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/support_helpers/tii.rb",
+      "line": 114,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Assignment.joins(:submissions).where(updated_field.gt(@after_time)).where(updated_field.lt((Time.now - 1.hour))).where(\"submissions.#{like_error}\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SupportHelpers::Tii::ShardFixer",
+        "method": "load_broken_objects"
+      },
+      "user_input": "like_error",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "cf943f27ffad630d4ce885bc26aa6e169a537527edc37391f5b029de8c617ed3",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "lib/cc/importer/standard/quiz_converter.rb",
+      "line": 65,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{Qti.get_conversion_command(out_folder, qti_file)}`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "CC::Importer::Standard::QuizConverter",
+        "method": "run_qti_converter"
+      },
+      "user_input": "Qti.get_conversion_command(out_folder, qti_file)",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "cf9f78f247f3cb3e3eb9fb107b2c2e812cd6ac068864e06dc5be6795224eff01",
       "check_name": "SQL",
       "message": "Possible SQL injection",
       "file": "lib/grade_calculator.rb",
-      "line": 605,
+      "line": 583,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name}\\n          (\\n            enrollment_id, grading_period_id,\\n            #{columns_to_insert_or_update[:columns].join(\", \")},\\n            course_score, root_account_id, created_at, updated_at\\n          )\\n          SELECT\\n            enrollments.id as enrollment_id,\\n            #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id or \"NULL\")} as grading_period_id,\\n            #{columns_to_insert_or_update[:insert_values].join(\", \")},\\n            #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n            #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n            #{updated_at} as created_at,\\n            #{updated_at} as updated_at\\n          FROM #{Enrollment.quoted_table_name} enrollments\\n          WHERE\\n            enrollments.id IN (#{joined_enrollment_ids})\\n      ON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\n      DO UPDATE SET\\n          #{columns_to_insert_or_update[:update_values].join(\", \")},\\n          updated_at = excluded.updated_at,\\n          root_account_id = #{(course or Course.find(course)).root_account_id},\\n          -- if workflow_state was previously deleted for some reason, update it to active\\n          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
+      "code": "Score.connection.execute(\"\\n      INSERT INTO #{Score.quoted_table_name}\\n          (\\n            enrollment_id, grading_period_id,\\n            #{columns_to_insert_or_update[:columns].join(\", \")},\\n            course_score, root_account_id, created_at, updated_at\\n          )\\n          SELECT\\n            enrollments.id as enrollment_id,\\n            #{(opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id or \"NULL\")} as grading_period_id,\\n            #{columns_to_insert_or_update[:insert_values].join(\", \")},\\n            #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"FALSE\"\nelse\n  \"TRUE\"\nend} AS course_score,\\n            #{(course or Course.find(course)).root_account_id} AS root_account_id,\\n            #{updated_at} as created_at,\\n            #{updated_at} as updated_at\\n          FROM #{Enrollment.quoted_table_name} enrollments\\n          WHERE\\n            enrollments.id IN (#{joined_enrollment_ids})\\n          ORDER BY enrollment_id\\n      ON CONFLICT #{(\"(enrollment_id, grading_period_id) WHERE grading_period_id IS NOT NULL\" or \"(enrollment_id) WHERE course_score\")}\\n      DO UPDATE SET\\n          #{columns_to_insert_or_update[:update_values].join(\", \")},\\n          updated_at = excluded.updated_at,\\n          root_account_id = #{(course or Course.find(course)).root_account_id},\\n          -- if workflow_state was previously deleted for some reason, update it to active\\n          workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')\\n    \")",
       "render_path": null,
       "location": {
         "type": "method",
@@ -118,29 +1323,261 @@
       },
       "user_input": "columns_to_insert_or_update[:columns].join(\", \")",
       "confidence": "Medium",
-      "note": "values being inserted do not come from user input."
+      "note": ""
     },
     {
       "warning_type": "SQL Injection",
       "warning_code": 0,
-      "fingerprint": "d8b569ca9d9f1bc701f854f35c463b45b8c69c3e0909033ccf2fc96a9d630130",
+      "fingerprint": "d20c023657e21d01d9b4c16ff26d7b5cc8ba74da73000106494ccb868ee7ba61",
       "check_name": "SQL",
       "message": "Possible SQL injection",
-      "file": "lib/grade_calculator.rb",
-      "line": 642,
+      "file": "config/initializers/active_record.rb",
+      "line": 523,
       "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "ScoreMetadata.connection.execute(\"\\n      INSERT INTO #{ScoreMetadata.quoted_table_name}\\n        (score_id, calculation_details, created_at, updated_at)\\n        SELECT\\n          scores.id AS score_id,\\n          CASE enrollments.user_id\\n            #{{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")}\\n            ELSE NULL\\n          END AS calculation_details,\\n          #{updated_at} AS created_at,\\n          #{updated_at} AS updated_at\\n        FROM #{Score.quoted_table_name} scores\\n        INNER JOIN #{Enrollment.quoted_table_name} enrollments ON\\n          enrollments.id = scores.enrollment_id\\n        LEFT OUTER JOIN #{ScoreMetadata.quoted_table_name} metadata ON\\n          metadata.score_id = scores.id\\n        WHERE\\n          scores.enrollment_id IN (#{joined_enrollment_ids}) AND\\n          scores.assignment_group_id IS NULL AND\\n          #{if opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period] then\n  \"scores.grading_period_id = #{opts.reverse_merge(:emit_live_event => true, :ignore_muted => true, :update_all_grading_period_scores => true, :update_course_score => true, :only_update_course_gp_metadata => false, :only_update_points => false)[:grading_period].id}\"\nelse\n  \"scores.course_score IS TRUE\"\nend}\\n      ON CONFLICT (score_id)\\n      DO UPDATE SET\\n        calculation_details = excluded.calculation_details,\\n        updated_at = excluded.updated_at\\n      ;\\n    \")",
+      "code": "Arel.sql(\"#{column} #{direction.to_s.upcase}#{(\" NULLS FIRST\" or \" NULLS LAST\" if (first_or_last == :last) and (direction == :desc))}\".strip)",
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "GradeCalculator",
-        "method": "save_course_and_grading_period_metadata"
+        "class": "ActiveRecord::Base",
+        "method": "nulls"
       },
-      "user_input": "{ user_id => ({ :current => ({ :dropped => scores[:current][:dropped] }), :final => ({ :dropped => scores[:final][:dropped] }) }) }.map do\n \"WHEN #{user_id} THEN cast('#{dropped.to_json}' as json)\"\n end.join(\" \")",
+      "user_input": "column",
       "confidence": "Medium",
-      "note": "values being inserted do not come from user input."
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "d727f7352be9b4271b8dd951a884b5a33b768a4d05c4d17108a122ec1f0b5888",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "gems/plugins/account_reports/lib/account_reports/course_reports.rb",
+      "line": 82,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "c.attachments.active.sum(\"COALESCE(CASE when size < #{Attachment.minimum_size_for_quota} THEN #{Attachment.minimum_size_for_quota} ELSE size END, 0)\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountReports::CourseReports",
+        "method": "course_storage"
+      },
+      "user_input": "Attachment.minimum_size_for_quota",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "da343c69cfabbf445c24a84fe8d24eea75e1b55d910c5365b8e4234e521d2b58",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 448,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Arel.sql((if (ActiveRecord::Base.configurations[Rails.env][\"adapter\"] == \"postgresql\") then\n  unless @collkey.key?(Shard.current.database_server.id) then\n    @collkey ||= {}\n    @collkey[Shard.current.database_server.id] = connection.extension(:pg_collkey).schema\n  end\n  if collation = (Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false) then\n    \"(#{col} COLLATE #{(Canvas::ICU.choose_pg12_collation(connection.icu_collations) and false)})\"\n  else\n    if schema = connection.extension(:pg_collkey).schema then\n      \"#{connection.extension(:pg_collkey).schema}.collkey(#{col}, '#{Canvas::ICU.locale_for_collation}', false, 3, true)\"\n    else\n      \"CAST(LOWER(replace(#{col}, '\\\\', '\\\\\\\\')) AS bytea)\"\n    end\n  end\nelse\n  col\nend))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": "best_unicode_collation_key"
+      },
+      "user_input": "col",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "da367762458bbc31e1a84e7b7c2f27927875d2e9c0e94e39d51d27c1a5ef10d3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1009,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"CREATE INDEX \\\"temp_primary_key\\\" ON #{connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)])}(#{connection.quote_column_name(primary_key)})\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "connection.quote_local_table_name(\"#{table_name}_in_batches_temp_table_#{apply_limits(self, start, finish).to_sql.hash.abs.to_s(36)}\"[(-63..-1)])",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "dabae4a777574d01b57b41ada118b10e493d7d4d45c89a12b71dd497869423e3",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 864,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.execute(\"CLOSE #{cursor}\")",
+      "render_path": null,
+      "location": null,
+      "user_input": "cursor",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e04fdc661f4e9d3c39ceee04418bf9d017f9c6a72da9a479639ad44f8b958c94",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/account.rb",
+      "line": 962,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Account.find_by_sql(\"WITH RECURSIVE t AS (\\n  SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id.parent_account_id).first}\\n  UNION\\n  SELECT accounts.* FROM #{Account.quoted_table_name} INNER JOIN t ON accounts.id=t.parent_account_id\\n)\\nSELECT * FROM t\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Account",
+        "method": "Account.account_chain"
+      },
+      "user_input": "Shard.local_id_for(starting_account_id.parent_account_id).first",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "e237e4c3b49f118040123823a48d1367eb64a6bdf7e2719f43dc9f8b978ae1fb",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 731,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "where(\"#{key}<=? AND #{key}>?\", Shard::IDS_PER_SHARD, 0)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Base",
+        "method": null
+      },
+      "user_input": "key",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ed48c3f339ecd5816f93b93f09cef84c3e41d00c47adbda021e021add96242d6",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "gems/plugins/account_reports/lib/account_reports/sis_exporter.rb",
+      "line": 712,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "GroupCategory.joins(\"LEFT JOIN #{Course.quoted_table_name} c ON c.id = group_categories.context_id\\n                   AND group_categories.context_type = 'Course'\").joins(\"LEFT JOIN #{Account.quoted_table_name} a ON a.id = group_categories.context_id\\n                   AND group_categories.context_type = 'Account'\").where(\"a.id IN (#{Account.sub_account_ids_recursive_sql(account.id)}) OR a.id=? OR EXISTS (?)\", account, CourseAccountAssociation.where(\"course_id=c.id\").where(:account_id => account))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "AccountReports::SisExporter",
+        "method": "group_categories"
+      },
+      "user_input": "Account.sub_account_ids_recursive_sql(account.id)",
+      "confidence": "High",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "ed7c9737aa0322745fdf46f8b995b7cbeb46a1823508dde7374a7a3a290a9ab9",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "config/initializers/active_record.rb",
+      "line": 1529,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "connection.select_value(\"SELECT COUNT(*) FROM pg_proc WHERE proname='#{procname}'\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ActiveRecord::Migration",
+        "method": "has_postgres_proc?"
+      },
+      "user_input": "procname",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f0e794152474fca2b5322b6a44ab57a4ee9e27fb14107f64e47d82190a40a74c",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "lib/due_date_cacher.rb",
+      "line": 328,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "Submission.where(\"(assignment_id, user_id) IN (#{assignment_and_student_id_values(:entries => entries).join(\",\")})\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DueDateCacher",
+        "method": "record_due_date_changes_for_auditable_assignments!"
+      },
+      "user_input": "assignment_and_student_id_values(:entries => entries).join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f2fc169c8452accc4bc52f6844fdc66f6728daa4a4401b68a03cf94c606d7dea",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/sis_batch.rb",
+      "line": 279,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "SisBatch.connection.select_value(\"UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state\\n\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "SisBatch",
+        "method": "fast_update_progress"
+      },
+      "user_input": "val",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "SQL Injection",
+      "warning_code": 0,
+      "fingerprint": "f376bb26f5f4a866aa2143116b7514c050c517143f442c55e4805c3be1649615",
+      "check_name": "SQL",
+      "message": "Possible SQL injection",
+      "file": "app/models/developer_key_account_binding.rb",
+      "line": 73,
+      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
+      "code": "DeveloperKeyAccountBinding.joins(\"JOIN unnest('#{\"{#{account_ids.join(\",\")}}\"}'::int8[]) WITH ordinality AS i (id, ord) ON i.id=account_id\")",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "DeveloperKeyAccountBinding",
+        "method": "DeveloperKeyAccountBinding.find_in_account_priority"
+      },
+      "user_input": "account_ids.join(\",\")",
+      "confidence": "Medium",
+      "note": ""
+    },
+    {
+      "warning_type": "Command Injection",
+      "warning_code": 14,
+      "fingerprint": "f59b869b789f2caae26c23664cb7cbc2ef3fe560c29848a9ae1580b506f301af",
+      "check_name": "Execute",
+      "message": "Possible command injection",
+      "file": "gems/plugins/qti_exporter/lib/qti.rb",
+      "line": 33,
+      "link": "https://brakemanscanner.org/docs/warning_types/command_injection/",
+      "code": "`#{PYTHON_MIGRATION_EXECUTABLE} --version 2>&1`",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "Qti",
+        "method": null
+      },
+      "user_input": "PYTHON_MIGRATION_EXECUTABLE",
+      "confidence": "Medium",
+      "note": ""
     }
   ],
-  "updated": "2020-06-09 16:34:47 -0500",
-  "brakeman_version": "4.8.2"
+  "updated": "2021-09-24 14:46:20 -0600",
+  "brakeman_version": "5.1.1"
 }

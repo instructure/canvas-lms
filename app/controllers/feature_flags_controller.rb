@@ -164,12 +164,11 @@ class FeatureFlagsController < ApplicationController
 
       flags = features.map { |fd|
         @context.lookup_feature_flag(fd.feature,
-          override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
-          skip_cache: skip_cache,
-          # Hide flags that are forced ON at a higher level
-          # Undocumented flag for frontend use only
-          hide_inherited_enabled: params[:hide_inherited_enabled]
-        )
+                                     override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
+                                     skip_cache: skip_cache,
+                                     # Hide flags that are forced ON at a higher level
+                                     # Undocumented flag for frontend use only
+                                     hide_inherited_enabled: params[:hide_inherited_enabled])
       }.compact
 
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
@@ -191,8 +190,8 @@ class FeatureFlagsController < ApplicationController
   #   ["fancy_wickets", "automatic_essay_grading", "telepathic_navigation"]
   def enabled_features
     if authorized_action(@context, @current_user, :read)
-      features = Feature.applicable_features(@context).map { |fd| @context.lookup_feature_flag(fd.feature) }.compact.
-                   select { |ff| ff.enabled? }.map(&:feature)
+      features = Feature.applicable_features(@context).map { |fd| @context.lookup_feature_flag(fd.feature) }.compact
+                        .select { |ff| ff.enabled? }.map(&:feature)
       render json: features
     end
   end
@@ -233,13 +232,15 @@ class FeatureFlagsController < ApplicationController
   def show
     if authorized_action(@context, @current_user, :read)
       return render json: { message: "missing feature parameter" }, status: :bad_request unless params[:feature].present?
+
       feature = params[:feature]
       raise ActiveRecord::RecordNotFound unless Feature.definitions.has_key?(feature.to_s)
+
       flag = @context.lookup_feature_flag(feature,
-        override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
-        skip_cache: @context.grants_right?(@current_user, session, :manage_feature_flags)
-      )
+                                          override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
+                                          skip_cache: @context.grants_right?(@current_user, session, :manage_feature_flags))
       raise ActiveRecord::RecordNotFound unless flag
+
       render json: feature_flag_json(flag, @context, @current_user, session)
     end
   end
@@ -273,12 +274,14 @@ class FeatureFlagsController < ApplicationController
       current_flag = @context.lookup_feature_flag(params[:feature], skip_cache: true)
       if current_flag
         return render json: { message: "higher account disallows setting feature flag" }, status: :forbidden if current_flag.locked?(@context)
+
         prior_state = current_flag.state
       end
 
       # require site admin privileges to unhide a hidden feature
       if !current_flag && feature_def.hidden?
         return render json: { message: "invalid feature" }, status: :bad_request unless Account.site_admin.grants_right?(@current_user, session, :read)
+
         prior_state = 'hidden'
       end
 
@@ -290,6 +293,7 @@ class FeatureFlagsController < ApplicationController
         if transitions[params[:state]] && transitions[params[:state]]['locked']
           return render json: { message: "state change not allowed" }, status: :forbidden
         end
+
         new_attrs[:state] = params[:state]
       end
 
@@ -321,9 +325,11 @@ class FeatureFlagsController < ApplicationController
   def delete
     if authorized_action(@context, @current_user, :manage_feature_flags)
       return render json: { message: "must specify feature" }, status: :bad_request unless params[:feature].present?
+
       flag = @context.feature_flags.find_by!(feature: params[:feature])
       prior_state = flag.state
       return render json: { message: "flag is locked" }, status: :forbidden if flag.locked?(@context)
+
       flag.current_user = @current_user # necessary step for audit log
       if flag.destroy
         feature_def = Feature.definitions[params[:feature]]
@@ -338,8 +344,8 @@ class FeatureFlagsController < ApplicationController
   def create_or_update_feature_flag(attributes, current_flag = nil)
     FeatureFlag.unique_constraint_retry do
       new_flag = @context.feature_flags.find(current_flag.id) if current_flag &&
-          !current_flag.default? && !current_flag.new_record? &&
-          current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
+                                                                 !current_flag.default? && !current_flag.new_record? &&
+                                                                 current_flag.context_type == @context.class.name && current_flag.context_id == @context.id
       new_flag ||= @context.feature_flags.build
       new_flag.assign_attributes(attributes)
       new_flag.current_user = @current_user # necessary step for audit log
@@ -347,5 +353,4 @@ class FeatureFlagsController < ApplicationController
       [new_flag, result]
     end
   end
-
 end

@@ -28,12 +28,11 @@ describe AuthenticationProvidersPresenter do
     end
   end
 
-  def stubbed_account(providers=[])
+  def stubbed_account(providers = [])
     double(authentication_providers: double(active: providers))
   end
 
   describe "#configs" do
-
     it "pulls configs from account" do
       config2 = double
       account = stubbed_account([double, config2])
@@ -53,12 +52,12 @@ describe AuthenticationProvidersPresenter do
       account = double()
       expect(account).to receive(:authentication_providers).exactly(1).times.and_return(double(active: []))
       presenter = described_class.new(account)
-      5.times{ presenter.configs }
+      5.times { presenter.configs }
     end
   end
 
   describe "SAML view helpers" do
-    let(:presenter){ described_class.new(double) }
+    let(:presenter) { described_class.new(double) }
 
     describe "#saml_identifiers" do
       it "is empty when saml disabled" do
@@ -79,7 +78,6 @@ describe AuthenticationProvidersPresenter do
       end
 
       context "when saml enabled" do
-
         before do
           allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(true)
         end
@@ -142,14 +140,15 @@ describe AuthenticationProvidersPresenter do
       AuthenticationProvider.valid_auth_types.each do |auth_type|
         klass = AuthenticationProvider.find_sti_class(auth_type)
         next if klass == AuthenticationProvider::SAML
+
         allow(klass).to receive(:enabled?).and_return(true)
       end
 
       allow(AuthenticationProvider::SAML).to receive(:enabled?).and_return(false)
       presenter = described_class.new(stubbed_account)
       options = presenter.sso_options
-      expect(options).to include({name: 'CAS', value: 'cas'})
-      expect(options).to include({name: 'LinkedIn', value: 'linkedin'})
+      expect(options).to include({ name: 'CAS', value: 'cas' })
+      expect(options).to include({ name: 'LinkedIn', value: 'linkedin' })
     end
 
     it "includes saml if saml enabled" do
@@ -159,15 +158,15 @@ describe AuthenticationProvidersPresenter do
       end
 
       presenter = described_class.new(stubbed_account)
-      expect(presenter.sso_options).to include({name: 'SAML', value: 'saml'})
+      expect(presenter.sso_options).to include({ name: 'SAML', value: 'saml' })
     end
   end
 
   describe "ip_configuration" do
     def stub_setting(val)
-      allow(Setting).to receive(:get).
-        with('account_authorization_config_ip_addresses', nil).
-        and_return(val)
+      allow(Setting).to receive(:get)
+        .with('account_authorization_config_ip_addresses', nil)
+        .and_return(val)
     end
 
     describe "#ips_configured?" do
@@ -215,7 +214,7 @@ describe AuthenticationProvidersPresenter do
   end
 
   describe "#login_name" do
-    let(:account){ Account.new }
+    let(:account) { Account.new }
 
     it "uses the one from the account if available" do
       account.login_handle_name = "LoginName"
@@ -254,9 +253,9 @@ describe AuthenticationProvidersPresenter do
   end
 
   describe "#position_options" do
-    let(:config){ AuthenticationProvider::SAML.new }
-    let(:configs){ [config, config, config, config] }
-    let(:account){ stubbed_account(configs) }
+    let(:config) { AuthenticationProvider::SAML.new }
+    let(:configs) { [config, config, config, config] }
+    let(:account) { stubbed_account(configs) }
 
     before do
       allow(configs).to receive(:all).and_return(AuthenticationProvider)
@@ -265,12 +264,12 @@ describe AuthenticationProvidersPresenter do
     it "generates a list from the saml config size" do
       allow(config).to receive(:new_record?).and_return(false)
       options = described_class.new(account).position_options(config)
-      expect(options).to eq([[1,1],[2,2],[3,3],[4,4]])
+      expect(options).to eq([[1, 1], [2, 2], [3, 3], [4, 4]])
     end
 
     it "tags on the 'Last' option if this config is new" do
       options = described_class.new(account).position_options(config)
-      expect(options).to eq([["Last",nil],[1,1],[2,2],[3,3],[4,4]])
+      expect(options).to eq([["Last", nil], [1, 1], [2, 2], [3, 3], [4, 4]])
     end
   end
 

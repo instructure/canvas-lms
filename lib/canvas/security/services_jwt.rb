@@ -24,16 +24,18 @@ class Canvas::Security::ServicesJwt
 
   attr_reader :token_string, :is_wrapped
 
-  def initialize(raw_token_string, wrapped=true)
+  def initialize(raw_token_string, wrapped = true)
     @is_wrapped = wrapped
     if raw_token_string.nil?
       raise ArgumentError, "Cannot decode nil token string"
     end
+
     @token_string = raw_token_string
   end
 
   def wrapper_token
     return {} unless is_wrapped
+
     raw_wrapper_token = Canvas::Security.base64_decode(token_string)
     keys = [signing_secret]
     keys << previous_signing_secret if previous_signing_secret
@@ -42,10 +44,10 @@ class Canvas::Security::ServicesJwt
 
   def original_token(ignore_expiration: false)
     original_crypted_token = if is_wrapped
-      wrapper_token[:user_token]
-    else
-      Canvas::Security.base64_decode(token_string)
-    end
+                               wrapper_token[:user_token]
+                             else
+                               Canvas::Security.base64_decode(token_string)
+                             end
     Canvas::Security.decrypt_services_jwt(
       original_crypted_token,
       signing_secret,
@@ -58,6 +60,7 @@ class Canvas::Security::ServicesJwt
     # tried the relevent keys, so we need not try anything else
     # if original_crypted_token is nil.
     raise unless original_crypted_token && previous_signing_secret
+
     Canvas::Security.decrypt_services_jwt(
       original_crypted_token,
       previous_signing_secret,
@@ -82,10 +85,11 @@ class Canvas::Security::ServicesJwt
     original_token[:exp]
   end
 
-  def self.generate(payload_data, base64=true)
+  def self.generate(payload_data, base64 = true)
     payload = create_payload(payload_data)
     crypted_token = Canvas::Security.create_encrypted_jwt(payload, signing_secret, encryption_secret)
     return crypted_token unless base64
+
     Canvas::Security.base64_encode(crypted_token)
   end
 
@@ -131,25 +135,25 @@ class Canvas::Security::ServicesJwt
     end
 
     for_user(domain, user,
-      real_user: real_user,
-      workflows: payload[:workflows],
-      context: context)
+             real_user: real_user,
+             workflows: payload[:workflows],
+             context: context)
   end
-
 
   def self.create_payload(payload_data)
     if payload_data[:sub].nil?
       raise ArgumentError, "Cannot generate a services JWT without a 'sub' entry"
     end
+
     timestamp = Time.zone.now.to_i
     payload_data.merge({
-      iss: "Canvas",
-      aud: ["Instructure"],
-      exp: timestamp + 3600,  # token is good for 1 hour
-      nbf: timestamp - 30,    # don't accept the token in the past
-      iat: timestamp,         # tell when the token was issued
-      jti: SecureRandom.uuid, # unique identifier
-    })
+                         iss: "Canvas",
+                         aud: ["Instructure"],
+                         exp: timestamp + 3600,  # token is good for 1 hour
+                         nbf: timestamp - 30,    # don't accept the token in the past
+                         iat: timestamp,         # tell when the token was issued
+                         jti: SecureRandom.uuid, # unique identifier
+                       })
   end
 
   def self.encryption_secret

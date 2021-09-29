@@ -24,7 +24,7 @@ module ConditionalRelease
     belongs_to :scoring_range, required: true
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, inverse_of: :assignment_set, dependent: :destroy
     accepts_nested_attributes_for :assignment_set_associations, allow_destroy: true
-    acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
+    acts_as_list :scope => { :scoring_range => self, :deleted_at => nil }
     has_one :rule, through: :scoring_range
     belongs_to :root_account, :class_name => "Account"
 

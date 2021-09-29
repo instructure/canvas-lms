@@ -24,8 +24,7 @@ module ContextModulesCommon
     fixture_file_upload('docs/txt.txt', 'text/plain', true)
   end
 
-
-  def create_modules(number_to_create, published=false)
+  def create_modules(number_to_create, published = false)
     modules = []
     number_to_create.times do |i|
       m = @course.context_modules.create!(:name => "module #{i}")
@@ -48,8 +47,8 @@ module ContextModulesCommon
   def module_setup
     @module = @course.context_modules.create!(:name => "module")
 
-    #create module items
-    #add first and last module items to get previous and next displayed
+    # create module items
+    # add first and last module items to get previous and next displayed
     @assignment1 = @course.assignments.create!(:title => 'first item in module')
     @assignment2 = @course.assignments.create!(:title => 'assignment')
     @assignment3 = @course.assignments.create!(:title => 'last item in module')
@@ -58,7 +57,7 @@ module ContextModulesCommon
     @wiki = @course.wiki_pages.create!(:title => "wiki", :body => 'hi')
     @discussion = @course.discussion_topics.create!(:title => 'discussion')
 
-    #add items to module
+    # add items to module
     @module.add_item :type => 'assignment', :id => @assignment1.id
     @module.add_item :type => 'assignment', :id => @assignment2.id
     @module.add_item :type => 'quiz', :id => @quiz.id
@@ -69,7 +68,7 @@ module ContextModulesCommon
     # add external tool
     @tool = @course.context_external_tools.create!(:name => "new tool", :consumer_key => "key",
                                                    :shared_secret => "secret", :domain => 'example.com',
-                                                   :custom_fields => {'a' => '1', 'b' => '2'})
+                                                   :custom_fields => { 'a' => '1', 'b' => '2' })
     @external_tool_tag = @module.add_item({
                                             :type => 'context_external_tool',
                                             :title => 'Example',
@@ -77,7 +76,7 @@ module ContextModulesCommon
                                             :new_tab => '0'
                                           })
     @external_tool_tag.publish!
-    #add external url
+    # add external url
     @external_url_tag = @module.add_item({
                                            :type => 'external_url',
                                            :title => 'pls view',
@@ -85,7 +84,7 @@ module ContextModulesCommon
                                          })
     @external_url_tag.publish!
 
-    #add another assignment at the end to create a bookend, provides next and previous for external url
+    # add another assignment at the end to create a bookend, provides next and previous for external url
     @module.add_item :type => 'assignment', :id => @assignment3.id
   end
 
@@ -146,23 +145,23 @@ module ContextModulesCommon
   def mark_as_done_setup
     @mark_done_module = create_context_module('Mark Done Module')
     page = @course.wiki_pages.create!(:title => "The page", :body => 'hi')
-    @tag = @mark_done_module.add_item({:id => page.id, :type => 'wiki_page'})
-    @mark_done_module.completion_requirements = {@tag.id => {:type => 'must_mark_done'}}
+    @tag = @mark_done_module.add_item({ :id => page.id, :type => 'wiki_page' })
+    @mark_done_module.completion_requirements = { @tag.id => { :type => 'must_mark_done' } }
     @mark_done_module.save!
   end
 
   def navigate_to_wikipage(title)
     els = ff('.context_module_item')
-    el = els.find {|e| e.text =~ /#{title}/}
+    el = els.find { |e| e.text =~ /#{title}/ }
     el.find_element(:css, 'a.title').click
     wait_for_ajaximations
   end
 
   def create_additional_assignment_for_module_1
     @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
-    @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
-                                         @tag_4.id => {:type => 'must_view'}}
+    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
+    @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' },
+                                          @tag_4.id => { :type => 'must_view' } }
     @module_1.save!
   end
 
@@ -195,7 +194,7 @@ module ContextModulesCommon
     f('.add_module_item_link').click
     wait_for_ajaximations
     select_module_item('#add_module_item_select', "File")
-    file_names.each { |item_name| select_module_item(item_select_selector + ' .module_item_select', item_name)}
+    file_names.each { |item_name| select_module_item(item_select_selector + ' .module_item_select', item_name) }
     scroll_to(f('.add_item_button.ui-button'))
     f('.add_item_button.ui-button').click
     wait_for_ajaximations
@@ -314,15 +313,15 @@ module ContextModulesCommon
 
   def add_non_requirement
     @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
+    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
     @module_1.save!
   end
 
   def add_min_score_assignment
     @assignment_4 = @course.assignments.create!(:title => "assignment 4")
-    @tag_4 = @module_1.add_item({:id => @assignment_4.id, :type => 'assignment'})
-    @module_1.completion_requirements = {@tag_1.id => {:type => 'must_view'},
-                                         @tag_4.id => {:type => 'min_score', :min_score => 90}}
+    @tag_4 = @module_1.add_item({ :id => @assignment_4.id, :type => 'assignment' })
+    @module_1.completion_requirements = { @tag_1.id => { :type => 'must_view' },
+                                          @tag_4.id => { :type => 'min_score', :min_score => 90 } }
     @module_1.require_sequential_progress = false
     @module_1.save!
   end
@@ -362,21 +361,22 @@ module ContextModulesCommon
 
   def wait_for_modules_ui
     return unless need_to_wait_for_modules_ui?
+
     # context_modules.js has some setTimeout(..., 1000) calls
     # before it adds click handlers and drag/drop
     sleep 2
     @already_waited_for_modules_ui = true
   end
 
-   def verify_edit_item_form
-     f('.context_module_item .al-trigger').click
-     wait_for_ajaximations
-     f('.edit_item_link').click
-     wait_for_ajaximations
-     expect(f('#edit_item_form')).to be_displayed
-     expect(f('#content_tag_title')).to be_displayed
-     expect(f('#content_tag_indent_select')).to be_displayed
-   end
+  def verify_edit_item_form
+    f('.context_module_item .al-trigger').click
+    wait_for_ajaximations
+    f('.edit_item_link').click
+    wait_for_ajaximations
+    expect(f('#edit_item_form')).to be_displayed
+    expect(f('#content_tag_title')).to be_displayed
+    expect(f('#content_tag_indent_select')).to be_displayed
+  end
 
   def lock_check_click(form)
     move_to_click('label[for=unlock_module_at]')

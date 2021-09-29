@@ -39,6 +39,7 @@ module Latex
     end
 
     private
+
     def mathman_parse
       target = :mml
       escaped = CGI.escape(latex)
@@ -50,9 +51,9 @@ module Latex
         request_id_signature = CanvasSecurity.sign_hmac_sha512(request_id)
         val = Canvas.timeout_protection("mathman") do
           response = CanvasHttp.get(url, {
-            'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
-            'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
-          })
+                                      'X-Request-Context-Id' => CanvasSecurity.base64_encode(request_id),
+                                      'X-Request-Context-Signature' => CanvasSecurity.base64_encode(request_id_signature)
+                                    })
           if response.code.to_i == 200
             response.body
           else
@@ -62,6 +63,7 @@ module Latex
           end
         end
         return unless val # probably shouldn't cache a nil value
+
         val
       end
     end

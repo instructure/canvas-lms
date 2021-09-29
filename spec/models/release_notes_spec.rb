@@ -24,18 +24,17 @@ require 'spec_helper'
 # a dynamo model that handles its own persistence, and so it is much more important
 # to ensure values are persisted correctly
 describe ReleaseNote do
-
   around(:each) do |example|
     override_dynamic_settings(private: { canvas: { 'release_notes.yml': {
       ddb_endpoint: ENV.fetch('DDB_ENDPOINT', 'http://dynamodb:8000/'),
       ddb_table_name: "canvas_test_release_notes#{ENV.fetch('PARALLEL_INDEX', '')}"
-    }.to_json }}) do
+    }.to_json } }) do
       ReleaseNotes::DevUtils.initialize_ddb_for_development!(recreate: true)
       example.run
     end
   end
 
-  it 'should persist all attributes' do
+  it 'persists all attributes' do
     show_at = Time.now.utc - 1.hour
     # For validaton later, since subsecond timestamps are lost and that's fine
     show_at = show_at.change(usec: 0)
@@ -54,7 +53,7 @@ describe ReleaseNote do
     expect(note.published).to be true
   end
 
-  it 'should persist languages' do
+  it 'persists languages' do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
     note.target_roles = ['student', 'ta']
@@ -75,7 +74,7 @@ describe ReleaseNote do
     expect(note['en'][:url]).to eq('https://example.com')
   end
 
-  it 'should show the notes in latest by category when published' do
+  it 'shows the notes in latest by category when published' do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
     note.target_roles = ['student', 'ta']
@@ -92,7 +91,7 @@ describe ReleaseNote do
     expect(notes.length).to eq(0)
   end
 
-  it 'should not show the notes in latest except when published' do
+  it 'does not show the notes in latest except when published' do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
     note.target_roles = ['student', 'ta']
@@ -118,7 +117,7 @@ describe ReleaseNote do
     expect(notes.length).to eq(0)
   end
 
-  it 'should remvove published notes when deleted' do
+  it 'remvoves published notes when deleted' do
     show_at = Time.now.utc - 1.hour
     note = ReleaseNote.new
     note.target_roles = ['student', 'ta']
@@ -137,7 +136,7 @@ describe ReleaseNote do
     expect(notes.length).to eq(0)
   end
 
-  it 'should not show future notes' do
+  it 'does not show future notes' do
     show_at = Time.now.utc + 1.hour
     note = ReleaseNote.new
     note.target_roles = ['student', 'ta']

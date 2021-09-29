@@ -48,6 +48,7 @@ module ConditionalRelease
 
     def self.rules_for(context, student, session)
       return unless enabled_in_context?(context)
+
       rules_data(context, student, session)
     end
 
@@ -66,7 +67,7 @@ module ConditionalRelease
       rules = active_rules(assignment.context, current_user, session)
       return nil unless rules
 
-      rules.find {|r| r['trigger_assignment'] == assignment.id.to_s || r['trigger_assignment_id'] == assignment.id}
+      rules.find { |r| r['trigger_assignment'] == assignment.id.to_s || r['trigger_assignment_id'] == assignment.id }
     end
 
     def self.active_rules(course, current_user, session)
@@ -118,6 +119,7 @@ module ConditionalRelease
 
       def assignment_attributes(assignment)
         return nil unless assignment.present?
+
         {
           id: assignment.id,
           title: assignment.title,
@@ -131,25 +133,27 @@ module ConditionalRelease
 
       def rules_data(course, student, session = {})
         return [] if course.blank? || student.blank?
+
         rules_data =
           ::Rails.cache.fetch(['conditional_release_rules_for_student2', student.cache_key(:submissions), course.cache_key(:conditional_release)].cache_key) do
             rules = course.conditional_release_rules.active.preload(Rule.preload_associations).to_a
 
             # ignore functionally empty rules
-            rules.reject!{|r| r.scoring_ranges.all?{|sr| sr.assignment_sets.all?{|s| s.assignment_set_associations.empty?}}}
+            rules.reject! { |r| r.scoring_ranges.all? { |sr| sr.assignment_sets.all? { |s| s.assignment_set_associations.empty? } } }
 
             trigger_assignments = course.assignments.where(:id => rules.map(&:trigger_assignment_id)).to_a.index_by(&:id)
-            trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys).
-              for_user(student).in_workflow_state(:graded).posted.to_a.index_by(&:assignment_id)
+            trigger_submissions = course.submissions.where(:assignment_id => trigger_assignments.keys)
+                                        .for_user(student).in_workflow_state(:graded).posted.to_a.index_by(&:assignment_id)
 
             assigned_set_ids = ConditionalRelease::AssignmentSetAction.current_assignments(
-              student, rules.flat_map(&:scoring_ranges).flat_map(&:assignment_sets)).pluck(:assignment_set_id)
+              student, rules.flat_map(&:scoring_ranges).flat_map(&:assignment_sets)
+            ).pluck(:assignment_set_id)
             rules.map do |rule|
               trigger_assignment = trigger_assignments[rule.trigger_assignment_id]
               trigger_sub = trigger_submissions[trigger_assignment.id]
               if trigger_sub&.score
                 relative_score = ConditionalRelease::Stats.percent_from_points(trigger_sub.score, trigger_assignment.points_possible)
-                assignment_sets = rule.scoring_ranges.select{|sr| sr.contains_score(relative_score)}.flat_map(&:assignment_sets)
+                assignment_sets = rule.scoring_ranges.select { |sr| sr.contains_score(relative_score) }.flat_map(&:assignment_sets)
                 selected_set_id =
                   if assignment_sets.length == 1
                     assignment_sets.first.id
@@ -159,7 +163,7 @@ module ConditionalRelease
               end
               assignment_sets_data = (assignment_sets || []).as_json(
                 include_root: false, except: [:root_account_id, :deleted_at],
-                include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}}
+                include: { assignment_set_associations: { except: [:root_account_id, :deleted_at] } }
               ).map(&:deep_symbolize_keys)
               rule.as_json(include_root: false, except: [:root_account_id, :deleted_at]).merge(
                 locked: relative_score.blank?,
@@ -172,7 +176,7 @@ module ConditionalRelease
         # to get the assignment data in when we're not maintaining back compat
         referenced_assignment_ids = rules_data.map do |rule_hash|
           rule_hash[:assignment_sets].map do |set_hash|
-            set_hash[:assignment_set_associations].map{|assoc_hash| assoc_hash[:assignment_id]}
+            set_hash[:assignment_set_associations].map { |assoc_hash| assoc_hash[:assignment_id] }
           end
         end.flatten
         referenced_assignments = course.assignments.where(:id => referenced_assignment_ids).to_a.index_by(&:id)
@@ -192,12 +196,12 @@ module ConditionalRelease
         # Fetch all the nested assignment_ids for the associated
         # CYOE content from the Rules provided
         ids = rules.flat_map do |rule|
-                rule[:assignment_sets].flat_map do |a|
-                  a[:assignments].flat_map do |asg|
-                    asg[:assignment_id]
-                  end
-                end
-              end
+          rule[:assignment_sets].flat_map do |a|
+            a[:assignments].flat_map do |asg|
+              asg[:assignment_id]
+            end
+          end
+        end
 
         # Get all the related Assignment models in Canvas
         Assignment.active.where(id: ids)
@@ -205,6 +209,7 @@ module ConditionalRelease
 
       def merge_assignment_data(response, assignments = nil)
         return response if response.blank? || (response.is_a?(Hash) && response.key?(:error))
+
         assignments = assignments_for(response) if assignments.blank?
 
         # Merge the Assignment models into the response for the given module item
@@ -225,9 +230,9 @@ module ConditionalRelease
 
       def assignment_keys
         %i(id title name description due_at unlock_at lock_at
-          points_possible min_score max_score grading_type
-          submission_types workflow_state context_id
-          context_type updated_at context_code)
+           points_possible min_score max_score grading_type
+           submission_types workflow_state context_id
+           context_type updated_at context_code)
       end
     end
   end

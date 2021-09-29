@@ -38,9 +38,8 @@ module Canvas::Oauth
       end
 
       it 'can override the default redirect_uri' do
-        expect(Provider.new('123','456').redirect_uri).to eq '456'
+        expect(Provider.new('123', '456').redirect_uri).to eq '456'
       end
-
     end
 
     describe '#has_valid_key?' do
@@ -111,8 +110,8 @@ module Canvas::Oauth
     end
 
     describe 'authorized_token?' do
-      let(:developer_key) {DeveloperKey.create!}
-      let(:user) {User.create!}
+      let(:developer_key) { DeveloperKey.create! }
+      let(:user) { User.create! }
 
       it 'finds a pre existing token with the same scope' do
         user.access_tokens.create!(:developer_key => developer_key, :scopes => ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"], :remember_access => true)
@@ -131,7 +130,7 @@ module Canvas::Oauth
     end
 
     describe '#app_name' do
-      let(:key_attrs) { {:name => 'some app', :user_name => 'some user', :email => 'some email'} }
+      let(:key_attrs) { { :name => 'some app', :user_name => 'some user', :email => 'some email' } }
       let(:key) { double(key_attrs) }
 
       it 'prefers the key name' do
@@ -182,7 +181,7 @@ module Canvas::Oauth
     context 'scopes' do
       let(:developer_key) { DeveloperKey.create! scopes: [TokenScopes::USER_INFO_SCOPE[:scope]] }
       let(:scopes) { [TokenScopes::USER_INFO_SCOPE[:scope]] }
-      let(:provider) { Provider.new(developer_key.id, 'some_uri', scopes)}
+      let(:provider) { Provider.new(developer_key.id, 'some_uri', scopes) }
 
       describe '#valid_scopes?' do
         it 'returns true if scopes requested are included on key' do

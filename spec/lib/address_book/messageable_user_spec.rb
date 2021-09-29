@@ -110,9 +110,9 @@ describe AddressBook::MessageableUser do
       student3 = student_in_course(active_all: true).user
       address_book = AddressBook::MessageableUser.new(teacher)
       address_book.known_users([student1, student2])
-      expect(teacher).to receive(:load_messageable_users).
-        with([student3], anything).
-        and_return(MessageableUser.where(id: student3).to_a)
+      expect(teacher).to receive(:load_messageable_users)
+        .with([student3], anything)
+        .and_return(MessageableUser.where(id: student3).to_a)
       known_users = address_book.known_users([student2, student3])
       expect(known_users.map(&:id)).to include(student2.id)
       expect(known_users.map(&:id)).to include(student3.id)
@@ -207,10 +207,10 @@ describe AddressBook::MessageableUser do
       specs_require_sharding
 
       it "finds cross-shard known users" do
-        enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
+        enrollment = @shard1.activate { teacher_in_course(active_all: true) }
         teacher = enrollment.user
         course = enrollment.course
-        student = @shard2.activate{ user_factory(active_all: true) }
+        student = @shard2.activate { user_factory(active_all: true) }
         student_in_course(course: course, user: student, active_all: true)
         address_book = AddressBook::MessageableUser.new(teacher)
         known_users = address_book.known_users([student])
@@ -300,10 +300,10 @@ describe AddressBook::MessageableUser do
       specs_require_sharding
 
       before :each do
-        enrollment = @shard1.activate{ teacher_in_course(active_all: true) }
+        enrollment = @shard1.activate { teacher_in_course(active_all: true) }
         @teacher = enrollment.user
         @course = enrollment.course
-        @student = @shard2.activate{ user_factory(active_all: true) }
+        @student = @shard2.activate { user_factory(active_all: true) }
         student_in_course(course: @course, user: @student, active_all: true)
       end
 
@@ -333,8 +333,8 @@ describe AddressBook::MessageableUser do
       # includes teacher, ta, and student in section1, but excludes student in section2
       address_book = AddressBook::MessageableUser.new(ta)
       expect(address_book.count_in_contexts([course.asset_string])).to eql({
-        course.asset_string => 3
-      })
+                                                                             course.asset_string => 3
+                                                                           })
     end
 
     it "returns count in an unassociated :context when an admin" do
@@ -343,8 +343,8 @@ describe AddressBook::MessageableUser do
       course = enrollment.course
       address_book = AddressBook::MessageableUser.new(sender)
       expect(address_book.count_in_contexts([course.asset_string])).to eql({
-        course.asset_string => 2
-      })
+                                                                             course.asset_string => 2
+                                                                           })
     end
   end
 
@@ -451,9 +451,9 @@ describe AddressBook::MessageableUser do
     it "avoids db query with rails cache" do
       teacher = teacher_in_course(active_all: true).user
       student = student_in_course(active_all: true, name: 'Bob').user
-      expect(Rails.cache).to receive(:fetch).
-        with(match(/address_book_preload/)).
-        and_return(MessageableUser.where(id: student).to_a)
+      expect(Rails.cache).to receive(:fetch)
+        .with(match(/address_book_preload/))
+        .and_return(MessageableUser.where(id: student).to_a)
       expect(teacher).to receive(:load_messageable_users).never
       AddressBook::MessageableUser.new(teacher).preload_users([student])
     end

@@ -17,11 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-
 require_relative '../helpers/blueprint_common'
 
 shared_context "blueprint courses assignment context" do
-
   def assignment_options
     f('.assignment')
   end
@@ -30,8 +28,7 @@ shared_context "blueprint courses assignment context" do
     f('#edit_assignment_header')
   end
 
-  let(:delete_assignment){'a.delete_assignment'}
-
+  let(:delete_assignment) { 'a.delete_assignment' }
 end
 
 describe "blueprint courses assignments" do
@@ -100,7 +97,7 @@ describe "blueprint courses assignments" do
       user_session(@teacher)
     end
 
-    it "should contain the delete cog-menu option on the index when unlocked" do
+    it "contains the delete cog-menu option on the index when unlocked" do
       get "/courses/#{@copy_to.id}/assignments"
 
       expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
@@ -109,8 +106,8 @@ describe "blueprint courses assignments" do
       expect(assignment_options).to contain_css(delete_assignment)
     end
 
-    it "should not contain the delete cog-menu option on the index when locked" do
-      @tag.update(restrictions: {content: true})
+    it "does not contain the delete cog-menu option on the index when locked" do
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/assignments"
 
@@ -120,7 +117,7 @@ describe "blueprint courses assignments" do
       expect(assignment_options).not_to contain_css(delete_assignment)
     end
 
-    it "should show the delete cog-menu option on the index when not locked" do
+    it "shows the delete cog-menu option on the index when not locked" do
       get "/courses/#{@copy_to.id}/assignments"
 
       expect(f("#assignment_#{@assmt_copy.id}")).to contain_css('.icon-blueprint')
@@ -130,8 +127,8 @@ describe "blueprint courses assignments" do
       expect(assignment_options).to contain_css(delete_assignment)
     end
 
-    it "should not allow the delete options on the edit page when locked" do
-      @tag.update(restrictions: {content: true})
+    it "does not allow the delete options on the edit page when locked" do
+      @tag.update(restrictions: { content: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
@@ -139,7 +136,7 @@ describe "blueprint courses assignments" do
       expect(assignment_header).not_to contain_css('.al-trigger')
     end
 
-    it "should show the delete cog-menu options on the edit when not locked" do
+    it "shows the delete cog-menu options on the edit when not locked" do
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
       options_button.click
@@ -147,9 +144,9 @@ describe "blueprint courses assignments" do
       expect(assignment_header).to contain_css('a.delete_assignment_link')
     end
 
-    it "should not allow editing of restricted items" do
+    it "does not allow editing of restricted items" do
       # restrict everything
-      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
@@ -163,7 +160,7 @@ describe "blueprint courses assignments" do
       expect(f('#assignment_grading_type')).not_to contain_css('option[value="not_graded"]')
     end
 
-    it "should not allow making a non-graded assignment graded when points are locked" do
+    it "does not allow making a non-graded assignment graded when points are locked" do
       not_graded_assignment = @copy_from.assignments.create!(
         title: "eh", description: "meh", submission_types: "not_graded", grading_type: 'not_graded'
       )
@@ -176,7 +173,7 @@ describe "blueprint courses assignments" do
       nga_copy.migration_id = nga_tag.migration_id
       nga_copy.save!
 
-      nga_tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      nga_tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments/#{nga_copy.id}/edit"
 
@@ -186,9 +183,9 @@ describe "blueprint courses assignments" do
       expect(f('input[name="grading_type"][type="hidden"]').attribute('value')).to eq 'not_graded'
     end
 
-    it "should not allow popup editing of restricted items" do
+    it "does not allow popup editing of restricted items" do
       # restrict everything
-      @tag.update(restrictions: {content: true, points: true, due_dates: true, availability_dates: true})
+      @tag.update(restrictions: { content: true, points: true, due_dates: true, availability_dates: true })
 
       get "/courses/#{@copy_to.id}/assignments"
 
@@ -212,14 +209,14 @@ describe "blueprint courses assignments" do
       user_session(@teacher)
     end
 
-    it "should show unlocked button on index page for unlocked assignment" do
+    it "shows unlocked button on index page for unlocked assignment" do
       get "/courses/#{@course.id}/assignments"
       expect(f('[data-view="lock-icon"] i.icon-blueprint')).to be_displayed
     end
 
-    it "should show locked button on index page for locked assignment" do
+    it "shows locked button on index page for locked assignment" do
       # restrict something
-      @tag.update(restrictions: {content: true})
+      @tag.update(restrictions: { content: true })
       get "/courses/#{@course.id}/assignments"
       expect(f('[data-view="lock-icon"] i.icon-blueprint-lock')).to be_displayed
     end

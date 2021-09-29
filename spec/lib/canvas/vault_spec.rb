@@ -24,23 +24,25 @@ module Canvas
   describe Vault do
     include WebMock::API
 
-    let(:token){ 'canvas_token' }
-    let(:token_path){ '/path/to/token' }
+    let(:token) { 'canvas_token' }
+    let(:token_path) { '/path/to/token' }
     let(:addr) { 'http://vault:8200' }
     let(:addr_path) { '/path/to/addr' }
     let(:static_config) {
       {
-      token: token,
-      addr: addr,
-      kv_mount: 'app-canvas'
-    } }
+        token: token,
+        addr: addr,
+        kv_mount: 'app-canvas'
+      }
+    }
     let(:path_config) {
       {
-      token_path: token_path,
-      addr_path: addr_path,
-      kv_mount: 'app-canvas'
-    } }
-    let(:local_config) { { token: 'file', addr: 'file'} }
+        token_path: token_path,
+        addr_path: addr_path,
+        kv_mount: 'app-canvas'
+      }
+    }
+    let(:local_config) { { token: 'file', addr: 'file' } }
 
     before do
       LocalCache.clear(force: true)
@@ -77,15 +79,15 @@ module Canvas
     describe '.read' do
       before(:each) do
         allow(described_class).to receive(:config).and_return(static_config)
-        @stub = stub_request(:get, "#{addr}/v1/test/path").
-          to_return(status: 200, body: {
-          data: {
-            foo: 'bar'
-          },
-          lease_duration: 3600,
-        }.to_json, headers: { 'content-type': 'application/json' })
-        stub_request(:get, "#{addr}/v1/bad/test/path").
-          to_return(status: 404, headers: { 'content-type': 'application/json' })
+        @stub = stub_request(:get, "#{addr}/v1/test/path")
+                .to_return(status: 200, body: {
+                  data: {
+                    foo: 'bar'
+                  },
+                  lease_duration: 3600,
+                }.to_json, headers: { 'content-type': 'application/json' })
+        stub_request(:get, "#{addr}/v1/bad/test/path")
+          .to_return(status: 404, headers: { 'content-type': 'application/json' })
       end
 
       it 'Caches the read' do
@@ -131,9 +133,9 @@ module Canvas
         cred_path = "sts/testaccount/sts/canvas-shards-lookupper-test"
         creds_hash = {
           cred_path => {
-            "access_key"=>"fake-access-key",
-            "secret_key"=>"fake-secret-key",
-            "security_token"=>"fake-security-token"
+            "access_key" => "fake-access-key",
+            "secret_key" => "fake-secret-key",
+            "security_token" => "fake-security-token"
           }
         }
         allow(described_class).to receive(:config).and_return(local_config)
@@ -152,23 +154,23 @@ module Canvas
       end
 
       describe 'locking and loading' do
-        let(:credential_path){ 'test/vault/creds/path' }
-        let(:lease_duration){ 3600 }
-        let(:credential_data){ { credential_id: 'aabbccdd', credential_secret: 'pampelmousse' } }
+        let(:credential_path) { 'test/vault/creds/path' }
+        let(:lease_duration) { 3600 }
+        let(:credential_data) { { credential_id: 'aabbccdd', credential_secret: 'pampelmousse' } }
         before(:each) do
           skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
           allow(ConfigFile).to receive(:load).with("local_cache").and_return({
-            store: "redis",
-            redis_host: "redis",
-            redis_port: 6379,
-            redis_db: 6 # intentionally one probably not used elsewhere
-          })
+                                                                               store: "redis",
+                                                                               redis_host: "redis",
+                                                                               redis_port: 6379,
+                                                                               redis_db: 6 # intentionally one probably not used elsewhere
+                                                                             })
           allow(ConfigFile).to receive(:load).and_call_original
-          @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}").
-            to_return(status: 200, body: {
-            data: credential_data,
-            lease_duration: lease_duration,
-          }.to_json, headers: { 'content-type': 'application/json' })
+          @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}")
+                       .to_return(status: 200, body: {
+                         data: credential_data,
+                         lease_duration: lease_duration,
+                       }.to_json, headers: { 'content-type': 'application/json' })
         end
 
         it "will queue if the lock is taken and there is no value in the cache" do
@@ -180,7 +182,7 @@ module Canvas
             Thread.new { t3_val = described_class.read(credential_path) },
             Thread.new { t4_val = described_class.read(credential_path) }
           ]
-          threads.each{|t| t.join }
+          threads.each { |t| t.join }
           expect(t1_val).to eq(credential_data)
           expect(t2_val).to eq(credential_data)
           expect(t3_val).to eq(credential_data)

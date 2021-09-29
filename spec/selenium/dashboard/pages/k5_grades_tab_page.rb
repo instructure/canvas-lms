@@ -157,9 +157,7 @@ module K5GradesTabPageObject
 
   #----------------------- Actions & Methods -------------------------
 
-
   #----------------------- Click Items -------------------------------
-
 
   def click_assignment_group_toggle
     assignment_group_toggle.click
@@ -176,5 +174,4 @@ module K5GradesTabPageObject
   end
 
   #----------------------------Element Management---------------------#
-
 end

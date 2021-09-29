@@ -27,5 +27,5 @@ class SisPostGradesStatus < ActiveRecord::Base
   validates :course, presence: true
   validates :grades_posted_at, presence: true
   validates :message, presence: true
-  validates :status, presence: true, inclusion: {in: ALLOWED_STATUSES}
+  validates :status, presence: true, inclusion: { in: ALLOWED_STATUSES }
 end

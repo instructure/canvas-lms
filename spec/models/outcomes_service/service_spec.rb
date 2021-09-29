@@ -56,7 +56,7 @@ describe OutcomesService::Service do
         beta_domain: 'canvas.beta',
         consumer_key: 'blah',
         jwt_secret: 'woo'
-      }}
+      } }
       root_account.save!
     end
 

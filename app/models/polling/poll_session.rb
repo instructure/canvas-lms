@@ -70,10 +70,11 @@ module Polling
 
     def visible_to?(user, session)
       self.course.grants_right?(user, session, :read) &&
-      (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
+        (self.course_section ? self.course_section.grants_right?(user, session, :read) : true)
     end
 
     private
+
     def section_belongs_to_course
       if self.course && self.course_section
         unless self.course.course_sections.include?(course_section)

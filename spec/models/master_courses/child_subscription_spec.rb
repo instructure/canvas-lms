@@ -31,7 +31,7 @@ describe MasterCourses::ChildSubscription do
       MasterCourses::ChildSubscription.is_child_course?(@course)
     end
 
-    it "should cache the result" do
+    it "caches the result" do
       enable_cache do
         expect(check).to be_falsey
         expect(MasterCourses::ChildSubscription).to receive(:where).never
@@ -40,7 +40,7 @@ describe MasterCourses::ChildSubscription do
       end
     end
 
-    it "should invalidate the cache when set/unset as master course" do
+    it "invalidates the cache when set/unset as master course" do
       enable_cache do
         expect(check).to be_falsey
         sub = @template.add_child_course!(@course) # invalidate on create
@@ -52,7 +52,7 @@ describe MasterCourses::ChildSubscription do
   end
 
   describe "migration id invalidation" do
-    it "should deactivate and reactivate migration ids for course content" do
+    it "deactivates and reactivate migration ids for course content" do
       master_course = course_factory
       @template = MasterCourses::MasterTemplate.set_as_master_course(master_course)
       child_course = course_factory
@@ -68,8 +68,8 @@ describe MasterCourses::ChildSubscription do
       expect(child_tag.root_account_id).to eq child_course.root_account_id
 
       sub.destroy!
-      expect(page_copy.reload.migration_id).to eq (sub.deactivation_prefix + mc_tag.migration_id)
-      expect(child_tag.reload.migration_id).to eq (sub.deactivation_prefix + mc_tag.migration_id)
+      expect(page_copy.reload.migration_id).to eq(sub.deactivation_prefix + mc_tag.migration_id)
+      expect(child_tag.reload.migration_id).to eq(sub.deactivation_prefix + mc_tag.migration_id)
       expect(child_course.reload.syllabus_master_template_id).to be_empty
 
       sub.undestroy

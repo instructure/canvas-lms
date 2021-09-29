@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def submission_model(opts={})
+  def submission_model(opts = {})
     enroll_user = !opts[:user] || !(opts[:assignment] || opts[:course])
     assignment = opts[:assignment] || assignment_model(:course => opts[:course])
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first
@@ -31,21 +31,21 @@ module Factories
 
   # just create the object, we don't care about callbacks or usual side effects
   def bare_submission_model(assignment, user, opts = {})
-    opts = (opts.presence || {submission_type: "online_text_entry", body: "o hai"}).
-      merge(workflow_state: "submitted", updated_at: Time.now.utc)
+    opts = (opts.presence || { submission_type: "online_text_entry", body: "o hai" })
+           .merge(workflow_state: "submitted", updated_at: Time.now.utc)
     submission = assignment.submissions.find_by!(user: user)
     submission.update_columns(opts)
     submission
   end
 
-  def graded_submission_model(opts={})
+  def graded_submission_model(opts = {})
     submission_model(opts)
     @submission.workflow_state = 'graded'
     @submission.save!
     @submission
   end
 
-  def unsubmitted_submission_model(opts={})
+  def unsubmitted_submission_model(opts = {})
     enroll_user = !opts[:user] || !(opts[:assignment] || opts[:course])
     assignment = opts[:assignment] || assignment_model(:course => opts[:course])
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first

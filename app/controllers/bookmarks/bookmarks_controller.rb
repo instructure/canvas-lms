@@ -175,6 +175,6 @@ class Bookmarks::BookmarksController < ApplicationController
   end
 
   def render_errors
-    render :json => {errors: @bookmark.errors}, :status => :bad_request
+    render :json => { errors: @bookmark.errors }, :status => :bad_request
   end
 end

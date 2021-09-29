@@ -106,7 +106,7 @@ class OutcomeImportsApiController < ApplicationController
   end
 
   rescue_from InvalidContentType do
-    render :json => {:error => t('Invalid content type, UTF-8 required')}, :status => 400
+    render :json => { :error => t('Invalid content type, UTF-8 required') }, :status => 400
   end
 
   # @API Import Outcomes
@@ -235,8 +235,9 @@ class OutcomeImportsApiController < ApplicationController
       if charset.present? && charset.casecmp('utf-8') != 0
         raise InvalidContentType
       end
-      params[:extension] ||= {"text/plain" => "csv",
-                              "text/csv" => "csv"}[request2.media_type] || "csv"
+
+      params[:extension] ||= { "text/plain" => "csv",
+                               "text/csv" => "csv" }[request2.media_type] || "csv"
       file_obj.set_file_attributes("outcome_import.#{params[:extension]}",
                                    request2.media_type)
       file_obj

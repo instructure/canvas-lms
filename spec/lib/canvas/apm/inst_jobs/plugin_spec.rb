@@ -26,6 +26,7 @@ describe Canvas::Apm::InstJobs::Plugin do
   class FakeSpan
     attr_reader :tags
     attr_accessor :resource, :span_type
+
     def initialize
       self.reset!
     end
@@ -41,6 +42,7 @@ describe Canvas::Apm::InstJobs::Plugin do
 
   class FakeTracer
     attr_reader :span
+
     def initialize
       @span = FakeSpan.new
     end
@@ -55,9 +57,8 @@ describe Canvas::Apm::InstJobs::Plugin do
     end
   end
 
-  let(:tracer){ FakeTracer.new }
-  let(:span){ tracer.span }
-
+  let(:tracer) { FakeTracer.new }
+  let(:span) { tracer.span }
 
   around do |example|
     Canvas::Apm::InstJobs::Plugin.tracer = tracer

@@ -26,11 +26,12 @@ module Canvas
           # fail but actually succeded in a way that seems like timeout issues. For a migration we'll just override the
           # statement timeout to be 3 minutes. (It should hopefully never take 3 minutes.)
           @cassandra ||= CanvasCassandra::DatabaseBuilder.from_config(cassandra_cluster,
-            override_options: { 'timeout' => 180 })
+                                                                      override_options: { 'timeout' => 180 })
         end
 
         def runnable?
           raise "cassandra_cluster is required to be defined" unless respond_to?(:cassandra_cluster) && cassandra_cluster.present?
+
           Switchman::Shard.current == Switchman::Shard.birth && CanvasCassandra::DatabaseBuilder.configured?(cassandra_cluster)
         end
 
@@ -60,7 +61,7 @@ module Canvas
       end
 
       def self.included(migration)
-        migration.tag :cassandra
+        migration.tag :cassandra # rubocop:disable Rails/ContentTag this is Outrigger's tag, not Rails'
         migration.singleton_class.include(ClassMethods)
       end
     end

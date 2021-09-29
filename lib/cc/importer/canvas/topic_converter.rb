@@ -29,7 +29,7 @@ module CC::Importer::Canvas
         cc_path = @package_root.item_path res.at_css('file')['href']
         cc_id = res['identifier']
         canvas_id = get_node_att(res, 'dependency', 'identifierref')
-        if canvas_id && meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]})
+        if canvas_id && (meta_res = @manifest.at_css(%{resource[identifier="#{canvas_id}"]}))
           canvas_path = @package_root.item_path meta_res.at_css('file')['href']
           meta_node = open_file_xml(canvas_path)
         else
@@ -48,7 +48,7 @@ module CC::Importer::Canvas
       [topics, announcements]
     end
 
-    def convert_topic(cc_doc, meta_doc, mig_id=nil)
+    def convert_topic(cc_doc, meta_doc, mig_id = nil)
       topic = {}
       topic['description'] = get_node_val(cc_doc, 'text')
       topic['title'] = get_node_val(cc_doc, 'title')
@@ -73,13 +73,12 @@ module CC::Importer::Canvas
         %w(has_group_category allow_rating only_graders_can_rate sort_by_rating locked).each do |setting|
           get_bool_val(meta_doc, setting).tap { |val| topic[setting] = val unless val.nil? }
         end
-        if asmnt_node = meta_doc.at_css('assignment')
+        if (asmnt_node = meta_doc.at_css('assignment'))
           topic['assignment'] = parse_canvas_assignment_data(asmnt_node)
         end
       end
 
       topic
     end
-
   end
 end

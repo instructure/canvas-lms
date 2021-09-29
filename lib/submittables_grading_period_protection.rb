@@ -59,14 +59,13 @@ module SubmittablesGradingPeriodProtection
     return true if submittable.only_visible_to_overrides && submittable.only_visible_to_overrides_was
     return true unless date_in_closed_grading_period?(submittable.due_at)
 
-
     apply_error(submittable, :due_at, ERROR_MESSAGES[:change_due_at_to_closed], flash_message)
     false
   end
 
   def grading_periods_allow_assignment_overrides_batch_create?(submittable, overrides, flash_message: false)
     return true unless constrained_by_grading_periods?
-    return true unless overrides.any? {|override| date_in_closed_grading_period?(override[:due_at])}
+    return true unless overrides.any? { |override| date_in_closed_grading_period?(override[:due_at]) }
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:set_override_due_at_in_closed], flash_message)
     false
@@ -74,6 +73,7 @@ module SubmittablesGradingPeriodProtection
 
   def grading_periods_allow_assignment_overrides_batch_update?(submittable, prepared_batch, flash_message: false)
     return true unless constrained_by_grading_periods?
+
     can_create_overrides?(submittable, prepared_batch[:overrides_to_create], flash_message: flash_message) &&
       can_update_overrides?(submittable, prepared_batch[:overrides_to_update], flash_message: flash_message) &&
       can_delete_overrides?(submittable, prepared_batch[:overrides_to_delete], flash_message: flash_message)
@@ -119,22 +119,22 @@ module SubmittablesGradingPeriodProtection
     # Known Issue: This method explicitly does not handle the case where
     # creating an override would cause a student to assume a due date in an
     # open grading period when previously in a closed grading period.
-    return true unless overrides.any? {|override| date_in_closed_grading_period?(override.due_at)}
+    return true unless overrides.any? { |override| date_in_closed_grading_period?(override.due_at) }
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:set_override_due_at_in_closed], flash_message)
     false
   end
 
   def can_update_overrides?(submittable, overrides, flash_message: false)
-    changed_overrides = overrides.select {|override| override.due_at_was.to_i != override.due_at.to_i}
+    changed_overrides = overrides.select { |override| override.due_at_was.to_i != override.due_at.to_i }
     return true if changed_overrides.empty?
 
-    if changed_overrides.any? {|override| date_in_closed_grading_period?(override.due_at_was)}
+    if changed_overrides.any? { |override| date_in_closed_grading_period?(override.due_at_was) }
       apply_error(submittable, :due_at, ERROR_MESSAGES[:change_override_due_at_in_closed], flash_message)
       return false
     end
 
-    return true unless changed_overrides.any? {|override| date_in_closed_grading_period?(override.due_at)}
+    return true unless changed_overrides.any? { |override| date_in_closed_grading_period?(override.due_at) }
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:change_override_due_at_to_closed], flash_message)
     false
@@ -144,7 +144,7 @@ module SubmittablesGradingPeriodProtection
     # Known Issue: This method explicitly does not handle the case where
     # deleting an override would cause a student to assume a due date in a
     # closed grading period when previously in an open grading period.
-    return true unless overrides.any? {|override| date_in_closed_grading_period?(override.due_at)}
+    return true unless overrides.any? { |override| date_in_closed_grading_period?(override.due_at) }
 
     apply_error(submittable, :due_at, ERROR_MESSAGES[:delete_override_in_closed], flash_message)
     false

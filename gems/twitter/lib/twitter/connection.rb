@@ -63,10 +63,10 @@ module Twitter
     def send_direct_message(user_name, user_id, message)
       url = '/1.1/direct_messages/new.json'
       response = access_token.post(url, {
-        screen_name: user_name,
-        user_id: user_id,
-        text: message
-      })
+                                     screen_name: user_name,
+                                     user_id: user_id,
+                                     text: message
+                                   })
       JSON.parse(response.body)
     end
 
@@ -75,19 +75,19 @@ module Twitter
       consumer.get_request_token(:oauth_callback => success_url)
     end
 
-    def self.twitter_consumer(key=nil, secret=nil)
+    def self.twitter_consumer(key = nil, secret = nil)
       require 'oauth'
       require 'oauth/consumer'
       twitter_config = Twitter::Connection.config
       key ||= twitter_config['api_key']
       secret ||= twitter_config['secret_key']
       OAuth::Consumer.new(key, secret, {
-        :site => "https://api.twitter.com",
-        :request_token_path => "/oauth/request_token",
-        :access_token_path => "/oauth/access_token",
-        :authorize_path => "/oauth/authorize",
-        :signature_method => "HMAC-SHA1"
-      })
+                            :site => "https://api.twitter.com",
+                            :request_token_path => "/oauth/request_token",
+                            :access_token_path => "/oauth/access_token",
+                            :authorize_path => "/oauth/authorize",
+                            :signature_method => "HMAC-SHA1"
+                          })
     end
     private_class_method :twitter_consumer
 
@@ -101,6 +101,7 @@ module Twitter
       if !config.respond_to?(:call)
         raise "Config must respond to #call"
       end
+
       @config = config
     end
 

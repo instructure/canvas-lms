@@ -32,4 +32,3 @@ class AddReplicaIdentityForGroupMemberships < ActiveRecord::Migration[5.2]
     change_column_null :group_memberships, :root_account_id, true
   end
 end
-

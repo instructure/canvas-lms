@@ -41,14 +41,14 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
     allow(Lti::PlagiarismSubscriptionsHelper).to receive(:new).and_return(psh)
     allow(psh).to receive(:create_subscription).and_return(nil)
     tool = create_tool_proxy(account)
-    tool.update(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
+    tool.update(raw_data: { 'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] } })
     tool
   end
 
   let(:placement) { Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
 
   context '#create_subscriptions' do
-    it 'should add a subscription to plagiarism tool proxies' do
+    it 'adds a subscription to plagiarism tool proxies' do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.save!
 
@@ -59,7 +59,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy.reload.subscription_id).to eq 'subscription_id'
     end
 
-    it 'should not add subscriptions to non-plagiarism tool proxies' do
+    it 'does not add subscriptions to non-plagiarism tool proxies' do
       psh = double('PlagiarismSubscriptionsHelper')
       expect(Lti::PlagiarismSubscriptionsHelper).not_to receive(:new)
       expect(psh).not_to receive(:create_subscription)
@@ -67,11 +67,11 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy.reload.subscription_id).to be_nil
     end
 
-    it 'should only create one subscription if there are 2 tools with the same product code, vendor code and SubmissionEvent endpoint' do
+    it 'only creates one subscription if there are 2 tools with the same product code, vendor code and SubmissionEvent endpoint' do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id',
         context: course_factory(account: account),
@@ -94,11 +94,11 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy2.reload.subscription_id).to eq('id2')
     end
 
-    it 'should not create a subscription if there are two tools and one tool already has a subscription' do
+    it 'does not create a subscription if there are two tools and one tool already has a subscription' do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id3',
         context: course_factory(account: account),
@@ -120,11 +120,11 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy2.reload.subscription_id).to eq('id3')
     end
 
-    it 'should create a subscription if there are two tools, but one has a different SubmissionEvent endpoint' do
+    it 'creates a subscription if there are two tools, but one has a different SubmissionEvent endpoint' do
       tool_proxy2 = Lti::ToolProxy.create!(
         raw_data: {
           'enabled_capability' => [placement],
-          'tool_profile' => {'service_offered' => [{'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          'tool_profile' => { 'service_offered' => [{ 'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent' }] },
         },
         subscription_id: 'id3',
         context: course_factory(account: account),
@@ -147,7 +147,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
   end
 
   context '#delete_subscriptions' do
-    it 'should remove subscriptions from plagiarism tool proxies' do
+    it 'removes subscriptions from plagiarism tool proxies' do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.subscription_id = 'subscription_id'
       tool_proxy.save!
@@ -161,7 +161,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
   end
 
   context '#recreate_subscriptions' do
-    it 'should delete and recreate subscriptions properly' do
+    it 'deletes and recreate subscriptions properly' do
       tool_proxy.raw_data['enabled_capability'] = [placement]
       tool_proxy.subscription_id = 'subscription_id'
       tool_proxy.save!

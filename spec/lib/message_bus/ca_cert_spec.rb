@@ -20,9 +20,8 @@
 require 'spec_helper'
 
 describe MessageBus::CaCert do
-
-  let(:cert_location){ "/tmp/fake_pulsar_cert_#{SecureRandom.hex(3)}.pem" }
-  let(:fake_vault_path){ 'fake/vault/path' }
+  let(:cert_location) { "/tmp/fake_pulsar_cert_#{SecureRandom.hex(3)}.pem" }
+  let(:fake_vault_path) { 'fake/vault/path' }
   let(:conf_hash) do
     {
       'PULSAR_CERT_VAULT_PATH' => fake_vault_path,
@@ -34,8 +33,8 @@ describe MessageBus::CaCert do
     skip("pulsar config required to test") unless MessageBus.enabled?
     File.delete(cert_location) if File.exist?(cert_location)
     allow(Canvas::Vault).to receive(:read).with(fake_vault_path).and_return({
-      certificate: "this-is-the-pulsar-cert-[NOT]"
-    })
+                                                                              certificate: "this-is-the-pulsar-cert-[NOT]"
+                                                                            })
     LocalCache.cache.clear
   end
 

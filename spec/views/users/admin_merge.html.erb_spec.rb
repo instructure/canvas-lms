@@ -22,7 +22,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/admin_merge" do
-  it "should only list accounts that the user can merge users in" do
+  it "only lists accounts that the user can merge users in" do
     user_factory
     @account = Account.create!(:name => "My Root Account")
     @account2 = @account.sub_accounts.create!(:name => "Sub-Account")
@@ -40,8 +40,8 @@ describe "/users/admin_merge" do
 
     render "users/admin_merge"
     expect(response).not_to be_nil
-    expect(response.body).to match /My Root Account/
-    expect(response.body).to match /Sub-Account/
-    expect(response.body).not_to match /Default Account/
+    expect(response.body).to match(/My Root Account/)
+    expect(response.body).to match(/Sub-Account/)
+    expect(response.body).not_to match(/Default Account/)
   end
 end

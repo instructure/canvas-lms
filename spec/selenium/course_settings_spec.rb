@@ -24,12 +24,12 @@ describe "course settings" do
   include_context "in-process server selenium tests"
   include CourseSettingsPage
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in :limit_privileges_to_course_section => false
     @account = @course.account
   end
 
-  it "should show unused tabs to teachers" do
+  it "shows unused tabs to teachers" do
     get "/courses/#{@course.id}/settings"
     wait_for_ajaximations
     expect(ff("#section-tabs .section.section-hidden").count).to be > 0
@@ -40,20 +40,20 @@ describe "course settings" do
       @account.enable_as_k5_account!
     end
 
-    it "should show a Back to Subject button that sends the user to the course home path" do
+    it "shows a Back to Subject button that sends the user to the course home path" do
       get "/courses/#{@course.id}/settings"
       expect(f('#back_to_subject')).to be_displayed
       expect(f('#back_to_subject')).to have_attribute("href", course_path(@course.id))
     end
 
-    it "should show the course name" do
+    it "shows the course name" do
       get "/courses/#{@course.id}/settings"
       name = f('.k5-heading-course-name')
       expect(name).to be_displayed
       expect(name.text).to eq @course.name
     end
 
-    it "should show the course alt name if it exists" do
+    it "shows the course alt name if it exists" do
       @course.alt_name = "the alt name"
       @course.save!
       get "/courses/#{@course.id}/settings"
@@ -62,7 +62,7 @@ describe "course settings" do
       expect(name.text).to eq @course.alt_name
     end
 
-    it 'should provide sync to homeroom and homeroom selection' do
+    it 'provides sync to homeroom and homeroom selection' do
       @course.update!(homeroom_course: true, name: 'homeroom1')
       orig_teacher = @teacher
       course_with_teacher(user: orig_teacher, course_name: 'homeroom2')
@@ -85,7 +85,6 @@ describe "course settings" do
       expect(options).to include 'homeroom1'
       expect(options).to include 'homeroom2'
     end
-
   end
 
   context "considering homeroom courses" do
@@ -135,35 +134,35 @@ describe "course settings" do
       expect(@course.grading_standard).to eq(@standard)
     end
 
-    it 'should show the correct course status when published' do
+    it 'shows the correct course status when published' do
       get "/courses/#{@course.id}/settings"
       expect(f('#course-status').text).to eq 'Course is Published'
     end
 
-    it 'should show the correct course status when unpublished' do
+    it 'shows the correct course status when unpublished' do
       @course.workflow_state = 'claimed'
       @course.save!
       get "/courses/#{@course.id}/settings"
       expect(f('#course-status').text).to eq 'Course is Unpublished'
     end
 
-    it "should show the correct status with a tooltip when published and graded submissions" do
-      course_with_student_submissions({submission_points: true})
+    it "shows the correct status with a tooltip when published and graded submissions" do
+      course_with_student_submissions({ submission_points: true })
       get "/courses/#{@course.id}/settings"
       course_status = f('#course-status')
       expect(course_status.text).to eq 'Course is Published'
       expect(course_status).to have_attribute('title', 'You cannot unpublish this course if there are graded student submissions')
     end
 
-    it "should allow selection of existing course grading standard" do
+    it "allows selection of existing course grading standard" do
       test_select_standard_for @course
     end
 
-    it "should allow selection of existing account grading standard" do
+    it "allows selection of existing account grading standard" do
       test_select_standard_for @course.root_account
     end
 
-    it "should toggle more options correctly" do
+    it "toggles more options correctly" do
       more_options_text = 'more options'
       fewer_options_text = 'fewer options'
       get "/courses/#{@course.id}/settings"
@@ -180,7 +179,7 @@ describe "course settings" do
       expect(more_options_link.text).to eq more_options_text
     end
 
-    it "should show the self enrollment code and url once enabled" do
+    it "shows the self enrollment code and url once enabled" do
       a = Account.default
       a.courses << @course
       a.settings[:self_enrollment] = 'manually_created'
@@ -200,15 +199,15 @@ describe "course settings" do
       wait.until do
         el = f('.self_enrollment_message')
         el.present? &&
-        el.text != nil &&
-        el.text != ""
+          el.text != nil &&
+          el.text != ""
       end
       message = f('.self_enrollment_message')
       expect(message).to include_text(code)
       expect(message).not_to include_text('self_enrollment_code')
     end
 
-    it "should not show the self enrollment code and url for blueprint templates even if enabled" do
+    it "does not show the self enrollment code and url for blueprint templates even if enabled" do
       a = Account.default
       a.courses << @course
       a.settings[:self_enrollment] = 'manually_created'
@@ -219,7 +218,7 @@ describe "course settings" do
       expect(f('.self_enrollment_message')).to_not be_displayed
     end
 
-    it "should enable announcement limit if show announcements enabled" do
+    it "enables announcement limit if show announcements enabled" do
       get "/courses/#{@course.id}/settings"
 
       more_options_link = f('.course_form_more_options_link')
@@ -242,7 +241,7 @@ describe "course settings" do
           @account.enable_feature!(:pace_plans)
         end
 
-        it "should display the pace plans setting (and if checked, the caution text)" do
+        it "displays the pace plans setting (and if checked, the caution text)" do
           get "/courses/#{@course.id}/settings"
 
           expect(element_exists?('.pace-plans-row')).to be_truthy
@@ -265,7 +264,7 @@ describe "course settings" do
           @account.disable_feature!(:pace_plans)
         end
 
-        it "should not display the pace plans setting" do
+        it "does not display the pace plans setting" do
           get "/courses/#{@course.id}/settings"
 
           expect(element_exists?('.pace-plans-row')).to be_falsey
@@ -273,14 +272,14 @@ describe "course settings" do
       end
     end
 
-    it "should show participation by default" do
+    it "shows participation by default" do
       get "/courses/#{@course.id}/settings"
 
       expect(element_exists?('.course-participation-row')).to be_truthy
       expect(element_exists?('#availability_options_container')).to be_truthy
     end
 
-    it "should check if it is a k5 course should not show the fields" do
+    it "checks if it is a k5 course should not show the fields" do
       @account.enable_as_k5_account!
       get "/courses/#{@course.id}/settings"
 
@@ -293,23 +292,21 @@ describe "course settings" do
       expect(element_exists?('#course_hide_distribution_graphs')).to be_falsey
       expect(element_exists?('#course_lock_all_announcements')).to be_falsey
     end
-
   end
 
   describe "course items" do
-
     def admin_cog(id)
       f(id).find_element(:css, '.admin-links').displayed?
-      rescue Selenium::WebDriver::Error::NoSuchElementError
-        false
+    rescue Selenium::WebDriver::Error::NoSuchElementError
+      false
     end
 
-    it 'should not show cog menu for disabling or moving on home nav item' do
+    it 'does not show cog menu for disabling or moving on home nav item' do
       get "/courses/#{@course.id}/settings#tab-navigation"
       expect(admin_cog('#nav_edit_tab_id_0')).to be_falsey
     end
 
-    it "should change course details" do
+    it "changes course details" do
       course_name = 'new course name'
       course_code = 'new course-101'
       locale_text = 'English (US)'
@@ -336,16 +333,16 @@ describe "course settings" do
       expect(@course.time_zone.name).to eq time_zone_value
     end
 
-    it "should only allow less resrictive options in Customize visibility" do
-       get "/courses/#{@course.id}/settings"
-       click_option('#course_course_visibility', 'institution', :value)
-       f('#course_custom_course_visibility').click
-       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
-       click_option('#course_course_visibility', 'course', :value)
-       expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
+    it "only allows less resrictive options in Customize visibility" do
+      get "/courses/#{@course.id}/settings"
+      click_option('#course_course_visibility', 'institution', :value)
+      f('#course_custom_course_visibility').click
+      expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Institution\nPublic"
+      click_option('#course_course_visibility', 'course', :value)
+      expect(ff("select[name*='course[syllabus_visibility_option]']")[0].text).to eq "Course\nInstitution\nPublic"
     end
 
-    it "should disable from Course Navigation tab", priority: "1", test_id: 112172 do
+    it "disables from Course Navigation tab", priority: "1", test_id: 112172 do
       get "/courses/#{@course.id}/settings#tab-navigation"
       ff(".al-trigger")[0].click
       ff(".icon-x")[0].click
@@ -360,16 +357,16 @@ describe "course settings" do
     end
 
     describe "move dialog" do
-      it "should return focus to cog menu button when disabling an item" do
+      it "returns focus to cog menu button when disabling an item" do
         get "/courses/#{@course.id}/settings#tab-navigation"
         cog_menu_button = ff(".al-trigger")[2]
-        cog_menu_button.click                 # open the menu
-        ff(".disable_nav_item_link")[2].click    # click "Disable"
+        cog_menu_button.click # open the menu
+        ff(".disable_nav_item_link")[2].click # click "Disable"
         check_element_has_focus(cog_menu_button)
       end
     end
 
-    it "should add a section" do
+    it "adds a section" do
       section_name = 'new section'
       get "/courses/#{@course.id}/settings#tab-sections"
 
@@ -383,7 +380,7 @@ describe "course settings" do
       expect(new_section).to include_text(section_name)
     end
 
-    it "should delete a section" do
+    it "deletes a section" do
       add_section('Delete Section')
       get "/courses/#{@course.id}/settings#tab-sections"
 
@@ -397,7 +394,7 @@ describe "course settings" do
       expect(ff('#sections > .section').count).to eq 1
     end
 
-    it "should edit a section" do
+    it "edits a section" do
       edit_text = 'Section Edit Text'
       add_section('Edit Section')
       get "/courses/#{@course.id}/settings#tab-sections"
@@ -419,7 +416,7 @@ describe "course settings" do
   end
 
   context "right sidebar" do
-    it "should allow leaving student view" do
+    it "allows leaving student view" do
       enter_student_view
       stop_link = f("#masquerade_bar .leave_student_view")
       expect(stop_link).to include_text "Leave Student View"
@@ -427,7 +424,7 @@ describe "course settings" do
       expect(displayed_username).to eq(@teacher.name)
     end
 
-    it "should allow resetting student view" do
+    it "allows resetting student view" do
       @fake_student_before = @course.student_view_student
       enter_student_view
       reset_link = f("#masquerade_bar .reset_test_student")
@@ -438,13 +435,13 @@ describe "course settings" do
       expect(@fake_student_before.id).not_to eq @fake_student_after.id
     end
 
-    it "should not include student view student in the statistics count" do
+    it "does not include student view student in the statistics count" do
       @fake_student = @course.student_view_student
       get "/courses/#{@course.id}/settings"
-      expect(fj('.summary tr:nth(0)').text).to match /Students:\s*None/
+      expect(fj('.summary tr:nth(0)').text).to match(/Students:\s*None/)
     end
 
-    it "should show the count of custom role enrollments" do
+    it "shows the count of custom role enrollments" do
       teacher_role = custom_teacher_role("teach")
       student_role = custom_student_role("weirdo")
 
@@ -453,12 +450,12 @@ describe "course settings" do
       student_role.deactivate!
       course_with_teacher(:course => @course, :role => teacher_role)
       get "/courses/#{@course.id}/settings"
-      expect(fj('.summary tr:nth(1)').text).to match /weirdo \(inactive\):\s*1/
-      expect(fj('.summary tr:nth(3)').text).to match /teach:\s*1/
-      expect(fj('.summary tr:nth(5)').text).to match /taaaa:\s*None/
+      expect(fj('.summary tr:nth(1)').text).to match(/weirdo \(inactive\):\s*1/)
+      expect(fj('.summary tr:nth(3)').text).to match(/teach:\s*1/)
+      expect(fj('.summary tr:nth(5)').text).to match(/taaaa:\s*None/)
     end
 
-    it "should show publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
+    it "shows publish/unpublish buttons for k5 subject courses", ignore_js_errors: true do
       @account.enable_as_k5_account!
       course_with_teacher_logged_in(:active_all => true)
       get "/courses/#{@course.id}/settings"
@@ -467,8 +464,8 @@ describe "course settings" do
     end
   end
 
-  it "should restrict student access inputs be hidden" do
-    @account.settings[:restrict_student_future_view] = {:locked => true, :value => true}
+  it "restricts student access inputs be hidden" do
+    @account.settings[:restrict_student_future_view] = { :locked => true, :value => true }
     @account.save!
 
     get "/courses/#{@course.id}/settings"
@@ -477,7 +474,7 @@ describe "course settings" do
     expect(f('#course_restrict_student_future_view')).to_not be_displayed
   end
 
-  it "should disable editing settings if :manage rights are not granted" do
+  it "disables editing settings if :manage rights are not granted" do
     user_factory(active_all: true)
     user_session(@user)
     role = custom_account_role('role', :account => @account)
@@ -493,7 +490,7 @@ describe "course settings" do
     expect(f("#content")).not_to contain_css(".course_form button[type='submit']")
   end
 
-  it "should let a sub-account admin edit enrollment term" do
+  it "lets a sub-account admin edit enrollment term" do
     term = Account.default.enrollment_terms.create!(:name => "some term")
     sub_a = Account.default.sub_accounts.create!
     account_admin_user(:active_all => true, :account => sub_a)
@@ -510,12 +507,12 @@ describe "course settings" do
   end
 
   context "link validator" do
-    before (:each) do
+    before(:each) do
       Setting.set('link_validator_poll_timeout', 100)
       Setting.set('link_validator_poll_timeout_initial', 100)
     end
 
-    it "should validate all the links" do
+    it "validates all the links" do
       allow_any_instance_of(CourseLinkValidator).to receive(:reachable_url?).and_return(false) # don't actually ping the links for the specs
 
       course_with_teacher_logged_in
@@ -534,8 +531,8 @@ describe "course settings" do
       @course.save!
 
       bank = @course.assessment_question_banks.create!(:title => 'bank')
-      aq = bank.assessment_questions.create!(:question_data => {'question_name' => 'test question',
-        'question_text' => html, 'answers' => [{'id' => 1}, {'id' => 2}]})
+      aq = bank.assessment_questions.create!(:question_data => { 'question_name' => 'test question',
+                                                                 'question_text' => html, 'answers' => [{ 'id' => 1 }, { 'id' => 2 }] })
 
       assmnt = @course.assignments.create!(:title => 'assignment', :description => html)
       event = @course.calendar_events.create!(:title => "event", :description => html)
@@ -549,7 +546,7 @@ describe "course settings" do
 
       get "/courses/#{@course.id}/settings"
 
-      expect_new_page_load{ f(".validator_link").click }
+      expect_new_page_load { f(".validator_link").click }
 
       f('#link_validator_wrapper button').click
       wait_for_ajaximations
@@ -561,20 +558,20 @@ describe "course settings" do
       expect(f("#all-results .alert")).to include_text("Found 17 broken links")
 
       result_links = ff("#all-results .result h2 a")
-      expect(result_links.map{|link| link.text.strip}).to match_array([
-        'Course Syllabus',
-        aq.question_data[:question_name],
-        qq.question_data[:question_name],
-        assmnt.title,
-        event.title,
-        topic.title,
-        mod.name,
-        quiz.title,
-        page.title
-      ])
+      expect(result_links.map { |link| link.text.strip }).to match_array([
+                                                                           'Course Syllabus',
+                                                                           aq.question_data[:question_name],
+                                                                           qq.question_data[:question_name],
+                                                                           assmnt.title,
+                                                                           event.title,
+                                                                           topic.title,
+                                                                           mod.name,
+                                                                           quiz.title,
+                                                                           page.title
+                                                                         ])
     end
 
-    it "should be able to filter links to unpublished content" do
+    it "is able to filter links to unpublished content" do
       course_with_teacher_logged_in
 
       active = @course.assignments.create!(:title => "blah")
@@ -605,10 +602,10 @@ describe "course settings" do
       expect(f("#all-results")).to be_displayed
 
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
-      syllabus_result = ff('#all-results .result').detect{|r| r.text.include?("Course Syllabus")}
+      syllabus_result = ff('#all-results .result').detect { |r| r.text.include?("Course Syllabus") }
       expect(syllabus_result).to include_text('unpublished link')
       expect(syllabus_result).to include_text('deleted link')
-      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      page_result = ff('#all-results .result').detect { |r| r.text.include?(page.title) }
       expect(page_result).to include_text('unpublished link')
 
       # hide the unpublished results
@@ -625,7 +622,7 @@ describe "course settings" do
       move_to_click('label[for=show_unpublished]')
 
       expect(f("#all-results .alert")).to include_text("Found 3 broken links")
-      page_result = ff('#all-results .result').detect{|r| r.text.include?(page.title)}
+      page_result = ff('#all-results .result').detect { |r| r.text.include?(page.title) }
       expect(page_result).to include_text('unpublished link')
     end
   end

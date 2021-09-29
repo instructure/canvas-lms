@@ -20,7 +20,6 @@
 
 module SIS
   class AbstractCourseImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       AbstractCourse.process_as_sis(@sis_options) do
@@ -46,7 +45,7 @@ module SIS
         @success_count = 0
       end
 
-      def add_abstract_course(abstract_course_id, short_name, long_name, status, term_id=nil, account_id=nil, fallback_account_id=nil)
+      def add_abstract_course(abstract_course_id, short_name, long_name, status, term_id = nil, account_id = nil, fallback_account_id = nil)
         raise ImportError, "No abstract_course_id given for an abstract course" if abstract_course_id.blank?
         raise ImportError, "No short_name given for abstract course #{abstract_course_id}" if short_name.blank?
         raise ImportError, "No long_name given for abstract course #{abstract_course_id}" if long_name.blank?
@@ -88,8 +87,6 @@ module SIS
         end
         @success_count += 1
       end
-
     end
-
   end
 end

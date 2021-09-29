@@ -86,7 +86,7 @@ class AdminsController < ApplicationController
       if admin.save
         # if they don't provide it, or they explicitly want it
         if params[:send_confirmation].nil? ||
-          Canvas::Plugin.value_to_boolean(params[:send_confirmation])
+           Canvas::Plugin.value_to_boolean(params[:send_confirmation])
           if user.registered?
             admin.account_user_notification!
           else
@@ -138,7 +138,7 @@ class AdminsController < ApplicationController
       scope = scope.where(user_id: user_ids) if user_ids
       route = polymorphic_url([:api_v1, @context, :admins])
       admins = Api.paginate(scope.order(:id), self, route)
-      render :json => admins.collect{ |admin| admin_json(admin, @current_user, session) }
+      render :json => admins.collect { |admin| admin_json(admin, @current_user, session) }
     end
   end
 

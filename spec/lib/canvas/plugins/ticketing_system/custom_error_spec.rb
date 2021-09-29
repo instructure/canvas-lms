@@ -22,20 +22,19 @@ require_dependency "canvas/plugins/ticketing_system/custom_error"
 
 module Canvas::Plugins::TicketingSystem
   describe CustomError do
-    let(:report){ ErrorReport.new }
+    let(:report) { ErrorReport.new }
     let(:delegate) { CustomError.new(report) }
 
     describe "#to_document" do
       it "translates an error_report to a json-able hash" do
-        expect(delegate.to_document).to eq({:subject=>nil, :description=>nil,
-           :report_type=>"ERROR", :error_message=>nil, :perceived_severity=>'',
-           :account_id=>nil, :account_domain=>nil, :report_origin_url=>nil,
-           :reporter=>
-             {:canvas_id=>"", :email=>"unknown-unknowndomain-example-com@instructure.example.com",
-              :name=>"Unknown User", :role=>nil, :become_user_uri=>nil, :environment=>nil},
-           :canvas_details=>
-             {:request_context_id=>nil, :error_report_id=>nil, :sub_account=>nil}
-        })
+        expect(delegate.to_document).to eq({ :subject => nil, :description => nil,
+                                             :report_type => "ERROR", :error_message => nil, :perceived_severity => '',
+                                             :account_id => nil, :account_domain => nil, :report_origin_url => nil,
+                                             :reporter =>
+             { :canvas_id => "", :email => "unknown-unknowndomain-example-com@instructure.example.com",
+               :name => "Unknown User", :role => nil, :become_user_uri => nil, :environment => nil },
+                                             :canvas_details =>
+             { :request_context_id => nil, :error_report_id => nil, :sub_account => nil } })
       end
     end
 
@@ -46,8 +45,8 @@ module Canvas::Plugins::TicketingSystem
         report.data['context_asset_string'] = "42"
         context = double(account_id: "123")
         allow(asset_manager).to receive(:find_by_asset_string).with("42").and_return(context)
-        expect(delegate.sub_account_tag(asset_manager, context.class)).
-          to eq("subaccount_123")
+        expect(delegate.sub_account_tag(asset_manager, context.class))
+          .to eq("subaccount_123")
       end
 
       # since Course is the expected type, we just need to NOT send
@@ -155,12 +154,9 @@ module Canvas::Plugins::TicketingSystem
       end
 
       it "maps an env hash to a json string" do
-        report.http_env = {one: "two", three: "four"}
-        expect(delegate.pretty_http_env).to eq( %Q{one: "two"\nthree: "four"})
+        report.http_env = { one: "two", three: "four" }
+        expect(delegate.pretty_http_env).to eq(%Q{one: "two"\nthree: "four"})
       end
     end
-
   end
-
-
 end

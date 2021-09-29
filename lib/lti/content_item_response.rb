@@ -22,18 +22,16 @@
 # Likewise, all the methods added will be available for all controllers.
 
 module Lti
-
   class ContentItemResponse
-
     MEDIA_TYPES = [:assignments, :discussion_topics, :modules, :module_items, :pages, :quizzes, :files]
     SUPPORTED_EXPORT_TYPES = %w(common_cartridge)
 
     def initialize(context, controller, current_user, media_types, export_type)
       @context = context
-      @controller = controller #for url generation
+      @controller = controller # for url generation
       @current_user = current_user
       @media_types = media_types.with_indifferent_access
-      @export_type = export_type || 'common_cartridge' #legacy API behavior defaults to common cartridge
+      @export_type = export_type || 'common_cartridge' # legacy API behavior defaults to common cartridge
 
       raise Lti::Errors::InvalidMediaTypeError unless media_types_valid?
       raise Lti::Errors::UnsupportedExportTypeError unless SUPPORTED_EXPORT_TYPES.include? @export_type
@@ -43,7 +41,7 @@ module Lti
       unless @query_params
         select = {}
         @media_types.each { |k, v| select[k] = v }
-        @query_params = {"export_type" => @export_type}
+        @query_params = { "export_type" => @export_type }
         @query_params['select'] = select if select.present?
       end
       @query_params
@@ -53,14 +51,14 @@ module Lti
       unless @media_type
         if canvas_media_type == 'module_item'
           case tag.content
-            when Assignment
-              @media_type = 'assignment'
-            when DiscussionTopic
-              @media_type = 'discussion_topic'
-            when Quizzes::Quiz
-              @media_type = 'quiz'
-            when WikiPage
-              @media_type = 'page'
+          when Assignment
+            @media_type = 'assignment'
+          when DiscussionTopic
+            @media_type = 'discussion_topic'
+          when Quizzes::Quiz
+            @media_type = 'quiz'
+          when WikiPage
+            @media_type = 'page'
           end
         else
           @media_type = canvas_media_type
@@ -78,9 +76,9 @@ module Lti
       @tag
     end
 
-
     def file
       return unless @media_types.include? :files
+
       unless @file
         @file = Attachment.where(:id => @media_types[:files].first).first
         if @context.is_a?(Account)
@@ -97,22 +95,22 @@ module Lti
 
     def title
       @title ||= case canvas_media_type
-                   when 'file'
-                     file.display_name
-                   when 'assignment'
-                     @context.assignments.where(id: @media_types[:assignments].first).first.title
-                   when 'discussion_topic'
-                     @context.discussion_topics.where(id: @media_types[:discussion_topics].first).first.title
-                   when 'module'
-                     @context.context_modules.where(id: @media_types[:modules].first).first.name
-                   when 'page'
-                     @context.wiki_pages.where(id: @media_types[:pages].first).first.title
-                   when 'module_item'
-                     tag.title
-                   when 'quiz'
-                     @context.quizzes.where(id: @media_types[:quizzes].first).first.title
-                   when 'course'
-                     @context.name
+                 when 'file'
+                   file.display_name
+                 when 'assignment'
+                   @context.assignments.where(id: @media_types[:assignments].first).first.title
+                 when 'discussion_topic'
+                   @context.discussion_topics.where(id: @media_types[:discussion_topics].first).first.title
+                 when 'module'
+                   @context.context_modules.where(id: @media_types[:modules].first).first.name
+                 when 'page'
+                   @context.wiki_pages.where(id: @media_types[:pages].first).first.title
+                 when 'module_item'
+                   tag.title
+                 when 'quiz'
+                   @context.quizzes.where(id: @media_types[:quizzes].first).first.title
+                 when 'course'
+                   @context.name
                  end
     end
 
@@ -121,29 +119,28 @@ module Lti
     end
 
     def url
-      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, {:verifier => file.uuid, :download => '1', :download_frd => '1'}) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
+      @url ||= @media_types.include?(:files) ? @controller.file_download_url(file, { :verifier => file.uuid, :download => '1', :download_frd => '1' }) : @controller.api_v1_course_content_exports_url(@context) + '?' + query_params.to_query
     end
 
-    def as_json(opts={})
+    def as_json(opts = {})
       case opts[:lti_message_type]
-        when 'ContentItemSelectionResponse'
-          content_item_selection_response_json
-        when 'ContentItemSelection'
-          content_item_selection_json
-        else
-          raise Lti::Errors::UnsupportedMessageTypeError
+      when 'ContentItemSelectionResponse'
+        content_item_selection_response_json
+      when 'ContentItemSelection'
+        content_item_selection_json
+      else
+        raise Lti::Errors::UnsupportedMessageTypeError
       end
     end
-
 
     private
 
     def canvas_media_type
       @canvas_media_type ||= if @media_types.keys.size == 1
-        @media_types.keys.first.to_s.singularize
-      else
-        'course'
-      end
+                               @media_types.keys.first.to_s.singularize
+                             else
+                               'course'
+                             end
     end
 
     def media_types_valid?
@@ -204,6 +201,5 @@ module Lti
         ]
       }
     end
-
   end
 end

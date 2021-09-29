@@ -39,8 +39,8 @@ if Rails.env.test?
     def raise(*args)
       if defined?(SpecTimeLimit) && args.first == SpecTimeLimit::Error
         have_ever_run_a_debugger = (
-          defined?(Byebug) && Byebug.respond_to?(:started?) ||
-          defined?(Pry) && Pry::InputLock.input_locks.any?
+          (defined?(Byebug) && Byebug.respond_to?(:started?)) ||
+          (defined?(Pry) && Pry::InputLock.input_locks.any?)
         )
         if have_ever_run_a_debugger
           Rails.logger.warn "Ignoring timeout because we're debugging"

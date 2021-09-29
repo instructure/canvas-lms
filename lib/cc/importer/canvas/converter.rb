@@ -56,7 +56,7 @@ module CC::Importer::Canvas
       set_progress(20)
       @course[:assignments] = convert_canvas_assignments
       set_progress(30)
-      @course[:discussion_topics], @course[:announcements]  = convert_topics_and_announcements
+      @course[:discussion_topics], @course[:announcements] = convert_topics_and_announcements
       set_progress(40)
       lti = CC::Importer::BLTIConverter.new
       res = lti.get_blti_resources(@manifest)
@@ -80,7 +80,7 @@ module CC::Importer::Canvas
       # for master course sync
       @course[:deletions] = @settings[:deletions] if @settings[:deletions].present?
 
-      #close up shop
+      # close up shop
       save_to_file
       set_progress(90)
       delete_unzipped_archive

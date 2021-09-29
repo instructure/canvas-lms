@@ -58,12 +58,12 @@ describe CC::LtiResourceLinks do
 
     it 'sets the correct namespace' do
       expect(subject.namespaces).to eq({
-        'xmlns' => 'http://www.imsglobal.org/xsd/imslticc_v1p3',
-        'xmlns:blti' => 'http://www.imsglobal.org/xsd/imsbasiclti_v1p0',
-        'xmlns:lticm' => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
-        'xmlns:lticp' => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
-        'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
-      })
+                                         'xmlns' => 'http://www.imsglobal.org/xsd/imslticc_v1p3',
+                                         'xmlns:blti' => 'http://www.imsglobal.org/xsd/imsbasiclti_v1p0',
+                                         'xmlns:lticm' => 'http://www.imsglobal.org/xsd/imslticm_v1p0',
+                                         'xmlns:lticp' => 'http://www.imsglobal.org/xsd/imslticp_v1p0',
+                                         'xmlns:xsi' => 'http://www.w3.org/2001/XMLSchema-instance'
+                                       })
     end
 
     it 'sets the title' do

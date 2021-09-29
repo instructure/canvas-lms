@@ -19,7 +19,6 @@
 #
 
 shared_examples_for 'WebConference' do
-
   describe "WebConference interface" do
     it { is_expected.to respond_to :initiate_conference }
     it { is_expected.to respond_to :conference_status }
@@ -29,5 +28,4 @@ shared_examples_for 'WebConference' do
     it { is_expected.to respond_to :infer_conference_settings }
     # admin_settings_url is an optional interface
   end
-
 end

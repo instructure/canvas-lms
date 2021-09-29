@@ -34,14 +34,16 @@ class ReportSnapshot < ActiveRecord::Base
       if month[key]
         stamp = ((Time.utc(month['year'], month['month'], 1).to_date >> 1) - 1.day).to_time.to_i
         next if stamp > now
-        items << [stamp.to_i*1000, month[key]]
+
+        items << [stamp.to_i * 1000, month[key]]
       end
     end
     report['weekly'].each do |week|
       if week[key]
         stamp = (week['week'] * 604800) + ((week['year'] - 1970) * 31556926)
         next if stamp > now
-        items << [stamp*1000, week[key]]
+
+        items << [stamp * 1000, week[key]]
       end
     end
     items.sort_by(&:first).uniq(&:first)
@@ -58,7 +60,7 @@ class ReportSnapshot < ActiveRecord::Base
   def data
     if !@data
       @data = JSON.parse(read_attribute(:data) || '{}')
-      @data['generated_at'] = Time.at(@data['generated_at'].to_i/1000) if @data['generated_at']
+      @data['generated_at'] = Time.at(@data['generated_at'].to_i / 1000) if @data['generated_at']
     end
     @data
   end
@@ -69,6 +71,7 @@ class ReportSnapshot < ActiveRecord::Base
 
   def serialize_data
     return unless @data
+
     data = @data.dup
     data['generated_at'] = data['generated_at'].to_i * 1000 if data['generated_at']
     write_attribute(:data, data.to_json)
@@ -81,18 +84,19 @@ class ReportSnapshot < ActiveRecord::Base
     begin
       return if self.report_type != REPORT_TO_SEND
       return if self.account != Account.default
+
       collection_type = Setting.get("usage_statistics_collection", "opt_out")
-      return if collection_type  == "opt_out"
+      return if collection_type == "opt_out"
 
       require 'lib/ssl_common'
 
       data = {
-          "collection_type" => collection_type,
-          "installation_uuid" => Canvas.installation_uuid,
-          "report_type" => self.report_type,
-          "data" => read_attribute(:data),
-          "rails_env" => Rails.env
-        }
+        "collection_type" => collection_type,
+        "installation_uuid" => Canvas.installation_uuid,
+        "report_type" => self.report_type,
+        "data" => read_attribute(:data),
+        "rails_env" => Rails.env
+      }
 
       if collection_type == "opt_in"
         data["account_name"] = Account.default.name

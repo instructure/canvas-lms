@@ -39,7 +39,8 @@ const item = {
   pointsPossibleAfter: '30',
   pointsPossibleCurrent: '30',
   student: 'Norval Abbott',
-  time: '11:16pm'
+  time: '11:16pm',
+  gradedAnonymously: false
 }
 
 function WrappedComponent(props) {
@@ -74,13 +75,13 @@ describe('SearchResultsRow', () => {
   })
 
   it('displays placeholder text if assignment is anonymous and muted', () => {
-    expect(renderAndGetRow(2, {assignment: {anonymousGrading: true, muted: true}})).toBe(
+    expect(renderAndGetRow(2, {assignment: {name: '', anonymousGrading: true, muted: true}})).toBe(
       'Not available; assignment is anonymous'
     )
   })
 
   it('displays placeholder text if student name is missing', () => {
-    expect(renderAndGetRow(2, {student: null})).toBe('Not available')
+    expect(renderAndGetRow(2, {student: ''})).toBe('Not available')
   })
 
   it('displays the history grader', () => {

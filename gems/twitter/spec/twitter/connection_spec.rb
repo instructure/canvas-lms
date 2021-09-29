@@ -20,7 +20,6 @@
 require 'spec_helper'
 
 describe Twitter::Connection do
-
   describe ".config=" do
     it "accepts any object with a call interface" do
       conf_class = Class.new do
@@ -29,7 +28,7 @@ describe Twitter::Connection do
         end
       end
 
-      described_class.config =  conf_class.new
+      described_class.config = conf_class.new
       expect(described_class.config['monkey']).to eq('banana')
     end
 
@@ -49,11 +48,10 @@ describe Twitter::Connection do
       config = double(call: {})
       Twitter::Connection.config = config
       consumer = double(get_request_token: "token")
-      expect(OAuth::Consumer).to receive(:new).
-        with("key", "secret", anything).and_return(consumer)
+      expect(OAuth::Consumer).to receive(:new)
+        .with("key", "secret", anything).and_return(consumer)
 
       expect(Twitter::Connection.config_check(settings)).to be_nil
     end
   end
-
 end

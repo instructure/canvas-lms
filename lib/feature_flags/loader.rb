@@ -87,6 +87,7 @@ module FeatureFlags
       if value.is_a?(TrueClass) || value.is_a?(FalseClass)
         return value ? "on" : "off"
       end
+
       return value
     end
   end

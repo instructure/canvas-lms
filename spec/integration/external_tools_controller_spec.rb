@@ -33,14 +33,14 @@ describe ExternalToolsController do
   describe "POST 'create'" do
     let(:post_body) {
       'external_tool%5Bname%5D=IMS+Cert+Tool&external_tool%5Bprivacy_level%5D=name_only'\
-          '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
-          '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
-          '%5Bcert_userid%5D%5D=%24User.id&external_tool%5Bcustom_fields%5BComplex!%40%23%24%5E*()'\
-          '%7B%7D%5B%5DKEY%5D%5D=Complex!%40%23%24%5E*%3B()%7B%7D%5B%5D%C2%BDValue&external_tool'\
-          '%5Bcustom_fields%5Bcert_username%5D%5D=%24User.username&external_tool%5Bcustom_fields'\
-          '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
-          'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
-          'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
+        '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
+        '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
+        '%5Bcert_userid%5D%5D=%24User.id&external_tool%5Bcustom_fields%5BComplex!%40%23%24%5E*()'\
+        '%7B%7D%5B%5DKEY%5D%5D=Complex!%40%23%24%5E*%3B()%7B%7D%5B%5D%C2%BDValue&external_tool'\
+        '%5Bcustom_fields%5Bcert_username%5D%5D=%24User.username&external_tool%5Bcustom_fields'\
+        '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
+        'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
+        'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
     }
 
     it 'accepts form data' do
@@ -48,7 +48,7 @@ describe ExternalToolsController do
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
@@ -59,45 +59,44 @@ describe ExternalToolsController do
       post(
         "/api/v1/courses/#{@course.id}/external_tools",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
       tool = assigns[:tool]
       expect(tool.settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
     end
-
   end
 
   describe "PUT 'update'" do
     let(:post_body) {
       'external_tool%5Bname%5D=IMS+Cert+Tool&external_tool%5Bprivacy_level%5D=name_only'\
-      '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
-      '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
-      '%5Bcert_userid%5D%5D=%24User.id&external_tool%5Bcustom_fields%5BComplex!%40%23%24%5E*()'\
-      '%7B%7D%5B%5DKEY%5D%5D=Complex!%40%23%24%5E*%3B()%7B%7D%5B%5D%C2%BDValue&external_tool'\
-      '%5Bcustom_fields%5Bcert_username%5D%5D=%24User.username&external_tool%5Bcustom_fields'\
-      '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
-      'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
-      'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
+        '&external_tool%5Bconsumer_key%5D=29f0c0ad-0cff-433f-8e35-797bd34710ea&external_tool'\
+        '%5Bcustom_fields%5Bsimple_key%5D%5D=custom_simple_value&external_tool%5Bcustom_fields'\
+        '%5Bcert_userid%5D%5D=%24User.id&external_tool%5Bcustom_fields%5BComplex!%40%23%24%5E*()'\
+        '%7B%7D%5B%5DKEY%5D%5D=Complex!%40%23%24%5E*%3B()%7B%7D%5B%5D%C2%BDValue&external_tool'\
+        '%5Bcustom_fields%5Bcert_username%5D%5D=%24User.username&external_tool%5Bcustom_fields'\
+        '%5Btc_profile_url%5D%5D=%24ToolConsumerProfile.url&external_tool%5Bdomain%5D=null&'\
+        'external_tool%5Burl%5D=https%3A%2F%2Fwww.imsglobal.org%2Flti%2Fcert%2Ftc_tool.php%3F'\
+        'x%3DWith%2520Space%26y%3Dyes&external_tool%5Bdescription%5D=null&external_tool%5Bshared_secret%5D=secret'
     }
 
-    it "should not update tool if user lacks update_manually" do
+    it "does not update tool if user lacks update_manually" do
       user_session(@student)
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
       assert_status(401)
     end
 
-    it "should update tool if user is granted update_manually" do
+    it "updates tool if user is granted update_manually" do
       user_session(@teacher)
       tool = new_valid_tool(@course)
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
       assert_status(200)
     end
@@ -108,7 +107,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
       expect(response).to be_successful
       expect(assigns[:tool]).not_to be_nil
@@ -120,7 +119,7 @@ describe ExternalToolsController do
       put(
         "/api/v1/courses/#{@course.id}/external_tools/#{tool.id}",
         params: post_body,
-        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded '}
+        headers: { 'CONTENT_TYPE' => 'application/x-www-form-urlencoded ' }
       )
 
       expect(assigns[:tool].settings[:custom_fields]["Complex!@#$^*(){}[]KEY"]).to eq 'Complex!@#$^*;(){}[]½Value'
@@ -149,7 +148,7 @@ describe ExternalToolsController do
 
       let(:app_center_response) do
         {
-          "id"   =>163,
+          "id" => 163,
           "short_name" => "pr_youtube",
           "name" => "YouTube",
           "description" => "\n<p>Search publicly available YouTube videos.</p>\n",
@@ -191,7 +190,7 @@ describe ExternalToolsController do
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
           params: post_body.to_json,
-          headers: {'CONTENT_TYPE' => 'application/json'}
+          headers: { 'CONTENT_TYPE' => 'application/json' }
         )
 
         expect(response).to be_successful
@@ -205,7 +204,7 @@ describe ExternalToolsController do
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
           params: post_body.to_json,
-          headers: {'CONTENT_TYPE' => 'application/json'}
+          headers: { 'CONTENT_TYPE' => 'application/json' }
         )
 
         expect(response).not_to be_successful
@@ -217,7 +216,7 @@ describe ExternalToolsController do
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
           params: post_body.to_json,
-          headers: {'CONTENT_TYPE' => 'application/json'}
+          headers: { 'CONTENT_TYPE' => 'application/json' }
         )
 
         expect(response).to be_successful
@@ -231,7 +230,7 @@ describe ExternalToolsController do
         post(
           "/api/v1/courses/#{@course.id}/create_tool_with_verification",
           params: post_body.to_json,
-          headers: {'CONTENT_TYPE' => 'application/json'}
+          headers: { 'CONTENT_TYPE' => 'application/json' }
         )
 
         expect(response).to be_successful

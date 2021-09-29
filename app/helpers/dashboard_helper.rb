@@ -60,7 +60,7 @@ module DashboardHelper
 
   def activity_category_links(category, items)
     max_contexts = 4
-    contexts = items.map{ |i| [i.context.name, i.context.linked_to] }.uniq
+    contexts = items.map { |i| [i.context.name, i.context.linked_to] }.uniq
     contexts_count = contexts.count
 
     # use the "and x more..." phrasing if > max_contexts contexts
@@ -113,24 +113,24 @@ module DashboardHelper
     case category
     when "Announcement"
       return I18n.t('helpers.dashboard_helper.x_new_in_announcements',
-               { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
-               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+                    { :one => "*1* Announcement", :other => "*%{count}* Announcements" },
+                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Conversation"
       return I18n.t('helpers.dashboard_helper.x_new_in_conversations',
-               { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
-               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+                    { :one => "*1* Conversation Message", :other => "*%{count}* Conversation Messages" },
+                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "Assignment"
       return I18n.t('helpers.dashboard_helper.x_new_in_assignments',
-               { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
-               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+                    { :one => "*1* Assignment Notification", :other => "*%{count}* Assignment Notifications" },
+                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "DiscussionEntry", "DiscussionTopic"
       return I18n.t('helpers.dashboard_helper.x_new_in_discussions',
-               { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
-               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+                    { :one => "*1* Discussion", :other => "*%{count}* Discussions" },
+                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     when "AssessmentRequest"
       return I18n.t('helpers.dashboard_helper.x_new_in_peer_reviews',
-               { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
-               { :count => items.size, :wrapper => '<b class="count">\1</b>' })
+                    { :one => "*1* Peer Review", :other => "*%{count}* Peer Reviews" },
+                    { :count => items.size, :wrapper => '<b class="count">\1</b>' })
     else
       raise "Unknown activity category"
     end
@@ -150,14 +150,13 @@ module DashboardHelper
     todo_ignore_dropdown_type?(activity_type) ? 'al-trigger disable_item_link' : 'disable_item_link disable-todo-item-link'
   end
 
-  def map_courses_for_menu(courses, opts={})
+  def map_courses_for_menu(courses, opts = {})
     Course.preload_menu_data_for(courses, @current_user, preload_favorites: true)
     mapped = courses.map do |course|
       presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, opts)
       presenter.to_h
     end
 
-    mapped.sort_by {|h| h[:position] || ::CanvasSort::Last}
+    mapped.sort_by { |h| h[:position] || ::CanvasSort::Last }
   end
-
 end

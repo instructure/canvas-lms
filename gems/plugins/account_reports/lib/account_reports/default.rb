@@ -20,7 +20,6 @@
 
 module AccountReports
   module Default
-
     # when adding new reports to this file make sure to add a migration to
     # enable the new report for all accounts with DataFixup::AddNewDefaultReport
 
@@ -53,11 +52,11 @@ module AccountReports
     end
 
     def self.sis_export_csv(account_report)
-      SisExporter.new(account_report, {:sis_format => true}).csv
+      SisExporter.new(account_report, { :sis_format => true }).csv
     end
 
     def self.provisioning_csv(account_report)
-      SisExporter.new(account_report, {:sis_format => false}).csv
+      SisExporter.new(account_report, { :sis_format => false }).csv
     end
 
     def self.unpublished_courses_csv(account_report)

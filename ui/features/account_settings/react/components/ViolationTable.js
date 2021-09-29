@@ -115,7 +115,7 @@ export default function ViolationTable({
 
   return (
     <Table caption={I18n.t('CSP Violations')}>
-      <Table.Head>
+      <Table.Head renderSortLabel={<ScreenReaderContent>{I18n.t('Sort by')}</ScreenReaderContent>}>
         <Table.Row>
           {HEADERS.map(header => {
             return (

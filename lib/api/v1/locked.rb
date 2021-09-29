@@ -21,10 +21,10 @@
 module Api::V1::Locked
   include ApplicationHelper
 
-  def locked_json(hash, object, user, type, options={})
+  def locked_json(hash, object, user, type, options = {})
     context = object.context if object.respond_to?(:context)
     locked = nil
-    locked = object.locked_for?(user, {check_policies: true, context: context}.merge(options)) if object.respond_to?(:locked_for?)
+    locked = object.locked_for?(user, { check_policies: true, context: context }.merge(options)) if object.respond_to?(:locked_for?)
 
     hash[:locked_for_user] = !!locked
     if locked

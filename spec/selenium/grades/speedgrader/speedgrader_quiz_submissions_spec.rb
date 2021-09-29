@@ -32,7 +32,7 @@ describe "speed grader - quiz submissions" do
     student_in_course
     2.times do |i|
       qs = @quiz.generate_submission(@student)
-      opts = i == 0 ? {finished_at: (Time.zone.today - 7) + 30.minutes} : {}
+      opts = i == 0 ? { finished_at: (Time.zone.today - 7) + 30.minutes } : {}
       Quizzes::SubmissionGrader.new(qs).grade_submission(opts)
     end
   end
@@ -82,15 +82,15 @@ describe "speed grader - quiz submissions" do
     # create our quiz and our multiple answers question
     @context = @course
     @q = quiz_model
-    answers = [ {'id': 1, 'text': 'one', 'weight': 100},
-                {'id': 2, 'text':'two', 'weight': 100},
-                {'id': 3, 'text': 'three', 'weight': 100},
-                {'id': 4, 'text': 'four', 'weight': 0} ]
+    answers = [{ id: 1, text: 'one', weight: 100 },
+               { id: 2, text: 'two', weight: 100 },
+               { id: 3, text: 'three', weight: 100 },
+               { id: 4, text: 'four', weight: 0 }]
     @quest1 = @q.quiz_questions.create!(
       question_data: {
         name: "first question",
-        'question_type': 'multiple_answers_question',
-        'answers': answers,
+        question_type: 'multiple_answers_question',
+        answers: answers,
         points_possible: 4
       }
     )
@@ -100,7 +100,7 @@ describe "speed grader - quiz submissions" do
     # create a submission and answer our question
     qs = @q.generate_submission(@student)
     (1..4).each do |var|
-       qs.submission_data["question_#{@quest1.id}_answer_#{var}"] = "1"
+      qs.submission_data["question_#{@quest1.id}_answer_#{var}"] = "1"
     end
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
@@ -146,7 +146,7 @@ describe "speed grader - quiz submissions" do
     @quiz.workflow_state = 'available'
     @quiz.save!
     qs = @quiz.generate_submission(@student)
-    qs.submission_data = {"foo": "bar1"}
+    qs.submission_data = { foo: "bar1" }
     Quizzes::SubmissionGrader.new(qs).grade_submission
 
     get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
@@ -163,28 +163,28 @@ describe "speed grader - quiz submissions" do
   end
 
   it "properly displays student quiz results when the teacher also " \
-    "has a student enrollment", priority: "2", test_id: 283740 do
+     "has a student enrollment", priority: "2", test_id: 283740 do
     @course.enroll_student(@teacher).accept!
 
     @quiz.quiz_questions.create!(quiz: @quiz, question_data: {
-        position: 1,
-        question_type: "true_false_question",
-        points_possible: 3,
-        question_name: "true false question"
-    })
+                                   position: 1,
+                                   question_type: "true_false_question",
+                                   points_possible: 3,
+                                   question_name: "true false question"
+                                 })
     @quiz.generate_quiz_data
     @quiz.workflow_state = 'available'
     @quiz.save!
 
     [@student, @teacher].each do
       @quiz.generate_submission(@student).tap do |qs|
-        qs.submission_data = {'foo': 'bar1'}
+        qs.submission_data = { foo: 'bar1' }
         Quizzes::SubmissionGrader.new(qs).grade_submission
       end
     end
 
     get "/courses/#{@course.id}/gradebook/speed_grader?" \
-      "assignment_id=#{@assignment.id}&student_id=#{@student.id}"
+        "assignment_id=#{@assignment.id}&student_id=#{@student.id}"
     wait_for_ajaximations
 
     in_frame('speedgrader_iframe', '.quiz-header') do

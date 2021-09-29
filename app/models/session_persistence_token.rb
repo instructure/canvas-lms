@@ -42,15 +42,17 @@ class SessionPersistenceToken < ActiveRecord::Base
   belongs_to :pseudonym
 
   attr_accessor :uncrypted_token
+
   validates_presence_of :pseudonym_id, :crypted_token, :token_salt
 
   def self.generate(pseudonym)
     salt = SecureRandom.hex(8)
     token = SecureRandom.hex(32)
     pseudonym.session_persistence_tokens.create!(
-                 :token_salt => salt,
-                 :uncrypted_token => token,
-                 :crypted_token => self.hashed_token(salt, token))
+      :token_salt => salt,
+      :uncrypted_token => token,
+      :crypted_token => self.hashed_token(salt, token)
+    )
   end
 
   def self.hashed_token(salt, token)
@@ -64,9 +66,11 @@ class SessionPersistenceToken < ActiveRecord::Base
   def self.find_by_pseudonym_credentials(creds)
     token_id, persistence_token, uuid = creds.split("::")
     return unless token_id.present? && persistence_token.present? && uuid.present?
+
     token = self.where(id: token_id).first
     return unless token
     return unless token.valid_token?(persistence_token, uuid)
+
     return token
   end
 
@@ -84,6 +88,7 @@ class SessionPersistenceToken < ActiveRecord::Base
 
   def pseudonym_credentials
     raise "can't build pseudonym_credentials except on just-generated token" unless uncrypted_token
+
     "#{id}::#{pseudonym.persistence_token}::#{uncrypted_token}"
   end
 

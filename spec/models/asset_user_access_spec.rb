@@ -32,7 +32,7 @@ describe AssetUserAccess do
       @asset.save!
     end
 
-    it "should update existing records that have bad display names" do
+    it "updates existing records that have bad display names" do
       expect(@asset.display_name).to eq "My Assignment"
     end
 
@@ -40,14 +40,14 @@ describe AssetUserAccess do
       expect(@asset.root_account_id).to eq(@course.root_account_id)
     end
 
-    it "should update existing records that have changed display names" do
+    it "updates existing records that have changed display names" do
       @assignment.title = 'My changed Assignment'
       @assignment.save!
       AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
       expect(@asset.reload.display_name).to eq 'My changed Assignment'
     end
 
-    it "should work for assessment questions" do
+    it "works for assessment questions" do
       question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: @course))
       asset = AssetUserAccess.log @user, question, { level: 'view', code: @assignment.asset_string }
       expect(asset.context).to eq @course
@@ -85,27 +85,27 @@ describe AssetUserAccess do
     end
 
     describe "for_user" do
-      it "should work with a User object" do
+      it "works with a User object" do
         expect(AssetUserAccess.for_user(@user)).to eq [@asset]
       end
 
-      it "should work with a list of User objects" do
+      it "works with a list of User objects" do
         expect(AssetUserAccess.for_user([@user])).to eq [@asset]
       end
 
-      it "should work with a User id" do
+      it "works with a User id" do
         expect(AssetUserAccess.for_user(@user.id)).to eq [@asset]
       end
 
-      it "should work with a list of User ids" do
+      it "works with a list of User ids" do
         expect(AssetUserAccess.for_user([@user.id])).to eq [@asset]
       end
 
-      it "should with with an empty list" do
+      it "withs with an empty list" do
         expect(AssetUserAccess.for_user([])).to eq []
       end
 
-      it "should not find unrelated accesses" do
+      it "does not find unrelated accesses" do
         expect(AssetUserAccess.for_user(User.create!)).to eq []
         expect(AssetUserAccess.for_user(@user.id + 1)).to eq []
       end
@@ -148,7 +148,6 @@ describe AssetUserAccess do
     it "can load by user context" do
       expect(AssetUserAccess.for_context(@user)).to eq [@asset]
     end
-
   end
 
   describe '#log_action' do
@@ -308,7 +307,7 @@ describe AssetUserAccess do
     before { allow(access).to receive :save }
 
     describe 'attribute values directly from hash' do
-      def it_sets_if_nil( attribute, hash_key = nil)
+      def it_sets_if_nil(attribute, hash_key = nil)
         hash_key ||= attribute
         access.log(context, { hash_key => 'value' })
         expect(access.send(attribute)).to eq 'value'
@@ -317,9 +316,9 @@ describe AssetUserAccess do
         expect(access.send(attribute)).to eq 'other'
       end
 
-      specify { it_sets_if_nil( :asset_category, :category ) }
-      specify { it_sets_if_nil( :asset_group_code, :group_code ) }
-      specify { it_sets_if_nil( :membership_type ) }
+      specify { it_sets_if_nil(:asset_category, :category) }
+      specify { it_sets_if_nil(:asset_group_code, :group_code) }
+      specify { it_sets_if_nil(:membership_type) }
     end
 
     describe 'interally set or calculated attribute values' do
@@ -381,11 +380,10 @@ describe AssetUserAccess do
         expect(AssetUserAccess.last.root_account_id).to eq(0)
       end
     end
-
   end
 
   describe '#corrected_view_score' do
-    it 'should deduct the participation score from the view score for a quiz' do
+    it 'deducts the participation score from the view score for a quiz' do
       subject.view_score = 10
       subject.participate_score = 4
       subject.asset_group_code = 'quizzes'
@@ -393,19 +391,19 @@ describe AssetUserAccess do
       expect(subject.corrected_view_score).to eq 6
     end
 
-    it 'should return the normal view score for anything but a quiz' do
+    it 'returns the normal view score for anything but a quiz' do
       subject.view_score = 10
       subject.participate_score = 4
 
       expect(subject.corrected_view_score).to eq 10
     end
 
-    it 'should not complain if there is no current score' do
+    it 'does not complain if there is no current score' do
       subject.view_score = nil
       subject.participate_score = 4
       allow(subject).to receive(:asset_group_code).and_return('quizzes')
 
-      expect(subject.corrected_view_score).to eq -4
+      expect(subject.corrected_view_score).to eq(-4)
     end
   end
 
@@ -417,7 +415,7 @@ describe AssetUserAccess do
     it "reads plugin setting for override" do
       ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs")
       ps.inheritance_scope = "shard"
-      ps.settings = { max_log_ids: [0,0,0,0,0,0,0], write_path: 'log' }
+      ps.settings = { max_log_ids: [0, 0, 0, 0, 0, 0, 0], write_path: 'log' }
       ps.save!
       expect(AssetUserAccess.view_counting_method).to eq("log")
     end

@@ -61,7 +61,7 @@ module MicrosoftSync
     MEMBER_MSFT_ROLE_TYPE = 'member'
 
     def initialize(user_id_to_msft_role_types)
-      @user_infos = user_id_to_msft_role_types.to_h.transform_values{|ctypes| UserInfo.new(ctypes)}
+      @user_infos = user_id_to_msft_role_types.to_h.transform_values { |ctypes| UserInfo.new(ctypes) }
     end
 
     def set_local_member(user_id, enrollment_type)
@@ -95,8 +95,9 @@ module MicrosoftSync
     end
 
     private
+
     def aads_with_action(action)
-      @user_infos.values.select{|info| info.actions.include?(action)}.map(&:aad_id).compact.uniq
+      @user_infos.values.select { |info| info.actions.include?(action) }.map(&:aad_id).compact.uniq
     end
 
     class UserInfo
@@ -112,17 +113,17 @@ module MicrosoftSync
       #
       # Actions for when there is a "member" PartialSyncChange:
       MEMBER_MSFT_ROLE_TYPE_ACTIONS = {
-        []               => %i[remove_member],
-        %w[member]       => %i[add_member],
-        %w[owner]        => [],
+        [] => %i[remove_member],
+        %w[member] => %i[add_member],
+        %w[owner] => [],
         %w[member owner] => %i[add_member],
       }.transform_keys(&:freeze).transform_values(&:freeze).freeze
 
       # Used if there is an "owner" change or both a "member" and "owner" PartialSyncChange:
       OWNER_MSFT_ROLE_TYPE_ACTIONS = {
-        []               => %i[remove_member remove_owner],
-        %w[member]       => %i[add_member remove_owner],
-        %w[owner]        => %i[add_member add_owner],
+        [] => %i[remove_member remove_owner],
+        %w[member] => %i[add_member remove_owner],
+        %w[owner] => %i[add_member add_owner],
         %w[member owner] => %i[add_member add_owner],
       }.transform_keys(&:freeze).transform_values(&:freeze).freeze
 

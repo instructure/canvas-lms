@@ -62,10 +62,10 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
       next unless enrollment == requested_enrollment
 
       return_value = if score.valid?
-        {grades: score}
-      else
-        errors_for(score)
-      end
+                       { grades: score }
+                     else
+                       errors_for(score)
+                     end
     end
 
     return_value

@@ -29,6 +29,7 @@ module Canvas::Vault
       unless cache
         vault_resp = api_client.logical.read(path)
         raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+
         return vault_resp&.data
       end
 
@@ -40,6 +41,7 @@ module Canvas::Vault
       cached_data = LocalCache.fetch(cache_key, expires_in: default_expiry, race_condition_ttl: default_race_condition_ttl) do
         vault_resp = api_client.logical.read(path)
         raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+
         fetched_lease_value = vault_resp&.lease_duration
         fetched_lease_value = vault_resp&.data&.[](:ttl) unless fetched_lease_value&.positive?
         fetched_lease_value = 10.minutes unless fetched_lease_value&.positive?
@@ -56,6 +58,7 @@ module Canvas::Vault
       Canvas::Errors.capture_exception(:vault, exception)
       stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
       return stale_value if stale_value.present?
+
       # if we can't serve any stale value, we're better erroring than handing back nil
       raise
     end

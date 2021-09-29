@@ -37,6 +37,7 @@ module Lti
 
         def index
           return render_error(params[:error_message]) if params.key?(:error_message)
+
           render json: output
         end
 
@@ -54,7 +55,7 @@ module Lti
       let_once(:context) { course_model(workflow_state: 'available') }
       let_once(:user) { student_in_course(course: context).user }
       let_once(:assignment) do
-        opts = {course: context}
+        opts = { course: context }
         opts[:submission_types] = 'external_tool'
         opts[:external_tool_tag_attributes] = {
           url: tool.url,
@@ -78,7 +79,7 @@ module Lti
       end
       let_once(:line_item) { assignment.line_items.first }
       let(:parsed_response_body) { JSON.parse(response.body) }
-      let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
+      let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
       describe '#before_actions' do
         context 'with user and line item in context' do
@@ -108,7 +109,7 @@ module Lti
 
         context 'with uuid that first digit matches user_id' do
           before { user.enrollments.first.update!(workflow_state: 'active') }
-          let(:valid_params) { {course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id} }
+          let(:valid_params) { { course_id: context.id, user_id: "#{user.id}apzx", line_item_id: line_item.id } }
 
           it 'fails to find user' do
             get :index, params: valid_params
@@ -160,7 +161,7 @@ module Lti
           before { user.enrollments.first.update!(workflow_state: 'active') }
 
           it 'fails to process the request' do
-            get :index, params: {course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1}
+            get :index, params: { course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1 }
             expect(response).to be_not_found
           end
         end
@@ -172,7 +173,7 @@ module Lti
         end
 
         context 'when resource link id is missing' do
-          let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
+          let(:valid_params) { { course_id: context.id, userId: user.id, line_item_id: line_item.id } }
 
           it 'is ignored' do
             expect_any_instance_of(Assignment).not_to receive(:prepare_for_ags_if_needed!)
@@ -185,7 +186,7 @@ module Lti
             a2 = assignment.clone
             a2.lti_context_id = nil
             a2.save
-            {course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id}
+            { course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id }
           }
 
           it 'fails to match assignment tool' do
@@ -196,7 +197,7 @@ module Lti
         end
 
         context 'with correct resource link id' do
-          let(:valid_params) { {course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id} }
+          let(:valid_params) { { course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id } }
 
           it 'fixes up line items on assignment' do
             expect_any_instance_of(Assignment).to receive(:prepare_for_ags_if_needed!)

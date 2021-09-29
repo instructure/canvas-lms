@@ -48,7 +48,7 @@ describe Mutations::CreateModule do
   end
 
   it "works" do
-    result = CanvasSchema.execute(mutation_str, context: {current_user: @teacher})
+    result = CanvasSchema.execute(mutation_str, context: { current_user: @teacher })
     expect(result.dig(*%w[data createModule module name])).to eq 'zxcv'
     new_module_id = result.dig(*%w[data createModule module _id])
     expect(@course.context_modules.find(new_module_id).name).to eq 'zxcv'
@@ -56,20 +56,20 @@ describe Mutations::CreateModule do
   end
 
   it "requires non-empty name" do
-    result = CanvasSchema.execute(mutation_str(name: ''), context: {current_user: @teacher})
+    result = CanvasSchema.execute(mutation_str(name: ''), context: { current_user: @teacher })
     expect(result.dig('data', 'createModule', 'errors')[0]['message']).to eq "can't be blank"
   end
 
   it "fails gracefully for invalid course id" do
     invalid_course_id = 0
-    result = CanvasSchema.execute(mutation_str(course_id: invalid_course_id), context: {current_user: @teacher})
+    result = CanvasSchema.execute(mutation_str(course_id: invalid_course_id), context: { current_user: @teacher })
     expect(result["errors"]).not_to be_nil
     expect(result.dig(*%w[data createModule])).to be_nil
   end
 
   it "requires permission" do
     student_in_course
-    result = CanvasSchema.execute(mutation_str, context: {current_user: @student})
+    result = CanvasSchema.execute(mutation_str, context: { current_user: @student })
     expect(result["errors"]).not_to be_nil
     expect(result.dig(*%w[data createModule])).to be_nil
   end

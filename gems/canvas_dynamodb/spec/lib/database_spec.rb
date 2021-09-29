@@ -21,10 +21,10 @@
 require "spec_helper"
 
 describe CanvasDynamoDB::Database do
-
   let(:logger_cls) do
     Class.new do
       attr_reader :messages
+
       def initialize
         @messages = []
       end
@@ -45,6 +45,7 @@ describe CanvasDynamoDB::Database do
     before(:each) do
       ddb_client_class = Class.new do
         attr_reader :last_query
+
         def get_item(hash)
           @last_query = hash
           {}
@@ -54,18 +55,18 @@ describe CanvasDynamoDB::Database do
     end
 
     it "prefixes table name on query" do
-      db.get_item(table_name: "my_table", key: {object_id: "dfas", mutation_id: "fasd"})
+      db.get_item(table_name: "my_table", key: { object_id: "dfas", mutation_id: "fasd" })
       expect(db.client.last_query[:table_name]).to eq("sdfa-my_table")
     end
 
     it "does not require prefix" do
       unprefix_db = CanvasDynamoDB::Database.new("123456", logger: logger_cls.new)
-      unprefix_db.get_item(table_name: "the_table", key: {object_id: "zxcv", mutation_id: "vcxz"})
+      unprefix_db.get_item(table_name: "the_table", key: { object_id: "zxcv", mutation_id: "vcxz" })
       expect(unprefix_db.client.last_query[:table_name]).to eq("the_table")
     end
 
     it "logs requests" do
-      db.get_item(table_name: "my_table", key: {object_id: "adsf", mutation_id: "afsd"})
+      db.get_item(table_name: "my_table", key: { object_id: "adsf", mutation_id: "afsd" })
       log_message = db.logger.messages.last
       expect(log_message).to match(/ DDB /)
       expect(log_message).to match(/\d+.\d+ms/)
@@ -74,9 +75,8 @@ describe CanvasDynamoDB::Database do
 
     it "can just be given a client object" do
       fake = Object.new
-      db = CanvasDynamoDB::Database.new("jklh", client_opts: {client: fake})
+      db = CanvasDynamoDB::Database.new("jklh", client_opts: { client: fake })
       expect(db.client).to eq(fake)
     end
   end
-
 end

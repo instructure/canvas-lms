@@ -20,7 +20,6 @@
 require_relative '../../common'
 
 module ImprovedOutcomeManagementPage
-
   # ---------------------- Elements ----------------------
   def state_standards_tree_button
     fj("button:contains('State Standards')")
@@ -172,7 +171,6 @@ module ImprovedOutcomeManagementPage
     f("span[data-testid='outcome-management-remove-modal']")
   end
 
-
   # ---------------------- Actions -----------------------
 
   def goto_improved_state_outcomes(outcome_url = "/accounts/self/outcomes")
@@ -254,11 +252,11 @@ module ImprovedOutcomeManagementPage
   end
 
   def select_outcome_group_with_text(text)
-    wait_for(method: nil, timeout: 2) {tree_browser.present?}
-    tree_browser_outcome_groups.select{|group| group.text.split("\n")[0] == text}.first
+    wait_for(method: nil, timeout: 2) { tree_browser.present? }
+    tree_browser_outcome_groups.select { |group| group.text.split("\n")[0] == text }.first
   end
 
   def select_drilldown_outcome_group_with_text(text)
-    drilldown_outcome_groups.select{|group| group.text.split("\n")[0] == text}.first
+    drilldown_outcome_groups.select { |group| group.text.split("\n")[0] == text }.first
   end
 end

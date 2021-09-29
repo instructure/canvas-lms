@@ -24,9 +24,8 @@ class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possi
     super(question_id, points_possible, 1, 0, 0)
     @points = 0.0
     @answer_data = answer_data
-    self.answer_details = {:text => answer_text || ""}
+    self.answer_details = { :text => answer_text || "" }
   end
-
 
   def [](k)
     @answer_data["question_#{question_id}_#{k}".to_sym]
@@ -40,6 +39,7 @@ class Quizzes::QuizQuestion::UserAnswer < Struct.new(:question_id, :points_possi
     if total_parts == 0
       return 0
     end
+
     score = (correct_parts.to_f / total_parts) * points_possible
     if incorrect_parts > 0
       if incorrect_dock

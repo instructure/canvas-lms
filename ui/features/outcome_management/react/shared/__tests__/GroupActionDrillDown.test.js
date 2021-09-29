@@ -142,9 +142,7 @@ describe('GroupActionDrillDown', () => {
   })
 
   it('selects a group if selectedGroupId is provided', () => {
-    const {getByText} = render(
-      <GroupActionDrillDown {...defaultProps({selectedGroupId: ['101']})} />
-    )
+    const {getByText} = render(<GroupActionDrillDown {...defaultProps({selectedGroupId: '101'})} />)
     fireEvent.click(getByText('Groups'))
     expect(getByText('Leaf folder')).toBeInTheDocument()
   })

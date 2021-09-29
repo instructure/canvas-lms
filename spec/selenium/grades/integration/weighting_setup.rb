@@ -69,12 +69,12 @@ module WeightingSetup
 
     backend_period_helper = Factories::GradingPeriodHelper.new
     @gp1 = backend_period_helper.create_for_group(@gpg, {
-      start_date: 1.hour.from_now, end_date: 2.weeks.from_now, title: 'grading period one'
-    })
+                                                    start_date: 1.hour.from_now, end_date: 2.weeks.from_now, title: 'grading period one'
+                                                  })
 
     @gp2 = backend_period_helper.create_for_group(@gpg, {
-      start_date: 2.weeks.ago, end_date: 1.day.ago, close_date: 1.week.from_now, title: 'grading period two'
-    })
+                                                    start_date: 2.weeks.ago, end_date: 1.day.ago, close_date: 1.week.from_now, title: 'grading period two'
+                                                  })
   end
 
   def create_assignments

@@ -31,7 +31,7 @@ describe CustomData do
       @custom_data.set_data(nil, str)
       expect(@custom_data.get_data(nil)).to eql str
 
-      hsh = {'lol'=>'hi', 'wut'=>'bye'}
+      hsh = { 'lol' => 'hi', 'wut' => 'bye' }
       @custom_data.set_data(nil, hsh)
       expect(@custom_data.get_data(nil)).to eql hsh
 
@@ -40,17 +40,17 @@ describe CustomData do
     end
 
     it "recognizes sub-scopes of previously-set data" do
-      @custom_data.set_data('kewl/skope', {'lol'=> {'wut'=>'ohai'} })
+      @custom_data.set_data('kewl/skope', { 'lol' => { 'wut' => 'ohai' } })
       expect(@custom_data.get_data('kewl/skope/lol/wut')).to eql 'ohai'
     end
 
     it "returns sub-scopes when a wide scope is requested" do
-      @custom_data.set_data('kewl/skope', {'lol'=> {'wut'=>'ohai'} })
-      expect(@custom_data.get_data('kewl')).to eql({'skope'=> {'lol'=> {'wut'=>'ohai'} } })
+      @custom_data.set_data('kewl/skope', { 'lol' => { 'wut' => 'ohai' } })
+      expect(@custom_data.get_data('kewl')).to eql({ 'skope' => { 'lol' => { 'wut' => 'ohai' } } })
     end
 
     it "raises ArgumentError for non-existing scopes" do
-      @custom_data.set_data('kewl/skope', {'lol'=> {'wut'=>'ohai'} })
+      @custom_data.set_data('kewl/skope', { 'lol' => { 'wut' => 'ohai' } })
       expect { @custom_data.get_data('no/data/here') }.to raise_error(ArgumentError)
     end
   end
@@ -64,25 +64,25 @@ describe CustomData do
 
   context "#delete_data" do
     it "deletes values" do
-      @custom_data.set_data(nil, {'a'=>1, 'b'=>2, 'c'=>3})
+      @custom_data.set_data(nil, { 'a' => 1, 'b' => 2, 'c' => 3 })
       expect(@custom_data.delete_data('a')).to eql 1
-      expect(@custom_data.get_data(nil)).to eql({'b'=>2, 'c'=>3})
+      expect(@custom_data.get_data(nil)).to eql({ 'b' => 2, 'c' => 3 })
     end
 
     it "cleans up empty JSON Objects if they result from value removal" do
-      @custom_data.set_data(nil, {'a'=> {'b'=> {'c'=>'bonjour!'}}, 'croissant'=>'merci!'})
+      @custom_data.set_data(nil, { 'a' => { 'b' => { 'c' => 'bonjour!' } }, 'croissant' => 'merci!' })
       expect(@custom_data.delete_data('a/b/c')).to eql 'bonjour!'
-      expect(@custom_data.get_data(nil)).to eql({'croissant'=>'merci!'})
+      expect(@custom_data.get_data(nil)).to eql({ 'croissant' => 'merci!' })
     end
 
     it "destroys the entire record if all of its data is removed" do
-      @custom_data.set_data(nil, {'a'=> {'b'=> {'c'=>'bonjour!'}}})
+      @custom_data.set_data(nil, { 'a' => { 'b' => { 'c' => 'bonjour!' } } })
       expect(@custom_data.delete_data('a/b/c')).to eql 'bonjour!'
       expect(@custom_data.destroyed?).to be_truthy
     end
 
     it "raises ArgumentError for non-existing scopes" do
-      @custom_data.set_data(nil, {'a'=>1, 'b'=>2, 'c'=>3})
+      @custom_data.set_data(nil, { 'a' => 1, 'b' => 2, 'c' => 3 })
       expect { @custom_data.delete_data('d') }.to raise_error(ArgumentError)
     end
   end

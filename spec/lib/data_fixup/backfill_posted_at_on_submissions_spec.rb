@@ -26,7 +26,7 @@ describe DataFixup::BackfillPostedAtOnSubmissions do
   let(:submission) { assignment.submission_for_student(student) }
 
   def do_backfill
-    DataFixup::BackfillPostedAtOnSubmissions.run(submission.id, submission.id+1)
+    DataFixup::BackfillPostedAtOnSubmissions.run(submission.id, submission.id + 1)
     submission.reload
   end
   private :do_backfill

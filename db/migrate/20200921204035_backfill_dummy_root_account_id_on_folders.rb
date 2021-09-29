@@ -22,6 +22,6 @@ class BackfillDummyRootAccountIdOnFolders < ActiveRecord::Migration[5.2]
 
   def up
     DataFixup::BackfillDummyRootAccountIdOnFolders.delay_if_production(priority: Delayed::LOWER_PRIORITY,
-      singleton: "long_data_fixups_#{Shard.current.database_server.id}").run
+                                                                       singleton: "long_data_fixups_#{Shard.current.database_server.id}").run
   end
 end

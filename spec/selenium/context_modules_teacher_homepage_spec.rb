@@ -34,7 +34,7 @@ describe "context modules" do
         get "/courses/#{@course.id}"
       end
 
-      it "should render as course home page", priority: "1", test_id: 126740 do
+      it "renders as course home page", priority: "1", test_id: 126740 do
         create_modules(1)
         @course.default_view = 'modules'
         @course.save!
@@ -42,7 +42,7 @@ describe "context modules" do
         expect(f('.add_module_link').text).not_to be_nil
       end
 
-      it "should add a new module", priority: "1", test_id: 126704 do
+      it "adds a new module", priority: "1", test_id: 126704 do
         add_module('New Module')
         mod = @course.context_modules.first
         expect(mod.name).to eq 'New Module'
@@ -80,7 +80,7 @@ describe "context modules" do
         expect(mod).to be_unpublished
       end
 
-      it "should edit a module", priority: "1", test_id: 126738 do
+      it "edits a module", priority: "1", test_id: 126738 do
         edit_text = 'Module Edited'
         f('.ig-header-admin .al-trigger').click
         f('.edit_module_link').click
@@ -92,7 +92,7 @@ describe "context modules" do
         expect(f('.context_module > .header')).to include_text(edit_text)
       end
 
-      it "should delete a module", priority: "1", test_id: 126736 do
+      it "deletes a module", priority: "1", test_id: 126736 do
         skip_if_safari(:alert)
         f('.ig-header-admin .al-trigger').click
         f('.delete_module_link').click
@@ -103,17 +103,17 @@ describe "context modules" do
         expect(f('.context_module > .header')).not_to be_displayed
       end
 
-      it "should add an assignment to a module", priority: "1", test_id: 126723 do
+      it "adds an assignment to a module", priority: "1", test_id: 126723 do
         add_new_module_item('#assignments_select', 'Assignment', '[ New Assignment ]', 'New Assignment Title')
         expect(fln('New Assignment Title')).to be_displayed
       end
 
-      it "should add a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
+      it "adds a assignment item to a module, publish new assignment refresh page and verify", priority: "2", test_id: 441358 do
         # this test basically verifies that the published icon is accurate after a page refresh
         mod = @course.context_modules.first
         assignment = @course.assignments.create!(title: "assignment 1")
         assignment.unpublish!
-        tag = mod.add_item({id: assignment.id, type: 'assignment'})
+        tag = mod.add_item({ id: assignment.id, type: 'assignment' })
         refresh_page
         item = f("#context_module_item_#{tag.id}")
         expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed
@@ -126,27 +126,27 @@ describe "context modules" do
         expect(tag).to be_published
       end
 
-      it "should add a quiz to a module", priority: "1", test_id: 126719 do
+      it "adds a quiz to a module", priority: "1", test_id: 126719 do
         mod = @course.context_modules.first
         quiz = @course.quizzes.create!(title: "New Quiz Title")
-        mod.add_item({id: quiz.id, type: 'quiz'})
+        mod.add_item({ id: quiz.id, type: 'quiz' })
         refresh_page
         verify_persistence('New Quiz Title')
       end
 
-      it "should add a content page item to a module", priority: "1", test_id: 126708 do
+      it "adds a content page item to a module", priority: "1", test_id: 126708 do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "New Page Title")
-        mod.add_item({id: page.id, type: 'wiki_page'})
+        mod.add_item({ id: page.id, type: 'wiki_page' })
         refresh_page
         verify_persistence('New Page Title')
       end
 
-      it "should add a content page item to a module and publish new page", priority: "2", test_id: 441357 do
+      it "adds a content page item to a module and publish new page", priority: "2", test_id: 441357 do
         mod = @course.context_modules.first
         page = @course.wiki_pages.create!(title: "PAGE 2")
         page.unpublish!
-        tag = mod.add_item({id: page.id, type: 'wiki_page'})
+        tag = mod.add_item({ id: page.id, type: 'wiki_page' })
         refresh_page
         item = f("#context_module_item_#{tag.id}")
         expect(f('span.publish-icon.unpublished.publish-icon-publish > i.icon-unpublish')).to be_displayed

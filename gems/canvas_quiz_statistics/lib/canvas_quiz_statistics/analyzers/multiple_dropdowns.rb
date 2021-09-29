@@ -27,14 +27,14 @@ module CanvasQuizStatistics::Analyzers
       answer_id = response.fetch(answer_key(blank), nil).to_s
 
       answer = if answer_id.present?
-        answer_set[:answers].detect { |a| "#{a[:id]}" == answer_id }
-      end
+                 answer_set[:answers].detect { |a| "#{a[:id]}" == answer_id }
+               end
 
       answer ||= generate_incorrect_answer({
-        id: MissingAnswerKey,
-        text: MissingAnswerText,
-        in: answer_set
-      })
+                                             id: MissingAnswerKey,
+                                             text: MissingAnswerText,
+                                             in: answer_set
+                                           })
 
       answer[:responses] += 1 if answer.present?
     end

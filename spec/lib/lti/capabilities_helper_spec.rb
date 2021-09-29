@@ -47,7 +47,7 @@ module Lti
       allow(m).to receive(:id).and_return(1)
       allow(m).to receive(:context).and_return(root_account)
       shard_mock = double('shard')
-      allow(shard_mock).to receive(:settings).and_return({encription_key: 'abc'})
+      allow(shard_mock).to receive(:settings).and_return({ encription_key: 'abc' })
       allow(m).to receive(:shard).and_return(shard_mock)
       allow(m).to receive(:opaque_identifier_for).and_return("6cd2e0d65bd5aef3b5ee56a64bdcd595e447bc8f")
       m
@@ -72,9 +72,9 @@ module Lti
 
     let(:variable_expander) { Lti::VariableExpander.new(root_account, account, controller, current_user: user, tool: tool) }
 
-    let(:invalid_enabled_caps){ %w(InvalidCap.Foo AnotherInvalid.Bar) }
-    let(:valid_enabled_caps){ %w(ToolConsumerInstance.guid Membership.role CourseSection.sourcedId) }
-    let(:supported_capabilities){
+    let(:invalid_enabled_caps) { %w(InvalidCap.Foo AnotherInvalid.Bar) }
+    let(:valid_enabled_caps) { %w(ToolConsumerInstance.guid Membership.role CourseSection.sourcedId) }
+    let(:supported_capabilities) {
       %w(ToolConsumerInstance.guid
          Canvas.term.name
          CourseSection.sourcedId

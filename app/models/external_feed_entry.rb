@@ -27,13 +27,13 @@ class ExternalFeedEntry < ActiveRecord::Base
 
   before_save :infer_defaults
   validates_presence_of :external_feed_id, :workflow_state
-  validates :title, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
-  validates :message, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
-  validates :source_url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
-  validates :url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: true}
-  validates :author_name, length: {maximum: maximum_string_length, allow_nil: true, allow_blank: false}
-  validates :author_url, length: {maximum: maximum_text_length, allow_nil: true, allow_blank: false}
-  validates :author_email, length: {maximum: maximum_string_length, allow_nil: true, allow_blank: false}
+  validates :title, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :message, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :source_url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
+  validates :author_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: false }
+  validates :author_url, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: false }
+  validates :author_email, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: false }
   sanitize_field :message, CanvasSanitize::SANITIZE
 
   def infer_defaults

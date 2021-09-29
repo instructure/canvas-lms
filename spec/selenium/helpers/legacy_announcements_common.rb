@@ -27,10 +27,10 @@ module AnnouncementsCommon
 
   def create_announcement_initial(message = 'announcement message')
     @context = @course
-    @announcement =  announcement_model(:title => 'new announcement', :message => message, :require_initial_post => true)
+    @announcement = announcement_model(:title => 'new announcement', :message => message, :require_initial_post => true)
   end
 
-  def create_announcement_manual(title,text)
+  def create_announcement_manual(title, text)
     get "/courses/#{@course.id}/announcements/"
     expect_new_page_load { f('.btn-primary').click }
     replace_content(f('input[name=title]'), title)
@@ -90,7 +90,7 @@ module AnnouncementsCommon
   # DRY method that checks that a group member can see all announcements created within a group
   #   and that clicking one takes you to it. Expects @announcement is defined and count is > 0
   def verify_member_sees_announcement(count = 1)
-    index = count-1
+    index = count - 1
     get announcements_page
     expect(ff('.discussion-topic').size).to eq count
     # Checks that new page is loaded when the indexed announcement is clicked to verify it actually loads the topic

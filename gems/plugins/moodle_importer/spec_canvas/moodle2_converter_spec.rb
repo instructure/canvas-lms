@@ -20,12 +20,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe Moodle::Converter do
-
   before(:once) do
     fixture_dir = File.dirname(__FILE__) + '/fixtures'
     archive_file_path = File.join(fixture_dir, 'moodle_backup_2.zip')
     unzipped_file_path = create_temp_dir!
-    converter = Moodle::Converter.new(:export_archive_path=>archive_file_path, :course_name=>'oi', :base_download_dir=>unzipped_file_path)
+    converter = Moodle::Converter.new(:export_archive_path => archive_file_path, :course_name => 'oi', :base_download_dir => unzipped_file_path)
     converter.export
     @base_course_data = converter.course.with_indifferent_access
 
@@ -35,18 +34,18 @@ describe Moodle::Converter do
     Importers::CourseContentImporter.import_content(@course, @course_data, nil, @cm)
   end
 
-  it "should successfully import the course" do
+  it "successfullies import the course" do
     allowed_warnings = [
       "Multiple Dropdowns question may have been imported incorrectly",
       "There are 3 Formula questions in this bank that will need to have their possible answers regenerated",
       "Missing links found in imported content",
       "The announcement \"News forum\" could not be linked to the module"
     ]
-    expect(@cm.old_warnings_format.all?{|w| allowed_warnings.find{|aw| w[0].start_with?(aw)}}).to eq true
+    expect(@cm.old_warnings_format.all? { |w| allowed_warnings.find { |aw| w[0].start_with?(aw) } }).to eq true
   end
 
   context "discussion topics" do
-    it "should convert discussion topics and announcements" do
+    it "converts discussion topics and announcements" do
       expect(@course.discussion_topics.count).to eq 2
 
       dt = @course.discussion_topics.first
@@ -61,7 +60,7 @@ describe Moodle::Converter do
   end
 
   context "assignments" do
-    it "should convert assignments" do
+    it "converts assignments" do
       expect(@course.assignments.count).to eq 2
 
       assignment2 = @course.assignments.where(title: 'Hidden Assignmnet').first
@@ -71,7 +70,7 @@ describe Moodle::Converter do
   end
 
   context "wiki pages" do
-    it "should convert wikis" do
+    it "converts wikis" do
       wiki = @course.wiki
       expect(wiki).not_to be_nil
       expect(wiki.wiki_pages.count).to eq 12
@@ -87,26 +86,26 @@ describe Moodle::Converter do
       skip if !Qti.qti_enabled?
     end
 
-    it "should convert quizzes" do
+    it "converts quizzes" do
       expect(@course.quizzes.count).to eq 2
     end
 
-    it "should convert Moodle Quiz module to a quiz" do
+    it "converts Moodle Quiz module to a quiz" do
       quiz = @course.quizzes.where(title: "Quiz Name").first
-      expect(quiz.description).to match /Quiz Description/
+      expect(quiz.description).to match(/Quiz Description/)
       expect(quiz.quiz_questions.count).to eq 11
     end
 
-    it "should convert Moodle Questionnaire module to a quiz" do
+    it "converts Moodle Questionnaire module to a quiz" do
       quiz = @course.quizzes.where(title: "Questionnaire Name").first
-      expect(quiz.description).to match /Sumary/
+      expect(quiz.description).to match(/Sumary/)
       expect(quiz.quiz_type).to eq 'survey'
       expect(quiz.quiz_questions.count).to eq 10
     end
   end
 
   context "modules" do
-    it "should convert modules and module items" do
+    it "converts modules and module items" do
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       expect(@course.context_modules.count).to eq 8

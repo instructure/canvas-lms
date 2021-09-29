@@ -24,6 +24,7 @@ describe EventStream::Logger do
   it "writes standard log messages" do
     l_klass = Class.new do
       attr_reader :msgs
+
       def initialize
         @msgs = []
       end
@@ -34,7 +35,7 @@ describe EventStream::Logger do
     end
     fake_logger = l_klass.new
     allow(EventStream::Logger).to receive(:logger).and_return(fake_logger)
-    EventStream::Logger.info("TEST", "stream_id", "insert", {'foo' => 'bar'})
+    EventStream::Logger.info("TEST", "stream_id", "insert", { 'foo' => 'bar' })
     expect(fake_logger.msgs.first).to eq("[TEST:INFO] stream_id:insert {\"foo\"=>\"bar\"}")
   end
 end

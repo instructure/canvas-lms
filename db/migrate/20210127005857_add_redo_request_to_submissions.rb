@@ -22,7 +22,7 @@ class AddRedoRequestToSubmissions < ActiveRecord::Migration[5.2]
 
   def up
     if connection.postgresql_version >= 110000
-      remove_column :submissions, :redo_request, if_exists: true
+      remove_column :submissions, :redo_request, if_exists: true # rubocop:disable Migration/RemoveColumn column replaced transactionally
       add_column :submissions, :redo_request, :boolean, default: false, null: false
     else
       # backfill and default will come in a postdeploy

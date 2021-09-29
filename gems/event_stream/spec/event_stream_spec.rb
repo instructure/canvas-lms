@@ -59,7 +59,7 @@ describe EventStream do
 
     it 'returns the index ids' do
       EventStream.get_index_ids_lookup = lambda { |index, rows|
-        rows.map{ |row| row[index.id_column] + 1}
+        rows.map { |row| row[index.id_column] + 1 }
       }
 
       expect(EventStream.get_index_ids(index, index_rows)).to eq (2..11).to_a

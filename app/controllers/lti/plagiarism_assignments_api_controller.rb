@@ -18,49 +18,49 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
-# @API Plagiarism Detection Platform Assignments
-# **Plagiarism Detection Platform API for Assignments (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
-#
-# @model LtiAssignment
-#     {
-#       "id": "LtiAssignment",
-#       "description": "A Canvas assignment",
-#       "properties": {
-#         "id": {
-#           "example": 4,
-#           "type": "integer"
-#         },
-#         "name": {
-#           "example": "Midterm Review",
-#           "type": "string"
-#         },
-#         "description": {
-#           "example": "<p>Do the following:</p>...",
-#           "type": "string"
-#         },
-#         "points_possible": {
-#           "example": 10,
-#           "type": "integer"
-#         },
-#         "due_at": {
-#           "description": "The due date for the assignment. If a user id is supplied and an assignment override is in place this field will reflect the due date as it applies to the user.",
-#           "example": "2012-07-01T23:59:00-06:00",
-#           "type": "datetime"
-#         },
-#         "lti_id": {
-#           "example": "86157096483e6b3a50bfedc6bac902c0b20a824f",
-#           "type": "string"
-#         },
-#         "course_id": {
-#            "example": 10000000000060,
-#            "type": "integer"
-#         },
-#         "lti_course_id": {
-#           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
-#           "type": "string"
-#         }
-#       }
-#     }
+  # @API Plagiarism Detection Platform Assignments
+  # **Plagiarism Detection Platform API for Assignments (Must use <a href="jwt_access_tokens.html">JWT access tokens</a> with this API).**
+  #
+  # @model LtiAssignment
+  #     {
+  #       "id": "LtiAssignment",
+  #       "description": "A Canvas assignment",
+  #       "properties": {
+  #         "id": {
+  #           "example": 4,
+  #           "type": "integer"
+  #         },
+  #         "name": {
+  #           "example": "Midterm Review",
+  #           "type": "string"
+  #         },
+  #         "description": {
+  #           "example": "<p>Do the following:</p>...",
+  #           "type": "string"
+  #         },
+  #         "points_possible": {
+  #           "example": 10,
+  #           "type": "integer"
+  #         },
+  #         "due_at": {
+  #           "description": "The due date for the assignment. If a user id is supplied and an assignment override is in place this field will reflect the due date as it applies to the user.",
+  #           "example": "2012-07-01T23:59:00-06:00",
+  #           "type": "datetime"
+  #         },
+  #         "lti_id": {
+  #           "example": "86157096483e6b3a50bfedc6bac902c0b20a824f",
+  #           "type": "string"
+  #         },
+  #         "course_id": {
+  #            "example": 10000000000060,
+  #            "type": "integer"
+  #         },
+  #         "lti_course_id": {
+  #           "example": "66157096483e6b3a50bfedc6bac902c0b20a8241",
+  #           "type": "string"
+  #         }
+  #       }
+  #     }
   class PlagiarismAssignmentsApiController < ApplicationController
     include Lti::Ims::AccessTokenHelper
 
@@ -108,17 +108,19 @@ module Lti
     end
 
     def assignment
-       @_assignment ||= Assignment.find_by(lti_context_id: params[:assignment_id]) || api_find(Assignment, params[:assignment_id])
+      @_assignment ||= Assignment.find_by(lti_context_id: params[:assignment_id]) || api_find(Assignment, params[:assignment_id])
       raise ActiveRecord::RecordNotFound unless @_assignment
+
       @_assignment
     end
 
     def user
       if params[:user_id].present?
-        @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: {user_lti_context_id: params[:user_id]}).take ||
-          User.active.find_by(lti_context_id: params[:user_id]) ||
-          User.active.find(params[:user_id])
+        @_user ||= User.joins(:past_lti_ids).where(user_past_lti_ids: { user_lti_context_id: params[:user_id] }).take ||
+                   User.active.find_by(lti_context_id: params[:user_id]) ||
+                   User.active.find(params[:user_id])
         raise ActiveRecord::RecordNotFound unless @_user
+
         @_user
       end
     end

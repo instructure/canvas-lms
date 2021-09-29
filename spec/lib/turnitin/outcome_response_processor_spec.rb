@@ -24,20 +24,20 @@ require 'turnitin_api'
 module Turnitin
   describe OutcomeResponseProcessor do
     before do
-      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
-      allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
+      allow(BasicLTI::Sourcedid).to receive(:encryption_secret) { 'encryption-secret-5T14NjaTbcYjc4' }
+      allow(BasicLTI::Sourcedid).to receive(:signing_secret) { 'signing-secret-vp04BNqApwdwUYPUI' }
     end
 
     include_context "shared_tii_lti"
     subject { described_class.new(tool, lti_assignment, lti_student, outcome_response_json) }
 
     describe '#process' do
-      let(:filename) {'my_sample_file'}
+      let(:filename) { 'my_sample_file' }
 
       before(:each) do
         original_submission_response = double('original_submission_mock')
         allow(original_submission_response).to receive(:headers).and_return(
-            {'content-disposition' => "attachment; filename=#{filename}", 'content-type' => 'plain/text'}
+          { 'content-disposition' => "attachment; filename=#{filename}", 'content-type' => 'plain/text' }
         )
         allow(original_submission_response).to receive(:body).and_return('1234')
         expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
@@ -91,7 +91,7 @@ module Turnitin
     describe "#process with request errors" do
       context 'when it is not the last attempt' do
         it 'does not create an error attachment' do
-          allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
+          allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts - 1)
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:response).and_raise(Faraday::TimeoutError, 'Net::ReadTimeout')
           expect { subject.process }.to raise_error(Faraday::TimeoutError)
           expect(lti_assignment.attachments.count).to eq 0
@@ -100,17 +100,18 @@ module Turnitin
         it 'creates a new job' do
           allow_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:uploaded_at).and_return(tii_response['meta']['date_uploaded'])
           time = Time.now.utc
-          attempt_number = subject.class.max_attempts-1
+          attempt_number = subject.class.max_attempts - 1
           original_submission_response = double('original_submission_mock')
           allow(original_submission_response).to receive(:headers).and_return({})
           expect_any_instance_of(TurnitinApi::OutcomesResponseTransformer).to receive(:original_submission).and_yield(original_submission_response)
           allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(attempt_number)
           mock = double()
           expect_any_instance_of(subject.class).to receive(:delay).with(
-              max_attempts: subject.class.max_attempts,
-              priority: Delayed::LOW_PRIORITY,
-              attempts: attempt_number,
-              run_at: time + (attempt_number ** 4) + 5).and_return(mock)
+            max_attempts: subject.class.max_attempts,
+            priority: Delayed::LOW_PRIORITY,
+            attempts: attempt_number,
+            run_at: time + (attempt_number**4) + 5
+          ).and_return(mock)
           expect(mock).to receive(:new_submission)
           Timecop.freeze(time) do
             subject.process
@@ -167,12 +168,12 @@ module Turnitin
 
     describe "#update_originality_data" do
       it 'raises an error and sends stat if max attempts are not exceeded' do
-        allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts-1)
+        allow_any_instance_of(subject.class).to receive(:attempt_number).and_return(subject.class.max_attempts - 1)
         allow(InstStatsd::Statsd).to receive(:increment)
         mock_turnitin_client = double('turnitin_client')
         allow(mock_turnitin_client).to receive(:scored?).and_return(false)
         allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
-        submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
+        submission = lti_assignment.submit_homework(lti_student, attachments: [attachment], submission_type: 'online_upload')
         expect do
           subject.update_originality_data(submission, attachment.asset_string)
         end.to raise_error Turnitin::Errors::SubmissionNotScoredError
@@ -189,7 +190,7 @@ module Turnitin
         mock_turnitin_client = double('turnitin_client')
         allow(mock_turnitin_client).to receive(:scored?).and_return(false)
         allow(subject).to receive(:turnitin_client).and_return(mock_turnitin_client)
-        submission = lti_assignment.submit_homework(lti_student, attachments:[attachment], submission_type: 'online_upload')
+        submission = lti_assignment.submit_homework(lti_student, attachments: [attachment], submission_type: 'online_upload')
         subject.update_originality_data(submission, attachment.asset_string)
         expect(submission.turnitin_data[attachment.asset_string][:status]).to eq 'error'
         expect(submission.turnitin_data[attachment.asset_string][:public_error_message]).to start_with "Turnitin has not"

@@ -21,22 +21,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.rb')
 require_dependency 'lti/tool_consumer_profile'
 
-
 module Lti
   describe ToolConsumerProfile do
-
-
     describe ".cached_find_by_developer_key" do
-
       context "unsharded" do
-
         it "finds the tool_consumer_profile" do
           account = Account.create!
           dev_key = account.developer_keys.create!
           tcp = dev_key.create_tool_consumer_profile!
           expect(ToolConsumerProfile.cached_find_by_developer_key(dev_key.id)).to eq tcp
         end
-
       end
 
       context "sharded" do
@@ -56,7 +50,6 @@ module Lti
           end
         end
 
-
         it "caches the tool consumer profile" do
           enable_cache do
             @shard2.activate do
@@ -69,7 +62,6 @@ module Lti
     end
 
     describe "clear_cache" do
-
       it 'clears the cache after update' do
         enable_cache do
           account = Account.create!
@@ -81,8 +73,6 @@ module Lti
           expect(MultiCache.fetch(ToolConsumerProfile.cache_key(dev_key.id))).to eq nil
         end
       end
-
-
     end
 
     describe 'restricted services' do
@@ -102,6 +92,5 @@ module Lti
         ).to be_truthy
       end
     end
-
   end
 end

@@ -37,8 +37,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
                                      :learning_outcome,
                                      :rubric,
                                      :wiki_page,
-                                     quiz: 'Quizzes::Quiz'
-  ]
+                                     quiz: 'Quizzes::Quiz']
   belongs_to :root_account, :class_name => 'Account'
   validates_with MasterCourses::TagValidator
 
@@ -69,7 +68,7 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
   end
 
   def mark_touch_content_if_restrictions_tightened
-    if !self.new_record? && self.restrictions_changed? && self.restrictions.any?{|type, locked| locked && !self.restrictions_was[type]}
+    if !self.new_record? && self.restrictions_changed? && self.restrictions.any? { |type, locked| locked && !self.restrictions_was[type] }
       @touch_content = true # set if restrictions for content or settings is true now when it wasn't before so we'll re-export and overwrite any changed content
     end
   end
@@ -83,24 +82,24 @@ class MasterCourses::MasterContentTag < ActiveRecord::Base
 
   def self.fetch_module_item_restrictions_for_child(item_ids)
     # does a silly fancy doublejoin so we can get all the restrictions in one query
-    data = self.
-      joins("INNER JOIN #{MasterCourses::ChildContentTag.quoted_table_name} ON
-          #{self.table_name}.migration_id=#{MasterCourses::ChildContentTag.table_name}.migration_id").
-      joins("INNER JOIN #{ContentTag.quoted_table_name} ON
+    data = self
+           .joins("INNER JOIN #{MasterCourses::ChildContentTag.quoted_table_name} ON
+          #{self.table_name}.migration_id=#{MasterCourses::ChildContentTag.table_name}.migration_id")
+           .joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{MasterCourses::ChildContentTag.table_name}.content_type=#{ContentTag.table_name}.content_type AND
-          #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id").
-      where(:content_tags => {:id => item_ids}).
-      pluck('content_tags.id', :restrictions)
+          #{MasterCourses::ChildContentTag.table_name}.content_id=#{ContentTag.table_name}.content_id")
+           .where(:content_tags => { :id => item_ids })
+           .pluck('content_tags.id', :restrictions)
     Hash[data]
   end
 
   def self.fetch_module_item_restrictions_for_master(item_ids)
-    data = self.
-      joins("INNER JOIN #{ContentTag.quoted_table_name} ON
+    data = self
+           .joins("INNER JOIN #{ContentTag.quoted_table_name} ON
           #{self.table_name}.content_type=#{ContentTag.table_name}.content_type AND
-          #{self.table_name}.content_id=#{ContentTag.table_name}.content_id").
-      where(:content_tags => {:id => item_ids}).
-      pluck('content_tags.id', :restrictions)
+          #{self.table_name}.content_id=#{ContentTag.table_name}.content_id")
+           .where(:content_tags => { :id => item_ids })
+           .pluck('content_tags.id', :restrictions)
     hash = Hash[data]
     (item_ids - hash.keys).each do |missing_id| # populate blank restrictions for all items without mastercontenttags created yet
       hash[missing_id] = {}

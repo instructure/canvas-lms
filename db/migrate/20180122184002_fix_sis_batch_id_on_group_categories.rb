@@ -21,7 +21,7 @@ class FixSisBatchIdOnGroupCategories < ActiveRecord::Migration[5.0]
   tag :predeploy
 
   def change
-    remove_column :group_categories, :sis_batch_id if column_exists?(:group_categories, :sis_batch_id)
+    remove_column :group_categories, :sis_batch_id if column_exists?(:group_categories, :sis_batch_id) # rubocop:disable Migration/RemoveColumn
     add_column :group_categories, :sis_batch_id, :integer, limit: 8
     add_foreign_key :group_categories, :sis_batches
     add_index :group_categories, :sis_batch_id

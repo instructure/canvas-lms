@@ -27,8 +27,8 @@ class ClearSmsOverrides < ActiveRecord::Migration[6.0]
       priority: Delayed::LOW_PRIORITY,
       n_strand: 'long_datafixups'
     ).run([
-      "allowed_sms_notification_categories",
-      "allowed_sms_notification_types"
-    ])
+            "allowed_sms_notification_categories",
+            "allowed_sms_notification_types"
+          ])
   end
 end

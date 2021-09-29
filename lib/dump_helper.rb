@@ -2,7 +2,7 @@
 
 require 'set'
 
-#DumpHelper.find_dump_error(viewer)
+# DumpHelper.find_dump_error(viewer)
 module DumpHelper
   class << self
     def find_dump_error(val, key = "val", __visited_dump_vars = Set.new)
@@ -38,7 +38,7 @@ module DumpHelper
         if val.is_a?(Hash)
           find_dump_error(val.keys, "#{key}.keys", __visited_dump_vars)
         end
-        if val.is_a?(Hash)|| val.is_a?(Struct)
+        if val.is_a?(Hash) || val.is_a?(Struct)
           val.each_pair do |k, v|
             find_dump_error(v, "#{key}[#{k.inspect}]", __visited_dump_vars)
           end

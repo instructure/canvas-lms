@@ -67,7 +67,7 @@ module MicrosoftSync::Matchers
         be_a_microsoft_sync_public_error(expected_matched_message),
         be_a(MicrosoftSync::Errors::GracefulCancelError)
       ]
-      @matches = @matchers.map{|m| m.matches?(actual)}
+      @matches = @matchers.map { |m| m.matches?(actual) }
       @matches.all?
     end
 

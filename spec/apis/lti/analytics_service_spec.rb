@@ -44,17 +44,17 @@ describe LtiApiController, type: :request do
     req = consumer.create_signed_request(:post, opts['path'], nil, :scheme => 'header', :timestamp => opts['timestamp'], :nonce => opts['nonce'])
     req.body = JSON.generate(opts['body']) if opts['body']
     post "https://www.example.com#{req.path}",
-      params: req.body,
-      headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
+         params: req.body,
+         headers: { "CONTENT_TYPE" => opts['content-type'], "HTTP_AUTHORIZATION" => req['Authorization'] }
   end
 
   context 'xAPI' do
-    it "should require a content-type of application/json" do
+    it "requires a content-type of application/json" do
       make_call('content-type' => 'application/xml')
       assert_status(415)
     end
 
-    it "should require the correct shared secret" do
+    it "requires the correct shared secret" do
       make_call('secret' => 'bad secret is bad')
       assert_status(401)
     end
@@ -62,29 +62,29 @@ describe LtiApiController, type: :request do
     def xapi_body
       # https://github.com/adlnet/xAPI-Spec/blob/master/xAPI.md#AppendixA
       {
-              id: "12345678-1234-5678-1234-567812345678",
-              actor: {
-                      account: {
-                              homePage: "http://www.instructure.com/",
-                              name: '123somemagicguid'
-                      }
-              },
-              verb: {
-                      id: "http://adlnet.gov/expapi/verbs/interacted",
-                      display: {
-                              "en-US" => "interacted"
-                      }
-              },
-              object: {
-                      id: "http://example.com/"
-              },
-              result: {
-                      duration: "PT10M0S"
-              }
+        id: "12345678-1234-5678-1234-567812345678",
+        actor: {
+          account: {
+            homePage: "http://www.instructure.com/",
+            name: '123somemagicguid'
+          }
+        },
+        verb: {
+          id: "http://adlnet.gov/expapi/verbs/interacted",
+          display: {
+            "en-US" => "interacted"
+          }
+        },
+        object: {
+          id: "http://example.com/"
+        },
+        result: {
+          duration: "PT10M0S"
+        }
       }
     end
 
-    it "should increment activity time" do
+    it "increments activity time" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
@@ -94,7 +94,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
 
-    it "should create an asset user access" do
+    it "creates an asset user access" do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
@@ -106,7 +106,7 @@ describe LtiApiController, type: :request do
     describe "page view creation" do
       before { Setting.set 'enable_page_views', 'db' }
 
-      it "should include url and interaction_seconds" do
+      it "includes url and interaction_seconds" do
         page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
         previous_count = page_views.count
         body = xapi_body
@@ -121,7 +121,7 @@ describe LtiApiController, type: :request do
       end
     end
 
-    it "should handle requests without durations" do
+    it "handles requests without durations" do
       body = xapi_body
       body.delete(:result)
       make_call('body' => body)
@@ -130,39 +130,38 @@ describe LtiApiController, type: :request do
   end
 
   context 'caliper' do
-
-    it "should require the correct shared secret" do
+    it "requires the correct shared secret" do
       make_call('secret' => 'bad secret is bad', 'path' => "/api/lti/v1/caliper/#{@token}")
       assert_status(401)
     end
 
     def caliper_body
       {
-              "@context" => "http://purl.imsglobal.org/ctx/caliper/v1/ViewEvent",
-              "@type" => "http://purl.imsglobal.org/caliper/v1/ViewEvent",
-              "action" => "viewed",
-              "startedAtTime" => Time.now.utc.to_i,
-              "duration" => "PT10M0S",
-              "actor" => {
-                      "@id" => '123somemagicguid',
-                      "@type" => "http://purl.imsglobal.org/caliper/v1/lis/Person"
-              },
-              "object" => {
-                      "@id" => "http://www.instructure.com/",
-                      "@type" => "http://www.idpf.org/epub/vocab/structure/#volume",
-                      "name" => "Test LTI Tool"
-              },
-              "edApp" => {
-                      "@id" => "http://www.instructure.com/",
-                      "@type" => "http://purl.imsglobal.org/caliper/v1/SoftwareApplication",
-                      "name" => "LTI Tool of All Things",
-                      "properties" => {},
-                      "lastModifiedTime" => Time.now.utc.to_i
-              }
+        "@context" => "http://purl.imsglobal.org/ctx/caliper/v1/ViewEvent",
+        "@type" => "http://purl.imsglobal.org/caliper/v1/ViewEvent",
+        "action" => "viewed",
+        "startedAtTime" => Time.now.utc.to_i,
+        "duration" => "PT10M0S",
+        "actor" => {
+          "@id" => '123somemagicguid',
+          "@type" => "http://purl.imsglobal.org/caliper/v1/lis/Person"
+        },
+        "object" => {
+          "@id" => "http://www.instructure.com/",
+          "@type" => "http://www.idpf.org/epub/vocab/structure/#volume",
+          "name" => "Test LTI Tool"
+        },
+        "edApp" => {
+          "@id" => "http://www.instructure.com/",
+          "@type" => "http://purl.imsglobal.org/caliper/v1/SoftwareApplication",
+          "name" => "LTI Tool of All Things",
+          "properties" => {},
+          "lastModifiedTime" => Time.now.utc.to_i
+        }
       }
     end
 
-    it "should increment activity time" do
+    it "increments activity time" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
 
@@ -172,7 +171,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time + 600
     end
 
-    it "should not increment activity time for different event types" do
+    it "does not increment activity time for different event types" do
       e = Enrollment.where(user_id: @student, course_id: @course).first
       previous_time = e.total_activity_time
       body = caliper_body
@@ -184,7 +183,7 @@ describe LtiApiController, type: :request do
       expect(e.reload.total_activity_time).to eq previous_time
     end
 
-    it "should create an asset user access" do
+    it "creates an asset user access" do
       accesses = AssetUserAccess.where(user_id: @student)
       previous_count = accesses.count
 
@@ -196,7 +195,7 @@ describe LtiApiController, type: :request do
     describe "page view creation" do
       before { Setting.set 'enable_page_views', 'db' }
 
-      it "should include url and interaction_seconds" do
+      it "includes url and interaction_seconds" do
         page_views = PageView.where(user_id: @student, context_id: @course, context_type: 'Course')
         previous_count = page_views.count
         body = caliper_body
@@ -211,12 +210,11 @@ describe LtiApiController, type: :request do
       end
     end
 
-    it "should handle requests without durations" do
+    it "handles requests without durations" do
       body = caliper_body
       body.delete('duration')
       make_call('body' => body, 'path' => "/api/lti/v1/caliper/#{@token}")
       expect(response).to be_successful
     end
   end
-
 end

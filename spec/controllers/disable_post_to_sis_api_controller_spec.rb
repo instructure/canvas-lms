@@ -21,9 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe DisablePostToSisApiController do
   describe "PUT disable_post_to_sis" do
-    let(:account) {account_model}
-    let(:course) {course_model(account: account, workflow_state: 'available')}
-    let(:admin) {account_admin_user(account: account)}
+    let(:account) { account_model }
+    let(:course) { course_model(account: account, workflow_state: 'available') }
+    let(:admin) { account_admin_user(account: account) }
 
     before do
       bypass_rescue
@@ -35,7 +35,7 @@ describe DisablePostToSisApiController do
                                     post_to_sis: true,
                                     workflow_state: 'published')
 
-      put 'disable_post_to_sis', params: {course_id: course.id}
+      put 'disable_post_to_sis', params: { course_id: course.id }
 
       expect(response).to be_successful
       expect(assignment.reload.post_to_sis).to eq false
@@ -47,7 +47,7 @@ describe DisablePostToSisApiController do
       end
 
       it 'responds with 200' do
-        put 'disable_post_to_sis', params: {course_id: course.id}
+        put 'disable_post_to_sis', params: { course_id: course.id }
 
         expect(response.code).to eq "204"
         expect(response).to be_successful
@@ -58,7 +58,7 @@ describe DisablePostToSisApiController do
                                       post_to_sis: true,
                                       workflow_state: 'published')
 
-        put 'disable_post_to_sis', params: {course_id: course.id}
+        put 'disable_post_to_sis', params: { course_id: course.id }
         assignment = Assignment.find(assignment.id)
 
         expect(response.code).to eq "204"
@@ -75,16 +75,16 @@ describe DisablePostToSisApiController do
         end
 
         let(:grading_period) do
-            grading_period_group.grading_periods.create!(
-              title:      'Too Much Tuna',
-              start_date: 2.months.from_now(Time.zone.now),
-              end_date:   3.months.from_now(Time.zone.now)
-            )
+          grading_period_group.grading_periods.create!(
+            title: 'Too Much Tuna',
+            start_date: 2.months.from_now(Time.zone.now),
+            end_date: 3.months.from_now(Time.zone.now)
+          )
         end
 
         it 'responds with 400 when grading period does not exist' do
-          put 'disable_post_to_sis', params: {course_id: course.id,
-                                     grading_period_id: 789465789}
+          put 'disable_post_to_sis', params: { course_id: course.id,
+                                               grading_period_id: 789465789 }
 
           parsed_json = json_parse(response.body)
           expect(response.code).to eq "400"
@@ -97,8 +97,8 @@ describe DisablePostToSisApiController do
                                         workflow_state: 'published',
                                         due_at: grading_period.start_date + 1.minute)
 
-          put 'disable_post_to_sis', params: {course_id: course.id,
-                                     grading_period_id: grading_period.id}
+          put 'disable_post_to_sis', params: { course_id: course.id,
+                                               grading_period_id: grading_period.id }
           assignment = Assignment.find(assignment.id)
 
           expect(response.code).to eq "204"

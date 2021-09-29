@@ -130,9 +130,10 @@ class CommMessagesApiController < ApplicationController
     if !Account.site_admin.grants_right?(@current_user, :read_messages)
       # ensure they can see the domain root account
       unless @domain_root_account.settings[:admins_can_view_notifications] &&
-        @domain_root_account.grants_right?(@current_user, :view_notifications)
+             @domain_root_account.grants_right?(@current_user, :view_notifications)
         return render_unauthorized_action
       end
+
       # and then scope to just the messages from that root account
       query = query.where(root_account_id: @domain_root_account)
     end

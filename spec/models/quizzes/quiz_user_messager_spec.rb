@@ -38,7 +38,6 @@ describe Quizzes::QuizUserMessager do
   end
 
   describe "#send" do
-
     it "sends to all students" do
       expect { send_message }.to change { recipient_messages('all') }.by 2
     end

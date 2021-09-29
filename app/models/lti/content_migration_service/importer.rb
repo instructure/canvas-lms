@@ -63,7 +63,7 @@ module Lti
       end
 
       def import_completed?
-        response = Canvas.retriable(on: Timeout::Error) {CanvasHttp.get(@status_url, base_request_headers)} if @status_url
+        response = Canvas.retriable(on: Timeout::Error) { CanvasHttp.get(@status_url, base_request_headers) } if @status_url
         if response&.code.to_i == 200
           parsed_response = JSON.parse(response.body)
           @export_status = parsed_response['status']
@@ -92,6 +92,7 @@ module Lti
 
       def load_tool!
         return @tool if @tool
+
         original_tool = ContextExternalTool.find(@original_tool_id)
         @tool = ContextExternalTool.find_external_tool(original_tool.domain, @course, @original_tool_id).tap do |t|
           unless t && t.content_migration_configured?

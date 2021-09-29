@@ -35,7 +35,7 @@ module CC
     delegate :add_error, :set_progress, :export_object?, :export_symbol?, :for_course_copy, :add_item_to_export, :add_exported_asset, :create_key, :to => :@manifest
     delegate :referenced_files, :to => :@html_exporter
 
-    def initialize(manifest, manifest_node, resources=nil)
+    def initialize(manifest, manifest_node, resources = nil)
       @manifest = manifest
       @manifest_node = manifest_node
       @course = @manifest.course
@@ -95,6 +95,5 @@ module CC
       set_progress(progress) if progress
       res
     end
-
   end
 end

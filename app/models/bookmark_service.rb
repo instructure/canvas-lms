@@ -22,24 +22,25 @@ require 'nokogiri'
 
 class BookmarkService < UserService
   include Delicious
-  
+
   def post_bookmark(opts)
     url = opts[:url]
     return unless url
+
     title = opts[:title] || t(:default_title, "No Title")
     description = opts[:comments] || ""
     tags = opts[:tags] || ['instructure']
     begin
-      if(self.service == 'delicious')
+      if (self.service == 'delicious')
         delicious_post_bookmark(self, url, title, description, tags)
-      elsif(self.service == 'diigo')
+      elsif (self.service == 'diigo')
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
     rescue => e
       # Should probably save the data to try again if it fails... at least one more try
     end
   end
-  
+
   def find_bookmarks(query)
     if self.service == 'diigo'
       last_get = Rails.cache.fetch('last_diigo_lookup') { Time.now - 60 }
@@ -69,9 +70,9 @@ class BookmarkService < UserService
         bookmarks
       end
     elsif service.service == 'delicious'
-      #This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
+      # This needs to be rewritten with new API and moved into a gem. (Currently not working and no way to test without updating the API.)
       url = "https://api.del.icio.us/v1/posts/all?tag=#{query}"
-      http,request = delicious_generate_request(url, 'GET', service.service_user_name, service.decrypted_password)
+      http, request = delicious_generate_request(url, 'GET', service.service_user_name, service.decrypted_password)
       response = http.request(request)
       case response
       when Net::HTTPSuccess

@@ -23,7 +23,6 @@ require 'nokogiri'
 describe ContextExternalToolsHelper do
   include ContextExternalToolsHelper
 
-
   before :once do
     @menu_item_options = {
       show_icon: true,
@@ -31,9 +30,7 @@ describe ContextExternalToolsHelper do
     }
   end
 
-
   shared_examples "#external_tools_menu_items" do
-
     before :each do
       html = helper.external_tools_menu_items(@mock_tools_hash, @menu_item_options)
       @parsed_html = Nokogiri::HTML5.fragment(html)
@@ -43,11 +40,11 @@ describe ContextExternalToolsHelper do
       expect(@parsed_html.children.count).to eq 3
     end
 
-    it "should have one .icon-course_home_sub_navigation icon" do
+    it "has one .icon-course_home_sub_navigation icon" do
       expect(@parsed_html.css(".icon-course_home_sub_navigation").count).to eq 2
     end
 
-    it "should have one launch-image icon" do
+    it "has one launch-image icon" do
       expect(@parsed_html.css("img[src='http://example.dev/icon.png']").count).to eq 1
     end
   end
@@ -95,29 +92,25 @@ describe ContextExternalToolsHelper do
   end
 
   context "With tools" do
-    def tool_settings(setting, include_class=false)
+    def tool_settings(setting, include_class = false)
       settings_hash = {
         url: "http://example.dev/launch",
         icon_url: "http://example.dev/icon.png",
         enabled: true
       }
 
-      settings_hash[:canvas_icon_class] = "icon-#{setting.to_s}" if include_class
+      settings_hash[:canvas_icon_class] = "icon-#{setting}" if include_class
       settings_hash
     end
 
-
     before :each do
-
       @controller = DummyController.new
       allow(@controller).to receive(:external_tool_url).and_return("http://stub.dev/tool_url")
       # allow(@controller).to receive(:request).and_return(ActionDispatch::TestRequest.new)
       # @controller.instance_variable_set(:@context, @course)
-
     end
 
     before :once do
-
       class DummyController < ApplicationController
         include ContextExternalToolsHelper
       end
@@ -126,8 +119,6 @@ describe ContextExternalToolsHelper do
       @root_account = @course.root_account
       @account = account_model(:root_account => @root_account, :parent_account => @root_account)
       @course.update_attribute(:account, @account)
-
-
 
       tool_1 = @course.context_external_tools.create(
         :name => "Awesome Tool with Icon Class",
@@ -141,7 +132,6 @@ describe ContextExternalToolsHelper do
       tool_1.course_home_sub_navigation = tool_1_settings
       tool_1.save!
 
-
       tool_2 = @course.context_external_tools.create(
         :name => "Awesome Tool with Icon Class",
         :domain => "example.dev",
@@ -152,9 +142,7 @@ describe ContextExternalToolsHelper do
       tool_2.course_home_sub_navigation = tool_settings(:course_home_sub_navigation)
       tool_2.save!
 
-
       @mock_tools_hash = [tool_1, tool_2, tool_1]
-
 
       tool_3 = @course.context_external_tools.create(
         :name => "Awesome Tool with Icon Class",
@@ -165,7 +153,6 @@ describe ContextExternalToolsHelper do
 
       tool_3.course_home_sub_navigation = tool_settings(:course_home_sub_navigation, true)
       tool_3.save!
-
     end
 
     include_examples "#external_tools_menu_items"

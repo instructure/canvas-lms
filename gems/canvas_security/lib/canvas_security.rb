@@ -25,7 +25,6 @@ require 'canvas_errors'
 require 'canvas_security/page_view_jwt'
 
 module CanvasSecurity
-
   class UnconfiguredError < StandardError; end
 
   # TODO: Maybe at one point Setting will be
@@ -40,7 +39,7 @@ module CanvasSecurity
   # In this instance, it's expected that canvas is going to inject
   # the Setting class, but we want to break depednencies that directly
   # point to canvas.
-  def self.settings_store(safe_invoke=false)
+  def self.settings_store(safe_invoke = false)
     return @@settings_store if @@settings_store
     return nil if safe_invoke
 
@@ -67,6 +66,7 @@ module CanvasSecurity
       res = config && config['encryption_key']
       raise('encryption key required, see config/security.yml') unless res
       raise('encryption key is too short, see config/security.yml') unless res.to_s.length >= 20
+
       res.to_s
     end
   end
@@ -79,6 +79,7 @@ module CanvasSecurity
     @config ||= begin
       path = Rails.root + 'config/security.yml'
       raise('config/security.yml missing, see security.yml.example') unless File.exist?(path)
+
       YAML.safe_load(ERB.new(File.read(path)).result, aliases: true)[Rails.env]
     end
   end
@@ -105,11 +106,11 @@ module CanvasSecurity
 
   def self.url_key_encrypt_data(data)
     encryption_data = encrypt_data("#{data.encoding}~#{data.dup.force_encoding('ASCII-8BIT')}")
-    encryption_data.map{|item| Base64.urlsafe_encode64(item, padding: false)}.join('~')
+    encryption_data.map { |item| Base64.urlsafe_encode64(item, padding: false) }.join('~')
   end
 
   def self.url_key_decrypt_data(data)
-    encrypted_data, nonce, tag = data.split('~').map{|item| Base64.urlsafe_decode64(item)}
+    encrypted_data, nonce, tag = data.split('~').map { |item| Base64.urlsafe_decode64(item) }
     encoding, data = decrypt_data(encrypted_data, nonce, tag).split('~', 2)
     data.force_encoding(encoding)
   end
@@ -170,11 +171,11 @@ module CanvasSecurity
     false
   end
 
-  def self.sign_hmac_sha512(string_to_sign, signing_secret=services_signing_secret)
+  def self.sign_hmac_sha512(string_to_sign, signing_secret = services_signing_secret)
     OpenSSL::HMAC.digest('sha512', signing_secret, string_to_sign)
   end
 
-  def self.verify_hmac_sha512(message, signature, signing_secret=services_signing_secret)
+  def self.verify_hmac_sha512(message, signature, signing_secret = services_signing_secret)
     secrets_to_check = [signing_secret]
     if signing_secret == services_signing_secret && services_previous_signing_secret
       secrets_to_check << services_previous_signing_secret
@@ -202,6 +203,7 @@ module CanvasSecurity
     end
     raw_jwt = JSON::JWT.new(jwt_body)
     return raw_jwt.to_s if key == :unsigned
+
     raw_jwt.sign(key || encryption_key, alg || :HS256).to_s
   end
 
@@ -219,6 +221,7 @@ module CanvasSecurity
   # Returns the token as a string.
   def self.create_encrypted_jwt(payload, signing_secret, encryption_secret, alg = nil)
     raise InvalidJwtKey unless signing_secret && encryption_secret
+
     jwt = JSON::JWT.new(payload)
     jws = jwt.sign(signing_secret, alg || :HS256)
     jwe = jws.encrypt(encryption_secret, 'dir', :A256GCM)
@@ -256,7 +259,7 @@ module CanvasSecurity
     raise CanvasSecurity::InvalidToken
   end
 
-  def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil, ignore_expiration: false)
+  def self.decrypt_services_jwt(token, signing_secret = nil, encryption_secret = nil, ignore_expiration: false)
     signing_secret ||= services_signing_secret
     encryption_secret ||= services_encryption_secret
 
@@ -297,7 +300,7 @@ module CanvasSecurity
 
   def self.validate_encryption_key(overwrite = false)
     db_hash = settings_store.get('encryption_key_hash', nil) rescue return # in places like rake db:test:reset, we don't care that the db/table doesn't exist
-    return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash}
+    return if encryption_keys.any? { |key| Digest::SHA1.hexdigest(key) == db_hash }
 
     if db_hash.nil? || overwrite
       begin
@@ -324,6 +327,7 @@ module CanvasSecurity
     end
 
     private
+
     def verify_jwt(body, ignore_expiration: false)
       verification_time = Time.now.utc
       if body[:iat].present?

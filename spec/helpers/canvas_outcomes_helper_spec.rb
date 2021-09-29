@@ -58,15 +58,15 @@ describe CanvasOutcomesHelper do
         it 'sets js_env values' do
           expect(subject).to receive(:extract_domain_jwt).and_return ['domain', 'jwt']
           expect(subject).to receive(:js_env).with({
-            canvas_outcomes: {
-              artifact_type: 'canvas.page',
-              artifact_id: wiki_page.id,
-              context_uuid: account.uuid,
-              host: expected_host,
-              jwt: 'jwt',
-              extra_key: 'extra_value'
-            }
-          })
+                                                     canvas_outcomes: {
+                                                       artifact_type: 'canvas.page',
+                                                       artifact_id: wiki_page.id,
+                                                       context_uuid: account.uuid,
+                                                       host: expected_host,
+                                                       jwt: 'jwt',
+                                                       extra_key: 'extra_value'
+                                                     }
+                                                   })
           subject.set_outcomes_alignment_js_env(wiki_page, account, extra_key: 'extra_value')
         end
       end
@@ -100,14 +100,14 @@ describe CanvasOutcomesHelper do
         it 'sets js_env with the group.context values' do
           expect(subject).to receive(:extract_domain_jwt).and_return ['domain', 'jwt']
           expect(subject).to receive(:js_env).with({
-            canvas_outcomes: {
-              artifact_type: 'canvas.page',
-              artifact_id: wiki_page.id,
-              context_uuid: @course.uuid,
-              host: 'http://domain',
-              jwt: 'jwt'
-            }
-          })
+                                                     canvas_outcomes: {
+                                                       artifact_type: 'canvas.page',
+                                                       artifact_id: wiki_page.id,
+                                                       context_uuid: @course.uuid,
+                                                       host: 'http://domain',
+                                                       jwt: 'jwt'
+                                                     }
+                                                   })
           subject.set_outcomes_alignment_js_env(wiki_page, @group, {})
         end
       end

@@ -258,21 +258,21 @@ class AppointmentGroupsController < ApplicationController
     )
     if params[:include]
       ActiveRecord::Associations::Preloader.new.preload(groups,
-                            [{:appointments =>
-                               [:parent_event,
-                                {:context =>
-                                  [{:appointment_group_contexts => :context},
-                                   :appointment_group_sub_contexts]},
-                                {:child_events =>
-                                  [:parent_event,
-                                   :context,
-                                   {:child_events =>
-                                     [:parent_event,
-                                      :context]}]}]},
-                             {:appointment_group_contexts => :context},
-                             :appointment_group_sub_contexts])
+                                                        [{ :appointments =>
+                                                           [:parent_event,
+                                                            { :context =>
+                                                              [{ :appointment_group_contexts => :context },
+                                                               :appointment_group_sub_contexts] },
+                                                            { :child_events =>
+                                                              [:parent_event,
+                                                               :context,
+                                                               { :child_events =>
+                                                                 [:parent_event,
+                                                                  :context] }] }] },
+                                                         { :appointment_group_contexts => :context },
+                                                         :appointment_group_sub_contexts])
     end
-    render :json => groups.map{ |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
+    render :json => groups.map { |group| appointment_group_json(group, @current_user, session, :include => params[:include]) }
   end
 
   # @API Create an appointment group
@@ -353,7 +353,7 @@ class AppointmentGroupsController < ApplicationController
     # break the ability to edit those.
     if contexts.any? { |c| c.concluded? }
       return render json: { error: t('cannot create an appointment group for a concluded course') },
-        status: :bad_request
+                    status: :bad_request
     end
 
     raise ActiveRecord::RecordNotFound unless contexts.present?
@@ -403,13 +403,13 @@ class AppointmentGroupsController < ApplicationController
   def edit
     if request.format == :html
       if authorized_action(@group, @current_user, :update)
-        @page_title = t('Edit %{title}', {title: @group.title})
+        @page_title = t('Edit %{title}', { title: @group.title })
         js_env({
-          :APPOINTMENT_GROUP_ID => @group.id,
-          :CALENDAR => {
-            MAX_GROUP_CONVERSATION_SIZE: 100,
-          }
-        })
+                 :APPOINTMENT_GROUP_ID => @group.id,
+                 :CALENDAR => {
+                   MAX_GROUP_CONVERSATION_SIZE: 100,
+                 }
+               })
         js_bundle :calendar_appointment_group_edit
         css_bundle :calendar_appointment_group_edit
         render :html => "".html_safe, :layout => true
@@ -525,7 +525,7 @@ class AppointmentGroupsController < ApplicationController
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def users
-    participants('User'){ |u| user_json(u, @current_user, session) }
+    participants('User') { |u| user_json(u, @current_user, session) }
   end
 
   # @API List student group participants
@@ -537,7 +537,7 @@ class AppointmentGroupsController < ApplicationController
   # @argument registration_status ["all"|"registered"|"registered"]
   #   Limits results to the a given participation status, defaults to "all"
   def groups
-    participants('Group'){ |g| group_json(g, @current_user, session) }
+    participants('Group') { |g| group_json(g, @current_user, session) }
   end
 
   # @API Get next appointment
@@ -559,7 +559,7 @@ class AppointmentGroupsController < ApplicationController
     events = ag_scope.preload(:appointments => :child_events).to_a.map do |ag|
       ag.appointments.detect do |appointment|
         appointment.start_at > Time.zone.now &&
-        appointment.child_events_for(@current_user).empty? &&
+          appointment.child_events_for(@current_user).empty? &&
           (appointment.participants_per_appointment.nil? ||
            appointment.child_events.count < appointment.participants_per_appointment)
       end
@@ -574,6 +574,7 @@ class AppointmentGroupsController < ApplicationController
   def participants(type, &formatter)
     if authorized_action(@group, @current_user, :read)
       return render :json => [] unless @group.participant_type == type
+
       render :json => Api.paginate(
         @group.possible_participants(registration_status: params[:registration_status]),
         self,
@@ -599,14 +600,14 @@ class AppointmentGroupsController < ApplicationController
 
   def appointment_group_params
     params.require(:appointment_group).permit(:title, :description, :location_name, :location_address, :participants_per_appointment,
-      :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
-      :sub_context_codes => [], :new_appointments => strong_anything)
+                                              :min_appointments_per_participant, :max_appointments_per_participant, :participant_visibility, :cancel_reason,
+                                              :sub_context_codes => [], :new_appointments => strong_anything)
   end
 
   def web_index
     # start with the first reservable appointment group
     group = AppointmentGroup.reservable_by(@current_user, params[:context_codes]).current.order(:start_at).first
-    anchor =calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
+    anchor = calendar_fragment :view_name => :agenda, :view_start => group && group.start_at.strftime('%Y-%m-%d')
     return redirect_to calendar2_url(:anchor => anchor)
   end
 
@@ -620,29 +621,28 @@ class AppointmentGroupsController < ApplicationController
                          !@group.appointments_participants.pluck(:user_id).include?(@current_user.id) &&
                          !@group.users_with_reservations_through_group.include?(@current_user.id))
     anchor = if needs_appointment
-      # start at the appointment group; enter find-appointment mode for a relevant course
-      args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
-      args[:find_appointment] = "course_#{student_course_id}"
-      calendar_fragment({ :view_name => :agenda }.merge(args))
-    else
-      # start at the appointment event, or the group start if no event is given
-      event = params[:event_id] && CalendarEvent.find_by(id: params[:event_id])
-      # For the calendar to correctly pop-up the event we should use the parent event if the
-      # event is a user event and the user does not own the event.
-      # i.e. teacher viewing appointment slot filled by student.
-      event = event.parent_event if event && event.user && event.user != @current_user
-      event = nil unless event && event.grants_right?(@current_user, :read)
-      args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
-      if event
-        calendar_args[:event_id] = event.id
-        # Event pop-up only works in month or week mode.
-        calendar_fragment({ :view_name => :month }.merge(args))
-      else
-        calendar_fragment({ :view_name => :agenda }.merge(args))
-      end
-    end
+               # start at the appointment group; enter find-appointment mode for a relevant course
+               args[:view_start] = @group.start_at.strftime('%Y-%m-%d')
+               args[:find_appointment] = "course_#{student_course_id}"
+               calendar_fragment({ :view_name => :agenda }.merge(args))
+             else
+               # start at the appointment event, or the group start if no event is given
+               event = params[:event_id] && CalendarEvent.find_by(id: params[:event_id])
+               # For the calendar to correctly pop-up the event we should use the parent event if the
+               # event is a user event and the user does not own the event.
+               # i.e. teacher viewing appointment slot filled by student.
+               event = event.parent_event if event && event.user && event.user != @current_user
+               event = nil unless event && event.grants_right?(@current_user, :read)
+               args[:view_start] = (event || @group).start_at.strftime('%Y-%m-%d')
+               if event
+                 calendar_args[:event_id] = event.id
+                 # Event pop-up only works in month or week mode.
+                 calendar_fragment({ :view_name => :month }.merge(args))
+               else
+                 calendar_fragment({ :view_name => :agenda }.merge(args))
+               end
+             end
     calendar_args[:anchor] = anchor
     redirect_to calendar2_url(calendar_args)
   end
-
 end

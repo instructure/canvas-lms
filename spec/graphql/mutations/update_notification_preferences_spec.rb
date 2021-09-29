@@ -27,7 +27,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     @student = @course.enroll_student(User.create!, enrollemnt_state: 'active').user
-    communication_channel(@teacher, {username: 'two@example.com', active_cc: true})
+    communication_channel(@teacher, { username: 'two@example.com', active_cc: true })
     @notification = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'Due Date')
   end
 
@@ -120,10 +120,10 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
 
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(mutation_str(opts), context: {
-      current_user: current_user,
-      request: ActionDispatch::TestRequest.create,
-      domain_root_account: @account
-    })
+                                    current_user: current_user,
+                                    request: ActionDispatch::TestRequest.create,
+                                    domain_root_account: @account
+                                  })
     result.to_h.with_indifferent_access
   end
 
@@ -137,8 +137,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :readPrivacyNoticeDate
-      )).to eq @teacher.preferences[:read_notification_privacy_info]
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :readPrivacyNoticeDate
+             )).to eq @teacher.preferences[:read_notification_privacy_info]
     end
   end
 
@@ -153,8 +153,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
-      )).to be true
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
+             )).to be true
       expect(@teacher.preferences[:send_observed_names_in_notifications]).to be true
 
       result = run_mutation(
@@ -165,8 +165,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
-      )).to be false
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
+             )).to be false
       expect(@teacher.preferences[:send_observed_names_in_notifications]).to be false
     end
   end
@@ -181,8 +181,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-      )).to be true
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+             )).to be true
 
       result = run_mutation(
         user_id: @teacher.id,
@@ -192,8 +192,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-      )).to be false
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+             )).to be false
     end
 
     it 'sets the course override setting' do
@@ -205,8 +205,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-      )).to be true
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+             )).to be true
 
       result = run_mutation(
         user_id: @teacher.id,
@@ -216,8 +216,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       )
       expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
       expect(result.dig(
-        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
-      )).to be false
+               :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendScoresInEmails
+             )).to be false
     end
   end
 

@@ -58,7 +58,7 @@ describe Mutations::MarkSubmissionCommentsRead do
   end
 
   def run_mutation(opts = {}, current_user = @teacher)
-    result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user})
+    result = CanvasSchema.execute(mutation_str(opts), context: { current_user: current_user })
     result.to_h.with_indifferent_access
   end
 
@@ -77,7 +77,7 @@ describe Mutations::MarkSubmissionCommentsRead do
   end
 
   it 'requires permission to mark submission as read' do
-    result = run_mutation({submission_comment_ids: @student_comment.id.to_s}, @student2)
+    result = run_mutation({ submission_comment_ids: @student_comment.id.to_s }, @student2)
     expect(
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments)
     ).to eq nil
@@ -91,7 +91,7 @@ describe Mutations::MarkSubmissionCommentsRead do
       result.dig(:data, :markSubmissionCommentsRead, :submissionComments).count
     ).to eq 2
     expect(
-      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).map{|x| x[:_id]}
+      result.dig(:data, :markSubmissionCommentsRead, :submissionComments).map { |x| x[:_id] }
     ).to eq [@student_comment.id.to_s, student_comment2.id.to_s]
     expect(ViewedSubmissionComment.count).to eq 2
     expect(@student_comment.read?(@teacher)).to eq true

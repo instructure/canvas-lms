@@ -20,17 +20,16 @@
 require 'spec_helper'
 
 describe Quizzes::QuizSerializer do
-
-  def quiz_serializer(options={})
+  def quiz_serializer(options = {})
     options.reverse_merge!({
-      controller: controller,
-      scope: @user,
-      session: @session
-    })
+                             controller: controller,
+                             scope: @user,
+                             session: @session
+                           })
     Quizzes::QuizSerializer.new(@quiz, options)
   end
   let(:quiz) { @quiz }
-  let(:context ) { @context }
+  let(:context) { @context }
   let(:serializer) { @serializer }
   let(:host_name) { 'example.com' }
   let(:json) { @json }
@@ -67,11 +66,10 @@ describe Quizzes::QuizSerializer do
     :hide_correct_answers_at, :show_correct_answers_last_attempt,
     :has_access_code, :migration_id
   ].each do |attribute|
-
-      it "serializes #{attribute}" do
-        expect(json[attribute]).to eq quiz.send(attribute)
-      end
+    it "serializes #{attribute}" do
+      expect(json[attribute]).to eq quiz.send(attribute)
     end
+  end
 
   it "serializes mobile_url" do
     expect(json[:mobile_url]).to eq 'http://example.com/courses/1/quizzes/1?force_user=1&persist_headless=1'
@@ -89,7 +87,7 @@ describe Quizzes::QuizSerializer do
     it "serializes description with a formatter if given" do
       @serializer = quiz_serializer(
         serializer_options: {
-          description_formatter: -> (_) {return "description from formatter"}
+          description_formatter: ->(_) { return "description from formatter" }
         }
       )
       json = @serializer.as_json[:quiz]
@@ -175,28 +173,27 @@ describe Quizzes::QuizSerializer do
 
   describe "access code" do
     it "is included if the user can grade" do
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
-        at_least(:once).and_return true
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades)
+                                                     .at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is included if the user can manage" do
-      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
-        at_least(:once).and_return true
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+                                                         .at_least(:once).and_return true
       expect(serializer.as_json[:quiz]).to have_key :access_code
     end
 
     it "is not included if the user can't grade or manage" do
-      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades).
-        at_least(:once).and_return false
-      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS).
-        at_least(:once).and_return false
+      expect(quiz.context).to receive(:grants_right?).with(@user, :manage_grades)
+                                                     .at_least(:once).and_return false
+      expect(quiz.context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+                                                         .at_least(:once).and_return false
       expect(serializer.as_json[:quiz]).not_to have_key :access_code
     end
   end
 
   describe "id" do
-
     it "stringifys when stringify_json_ids? is true" do
       expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
       expect(controller).to receive(:stringify_json_ids?).at_least(:once).and_return true
@@ -208,22 +205,21 @@ describe Quizzes::QuizSerializer do
       expect(serializer.as_json[:quiz][:id]).to eq quiz.id
       expect(serializer.as_json[:quiz][:id].is_a?(Integer)).to be_truthy
     end
-
   end
 
   describe "lock_info" do
     it "includes lock_info when appropriate" do
-      expect(quiz).to receive(:locked_for?).
-        with(@user, check_policies: true, context: @context).
-        and_return({due_at: true})
+      expect(quiz).to receive(:locked_for?)
+        .with(@user, check_policies: true, context: @context)
+        .and_return({ due_at: true })
       json = quiz_serializer.as_json[:quiz]
       expect(json).to have_key :lock_info
       expect(json).to have_key :lock_explanation
       expect(json[:locked_for_user]).to eq true
 
-      expect(quiz).to receive(:locked_for?).
-        with(@user, check_policies: true, context: @context).
-        and_return false
+      expect(quiz).to receive(:locked_for?)
+        .with(@user, check_policies: true, context: @context)
+        .and_return false
       json = quiz_serializer.as_json[:quiz]
       expect(json).not_to have_key :lock_info
       expect(json).not_to have_key :lock_explanation
@@ -232,10 +228,10 @@ describe Quizzes::QuizSerializer do
 
     it "doesn't if skip_lock_tests is on" do
       json = quiz_serializer({
-        serializer_options: {
-          skip_lock_tests: true
-        }
-      }).as_json[:quiz]
+                               serializer_options: {
+                                 skip_lock_tests: true
+                               }
+                             }).as_json[:quiz]
       expect(json).not_to have_key :lock_info
       expect(json).not_to have_key :lock_explanation
       expect(json).not_to have_key :locked_for_user
@@ -243,7 +239,6 @@ describe Quizzes::QuizSerializer do
   end
 
   describe "unpublishable" do
-
     it "is not present unless the user can manage the quiz's assignments" do
       manage_result = true
       allow(context).to receive(:grants_any_right?).with(@user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS) { manage_result }
@@ -292,21 +287,18 @@ describe Quizzes::QuizSerializer do
   end
 
   describe "preview_url" do
-
     it "is only present when the user can grade the quiz" do
       course_with_teacher(active_all: true)
       course_quiz(true)
-      expect(quiz_serializer(scope: @teacher).as_json[:quiz][:preview_url]).
-        to eq controller.send(:course_quiz_take_url, @quiz.context, @quiz, preview: '1')
+      expect(quiz_serializer(scope: @teacher).as_json[:quiz][:preview_url])
+        .to eq controller.send(:course_quiz_take_url, @quiz.context, @quiz, preview: '1')
       course_with_student(active_all: true, course: @course)
       expect(quiz_serializer(scope: @student).as_json[:quiz]).not_to have_key :preview_url
     end
   end
 
   describe "links" do
-
     describe "assignment_group" do
-
       context "controller accepts_jsonapi?" do
         before { skip }
 
@@ -327,7 +319,6 @@ describe Quizzes::QuizSerializer do
       end
 
       context "controller doesn't accept jsonapi" do
-
         it "serialized the assignment_group as assignment_group_id" do
           expect(controller).to receive(:accepts_jsonapi?).at_least(:once).and_return false
           expect(serializer.as_json[:quiz]['assignment_group_id']).to be_nil
@@ -342,7 +333,6 @@ describe Quizzes::QuizSerializer do
     describe "student_quiz_submissions" do
       before { skip }
       context "when user may grade" do
-
         it "sends the url for all submissions" do
           course_with_teacher(active_all: true)
           quiz_with_graded_submission([], course: @course)
@@ -359,20 +349,16 @@ describe Quizzes::QuizSerializer do
             controller.send(:api_v1_course_quiz_submissions_url, @quiz.context.id, @quiz.id)
           )
         end
-
       end
 
       context "when user may not grade" do
-
         it "sends nil" do
           course_with_student(active_all: true)
           quiz_with_graded_submission([], user: @student, course: @course)
           serializer = quiz_serializer(scope: @student)
           expect(serializer.as_json[:quiz]['links']['student_quiz_submissions']).to be_nil
         end
-
       end
-
     end
 
     describe "quiz_submission" do
@@ -437,11 +423,11 @@ describe Quizzes::QuizSerializer do
         course_with_student(active_all: true, course: @course)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @teacher)
-        expect(serializer.as_json[:quiz]['links']['submitted_students']).
-          to eq controller.send(:api_v1_course_quiz_submission_users_url,
-                                    @quiz.context,
-                                    @quiz,
-                                    submitted: true)
+        expect(serializer.as_json[:quiz]['links']['submitted_students'])
+          .to eq controller.send(:api_v1_course_quiz_submission_users_url,
+                                 @quiz.context,
+                                 @quiz,
+                                 submitted: true)
       end
     end
 
@@ -462,11 +448,11 @@ describe Quizzes::QuizSerializer do
         course_with_student(active_all: true, course: @course)
         quiz_with_graded_submission([], user: @student, course: @course)
         serializer = quiz_serializer(scope: @teacher)
-        expect(serializer.as_json[:quiz]['links']['unsubmitted_students']).
-          to eq controller.send(:api_v1_course_quiz_submission_users_url,
-                                    @quiz.context,
-                                    @quiz,
-                                    submitted: 'false')
+        expect(serializer.as_json[:quiz]['links']['unsubmitted_students'])
+          .to eq controller.send(:api_v1_course_quiz_submission_users_url,
+                                 @quiz.context,
+                                 @quiz,
+                                 submitted: 'false')
       end
     end
   end
@@ -514,18 +500,18 @@ describe Quizzes::QuizSerializer do
   describe "permissions" do
     it "serializes permissions" do
       expect(serializer.as_json[:quiz][:permissions]).to eq({
-        read: true,
-        submit: true,
-        review_grades: true,
-        create: true,
-        update: true,
-        read_statistics: true,
-        view_answer_audits: true,
-        manage: true,
-        delete: true,
-        grade: true,
-        preview: true
-      })
+                                                              read: true,
+                                                              submit: true,
+                                                              review_grades: true,
+                                                              create: true,
+                                                              update: true,
+                                                              read_statistics: true,
+                                                              view_answer_audits: true,
+                                                              manage: true,
+                                                              delete: true,
+                                                              grade: true,
+                                                              preview: true
+                                                            })
     end
   end
 
@@ -544,7 +530,7 @@ describe Quizzes::QuizSerializer do
     output = serializer.as_json[:quiz]
     expect(output).not_to have_key :all_dates
 
-    [ :due_at, :lock_at, :unlock_at ].each do |key|
+    [:due_at, :lock_at, :unlock_at].each do |key|
       expect(output[key]).to eq student_overrides[key]
     end
   end
@@ -559,7 +545,7 @@ describe Quizzes::QuizSerializer do
 
     output = serializer.as_json[:quiz]
 
-    [ :due_at, :lock_at, :unlock_at ].each do |key|
+    [:due_at, :lock_at, :unlock_at].each do |key|
       expect(output[key]).to eq quiz.send(key)
     end
   end
@@ -622,7 +608,6 @@ describe Quizzes::QuizSerializer do
         expect(json[:quiz]).not_to have_key :only_visible_to_overrides
       end
     end
-
   end
 
   it "includes anonymous_submisions if quiz is a survey quiz" do
@@ -654,5 +639,4 @@ describe Quizzes::QuizSerializer do
       expect(@serializer.as_json[:quiz][:important_dates]).to be true
     end
   end
-
 end

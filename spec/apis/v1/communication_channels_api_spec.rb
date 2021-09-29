@@ -30,52 +30,54 @@ describe 'CommunicationChannels API', type: :request do
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { :controller => 'communication_channels',
-        :action => 'index', :format => 'json', :user_id => @someone.id.to_param }
+                        :action => 'index', :format => 'json', :user_id => @someone.id.to_param }
     end
 
     context 'an authorized user' do
-      it 'should list all channels without bounce information for a user that is not a site admin' do
+      it 'lists all channels without bounce information for a user that is not a site admin' do
         json = api_call_as_user(@someone, :get, @path, @path_options)
 
         cc = @someone.communication_channel
         expect(json).to eql [{
-          'id'       => cc.id,
+          'id' => cc.id,
           'created_at' => cc.created_at.iso8601,
-          'address'  => cc.path,
-          'type'     => cc.path_type,
+          'address' => cc.path,
+          'type' => cc.path_type,
           'position' => cc.position,
           'workflow_state' => 'unconfirmed',
-          'user_id'  => cc.user_id }]
+          'user_id' => cc.user_id
+        }]
       end
 
-      it 'should list all channels with bounce information for a user that is a site admin' do
+      it 'lists all channels with bounce information for a user that is a site admin' do
         json = api_call_as_user(@admin, :get, @path, @path_options)
 
         cc = @someone.communication_channel
         expect(json).to eql [{
-          'id'       => cc.id,
+          'id' => cc.id,
           'created_at' => cc.created_at.iso8601,
-          'address'  => cc.path,
-          'type'     => cc.path_type,
+          'address' => cc.path,
+          'type' => cc.path_type,
           'position' => cc.position,
           'workflow_state' => 'unconfirmed',
-          'user_id'  => cc.user_id,
+          'user_id' => cc.user_id,
           'last_bounce_at' => nil,
           'last_bounce_summary' => nil,
           'last_suppression_bounce_at' => nil,
           'last_transient_bounce_at' => nil,
-          'last_transient_bounce_summary' => nil }]
+          'last_transient_bounce_summary' => nil
+        }]
       end
     end
 
     context 'an unauthorized user' do
-      it 'should return 401' do
+      it 'returns 401' do
         user_with_pseudonym
         raw_api_call(:get, @path, @path_options)
         expect(response.code).to eql '401'
       end
 
-      it "should not list channels for a teacher's students" do
+      it "does not list channels for a teacher's students" do
         course_with_teacher
         @course.enroll_student(@someone)
         @user = @teacher
@@ -97,13 +99,14 @@ describe 'CommunicationChannels API', type: :request do
 
       @path = "/api/v1/users/#{@someone.id}/communication_channels"
       @path_options = { :controller => 'communication_channels',
-        :action => 'create', :format => 'json',
-        :user_id => @someone.id.to_param, }
+                        :action => 'create', :format => 'json',
+                        :user_id => @someone.id.to_param, }
       @post_params = { :communication_channel => {
-        :address => 'new+api@example.com', :type => 'email' }}
+        :address => 'new+api@example.com', :type => 'email'
+      } }
     end
 
-    it 'should not create a login on restore of login that was set to build login' do
+    it 'does not create a login on restore of login that was set to build login' do
       json = api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
       channel = CommunicationChannel.find(json['id'])
       channel.update(workflow_state: 'retired', build_pseudonym_on_confirm: true)
@@ -112,41 +115,42 @@ describe 'CommunicationChannels API', type: :request do
       expect(channel.pseudonym).to be_nil
     end
 
-    it 'should should casing communication channel restores' do
+    it 'shoulds casing communication channel restores' do
       json = api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
       channel = CommunicationChannel.find(json['id'])
       channel.update(workflow_state: 'retired', build_pseudonym_on_confirm: true)
       api_call(:post, @path, @path_options, @post_params.merge({
-        skip_confirmation: 1,
-        communication_channel: {
-          address: 'NEW+api@example.com',
-          type: 'email'
-        }
-      }))
+                                                                 skip_confirmation: 1,
+                                                                 communication_channel: {
+                                                                   address: 'NEW+api@example.com',
+                                                                   type: 'email'
+                                                                 }
+                                                               }))
       expect(channel.reload.workflow_state).to eq 'active'
       expect(channel.path).to eq 'NEW+api@example.com'
     end
 
-    it 'should be able to create new channels' do
+    it 'is able to create new channels' do
       json = api_call(:post, @path, @path_options, @post_params.merge({
-        :skip_confirmation => 1 }))
+                                                                        :skip_confirmation => 1
+                                                                      }))
 
       @channel = CommunicationChannel.find(json['id'])
 
       expect(json).to eq({
-        'id' => @channel.id,
-        'created_at' => @channel.created_at.iso8601,
-        'address' => 'new+api@example.com',
-        'type' => 'email',
-        'workflow_state' => 'active',
-        'user_id' => @someone.id,
-        'position' => 2,
-        'last_bounce_at' => nil,
-        'last_bounce_summary' => nil,
-        'last_suppression_bounce_at' => nil,
-        'last_transient_bounce_at' => nil,
-        'last_transient_bounce_summary' => nil
-      })
+                           'id' => @channel.id,
+                           'created_at' => @channel.created_at.iso8601,
+                           'address' => 'new+api@example.com',
+                           'type' => 'email',
+                           'workflow_state' => 'active',
+                           'user_id' => @someone.id,
+                           'position' => 2,
+                           'last_bounce_at' => nil,
+                           'last_bounce_summary' => nil,
+                           'last_suppression_bounce_at' => nil,
+                           'last_transient_bounce_at' => nil,
+                           'last_transient_bounce_summary' => nil
+                         })
     end
 
     it "doesn't error if the user already has a login with the same e-mail address" do
@@ -158,9 +162,10 @@ describe 'CommunicationChannels API', type: :request do
     context 'a site admin' do
       before { @user = @site_admin }
 
-      it 'should be able to auto-validate new channels' do
+      it 'is able to auto-validate new channels' do
         json = api_call(:post, @path, @path_options, @post_params.merge({
-          :skip_confirmation => 1 }))
+                                                                          :skip_confirmation => 1
+                                                                        }))
 
         @channel = CommunicationChannel.find(json['id'])
         expect(@channel).to be_active
@@ -170,59 +175,58 @@ describe 'CommunicationChannels API', type: :request do
     context 'an account admin' do
       before { @user = @admin }
 
-      it 'should be able to create new channels for other users' do
+      it 'is able to create new channels for other users' do
         json = api_call(:post, @path, @path_options, @post_params)
 
         @channel = CommunicationChannel.find(json['id'])
 
         expect(json).to eq({
-          'id' => @channel.id,
-          'created_at' => @channel.created_at.iso8601,
-          'address' => 'new+api@example.com',
-          'type' => 'email',
-          'workflow_state' => 'unconfirmed',
-          'user_id' => @someone.id,
-          'position' => 2
-        })
+                             'id' => @channel.id,
+                             'created_at' => @channel.created_at.iso8601,
+                             'address' => 'new+api@example.com',
+                             'type' => 'email',
+                             'workflow_state' => 'unconfirmed',
+                             'user_id' => @someone.id,
+                             'position' => 2
+                           })
       end
 
-      it 'should be able to create new channels for other users and auto confirm' do
-        json = api_call(:post, @path, @path_options, @post_params.merge({:skip_confirmation => 1}))
+      it 'is able to create new channels for other users and auto confirm' do
+        json = api_call(:post, @path, @path_options, @post_params.merge({ :skip_confirmation => 1 }))
 
         @channel = CommunicationChannel.find(json['id'])
 
         expect(json).to eq({
-          'id' => @channel.id,
-          'created_at' => @channel.created_at.iso8601,
-          'address' => 'new+api@example.com',
-          'type' => 'email',
-          'workflow_state' => 'active',
-          'user_id' => @someone.id,
-          'position' => 2
-        })
+                             'id' => @channel.id,
+                             'created_at' => @channel.created_at.iso8601,
+                             'address' => 'new+api@example.com',
+                             'type' => 'email',
+                             'workflow_state' => 'active',
+                             'user_id' => @someone.id,
+                             'position' => 2
+                           })
       end
-
     end
 
     context 'a user' do
       before { @user = @someone }
 
-      it 'should be able to create its own channels' do
+      it 'is able to create its own channels' do
         expect {
           api_call(:post, @path, @path_options, @post_params)
         }.to change(CommunicationChannel, :count).by(1)
       end
 
-      it 'should not be able to create channels for others' do
+      it 'is not able to create channels for others' do
         raw_api_call(:post, "/api/v1/users/#{@admin.id}/communication_channels",
-          @path_options.merge(:user_id => @admin.to_param), @post_params)
+                     @path_options.merge(:user_id => @admin.to_param), @post_params)
 
         expect(response.code).to eql '401'
       end
 
       context 'not configured push' do
-        it 'should complain about sns not being configured' do
-          @post_params.merge!(communication_channel: {token: 'registration_token', type: 'push'})
+        it 'complains about sns not being configured' do
+          @post_params.merge!(communication_channel: { token: 'registration_token', type: 'push' })
           raw_api_call(:post, @path, @path_options, @post_params)
 
           expect(response.code).to eql '400'
@@ -230,7 +234,7 @@ describe 'CommunicationChannels API', type: :request do
       end
 
       context 'push' do
-        before { @post_params.merge!(communication_channel: {token: +'registration_token', type: 'push'}) }
+        before { @post_params.merge!(communication_channel: { token: +'registration_token', type: 'push' }) }
 
         let(:client) { double() }
         let(:dk) do
@@ -240,7 +244,7 @@ describe 'CommunicationChannels API', type: :request do
           dk
         end
 
-        it "should work" do
+        it "works" do
           allow(DeveloperKey).to receive(:sns).and_return(client)
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
@@ -251,7 +255,7 @@ describe 'CommunicationChannels API', type: :request do
           expect(@user.notification_endpoints.first.arn).to eq 'endpointarn'
         end
 
-        it "shouldn't create two push channels regardless of case" do
+        it "does not create two push channels regardless of case" do
           allow(DeveloperKey).to receive(:sns).and_return(client)
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
@@ -265,7 +269,7 @@ describe 'CommunicationChannels API', type: :request do
         context 'shards' do
           specs_require_sharding
 
-          it "should not have unique constraint error for push channel" do
+          it "does not have unique constraint error for push channel" do
             allow(DeveloperKey).to receive(:sns).and_return(client)
             $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
             expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
@@ -281,7 +285,6 @@ describe 'CommunicationChannels API', type: :request do
             expect(response).to be_successful
           end
         end
-
       end
     end
   end
@@ -294,7 +297,7 @@ describe 'CommunicationChannels API', type: :request do
       user
     end
     let_once(:channel) { someone.communication_channel }
-    let(:path) {"/api/v1/users/#{someone.id}/communication_channels/#{channel.id}"}
+    let(:path) { "/api/v1/users/#{someone.id}/communication_channels/#{channel.id}" }
     let(:path_options) do
       { :controller => 'communication_channels',
         :action => 'destroy', :user_id => someone.to_param, :format => 'json',
@@ -304,45 +307,45 @@ describe 'CommunicationChannels API', type: :request do
     context 'an admin' do
       before(:each) { @user = admin }
 
-      it "should be able to delete others' channels" do
+      it "is able to delete others' channels" do
         json = api_call(:delete, path, path_options)
 
         expect(json).to eq({
-          'position' => 1,
-          'address' => channel.path,
-          'id' => channel.id,
-          'workflow_state' => 'retired',
-          'user_id' => someone.id,
-          'type' => 'email',
-          'created_at' => channel.created_at.iso8601
-        })
+                             'position' => 1,
+                             'address' => channel.path,
+                             'id' => channel.id,
+                             'workflow_state' => 'retired',
+                             'user_id' => someone.id,
+                             'type' => 'email',
+                             'created_at' => channel.created_at.iso8601
+                           })
       end
     end
 
     context 'a user' do
       before(:each) { @user = someone }
 
-      it 'should be able to delete its own channels' do
+      it 'is able to delete its own channels' do
         json = api_call(:delete, path, path_options)
 
         expect(json).to eq({
-          'position' => 1,
-          'address' => channel.path,
-          'id' => channel.id,
-          'workflow_state' => 'retired',
-          'user_id' => someone.id,
-          'type' => 'email',
-          'created_at' => channel.created_at.iso8601
-        })
+                             'position' => 1,
+                             'address' => channel.path,
+                             'id' => channel.id,
+                             'workflow_state' => 'retired',
+                             'user_id' => someone.id,
+                             'type' => 'email',
+                             'created_at' => channel.created_at.iso8601
+                           })
       end
 
-      it "should 404 if already deleted" do
+      it "404s if already deleted" do
         api_call(:delete, path, path_options)
         raw_api_call(:delete, path, path_options)
         expect(response.code).to eq '404'
       end
 
-      it "should not be able to delete others' channels" do
+      it "is not able to delete others' channels" do
         admin_channel = admin.communication_channel
         raw_api_call(:delete, "/api/v1/users/#{admin.id}/communication_channels/#{admin_channel.id}",
                      path_options.merge(:user_id => admin.to_param, :id => admin_channel.to_param))
@@ -350,7 +353,7 @@ describe 'CommunicationChannels API', type: :request do
         expect(response.code).to eql '401'
       end
 
-      it "should be able to delete by path, instead of id" do
+      it "is able to delete by path, instead of id" do
         api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                  :controller => 'communication_channels',
                  :action => 'destroy', :user_id => someone.to_param, :format => 'json',
@@ -358,7 +361,7 @@ describe 'CommunicationChannels API', type: :request do
         expect(CommunicationChannel.find(channel.id)).to be_retired # for some reason, .reload on a let() bound model returns nil
       end
 
-      it "should 404 if already deleted by path" do
+      it "404s if already deleted by path" do
         api_call(:delete, "/api/v1/users/#{someone.id}/communication_channels/#{channel.path_type}/#{URI.escape(channel.path)}",
                  :controller => 'communication_channels',
                  :action => 'destroy', :user_id => someone.to_param, :format => 'json',

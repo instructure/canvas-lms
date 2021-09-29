@@ -88,5 +88,4 @@ class MessageDispatcher < Delayed::PerformableMethod
       end
     end
   end
-
 end

@@ -74,14 +74,14 @@ describe "Wiki Pages" do
     end
 
     context "Publish Cloud" do
-      it "should set focus back to the publish cloud after unpublish" do
+      it "sets focus back to the publish cloud after unpublish" do
         visit_course_wiki_index_page(@course.id)
         f('.publish-icon').click
         wait_for_ajaximations
         check_element_has_focus(f('.publish-icon'))
       end
 
-      it "should set focus back to the publish cloud after publish" do
+      it "sets focus back to the publish cloud after publish" do
         visit_course_wiki_index_page(@course.id)
         f('.publish-icon').click # unpublish it.
         wait_for_ajaximations
@@ -144,13 +144,13 @@ describe "Wiki Pages" do
         f('tbody .al-trigger').click
       end
 
-      it "should set focus back to the cog after setting" do
+      it "sets focus back to the cog after setting" do
         f('.use-as-front-page-menu-item').click
         wait_for_ajaximations
         check_element_has_focus(f('tbody .al-trigger'))
       end
 
-      it "should set focus to the next focusable item if you press Tab" do
+      it "sets focus to the next focusable item if you press Tab" do
         f('.use-as-front-page-menu-item').send_keys(:tab)
         check_element_has_focus(ff('.select-page-checkbox')[1])
       end
@@ -163,7 +163,7 @@ describe "Wiki Pages" do
         f('.edit-menu-item').click
       end
 
-      it "should set focus back to the cog menu if you cancel the dialog" do
+      it "sets focus back to the cog menu if you cancel the dialog" do
         f('.ui-dialog-buttonset .btn').click
         check_element_has_focus(f('tbody .al-trigger'))
       end
@@ -178,7 +178,7 @@ describe "Wiki Pages" do
         check_element_has_focus(f('tbody .al-trigger'))
       end
 
-      it "should return focus to the dialog if you cancel, then reopen the dialog" do
+      it "returns focus to the dialog if you cancel, then reopen the dialog" do
         f('.ui-dialog-titlebar-close').click
         check_element_has_focus(f('tbody .al-trigger'))
         f('tbody .al-trigger').click
@@ -187,7 +187,7 @@ describe "Wiki Pages" do
         check_element_has_focus(ff('.page-edit-dialog .edit-control-text').last)
       end
 
-      it "should set focus back to the cog menu if you edit the title and save" do
+      it "sets focus back to the cog menu if you edit the title and save" do
         f('.ui-dialog-buttonset .btn-primary').click
         wait_for_ajaximations
         check_element_has_focus(f('tbody .al-trigger'))
@@ -227,7 +227,7 @@ describe "Wiki Pages" do
         get "/courses/#{@course.id}/pages/#{@vpage.url}/revisions"
       end
 
-      it "should focus the revision buttons" do
+      it "focuses the revision buttons" do
         driver.execute_script("$('.close-button').focus();")
         f('.close-button').send_keys(:tab)
         all_revisions = ff('.revision-details')
@@ -237,7 +237,7 @@ describe "Wiki Pages" do
         end
       end
 
-      it "should validate that revision restored is displayed", priority: "1", test_id: 126832 do
+      it "validates that revision restored is displayed", priority: "1", test_id: 126832 do
         get "/courses/#{@course.id}/pages/#{@vpage.url}"
         f('.al-trigger').click
         expect(f('.icon-clock')).to be_present
@@ -269,14 +269,14 @@ describe "Wiki Pages" do
         wait_for_ajaximations
       end
 
-      it "should alert user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
+      it "alerts user if navigating away from page with unsaved RCE changes", priority: "1", test_id: 267612 do
         add_text_to_tiny("derp")
         course_home_nav_menu.click
         expect(driver.switch_to.alert).to be_present
         driver.switch_to.alert.accept
       end
 
-      it "should alert user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
+      it "alerts user if navigating away from page with unsaved html changes", priority: "1", test_id: 126838 do
         skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys("derp")
@@ -285,7 +285,7 @@ describe "Wiki Pages" do
         driver.switch_to.alert.accept
       end
 
-      it "should not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
+      it "does not save changes when navigating away and not saving", priority: "1", test_id: 267613 do
         skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         wiki_page_body.send_keys('derp')
@@ -296,7 +296,7 @@ describe "Wiki Pages" do
         expect(f('textarea')).not_to include_text('derp')
       end
 
-      it "should alert user if navigating away from page after title change", priority: "1", test_id: 267832 do
+      it "alerts user if navigating away from page after title change", priority: "1", test_id: 267832 do
         skip_if_safari(:alert)
         switch_editor_views(wiki_page_body)
         f('.title').clear()

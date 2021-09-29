@@ -19,7 +19,6 @@
 #
 
 class NotificationPolicy < ActiveRecord::Base
-
   include NotificationPreloader
   belongs_to :communication_channel
   has_many :delayed_messages, inverse_of: :notification_policy, :dependent => :destroy
@@ -36,8 +35,8 @@ class NotificationPolicy < ActiveRecord::Base
   scope :for, lambda { |context|
     case context
     when User
-      joins(:communication_channel).
-          where("communication_channels.user_id=? AND communication_channels.workflow_state<>'retired'", context)
+      joins(:communication_channel)
+        .where("communication_channels.user_id=? AND communication_channels.workflow_state<>'retired'", context)
     when Notification
       where(:notification_id => context)
     else
@@ -59,13 +58,13 @@ class NotificationPolicy < ActiveRecord::Base
         bool_val = (value == 'true')
         # save the preference as a symbol (convert from string)
         case key.to_sym
-          when :send_scores_in_emails
-            # Only set if a root account and the root account allows the setting.
-            if params[:root_account].settings[:allow_sending_scores_in_emails] != false
-              user.preferences[key.to_sym] = bool_val
-            end
-          when :no_submission_comments_inbox, :send_observed_names_in_notifications
+        when :send_scores_in_emails
+          # Only set if a root account and the root account allows the setting.
+          if params[:root_account].settings[:allow_sending_scores_in_emails] != false
             user.preferences[key.to_sym] = bool_val
+          end
+        when :no_submission_comments_inbox, :send_observed_names_in_notifications
+          user.preferences[key.to_sym] = bool_val
         end
       end
       user.save!
@@ -81,15 +80,15 @@ class NotificationPolicy < ActiveRecord::Base
       # create or update the entry.
       NotificationPolicy.transaction do
         notifications.each do |notification_id|
-          scope = user.notification_policies.
-              where(communication_channel_id: cc, notification_id: notification_id)
+          scope = user.notification_policies
+                      .where(communication_channel_id: cc, notification_id: notification_id)
           p = scope.first_or_initialize
           # Set the frequency and save
           p.frequency = frequency
           p.save!
         end
       end # transaction
-    end #if..else
+    end # if..else
     nil
   end
 
@@ -121,6 +120,7 @@ class NotificationPolicy < ActiveRecord::Base
   def self.find_or_update_for_category(communication_channel, category, frequency = nil)
     notifs = Notification.where("category = ?", category)
     raise ActiveRecord::RecordNotFound unless notifs.exists?
+
     notifs.map do |notif|
       NotificationPolicy.find_or_update_for(communication_channel, notif.name, frequency)
     end
@@ -133,6 +133,7 @@ class NotificationPolicy < ActiveRecord::Base
     notification_name = notification_name.titleize unless notification_name == 'Confirm SMS Communication Channel'
     notification = BroadcastPolicy.notification_finder.by_name(notification_name)
     raise ActiveRecord::RecordNotFound unless notification
+
     communication_channel.shard.activate do
       unique_constraint_retry do
         np = communication_channel.notification_policies.where(notification_id: notification).first

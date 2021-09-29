@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,23 +15,14 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {
-  NAVIGATION_MESSAGE as MENTIONS_NAVIGATION_MESSAGE,
-  INPUT_CHANGE_MESSAGE as MENTIONS_INPUT_CHANGE_MESSAGE,
-  SELECTION_MESSAGE as MENTIONS_SELECTION_MESSAGE
-} from '../../../rce/plugins/canvas_mentions/constants'
 
-export const whitelist = [
-  'requestFullWindowLaunch',
-  'lti.resourceImported',
-  'toggleCourseNavigationMenu'
-]
-
-// These are handled elsewhere so ignore them
-export const ignorelist = [
-  'A2ExternalContentReady',
-  'LtiDeepLinkingResponse',
-  MENTIONS_NAVIGATION_MESSAGE,
-  MENTIONS_INPUT_CHANGE_MESSAGE,
-  MENTIONS_SELECTION_MESSAGE
-]
+export type InputEvent = {
+  // A unique ID for the widget that generated this event, which can be used
+  // to group related events to get an idea of the whole interaction.
+  id: string;
+  locale: string;
+  method: 'pick' | 'type' | 'paste';
+  // Will be null if the value did not parse into a date.
+  parsed?: string;
+  value: string;
+};

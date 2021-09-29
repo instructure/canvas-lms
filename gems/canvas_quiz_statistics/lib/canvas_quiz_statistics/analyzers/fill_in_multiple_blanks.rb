@@ -43,7 +43,7 @@ module CanvasQuizStatistics::Analyzers
     # Number of students who have filled at least one blank.
     #
     # @return [Integer]
-    metric :responses => [ :blanks ] do |responses, blanks|
+    metric :responses => [:blanks] do |responses, blanks|
       responses.select do |response|
         blanks.any? do |blank|
           answer_present_for_blank?(response, blank)
@@ -61,21 +61,21 @@ module CanvasQuizStatistics::Analyzers
     # Number of students who filled all blanks correctly.
     #
     # @return [Integer]
-    metric :correct => [ :grades ] do |responses, grades|
+    metric :correct => [:grades] do |responses, grades|
       grades.select { |r| r == 'true' }.length
     end
 
     # Number of students who filled one or more blanks correctly.
     #
     # @return [Integer]
-    metric :partially_correct => [ :grades ] do |responses, grades|
+    metric :partially_correct => [:grades] do |responses, grades|
       grades.select { |r| r == 'partial' }.length
     end
 
     # Number of students who didn't fill any blank correctly.
     #
     # @return [Integer]
-    metric :incorrect => [ :grades ] do |responses, grades|
+    metric :incorrect => [:grades] do |responses, grades|
       grades.select { |r| Base::Constants::FalseLike.include?(r) }.length
     end
 
@@ -127,7 +127,7 @@ module CanvasQuizStatistics::Analyzers
     #     }
     #   ]
     # }
-    metric :answer_sets => [ :blanks ] do |responses, blanks|
+    metric :answer_sets => [:blanks] do |responses, blanks|
       answer_sets = blanks.map do |blank|
         answers_for_blank = @question_data[:answers].select do |answer|
           answer[:blank_id] == blank
@@ -168,7 +168,7 @@ module CanvasQuizStatistics::Analyzers
 
     def answer_present_for_blank?(response, blank)
       response[key_for_answer_id(blank)].present? ||
-      response[key_for_answer_text(blank)].present?
+        response[key_for_answer_text(blank)].present?
     end
 
     def locate_answer(response, answers, blank)

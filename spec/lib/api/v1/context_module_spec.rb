@@ -43,19 +43,20 @@ describe Api::V1::ContextModule do
       if context.context_module_tags != [] && context.context_module_tags.first.url
         return context.context_module_tags.first.url
       end
+
       context.context_external_tools.first.url
     end
   end
 
   describe "#module_item_json" do
-    subject { Dummy.new(double(params: {frame_external_urls: 'http://www.instructure.com'})) }
+    subject { Dummy.new(double(params: { frame_external_urls: 'http://www.instructure.com' })) }
 
     before do
       course_with_teacher(account: Account.default)
       course_with_student(course: @course)
 
       @cm = ContextModule.new(context: @course)
-      @cm.prerequisites = {:type=>"context_module", :name=>'test', :id=>1}
+      @cm.prerequisites = { :type => "context_module", :name => 'test', :id => 1 }
       @cm.save!
 
       @tool = @course.context_external_tools.create(name: "a", domain: "instructure.com", consumer_key: '12345', shared_secret: 'secret', url: 'http://www.toolurl.com')
@@ -69,12 +70,12 @@ describe Api::V1::ContextModule do
       @tg.save!
     end
 
-    it "should use the content tag's content url when the tag's url is not defined" do
+    it "uses the content tag's content url when the tag's url is not defined" do
       json = subject.module_item_json(@tg, @user, @session, @cm)
       expect(json[:url]).to eq "http://www.toolurl.com?id=#{@tool.id}&url=http%3A%2F%2Fwww.toolurl.com"
     end
 
-    it "should use the content tag's url when the tag's url is defined" do
+    it "uses the content tag's url when the tag's url is defined" do
       @tool.url = nil
       @tool.save!
 

@@ -54,10 +54,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   :submission_correct_count_average=>1,
   #   :questions=>
   #     [output of stats_for_question for every question in submission_data]
-  def generate(legacy=true, options = {})
+  def generate(legacy = true, options = {})
     submissions = submissions_for_statistics(options)
     # questions: questions from quiz#quiz_data
-    #{1022=>
+    # {1022=>
     # {"id"=>1022,
     #  "points_possible"=>1,
     #  "question_type"=>"numerical_question",
@@ -67,10 +67,10 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     #  "assessment_question_id"=>1022,
     # }, ...}
     questions = Hash[
-      (quiz.quiz_data || []).map { |q| q[:questions] || q }.
-      flatten.
-      select { |q| q[:answers] }.
-      map { |q| [q[:id], q] }
+      (quiz.quiz_data || []).map { |q| q[:questions] || q }
+                            .flatten
+                            .select { |q| q[:answers] }
+                            .map { |q| [q[:id], q] }
     ]
     stats = {}
     found_ids = {}
@@ -88,7 +88,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     temp_users = {}
     correct_cnt = incorrect_cnt = total_duration = 0
     submissions.each_with_index do |sub, index|
-      #check for temporary user submissions
+      # check for temporary user submissions
       if sub.user_id
         stats[:submission_user_ids] << sub.user_id if sub.user_id > 0
       else
@@ -104,6 +104,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       answers = sub.submission_data || []
       next unless answers.is_a?(Array)
+
       score_counter << sub.score.to_f
       correct_cnt += answers.count { |a| a[:correct] == true }
       incorrect_cnt += answers.count { |a| a[:correct] == false }
@@ -123,13 +124,13 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     else
       stats[:submission_correct_count_average] =
         stats[:submission_incorrect_count_average] =
-        stats[:submission_duration_average] = 0
+          stats[:submission_duration_average] = 0
     end
 
     assessment_questions = if questions_hash.any? { |_, q| q[:assessment_question_id] }
                              Hash[
-                               AssessmentQuestion.where(:id => questions_hash.keys).
-                               map { |aq| [aq.id, aq] }
+                               AssessmentQuestion.where(:id => questions_hash.keys)
+                                                 .map { |aq| [aq.id, aq] }
                              ]
                            else
                              {}
@@ -158,7 +159,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       end
       if obj[:answers] && obj[:question_type] != 'text_only_question'
         stat = stats_for_question(obj, responses_for_question[obj[:id]], legacy)
-        stat[:answers].each{|a| a.delete(:user_names)} if stat[:answers] && anonymous?
+        stat[:answers].each { |a| a.delete(:user_names) } if stat[:answers] && anonymous?
         stats[:questions] << ['question', stat]
       end
     end
@@ -214,6 +215,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
       quiz_datas.compact.each do |quiz_data|
         quiz_data.each do |question|
           next if question['entry_type'] == 'quiz_group'
+
           if !found_question_ids[question[:id]]
             columns << "#{question[:id]}: #{strip_tags(question[:question_text])}"
             columns << question[:points_possible]
@@ -263,6 +265,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
         row << submission.attempt if includes_all_versions?
         columns[first_question_index..last_question_index].each do |id|
           next unless id.is_a?(String)
+
           id = id.to_i
           answer = submission.submission_data.detect { |a| a[:question_id] == id }
           question = submission.quiz_data.detect { |q| q[:id] == id }
@@ -353,6 +356,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
 
   def strip_html_answers(question)
     return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
+
     for answer in question[:answers] do
       answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
     end
@@ -387,7 +391,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   #   "unexpected_response_values"=>[],
   #   "user_ids"=>[1,2,3],
   #   "multiple_responses"=>false}],
-  def stats_for_question(question, responses, legacy=true)
+  def stats_for_question(question, responses, legacy = true)
     if !legacy && CQS.can_analyze?(question)
       output = {}
 
@@ -426,5 +430,4 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
     question[:answers] << none if none && none[:responses] > 0
     question.to_hash.with_indifferent_access
   end
-
 end

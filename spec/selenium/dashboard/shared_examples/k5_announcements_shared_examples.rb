@@ -291,6 +291,5 @@ shared_examples_for "K5 Subject Home Tab" do
       expect(announcement_title(subject_announcement2_title)).to be_displayed
       expect(announcement_content_text(subject_announcement2_content)).to be_displayed
     end
-
   end
 end

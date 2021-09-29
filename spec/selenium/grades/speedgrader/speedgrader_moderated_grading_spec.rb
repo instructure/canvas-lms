@@ -61,7 +61,7 @@ describe "speed grader" do
       wait_for_ajaximations
     end
 
-    it "should create provisional grades and submission comments" do
+    it "creates provisional grades and submission comments" do
       @submission.find_or_create_provisional_grade!(@user, score: 7)
       @submission.add_comment(commenter: @user, comment: 'wat', provisional: true)
 
@@ -93,7 +93,7 @@ describe "speed grader" do
       expect(pg.submission_comments.map(&:comment)).to be_include 'srsly'
     end
 
-    it "should create rubric assessments for the provisional grade" do
+    it "creates rubric assessments for the provisional grade" do
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
 
       comment = "some silly comment"
@@ -136,7 +136,7 @@ describe "speed grader" do
 
     include_examples "moderated grading"
 
-    it "should not lock a provisional grader out if graded by self" do
+    it "does not lock a provisional grader out if graded by self" do
       @assignment.moderation_graders.create!(user: @ta, anonymous_id: '12345')
       @submission.find_or_create_provisional_grade!(@ta, score: 7)
 
@@ -145,7 +145,7 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to_not be_displayed
     end
 
-    it "should lock a provisional grader out if graded by someone else" do
+    it "locks a provisional grader out if graded by someone else" do
       other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.grade_student(@student, grader: other_ta, provisional: true, score: 7)
 
@@ -154,7 +154,7 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to be_displayed
     end
 
-    it "should lock a provisional grader out if graded by someone else while switching students" do
+    it "locks a provisional grader out if graded by someone else while switching students" do
       other_ta = course_with_ta(course: @course, active_all: true).user
       original_sub = @submission
       student_submission
@@ -181,7 +181,7 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to be_displayed
     end
 
-    it "should not lock a provisional grader out if someone else graded but more grader slots are available" do
+    it "does not lock a provisional grader out if someone else graded but more grader slots are available" do
       @assignment.update_attribute :grader_count, 2
       other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')
@@ -192,7 +192,7 @@ describe "speed grader" do
       expect(f('#not_gradeable_message')).to_not be_displayed
     end
 
-    it "should not lock a provisional grader out if someone else graded but grader is final grader" do
+    it "does not lock a provisional grader out if someone else graded but grader is final grader" do
       @assignment.update_attribute :final_grader, @ta
       other_ta = course_with_ta(course: @course, active_all: true).user
       @assignment.moderation_graders.create!(user: other_ta, anonymous_id: '12345')

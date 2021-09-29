@@ -86,7 +86,7 @@ describe 'editing a quiz' do
         alert_box = f('.alert .unpublished_warning')
         expect(alert_box.text).to \
           eq "You have made changes to the questions in this quiz.\nThese "\
-            "changes will not appear for students until you save the quiz."
+             "changes will not appear for students until you save the quiz."
 
         # verify button
         save_it_now_button = fj('.btn.btn-primary', '.edit_quizzes_quiz')
@@ -182,7 +182,7 @@ describe 'editing a quiz' do
     context 'when the quiz has a question with a custom name' do
       before(:each) do
         @custom_name = 'the hardest question ever'
-        qd = { question_type: "text_only_question", id: 1, question_name: @custom_name}.with_indifferent_access
+        qd = { question_type: "text_only_question", id: 1, question_name: @custom_name }.with_indifferent_access
         @quiz.quiz_questions.create! question_data: qd
         @quiz.save!
         @quiz.reload
@@ -194,7 +194,7 @@ describe 'editing a quiz' do
         expect(f('.question_name')).to include_text @custom_name
       end
     end
-    
+
     it "does allow safe :redirect_to query param" do
       get "/courses/#{@course.id}/quizzes/#{@quiz.id}/edit?return_to=#{course_assignments_url(@course)}"
       expect(f('#quiz_edit_actions #cancel_button').attribute('href')).to eq(course_assignments_url(@course))

@@ -26,7 +26,7 @@ describe "equation editor" do
   include QuizzesCommon
   include RCENextPage
 
-  it "should keep cursor position when clicking close" do
+  it "keeps cursor position when clicking close" do
     course_with_teacher_logged_in
 
     quiz_model(course: @course)

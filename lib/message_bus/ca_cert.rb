@@ -48,6 +48,7 @@ module MessageBus
       # it's possible another process has already
       # moved this file into place, in which case do nothing.
       return true if File.exist?(cert_path_on_disk)
+
       # renaming is atomic, and overwrites silently.
       # if two processes are racing and each write
       # their own version of the file and rename them into place, the last write wins,

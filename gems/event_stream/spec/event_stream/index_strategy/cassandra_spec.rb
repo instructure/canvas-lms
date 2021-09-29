@@ -150,7 +150,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
         @ids = (1..4).to_a
         @typed_results = @ids.map { |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
-        @raw_results = @typed_results.map { |record| {'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}"} }
+        @raw_results = @typed_results.map { |record| { 'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}" } }
       end
 
       def setup_fetch(start, requested)
@@ -164,7 +164,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
         allow(@raw_results).to stub_with_multiple_yields
 
-        expect(@stream).to receive(:fetch).once.with(@ids[start, requested], {:strategy=>:batch}).and_return(@typed_results[start, requested])
+        expect(@stream).to receive(:fetch).once.with(@ids[start, requested], { :strategy => :batch }).and_return(@typed_results[start, requested])
       end
 
       def setup_execute(start, requested)
@@ -254,16 +254,16 @@ describe EventStream::IndexStrategy::Cassandra do
           @index.index.bucket_size 1.minute
           @index.index.scrollback_limit Time.zone.now - @newest
           bucket = @index.bucket_for_time(@newest)
-          expect(@database).to receive(:execute).once.
-            with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything, anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything, anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
         it "skips results newer than newest in starting bucket" do
-          expect(@database).to receive(:execute).once.
-            with(/AND ordered_id < \?/, anything, anything, "#{@newest.to_i + 1}/", anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/AND ordered_id < \?/, anything, anything, "#{@newest.to_i + 1}/", anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
@@ -272,9 +272,9 @@ describe EventStream::IndexStrategy::Cassandra do
           page.next_bookmark = page.bookmark_for(@typed_results[0])
           page, bookmark = page.next_page, page.next_bookmark
 
-          expect(@database).to receive(:execute).once.
-            with(/AND ordered_id < \?/, anything, anything, bookmark[1], anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/AND ordered_id < \?/, anything, anything, bookmark[1], anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1, :page => page)
         end
       end
@@ -293,16 +293,16 @@ describe EventStream::IndexStrategy::Cassandra do
           @index.index.bucket_size @oldest.to_i - 1
           @index.index.scrollback_limit 1.day
           bucket = @index.bucket_for_time(@oldest)
-          expect(@database).to receive(:execute).once.
-            with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
         it "skips results older than oldest in any bucket" do
-          expect(@database).to receive(:execute).once.
-            with(/AND ordered_id >= \?/, anything, "#{@oldest.to_i}/", anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/AND ordered_id >= \?/, anything, "#{@oldest.to_i}/", anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
@@ -314,9 +314,9 @@ describe EventStream::IndexStrategy::Cassandra do
           @index.index.bucket_size scrollback_limit.to_i - 1
           bucket = @index.bucket_for_time(scrollback_limit)
 
-          expect(@database).to receive(:execute).once.
-            with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything).
-            and_return(@query)
+          expect(@database).to receive(:execute).once
+                                                .with(/WHERE #{@index.index.key_column} = \?/, "key/#{bucket}", anything, anything)
+                                                .and_return(@query)
           @pager.paginate(:per_page => 1)
         end
 
@@ -343,7 +343,7 @@ describe EventStream::IndexStrategy::Cassandra do
 
         @ids = (1..4).to_a
         @typed_results = @ids.map { |id| @stream.record_type.new('id' => id, 'created_at' => id.minutes.ago) }
-        @raw_results = @typed_results.map { |record| {'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}", 'bucket' => 0} }
+        @raw_results = @typed_results.map { |record| { 'id' => record.id, 'ordered_id' => "#{record.created_at.to_i}/#{record.id}", 'bucket' => 0 } }
       end
 
       def setup_fetch(start, requested)
@@ -425,7 +425,7 @@ describe EventStream::IndexStrategy::Cassandra do
       end
       base_index = @stream.add_index :thing do
         self.table table
-        self.entry_proc lambda{ |record| record.entry }
+        self.entry_proc lambda { |record| record.entry }
       end
       @index = base_index.strategy_for(:cassandra)
 
@@ -434,13 +434,13 @@ describe EventStream::IndexStrategy::Cassandra do
     end
 
     it "translates argument through key_proc if present" do
-      @index.index.key_proc lambda{ |entry| entry.key }
-      expect(@index).to receive(:for_key).once.with(@key, {:strategy=>:cassandra})
+      @index.index.key_proc lambda { |entry| entry.key }
+      expect(@index).to receive(:for_key).once.with(@key, { :strategy => :cassandra })
       @stream.for_thing(@entry)
     end
 
     it "permits and forwards options" do
-      options = {oldest: 1.day.ago}
+      options = { oldest: 1.day.ago }
       expect(@index).to receive(:for_key).once.with([@entry], options)
       @stream.for_thing(@entry, options)
     end

@@ -22,17 +22,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/discussion_topics/_entry" do
-  it "should render" do
+  it "renders" do
     course_with_teacher
     view_context(@course, @user)
     @topic = @course.discussion_topics.create!(:title => "some title")
     @topic.context
     assign(:entries, [])
     assign(:topic, @topic)
-    render :partial => "discussion_topics/entry", :object => nil, :locals => {:topic => @topic}
+    render :partial => "discussion_topics/entry", :object => nil, :locals => { :topic => @topic }
   end
 
-  it "should render with data" do
+  it "renders with data" do
     course_with_teacher
     view_context(@course, @user)
     @topic = @course.discussion_topics.create!(:title => "some title")
@@ -42,6 +42,6 @@ describe "/discussion_topics/_entry" do
     assign(:entries, [@entry])
     assign(:grouped_entries, [@entry].group_by(&:parent_id))
     assign(:topic, @topic)
-    render :partial => "discussion_topics/entry", :object => @entry, :locals => {:topic => @topic}
+    render :partial => "discussion_topics/entry", :object => @entry, :locals => { :topic => @topic }
   end
 end

@@ -26,7 +26,6 @@ describe "scheduler" do
   include Calendar2Common
 
   context "as a teacher" do
-
     before(:once) do
       Account.default.settings[:show_scheduler] = true
       Account.default.save!
@@ -80,7 +79,7 @@ describe "scheduler" do
         fj('.ui-datepicker-trigger:visible').click
         datepicker_current
         set_value(fj('.time_field.start_time:visible'), start_time_text)
-        set_value(fj('.time_field.end_time:visible'),end_time_text)
+        set_value(fj('.time_field.end_time:visible'), end_time_text)
         set_value(fj('.date_field:visible'), date)
         find('.scheduler-event-details-footer .btn-primary').click
         wait_for_ajax_requests

@@ -21,10 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '../../../import_helper')
 
 describe "Importing Groups" do
-
   SYSTEMS.each do |system|
     if import_data_exists? system, 'group'
-      it "should import from #{system}" do
+      it "imports from #{system}" do
         data = get_import_data(system, 'group')
         context = get_import_context(system)
         migration = context.content_migrations.create!
@@ -44,7 +43,7 @@ describe "Importing Groups" do
     end
   end
 
-  it "should attach to a discussion" do
+  it "attaches to a discussion" do
     data = get_import_data('bb8', 'group')
     context = get_import_context('bb8')
     migration = context.content_migrations.create!
@@ -66,15 +65,15 @@ describe "Importing Groups" do
     expect(group.discussion_topics.count).to eq 1
   end
 
-  it "should respect group_category from the hash" do
+  it "respects group_category from the hash" do
     course_with_teacher
     migration = @course.content_migrations.create!
     group = @course.groups.build
-    Importers::GroupImporter.import_from_migration({:group_category => "random category"}, @course, migration, group)
+    Importers::GroupImporter.import_from_migration({ :group_category => "random category" }, @course, migration, group)
     expect(group.group_category.name).to eq "random category"
   end
 
-  it "should default group_category to imported if not in the hash" do
+  it "defaults group_category to imported if not in the hash" do
     course_with_teacher
     migration = @course.content_migrations.create!
     group = @course.groups.build

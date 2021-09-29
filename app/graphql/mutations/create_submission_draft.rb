@@ -72,7 +72,7 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
 
     submission_draft.save!
 
-    {submission_draft: submission_draft}
+    { submission_draft: submission_draft }
   rescue ActiveRecord::RecordNotFound
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => invalid

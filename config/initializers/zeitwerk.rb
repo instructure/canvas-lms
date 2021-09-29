@@ -24,22 +24,22 @@ if CANVAS_ZEITWERK
   # This is because the jsx folder does not contain ruby to
   # autoload.  You should NOT use this pattern as a workaround
   # for badly-named ruby code.
-  Rails.autoloaders.main.ignore(Rails.root.join('app','jsx'))
+  Rails.autoloaders.main.ignore(Rails.root.join('app', 'jsx'))
 
-  # This one exists because we require plugins to be const get'd from Canvas::Plugins::Validators::
-  #require 'canvas'
-  #require 'canvas/plugins'
-  #require 'canvas/plugins/validators'
+  # # This one exists because we require plugins to be const get'd from Canvas::Plugins::Validators::
+  # require 'canvas'
+  # require 'canvas/plugins'
+  # require 'canvas/plugins/validators'
 
-  # TODO: Load things that are not being properly loaded by zeitwerk right now
-  #require 'canvas_connect'
-  #require 'canvas_connect/version'
-  # in the canvas_connect gem, the "to_prepare"
-  # block uses this.
-  #require 'canvas/plugins/adobe_connect'
-  #require 'canvas_webex'
-  #require 'canvas_webex/version'
-  #byebug
+  # # TODO: Load things that are not being properly loaded by zeitwerk right now
+  # require 'canvas_connect'
+  # require 'canvas_connect/version'
+  # # in the canvas_connect gem, the "to_prepare"
+  # # block uses this.
+  # require 'canvas/plugins/adobe_connect'
+  # require 'canvas_webex'
+  # require 'canvas_webex/version'
+  # byebug
 
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(

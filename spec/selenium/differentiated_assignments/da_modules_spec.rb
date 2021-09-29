@@ -44,34 +44,33 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
       da_module_setup
     end
 
-    it "should not show inaccessible module items" do
+    it "does not show inaccessible module items" do
       create_section_overrides(@section1)
       get "/courses/#{@course.id}/modules"
       expect_module_to_not_have_items(@module)
     end
-    it "should display module items with overrides" do
+    it "displays module items with overrides" do
       create_section_overrides(@default_section)
       get "/courses/#{@course.id}/modules"
       expect_module_to_have_items(@module)
     end
-    it "should show module items with graded submissions" do
+    it "shows module items with graded submissions" do
       grade_da_assignments
       get "/courses/#{@course.id}/modules"
       expect_module_to_have_items(@module)
     end
-    it "should ignore completion requirements of inaccessible module items" do
+    it "ignores completion requirements of inaccessible module items" do
       create_section_override_for_assignment(@da_discussion.assignment)
       create_section_override_for_assignment(@da_quiz)
       create_section_override_for_assignment(@da_assignment, course_section: @section1)
-      @module.completion_requirements = {@tag_assignment.id => {:type => 'must_view'},
-                                         @tag_discussion.id => {:type => 'must_view'},
-                                         @tag_quiz.id => {:type => 'must_view'}
-                                         }
+      @module.completion_requirements = { @tag_assignment.id => { :type => 'must_view' },
+                                          @tag_discussion.id => { :type => 'must_view' },
+                                          @tag_quiz.id => { :type => 'must_view' } }
       @module.save
       expect(@module.evaluate_for(@student).workflow_state).to include("unlocked")
       get "/courses/#{@course.id}/modules/items/#{@tag_discussion.id}"
       get "/courses/#{@course.id}/modules/items/#{@tag_quiz.id}"
-      #confirm canvas believes this module is now completed despite the invisible assignment not having been viewed
+      # confirm canvas believes this module is now completed despite the invisible assignment not having been viewed
       expect(@module.evaluate_for(@student).workflow_state).to include("completed")
     end
   end
@@ -84,17 +83,17 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         da_module_setup
       end
 
-      it "should not show inaccessible module items", priority: "1", test_id: 135291 do
+      it "does not show inaccessible module items", priority: "1", test_id: 135291 do
         create_section_overrides(@section1)
         get "/courses/#{@course.id}/modules"
         expect_module_to_not_have_items(@module)
       end
-      it "should display module items with overrides", priority: "1", test_id: 135292 do
+      it "displays module items with overrides", priority: "1", test_id: 135292 do
         create_section_overrides(@default_section)
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end
-      it "should show module items with graded submissions", priority: "1", test_id: 135293 do
+      it "shows module items with graded submissions", priority: "1", test_id: 135293 do
         grade_da_assignments
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
@@ -108,7 +107,7 @@ describe "interaction with differentiated assignments/quizzes/discusssions in mo
         da_module_setup
       end
 
-      it "should display all module items" do
+      it "displays all module items" do
         get "/courses/#{@course.id}/modules"
         expect_module_to_have_items(@module)
       end

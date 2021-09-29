@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def bookmark_service_model(opts={})
+  def bookmark_service_model(opts = {})
     @bookmark_service = factory_with_protected_attributes(BookmarkService, valid_bookmark_service_attributes.merge(opts))
   end
 
@@ -27,7 +27,7 @@ module Factories
     {
       :user_id => User.create!.id,
       :token => 'value for token',
-      :secret => 'value for secret', 
+      :secret => 'value for secret',
       :protocol => 'value for protocol',
       :service => 'diigo',
       :service_user_url => 'value for service_user_url',

@@ -645,7 +645,7 @@
 #     }
 class AssignmentsApiController < ApplicationController
   before_action :require_context
-  before_action :require_user_visibility, :only=>[:user_index]
+  before_action :require_user_visibility, :only => [:user_index]
   include Api::V1::Assignment
   include Api::V1::Submission
   include Api::V1::AssignmentOverride
@@ -678,7 +678,7 @@ class AssignmentsApiController < ApplicationController
   #   Return only assignments that have post_to_sis set or not set.
   # @returns [Assignment]
   def index
-    error_or_array= get_assignments(@current_user)
+    error_or_array = get_assignments(@current_user)
     render :json => error_or_array unless performed?
   end
 
@@ -687,7 +687,7 @@ class AssignmentsApiController < ApplicationController
   # See {api:AssignmentsApiController#index List assignments} for valid arguments.
   def user_index
     @user.shard.activate do
-      error_or_array= get_assignments(@user)
+      error_or_array = get_assignments(@user)
       render :json => error_or_array unless performed?
     end
   end
@@ -766,12 +766,12 @@ class AssignmentsApiController < ApplicationController
       # return assignment json based on requested result type
       # Serializing an assignment into a quiz format is required by N.Q Quiz shells on Quizzes Page
       result_json = if use_quiz_json?
-        quiz_json(new_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
-      else
-        # Include the updated positions in the response so the frontend can
-        # update them appropriately
-        assignment_json(new_assignment, @current_user, session)
-      end
+                      quiz_json(new_assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
+                    else
+                      # Include the updated positions in the response so the frontend can
+                      # update them appropriately
+                      assignment_json(new_assignment, @current_user, session)
+                    end
 
       result_json['new_positions'] = positions_hash
       render :json => result_json
@@ -782,11 +782,11 @@ class AssignmentsApiController < ApplicationController
 
   def get_assignments(user)
     if authorized_action(@context, user, :read)
-      log_api_asset_access([ "assignments", @context ], "assignments", "other")
-      scope = Assignments::ScopedToUser.new(@context, user).scope.
-        eager_load(:assignment_group).
-        preload(:rubric_association, :rubric).
-        reorder("assignment_groups.position, assignments.position, assignments.id")
+      log_api_asset_access(["assignments", @context], "assignments", "other")
+      scope = Assignments::ScopedToUser.new(@context, user).scope
+                                       .eager_load(:assignment_group)
+                                       .preload(:rubric_association, :rubric)
+                                       .reorder("assignment_groups.position, assignments.position, assignments.id")
       scope = Assignment.search_by_attribute(scope, :title, params[:search_term])
       include_params = Array(params[:include])
 
@@ -794,7 +794,8 @@ class AssignmentsApiController < ApplicationController
         return invalid_bucket_error unless SortsAssignments::VALID_BUCKETS.include?(params[:bucket].to_sym)
 
         users = current_user_and_observed(
-                    include_observed: include_params.include?("observed_users"))
+          include_observed: include_params.include?("observed_users")
+        )
         submissions_for_user = scope.with_submissions_for_user(users).flat_map(&:submissions)
         scope = SortsAssignments.bucket_filter(scope, params[:bucket], session, user, @current_user, @context, submissions_for_user)
       end
@@ -805,6 +806,7 @@ class AssignmentsApiController < ApplicationController
         if params[:assignment_ids].length > Api.max_per_page
           return render json: { message: "Request contains too many assignment_ids.  Limit #{Api.max_per_page}" }, status: 400
         end
+
         scope = scope.where(id: params[:assignment_ids])
       end
       case params[:order_by]
@@ -819,12 +821,12 @@ class AssignmentsApiController < ApplicationController
       end
 
       assignments = if params[:assignment_group_id].present?
-        assignment_group_id = params[:assignment_group_id]
-        scope = scope.where(assignment_group_id: assignment_group_id)
-        Api.paginate(scope, self, api_v1_course_assignment_group_assignments_url(@context, assignment_group_id))
-      else
-        Api.paginate(scope, self, api_v1_course_assignments_url(@context))
-      end
+                      assignment_group_id = params[:assignment_group_id]
+                      scope = scope.where(assignment_group_id: assignment_group_id)
+                      Api.paginate(scope, self, api_v1_course_assignment_group_assignments_url(@context, assignment_group_id))
+                    else
+                      Api.paginate(scope, self, api_v1_course_assignments_url(@context))
+                    end
 
       if params[:assignment_ids] && assignments.length != params[:assignment_ids].length
         invalid_ids = params[:assignment_ids] - assignments.map(&:id).map(&:to_s)
@@ -840,8 +842,8 @@ class AssignmentsApiController < ApplicationController
       override_dates = value_to_boolean(override_param)
       if override_dates || include_all_dates || include_override_objects
         ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_overrides)
-        assignments.select{ |a| a.assignment_overrides.size == 0 }.
-          each { |a| a.has_no_overrides = true }
+        assignments.select { |a| a.assignment_overrides.size == 0 }
+                   .each { |a| a.has_no_overrides = true }
 
         if AssignmentOverrideApplicator.should_preload_override_students?(assignments, user, "assignments_api")
           AssignmentOverrideApplicator.preload_assignment_override_students(assignments, user)
@@ -873,7 +875,6 @@ class AssignmentsApiController < ApplicationController
 
       hashes = []
       hashes = assignments.map do |assignment|
-
         visibility_array = assignment_visibilities[assignment.id] if assignment_visibilities
         submission = submissions[assignment.id]
         needs_grading_course_proxy = @context.grants_right?(user, session, :manage_grades) ?
@@ -955,10 +956,10 @@ class AssignmentsApiController < ApplicationController
       }
 
       result_json = if use_quiz_json?
-        quiz_json(@assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
-      else
-        assignment_json(@assignment, @current_user, session, options)
-      end
+                      quiz_json(@assignment, @context, @current_user, session, {}, QuizzesNext::QuizSerializer)
+                    else
+                      assignment_json(@assignment, @current_user, session, options)
+                    end
 
       render :json => result_json
     end
@@ -1148,7 +1149,7 @@ class AssignmentsApiController < ApplicationController
     if authorized_action(@assignment, @current_user, :create)
       @assignment.content_being_saved_by(@current_user)
       result = create_api_assignment(@assignment, params.require(:assignment), @current_user, @context,
-        calculate_grades: params.delete(:calculate_grades))
+                                     calculate_grades: params.delete(:calculate_grades))
       render_create_or_update_result(result)
     end
   end
@@ -1395,12 +1396,14 @@ class AssignmentsApiController < ApplicationController
   # @returns Progress
   def bulk_update
     return render_json_unauthorized unless @context.grants_any_right?(@current_user, session, :manage_assignments, :manage_assignments_edit)
+
     data = params.permit(:_json => [:id, :all_dates => [:id, :base, :due_at, :unlock_at, :lock_at]]).to_h[:_json]
     return render json: { message: 'expected array' }, status: :bad_request unless data.is_a?(Array)
     return render json: { message: 'missing assignment id' }, status: :bad_request unless data.all? { |a| a.key?('id') }
 
     assignments = @context.assignments.active.where(id: data.map { |a| a['id'] }).to_a
     raise ActiveRecord::RecordNotFound unless assignments.size == data.size
+
     assignments.each do |assignment|
       return render_json_unauthorized unless assignment.user_can_update?(@current_user, session)
     end
@@ -1417,6 +1420,7 @@ class AssignmentsApiController < ApplicationController
 
   def assignment_json_opts
     return {} unless params[:assignment]&.key?(:override_dates)
+
     {
       override_dates: value_to_boolean(params[:assignment][:override_dates])
     }
@@ -1429,7 +1433,7 @@ class AssignmentsApiController < ApplicationController
       status = result == :forbidden ? :forbidden : :bad_request
       errors = @assignment.errors.as_json[:errors]
       errors['published'] = errors.delete(:workflow_state) if errors.key?(:workflow_state)
-      render json: {errors: errors}, status: status
+      render json: { errors: errors }, status: status
     end
   end
 
@@ -1441,7 +1445,8 @@ class AssignmentsApiController < ApplicationController
 
   def require_user_visibility
     return render_unauthorized_action unless @current_user.present?
-    @user = params[:user_id]=="self" ? @current_user : api_find(User, params[:user_id])
+
+    @user = params[:user_id] == "self" ? @current_user : api_find(User, params[:user_id])
     if @context.grants_right?(@current_user, :view_all_grades)
       # teacher, ta
       return if @context.students_visible_to(@current_user).include?(@user)
@@ -1474,6 +1479,7 @@ class AssignmentsApiController < ApplicationController
     @_target_assignment_for_duplicate ||= begin
       target_assignment_id = params[:target_assignment_id]
       return old_assignment_for_duplicate if target_assignment_id.blank?
+
       target_course_for_duplicate.active_assignments.find_by(id: target_assignment_id)
     end
   end
@@ -1486,6 +1492,7 @@ class AssignmentsApiController < ApplicationController
     @_target_course_for_duplicate ||= begin
       target_course_id = params[:target_course_id]
       return @context if target_course_id.blank?
+
       Course.find_by(id: target_course_id)
     end
   end

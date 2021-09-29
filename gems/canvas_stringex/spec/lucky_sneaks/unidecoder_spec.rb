@@ -63,7 +63,7 @@ describe "Unidecoder" do
     "私はガラスを食べられます。それは私を傷つけません。" => # Japanese
       "Si hagarasuwoShi beraremasu. sorehaSi woShang tukemasen. "
   }
-  
+
   it "unidecoder_decode" do
     DONT_CONVERT.each do |ascii|
       expect(ascii).to eq LuckySneaks::Unidecoder.decode(ascii)
@@ -72,7 +72,7 @@ describe "Unidecoder" do
       expect(ascii).to eq LuckySneaks::Unidecoder.decode(unicode)
     end
   end
-  
+
   it "to_ascii" do
     DONT_CONVERT.each do |ascii|
       expect(ascii).to eq ascii.to_ascii
@@ -81,7 +81,7 @@ describe "Unidecoder" do
       expect(ascii).to eq unicode.to_ascii
     end
   end
-  
+
   it "unidecoder_encode" do
     {
       # Strings
@@ -92,7 +92,7 @@ describe "Unidecoder" do
       expect(unicode).to eq LuckySneaks::Unidecoder.encode(codepoint)
     end
   end
-  
+
   it "unidecoder_in_json_file" do
     {
       "A" => "x00.json (line 67)",

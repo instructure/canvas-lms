@@ -116,12 +116,12 @@ class Quizzes::QuizReportsController < ApplicationController
       all_versions = value_to_boolean(params[:includes_all_versions])
       stats = Quizzes::QuizStatistics::REPORTS.map do |report_type|
         @quiz.current_statistics_for(report_type, {
-          includes_all_versions: all_versions,
-          includes_sis_ids: include_sis_ids?
-        })
+                                       includes_all_versions: all_versions,
+                                       includes_sis_ids: include_sis_ids?
+                                     })
       end
 
-      expose stats, %w[ file progress ]
+      expose stats, %w[file progress]
     end
   end
 
@@ -153,19 +153,19 @@ class Quizzes::QuizReportsController < ApplicationController
     authorized_action(@quiz, @current_user, :read_statistics)
 
     p = if accepts_jsonapi?
-      Array(params[:quiz_reports]).first
-    else
-      params[:quiz_report]
-    end || {}
+          Array(params[:quiz_reports]).first
+        else
+          params[:quiz_report]
+        end || {}
 
     unless Quizzes::QuizStatistics::REPORTS.include?(p[:report_type])
       reject! 'invalid quiz report type', 400
     end
 
     statistics = @quiz.current_statistics_for(p[:report_type], {
-      includes_all_versions: value_to_boolean(p[:includes_all_versions]),
-      includes_sis_ids: include_sis_ids?
-    })
+                                                includes_all_versions: value_to_boolean(p[:includes_all_versions]),
+                                                includes_sis_ids: include_sis_ids?
+                                              })
 
     if statistics.generating_csv?
       reject! 'report is already being generated', 409
@@ -237,27 +237,27 @@ class Quizzes::QuizReportsController < ApplicationController
     @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
   end
 
-  def expose(stats, includes=[])
-    stats = [ stats ] unless stats.is_a?(Array)
+  def expose(stats, includes = [])
+    stats = [stats] unless stats.is_a?(Array)
 
     json = if accepts_jsonapi?
-      serialize_jsonapi(stats, includes)
-    else
-      serialize_json(stats, includes)
-    end
+             serialize_jsonapi(stats, includes)
+           else
+             serialize_json(stats, includes)
+           end
 
     render json: json
   end
 
-  def serialize_json(stats, includes=[])
+  def serialize_json(stats, includes = [])
     serialized_set = stats.map do |report_stats|
       Quizzes::QuizReportSerializer.new(report_stats, {
-        controller: self,
-        root: false,
-        include_root: false,
-        scope: @current_user,
-        includes: includes
-      }).as_json
+                                          controller: self,
+                                          root: false,
+                                          include_root: false,
+                                          scope: @current_user,
+                                          includes: includes
+                                        }).as_json
     end
 
     serialized_set.length == 1 ? serialized_set[0] : serialized_set
@@ -265,16 +265,16 @@ class Quizzes::QuizReportsController < ApplicationController
 
   def serialize_jsonapi(stats, includes)
     serialized_set = Canvas::APIArraySerializer.new(stats, {
-      each_serializer: Quizzes::QuizReportSerializer,
-      controller: self,
-      scope: @current_user,
-      root: false,
-      include_root: false,
-      includes: includes,
-      meta: {
-        primaryCollection: 'quiz_reports'
-      }
-    }).as_json
+                                                      each_serializer: Quizzes::QuizReportSerializer,
+                                                      controller: self,
+                                                      scope: @current_user,
+                                                      root: false,
+                                                      include_root: false,
+                                                      includes: includes,
+                                                      meta: {
+                                                        primaryCollection: 'quiz_reports'
+                                                      }
+                                                    }).as_json
 
     { quiz_reports: serialized_set }
   end
@@ -283,9 +283,9 @@ class Quizzes::QuizReportsController < ApplicationController
   # one can embed it.
   def backward_compatible_includes
     if accepts_jsonapi?
-      Array(params[:include]).map(&:to_s) & %w[ file progress ]
+      Array(params[:include]).map(&:to_s) & %w[file progress]
     else
-      %w[ file ]
+      %w[file]
     end
   end
 end

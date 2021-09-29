@@ -24,18 +24,17 @@ describe PlannerNote do
     student_in_course
     teacher_in_course
     @student_planner_note = PlannerNote.create!(user_id: @student.id,
-                                                        todo_date: 4.days.from_now,
-                                                        title: "Student Test Assignment",
-                                                        course_id: @course.id)
+                                                todo_date: 4.days.from_now,
+                                                title: "Student Test Assignment",
+                                                course_id: @course.id)
     @teacher_planner_note = PlannerNote.create!(user_id: @teacher.id,
-                                                        todo_date: 4.days.from_now,
-                                                        title: "Student Test Assignment",
-                                                        details: "Students Need Grading",
-                                                        course_id: @course.id)
+                                                todo_date: 4.days.from_now,
+                                                title: "Student Test Assignment",
+                                                details: "Students Need Grading",
+                                                course_id: @course.id)
   end
 
   describe "::planner_note_workflow_state" do
-
     it "returns 'deleted' for deleted note" do
       @teacher_planner_note.destroy!
       expect(@teacher_planner_note.workflow_state).to eq 'deleted'
@@ -48,9 +47,9 @@ describe PlannerNote do
 
   it "creates a note without a course" do
     note = PlannerNote.create!(user_id: @teacher.id,
-                                                      todo_date: 4.days.from_now,
-                                                      title: "Student Test Assignment",
-                                                      details: "Students Need Grading")
+                               todo_date: 4.days.from_now,
+                               title: "Student Test Assignment",
+                               details: "Students Need Grading")
     expect(note.workflow_state).to eq 'active'
   end
 

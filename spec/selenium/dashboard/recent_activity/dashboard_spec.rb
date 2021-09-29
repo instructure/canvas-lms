@@ -40,14 +40,14 @@ describe "dashboard" do
 
     before :each do
       @announcement1 = @course.announcements.create!(title: "here is an annoucement",
-                                   message: "here is the announcement message",
-                                   is_section_specific: true,
-                                   course_sections: [@section1])
+                                                     message: "here is the announcement message",
+                                                     is_section_specific: true,
+                                                     course_sections: [@section1])
 
       @announcement2 = @course.announcements.create!(title: "here is another annoucement",
-                                                    message: "here is the other announcement message",
-                                                    is_section_specific: true,
-                                                    course_sections: [@section2])
+                                                     message: "here is the other announcement message",
+                                                     is_section_specific: true,
+                                                     course_sections: [@section2])
 
       user_session(@student1)
       get '/'
@@ -106,9 +106,9 @@ describe "dashboard" do
 
     before :each do
       @announcement1 = @course.announcements.create!(title: "here is an annoucement",
-                                                    message: "here is the announcement message",
-                                                    is_section_specific: true,
-                                                    course_sections: [@section1])
+                                                     message: "here is the announcement message",
+                                                     is_section_specific: true,
+                                                     course_sections: [@section1])
 
       @announcement2 = @course.announcements.create!(title: "here is another annoucement",
                                                      message: "here is the other announcement message",

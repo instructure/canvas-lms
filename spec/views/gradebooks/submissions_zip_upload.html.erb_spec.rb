@@ -31,7 +31,7 @@ describe "/gradebooks/submissions_zip_upload", type: :view do
     assign(:failures, [])
   end
 
-  it "should render" do
+  it "renders" do
     render 'gradebooks/submissions_zip_upload'
 
     expect(rendered).to be_present

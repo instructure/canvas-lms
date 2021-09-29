@@ -30,7 +30,7 @@ RSpec.describe Submissions::AnonymousPreviewsController do
     end
 
     it "renders show_preview" do
-      get :show, params: {course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id, preview: true}
+      get :show, params: { course_id: @context.id, assignment_id: @assignment.id, anonymous_id: @submission.anonymous_id, preview: true }
       expect(response).to render_template(:show_preview)
     end
 
@@ -39,7 +39,7 @@ RSpec.describe Submissions::AnonymousPreviewsController do
       user_session(@teacher)
 
       submission = assignment.submission_for_student(@student)
-      get :show, params: {course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true}
+      get :show, params: { course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true }
       expect(assigns[:anonymize_students]).to be true
     end
 
@@ -50,7 +50,7 @@ RSpec.describe Submissions::AnonymousPreviewsController do
       user_session(reviewer)
 
       submission = assignment.submission_for_student(@student)
-      get :show, params: {course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true}
+      get :show, params: { course_id: @course.id, assignment_id: assignment.id, anonymous_id: submission.anonymous_id, preview: true }
       expect(assigns[:anonymize_students]).to be true
     end
   end

@@ -66,6 +66,7 @@ module DataFixup
           # Setting a role override on SiteAdmin will trickle down effects to
           # other accounts.
           next if account == site_admin
+
           # Create a RoleOverride for ta/ta-based roles only if either a
           # moderate_grades one does not exist (so disabled), or if one exists
           # exists but is disabled.

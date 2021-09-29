@@ -22,7 +22,7 @@ require_relative '../common'
 describe "assignments turn it in" do
   include_context "in-process server selenium tests"
 
-  before (:each) do
+  before(:each) do
     course_with_teacher_logged_in
     account = Account.default
     account.turnitin_account_id = 'asdf'
@@ -61,20 +61,20 @@ describe "assignments turn it in" do
 
   def expected_settings
     {
-        'originality_report_visibility' => 'after_due_date',
-        's_paper_check' => '0',
-        'internet_check' => '0',
-        'journal_check' => '0',
-        'exclude_biblio' => '0',
-        'exclude_quoted' => '0',
-        'exclude_type' => '1',
-        'exclude_value' => '5',
-        'submit_papers_to' => '0',
-        's_view_report' => '1'
+      'originality_report_visibility' => 'after_due_date',
+      's_paper_check' => '0',
+      'internet_check' => '0',
+      'journal_check' => '0',
+      'exclude_biblio' => '0',
+      'exclude_quoted' => '0',
+      'exclude_type' => '1',
+      'exclude_value' => '5',
+      'submit_papers_to' => '0',
+      's_view_report' => '1'
     }
   end
 
-  it "should create turnitin settings" do
+  it "creates turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     expect {
       get "/courses/#{@course.id}/assignments/new"
@@ -86,12 +86,12 @@ describe "assignments turn it in" do
     expect(Assignment.last.turnitin_settings).to eq expected_settings
   end
 
-  it "should edit turnitin settings" do
+  it "edits turnitin settings" do
     skip_if_chrome('issue with change_turnitin_settings method')
     assignment = @course.assignments.create!(
-        :name => 'test assignment',
-        :due_at => (Time.now.utc + 2.days),
-        :assignment_group => @course.assignment_groups.create!(:name => "default")
+      :name => 'test assignment',
+      :due_at => (Time.now.utc + 2.days),
+      :assignment_group => @course.assignment_groups.create!(:name => "default")
     )
 
     get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"

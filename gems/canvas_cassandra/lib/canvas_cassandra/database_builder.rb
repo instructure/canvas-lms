@@ -23,6 +23,7 @@ module CanvasCassandra
   module DatabaseBuilder
     def self.configured?(config_name, environment = ::Rails.env)
       raise ArgumentError, "config name required" if config_name.blank?
+
       config = ConfigFile.load('cassandra', environment)
       config = config && config[config_name]
       config && config['servers'] && config['keyspace']
@@ -47,9 +48,11 @@ module CanvasCassandra
         config = config.merge(override_options) if override_options
         servers = Array(config['servers'])
         raise "No Cassandra servers defined for: #{config_name.inspect}" unless servers.present?
+
         keyspace = config['keyspace']
         raise "No keyspace specified for: #{config_name.inspect}" unless keyspace.present?
-        opts = {:keyspace => keyspace, :cql_version => '3.0.0'}
+
+        opts = { :keyspace => keyspace, :cql_version => '3.0.0' }
         opts[:retries] = config['retries'] if config['retries']
         opts[:connect_timeout] = config['connect_timeout'] if config['connect_timeout']
         opts[:timeout] = config['timeout'] if config['timeout']

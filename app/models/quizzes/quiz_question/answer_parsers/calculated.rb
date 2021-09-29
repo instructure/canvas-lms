@@ -25,7 +25,7 @@ module Quizzes::QuizQuestion::AnswerParsers
       question[:variables] = parse_variables(question[:variables])
 
       @answers.map_with_group! do |answer_group, answer|
-        answer_params = {:weight => 100, :variables => []}
+        answer_params = { :weight => 100, :variables => [] }
         answer_params[:answer] = answer[:answer_text].to_f
 
         variables = hash_to_array(answer[:variables])
@@ -49,18 +49,19 @@ module Quizzes::QuizQuestion::AnswerParsers
     end
 
     private
+
     def format_formulas(formulas)
       formulas = hash_to_array(formulas)
       formulas.map do |formula|
-        formula = Quizzes::QuizQuestion::RawFields.new({formula: trim_length(formula)})
-        {formula: formula.fetch_with_enforced_length(:formula)}
+        formula = Quizzes::QuizQuestion::RawFields.new({ formula: trim_length(formula) })
+        { formula: formula.fetch_with_enforced_length(:formula) }
       end
     end
 
     def parse_variables(variables)
       @scale_lookup_dictionary ||= {}
       hash_to_array(variables).map do |variable|
-        variable = Quizzes::QuizQuestion::RawFields.new(variable.merge({name: trim_length(variable[:name])}))
+        variable = Quizzes::QuizQuestion::RawFields.new(variable.merge({ name: trim_length(variable[:name]) }))
 
         # Setup a scale lookup dictionary
         var_name = variable.fetch_with_enforced_length(:name)
@@ -96,6 +97,5 @@ module Quizzes::QuizQuestion::AnswerParsers
     def trim_padding(n)
       n.to_s[9..-1].to_i
     end
-
   end
 end

@@ -19,15 +19,14 @@
 
 module DifferentiatedAssignments
   module HomeworkAssignee
-
     module Group
       BASE    = 'Group'
       GROUP_X = "#{BASE} A".freeze
       GROUP_Y = "#{BASE} B".freeze
       GROUP_Z = "#{BASE} C".freeze
       ALL     = Group.constants.map { |c| Group.const_get(c) }
-                               .reject { |c| c == Group::BASE }
-                               .freeze
+                     .reject { |c| c == Group::BASE }
+                     .freeze
     end
 
     module Section
@@ -36,8 +35,8 @@ module DifferentiatedAssignments
       SECTION_B = "#{BASE} B".freeze
       SECTION_C = "#{BASE} C".freeze
       ALL       = Section.constants.map { |c| Section.const_get(c) }
-                                   .reject { |c| c == Section::BASE }
-                                   .freeze
+                         .reject { |c| c == Section::BASE }
+                         .freeze
     end
 
     module Student
@@ -47,8 +46,8 @@ module DifferentiatedAssignments
       THIRD_STUDENT  = "#{BASE} 3".freeze
       FOURTH_STUDENT = "#{BASE} 4".freeze
       ALL            = Student.constants.map { |c| Student.const_get(c) }
-                                        .reject { |c| c == Student::BASE }
-                                        .freeze
+                              .reject { |c| c == Student::BASE }
+                              .freeze
     end
 
     EVERYONE  = 'Everyone'.freeze

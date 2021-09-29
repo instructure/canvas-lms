@@ -19,7 +19,6 @@
 
 module CC::Exporter::Epub
   class Exporter
-
     include CC::Exporter::Epub::ModuleSorter
 
     RESOURCE_TITLES = {
@@ -42,13 +41,14 @@ module CC::Exporter::Epub
       "WikiPage" => :pages
     }.freeze
 
-    def initialize(cartridge, sort_by_content=false, export_type=:epub, global_identifiers: false)
+    def initialize(cartridge, sort_by_content = false, export_type = :epub, global_identifiers: false)
       @cartridge = cartridge
       @export_type = export_type
       @sort_by_content = sort_by_content || cartridge_json[:modules].empty?
       @global_identifiers = global_identifiers
     end
     attr_reader :cartridge, :sort_by_content, :global_identifiers
+
     delegate :unsupported_files, to: :cartridge_converter, allow_nil: true
 
     def cartridge_json
@@ -75,7 +75,7 @@ module CC::Exporter::Epub
     def filename_prefix
       @filename_prefix ||= begin
         title = cartridge_json[:title] || ''
-        name = CanvasTextHelper.truncate_text(title.path_safe, {:max_length => 200, :ellipsis => ''})
+        name = CanvasTextHelper.truncate_text(title.path_safe, { :max_length => 200, :ellipsis => '' })
         timestamp = Time.zone.now.strftime('%Y-%b-%d_%H-%M-%S')
         "#{name}-#{timestamp}"
       end
@@ -87,6 +87,7 @@ module CC::Exporter::Epub
 
     def get_item(resource_type, identifier)
       return {} unless cartridge_json[resource_type].present?
+
       cartridge_json[resource_type].find(-> { return {} }) do |resource|
         resource[:identifier] == identifier
       end
@@ -103,7 +104,7 @@ module CC::Exporter::Epub
     end
 
     def get_syllabus_item(identifier)
-      cartridge_json[:syllabus].find(-> {{}}) do |syllabus_item|
+      cartridge_json[:syllabus].find(-> { {} }) do |syllabus_item|
         syllabus_item[:identifier] == identifier
       end
     end
@@ -115,13 +116,13 @@ module CC::Exporter::Epub
     def create_universal_template(resource)
       template_content = cartridge_json[resource] || []
       template = Exporter.resource_template(resource)
-      Template.new({resources: template_content, reference: resource}, template, self)
+      Template.new({ resources: template_content, reference: resource }, template, self)
     end
 
     def create_content_template(resource)
       resource_content = sort_by_content ? cartridge_json[resource] : filter_content_to_module(resource)
       update_table_of_contents(resource, resource_content)
-      Template.new({resources: resource_content, reference: resource}, base_template, self)
+      Template.new({ resources: resource_content, reference: resource }, base_template, self)
     end
 
     def update_table_of_contents(resource, resource_content)
@@ -149,10 +150,11 @@ module CC::Exporter::Epub
     end
 
     private
+
     def cartridge_converter
       @_cartridge_converter ||= Converters::CartridgeConverter.new({
-        archive_file: cartridge
-      })
+                                                                     archive_file: cartridge
+                                                                   })
     end
   end
 end

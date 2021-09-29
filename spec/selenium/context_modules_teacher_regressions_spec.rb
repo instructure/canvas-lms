@@ -31,9 +31,9 @@ describe "context modules" do
       @quiz = @course.assignments.create!(:title => 'quiz assignment', :submission_types => 'online_quiz')
       @assignment = @course.assignments.create!(:title => 'assignment 1', :submission_types => 'online_text_entry')
       @assignment2 = @course.assignments.create!(:title => 'assignment 2',
-        :submission_types => 'online_text_entry',
-        :due_at => 2.days.from_now,
-        :points_possible => 10)
+                                                 :submission_types => 'online_text_entry',
+                                                 :due_at => 2.days.from_now,
+                                                 :points_possible => 10)
       @assignment3 = @course.assignments.create!(:title => 'assignment 3', :submission_types => 'online_text_entry')
 
       @ag1 = @course.assignment_groups.create!(:name => "Assignment Group 1")
@@ -45,13 +45,13 @@ describe "context modules" do
       user_session(@teacher)
     end
 
-    it "should not create a duplicate page if you publish after renaming" do
+    it "does not create a duplicate page if you publish after renaming" do
       mod = @course.context_modules.create! name: 'TestModule'
       page = @course.wiki_pages.create title: 'A Page'
       page.workflow_state = 'unpublished'
       page.save!
       page_count = @course.wiki_pages.count
-      tag = mod.add_item({:id => page.id, :type => 'wiki_page'})
+      tag = mod.add_item({ :id => page.id, :type => 'wiki_page' })
 
       get "/courses/#{@course.id}/modules"
 
@@ -68,7 +68,7 @@ describe "context modules" do
       expect(page.reload).to be_published
     end
 
-    it "should not rename every text header when you rename one" do
+    it "does not rename every text header when you rename one" do
       mod = @course.context_modules.create! name: 'TestModule'
       tag1 = mod.add_item(title: 'First text header', type: 'sub_header')
       tag2 = mod.add_item(title: 'Second text header', type: 'sub_header')
@@ -83,7 +83,7 @@ describe "context modules" do
       expect(item1).not_to include_text('Renamed!')
     end
 
-    it "should not rename every external tool link when you rename one" do
+    it "does not rename every external tool link when you rename one" do
       tool = @course.context_external_tools.create! name: 'WHAT', consumer_key: 'what', shared_secret: 'what', url: 'http://what.example.org'
       mod = @course.context_modules.create! name: 'TestModule'
       tag1 = mod.add_item(title: 'A', type: 'external_tool', id: tool.id, url: 'http://what.example.org/A')
@@ -99,10 +99,10 @@ describe "context modules" do
       expect(item1).not_to include_text('Renamed!')
     end
 
-    it "should preserve completion criteria after indent change" do
+    it "preserves completion criteria after indent change" do
       mod = @course.context_modules.create! name: 'Test Module'
       tag = mod.add_item(type: 'assignment', id: @assignment2.id)
-      mod.completion_requirements = {tag.id => {type: 'must_submit'}}
+      mod.completion_requirements = { tag.id => { type: 'must_submit' } }
       mod.save!
 
       get "/courses/#{@course.id}/modules"

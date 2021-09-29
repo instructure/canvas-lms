@@ -60,6 +60,7 @@ class AssessmentQuestionsController < ApplicationController
   end
 
   private
+
   def require_bank
     @bank = @context.assessment_question_banks.active.find(params[:question_bank_id])
   end

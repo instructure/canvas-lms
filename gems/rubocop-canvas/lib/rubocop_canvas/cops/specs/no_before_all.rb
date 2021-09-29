@@ -31,9 +31,11 @@ module RuboCop
         def on_send(node)
           _receiver, method_name, *args = *node
           return unless BAD_METHOD == method_name
+
           first_arg = args.to_a.first
           return unless first_arg
           return unless BAD_ARG == first_arg.children.first
+
           add_offense node, message: MSG, severity: :warning
         end
       end

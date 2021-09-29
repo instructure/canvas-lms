@@ -32,10 +32,11 @@ module CanvasCrummy
         # I wanted this next line to look more like:
         # html_options = options.pluck { |k,v| %w{class id}.include? k.to_s  }
         # but couldn't figure out how
-        html_options = options[:class] ? {:class => options[:class]} : {}
+        html_options = options[:class] ? { :class => options[:class] } : {}
         html_options[:id] = options[:id] if options[:id]
         raise ArgumentError, "Need more arguments" unless name or options[:record] or block_given?
         raise ArgumentError, "Cannot pass url and use block" if url && block_given?
+
         before_action(options) do |instance|
           url_value = url
           url_value = yield instance if block_given?
@@ -61,7 +62,7 @@ module CanvasCrummy
       #   add_crumb("Home", "/")
       #   add_crumb("Business") { |instance| instance.business_path }
       #
-      def add_crumb(name, url=nil, options = {})
+      def add_crumb(name, url = nil, options = {})
         crumbs.push [name, url, options]
       end
 

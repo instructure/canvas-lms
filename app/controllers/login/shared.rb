@@ -45,7 +45,7 @@ module Login::Shared
     unless otp_passed
       mfa_settings = user.mfa_settings(pseudonym_hint: @current_pseudonym)
       if (user.otp_secret_key && mfa_settings == :optional) ||
-          mfa_settings == :required
+         mfa_settings == :required
         session[:pending_otp] = true
         return redirect_to otp_login_url
       end
@@ -58,9 +58,9 @@ module Login::Shared
     if pseudonym.account_id != @domain_root_account.id
       # they have no reason to be at this account; send them to where they belong
       if (session[:return_to].blank? || session[:return_to] == '/') &&
-        session[:oauth2].blank? &&
-        @domain_root_account.user_account_associations.where(user_id: pseudonym.user_id).none? &&
-        !@domain_root_account.grants_right?(user, :read)
+         session[:oauth2].blank? &&
+         @domain_root_account.user_account_associations.where(user_id: pseudonym.user_id).none? &&
+         !@domain_root_account.grants_right?(user, :read)
         return redirect_to dashboard_url(host: HostUrl.context_host(pseudonym.account, request.host_with_port), cross_domain_login: request.host_with_port)
       end
 
@@ -71,10 +71,10 @@ module Login::Shared
 
     if pseudonym.account_id == Account.site_admin.id && Account.site_admin.delegated_authentication?
       cookies['canvas_sa_delegated'] = {
-          :value => '1',
-          :domain => remember_me_cookie_domain,
-          :httponly => true,
-          :secure => CanvasRails::Application.config.session_options[:secure]
+        :value => '1',
+        :domain => remember_me_cookie_domain,
+        :httponly => true,
+        :secure => CanvasRails::Application.config.session_options[:secure]
       }
     end
     session[:require_terms] = true if @domain_root_account.require_acceptance_of_terms?(user)
@@ -88,7 +88,7 @@ module Login::Shared
         provider = Canvas::Oauth::Provider.new(oauth[:client_id], oauth[:redirect_uri], oauth[:scopes], oauth[:purpose])
         return redirect_to Canvas::Oauth::Provider.confirmation_redirect(self, provider, user)
       elsif session[:course_uuid] && user &&
-          (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
+            (course = Course.where(uuid: session[:course_uuid], workflow_state: "created").first)
         claim_session_course(course, user)
         format.html { redirect_to(course_url(course, :login_success => '1')) }
       elsif session[:confirm]

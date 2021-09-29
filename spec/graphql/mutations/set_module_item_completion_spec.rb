@@ -36,11 +36,11 @@ describe Mutations::SetModuleItemCompletion do
 
   before(:each) do
     module1.add_item(id: assignment.id, type: "assignment")
-    module1.completion_requirements = [{id: module1_assignment_item.id, type: "must_mark_done"}]
+    module1.completion_requirements = [{ id: module1_assignment_item.id, type: "must_mark_done" }]
     module1.save!
 
     module2.add_item(id: assignment.id, type: "assignment")
-    module2.completion_requirements = [{id: module2_assignment_item.id, type: "must_mark_done"}]
+    module2.completion_requirements = [{ id: module2_assignment_item.id, type: "must_mark_done" }]
     module2.save!
 
     module1.context_module_progressions.create!(user: student)
@@ -71,7 +71,7 @@ describe Mutations::SetModuleItemCompletion do
   context "when executed by a user with permission to view the module and its owning course" do
     before(:each) { course.offer! }
 
-    let(:context) { {current_user: student} }
+    let(:context) { { current_user: student } }
 
     describe "returned values" do
       it "returns the ID of the module item in the moduleItem field" do
@@ -90,7 +90,7 @@ describe Mutations::SetModuleItemCompletion do
         end
 
         it "does not update the item if the requirement is not mark-as-done" do
-          module1.completion_requirements = [{id: module1_assignment_item.id, type: "must_read"}]
+          module1.completion_requirements = [{ id: module1_assignment_item.id, type: "must_read" }]
           module1.save!
 
           CanvasSchema.execute(mutation_str(module_id: module1.id, item_id: module1_assignment_item.id), context: context)
@@ -166,12 +166,12 @@ describe Mutations::SetModuleItemCompletion do
 
   context "when the caller does not have permission to read the course" do
     it "returns an error" do
-      result = CanvasSchema.execute(mutation_str, context: {current_user: student})
+      result = CanvasSchema.execute(mutation_str, context: { current_user: student })
       expect(result.dig("errors", 0, "message")).to eq "not found"
     end
 
     it "does not return data pertaining to the module item" do
-      result = CanvasSchema.execute(mutation_str, context: {current_user: student})
+      result = CanvasSchema.execute(mutation_str, context: { current_user: student })
       expect(result.dig("data", "setModuleItemCompletion")).to be nil
     end
   end

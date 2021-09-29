@@ -42,7 +42,7 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       @account.roles.create(name: 'Custom Admin Role2', base_role_type: 'AccountAdmin')
   end
 
-  it 'should be idempotent' do
+  it 'is idempotent' do
     create_role_override('manage_courses', @account_admin_role, enabled: false)
 
     DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
@@ -70,7 +70,7 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       expect(RoleOverride.where(permission: 'manage_courses_delete').count).to eq 1
       new_ro =
         RoleOverride.where(permission: 'manage_courses_delete', role_id: @account_admin_role.id)
-          .first
+                    .first
       expect(new_ro.context).to eq @account
       expect(new_ro.role).to eq @account_admin_role
       expect(new_ro.enabled).to be_falsey
@@ -82,7 +82,7 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       expect(old_change_course_state_ro.enabled).to be_falsey
     end
 
-    it 'should create a new role override for :manage_courses_delete that is disabled' do
+    it 'creates a new role override for :manage_courses_delete that is disabled' do
       create_role_override('manage_courses', @account_admin_role, enabled: false)
 
       DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete.run(
@@ -92,7 +92,7 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
       expect(RoleOverride.where(permission: 'manage_courses_delete').count).to eq 1
       new_ro =
         RoleOverride.where(permission: 'manage_courses_delete', role_id: @account_admin_role.id)
-          .first
+                    .first
       expect(new_ro.context).to eq @account
       expect(new_ro.role).to eq @account_admin_role
       expect(new_ro.enabled).to be_falsey
@@ -158,7 +158,7 @@ describe 'DataFixup::GranularPermissions::AddRoleOverridesForManageCoursesDelete
         RoleOverride.where(permission: 'manage_courses', role_id: @account_membership_role.id).first
       old_change_course_state_ro =
         RoleOverride.where(permission: 'change_course_state', role_id: @account_membership_role.id)
-          .first
+                    .first
       expect(old_manage_courses_ro.enabled).to be_truthy
       expect(old_change_course_state_ro.enabled).to be_truthy
     end

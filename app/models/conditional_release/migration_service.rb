@@ -27,12 +27,12 @@ module ConditionalRelease
       def begin_export(course, opts)
         assignment_ids = nil
         if opts[:selective]
-          assignment_ids = opts[:exported_assets].map{|asset| (match = asset.match(/assignment_(\d+)/)) && match[1]}.compact
+          assignment_ids = opts[:exported_assets].map { |asset| (match = asset.match(/assignment_(\d+)/)) && match[1] }.compact
           return unless assignment_ids.any?
         end
 
         # just pretend like we started an export even if we're not actually hitting a service anymore
-        return {:native => true, :course => course, :assignment_ids => assignment_ids}
+        return { :native => true, :course => course, :assignment_ids => assignment_ids }
       end
 
       def export_completed?(export_data)
@@ -44,7 +44,7 @@ module ConditionalRelease
       end
 
       def generate_native_export(course, assignment_ids)
-        data = {'native' => true}
+        data = { 'native' => true }
         rules_scope = course.conditional_release_rules.active.order(:id).preload(ConditionalRelease::Rule.preload_associations)
         rules_scope = rules_scope.where(:trigger_assignment_id => assignment_ids) if assignment_ids
         rules = rules_scope.to_a
@@ -52,7 +52,7 @@ module ConditionalRelease
 
         data['rules'] = rules.map do |rule|
           {
-            'trigger_assignment_id' => {'$canvas_assignment_id' => rule.trigger_assignment_id}, # this tells canvas to translate this id on re-import
+            'trigger_assignment_id' => { '$canvas_assignment_id' => rule.trigger_assignment_id }, # this tells canvas to translate this id on re-import
             'scoring_ranges' => rule.scoring_ranges.map do |range|
               {
                 'lower_bound' => range.lower_bound,
@@ -60,7 +60,7 @@ module ConditionalRelease
                 'assignment_sets' => range.assignment_sets.map do |set|
                   {
                     'assignment_set_associations' => set.assignment_set_associations.map do |assoc|
-                      {'$canvas_assignment_id' => assoc.assignment_id}
+                      { '$canvas_assignment_id' => assoc.assignment_id }
                     end
                   }
                 end
@@ -78,6 +78,7 @@ module ConditionalRelease
           trigger_key = is_native ? 'trigger_assignment_id' : 'trigger_assignment'
           trigger_id = rule_hash[trigger_key]["$canvas_assignment_id"]
           next unless valid_id?(trigger_id)
+
           rule = course.conditional_release_rules.active.where(:trigger_assignment_id => trigger_id).first
           if rule
             # TODO: yes this is lazy as hell but mostly blame the jerk that originally wrote the conditional_release importer
@@ -94,7 +95,8 @@ module ConditionalRelease
               set_hash.delete(association_key).each do |assoc_hash|
                 assignment_id = assoc_hash["$canvas_assignment_id"]
                 next unless valid_id?(assignment_id)
-                associations << {:assignment_id => assignment_id}
+
+                associations << { :assignment_id => assignment_id }
               end
               set_hash["assignment_set_associations_attributes"] = associations
               set_hash
@@ -104,7 +106,7 @@ module ConditionalRelease
           all_successful = false unless rule.update(scoring_ranges_attributes: ranges)
         end
         if all_successful
-          {:native => true}
+          { :native => true }
         else
           raise "not all rules were able to be saved"
         end

@@ -30,15 +30,15 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
   end
 
   def self.open_id_connect_params
-    [ :client_id,
-      :client_secret,
-      :authorize_url,
-      :token_url,
-      :scope,
-      :login_attribute,
-      :end_session_endpoint,
-      :userinfo_endpoint,
-      :jit_provisioning ].freeze
+    [:client_id,
+     :client_secret,
+     :authorize_url,
+     :token_url,
+     :scope,
+     :login_attribute,
+     :end_session_endpoint,
+     :userinfo_endpoint,
+     :jit_provisioning].freeze
   end
 
   def self.recognized_params
@@ -47,6 +47,7 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
 
   def self.recognized_federated_attributes
     return super unless self == OpenIDConnect
+
     # we allow any attribute
     nil
   end
@@ -61,14 +62,14 @@ class AuthenticationProvider::OpenIDConnect < AuthenticationProvider::Oauth2
 
   def self.debugging_keys
     [{
-       debugging: -> { t("Testing state") },
-       nonce: -> { t("Nonce") },
-       authorize_url: -> { t("Authorize URL") },
-       get_token_response: -> { t("Error fetching access token") },
-       claims_response: -> { t("Error fetching user details") },
-       id_token: -> { t("ID Token") },
-       userinfo: -> { t("Userinfo") },
-     }]
+      debugging: -> { t("Testing state") },
+      nonce: -> { t("Nonce") },
+      authorize_url: -> { t("Authorize URL") },
+      get_token_response: -> { t("Error fetching access token") },
+      claims_response: -> { t("Error fetching user details") },
+      id_token: -> { t("ID Token") },
+      userinfo: -> { t("Userinfo") },
+    }]
   end
 
   alias_attribute :end_session_endpoint, :log_out_url

@@ -48,6 +48,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
 
   def be_lti_membership_context
     return be_lti_course_membership_context(decorated_course) if context_type == :course
+
     be_lti_group_membership_context(decorated_group)
   end
 
@@ -60,7 +61,7 @@ describe Lti::Ims::NamesAndRolesSerializer do
     end
 
     if context_type == :course
-      be_lti_course_membership(matcher_opts.merge!(expected: [ decorated_enrollment ]))
+      be_lti_course_membership(matcher_opts.merge!(expected: [decorated_enrollment]))
     else
       be_lti_group_membership(matcher_opts.merge!(expected: decorated_group_member))
     end
@@ -68,13 +69,13 @@ describe Lti::Ims::NamesAndRolesSerializer do
 
   def create_pseudonym!(user)
     user.pseudonyms.create!({
-      account: course.account,
-      unique_id: 'user1@example.com',
-      password: 'asdfasdf',
-      password_confirmation: 'asdfasdf',
-      workflow_state: 'active',
-      sis_user_id: 'user-1-sis-user-id-1'
-    })
+                              account: course.account,
+                              unique_id: 'user1@example.com',
+                              password: 'asdfasdf',
+                              password_confirmation: 'asdfasdf',
+                              workflow_state: 'active',
+                              sis_user_id: 'user-1-sis-user-id-1'
+                            })
   end
 
   shared_examples 'enrollment serialization' do

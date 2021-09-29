@@ -76,4 +76,3 @@ module GradebookHistorySetup
     @assignment_due_one_week.grade_student(@course.students.first, grade: String(Random.rand(1...10)), grader: @teacher)
   end
 end
-

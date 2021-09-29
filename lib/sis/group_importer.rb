@@ -20,7 +20,6 @@
 
 module SIS
   class GroupImporter < BaseImporter
-
     def process
       importer = Work.new(@batch, @root_account, @logger)
       Group.process_as_sis(@sis_options) do
@@ -32,6 +31,7 @@ module SIS
     end
 
     private
+
     class Work
       attr_accessor :success_count, :roll_back_data
 
@@ -61,6 +61,7 @@ module SIS
           context = @accounts_cache[account_id]
           context ||= @root_account.all_accounts.active.where(sis_source_id: account_id).take
           raise ImportError, "Account with sis id #{account_id} didn't exist for group #{group_id}." unless context
+
           @accounts_cache[context.sis_source_id] = context
         end
 
@@ -124,8 +125,6 @@ module SIS
           raise ImportError, msg
         end
       end
-
     end
-
   end
 end

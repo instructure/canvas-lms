@@ -36,8 +36,8 @@ describe Types::SectionType do
   end
 
   context "sis field" do
-    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
-    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+    let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false }) }
+    let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false }) }
 
     it "returns sis_id if you have read_sis permissions" do
       tester = GraphQLTypeTester.new(section, current_user: read_admin)

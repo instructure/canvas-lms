@@ -38,6 +38,7 @@ module Canvas::SoftDeletable
     alias_method :destroy_permanently!, :destroy
     def destroy
       return true if deleted?
+
       self.workflow_state = 'deleted'
       run_callbacks(:destroy) { save! }
     end

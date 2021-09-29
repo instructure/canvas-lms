@@ -20,7 +20,6 @@
 require_relative '../common'
 
 module CommonsFavoriteTray
-
   # ------------------------------ Selectors -----------------------------
 
   # ------------------------------ Elements ------------------------------
@@ -29,10 +28,9 @@ module CommonsFavoriteTray
     f("[role='dialog']")
   end
 
-	def tray_iframe
-		commons_fav_tray.find_element(:css, "iframe")
-	end
+  def tray_iframe
+    commons_fav_tray.find_element(:css, "iframe")
+  end
 
   # ------------------------------ Actions --------------------------------
-
 end

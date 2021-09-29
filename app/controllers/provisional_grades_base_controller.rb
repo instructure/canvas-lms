@@ -36,7 +36,7 @@ class ProvisionalGradesBaseController < ApplicationController
       return render json: { message: "Assignment grades have already been published" }, status: :bad_request
     end
 
-    json = {needs_provisional_grade: @assignment.can_be_moderated_grader?(@current_user)}
+    json = { needs_provisional_grade: @assignment.can_be_moderated_grader?(@current_user) }
 
     return render json: json unless submission_updated?
 

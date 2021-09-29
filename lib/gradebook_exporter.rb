@@ -43,8 +43,8 @@ class GradebookExporter
 
   def to_csv
     I18n.locale = @options[:locale] || infer_locale(
-      context:      @course,
-      user:         @user,
+      context: @course,
+      user: @user,
       root_account: @course.root_account
     )
 
@@ -69,7 +69,7 @@ class GradebookExporter
     end
   end
 
-  def buffer_columns(column_name, buffer_value=nil)
+  def buffer_columns(column_name, buffer_value = nil)
     column_count = BUFFER_COLUMN_DEFINITIONS.fetch(column_name).length
     Array.new(column_count, buffer_value)
   end
@@ -184,6 +184,7 @@ class GradebookExporter
 
         lengths_match = header.length == row.length
         raise "column lengths don't match" if !lengths_match && !Rails.env.production?
+
         csv << row
       end
 
@@ -200,7 +201,7 @@ class GradebookExporter
         row << (column.read_only? ? read_only : nil)
       end
 
-      row.concat(assignments.map{ |a| format_numbers(a.points_possible) })
+      row.concat(assignments.map { |a| format_numbers(a.points_possible) })
 
       if should_show_totals
         row.concat([read_only] * group_filler_length)
@@ -224,18 +225,17 @@ class GradebookExporter
 
       # Rest of the Rows
       student_enrollments.each_slice(100) do |student_enrollments_batch|
-
         student_ids = student_enrollments_batch.map(&:user_id)
 
-        visible_assignments = @course.submissions.
-          active.
-          where(user_id: student_ids.uniq).
-          pluck(:assignment_id, :user_id).
-          each_with_object(Hash.new {|hash, key| hash[key] = Set.new}) do |ids, reducer|
-            assignment_key = ids.first
-            student_key = ids.second
-            reducer[assignment_key].add(student_key)
-          end
+        visible_assignments = @course.submissions
+                                     .active
+                                     .where(user_id: student_ids.uniq)
+                                     .pluck(:assignment_id, :user_id)
+                                     .each_with_object(Hash.new { |hash, key| hash[key] = Set.new }) do |ids, reducer|
+          assignment_key = ids.first
+          student_key = ids.second
+          reducer[assignment_key].add(student_key)
+        end
 
         # Custom Columns, custom_column_data are hashes
         custom_column_data = CustomGradebookColumnDatum.where(
@@ -270,7 +270,7 @@ class GradebookExporter
 
           # Custom Columns Data
           custom_gradebook_columns.each do |column|
-            row << custom_column_data[student.id]&.find {|datum| column.id == datum.custom_gradebook_column_id}&.content
+            row << custom_column_data[student.id]&.find { |datum| column.id == datum.custom_gradebook_column_id }&.content
           end
 
           row.concat(student_submissions)
@@ -321,7 +321,7 @@ class GradebookExporter
     # course_section: used for display_name in csv output
     # user > pseudonyms: used for sis_user_id/unique_id if options[:include_sis_id]
     # user > pseudonyms > account: used in SisPseudonym > works_for_account
-    includes = {:user => {:pseudonyms => :account}, :course_section => [], :scores => []}
+    includes = { :user => { :pseudonyms => :account }, :course_section => [], :scores => [] }
 
     enrollments = scope.preload(includes).eager_load(:user).order_by_sortable_name.to_a
     enrollments.each { |e| e.course = @course }

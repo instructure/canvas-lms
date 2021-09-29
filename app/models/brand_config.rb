@@ -27,7 +27,7 @@ class BrandConfig < ActiveRecord::Base
   ATTRS_TO_INCLUDE_IN_MD5 = ([:variables, :parent_md5] + OVERRIDE_TYPES).freeze
 
   validates :variables, presence: true, unless: :overrides?
-  validates :md5, length: {is: 32}
+  validates :md5, length: { is: 32 }
 
   before_validation :generate_md5
   before_update do
@@ -41,7 +41,6 @@ class BrandConfig < ActiveRecord::Base
   belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
   has_many :shared_brand_configs, foreign_key: 'brand_config_md5'
-
 
   def self.for(attrs)
     attrs = attrs.with_indifferent_access.slice(*ATTRS_TO_INCLUDE_IN_MD5)
@@ -81,7 +80,7 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def default?
-    ([:variables] + OVERRIDE_TYPES).all? {|a| self[a].blank? }
+    ([:variables] + OVERRIDE_TYPES).all? { |a| self[a].blank? }
   end
 
   def generate_md5
@@ -162,6 +161,7 @@ class BrandConfig < ActiveRecord::Base
 
     define_method :"move_#{type}_to_s3_if_enabled!" do
       return unless Canvas::Cdn.enabled?
+
       s3_uploader.upload_file(send(:"public_#{type}_path"))
       begin
         File.delete(send(:"#{type}_file"))
@@ -208,10 +208,10 @@ class BrandConfig < ActiveRecord::Base
   def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_or_id)
     save_and_sync_to_s3!(progress)
     shared_brand_config = if shared_brand_config_or_id.is_a?(SharedBrandConfig)
-        shared_brand_config_or_id
-      else
-        SharedBrandConfig.find(shared_brand_config_or_id)
-      end
+                            shared_brand_config_or_id
+                          else
+                            SharedBrandConfig.find(shared_brand_config_or_id)
+                          end
     old_md5 = shared_brand_config.brand_config_md5
     shared_brand_config.brand_config_md5 = md5
     shared_brand_config.save!
@@ -219,32 +219,32 @@ class BrandConfig < ActiveRecord::Base
     progress&.increment_completion!(1)
   end
 
-  def save_and_sync_to_s3!(progress=nil)
+  def save_and_sync_to_s3!(progress = nil)
     save_all_files!
     progress.increment_completion!(4) if progress&.total
   end
 
   def self.destroy_if_unused(md5)
     return unless md5
-    unused_brand_config = BrandConfig.
-      where(md5: md5).
-      where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
-      first
+
+    unused_brand_config = BrandConfig
+                          .where(md5: md5)
+                          .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
+                          .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5"))
+                          .first
     if unused_brand_config
       unused_brand_config.destroy
     end
   end
 
   def self.clean_unused_from_db!
-    BrandConfig.
-      where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5")).
-      where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
+    BrandConfig
+      .where("NOT EXISTS (?)", Account.where("brand_config_md5=brand_configs.md5"))
+      .where("NOT EXISTS (?)", SharedBrandConfig.where("brand_config_md5=brand_configs.md5")).
       # When someone is actively working in the theme editor, it just saves one
       # in their session, so only delete stuff that is more than a week old,
       # to not clear out a theme someone was working on.
-      where(["created_at < ?", 1.week.ago]).
-      delete_all
+      where(["created_at < ?", 1.week.ago])
+      .delete_all
   end
-
 end

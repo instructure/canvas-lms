@@ -83,7 +83,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   simply_versioned
 
-  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'")}, as: :content, inverse_of: :content, class_name: 'ContentTag'
+  has_many :context_module_tags, -> { where("content_tags.tag_type='context_module' AND content_tags.workflow_state<>'deleted'") }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
   # This callback is listed here in order for the :link_assignment_overrides
   # method to be called after the simply_versioned callbacks. We want the
@@ -182,7 +182,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def link_assignment_overrides
     override_students = [assignment_override_students]
     overrides = [assignment_overrides]
-    overrides_params = {:quiz_id => id, :quiz_version => version_number}
+    overrides_params = { :quiz_id => id, :quiz_version => version_number }
 
     if assignment
       override_students += [assignment.assignment_override_students]
@@ -251,6 +251,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def current_points_possible
     entries = self.root_entries
     return self.assignment.points_possible if entries.empty? && self.assignment
+
     self.class.count_points_possible(entries)
   end
 
@@ -291,12 +292,12 @@ class Quizzes::Quiz < ActiveRecord::Base
     res
   end
 
-  def restore(from=nil)
+  def restore(from = nil)
     self.workflow_state = if self.has_student_submissions?
-      "available"
-    else
-      "unpublished"
-    end
+                            "available"
+                          else
+                            "unpublished"
+                          end
     self.save
     self.assignment.restore(:quiz) if self.for_assignment?
   end
@@ -374,7 +375,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # NOTE: We don't have a submission user when the teacher is previewing the
     # quiz and displaying the results'
     return true if self.grants_right?(user, :grade) &&
-      (submission && submission.user && submission.user != user)
+                   (submission && submission.user && submission.user != user)
 
     return false unless self.show_correct_answers
 
@@ -490,6 +491,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   protected :update_assignment
 
   attr_reader :should_clear_availability_cache
+
   def check_if_needs_availability_cache_clear
     @should_clear_availability_cache ||= will_save_change_to_due_at? || will_save_change_to_lock_at? || will_save_change_to_unlock_at? || will_save_change_to_workflow_state?
   end
@@ -515,10 +517,10 @@ class Quizzes::Quiz < ActiveRecord::Base
     # 2. have been started; and
     # 3. won't lose time through this change.
     where_clause = <<~END
-      quiz_id = ? AND
-      started_at IS NOT NULL AND
-      finished_at IS NULL AND
-    #{update_sql} > end_at
+        quiz_id = ? AND
+        started_at IS NOT NULL AND
+        finished_at IS NULL AND
+      #{update_sql} > end_at
     END
 
     Quizzes::QuizSubmission.where(where_clause, self, new_end_at).update_all(["end_at = #{update_sql}", new_end_at])
@@ -563,8 +565,9 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Returns the list of all "root" entries, either questions or question
   # groups for this quiz.  This is PRE-SAVED data.  Once the quiz has
   # been saved, all the data can be found in Quizzes::Quiz.quiz_data
-  def root_entries(force_check=false)
+  def root_entries(force_check = false)
     return @root_entries if @root_entries && !force_check
+
     result = []
     result.concat self.active_quiz_questions_without_group
     result.concat self.quiz_groups
@@ -572,7 +575,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       res = nil
       if e.is_a? Quizzes::QuizQuestion
         res = e.data
-      else #it's a Quizzes::QuizGroup
+      else # it's a Quizzes::QuizGroup
         data = e.attributes.with_indifferent_access
         data[:entry_type] = "quiz_group"
         if e.assessment_question_bank_id
@@ -590,11 +593,11 @@ class Quizzes::Quiz < ActiveRecord::Base
     @root_entries = result
   end
 
-
   # Returns the number of questions a student will see on the
   # SAVED version of the quiz
-  def question_count(force_check=false)
+  def question_count(force_check = false)
     return read_attribute(:question_count) if !force_check && read_attribute(:question_count)
+
     question_count = 0
     self.stored_questions.each do |q|
       if q[:pick_count]
@@ -618,11 +621,11 @@ class Quizzes::Quiz < ActiveRecord::Base
       if datum["entry_type"] == "quiz_group"
         if datum["assessment_question_bank_id"]
           # get ALL question types possible from the bank
-          AssessmentQuestion.
-            where(assessment_question_bank_id: datum["assessment_question_bank_id"]).
-            pluck(:question_data).map{|data| data["question_type"]}
+          AssessmentQuestion
+            .where(assessment_question_bank_id: datum["assessment_question_bank_id"])
+            .pluck(:question_data).map { |data| data["question_type"] }
         else
-          datum["questions"].map{|q| q["question_type"]}
+          datum["questions"].map { |q| q["question_type"] }
         end
       else
         datum["question_type"]
@@ -640,19 +643,19 @@ class Quizzes::Quiz < ActiveRecord::Base
   # the version found by gathering relationships on the Quiz data models,
   # but the version being held in Quizzes::Quiz.quiz_data.  Caches the result
   # in @stored_questions.
-  def stored_questions(preview=false)
+  def stored_questions(preview = false)
     return @stored_questions if @stored_questions && !preview
 
     @stored_questions = begin
       data_set = if preview
-        self.generate_quiz_data(:persist => false)
-      else
-        self.quiz_data || []
-      end
+                   self.generate_quiz_data(:persist => false)
+                 else
+                   self.quiz_data || []
+                 end
 
       builder = Quizzes::QuizQuestionBuilder.new({
-        shuffle_answers: self.shuffle_answers
-      })
+                                                   shuffle_answers: self.shuffle_answers
+                                                 })
 
       builder.shuffle_quiz_data!(data_set)
     end
@@ -666,7 +669,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self.allowed_attempts == -1
   end
 
-  def build_submission_end_at(submission, with_time_limit=true)
+  def build_submission_end_at(submission, with_time_limit = true)
     course = context
     user   = submission.user
     end_at = nil
@@ -684,8 +687,8 @@ class Quizzes::Quiz < ActiveRecord::Base
     return end_at if user.is_a?(::User) && self.grants_right?(user, :grade)
 
     # We no longer use enrollment_term but get this info from enrollment_state
-    fallback_end_at = course.enrollments.for_user(user).active_by_date.
-      maximum('enrollment_states.state_valid_until')
+    fallback_end_at = course.enrollments.for_user(user).active_by_date
+                            .maximum('enrollment_states.state_valid_until')
 
     # set to lock date
     if lock_at && !submission.manually_unlocked
@@ -701,13 +704,13 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # Generates a submission for the specified user on this quiz, based
   # on the SAVED version of the quiz.  Does not consider permissions.
-  def generate_submission(user, preview=false)
+  def generate_submission(user, preview = false)
     submission = nil
 
     transaction do
       builder = Quizzes::QuizQuestionBuilder.new({
-        shuffle_answers: self.shuffle_answers
-      })
+                                                   shuffle_answers: self.shuffle_answers
+                                                 })
 
       submission = Quizzes::SubmissionManager.new(self).find_or_create_submission(user, preview)
       submission.retake
@@ -735,7 +738,6 @@ class Quizzes::Quiz < ActiveRecord::Base
       else
         submission.with_versioning(true, &:save!)
       end
-
     end
     submission.record_creation_event unless preview
     submission
@@ -755,7 +757,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   # SAVED version.  That is, gathers the relationship entities from
   # the database and uses them to populate a static version that will
   # be held in Quizzes::Quiz.quiz_data
-  def generate_quiz_data(opts={})
+  def generate_quiz_data(opts = {})
     entries = self.root_entries(true)
     t = Time.now
     entries.each do |e|
@@ -775,7 +777,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     data
   end
 
-  def add_assessment_questions(assessment_questions, group=nil)
+  def add_assessment_questions(assessment_questions, group = nil)
     questions = assessment_questions.map do |assessment_question|
       question = self.quiz_questions.build
       question.quiz_group_id = group.id if group && group.quiz_id == self.id
@@ -797,7 +799,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   alias_method :to_s, :quiz_title
 
-  def low_level_locked_for?(user, opts={})
+  def low_level_locked_for?(user, opts = {})
     RequestCache.cache(locked_request_cache_key(user)) do
       user_submission = user && quiz_submissions.where(user_id: user.id).first
       return false if user_submission && user_submission.manually_unlocked
@@ -816,7 +818,7 @@ class Quizzes::Quiz < ActiveRecord::Base
       elsif !opts[:skip_assignment] && (assignment_lock = locked_by_assignment?(user, opts))
         locked = assignment_lock
       elsif (module_lock = locked_by_module_item?(user, opts))
-        locked = lock_info.merge({module: module_lock.context_module})
+        locked = lock_info.merge({ module: module_lock.context_module })
       elsif !context.try_rescue(:is_public) && !context.grants_right?(user, :participate_as_student) && !opts[:is_observer]
         locked = lock_info.merge({ missing_permission: :participate_as_student.to_s })
       end
@@ -831,7 +833,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     assignment.low_level_locked_for?(user, opts)
   end
 
-  def context_module_action(user, action, points=nil)
+  def context_module_action(user, action, points = nil)
     tags_to_update = self.context_module_tags.to_a
     if self.assignment
       tags_to_update += self.assignment.context_module_tags
@@ -843,7 +845,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   def locked=(new_val)
     new_val = Canvas::Plugin.value_to_boolean(new_val)
     if new_val
-      #lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
+      # lock the quiz either until unlock_at, or indefinitely if unlock_at.nil?
       self.lock_at = Time.now
       self.unlock_at = [self.lock_at, self.unlock_at].min if self.unlock_at
     else
@@ -897,12 +899,13 @@ class Quizzes::Quiz < ActiveRecord::Base
   def changed_significantly_since?(version_number)
     @significant_version ||= {}
     return @significant_version[version_number] if @significant_version.has_key?(version_number)
+
     old_version = self.versions.get(version_number).model
 
     needs_review = false
     # Allow for floating point rounding error comparing to versions created before BigDecimal was used
     needs_review = true if [old_version.points_possible, self.points_possible].select(&:present?).count == 1 ||
-      ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
+                           ((old_version.points_possible || 0) - (self.points_possible || 0)).abs > 0.0001
     needs_review = true if (old_version.quiz_data || []).length != (self.quiz_data || []).length
     if !needs_review
       new_data = self.quiz_data
@@ -916,6 +919,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def validate_quiz_type
     return if self.quiz_type.blank?
+
     unless valid_quiz_type_values.include?(self.quiz_type)
       errors.add(:invalid_quiz_type, t('#quizzes.quiz.errors.invalid_quiz_type', "Quiz type is not valid"))
     end
@@ -927,6 +931,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def validate_ip_filter
     return if self.ip_filter.blank?
+
     require 'ipaddr'
     begin
       self.ip_filter.split(/,/).each { |filter| ::IPAddr.new(filter) }
@@ -937,6 +942,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def validate_hide_results
     return if self.hide_results.blank?
+
     unless valid_hide_results_values.include?(self.hide_results)
       errors.add(:invalid_hide_results, t('#quizzes.quiz.errors.invalid_hide_results', "Hide results is not valid"))
     end
@@ -957,6 +963,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def strip_html_answers(question)
     return if !question || !question[:answers] || !(%w(multiple_choice_question multiple_answers_question).include? question[:question_type])
+
     for answer in question[:answers] do
       answer[:text] = strip_tags(answer[:html]) if !answer[:html].blank? && answer[:text].blank?
     end
@@ -1024,6 +1031,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def post_to_sis=(post_to_sis)
     return unless assignment
+
     assignment.post_to_sis = post_to_sis
   end
 
@@ -1098,7 +1106,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     end
     can :delete
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_grades) } #admins.include? user }
+    given { |user, session| self.context.grants_right?(user, session, :manage_grades) } # admins.include? user }
     can :read_statistics and can :read and can :submit and can :grade and can :review_grades
 
     given { |user| self.available? && self.context.try_rescue(:is_public) && !self.graded? && self.visible_to_user?(user) }
@@ -1142,23 +1150,23 @@ class Quizzes::Quiz < ActiveRecord::Base
   scope :for_course, lambda { |course_id| where(:context_type => 'Course', :context_id => course_id) }
 
   # NOTE: only use for courses with differentiated assignments on
-  scope :visible_to_students_in_course_with_da, lambda {|student_ids, course_ids|
-    joins(:quiz_student_visibilities).
-    where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
+  scope :visible_to_students_in_course_with_da, lambda { |student_ids, course_ids|
+    joins(:quiz_student_visibilities)
+      .where(:quiz_student_visibilities => { :user_id => student_ids, :course_id => course_ids })
   }
 
   # Return all quizzes and their active overrides where either the
   # quiz or one of its overrides is due between start and ending.
   scope :due_between_with_overrides, lambda { |start, ending|
     joins("LEFT OUTER JOIN #{AssignmentOverride.quoted_table_name} assignment_overrides
-          ON assignment_overrides.quiz_id = quizzes.id").
-    group("quizzes.id").
-    where('quizzes.due_at BETWEEN ? AND ?
+          ON assignment_overrides.quiz_id = quizzes.id")
+      .group("quizzes.id")
+      .where('quizzes.due_at BETWEEN ? AND ?
           OR assignment_overrides.due_at_overridden AND
           assignment_overrides.due_at BETWEEN ? AND ?', start, ending, start, ending)
   }
 
-  scope :ungraded_with_user_due_date, -> (user) do
+  scope :ungraded_with_user_due_date, ->(user) do
     from("(WITH overrides AS (
           SELECT DISTINCT ON (o.quiz_id, o.user_id) *
           FROM (
@@ -1189,13 +1197,13 @@ class Quizzes::Quiz < ActiveRecord::Base
         )
         SELECT CASE WHEN overrides.due_at_overridden THEN overrides.due_at ELSE q.due_at END as user_due_date, q.*
         FROM #{Quizzes::Quiz.quoted_table_name} q
-        INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes").
-      not_for_assignment
+        INNER JOIN overrides ON overrides.quiz_id = q.id) as quizzes")
+      .not_for_assignment
   end
 
-  scope :ungraded_due_between_for_user, -> (start, ending, user) do
-    ungraded_with_user_due_date(user).
-      where(user_due_date: start..ending)
+  scope :ungraded_due_between_for_user, ->(start, ending, user) do
+    ungraded_with_user_due_date(user)
+      .where(user_due_date: start..ending)
   end
 
   # Return quizzes (up to limit) that do not have any submissions
@@ -1203,15 +1211,15 @@ class Quizzes::Quiz < ActiveRecord::Base
     where("(SELECT COUNT(id) FROM #{Quizzes::QuizSubmission.quoted_table_name}
             WHERE quiz_id = quizzes.id
             AND workflow_state = 'complete'
-            AND user_id = ?) = 0", user_id).
-      limit(limit).
-      order("quizzes.due_at").
-      preload(:context)
+            AND user_id = ?) = 0", user_id)
+      .limit(limit)
+      .order("quizzes.due_at")
+      .preload(:context)
   }
 
   scope :not_locked, -> {
     where("(quizzes.unlock_at IS NULL OR quizzes.unlock_at<:now) AND (quizzes.lock_at IS NULL OR quizzes.lock_at>:now)",
-      :now => Time.zone.now)
+          :now => Time.zone.now)
   }
 
   scope :not_ignored_by, lambda { |user, purpose|
@@ -1249,8 +1257,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def require_lockdown_browser_for_results
     self.require_lockdown_browser &&
-    self[:require_lockdown_browser_for_results] &&
-    Quizzes::Quiz.lockdown_browser_plugin_enabled?
+      self[:require_lockdown_browser_for_results] &&
+      Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
   alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
@@ -1314,28 +1322,30 @@ class Quizzes::Quiz < ActiveRecord::Base
   def can_unpublish?
     return true if new_record?
     return @can_unpublish unless @can_unpublish.nil?
+
     @can_unpublish = !has_student_submissions? && (assignment.blank? || assignment.can_unpublish?)
   end
   attr_writer :can_unpublish
 
-  def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs=nil)
+  def self.preload_can_unpublish(quizzes, assmnt_ids_with_subs = nil)
     return unless quizzes.any?
+
     assmnt_ids_with_subs ||= Assignment.assignment_ids_with_submissions(quizzes.map(&:assignment_id).compact)
 
     # yes, this is a complicated query, but it greatly improves the runtime to do it this way
-    filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id").
-      not_settings_only.where("user_id IS NOT NULL")
+    filter = Quizzes::QuizSubmission.where("quiz_submissions.quiz_id=s.quiz_id")
+                                    .not_settings_only.where("user_id IS NOT NULL")
     values = quizzes.map { |q| "(#{q.id})" }.join(", ")
     constant_table = "( VALUES #{values} ) AS s(quiz_id)"
 
-    quiz_ids_with_subs = Quizzes::QuizSubmission.
-        from(constant_table).
-        where("EXISTS (?)", filter).
-        pluck("s.quiz_id")
+    quiz_ids_with_subs = Quizzes::QuizSubmission
+                         .from(constant_table)
+                         .where("EXISTS (?)", filter)
+                         .pluck("s.quiz_id")
 
     quizzes.each do |quiz|
       quiz.can_unpublish = !(quiz_ids_with_subs.include?(quiz.id)) &&
-        (quiz.assignment_id.nil? || !assmnt_ids_with_subs.include?(quiz.assignment_id))
+                           (quiz.assignment_id.nil? || !assmnt_ids_with_subs.include?(quiz.assignment_id))
     end
   end
 
@@ -1358,6 +1368,7 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def has_file_upload_question?
     return false unless quiz_data.present?
+
     !!quiz_data.detect { |data_hash| data_hash[:question_type] == 'file_upload_question' }
   end
 
@@ -1384,18 +1395,18 @@ class Quizzes::Quiz < ActiveRecord::Base
         version_number: self.version_number
       }
       if current_quiz_question_regrades.present?
-        Quizzes::QuizRegrader::Regrader.delay(strand: "quiz:#{self.global_id}:regrading").
-          regrade!(options)
+        Quizzes::QuizRegrader::Regrader.delay(strand: "quiz:#{self.global_id}:regrading")
+                                       .regrade!(options)
       end
     end
     true
   end
 
   def current_regrade
-    Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number).
-      where("quiz_question_regrades.regrade_option != 'disabled'").
-      eager_load(:quiz_question_regrades).
-      preload(quiz_question_regrades: :quiz_question).first
+    Quizzes::QuizRegrade.where(quiz_id: id, quiz_version: version_number)
+                        .where("quiz_question_regrades.regrade_option != 'disabled'")
+                        .eager_load(:quiz_question_regrades)
+                        .preload(quiz_question_regrades: :quiz_question).first
   end
 
   def current_quiz_question_regrades
@@ -1404,8 +1415,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   def questions_regraded_since(created_at)
     question_regrades = Set.new
-    quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at).
-      eager_load(:quiz_question_regrades).each do |regrade|
+    quiz_regrades.where("quiz_regrades.created_at > ? AND quiz_question_regrades.regrade_option != 'disabled'", created_at)
+                 .eager_load(:quiz_question_regrades).each do |regrade|
       ids = regrade.quiz_question_regrades.map { |qqr| qqr.quiz_question_id }
       question_regrades.merge(ids)
     end
@@ -1503,8 +1514,8 @@ class Quizzes::Quiz < ActiveRecord::Base
 
   # returns visible students for differentiated assignments
   def visible_students_with_da(context_students)
-    quiz_students = context_students.joins(:quiz_student_visibilities).
-      where('quiz_id = ?', self.id)
+    quiz_students = context_students.joins(:quiz_student_visibilities)
+                                    .where('quiz_id = ?', self.id)
 
     # empty quiz_students means the quiz is for everyone
     return quiz_students if quiz_students.present?

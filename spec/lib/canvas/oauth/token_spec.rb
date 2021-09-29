@@ -87,7 +87,7 @@ module Canvas::Oauth
     end
 
     describe '#access_token' do
-      let(:scopes) {["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"]}
+      let(:scopes) { ["#{TokenScopes::OAUTH2_SCOPE_NAMESPACE}userinfo"] }
 
       it 'creates a new token if none exists' do
         expect(user.access_tokens).to be_empty
@@ -174,11 +174,11 @@ module Canvas::Oauth
 
       it 'grabs the user json as well' do
         expect(json['user']).to eq({
-          'id' => user.id,
-          'name' => user.name,
-          'global_id' => user.global_id.to_s,
-          'effective_locale' => 'en'
-        })
+                                     'id' => user.id,
+                                     'name' => user.name,
+                                     'global_id' => user.global_id.to_s,
+                                     'effective_locale' => 'en'
+                                   })
       end
 
       it 'returns the expires_in parameter' do
@@ -204,10 +204,10 @@ module Canvas::Oauth
         real_user = User.create!
         allow(token).to receive(:real_user).and_return(real_user)
         expect(json['real_user']).to eq({
-          'id' => real_user.id,
-          'name' => real_user.name,
-          'global_id' => real_user.global_id.to_s
-        })
+                                          'id' => real_user.id,
+                                          'name' => real_user.name,
+                                          'global_id' => real_user.global_id.to_s
+                                        })
         expect(user.access_tokens.where(real_user: real_user).count).to eq 1
       end
 
@@ -227,8 +227,8 @@ module Canvas::Oauth
 
       it 'sets the new data hash into redis with 10 min ttl' do
         redis = Object.new
-        code_data = {user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil}
-        #should have 10 min (in seconds) ttl passed as second param
+        code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
+        # should have 10 min (in seconds) ttl passed as second param
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 600, code_data.to_json)
         allow(Canvas).to receive_messages(:redis => redis)
         Token.generate_code_for(1, 2, 3)
@@ -236,8 +236,8 @@ module Canvas::Oauth
 
       it 'sets the new data hash into redis with 10 sec ttl' do
         redis = Object.new
-        code_data = {user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil}
-        #should have 10 sec ttl passed as second param with setting
+        code_data = { user: 1, real_user: 2, client_id: 3, scopes: nil, purpose: nil, remember_access: nil }
+        # should have 10 sec ttl passed as second param with setting
         Setting.set('oath_token_request_timeout', '10')
         expect(redis).to receive(:setex).with('oauth2:brand_new_code', 10, code_data.to_json)
         allow(Canvas).to receive_messages(:redis => redis)

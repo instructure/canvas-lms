@@ -23,7 +23,6 @@ require_dependency "api/v1/course_json"
 
 module Api
   module V1
-
     describe CourseJson do
       let_once(:course) { ::Course.create! }
       let(:course_json) { CourseJson.new(course, nil, includes, []) }
@@ -464,7 +463,7 @@ module Api
       end
 
       describe '#include_description' do
-        let(:predicate){ course_json.include_description }
+        let(:predicate) { course_json.include_description }
 
         it 'affirms when the public_description key is in the includes array' do
           includes << 'public_description'
@@ -481,11 +480,10 @@ module Api
         end
       end
 
-
       describe '#include_total_scores?' do
         let(:predicate) { course_json.include_total_scores? }
         let(:course_settings) { Hash.new }
-        let(:course) { double( course_settings ) }
+        let(:course) { double(course_settings) }
 
         describe 'when total scores key is set' do
           before { includes << :total_scores }
@@ -516,7 +514,6 @@ module Api
         end
       end
 
-
       describe '#allowed_attributes' do
         it 'just returns the base attributes when there are no includes' do
           includes.clear
@@ -525,10 +522,9 @@ module Api
 
         it 'tacks on any includes' do
           includes << :some << :other << :keys
-          expect(course_json.allowed_attributes).to eq( CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys] )
+          expect(course_json.allowed_attributes).to eq(CourseJson::BASE_ATTRIBUTES + [:some, :other, :keys])
         end
       end
-
 
       describe '#methods_to_send' do
         it 'includes the end_at field' do
@@ -553,20 +549,19 @@ module Api
         end
       end
 
-
       describe '#clear_unneeded_fields' do
-        let(:hash){ Hash.new }
+        let(:hash) { Hash.new }
 
         describe 'with an optional field' do
           before { hash['enrollments'] = [] }
 
           it 'kicks the key-value pair out if the value is nil' do
             hash['enrollments'] = nil
-            expect(course_json.clear_unneeded_fields(hash)).to eq({ })
+            expect(course_json.clear_unneeded_fields(hash)).to eq({})
           end
 
           it 'keeps the key-value pair if the value is not nil' do
-            expect(course_json.clear_unneeded_fields(hash)).to eq({'enrollments' => [] })
+            expect(course_json.clear_unneeded_fields(hash)).to eq({ 'enrollments' => [] })
           end
         end
 
@@ -579,14 +574,13 @@ module Api
           end
 
           it 'keeps the key-value pair if the value is not nil' do
-            expect(course_json.clear_unneeded_fields(hash)).to eq({'some_other_key' => 'some_value' })
+            expect(course_json.clear_unneeded_fields(hash)).to eq({ 'some_other_key' => 'some_value' })
           end
         end
-
       end
 
       describe '#description' do
-        let(:course) { double(:public_description => 'an eloquent anecdote' ) }
+        let(:course) { double(:public_description => 'an eloquent anecdote') }
 
         it 'returns the description when its configured for inclusion' do
           includes << :public_description
@@ -602,14 +596,14 @@ module Api
 
       describe '#initialization' do
         let(:enrollments) { double(:enrollments) }
-        let(:hash) { {:a => '1', :b => '2'} }
-        let(:includes) { ['these', 'three', 'keys' ] }
+        let(:hash) { { :a => '1', :b => '2' } }
+        let(:includes) { ['these', 'three', 'keys'] }
 
         before(:each) do
-          @json = CourseJson.new(course, user, includes, enrollments){ hash }
+          @json = CourseJson.new(course, user, includes, enrollments) { hash }
         end
 
-        subject{ @json }
+        subject { @json }
 
         describe '#course' do
           subject { super().course }
@@ -639,8 +633,8 @@ module Api
 
       describe '#set_sis_course_id' do
         let(:sis_course) { double(grants_right?: @has_right, sis_source_id: @sis_id, sis_batch_id: @batch, root_account: root_account) }
-        let(:sis_course_json) { CourseJson.new( sis_course, user, includes, [] ) }
-        let(:root_account) { double(grants_right?: @has_right ) }
+        let(:sis_course_json) { CourseJson.new(sis_course, user, includes, []) }
+        let(:root_account) { double(grants_right?: @has_right) }
         let(:hash) { Hash.new }
 
         before do
@@ -669,7 +663,7 @@ module Api
             end
 
             it 'does not get cleared out before translation to json' do
-              expect(sis_course_json.clear_unneeded_fields( hash )).to eq({ 'sis_course_id' => nil, 'sis_import_id' => nil})
+              expect(sis_course_json.clear_unneeded_fields(hash)).to eq({ 'sis_course_id' => nil, 'sis_import_id' => nil })
             end
           end
         end
@@ -680,8 +674,8 @@ module Api
         end
 
         it 'uses precalculated permissions if available' do
-          precalculated_permissions = {:read_sis => false, :manage_sis => true}
-          course_json_with_perms = CourseJson.new( sis_course, user, includes, [], precalculated_permissions: precalculated_permissions)
+          precalculated_permissions = { :read_sis => false, :manage_sis => true }
+          course_json_with_perms = CourseJson.new(sis_course, user, includes, [], precalculated_permissions: precalculated_permissions)
           expect(sis_course).to_not receive(:grants_right?)
           course_json_with_perms.set_sis_course_id(hash)
           expect(hash['sis_course_id']).to eq 1357
@@ -689,12 +683,12 @@ module Api
       end
 
       describe '#permissions' do
-        let(:course) { double(:public_description => 'an eloquent anecdote' ) }
+        let(:course) { double(:public_description => 'an eloquent anecdote') }
 
         it 'returns the permissions when its configured for inclusion' do
           includes << :permissions
           expect(course_json.include_permissions).to be_truthy
-          expect(course_json.permissions_to_include).to eq [ :create_discussion_topic, :create_announcement ]
+          expect(course_json.permissions_to_include).to eq [:create_discussion_topic, :create_announcement]
         end
 
         it 'is nil when configured not to be included' do

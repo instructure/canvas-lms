@@ -100,6 +100,7 @@ export const DiscussionThreadContainer = props => {
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
+    props.removeDraftFromDiscussionCache(cache, result)
     addReplyToDiscussionEntry(cache, variables, newDiscussionEntry)
   }
 
@@ -190,6 +191,18 @@ export const DiscussionThreadContainer = props => {
   const marginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth})`
   const replyMarginDepth = `calc(${theme.variables.spacing.xxLarge} * ${props.depth + 1})`
 
+  const findDraftMessage = () => {
+    let rootEntryDraftMessage = ''
+    props.discussionTopic?.discussionEntryDraftsConnection?.nodes.every(draftEntry => {
+      if (draftEntry.rootEntryId === props.discussionEntry._id && !draftEntry.discussionEntryId) {
+        rootEntryDraftMessage = draftEntry.message
+        return false
+      }
+      return true
+    })
+    return rootEntryDraftMessage
+  }
+
   const threadActions = []
   if (props.discussionEntry.permissions.reply) {
     threadActions.push(
@@ -197,6 +210,7 @@ export const DiscussionThreadContainer = props => {
         key={`reply-${props.discussionEntry._id}`}
         authorName={props.discussionEntry.author.displayName}
         delimiterKey={`reply-delimiter-${props.discussionEntry._id}`}
+        hasDraftEntry={!!findDraftMessage()}
         onClick={() => {
           const newEditorExpanded = !editorExpanded
           setEditorExpanded(newEditorExpanded)
@@ -222,7 +236,7 @@ export const DiscussionThreadContainer = props => {
         delimiterKey={`like-delimiter-${props.discussionEntry._id}`}
         onClick={toggleRating}
         authorName={props.discussionEntry.author.displayName}
-        isLiked={props.discussionEntry.entryParticipant?.rating}
+        isLiked={!!props.discussionEntry.entryParticipant?.rating}
         likeCount={props.discussionEntry.ratingSum || 0}
         interaction={props.discussionEntry.permissions.rate ? 'enabled' : 'disabled'}
       />
@@ -345,9 +359,11 @@ export const DiscussionThreadContainer = props => {
               <Flex padding={responsiveProps.padding}>
                 <Flex.Item shouldShrink shouldGrow>
                   <DiscussionEntryContainer
+                    discussionTopic={props.discussionTopic}
+                    discussionEntry={props.discussionEntry}
                     isTopic={false}
                     postUtilities={
-                      !props.discussionEntry.deleted ? (
+                      filter !== 'drafts' && !props.discussionEntry.deleted ? (
                         <ThreadActions
                           id={props.discussionEntry._id}
                           isUnread={!props.discussionEntry.entryParticipant?.read}
@@ -403,6 +419,7 @@ export const DiscussionThreadContainer = props => {
                       props.discussionTopic.author,
                       props.discussionEntry.author
                     )}
+                    updateDraftCache={props.updateDraftCache}
                   >
                     {threadActions.length > 0 && (
                       <View as="div" padding="x-small none none">
@@ -482,7 +499,9 @@ DiscussionThreadContainer.propTypes = {
   parentRefCurrent: PropTypes.object,
   onOpenIsolatedView: PropTypes.func,
   goToTopic: PropTypes.func,
-  highlightEntryId: PropTypes.string
+  highlightEntryId: PropTypes.string,
+  removeDraftFromDiscussionCache: PropTypes.func,
+  updateDraftCache: PropTypes.func
 }
 
 DiscussionThreadContainer.defaultProps = {
@@ -521,6 +540,8 @@ const DiscussionSubentries = props => {
       discussionTopic={props.discussionTopic}
       markAsRead={props.markAsRead}
       parentRefCurrent={props.parentRefCurrent}
+      removeDraftFromDiscussionCache={props.removeDraftFromDiscussionCache}
+      updateDraftCache={props.updateDraftCache}
     />
   ))
 }
@@ -530,5 +551,7 @@ DiscussionSubentries.propTypes = {
   discussionEntryId: PropTypes.string,
   depth: PropTypes.number,
   markAsRead: PropTypes.func,
-  parentRefCurrent: PropTypes.object
+  parentRefCurrent: PropTypes.object,
+  removeDraftFromDiscussionCache: PropTypes.func,
+  updateDraftCache: PropTypes.func
 }

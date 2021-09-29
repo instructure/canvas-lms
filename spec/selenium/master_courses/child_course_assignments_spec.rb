@@ -48,7 +48,7 @@ describe "master courses - child courses - assignment locking" do
     user_session(@teacher)
   end
 
-  it "should show the delete cog-menu options on the edit when not locked" do
+  it "shows the delete cog-menu options on the edit when not locked" do
     get "/courses/#{@copy_to.id}/assignments/#{@assmt_copy.id}/edit"
 
     f('.al-trigger').click

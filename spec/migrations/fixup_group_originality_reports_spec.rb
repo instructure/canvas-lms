@@ -21,8 +21,8 @@ require_relative "../spec_helper"
 
 describe DataFixup::FixupGroupOriginalityReports do
   let(:submission_one) { submission_model }
-  let(:submission_two) { submission_model({assignment: submission_one.assignment}) }
-  let!(:submission_three) { submission_model({assignment: submission_one.assignment}) }
+  let(:submission_two) { submission_model({ assignment: submission_one.assignment }) }
+  let!(:submission_three) { submission_model({ assignment: submission_one.assignment }) }
   let(:user_one) { submission_one.user }
   let(:user_two) { submission_two.user }
   let(:course) { submission_one.assignment.course }

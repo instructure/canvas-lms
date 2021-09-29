@@ -49,7 +49,7 @@ module Types
     def messages
       load_association(:conversation_message_participants).then do |participants|
         Promise.all(
-          participants.map{|participant| Loaders::AssociationLoader.for(ConversationMessageParticipant, :conversation_message).load(participant)}
+          participants.map { |participant| Loaders::AssociationLoader.for(ConversationMessageParticipant, :conversation_message).load(participant) }
         ).then do
           object.messages
         end

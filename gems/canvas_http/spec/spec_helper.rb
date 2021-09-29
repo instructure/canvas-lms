@@ -28,5 +28,5 @@ RSpec.configure do |config|
 end
 
 class NullLogger
-  def warn(msg);end
+  def warn(msg); end
 end

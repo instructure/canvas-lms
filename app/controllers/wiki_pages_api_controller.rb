@@ -243,7 +243,7 @@ class WikiPagesApiController < ApplicationController
   # @returns [Page]
   def index
     if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
-      log_api_asset_access([ "pages", @context ], "pages", "other")
+      log_api_asset_access(["pages", @context], "pages", "other")
       pages_route = polymorphic_url([:api_v1, @context, :wiki_pages])
       # omit body from selection, since it's not included in index results
       scope = @context.wiki_pages.select(WikiPage.column_names - ['body']).preload(:user)
@@ -425,6 +425,7 @@ class WikiPagesApiController < ApplicationController
   def destroy
     if authorized_action(@page, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@page)
+
       if !@was_front_page
         @page.destroy
         process_front_page
@@ -585,7 +586,7 @@ class WikiPagesApiController < ApplicationController
     @was_front_page = @page.is_front_page? if @page
   end
 
-  def get_update_params(allowed_fields=Set[])
+  def get_update_params(allowed_fields = Set[])
     # normalize parameters
     page_params = params[:wiki_page] ? params[:wiki_page].permit(*%w(title body notify_of_update published front_page editing_roles)) : {}
 
@@ -598,7 +599,7 @@ class WikiPagesApiController < ApplicationController
 
     if page_params.has_key?(:editing_roles)
       editing_roles = page_params[:editing_roles].split(',').map(&:strip)
-      invalid_roles = editing_roles.reject{|role| %w(teachers students members public).include?(role)}
+      invalid_roles = editing_roles.reject { |role| %w(teachers students members public).include?(role) }
       unless invalid_roles.empty?
         @page.errors.add(:editing_roles, t(:invalid_editing_roles, 'The provided editing roles are invalid'))
         return :bad_request
@@ -624,8 +625,8 @@ class WikiPagesApiController < ApplicationController
 
       if editing_roles
         existing_editing_roles = (@page.editing_roles || '').split(',')
-        editing_roles_changed = existing_editing_roles.reject{|role| editing_roles.include?(role)}.length > 0
-        editing_roles_changed |= editing_roles.reject{|role| existing_editing_roles.include?(role)}.length > 0
+        editing_roles_changed = existing_editing_roles.reject { |role| editing_roles.include?(role) }.length > 0
+        editing_roles_changed |= editing_roles.reject { |role| existing_editing_roles.include?(role) }.length > 0
         rejected_fields << :editing_roles if editing_roles_changed
       end
 
@@ -682,11 +683,12 @@ class WikiPagesApiController < ApplicationController
 
   def assign_todo_date
     return if params.dig(:wiki_page, :student_todo_at).nil? && params.dig(:wiki_page, :student_planner_checkbox).nil?
+
     if @page.context.grants_any_right?(@current_user, session, :manage_content)
       @page.todo_date = params.dig(:wiki_page, :student_todo_at) if params.dig(:wiki_page, :student_todo_at)
       # Only clear out if the checkbox is explicitly specified in the request
       if params[:wiki_page].key?("student_planner_checkbox") &&
-        !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
+         !value_to_boolean(params[:wiki_page][:student_planner_checkbox])
         @page.todo_date = nil
       end
     end

@@ -34,10 +34,12 @@ module CC::Exporter::Epub
       @style = File.read(css)
     end
     attr_reader :content, :base_template, :exporter, :title, :reference, :style
+
     delegate :get_item, :sort_by_content, :unsupported_files, to: :exporter
 
-    def build(item=nil)
+    def build(item = nil)
       return if item.try(:empty?)
+
       template_path = template(item) || base_template
       template = File.expand_path(template_path, __FILE__)
       if File.exist?(template)
@@ -56,6 +58,7 @@ module CC::Exporter::Epub
 
     def template(item)
       return unless item
+
       Exporter.resource_template(resource_type(item))
     end
 
@@ -82,11 +85,12 @@ module CC::Exporter::Epub
     end
 
     def display_prerequisites(prerequisites)
-      prerequisites.map {|prerequisite| prerequisite[:title] }.join(', ')
+      prerequisites.map { |prerequisite| prerequisite[:title] }.join(', ')
     end
 
     def friendly_date(date)
       return unless date
+
       datetime_string(Date.parse(date))
     end
 

@@ -21,10 +21,9 @@ require_relative '../spec_helper'
 require_relative '../../config/initializers/twitter'
 
 describe CanvasTwitterConfig do
-
   describe "#call" do
     it "returns a config with indifference access" do
-      plugin = double(settings: {consumer_key: "abcdefg", consumer_secret_dec: "12345"})
+      plugin = double(settings: { consumer_key: "abcdefg", consumer_secret_dec: "12345" })
       allow(Canvas::Plugin).to receive(:find).with(:twitter).and_return(plugin)
       output = described_class.call
       expect(output['api_key']).to eq("abcdefg")

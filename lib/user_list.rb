@@ -70,7 +70,7 @@ class UserList
 
   def users
     existing = @addresses.select { |a| a[:user_id] }
-    existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] } ) do |shard_existing|
+    existing_users = Shard.partition_by_shard(existing, lambda { |a| a[:shard] }) do |shard_existing|
       User.where(id: shard_existing.map { |a| a[:user_id] })
     end
 
@@ -91,80 +91,80 @@ class UserList
   private
 
   module Parsing
-  def parse_single_user(path)
-    return if path.blank?
+    def parse_single_user(path)
+      return if path.blank?
 
-    unique_id_regex = Pseudonym.validators.
-      find { |v| v.attributes.include?(:unique_id) && v.is_a?(ActiveModel::Validations::FormatValidator) }.
-      options[:with]
-    # look for phone numbers by searching for 10 digits, allowing
-    # any non-word characters
-    if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
-      type = :sms
-    elsif path.include?('@') && (email = parse_email(path))
-      type = :email
-      name, path = email
-    elsif path =~ unique_id_regex
-      type = :pseudonym
-    else
-      @errors << { :address => path, :details => :unparseable }
-      return
+      unique_id_regex = Pseudonym.validators
+                                 .find { |v| v.attributes.include?(:unique_id) && v.is_a?(ActiveModel::Validations::FormatValidator) }
+                                 .options[:with]
+      # look for phone numbers by searching for 10 digits, allowing
+      # any non-word characters
+      if path =~ /^([^\d\w]*\d[^\d\w]*){10}$/
+        type = :sms
+      elsif path.include?('@') && (email = parse_email(path))
+        type = :email
+        name, path = email
+      elsif path =~ unique_id_regex
+        type = :pseudonym
+      else
+        @errors << { :address => path, :details => :unparseable }
+        return
+      end
+
+      @addresses << { :name => name, :address => path, :type => type }
     end
 
-    @addresses << { :name => name, :address => path, :type => type }
-  end
-
-  def parse_email(email)
-    case email
-    when /^(["'])(.*?[^\\])\1\s*<(\S+?@\S+?)>/
-      a, b = $2, $3
-      a = a.gsub(/\\(["'])/, '\1')
-      [a, b]
-    when /\s*(.+?)\s*<(\S+?@\S+?)>/
-      [$1, $2]
-    when /<(\S+?@\S+?)>/
-      [nil, $1]
-    when /(\S+?@\S+)/
-      [nil, $1]
-    else
-      nil
+    def parse_email(email)
+      case email
+      when /^(["'])(.*?[^\\])\1\s*<(\S+?@\S+?)>/
+        a, b = $2, $3
+        a = a.gsub(/\\(["'])/, '\1')
+        [a, b]
+      when /\s*(.+?)\s*<(\S+?@\S+?)>/
+        [$1, $2]
+      when /<(\S+?@\S+?)>/
+        [nil, $1]
+      when /(\S+?@\S+)/
+        [nil, $1]
+      else
+        nil
+      end
     end
-  end
 
-  def quote_ends(chars, i)
-    loop do
-      i = i + 1
-      return false if i >= chars.size
-      return false if chars[i] == '@'
-      return true if chars[i] == '"'
+    def quote_ends(chars, i)
+      loop do
+        i = i + 1
+        return false if i >= chars.size
+        return false if chars[i] == '@'
+        return true if chars[i] == '"'
+      end
     end
-  end
 
-  def parse_list(list_in)
-    if list_in.is_a?(Array)
-      list = list_in.map(&:strip)
-      list.each{ |path| parse_single_user(path) }
-    else
-      str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
-      chars = str.split("")
-      user_start = 0
-      in_quotes = false
-      chars.each_with_index do |char, i|
-        if not in_quotes
-          case char
-          when ','
-            user_line = str[user_start, i - user_start].strip
-            parse_single_user(user_line) unless user_line.blank?
-            user_start = i + 1
-          when '"'
-            in_quotes = true if quote_ends(chars, i)
+    def parse_list(list_in)
+      if list_in.is_a?(Array)
+        list = list_in.map(&:strip)
+        list.each { |path| parse_single_user(path) }
+      else
+        str = list_in.strip.gsub(/“|”/, "\"").gsub(/\n+/, ",").gsub(/\s+/, " ").gsub(/;/, ",") + ","
+        chars = str.split("")
+        user_start = 0
+        in_quotes = false
+        chars.each_with_index do |char, i|
+          if not in_quotes
+            case char
+            when ','
+              user_line = str[user_start, i - user_start].strip
+              parse_single_user(user_line) unless user_line.blank?
+              user_start = i + 1
+            when '"'
+              in_quotes = true if quote_ends(chars, i)
+            end
+          else
+            in_quotes = false if char == '"'
           end
-        else
-          in_quotes = false if char == '"'
         end
       end
     end
-  end
   end
   include Parsing
 
@@ -175,25 +175,29 @@ class UserList
       trusted_account_ids.delete(Account.site_admin.id)
     end
     all_account_ids = [@root_account.id] + trusted_account_ids
-    associated_shards = @addresses.map {|x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards = @addresses.map { |x| Pseudonym.associated_shards(x[:address].downcase) }.flatten.to_set
     associated_shards << @root_account.shard
     # Search for matching pseudonyms
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
-      Pseudonym.active.
-          select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id").
-          where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map {|x| x[:address].downcase}, @addresses.map {|x| x[:address]}, account_ids).
-          map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
-        addresses = @addresses.select { |a| a[:address].downcase == login[:address].downcase ||
-            (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))}
+
+      Pseudonym.active
+               .select("unique_id AS address, (SELECT name FROM #{User.quoted_table_name} WHERE users.id=user_id) AS name, user_id, account_id, sis_user_id")
+               .where("(LOWER(unique_id) IN (?) OR sis_user_id IN (?)) AND account_id IN (?)", @addresses.map { |x| x[:address].downcase }, @addresses.map { |x| x[:address] }, account_ids)
+               .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
+        addresses = @addresses.select { |a|
+          a[:address].downcase == login[:address].downcase ||
+            (login[:sis_user_id] && (a[:address] == login[:sis_user_id] || a[:sis_user_id] == login[:sis_user_id]))
+        }
         addresses.each do |address|
           # already found a matching pseudonym
           if address[:user_id]
             # we already have the one from this-account, just go with it
             next if address[:account_id] == @root_account.local_id && address[:shard] == @root_account.shard
+
             # neither is from this-account, flag an error
             if (login[:account_id] != @root_account.local_id || Shard.current != @root_account.shard) &&
-              (login[:user_id] != address[:user_id] || Shard.current != address[:shard])
+               (login[:user_id] != address[:user_id] || Shard.current != address[:shard])
               address[:type] = :pseudonym if address[:type] == :email
               address[:user_id] = false
               address[:details] = :non_unique
@@ -214,20 +218,20 @@ class UserList
     # Search for matching emails (only if not open registration; otherwise there's no point - we just
     # create temporary users)
     emails = @addresses.select { |a| a[:type] == :email } if @search_method != :open
-    associated_shards = @addresses.map {|x| CommunicationChannel.associated_shards(x[:address].downcase) }.flatten.to_set
+    associated_shards = @addresses.map { |x| CommunicationChannel.associated_shards(x[:address].downcase) }.flatten.to_set
     associated_shards << @root_account.shard
     Shard.partition_by_shard(all_account_ids) do |account_ids|
       next if GlobalLookups.enabled? && !associated_shards.include?(Shard.current)
 
       pseudos = Pseudonym.active
-          .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
-          .joins(:user => :communication_channels)
-          .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase}, account_ids)
+                         .select('path AS address, users.name AS name, communication_channels.user_id AS user_id, communication_channels.workflow_state AS workflow_state')
+                         .joins(:user => :communication_channels)
+                         .where("LOWER(path) IN (?) AND account_id IN (?)", emails.map { |x| x[:address].downcase }, account_ids)
       pseudos = if @root_account.feature_enabled?(:allow_unconfirmed_users_in_user_list)
-          pseudos.merge(CommunicationChannel.unretired)
-        else
-          pseudos.merge(CommunicationChannel.active)
-        end
+                  pseudos.merge(CommunicationChannel.unretired)
+                else
+                  pseudos.merge(CommunicationChannel.active)
+                end
 
       pseudos.map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |login|
         addresses = emails.select { |a| a[:address].downcase == login[:address].downcase }
@@ -262,16 +266,16 @@ class UserList
     # reformat
     smses.each do |sms|
       number = sms[:address].gsub(/[^\d\w]/, '')
-      sms[:address] = "(#{number[0,3]}) #{number[3,3]}-#{number[6,4]}"
+      sms[:address] = "(#{number[0, 3]}) #{number[3, 3]}-#{number[6, 4]}"
     end
     sms_account_ids = @search_method != :closed ? [@root_account] : all_account_ids
     Shard.partition_by_shard(sms_account_ids) do |account_ids|
       sms_scope = @search_method != :closed ? Pseudonym : Pseudonym.where(:account_id => account_ids)
-      sms_scope.active.
-          select('path AS address, users.name AS name, communication_channels.user_id AS user_id').
-          joins(:user => :communication_channels).
-          where("communication_channels.workflow_state='active' AND (#{smses.map{|x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})").
-          map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
+      sms_scope.active
+               .select('path AS address, users.name AS name, communication_channels.user_id AS user_id')
+               .joins(:user => :communication_channels)
+               .where("communication_channels.workflow_state='active' AND (#{smses.map { |x| "path LIKE '#{x[:address].gsub(/[^\d]/, '')}%'" }.join(" OR ")})")
+               .map { |pseudonym| pseudonym.attributes.symbolize_keys }.each do |sms|
         address = sms.delete(:address)[/\d+/]
         addresses = smses.select { |a| a[:address].gsub(/[^\d]/, '') == address }
         addresses.each do |address|
@@ -313,5 +317,4 @@ class UserList
       end
     end
   end
-
 end

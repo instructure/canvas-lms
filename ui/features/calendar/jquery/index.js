@@ -315,7 +315,7 @@ export default class Calendar {
   // Close all event details popup on the page and have them cleaned up.
   closeEventPopups() {
     // Close any open popup as it gets detached when rendered
-    $('.event-details').each(function() {
+    $('.event-details').each(function () {
       const existingDialog = $(this).data('showEventDetailsDialog')
       if (existingDialog) {
         existingDialog.close()
@@ -328,7 +328,10 @@ export default class Calendar {
     // which causes the pop-up to close if it is already open by the time the resize callback is called.
     // That hack doesn't rely on this handler to run, so let's just make sure that the window size has
     // actually changed before doing anything.
-    if (this.prevWindowHeight === window.innerHeight && this.prevWindowWidth === window.innerWidth) {
+    if (
+      this.prevWindowHeight === window.innerHeight &&
+      this.prevWindowWidth === window.innerWidth
+    ) {
       return
     }
 
@@ -372,7 +375,7 @@ export default class Calendar {
 
     let reservedText = ''
     if (event.isAppointmentGroupEvent()) {
-      if (event.appointmentGroupEventStatus === 'Reserved') {
+      if (event.appointmentGroupEventStatus === I18n.t('Reserved')) {
         reservedText = `\n\n${I18n.t('Reserved By You')}`
       } else if (event.reservedUsers === '') {
         reservedText = `\n\n${I18n.t('Unreserved')}`
@@ -473,7 +476,10 @@ export default class Calendar {
       return
     }
 
-    if (event.eventType === 'assignment' && (event.assignment.unlock_at || event.assignment.lock_at)) {
+    if (
+      event.eventType === 'assignment' &&
+      (event.assignment.unlock_at || event.assignment.lock_at)
+    ) {
       startDate = event.assignment.unlock_at && moment(event.assignment.unlock_at)
       endDate = event.assignment.lock_at && moment(event.assignment.lock_at)
       if (!withinMomentDates(event.start, startDate, endDate)) {
@@ -604,14 +610,8 @@ export default class Calendar {
   }
 
   isSameWeek(date1, date2) {
-    const week1 = fcUtil
-      .clone(date1)
-      .weekday(0)
-      .stripTime()
-    const week2 = fcUtil
-      .clone(date2)
-      .weekday(0)
-      .stripTime()
+    const week1 = fcUtil.clone(date1).weekday(0).stripTime()
+    const week2 = fcUtil.clone(date2).weekday(0).stripTime()
     return +week1 === +week2
   }
 

@@ -36,7 +36,7 @@ module RequestContext
         }
       end
 
-      [ status, headers, body ]
+      [status, headers, body]
     end
   end
 end

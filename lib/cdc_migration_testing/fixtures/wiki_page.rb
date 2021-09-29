@@ -22,10 +22,10 @@ module CdcFixtures
   def self.create_wiki_page
     Wiki.new.save!(validate: false)
     WikiPage.new({
-      wiki_id: 1,
-      workflow_state: 'default',
-      context_id: 1,
-      context_type: 'Course'
-    })
+                   wiki_id: 1,
+                   workflow_state: 'default',
+                   context_id: 1,
+                   context_type: 'Course'
+                 })
   end
 end

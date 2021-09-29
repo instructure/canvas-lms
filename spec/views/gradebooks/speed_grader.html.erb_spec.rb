@@ -40,9 +40,9 @@ describe "/gradebooks/speed_grader" do
     @group = @course.groups.create!(name: "a group", group_category: @group_category)
     add_user_to_group(@user, @group, true)
     @assignment = @course.assignments.create!(assignment_valid_attributes.merge(
-      group_category: @group_category,
-      grade_group_students_individually: true
-    ))
+                                                group_category: @group_category,
+                                                grade_group_students_individually: true
+                                              ))
 
     assign(:assignment, @assignment)
     assign(:submissions, [])
@@ -116,7 +116,7 @@ describe "/gradebooks/speed_grader" do
     expect(rendered).to match(/button.+?class=.+?submit_comment_button/)
   end
 
-  it 'it renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
+  it 'renders the plagiarism resubmit button if the assignment has a plagiarism tool' do
     allow_any_instance_of(Assignment).to receive(:assignment_configuration_tool_lookup_ids) { [1] }
     render template: 'gradebooks/speed_grader', locals: locals
     expect(rendered).to include "<div id='plagiarism_platform_info_container'>"

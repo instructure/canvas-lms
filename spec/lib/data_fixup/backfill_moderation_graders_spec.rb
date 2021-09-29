@@ -36,7 +36,7 @@ describe DataFixup::BackfillModerationGraders do
   end
 
   def do_backfill
-    DataFixup::BackfillModerationGraders.run(@assignment.id, @assignment.id+1)
+    DataFixup::BackfillModerationGraders.run(@assignment.id, @assignment.id + 1)
   end
   private :do_backfill
 

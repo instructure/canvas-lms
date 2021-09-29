@@ -144,21 +144,21 @@ module DiscussionsCommon
     wait_for_ajaximations
     f('#searchTerm').send_keys(:return)
     # logic for dealing with options
-      case opts
-      when {:only_graded=>true}
-        set_checkbox('onlyGraded', opts[:only_graded])
-      when {:only_unread=>true}
-        set_checkbox('onlyUnread', opts[:only_unread])
-      when {:only_unread=>true, :only_graded=>true}
-        set_checkbox('onlyGraded', opts[:only_graded])
-        set_checkbox('onlyUnread', opts[:only_unread])
-      end
+    case opts
+    when { :only_graded => true }
+      set_checkbox('onlyGraded', opts[:only_graded])
+    when { :only_unread => true }
+      set_checkbox('onlyUnread', opts[:only_unread])
+    when { :only_unread => true, :only_graded => true }
+      set_checkbox('onlyGraded', opts[:only_graded])
+      set_checkbox('onlyUnread', opts[:only_unread])
+    end
     wait_for_animations
   end
 
   def index_is_showing?(*topics)
     ffj('.discussion-list li.discussion:visible').count == topics.size &&
-        topics.all? { |t| topic_index_element(t).try(:displayed?) }
+      topics.all? { |t| topic_index_element(t).try(:displayed?) }
   end
 
   def add_attachment_and_validate
@@ -194,10 +194,10 @@ module DiscussionsCommon
     expect(ff('.discussion-list li.discussion').length).to eq DiscussionTopic.count
   end
 
-  def topic_for_filtering(opts={})
+  def topic_for_filtering(opts = {})
     name = "#{opts[:graded] ? 'graded' : 'ungraded'} #{opts[:read] ? 'read' : 'unread'} topic"
     if opts[:graded]
-      a = course.assignments.create!(name:  name + ' assignment', submission_types: 'discussion_topic', assignment_group: assignment_group)
+      a = course.assignments.create!(name: name + ' assignment', submission_types: 'discussion_topic', assignment_group: assignment_group)
       dt = a.discussion_topic
       dt.title = name + ' title'
       dt.save!

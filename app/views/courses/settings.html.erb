@@ -274,7 +274,7 @@
           <div class="tall-row">
             <div class="nobr">
               <%= f.check_box :sync_enrollments_from_homeroom, class: 'sync_enrollments_from_homeroom_checkbox', :disabled => !can_manage || @context.homeroom_course %>
-              <%= f.label :sync_enrollments_from_homeroom, :en => "Sync enrollments from homeroom" %><br/>
+              <%= f.label :sync_enrollments_from_homeroom, :en => "Sync enrollments and course start/end dates from homeroom" %><br/>
             </div>
             <div class="sync_enrollments_from_homeroom_select">
               <% format_options = options_from_collection_for_select(@homeroom_courses, 'id', 'name', @context.homeroom_course_id) %>

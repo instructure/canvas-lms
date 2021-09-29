@@ -43,11 +43,12 @@ class DiscussionTopicUsersController < ApplicationController
     calculator = ::MessageableUser::Calculator.new(@current_user)
     users = calculator.search_messageable_users(context: @topic, search: params[:search])
     users = Api.paginate(users, self, messageable_user_pagination_url)
-      .map { |user| conversation_user_json(user, @current_user, session) }
+               .map { |user| conversation_user_json(user, @current_user, session) }
     render json: users
   end
 
   protected
+
   def require_topic_and_read_access
     @topic = @context.all_discussion_topics.active.find(params[:topic_id])
     authorized_action(@topic, @current_user, :read) && check_differentiated_assignments(@topic)

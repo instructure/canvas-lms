@@ -31,14 +31,14 @@ class Mutations::MarkSubmissionCommentsRead < Mutations::BaseMutation
     submission = Submission.find(input[:submission_id])
     verify_authorized_action!(submission, :comment)
 
-    input_sc_ids = submission.submission_comments.
-      where(id: input[:submission_comment_ids]).limit(SUBMISSION_COMMENT_LIMIT).pluck(:id)
+    input_sc_ids = submission.submission_comments
+                             .where(id: input[:submission_comment_ids]).limit(SUBMISSION_COMMENT_LIMIT).pluck(:id)
     created_vscsc_ids = ViewedSubmissionComment.where(submission_comment_id: input[:submission_comment_ids], user: current_user).pluck(:submission_comment_id)
     ids_to_be_created = input_sc_ids - created_vscsc_ids
     ids_to_be_created.each do |sc_id|
       ViewedSubmissionComment.create!(submission_comment_id: sc_id, user: current_user)
     end
-    {submission_comments: SubmissionComment.where(id: input_sc_ids)}
+    { submission_comments: SubmissionComment.where(id: input_sc_ids) }
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)
   rescue ActiveRecord::RecordNotFound

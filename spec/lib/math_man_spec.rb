@@ -56,7 +56,7 @@ describe MathMan do
     it 'must retain the path from base_url setting' do
       url = MathMan.url_for(latex: latex, target: :mml)
       parsed = Addressable::URI.parse(url)
-      expect(parsed.path).to eq ('/beta/mml')
+      expect(parsed.path).to eq('/beta/mml')
     end
 
     it 'includes target string in generated url' do

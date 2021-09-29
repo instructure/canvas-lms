@@ -28,19 +28,22 @@ class Linter
     auto_correct: false,
     boyscout_mode: true,
     campsite_mode: true,
+    command: nil,
     comment_post_processing: proc { |comments| comments },
     custom_comment_generation: false,
     env_sha: ENV['SHA'] || ENV['GERRIT_PATCHSET_REVISION'],
+    format: nil,
     file_regex: /./,
-    generate_comment_proc: proc { },
+    generate_comment_proc: proc {},
     gerrit_patchset: !!ENV['GERRIT_PATCHSET_REVISION'],
     heavy_mode: false,
-    heavy_mode_proc: proc {},
     include_git_dir_in_output: !!!ENV['GERRIT_PATCHSET_REVISION'],
+    linter_name: nil,
     plugin: ENV['GERRIT_PROJECT'],
     skip_file_size_check: false,
     skip_wips: false,
-    base_dir: nil
+    base_dir: nil,
+    severe_anywhere: true
   }.freeze
 
   def initialize(options = {})
@@ -48,6 +51,15 @@ class Linter
 
     if options[:plugin] == 'canvas-lms'
       options[:plugin] = nil
+    end
+
+    if options[:plugin].nil?
+      canvas_dir = File.expand_path("..", __dir__)
+      plugins_dir = File.join(canvas_dir, "gems/plugins")
+      if Dir.pwd.start_with?(plugins_dir)
+        options[:plugin] = Dir.pwd[(plugins_dir.length + 1)..]
+        Dir.chdir(canvas_dir)
+      end
     end
 
     options.each do |key, value|
@@ -71,50 +83,25 @@ class Linter
       return true
     end
 
-    if heavy_mode
-      heavy_mode_proc.call(files)
-    else
-      publish_comments
-    end
+    publish_comments
+  end
+
+  def severe_levels
+    return @severe_levels if @severe_levels
+
+    boyscout_mode ? %w(info warn error fatal) : %w(warn error fatal)
   end
 
   private
 
-  # TODO: generate from DEFAULT_OPTIONS
-  attr_reader :append_files_to_command,
-              :auto_correct,
-              :boyscout_mode,
-              :campsite_mode,
-              :command,
-              :comment_post_processing,
-              :default_boyscout_mode,
-              :custom_comment_generation,
-              :env_sha,
-              :file_regex,
-              :format,
-              :generate_comment_proc,
-              :gergich_capture,
-              :gerrit_patchset,
-              :heavy_mode,
-              :heavy_mode_proc,
-              :include_git_dir_in_output,
-              :linter_name,
-              :plugin,
-              :severe_levels,
-              :skip_file_size_check,
-              :skip_wips,
-              :base_dir
+  attr_reader(*DEFAULT_OPTIONS.keys)
 
   def git_dir
     @git_dir ||= plugin && "gems/plugins/#{plugin}/"
   end
 
-  def severe_levels
-    boyscout_mode ? %w(error warn info) : %w(error warn)
-  end
-
   def dr_diff
-    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode, base_dir: base_dir)
+    @dr_diff ||= ::DrDiff::Manager.new(git_dir: git_dir, sha: env_sha, campsite: campsite_mode, heavy: heavy_mode, base_dir: base_dir, severe_anywhere: severe_anywhere)
   end
 
   def wip?
@@ -155,13 +142,19 @@ class Linter
   def publish_comments
     processed_comments = comment_post_processing.call(generate_comments)
 
-    unless processed_comments.size > 0
+    if processed_comments.empty?
       puts "-- -- -- -- -- -- -- -- -- -- --"
       puts "No relevant #{linter_name} errors found!"
       puts "-- -- -- -- -- -- -- -- -- -- --"
+      return true
     end
 
     if gerrit_patchset
+      if boyscout_mode
+        processed_comments.each do |comment|
+          comment[:severity] = 'error'
+        end
+      end
       publish_gergich_comments(processed_comments)
     else
       publish_local_comments(processed_comments)
@@ -170,7 +163,7 @@ class Linter
         puts "Fix and/or git add the corrections and try to commit again."
       end
     end
-    processed_comments.size.zero?
+    boyscout_mode ? false : processed_comments.any? { |c| severe_levels.include?(c[:severity]) }
   end
 
   def publish_gergich_comments(comments)
@@ -182,9 +175,13 @@ class Linter
     end
 
     comments.each do |comment|
+      message = +"[#{comment[:source]}] "
+      message << "#{comment[:rule]}: " if comment[:rule]
+      message << comment[:message]
+
       draft.add_comment comment[:path],
                         comment[:position],
-                        comment[:message],
+                        message,
                         comment[:severity]
     end
 
@@ -199,12 +196,18 @@ class Linter
   end
 
   def pretty_comment(comment)
-    message = ""
-    message += "[#{comment[:severity]}]".colorize(:yellow)
+    message = +""
+    severity_color = severe_levels.include?(comment[:severity]) ? :red : :yellow
+    severity_color = :green if comment[:corrected]
+    message << "[#{comment[:severity]}]".colorize(severity_color)
     unless comment[:cover_message]
-      message += " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
+      message << " #{comment[:path].colorize(:light_blue)}:#{comment[:position]}"
     end
-    message += " => #{comment[:message].colorize(:green)}"
+    message << " => "
+    message << "[Correctable] ".colorize(:yellow) if comment[:correctable]
+    message << "[Corrected] ".colorize(:green) if comment[:corrected]
+    message << "#{comment[:rule]}: " if comment[:rule]
+    message << comment[:message].colorize(:green)
     puts message
   end
 end

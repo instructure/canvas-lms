@@ -21,7 +21,7 @@ require 'academic_benchmarks'
 
 module AcademicBenchmark
   class Converter < Canvas::Migration::Migrator
-    def initialize(settings={})
+    def initialize(settings = {})
       super(settings, "academic_benchmark")
       @ratings_overrides = settings[:migration_options] || {}
       @course[:learning_outcomes] = []
@@ -32,11 +32,11 @@ module AcademicBenchmark
     def export
       unless content_migration
         raise Canvas::Migration::Error,
-          "Missing required content_migration settings"
+              "Missing required content_migration settings"
       end
       unless Account.site_admin.grants_right?(content_migration.user, :manage_global_outcomes)
         raise Canvas::Migration::Error,
-          "User isn't allowed to edit global outcomes"
+              "User isn't allowed to edit global outcomes"
       end
       unless @archive_file
         unless @partner_id.present? || AcademicBenchmark.ensure_partner_id.nil?
@@ -62,6 +62,7 @@ module AcademicBenchmark
     def post_process; end
 
     private
+
     def outcome_data
       unless @_outcome_data
         begin

@@ -45,8 +45,7 @@ describe 'Anonymous Provisional Grades API', type: :request do
     it 'requires authorization' do
       json = api_call_as_user(@student, :get, @path, @params, {}, {}, { expected_status: 401 })
       expect(json['status']).to eq 'unauthorized'
-      expect(json.fetch('errors')).to include({'message' => 'user not authorized to perform that action'})
+      expect(json.fetch('errors')).to include({ 'message' => 'user not authorized to perform that action' })
     end
   end
 end
-

@@ -35,17 +35,17 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
 
     GuardRail.activate(:secondary) do
       Quizzes::Quiz.find_ids_in_ranges do |min_id, max_id|
-        Quizzes::Quiz.where(:id => min_id..max_id).
-          where("updated_at > ? AND quiz_data LIKE ?", date, "%assessment_questions%").pluck(Arel.sql("id, quiz_data as qd")).each do |id, data|
+        Quizzes::Quiz.where(:id => min_id..max_id)
+                     .where("updated_at > ? AND quiz_data LIKE ?", date, "%assessment_questions%").pluck(Arel.sql("id, quiz_data as qd")).each do |id, data|
           updates = links_to_change(data)
           quiz_updates[id] = updates if updates.any?
         end
       end
 
       Quizzes::QuizQuestion.find_ids_in_ranges do |min_id, max_id|
-        Quizzes::QuizQuestion.where(:id => min_id..max_id).
-          where("updated_at > ? AND question_data LIKE ? AND (assessment_question_id IS NOT NULL OR migration_id IS NOT NULL)",
-            date, "%assessment_questions%").pluck(Arel.sql("id, question_data as qd")).each do |id, data|
+        Quizzes::QuizQuestion.where(:id => min_id..max_id)
+                             .where("updated_at > ? AND question_data LIKE ? AND (assessment_question_id IS NOT NULL OR migration_id IS NOT NULL)",
+                                    date, "%assessment_questions%").pluck(Arel.sql("id, question_data as qd")).each do |id, data|
           updates = links_to_change(data)
           qq_updates[id] = updates if updates.any?
         end

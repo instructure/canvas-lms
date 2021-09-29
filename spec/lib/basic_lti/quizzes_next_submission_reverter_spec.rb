@@ -40,7 +40,7 @@ describe BasicLTI::QuizzesNextSubmissionReverter do
         due_at: Time.zone.now + 1000,
         points_possible: "1.5",
         submission_types: 'external_tool',
-        external_tool_tag_attributes: {url: tool.url}
+        external_tool_tag_attributes: { url: tool.url }
       }
     )
   end

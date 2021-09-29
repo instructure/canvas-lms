@@ -22,17 +22,17 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/users/name" do
-  it "should allow deletes for unmanagaged pseudonyms with correct privileges" do
+  it "allows deletes for unmanagaged pseudonyms with correct privileges" do
     account_admin_user :account => Account.default
     course_with_student :account => Account.default
     view_context(Account.default, @admin)
     assign(:user, @student)
     assign(:enrollments, [])
     render :partial => "users/name"
-    expect(response.body).to match /Delete from #{Account.default.name}/
+    expect(response.body).to match(/Delete from #{Account.default.name}/)
   end
 
-  it "should allow deletes for managaged pseudonyms with correct privileges" do
+  it "allows deletes for managaged pseudonyms with correct privileges" do
     account_admin_user :account => Account.default
     course_with_student :account => Account.default
     managed_pseudonym(@student, :account => account_model)
@@ -40,10 +40,10 @@ describe "/users/name" do
     assign(:user, @student)
     assign(:enrollments, [])
     render :partial => "users/name"
-    expect(response.body).to match /Delete from #{Account.default.name}/
+    expect(response.body).to match(/Delete from #{Account.default.name}/)
   end
 
-  it "should not allow deletes for managed pseudonyms without correct privileges" do
+  it "does not allow deletes for managed pseudonyms without correct privileges" do
     @admin = user_factory :account => Account.default
     course_with_student :account => Account.default
     managed_pseudonym(@student, :account => account_model)
@@ -51,24 +51,24 @@ describe "/users/name" do
     assign(:user, @student)
     assign(:enrollments, [])
     render :partial => "users/name"
-    expect(response.body).not_to match /Delete from #{Account.default.name}/
+    expect(response.body).not_to match(/Delete from #{Account.default.name}/)
   end
 
-  it "should not allow deletes for unmanaged pseudonyms without correct privileges" do
+  it "does not allow deletes for unmanaged pseudonyms without correct privileges" do
     @admin = user_factory :account => Account.default
     course_with_student :account => Account.default
     view_context(Account.default, @admin)
     assign(:user, @student)
     assign(:enrollments, [])
     render :partial => "users/name"
-    expect(response.body).not_to match /Delete from #{Account.default.name}/
+    expect(response.body).not_to match(/Delete from #{Account.default.name}/)
   end
 
   describe "default email address" do
     before :once do
       course_with_teacher :active_all => true
       student_in_course :active_all => true
-      communication_channel(@student, {username: 'secret@example.com', active_cc: true})
+      communication_channel(@student, { username: 'secret@example.com', active_cc: true })
     end
 
     it "includes email address for teachers by default" do
@@ -81,7 +81,7 @@ describe "/users/name" do
 
     it "does not include it if the permission is denied" do
       RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
-                     :role => teacher_role, :enabled => false)
+                           :role => teacher_role, :enabled => false)
       view_context(@course, @teacher)
       assign(:user, @student)
       assign(:enrollments, [])
@@ -95,7 +95,7 @@ describe "/users/name" do
     let(:sally) { account_admin_user(account: account) }
     let(:bob) { teacher_in_course(account: account, active_enrollment: true).user }
 
-    it "should display when acting user has permission to merge shown user" do
+    it "displays when acting user has permission to merge shown user" do
       pseudonym(bob, account: account)
 
       assign(:domain_root_account, account)
@@ -107,7 +107,7 @@ describe "/users/name" do
       expect(response).to have_tag("a.merge_user_link")
     end
 
-    it "should not display when acting user lacks permission to merge shown user" do
+    it "does not display when acting user lacks permission to merge shown user" do
       pseudonym(sally, account: account)
 
       assign(:domain_root_account, account)
@@ -119,7 +119,7 @@ describe "/users/name" do
       expect(response).not_to have_tag("a.merge_user_link")
     end
 
-    it "should not display when non-admin looking at self" do
+    it "does not display when non-admin looking at self" do
       # has permission to merge on self, but wouldn't be able to select any
       # merge targets
       pseudonym(bob, account: account)

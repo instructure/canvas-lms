@@ -37,8 +37,8 @@ class ConversationMessageParticipant < ActiveRecord::Base
   scope :deleted, -> { where(workflow_state: 'deleted') }
 
   scope :for_conversation_and_message, lambda { |conversation_id, message_id|
-    joins(:conversation_participant).
-        where(:conversation_id => conversation_id, :conversation_message_id => message_id)
+    joins(:conversation_participant)
+      .where(:conversation_id => conversation_id, :conversation_message_id => message_id)
   }
 
   workflow do
@@ -50,7 +50,7 @@ class ConversationMessageParticipant < ActiveRecord::Base
     conversation_message.conversation
   end
 
-  def self.query_deleted(user_id, options={})
+  def self.query_deleted(user_id, options = {})
     query = self.deleted.eager_load(:conversation_message).where(user_id: user_id).order(deleted_at: :desc)
 
     query = query.where('conversation_messages.conversation_id = ?', options['conversation_id']) if options['conversation_id']
@@ -59,5 +59,4 @@ class ConversationMessageParticipant < ActiveRecord::Base
 
     query
   end
-
 end

@@ -32,7 +32,6 @@ shared_context "announcements_page_shared_context" do
   let(:course_page_disabled_notice) { "That page has been disabled for this course" }
 end
 
-
 module AnnouncementHelpers
   def new_announcement(course)
     course.announcements.create!(title: "Announcement 1", message: "Announcement 1 detail")
@@ -40,12 +39,12 @@ module AnnouncementHelpers
 
   def disable_view_announcements(course, context_role)
     course.root_account.role_overrides.create!(permission: 'read_announcements',
-                                                role: context_role, enabled: false)
+                                               role: context_role, enabled: false)
   end
 
   def enable_view_announcements(course, context_role)
     course.root_account.role_overrides.create!(permission: 'read_announcements',
-                                                role: context_role, enabled: true)
+                                               role: context_role, enabled: true)
   end
 
   def view_announcement_detail

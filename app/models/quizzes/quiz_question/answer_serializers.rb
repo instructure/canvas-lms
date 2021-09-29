@@ -38,10 +38,10 @@ module Quizzes::QuizQuestion::AnswerSerializers
 
       klass = question_type.gsub(/_question$/, '').demodulize.camelize
 
-
       begin
         # raise name_error because `::Error` is in the namespace, but is not a valid answer type
         raise NameError if klass == 'Error'
+
         "Quizzes::QuizQuestion::AnswerSerializers::#{klass}".constantize.new(question)
       rescue NameError
         Quizzes::QuizQuestion::AnswerSerializers::Unknown.new(question)

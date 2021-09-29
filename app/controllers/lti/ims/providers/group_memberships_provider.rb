@@ -19,7 +19,6 @@
 
 module Lti::Ims::Providers
   class GroupMembershipsProvider < MembershipsProvider
-
     def context
       @_context ||= GroupContextDecorator.new(super)
     end
@@ -33,7 +32,7 @@ module Lti::Ims::Providers
       preload_past_lti_ids(enrollments)
 
       memberships = to_memberships(enrollments)
-      [ memberships, metadata ]
+      [memberships, metadata]
     end
 
     def base_users_scope
@@ -50,6 +49,7 @@ module Lti::Ims::Providers
 
     def apply_role_filter(scope)
       return scope unless role?
+
       enrollment_types = queryable_roles(role)
       if enrollment_types.present? && group_role?(enrollment_types)
         enrollment_types == [:group_leader] ? scope.where(user: context.leader_id) : scope
@@ -74,7 +74,6 @@ module Lti::Ims::Providers
 
     # *Decorators fix up models to conforms to interface expected by Lti::Ims::NamesAndRolesSerializer
     class GroupMembershipDecorator < SimpleDelegator
-
       def initialize(membership, tool)
         super(membership)
         @tool = tool

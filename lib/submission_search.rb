@@ -35,9 +35,9 @@ class SubmissionSearch
   end
 
   def user_search_scope
-    UserSearch.
-      for_user_in_context(@options[:user_search], @assignment.context, @searcher, @session, @options).
-      except(:order)
+    UserSearch
+      .for_user_in_context(@options[:user_search], @assignment.context, @searcher, @session, @options)
+      .except(:order)
   end
 
   def add_filters(search_scope)
@@ -52,26 +52,25 @@ class SubmissionSearch
     end
 
     if @options[:user_search]
-      search_scope = search_scope.
-        where("submissions.user_id IN (SELECT id FROM (#{user_search_scope.to_sql}) AS user_search_ids)")
+      search_scope = search_scope
+                     .where("submissions.user_id IN (SELECT id FROM (#{user_search_scope.to_sql}) AS user_search_ids)")
     end
 
     if @options[:enrollment_types].present?
       search_scope = search_scope.where(user_id:
-        @course.enrollments.select(:user_id).where(type: @options[:enrollment_types])
-      )
+        @course.enrollments.select(:user_id).where(type: @options[:enrollment_types]))
     end
 
     search_scope = if @course.grants_any_right?(@searcher, @session, :manage_grades, :view_all_grades)
-      # TODO: may want to add a preloader for this
-      allowed_user_ids = @course.users_visible_to(@searcher)
-      search_scope.where(user_id: allowed_user_ids)
-    elsif @course.grants_right?(@searcher, @session, :read_grades)
-      # a user can see their own submission
-      search_scope.where(user_id: @searcher.id)
-    else
-      Submission.none # return nothing
-    end
+                     # TODO: may want to add a preloader for this
+                     allowed_user_ids = @course.users_visible_to(@searcher)
+                     search_scope.where(user_id: allowed_user_ids)
+                   elsif @course.grants_right?(@searcher, @session, :read_grades)
+                     # a user can see their own submission
+                     search_scope.where(user_id: @searcher.id)
+                   else
+                     Submission.none # return nothing
+                   end
 
     if @options[:scored_less_than]
       search_scope = search_scope.where("submissions.score < ?", @options[:scored_less_than])

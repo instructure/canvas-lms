@@ -18,13 +18,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module DataFixup::PopulateRootAccountIdOnAttachments
-
   # This is a little different than the other PopulateRootAccountId fix ups.
   # Since Attachments needs multiple passes, in order, they all happen here.
   # DataFixup::PopulateRootAccountIdOnModels triggers this fixup
   # as part of the `populate_overrides` call. Hopefully no comedy ensues.
   def self.populate(min, max)
-
     # First pass: do standard migration
     # Not inside of Attachment.find_ids_in_ranges since that is called inside of
     # PopulateRootAccountIdOnModels
@@ -48,25 +46,25 @@ module DataFixup::PopulateRootAccountIdOnAttachments
   end
 
   def self.from_namespace(batch_min, batch_max)
-    attachments = Attachment.
-        where(id: batch_min..batch_max, root_account_id: nil).
-        where('namespace is not null') # ignore the poor, orphaned attachments (deleted?)
+    attachments = Attachment
+                  .where(id: batch_min..batch_max, root_account_id: nil)
+                  .where('namespace is not null') # ignore the poor, orphaned attachments (deleted?)
 
     return if attachments.empty? # no droids here, move along
 
-    id_to_global = attachments.
-      select(:id, :namespace).
-      pluck(:id, :namespace).
-      map do |attachment_id, namespace|
-        # Attachment#namespace is a mix bag of local (1, account_1) and gobal
-        # (account_20000000000001) account ids, convert to local and back to
-        # global to ensure everything is a global id in the end.
-        namespace_id = namespace.split('_').last
-        local_account_id, shard_id = Shard.local_id_for(namespace_id)
-        global_account_id = Shard.global_id_for(local_account_id, shard_id)
+    id_to_global = attachments
+                   .select(:id, :namespace)
+                   .pluck(:id, :namespace)
+                   .map do |attachment_id, namespace|
+      # Attachment#namespace is a mix bag of local (1, account_1) and gobal
+      # (account_20000000000001) account ids, convert to local and back to
+      # global to ensure everything is a global id in the end.
+      namespace_id = namespace.split('_').last
+      local_account_id, shard_id = Shard.local_id_for(namespace_id)
+      global_account_id = Shard.global_id_for(local_account_id, shard_id)
 
-        [attachment_id, global_account_id]
-      end
+      [attachment_id, global_account_id]
+    end
 
     # join in the mappings by treating it as a values table:
     #   VALUES ('id', 'global'), ..
@@ -88,8 +86,8 @@ module DataFixup::PopulateRootAccountIdOnAttachments
   end
 
   def self.default_to_zero(batch_min, batch_max)
-    Attachment.
-        where(id: batch_min..batch_max, root_account_id: nil).
-        update_all(root_account_id: 0)
+    Attachment
+      .where(id: batch_min..batch_max, root_account_id: nil)
+      .update_all(root_account_id: 0)
   end
 end

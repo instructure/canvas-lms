@@ -19,7 +19,7 @@
 #
 
 module Factories
-  def communication_channel_model(opts={})
+  def communication_channel_model(opts = {})
     @cc = factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes.merge(opts))
     @communication_channel = @cc
   end
@@ -33,7 +33,7 @@ module Factories
     }
   end
 
-  def communication_channel(user, opts={})
+  def communication_channel(user, opts = {})
     username = opts[:username] || "nobody-#{user.id}@example.com"
     @cc = user.communication_channels.create!(path_type: opts[:path_type] || 'email', path: username) do |cc|
       cc.workflow_state = 'active' if opts[:active_cc] || opts[:active_all]

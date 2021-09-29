@@ -171,7 +171,7 @@ module Lti::Ims
 
           shared_examples_for 'creates a new submission' do
             it 'increments attempt' do
-              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              submission_body = { submitted_at: 1.hour.ago, submission_type: 'external_tool' }
               attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
               send_request
               expect(result.submission.reload.attempt).to eq attempt + 1
@@ -180,7 +180,7 @@ module Lti::Ims
 
           shared_examples_for 'updates existing submission' do
             it 'does not increment attempt or change submitted_at' do
-              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              submission_body = { submitted_at: 1.hour.ago, submission_type: 'external_tool' }
               submission = result.submission.assignment.submit_homework(user, submission_body)
               attempt = submission.attempt
               submitted_at = submission.submitted_at
@@ -405,7 +405,7 @@ module Lti::Ims
             end
 
             it 'only submits assignment once' do
-              submission_body = {submitted_at: 1.hour.ago, submission_type: 'external_tool'}
+              submission_body = { submitted_at: 1.hour.ago, submission_type: 'external_tool' }
               attempt = result.submission.assignment.submit_homework(user, submission_body).attempt
               send_request
               expect(result.submission.reload.attempt).to eq attempt + 1
@@ -564,9 +564,9 @@ module Lti::Ims
             let(:params_overrides) do
               super().merge(
                 Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
-                  new_submission: false,
-                  submission_type: submission_type
-                }),
+                                                                               new_submission: false,
+                                                                               submission_type: submission_type
+                                                                             }),
                 scoreGiven: 10,
                 scoreMaximum: 10
               )
@@ -588,9 +588,9 @@ module Lti::Ims
             let(:params_overrides) do
               super().merge(
                 Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
-                  new_submission: true,
-                  submission_type: submission_type
-                }),
+                                                                               new_submission: true,
+                                                                               submission_type: submission_type
+                                                                             }),
                 scoreGiven: 10,
                 scoreMaximum: 10
               )
@@ -612,9 +612,9 @@ module Lti::Ims
             let(:params_overrides) do
               super().merge(
                 Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
-                  new_submission: true,
-                  submission_type: submission_type
-                }),
+                                                                               new_submission: true,
+                                                                               submission_type: submission_type
+                                                                             }),
                 scoreGiven: 10,
                 scoreMaximum: 10
               )
@@ -650,19 +650,19 @@ module Lti::Ims
               let(:params_overrides) do
                 super().merge(
                   Lti::Result::AGS_EXT_SUBMISSION => extension_overrides.merge({
-                    new_submission: true,
-                    submission_type: submission_type
-                  }),
+                                                                                 new_submission: true,
+                                                                                 submission_type: submission_type
+                                                                               }),
                   scoreGiven: 10,
                   scoreMaximum: 10
                 )
               end
-  
+
               it 'succeeds when under limit' do
                 send_request
                 expect(response.status.to_i).to eq 200
               end
-  
+
               it 'succeeds when over limit' do
                 result.submission.update!(attempt: 4)
                 send_request

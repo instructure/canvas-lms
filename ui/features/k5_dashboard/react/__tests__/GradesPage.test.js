@@ -223,7 +223,10 @@ const defaultSpecificPeriodGrades = [
 
 const defaultProps = {
   visible: true,
-  currentUserRoles: ['student', 'user']
+  currentUserRoles: ['student', 'user'],
+  currentUser: {
+    id: '1'
+  }
 }
 
 describe('GradesPage', () => {

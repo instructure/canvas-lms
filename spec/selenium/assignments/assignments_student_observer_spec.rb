@@ -42,7 +42,7 @@ describe "assignments" do
         @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section2, :enrollment_state => 'active')
       end
 
-      it "should see own section's lock dates" do
+      it "sees own section's lock dates" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
@@ -51,7 +51,7 @@ describe "assignments" do
       end
 
       context "with multiple section enrollments in same course" do
-        it "should have the earliest 'lock until' date and the latest 'lock after' date" do
+        it "has the earliest 'lock until' date and the latest 'lock after' date" do
           @assignment.update :lock_at => @lock_at + 22.days
           @course.enroll_user(@observer, 'ObserverEnrollment', :section => @section1, :enrollment_state => 'active')
           extend TextHelper
@@ -70,7 +70,7 @@ describe "assignments" do
         @observer_enrollment.update_attribute(:associated_user_id, @student.id)
       end
 
-      it "should return student's lock dates" do
+      it "returns student's lock dates" do
         extend TextHelper
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
         expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')
@@ -84,7 +84,7 @@ describe "assignments" do
           @course.enroll_user(@student, 'StudentEnrollment', :section => @section2, :enrollment_state => 'active')
         end
 
-        it "should show overridden lock dates for student" do
+        it "shows overridden lock dates for student" do
           extend TextHelper
           get "/courses/#{@course.id}/assignments/#{@assignment.id}"
           expected_unlock = datetime_string(@override.unlock_at).gsub(/\s+/, ' ')

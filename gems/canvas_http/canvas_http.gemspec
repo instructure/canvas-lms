@@ -1,4 +1,3 @@
-# coding: utf-8
 # frozen_string_literal: true
 
 lib = File.expand_path('../lib', __FILE__)
@@ -19,8 +18,8 @@ Gem::Specification.new do |spec|
   spec.add_dependency "multipart"
 
   spec.add_development_dependency "bundler", "~> 2.2"
+  spec.add_development_dependency "multipart"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "rspec", "~> 3.5.0"
-  spec.add_development_dependency "multipart"
   spec.add_development_dependency "webmock", "1.24.6"
 end

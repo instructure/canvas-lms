@@ -28,11 +28,11 @@ describe Polling::PollChoicesController, type: :request do
   describe 'GET index' do
     before :once do
       @poll = @teacher.polls.create!(question: "Example Poll")
-      @poll.poll_choices.create!(text: "Poll Choice 1", is_correct:false, position: 1)
-      @poll.poll_choices.create!(text: "Poll Choice 3", is_correct:false, position: 3)
-      @poll.poll_choices.create!(text: "Poll Choice 4", is_correct:false, position: 4)
-      @poll.poll_choices.create!(text: "Poll Choice 2", is_correct:false, position: 2)
-      @poll.poll_choices.create!(text: "Poll Choice 5", is_correct:false, position: 5)
+      @poll.poll_choices.create!(text: "Poll Choice 1", is_correct: false, position: 1)
+      @poll.poll_choices.create!(text: "Poll Choice 3", is_correct: false, position: 3)
+      @poll.poll_choices.create!(text: "Poll Choice 4", is_correct: false, position: 4)
+      @poll.poll_choices.create!(text: "Poll Choice 2", is_correct: false, position: 2)
+      @poll.poll_choices.create!(text: "Poll Choice 5", is_correct: false, position: 5)
     end
 
     def get_index(raw = false, data = {}, headers = {})
@@ -40,8 +40,7 @@ describe Polling::PollChoicesController, type: :request do
       helper.call(:get,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
                   { controller: 'polling/poll_choices', action: 'index', format: 'json',
-                    poll_id: @poll.id.to_s
-                  }, data, headers)
+                    poll_id: @poll.id.to_s }, data, headers)
     end
 
     it "returns all existing poll choices" do
@@ -50,7 +49,7 @@ describe Polling::PollChoicesController, type: :request do
       expect(poll_choices_json.size).to eq 5
 
       poll_choices_json.each_with_index do |pc, i|
-        expect(pc['text']).to eq "Poll Choice #{i+1}"
+        expect(pc['text']).to eq "Poll Choice #{i + 1}"
       end
     end
 
@@ -59,10 +58,9 @@ describe Polling::PollChoicesController, type: :request do
       poll_choices_json = json['poll_choices']
 
       poll_choices_json.each_with_index do |pc, i|
-        expect(pc['position']).to eq i+1
+        expect(pc['position']).to eq i + 1
       end
     end
-
 
     it "paginates to the jsonapi standard if requested" do
       json = get_index(false, {}, 'Accept' => 'application/vnd.api+json')
@@ -70,7 +68,7 @@ describe Polling::PollChoicesController, type: :request do
       expect(poll_choices_json.size).to eq 5
 
       poll_choices_json.each_with_index do |pc, i|
-        expect(pc['text']).to eq "Poll Choice #{i+1}"
+        expect(pc['text']).to eq "Poll Choice #{i + 1}"
       end
 
       expect(json).to have_key('meta')
@@ -114,8 +112,7 @@ describe Polling::PollChoicesController, type: :request do
                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
                   { controller: 'polling/poll_choices', action: 'show', format: 'json',
                     poll_id: @poll.id.to_s,
-                    id: @poll_choice.id.to_s
-                  }, data)
+                    id: @poll_choice.id.to_s }, data)
     end
 
     it "retrieves the poll specified" do
@@ -166,7 +163,6 @@ describe Polling::PollChoicesController, type: :request do
           expect(poll_choice_json).to have_key('is_correct')
         end
       end
-
     end
   end
 
@@ -175,13 +171,12 @@ describe Polling::PollChoicesController, type: :request do
       @poll = @teacher.polls.create!(question: 'An Example Poll')
     end
 
-    def post_create(params, raw=false)
+    def post_create(params, raw = false)
       helper = method(raw ? :raw_api_call : :api_call)
       helper.call(:post,
                   "/api/v1/polls/#{@poll.id}/poll_choices",
                   { controller: 'polling/poll_choices', action: 'create', format: 'json',
-                    poll_id: @poll.id.to_s
-                  },
+                    poll_id: @poll.id.to_s },
                   { poll_choices: [params] }, {}, {})
     end
 
@@ -202,7 +197,7 @@ describe Polling::PollChoicesController, type: :request do
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        post_create({text: 'Poll Choice 1'}, true)
+        post_create({ text: 'Poll Choice 1' }, true)
         expect(response.code).to eq '401'
       end
     end
@@ -214,16 +209,15 @@ describe Polling::PollChoicesController, type: :request do
       @poll_choice = @poll.poll_choices.create!(text: 'Old Poll Choice', is_correct: true)
     end
 
-    def put_update(params, raw=false)
+    def put_update(params, raw = false)
       helper = method(raw ? :raw_api_call : :api_call)
 
       helper.call(:put,
-               "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-               { controller: 'polling/poll_choices', action: 'update', format: 'json',
-                 poll_id: @poll.id.to_s,
-                 id: @poll_choice.id.to_s
-               },
-               { poll_choices: [params] }, {}, {})
+                  "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
+                  { controller: 'polling/poll_choices', action: 'update', format: 'json',
+                    poll_id: @poll.id.to_s,
+                    id: @poll_choice.id.to_s },
+                  { poll_choices: [params] }, {}, {})
     end
 
     context "as a teacher" do
@@ -244,7 +238,7 @@ describe Polling::PollChoicesController, type: :request do
     context "as a student" do
       it "is unauthorized" do
         student_in_course(:active_all => true, :course => @course)
-        put_update({text: 'New Text'}, true)
+        put_update({ text: 'New Text' }, true)
         expect(response.code).to eq '401'
       end
     end
@@ -258,13 +252,11 @@ describe Polling::PollChoicesController, type: :request do
 
     def delete_destroy
       raw_api_call(:delete,
-                  "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
-      { controller: 'polling/poll_choices', action: 'destroy', format: 'json',
-        poll_id: @poll.id.to_s,
-        id: @poll_choice.id.to_s
-      },
-      {}, {}, {})
-
+                   "/api/v1/polls/#{@poll.id}/poll_choices/#{@poll_choice.id}",
+                   { controller: 'polling/poll_choices', action: 'destroy', format: 'json',
+                     poll_id: @poll.id.to_s,
+                     id: @poll_choice.id.to_s },
+                   {}, {}, {})
     end
 
     context "as a teacher" do
@@ -286,5 +278,4 @@ describe Polling::PollChoicesController, type: :request do
       end
     end
   end
-
 end

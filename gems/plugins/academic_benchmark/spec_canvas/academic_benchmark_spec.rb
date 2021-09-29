@@ -20,7 +20,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 describe AcademicBenchmark do
-
   before(:each) do
     @root_account = Account.site_admin
     account_admin_user(:account => @root_account, :active_all => true)
@@ -29,8 +28,8 @@ describe AcademicBenchmark do
     @cm.converter_class = @plugin.settings['converter_class']
     @cm.migration_settings[:migration_type] = 'academic_benchmark_importer'
     @cm.migration_settings[:import_immediately] = true
-    @cm.migration_settings[:migration_options] = {points_possible: 10, mastery_points: 6,
-      ratings: [{description: 'Bad', points: 0}, {description: 'Awesome', points: 10}]}
+    @cm.migration_settings[:migration_options] = { points_possible: 10, mastery_points: 6,
+                                                   ratings: [{ description: 'Bad', points: 0 }, { description: 'Awesome', points: 10 }] }
     @cm.user = @user
     @cm.save!
 
@@ -54,8 +53,8 @@ describe AcademicBenchmark do
   def verify_rubric_criterion(outcome)
     expect(outcome.data[:rubric_criterion][:mastery_points]).to eq 6
     expect(outcome.data[:rubric_criterion][:points_possible]).to eq 10
-    expect(outcome.data[:rubric_criterion][:ratings]).to eq [{description: 'Bad', points: 0},
-                                                             {description: 'Awesome', points: 10}]
+    expect(outcome.data[:rubric_criterion][:ratings]).to eq [{ description: 'Bad', points: 0 },
+                                                             { description: 'Awesome', points: 10 }]
   end
 
   def verify_full_import
@@ -68,76 +67,76 @@ describe AcademicBenchmark do
     expect(b.migration_id).to eq "AF2F25CE-CCB8-11DD-A7C8-69619DFF4B22"
     expect(b.title).to eq "SS.912.A.1 - Use research and inquiry skills to analyze America"
     {
-      "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.1",
-          :description=>"Describe the importance of historiography, which includes how historical knowledge is obtained" \
-                        " and transmitted, when interpreting events in history."
+          :short_description => "SS.912.A.1.1",
+          :description => "Describe the importance of historiography, which includes how historical knowledge is obtained" \
+                          " and transmitted, when interpreting events in history."
         },
-        "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF2FEA9A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.2",
-          :description=>"Utilize a variety of primary and secondary sources to identify author, historical significance," \
-                        " audience, and authenticity to understand a historical period."
+          :short_description => "SS.912.A.1.2",
+          :description => "Utilize a variety of primary and secondary sources to identify author, historical significance," \
+                          " audience, and authenticity to understand a historical period."
         },
-        "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.3",
-          :description=>"Utilize timelines to identify the time sequence of historical data."
+          :short_description => "SS.912.A.1.3",
+          :description => "Utilize timelines to identify the time sequence of historical data."
         },
-        "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.4",
-          :description=>"Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used" \
-                        " to interpret the significance of time periods and events from the past."
+          :short_description => "SS.912.A.1.4",
+          :description => "Analyze how images, symbols, objects, cartoons, graphs, charts, maps, and artwork may be used" \
+                          " to interpret the significance of time periods and events from the past."
         },
-        "AF31281A-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF31281A-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.5",
-          :description=>"Evaluate the validity, reliability, bias, and authenticity of current events and Internet resources."
+          :short_description => "SS.912.A.1.5",
+          :description => "Evaluate the validity, reliability, bias, and authenticity of current events and Internet resources."
         },
-        "AF319610-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF319610-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.6",
-          :description=>"Use case studies to explore social, political, legal, and economic relationships in history."
+          :short_description => "SS.912.A.1.6",
+          :description => "Use case studies to explore social, political, legal, and economic relationships in history."
         },
-        "AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.1.7",
-          :description=>"Describe various socio-cultural aspects of American life including arts, artifacts, literature, education, and publications."
+          :short_description => "SS.912.A.1.7",
+          :description => "Describe various socio-cultural aspects of American life including arts, artifacts, literature, education, and publications."
         },
-        "AF325C58-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF325C58-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.2",
-          :description=>"Understand the causes, course, and consequences of the Civil War and Reconstruction and its effects on the American people."
+          :short_description => "SS.912.A.2",
+          :description => "Understand the causes, course, and consequences of the Civil War and Reconstruction and its effects on the American people."
         },
-        "AF359634-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF359634-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.3",
-          :description=>"Analyze the transformation of the American economy and the changing social and" \
-                        " political conditions in response to the Industrial Revolution."
+          :short_description => "SS.912.A.3",
+          :description => "Analyze the transformation of the American economy and the changing social and" \
+                          " political conditions in response to the Industrial Revolution."
         },
-        "AF3B2A72-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF3B2A72-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.4",
-          :description=>"Demonstrate an understanding of the changing role of the United States in world affairs through the end of World War I."
+          :short_description => "SS.912.A.4",
+          :description => "Demonstrate an understanding of the changing role of the United States in world affairs through the end of World War I."
         },
-        "AF3FF1EC-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF3FF1EC-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.5",
-          :description=>"Analyze the effects of the changing social, political, and economic conditions of the Roaring Twenties and the Great Depression."
+          :short_description => "SS.912.A.5",
+          :description => "Analyze the effects of the changing social, political, and economic conditions of the Roaring Twenties and the Great Depression."
         },
-        "AF4522DE-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF4522DE-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.6",
-          :description=>"Understand the causes and course of World War II, the character of the war at home and abroad," \
-                        " and its reshaping of the United States role in the post-war world."
+          :short_description => "SS.912.A.6",
+          :description => "Understand the causes and course of World War II, the character of the war at home and abroad," \
+                          " and its reshaping of the United States role in the post-war world."
         },
-        "AF4B6DB0-CCB8-11DD-A7C8-69619DFF4B22"=>
+      "AF4B6DB0-CCB8-11DD-A7C8-69619DFF4B22" =>
         {
-          :short_description=>"SS.912.A.7",
-          :description=>"Understand the rise and continuing international influence of the United States as a" \
-                        " world leader and the impact of contemporary social and political movements on American life."
+          :short_description => "SS.912.A.7",
+          :description => "Understand the rise and continuing international influence of the United States as a" \
+                          " world leader and the impact of contemporary social and political movements on American life."
         }
     }.each do |migration_id, descriptions|
       g = LearningOutcome.global.find_by(migration_id: migration_id)
@@ -161,7 +160,7 @@ describe AcademicBenchmark do
     outcome.instance_variable_get('@children').each { |o| check_built_outcome(o) }
   end
 
-  it "should successfully import the standards" do
+  it "successfullies import the standards" do
     @cm.export_content
     run_jobs
     @cm.reload
@@ -171,7 +170,7 @@ describe AcademicBenchmark do
     verify_full_import()
   end
 
-  it "should reject creating global outcomes if no permissions" do
+  it "rejects creating global outcomes if no permissions" do
     @cm.user = nil
     @cm.save!
     @cm.export_content
@@ -191,7 +190,7 @@ describe AcademicBenchmark do
       @cm.save!
     end
 
-    it "should fail with no partner ID" do
+    it "fails with no partner ID" do
       @plugin.settings[:partner_id] = nil
       @plugin.settings[:partner_key] = "a"
       @cm.export_content
@@ -203,7 +202,7 @@ describe AcademicBenchmark do
       expect(@cm.workflow_state).to eq 'failed'
     end
 
-    it "should fail with an empty string partner ID" do
+    it "fails with an empty string partner ID" do
       current_settings = @plugin.settings
       new_settings = current_settings.merge(:partner_id => "", :partner_key => "a")
       allow(@plugin).to receive(:settings).and_return(new_settings)
@@ -245,12 +244,12 @@ describe AcademicBenchmark do
 
   it "raises error when crendentials are not set" do
     allow(AcademicBenchmark).to receive(:config).and_return({})
-    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(
+    expect { AcademicBenchmark.ensure_ab_credentials }.to raise_error(
       Canvas::Migration::Error,
       "Not importing academic benchmark data because the Academic Benchmarks Partner ID is not set"
     )
-    allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "user"})
-    expect{ AcademicBenchmark.ensure_ab_credentials }.to raise_error(
+    allow(AcademicBenchmark).to receive(:config).and_return({ partner_id: "user" })
+    expect { AcademicBenchmark.ensure_ab_credentials }.to raise_error(
       Canvas::Migration::Error,
       "Not importing academic benchmark data because the Academic Benchmarks Partner key is not set"
     )

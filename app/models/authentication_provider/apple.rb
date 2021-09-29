@@ -24,7 +24,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   self.plugin = :apple
   plugin_settings :client_id, client_secret: :client_secret_dec
 
-  SENSITIVE_PARAMS = [ :client_secret ].freeze
+  SENSITIVE_PARAMS = [:client_secret].freeze
 
   def self.display_name
     'Sign in with Apple'
@@ -64,11 +64,10 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
     jwt_string = params['id_token']
     debug_set(:id_token, jwt_string) if instance_debugging
     id_token = JSON::JWT.decode(jwt_string, apple_public_keys)
-    unless
-      id_token[:iss] == 'https://appleid.apple.com' &&
-      id_token[:aud] == client_id &&
-      id_token[:sub].present? &&
-      id_token[:exp] > Time.now.to_i
+    unless id_token[:iss] == 'https://appleid.apple.com' &&
+           id_token[:aud] == client_id &&
+           id_token[:sub].present? &&
+           id_token[:exp] > Time.now.to_i
       Rails.logger.warn("Failed to decode Sign in with Apple id_token: #{jwt_string.inspect}")
       raise Canvas::Security::InvalidToken
     end
@@ -111,7 +110,7 @@ class AuthenticationProvider::Apple < AuthenticationProvider::OpenIDConnect
   # fetch from https://appleid.apple.com/auth/keys
   def apple_public_keys
     keys_json = Setting.get('apple_public_key', nil).presence ||
-      CanvasHttp.get('https://appleid.apple.com/auth/keys').body
+                CanvasHttp.get('https://appleid.apple.com/auth/keys').body
     JSON::JWK::Set.new(JSON.parse(keys_json))
   end
 end

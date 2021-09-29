@@ -31,7 +31,7 @@ class Mutations::CreateCommentBankItem < Mutations::BaseMutation
     verify_authorized_action!(record, :create)
     return errors_for(record) unless record.save
 
-    {comment_bank_item: record}
+    { comment_bank_item: record }
   end
 
   private

@@ -60,7 +60,7 @@ module ConditionalRelease
         scoring_ranges: {
           include: {
             assignment_sets: {
-              include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}},
+              include: { assignment_set_associations: { except: [:root_account_id, :deleted_at] } },
               except: [:root_account_id, :deleted_at]
             }
           },

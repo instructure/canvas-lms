@@ -76,8 +76,8 @@ describe "speed grader - grade display" do
     it "shows late deduction and final grade" do
       Speedgrader.visit(@course.id, @a1.id)
 
-      late_penalty_value = "-" + @course.students[0].submissions.find_by(assignment_id:@a1.id).points_deducted.to_s
-      final_grade_value = @course.students[0].submissions.find_by(assignment_id:@a1.id).published_grade
+      late_penalty_value = "-" + @course.students[0].submissions.find_by(assignment_id: @a1.id).points_deducted.to_s
+      final_grade_value = @course.students[0].submissions.find_by(assignment_id: @a1.id).published_grade
 
       # the data from rails and data from ui are not in the same format
       expect(Speedgrader.late_points_deducted_text.to_f.to_s).to eq late_penalty_value

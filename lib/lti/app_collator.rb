@@ -19,7 +19,6 @@
 #
 module Lti
   class AppCollator
-
     def initialize(context, reregistration_url_builder = nil)
       @context = context
       @reregistration_url_builder = reregistration_url_builder
@@ -37,7 +36,7 @@ module Lti
       )
     end
 
-    def app_definitions(collection, opts={})
+    def app_definitions(collection, opts = {})
       collection.map do |o|
         case o
         when ContextExternalTool
@@ -102,7 +101,7 @@ module Lti
 
     def build_reregistration_url(tool_proxy)
       if root_account.feature_enabled?(:lti2_rereg) && @reregistration_url_builder &&
-          tool_proxy.reregistration_message_handler
+         tool_proxy.reregistration_message_handler
 
         @reregistration_url_builder.call(@context, tool_proxy.id)
       end

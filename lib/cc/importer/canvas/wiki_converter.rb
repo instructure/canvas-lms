@@ -27,6 +27,7 @@ module CC::Importer::Canvas
       wiki_dir = @package_root.item_path(WIKI_FOLDER)
       Dir["#{wiki_dir}/**/**"].each do |path|
         next if File.directory?(path)
+
         doc = open_file_html5(path)
         wikis << convert_wiki(doc, path)
       end
@@ -50,7 +51,7 @@ module CC::Importer::Canvas
       wiki[:url_name] = wiki_name
       wiki[:assignment] = nil
       wiki[:todo_date] = meta['todo_date']
-      if asg_id = meta['assignment_identifier']
+      if (asg_id = meta['assignment_identifier'])
         wiki[:assignment] = {
           migration_id: asg_id,
           assignment_overrides: [],
@@ -60,6 +61,5 @@ module CC::Importer::Canvas
       end
       wiki
     end
-
   end
 end

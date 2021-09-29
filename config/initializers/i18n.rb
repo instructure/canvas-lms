@@ -116,6 +116,7 @@ module FormatInterpolatedNumbers
     values = values.dup
     values.each do |key, value|
       next unless value.is_a?(Numeric)
+
       values[key] = ActiveSupport::NumberHelper.number_to_delimited(value)
     end
     super(string, values)
@@ -128,10 +129,11 @@ I18nliner.infer_interpolation_values = false
 module I18nliner
   module RehashArrays
     def infer_pluralization_hash(default, *args)
-      if default.is_a?(Array) && default.all?{|a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol)}
+      if default.is_a?(Array) && default.all? { |a| a.is_a?(Array) && a.size == 2 && a.first.is_a?(Symbol) }
         # this was a pluralization hash but rails 4 made it an array in the view helpers
         return Hash[default]
       end
+
       super
     end
   end
@@ -140,7 +142,7 @@ end
 
 if ENV['LOLCALIZE']
   require 'i18n_tasks'
-  I18n.send :extend, I18nTasks::Lolcalize
+  I18n.extend I18nTasks::Lolcalize
 end
 
 module I18nUtilities
@@ -171,9 +173,9 @@ module I18nUtilities
   end
 end
 
-ActionView::Base.send(:include, I18nUtilities)
-ActionView::Helpers::FormHelper.send(:include, I18nUtilities)
-ActionView::Helpers::FormTagHelper.send(:include, I18nUtilities)
+ActionView::Base.include I18nUtilities
+ActionView::Helpers::FormHelper.include I18nUtilities
+ActionView::Helpers::FormTagHelper.include I18nUtilities
 
 module I18nFormHelper
   # a convenience method to put the ":" after the label text (or do whatever
@@ -276,6 +278,7 @@ I18n.send(:extend, Module.new {
       # english, rather than asploding
       key, options = I18nliner::CallHelpers.infer_arguments(args)
       raise if (options[:locale] || locale) == default_locale
+
       super(key, options.merge(locale: default_locale))
     end
   end

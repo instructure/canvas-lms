@@ -43,7 +43,6 @@
 # you may want to use some kind of partitioning key as part of the topic name
 # like the shard id or event account id.
 module MessageBus
-
   mattr_accessor :logger, :on_work_unit_end
   mattr_reader :max_mem_queue_size_lambda, :worker_process_interval_lambda
 
@@ -180,7 +179,7 @@ module MessageBus
     end
   end
 
-  def self.topic_url(namespace, topic_name, app_env=Canvas.environment)
+  def self.topic_url(namespace, topic_name, app_env = Canvas.environment)
     ns = MessageBus::Namespace.build(namespace)
     app_env = (app_env || "development").downcase
     conf_hash = self.config
@@ -189,7 +188,7 @@ module MessageBus
     # like test/beta/edge whatever and not have to provision
     # other overhead to separate them or deal with the confusion of shared
     # data in a single topic.
-    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns.to_s}/#{app_env}-#{topic_name}"
+    "persistent://#{conf_hash['PULSAR_TENANT']}/#{ns}/#{app_env}-#{topic_name}"
   end
 
   ##
@@ -299,7 +298,7 @@ module MessageBus
     hash['PULSAR_BROKER_URI'].present? && hash['PULSAR_TENANT'].present?
   end
 
-  def self.config(shard=::Switchman::Shard.current)
+  def self.config(shard = ::Switchman::Shard.current)
     cluster_id = shard.database_server.id
     settings = DynamicSettings.find(tree: :private, cluster: cluster_id)
     loaded_settings = (settings['pulsar.yml'] || '{}')

@@ -40,14 +40,14 @@ describe Lti::ContentItemUtil do
           "chapter" : "12",
           "section" : "3"
         },
-        "confirmUrl" : "'+url+'"
+        "confirmUrl" : "' + url + '"
       }')
     end
     subject { described_class.new(content_item) }
 
     it 'makes a POST to confirm creation' do
-      stub_request(:post, url).
-        to_return(:status => 200, :body => "", :headers => {})
+      stub_request(:post, url)
+        .to_return(:status => 200, :body => "", :headers => {})
 
       subject.success_callback
       run_jobs
@@ -55,8 +55,8 @@ describe Lti::ContentItemUtil do
     end
 
     it 'makes a DELETE to signify Cancelation' do
-      stub_request(:delete, url).
-        to_return(:status => 200, :body => "", :headers => {})
+      stub_request(:delete, url)
+        .to_return(:status => 200, :body => "", :headers => {})
 
       subject.failure_callback
       run_jobs
@@ -96,5 +96,4 @@ describe Lti::ContentItemUtil do
       run_jobs
     end
   end
-
 end

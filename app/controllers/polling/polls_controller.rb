@@ -166,12 +166,13 @@ module Polling
     end
 
     protected
+
     def paginate_for(polls)
       meta = {}
       json = if accepts_jsonapi?
-              polls, meta = Api.jsonapi_paginate(polls, self, api_v1_polls_url)
-              meta[:primaryCollection] = 'polls'
-              polls
+               polls, meta = Api.jsonapi_paginate(polls, self, api_v1_polls_url)
+               meta[:primaryCollection] = 'polls'
+               polls
              else
                Api.paginate(polls, self, api_v1_polls_url)
              end
@@ -183,13 +184,13 @@ module Polling
       polls = Array.wrap(polls)
 
       Canvas::APIArraySerializer.new(polls, {
-        each_serializer: Polling::PollSerializer,
-        controller: self,
-        root: :polls,
-        meta: meta,
-        scope: @current_user,
-        include_root: false
-      }).as_json
+                                       each_serializer: Polling::PollSerializer,
+                                       controller: self,
+                                       root: :polls,
+                                       meta: meta,
+                                       scope: @current_user,
+                                       include_root: false
+                                     }).as_json
     end
 
     def get_poll_params

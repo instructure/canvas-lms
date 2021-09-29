@@ -1,0 +1,5 @@
+inherit_from:
+  - ../../../../../../../.rubocop.yml
+
+Layout/EmptyLineAfterMagicComment:
+  Enabled: false # fixtures purposely have errors

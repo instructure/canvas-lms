@@ -22,7 +22,7 @@ require_relative "quizzes_common"
 module QuizQuestionsCommon
   include QuizzesCommon
 
-  def create_oqaat_quiz(opts={})
+  def create_oqaat_quiz(opts = {})
     course_with_teacher(:active_all => true)
     student_in_course(:active_all => true)
     @quiz = @course.quizzes.create
@@ -39,13 +39,12 @@ module QuizQuestionsCommon
 
   def quiz_question(name, question, _id)
     answers = [
-      {:weight=>100, :answer_text=>"A", :answer_comments=>"", :id=>1490},
-      {:weight=>0, :answer_text=>"B", :answer_comments=>"", :id=>1020},
-      {:weight=>0, :answer_text=>"C", :answer_comments=>"", :id=>7051}
+      { :weight => 100, :answer_text => "A", :answer_comments => "", :id => 1490 },
+      { :weight => 0, :answer_text => "B", :answer_comments => "", :id => 1020 },
+      { :weight => 0, :answer_text => "C", :answer_comments => "", :id => 7051 }
     ]
-    data = { :question_name=>name, :points_possible=>1, :question_text=>question,
-      :answers=>answers, :question_type=>"multiple_choice_question"
-    }
+    data = { :question_name => name, :points_possible => 1, :question_text => question,
+             :answers => answers, :question_type => "multiple_choice_question" }
 
     @quiz.quiz_questions.create!(:question_data => data)
   end

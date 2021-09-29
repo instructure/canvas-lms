@@ -23,7 +23,7 @@ module Importers
   class LearningOutcomeGroupImporter < Importer
     self.item_class = LearningOutcomeGroup
 
-    def self.import_from_migration(hash, migration, item=nil, skip_import=false)
+    def self.import_from_migration(hash, migration, item = nil, skip_import = false)
       hash = hash.with_indifferent_access
       if skip_import
         Importers::LearningOutcomeGroupImporter.process_children(hash, hash[:parent_group], migration, skip_import)
@@ -44,10 +44,10 @@ module Importers
         root_outcome_group = context.root_outcome_group
         parent_group = hash[:parent_group] || root_outcome_group
 
-        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s).
-          where(migration_id: hash[:migration_id]).first if hash[:migration_id]
+        item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s)
+                                     .where(migration_id: hash[:migration_id]).first if hash[:migration_id]
         item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
-          context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
+                                              context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
         # Don't migrate if we already have a folder with the same name inside the parent_group
         item ||= LearningOutcomeGroup.active.where(
           context: context,
@@ -70,8 +70,8 @@ module Importers
         source_group = LearningOutcomeGroup.active.find_by(id: hash[:source_outcome_group_id])
 
         if source_group && \
-            item.title == source_group.title && \
-            context&.associated_accounts&.include?(source_group.context)
+           item.title == source_group.title && \
+           context&.associated_accounts&.include?(source_group.context)
           item.source_outcome_group = source_group
         end
       end
@@ -109,7 +109,7 @@ module Importers
       item
     end
 
-    def self.process_children(hash, item, migration, skip_import=false)
+    def self.process_children(hash, item, migration, skip_import = false)
       if hash[:outcomes]
         hash[:outcomes].each do |child|
           if child[:type] == 'learning_outcome_group'

@@ -28,7 +28,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 # name would only be evaluated once, preventing translation of a
 # crumb, among other things
 describe "CrummyController" do
-  CrummyController = Class.new(super_class=ActionController::Base) do
+  CrummyController = Class.new(super_class = ActionController::Base) do
     def self.filter_blocks
       @filter_blocks ||= []
     end
@@ -55,11 +55,11 @@ describe "CrummyController" do
       end
     }
 
-    CrummyNameController = Class.new(super_class=CrummyController) do
+    CrummyNameController = Class.new(super_class = CrummyController) do
       add_crumb(name_run_proc, "http://")
     end
 
-    it "should reevaluate the proc on each run" do
+    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = CrummyNameController.new
       a.run_filter_blocks
@@ -85,11 +85,11 @@ describe "CrummyController" do
       end
     }
 
-    CrummyUrlController = Class.new(super_class=CrummyController) do
+    CrummyUrlController = Class.new(super_class = CrummyController) do
       add_crumb("Name", &url_run_proc)
     end
 
-    it "should reevaluate the proc on each run" do
+    it "reevaluates the proc on each run" do
       # first run should add crumb "A"
       a = CrummyUrlController.new
       a.run_filter_blocks

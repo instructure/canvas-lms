@@ -20,7 +20,6 @@
 require_relative '../../spec_helper'
 
 describe SupportHelpers::Fixer do
-
   describe "#job_id" do
     it 'generates a unique id' do
       fixer1 = SupportHelpers::Fixer.new('email')

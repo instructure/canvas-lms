@@ -23,7 +23,6 @@
 
 module Lti
   class VariableExpansion
-
     attr_reader :name, :permission_groups, :default_name
 
     def initialize(name, permission_groups, expansion_proc, *guards, default_name: nil)
@@ -44,9 +43,10 @@ module Lti
     end
 
     private
+
     def expand_for?(expander)
-      @guards.map {|guard| expander.instance_exec(&guard) }.
-        inject { |memo, obj| memo && obj }
+      @guards.map { |guard| expander.instance_exec(&guard) }
+             .inject { |memo, obj| memo && obj }
     end
   end
 end

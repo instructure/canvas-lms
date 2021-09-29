@@ -47,15 +47,15 @@ describe 'Student Gradebook' do
 
   shared_examples 'Student Gradebook View' do |role|
     it "for #{role == 'observer' ? 'an Observer' : 'a Student'}", priority: '1',
-       test_id: role == 'observer' ? 164027 : 164024 do
-      course_with_student_logged_in({course_name: 'Course A'})
+                                                                  test_id: role == 'observer' ? 164027 : 164024 do
+      course_with_student_logged_in({ course_name: 'Course A' })
       course1 = @course
       student = @user
       @teacher = User.create!
 
-      course_with_user 'StudentEnrollment', {user: student, course_name: 'Course B', active_all: true}
+      course_with_user 'StudentEnrollment', { user: student, course_name: 'Course B', active_all: true }
       course2 = @course
-      course_with_user 'StudentEnrollment', {user: student, course_name: 'Course C', active_all: true}
+      course_with_user 'StudentEnrollment', { user: student, course_name: 'Course C', active_all: true }
       course3 = @course
 
       gi = 0
@@ -64,7 +64,6 @@ describe 'Student Gradebook' do
         assignments = []
 
         (1..3).each do |i|
-
           assignment = course.assignments.create!(
             title: "Assignment #{i}",
             points_possible: 20
@@ -79,15 +78,14 @@ describe 'Student Gradebook' do
       if role == 'observer'
         observer = user_factory(name: 'Observer', active_all: true, active_state: 'active')
         [course1, course2, course3].each do |course|
-
           enrollment = ObserverEnrollment.new(user: observer,
-                                     course: course,
-                                 workflow_state: 'active')
+                                              course: course,
+                                              workflow_state: 'active')
 
           enrollment.associated_user_id = student
           enrollment.save!
         end
-      user_session(observer)
+        user_session(observer)
       end
 
       get "/courses/#{@course.id}/grades/#{student.id}"
@@ -97,8 +95,7 @@ describe 'Student Gradebook' do
       click_option('#course_select_menu', course2.name)
       expect_new_page_load { f('#apply_select_menus').click }
       details = ff('[id^="submission_"].assignment_graded .grade')
-      details.each {|detail| scores.push detail.text[/\d+/].to_i}
-
+      details.each { |detail| scores.push detail.text[/\d+/].to_i }
 
       expect(scores).to eq grades[3..5]
     end
@@ -111,14 +108,14 @@ describe 'Student Gradebook' do
     means = []
     [0, 3, 6].each do |i|
       # the format below ensures that 18.0 is displayed as 18.
-      mean = format('%g' % (('%.2f' % (grades[i, 3].inject {|a, e| a + e}.to_f / 3))))
+      mean = format('%g' % (('%.2f' % (grades[i, 3].inject { |a, e| a + e }.to_f / 3))))
       means.push mean
     end
 
     expectations = [
-      {high: '15', low: '5', mean: means[0]},
-      {high: '19', low: '10', mean: means[1]},
-      {high: '17', low: '4', mean: means[2]}
+      { high: '15', low: '5', mean: means[0] },
+      { high: '19', low: '10', mean: means[1] },
+      { high: '17', low: '4', mean: means[2] }
     ]
 
     grades.each_with_index do |grade, index|
@@ -146,7 +143,6 @@ describe 'Student Gradebook' do
   context 'Student Grades' do
     it_behaves_like 'Student Gradebook View', 'observer'
     it_behaves_like 'Student Gradebook View'
-
   end
 
   it 'calculates grades based on graded assignments', priority: '1', test_id: 164025 do
@@ -216,9 +212,9 @@ describe 'Student Gradebook' do
       )
     end
     # leave a comment as a teacher
-    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job')}
+    let_once(:teacher_comment) { student_submission.submission_comments.create!(comment: 'good job') }
 
-    it 'should display comments from a teacher on student grades page', priority: "1", test_id: 537621 do
+    it 'displays comments from a teacher on student grades page', priority: "1", test_id: 537621 do
       user_session(student)
       get "/courses/#{published_course.id}/grades"
 
@@ -230,7 +226,7 @@ describe 'Student Gradebook' do
       expect(fj('.score_details_table span:first')).to include_text('good job')
     end
 
-    it 'should not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
+    it 'does not display comments from a teacher on student grades page if assignment is muted', priority: "1", test_id: 537620 do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 
@@ -238,14 +234,14 @@ describe 'Student Gradebook' do
       expect(f("#comments_thread_#{assignment.id}")).not_to include_text('good job')
     end
 
-    it 'should display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
+    it 'displays comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537868 do
       user_session(student)
 
       get "/courses/#{published_course.id}/assignments/#{assignment.id}"
       expect(fj('.comments.module .comment:first')).to include_text('good job')
     end
 
-    it 'should not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
+    it 'does not display comments from a teacher on assignment show page if assignment is muted', priority: "1", test_id: 537867 do
       assignment.ensure_post_policy(post_manually: true)
       user_session(student)
 

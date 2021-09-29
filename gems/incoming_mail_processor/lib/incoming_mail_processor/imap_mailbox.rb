@@ -22,7 +22,6 @@ require 'net/imap'
 require File.expand_path('../configurable_timeout', __FILE__)
 
 module IncomingMailProcessor
-
   class ImapMailbox
     include ConfigurableTimeout
 
@@ -52,10 +51,10 @@ module IncomingMailProcessor
     rescue
     end
 
-    def each_message(opts={})
+    def each_message(opts = {})
       @imap.select(@folder)
       message_ids = @imap.search(@filter)
-      message_ids = message_ids.select{|id| id % opts[:stride] == opts[:offset]} if opts[:stride] && opts[:offset]
+      message_ids = message_ids.select { |id| id % opts[:stride] == opts[:offset] } if opts[:stride] && opts[:offset]
       message_ids.each do |message_id|
         body = @imap.fetch(message_id, "RFC822")[0].attr["RFC822"]
         yield message_id, body
@@ -84,5 +83,4 @@ module IncomingMailProcessor
       length
     end
   end
-
 end
