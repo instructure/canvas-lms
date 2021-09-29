@@ -50,6 +50,9 @@
   "beginning_of_your_to_do_history_61ef2dce": {
     "message": "Starten på gjeremålshistorikken din"
   },
+  "below_is_an_example_of_how_students_will_see_their_8f7e7971": {
+    "message": "Nedanfor er eit døme på korleis timeplanen ser ut for studentane"
+  },
   "calendar_a8563bb2": { "message": "Kalender:" },
   "calendar_event_89aadc1c": { "message": "Kalenderhending" },
   "canvas_planner_98ed106": { "message": "Canvas-planleggar" },
@@ -61,13 +64,13 @@
     "message": "{ count, plural,\n     =0 {# muligheter}\n    one {# mulighet}\n  other {# muligheter}\n}"
   },
   "count_plural_one_hide_missing_item_other_hide_miss_4a2562f7": {
-    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Skjul # manglande element}\n  other {Skjul # manglande element}\n}"
   },
   "count_plural_one_show_completed_item_other_show_co_8d0d0ae5": {
     "message": "{ count, plural,\n    one {Vis # fullført element}\n  other {Vis # fullførte element}\n}"
   },
   "count_plural_one_show_missing_item_other_show_miss_509327ef": {
-    "message": "{ count, plural,\n    one {}\n  other {}\n}"
+    "message": "{ count, plural,\n    one {Vis # manglande element}\n  other {Vis  manglande element}\n}"
   },
   "course_8a63b4a3": { "message": "Emne" },
   "course_to_do_bcbbab54": { "message": "{ course } Gjeremål" },
@@ -95,13 +98,29 @@
   "error_loading_grades_e0b38f4d": {
     "message": "Feil under lasting av vurderingar"
   },
+  "error_loading_items_5218438e": {
+    "message": "Feil under lasting av element"
+  },
   "error_loading_more_items_3f109d9f": {
     "message": "Feil under lasting av fleire element"
   },
   "error_loading_past_items_2881dbb1": {
     "message": "Feil under lasting av tidlegare element"
   },
+  "exciting_discussion_9f67bd0a": { "message": "Engasjerande diskusjon" },
   "excused_cf8792eb": { "message": "Fritak er innvilga" },
+  "failed_peeking_into_your_future_e95b9306": {
+    "message": "Eg kunne ikkje sjå inn i framtida di"
+  },
+  "failed_peeking_into_your_past_5bec2323": {
+    "message": "Eg kunne ikkje sjå fortida di"
+  },
+  "failed_saving_changes_on_name_1e100ad": {
+    "message": "Feil ved lagring av endringar for { name }."
+  },
+  "failed_to_delete_name_bdd7b810": {
+    "message": "Kunne ikkje slette { name }."
+  },
   "failed_to_delete_to_do_64edff49": { "message": "Kan ikkje slette gjeremål" },
   "failed_to_get_new_activity_17e7ec7c": {
     "message": "Kan ikkje hente ny aktivitet"
@@ -109,6 +128,7 @@
   "failed_to_load_opportunities_52ab6404": { "message": "Kan ikkje laste val" },
   "failed_to_save_to_do_ddc7503b": { "message": "Kan ikke lagre gjeremål" },
   "feedback_6dcc1991": { "message": "Tilbakemelding" },
+  "fun_quiz_47ab0b0": { "message": "Underhaldande quiz" },
   "go_to_card_view_dashboard_9d03970e": {
     "message": "Gå til rutevising av dashbord"
   },
@@ -119,7 +139,15 @@
     "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
   },
   "join_6cafecca": { "message": "Ta del" },
+  "join_active_online_meeting_d9d892b2": {
+    "message": "bli med på aktivt møte"
+  },
+  "join_online_meeting_b1725843": { "message": "bli med på møtet" },
+  "jump_to_navigation_toolbar_2952cd8b": {
+    "message": "Hopp til navigasjonslinja."
+  },
   "jump_to_today_254ccf41": { "message": "Hopp til i dag" },
+  "language_arts_35b79a8b": { "message": "Språkvitskap" },
   "late_2be42b88": { "message": "Sein" },
   "load_more_a36f9cf9": { "message": "Last opp meir" },
   "load_prior_dates_f2b0f6f0": { "message": "Last tidlegare datoar" },
@@ -135,6 +163,7 @@
   "looks_like_there_isn_t_anything_here_d9bcef49": {
     "message": "Ser ikkje ut som om det finns noko her"
   },
+  "math_ede93050": { "message": "Matematikk" },
   "missing_1a256b3b": { "message": "Manglar" },
   "missing_items_for_title_516511f8": {
     "message": "Manglar element i { title }"
@@ -149,6 +178,7 @@
     "message": "Ingen innleveringsfristar er sett opp"
   },
   "no_grade_3b4d7f3e": { "message": "Inga vurdering" },
+  "nothing_due_this_week_d45c9ef9": { "message": "Ingen oppgåver denne veka" },
   "nothing_for_now_e3e3ce2a": { "message": "Ingenting akkurat no" },
   "nothing_here_needs_attention_c4eaded6": {
     "message": "Ingenting å følgje opp."
@@ -180,9 +210,12 @@
   "previous_month_bb1e3c84": { "message": "Førre månad" },
   "pts_699bd9aa": { "message": "poeng" },
   "quiz_e0dcce8f": { "message": "Quiz" },
+  "redo_363c58b7": { "message": "Gjer om att" },
   "reminder_date_4564d12d": { "message": "Påminning: { date }" },
   "replies_4a8577c8": { "message": "Svar" },
   "save_11a80ec3": { "message": "Lagre" },
+  "schedule_preview_3bcda153": { "message": "Førehandsvising av timeplan" },
+  "science_8d92214a": { "message": "Vitskap" },
   "scroll_up_to_see_your_history_19b14cad": {
     "message": "Rull opp for å sjå historikken din! "
   },
@@ -191,6 +224,7 @@
   },
   "show_all_ae37d610": { "message": "Vis alt" },
   "show_my_grades_ebd08684": { "message": "Vis vurderingsresultata mine" },
+  "social_studies_13fa30c7": { "message": "Samfunnsvitskap" },
   "startdate_to_enddate_d245175b": {
     "message": "{ startDate } til { endDate }"
   },
@@ -208,11 +242,15 @@
     "message": "Vellukka: Gjeremålsliste er oppretta"
   },
   "task_16b0ef38": { "message": "Oppgåve" },
+  "the_best_assignment_15e98be1": { "message": "Den beste innleveringa" },
   "the_date_and_time_this_to_do_is_due_74c823d4": {
     "message": "Dato og tidspunkt som er frist for gjeremålet"
   },
   "there_are_no_points_associated_with_this_item_449c712a": {
     "message": "Det er ingen poeng knytta til elementet"
+  },
+  "there_is_nothing_planned_for_today_e09bfc8c": {
+    "message": "Ingen planar for i dag"
   },
   "time_2b5aac58": { "message": "Tidspunkt" },
   "title_ee03d132": { "message": "Tittel" },
@@ -232,6 +270,8 @@
   "use_arrow_keys_to_navigate_options_2021cc50": {
     "message": "Bruk piltastane for å navigere mellom alternativa."
   },
+  "view_next_week_7f61f755": { "message": "Vis neste veke" },
+  "view_previous_week_6f83849f": { "message": "Vis førre veke" },
   "yesterday_at_date_1aa6d18e": { "message": "I går på { date }" },
   "yesterday_c6bd6abf": { "message": "I går" },
   "you_have_media_feedback_f5f9aba8": { "message": "Du har tilbakemelding. " },
