@@ -234,6 +234,14 @@ class InfoController < ApplicationController
       default_shard: -> { Shard.connection.active? }
     }
 
+    if InstFS.enabled?
+      ret['instructure_file_service'] = -> do
+        CanvasHttp
+          .get(URI.join(InstFS.app_host, '/readiness').to_s)
+          .is_a?(Net::HTTPSuccess)
+      end
+    end
+
     if Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST]
       ret['rich_content_service'] = -> do
         CanvasHttp
