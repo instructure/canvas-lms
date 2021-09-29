@@ -58,9 +58,11 @@ export function Reply({...props}) {
             alt={I18n.t('Reply to post from %{author}', {author: props.authorName})}
           >
             <Text weight="bold" size={responsiveProps.textSize}>
-              <View margin="0 small 0 0">
-                {props.hasDraftEntry && <IconEditLine size="x-small" />}
-              </View>
+              {props.hasDraftEntry && (
+                <View margin="0 small 0 0">
+                  <IconEditLine size="x-small" />
+                </View>
+              )}
               {replyButtonText}
             </Text>
           </AccessibleContent>
