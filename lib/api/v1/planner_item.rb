@@ -269,12 +269,12 @@ module Api::V1::PlannerItem
     url_regex_str = url_regex_str.split("\n").join('|')
     url_regex = Regexp.new "(#{url_regex_str})"
 
-    if (event_description)
+    if event_description
       m = event_description.match(url_regex)
       return m[0] if m
     end
 
-    if (event_location)
+    if event_location
       m = event_location.match(url_regex)
       return m[0] if m
     end

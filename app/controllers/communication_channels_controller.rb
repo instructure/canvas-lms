@@ -197,7 +197,7 @@ class CommunicationChannelsController < ApplicationController
     @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
                                                :path_type => params[:communication_channel][:type])
 
-    if (!@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH)
+    if !@cc.new_record? && !@cc.retired? && @cc.path_type != CommunicationChannel::TYPE_PUSH
       @cc.errors.add(:path, 'unique!')
       return render :json => @cc.errors.as_json, :status => :bad_request
     end

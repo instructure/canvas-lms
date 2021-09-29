@@ -57,7 +57,7 @@ module Api::V1::User
       enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
       if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
-        course_or_section = @context if (@context.is_a?(Course) || @context.is_a?(CourseSection))
+        course_or_section = @context if @context.is_a?(Course) || @context.is_a?(CourseSection)
         sis_context = enrollment || course_or_section || @domain_root_account
         pseudonym = SisPseudonym.for(user, sis_context, type: :implicit, require_sis: false, root_account: @domain_root_account, in_region: true)
         enrollment_json_opts[:sis_pseudonym] = pseudonym if pseudonym&.sis_user_id

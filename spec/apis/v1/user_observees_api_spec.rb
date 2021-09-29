@@ -87,7 +87,7 @@ describe UserObserveesController, type: :request do
       page = "?per_page=1&page=#{opts[:page]}"
     end
 
-    if (opts[:avatars])
+    if opts[:avatars]
       params.merge!(include: ["avatar_url"])
     end
     json = api_call_as_user(

@@ -721,7 +721,7 @@ class Attachment < ActiveRecord::Base
       GuardRail.activate(:secondary) do
         context.shard.activate do
           quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
-          quota = context.quota if (context.respond_to?("quota") && context.quota)
+          quota = context.quota if context.respond_to?("quota") && context.quota
 
           attachment_scope = context.attachments.active.where(root_attachment_id: nil)
 
@@ -1342,9 +1342,9 @@ class Attachment < ActiveRecord::Base
       if next_clear_cache.present? && next_clear_cache < (Time.zone.now + AdheresToPolicy::Cache::CACHE_EXPIRES_IN)
         clear_permissions(next_clear_cache)
       end
-      if (self.unlock_at && Time.zone.now < self.unlock_at)
+      if self.unlock_at && Time.zone.now < self.unlock_at
         locked = { :asset_string => self.asset_string, :unlock_at => self.unlock_at }
-      elsif (self.lock_at && Time.now > self.lock_at)
+      elsif self.lock_at && Time.now > self.lock_at
         locked = { :asset_string => self.asset_string, :lock_at => self.lock_at }
       elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { :asset_string => self.asset_string, :context_module => item.context_module.attributes }

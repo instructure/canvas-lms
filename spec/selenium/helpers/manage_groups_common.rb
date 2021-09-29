@@ -61,7 +61,7 @@ module ManageGroupsCommon
       count = i + 1
       student = user_model :name => "student #{count}"
       students.push student
-      if (!opts[count.to_s].nil?)
+      if !opts[count.to_s].nil?
         @course.enroll_student(student, opts[count.to_s])
       else
         @course.enroll_student(student)

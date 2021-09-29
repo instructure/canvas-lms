@@ -548,7 +548,7 @@ class RoleOverridesController < ApplicationController
 
   def create
     if authorized_action(@context, @current_user, :manage_role_overrides)
-      if (params[:account_roles] || @context == Account.site_admin)
+      if params[:account_roles] || @context == Account.site_admin
         roles = @context.available_account_roles(true)
       else
         roles = @context.available_course_roles(true)

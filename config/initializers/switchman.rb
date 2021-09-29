@@ -199,7 +199,7 @@ Rails.application.config.after_initialize do
       end
 
       all.each do |db|
-        next if (regions.include?(db.config[:region]) || !db.config[:region])
+        next if regions.include?(db.config[:region]) || !db.config[:region]
         next if db.shards.empty?
 
         regions << db.config[:region]

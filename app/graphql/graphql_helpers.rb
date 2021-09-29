@@ -56,7 +56,7 @@ module GraphQLHelpers
 
   def self.parse_relay_id(relay_id, expected_type)
     type, id = GraphQL::Schema::UniqueWithinType.decode(relay_id)
-    if (type != expected_type || id.nil?)
+    if type != expected_type || id.nil?
       raise InvalidIDError.new("expected an id for #{expected_type}")
     else
       id

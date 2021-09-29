@@ -69,7 +69,7 @@ module LiveEvents
 
     # Post an event for the current account.
     def post_event(event_name:, payload:, time: Time.now, context: nil, partition_key: nil) # rubocop:disable Rails/SmartTimeZone
-      if (LiveEvents::Client.config)
+      if LiveEvents::Client.config
         context ||= materialized_context
         client.post_event(event_name, payload, time, context, partition_key)
       end

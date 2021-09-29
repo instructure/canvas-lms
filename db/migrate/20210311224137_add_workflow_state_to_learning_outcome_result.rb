@@ -23,7 +23,7 @@ class AddWorkflowStateToLearningOutcomeResult < ActiveRecord::Migration[6.0]
   disable_ddl_transaction!
 
   def up
-    if (connection.postgresql_version >= 110000)
+    if connection.postgresql_version >= 110000
       add_column :learning_outcome_results, :workflow_state, :string, default: 'active', null: false, if_not_exists: true
     else
       add_column :learning_outcome_results, :workflow_state, :string, if_not_exists: true

@@ -197,7 +197,7 @@ module CC
       node.assignment_group_identifierref key_generator.create_key(assignment.assignment_group) if assignment.assignment_group && (!manifest || manifest.export_object?(assignment.assignment_group))
       if assignment.grading_standard
         if assignment.grading_standard.context == assignment.context
-          node.grading_standard_identifierref key_generator.create_key(assignment.grading_standard) if (!manifest || manifest.export_object?(assignment.grading_standard))
+          node.grading_standard_identifierref key_generator.create_key(assignment.grading_standard) if !manifest || manifest.export_object?(assignment.grading_standard)
         else
           node.grading_standard_external_identifier assignment.grading_standard.id
         end

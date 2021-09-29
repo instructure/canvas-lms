@@ -124,7 +124,7 @@ describe "student groups" do
         # first item in the student_list array is the group name
         # I skip the group name and then do an index-1 to account for skipping index 0
         student_list.each_with_index do |student, index|
-          if (index != 0)
+          if index != 0
             expect(student).to include_text(expected_student_list[index - 1].to_s)
           end
         end
@@ -281,7 +281,7 @@ describe "student groups" do
         # first item in the student_list array is the group name
         # I skip the group name and then do an index-1 to account for skipping index 0
         student_list.each_with_index do |student, index|
-          if (index != 0)
+          if index != 0
             expect(student).to include_text(expected_student_list[index - 1].to_s)
           end
         end

@@ -1467,7 +1467,7 @@ class DiscussionTopic < ActiveRecord::Base
       next true if user && user.id == self.user_id
 
       next false unless context
-      next false unless (is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum))
+      next false unless is_announcement ? context.grants_right?(user, :read_announcements) : context.grants_right?(user, :read_forum)
 
       # Don't have visibilites for any of the specific sections in a section specific topic
       if context.is_a?(Course) && self.try(:is_section_specific)
@@ -1521,9 +1521,9 @@ class DiscussionTopic < ActiveRecord::Base
 
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
-      if (self.delayed_post_at && self.delayed_post_at > Time.now)
+      if self.delayed_post_at && self.delayed_post_at > Time.now
         locked = { object: self, unlock_at: delayed_post_at }
-      elsif (self.lock_at && self.lock_at < Time.now)
+      elsif self.lock_at && self.lock_at < Time.now
         locked = { object: self, lock_at: lock_at, can_view: true }
       elsif !opts[:skip_assignment] && (l = assignment&.low_level_locked_for?(user, opts))
         locked = l

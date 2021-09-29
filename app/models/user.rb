@@ -2246,7 +2246,7 @@ class User < ActiveRecord::Base
 
   def upcoming_events(opts = {})
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if (!context_codes || context_codes.empty?)
+    return [] if !context_codes || context_codes.empty?
 
     now = Time.zone.now
 
@@ -2339,7 +2339,7 @@ class User < ActiveRecord::Base
   def undated_events(opts = {})
     opts = opts.dup
     context_codes = opts[:context_codes] || (opts[:contexts] ? setup_context_lookups(opts[:contexts]) : self.cached_context_codes)
-    return [] if (!context_codes || context_codes.empty?)
+    return [] if !context_codes || context_codes.empty?
 
     undated_events = []
     undated_events += CalendarEvent.active.for_user_and_context_codes(self, context_codes, []).undated.updated_after(opts[:updated_at])

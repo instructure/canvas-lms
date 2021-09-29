@@ -550,7 +550,7 @@ module AccountReports::ReportHelper
   def read_csv_in_chunks(filename, chunk_size = 1000)
     CSV.open(filename) do |csv|
       rows = []
-      while (!(row = csv.readline).nil?)
+      while !(row = csv.readline).nil?
         rows << row
         if rows.size == chunk_size
           yield rows

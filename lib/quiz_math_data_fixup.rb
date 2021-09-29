@@ -124,7 +124,7 @@ module QuizMathDataFixup
         mml = n.attribute('data-mathml') if n
         mjnodes.each(&:remove)
       end
-      if (latex.content.length > 0)
+      if latex.content.length > 0
         if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/ && latex.content !~ /[\\+-^=<>]|{.+}/
           # the content is not delimineted latex,
           # and doesn't even _look like_ latex
