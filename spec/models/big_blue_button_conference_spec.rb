@@ -35,11 +35,13 @@ describe BigBlueButtonConference do
       @course = course_factory
       user_with_communication_channel
       @course.enroll_teacher(@user).accept
+      @create_time = (Time.zone.now.to_f * 1000).to_i # Time since epoch in milliseconds
       @conference = BigBlueButtonConference.create!(
         :title => "my conference",
         :user => @user,
         :context => @course
       )
+      @conference.settings[:create_time] = @create_time
     end
 
     it "correctlies retrieve a config hash" do
@@ -56,7 +58,7 @@ describe BigBlueButtonConference do
       @conference.settings[:admin_key] = 'admin'
       @conference.settings[:user_key] = 'user'
       @conference.save
-      params = { :fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id }
+      params = { :fullName => user_factory.name, :meetingID => @conference.conference_key, :userID => user_factory.id, :createTime => @conference.settings[:create_time] }
       admin_params = params.merge(:password => 'admin').to_query
       user_params = params.merge(:password => 'user').to_query
       expect(@conference.admin_join_url(@user)).to eql("https://bbb.instructure.com/bigbluebutton/api/join?#{admin_params}&checksum=" +
@@ -71,16 +73,18 @@ describe BigBlueButtonConference do
     end
 
     it "recreates the conference" do
-      expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
+      allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
       # load a new instance to clear out @conference_active
       @conference = WebConference.find(@conference.id)
-      expect(@conference).to receive(:send_request).with(:create, anything).and_return(true)
+      allow(@conference).to receive(:send_request).with(:create, anything).and_return({ createTime: @create_time })
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)
     end
 
     it "does not recreate the conference if it is active" do
-      expect(@conference).to receive(:send_request).once.with(:create, anything).and_return(true)
+      expect(@conference).to receive(:send_request).once.with(:create, anything).and_return({
+                                                                                              createTime: @create_time,
+                                                                                            })
       @conference.initiate_conference
       expect(@conference).to be_active
       expect(@conference.craft_url(@user)).to match(/\Ahttps:\/\/bbb\.instructure\.com\/bigbluebutton\/api\/join/)

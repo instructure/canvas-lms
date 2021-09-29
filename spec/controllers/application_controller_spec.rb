@@ -2063,6 +2063,13 @@ describe ApplicationController do
         expect(controller.send(:show_immersive_reader?)).to be true
       end
 
+      it "is false when there is no logged in user" do
+        controller.instance_variable_set(:@current_user, nil)
+        controller.params[:controller] = "wiki_pages"
+        controller.params[:action] = "show"
+        expect(controller.send(:show_immersive_reader?)).to be false
+      end
+
       it "is false on pages where immersive reader is not supported" do
         controller.params[:controller] = "discussion_topics"
         controller.params[:action] = "index"
