@@ -45,7 +45,7 @@ end
 describe Api::V1::User do
   before :once do
     @admin = account_admin_user
-    course_with_student(:user => user_with_pseudonym(:name => 'Student', :username => 'pvuser@example.com'))
+    course_with_student(:user => user_with_pseudonym(:name => 'Sheldon Cooper', :username => 'pvuser@example.com'))
     @student = @user
     @student.pseudonym.update_attribute(:sis_user_id, 'sis-user-id')
     @user = @admin
@@ -60,6 +60,16 @@ describe Api::V1::User do
   end
 
   context 'user_json' do
+    it 'supports optionally including first_name' do
+      json = @test_api.user_json(@student, @admin, {}, ['first_name'], @course)
+      expect(json['first_name']).to eq @student.first_name
+    end
+
+    it 'supports optionally including last_name' do
+      json = @test_api.user_json(@student, @admin, {}, ['last_name'], @course)
+      expect(json['last_name']).to eq @student.last_name
+    end
+
     it 'supports optionally providing the avatar if avatars are enabled' do
       @student.account.set_service_availability(:avatars, false)
       @student.account.save!
@@ -345,11 +355,11 @@ describe Api::V1::User do
                @test_api.user_json(@student, @admin, {}, [])
              end
       expect(json).to eq({
-                           "name" => "Student",
-                           "sortable_name" => "Student",
+                           "name" => "Sheldon Cooper",
+                           "sortable_name" => "Cooper, Sheldon",
                            "id" => @student.id,
                            'created_at' => @student.created_at.iso8601,
-                           "short_name" => "Student",
+                           "short_name" => "Sheldon Cooper",
                            "sis_user_id" => "sis-user-id",
                            "integration_id" => nil,
                            "sis_import_id" => @student.pseudonym.sis_batch_id,
