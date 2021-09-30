@@ -363,6 +363,8 @@ class Course < ActiveRecord::Base
   end
 
   def update_enrollment_states_if_necessary
+    return if saved_change_to_id # new object, nothing to possibly invalidate
+
     if (saved_changes.keys & %w{restrict_enrollments_to_course_dates account_id enrollment_term_id}).any? ||
        (self.restrict_enrollments_to_course_dates? && (saved_changes.keys & %w{start_at conclude_at}).any?) ||
        (self.saved_change_to_workflow_state? && (completed? || self.workflow_state_before_last_save == 'completed'))
