@@ -108,8 +108,8 @@ describe InfoController do
       get 'readiness'
       expect(response.code).to eq '503'
       components = JSON.parse(response.body)['components']
-      redis = components.find { |c| c['name'] == 'redis' }
-      expect(redis['status']).to eq 503
+      ha_cache = components.find { |c| c['name'] == 'ha_cache' }
+      expect(ha_cache['status']).to eq 503
     end
 
     it 'catchs any timeouts thrown and logs them as warnings' do
@@ -128,7 +128,7 @@ describe InfoController do
       expect(response).to be_successful
       components = JSON.parse(response.body)['components']
       expect(components.map { |c| c['name'] }).to eq %w[
-        common_css common_js consul filesystem jobs postgresql redis rev_manifest vault
+        common_css common_js consul filesystem jobs postgresql ha_cache rev_manifest vault
       ]
       expect(components.map { |c| c['status'] }).to eq [200, 200, 200, 200, 200, 200, 200, 200, 200]
     end
