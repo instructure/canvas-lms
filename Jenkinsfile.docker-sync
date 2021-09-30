@@ -28,11 +28,11 @@ final SYNC_IMAGES = [
     target: 'starlord.inscloudgate.net/jenkins/dockerfile:1.0-experimental',
   ],
   'instructure/ruby-passenger:2.6': [
-    job: '/Canvas/main-canvas-postgres-12-ruby-2.6-postmerge',
+    job: null,
     target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.6',
   ],
   'instructure/ruby-passenger:2.7': [
-    job: null,
+    job: '/Canvas/main-postmerge',
     target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.7',
   ],
   'instructure/ruby-passenger:2.7-bionic': [
