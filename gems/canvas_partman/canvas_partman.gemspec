@@ -14,7 +14,7 @@ Gem::Specification.new do |spec|
   spec.license       = 'AGPL'
 
   spec.add_dependency 'activerecord', '>= 3.2'
-  spec.add_dependency 'activerecord-pg-extensions', '>= 0.3.0'
+  spec.add_dependency 'activerecord-pg-extensions', '~> 0.4'
   spec.add_dependency 'pg', '>= 0.17', '< 2.0'
 
   spec.add_development_dependency 'bundler', '~> 2.2'

@@ -291,7 +291,7 @@ module Lti
         # it in the launch as "truncated"
         results = results.first(limit) << 'truncated' if results.length > limit
         results.join(',')
-      rescue ActiveRecord::QueryTimeout
+      rescue ActiveRecord::QueryCanceled
         "timed out"
       end
     end
