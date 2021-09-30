@@ -27,6 +27,8 @@ import React from 'react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '@canvas/assignments/graphql/student/Submission'
 
+jest.mock('@canvas/upload-file')
+
 describe('ContentTabs', () => {
   beforeAll(() => {
     window.ENV.use_rce_enhancements = true
@@ -506,6 +508,226 @@ describe('ContentTabs', () => {
       )
 
       expect(queryByText(groupMatcher)).not.toBeInTheDocument()
+    })
+  })
+
+  describe('file upload handling', () => {
+    let uploadedFileCount
+
+    beforeEach(() => {
+      uploadedFileCount = 0
+      uploadFileModule.uploadFile.mockImplementation(_file => {
+        uploadedFileCount += 1
+        return {id: `${uploadedFileCount}`}
+      })
+    })
+
+    afterEach(() => {
+      uploadFileModule.uploadFile.mockReset()
+    })
+
+    async function submitFiles(container, files) {
+      await waitFor(() => expect(container.querySelector('input[type="file"]')).toBeInTheDocument())
+      const fileInput = container.querySelector('input[type="file"]')
+      fireEvent.change(fileInput, {target: {files}})
+    }
+
+    it('calls uploadFile once for each file received that needs uploading', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 2}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [
+        new File(['foo'], 'file1.pdf', {type: 'application/pdf'}),
+        new File(['foo2'], 'file2.pdf', {type: 'application/pdf'})
+      ])
+
+      const {calls} = uploadFileModule.uploadFile.mock
+      expect(calls).toHaveLength(2)
+      expect(calls[0][1]).toEqual({content_type: 'application/pdf', name: 'file1.pdf'})
+      expect(calls[1][1]).toEqual({content_type: 'application/pdf', name: 'file2.pdf'})
+    })
+
+    // Byproduct of how the dummy submissions are being handled. Check out ViewManager
+    // for some context around this
+    it('creates a submission draft for the current attempt when not on attempt 0', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 2}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            activeSubmissionType: 'online_upload',
+            attempt: 2,
+            fileIds: ['1']
+          }
+        })
+      })
+    })
+
+    it('creates a submission draft for attempt 1 when on attempt 0', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const {container} = render(
+        <MockedProvider>
+          <AttemptTab {...props} focusAttemptOnInit />
+        </MockedProvider>
+      )
+
+      await submitFiles(container, [new File(['foo'], 'file1.pdf', {type: 'application/pdf'})])
+
+      await waitFor(() => {
+        expect(props.createSubmissionDraft).toHaveBeenCalledWith({
+          variables: {
+            id: '1',
+            activeSubmissionType: 'online_upload',
+            attempt: 1,
+            fileIds: ['1']
+          }
+        })
+      })
+    })
+
+    it('renders a progress bar with the name of each file being uploaded', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const progressHandlers = []
+
+      uploadFileModule.uploadFile.mockReset()
+      uploadFileModule.uploadFile
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '1', name: 'file1.pdf'})
+        })
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '2', name: 'file2.pdf'})
+        })
+
+      const {container, findAllByRole} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+      await submitFiles(container, [
+        new File(['asdf'], 'file1.pdf', {type: 'application/pdf'}),
+        new File(['sdfg'], 'file2.pdf', {type: 'application/pdf'})
+      ])
+
+      progressHandlers[0]({loaded: 10, total: 100})
+      progressHandlers[1]({loaded: 50, total: 250})
+
+      const progressBars = await findAllByRole('progressbar')
+      expect(progressBars).toHaveLength(2)
+
+      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
+      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+      expect(progressBars[0]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for file1.pdf 10 percent'
+      )
+
+      expect(progressBars[1]).toHaveAttribute('aria-valuenow', '50')
+      expect(progressBars[1]).toHaveAttribute('aria-valuemax', '250')
+      expect(progressBars[1]).toHaveAttribute('aria-valuetext', '20 percent')
+      expect(progressBars[1]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for file2.pdf 20 percent'
+      )
+    })
+
+    it('shows the URL of a file being uploaded if no name is present', async () => {
+      const props = await mockAssignmentAndSubmission({
+        Assignment: {submissionTypes: ['online_upload']},
+        Submission: {attempt: 0}
+      })
+      props.focusAttemptOnInit = true
+      props.updateUploadingFiles = jest.fn()
+      props.createSubmissionDraft = jest.fn()
+
+      const progressHandlers = []
+
+      uploadFileModule.uploadFile.mockReset()
+      uploadFileModule.uploadFile
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '1', name: 'file1.pdf'})
+        })
+        .mockImplementationOnce((url, data, file, ajaxLib, onProgress) => {
+          progressHandlers.push(onProgress)
+          return Promise.resolve({id: '2', name: 'file2.pdf'})
+        })
+
+      const {findAllByRole} = render(
+        <MockedProvider>
+          <AttemptTab {...props} />
+        </MockedProvider>
+      )
+
+      fireEvent(
+        window,
+        new MessageEvent('message', {
+          data: {
+            messageType: 'LtiDeepLinkingResponse',
+            content_items: [
+              {
+                url: 'http://localhost/some-lti-file',
+                mediaType: 'plain/txt'
+              }
+            ]
+          }
+        })
+      )
+
+      progressHandlers[0]({loaded: 10, total: 100})
+
+      const progressBars = await findAllByRole('progressbar')
+      expect(progressBars).toHaveLength(1)
+
+      expect(progressBars[0]).toHaveAttribute('aria-valuenow', '10')
+      expect(progressBars[0]).toHaveAttribute('aria-valuemax', '100')
+      expect(progressBars[0]).toHaveAttribute('aria-valuetext', '10 percent')
+      expect(progressBars[0]).toHaveAttribute(
+        'aria-label',
+        'Upload progress for http://localhost/some-lti-file 10 percent'
+      )
     })
   })
 })
