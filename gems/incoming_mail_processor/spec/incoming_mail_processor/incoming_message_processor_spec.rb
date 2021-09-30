@@ -139,6 +139,42 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     end
   end
 
+  describe ".healthy?" do
+    before do
+      @mock_mailbox = double
+      allow(IncomingMessageProcessor).to receive(:create_mailbox).and_return(@mock_mailbox)
+      IncomingMessageProcessor.logger = logger
+
+      config = {
+        'poll_interval' => 42,
+        'ignore_stdin' => true,
+        'imap' => {
+          'server' => "fake",
+          'port' => 4422,
+          'username' => "fake@fake.fake",
+          'password' => "fake",
+          'ssl' => true,
+          'filter' => ['ALL'],
+        }
+      }
+
+      IncomingMessageProcessor.configure(config)
+    end
+
+    it "returns true after a successful connect+disconnect" do
+      expect(@mock_mailbox).to receive(:connect)
+      expect(@mock_mailbox).to receive(:disconnect)
+
+      expect(IncomingMessageProcessor).to be_healthy
+    end
+
+    it "errors if connect errors" do
+      allow(@mock_mailbox).to receive(:connect).and_raise(Timeout::Error)
+
+      expect { IncomingMessageProcessor.healthy? }.to raise_error(Timeout::Error)
+    end
+  end
+
   describe "#process_single" do
     before do
       expect_no_errors

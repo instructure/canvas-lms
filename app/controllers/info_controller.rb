@@ -325,6 +325,12 @@ class InfoController < ApplicationController
         ).nil?
       end
     end
+
+    if IncomingMailProcessor::IncomingMessageProcessor.run_periodically?
+      ret[:incoming_mail] = -> do
+        IncomingMailProcessor::IncomingMessageProcessor.healthy?
+      end
+    end
     ret
   end
 
