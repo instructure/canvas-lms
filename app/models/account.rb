@@ -564,8 +564,10 @@ class Account < ActiveRecord::Base
   end
 
   def update_account_associations_if_changed
-    if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
-      self.shard.activate do
+    # if the account structure changed, but this is _not_ a new object
+    if (saved_change_to_parent_account_id? || saved_change_to_root_account_id?) &&
+       !saved_change_to_id?
+      shard.activate do
         delay_if_production.update_account_associations
       end
     end
