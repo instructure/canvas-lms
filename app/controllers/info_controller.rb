@@ -185,7 +185,7 @@ class InfoController < ApplicationController
       # returns a boolean
       postgresql: check.call { Account.connection.active? },
       # nil response treated as truthy
-      redis: check.call { MultiCache.cache.fetch('readiness').nil? },
+      ha_cache: check.call { MultiCache.cache.fetch('readiness').nil? },
       # ensures `gulp rev` has ran; returns a string, treated as truthy
       rev_manifest: check.call { Canvas::Cdn::RevManifest.gulp_manifest.values.first },
       # ensures we retrieved something back from Vault; returns a boolean
@@ -235,7 +235,7 @@ class InfoController < ApplicationController
     }
 
     if InstFS.enabled?
-      ret['instructure_file_service'] = -> do
+      ret[:insf_fs] = -> do
         CanvasHttp
           .get(URI.join(InstFS.app_host, '/readiness').to_s)
           .is_a?(Net::HTTPSuccess)
@@ -250,7 +250,7 @@ class InfoController < ApplicationController
     end
 
     if Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST]
-      ret['rich_content_service'] = -> do
+      ret[:rich_content_service] = -> do
         CanvasHttp
           .get(
             URI::HTTPS.build(
