@@ -19,7 +19,11 @@ require 'spec_helper'
 
 module DynamicSettings
   RSpec.describe PrefixProxy do
-    let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes) }
+    let(:proxy) do
+      PrefixProxy.new(
+        'foo/bar', service: nil, tree: nil, default_ttl: 3.minutes, data_center: 'iad-test'
+      )
+    end
 
     after(:each) do
       DynamicSettings.cache.clear(force: true)
@@ -205,7 +209,7 @@ module DynamicSettings
                                                          'Value' => 'bar3'
                                                        }
                                                      }
-                                                   ])
+                                                   ], {})
         proxy.set_keys(kvs)
       end
 
@@ -232,7 +236,7 @@ module DynamicSettings
                                                          'Value' => 'bar3'
                                                        }
                                                      }
-                                                   ])
+                                                   ], dc: 'iad-test')
         proxy.set_keys(kvs, global: true)
       end
     end
