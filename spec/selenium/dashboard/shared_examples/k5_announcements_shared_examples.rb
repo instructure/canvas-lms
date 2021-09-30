@@ -110,7 +110,6 @@ shared_examples_for 'k5 homeroom announcements' do
 
   context 'announcement attachments with the better file downloading and previewing flags on' do
     before :once do
-      Account.site_admin.enable_feature!(:rce_better_file_downloading)
       Account.site_admin.enable_feature!(:rce_better_file_previewing)
 
       attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
