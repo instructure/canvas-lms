@@ -624,7 +624,9 @@ class GradebooksController < ApplicationController
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
       js_env(
+        COURSE_URL: named_context_url(@context, :context_url),
         COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
+        OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
         OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?) &&
           Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
       )

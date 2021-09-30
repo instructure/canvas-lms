@@ -17,113 +17,14 @@
  */
 
 import React from 'react'
-import {oneOf, bool, string} from 'prop-types'
-import {IconMiniArrowDownSolid} from '@instructure/ui-icons'
-import {Button} from '@instructure/ui-buttons'
-import {Menu} from '@instructure/ui-menu'
-import {Text} from '@instructure/ui-text'
-import I18n from 'i18n!gradebook'
+import GradebookMenu from './gradebook_menu'
 
-class GradebookMenu extends React.Component {
-  static propTypes = {
-    courseUrl: string.isRequired,
-    learningMasteryEnabled: bool.isRequired,
-    variant: oneOf(['DefaultGradebook', 'DefaultGradebookLearningMastery']).isRequired
-  }
-
-  static menuItemsForGradebook = {
-    DefaultGradebook: ['LearningMastery', 'IndividualGradebook', 'Separator', 'GradebookHistory'],
-    DefaultGradebookLearningMastery: [
-      'DefaultGradebook',
-      'IndividualGradebook',
-      'Separator',
-      'GradebookHistory'
-    ]
-  }
-
-  setLocation(url) {
-    window.location = url
-  }
-
-  handleDefaultGradebookSelect() {
-    this.setLocation(`${this.props.courseUrl}/gradebook?view=gradebook`)
-  }
-
-  handleLearningMasterySelect() {
-    this.setLocation(`${this.props.courseUrl}/gradebook?view=learning_mastery`)
-  }
-
-  handleIndividualGradebookSelect() {
-    this.setLocation(
-      `${this.props.courseUrl}/gradebook/change_gradebook_version?version=individual`
-    )
-  }
-
-  handleGradebookHistorySelect() {
-    this.setLocation(`${this.props.courseUrl}/gradebook/history`)
-  }
-
-  renderDefaultGradebookMenuItem() {
-    const key = 'default-gradebook'
-    return (
-      <Menu.Item onSelect={() => this.handleDefaultGradebookSelect()} key={key}>
-        <span data-menu-item-id={key}>{I18n.t('Gradebook…')}</span>
-      </Menu.Item>
-    )
-  }
-
-  renderIndividualGradebookMenuItem() {
-    const key = 'individual-gradebook'
-    return (
-      <Menu.Item onSelect={() => this.handleIndividualGradebookSelect()} key={key}>
-        <span data-menu-item-id={key}>{I18n.t('Individual View…')}</span>
-      </Menu.Item>
-    )
-  }
-
-  renderGradebookHistoryMenuItem() {
-    const key = 'gradebook-history'
-    return (
-      <Menu.Item onSelect={() => this.handleGradebookHistorySelect()} key={key}>
-        <span data-menu-item-id={key}>{I18n.t('Gradebook History…')}</span>
-      </Menu.Item>
-    )
-  }
-
-  renderLearningMasteryMenuItem() {
-    if (!this.props.learningMasteryEnabled) return null
-    const key = 'learning-mastery'
-    return (
-      <Menu.Item onSelect={() => this.handleLearningMasterySelect()} key={key}>
-        <span data-menu-item-id={key}>{I18n.t('Learning Mastery…')}</span>
-      </Menu.Item>
-    )
-  }
-
-  renderSeparatorMenuItem() {
-    return <Menu.Separator key="separator" />
-  }
-
-  renderMenuItems() {
-    const menuItems = GradebookMenu.menuItemsForGradebook[this.props.variant]
-    return menuItems.map(menuItem => this[`render${menuItem}MenuItem`]())
-  }
-
-  renderButton() {
-    let label = I18n.t('Gradebook')
-    if (this.props.variant === 'DefaultGradebookLearningMastery') label = I18n.t('Learning Mastery')
-    return (
-      <Button variant="link">
-        <Text color="primary">
-          {label} <IconMiniArrowDownSolid />
-        </Text>
-      </Button>
-    )
-  }
-
-  render() {
-    return <Menu trigger={this.renderButton()}>{this.renderMenuItems()}</Menu>
-  }
+export default function GradebookMenuContainer({courseUrl, learningMasteryEnabled, variant}) {
+  return (
+    <GradebookMenu
+      courseUrl={courseUrl}
+      learningMasteryEnabled={learningMasteryEnabled}
+      variant={variant}
+    />
+  )
 }
-
-export default GradebookMenu
