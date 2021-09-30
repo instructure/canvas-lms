@@ -242,6 +242,13 @@ class InfoController < ApplicationController
       end
     end
 
+    if Canvas.redis_enabled?
+      ret[:redis] = -> do
+        nodes = Canvas.redis.try(:ring)&.nodes || Array.wrap(Canvas.redis)
+        nodes.all? { |node| node.get("deep_check").nil? }
+      end
+    end
+
     if Services::RichContent.send(:service_settings)[:RICH_CONTENT_APP_HOST]
       ret['rich_content_service'] = -> do
         CanvasHttp
