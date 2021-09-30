@@ -44,7 +44,7 @@ module Qti
         answer[:end] = lte.text.to_f
       end
 
-      if (answer[:start] && answer[:end])
+      if answer[:start] && answer[:end]
         answer[:numerical_answer_type] = "range_answer"
         @question[:answers] << answer
       elsif (equal = @doc.at_css('responseCondition equal baseValue'))

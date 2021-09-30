@@ -149,7 +149,7 @@ module Canvas::ICU
   end
 
   def self.compare(a, b)
-    if (!a.is_a?(String) || !b.is_a?(String))
+    if !a.is_a?(String) || !b.is_a?(String)
       a <=> b
     else
       collator.compare(a, b)

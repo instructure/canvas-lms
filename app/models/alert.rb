@@ -90,7 +90,7 @@ class Alert < ActiveRecord::Base
   def criteria=(values)
     if values[0].is_a? Hash
       values = values.map do |params|
-        if (params[:id].present?)
+        if params[:id].present?
           id = params.delete(:id).to_i
           criterion = self.criteria.to_ary.find { |c| c.id == id }
           criterion.attributes = params

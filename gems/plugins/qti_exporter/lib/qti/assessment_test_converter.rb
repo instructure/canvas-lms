@@ -238,7 +238,7 @@ module Qti
             copy[:question_bank_migration_id] = bank_ref_id
             @quiz[:questions] << copy
           end
-        elsif (!group[:questions].empty? || group[:question_bank_migration_id])
+        elsif !group[:questions].empty? || group[:question_bank_migration_id]
           @quiz[:questions] << group
         end
       end

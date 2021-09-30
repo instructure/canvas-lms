@@ -125,6 +125,8 @@ Style/Encoding:
   Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
+Style/ParenthesesAroundCondition:
+  Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/SpecialGlobalVars:

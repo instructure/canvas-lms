@@ -457,8 +457,8 @@ class FilesController < ApplicationController
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
 
-    if ((@submission && authorized_action(@submission, @current_user, :read)) ||
-        ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
+    if (@submission && authorized_action(@submission, @current_user, :read)) ||
+       ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download))
       render :json => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end

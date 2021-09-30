@@ -272,7 +272,7 @@ class ActiveRecord::Base
   end
 
   def touch_context
-    return if (@@skip_touch_context ||= false || @skip_touch_context ||= false)
+    return if @@skip_touch_context ||= false || @skip_touch_context ||= false
 
     if self.respond_to?(:context_type) && self.respond_to?(:context_id) && self.context_type && self.context_id
       self.class.connection.after_transaction_commit do
@@ -1207,7 +1207,7 @@ ActiveRecord::Relation.class_eval do
 
   def not_recently_touched
     scope = self
-    if ((personal_space = Setting.get('touch_personal_space', 0).to_i) != 0)
+    if (personal_space = Setting.get('touch_personal_space', 0).to_i) != 0
       personal_space -= 1
       # truncate to seconds
       bound = Time.at(Time.now.to_i - personal_space).utc

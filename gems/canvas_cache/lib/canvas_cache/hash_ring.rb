@@ -114,7 +114,7 @@ module CanvasCache
       lower = 0
       idx = 0
 
-      while (lower <= upper) do
+      while lower <= upper do
         idx = (lower + upper) / 2
         comp = ary[idx] <=> value
 

@@ -1654,11 +1654,11 @@ class Assignment < ActiveRecord::Base
     RequestCache.cache(locked_request_cache_key(user)) do
       locked = false
       assignment_for_user = self.overridden_for(user)
-      if (assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now)
+      if assignment_for_user.unlock_at && assignment_for_user.unlock_at > Time.zone.now
         locked = { object: assignment_for_user, unlock_at: assignment_for_user.unlock_at }
       elsif self.could_be_locked && (item = locked_by_module_item?(user, opts))
         locked = { object: self, module: item.context_module }
-      elsif (assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now)
+      elsif assignment_for_user.lock_at && assignment_for_user.lock_at < Time.zone.now
         locked = { object: assignment_for_user, lock_at: assignment_for_user.lock_at, can_view: true }
       else
         each_submission_type do |submission, _, short_type|
@@ -3590,7 +3590,7 @@ class Assignment < ActiveRecord::Base
   # You must also check submission.eligible_for_showing_score_statistics
   def can_view_score_statistics?(user)
     # The assignment must have points_possible > 0,
-    return false unless (points_possible.present? && points_possible > 0)
+    return false unless points_possible.present? && points_possible > 0
 
     # Students can only see statistics when count >= 5 and not disabled by the instructor
     # Instructor can see statistics at any time.

@@ -397,7 +397,7 @@ module CC
             end # c_node
 
             res_node.setvar '100', :action => 'Set', :varname => 'SCORE'
-            res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb") unless (answer['comments'].blank? && answer['comments_html'].blank?)
+            res_node.displayfeedback(:feedbacktype => 'Response', :linkrefid => "#{answer['id']}_fb") unless answer['comments'].blank? && answer['comments_html'].blank?
             correct_feedback_ref(res_node, question)
           end # res_node
         end
@@ -421,7 +421,7 @@ module CC
             r_node.setvar(correct_points, :varname => 'SCORE', :action => 'Add')
           end
 
-          unless (answer['comments'].blank? && answer['comments_html'].blank?)
+          unless answer['comments'].blank? && answer['comments_html'].blank?
             node.respcondition do |r_node|
               r_node.conditionvar do |c_node|
                 c_node.not do |n_node|
@@ -470,7 +470,7 @@ module CC
 
       def answer_feedback_respconditions(node, question)
         question['answers'].each do |answer|
-          unless (answer['comments'].blank? && answer['comments_html'].blank?)
+          unless answer['comments'].blank? && answer['comments_html'].blank?
             respident = 'response1'
             if MULTI_ANSWER_TYPES.member? question['question_type']
               respident = "response_#{answer['blank_id']}"

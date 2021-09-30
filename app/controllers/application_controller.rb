@@ -141,7 +141,7 @@ class ApplicationController < ActionController::Base
         ]
 
         # Cisco doesn't want to load lato extended. see LS-1559
-        if (Setting.get('disable_lato_extended', 'false') == 'false')
+        if Setting.get('disable_lato_extended', 'false') == 'false'
           editor_css << view_context.stylesheet_path(css_url_for('lato_extended'))
           editor_hc_css << view_context.stylesheet_path(css_url_for('lato_extended'))
         else
@@ -1247,7 +1247,7 @@ class ApplicationController < ActionController::Base
       @current_user = @context if @context.is_a?(User)
     end
     if !@context || (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
-      @problem ||= t("#application.errors.invalid_feed_parameters", "Invalid feed parameters.") if (opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym))
+      @problem ||= t("#application.errors.invalid_feed_parameters", "Invalid feed parameters.") if opts[:only] && !opts[:only].include?(@context.class.to_s.underscore.to_sym)
       @problem ||= t "#application.errors.feed_not_found", "Could not find feed."
       render template: "shared/unauthorized_feed", status: :bad_request, formats: [:html]
       return false
@@ -1746,7 +1746,7 @@ class ApplicationController < ActionController::Base
       @wiki = @context.wiki
 
       @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
-      if (params[:format] && !['json', 'html'].include?(params[:format]))
+      if params[:format] && !['json', 'html'].include?(params[:format])
         @page_name += ".#{params[:format]}"
         params[:format] = 'html'
       end

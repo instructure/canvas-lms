@@ -495,7 +495,7 @@ class Account < ActiveRecord::Base
 
   def require_acceptance_of_terms?(user)
     return false if !terms_required?
-    return true if (user.nil? || user.new_record?)
+    return true if user.nil? || user.new_record?
 
     soc2_start_date = Setting.get('SOC2_start_date', Time.new(2015, 5, 16, 0, 0, 0).utc).to_datetime
     return false if user.created_at < soc2_start_date
@@ -949,7 +949,7 @@ class Account < ActiveRecord::Base
   def self.account_chain(starting_account_id)
     chain = []
 
-    if (starting_account_id.is_a?(Account))
+    if starting_account_id.is_a?(Account)
       chain << starting_account_id
       starting_account_id = starting_account_id.parent_account_id
     end
@@ -976,7 +976,7 @@ class Account < ActiveRecord::Base
     block = lambda do |_name|
       Shard.shard_for(starting_account_id).activate do
         id_chain = []
-        if (starting_account_id.is_a?(Account))
+        if starting_account_id.is_a?(Account)
           id_chain << starting_account_id.id
           starting_account_id = starting_account_id.parent_account_id
         end

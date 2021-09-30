@@ -962,7 +962,7 @@ class Submission < ActiveRecord::Base
       #   score_cache_time = 86400
       # end
       # only cache the score for 20 minutes or 24 hours based on when the paper was submitted
-      if (score_age > score_cache_time)
+      if score_age > score_cache_time
         # check if we just recently requested this score
         last_checked = 1000 # default to a high number so that if it is not set, it won't effect the outcome
         if !data[:similarity_score_check_time].blank?
@@ -2564,8 +2564,8 @@ class Submission < ActiveRecord::Base
          end
     state = cp.try(:workflow_state)
     return state if state.present?
-    return "read" if (assignment.deleted? || assignment.muted? || !self.user_id)
-    return "unread" if (self.grade || self.score)
+    return "read" if assignment.deleted? || assignment.muted? || !self.user_id
+    return "unread" if self.grade || self.score
 
     has_comments = if visible_submission_comments.loaded?
                      visible_submission_comments.detect { |c| c.author_id != user_id }

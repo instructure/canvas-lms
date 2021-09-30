@@ -61,7 +61,7 @@ class Conversation < ActiveRecord::Base
   end
 
   def self.private_hash_for(users_or_user_ids, context_code = nil)
-    if (users_or_user_ids.first.is_a?(User))
+    if users_or_user_ids.first.is_a?(User)
       user_ids = Shard.birth.activate { users_or_user_ids.map(&:id) }
     else
       user_ids = users_or_user_ids

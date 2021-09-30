@@ -31,9 +31,9 @@ class BookmarkService < UserService
     description = opts[:comments] || ""
     tags = opts[:tags] || ['instructure']
     begin
-      if (self.service == 'delicious')
+      if self.service == 'delicious'
         delicious_post_bookmark(self, url, title, description, tags)
-      elsif (self.service == 'diigo')
+      elsif self.service == 'diigo'
         Diigo::Connection.diigo_post_bookmark(self, url, title, description, tags)
       end
     rescue => e

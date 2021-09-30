@@ -40,7 +40,7 @@ describe "admin settings tab" do
   end
 
   def state_checker checker, check_state
-    if (checker)
+    if checker
       expect(check_state).to be_truthy
     else
       expect(check_state).to be_falsey
@@ -50,7 +50,7 @@ describe "admin settings tab" do
   def check_box_verifier(css_selectors, features, checker = true)
     is_symbol = false
 
-    css_selectors = [css_selectors] unless (css_selectors.is_a? Array)
+    css_selectors = [css_selectors] unless css_selectors.is_a? Array
 
     if features.is_a? Symbol
       is_symbol = true
@@ -58,7 +58,7 @@ describe "admin settings tab" do
         features = get_default_services
       end
     end
-    if ((features.is_a? Array) && !checker)
+    if (features.is_a? Array) && !checker
       default_selectors = []
       features.each do |feature|
         check_state = Account.default.service_enabled?(feature)
@@ -73,18 +73,18 @@ describe "admin settings tab" do
       f(selector).click
     end
     click_submit
-    if (is_symbol == false)
+    if is_symbol == false
       check_state = Account.default.service_enabled?(features[:allowed_services])
       state_checker checker, check_state
     else
-      if (features.is_a? Array)
+      if features.is_a? Array
         default_selectors = []
         features.each do |feature|
           check_state = Account.default.service_enabled?(feature)
           state_checker checker, check_state
           default_selectors.push("#account_services_#{feature}")
         end
-        if (checker)
+        if checker
           default_selectors += css_selectors
         end
         css_selectors = default_selectors
@@ -131,7 +131,7 @@ describe "admin settings tab" do
 
     describe "allow self-enrollment" do
       def enrollment_helper(value = '')
-        if (value == '')
+        if value == ''
           f("#account_settings_self_enrollment option[value='']").click
         else
           f("#account_settings_self_enrollment option[value=#{value}]").click

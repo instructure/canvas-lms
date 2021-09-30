@@ -160,7 +160,7 @@ class RequestThrottle
   end
 
   def tool_id(request)
-    return unless (request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback})
+    return unless request.request_method_symbol == :post && request.fullpath =~ %r{/api/lti/v1/tools/([^/]+)/(?:ext_)?grade_passback}
 
     tool_id = $1
     return unless tool_id =~ Api::ID_REGEX

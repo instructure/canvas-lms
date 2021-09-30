@@ -362,7 +362,7 @@ class PageView < ActiveRecord::Base
     members = Set.new
     time = time..time unless time.is_a?(Range)
     bucket_time = time.begin
-    while (time.cover?(bucket_time))
+    while time.cover?(bucket_time)
       bucket = user_count_bucket_for_time(bucket_time)
       members.merge(Canvas.redis.smembers(bucket))
       bucket_time += 5.minutes

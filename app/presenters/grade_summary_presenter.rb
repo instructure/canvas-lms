@@ -114,7 +114,7 @@ class GradeSummaryPresenter
   end
 
   def validate_id
-    raise ActiveRecord::RecordNotFound if (!@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil?)
+    raise ActiveRecord::RecordNotFound if !@id_param.is_a?(User) && (@id_param.to_s =~ Api::ID_REGEX).nil?
 
     true
   end

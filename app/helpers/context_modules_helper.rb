@@ -86,7 +86,7 @@ module ContextModulesHelper
   def module_item_publishable_id(item)
     if item.nil?
       ''
-    elsif (item.content_type == 'WikiPage')
+    elsif item.content_type == 'WikiPage'
       item.content.url
     else
       (item.content && item.content.respond_to?(:published?) ? item.content.id : item.id)
