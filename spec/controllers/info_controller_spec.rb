@@ -155,6 +155,8 @@ describe InfoController do
         .with('rich-content-service')
         .and_return(DynamicSettings::FallbackProxy.new('app-host' => 'rce.instructure.com'))
       allow(CanvasHttp).to receive(:get).with(any_args).and_return(success_response)
+      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:run_periodically).and_return(true)
+      allow(IncomingMailProcessor::IncomingMessageProcessor).to receive(:healthy?).and_return(true)
     end
 
     it 'renders readiness check within json response' do
