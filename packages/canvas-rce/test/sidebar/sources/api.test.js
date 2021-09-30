@@ -86,6 +86,10 @@ describe('sources/api', () => {
     it('sets hasMore to true', () => {
       assert.strictEqual(apiSource.initializeImages(props)[props.contextType].hasMore, true)
     })
+
+    it('sets searchString to an empty string', () => {
+      assert.strictEqual(apiSource.initializeImages(props).searchString, '')
+    })
   })
 
   describe('URI construction (baseUri)', () => {
@@ -731,6 +735,7 @@ describe('sources/api', () => {
         files: []
       }
     }
+    props.searchString = 'panda'
 
     it('can fetch folders', () => {
       fetchMock.mock(/\/folders\?/, {body})
@@ -745,7 +750,8 @@ describe('sources/api', () => {
       return apiSource.fetchImages(props).then(page => {
         assert.deepStrictEqual(page, {
           bookmark: 'mo.images',
-          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
+          files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}],
+          searchString: 'panda'
         })
         fetchMock.restore()
       })
