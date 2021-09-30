@@ -23,6 +23,28 @@ import {StoreProvider} from '../shared/StoreContext'
 import formatMessage from '../../../format-message'
 import {headerFor, originFromHost} from '../../../sidebar/sources/api'
 
+export const handleUpload = (error, uploadData, onUploadComplete, uploadBookmark) => {
+  let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+
+  if (error?.name === 'FileSizeError') {
+    err_msg = formatMessage(
+      'Size of caption file is greater than the maximum {max} kb allowed file size.',
+      {max: error.maxBytes / 1000}
+    )
+  }
+
+  const editorComponent = Bridge.activeEditor()
+  let newBookmark
+  if (uploadBookmark) {
+    newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+    editorComponent.editor.selection.moveToBookmark(uploadBookmark)
+  }
+  onUploadComplete(err_msg, uploadData)
+  if (newBookmark) {
+    editorComponent.editor.selection.moveToBookmark(newBookmark)
+  }
+}
+
 export default function (ed, document) {
   return import('@instructure/canvas-media').then(CanvasMedia => {
     const UploadMedia = CanvasMedia.default
@@ -53,27 +75,6 @@ export default function (ed, document) {
       handleDismiss()
     }
 
-    const handleUpload = (error, uploadData, onUploadComplete) => {
-      let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
-      if (error?.file?.size > error?.maxFileSize * 1024 * 1024) {
-        err_msg = formatMessage(
-          'Size of {file} is greater than the maximum {max} MB allowed file size.',
-          {file: error.file.name, max: error.maxFileSize}
-        )
-      }
-
-      const editorComponent = Bridge.activeEditor()
-      let newBookmark
-      if (uploadBookmark) {
-        newBookmark = editorComponent.editor.selection.getBookmark(2, true)
-        editorComponent.editor.selection.moveToBookmark(uploadBookmark)
-      }
-      onUploadComplete(err_msg, uploadData)
-      if (newBookmark) {
-        editorComponent.editor.selection.moveToBookmark(newBookmark)
-      }
-    }
-
     const trayProps = Bridge.trayProps.get(ed)
 
     ReactDOM.render(
@@ -91,7 +92,7 @@ export default function (ed, document) {
             liveRegion={() => document.getElementById('flash_screenreader_holder')}
             onStartUpload={fileProps => handleStartUpload(fileProps)}
             onUploadComplete={(err, data) =>
-              handleUpload(err, data, contentProps.mediaUploadComplete)
+              handleUpload(err, data, contentProps.mediaUploadComplete, uploadBookmark)
             }
             onDismiss={handleDismiss}
             tabs={{record: true, upload: true}}
