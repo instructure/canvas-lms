@@ -26,7 +26,7 @@ pipeline {
   }
 
   stages {
-    stage ('Parameters Check') {
+    stage('Parameters Check') {
       steps {
         script {
           if (!params.TARGET) {
