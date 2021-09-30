@@ -187,7 +187,7 @@ describe GradebooksController do
     it "includes assignment sort options in the ENV" do
       user_session(@teacher)
       get :grade_summary, params: { course_id: @course.id, id: @student.id }
-      expect(assigns[:js_env][:assignment_sort_options]).to match_array [["Due Date", "due_at"], ["Title", "title"]]
+      expect(assigns[:js_env][:assignment_sort_options]).to match_array [["Due Date", "due_at"], ["Name", "title"]]
     end
 
     it "includes the current assignment sort order in the ENV" do
