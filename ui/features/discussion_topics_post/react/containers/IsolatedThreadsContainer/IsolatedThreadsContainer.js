@@ -359,6 +359,7 @@ const IsolatedThreadContainer = props => {
                     )}
                     updateDraftCache={props.updateDraftCache}
                     quotedEntry={props.discussionEntry.quotedEntry}
+                    attachment={props.discussionEntry.attachment}
                   >
                     <View as="div" padding="x-small none none">
                       <ThreadingToolbar discussionEntry={props.discussionEntry} isIsolatedView>

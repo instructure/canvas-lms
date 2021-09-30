@@ -19,6 +19,7 @@
 import {bool, number, shape, string} from 'prop-types'
 import {DiscussionEntryPermissions} from './DiscussionEntryPermissions'
 import gql from 'graphql-tag'
+import {Attachment} from './Attachment'
 import {PageInfo} from './PageInfo'
 import {User} from './User'
 
@@ -34,6 +35,9 @@ export const DiscussionEntry = {
       ratingCount
       ratingSum
       subentriesCount
+      attachment {
+        ...Attachment
+      }
       entryParticipant {
         rating
         read
@@ -64,6 +68,7 @@ export const DiscussionEntry = {
         deleted
       }
     }
+    ${Attachment.fragment}
     ${DiscussionEntryPermissions.fragment}
   `,
 
@@ -77,6 +82,7 @@ export const DiscussionEntry = {
     ratingCount: number,
     ratingSum: number,
     subentriesCount: number,
+    attachment: Attachment.shape,
     author: User.shape,
     editor: User.shape,
     entryParticipant: shape({
@@ -118,6 +124,7 @@ export const DiscussionEntry = {
     ratingCount = null,
     ratingSum = null,
     subentriesCount = 2,
+    attachment = Attachment.mock(),
     author = User.mock(),
     editor = User.mock(),
     entryParticipant = {
@@ -155,6 +162,7 @@ export const DiscussionEntry = {
     ratingCount,
     ratingSum,
     subentriesCount,
+    attachment,
     author,
     editor,
     entryParticipant,
