@@ -85,6 +85,15 @@ module IncomingMailProcessor
       end
     end
 
+    def self.healthy?
+      mailbox_accounts.each do |account|
+        mailbox = create_mailbox(account)
+        mailbox.connect
+        mailbox.disconnect
+      end
+      true
+    end
+
     def process(opts = {})
       if opts[:mailbox_account_address]
         # Find the one with that address, or do nothing if none exists (probably means we're in the middle of a deploy)
