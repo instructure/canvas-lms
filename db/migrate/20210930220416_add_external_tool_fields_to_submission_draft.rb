@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,24 +15,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+class AddExternalToolFieldsToSubmissionDraft < ActiveRecord::Migration[6.0]
+  tag :predeploy
 
-module Types
-  DRAFTABLE_SUBMISSION_TYPES = %w[
-    basic_lti_launch
-    media_recording
-    online_text_entry
-    online_upload
-    online_url
-    student_annotation
-  ].freeze
-
-  class DraftableSubmissionType < BaseEnum
-    graphql_name 'DraftableSubmissionType'
-    description 'Types of submissions that can have a submission draft'
-
-    DRAFTABLE_SUBMISSION_TYPES.each { |draftable_type|
-      value(draftable_type)
-    }
+  def change
+    change_table :submission_drafts, bulk: false do |t|
+      t.column :context_external_tool_id, :bigint
+      t.column :lti_launch_url, :text
+      t.column :resource_link_lookup_uuid, :uuid
+    end
   end
 end
