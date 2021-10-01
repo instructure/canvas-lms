@@ -23,12 +23,7 @@ import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionPermissions} from '../../../../graphql/DiscussionPermissions'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {
-  getEditUrl,
-  getSpeedGraderUrl,
-  getPeerReviewsUrl,
-  responsiveQuerySizes
-} from '../../../utils'
+import {getSpeedGraderUrl, responsiveQuerySizes} from '../../../utils'
 import {handlers} from '../../../../graphql/mswHandlers'
 import {mswClient} from '../../../../../../shared/msw/mswClient'
 import {mswServer} from '../../../../../../shared/msw/mswServer'
@@ -55,6 +50,8 @@ describe('DiscussionTopicContainer', () => {
     window.location = {assign: assignMock}
     window.open = openMock
     window.ENV = {
+      EDIT_URL: 'this_is_the_edit_url',
+      PEER_REVIEWS_URL: 'this_is_the_peer_reviews_url',
       context_asset_string: 'course_1',
       course_id: '1',
       discussion_topic_menu_tools: [
@@ -209,7 +206,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Edit'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getEditUrl('1', '1'))
+      expect(assignMock).toHaveBeenCalledWith(window.ENV.EDIT_URL)
     })
   })
 
@@ -219,7 +216,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Peer Reviews'))
 
     await waitFor(() => {
-      expect(assignMock).toHaveBeenCalledWith(getPeerReviewsUrl('1', '1'))
+      expect(assignMock).toHaveBeenCalledWith(window.ENV.PEER_REVIEWS_URL)
     })
   })
 
@@ -251,7 +248,7 @@ describe('DiscussionTopicContainer', () => {
     fireEvent.click(getByText('Open in Speedgrader'))
 
     await waitFor(() => {
-      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1'), '_blank')
+      expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl(), '_blank')
     })
   })
 

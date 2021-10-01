@@ -22,14 +22,7 @@ import DirectShareUserModal from '../../../../../shared/direct-sharing/react/com
 import DirectShareCourseTray from '../../../../../shared/direct-sharing/react/components/DirectShareCourseTray'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionEdit} from '../../components/DiscussionEdit/DiscussionEdit'
-import {
-  getSpeedGraderUrl,
-  getEditUrl,
-  getPeerReviewsUrl,
-  isGraded,
-  getReviewLinkUrl,
-  responsiveQuerySizes
-} from '../../utils'
+import {getSpeedGraderUrl, isGraded, getReviewLinkUrl, responsiveQuerySizes} from '../../utils'
 import {Highlight} from '../../components/Highlight/Highlight'
 import I18n from 'i18n!discussion_posts'
 import {PeerReview} from '../../components/PeerReview/PeerReview'
@@ -387,10 +380,7 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               }
                               onEdit={
                                 props.discussionTopic.permissions?.update
-                                  ? () =>
-                                      window.location.assign(
-                                        getEditUrl(ENV.course_id, props.discussionTopic._id)
-                                      )
+                                  ? () => window.location.assign(ENV.EDIT_URL)
                                   : null
                               }
                               onTogglePublish={
@@ -399,25 +389,12 @@ export const DiscussionTopicContainer = ({createDiscussionEntry, ...props}) => {
                               onToggleSubscription={onSubscribe}
                               onOpenSpeedgrader={
                                 props.discussionTopic.permissions?.speedGrader
-                                  ? () =>
-                                      window.open(
-                                        getSpeedGraderUrl(
-                                          ENV.course_id,
-                                          props.discussionTopic.assignment?._id
-                                        ),
-                                        '_blank'
-                                      )
+                                  ? () => window.open(getSpeedGraderUrl(), '_blank')
                                   : null
                               }
                               onPeerReviews={
                                 props.discussionTopic.permissions?.peerReview
-                                  ? () =>
-                                      window.location.assign(
-                                        getPeerReviewsUrl(
-                                          ENV.course_id,
-                                          props.discussionTopic.assignment?._id
-                                        )
-                                      )
+                                  ? () => window.location.assign(ENV.PEER_REVIEWS_URL)
                                   : null
                               }
                               showRubric={props.discussionTopic.permissions?.showRubric}
