@@ -175,7 +175,7 @@ class GradeSummaryPresenter
   end
 
   def sort_options
-    options = [[I18n.t('Due Date'), 'due_at'], [I18n.t('Title'), 'title']]
+    options = [[I18n.t('Due Date'), 'due_at'], [I18n.t('Name'), 'title']]
     if @context.active_record_types[:assignments] && assignments.uniq(&:assignment_group_id).length > 1
       options << [I18n.t('Assignment Group'), 'assignment_group']
     end
