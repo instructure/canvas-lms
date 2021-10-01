@@ -10852,6 +10852,11 @@ hy:
         
         Հանձնարարության ուշացած ուղարկում
     late_grading_display: "Ուշացած գնահատում"
+    membership_update_description: |-
+        *Միայն ադմինիստրատոր՝ նախատեսված գրանցումը ակտիվացված է*
+        
+        *Խմբի գրանցումը
+        *ընդունվել/մերժվել է
     membership_update_display: " Անդամակցության թարմացում"
     missing_description_description: "%{category} ծանուցումների համար"
     missing_display_display: "%{category} ծանուցումների համար"
@@ -10926,6 +10931,15 @@ hy:
       web_conference_invitation: "Վեբ-կոնֆերանսի հրավեր"
       web_conference_recording_ready: "Վեբ-կոնֆերանսի գրառումը պատրաստ է"
     no_subject: "Առանց վերնագրի"
+    other_description: |-
+        *Միայն դասավանդողը և ադմինիստրատորը՝*
+        
+        *Գրանցում դասընթացին
+        *Հաշվետվության ստեղծում
+        *Բովանդակության արտահանում
+        *Տեղափոխության մասին հաշվետվություն
+        *Նոր հաշվի օգտատեր
+        *Ունկնդիրների նոր խումբ
     other_display: "Վարչական ծանուցումներ"
     recording_ready_display: "Գրառումը պատրաստ է"
     reminder_display: Հիշեցում
