@@ -214,6 +214,23 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText('Outcome 2 - Course folder 0')).toBeInTheDocument()
   })
 
+  it('shows and closes Find Outcomes modal if Add Outcomes option from group menu is selected', async () => {
+    const {getByText, queryByText, getByTestId, getByRole} = render(<OutcomeManagementPanel />, {
+      ...groupDetailDefaultProps
+    })
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Course folder 0'))
+    await act(async () => jest.runOnlyPendingTimers())
+    fireEvent.click(getByText('Menu for group Course folder 0'))
+    fireEvent.click(within(getByRole('menu')).getByText('Add Outcomes'))
+    await act(async () => jest.runOnlyPendingTimers())
+    expect(getByText('Add Outcomes to "Course folder 0"')).toBeInTheDocument()
+    fireEvent.click(within(getByTestId('find-outcomes-modal')).getByText('Done'))
+    // Run all timers to remove the modal from the DOM
+    await act(async () => jest.runAllTimers())
+    expect(queryByText('Add Outcomes to "Course folder 0"')).not.toBeInTheDocument()
+  })
+
   it('shows remove group modal if remove option from group menu is selected', async () => {
     const {getByText, getByRole} = render(<OutcomeManagementPanel />, {
       ...groupDetailDefaultProps
@@ -722,6 +739,7 @@ describe('OutcomeManagementPanel', () => {
         id: '300',
         parentOutcomeGroupId: '2',
         title: null,
+        returnTitle: 'Group 300',
         description: null,
         vendorGuid: null
       }),
