@@ -71,6 +71,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     it 'autosaves htmlview entered content' do
       create_and_edit_announcement
       switch_to_html_view
+      switch_to_raw_html_editor
       f('textarea#discussion-topic-message10').send_keys('html text')
       f("#discussion-title").send_keys("New Discussion Title")
       driver.navigate.refresh
@@ -192,6 +193,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
 
       # simulate a placeholder image
       switch_to_html_view
+      switch_to_raw_html_editor
       f('textarea#discussion-topic-message10').send_keys(
         "<div data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px;'>svg spinner here</div>"
       )

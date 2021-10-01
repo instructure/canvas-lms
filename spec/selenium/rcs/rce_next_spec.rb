@@ -190,6 +190,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         visit_front_page_edit(@course)
 
         switch_to_html_view
+        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<a href="http://example.com">edit me</a>')
         switch_to_editor_view
@@ -198,6 +199,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           click_link_for_options
           click_link_options_button
 
+          wait_for_ajaximations
           expect(link_options_tray).to be_displayed
 
           link_text_textbox = f('input[type="text"][value="edit me"]')
@@ -946,6 +948,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         visit_front_page_edit(@course)
 
         switch_to_html_view
+        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
         switch_to_editor_view
@@ -973,6 +976,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         visit_front_page_edit(@course)
 
         switch_to_html_view
+        switch_to_raw_html_editor
         html_view = f('textarea#wiki_page_body')
         html_view.send_keys('<img src="image.jpg" alt="image.jpg" />')
         switch_to_editor_view
@@ -1463,117 +1467,93 @@ describe 'RCE next tests', ignore_js_errors: true do
         driver.execute_script('if (document.fullscreenElement) document.exitFullscreen()')
       end
 
-      describe 'with the use_rce_pretty_html_editor flag off' do
-        before(:each) { Account.site_admin.disable_feature! :rce_pretty_html_editor }
+      it 'switches between wysiwyg and pretty html view' do
+        skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29')
+        rce_wysiwyg_state_setup(@course)
+        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-        it 'switches between wysiwyg and raw html view' do
-          rce_wysiwyg_state_setup(@course)
-          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        # click edit button -> fancy editor
+        click_editor_view_button
 
-          click_editor_view_button
-          expect(f('textarea#wiki_page_body')).to be_displayed
+        # it's lazy loaded
+        expect(f('.RceHtmlEditor')).to be_displayed
 
-          click_editor_view_button
-          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
-        end
+        # click edit button -> back to the rce
+        click_editor_view_button
+        expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
 
-        it 'displays the editor in fullscreen' do
-          rce_wysiwyg_state_setup(@course)
+        # shift-o edit button -> raw editor
+        shift_O_combination('[data-btn-id="rce-edit-btn"]')
+        expect(f('textarea#wiki_page_body')).to be_displayed
 
-          click_editor_view_button
-          expect(f('textarea#wiki_page_body')).to be_displayed
-
-          click_full_screen_button
-          expect(fullscreen_element).to eq(f('textarea#wiki_page_body'))
-        end
+        # click "Pretty HTML Editor" status bar button -> fancy editor
+        fj('button:contains("Pretty HTML Editor")').click
+        expect(f('.RceHtmlEditor')).to be_displayed
       end
 
-      describe 'with the use_rce_pretty_html_editor flag on' do
-        before(:each) { Account.site_admin.enable_feature! :rce_pretty_html_editor }
+      it 'displays the editor in fullscreen' do
+        skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-29')
+        rce_wysiwyg_state_setup(@course)
 
-        it 'switches between wysiwyg and pretty html view' do
-          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally')
-          rce_wysiwyg_state_setup(@course)
-          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        click_editor_view_button
+        expect(f('.RceHtmlEditor')).to be_displayed
 
-          # click edit button -> fancy editor
-          click_editor_view_button
+        click_full_screen_button
+        expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
+      end
 
-          # it's lazy loaded
-          expect(f('.RceHtmlEditor')).to be_displayed
+      it 'gets default html editor from the rce.htmleditor cookie' do
+        get '/'
+        driver.manage.add_cookie(name: 'rce.htmleditor', value: 'RAW', path: '/')
 
-          # click edit button -> back to the rce
-          click_editor_view_button
-          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        rce_wysiwyg_state_setup(@course)
 
-          # shift-o edit button -> raw editor
-          shift_O_combination('[data-btn-id="rce-edit-btn"]')
-          expect(f('textarea#wiki_page_body')).to be_displayed
+        # clicking opens raw editor
+        click_editor_view_button
+        expect(f('textarea#wiki_page_body')).to be_displayed
+      ensure
+        driver.manage.delete_cookie('rce.htmleditor')
+      end
 
-          # click "Pretty HTML Editor" status bar button -> fancy editor
-          fj('button:contains("Pretty HTML Editor")').click
-          expect(f('.RceHtmlEditor')).to be_displayed
-        end
+      it 'saves pretty HTML editor text on submit' do
+        skip(
+          'Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35'
+        )
+        quiz_content = '<p>test</p>'
+        @quiz = @course.quizzes.create!
+        open_quiz_edit_form
+        click_questions_tab
+        click_new_question_button
+        create_essay_question
+        expect_new_page_load { f('.save_quiz_button').click }
+        open_quiz_show_page
+        expect_new_page_load { f('#preview_quiz_button').click }
+        switch_to_html_view
+        expect(f('.RceHtmlEditor')).to be_displayed
+        f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
+        expect_new_page_load { submit_quiz }
+        expect(f("#questions .essay_question .quiz_response_text").attribute("innerHTML")).to eq(
+          quiz_content
+        )
+      end
 
-        it 'displays the editor in fullscreen' do
-          skip('Cannot get this to pass flakey spec catcher in jenkins, though is fine locally')
-          rce_wysiwyg_state_setup(@course)
+      it 'sanitizes the HTML set in the HTML editor' do
+        skip 'still flakey. Needs to be addressed in MAT-386'
+        get '/'
 
-          click_editor_view_button
-          expect(f('.RceHtmlEditor')).to be_displayed
+        html = <<~HTML
+          <img src="/" id="test-image" onerror="alert('hello')" />
+        HTML
 
-          click_full_screen_button
-          expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
-        end
+        rce_wysiwyg_state_setup(
+          @course,
+          html,
+          html: true,
+          new_rce: true
+        )
 
-        it 'gets default html editor from the rce.htmleditor cookie' do
-          get '/'
-          driver.manage.add_cookie(name: 'rce.htmleditor', value: 'RAW', path: '/')
-
-          rce_wysiwyg_state_setup(@course)
-
-          # clicking opens raw editor
-          click_editor_view_button
-          expect(f('textarea#wiki_page_body')).to be_displayed
-        ensure
-          driver.manage.delete_cookie('rce.htmleditor')
-        end
-
-        it 'saves pretty HTML editor text on submit' do
-          skip(
-            'Cannot get this to pass flakey spec catcher in jenkins, though is fine locally MAT-35'
-          )
-          quiz_content = '<p>test</p>'
-          @quiz = @course.quizzes.create!
-          open_quiz_edit_form
-          click_questions_tab
-          click_new_question_button
-          create_essay_question
-          expect_new_page_load { f('.save_quiz_button').click }
-          open_quiz_show_page
-          expect_new_page_load { f('#preview_quiz_button').click }
-          switch_to_html_view
-          expect(f('.RceHtmlEditor')).to be_displayed
-          f('.RceHtmlEditor .CodeMirror textarea').send_keys(quiz_content)
-          expect_new_page_load { submit_quiz }
-          expect(f('#questions .essay_question .quiz_response_text').attribute('innerHTML')).to eq(
-            quiz_content
-          )
-        end
-
-        it 'sanitizes the HTML set in the HTML editor' do
-          skip 'still flakey. Needs to be addressed in MAT-386'
-          get '/'
-
-          html = <<~HTML
-            <img src="/" id="test-image" onerror="alert('hello')" />
-          HTML
-
-          rce_wysiwyg_state_setup(@course, html, html: true, new_rce: true)
-
-          in_frame rce_page_body_ifr_id do
-            expect(f('#test-image').attribute('onerror')).to be_nil
-          end
+        in_frame rce_page_body_ifr_id do
+          expect(f('#test-image').attribute('onerror')).to be_nil
         end
       end
     end
