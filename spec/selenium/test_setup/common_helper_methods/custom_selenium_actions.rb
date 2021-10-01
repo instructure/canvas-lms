@@ -329,6 +329,13 @@ module CustomSeleniumActions
     edit_btn.click
   end
 
+  def switch_to_raw_html_editor
+    button = f('button[data-btn-id="rce-editormessage-btn"]')
+    if button.text == 'Raw HTML Editor'
+      button.click
+    end
+  end
+
   def clear_tiny(tiny_controlling_element, iframe_id = nil)
     if iframe_id
       in_frame iframe_id do

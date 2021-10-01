@@ -308,8 +308,8 @@ describe "Wiki Pages" do
 
     it "embeds vimeo video in the page", priority: "1", test_id: 126835 do
       get "/courses/#{@course.id}/pages/Page1/edit"
-      element = f("#wiki_page_body")
       switch_editor_views
+      switch_to_raw_html_editor
       html_contents = %q(
         <p>
           <iframe style="width: 640px; height: 480px;"
@@ -323,6 +323,7 @@ describe "Wiki Pages" do
           </iframe>
         </p>
       )
+      element = f('#wiki_page_body')
       element.send_keys(html_contents)
       wait_for_new_page_load { f(".btn-primary").click }
       expect(f("iframe")).to be_present
