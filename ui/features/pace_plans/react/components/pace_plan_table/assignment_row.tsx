@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_assignment_row'
 import {debounce, pick} from 'lodash'
 import moment from 'moment-timezone'
@@ -45,7 +46,6 @@ import {
   getDueDate,
   getExcludeWeekends,
   getPacePlanItemPosition,
-  isPlanCompleted,
   getDisabledDaysOfWeek
 } from '../../reducers/pace_plans'
 import {autoSavingActions as actions} from '../../actions/pace_plan_items'
@@ -71,7 +71,6 @@ interface StoreProps {
   readonly excludeWeekends: boolean
   readonly pacePlanItemPosition: number
   readonly blackoutDates: BlackoutDate[]
-  readonly planCompleted: boolean
   readonly autosaving: boolean
   readonly enrollmentHardEndDatePlan: boolean
   readonly adjustingHardEndDatesAfter?: number
@@ -135,13 +134,6 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
       false
     )
     return parseInt(this.state.duration, 10) + daysDiff
-  }
-
-  dateInputIsDisabled = (): boolean => {
-    return (
-      this.props.planCompleted ||
-      (this.props.enrollmentHardEndDatePlan && !!this.props.adjustingHardEndDatesAfter)
-    )
   }
 
   parsePositiveNumber = (value?: string): number | false => {
@@ -217,7 +209,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
         this.props.setAdjustingHardEndDatesAfter(this.props.pacePlanItemPosition)
       }
 
-      this.props.setPlanItemDuration(this.props.pacePlanItem.id, duration, saveParams)
+      this.props.setPlanItemDuration(this.props.pacePlanItem.module_item_id, duration, saveParams)
     }
   }
 
@@ -267,7 +259,7 @@ export class AssignmentRow extends React.Component<ComponentProps, LocalState> {
 
       return (
         <NumberInput
-          interaction={this.props.planCompleted ? 'disabled' : 'enabled'}
+          interaction="enabled"
           renderLabel={
             <ScreenReaderContent>
               Duration for module {this.props.pacePlanItem.assignment_title}
@@ -345,7 +337,6 @@ const mapStateToProps = (state: StoreState, props: PassedProps): StoreProps => {
     excludeWeekends: getExcludeWeekends(state),
     pacePlanItemPosition: getPacePlanItemPosition(state, props),
     blackoutDates: getBlackoutDates(state),
-    planCompleted: isPlanCompleted(state),
     autosaving: getAutoSaving(state),
     enrollmentHardEndDatePlan: !!(
       pacePlan.hard_end_dates && pacePlan.context_type === 'Enrollment'

@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import keycode from 'keycode'
 import {connect} from 'react-redux'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_plan_picker'
 
 import {ApplyTheme} from '@instructure/ui-themeable'

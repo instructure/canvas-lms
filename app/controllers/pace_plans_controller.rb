@@ -32,7 +32,7 @@ class PacePlansController < ApplicationController
 
     if @pace_plan.nil?
       @pace_plan = @context.pace_plans.new
-      @context.context_module_tags.each do |module_item|
+      @context.context_module_tags.not_deleted.each do |module_item|
         @pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
       end
     end
@@ -95,6 +95,8 @@ class PacePlansController < ApplicationController
                end
       # Duplicate a published plan if one exists for the plan or for the course
       published_pace_plan = @course.pace_plans.published.where(params).take || @course.pace_plans.primary.published.take
+      # Set start date to the enrollment's begin date for student plans
+      params[:start_date] = @context.start_at || @context.created_at if @context.is_a?(Enrollment)
       if published_pace_plan
         @pace_plan = published_pace_plan.duplicate(params)
       else
