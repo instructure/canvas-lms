@@ -136,10 +136,9 @@ module MicrosoftSync
     # yet replicated.)
     def step_full_sync_prerequisites(_mem_data, _job_state_data)
       if CanvasModelsHelpers.max_enrollment_members_reached?(course)
-        raise MaxMemberEnrollmentsReached
-      end
-      if CanvasModelsHelpers.max_enrollment_owners_reached?(course)
-        raise MaxOwnerEnrollmentsReached
+        raise_and_disable_group(MaxMemberEnrollmentsReached)
+      elsif CanvasModelsHelpers.max_enrollment_owners_reached?(course)
+        raise_and_disable_group(MaxOwnerEnrollmentsReached)
       end
 
       PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
@@ -253,14 +252,23 @@ module MicrosoftSync
       # remove the group on the Microsoft side (INTEROP-6672)
       raise Errors::MissingOwners if diff.local_owners.empty?
 
-      raise MaxMemberEnrollmentsReached if diff.max_enrollment_members_reached?
-      raise MaxOwnerEnrollmentsReached if diff.max_enrollment_owners_reached?
+      raise_and_disable_group(MaxMemberEnrollmentsReached) if diff.max_enrollment_members_reached?
+      raise_and_disable_group(MaxOwnerEnrollmentsReached) if diff.max_enrollment_owners_reached?
 
       execute_diff(diff)
 
       StateMachineJob::NextStep.new(:step_check_team_exists)
     rescue *Errors::INTERMITTENT_AND_NOTFOUND => e
       retry_object_for_error(e, step: :step_generate_diff)
+    end
+
+    def raise_and_disable_group(error_class)
+      err = error_class.new
+      # Need to manually update last_error; StateMachineJob won't do it since the group
+      # will be in a 'deleted' state
+      group.update last_error: MicrosoftSync::Errors.serialize(err)
+      group.destroy
+      raise err
     end
 
     # Execute a MembershipDiff or PartialMembershipDiff -- add and remove
@@ -283,6 +291,10 @@ module MicrosoftSync
         )
         log_batch_skipped(:remove, skipped)
       end
+    rescue Errors::MembersQuotaExceeded
+      raise_and_disable_group(MaxMemberEnrollmentsReached)
+    rescue Errors::OwnersQuotaExceeded
+      raise_and_disable_group(MaxOwnerEnrollmentsReached)
     end
 
     def step_check_team_exists(_mem_data, _job_state_data)
