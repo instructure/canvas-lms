@@ -1223,6 +1223,20 @@ describe Submission do
 
     let(:submission) { @assignment.submissions.find_by(user_id: @student) }
 
+    it "applies the missing policy to the score when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.score
+      }.from(nil).to(200)
+    end
+
+    it "applies the missing policy to the grade when changing from excused to missing" do
+      @assignment.grade_student(@student, grader: @teacher, excused: true)
+      expect { submission.update!(late_policy_status: "missing") }.to change {
+        submission.grade
+      }.from(nil).to('200')
+    end
+
     it "applies the late policy when score changes" do
       Timecop.freeze(2.days.ago(@date)) do
         @assignment.submit_homework(@student, body: "a body")
@@ -2303,15 +2317,17 @@ describe Submission do
       it "generates the originality data" do
         originality_report.originality_report_url = 'http://example.com'
         originality_report.save!
-        expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state,
-                                                      error_message: nil
-                                                    }
-                                                  })
+        expect(submission.originality_data).to eq(
+          {
+            attachment.asset_string => {
+              similarity_score: originality_report.originality_score,
+              state: originality_report.state,
+              report_url: originality_report.originality_report_url,
+              status: originality_report.workflow_state,
+              error_message: nil
+            }
+          }
+        )
       end
 
       context 'multiple originality reports for the same attachment' do
@@ -2411,15 +2427,17 @@ describe Submission do
           status: 'pending'
         }
         submission.turnitin_data[attachment.asset_string] = tii_data
-        expect(submission.originality_data).to eq({
-                                                    attachment.asset_string => {
-                                                      similarity_score: originality_report.originality_score,
-                                                      state: originality_report.state,
-                                                      report_url: originality_report.originality_report_url,
-                                                      status: originality_report.workflow_state,
-                                                      error_message: nil
-                                                    }
-                                                  })
+        expect(submission.originality_data).to eq(
+          {
+            attachment.asset_string => {
+              similarity_score: originality_report.originality_score,
+              state: originality_report.state,
+              report_url: originality_report.originality_report_url,
+              status: originality_report.workflow_state,
+              error_message: nil
+            }
+          }
+        )
       end
 
       it 'does not cause error if originality score is nil' do

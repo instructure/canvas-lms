@@ -42,7 +42,7 @@ pipeline {
       }
     }
 
-    stage ('Master Bouncer Check All') {
+    stage('Master Bouncer Check All') {
       steps {
         // should only take about 5-10 min, but just in case
         timeout(time: 30) {

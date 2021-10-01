@@ -31,7 +31,7 @@ pipeline {
 
   // TODO: This will run all xbrowser tests consecutively, still need to get parallel depending on runtime
   stages {
-    stage ('Setup') {
+    stage('Setup') {
       steps {
         cleanAndSetup()
         timeout(time: 10) {
@@ -42,7 +42,7 @@ pipeline {
       }
     }
 
-    stage ('Xbrowser Tests') {
+    stage('Xbrowser Tests') {
       steps {
         timeout(time: 60) {
           sh 'build/new-jenkins/xbrowser-test.sh'
@@ -58,7 +58,7 @@ pipeline {
       script {
         def htmlFiles
         // find all results files
-        dir ('tmp') {
+        dir('tmp') {
           htmlFiles = findFiles glob: '**/index.html'
         }
         // publish html
