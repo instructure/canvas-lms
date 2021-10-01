@@ -1518,6 +1518,7 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
       get 'accounts/:account_id/permissions', action: :permissions
       get 'accounts/:account_id/settings', action: :show_settings
+      get 'manually_created_courses_account', action: :manually_created_courses_account
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
       put 'accounts/:account_id/users/:user_id/restore', action: :restore_user
     end
