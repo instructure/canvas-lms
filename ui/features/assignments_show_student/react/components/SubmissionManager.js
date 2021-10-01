@@ -214,7 +214,7 @@ export default class SubmissionManager extends Component {
   }
 
   updateCachedSubmissionDraft = (cache, newDraft) => {
-    const {assignment} = JSON.parse(
+    const {assignment, submission} = JSON.parse(
       JSON.stringify(
         cache.readQuery({
           query: STUDENT_VIEW_QUERY,
@@ -226,12 +226,14 @@ export default class SubmissionManager extends Component {
       )
     )
 
-    assignment.submissionsConnection.nodes[0].submissionDraft = newDraft
-
+    submission.submissionDraft = newDraft
     cache.writeQuery({
       query: STUDENT_VIEW_QUERY,
-      variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id},
-      data: {assignment}
+      variables: {
+        assignmentLid: this.props.assignment._id,
+        submissionID: this.props.submission.id
+      },
+      data: {assignment, submission}
     })
   }
 

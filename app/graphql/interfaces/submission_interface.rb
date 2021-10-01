@@ -273,6 +273,9 @@ module Interfaces::SubmissionInterface
 
   field :submission_draft, Types::SubmissionDraftType, null: true
   def submission_draft
+    # Other users (e.g. Observers) should not be able to see submission drafts
+    return nil if submission.user != current_user
+
     load_association(:submission_drafts).then do |drafts|
       # Submission.attempt can be in either 0 or nil which mean the same thing
       target_attempt = (object.attempt || 0) + 1
