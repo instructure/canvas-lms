@@ -132,7 +132,7 @@ module Api::V1::Submission
       end
     end
 
-    if context.account_membership_allows(current_user)
+    if params[:anonymize_user_id] || context.account_membership_allows(current_user)
       hash['anonymous_id'] = submission.anonymous_id
     end
 
@@ -162,6 +162,11 @@ module Api::V1::Submission
       json_fields -= params[:exclude_response_fields]
       json_methods -= params[:exclude_response_fields]
       other_fields -= params[:exclude_response_fields]
+    end
+
+    if params[:anonymize_user_id]
+      json_fields -= ["user_id"]
+      json_fields << "anonymous_id"
     end
 
     attempt.assignment = assignment
