@@ -79,7 +79,7 @@ function renderDatepickerTime($input) {
   if (tz.useMeridian()) {
     meridianSelect = (
       <select
-        defaultValue={data.ampm}
+        defaultValue={data.ampm.toLowerCase()}
         className="ui-datepicker-time-ampm un-bootrstrapify"
         title={STRINGS.selectTitle}
       >
