@@ -60,16 +60,6 @@ export function addUsersLink(event) {
 }
 
 $(document).ready(function () {
-  // find the index of tab whose id matches the URL's hash
-  const initialTab =
-    ENV.FEATURES && ENV.FEATURES.remember_settings_tab
-      ? Array.from(
-          document
-            .getElementById('account_settings_tabs')
-            ?.querySelectorAll('ul>li>a[id^="tab"]') || []
-        ).findIndex(t => `#${t.id}` === `${window.location.hash}-link`)
-      : -1
-
   function checkFutureListingSetting() {
     if ($('#account_settings_restrict_student_future_view_value').is(':checked')) {
       $('.future_listing').show()
@@ -148,22 +138,11 @@ $(document).ready(function () {
   globalAnnouncements.augmentView()
   globalAnnouncements.bindDomEvents()
 
-  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
-    $('#account_settings_tabs').on('tabsactivate', (event, ui) => {
-      try {
-        const hash = new URL(ui.newTab.context.href).hash
-        window.location.hash = hash
-      } catch (_ignore) {
-        // get here if `new URL` throws, but it shouldn't, and
-        // there's really nothing we need to do about it
-      }
-    })
-  }
   $('#account_settings_tabs')
     .on('tabsbeforeactivate tabscreate', (event, ui) => {
       const tabId =
         event.type === 'tabscreate'
-          ? window.location.hash.replace('#', '') + '-link'
+          ? location.hash.replace('#', '') + '-link'
           : ui.newTab.context.id
 
       if (tabId === 'tab-reports-link' && !reportsTabHasLoaded) {
@@ -180,18 +159,18 @@ $(document).ready(function () {
 
             $('.open_report_description_link').click(openReportDescriptionLink)
 
-            $('.run_report_link').click(function (_event) {
+            $('.run_report_link').click(function (event) {
               event.preventDefault()
               $(this).parent('form').submit()
             })
 
             $('.run_report_form').formSubmit({
               resetForm: true,
-              beforeSubmit(_data) {
+              beforeSubmit(data) {
                 $(this).loadingImage()
                 return true
               },
-              success(_data) {
+              success(data) {
                 $(this).loadingImage('remove')
                 const report = $(this).attr('id').replace('_form', '')
                 $('#' + report)
@@ -205,16 +184,16 @@ $(document).ready(function () {
                   .show()
                 $(this).parent('.report_dialog').dialog('close')
               },
-              error(_data) {
+              error(data) {
                 $(this).loadingImage('remove')
                 $(this).parent('.report_dialog').dialog('close')
               }
             })
 
-            $('.configure_report_link').click(function (_event) {
+            $('.configure_report_link').click(function (event) {
               event.preventDefault()
-              const data = $(this).data()
-              let $dialog = data.$report_dialog
+              let data = $(this).data(),
+                $dialog = data.$report_dialog
               const responsiveWidth = _settings_smallTablet ? 400 : 320
               if (!$dialog) {
                 $dialog = data.$report_dialog = $(this)
@@ -276,7 +255,7 @@ $(document).ready(function () {
           })
       }
     })
-    .tabs({active: initialTab >= 0 ? initialTab : null})
+    .tabs()
     .show()
 
   $('.add_ip_filter_link').click(event => {
@@ -288,7 +267,7 @@ $(document).ready(function () {
     event.preventDefault()
     $(this).parents('.ip_filter').remove()
   })
-  if ($('.ip_filter:not(.blank)').length === 0) {
+  if ($('.ip_filter:not(.blank)').length == 0) {
     $('.add_ip_filter_link').click()
   }
   $('.ip_help_link').click(event => {
@@ -310,7 +289,7 @@ $(document).ready(function () {
     })
   })
 
-  $('#account_settings_external_notification_warning_checkbox').on('change', function (_e) {
+  $('#account_settings_external_notification_warning_checkbox').on('change', function (e) {
     $('#account_settings_external_notification_warning').val($(this).prop('checked') ? 1 : 0)
   })
 
@@ -320,8 +299,8 @@ $(document).ready(function () {
     $(this).parents('.custom_help_link').hide()
   })
 
-  const $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank')
-  let uniqueCounter = 1000
+  let $blankCustomHelpLink = $('.custom_help_link.blank').detach().removeClass('blank'),
+    uniqueCounter = 1000
   $('.add_custom_help_link').click(event => {
     event.preventDefault()
     const $newContainer = $blankCustomHelpLink.clone(true).appendTo('#custom_help_links').show(),
@@ -331,7 +310,7 @@ $(document).ready(function () {
     $.each(['id', 'name', 'for'], (i, prop) => {
       $newContainer
         .find('[' + prop + ']')
-        .attr(prop, (_i, previous) => previous.replace(/\d+/, newId))
+        .attr(prop, (i, previous) => previous.replace(/\d+/, newId))
     })
   })
 
@@ -423,7 +402,7 @@ $(document).ready(function () {
           )
         }
       },
-      _data => {
+      data => {
         $link.text(
           I18n.t(
             'notices.turnitin.invalid_settings',
@@ -437,7 +416,7 @@ $(document).ready(function () {
   // Admins tab
   $('.add_users_link').click(addUsersLink)
 
-  $('.service_help_dialog').each(function (_index) {
+  $('.service_help_dialog').each(function (index) {
     const $dialog = $(this),
       serviceName = $dialog.attr('id').replace('_help_dialog', '')
 
@@ -459,7 +438,7 @@ $(document).ready(function () {
 
   function displayCustomEmailFromName() {
     let displayText = $('#account_settings_outgoing_email_default_name').val()
-    if (displayText === '') {
+    if (displayText == '') {
       displayText = I18n.t('custom_text_blank', '[Custom Text]')
     }
     $('#custom_default_name_display').text(displayText)
@@ -505,7 +484,6 @@ $(document).ready(function () {
     const $textarea = $rce_container.find('textarea')
     RichContentEditor.preloadRemoteModule()
     const $terms_type = $('#account_terms_of_service_terms_type').change(onTermsTypeChange)
-    // eslint-disable-next-line no-inner-declarations
     async function onTermsTypeChange() {
       if ($terms_type.val() === 'custom') {
         $('#terms_of_service_modal').show()
@@ -525,14 +503,5 @@ $(document).ready(function () {
       }
     }
     onTermsTypeChange()
-  }
-
-  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
-    window.addEventListener('popstate', () => {
-      const openTab = window.location.hash
-      if (openTab) {
-        document.querySelector(`[href="${openTab}"]`)?.click()
-      }
-    })
   }
 })
