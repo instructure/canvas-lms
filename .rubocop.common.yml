@@ -93,6 +93,8 @@ Rails/ContentTag:
     - "**/db/migrate/*" # this cop is for views, not migrations, where it gets confused with outrigger
     - "doc/**/*"
 
+RSpec/AnyInstance:
+  Enabled: false # while using an instance double would be preferable, it's a pain
 RSpec/DescribedClass:
   Enabled: false # we haven't used it, and it seems antithetical to RSpec/NamedSubject
 RSpec/EmptyExampleGroup:
@@ -101,6 +103,8 @@ RSpec/ExampleLength:
   Enabled: false # this is a Metrics-style cop
 RSpec/ExampleWording:
   Severity: error
+RSpec/ExpectInHook:
+  Enabled: false # follows RSpec/MultipleExpectations
 RSpec/InstanceVariable:
   Enabled: false # legacy code
 RSpec/MessageSpies:
@@ -113,6 +117,8 @@ RSpec/NestedGroups:
   Enabled: false # legacy code
 RSpec/RepeatedDescription:
   Severity: error
+RSpec/StubbedMock:
+  Enabled: false # this style goes along with spies
 
 Specs/EnsureSpecExtension:
   Exclude:
@@ -126,6 +132,7 @@ Style/Encoding:
 Style/FrozenStringLiteralComment:
   Severity: error
 Style/IfUnlessModifier:
+  # see also https://github.com/rubocop/rubocop/discussions/10048
   Enabled: false # can obscure important decisions or put too much code in a line
 Style/NumericPredicate:
   Enabled: false # `> 0` can be easier to read than `.positive?`
@@ -232,9 +239,13 @@ Style/StderrPuts: # TODO: autocorrect
   Enabled: false
 Style/StringLiterals:
   EnforcedStyle: double_quotes
-  Enabled: false # TODO: auotcorrect
+  Enabled: false # TODO: autocorrect
 Style/SymbolArray: # TODO: autocorrect
   Enabled: false
+Style/QuotedSymbols:
+  # once Style/StringLiterals is enabled, we can remove this since it will inherit
+  EnforcedStyle: double_quotes
+  AutoCorrect: false
 Style/TrailingCommaInArguments: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
