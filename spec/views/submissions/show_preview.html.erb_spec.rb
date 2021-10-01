@@ -85,6 +85,17 @@ describe "/submissions/show_preview" do
       expect(response.body.include?("%22enable_annotations%22:null")).to be false
     end
 
+    it "includes an indicator if unread annotations exist" do
+      @course.root_account.enable_feature! :submission_feedback_indicators
+      assignment = @course.assignments.create!(title: "some assignment", submission_types: "online_upload")
+      submission = assignment.submit_homework(@user, attachments: [@attachment])
+      assign(:assignment, assignment)
+      assign(:submission, submission)
+      @student.mark_submission_annotations_unread!(submission)
+      render template: "submissions/show_preview", locals: { anonymize_students: assignment.anonymize_students? }
+      expect(response.body).to include %{<span class="submission_annotation_unread_indicator"}
+    end
+
     it "renders an iframe with a src to canvadoc sessions controller when assignment is a student annotation" do
       assignment = @course.assignments.create!(
         annotatable_attachment: @attachment,

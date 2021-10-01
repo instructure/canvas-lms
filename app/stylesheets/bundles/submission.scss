@@ -117,6 +117,16 @@
   }
 }
 
+.submission_annotation_unread_indicator {
+  color: $fire;
+  font-size: x-large;
+  margin-#{direction(left)}: -4px;
+  vertical-align: 1px;
+  &::after {
+    content: "\2022";
+  }
+}
+
 .file-upload-submission {
   display: flex;
   align-items: center;

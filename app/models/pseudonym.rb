@@ -49,6 +49,9 @@ class Pseudonym < ActiveRecord::Base
   end
   before_validation :validate_unique_id
   before_destroy :retire_channels
+  validates :declared_user_type,
+            allow_nil: true,
+            inclusion: { in: %w[administrative observer staff student student_other teacher] }
 
   before_save :set_password_changed
   before_validation :infer_defaults, :verify_unique_sis_user_id, :verify_unique_integration_id

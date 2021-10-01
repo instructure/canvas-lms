@@ -23,7 +23,7 @@ import 'jqueryui/dialog'
 import '@canvas/doc-previews'
 
 $(document).ready(() => {
-  $('a.flash').click(function() {
+  $('a.flash').click(function () {
     swfobject.embedSWF(
       $(this).attr('href'),
       'main',
@@ -38,7 +38,7 @@ $(document).ready(() => {
     return false
   })
 
-  $('.modal_preview_link').live('click', function() {
+  $('.modal_preview_link').live('click', function () {
     // overflow:hidden is because of some weird thing where the google doc preview gets double scrollbars
     $('<div style="padding:0; overflow:hidden;">')
       .dialog({
@@ -49,6 +49,7 @@ $(document).ready(() => {
         height: $(document).height() * 0.75
       })
       .loadDocPreview($.extend({height: '100%'}, $(this).data()))
+    $('.submission_annotation_unread_indicator').hide()
     return false
   })
 })

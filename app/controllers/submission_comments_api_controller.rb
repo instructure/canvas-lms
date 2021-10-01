@@ -127,6 +127,8 @@ class SubmissionCommentsApiController < ApplicationController
         submission = assignment.submissions.where(user_id: user).take
         return render json: { error: "Couldn't find Submission for user with API id #{params[:user_id]}" }, status: :bad_request unless submission
 
+        user.mark_submission_annotations_unread!(submission) unless user == author
+
         instructors = @context.instructors_in_charge_of(user)
 
         # If the author is an instructor, check post_policies to see if we should notify others.

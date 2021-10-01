@@ -143,6 +143,9 @@ describe 'Submissions Comment API', type: :request do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args)
       annotation_notification_call(author_id: @teacher.to_param)
       expect(response.status).to eq 200
+
+      submission = auto_post_assignment.submission_for_student(@student)
+      expect(@student.reload.unread_submission_annotations?(submission)).to eq true
     end
 
     it 'works for group submission annotation' do

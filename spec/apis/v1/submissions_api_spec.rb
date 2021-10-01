@@ -4754,6 +4754,52 @@ describe 'Submissions API', type: :request do
     expect(@submission.reload.read?(@teacher)).to be_falsey
   end
 
+  context 'document annotation read state' do
+    before :once do
+      course_with_student_and_submitted_homework
+    end
+
+    it 'retrieves document annotation read state' do
+      @student.mark_submission_annotations_unread!(@submission)
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
+                              { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                                action: 'document_annotations_read_state', controller: 'submissions_api', format: 'json' })
+      expect(json).to eq({ 'read' => false })
+
+      @student.mark_submission_annotations_read!(@submission)
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
+                              { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                                action: 'document_annotations_read_state', controller: 'submissions_api', format: 'json' })
+      expect(json).to eq({ 'read' => true })
+    end
+
+    it "requires read permission on the submission" do
+      temp = @student
+      other_student = student_in_course(active_all: true).user
+      @student = temp
+
+      api_call_as_user(other_student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'document_annotations_read_state', controller: 'submissions_api', format: 'json' },
+                       {}, {}, { expected_status: 401 })
+    end
+
+    it 'marks document annotations read' do
+      @student.mark_submission_annotations_unread!(@submission)
+      api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'mark_document_annotations_read', controller: 'submissions_api', format: 'json' })
+      expect(@user.reload.unread_submission_annotations?(@submission)).to eq false
+    end
+
+    it "doesn't allow you to mark someone else's document annotations read" do
+      api_call_as_user(@teacher, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/document_annotations/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'mark_document_annotations_read', controller: 'submissions_api', format: 'json' }, {},
+                       {}, { expected_status: 401 })
+    end
+  end
+
   context 'bulk update' do
     before :each do
       @student1 = user_factory(active_all: true)
