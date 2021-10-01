@@ -87,12 +87,20 @@ module Types
                "only return enrollments for this course",
                required: false,
                prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func("Course")
+      argument :current_only, Boolean,
+               "Whether or not to restrict results to `active` enrollments in `available` courses",
+               required: false
+      argument :order_by, [String],
+               "The fields to order the results by",
+               required: false
     end
 
-    def enrollments(course_id: nil)
+    def enrollments(course_id: nil, current_only: false, order_by: [])
       course_ids = [course_id].compact
       Loaders::UserCourseEnrollmentLoader.for(
-        course_ids: course_ids
+        course_ids: course_ids,
+        order_by: order_by,
+        current_only: current_only
       ).load(object.id).then do |enrollments|
         (enrollments || []).select { |enrollment|
           object == context[:current_user] ||
@@ -316,12 +324,19 @@ end
 
 module Loaders
   class UserCourseEnrollmentLoader < Loaders::ForeignKeyLoader
-    def initialize(course_ids:)
+    def initialize(course_ids:, order_by: [], current_only: false)
       scope = Enrollment.joins(:course)
-                        .where.not(enrollments: { workflow_state: "deleted" })
-                        .where.not(courses: { workflow_state: "deleted" })
+
+      scope = if current_only
+                scope.current.active_by_date
+              else
+                scope.where.not(enrollments: { workflow_state: "deleted" })
+                     .where.not(courses: { workflow_state: "deleted" })
+              end
 
       scope = scope.where(course_id: course_ids) if course_ids.present?
+
+      order_by.each { |o| scope = scope.order(o) }
 
       super(scope, :user_id)
     end

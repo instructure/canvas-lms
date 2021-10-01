@@ -22,18 +22,15 @@ import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Flex} from '@instructure/ui-flex'
 import {EnrollmentShape} from './Shape'
 import I18n from 'i18n!*'
+import {groupBy, sortBy, sortedUniqBy} from 'lodash'
 
 export default function NotificationPreferencesContextSelect(props) {
-  const activeUniqueEnrollments = useMemo(() => {
-    const courseIds = new Set()
-    return (
-      props.enrollments?.filter(e => {
-        if (e.state !== 'active') return false
-        const duplicate = courseIds.has(e.course.id)
-        courseIds.add(e.course.id)
-        return !duplicate
-      }) || []
-    )
+  const sortedGroupedUniqueEnrollments = useMemo(() => {
+    if (!props.enrollments) return []
+
+    const uniqueEnrollments = sortedUniqBy(props.enrollments, 'course._id')
+    const groupedEnrollments = Object.entries(groupBy(uniqueEnrollments, 'course.term._id'))
+    return sortBy(groupedEnrollments, [([_, e]) => e[0].course.term.name])
   }, [props.enrollments])
 
   const handleChange = useCallback(
@@ -53,10 +50,14 @@ export default function NotificationPreferencesContextSelect(props) {
         <SimpleSelect.Option id="account" value="account">
           {I18n.t('Account')}
         </SimpleSelect.Option>
-        {activeUniqueEnrollments.map(e => (
-          <SimpleSelect.Option key={e.course.id} id={e.course.id} value={e.course._id}>
-            {e.course.name}
-          </SimpleSelect.Option>
+        {sortedGroupedUniqueEnrollments.map(([termId, enrollments]) => (
+          <SimpleSelect.Group renderLabel={enrollments[0].course.term.name} key={termId}>
+            {enrollments.map(e => (
+              <SimpleSelect.Option key={e.course._id} id={e.course._id} value={e.course._id}>
+                {e.course.name}
+              </SimpleSelect.Option>
+            ))}
+          </SimpleSelect.Group>
         ))}
       </SimpleSelect>
     </Flex>
