@@ -40,7 +40,7 @@ import GroupActionDrillDown from './shared/GroupActionDrillDown'
 import useOutcomesImport from '@canvas/outcomes/react/hooks/useOutcomesImport'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
-  const {isMobileView, isCourse, rootIds} = useCanvasContext()
+  const {isMobileView, isCourse, rootOutcomeGroup, rootIds} = useCanvasContext()
   const [showOutcomesView, setShowOutcomesView] = useState(false)
   const [scrollContainer, setScrollContainer] = useState(null)
   const {
@@ -61,7 +61,8 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
     id: selectedGroupId,
     query: FIND_GROUP_OUTCOMES,
     loadOutcomesIsImported: true,
-    searchString: debouncedSearchString
+    searchString: debouncedSearchString,
+    targetGroupId: rootOutcomeGroup?.id
   })
 
   useEffect(() => {
@@ -232,7 +233,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                     '#EEEEEE url("/images/splitpane_handle-ew.gif") no-repeat scroll 50% 50%'
                 }}
               />
-              {/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
+              {/* eslint-enable jsx-a11y/no-noninteractive-tabindex */}
             </Flex.Item>
             <Flex.Item
               as="div"
