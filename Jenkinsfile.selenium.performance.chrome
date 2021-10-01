@@ -45,7 +45,7 @@ pipeline {
   }
 
   stages {
-    stage ('Setup') {
+    stage('Setup') {
       steps {
         cleanAndSetup()
       }
@@ -82,7 +82,7 @@ pipeline {
       }
     }
 
-    stage ('Setup Containers') {
+    stage('Setup Containers') {
       steps {
         timeout(time: 20) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
@@ -92,7 +92,7 @@ pipeline {
       }
     }
 
-    stage ('Selenium Performance Tests') {
+    stage('Selenium Performance Tests') {
       steps {
         timeout(time: 60) {
           sh 'build/new-jenkins/rspec-with-retries.sh performance'
@@ -120,7 +120,7 @@ pipeline {
           script {
             def htmlFiles
             // find all results files
-            dir ('tmp') {
+            dir('tmp') {
               htmlFiles = findFiles glob: '**/index.html'
             }
             // publish html
