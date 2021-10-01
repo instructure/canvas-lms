@@ -699,6 +699,20 @@ describe DiscussionTopicsController do
         expect(assigns[:js_env][:SEQUENCE]).to be_truthy
       end
 
+      it "sets correct URL env vars" do
+        Account.default.enable_feature! :react_discussions_post
+        outcome_with_rubric
+        @rubric.associate_with(@topic.assignment, @course, :purpose => "grading")
+        @topic.assignment.peer_reviews = true
+        user_session(@teacher)
+        get 'show', params: { :course_id => @course.id, :id => @topic.id }
+        expect(assigns[:js_env][:EDIT_URL]).to eq "/courses/#{@course.id}/discussion_topics/#{@topic.id}/edit"
+        expect(assigns[:js_env][:DISCUSSION][:GRADED_RUBRICS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/rubric"
+        expect(assigns[:js_env][:SPEEDGRADER_URL_TEMPLATE])
+          .to eq "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@topic.assignment.id}&student_id=%3Astudent_id"
+        expect(assigns[:js_env][:PEER_REVIEWS_URL]).to eq "/courses/#{@course.id}/assignments/#{@topic.assignment.id}/peer_reviews"
+      end
+
       it "assigns groups from the topic's category" do
         user_session(@teacher)
 

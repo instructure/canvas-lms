@@ -24,22 +24,13 @@ export const isGraded = (assignment = null) => {
   return assignment !== null
 }
 
-export const getSpeedGraderUrl = (courseId, assignmentId, authorId = null) => {
-  let speedGraderUrl = `/courses/${courseId}/gradebook/speed_grader?assignment_id=${assignmentId}`
-
+export const getSpeedGraderUrl = (authorId = null) => {
+  let speedGraderUrl = ENV.SPEEDGRADER_URL_TEMPLATE
   if (authorId !== null) {
-    speedGraderUrl += `&student_id=${authorId}`
+    speedGraderUrl = speedGraderUrl.replace(/%3Astudent_id/, authorId)
   }
 
   return speedGraderUrl
-}
-
-export const getEditUrl = (courseId, discussionTopicId) => {
-  return `/courses/${courseId}/discussion_topics/${discussionTopicId}/edit`
-}
-
-export const getPeerReviewsUrl = (courseId, assignmentId) => {
-  return `/courses/${courseId}/assignments/${assignmentId}/peer_reviews`
 }
 
 export const getGroupDiscussionUrl = (groupId, childDiscussionId) => {

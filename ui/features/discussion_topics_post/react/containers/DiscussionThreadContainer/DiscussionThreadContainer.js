@@ -261,14 +261,7 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onOpenInSpeedGrader = () => {
-    window.open(
-      getSpeedGraderUrl(
-        ENV.course_id,
-        props.discussionTopic.assignment._id,
-        props.discussionEntry.author._id
-      ),
-      '_blank'
-    )
+    window.open(getSpeedGraderUrl(props.discussionEntry.author._id), '_blank')
   }
 
   // Scrolling auto listener to mark messages as read
