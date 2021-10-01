@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import {createCache} from '@canvas/apollo'
-import {render, screen} from '@testing-library/react'
+import {render, screen, within} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import mockGraphqlQuery from '@canvas/graphql-query-mock'
 import React from 'react'
@@ -113,13 +113,17 @@ describe('Notification Settings page', () => {
     ).toBeInTheDocument()
   })
 
-  it('does not include inactive enrollments in the dropdown', async () => {
-    const mocks = (await mockAccountNotificationsQuery({Node: {__typename: 'User'}})).concat(
-      await mockUserEnrollmentsQuery({Node: {__typename: 'User'}})
-    )
+  it('displays course terms in the dropdown', async () => {
+    const accountMocks = await mockAccountNotificationsQuery({Node: {__typename: 'User'}})
+    const enrollmentMocks = await mockUserEnrollmentsQuery({Node: {__typename: 'User'}})
+    enrollmentMocks[0].result.data.legacyNode.enrollments.forEach(e => {
+      e.course.name = 'Course Name'
+      e.course.term.name = 'Term Name'
+      e.course.term.id = '1'
+    })
 
     const {findByLabelText} = render(
-      <MockedProvider mocks={mocks} cache={createCache()}>
+      <MockedProvider mocks={accountMocks.concat(enrollmentMocks)} cache={createCache()}>
         <AccountNotificationSettingsView accountId="1" userId="1" courseSelectorEnabled />
       </MockedProvider>
     )
@@ -127,7 +131,11 @@ describe('Notification Settings page', () => {
     const dropdown = await findByLabelText('Settings for')
     userEvent.click(dropdown)
 
-    expect(await screen.queryByText('Hello World')).not.toBeInTheDocument()
+    const terms = await screen.findAllByText('Term Name')
+    expect(terms.length).toEqual(1)
+
+    const termNameGroupQueries = within(terms[0].parentElement)
+    expect((await termNameGroupQueries.findAllByText('Course Name')).length).toEqual(2)
   })
 
   it('only shows a course with multiple enrollments once', async () => {

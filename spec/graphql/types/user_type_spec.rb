@@ -205,6 +205,33 @@ describe Types::UserType do
       ).to eq [@student.enrollments.first.to_param]
     end
 
+    it "excludes unavailable courses when currentOnly is true" do
+      @course1.complete
+
+      expect(user_type.resolve("enrollments(currentOnly: true) { _id }")).to eq []
+    end
+
+    it "excludes concluded courses when currentOnly is true" do
+      @course1.start_at = 2.weeks.ago
+      @course1.conclude_at = 1.week.ago
+      @course1.restrict_enrollments_to_course_dates = true
+      @course1.save!
+
+      expect(user_type.resolve("enrollments(currentOnly: true) { _id }")).to eq []
+    end
+
+    it "sorts correctly when orderBy is provided" do
+      @course2.start_at = 1.week.ago
+      @course2.save!
+
+      expect(user_type.resolve('enrollments(orderBy: ["courses.start_at"]) {
+          _id
+          course {
+            _id
+          }
+        }', current_user: @student).map(&:to_i)).to eq [@course2.id, @course1.id]
+    end
+
     it "doesn't return enrollments for courses the user doesn't have permission for" do
       expect(
         user_type.resolve(%|enrollments(courseId: "#{@course2.id}") { _id }|)
