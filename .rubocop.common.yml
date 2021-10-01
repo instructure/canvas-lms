@@ -125,12 +125,18 @@ Style/Encoding:
   Severity: error
 Style/FrozenStringLiteralComment:
   Severity: error
+Style/IfUnlessModifier:
+  Enabled: false # can obscure important decisions or put too much code in a line
+Style/NumericPredicate:
+  Enabled: false # `> 0` can be easier to read than `.positive?`
 Style/ParenthesesAroundCondition:
   Severity: error
 Style/PerlBackrefs:
   Enabled: false # Regexp.last_match(1) is far worse than $1
 Style/SpecialGlobalVars:
   Enabled: false # $! and $? are fine
+Style/WhileUntilModifier:
+  Enabled: false # nontrivial loops should look like loops
 
 # the following cops are currently silenced, but we may want to enable them IF
 # we correct all instances in the codebase first
@@ -184,6 +190,9 @@ Style/DoubleNegation: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/Dir: # TODO: autocorrect
   Enabled: false
+Style/EmptyElse: # TODO: autocorrect
+  Enabled: false
+  EnforcedStyle: empty # explicit nil indicates programmer intent
 Style/FormatStringToken: # TODO: investigate if this complains about our i18n library
   Enabled: false
 Style/GuardClause: # TODO
@@ -191,8 +200,6 @@ Style/GuardClause: # TODO
 Style/HashSyntax:
   EnforcedStyle: ruby19_no_mixed_keys
   Enabled: false # TODO: autocorrect
-Style/IfUnlessModifier: # TODO: autocorrect
-  Enabled: false
 Style/Lambda: # TODO: autocorrect
   Enabled: false
 Style/MethodCallWithArgsParentheses: # TODO: autocorrect
@@ -200,8 +207,6 @@ Style/MethodCallWithArgsParentheses: # TODO: autocorrect
 Style/MethodCallWithoutArgsParentheses: # TODO: autocorrect
   Enabled: false
 Style/NumericLiterals: # TODO: autocorrect
-  Enabled: false
-Style/NumericPredicate: # TODO: autocorrect (unsafe)
   Enabled: false
 Style/ParallelAssignment: # TODO: autocorrect (with probable exceptions)
   Enabled: false
@@ -235,8 +240,6 @@ Style/TrailingCommaInArguments: # TODO: autocorrect
 Style/TrailingCommaInArrayLiteral: # TODO: autocorrect
   Enabled: false
 Style/TrailingCommaInHashLiteral: # TODO: autocorrect
-  Enabled: false
-Style/WhileUntilModifier: # TODO: autocorrect
   Enabled: false
 Style/WordArray: # TODO: autocorrect
   Enabled: false

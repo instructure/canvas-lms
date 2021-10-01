@@ -548,7 +548,7 @@ describe('sources/api', () => {
     const fileProps = {}
     const apiProps = {}
 
-    it.only('includes "onDuplicate"', () => {
+    it('includes "onDuplicate"', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource.preflightUpload(fileProps, {onDuplicate: 'overwrite'}, apiProps).then(() => {

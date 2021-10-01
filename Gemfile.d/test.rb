@@ -55,6 +55,7 @@ group :test do
   gem 'escape_code', '0.2', require: false
   gem 'luminosity_contrast', '0.2.1'
   gem 'pact', '1.57.0', require: false
+    gem 'pact-support', '1.16.8', require: false
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.40.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'

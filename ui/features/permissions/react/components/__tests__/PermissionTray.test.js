@@ -82,6 +82,6 @@ it('renders unassigned roles if any are present', () => {
 it('renders details toggles for permissions if any are present', () => {
   const props = makeDefaultProps()
   const tree = shallow(<PermissionTray {...props} />)
-  const node = tree.find('DetailsToggle')
+  const node = tree.find('PermissionDetailToggles')
   expect(node.exists()).toBeTruthy()
 })
