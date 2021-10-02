@@ -148,6 +148,7 @@ export const MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS = [
       {
         id: '9',
         description: '',
+        html_url: 'http://localhost:3000/courses/30/assignments/9',
         due_at: '2021-10-25T05:59:59Z',
         points_possible: 10,
         grading_type: 'points',

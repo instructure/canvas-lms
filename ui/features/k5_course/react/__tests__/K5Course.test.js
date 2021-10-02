@@ -36,12 +36,14 @@ import {
 import {TAB_IDS} from '@canvas/k5/react/utils'
 import {MOCK_OBSERVER_LIST} from '@canvas/k5/react/__tests__/fixtures'
 import sinon from 'sinon'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/react/ObserverOptions'
 
 const currentUser = {
   id: '1',
   display_name: 'Geoffrey Jellineck',
   avatar_image_url: 'http://avatar'
 }
+const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUser.id}`
 const defaultEnv = {
   current_user: currentUser,
   course_id: '30',
@@ -193,6 +195,7 @@ afterEach(() => {
   moxios.uninstall()
   fetchMock.restore()
   fakeXhrServer.restore()
+  window.location.hash = ''
 })
 
 describe('K-5 Subject Course', () => {
@@ -335,9 +338,6 @@ describe('K-5 Subject Course', () => {
   })
 
   describe('Student View Button functionality', () => {
-    afterAll(() => {
-      window.location.hash = ''
-    })
     it('Shows the Student View button when the user has student view mode access', () => {
       const {queryByRole} = render(<K5Course {...defaultProps} showStudentView />)
       expect(queryByRole('link', {name: 'Student View'})).toBeInTheDocument()
@@ -736,7 +736,7 @@ describe('K-5 Subject Course', () => {
     })
   })
 
-  describe('Parent Support', () => {
+  describe('Observer Support', () => {
     beforeEach(() => {
       fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
       fetchMock.get(
@@ -747,7 +747,7 @@ describe('K-5 Subject Course', () => {
     })
 
     afterEach(() => {
-      fetchMock.restore()
+      document.cookie = `${observedUserCookieName}=`
     })
 
     it('shows picker when user is an observer', () => {
@@ -758,11 +758,12 @@ describe('K-5 Subject Course', () => {
     })
 
     it('shows the observee grades on the Grades Tab', async () => {
-      const {getByRole, getByText} = render(<K5Course {...defaultProps} parentSupportEnabled />)
+      const {getByRole, getByText} = render(
+        <K5Course {...defaultProps} parentSupportEnabled defaultTab={TAB_IDS.GRADES} />
+      )
       const select = getByRole('combobox', {name: 'Select a student to view'})
       act(() => select.click())
       act(() => getByText('Student 5').click())
-      act(() => getByRole('tab', {name: 'Arts and Crafts Grades'}).click())
       await waitFor(() => {
         const formattedSubmittedDate = tz.format(
           '2021-09-20T23:55:08Z',

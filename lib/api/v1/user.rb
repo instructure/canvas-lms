@@ -49,12 +49,17 @@ module Api::V1::User
     end
   end
 
-  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment = nil, tool_includes: [])
+  def user_json(user, current_user, session, includes = [], context = @context, enrollments = nil, excludes = [], enrollment = nil, tool_includes: [], grading_period: nil)
     includes ||= []
     excludes ||= []
     api_json(user, current_user, session, API_USER_JSON_OPTS).tap do |json|
       json[:created_at] = json[:created_at]&.iso8601
-      enrollment_json_opts = { current_grading_period_scores: includes.include?('current_grading_period_scores') }
+      enrollment_json_opts = {}
+      if grading_period.nil?
+        enrollment_json_opts[:current_grading_period_scores] = includes.include?('current_grading_period_scores')
+      else
+        enrollment_json_opts[:grading_period] = grading_period
+      end
       if includes.include?('sis_user_id') || (!excludes.include?('pseudonym') && user_json_is_admin?(context, current_user))
         include_root_account = @domain_root_account.trust_exists?
         course_or_section = @context if @context.is_a?(Course) || @context.is_a?(CourseSection)
@@ -302,7 +307,7 @@ module Api::V1::User
         json[:locked] = lockedbysis
       end
       if includes.include?('observed_users') && enrollment.observer? && enrollment.associated_user && !enrollment.associated_user.deleted?
-        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id))
+        json[:observed_user] = user_json(enrollment.associated_user, user, session, user_includes, @context, enrollment.associated_user.not_ended_enrollments.all_student.shard(enrollment).where(:course_id => enrollment.course_id), grading_period: opts[:grading_period])
       end
       if includes.include?('can_be_removed')
         json[:can_be_removed] = (!enrollment.defined_by_sis? || context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis)) &&
@@ -367,7 +372,8 @@ module Api::V1::User
 
     (user.id == enrollment.user_id && !course.hide_final_grades?) ||
       course.grants_any_right?(user, :manage_grades, :view_all_grades) ||
-      enrollment.user.grants_right?(user, :read_as_parent)
+      enrollment.user.grants_right?(user, :read_as_parent) ||
+      (enrollment.grants_right?(user, :read_grades) && !course.hide_final_grades?)
   end
 
   def get_context_groups(context)
