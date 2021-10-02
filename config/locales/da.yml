@@ -17635,7 +17635,7 @@ da:
     all_submissions_description: |-
         *Kun instruktør og admin:*
         
-        Aflevering / gen-aflevering af opgave (undtagen test)
+              Aflevering / gen-aflevering af opgave (undtagen test)
     all_submissions_display: "Alle afleveringer"
     announcement_created_by_you_description: |-
         * Beskeder oprettet af dig
@@ -17655,7 +17655,7 @@ da:
     blueprint_description: |-
         *Kun instruktør og admin:*
         
-        Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
+              Indholdet blev synkroniseret fra et blueprint-fag til tilhørende fag
     blueprint_display: "Blueprint synkronisering"
     calendar_description: "Nye og ændrede elementer i dit fags kalender"
     calendar_display: Kalender
@@ -17690,7 +17690,7 @@ da:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-        Placering og indhold af et mislykket link, som en studerende har interageret med
+                Placering og indhold af et mislykket link, som en studerende har interageret med
     content_link_error_display: Indholdslinkfejl
     conversation_created_description: "Du oprettede en diskussion"
     conversation_created_display: "Diskussioner som jeg har oprettet"
@@ -17699,9 +17699,9 @@ da:
     course_content_description: |-
         Skift til fagindhold: 
         
-        * Sideindhold
-        * Testindhold
-        * Opgaveindhold
+              * Sideindhold
+              * Testindhold
+              * Opgaveindhold
     course_content_display: Fagindhold
     discussion_description: "Nyt diskussionsemne i dit fag"
     discussion_display: Diskussion
@@ -17714,8 +17714,8 @@ da:
     grading_description: |-
         Inkluderer: 
         
-        * Opgaver / indtastet/ændret indsendelseskarakter
-        * Ændret karaktervægt
+              * Opgaver / indtastet/ændret indsendelseskarakter
+              * Ændret karaktervægt
     grading_display: Karaktergivning
     grading_notify_include_grade: "Inkluder scorer når der alarmeres om karakterændringer."
     grading_policies_description: "Ændring i fagets karakterbestemmelser"
@@ -17723,21 +17723,21 @@ da:
     invitation_description: |-
         Invitation til: 
         
-        * Webkonference
-        * Gruppe
-        * Samarbejde
-        * Peer review & påmindelse
+              * Webkonference
+              * Gruppe
+              * Samarbejde
+              * Peer review & påmindelse
     invitation_display: Invitation
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-        Sen opgaveindsendelse
+              Sen opgaveindsendelse
     late_grading_display: "Sen karaktergivning"
     membership_update_description: |-
         *Kun admin: afventende tilmelding aktiveret*
         
-        * Gruppetilmelding
-        * godkendt/afvist
+              * Gruppetilmelding
+              * godkendt/afvist
     membership_update_display: "Opdatering af medlemskab"
     missing_description_description: "Til %{category} meddelelser"
     missing_display_display: "Til %{category} meddelelser"
@@ -17822,19 +17822,19 @@ da:
     other_description: |-
         *Kun instruktør og administrator:*
         
-        * Tilmelding til fag
-        * Rapport genereret
-        * Eksport af indhold
-        * Overførselsrapport
-        * Ny kontobruger
-        * Ny studiegruppe
+              * Tilmelding til fag
+              * Rapport genereret
+              * Eksport af indhold
+              * Overførselsrapport
+              * Ny kontobruger
+              * Ny studiegruppe
     other_display: "Administrative meddelelser"
     recording_ready_display: "Optagelse er klar"
     reminder_display: Påmindelse
     student_appointment_description: |-
         *Kun instruktør og administrator:*
         
-        Tilmelding til studieaftale
+              Tilmelding til studieaftale
     student_appointment_display: "Tilmeldinger til studieaftale"
     submission_comment_description: "Kommentar til opgaveaflevering"
     submission_comment_display: Afleveringskommentar
