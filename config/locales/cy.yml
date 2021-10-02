@@ -15585,7 +15585,7 @@ cy:
     all_submissions_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        Cyflwyno/ailgyflwyno aseiniad (ac eithrio cwisiau)
+              Cyflwyno/ailgyflwyno aseiniad (ac eithrio cwisiau)
     all_submissions_display: "Pob Cyflwyniad"
     announcement_created_by_you_description: |-
         * Cyhoeddiadau wedi’u creu gennych chi
@@ -15601,7 +15601,7 @@ cy:
     blueprint_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        Cafodd cynnwys ei gysoni o gwrs glasbrint i gyrsiau cysylltiedig
+              Cafodd cynnwys ei gysoni o gwrs glasbrint i gyrsiau cysylltiedig
     blueprint_display: "Cysoni glasbrint"
     calendar_description: "Eitemau newydd ac eitemau wedi newid ar galendr eich cwrs"
     calendar_display: Calendr
@@ -15636,7 +15636,7 @@ cy:
     content_link_error_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        Lleoliad a chynnwys dolen sydd wedi methu y mae myfyriwr wedi rhyngweithio â hi
+                Lleoliad a chynnwys dolen sydd wedi methu y mae myfyriwr wedi rhyngweithio â hi
     content_link_error_display: "Gwall Dolen Gynnwys"
     conversation_created_description: "Rydych chi wedi creu sgwrs"
     conversation_created_display: "Sgyrsiau wedi'u creu gennyf fi"
@@ -15645,9 +15645,9 @@ cy:
     course_content_description: |-
         Newid i gynnwys cwrs: 
         
-        * Cynnwys tudalen
-        * Cynnwys cwis
-        * Cynnwys aseiniad
+              * Cynnwys tudalen
+              * Cynnwys cwis
+              * Cynnwys aseiniad
     course_content_display: "Cynnwys cwrs"
     discussion_description: "Pwnc trafod newydd yn eich cwrs"
     discussion_display: Trafodaeth
@@ -15660,29 +15660,29 @@ cy:
     grading_description: |-
         Yn cynnwys: 
         
-        * Gradd aseiniad/cyflwyniad wedi'i rhoi/newid
-        * Pwysoliad gradd wedi'i newid
+              * Gradd aseiniad/cyflwyniad wedi'i rhoi/newid
+              * Pwysoliad gradd wedi'i newid
     grading_display: Graddio
     grading_policies_description: "Newid polisi graddio cwrs"
     grading_policies_display: "Polisïau Graddio"
     invitation_description: |-
         Gwahoddiad ar gyfer: 
         
-        * Gwe-gynhadledd
-        * Grŵp
-        * Cydweithio
-        * Adolygu gan gyd-fyfyrwyr a nodyn atgoffa
+              * Gwe-gynhadledd
+              * Grŵp
+              * Cydweithio
+              * Adolygu gan gyd-fyfyrwyr a nodyn atgoffa
     invitation_display: Gwahoddiad
     late_grading_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        Cyflwyno aseiniad yn hwyr
+              Cyflwyno aseiniad yn hwyr
     late_grading_display: "Graddio Hwyr"
     membership_update_description: |-
         *Gweinyddwr yn unig: nes bydd yr ymrestriad wedi’i ysgogi*
         
-        * Ymrestriad grŵp
-        * wedi derbyn/gwrthod
+              * Ymrestriad grŵp
+              * wedi derbyn/gwrthod
     membership_update_display: "Diweddaru Aelodaeth"
     missing_description_description: "Ar gyfer hysbysiadau %{category}"
     missing_display_display: "Ar gyfer hysbysiadau %{category}"
@@ -15767,19 +15767,19 @@ cy:
     other_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        * Ymrestriad Cwrs
-        * Adroddiad wedi’i greu
-        * Allgludo cynnwys
-        * Adroddiad mudo
-        * Defnyddiwr cyfrif newydd
-        * Grŵp myfyrwyr newydd
+              * Ymrestriad Cwrs
+              * Adroddiad wedi’i greu
+              * Allgludo cynnwys
+              * Adroddiad mudo
+              * Defnyddiwr cyfrif newydd
+              * Grŵp myfyrwyr newydd
     other_display: "Hysbysiadau Gweinyddol"
     recording_ready_display: "Recordiad yn Barod"
     reminder_display: "Nodyn atgoffa"
     student_appointment_description: |-
         *Addysgwr a Gweinyddwr yn unig:*
         
-        Archebu apwyntiadau gan fyfyrwyr
+              Archebu apwyntiadau gan fyfyrwyr
     student_appointment_display: "Archebu Apwyntiadau gan Fyfyrwyr"
     submission_comment_description: "Sylw ar gyflwyniad aseiniad"
     submission_comment_display: "Sylw ar y cyflwyniad"
