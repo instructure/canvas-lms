@@ -139,6 +139,12 @@ export default class DatetimeField {
   addDatePicker(options) {
     this.$field.wrap('<div class="input-append" />')
     const $wrapper = this.$field.parent('.input-append')
+    // See if we were given an ISO initial value so we don't have to try to parse
+    const initialValue = this.$field.attr('data-initial-value')
+    if (initialValue) {
+      this.$field.removeAttr('data-initial-value')
+      this.$field.data('inputdate', new Date(initialValue))
+    }
     if (!this.isReadonly()) {
       const datepickerOptions = $.extend(
         {},
@@ -183,7 +189,7 @@ export default class DatetimeField {
   setDate(date) {
     if (!this.showDate) {
       this.implicitDate = date
-      this.$field.data('inputdate', date.toISOString())
+      this.$field.data('inputdate', date)
       return this.setFromValue()
     } else {
       return this.setFormattedDatetime(date, DATE_FORMAT_OPTIONS)
@@ -292,7 +298,7 @@ export default class DatetimeField {
     })
 
     if (this.$hiddenInput) {
-      this.$hiddenInput.val(this.fudged)
+      this.$hiddenInput.val(this.fudged?.toISOString())
     }
 
     // date_fields and time_fields don't have timepicker data fields

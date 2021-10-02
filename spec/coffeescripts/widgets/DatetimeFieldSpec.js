@@ -218,6 +218,15 @@ test('should initialize from the inputdate data', function () {
   equal(field.$suggest.text(), 'Sun, Jul 20, 1969, 9:56 PM')
 })
 
+test('should initialize from the initial value attribute if present, and then remove it', function () {
+  this.$initialValueField = $(
+    '<input type="text" name="has_initial_value" data-initial-value="2021-02-14T14:00:00Z">'
+  )
+  const field = new DatetimeField(this.$initialValueField, {})
+  equal(field.$suggest.text(), 'Sun, Feb 14, 2021, 9:00 AM')
+  equal(this.$initialValueField.attr('data-initial-value'), undefined)
+})
+
 test('should tie it to update on keyup only', function () {
   const field = new DatetimeField(this.$field, {})
 
@@ -394,10 +403,10 @@ test('sets blank field', function () {
   equal(this.$field.data('blank'), false)
 })
 
-test('sets value of hiddenInput, if present, to fudged time', function () {
+test('sets value of hiddenInput, if present, to fudged time as ISO8601', function () {
   this.field.addHiddenInput()
   this.field.updateData()
-  equal(this.$field.data('hiddenInput').val(), this.field.fudged.toString())
+  equal(this.$field.data('hiddenInput').val(), this.field.fudged.toISOString())
 })
 
 test('sets time-* to fudged, 12-hour values', function () {

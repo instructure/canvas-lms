@@ -76,7 +76,7 @@ function renderDatepickerTime($input) {
   )
 
   let meridianSelect = ''
-  if (tz.useMeridian()) {
+  if (tz.hasMeridian()) {
     meridianSelect = (
       <select
         defaultValue={data.ampm.toLowerCase()}

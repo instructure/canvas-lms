@@ -16,12 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import { parse, format } from 'datetime'
+import {parse, format} from 'datetime'
 
-export {
-  hasMeridiem as hasMeridian,
-  useMeridiem as useMeridian,
-} from 'datetime'
+export {hasMeridiem as hasMeridian} from 'datetime'
 
 export function isMidnight(date) {
   if (date === null) {
@@ -45,4 +42,4 @@ export function mergeTimeAndDate(time, date) {
   return parse(format(date, '%F ') + format(time, '%T'))
 }
 
-export { default as default } from './jquery/index'
+export {default} from './jquery/index'
