@@ -15404,7 +15404,7 @@ nb-x-k12:
     all_submissions_description: |-
         *Kun for instruktør og admin:*
         
-        Oppgaveinnlevering/gjeninnlevering (unntatt quiz)
+              Oppgaveinnlevering/gjeninnlevering (unntatt quiz)
     all_submissions_display: "Alle innleveringer"
     announcement_created_by_you_description: |-
         * Beskjeder opprettet av deg
@@ -15420,7 +15420,7 @@ nb-x-k12:
     blueprint_description: |-
         *Kun for instruktør og admin:*
         
-        Innhold ble synkronisert fra en fagmal til tilknyttede fag
+              Innhold ble synkronisert fra en fagmal til tilknyttede fag
     blueprint_display: Fagmalsynkronisering
     calendar_description: "Nye og endrede elementer i fagkalenderen din"
     calendar_display: Kalender
@@ -15455,7 +15455,7 @@ nb-x-k12:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-        Plassering og innhold på en ødelagt lenke som en elev har samhandlet med
+                Plassering og innhold på en ødelagt lenke som en elev har samhandlet med
     content_link_error_display: "Avvik på innholdslenke"
     conversation_created_description: "Du opprettet en samtale"
     conversation_created_display: "Samtaler opprettet av meg"
@@ -15464,9 +15464,9 @@ nb-x-k12:
     course_content_description: |-
         Endre til fag-innhold: 
         
-        * Sideinnhold
-        * Testinnhold
-        * Oppgaveinnhold
+              * Sideinnhold
+              * Testinnhold
+              * Oppgaveinnhold
     course_content_display: Faginnhold
     discussion_description: "Nytt diskusjonstema i faget ditt"
     discussion_display: Diskusjon
@@ -15479,29 +15479,29 @@ nb-x-k12:
     grading_description: |-
         Inkluderer: 
         
-        * Oppgave/innleveringsvurdering skrevet inn/endret
-        * Vurderingvekting endret
+              * Oppgave/innleveringsvurdering skrevet inn/endret
+              * Vurderingvekting endret
     grading_display: Vurdering
     grading_policies_description: "Retningslinjer for vurdering i faget er endret"
     grading_policies_display: "Retningslinjer for vurdering"
     invitation_description: |-
         Invitasjon for: 
         
-        * Nettkonferanse
-        * Gruppe
-        * Samarbeid
-        * Medelevvurdering og påminnelse
+              * Nettkonferanse
+              * Gruppe
+              * Samarbeid
+              * Medelevvurdering og påminnelse
     invitation_display: Invitasjon
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-        Sen innlevering av oppgave
+              Sen innlevering av oppgave
     late_grading_display: "Forsinket vurdering"
     membership_update_description: |-
         *Kun admin: avventer påmelding aktivert*
         
-        * Gruppepåmelding
-        * Akesptert/avslått
+              * Gruppepåmelding
+              * Akesptert/avslått
     membership_update_display: "Oppdatering av medlemskap"
     missing_description_description: "For %{category}-varslinger"
     missing_display_display: "For %{category}-varslinger"
@@ -15586,19 +15586,19 @@ nb-x-k12:
     other_description: |-
         *Kun Instruktør og Administrator:*
         
-        * Fagpåmelding
-        * Rapport generert
-        * Innhold eksport
-        * Flytte rapport
-        * Ny kontobruker
-        * Ny elevgruppe
+              * Fagpåmelding
+              * Rapport generert
+              * Innhold eksport
+              * Flytte rapport
+              * Ny kontobruker
+              * Ny elevgruppe
     other_display: "Administrative varslinger"
     recording_ready_display: "Opptak klart"
     reminder_display: Påminnelse
     student_appointment_description: |-
         *Kun Instruktør og Admin:*
         
-        Påmelding for elevavtale
+              Påmelding for elevavtale
     student_appointment_display: "Påmeldinger til elevavtaler"
     submission_comment_description: "Kommentar – oppgaveinnlevering"
     submission_comment_display: Innleveringskommentar
