@@ -18341,7 +18341,7 @@ ar:
     all_submissions_description: |-
         *المعلم والمسؤول فقط:*
         
-        المهمة (باستثناء الاختبارات) المرسلة/المعاد إرسالها
+              المهمة (باستثناء الاختبارات) المرسلة/المعاد إرسالها
     all_submissions_display: "كافة الإرسالات"
     announcement_created_by_you_description: |-
         * الإعلانات التي قمت بإنشائها
@@ -18361,7 +18361,7 @@ ar:
     blueprint_description: |-
         *المعلم والمسؤول فقط:*
         
-        تمت مزامنة المحتوى من مساق مخطط إلى مساقات مقترنة.
+              تمت مزامنة المحتوى من مساق مخطط إلى مساقات مقترنة.
     blueprint_display: "مزامنة المساق المخطط"
     calendar_description: "عناصر جديدة ومتغيرة في تقويم المساق لديك"
     calendar_display: التقويم
@@ -18394,7 +18394,7 @@ ar:
       student_appointment_signups: "تسجيلات موعد الطالب"
       submission_comment: "تعليق الإرسال"
     content_link_error_description: "*المعلم والمسؤول فقط:*\n\n\
-        موقع ومحتوى ارتباط فاشل تفاعل معه أحد الطلاب  "
+        \x20       موقع ومحتوى ارتباط فاشل تفاعل معه أحد الطلاب  "
     content_link_error_display: "خطأ ارتباط محتوى"
     conversation_created_description: "قمت بإنشاء محادثة"
     conversation_created_display: "المحادثات التي قمتُ بإنشائها"
@@ -18403,9 +18403,9 @@ ar:
     course_content_description: |-
         التغيير إلى محتوى مساق: 
         
-        * محتوى الصفحة
-        * محتوى الاختبار الموجز
-        * محتوى المهمة
+              * محتوى الصفحة
+              * محتوى الاختبار الموجز
+              * محتوى المهمة
     course_content_display: "محتوى المساق"
     discussion_description: "موضوع مناقشة جديد في المساق لديك"
     discussion_display: المناقشات
@@ -18418,8 +18418,8 @@ ar:
     grading_description: |-
         يتضمن: 
         
-        * تم إدخال/تغيير درجة المهمة/الإرسال
-        * تم تغيير وزن الدرجة
+              * تم إدخال/تغيير درجة المهمة/الإرسال
+              * تم تغيير وزن الدرجة
     grading_display: التقديرات
     grading_notify_include_grade: "تضمين النقاط عند التنبيه حول تغييرات التقديرات."
     grading_policies_description: "تغييرات سياسة تقييم درجات المساق"
@@ -18427,21 +18427,21 @@ ar:
     invitation_description: |-
         دعوة إلى: 
         
-        * مؤتمر ويب
-        * مجموعة
-        * تعاون
-        * مراجعة نظراء وتذكير
+              * مؤتمر ويب
+              * مجموعة
+              * تعاون
+              * مراجعة نظراء وتذكير
     invitation_display: الدعوة
     late_grading_description: |-
         *المعلم والمسؤول فقط:*
         
-        إرسال المهمة متأخرًا
+              إرسال المهمة متأخرًا
     late_grading_display: "تقييم الدرجات الأخير"
     membership_update_description: |-
         *المسؤول فقط: تم تنشيط الالتحاق المعلق*
         
-        * الالتحاق بالمجموعة
-        * مقبول/مرفوض
+              * الالتحاق بالمجموعة
+              * مقبول/مرفوض
     membership_update_display: "تحديث العضوية"
     missing_description_description: "بالنسبة لإعلامات %{category}"
     missing_display_display: "بالنسبة لإعلامات %{category}"
@@ -18526,19 +18526,19 @@ ar:
     other_description: |-
         *المعلم والمسؤول فقط:*
         
-        * تسجيل في الدورة التدريبية
-        * إنشاء التقرير
-        * تصدير المحتوى
-        * تقرير الترحيل
-        * مستخدم الحساب الجديد
-        * مجموعة الطلاب الجديدة
+              * تسجيل في الدورة التدريبية
+              * إنشاء التقرير
+              * تصدير المحتوى
+              * تقرير الترحيل
+              * مستخدم الحساب الجديد
+              * مجموعة الطلاب الجديدة
     other_display: "إخطارات إدارية"
     recording_ready_display: "التسجيل جاهز"
     reminder_display: التذكير
     student_appointment_description: |-
         *المعلم والمسؤول فقط:*
         
-        التسجيل لموعد طالب
+              التسجيل لموعد طالب
     student_appointment_display: "تسجيلات موعد الطالب"
     submission_comment_description: "تعليق إرسال المهمة"
     submission_comment_display: "تعليق الإرسال"
