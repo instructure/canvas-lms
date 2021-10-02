@@ -15793,7 +15793,7 @@ is:
     all_submissions_description: |-
         *Aðeins fyrir leiðbeinanda og stjórnanda:*
         
-        Skil /endurskil verkefna (nema spurningalista)
+              Skil /endurskil verkefna (nema spurningalista)
     all_submissions_display: "Öll skil"
     announcement_created_by_you_description: |-
         * Þínar tilkynningar
@@ -15809,7 +15809,7 @@ is:
     blueprint_description: |-
         *Aðeins fyrir kennara og stjórnanda:*
         
-        Efni var samhæft frá Blueprint námskeiði við tengd námskeið
+              Efni var samhæft frá Blueprint námskeiði við tengd námskeið
     blueprint_display: "Samhæfing við Blueprint"
     calendar_description: "Ný og breytt atriði á dagatali námskeiðsins þíns"
     calendar_display: Dagatal
@@ -15844,7 +15844,7 @@ is:
     content_link_error_description: |-
         *Aðeins leiðbeinandi og kerfisstjóri:*
         
-        Staðsetning og efni bilaðs hlekks sem nemandi hefur reynt að nota
+                Staðsetning og efni bilaðs hlekks sem nemandi hefur reynt að nota
     content_link_error_display: Efnishlekksvilla
     conversation_created_description: "Þú stofnaðir samræðu"
     conversation_created_display: "Samræður sem ég hef stofnað"
@@ -15853,9 +15853,9 @@ is:
     course_content_description: |-
         Breyting á efni námskeiðs: 
         
-        * Efni síðu
-        * Efni prófs
-        * Efni verkefnis
+              * Efni síðu
+              * Efni prófs
+              * Efni verkefnis
     course_content_display: Námskeiðsefni
     discussion_description: "Nýtt umræðuefni á námskeiðinu þínu"
     discussion_display: Umræða
@@ -15868,29 +15868,29 @@ is:
     grading_description: |-
         Inniheldur: 
         
-        * Verkefni/skil-einkunn skráð/breytt
-        * Einkunnarvægi breytt
+              * Verkefni/skil-einkunn skráð/breytt
+              * Einkunnarvægi breytt
     grading_display: Einkunnagjöf
     grading_policies_description: "Breytt einkunnastefna námskeiðs"
     grading_policies_display: Einkunnastefnur
     invitation_description: |-
         Boð á eða í: 
         
-        * Vefráðstefnu
-        * Hóp
-        * Samvinnu
-        * Jafningjamat og áminningu
+              * Vefráðstefnu
+              * Hóp
+              * Samvinnu
+              * Jafningjamat og áminningu
     invitation_display: Boð
     late_grading_description: |-
         *Aðeins kennari og stjórnandi:*
         
-        Síðskil verkefnis
+              Síðskil verkefnis
     late_grading_display: "Síðbúin einkunnagjöf"
     membership_update_description: |-
         *Aðeins kerfisstjórnandi: innritun í bið er virk*
         
-        * hópinnritun
-        * samþykkt/hafnað
+              * hópinnritun
+              * samþykkt/hafnað
     membership_update_display: "Uppfærsla aðildar"
     missing_description_description: "Fyrir tilkynningar í %{category}"
     missing_display_display: "Fyrir tilkynningar í %{category}"
@@ -15975,19 +15975,19 @@ is:
     other_description: |-
         *Aðeins kennari og stjórnandi:*
         
-        * Skráning í námskeið
-        * Skýrslugerð
-        * Útflutt efni
-        * Afritunarkýrsla
-        * Nýr notandi reiknings
-        * Nýr nemendahópur
+              * Skráning í námskeið
+              * Skýrslugerð
+              * Útflutt efni
+              * Afritunarkýrsla
+              * Nýr notandi reiknings
+              * Nýr nemendahópur
     other_display: "Tilkynningar stjórnenda"
     recording_ready_display: "Upptaka tilbúin"
     reminder_display: Áminning
     student_appointment_description: |-
         *Aðeins kennari og stjórnandi:*
         
-        Fundarskráning nemanda
+              Fundarskráning nemanda
     student_appointment_display: "Fundaskráningar nemanda"
     submission_comment_description: "Athugasemd við verkefnisskil"
     submission_comment_display: "Athugasemd með skilum"
