@@ -382,6 +382,17 @@ describe Types::DiscussionType do
         expect(discussion_type.resolve('mentionableUsersConnection { nodes { _id } }')).to eq(discussion.context.users.map(&:id).map(&:to_s))
       end
     end
+
+    it "does not expose message when locked for user" do
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(true)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to be_nil
+      allow_any_instantiation_of(discussion).to receive(:locked_for?)
+        .with(@teacher, check_policies: true)
+        .and_return(false)
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to eq discussion.message
+    end
   end
 
   context "group discussion" do
