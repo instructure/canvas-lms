@@ -17635,7 +17635,7 @@ nb:
     all_submissions_description: |-
         *Kun for instruktør og admin:*
         
-        Oppgaveinnlevering/gjeninnlevering (unntatt quiz)
+              Oppgaveinnlevering/gjeninnlevering (unntatt quiz)
     all_submissions_display: "Alle innleveringer"
     announcement_created_by_you_description: |-
         * Kunngjøringer opprettet av deg
@@ -17655,7 +17655,7 @@ nb:
     blueprint_description: |-
         *Kun for instruktør og admin:*
         
-        Innhold ble synkronisert fra en emnemal til tilknyttede emner
+              Innhold ble synkronisert fra en emnemal til tilknyttede emner
     blueprint_display: Emnemalsynkronisering
     calendar_description: "Nye og endrede elementer i emnekalenderen din"
     calendar_display: Kalender
@@ -17690,7 +17690,7 @@ nb:
     content_link_error_description: |-
         *Kun instruktør og admin:*
         
-        Plassering og innhold på en ødelagt lenke som en student har samhandlet med
+                Plassering og innhold på en ødelagt lenke som en student har samhandlet med
     content_link_error_display: "Avvik på innholdslenke"
     conversation_created_description: "Du opprettet en samtale"
     conversation_created_display: "Samtaler opprettet av meg"
@@ -17699,9 +17699,9 @@ nb:
     course_content_description: |-
         Endring i emneinnhold: 
         
-        * Sideinnhold
-        * Testinnhold
-        * Oppgaveinnhold
+              * Sideinnhold
+              * Testinnhold
+              * Oppgaveinnhold
     course_content_display: Emneinnhold
     discussion_description: "Nytt diskusjonstema i emnet ditt"
     discussion_display: Diskusjon
@@ -17714,8 +17714,8 @@ nb:
     grading_description: |-
         Inkluderer: 
         
-        * Oppgave/innleverings karakter skrevet inn/endret
-        * Karaktervekting endret
+              * Oppgave/innleverings karakter skrevet inn/endret
+              * Karaktervekting endret
     grading_display: Karaktersetting
     grading_notify_include_grade: "Inkluder resultat når det varsles om karakterendringer."
     grading_policies_description: "Retningslinjer for karaktersetting i emnet er endret"
@@ -17723,21 +17723,21 @@ nb:
     invitation_description: |-
         Invitasjon for: 
         
-        * Nettkonferanse
-        * Gruppe
-        * Samarbeid
-        * Hverandrevurdering og påminnelse
+              * Nettkonferanse
+              * Gruppe
+              * Samarbeid
+              * Hverandrevurdering og påminnelse
     invitation_display: Invitasjon
     late_grading_description: |-
         *Kun instruktør og admin:*
         
-        Sen innlevering av oppgave
+              Sen innlevering av oppgave
     late_grading_display: "Forsinket karaktersetting"
     membership_update_description: |-
         *Kun admin: avventer påmelding aktivert*
         
-        * Gruppepåmelding
-        * Akesptert/avslått
+              * Gruppepåmelding
+              * Akesptert/avslått
     membership_update_display: "Oppdatering av medlemskap"
     missing_description_description: "For %{category}-varslinger"
     missing_display_display: "For %{category}-varslinger"
@@ -17822,19 +17822,19 @@ nb:
     other_description: |-
         *Kun Instruktør og Administrator:*
         
-        * Emnepåmelding
-        * Rapport generert
-        * Innhold eksport
-        * Flytte rapport
-        * Ny kontobruker
-        * Ny studentgruppe
+              * Emnepåmelding
+              * Rapport generert
+              * Innhold eksport
+              * Flytte rapport
+              * Ny kontobruker
+              * Ny studentgruppe
     other_display: "Administrative varslinger"
     recording_ready_display: "Opptak klart"
     reminder_display: Påminnelse
     student_appointment_description: |-
         *Kun Instruktør og Admin:*
         
-        Påmelding for studentavtale
+              Påmelding for studentavtale
     student_appointment_display: "Påmeldinger til studentavtaler"
     submission_comment_description: "Kommentar – oppgaveinnlevering"
     submission_comment_display: Innleveringskommentar
