@@ -139,6 +139,12 @@ describe 'Submissions Comment API', type: :request do
       expect(response.status).to eq 200
     end
 
+    it 'sends notification for admin annotation' do
+      expect(BroadcastPolicy.notifier).to receive(:send_notification).twice
+      annotation_notification_call(author_id: @admin.to_param)
+      expect(response.status).to eq 200
+    end
+
     it 'sends notification to student for teacher annotation when assignment post_manually is false' do
       expect(BroadcastPolicy.notifier).to receive(:send_notification).with(*student_args)
       annotation_notification_call(author_id: @teacher.to_param)
