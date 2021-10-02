@@ -89,15 +89,38 @@ $.fn.datepicker = function (options) {
       options.prevOnSelect.call(this, text, picker)
     }
     const $div = picker.dpDiv
+    // We want to pass the inputdate metadata back into our target because
+    // if there has been a change via the datepicker, there's no guarantee
+    // that the formatted value we are about to jam into the input field
+    // itself is in fact parsable by tz. This is already true in momentjs
+    // for many of our locales, and will only continue to diverge as we
+    // increase adoption of the Intl.DateTimeFormat stuff. DatetimeField
+    // is smart enough to always use the inputdate metadata if it's there
+    // preferentially to trying to use tz.parse.
+    const inputdate = new Date(
+      picker.selectedYear,
+      picker.selectedMonth,
+      parseInt(picker.selectedDay, 10)
+    )
     const hr = $div.find('.ui-datepicker-time-hour').val() || $(this).data('time-hour')
     const min = $div.find('.ui-datepicker-time-minute').val() || $(this).data('time-minute')
     const ampm = $div.find('.ui-datepicker-time-ampm').val() || $(this).data('time-ampm')
     if (hr || min) {
-      text += ' ' + hr + ':' + (min || '00')
-      if (tz.useMeridian()) {
-        text += ' ' + (ampm || I18n.t('#time.pm'))
+      let numericHr = parseInt(hr, 10)
+      const numericMin = parseInt(min || '0', 10)
+      let meridiem = ''
+      if (tz.hasMeridian()) {
+        const isPM =
+          !ampm || !!ampm.match(new RegExp('^' + I18n.t('#time.pm'), 'i')) || numericHr > 12
+        meridiem = ' ' + (isPM ? I18n.t('#time.pm') : I18n.t('#time.am'))
+        numericHr %= 12
+        text += ' ' + (numericHr || 12).toString() + ':' + (min || '00') + meridiem
+        if (isPM) numericHr += 12
       }
+      inputdate.setHours(numericHr)
+      inputdate.setMinutes(numericMin)
     }
+    picker.input.data('inputdate', inputdate)
     picker.input.val(text).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
@@ -105,7 +128,7 @@ $.fn.datepicker = function (options) {
       const cur = $.datepicker._curInst
       const inst = cur
       const sel = $(
-        'td.' + $.datepicker._dayOverClass + ', td.' + $.datepicker._currentClass,
+        `td.${$.datepicker._dayOverClass}, td.${$.datepicker._currentClass}`,
         inst.dpDiv
       )
       if (sel[0]) {
@@ -177,7 +200,7 @@ $.fn.datepicker = function (options) {
           } else {
             $.datepicker._hideDatepicker(null, $.datepicker._get(inst, 'duration'))
           }
-        } else if (event.keyCode && event.keyCode == 27) {
+        } else if (event.keyCode && event.keyCode === 27) {
           $.datepicker._hideDatepicker(null, '')
         }
       }
@@ -272,7 +295,7 @@ $.fn.timepicker = function () {
         $('#time_picker').hide().slideDown()
       })
       .blur(function () {
-        if ($('#time_picker').data('attached_to') == $(this)[0]) {
+        if ($('#time_picker').data('attached_to') === $(this)[0]) {
           $('#time_picker').data('attached_to', null)
           $('#time_picker')
             .hide()
@@ -280,11 +303,11 @@ $.fn.timepicker = function () {
             .removeClass('ui-state-highlight')
         }
       })
-      .keycodes('esc return', function (event) {
+      .keycodes('esc return', function () {
         $(this).triggerHandler('blur')
       })
       .keycodes('ctrl+up ctrl+right ctrl+left ctrl+down', function (event) {
-        if ($('#time_picker').data('attached_to') != $(this)[0]) {
+        if ($('#time_picker').data('attached_to') !== $(this)[0]) {
           return
         }
         event.preventDefault()
@@ -395,7 +418,7 @@ $._initializeTimepicker = function () {
       const val = $(this).text()
       if (val > 0 && val <= 12) {
         hr = val
-      } else if (val == 'am' || val == 'pm') {
+      } else if (val === 'am' || val === 'pm') {
         ampm = val
       } else {
         min = val

@@ -16,123 +16,140 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as tz from '../'
-import { configure } from '../'
 import timezone from 'timezone/index'
 import french from 'timezone/fr_FR'
 import AmericaDenver from 'timezone/America/Denver'
 import AmericaChicago from 'timezone/America/Chicago'
-import { setup, moonwalk, epoch, equal } from './helpers'
+import * as tz from '..'
+import {configure} from '..'
+import {moonwalk, epoch} from './helpers'
 
-setup(this)
+describe('format::', () => {
+  const oldENV = window.ENV
 
-test('format() should format relative to UTC by default', () =>
-  equal(tz.format(moonwalk, '%F %T%:z'), '1969-07-21 02:56:00+00:00'))
-
-test('format() should format in en_US by default', () =>
-  equal(tz.format(moonwalk, '%c'), 'Mon 21 Jul 1969 02:56:00 AM UTC'))
-
-test('format() should parse the value if necessary', () =>
-  equal(tz.format('1969-07-21 02:56', '%F %T%:z'), '1969-07-21 02:56:00+00:00'))
-
-test('format() should return null if the parse fails', () =>
-  equal(tz.format('bogus', '%F %T%:z'), null))
-
-test('format() should return null if the format string is unrecognized', () =>
-  equal(tz.format(moonwalk, 'bogus'), null))
-
-test('format() should preserve 12-hour+am/pm if the locale does define am/pm', () => {
-  const time = tz.parse('1969-07-21 15:00:00')
-  equal(tz.format(time, '%-l%P'), '3pm')
-  equal(tz.format(time, '%I%P'), '03pm')
-  equal(tz.format(time, '%r'), '03:00:00 PM')
-})
-
-test("format() should promote 12-hour+am/pm into 24-hour if the locale doesn't define am/pm", () => {
-  configure({
-    tz: timezone(french, 'fr_FR'),
-    momentLocale: 'fr',
+  beforeEach(() => {
+    window.ENV = {LOCALE: 'en'}
   })
 
-  const time = tz.parse('1969-07-21 15:00:00')
-
-  equal(tz.format(time, '%-l%P'), '15')
-  equal(tz.format(time, '%I%P'), '15')
-  equal(tz.format(time, '%r'), '15:00:00')
-})
-
-test("format() should use a specific timezone when asked", () => {
-  configure({
-    tz: timezone,
-    tzData: {
-      'America/Denver': AmericaDenver,
-      'America/Chicago': AmericaChicago,
-    }
+  afterEach(() => {
+    window.ENV = oldENV
   })
 
-  const time = tz.parse('1969-07-21 15:00:00')
-  equal(tz.format(time, '%-l%P', 'America/Denver'), '9am')
-  equal(tz.format(time, '%-l%P', 'America/Chicago'), '10am')
-})
-
-test('format() should recognize date.formats.*', () => {
-  configure({
-    formats: {
-      'date.formats.short': '%b %-d'
-    }
+  it('formats relative to UTC by default', () => {
+    expect(tz.format(moonwalk, '%F %T%:z')).toBe('1969-07-21 02:56:00+00:00')
   })
 
-  equal(tz.format(moonwalk, 'date.formats.short'), 'Jul 21')
-})
-
-test('format() should recognize time.formats.*', () => {
-  configure({
-    formats: {
-      'time.formats.tiny': '%-l:%M%P'
-    }
+  it('formats in en_US by default', () => {
+    expect(tz.format(moonwalk, '%c')).toBe('Mon 21 Jul 1969 02:56:00 AM UTC')
   })
 
-  equal(tz.format(epoch, 'time.formats.tiny'), '12:00am')
-})
-
-test('format() should localize when given a localization key', () => {
-  configure({
-    tz: timezone('fr_FR', french),
-    momentLocale: 'fr',
-    formats: {
-      'date.formats.full': '%-d %b %Y %-l:%M%P'
-    }
+  it('parses the value if necessary', () => {
+    expect(tz.format('1969-07-21 02:56', '%F %T%:z')).toBe('1969-07-21 02:56:00+00:00')
   })
 
-  equal(tz.format(moonwalk, 'date.formats.full'), '21 juil. 1969 2:56')
-})
-
-test('format() should automatically convert %l to %-l when given a localization key', () => {
-  configure({
-    formats: {
-      'time.formats.tiny': '%l:%M%P'
-    }
+  it('returns null if the parse fails', () => {
+    expect(tz.format('bogus', '%F %T%:z')).toBe(null)
   })
 
-  equal(tz.format(moonwalk, 'time.formats.tiny'), '2:56am')
-})
-
-test('format() should automatically convert %k to %-k when given a localization key', () => {
-  configure({
-    formats: {
-      'time.formats.tiny': '%k:%M'
-    }
+  it('returns null if the format string is unrecognized', () => {
+    expect(tz.format(moonwalk, 'bogus')).toBe(null)
   })
 
-  equal(tz.format(moonwalk, 'time.formats.tiny'), '2:56')
-})
-
-test('format() should automatically convert %e to %-e when given a localization key', () => {
-  configure({
-    formats: {
-      'date.formats.short': '%b %e'
-    }
+  it('preserves 12-hour+am/pm if the locale does define am/pm', () => {
+    const time = tz.parse('1969-07-21 15:00:00')
+    expect(tz.format(time, '%-l%P')).toBe('3pm')
+    expect(tz.format(time, '%I%P')).toBe('03pm')
+    expect(tz.format(time, '%r')).toBe('03:00:00 PM')
   })
 
-  equal(tz.format(epoch, 'date.formats.short'), 'Jan 1')
+  it("promotes 12-hour+am/pm into 24-hour if the locale doesn't define am/pm", () => {
+    configure({
+      tz: timezone(french, 'fr_FR'),
+      momentLocale: 'fr'
+    })
+    window.ENV.LOCALE = 'fr'
+
+    const time = tz.parse('1969-07-21 15:00:00')
+
+    expect(tz.format(time, '%-l%P')).toBe('15')
+    expect(tz.format(time, '%I%P')).toBe('15')
+    expect(tz.format(time, '%r')).toBe('15:00:00')
+  })
+
+  it('uses a specific timezone when asked', () => {
+    configure({
+      tz: timezone,
+      tzData: {
+        'America/Denver': AmericaDenver,
+        'America/Chicago': AmericaChicago
+      }
+    })
+
+    const time = tz.parse('1969-07-21 15:00:00')
+    expect(tz.format(time, '%-l%P', 'America/Denver')).toBe('9am')
+    expect(tz.format(time, '%-l%P', 'America/Chicago')).toBe('10am')
+  })
+
+  it('recognizes date.formats.*', () => {
+    configure({
+      formats: {
+        'date.formats.short': '%b %-d'
+      }
+    })
+
+    expect(tz.format(moonwalk, 'date.formats.short')).toBe('Jul 21')
+  })
+
+  it('recognizes time.formats.*', () => {
+    configure({
+      formats: {
+        'time.formats.tiny': '%-l:%M%P'
+      }
+    })
+
+    expect(tz.format(epoch, 'time.formats.tiny')).toBe('12:00am')
+  })
+
+  it('localizes when given a localization key', () => {
+    configure({
+      tz: timezone('fr_FR', french),
+      momentLocale: 'fr',
+      formats: {
+        'date.formats.full': '%-d %b %Y %-l:%M%P'
+      }
+    })
+    window.ENV.LOCALE = 'fr'
+
+    expect(tz.format(moonwalk, 'date.formats.full')).toBe('21 juil. 1969 2:56')
+  })
+
+  it('automatically converts %l to %-l when given a localization key', () => {
+    configure({
+      formats: {
+        'time.formats.tiny': '%l:%M%P'
+      }
+    })
+
+    expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56am')
+  })
+
+  it('automatically converts %k to %-k when given a localization key', () => {
+    configure({
+      formats: {
+        'time.formats.tiny': '%k:%M'
+      }
+    })
+
+    expect(tz.format(moonwalk, 'time.formats.tiny')).toBe('2:56')
+  })
+
+  it('automatically converts %e to %-e when given a localization key', () => {
+    configure({
+      formats: {
+        'date.formats.short': '%b %e'
+      }
+    })
+
+    expect(tz.format(epoch, 'date.formats.short')).toBe('Jan 1')
+  })
 })
