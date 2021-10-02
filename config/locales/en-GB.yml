@@ -17676,7 +17676,7 @@ en-GB:
     all_submissions_description: |-
         *Instructor and Admin only:*
         
-        Assignment (except quizzes) submission/resubmission
+              Assignment (except quizzes) submission/resubmission
     all_submissions_display: "All submissions"
     announcement_created_by_you_description: |-
         * Announcements created by you
@@ -17696,7 +17696,7 @@ en-GB:
     blueprint_description: |-
         *Instructor and Admin only:*
         
-        Content was synced from a blueprint course to associated courses
+              Content was synced from a blueprint course to associated courses
     blueprint_display: "Blueprint Sync"
     calendar_description: "New and changed items on your course calendar"
     calendar_display: Calendar
@@ -17731,7 +17731,7 @@ en-GB:
     content_link_error_description: |-
         *Instructor and Admin only:*
         
-        Location and content of a failed link that a student has interacted with
+                Location and content of a failed link that a student has interacted with
     content_link_error_display: "Content Link Error"
     conversation_created_description: "You created a conversation"
     conversation_created_display: "Conversations created by me"
@@ -17740,9 +17740,9 @@ en-GB:
     course_content_description: |-
         Change to course content: 
         
-        * Page content
-        * Quiz content
-        * Assignment content
+              * Page content
+              * Quiz content
+              * Assignment content
     course_content_display: "Course Content"
     discussion_description: "New discussion topic in your course"
     discussion_display: Discussion
@@ -17755,8 +17755,8 @@ en-GB:
     grading_description: |-
         Includes: 
         
-        * Assignment/submission grade entered/changed
-        * Grade weight changed
+              * Assignment/submission grade entered/changed
+              * Grade weight changed
     grading_display: Grading
     grading_notify_include_grade: "Include scores when alerting about grade changes."
     grading_policies_description: "Course grading policy change"
@@ -17764,21 +17764,21 @@ en-GB:
     invitation_description: |-
         Invitation for: 
         
-        * Web conference
-        * Group
-        * Collaboration
-        * Peer review & reminder
+              * Web conference
+              * Group
+              * Collaboration
+              * Peer review & reminder
     invitation_display: Invitation
     late_grading_description: |-
         *Instructor and admin only:*
         
-        Late assignment submission
+              Late assignment submission
     late_grading_display: "Late grading"
     membership_update_description: |-
         *Admin only: pending enrolment activated*
         
-        * Group enrolment
-        * accepted/rejected
+              * Group enrolment
+              * accepted/rejected
     membership_update_display: "Membership update"
     missing_description_description: "For %{category} notifications"
     missing_display_display: "For %{category} notifications"
@@ -17863,19 +17863,19 @@ en-GB:
     other_description: |-
         *Instructor and Admin only:*
         
-        * Course enrolment
-        * Report generated
-        * Content export
-        * Migration report
-        * New account user
-        * New student group
+              * Course enrolment
+              * Report generated
+              * Content export
+              * Migration report
+              * New account user
+              * New student group
     other_display: "Administrative Notifications"
     recording_ready_display: "Recording ready"
     reminder_display: Reminder
     student_appointment_description: |-
         *Instructor and admin only:*
         
-        Student appointment sign-up
+              Student appointment sign-up
     student_appointment_display: "Student appointment signups"
     submission_comment_description: "Assignment submission comment"
     submission_comment_display: "Submission comment"
