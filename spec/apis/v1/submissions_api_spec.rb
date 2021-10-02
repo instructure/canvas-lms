@@ -4800,6 +4800,52 @@ describe 'Submissions API', type: :request do
     end
   end
 
+  context 'rubric comments read state' do
+    before :once do
+      course_with_student_and_submitted_homework
+    end
+
+    it 'retrieves rubric comments read state' do
+      @student.mark_rubric_comments_unread!(@submission)
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_comments/read",
+                              { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                                action: 'rubric_comments_read_state', controller: 'submissions_api', format: 'json' })
+      expect(json).to eq({ 'read' => false })
+
+      @student.mark_rubric_comments_read!(@submission)
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_comments/read",
+                              { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                                action: 'rubric_comments_read_state', controller: 'submissions_api', format: 'json' })
+      expect(json).to eq({ 'read' => true })
+    end
+
+    it "requires read permission on the submission" do
+      temp = @student
+      other_student = student_in_course(active_all: true).user
+      @student = temp
+
+      api_call_as_user(other_student, :get, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_comments/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'rubric_comments_read_state', controller: 'submissions_api', format: 'json' },
+                       {}, {}, { expected_status: 401 })
+    end
+
+    it 'marks rubric comments read' do
+      @student.mark_rubric_comments_unread!(@submission)
+      api_call_as_user(@student, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_comments/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'mark_rubric_comments_read', controller: 'submissions_api', format: 'json' })
+      expect(@user.reload.unread_rubric_comments?(@submission)).to eq false
+    end
+
+    it "doesn't allow you to mark someone else's rubric comments read" do
+      api_call_as_user(@teacher, :put, "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/rubric_comments/read",
+                       { course_id: @course.to_param, assignment_id: @assignment.to_param, user_id: @student.to_param,
+                         action: 'mark_rubric_comments_read', controller: 'submissions_api', format: 'json' }, {},
+                       {}, { expected_status: 401 })
+    end
+  end
+
   context 'bulk update' do
     before :each do
       @student1 = user_factory(active_all: true)
