@@ -262,18 +262,3 @@ def runReporter() {
     throw e
   }
 }
-
-def useRspecQ(percentage) {
-  if (configuration.isRspecqEnabled()) {
-    env.RSPECQ_ENABLED = '1'
-    return true
-  }
-
-  java.security.SecureRandom random = new java.security.SecureRandom()
-  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
-    env.RSPECQ_ENABLED = '0'
-    return false
-  }
-
-  return true
-}
