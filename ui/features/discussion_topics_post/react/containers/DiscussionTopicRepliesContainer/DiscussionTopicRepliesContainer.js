@@ -17,26 +17,24 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
+import {AUTO_MARK_AS_READ_DELAY, PER_PAGE, SearchContext} from '../../utils/constants'
 import {Discussion} from '../../../graphql/Discussion'
 import {DiscussionThreadContainer} from '../DiscussionThreadContainer/DiscussionThreadContainer'
 import I18n from 'i18n!discussion_topics_post'
-import {PER_PAGE, SearchContext} from '../../utils/constants'
 import {updateDiscussionTopicEntryCounts} from '../../utils/index'
 import PropTypes from 'prop-types'
 import React, {useContext, useEffect, useState} from 'react'
+import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 import {ThreadPagination} from '../../components/ThreadPagination/ThreadPagination'
 import {UPDATE_DISCUSSION_ENTRIES_READ_STATE} from '../../../graphql/Mutations'
 import {useMutation} from 'react-apollo'
 import {View} from '@instructure/ui-view'
-import {SearchResultsCount} from '../../components/SearchResultsCount/SearchResultsCount'
 
 export const DiscussionTopicRepliesContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const {filter, searchTerm, setPageNumber} = useContext(SearchContext)
 
   const [discussionEntriesToUpdate, setDiscussionEntriesToUpdate] = useState(new Set())
-
-  const AUTO_MARK_AS_READ_DELAY = 3000
 
   const updateCache = (cache, result) => {
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {
@@ -83,7 +81,8 @@ export const DiscussionTopicRepliesContainer = props => {
   }, [
     discussionEntriesToUpdate,
     props.discussionTopic.discussionEntriesConnection.nodes,
-    updateDiscussionEntriesReadState
+    updateDiscussionEntriesReadState,
+    filter
   ])
 
   const markAsRead = entryId => {
