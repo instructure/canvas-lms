@@ -2217,6 +2217,7 @@ class Assignment < ActiveRecord::Base
     raise "Student Required" unless original_student
 
     eula_timestamp = opts[:eula_agreement_timestamp]
+    webhook_info = assignment_configuration_tool_lookups.take&.webhook_info
 
     if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
@@ -2269,6 +2270,12 @@ class Assignment < ActiveRecord::Base
         homework.lti_user_id = homework_lti_user_id_hash[student_id]
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
+
+        if webhook_info
+          homework.turnitin_data[:webhook_info] = webhook_info
+        else
+          homework.turnitin_data.delete(:webhook_info)
+        end
 
         if self.annotated_document?
           annotation_context = homework.annotation_context(draft: true)

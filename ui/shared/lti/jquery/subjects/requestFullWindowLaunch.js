@@ -64,8 +64,8 @@ const buildLaunchUrl = (messageUrl, placement, display) => {
   return `${baseUrl}&url=${encodedToolLaunchUrl}${clientIdParam}${placementParam}${assignmentParam}`
 }
 
-const handler = data => {
-  const {url, launchType, launchOptions, placement, display} = parseData(data)
+const handler = ({message}) => {
+  const {url, launchType, launchOptions, placement, display} = parseData(message.data)
   const launchUrl = buildLaunchUrl(url, placement, display)
 
   let proxy

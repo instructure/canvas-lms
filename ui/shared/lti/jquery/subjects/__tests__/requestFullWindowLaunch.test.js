@@ -37,18 +37,18 @@ describe('requestFullWindowLaunch', () => {
 
   describe('with string provided', () => {
     it('uses launch type same_window', () => {
-      handler('http://localhost/test')
+      handler({message: {data: 'http://localhost/test'}})
       expect(window.location.assign).toHaveBeenCalled()
     })
 
     it('pulls out client_id if provided', () => {
-      handler('http://localhost/test?client_id=hello')
+      handler({message: {data: 'http://localhost/test?client_id=hello'}})
       const launch_url = new URL(window.location.assign.mock.calls[0][0])
       expect(launch_url.searchParams.get('client_id')).toEqual('hello')
     })
 
     it('pulls out assignment_id if provided', () => {
-      handler('http://localhost/test?client_id=hello&assignment_id=50')
+      handler({message: {data: 'http://localhost/test?client_id=hello&assignment_id=50'}})
       const launch_url = new URL(window.location.assign.mock.calls[0][0])
       expect(launch_url.searchParams.get('assignment_id')).toEqual('50')
     })
@@ -56,21 +56,23 @@ describe('requestFullWindowLaunch', () => {
 
   describe('with object provided', () => {
     it('must contain a `url` property', () => {
-      expect(() => handler({foo: 'bar'})).toThrow('message must contain a `url` property')
+      expect(() => handler({message: {data: {foo: 'bar'}}})).toThrow(
+        'message must contain a `url` property'
+      )
     })
 
     it('uses launch type same_window by default', () => {
-      handler({url: 'http://localhost/test'})
+      handler({message: {data: {url: 'http://localhost/test'}}})
       expect(window.location.assign).toHaveBeenCalled()
     })
 
     it('opens launch type new_window in a new tab', () => {
-      handler({url: 'http://localhost/test', launchType: 'new_window'})
+      handler({message: {data: {url: 'http://localhost/test', launchType: 'new_window'}}})
       expect(window.open).toHaveBeenCalled()
     })
 
     it('opens launch type popup in a popup window', () => {
-      handler({url: 'http://localhost/test', launchType: 'popup'})
+      handler({message: {data: {url: 'http://localhost/test', launchType: 'popup'}}})
       expect(window.open).toHaveBeenCalledWith(
         expect.any(String),
         'popupLaunch',
@@ -79,13 +81,13 @@ describe('requestFullWindowLaunch', () => {
     })
 
     it('errors on unknown launch type', () => {
-      expect(() => handler({url: 'http://localhost/test', launchType: 'fake'})).toThrow(
-        "unknown launchType, must be 'popup', 'new_window', 'same_window'"
-      )
+      expect(() =>
+        handler({message: {data: {url: 'http://localhost/test', launchType: 'fake'}}})
+      ).toThrow("unknown launchType, must be 'popup', 'new_window', 'same_window'")
     })
 
     it('uses placement to add to launch url', () => {
-      handler({url: 'http://localhost/test', placement: 'course_navigation'})
+      handler({message: {data: {url: 'http://localhost/test', placement: 'course_navigation'}}})
       expect(window.location.assign).toHaveBeenCalledWith(
         expect.stringContaining('&placement=course_navigation')
       )
@@ -93,9 +95,13 @@ describe('requestFullWindowLaunch', () => {
 
     it('uses launchOptions to add width and height to popup', () => {
       handler({
-        url: 'http://localhost/test',
-        launchType: 'popup',
-        launchOptions: {width: 420, height: 400}
+        message: {
+          data: {
+            url: 'http://localhost/test',
+            launchType: 'popup',
+            launchOptions: {width: 420, height: 400}
+          }
+        }
       })
       expect(window.open).toHaveBeenCalledWith(
         expect.any(String),
@@ -105,13 +111,13 @@ describe('requestFullWindowLaunch', () => {
     })
 
     it('uses display type borderless by default', () => {
-      handler({url: 'http://localhost/test'})
+      handler({message: {data: {url: 'http://localhost/test'}}})
       const launch_url = new URL(window.location.assign.mock.calls[0][0])
       expect(launch_url.searchParams.get('display')).toEqual('borderless')
     })
 
     it('allows display type to be overridden', () => {
-      handler({url: 'http://localhost/test', display: 'full_width_in_context'})
+      handler({message: {data: {url: 'http://localhost/test', display: 'full_width_in_context'}}})
       const launch_url = new URL(window.location.assign.mock.calls[0][0])
       expect(launch_url.searchParams.get('display')).toEqual('full_width_in_context')
     })
@@ -119,7 +125,7 @@ describe('requestFullWindowLaunch', () => {
 
   describe('with anything other than a string or object provided', () => {
     it('errors', () => {
-      expect(() => handler(['foo', 'bar'])).toThrow(
+      expect(() => handler({message: {data: ['foo', 'bar']}})).toThrow(
         'message contents must either be a string or an object'
       )
     })

@@ -16,11 +16,6 @@ rce_pretty_html_editor:
   display_name: RCE Pretty HTML Editor
   description: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
   applies_to: SiteAdmin
-rce_better_file_previewing:
-  state: hidden
-  display_name: RCE Better File Previewing
-  description: Preview files linked in the RCE in an overlay rather than a new browser tab.
-  applies_to: SiteAdmin
 rce_limit_init_render_on_page:
   state: hidden
   display_name: RCE Limit number of RCEs initially rendered on the page

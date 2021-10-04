@@ -107,7 +107,8 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
           'service_offered' => []
         }
       },
-      lti_version: '1'
+      lti_version: '1',
+      subscription_id: overrides[:add_subscription_id] && SecureRandom.uuid
     )
 
     Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
