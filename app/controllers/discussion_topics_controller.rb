@@ -668,6 +668,8 @@ class DiscussionTopicsController < ApplicationController
       set_student_context_cards_js_env
     end
 
+    @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
+
     # Render updated Post UI if feature flag is enabled
     if @context.feature_enabled?(:react_discussions_post)
       topics = groups_and_group_topics if @topic.for_group_discussion?
@@ -686,8 +688,23 @@ class DiscussionTopicsController < ApplicationController
                  :COURSE_ID => @sequence_asset.context.id,
                } })
       end
+
+      @assignment_presenter = AssignmentPresenter.new(@topic.assignment)
+      if @topic.for_assignment? && @presenter.allows_speed_grader? && @assignment_presenter.can_view_speed_grader_link?(@current_user)
+        js_env(
+          { SPEEDGRADER_URL_TEMPLATE: named_context_url(
+            @topic.assignment.context,
+            :speed_grader_context_gradebook_url,
+            assignment_id: @topic.assignment.id,
+            student_id: ":student_id"
+          ) }
+        )
+      end
+
       js_env({
-               course_id: params[:course_id],
+               course_id: params[:course_id] || @context.course&.id,
+               EDIT_URL: context_url(@topic.context, :edit_context_discussion_topic_url, @topic),
+               PEER_REVIEWS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_peer_reviews_url, @topic.assignment.id) : nil,
                discussion_topic_id: params[:id],
                manual_mark_as_read: @current_user&.manual_mark_as_read?,
                discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
@@ -695,17 +712,18 @@ class DiscussionTopicsController < ApplicationController
                isolated_view: Account.site_admin.feature_enabled?(:isolated_view),
                draft_discussions: Account.site_admin.feature_enabled?(:draft_discussions),
                should_show_deeply_nested_alert: @current_user&.should_show_deeply_nested_alert?,
+               # GRADED_RUBRICS_URL must be within DISCUSSION to avoid page error
                DISCUSSION: { GRADED_RUBRICS_URL: @topic.assignment ? context_url(@topic.assignment.context, :context_assignment_rubric_url, @topic.assignment.id) : nil },
                apollo_caching: Account.site_admin.feature_enabled?(:apollo_caching),
                discussion_cache_key: Base64.encode64("#{@current_user.uuid}vyfW=;[p-0?:{P_\=HUpgraqe;njalkhpvoiulkimmaqewg")
              })
+
       js_bundle :discussion_topics_post
       css_bundle :discussions_index
       render html: '', layout: true
       return
     end
 
-    @presenter = DiscussionTopicPresenter.new(@topic, @current_user)
     @assignment = @topic.for_assignment? ? AssignmentOverrideApplicator.assignment_overridden_for(@topic.assignment, @current_user) : nil
     @context.require_assignment_group rescue nil
 

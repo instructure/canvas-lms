@@ -47,7 +47,8 @@ describe('DiscussionThreadContainer', () => {
     delete window.location
     window.open = openMock
     window.ENV = {
-      course_id: '1'
+      course_id: '1',
+      SPEEDGRADER_URL_TEMPLATE: '/courses/1/gradebook/speed_grader?assignment_id=1&:student_id'
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -245,7 +246,7 @@ describe('DiscussionThreadContainer', () => {
       fireEvent.click(getByTestId('inSpeedGrader'))
 
       await waitFor(() => {
-        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('1', '1', '2'), `_blank`)
+        expect(openMock).toHaveBeenCalledWith(getSpeedGraderUrl('2'), `_blank`)
       })
     })
 

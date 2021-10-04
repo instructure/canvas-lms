@@ -188,14 +188,7 @@ export const IsolatedViewContainer = props => {
   }
 
   const onOpenInSpeedGrader = discussionEntry => {
-    window.open(
-      getSpeedGraderUrl(
-        window.ENV?.course_id,
-        props.discussionTopic.assignment._id,
-        discussionEntry.author._id
-      ),
-      '_blank'
-    )
+    window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
   const onReplySubmit = (message, replyId, includeReplyPreview) => {
