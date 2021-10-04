@@ -31,7 +31,7 @@ group :test do
   gem 'gergich', '2.0.0', require: false
     gem 'mime-types-data', '3.2021.0901', require: false
 
-  gem 'rubocop', '1.22.0', require: false
+  gem 'rubocop', '1.21.0', require: false
     gem 'rubocop-ast', '1.12.0', require: false
     gem 'unicode-display_width', '2.1.0', require: false
   gem 'rubocop-canvas', require: false, path: "#{'../' if dedicated_gemfile}gems/rubocop-canvas"
