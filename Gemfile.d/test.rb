@@ -71,4 +71,7 @@ group :test do
   gem 'axe-core-rspec', '~> 4.1.0', require: false
   gem 'axe-core-api', '~> 4.1.0', require: false
   gem 'stormbreaker', '0.0.5', require: false
+
+  # performance tools for instrumenting rspec tests
+  gem 'stackprof'
 end
