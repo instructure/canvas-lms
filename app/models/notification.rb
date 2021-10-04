@@ -520,11 +520,11 @@ class Notification < Switchman::UnshardedRecord
     when 'Files'
       t(:files_display, 'Files')
     when 'Discussion'
-      t(:discussion_display, 'Discussion')
+      t(:discussion_display, 'New Topic')
     when 'DiscussionEntry'
-      t(:discussion_post_display, 'Discussion Post')
+      t(:discussion_post_display, 'New Reply')
     when 'DiscussionMention'
-      t('Discussion Mention')
+      t('New Mention')
     when 'Due Date'
       t(:due_date_display, 'Due Date')
     when 'Grading'
@@ -594,11 +594,11 @@ class Notification < Switchman::UnshardedRecord
     when 'Files'
       t(:files_description, 'New file added to your course')
     when 'Discussion'
-      t(:discussion_description, 'New discussion topic in your course')
+      t(:discussion_description, 'New Discussion topic in your course')
     when 'DiscussionEntry'
-      t(:discussion_post_description, "New discussion post in a topic you're subscribed to")
+      t(:discussion_post_description, "New reply on a topic you're subscribed to")
     when 'DiscussionMention'
-      t("New mention in a discussion post.")
+      t("New Mention in a Discussion")
     when 'Due Date'
       t(:due_date_description, 'Assignment due date change')
     when 'Grading'
