@@ -1478,6 +1478,38 @@ test('renders Assignment Names label', function () {
   ok(assignmentSearch.textContent.includes('Assignment Names'))
 })
 
+test('enables the input if there is at least one assignment to filter by', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
+  const assignmentSearchInput = document.getElementById('assignments-filter')
+  notOk(assignmentSearchInput.disabled)
+})
+
+test('disables the input if the grid has not yet rendered', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
+  this.gradebook.renderAssignmentSearchFilter([{id: '1', name: 'An Assignment'}])
+  const assignmentSearchInput = document.getElementById('assignments-filter')
+  ok(assignmentSearchInput.disabled)
+})
+
+test('disables the input if there are no assignments to filter by', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  this.gradebook.renderAssignmentSearchFilter([])
+  const assignmentSearchInput = document.getElementById('assignments-filter')
+  ok(assignmentSearchInput.disabled)
+})
+
+test('displays a select menu option for each assignment', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  const assignment = {id: '1', name: 'An assignment'}
+  this.gradebook.renderAssignmentSearchFilter([assignment])
+  const assignmentSearchInput = document.getElementById('assignments-filter')
+  assignmentSearchInput.click()
+  const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
+  ok(options.some(option => option.textContent === assignment.name))
+  assignmentSearchInput.click() // close the menu to avoid DOM test pollution
+})
+
 QUnit.module(
   'Gradebook#renderStudentSearchFilter (gradebook_assignment_search_and_redesign: true)',
   {
@@ -3749,6 +3781,26 @@ QUnit.module('Gradebook#filterAssignments', {
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
   }
+})
+
+test('when filtering by assignments, only includes assignments in the filter', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+  this.gradebook.filteredAssignmentIds = ['2301', '2304']
+  const assignments = this.gradebook.filterAssignments(this.assignments)
+  propEqual(
+    assignments.map(a => a.id),
+    ['2301', '2304']
+  )
+})
+
+test('does not filter assignments when the filtered IDs is an empty array', function () {
+  this.gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+  this.gradebook.filteredAssignmentIds = []
+  const assignments = this.gradebook.filterAssignments(this.assignments)
+  propEqual(
+    assignments.map(a => a.id),
+    ['2301', '2302', '2304']
+  )
 })
 
 test('excludes "not_graded" assignments', function () {
