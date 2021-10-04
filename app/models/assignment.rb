@@ -2007,14 +2007,7 @@ class Assignment < ActiveRecord::Base
 
   def associated_tool_proxy
     actl = assignment_configuration_tool_lookups.take
-    return unless actl
-
-    Lti::ToolProxy.proxies_in_order_by_codes(
-      context: self.course,
-      vendor_code: actl.tool_vendor_code,
-      product_code: actl.tool_product_code,
-      resource_type_code: actl.tool_resource_type_code
-    ).first
+    actl&.associated_tool_proxy
   end
 
   def save_grade_to_submission(submission, original_student, group, opts)

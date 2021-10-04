@@ -117,6 +117,22 @@
   }
 }
 
+.unread_indicator {
+  color: var(--ic-brand-button--primary-bgd);
+  font-size: x-large;
+  vertical-align: 1px;
+  &::after {
+    font-family: 'Lato Extended';
+    content: "\2022";
+  }
+  &.submission_annotation {
+    margin-#{direction(left)}: -4px;
+  }
+  &.rubric_comment {
+    margin-#{direction(left)}: -13px;
+  }
+}
+
 .file-upload-submission {
   display: flex;
   align-items: center;

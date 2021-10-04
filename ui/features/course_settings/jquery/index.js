@@ -165,13 +165,30 @@ $(document).ready(function () {
     $edit_section_form = $('#edit_section_form'),
     $course_form = $('#course_form'),
     $enrollment_dialog = $('#enrollment_dialog'),
-    $tabBar = $('#course_details_tabs'),
+    $tabBar = $('#course_details_tabs')
+
+  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
+    // find the index of the tab whose href matches the URL's hash
+    const initialTab = Array.from(
+      $tabBar[0].querySelectorAll('ul>li>a[href*="#tab"]') || []
+    ).findIndex(t => `#${t.id}` === `${window.location.hash}-link`)
+    $tabBar
+      .on('tabsactivate', (event, ui) => {
+        try {
+          const hash = new URL(ui.newTab.context.href).hash
+          window.location.hash = hash
+        } catch (_ignore) {
+          // if the URL can't be parsed, so be it.
+        }
+      })
+      .tabs({active: initialTab >= 0 ? initialTab : null})
+      .show()
+  } else {
     // as of jqueryui 1.9, the cookie trumps the fragment :(. so we hack
     // around that here
-    initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash)
-
-  $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show()
-
+    const initialTab = _.indexOf(_.pluck($tabBar.find('> ul a'), 'hash'), location.hash)
+    $tabBar.tabs({cookie: {}, active: initialTab >= 0 ? initialTab : null}).show()
+  }
   $add_section_form.formSubmit({
     required: ['course_section[name]'],
     beforeSubmit(data) {
@@ -599,4 +616,13 @@ $(document).ready(function () {
       $('#pace_plans_caution_text').toggleClass('shown', this.checked)
     })
     .trigger('change')
+
+  if (ENV.FEATURES && ENV.FEATURES.remember_settings_tab) {
+    window.addEventListener('popstate', () => {
+      const openTab = window.location.hash
+      if (openTab) {
+        document.querySelector(`[href="${openTab}"]`)?.click()
+      }
+    })
+  }
 })

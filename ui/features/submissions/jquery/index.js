@@ -55,31 +55,22 @@ function submissionLoaded(data) {
       if ($('#submission_comment_' + comment.id).length > 0) {
         continue
       }
-      const $comment = $('#comment_blank')
-        .clone(true)
-        .removeAttr('id')
+      const $comment = $('#comment_blank').clone(true).removeAttr('id')
       comment.posted_at = $.datetimeString(comment.created_at)
       $comment.fillTemplateData({
         data: comment,
         id: 'submission_comment_' + comment.id
       })
       if (comment.media_comment_id) {
-        const $media_comment_link = $('#comment_media_blank')
-          .clone(true)
-          .removeAttr('id')
+        const $media_comment_link = $('#comment_media_blank').clone(true).removeAttr('id')
         $media_comment_link.fillTemplateData({
           data: comment
         })
-        $comment
-          .find('.comment')
-          .empty()
-          .append($media_comment_link.show())
+        $comment.find('.comment').empty().append($media_comment_link.show())
       } else {
         for (var jdx in comment.attachments) {
           const attachment = comment.attachments[jdx].attachment
-          const $attachment = $('#comment_attachment_blank')
-            .clone(true)
-            .removeAttr('id')
+          const $attachment = $('#comment_attachment_blank').clone(true).removeAttr('id')
           attachment.comment_id = comment.id
           $attachment.fillTemplateData({
             data: attachment,
@@ -88,9 +79,7 @@ function submissionLoaded(data) {
           $comment.find('.comment_attachments').append($attachment.show())
         }
       }
-      $('.comments .comment_list')
-        .append($comment.show())
-        .scrollTop(10000)
+      $('.comments .comment_list').append($comment.show()).scrollTop(10000)
       if ($('.grading_comment').val() === comment.comment) {
         $('.grading_comment').val('')
       }
@@ -144,19 +133,19 @@ function makeRubricAccessible($rubric) {
     13: 'enter',
     27: 'esc'
   }
-  $('.hide_rubric_link').keydown(function(e) {
+  $('.hide_rubric_link').keydown(function (e) {
     if (keyCodes[e.which] == 'enter') {
       e.preventDefault()
       $(this).click()
     }
   })
-  $tabs.each(function() {
+  $tabs.each(function () {
     $(this).bind('keydown', e => {
       if (keyCodes[e.which] == 'esc') $('.hide_rubric_link').click()
     })
   })
-  $(tabBounds).each(function(e) {
-    $(this).bind('keydown', function(e) {
+  $(tabBounds).each(function (e) {
+    $(this).bind('keydown', function (e) {
       if (keyCodes[e.which] == 'tab') {
         const isLeavingHolder = $(this).is($(tabBounds).first()) ? e.shiftKey : !e.shiftKey
         if (isLeavingHolder) {
@@ -180,22 +169,18 @@ function makeRubricAccessible($rubric) {
 }
 function toggleRubric($rubric) {
   const ariaSetting = $rubric.is(':visible')
-  $('#application')
-    .find('[data-hide_from_rubric]')
-    .attr('aria-hidden', ariaSetting)
+  $('#application').find('[data-hide_from_rubric]').attr('aria-hidden', ariaSetting)
 }
 function closeRubric() {
-  $('#rubric_holder').fadeOut(function() {
+  $('#rubric_holder').fadeOut(function () {
     toggleRubric($(this))
     $('.assess_submission_link').focus()
   })
 }
 function openRubric() {
-  $('#rubric_holder').fadeIn(function() {
+  $('#rubric_holder').fadeIn(function () {
     toggleRubric($(this))
-    $(this)
-      .find('.hide_rubric_link')
-      .focus()
+    $(this).find('.hide_rubric_link').focus()
   })
 }
 function windowResize() {
@@ -211,18 +196,14 @@ function windowResize() {
 // submissions.coffee requires this file and then immediately triggers it,
 // while submissionsSpec.jsx triggers it after setup is complete.
 export function setup() {
-  $(document).ready(function() {
+  $(document).ready(function () {
     $('.comments .comment_list .play_comment_link').mediaCommentThumbnail('small')
-    $(window)
-      .bind('resize', windowResize)
-      .triggerHandler('resize')
+    $(window).bind('resize', windowResize).triggerHandler('resize')
     $('.comments_link').click(event => {
       event.preventDefault()
       $('.comments').slideToggle(() => {
         $('.comments .media_comment_content').empty()
-        $('.comments textarea:visible')
-          .focus()
-          .select()
+        $('.comments textarea:visible').focus().select()
       })
     })
     $('.save_comment_button').click(event => {
@@ -304,24 +285,20 @@ export function setup() {
     })
     $('.attach_comment_file_link').click(event => {
       event.preventDefault()
-      const $attachment = $('#comment_attachment_input_blank')
-        .clone(true)
-        .removeAttr('id')
+      const $attachment = $('#comment_attachment_input_blank').clone(true).removeAttr('id')
       $attachment.find('input').attr('name', 'attachments[' + fileIndex++ + '][uploaded_data]')
       $('#add_comment_form .comment_attachments').append($attachment.slideDown())
     })
-    $('.delete_comment_attachment_link').click(function(event) {
+    $('.delete_comment_attachment_link').click(function (event) {
       event.preventDefault()
       $(this)
         .parents('.comment_attachment_input')
-        .slideUp(function() {
+        .slideUp(function () {
           $(this).remove()
         })
     })
-    $('.save_rubric_button').click(function() {
-      const $rubric = $(this)
-        .parents('#rubric_holder')
-        .find('.rubric')
+    $('.save_rubric_button').click(function () {
+      const $rubric = $(this).parents('#rubric_holder').find('.rubric')
       const submitted_data = rubricAssessment.assessmentData($rubric)
       const url = $('.update_rubric_assessment_url').attr('href')
       const method = 'POST'
@@ -351,9 +328,7 @@ export function setup() {
             .val(assessment.id)
             .text(assessment.assessor_name)
             .attr('id', 'rubric_assessment_option_' + assessment.id)
-          $('#rubric_assessments_select')
-            .prepend($option)
-            .val(assessment.id)
+          $('#rubric_assessments_select').prepend($option).val(assessment.id)
         }
         $('#rubric_assessment_option_' + assessment.id).text(assessment.assessor_name)
         $('#new_rubric_assessment_option').remove()
@@ -385,10 +360,15 @@ export function setup() {
     $('.assess_submission_link').click(event => {
       event.preventDefault()
       $('#rubric_assessments_select').change()
+      if (ENV.mark_rubric_comments_read_url) {
+        $.ajaxJSON(ENV.mark_rubric_comments_read_url, 'PUT', {}, () => {})
+        $('.rubric_comment.unread_indicator').hide()
+        $('.submission-details-header__rubric .assess_submission_link').attr('title', '')
+      }
       openRubric()
     })
     $('#rubric_assessments_select')
-      .change(function() {
+      .change(function () {
         const id = $(this).val()
         let found = null
         for (const idx in rubricAssessments) {
@@ -413,9 +393,7 @@ export function setup() {
         'create',
         'any',
         (id, type) => {
-          $('#media_media_recording')
-            .data('comment_id', id)
-            .data('comment_type', type)
+          $('#media_media_recording').data('comment_id', id).data('comment_type', type)
           $(document).triggerHandler('comment_change')
           $('#add_comment_form').show()
           $('#media_media_recording').hide()
@@ -432,7 +410,7 @@ export function setup() {
       $('#media_media_recording').hide()
     })
     $('.comments .comment_list')
-      .delegate('.play_comment_link', 'click', function(event) {
+      .delegate('.play_comment_link', 'click', function (event) {
         event.preventDefault()
         const comment_id = $(this)
           .parents('.comment_media')
@@ -476,12 +454,10 @@ $(document).fragmentChange((event, hash) => {
     if (params && params.comment) {
       $('.grading_comment').val(params.comment)
     }
-    $('.grading_comment')
-      .focus()
-      .select()
+    $('.grading_comment').focus().select()
   }
 })
-INST.refreshGrades = function() {
+INST.refreshGrades = function () {
   const url = $('.submission_data_url').attr('href')
   setTimeout(() => {
     $.ajaxJSON(url, 'GET', {}, submissionLoaded)

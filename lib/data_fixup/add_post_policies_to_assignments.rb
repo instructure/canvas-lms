@@ -28,7 +28,7 @@ module DataFixup::AddPostPoliciesToAssignments
               .find_ids_in_batches do |submission_ids|
       Submission.joins(:assignment)
                 .where(id: submission_ids)
-                .where(<<~SQL).
+                .where(<<~SQL)
                   CASE assignments.muted
                     WHEN TRUE
                       THEN posted_at IS NOT NULL
@@ -36,7 +36,7 @@ module DataFixup::AddPostPoliciesToAssignments
                       graded_at IS NOT NULL AND posted_at IS NULL OR graded_at IS NULL AND posted_at IS NOT NULL OR posted_at<>graded_at
                   END
                 SQL
-        update_all("posted_at = (CASE assignments.muted WHEN TRUE THEN NULL ELSE graded_at END), updated_at = NOW()")
+                .update_all("posted_at = (CASE assignments.muted WHEN TRUE THEN NULL ELSE graded_at END), updated_at = NOW()")
     end
   end
 

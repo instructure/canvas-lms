@@ -24,6 +24,7 @@ import {ShowProjectionsButton} from '../show_projections_button'
 const toggleShowProjections = jest.fn()
 
 const defaultProps = {
+  responsiveSize: 'large' as const,
   showProjections: false,
   toggleShowProjections
 }
@@ -47,5 +48,23 @@ describe('ShowProjectionsButton', () => {
     const {getByRole} = render(<ShowProjectionsButton {...defaultProps} />)
     act(() => getByRole('button', {name: 'Show Projections'}).click())
     expect(toggleShowProjections).toHaveBeenCalled()
+  })
+
+  it('only renders the Show icon when at small screen sizes', () => {
+    const {getByRole, queryByTestId} = render(
+      <ShowProjectionsButton {...defaultProps} responsiveSize="small" />
+    )
+    expect(getByRole('button', {name: 'Show Projections'})).toBeInTheDocument()
+    expect(queryByTestId('projections-icon-button')).toBeInTheDocument()
+    expect(queryByTestId('projections-text-button')).not.toBeInTheDocument()
+  })
+
+  it('only renders the Hide icon when at small screen sizes', () => {
+    const {getByRole, queryByTestId} = render(
+      <ShowProjectionsButton {...defaultProps} responsiveSize="small" showProjections />
+    )
+    expect(getByRole('button', {name: 'Hide Projections'})).toBeInTheDocument()
+    expect(queryByTestId('projections-icon-button')).toBeInTheDocument()
+    expect(queryByTestId('projections-text-button')).not.toBeInTheDocument()
   })
 })

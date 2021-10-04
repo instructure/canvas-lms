@@ -19,17 +19,22 @@
 import React from 'react'
 
 import Module from './module'
-import {StoreState, PacePlan} from '../../types'
+import {PacePlan, ResponsiveSizes, StoreState} from '../../types'
 import {connect} from 'react-redux'
 import {getPacePlan} from '../../reducers/pace_plans'
-import {getShowProjections} from '../../reducers/ui'
+import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
 
 interface StoreProps {
   readonly pacePlan: PacePlan
+  readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
 }
 
-export const PacePlanTable: React.FC<StoreProps> = ({pacePlan, showProjections}) => (
+export const PacePlanTable: React.FC<StoreProps> = ({
+  pacePlan,
+  responsiveSize,
+  showProjections
+}) => (
   <>
     {pacePlan.modules.map((module, index) => (
       <Module
@@ -37,6 +42,7 @@ export const PacePlanTable: React.FC<StoreProps> = ({pacePlan, showProjections})
         index={index + 1}
         module={module}
         pacePlan={pacePlan}
+        responsiveSize={responsiveSize}
         showProjections={showProjections}
       />
     ))}
@@ -46,6 +52,7 @@ export const PacePlanTable: React.FC<StoreProps> = ({pacePlan, showProjections})
 const mapStateToProps = (state: StoreState) => {
   return {
     pacePlan: getPacePlan(state),
+    responsiveSize: getResponsiveSize(state),
     showProjections: getShowProjections(state)
   }
 }
