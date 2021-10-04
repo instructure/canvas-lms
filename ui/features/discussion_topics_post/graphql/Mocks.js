@@ -223,7 +223,8 @@ export const updateDiscussionEntryParticipantMock = ({
   discussionEntryId = '1',
   read = null,
   rating = null,
-  forcedReadState = null
+  forcedReadState = null,
+  shouldError = false
 } = {}) => [
   {
     request: {
@@ -252,7 +253,8 @@ export const updateDiscussionEntryParticipantMock = ({
           __typename: 'UpdateDiscussionEntryParticipantPayload'
         }
       }
-    }
+    },
+    ...(shouldError && {error: new Error('graphql error')})
   }
 ]
 
