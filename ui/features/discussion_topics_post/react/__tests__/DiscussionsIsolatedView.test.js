@@ -201,40 +201,6 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
   })
 
-  it('go to topic button should clear search term', async () => {
-    const mocks = [
-      ...getDiscussionQueryMock(),
-      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false}),
-      ...getDiscussionSubentriesQueryMock({
-        includeRelativeEntry: false,
-        last: 5
-      }),
-      ...getDiscussionSubentriesQueryMock({
-        beforeRelativeEntry: false,
-        first: 0,
-        includeRelativeEntry: false
-      }),
-      ...getDiscussionQueryMock()
-    ]
-    const container = setup(mocks)
-    fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'parent'}
-    })
-    const goToReply = await container.findByTestId('go-to-reply')
-    fireEvent.click(goToReply)
-
-    const isolatedKabab = await container.findAllByTestId('thread-actions-menu')
-    fireEvent.click(isolatedKabab[0])
-
-    await waitFor(() => {
-      expect(container.queryByTestId('discussion-topic-container')).toBeNull()
-    })
-    const goToTopic = await container.findByText('Go To Topic')
-    fireEvent.click(goToTopic)
-
-    expect(await container.findByTestId('discussion-topic-container')).toBeTruthy()
-  })
-
   it('should clear input when button is pressed', async () => {
     const mocks = [
       ...getDiscussionQueryMock(),
