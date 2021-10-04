@@ -94,6 +94,9 @@ module Canvas::Oauth
                                                })
         @access_token.real_user = real_user if real_user && real_user != user
 
+        expires_in = key.tokens_expire_in
+        @access_token.permanent_expires_at = Time.now.utc + expires_in if expires_in
+
         @access_token.save!
 
         @access_token.clear_full_token! if @access_token.scoped_to?(['userinfo'])
