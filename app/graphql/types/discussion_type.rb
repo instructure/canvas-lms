@@ -44,7 +44,6 @@ module Types
 
     global_id_field :id
     field :title, String, null: true
-    field :message, String, null: true
     field :context_id, ID, null: false
     field :context_type, String, null: false
     field :delayed_post_at, Types::DateTimeType, null: true
@@ -61,6 +60,11 @@ module Types
     field :is_announcement, Boolean, null: false
     field :is_section_specific, Boolean, null: true
     field :require_initial_post, Boolean, null: true
+
+    field :message, String, null: true
+    def message
+      object.message unless object.locked_for?(current_user, check_policies: true)
+    end
 
     field :initial_post_required_for_current_user, Boolean, null: false
     def initial_post_required_for_current_user

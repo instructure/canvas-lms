@@ -1141,6 +1141,8 @@ class DiscussionTopic < ActiveRecord::Base
   end
 
   set_policy do
+    # Users may have can :read, but should not have access to all the data
+    # because the topic is locked_for?(user)
     given { |user| self.visible_for?(user) }
     can :read
 
@@ -1513,9 +1515,12 @@ class DiscussionTopic < ActiveRecord::Base
     end
   end
 
-  #         Determine if the discussion topic is locked for a specific user. The topic is locked when the
-  #         delayed_post_at is in the future or the group assignment is locked. This does not determine
-  #         the visibility of the topic to the user, only that they are unable to reply.
+  # Determine if the discussion topic is locked for a user. The topic is locked
+  # if the delayed_post_at is in the future or the assignment is locked.
+  # This does not determine the visibility of the topic to the user,
+  # only that they are unable to reply and unable to see the message.
+  # Generally you want to call :locked_for?(user, check_policies: true), which
+  # will call this method.
   def low_level_locked_for?(user, opts = {})
     return false if opts[:check_policies] && self.grants_right?(user, :read_as_admin)
 
