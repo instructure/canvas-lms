@@ -148,8 +148,10 @@ describe CanvasPartman::PartitionManager do
 
       it "uses timeout protection" do
         timeout_count = 0
-        allow(Trail.connection).to receive(:execute) do |statement|
-          timeout_count += 1 if statement =~ /SET LOCAL statement_timeout=90000/
+        conn = Trail.connection
+        allow(conn).to receive(:execute) do |statement|
+          conn.materialize_transactions
+          timeout_count += 1 if statement.include?("SET LOCAL statement_timeout")
         end
         subject.create_partition(0)
         expect(timeout_count).to eq(1)

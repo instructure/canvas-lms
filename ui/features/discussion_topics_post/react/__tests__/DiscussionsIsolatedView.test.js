@@ -17,12 +17,15 @@
  */
 
 import {AlertManagerContext} from '@canvas/alerts/react/AlertManager'
-import {ApolloProvider} from 'react-apollo'
+import {
+  createDiscussionEntryMock,
+  getDiscussionQueryMock,
+  getDiscussionSubentriesQueryMock,
+  updateDiscussionEntryMock
+} from '../../graphql/Mocks'
 import DiscussionTopicManager from '../DiscussionTopicManager'
 import {fireEvent, render, waitFor} from '@testing-library/react'
-import {handlers} from '../../graphql/mswHandlers'
-import {mswClient} from '../../../../shared/msw/mswClient'
-import {mswServer} from '../../../../shared/msw/mswServer'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 
 jest.mock('@canvas/rce/RichContentEditor')
@@ -30,21 +33,26 @@ jest.mock('../utils', () => ({
   ...jest.requireActual('../utils'),
   responsiveQuerySizes: () => ({desktop: {maxWidth: '1024px'}})
 }))
+jest.mock('../utils/constants', () => ({
+  ...jest.requireActual('../utils/constants'),
+  SEARCH_TERM_DEBOUNCE_DELAY: 0
+}))
 
 describe('DiscussionsIsolatedView', () => {
-  const server = mswServer(handlers)
   const setOnFailure = jest.fn()
   const setOnSuccess = jest.fn()
 
   beforeAll(() => {
-    // eslint-disable-next-line no-undef
-    fetchMock.dontMock()
-    server.listen()
-
     window.ENV = {
       discussion_topic_id: '1',
       course_id: '1',
-      isolated_view: true
+      isolated_view: true,
+      current_user: {
+        id: '2',
+        avatar_image_url:
+          'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+        display_name: 'Hank Mccoy'
+      }
     }
 
     window.matchMedia = jest.fn().mockImplementation(() => {
@@ -58,39 +66,44 @@ describe('DiscussionsIsolatedView', () => {
     })
   })
 
-  beforeEach(() => {
-    mswClient.cache.reset()
-  })
-
   afterEach(() => {
-    server.resetHandlers()
     setOnFailure.mockClear()
     setOnSuccess.mockClear()
   })
 
-  afterAll(() => {
-    server.close()
-    // eslint-disable-next-line no-undef
-    fetchMock.enableMocks()
-  })
-
-  const setup = () => {
+  const setup = mocks => {
     return render(
-      <ApolloProvider client={mswClient}>
+      <MockedProvider mocks={mocks}>
         <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
           <DiscussionTopicManager discussionTopicId="1" />
         </AlertManagerContext.Provider>
-      </ApolloProvider>
+      </MockedProvider>
     )
   }
 
-  it.skip('should be able to post a reply to an entry', async () => {
-    const {findByText, findByTestId, queryByTestId} = setup()
+  it('should be able to post a reply to an entry', async () => {
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionSubentriesQueryMock({
+        includeRelativeEntry: false,
+        last: 5
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        beforeRelativeEntry: false,
+        first: 0,
+        includeRelativeEntry: false
+      }),
+      ...createDiscussionEntryMock({
+        includeReplyPreview: false,
+        replyFromEntryId: '1'
+      })
+    ]
+    const {findByText, findByTestId, queryByTestId} = setup(mocks)
 
     const replyButton = await findByTestId('threading-toolbar-reply')
     fireEvent.click(replyButton)
 
-    expect(findByText('Thread')).toBeTruthy()
+    expect(await findByText('Thread')).toBeTruthy()
 
     const doReplyButton = await findByTestId('DiscussionEdit-submit')
     fireEvent.click(doReplyButton)
@@ -103,7 +116,20 @@ describe('DiscussionsIsolatedView', () => {
   })
 
   it('should be able to edit a root entry', async () => {
-    const {findByText, findByTestId, findAllByTestId} = setup()
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionSubentriesQueryMock({
+        includeRelativeEntry: false,
+        last: 5
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        beforeRelativeEntry: false,
+        first: 0,
+        includeRelativeEntry: false
+      }),
+      ...updateDiscussionEntryMock()
+    ]
+    const {findByText, findByTestId, findAllByTestId} = setup(mocks)
 
     const expandButton = await findByTestId('expand-button')
     fireEvent.click(expandButton)
@@ -123,7 +149,11 @@ describe('DiscussionsIsolatedView', () => {
   })
 
   it('should not render go to reply button with single character search term', async () => {
-    const container = setup()
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock({searchTerm: 'a', rootEntries: false})
+    ]
+    const container = setup(mocks)
     await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'a'}
@@ -133,7 +163,20 @@ describe('DiscussionsIsolatedView', () => {
   })
 
   it('should open isolated view when go to reply button is clicked', async () => {
-    const container = setup()
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false}),
+      ...getDiscussionSubentriesQueryMock({
+        includeRelativeEntry: false,
+        last: 5
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        beforeRelativeEntry: false,
+        first: 0,
+        includeRelativeEntry: false
+      })
+    ]
+    const container = setup(mocks)
     await waitFor(() => expect(container.queryByTestId('isolated-view-container')).toBeNull())
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'parent'}
@@ -141,11 +184,15 @@ describe('DiscussionsIsolatedView', () => {
     const goToReply = await container.findByTestId('go-to-reply')
     fireEvent.click(goToReply)
 
-    await waitFor(() => expect(container.queryByTestId('isolated-view-container')).not.toBeNull())
+    expect(await container.findByTestId('isolated-view-container')).toBeInTheDocument()
   })
 
-  it.skip('should show reply button in isolated view when search term is present', async () => {
-    const container = setup()
+  it('should show reply button in isolated view when search term is present', async () => {
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false})
+    ]
+    const container = setup(mocks)
     fireEvent.change(await container.findByTestId('search-filter'), {
       target: {value: 'parent'}
     })
@@ -154,11 +201,24 @@ describe('DiscussionsIsolatedView', () => {
     await waitFor(() => expect(container.queryByTestId('threading-toolbar-reply')).toBeNull())
   })
 
-  // This isn't a broken test. This functionality is really not working.
-  it.skip('go to topic button should clear search term', async () => {
-    const container = setup()
+  it('go to topic button should clear search term', async () => {
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock({searchTerm: 'parent', rootEntries: false}),
+      ...getDiscussionSubentriesQueryMock({
+        includeRelativeEntry: false,
+        last: 5
+      }),
+      ...getDiscussionSubentriesQueryMock({
+        beforeRelativeEntry: false,
+        first: 0,
+        includeRelativeEntry: false
+      }),
+      ...getDiscussionQueryMock()
+    ]
+    const container = setup(mocks)
     fireEvent.change(await container.findByTestId('search-filter'), {
-      target: {value: 'a'}
+      target: {value: 'parent'}
     })
     const goToReply = await container.findByTestId('go-to-reply')
     fireEvent.click(goToReply)
@@ -176,7 +236,12 @@ describe('DiscussionsIsolatedView', () => {
   })
 
   it('should clear input when button is pressed', async () => {
-    const container = setup()
+    const mocks = [
+      ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock({searchTerm: 'A new Search', rootEntries: false}),
+      ...getDiscussionQueryMock()
+    ]
+    const container = setup(mocks)
     let searchInput = container.findByTestId('search-filter')
 
     fireEvent.change(await container.findByTestId('search-filter'), {

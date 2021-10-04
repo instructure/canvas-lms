@@ -19,7 +19,7 @@
 import React from 'react'
 
 import {Transition} from '@instructure/ui-motion'
-import {View} from '@instructure/ui-view'
+import {View, ViewOverflowX, ViewOverflowY} from '@instructure/ui-view'
 
 interface ComponentProps {
   readonly children: any
@@ -33,16 +33,16 @@ const SlideTransition: React.FC<ComponentProps> = ({children, direction, expande
     direction === 'horizontal'
       ? {
           as: 'span',
-          maxWidth: expanded ? size : '0',
-          overflowX: 'hidden'
+          width: expanded ? size : '0',
+          overflowX: 'hidden' as ViewOverflowX
         }
       : {}
   const verticalProps =
     direction === 'vertical'
       ? {
           as: 'div',
-          maxHeight: expanded ? size : '0',
-          overflowY: 'hidden'
+          height: expanded ? size : '0',
+          overflowY: 'hidden' as ViewOverflowY
         }
       : {}
   return (

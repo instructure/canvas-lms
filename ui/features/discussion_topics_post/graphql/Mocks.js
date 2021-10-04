@@ -129,7 +129,7 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(includeRelativeEntry !== null && {includeRelativeEntry}),
         ...(last !== null && {last}),
         ...(relativeEntryId !== null && {relativeEntryId}),
-        rolePillTypes,
+        ...(rolePillTypes !== null && {rolePillTypes}),
         sort
       }
     },
@@ -256,7 +256,10 @@ export const updateDiscussionEntryParticipantMock = ({
   }
 ]
 
-export const updateDiscussionEntryMock = ({discussionEntryId = '1', message = ''} = {}) => [
+export const updateDiscussionEntryMock = ({
+  discussionEntryId = '1',
+  message = '<p>This is the parent reply</p>'
+} = {}) => [
   {
     request: {
       query: UPDATE_DISCUSSION_ENTRY,

@@ -927,17 +927,7 @@ class AssignmentsApiController < ApplicationController
       end
 
       include_visibility = included_params.include?('assignment_visibility') && @context.grants_any_right?(@current_user, :read_as_admin, :manage_grades, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-      include_all_dates = value_to_boolean(params[:all_dates] || false)
-
       include_override_objects = included_params.include?('overrides') && @context.grants_any_right?(@current_user, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-
-      override_param = params[:override_assignment_dates] || true
-      override_dates = value_to_boolean(override_param)
-
-      needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
-      needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
-
-      include_can_submit = included_params.include?('can_submit')
 
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
@@ -945,14 +935,15 @@ class AssignmentsApiController < ApplicationController
 
       options = {
         submission: submissions,
-        override_dates: override_dates,
+        override_dates: value_to_boolean(params[:override_assignment_dates] || true),
         include_visibility: include_visibility,
-        needs_grading_count_by_section: needs_grading_count_by_section,
-        include_all_dates: include_all_dates,
+        needs_grading_count_by_section: value_to_boolean(params[:needs_grading_count_by_section]),
+        include_all_dates: value_to_boolean(params[:all_dates]),
         include_overrides: include_override_objects,
         include_can_edit: included_params.include?('can_edit'),
         include_score_statistics: included_params.include?('score_statistics'),
-        include_can_submit: include_can_submit
+        include_can_submit: included_params.include?('can_submit'),
+        include_webhook_info: included_params.include?('webhook_info')
       }
 
       result_json = if use_quiz_json?

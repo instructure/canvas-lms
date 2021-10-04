@@ -41,6 +41,7 @@ class RubricAssessment < ActiveRecord::Base
 
   before_save :update_artifact_parameters
   before_save :htmlify_rating_comments
+  before_save :mark_unread_comments
   before_create :set_root_account_id
   after_save :update_assessment_requests, :update_artifact
   after_save :track_outcomes
@@ -140,6 +141,17 @@ class RubricAssessment < ActiveRecord::Base
         end
       end
     end
+    true
+  end
+
+  def mark_unread_comments
+    return unless artifact.is_a?(Submission)
+    return unless data_changed? && data.present?
+
+    if data.any? { |rating| rating.is_a?(Hash) && rating[:comments].present? }
+      user.mark_rubric_comments_unread!(artifact)
+    end
+
     true
   end
 

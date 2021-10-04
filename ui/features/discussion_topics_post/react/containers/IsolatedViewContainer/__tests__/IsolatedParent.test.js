@@ -137,7 +137,15 @@ describe('IsolatedParent', () => {
     window.ENV = {
       should_show_deeply_nested_alert: true
     }
-    const {queryByText} = setup(defaultProps({overrides: {RCEOpen: true}}))
+    const {queryByText} = setup(
+      defaultProps({
+        discussionEntryOverrides: {
+          isolatedEntryId: '77',
+          parentId: '77'
+        },
+        overrides: {RCEOpen: true}
+      })
+    )
 
     expect(
       queryByText(

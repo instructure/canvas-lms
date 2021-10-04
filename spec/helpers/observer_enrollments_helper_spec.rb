@@ -157,6 +157,12 @@ describe ObserverEnrollmentsHelper do
     expect(users[0][:name]).to eq("Student 1")
   end
 
+  it "returns [] if user not provided" do
+    enroll_observer(@course1, @observer, @student1)
+
+    expect(observed_users(nil, nil)).to eq []
+  end
+
   context "sharding" do
     specs_require_sharding
 
