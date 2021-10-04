@@ -27,6 +27,7 @@ require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
 require_relative '../shared_examples/k5_subject_grades_shared_examples'
+require_relative '../../../helpers/observer_enrollments_helper_spec'
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -37,6 +38,7 @@ describe "observer k5 dashboard" do
   include K5GradesTabPageObject
   include GradebookSetup
   include K5ResourceTabPageObject
+  include ObserverEnrollmentsHelper
 
   before :once do
     Account.site_admin.enable_feature!(:k5_parent_support)
@@ -46,7 +48,7 @@ describe "observer k5 dashboard" do
 
   before :each do
     user_session @observer
-    driver.manage.delete_cookie('k5_observed_user_id')
+    driver.manage.delete_cookie("#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}")
   end
 
   context 'single observed student' do

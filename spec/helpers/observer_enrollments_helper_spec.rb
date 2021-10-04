@@ -36,6 +36,10 @@ describe ObserverEnrollmentsHelper do
     @course2.enroll_student(@student1)
   end
 
+  before :each do
+    instance_variable_set(:@current_user, @observer)
+  end
+
   def enroll_observer(course, observer, linked_student)
     course.enroll_user(observer, "ObserverEnrollment", { associated_user_id: linked_student.id })
   end
@@ -120,22 +124,23 @@ describe ObserverEnrollmentsHelper do
     expect(users[0][:sortable_name]).to eq("Observer")
   end
 
-  context "SELECTED_OBSERVED_USER_COOKIE cookie" do
+  context "with the observed user cookie" do
     before :once do
       @course1.enroll_teacher(@observer)
       enroll_observer(@course1, @observer, @student1)
       enroll_observer(@course1, @observer, @student2)
+      @observed_user_cookie_name = "#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}"
     end
 
     it "sets @selected_observed_user to user passed in cookie, if valid" do
-      cookies["k5_observed_user_id"] = @student2.id.to_s
+      cookies[@observed_user_cookie_name] = @student2.id.to_s
 
       observed_users(@observer, nil)
       expect(@selected_observed_user.id).to be(@student2.id)
     end
 
     it "does not set @selected_observed_user to an invalid user" do
-      cookies["k5_observed_user_id"] = "53276893"
+      cookies[@observed_user_cookie_name] = "53276893"
 
       observed_users(@observer, nil)
       expect(@selected_observed_user.id).to be(@observer.id)
