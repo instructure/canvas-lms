@@ -156,7 +156,7 @@ module CC
       [title, body]
     end
 
-    UPLOADED_MEDIA_REGEX = /\/media_objects\/|\/Uploaded Media\//.freeze
+    MEDIAHREF_REGEX = %r{/media_objects_iframe\?mediahref=/}.freeze
     SPECIAL_REFERENCE_REGEX = /(?:\$|%24)[^%$]*(?:\$|%24)/.freeze
     WEB_CONTENT_REFERENCE_REGEX = Regexp.union(
       Regexp.new(Regexp.escape(CC::CCHelper::WEB_CONTENT_TOKEN)),
@@ -173,16 +173,15 @@ module CC
         if source =~ WEB_CONTENT_REFERENCE_REGEX
           attachment_key = CGI.unescape(source.sub(WEB_CONTENT_REFERENCE_REGEX, ''))
           if node['data-media-type']
-            # files uploaded directly using the Kaltura plugin media recording feature
-            if attachment_key =~ UPLOADED_MEDIA_REGEX
-              # formatted appropriately, no need to massage the pathname
-              attachment_key
-            else
-              # all other media uploads
+            if attachment_key =~ MEDIAHREF_REGEX
+              # e.g. "/media_objects_iframe?mediahref=/foo.mp3?canvas_download&amp;type=audio=1&canvas_qs_type=audio"
               attachment_key = attachment_key.split('?').second
               attachment_key = "/" + attachment_key.split('/').second
+            else
+              # formatted appropriately, no need to massage the pathname
             end
           else
+            # e.g. "/amazing_file.txt?canvas_=1&canvas_qs_wrap=1"
             attachment_key = attachment_key.split('?').first
             attachment_key = attachment_key.split('/').join('/')
           end
