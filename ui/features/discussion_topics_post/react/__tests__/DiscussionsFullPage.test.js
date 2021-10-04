@@ -322,9 +322,7 @@ describe('DiscussionFullPage', () => {
     // these queries in our mocks we provide to MockedProvider
     const mocks = [
       ...getDiscussionQueryMock(),
-      ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock(),
-      ...getDiscussionQueryMock()
     ]
     const container = setup(mocks)
 
