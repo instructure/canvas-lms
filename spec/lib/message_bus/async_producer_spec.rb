@@ -31,7 +31,7 @@ describe MessageBus::AsyncProducer do
   describe "#produce_message error handling" do
     specs_require_sharding
 
-    before(:all) do
+    before(:once) do
       Bundler.require(:pulsar)
       ErrorReport.delete_all
     end
@@ -43,17 +43,18 @@ describe MessageBus::AsyncProducer do
     end
 
     it "sends error reports to contextual shard" do
-      @shard1.activate!
-      prior_err_count = ErrorReport.count
-      prior_err2_count = @shard2.activate { ErrorReport.count }
-      producer = ::MessageBus::AsyncProducer.new(start_thread: false)
-      @shard2.activate { producer.push('a', 'b', 'c') } # will write shard2 as shard id
-      allow(producer).to receive(:produce_message).and_raise(VerySpecialAsycnMbTestError)
-      expect(producer.queue_depth).to eq(1)
-      expect { producer.send(:process_one_queue_item) }.to_not raise_error
-      expect(ErrorReport.count).to eq(prior_err_count)
-      @shard2.activate do
-        expect(ErrorReport.count).to eq(prior_err2_count + 1)
+      @shard1.activate do
+        prior_err_count = ErrorReport.count
+        prior_err2_count = @shard2.activate { ErrorReport.count }
+        producer = ::MessageBus::AsyncProducer.new(start_thread: false)
+        @shard2.activate { producer.push('a', 'b', 'c') } # will write shard2 as shard id
+        allow(producer).to receive(:produce_message).and_raise(VerySpecialAsycnMbTestError)
+        expect(producer.queue_depth).to eq(1)
+        expect { producer.send(:process_one_queue_item) }.to_not raise_error
+        expect(ErrorReport.count).to eq(prior_err_count)
+        @shard2.activate do
+          expect(ErrorReport.count).to eq(prior_err2_count + 1)
+        end
       end
     end
   end

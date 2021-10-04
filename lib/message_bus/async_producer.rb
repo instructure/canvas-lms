@@ -115,7 +115,7 @@ module MessageBus
 
       status = :none
       namespace, topic_name, message, shard_id = *work_tuple
-      Shard.find(shard_id).activate do
+      Shard.lookup(shard_id).activate do
         begin
           status = produce_message(namespace, topic_name, message)
         rescue StandardError => e
