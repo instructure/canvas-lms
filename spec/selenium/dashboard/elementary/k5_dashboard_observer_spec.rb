@@ -26,6 +26,7 @@ require_relative '../pages/k5_schedule_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
+require_relative '../shared_examples/k5_subject_grades_shared_examples'
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -220,15 +221,6 @@ describe "observer k5 dashboard" do
       expect(schedule_item.text).to include('today assignment1')
     end
 
-    it 'shows late assignment as Missing' do
-      skip("LS-2582 grades not working right now")
-      create_dated_assignment(@subject_course, "assignment 2 missing", 1.day.ago(Time.zone.now), 15)
-
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[0].text).to include("Missing")
-    end
-
     it 'shows the Important Info for subject resources tab' do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
@@ -300,5 +292,9 @@ describe "observer k5 dashboard" do
 
   context 'course tab navigation shared examples' do
     it_behaves_like 'k5 subject navigation tabs'
+  end
+
+  context 'subject grades shared examples' do
+    it_behaves_like 'k5 subject grades'
   end
 end
