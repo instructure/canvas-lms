@@ -22,7 +22,10 @@ import {
   UPDATE_DISCUSSION_ENTRY_PARTICIPANT,
   UPDATE_DISCUSSION_ENTRY,
   SUBSCRIBE_TO_DISCUSSION_TOPIC,
-  CREATE_DISCUSSION_ENTRY
+  CREATE_DISCUSSION_ENTRY,
+  DELETE_DISCUSSION_TOPIC,
+  UPDATE_DISCUSSION_READ_STATE,
+  UPDATE_DISCUSSION_TOPIC
 } from './Mutations'
 import {Discussion} from './Discussion'
 import {DiscussionEntry} from './DiscussionEntry'
@@ -339,6 +342,74 @@ export const createDiscussionEntryMock = ({
             message
           }),
           __typename: 'CreateDiscussionEntryPayload'
+        }
+      }
+    }
+  }
+]
+
+export const deleteDiscussionTopicMock = ({id = '1'} = {}) => [
+  {
+    request: {
+      query: DELETE_DISCUSSION_TOPIC,
+      variables: {id}
+    },
+    result: {
+      data: {
+        deleteDiscussionTopic: {
+          discussionTopicId: id,
+          __typename: 'DeleteDiscussionTopicPayload'
+        }
+      }
+    }
+  }
+]
+
+export const updateDiscussionReadStateMock = ({discussionTopicId = '1', read = true} = {}) => [
+  {
+    request: {
+      query: UPDATE_DISCUSSION_READ_STATE,
+      variables: {
+        discussionTopicId,
+        read
+      }
+    },
+    result: {
+      data: {
+        updateDiscussionReadState: {
+          discussionTopic: Discussion.mock({
+            id: btoa(`Discussion-${discussionTopicId}`),
+            _id: discussionTopicId
+          }),
+          __typename: 'UpdateDiscussionReadStatePayload'
+        }
+      }
+    }
+  }
+]
+
+export const updateDiscussionTopicMock = ({
+  discussionTopicId = '1',
+  published = null,
+  locked = null
+} = {}) => [
+  {
+    request: {
+      query: UPDATE_DISCUSSION_TOPIC,
+      variables: {
+        discussionTopicId,
+        ...(published !== null && {published}),
+        ...(locked !== null && {locked})
+      }
+    },
+    result: {
+      data: {
+        updateDiscussionTopic: {
+          discussionTopic: Discussion.mock({
+            id: btoa(`Discussion-${discussionTopicId}`),
+            _id: discussionTopicId
+          }),
+          __typename: 'UpdateDiscussionTopicPayload'
         }
       }
     }
