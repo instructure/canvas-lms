@@ -17,11 +17,12 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'spec_helper'
-require 'lti_1_3_tool_configuration_spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
-  include_context 'lti_1_3_tool_configuration_spec_helper'
+RSpec.describe SecurityController, type: :request do
+  # This uses the lti keyset, but it doesn't really matter which one
+  let(:url) { Rails.application.routes.url_helpers.jwks_show_path }
+  let(:json) { JSON.parse(response.body) }
 
   let(:fallback_proxy) do
     Canvas::DynamicSettings::FallbackProxy.new({
@@ -31,9 +32,30 @@ RSpec.shared_context "lti_1_3_spec_helper", shared_context: :metadata do
                                                })
   end
 
-  let(:developer_key) { DeveloperKey.create!(account: account) }
-
   before do
     allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
+  end
+
+  it 'returns ok status' do
+    get url
+    expect(response).to have_http_status :ok
+  end
+
+  it 'returns a jwk set' do
+    get url
+    expect(json['keys']).not_to be_empty
+  end
+
+  it 'sets the Cache-control header' do
+    get url
+    expect(response.headers['Cache-Control']).to include 'max-age=864000'
+  end
+
+  it 'returns well-formed public key jwks' do
+    get url
+    expected_keys = %w(kid kty alg e n use)
+    json['keys'].each do |key|
+      expect(key.keys - expected_keys).to be_empty
+    end
   end
 end

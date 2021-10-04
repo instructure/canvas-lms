@@ -17,7 +17,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class Canvas::Security::ServicesJwt
+class CanvasSecurity::ServicesJwt
+  KeyStorage = CanvasSecurity::KeyStorage.new('services-jwt')
+
   class InvalidRefresh < RuntimeError; end
 
   REFRESH_WINDOW = 6.hours
@@ -36,35 +38,20 @@ class Canvas::Security::ServicesJwt
   def wrapper_token
     return {} unless is_wrapped
 
-    raw_wrapper_token = Canvas::Security.base64_decode(token_string)
+    raw_wrapper_token = CanvasSecurity.base64_decode(token_string)
     keys = [signing_secret]
     keys << previous_signing_secret if previous_signing_secret
-    Canvas::Security.decode_jwt(raw_wrapper_token, keys)
+    CanvasSecurity.decode_jwt(raw_wrapper_token, keys)
   end
 
   def original_token(ignore_expiration: false)
     original_crypted_token = if is_wrapped
                                wrapper_token[:user_token]
                              else
-                               Canvas::Security.base64_decode(token_string)
+                               CanvasSecurity.base64_decode(token_string)
                              end
-    Canvas::Security.decrypt_services_jwt(
+    CanvasSecurity::ServicesJwt.decrypt(
       original_crypted_token,
-      signing_secret,
-      encryption_secret,
-      ignore_expiration: ignore_expiration
-    )
-  rescue Canvas::Security::InvalidToken
-    # if we failed during the wrapper token decoding then
-    # there is no way to decrypt this because we already
-    # tried the relevent keys, so we need not try anything else
-    # if original_crypted_token is nil.
-    raise unless original_crypted_token && previous_signing_secret
-
-    Canvas::Security.decrypt_services_jwt(
-      original_crypted_token,
-      previous_signing_secret,
-      encryption_secret,
       ignore_expiration: ignore_expiration
     )
   end
@@ -85,15 +72,25 @@ class Canvas::Security::ServicesJwt
     original_token[:exp]
   end
 
-  def self.generate(payload_data, base64 = true)
+  # Symmetric services JWTs are now deprecated
+  def self.generate(payload_data, base64 = true, symmetric: false)
     payload = create_payload(payload_data)
-    crypted_token = Canvas::Security.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+    crypted_token = if symmetric
+                      CanvasSecurity.create_encrypted_jwt(payload, signing_secret, encryption_secret)
+                    else
+                      CanvasSecurity.create_encrypted_jwt(
+                        payload,
+                        CanvasSecurity::ServicesJwt::KeyStorage.present_key,
+                        encryption_secret,
+                        :autodetect
+                      )
+                    end
     return crypted_token unless base64
 
-    Canvas::Security.base64_encode(crypted_token)
+    CanvasSecurity.base64_encode(crypted_token)
   end
 
-  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil)
+  def self.for_user(domain, user, real_user: nil, workflows: nil, context: nil, symmetric: false)
     if domain.blank? || user.nil?
       raise ArgumentError, "Must have a domain and a user to build a JWT"
     end
@@ -105,17 +102,17 @@ class Canvas::Security::ServicesJwt
     payload[:masq_sub] = real_user.global_id if real_user
     if workflows.present?
       payload[:workflows] = workflows
-      state = Canvas::JWTWorkflow.state_for(workflows, context, user)
+      state = CanvasSecurity::JWTWorkflow.state_for(workflows, context, user)
       payload[:workflow_state] = state unless state.empty?
     end
     if context
       payload[:context_type] = context.class.name
       payload[:context_id] = context.id.to_s
     end
-    generate(payload)
+    generate(payload, symmetric: symmetric)
   end
 
-  def self.refresh_for_user(jwt, domain, user, real_user: nil)
+  def self.refresh_for_user(jwt, domain, user, real_user: nil, symmetric: false)
     begin
       payload = new(jwt, false).original_token(ignore_expiration: true)
     rescue JSON::JWT::InvalidFormat
@@ -137,7 +134,8 @@ class Canvas::Security::ServicesJwt
     for_user(domain, user,
              real_user: real_user,
              workflows: payload[:workflows],
-             context: context)
+             context: context,
+             symmetric: symmetric)
   end
 
   def self.create_payload(payload_data)
@@ -156,16 +154,23 @@ class Canvas::Security::ServicesJwt
                        })
   end
 
+  def self.decrypt(token, ignore_expiration: false)
+    CanvasSecurity.decrypt_encrypted_jwt(token, {
+                                           'HS256' => [signing_secret, previous_signing_secret],
+                                           'RS256' => KeyStorage.public_keyset
+                                         }, encryption_secret, ignore_expiration: ignore_expiration)
+  end
+
   def self.encryption_secret
-    Canvas::Security.services_encryption_secret
+    CanvasSecurity.services_encryption_secret
   end
 
   def self.signing_secret
-    Canvas::Security.services_signing_secret
+    CanvasSecurity.services_signing_secret
   end
 
   def self.previous_signing_secret
-    Canvas::Security.services_previous_signing_secret
+    CanvasSecurity.services_previous_signing_secret
   end
 
   private

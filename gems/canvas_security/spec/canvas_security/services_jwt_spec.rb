@@ -17,18 +17,40 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_relative '../../../spec_helper'
-require_dependency "canvas/security/services_jwt"
+require 'spec_helper'
 
-module Canvas::Security
+module CanvasSecurity
+  # A dummy context
+  class ServicesJwtContext
+    attr_reader :id
+
+    def initialize(id)
+      @id = id
+    end
+
+    def self.find(id)
+      ServicesJwtContext.new(id)
+    end
+  end
+
   describe ServicesJwt do
+    before do
+      @fallback_proxy = DynamicSettings::FallbackProxy.new({
+                                                             CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,
+                                                             CanvasSecurity::KeyStorage::PRESENT => CanvasSecurity::KeyStorage.new_key,
+                                                             CanvasSecurity::KeyStorage::FUTURE => CanvasSecurity::KeyStorage.new_key
+                                                           })
+
+      allow(DynamicSettings).to receive(:kv_proxy).and_return(@fallback_proxy)
+    end
+
     describe "under normal circumstances" do
       include_context "JWT setup"
 
       let(:translate_token) do
         ->(jwt) {
-          decoded_crypted_token = Canvas::Security.base64_decode(jwt)
-          return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+          decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
+          return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
         }
       end
 
@@ -111,8 +133,8 @@ module Canvas::Security
 
           it "allows the introduction of arbitrary data" do
             jwt = ServicesJwt.generate(sub: 2, foo: "bar")
-            decoded_crypted_token = Canvas::Security.base64_decode(jwt)
-            decrypted_token_body = Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+            decoded_crypted_token = CanvasSecurity.base64_decode(jwt)
+            decrypted_token_body = CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
             expect(decrypted_token_body[:foo]).to eq("bar")
           end
 
@@ -171,7 +193,7 @@ module Canvas::Security
           it 'includes workflow_state if workflows is given' do
             workflows = [:foo]
             state = { 'a' => 123 }
-            expect(Canvas::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
+            expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).with(workflows, ctx, user).and_return(state)
             jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body[:workflow_state]).to eq(state)
@@ -179,18 +201,17 @@ module Canvas::Security
 
           it 'does not include workflow_state if empty' do
             workflows = [:foo]
-            expect(Canvas::JWTWorkflow).to receive(:state_for).and_return({})
+            expect(CanvasSecurity::JWTWorkflow).to receive(:state_for).and_return({})
             jwt = ServicesJwt.for_user(host, user, workflows: workflows, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
             expect(decrypted_token_body).not_to have_key :workflow_state
           end
 
           it 'includes context type and id if context is given' do
-            ctx = Course.new
-            ctx.id = 47
+            ctx = ServicesJwtContext.new(47)
             jwt = ServicesJwt.for_user(host, user, context: ctx)
             decrypted_token_body = translate_token.call(jwt)
-            expect(decrypted_token_body[:context_type]).to eq 'Course'
+            expect(decrypted_token_body[:context_type]).to eq 'CanvasSecurity::ServicesJwtContext'
             expect(decrypted_token_body[:context_id]).to eq '47'
           end
 
@@ -273,7 +294,7 @@ module Canvas::Security
           end
 
           it 'generates a token with same context as original' do
-            context = course_factory
+            context = ServicesJwtContext.new(123)
             jwt = ServicesJwt.for_user(host, user1, context: context)
             refreshed = ServicesJwt.refresh_for_user(jwt, host, user1)
             payload = translate_token.call(refreshed)
@@ -318,10 +339,10 @@ module Canvas::Security
           jwt_non_key = ServicesJwt.new(base64_encoded_wrapper_non_key)
           expect(jwt_new_key.wrapper_token[:iss]).to eq("some other service")
           expect(jwt_old_key.wrapper_token[:iss]).to eq("some other service")
-          expect { jwt_non_key.wrapper_token }.to raise_error(Canvas::Security::InvalidToken)
+          expect { jwt_non_key.wrapper_token }.to raise_error(CanvasSecurity::InvalidToken)
           expect(jwt_new_key.user_global_id).to eq(84)
           expect(jwt_old_key.user_global_id).to eq(84)
-          expect { jwt_non_key.user_global_id }.to raise_error(Canvas::Security::InvalidToken)
+          expect { jwt_non_key.user_global_id }.to raise_error(CanvasSecurity::InvalidToken)
         end
       end
     end

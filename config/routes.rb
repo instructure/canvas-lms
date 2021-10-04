@@ -942,6 +942,7 @@ CanvasRails::Application.routes.draw do
 
   post 'object_snippet' => 'context#object_snippet'
   get 'saml2' => 'login/saml#metadata'
+  get 'internal/services/jwks' => 'security#jwks'
 
   # Routes for course exports
   get 'xsd/:version.xsd' => 'content_exports#xml_schema'
@@ -2391,7 +2392,7 @@ CanvasRails::Application.routes.draw do
   post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
   get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
   delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
-  get 'login/oauth2/jwks' => 'oauth2_provider#jwks', as: :oauth2_jwks
+  get 'login/oauth2/jwks' => 'security#jwks', as: :oauth2_jwks
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
@@ -2541,7 +2542,7 @@ CanvasRails::Application.routes.draw do
     end
 
     # Security
-    scope(controller: 'lti/ims/security') do
+    scope(controller: 'security') do
       get "security/jwks", action: :jwks, as: :jwks_show
     end
 

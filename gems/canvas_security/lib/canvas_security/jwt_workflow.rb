@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Canvas
+module CanvasSecurity
   class JWTWorkflow
     def initialize(&token_state)
       @token_state = token_state
@@ -41,39 +41,6 @@ module Canvas
     def self.register(label, &token_state)
       @workflows ||= {}
       @workflows[label.to_sym] = JWTWorkflow.new(&token_state)
-    end
-
-    # Register jwt token workflows with specific state requirments.
-    #
-    # - Try to keep workflow state in tokens to a minium. Remember this will be
-    #   passed around with every request in the service workflow.
-    #
-    register(:rich_content) do |context, user|
-      tool_context = context.is_a?(Group) ? context.context : context
-      {
-        usage_rights_required: (
-          tool_context.respond_to?(:usage_rights_required?) &&
-          tool_context&.usage_rights_required?
-        ) || false,
-        can_upload_files: (
-          user &&
-          context &&
-          context.grants_right?(user, :manage_files_add)
-        ) || false,
-        can_create_pages: (
-          user &&
-          context &&
-          context.respond_to?(:wiki) &&
-          context.wiki_id &&
-          context.wiki.grants_right?(user, :create_page)
-        ) || false
-      }
-    end
-
-    register(:ui) do |_, user|
-      {
-        use_high_contrast: user.try(:prefers_high_contrast?)
-      }
     end
   end
 end

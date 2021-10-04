@@ -102,7 +102,7 @@ module Services
       end
 
       def headers(jwt_body, headers = {})
-        token = Canvas::Security::ServicesJwt.generate(jwt_body)
+        token = CanvasSecurity::ServicesJwt.generate(jwt_body, symmetric: true)
         headers['Authorization'] = "Bearer #{token}"
         headers
       end

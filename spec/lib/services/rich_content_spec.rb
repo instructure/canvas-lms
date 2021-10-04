@@ -44,9 +44,9 @@ module Services
         domain = double("domain")
         ctx = double("ctx", grants_right?: true)
         jwt = double("jwt")
-        allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(domain, user,
-                                                                        include(workflows: [:rich_content, :ui],
-                                                                                context: ctx)).and_return(jwt)
+        allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(domain, user,
+                                                                      include(workflows: [:rich_content, :ui],
+                                                                              context: ctx)).and_return(jwt)
         env = described_class.env_for(user: user, domain: domain, context: ctx)
         expect(env[:JWT]).to eql(jwt)
       end
@@ -56,7 +56,7 @@ module Services
         masq_user = double("masq_user", global_id: 'other global id')
         domain = double("domain")
         jwt = double("jwt")
-        allow(Canvas::Security::ServicesJwt).to receive(:for_user).with(
+        allow(CanvasSecurity::ServicesJwt).to receive(:for_user).with(
           domain,
           user,
           include(real_user: masq_user),
@@ -82,7 +82,7 @@ module Services
       end
 
       it "does not raise when encyption/signing secrets are nil" do
-        allow(Canvas::Security::ServicesJwt).to receive(:for_user).and_raise(Canvas::Security::InvalidJwtKey)
+        allow(CanvasSecurity::ServicesJwt).to receive(:for_user).and_raise(Canvas::Security::InvalidJwtKey)
         env = described_class.env_for(user: {}, domain: "domain")
         expect(env[:JWT]).to eq("InvalidJwtKey")
       end

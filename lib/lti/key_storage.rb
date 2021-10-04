@@ -19,5 +19,5 @@
 #
 
 module Lti
-  KeyStorage = Canvas::Security::KeyStorage.new('lti-keys')
+  KeyStorage = CanvasSecurity::KeyStorage.new('lti-keys')
 end
