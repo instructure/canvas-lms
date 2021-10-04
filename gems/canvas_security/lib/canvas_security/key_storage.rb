@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-module Canvas::Security
+module CanvasSecurity
   class KeyStorage
     PAST = 'jwk-past.json'.freeze
     PRESENT = 'jwk-present.json'.freeze
@@ -61,17 +61,17 @@ module Canvas::Security
         }
         consul_proxy.set_keys(kvs, global: true)
       end
-      Canvas::DynamicSettings.reset_cache!
+      DynamicSettings.reset_cache!
     end
 
     # Retrieve the public keys in JWK format
     #
     # @return [Array] The array of public keys in JWK format
     def public_keyset
-      retrieve_keys.values.map do |private_jwk|
+      JSON::JWK::Set.new(retrieve_keys.values.compact.map do |private_jwk|
         public_jwk = private_jwk.to_key.public_key.to_jwk
         public_jwk.merge(private_jwk.select { |k, _| %w(alg use kid).include?(k) })
-      end
+      end)
     end
 
     # Retrieve the present key
@@ -104,7 +104,7 @@ module Canvas::Security
     end
 
     def consul_proxy
-      @consul_proxy ||= Canvas::DynamicSettings.kv_proxy(@prefix, tree: :store)
+      @consul_proxy ||= DynamicSettings.kv_proxy(@prefix, tree: :store)
     end
 
     def self.max_cache_age
@@ -112,7 +112,7 @@ module Canvas::Security
     end
 
     def self.new_key
-      Canvas::Security::RSAKeyPair.new.to_jwk.to_json
+      CanvasSecurity::RSAKeyPair.new.to_jwk.to_json
     end
   end
 end

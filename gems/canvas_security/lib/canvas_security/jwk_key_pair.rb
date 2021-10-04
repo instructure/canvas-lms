@@ -17,19 +17,22 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+module CanvasSecurity
+  class JWKKeyPair
+    attr_reader :public_key, :private_key, :alg, :use
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
-
-describe Canvas::Security::RSAKeyPair do
-  describe "initialize" do
-    it 'generates a public key of default size 2048' do
-      keys = Canvas::Security::RSAKeyPair.new
-      expect(/\d+/.match(keys.public_key.to_text())[0]).to eq "2048"
+    def to_jwk
+      private_key.to_jwk(kid: kid, alg: alg, use: use)
     end
 
-    it 'generates a private key of default size 2048' do
-      keys = Canvas::Security::RSAKeyPair.new
-      expect(/\d+/.match(keys.private_key.to_text())[0]).to eq "2048"
+    def public_jwk
+      private_key.public_key.to_jwk(kid: kid, alg: alg, use: use)
+    end
+
+    private
+
+    def kid
+      @kid ||= "#{Time.now.utc.iso8601}_#{SecureRandom.uuid}"
     end
   end
 end

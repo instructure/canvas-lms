@@ -19,7 +19,7 @@
 #
 require 'openssl'
 
-module Canvas::Security
+module CanvasSecurity
   class RSAKeyPair < JWKKeyPair
     KTY = 'RSA'.freeze
     ALG = 'RS256'.freeze

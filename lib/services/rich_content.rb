@@ -23,12 +23,14 @@ module Services
       env_hash = service_settings.dup
       if user && domain
         begin
-          env_hash[:JWT] = Canvas::Security::ServicesJwt.for_user(
+          env_hash[:JWT] = CanvasSecurity::ServicesJwt.for_user(
             domain,
             user,
             context: context,
             real_user: real_user,
-            workflows: [:rich_content, :ui]
+            workflows: [:rich_content, :ui],
+            # TODO: remove this once we teach the rcs to consume the asymmetric ones
+            symmetric: true
           )
         rescue Canvas::Security::InvalidJwtKey => exception
           Canvas::Errors.capture_exception(:jwt, exception)
