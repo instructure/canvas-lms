@@ -412,7 +412,7 @@ describe DiscussionTopicsController do
       end
 
       context "podcast_enabled" do
-        it "adds podcast_url to header" do
+        it "adds Discussion Podcast Feed to header" do
           discussion.podcast_enabled = true
           discussion.save
 
@@ -420,6 +420,12 @@ describe DiscussionTopicsController do
           expect(response.to_a.to_s).to match(/.+enrollment.+\.rss/)
           expect(response.to_a.to_s).to include("Discussion Podcast Feed")
         end
+      end
+
+      it "adds Discussion Atom Feed to header" do
+        subject
+        expect(response.to_a.to_s).to match(/.+enrollment.+\.atom/)
+        expect(response.to_a.to_s).to include("Discussion Atom Feed")
       end
     end
 
