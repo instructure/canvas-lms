@@ -1399,7 +1399,8 @@ QUnit.module('EditView: Quizzes 2', {
     this.view = editView({
       html_url: 'http://foo',
       submission_types: ['external_tool'],
-      is_quiz_lti_assignment: true
+      is_quiz_lti_assignment: true,
+      frozen_attributes: ['submission_types']
     })
   },
   teardown() {
@@ -1432,6 +1433,18 @@ test('save routes to cancelLocation', function () {
 
 test('build adds full_width display param to normal route', function () {
   equal(this.view.locationAfterSave({}), 'http://foo?display=full_width')
+})
+
+test('does not allow user to change submission type', function () {
+  equal(this.view.$('#assignment_submission_type').prop('disabled'), true)
+})
+
+test('does not allow user to change external tool url', function () {
+  equal(this.view.$('#assignment_external_tool_tag_attributes_url').prop('disabled'), true)
+})
+
+test('does not allow user to choose a new external tool', function () {
+  equal(this.view.$('#assignment_external_tool_tag_attributes_url_find').prop('disabled'), true)
 })
 
 QUnit.module('EditView: anonymous grading', hooks => {

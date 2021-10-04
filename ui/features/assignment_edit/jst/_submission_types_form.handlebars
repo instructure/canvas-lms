@@ -245,7 +245,8 @@
               <input id="assignment_external_tool_tag_attributes_url" class="ic-Input" name="external_tool_tag_attributes[url]"
                 type="url" value="{{externalToolUrl}}" placeholder="http://www.example.com/launch" {{disabledIfIncludes
                 frozenAttributes "submission_types"}} />
-              <button class="Button" id="assignment_external_tool_tag_attributes_url_find" type="button">
+              <button class="Button" id="assignment_external_tool_tag_attributes_url_find" type="button" {{disabledIfIncludes
+                frozenAttributes "submission_types"}}>
                 {{#t}}Find{{/t}}
               </button>
               {{#if submissionTypesFrozen}}
