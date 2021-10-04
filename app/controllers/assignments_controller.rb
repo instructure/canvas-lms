@@ -99,7 +99,8 @@ class AssignmentsController < ApplicationController
   def render_a2_student_view?
     @current_user.present? && @assignment.a2_enabled? && !can_do(@context, @current_user, :read_as_admin) &&
       (!params.key?(:assignments_2) || value_to_boolean(params[:assignments_2])) &&
-      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true")
+      (!@context_enrollment&.observer? || Setting.get("assignments_2_observer_view", "false") == "true") &&
+      @current_user_submission&.submission_type != 'basic_lti_launch'
   end
 
   def a2_active_student_and_enrollment
