@@ -104,8 +104,10 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+  if (env.RSPECQ_ENABLED == '1') {
+    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
+  }
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
