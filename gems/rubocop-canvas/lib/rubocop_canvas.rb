@@ -41,7 +41,6 @@ require 'rubocop_canvas/cops/migration/delay'
 ## rails
 require 'rubocop_canvas/cops/rails/smart_time_zone'
 ## specs
-require 'rubocop_canvas/cops/specs/no_before_all'
 require 'rubocop_canvas/cops/specs/no_before_once_stubs'
 require 'rubocop_canvas/cops/specs/no_disable_implicit_wait.rb'
 require 'rubocop_canvas/cops/specs/ensure_spec_extension'
