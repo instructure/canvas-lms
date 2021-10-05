@@ -22,7 +22,7 @@ require 'spec_helper'
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:account) { Account.create! }
   let(:course) do
-    course_with_student(account: account, active_all: true)
+    course_with_student(account: account)
     @course
   end
   let(:student) { course.student_enrollments.first.user }
@@ -107,8 +107,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
           'service_offered' => []
         }
       },
-      lti_version: '1',
-      subscription_id: overrides[:add_subscription_id] && SecureRandom.uuid
+      lti_version: '1'
     )
 
     Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
