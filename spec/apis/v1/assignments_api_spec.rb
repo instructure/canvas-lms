@@ -2057,8 +2057,6 @@ describe AssignmentsApiController, type: :request do
     context 'LTI 2.x' do
       include_context 'lti2_spec_helper'
 
-      let(:root_account) { account.root_account }
-      let(:course) { Course.create!(name: 'test course', account: account) }
       let(:teacher) { teacher_in_course(course: course) }
 
       it "checks for tool installation in entire account chain" do
@@ -2102,10 +2100,32 @@ describe AssignmentsApiController, type: :request do
         let(:lookups) { assignment.assignment_configuration_tool_lookups }
 
         before do
-          allow_any_instance_of(AssignmentConfigurationToolLookup).to(
-            receive(:create_subscription).and_return(SecureRandom.uuid)
-          )
           user_session(@user)
+        end
+
+        it 'shows webhook subscription information on the assignment with ?include[]=include_webhook_info' do
+          tool_proxy.update(subscription_id: SecureRandom.uuid)
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{course.id}/assignments/#{assignment.id}.json",
+            { controller: "assignments_api", action: "show",
+              format: "json", course_id: course.id.to_s,
+              id: assignment.id.to_s, include: 'webhook_info' }
+          )
+          expect(json['webhook_info']).to eq(
+            {
+              'product_code' => product_family.product_code,
+              'vendor_code' => product_family.vendor_code,
+              'resource_type_code' => 'code',
+              'tool_proxy_id' => tool_proxy.id,
+              'tool_proxy_created_at' => tool_proxy.created_at.iso8601,
+              'tool_proxy_updated_at' => tool_proxy.updated_at.iso8601,
+              'tool_proxy_name' => tool_proxy.name,
+              'tool_proxy_context_type' => tool_proxy.context_type,
+              'tool_proxy_context_id' => tool_proxy.context_id,
+              'subscription_id' => tool_proxy.subscription_id,
+            }
+          )
         end
 
         context 'when changing the workflow state' do

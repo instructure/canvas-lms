@@ -42,6 +42,7 @@ class PseudonymsController < ApplicationController
   # @response_field authentication_provider_type The type of the authentication
   #                 provider that this login is associated with
   # @response_field workflow_state The current status of the login
+  # @response_field declared_user_type The declared intention for this user's role
   #
   # @example_response
   #   [
@@ -53,7 +54,8 @@ class PseudonymsController < ApplicationController
   #       "user_id": 2,
   #       "authentication_provider_id": 1,
   #       "authentication_provider_type": "facebook",
-  #       "workflow_state": "active"
+  #       "workflow_state": "active",
+  #       "declared_user_type": null,
   #     }
   #   ]
   def index
@@ -218,6 +220,21 @@ class PseudonymsController < ApplicationController
   #   provider, or the type of the provider (in which case, it will find the
   #   first matching provider).
   #
+  # @argument login[declared_user_type] [String]
+  #   The declared intention of the user type. This can be set, but does
+  #   not change any Canvas functionality with respect to their access.
+  #   A user can still be a teacher, admin, student, etc. in any particular
+  #   context without regard to this setting. This can be used for
+  #   administrative purposes for integrations to be able to more easily
+  #   identify why the user was created.
+  #   Valid values are:
+  #     * administrative
+  #     * observer
+  #     * staff
+  #     * student
+  #     * student_other
+  #     * teacher
+  #
   # @example_request
   #
   #   #create a facebook login for user with ID 123
@@ -310,6 +327,21 @@ class PseudonymsController < ApplicationController
   # @argument login[workflow_state] [String, "active"|"suspended"]
   #   Used to suspend or re-activate a login.
   #
+  # @argument login[declared_user_type] [String]
+  #   The declared intention of the user type. This can be set, but does
+  #   not change any Canvas functionality with respect to their access.
+  #   A user can still be a teacher, admin, student, etc. in any particular
+  #   context without regard to this setting. This can be used for
+  #   administrative purposes for integrations to be able to more easily
+  #   identify why the user was created.
+  #   Valid values are:
+  #     * administrative
+  #     * observer
+  #     * staff
+  #     * student
+  #     * student_other
+  #     * teacher
+  #
   # @example_request
   #   curl https://<canvas>/api/v1/accounts/:account_id/logins/:login_id \
   #     -H "Authorization: Bearer <ACCESS-TOKEN>" \
@@ -326,6 +358,7 @@ class PseudonymsController < ApplicationController
   #     "integration_id": null,
   #     "authentication_provider_id": null,
   #     "workflow_state": "active",
+  #     "declared_user_type": "teacher"
   #   }
   def update
     if api_request?
@@ -423,6 +456,7 @@ class PseudonymsController < ApplicationController
       :authentication_provider_id,
       :integration_id,
       :workflow_state,
+      :declared_user_type
     ).blank?
       render json: nil, status: :bad_request
       return false
@@ -439,6 +473,10 @@ class PseudonymsController < ApplicationController
 
     has_right_if_requests_change(:authentication_provider, :update) do
       @pseudonym.authentication_provider = params[:pseudonym][:authentication_provider]
+    end or return false
+
+    has_right_if_requests_change(:declared_user_type, :update) do
+      @pseudonym.declared_user_type = params[:pseudonym][:declared_user_type]
     end or return false
 
     has_right_if_requests_change(:sis_user_id, :manage_sis) do

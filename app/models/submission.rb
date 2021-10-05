@@ -69,8 +69,7 @@ class Submission < ActiveRecord::Base
                 :skip_grade_calc,
                 :grade_posting_in_progress,
                 :score_unchanged
-  attr_writer :versioned_originality_reports,
-              :text_entry_originality_reports
+  attr_writer :versioned_originality_reports
   # This can be set to true to force late policy behaviour that would
   # be skipped otherwise. See #late_policy_relevant_changes? and
   # #score_late_or_none. It is reset to false in an after save so late
@@ -331,6 +330,7 @@ class Submission < ActiveRecord::Base
   # validation. Otherwise if we place it in any earlier (e.g.
   # before/after_initialize), every Submission.new will make database calls.
   before_validation :set_anonymous_id, if: :new_record?
+  before_save :set_late_policy_attributes
   before_save :apply_late_policy, if: :late_policy_relevant_changes?
   before_save :update_if_pending
   before_save :validate_single_submission, :infer_values
@@ -790,34 +790,24 @@ class Submission < ActiveRecord::Base
       hash[originality_report.asset_key] = {
         similarity_score: originality_report.originality_score&.round(2),
         state: originality_report.state,
+        attachment_id: originality_report.attachment_id,
         report_url: originality_report.originality_report_url,
         status: originality_report.workflow_state,
-        error_message: originality_report.error_message
+        error_message: originality_report.error_message,
+        created_at: originality_report.created_at,
+        updated_at: originality_report.updated_at,
       }
     end
-    ret_val = turnitin_data.merge(data)
-    ret_val.delete(:provider)
-    ret_val
+    turnitin_data.except(:webhook_info, :provider, :last_processed_attempt).merge(data)
   end
 
-  def text_entry_originality_reports
-    @text_entry_originality_reports ||= begin
-      if self.association(:originality_reports).loaded?
-        originality_reports.select { |o| o.attachment_id.blank? }
-      else
-        originality_reports.where(attachment_id: nil)
-      end
-    end
-  end
-
-  # Returns an array of both the versioned originality reports (those with attachments) and
-  # text_entry_originality_reports in a sorted order. The ordering goes from least preferred
-  # report to most preferred reports, assuming there are reports that share the same submission and
-  # attachment combination. Otherwise, the ordering can be safely ignored.
+  # Returns an array of the versioned originality reports in a sorted order. The ordering goes
+  # from least preferred report to most preferred reports, assuming there are reports that share
+  # the same submission and attachment combination. Otherwise, the ordering can be safely ignored.
   #
   # @return [Array<OriginalityReport>]
   def originality_reports_for_display
-    (versioned_originality_reports + text_entry_originality_reports).uniq.sort_by do |report|
+    versioned_originality_reports.uniq.sort_by do |report|
       [OriginalityReport::ORDERED_VALID_WORKFLOW_STATES.index(report.workflow_state) || -1, report.updated_at]
     end
   end
@@ -854,8 +844,7 @@ class Submission < ActiveRecord::Base
   end
 
   def has_originality_report?
-    versioned_originality_reports.present? ||
-      text_entry_originality_reports.present?
+    versioned_originality_reports.present?
   end
 
   def all_versioned_attachments
@@ -925,8 +914,7 @@ class Submission < ActiveRecord::Base
     # check to see if the score is stale, if so, fetch it again
     update_scores = false
     if Canvas::Plugin.find(:vericite).try(:enabled?) && !self.readonly? && lookup_data
-      self.vericite_data_hash.keys.each do |asset_string|
-        data = self.vericite_data_hash[asset_string]
+      self.vericite_data_hash.each_value do |data|
         next unless data && data.is_a?(Hash) && data[:object_id]
 
         update_scores = update_scores || vericite_recheck_score(data)
@@ -990,8 +978,7 @@ class Submission < ActiveRecord::Base
     # flag to make sure that all scores are just updates and not new
     recheck_score_all = true
     data_changed = false
-    self.vericite_data_hash.keys.each do |asset_string|
-      data = self.vericite_data_hash[asset_string]
+    self.vericite_data_hash.each do |asset_string, data|
       # keep track whether the score state changed
       data_orig = data.dup
       next unless data && data.is_a?(Hash) && data[:object_id]
@@ -1425,13 +1412,6 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    self.seconds_late_override = nil unless late_policy_status == 'late'
-    if self.excused_changed? && self.excused
-      self.late_policy_status = nil
-      self.seconds_late_override = nil
-    elsif self.late_policy_status_changed? && self.late_policy_status.present?
-      self.excused = false
-    end
     self.submitted_at ||= Time.now if self.has_submission?
     self.quiz_submission.reload if self.quiz_submission_id
     self.workflow_state = 'submitted' if self.unsubmitted? && self.submitted_at
@@ -1726,16 +1706,13 @@ class Submission < ActiveRecord::Base
   end
 
   def versioned_originality_reports
-    @versioned_originality_reports ||= begin
-      attachment_ids = attachment_ids_for_version
-      return [] if attachment_ids.empty?
-
-      if self.association(:originality_reports).loaded?
-        originality_reports.select { |o| attachment_ids.include?(o.attachment_id) }
-      else
-        originality_reports.where(attachment_id: attachment_ids)
-      end
-    end
+    @versioned_originality_reports ||=
+      # turns out the database stores timestamps with 9 decimal places, but Ruby/Rails only serves
+      # up 6.  however, submission versions (when deserialized into a Submission model) like to
+      # show 9. and apparently to_f rounds, but iso8601 doesn't
+      # it would be better if we saved the attempt number on the originality report and matched
+      # them up that way
+      originality_reports.select { |o| o.submission_time&.iso8601(6) == submitted_at&.iso8601(6) }
   end
 
   def versioned_attachments
@@ -1794,32 +1771,19 @@ class Submission < ActiveRecord::Base
   # submissions (avoids having O(N) originality report queries)
   # NOTE: all submissions must belong to the same shard
   def self.bulk_load_versioned_originality_reports(submissions)
-    attachment_ids_by_submission_and_index = group_attachment_ids_by_submission_and_index(submissions)
-    bulk_attachment_ids = attachment_ids_by_submission_and_index.values.flatten
-
-    reports_by_attachment_id = if bulk_attachment_ids.empty?
-                                 {}
-                               else
-                                 OriginalityReport.where(
-                                   submission_id: submissions.map(&:id), attachment_id: bulk_attachment_ids
-                                 ).group_by(&:attachment_id)
-                               end
-
-    submissions.each_with_index do |s, index|
-      s.versioned_originality_reports =
-        reports_by_attachment_id.values_at(*attachment_ids_by_submission_and_index[[s, index]]).flatten.compact
+    reports = originality_reports_by_submission_id_submission_time(submissions)
+    submissions.each do |s|
+      s.versioned_originality_reports = reports.dig(s.id, s.submitted_at&.iso8601(6))
     end
   end
 
-  def self.bulk_load_text_entry_originality_reports(submissions)
-    submissions = Array(submissions)
-    submission_ids = submissions.map(&:id)
-
-    reports_by_submission =
-      OriginalityReport.where(submission_id: submission_ids, attachment_id: nil).group_by(&:submission_id)
-
-    submissions.each do |s|
-      s.text_entry_originality_reports = reports_by_submission[s.id] || []
+  def self.originality_reports_by_submission_id_submission_time(submissions)
+    reports = OriginalityReport.where(submission_id: submissions)
+    reports.each_with_object({}) do |report, hash|
+      report_submission_time = report.submission_time.iso8601(6)
+      hash[report.submission_id] ||= {}
+      hash[report.submission_id][report_submission_time] ||= []
+      hash[report.submission_id][report_submission_time] << report
     end
   end
 
@@ -2442,6 +2406,7 @@ class Submission < ActiveRecord::Base
   def self.json_serialization_full_parameters(additional_parameters = {})
     includes = { :quiz_submission => {} }
     methods = [:submission_history, :attachments, :entered_score, :entered_grade]
+    methods << :word_count if Account.site_admin.feature_enabled?(:word_count_in_speed_grader)
     methods << (additional_parameters.delete(:comments) || :submission_comments)
     excepts = additional_parameters.delete :except
 
@@ -2835,7 +2800,25 @@ class Submission < ActiveRecord::Base
     end
   end
 
+  def word_count
+    return nil unless body
+
+    tinymce_wordcount_count_regex = /[\w\u2019\x27\-\u00C0-\u1FFF]+/
+    @word_count ||= ActionController::Base.helpers.strip_tags(body).scan(tinymce_wordcount_count_regex).size
+  end
+
   private
+
+  def set_late_policy_attributes
+    self.seconds_late_override = nil unless late_policy_status == 'late'
+
+    if will_save_change_to_excused?(to: true)
+      self.late_policy_status = nil
+      self.seconds_late_override = nil
+    elsif will_save_change_to_late_policy_status? && late_policy_status.present?
+      self.excused = false
+    end
+  end
 
   def reset_redo_request
     self.redo_request = false if self.redo_request && self.attempt_changed?

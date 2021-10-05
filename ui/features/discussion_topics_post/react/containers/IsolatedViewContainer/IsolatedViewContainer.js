@@ -188,14 +188,7 @@ export const IsolatedViewContainer = props => {
   }
 
   const onOpenInSpeedGrader = discussionEntry => {
-    window.open(
-      getSpeedGraderUrl(
-        window.ENV?.course_id,
-        props.discussionTopic.assignment._id,
-        discussionEntry.author._id
-      ),
-      '_blank'
-    )
+    window.open(getSpeedGraderUrl(discussionEntry.author._id), '_blank')
   }
 
   const onReplySubmit = (message, replyId, includeReplyPreview) => {
@@ -243,19 +236,22 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId:
-        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
+      ...(props.relativeEntryId &&
+        props.relativeEntryId !== props.discussionEntryId && {
+          relativeEntryId: props.relativeEntryId
+        }),
       includeRelativeEntry: !!props.relativeEntryId
     }
   })
 
   const isolatedEntryNewerDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
+    skip: !props.relativeEntryId,
     variables: {
       discussionEntryID: props.discussionEntryId,
       first: 0,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId: props.relativeEntryId,
+      ...(props.relativeEntryId && {relativeEntryId: props.relativeEntryId}),
       includeRelativeEntry: false,
       beforeRelativeEntry: false
     }

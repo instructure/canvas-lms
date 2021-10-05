@@ -27,8 +27,9 @@ export const initialState: UIState = {
   selectedContextType: 'Course',
   selectedContextId: window.ENV.COURSE?.id || '',
   loadingMessage: '',
-  showLoadingOverlay: false,
   editingBlackoutDates: false,
+  showLoadingOverlay: false,
+  responsiveSize: 'large',
   showProjections: false,
   adjustingHardEndDatesAfter: undefined
 }
@@ -42,6 +43,7 @@ export const getPlanPublishing = (state: StoreState) => state.ui.planPublishing
 export const getSelectedContextType = (state: StoreState) => state.ui.selectedContextType
 export const getSelectedContextId = (state: StoreState) => state.ui.selectedContextId
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
+export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
 export const getShowProjections = (state: StoreState) => state.ui.showProjections
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
@@ -72,6 +74,8 @@ export default (state = initialState, action: UIAction): UIState => {
         selectedContextType: action.payload.contextType,
         selectedContextId: action.payload.contextId
       }
+    case UIConstants.SET_RESPONSIVE_SIZE:
+      return {...state, responsiveSize: action.payload}
     case UIConstants.SHOW_LOADING_OVERLAY:
       return {...state, showLoadingOverlay: true, loadingMessage: action.payload}
     case UIConstants.HIDE_LOADING_OVERLAY:

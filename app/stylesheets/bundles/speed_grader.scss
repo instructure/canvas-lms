@@ -932,3 +932,13 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
 #library-suggestions {
   float: direction(right);
 }
+
+.secondary_mount_point_container {
+  position: relative;
+
+  #speed_grader_edit_status_secondary_mount_point {
+    position: absolute;
+    right: 24px;
+    top: 33px;
+  }
+}

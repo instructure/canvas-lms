@@ -20,11 +20,23 @@
 
 module Canvas::Plugins::Validators::SessionsValidator
   def self.validate(settings, plugin_setting)
-    timeout = settings["session_timeout"].to_f.minutes
-    if timeout.to_i < 20.minutes.to_i
-      plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.login_expiration_minimum', 'Session expiration must be 20 minutes or greater'))
-    else
-      settings.to_hash.with_indifferent_access
+    settings_keys = %w[session_timeout mobile_timeout]
+    result = {}
+    settings_keys.each do |key|
+      if settings[key].blank?
+        result[key] = nil
+        next
+      end
+
+      timeout = settings[key].to_f.minutes
+      if timeout.to_i < 20.minutes.to_i
+        plugin_setting.errors.add(:base, I18n.t('canvas.plugins.errors.login_expiration_minimum',
+                                                'Session expiration must be 20 minutes or greater'))
+      end
+      result[key] = timeout.to_i / 60
     end
+    return unless plugin_setting.errors.empty?
+
+    result.with_indifferent_access
   end
 end

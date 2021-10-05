@@ -3054,6 +3054,34 @@ describe Course, "tabs_available" do
       expect(tabs).not_to be_include("Item Banks")
     end
 
+    context "when 'Item Banks' has been added to the course navigation links" do
+      let!(:quiz_lti_tool) do
+        @course.context_external_tools.create!(
+          :url => "http://example.com/ims/lti",
+          :consumer_key => "asdf",
+          :shared_secret => "hjkl",
+          :name => "external tool 1",
+          :course_navigation => {
+            :text => "Item Banks",
+            :url => "http://example.com/ims/lti",
+            :default => false,
+          }
+        )
+      end
+
+      before do
+        @course.update!(tab_configuration: [{ :id => "context_external_tool_#{quiz_lti_tool.id}" }])
+      end
+
+      it "does not make the item banks tab available for students" do
+        external_tool_tabs = @course.external_tool_tabs({}, @user).pluck(:label)
+        expect(external_tool_tabs).to include("Item Banks")
+
+        available_tabs = @course.tabs_available(@user, include_external: true).pluck(:label)
+        expect(available_tabs).not_to include("Item Banks")
+      end
+    end
+
     it 'sets the target value on the tab if the external tool has a windowTarget' do
       tool = @course.context_external_tools.create!(
         :url => "http://example.com/ims/lti",

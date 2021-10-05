@@ -25,16 +25,25 @@ import {
   MOCK_GRADING_PERIODS_EMPTY,
   MOCK_GRADING_PERIODS_NORMAL,
   MOCK_ASSIGNMENT_GROUPS,
-  MOCK_ENROLLMENTS
+  MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS,
+  MOCK_ENROLLMENTS,
+  MOCK_ENROLLMENTS_WITH_OBSERVED_USERS
 } from './mocks'
 
 const GRADING_PERIODS_URL = encodeURI(
   '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores'
 )
+const OBSERVER_GRADING_PERIODS_URL = encodeURI(
+  '/api/v1/courses/12?include[]=grading_periods&include[]=current_grading_period_scores&include[]=total_scores&include[]=observed_users'
+)
 const ASSIGNMENT_GROUPS_URL = encodeURI(
   '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments'
 )
+const OBSERVER_ASSIGNMENT_GROUPS_URL = encodeURI(
+  '/api/v1/courses/12/assignment_groups?include[]=assignments&include[]=submission&include[]=read_state&include[]=submission_comments&include[]=observed_users'
+)
 const ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1'
+const OBSERVER_ENROLLMENTS_URL = '/api/v1/courses/12/enrollments?user_id=1&include=observed_users'
 
 describe('GradesPage', () => {
   const getProps = (overrides = {}) => ({
@@ -47,6 +56,7 @@ describe('GradesPage', () => {
       id: '1'
     },
     showLearningMasteryGradebook: false,
+    observedUserId: null,
     ...overrides
   })
 
@@ -308,6 +318,78 @@ describe('GradesPage', () => {
       expect(getByText('Learning outcome gradebook for History')).toBeInTheDocument()
       await waitFor(() => expect(queryByText('Loading outcome results')).not.toBeInTheDocument())
       expect(getByText('An error occurred loading outcomes data.')).toBeInTheDocument()
+    })
+  })
+
+  describe('observer support', () => {
+    beforeEach(() => {
+      fetchMock.get(OBSERVER_GRADING_PERIODS_URL, JSON.stringify(MOCK_GRADING_PERIODS_EMPTY))
+      fetchMock.get(
+        OBSERVER_ASSIGNMENT_GROUPS_URL,
+        JSON.stringify(MOCK_ASSIGNMENT_GROUPS_WITH_OBSERVED_USERS)
+      )
+      fetchMock.get(OBSERVER_ENROLLMENTS_URL, JSON.stringify(MOCK_ENROLLMENTS_WITH_OBSERVED_USERS))
+    })
+
+    it('only shows assignment details for the observed user', async () => {
+      const {getByText, rerender} = render(<GradesPage {...getProps({observedUserId: '5'})} />)
+      let formattedSubmittedDate = tz.format(
+        '2021-09-20T23:55:08Z',
+        'date.formats.full_with_weekday'
+      )
+      await waitFor(() => {
+        ;[
+          'Assignment 3',
+          `Submitted ${formattedSubmittedDate}`,
+          'Assignments',
+          '6 pts',
+          'Out of 10 pts'
+        ].forEach(label => {
+          expect(getByText(label)).toBeInTheDocument()
+        })
+      })
+      formattedSubmittedDate = tz.format('2021-09-22T21:25:08Z', 'date.formats.full_with_weekday')
+      rerender(<GradesPage {...getProps({observedUserId: '6'})} />)
+      ;[
+        'Assignment 3',
+        `Submitted ${formattedSubmittedDate}`,
+        'Assignments',
+        '8 pts',
+        'Out of 10 pts'
+      ].forEach(label => {
+        expect(getByText(label)).toBeInTheDocument()
+      })
+    })
+
+    it('displays fetched course total grade for the observed user', async () => {
+      const {getByText, queryByText, rerender} = render(
+        <GradesPage {...getProps({observedUserId: '5'})} />
+      )
+
+      await waitFor(() => {
+        expect(getByText('Total: 88.00%')).toBeInTheDocument()
+        expect(getByText('History Total: 88.00%')).toBeInTheDocument()
+        expect(queryByText('Total: 76.20%')).not.toBeInTheDocument()
+      })
+
+      rerender(<GradesPage {...getProps({observedUserId: '6'})} />)
+      await waitFor(() => {
+        expect(getByText('Total: 76.20%')).toBeInTheDocument()
+        expect(getByText('History Total: 76.20%')).toBeInTheDocument()
+        expect(queryByText('Total: 88.00%')).not.toBeInTheDocument()
+      })
+    })
+
+    it('displays assignment group totals for the observed user when expanded', async () => {
+      const {getByText, findByText, queryByText, rerender} = render(
+        <GradesPage {...getProps({observedUserId: '6'})} />
+      )
+      const totalsButton = await findByText('View Assignment Group Totals')
+      expect(queryByText('Assignments: 80.00%')).not.toBeInTheDocument()
+      act(() => totalsButton.click())
+      expect(getByText('Assignments: 80.00%')).toBeInTheDocument()
+      rerender(<GradesPage {...getProps({observedUserId: '5'})} />)
+      expect(getByText('Assignments: 60.00%')).toBeInTheDocument()
     })
   })
 })

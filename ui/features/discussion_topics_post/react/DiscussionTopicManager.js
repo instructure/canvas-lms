@@ -160,10 +160,9 @@ const DiscussionTopicManager = props => {
 
   const updateCache = (cache, result) => {
     try {
-      const lastPage = discussionTopicQuery.data.legacyNode.entriesTotalPages - 1
       const options = {
         query: DISCUSSION_QUERY,
-        variables: {...variables, page: btoa(lastPage * PER_PAGE)}
+        variables: {...variables}
       }
       const newDiscussionEntry = result.data.createDiscussionEntry.discussionEntry
       const currentDiscussion = JSON.parse(JSON.stringify(cache.readQuery(options)))
