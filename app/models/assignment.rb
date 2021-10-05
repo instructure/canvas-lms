@@ -2007,7 +2007,14 @@ class Assignment < ActiveRecord::Base
 
   def associated_tool_proxy
     actl = assignment_configuration_tool_lookups.take
-    actl&.associated_tool_proxy
+    return unless actl
+
+    Lti::ToolProxy.proxies_in_order_by_codes(
+      context: self.course,
+      vendor_code: actl.tool_vendor_code,
+      product_code: actl.tool_product_code,
+      resource_type_code: actl.tool_resource_type_code
+    ).first
   end
 
   def save_grade_to_submission(submission, original_student, group, opts)
@@ -2217,7 +2224,6 @@ class Assignment < ActiveRecord::Base
     raise "Student Required" unless original_student
 
     eula_timestamp = opts[:eula_agreement_timestamp]
-    webhook_info = assignment_configuration_tool_lookups.take&.webhook_info
 
     if opts[:submission_type] == "student_annotation"
       raise "Invalid Attachment" if opts[:annotatable_attachment_id].blank?
@@ -2270,12 +2276,6 @@ class Assignment < ActiveRecord::Base
         homework.lti_user_id = homework_lti_user_id_hash[student_id]
         homework.turnitin_data[:eula_agreement_timestamp] = eula_timestamp if eula_timestamp.present?
         homework.resource_link_lookup_uuid = opts[:resource_link_lookup_uuid]
-
-        if webhook_info
-          homework.turnitin_data[:webhook_info] = webhook_info
-        else
-          homework.turnitin_data.delete(:webhook_info)
-        end
 
         if self.annotated_document?
           annotation_context = homework.annotation_context(draft: true)

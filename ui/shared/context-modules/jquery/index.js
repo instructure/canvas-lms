@@ -979,7 +979,7 @@ const newPillMessage = function($module, requirement_count) {
   }
 }
 
-modules.initModuleManagement = function(duplicate) {
+modules.initModuleManagement = function() {
   // Create the context modules backbone view to manage the publish button.
   const context_modules_view = new ContextModulesView({
     el: $('#content'),
@@ -1444,7 +1444,7 @@ modules.initModuleManagement = function(duplicate) {
           $('.context_module')
             .find('.expand_module_link,.collapse_module_link')
             .bind('click keyclick', toggleModuleCollapse)
-          modules.initModuleManagement($newModule)
+          modules.initModuleManagement()
         })
         .catch(showFlashError(I18n.t('Error rendering duplicated module')))
     }
@@ -2254,9 +2254,7 @@ modules.initModuleManagement = function(duplicate) {
     moduleItems[contentKey].push({model, view})
   }
 
-  var parent = duplicate || $('#context_modules')
-
-  parent.find('.publish-icon').each((index, el) => {
+  $('.publish-icon').each((index, el) => {
     const $el = $(el)
     if ($el.data('id')) {
       const view = initPublishButton($el)
@@ -2596,7 +2594,7 @@ $(document).ready(function() {
   }
 
   if ($('#context_modules').hasClass('editable')) {
-    requestAnimationFrame(() => { modules.initModuleManagement() })
+    requestAnimationFrame(modules.initModuleManagement)
     modules.loadMasterCourseData()
   }
 
