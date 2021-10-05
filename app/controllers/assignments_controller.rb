@@ -117,9 +117,9 @@ class AssignmentsController < ApplicationController
 
   def render_a2_student_view(student:)
     submission = @assignment.submissions.find_by(user: student)
-    graphql_submisison_id = nil
+    graphql_submission_id = nil
     if submission
-      graphql_submisison_id = CanvasSchema.id_from_object(
+      graphql_submission_id = CanvasSchema.id_from_object(
         submission,
         CanvasSchema.resolve_type(nil, submission, nil),
         nil
@@ -164,7 +164,7 @@ class AssignmentsController < ApplicationController
              CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
              COURSE_ID: @context.id,
              PREREQS: assignment_prereqs,
-             SUBMISSION_ID: graphql_submisison_id
+             SUBMISSION_ID: graphql_submission_id
            })
     css_bundle :assignments_2_student
     js_bundle :assignments_show_student

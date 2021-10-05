@@ -298,6 +298,19 @@ describe('CommentsTrayBody', () => {
     expect(await waitFor(() => queryByLabelText('Comment input box'))).not.toBeInTheDocument()
   })
 
+  it('does not render CommentTextArea when an observer is viewing the submission', async () => {
+    const mocks = [await mockSubmissionCommentQuery()]
+    const props = await mockAssignmentAndSubmission()
+    const {queryByLabelText} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
+        <MockedProvider mocks={mocks}>
+          <CommentsTrayBody {...props} />
+        </MockedProvider>
+      </StudentViewContext.Provider>
+    )
+    expect(await waitFor(() => queryByLabelText('Comment input box'))).not.toBeInTheDocument()
+  })
+
   it('notifies user when comment successfully sent', async () => {
     const mocks = await Promise.all([mockSubmissionCommentQuery(), mockCreateSubmissionComment()])
     const props = await mockAssignmentAndSubmission()

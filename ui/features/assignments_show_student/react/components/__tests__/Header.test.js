@@ -367,6 +367,16 @@ describe('Add Comment/View Feedback button', () => {
     expect(getByText('Add Comment')).toBeInTheDocument()
   })
 
+  it('renders as "View Feedback" for observers', async () => {
+    const props = await mockAssignmentAndSubmission()
+    const {getByText} = render(
+      <StudentViewContext.Provider value={{allowChangesToSubmission: false, isObserver: true}}>
+        <Header {...props} />
+      </StudentViewContext.Provider>
+    )
+    expect(getByText('View Feedback')).toBeInTheDocument()
+  })
+
   it('renders as "View Feedback" if feedback exists', async () => {
     const props = await mockAssignmentAndSubmission({
       Submission: {feedbackForCurrentAttempt: true}
