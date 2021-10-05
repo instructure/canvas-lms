@@ -53,7 +53,7 @@ pipeline {
               sh 'build/new-jenkins/test-engines.sh'
             }
 
-            extendedStage('Pulsar').obeysAllowStages(false).timeout(10).execute {
+            extendedStage('Pulsar').obeysAllowStages(false).required(false).timeout(10).execute {
               withEnv([
                   'COMPOSE_FILE=docker-compose.new-jenkins.yml:docker-compose.new-jenkins.vendored-gems.yml:docker-compose.new-jenkins.pulsar.yml'
               ]) {
