@@ -157,7 +157,7 @@ class AuthenticationProvider < ActiveRecord::Base
     delay_if_production.soft_delete_pseudonyms
     true
   end
-  alias destroy_permanently! destroy
+  alias_method :destroy_permanently!, :destroy
 
   def auth_password=(password)
     return if password.blank?
@@ -213,7 +213,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
     !!settings['mfa_required']
   end
-  alias mfa_required mfa_required?
+  alias_method :mfa_required, :mfa_required?
 
   def mfa_required=(value)
     value = false if account.mfa_settings == :disabled

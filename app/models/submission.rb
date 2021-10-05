@@ -83,7 +83,7 @@ class Submission < ActiveRecord::Base
   belongs_to :course, inverse_of: :submissions
   has_many :observer_alerts, as: :context, inverse_of: :context, dependent: :destroy
   belongs_to :user
-  alias student user
+  alias_method :student, :user
   belongs_to :grader, :class_name => 'User'
   belongs_to :grading_period
   belongs_to :group
@@ -249,7 +249,7 @@ class Submission < ActiveRecord::Base
     state :graded
     state :deleted
   end
-  alias needs_review? pending_review?
+  alias_method :needs_review?, :pending_review?
 
   delegate :auditable?, to: :assignment, prefix: true
   delegate :can_be_moderated_grader?, to: :assignment, prefix: true
@@ -2323,7 +2323,7 @@ class Submission < ActiveRecord::Base
     def past_due?
       seconds_late > 0
     end
-    alias past_due past_due?
+    alias_method :past_due, :past_due?
 
     def late?
       return false if excused?
@@ -2331,7 +2331,7 @@ class Submission < ActiveRecord::Base
 
       submitted_at.present? && past_due?
     end
-    alias late late?
+    alias_method :late, :late?
 
     def missing?
       return false if excused?
@@ -2341,7 +2341,7 @@ class Submission < ActiveRecord::Base
 
       cached_quiz_lti? || assignment.expects_submission?
     end
-    alias missing missing?
+    alias_method :missing, :missing?
 
     def graded?
       excused || (!!score && workflow_state == 'graded')

@@ -771,7 +771,7 @@ class ApplicationController < ActionController::Base
     render_unauthorized_action unless can_do
     can_do
   end
-  alias :authorized_action? :authorized_action
+  alias_method :authorized_action?, :authorized_action
 
   def fix_ms_office_redirects
     if ms_office?

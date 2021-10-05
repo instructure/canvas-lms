@@ -47,7 +47,7 @@ module AdheresToPolicy
       end
     end
     # alias so its backwards compatible.
-    alias :check_policy :granted_rights
+    alias_method :check_policy, :granted_rights
 
     # Public: Gets the requested rights and their status to a user.
     #

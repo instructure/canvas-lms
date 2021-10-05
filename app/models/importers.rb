@@ -51,7 +51,7 @@ module Importers
 
         self.item_class.translate(*args)
       end
-      alias :t :translate
+      alias_method :t, :translate
 
       def logger(*args)
         raise "Needs self.item_class to be set in #{self}" unless self.item_class

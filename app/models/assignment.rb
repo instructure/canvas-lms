@@ -697,7 +697,7 @@ class Assignment < ActiveRecord::Base
   end
 
   attr_accessor :skip_schedule_peer_reviews
-  alias skip_schedule_peer_reviews? skip_schedule_peer_reviews
+  alias_method :skip_schedule_peer_reviews?, :skip_schedule_peer_reviews
   def needs_auto_peer_reviews_scheduled?
     !skip_schedule_peer_reviews? && peer_reviews? && automatic_peer_reviews? && !peer_reviews_assigned?
   end
@@ -1326,7 +1326,7 @@ class Assignment < ActiveRecord::Base
     state :deleted
   end
 
-  alias destroy_permanently! destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
@@ -3270,7 +3270,7 @@ class Assignment < ActiveRecord::Base
   def gradeable?
     submission_types != 'not_graded' && submission_types != 'wiki_page'
   end
-  alias graded? gradeable?
+  alias_method :graded?, :gradeable?
 
   def gradeable_was?
     submission_types_was != 'not_graded' && submission_types_was != 'wiki_page'
@@ -3616,7 +3616,7 @@ class Assignment < ActiveRecord::Base
     # an unposted submission.
     unposted_anonymous_submissions?
   end
-  alias anonymize_students anonymize_students?
+  alias_method :anonymize_students, :anonymize_students?
 
   def unposted_anonymous_submissions?
     Assignment.preload_unposted_anonymous_submissions([self]) unless defined? @unposted_anonymous_submissions

@@ -170,7 +170,7 @@ class DiscussionTopic < ActiveRecord::Base
   def threaded?
     self.discussion_type == DiscussionTypes::THREADED || context.feature_enabled?("react_discussions_post")
   end
-  alias :threaded :threaded?
+  alias_method :threaded, :threaded?
 
   def discussion_type
     read_attribute(:discussion_type) || DiscussionTypes::SIDE_COMMENT
