@@ -1472,7 +1472,7 @@ class Course < ActiveRecord::Base
     super
   end
 
-  alias destroy_permanently! destroy
+  alias_method :destroy_permanently!, :destroy
   def destroy
     return false if template?
 

@@ -72,12 +72,12 @@ class AccountNotification < ActiveRecord::Base
   def current?
     end_at >= Time.zone.now
   end
-  alias current :current?
+  alias_method :current, :current?
 
   def past?
     end_at < Time.zone.now
   end
-  alias past :past?
+  alias_method :past, :past?
 
   def self.for_user_and_account(user, root_account, include_past: false)
     GuardRail.activate(:secondary) do

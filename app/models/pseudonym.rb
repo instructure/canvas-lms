@@ -495,7 +495,7 @@ class Pseudonym < ActiveRecord::Base
   def changed?
     !strip_inferred_authentication_provider(changed_attribute_names_to_save).empty?
   end
-  alias has_changes_to_save? changed?
+  alias_method :has_changes_to_save?, :changed?
 
   def attribute_names_for_partial_writes
     strip_inferred_authentication_provider(super)

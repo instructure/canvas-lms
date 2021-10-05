@@ -96,7 +96,7 @@ module Factories
     attachment_model({ :content_type => 'application/pdf' }.merge(opts))
   end
 
-  alias :canvadocable_attachment_model :crocodocable_attachment_model
+  alias_method :canvadocable_attachment_model, :crocodocable_attachment_model
 
   def attachment_obj_with_context(obj, opts = {})
     @attachment = factory_with_protected_attributes(Attachment, valid_attachment_attributes.merge(opts))

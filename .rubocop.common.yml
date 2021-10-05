@@ -59,6 +59,8 @@ Lint/RedundantStringCoercion:
   Severity: error
 Lint/RedundantWithIndex:
   Severity: error
+Lint/SafeNavigationConsistency:
+  Enabled: false # https://github.com/rubocop/rubocop/issues/9816
 Lint/SendWithMixinArgument:
   Severity: error
 Lint/SymbolConversion:
@@ -123,8 +125,9 @@ RSpec/StubbedMock:
 Specs/EnsureSpecExtension:
   Exclude:
     - spec/shared_examples/**/*
-Style/AsciiComments:
-  Enabled: false # we have comments in other languages
+Style/Alias:
+  EnforcedStyle: prefer_alias_method # https://github.com/rubocop/ruby-style-guide/issues/821
+  Severity: error
 Style/Documentation:
   Enabled: false # most things don't need to be documented
 Style/Encoding:
@@ -151,11 +154,12 @@ Style/WhileUntilModifier:
 Lint/AmbiguousBlockAssociation: # TODO
   Exclude:
     - spec/**/*
-Lint/UnusedBlockArgument: # TODO maually fix these by removing the argument if possible
+Lint/UnusedBlockArgument: # TODO manually fix these by removing the argument if possible
   Severity: warning
   AutoCorrect: false
-Lint/UnusedMethodArgument: # TODO maually fix these by removing the argument if possible
+Lint/UnusedMethodArgument: # TODO manually fix these by removing the argument if possible
   Severity: warning
+  AllowUnusedKeywordArguments: true # there's no way to mark a kwarg as unused
   AutoCorrect: false
 Lint/UselessAssignment: # TODO
   Severity: warning
