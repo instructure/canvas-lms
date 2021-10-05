@@ -64,7 +64,7 @@ module Workflow
       @scoped_state = new_state
       instance_eval(&events_and_etc) if events_and_etc
     end
-    alias :workflow_state :state
+    alias_method :workflow_state, :state
 
     def event(name, args = {}, &action)
       @scoped_state.events[name.to_sym] =

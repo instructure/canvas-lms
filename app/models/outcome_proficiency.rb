@@ -42,14 +42,14 @@ class OutcomeProficiency < ApplicationRecord
   after_save :clear_cached_proficiencies
   after_save :propagate_changes_to_rubrics
 
-  alias original_destroy_permanently! destroy_permanently!
+  alias_method :original_destroy_permanently!, :destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
     self.outcome_proficiency_ratings.delete_all
     original_destroy_permanently!
   end
 
-  alias original_undestroy undestroy
+  alias_method :original_undestroy, :undestroy
   private :original_undestroy
   def undestroy
     transaction do

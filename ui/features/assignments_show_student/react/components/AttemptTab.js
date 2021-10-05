@@ -18,6 +18,7 @@
 
 import {Alert} from '@instructure/ui-alerts'
 import {Assignment} from '@canvas/assignments/graphql/student/Assignment'
+import axios from '@canvas/axios'
 import {bool, func, string} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -37,6 +38,7 @@ import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y-con
 import StudentViewContext from './Context'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
 import {Text} from '@instructure/ui-text'
+import {uploadFile} from '@canvas/upload-file'
 import {View} from '@instructure/ui-view'
 
 const FilePreview = lazy(() => import('./AttemptType/FilePreview'))
@@ -114,19 +116,135 @@ export default class AttemptTab extends Component {
     uploadingFiles: bool
   }
 
+  state = {
+    filesToUpload: []
+  }
+
   renderFileUpload = () => {
     return (
       <Suspense fallback={<LoadingIndicator />}>
         <FileUpload
           assignment={this.props.assignment}
           createSubmissionDraft={this.props.createSubmissionDraft}
+          filesToUpload={this.state.filesToUpload}
           focusOnInit={this.props.focusAttemptOnInit}
           submission={this.props.submission}
-          updateUploadingFiles={this.props.updateUploadingFiles}
-          uploadingFiles={this.props.uploadingFiles}
+          onCanvasFileRequested={this.onCanvasFileRequested}
+          onUploadRequested={this.onUploadRequested}
         />
       </Suspense>
     )
+  }
+
+  onCanvasFileRequested = ({fileID, onError}) => {
+    this.updateUploadingFiles(async () => {
+      try {
+        await this.createFileUploadSubmissionDraft([fileID])
+      } catch (err) {
+        onError()
+      }
+    })
+  }
+
+  onUploadRequested = ({files, onSuccess, onError}) => {
+    this.setState(
+      {
+        filesToUpload: files.map((file, i) => {
+          const name = file.name || file.title || file.url
+          const _id = `${i}-${file.url || file.name}`
+
+          // As we receive progress events for this upload, we'll update the
+          // "loaded and "total" values. Set some placeholder values so that
+          // we start at 0%.
+          return {_id, index: i, isLoading: true, name, loaded: 0, total: 1}
+        })
+      },
+      onSuccess
+    )
+    this.updateUploadingFiles(async () => {
+      try {
+        const newFiles = await this.uploadFiles(files)
+        await this.createFileUploadSubmissionDraft(newFiles.map(file => file.id))
+      } catch (err) {
+        onError()
+      } finally {
+        this.setState({filesToUpload: []})
+      }
+    })
+  }
+
+  createFileUploadSubmissionDraft = async newFileIDs => {
+    const {submission} = this.props
+    const existingAttachments = submission?.submissionDraft?.attachments || []
+
+    await this.props.createSubmissionDraft({
+      variables: {
+        id: submission.id,
+        activeSubmissionType: 'online_upload',
+        attempt: submission.attempt || 1,
+        fileIds: existingAttachments.map(file => file._id).concat(newFileIDs)
+      }
+    })
+  }
+
+  updateUploadingFiles = async wrappedFunc => {
+    this.props.updateUploadingFiles(true)
+    await wrappedFunc()
+    this.props.updateUploadingFiles(false)
+  }
+
+  uploadFiles = async files => {
+    // This is taken almost verbatim from the uploadFiles method in the
+    // upload-file module.  Rather than calling that method, we call uploadFile
+    // for each file to track progress for the individual uploads.
+    const {assignment} = this.props
+    const uploadUrl = `/api/v1/courses/${assignment.env.courseId}/assignments/${assignment._id}/submissions/${assignment.env.currentUser.id}/files`
+
+    const uploadPromises = []
+    files.forEach((file, i) => {
+      const onProgress = event => {
+        const {loaded, total} = event
+        this.updateUploadProgress({index: i, loaded, total})
+      }
+
+      let promise
+      if (file.url) {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            url: file.url,
+            name: file.title,
+            content_type: file.mediaType,
+            submit_assignment: false
+          },
+          null,
+          axios,
+          onProgress
+        )
+      } else {
+        promise = uploadFile(
+          uploadUrl,
+          {
+            name: file.name,
+            content_type: file.type
+          },
+          file,
+          axios,
+          onProgress
+        )
+      }
+      uploadPromises.push(promise)
+    })
+
+    return Promise.all(uploadPromises)
+  }
+
+  updateUploadProgress = ({index, loaded, total}) => {
+    this.setState(state => {
+      const filesToUpload = [...state.filesToUpload]
+      filesToUpload[index] = {...filesToUpload[index], loaded, total}
+      return {filesToUpload}
+    })
   }
 
   renderFileAttempt = () => {

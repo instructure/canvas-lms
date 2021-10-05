@@ -24,7 +24,7 @@ module Types
     implements Interfaces::LegacyIDInterface
     graphql_name "Term"
 
-    alias term object
+    alias_method :term, :object
 
     global_id_field :id
 

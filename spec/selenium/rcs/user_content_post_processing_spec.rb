@@ -59,12 +59,12 @@ describe 'user_content post processing' do
       # the file link w/o /download
       file_link1 = f('a#link1')
       expect(file_link1).to be_displayed
-      expect(file_link1.attribute('class')).to eq('')
+      expect(file_link1.attribute('class')).to eq('file_preview_link')
       expect(file_link1.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
 
       file_link2 = f('a#link2')
       expect(file_link2).to be_displayed
-      expect(file_link2.attribute('class')).to eq('')
+      expect(file_link2.attribute('class')).to eq('file_preview_link')
       expect(
         file_link2.attribute('href')
       ).to end_with "#{@file_url}/download?wrap=1&verifier=#{@file.uuid}"
@@ -106,7 +106,7 @@ describe 'user_content post processing' do
       # the file link
       file_link = f('a#thelink')
       expect(file_link).to be_displayed
-      expect(file_link.attribute('class')).to eq('inline_disabled')
+      expect(file_link.attribute('class')).to eq('inline_disabled preview_in_overlay')
       expect(file_link.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
 
       # the file inline preview button
@@ -140,9 +140,7 @@ describe 'user_content post processing' do
     end
   end
 
-  describe 'with rce_better_file_previewing flag on' do
-    before(:each) { Account.site_admin.enable_feature!(:rce_better_file_previewing) }
-
+  describe 'rce file link previews' do
     it 'previews files in the FilePreview overlay' do
       create_wiki_page_with_content(
         'page',

@@ -621,12 +621,7 @@ export class DiscussionRow extends Component {
       return null
     }
 
-    return (
-      <SectionsTooltip
-        totalUserCount={this.props.discussion.user_count}
-        sections={this.props.discussion.sections}
-      />
-    )
+    return <SectionsTooltip sections={this.props.discussion.sections} />
   }
 
   renderTitle = () => {

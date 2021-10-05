@@ -166,6 +166,8 @@ class SearchController < ApplicationController
   #   Only return courses that allow self enrollment. Defaults to false.
   #
   def all_courses
+    return render_unauthorized_action unless @domain_root_account.enable_course_catalog?
+
     @courses = Course.where(root_account_id: @domain_root_account)
                      .where(indexed: true)
                      .where(workflow_state: 'available')

@@ -1253,7 +1253,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     self[:require_lockdown_browser] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
-  alias :require_lockdown_browser? :require_lockdown_browser
+  alias_method :require_lockdown_browser?, :require_lockdown_browser
 
   def require_lockdown_browser_for_results
     self.require_lockdown_browser &&
@@ -1261,13 +1261,13 @@ class Quizzes::Quiz < ActiveRecord::Base
       Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
-  alias :require_lockdown_browser_for_results? :require_lockdown_browser_for_results
+  alias_method :require_lockdown_browser_for_results?, :require_lockdown_browser_for_results
 
   def require_lockdown_browser_monitor
     self[:require_lockdown_browser_monitor] && Quizzes::Quiz.lockdown_browser_plugin_enabled?
   end
 
-  alias :require_lockdown_browser_monitor? :require_lockdown_browser_monitor
+  alias_method :require_lockdown_browser_monitor?, :require_lockdown_browser_monitor
 
   def lockdown_browser_monitor_data
     self[:lockdown_browser_monitor_data]

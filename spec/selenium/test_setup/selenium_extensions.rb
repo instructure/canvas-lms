@@ -176,7 +176,7 @@ module SeleniumExtensions
         super
       end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}"
     end
-    alias first find_element
+    alias_method :first, :find_element
 
     def find_elements(*args)
       result = []
@@ -187,7 +187,7 @@ module SeleniumExtensions
       result.present? or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{args.map(&:inspect).join(", ")}"
       result
     end
-    alias all find_elements
+    alias_method :all, :find_elements
 
     class << self
       attr_accessor :timeout

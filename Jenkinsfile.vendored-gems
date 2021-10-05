@@ -61,6 +61,9 @@ pipeline {
                 int retryLimit = 4
                 Boolean stillRunning = true
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull starlord.inscloudgate.net/jenkins/pulsar:latest'
+                // try to give the pulsar container a head start so that if we are retrying the
+                // admin script we aren't also rebooting the pulsar container itself each time.
+                sh 'docker-compose up -d pulsar'
                 while (stillRunning && retries < retryLimit) {
                   try {
                     // sometimes the pulsar container kills itself on boot

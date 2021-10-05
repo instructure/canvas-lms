@@ -26,6 +26,8 @@ require_relative '../pages/k5_schedule_tab_page'
 require_relative '../pages/k5_resource_tab_page'
 require_relative '../../../helpers/k5_common'
 require_relative '../shared_examples/k5_navigation_tabs_shared_examples'
+require_relative '../shared_examples/k5_subject_grades_shared_examples'
+require_relative '../../../helpers/observer_enrollments_helper_spec'
 
 describe "observer k5 dashboard" do
   include_context "in-process server selenium tests"
@@ -36,6 +38,7 @@ describe "observer k5 dashboard" do
   include K5GradesTabPageObject
   include GradebookSetup
   include K5ResourceTabPageObject
+  include ObserverEnrollmentsHelper
 
   before :once do
     Account.site_admin.enable_feature!(:k5_parent_support)
@@ -45,7 +48,7 @@ describe "observer k5 dashboard" do
 
   before :each do
     user_session @observer
-    driver.manage.delete_cookie('k5_observed_user_id')
+    driver.manage.delete_cookie("#{ObserverEnrollmentsHelper::OBSERVER_COOKIE_PREFIX}#{@observer.id}")
   end
 
   context 'single observed student' do
@@ -220,15 +223,6 @@ describe "observer k5 dashboard" do
       expect(schedule_item.text).to include('today assignment1')
     end
 
-    it 'shows late assignment as Missing' do
-      skip("LS-2582 grades not working right now")
-      create_dated_assignment(@subject_course, "assignment 2 missing", 1.day.ago(Time.zone.now), 15)
-
-      get "/courses/#{@subject_course.id}#grades"
-
-      expect(grades_assignments_list[0].text).to include("Missing")
-    end
-
     it 'shows the Important Info for subject resources tab' do
       important_info_text = "Show me what you can do"
       create_important_info_content(@subject_course, important_info_text)
@@ -300,5 +294,9 @@ describe "observer k5 dashboard" do
 
   context 'course tab navigation shared examples' do
     it_behaves_like 'k5 subject navigation tabs'
+  end
+
+  context 'subject grades shared examples' do
+    it_behaves_like 'k5 subject grades'
   end
 end

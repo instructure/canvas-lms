@@ -288,6 +288,16 @@ describe "speed grader submissions" do
       expect(@student.attachments.last.filename).to eq 'file_removed.pdf'
     end
 
+    it "displays word count for text submission" do
+      Account.site_admin.enable_feature!(:word_count_in_speed_grader)
+      student_submission
+
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}&student_id=#{@submission.student.id}"
+
+      # check for word count
+      expect(f('#submission_word_count')).to include_text(@submission.word_count.to_s)
+    end
+
     context "turnitin" do
       before(:each) do
         @assignment.turnitin_enabled = true

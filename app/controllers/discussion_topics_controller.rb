@@ -650,6 +650,7 @@ class DiscussionTopicsController < ApplicationController
 
     if (can_read_and_visible = @topic.grants_right?(@current_user, session, :read) && @topic.visible_for?(@current_user))
       @topic.change_read_state('read', @current_user) unless @locked.is_a?(Hash) && !@locked[:can_view]
+      add_rss_links_to_content
     end
 
     if @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage)
@@ -839,18 +840,6 @@ class DiscussionTopicsController < ApplicationController
             conditional_release_js_env(@topic.assignment, includes: [:rule])
             js_bundle :discussion_topic
             css_bundle :tinymce, :discussions, :learning_outcomes
-
-            if @context_enrollment
-              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :atom), { :title => t(:discussion_atom_feed_title, "Discussion Atom Feed") })
-              if @topic.podcast_enabled
-                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context_enrollment.feed_code, :rss), { :title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
-              end
-            elsif @context.available?
-              content_for_head helpers.auto_discovery_link_tag(:atom, feeds_topic_format_path(@topic.id, @context.feed_code, :atom), { :title => t(:discussion_atom_feed_title, "Discussion Atom Feed") })
-              if @topic.podcast_enabled
-                content_for_head helpers.auto_discovery_link_tag(:rss, feeds_topic_format_path(@topic.id, @context.feed_code, :rss), { :title => t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
-              end
-            end
 
             render stream: can_stream_template?
           end
@@ -1567,6 +1556,21 @@ class DiscussionTopicsController < ApplicationController
   end
 
   private
+
+  def add_rss_links_to_content
+    rss_context = @context_enrollment
+    rss_context ||= @context if @context.available?
+    if rss_context
+      content_for_head helpers.auto_discovery_link_tag(:atom,
+                                                       feeds_topic_format_path(@topic.id, rss_context.feed_code, :atom),
+                                                       { title: t(:discussion_atom_feed_title, "Discussion Atom Feed") })
+      if @topic.podcast_enabled
+        content_for_head helpers.auto_discovery_link_tag(:rss,
+                                                         feeds_topic_format_path(@topic.id, rss_context.feed_code, :rss),
+                                                         { title: t(:discussion_podcast_feed_title, "Discussion Podcast Feed") })
+      end
+    end
+  end
 
   def groups_and_group_topics
     @groups = @topic.group_category.groups.active

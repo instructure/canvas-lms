@@ -23,7 +23,7 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/react/ObserverOptions'
 
 import {MOCK_TODOS} from './mocks'
 import {
@@ -37,8 +37,11 @@ import {destroyContainer} from '@canvas/alerts/react/FlashAlert'
 
 const ASSIGNMENTS_URL = /\/api\/v1\/calendar_events\?type=assignment&important_dates=true&.*/
 
+const currentUserId = '1'
+const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
+
 const currentUser = {
-  id: '1',
+  id: currentUserId,
   display_name: 'Geoffrey Jellineck',
   avatar_image_url: 'http://avatar'
 }
@@ -767,11 +770,11 @@ describe('K-5 Dashboard', () => {
 
   describe('Parent Support', () => {
     afterEach(() => {
-      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
+      document.cookie = `${observedUserCookieName}=`
     })
 
     beforeEach(() => {
-      document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+      document.cookie = `${observedUserCookieName}=4;path=/`
     })
 
     const getLastRequest = async () => {

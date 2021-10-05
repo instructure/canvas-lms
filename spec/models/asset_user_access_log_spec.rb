@@ -18,16 +18,19 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'spec_helper.rb'
+require 'spec_helper'
 
 describe AssetUserAccessLog do
   around(:each) do |example|
     old_interval = MessageBus.worker_process_interval_lambda
+    old_compaction_recv_timeout = Setting.get("aua_compaction_receive_timeout_ms", "1000")
     # let's not waste time with queue throttling in tests
     MessageBus.worker_process_interval = -> { 0.01 }
+    Setting.set("aua_compaction_receive_timeout_ms", "50")
     example.run
   ensure
     MessageBus.worker_process_interval = old_interval unless old_interval.nil?
+    Setting.set("aua_compaction_receive_timeout_ms", old_compaction_recv_timeout)
   end
 
   def reset_message_bus_topic(topic_root_account, subscription_name)
@@ -183,9 +186,11 @@ describe AssetUserAccessLog do
     end
 
     def await_message_bus_queue!(target_depth: 0)
+      # rubocop:disable Lint/NoSleep this is the best way I know of to give up thread priority
       while MessageBus.production_worker.queue_depth > target_depth
         sleep 0.01 # give background thread a chance to make progress
       end
+      # rubocop:enable Lint/NoSleep
     end
 
     def advance_sequence(model, by_count)
@@ -262,7 +267,7 @@ describe AssetUserAccessLog do
           expect(AssetUserAccessLog.log_model(24.hours.ago).count).to eq(0)
           # we should only have one setting with an offset in it, the other should have been zeroed
           # out during the truncation
-          expect(AssetUserAccessLog.metadatum_payload[:max_log_ids].select { |id| id > 0 }.size).to eq(1)
+          expect(AssetUserAccessLog.metadatum_payload[:max_log_ids].count { |id| id > 0 }).to eq(1)
         end
       end
 
@@ -485,7 +490,7 @@ describe AssetUserAccessLog do
                                                                            "db_writes_enabled" => true
                                                                          })
         compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].select { |id| id > 0 }.length > 0).to be_truthy
+        expect(compaction_state[:max_log_ids].count { |id| id > 0 } > 0).to be_truthy
         Timecop.freeze do
           generate_log([@asset_2, @asset_7, @asset_3], 5)
           AssetUserAccessLog.compact
@@ -501,7 +506,7 @@ describe AssetUserAccessLog do
         expect(@asset_7.reload.view_score).to eq(5.0)
         expect(@asset_8.reload.view_score).to eq(20.0)
         compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].select { |id| id > 0 }.length > 0).to be_truthy
+        expect(compaction_state[:max_log_ids].count { |id| id > 0 } > 0).to be_truthy
         # Stop writing to postgres entirely for a while
         allow(AssetUserAccessLog).to receive(:channel_config).and_return({
                                                                            "pulsar_writes_enabled" => true,
@@ -513,7 +518,7 @@ describe AssetUserAccessLog do
           AssetUserAccessLog.compact
         end
         compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].select { |id| id > 0 }.length > 0).to be_truthy
+        expect(compaction_state[:max_log_ids].count { |id| id > 0 } > 0).to be_truthy
         expect(@asset_1.reload.view_score).to eq(60.0)
         expect(@asset_2.reload.view_score).to eq(85.0)
         expect(@asset_3.reload.view_score).to eq(15.0)
@@ -534,7 +539,7 @@ describe AssetUserAccessLog do
           AssetUserAccessLog.compact
         end
         compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].select { |id| id > 0 }.length > 0).to be_truthy
+        expect(compaction_state[:max_log_ids].count { |id| id > 0 } > 0).to be_truthy
         expect(@asset_1.reload.view_score).to eq(70.0)
         expect(@asset_2.reload.view_score).to eq(85.0)
         expect(@asset_3.reload.view_score).to eq(15.0)
@@ -556,7 +561,7 @@ describe AssetUserAccessLog do
           AssetUserAccessLog.compact
         end
         compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].select { |id| id > 0 }.length > 0).to be_truthy
+        expect(compaction_state[:max_log_ids].count { |id| id > 0 } > 0).to be_truthy
         expect(@asset_1.reload.view_score).to eq(70.0)
         expect(@asset_2.reload.view_score).to eq(85.0)
         expect(@asset_3.reload.view_score).to eq(25.0)

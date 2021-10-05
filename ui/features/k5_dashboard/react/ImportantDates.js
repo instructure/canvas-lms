@@ -19,7 +19,6 @@
 import React, {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!important_dates'
-import getCookie from 'get-cookie'
 import moment from 'moment-timezone'
 
 import {View} from '@instructure/ui-view'
@@ -37,14 +36,14 @@ import FilterCalendarsModal from './FilterCalendarsModal'
 import ImportantDatesEmpty from './ImportantDatesEmpty'
 import ImportantDateSection from './ImportantDateSection'
 import {groupImportantDates} from '@canvas/k5/react/utils'
-import {SELECTED_OBSERVED_USER_COOKIE} from '@canvas/k5/react/ObserverOptions'
 
 const ImportantDates = ({
   contexts,
   handleClose,
   selectedContextCodes: initialSelectedContextCodes,
   selectedContextsLimit,
-  timeZone
+  timeZone,
+  observedUserId
 }) => {
   const [calendarsModalOpen, setCalendarsModalOpen] = useState(false)
   const [loadingAssignments, setLoadingAssignments] = useState(true)
@@ -80,7 +79,6 @@ const ImportantDates = ({
   const contextsLoaded = !!contexts && !!selectedContextCodes
   const tooManyContexts = contextsLoaded && contexts.length > selectedContextsLimit
 
-  const observedUserId = getCookie(SELECTED_OBSERVED_USER_COOKIE)
   const fetchPath =
     ENV.FEATURES?.k5_parent_support && observedUserId && observedUserId !== ENV.current_user_id
       ? `/api/v1/users/${observedUserId}/calendar_events`
@@ -226,7 +224,8 @@ ImportantDates.propTypes = {
   handleClose: PropTypes.func,
   selectedContextCodes: PropTypes.arrayOf(PropTypes.string),
   selectedContextsLimit: PropTypes.number.isRequired,
-  timeZone: PropTypes.string.isRequired
+  timeZone: PropTypes.string.isRequired,
+  observedUserId: PropTypes.string
 }
 
 export default ImportantDates

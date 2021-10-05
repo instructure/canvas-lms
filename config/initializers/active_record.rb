@@ -82,7 +82,7 @@ class ActiveRecord::Base
     read_attribute(attr_name) || (write_attribute(attr_name, default_value) && read_attribute(attr_name))
   end
 
-  alias :clone :dup
+  alias_method :clone, :dup
 
   # See ActiveModel#serializable_add_includes
   def serializable_add_includes(options = {}, &block)
