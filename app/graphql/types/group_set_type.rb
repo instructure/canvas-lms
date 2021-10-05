@@ -22,7 +22,7 @@ module Types
   class GroupSetType < ApplicationObjectType
     graphql_name "GroupSet"
 
-    alias_method :set, :object
+    alias set object
 
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface

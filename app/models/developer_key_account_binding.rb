@@ -104,7 +104,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     "accounts/site_admin/developer_key_account_bindings/#{developer_key.global_id}"
   end
 
-  alias_method :allowed?, :allow?
+  alias allowed? allow?
 
   private
 

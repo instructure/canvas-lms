@@ -243,7 +243,6 @@ export const IsolatedViewContainer = props => {
   })
 
   const isolatedEntryNewerDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    skip: !props.relativeEntryId,
     variables: {
       discussionEntryID: props.discussionEntryId,
       first: 0,

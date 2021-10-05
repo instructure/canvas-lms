@@ -284,7 +284,6 @@ export const K5Dashboard = ({
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
-      observedUserId={observedUserId}
     />
   )
 
