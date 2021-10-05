@@ -196,10 +196,9 @@ describe('ContentTabs', () => {
               state: 'submitted'
             }
           })
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(true)
-          })
+
+          const {findByTestId} = await renderAttemptTab(props)
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('does not render as read-only if the submission has been graded pre-submission', async () => {
@@ -211,10 +210,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(false)
-          })
+          const {queryByTestId} = await renderAttemptTab(props)
+          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
         })
 
         it('renders as read-only if the submission has been graded post-submission', async () => {
@@ -226,10 +223,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(true)
-          })
+          const {findByTestId} = await renderAttemptTab(props)
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('renders as read-only if changes are not allowed to the submission', async () => {
@@ -240,14 +235,13 @@ describe('ContentTabs', () => {
             }
           })
 
-          render(
+          const {findByTestId} = render(
             <StudentViewContext.Provider value={{allowChangesToSubmission: false}}>
               <AttemptTab {...props} focusAttemptOnInit={false} />
             </StudentViewContext.Provider>
           )
-          await waitFor(() => {
-            expect(tinymce?.editors[0]?.readonly).toStrictEqual(true)
-          })
+
+          expect(await findByTestId('read-only-content')).toBeInTheDocument()
         })
 
         it('does not render as read-only if changes are allowed and the submission is not submitted', async () => {
@@ -258,10 +252,8 @@ describe('ContentTabs', () => {
             }
           })
 
-          await renderAttemptTab(props)
-          await waitFor(() => {
-            expect(fakeEditor.readonly).toStrictEqual(false)
-          })
+          const {queryByTestId} = await renderAttemptTab(props)
+          expect(queryByTestId('read-only-content')).not.toBeInTheDocument()
         })
       })
     })

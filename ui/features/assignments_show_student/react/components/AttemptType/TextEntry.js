@@ -21,6 +21,7 @@ import React, {createRef} from 'react'
 import CanvasRce from '@canvas/rce/react/CanvasRce'
 import TinyMCEContentItem from '@canvas/tinymce-external-tools/TinyMCEContentItem'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import apiUserContent from '@canvas/util/jquery/apiUserContent'
 
 // This is how long we wait to see that changes have stopped before actually
 // saving the draft
@@ -84,7 +85,7 @@ export default class TextEntry extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    if (this._tinyeditor == null) {
+    if (this._tinyeditor == null || this.props.readOnly) {
       return
     }
 
@@ -187,27 +188,36 @@ export default class TextEntry extends React.Component {
 
   render() {
     return (
-      <div data-testid="text-editor">
-        <span>
-          <CanvasRce
-            ref={this._rceRef}
-            autosave={false}
-            defaultContent={this.getDraftBody()}
-            editorOptions={{
-              focus: false
-            }}
-            height={300}
-            readOnly={this.props.readOnly}
-            textareaId="textentry_text"
-            onFocus={this.handleEditorFocus}
-            onBlur={() => {}}
-            onInit={this.handleRCEInit}
-            onContentChange={content => {
-              this.checkForChanges(content)
+      <>
+        {this.props.readOnly ? (
+          <div
+            data-testid="read-only-content"
+            dangerouslySetInnerHTML={{
+              __html: apiUserContent.convert(this.props.submission.body)
             }}
           />
-        </span>
-      </div>
+        ) : (
+          <div data-testid="text-editor">
+            <CanvasRce
+              ref={this._rceRef}
+              autosave={false}
+              defaultContent={this.getDraftBody()}
+              editorOptions={{
+                focus: false
+              }}
+              height={300}
+              readOnly={this.props.readOnly}
+              textareaId="textentry_text"
+              onFocus={this.handleEditorFocus}
+              onBlur={() => {}}
+              onInit={this.handleRCEInit}
+              onContentChange={content => {
+                this.checkForChanges(content)
+              }}
+            />
+          </div>
+        )}
+      </>
     )
   }
 }
