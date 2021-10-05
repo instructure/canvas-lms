@@ -228,7 +228,7 @@ describe('DiscussionFullPage', () => {
       const mocks = [...getDiscussionQueryMock(), ...getDiscussionQueryMock({searchTerm: 'aa'})]
       const container = setup(mocks)
       expect(await container.findByTestId('discussion-topic-container')).toBeInTheDocument()
-      fireEvent.change(container.getByTestId('search-filter'), {
+      fireEvent.change(container.getByLabelText('Search entries or author'), {
         target: {value: 'aa'}
       })
       await waitFor(() =>
@@ -271,27 +271,19 @@ describe('DiscussionFullPage', () => {
       expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
     })
 
-    it('allows subscribing to the topic', async () => {
+    it('toggles a topics subscribed state when subscribed is clicked', async () => {
       const mocks = [
         ...getDiscussionQueryMock(),
+        ...subscribeToDiscussionTopicMock({subscribed: false}),
         ...subscribeToDiscussionTopicMock({subscribed: true})
       ]
-      mocks[0].result.data.legacyNode.subscribed = false
       const container = setup(mocks)
-      const subscribeButton = await container.findByText('Unsubscribed')
-      fireEvent.click(subscribeButton)
-      expect(await container.findByText('Subscribed')).toBeInTheDocument()
-    })
-
-    it('allows unsubscribing to the topic', async () => {
-      const mocks = [
-        ...getDiscussionQueryMock(),
-        ...subscribeToDiscussionTopicMock({subscribed: false})
-      ]
-      const container = setup(mocks)
-      const subscribeButton = await container.findByText('Subscribed')
-      fireEvent.click(subscribeButton)
+      expect(await container.findByText('This is a Discussion Topic Message')).toBeInTheDocument()
+      const actionsButton = container.getByText('Subscribed')
+      fireEvent.click(actionsButton)
       expect(await container.findByText('Unsubscribed')).toBeInTheDocument()
+      fireEvent.click(actionsButton)
+      expect(await container.findByText('Subscribed')).toBeInTheDocument()
     })
 
     it('renders a readonly publish button if canUnpublish is false', async () => {
@@ -330,7 +322,9 @@ describe('DiscussionFullPage', () => {
     // these queries in our mocks we provide to MockedProvider
     const mocks = [
       ...getDiscussionQueryMock(),
+      ...getDiscussionQueryMock(),
       ...createDiscussionEntryMock(),
+      ...getDiscussionQueryMock()
     ]
     const container = setup(mocks)
 

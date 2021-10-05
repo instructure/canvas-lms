@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ApolloProvider} from 'react-apollo'
 import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionEntry} from '../../../../graphql/DiscussionEntry'
 import {fireEvent, render} from '@testing-library/react'
 import {IsolatedParent} from '../IsolatedParent'
-import {MockedProvider} from '@apollo/react-testing'
+import {mswClient} from '../../../../../../shared/msw/mswClient'
 import React from 'react'
 
 jest.mock('../../../utils', () => ({
@@ -48,11 +49,11 @@ describe('IsolatedParent', () => {
     ...overrides
   })
 
-  const setup = (props, mocks) => {
+  const setup = props => {
     return render(
-      <MockedProvider mocks={mocks}>
+      <ApolloProvider client={mswClient}>
         <IsolatedParent {...props} />
-      </MockedProvider>
+      </ApolloProvider>
     )
   }
 
@@ -136,15 +137,7 @@ describe('IsolatedParent', () => {
     window.ENV = {
       should_show_deeply_nested_alert: true
     }
-    const {queryByText} = setup(
-      defaultProps({
-        discussionEntryOverrides: {
-          isolatedEntryId: '77',
-          parentId: '77'
-        },
-        overrides: {RCEOpen: true}
-      })
-    )
+    const {queryByText} = setup(defaultProps({overrides: {RCEOpen: true}}))
 
     expect(
       queryByText(

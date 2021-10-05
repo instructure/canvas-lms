@@ -104,10 +104,8 @@ def createDistribution(nestedStages) {
 def setupNode() {
   distribution.unstashBuildScripts()
   libraryScript.execute 'bash/print-env-excluding-secrets.sh'
-  if (env.RSPECQ_ENABLED == '1') {
-    def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
-    env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
-  }
+  def redisPassword = URLEncoder.encode("${env.RSPECQ_REDIS_PASSWORD ?: ''}", 'UTF-8')
+  env.RSPECQ_REDIS_URL = "redis://:${redisPassword}@${TEST_QUEUE_HOST}:6379"
   credentials.withStarlordCredentials { ->
     sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
   }
@@ -261,4 +259,19 @@ def runReporter() {
 
     throw e
   }
+}
+
+def useRspecQ(percentage) {
+  if (configuration.isRspecqEnabled()) {
+    env.RSPECQ_ENABLED = '1'
+    return true
+  }
+
+  java.security.SecureRandom random = new java.security.SecureRandom()
+  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
+    env.RSPECQ_ENABLED = '0'
+    return false
+  }
+
+  return true
 }

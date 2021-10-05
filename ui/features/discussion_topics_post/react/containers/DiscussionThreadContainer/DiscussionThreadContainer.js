@@ -52,6 +52,36 @@ import {ThreadingToolbar} from '../../components/ThreadingToolbar/ThreadingToolb
 import {useMutation, useQuery} from 'react-apollo'
 import {View} from '@instructure/ui-view'
 
+export const mockThreads = {
+  discussionEntry: {
+    id: '432',
+    author: {
+      displayName: 'Jeffrey Johnson',
+      avatarUrl: 'someURL'
+    },
+    createdAt: '2021-02-08T13:36:05-07:00',
+    message:
+      '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
+    read: true,
+    lastReply: null,
+    rootEntryParticipantCounts: {
+      unreadCount: 0,
+      repliesCount: 0
+    },
+    subentriesCount: 0,
+    permissions: {
+      attach: true,
+      create: true,
+      delete: true,
+      rate: true,
+      read: true,
+      reply: true,
+      update: true,
+      viewRating: true
+    }
+  }
+}
+
 export const DiscussionThreadContainer = props => {
   const {searchTerm, sort, filter} = useContext(SearchContext)
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -261,7 +291,14 @@ export const DiscussionThreadContainer = props => {
   }
 
   const onOpenInSpeedGrader = () => {
-    window.open(getSpeedGraderUrl(props.discussionEntry.author._id), '_blank')
+    window.open(
+      getSpeedGraderUrl(
+        ENV.course_id,
+        props.discussionTopic.assignment._id,
+        props.discussionEntry.author._id
+      ),
+      '_blank'
+    )
   }
 
   // Scrolling auto listener to mark messages as read
