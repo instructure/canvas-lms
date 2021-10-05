@@ -2131,7 +2131,7 @@ describe UsersController do
       expect(assigns[:enrollments].sort_by(&:id)).to eq [@enrollment1, @enrollment2]
     end
 
-    it "404s on a deleted user" do
+    it "401s on a deleted user" do
       course_with_teacher(:active_all => 1)
 
       account_admin_user
@@ -2139,7 +2139,7 @@ describe UsersController do
       @teacher.destroy
 
       get 'show', params: { id: @teacher.id }
-      expect(response.status).to eq 404
+      expect(response.status).to eq 401
       expect(response).not_to render_template('users/show')
     end
 
@@ -2165,6 +2165,34 @@ describe UsersController do
       expect(response).to be_successful
       user = json_parse
       expect(user['name']).to eq @student.name
+    end
+
+    it "redirects to login when not logged in, even if the user doesn't exist" do
+      get 'show', params: { id: 50 }
+      expect(response).to redirect_to("/login")
+    end
+
+    it "401s if the user doesn't exist when you are logged in" do
+      defunct_user = User.create!.destroy_permanently!
+      user_factory(active_all: true)
+      user_session(@user)
+      get 'show', params: { id: defunct_user.id }
+      expect(response.status).to eq 401
+    end
+
+    it "401s if the user exists but you don't have permission" do
+      user2 = user_factory(active_all: true)
+      user_factory(active_all: true)
+      user_session(@user)
+      get 'show', params: { id: user2.id }
+      expect(response.status).to eq 401
+    end
+
+    it "renders for an admin" do
+      account_admin_user(active_all: true)
+      user_session(@user)
+      get 'show', params: { id: @user.id }
+      expect(response.status).to eq 200
     end
   end
 
