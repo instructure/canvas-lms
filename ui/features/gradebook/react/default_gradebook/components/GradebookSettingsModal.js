@@ -125,6 +125,7 @@ export default class GradebookSettingsModal extends React.Component {
       }).isRequired,
       showNotes: bool.isRequired,
       showUnpublishedAssignments: bool.isRequired,
+      showSeparateFirstLastNames: bool.isRequired,
       statusColors: objectOf(string).isRequired,
       viewUngradedAsZero: bool.isRequired
     })
@@ -391,6 +392,12 @@ export default class GradebookSettingsModal extends React.Component {
                       checked: this.state.viewOptions.showUnpublishedAssignments,
                       onChange: value => {
                         this.setViewOption('showUnpublishedAssignments', value)
+                      }
+                    }}
+                    showSeparateFirstLastNames={{
+                      checked: this.state.viewOptions.showSeparateFirstLastNames,
+                      onChange: value => {
+                        this.setViewOption('showSeparateFirstLastNames', value)
                       }
                     }}
                     viewUngradedAsZero={{
