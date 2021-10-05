@@ -138,6 +138,7 @@
                            :value => datetime_string(announcement.start_at),
                            :id => "account_notification_start_at_#{announcement.id}",
                            "aria-labelledby" => "announcement_starts_at_label",
+                           "data-initial-value" => announcement.start_at.iso8601,
                            :title => accessible_date_format,
                            :readonly => true %>
         <% else %>
@@ -146,6 +147,7 @@
                            :id => "account_notification_start_at_#{announcement.id}",
                            :class => 'datetime_field',
                            "aria-labelledby" => "announcement_starts_at_label",
+                           "data-initial-value" => announcement.start_at.iso8601,
                            "data-tooltip" => "",
                            :title => accessible_date_format %>
         <% end %>
@@ -164,6 +166,7 @@
                            :value => datetime_string(announcement.end_at),
                            :id => "account_notification_end_at_#{announcement.id}",
                            "aria-labelledby" => "announcement_ends_at_label",
+                           "data-initial-value" => announcement.end_at.iso8601,
                            :title => accessible_date_format,
                            :readonly => true %>
         <% else %>
@@ -172,6 +175,7 @@
                            :id => "account_notification_end_at_#{announcement.id}",
                            :class => 'datetime_field',
                            "aria-labelledby" => "announcement_ends_at_label",
+                           "data-initial-value" => announcement.end_at.iso8601,
                            "data-tooltip" => "",
                            :title => accessible_date_format %>
         <% end %>

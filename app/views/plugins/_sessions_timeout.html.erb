@@ -22,5 +22,9 @@
       <td><%= f.blabel :session_timeout, :en => "Time before session expires in minutes (20 minimum)" %></td>
       <td><%= f.text_field :session_timeout %></td>
     </tr>
+    <tr>
+      <td><%= f.blabel :mobile_timeout, :en => "Time before session expires in minutes (20 minimum) for mobile applications" %></td>
+      <td><%= f.text_field :mobile_timeout %></td>
+    </tr>
   </table>
 <% end %>

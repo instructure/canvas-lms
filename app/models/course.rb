@@ -3242,8 +3242,10 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
         delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
-        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-
+        if item_banks_tab &&
+           !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+          tabs.reject! { |tab| tab[:id] == item_banks_tab[:id] }
+        end
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
         tabs.delete(outcome_tab) if outcome_tab && (!user || !check_for_permission.call(:manage_content, :participate_as_student, :read_as_admin))

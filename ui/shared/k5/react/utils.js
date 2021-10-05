@@ -171,24 +171,38 @@ export const sendMessage = (recipientId, message, subject) =>
     body: {recipients: [recipientId], body: message, group_conversation: false, subject}
   })
 
+const getSubmission = (assignment, observedUserId) =>
+  observedUserId
+    ? assignment.submission?.find(s => s.user_id === observedUserId)
+    : assignment.submission
+
 /* Takes raw response from assignment_groups API and returns an array of objects with each
    assignment group's id, name, and total score. If gradingPeriodId is passed, only return
    totals for assignment groups which have assignments in the provided grading period. */
-export const getAssignmentGroupTotals = (data, gradingPeriodId) => {
+export const getAssignmentGroupTotals = (data, gradingPeriodId, observedUserId) => {
   if (gradingPeriodId) {
     data = data.filter(group =>
-      group.assignments?.some(a => a.submission?.grading_period_id === gradingPeriodId)
+      group.assignments?.some(a => {
+        const submission = getSubmission(a, observedUserId)
+        return submission?.grading_period_id === gradingPeriodId
+      })
     )
   }
   return data.map(group => {
+    const assignments = group.assignments.map(a => ({
+      ...a,
+      submission: getSubmission(a, observedUserId)
+    }))
     const groupScores = AssignmentGroupGradeCalculator.calculate(
-      group.assignments.map(a => ({
-        points_possible: a.points_possible,
-        assignment_id: a.id,
-        assignment_group_id: a.assignment_group_id,
-        ...a.submission
-      })),
-      group,
+      assignments.map(a => {
+        return {
+          points_possible: a.points_possible,
+          assignment_id: a.id,
+          assignment_group_id: a.assignment_group_id,
+          ...a.submission
+        }
+      }),
+      {...group, assignments},
       false
     )
     return {
@@ -207,27 +221,30 @@ export const getAssignmentGroupTotals = (data, gradingPeriodId) => {
 
 /* Takes raw response from assignment_groups API and returns an array of assignments with
    grade information, sorted by due date. */
-export const getAssignmentGrades = data =>
-  data
+export const getAssignmentGrades = (data, observedUserId) => {
+  return data
     .map(group =>
-      group.assignments.map(a => ({
-        id: a.id,
-        assignmentName: a.name,
-        url: a.html_url,
-        dueDate: a.due_at,
-        assignmentGroupName: group.name,
-        assignmentGroupId: group.id,
-        pointsPossible: a.points_possible,
-        gradingType: a.grading_type,
-        score: a.submission?.score,
-        grade: a.submission?.grade,
-        submissionDate: a.submission?.submitted_at,
-        unread: a.submission?.read_state === 'unread',
-        late: a.submission?.late,
-        excused: a.submission?.excused,
-        missing: a.submission?.missing,
-        hasComments: !!a.submission?.submission_comments?.length
-      }))
+      group.assignments.map(a => {
+        const submission = getSubmission(a, observedUserId)
+        return {
+          id: a.id,
+          assignmentName: a.name,
+          url: a.html_url,
+          dueDate: a.due_at,
+          assignmentGroupName: group.name,
+          assignmentGroupId: group.id,
+          pointsPossible: a.points_possible,
+          gradingType: a.grading_type,
+          score: submission?.score,
+          grade: submission?.grade,
+          submissionDate: submission?.submitted_at,
+          unread: submission?.read_state === 'unread',
+          late: submission?.late,
+          excused: submission?.excused,
+          missing: submission?.missing,
+          hasComments: !!submission?.submission_comments?.length
+        }
+      })
     )
     .flat(1)
     .sort((a, b) => {
@@ -235,11 +252,20 @@ export const getAssignmentGrades = data =>
       if (b.dueDate == null) return -1
       return moment(a.dueDate).diff(moment(b.dueDate))
     })
+}
 
 /* Formats course total score and grade (if applicable) into string from enrollments API
    response */
-export const getTotalGradeStringFromEnrollments = (enrollments, userId) => {
-  const grades = enrollments.find(({user_id}) => user_id === userId)?.grades
+export const getTotalGradeStringFromEnrollments = (enrollments, userId, observedUserId) => {
+  let grades
+  if (observedUserId) {
+    const enrollment = enrollments.find(
+      ({associated_user_id}) => associated_user_id === observedUserId
+    )
+    grades = enrollment?.observed_user?.enrollments[0]?.grades
+  } else {
+    grades = enrollments.find(({user_id}) => user_id === userId)?.grades
+  }
   if (grades?.current_score == null) {
     return I18n.t('n/a')
   }

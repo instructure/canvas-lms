@@ -216,10 +216,11 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
               width="1%"
               height="calc(100vh - 8.75rem)"
             >
-              {/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/no-noninteractive-tabindex */}
+              {/* eslint-disable jsx-a11y/no-noninteractive-tabindex */}
               <div
                 tabIndex="0"
                 role="separator"
+                aria-hidden="true"
                 aria-orientation="vertical"
                 onKeyDown={onKeyDownHandler}
                 ref={setDelimiterRef}

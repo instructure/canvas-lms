@@ -123,7 +123,8 @@ module Api::V1::Assignment
       needs_grading_count_by_section: false,
       exclude_response_fields: [],
       include_planner_override: false,
-      include_can_edit: false
+      include_can_edit: false,
+      include_webhook_info: false
     )
 
     if opts[:override_dates] && !assignment.new_record?
@@ -232,6 +233,12 @@ module Api::V1::Assignment
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
                                            :assignment_id => assignment.id)
+    end
+
+    # the webhook_info is for internal use only and is not intended to be used with
+    # multiple assignments, it will create difficult to fix n+1s
+    if opts[:include_webhook_info]
+      hash['webhook_info'] = assignment.assignment_configuration_tool_lookups[0]&.webhook_info
     end
 
     if assignment.automatic_peer_reviews? && assignment.peer_reviews?
