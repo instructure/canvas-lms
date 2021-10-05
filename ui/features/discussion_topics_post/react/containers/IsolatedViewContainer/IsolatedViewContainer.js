@@ -236,10 +236,8 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      ...(props.relativeEntryId &&
-        props.relativeEntryId !== props.discussionEntryId && {
-          relativeEntryId: props.relativeEntryId
-        }),
+      relativeEntryId:
+        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
       includeRelativeEntry: !!props.relativeEntryId
     }
   })
@@ -251,7 +249,7 @@ export const IsolatedViewContainer = props => {
       first: 0,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      ...(props.relativeEntryId && {relativeEntryId: props.relativeEntryId}),
+      relativeEntryId: props.relativeEntryId,
       includeRelativeEntry: false,
       beforeRelativeEntry: false
     }

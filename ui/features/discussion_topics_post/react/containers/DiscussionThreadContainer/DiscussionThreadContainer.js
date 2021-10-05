@@ -479,6 +479,7 @@ const DiscussionSubentries = props => {
   const {sort} = useContext(SearchContext)
   const variables = {
     discussionEntryID: props.discussionEntryId,
+    relativeEntryId: null,
     first: PER_PAGE,
     sort,
     courseID: window.ENV?.course_id

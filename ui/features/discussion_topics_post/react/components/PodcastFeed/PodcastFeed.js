@@ -16,23 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!discussion_posts'
+import {IconRssLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
 import React from 'react'
-
-import {Button} from '@instructure/ui-buttons'
-import {IconRssLine} from '@instructure/ui-icons'
+import {Text} from '@instructure/ui-text'
 
 export const PodcastFeed = ({...props}) => {
   return (
     <Button
       color="secondary"
-      margin="xx-small"
+      display={props.responsiveProps?.display}
       renderIcon={IconRssLine}
       href={props.linkUrl}
       data-testid="post-rssfeed"
     >
-      {I18n.t('Topic: Podcast Feed')}
+      <Text weight="bold" size={props.responsiveProps?.textSize}>
+        {I18n.t('Topic: Podcast Feed')}
+      </Text>
     </Button>
   )
 }
@@ -41,5 +43,6 @@ PodcastFeed.propTypes = {
   /**
    * Link to discussions RSS feed
    */
-  linkUrl: PropTypes.string.isRequired
+  linkUrl: PropTypes.string.isRequired,
+  responsiveProps: PropTypes.object
 }

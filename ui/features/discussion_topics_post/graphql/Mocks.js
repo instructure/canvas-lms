@@ -131,7 +131,7 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(first !== null && {first}),
         ...(includeRelativeEntry !== null && {includeRelativeEntry}),
         ...(last !== null && {last}),
-        ...(relativeEntryId !== null && {relativeEntryId}),
+        relativeEntryId,
         ...(rolePillTypes !== null && {rolePillTypes}),
         sort
       }

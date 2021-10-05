@@ -732,5 +732,23 @@ describe('DiscussionTopicContainer', () => {
 
       expect(queryByText('eer review for Morty Smith Due: Mar 31 5:59am')).toBeNull()
     })
+
+    describe('PodcastFeed Button', () => {
+      it('does not render when Discussion Podcast Feed is not present', () => {
+        const {queryByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(queryByTestId('post-rssfeed')).toBeNull()
+      })
+
+      it('renders when Discussion Podcast Feed is present', () => {
+        const ln = document.createElement('link')
+        ln.title = 'Discussion Podcast Feed'
+        ln.type = 'application/rss+xml'
+        ln.href = 'http://localhost:3000/feeds/topics/47/enrollment_mhumV2R51z5IsK.rss'
+        document.head.append(ln)
+
+        const {getByTestId} = setup({discussionTopic: Discussion.mock()})
+        expect(getByTestId('post-rssfeed')).toBeTruthy()
+      })
+    })
   })
 })
