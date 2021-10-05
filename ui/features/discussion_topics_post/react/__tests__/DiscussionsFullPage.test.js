@@ -328,10 +328,7 @@ describe('DiscussionFullPage', () => {
     // For some reason when we add a reply to a discussion topic we end up performing
     // 2 additional discussion queries. Until we address that issue we need to specify
     // these queries in our mocks we provide to MockedProvider
-    const mocks = [
-      ...getDiscussionQueryMock(),
-      ...createDiscussionEntryMock(),
-    ]
+    const mocks = [...getDiscussionQueryMock(), ...createDiscussionEntryMock()]
     const container = setup(mocks)
 
     const replyButton = await container.findByTestId('discussion-topic-reply')
