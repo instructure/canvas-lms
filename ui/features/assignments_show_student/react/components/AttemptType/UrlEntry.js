@@ -34,6 +34,7 @@ import {IconEyeLine, IconExternalLinkLine} from '@instructure/ui-icons'
 import {Text} from '@instructure/ui-text'
 import {Link} from '@instructure/ui-link'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import StudentViewContext from '../Context'
 import {TextInput} from '@instructure/ui-text-input'
 
 const ERROR_MESSAGE = [
@@ -158,48 +159,53 @@ class UrlEntry extends React.Component {
     }
 
     return (
-      <Flex direction="column">
-        <Flex.Item overflowY="visible">
-          <div style={inputStyle}>
-            <Flex justifyItems="center" alignItems="start">
-              <Flex.Item grow>
-                <TextInput
-                  renderLabel={
-                    <ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>
-                  }
-                  type="url"
-                  placeholder={I18n.t('http://')}
-                  value={this.state.url}
-                  onBlur={this.handleBlur}
-                  onChange={this.handleChange}
-                  messages={this.state.messages}
-                  ref={this._urlInputRef}
-                  data-testid="url-input"
-                />
-              </Flex.Item>
-              <Flex.Item>
-                {this.state.valid && (
-                  <Button
-                    icon={IconEyeLine}
-                    margin="0 0 0 x-small"
-                    onClick={() => window.open(this.state.url)}
-                    data-testid="preview-button"
-                  >
-                    <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
-                  </Button>
-                )}
-              </Flex.Item>
-            </Flex>
-          </div>
-        </Flex.Item>
-        <Flex.Item margin="small 0" overflowY="visible">
-          <MoreOptions
-            assignmentID={this.props.assignment._id}
-            courseID={this.props.assignment.env.courseId}
-            userID={this.props.assignment.env.currentUser.id}
-          />
-        </Flex.Item>
-      </Flex>
+      <StudentViewContext.Consumer>
+        {context => (
+          <Flex direction="column">
+            <Flex.Item overflowY="visible">
+              <div style={inputStyle}>
+                <Flex justifyItems="center" alignItems="start">
+                  <Flex.Item grow>
+                    <TextInput
+                      renderLabel={
+                        <ScreenReaderContent>{I18n.t('Website url input')}</ScreenReaderContent>
+                      }
+                      type="url"
+                      placeholder={I18n.t('http://')}
+                      value={this.state.url}
+                      onBlur={this.handleBlur}
+                      onChange={this.handleChange}
+                      messages={this.state.messages}
+                      ref={this._urlInputRef}
+                      data-testid="url-input"
+                      interaction={!context.allowChangesToSubmission ? 'readonly' : 'enabled'}
+                    />
+                  </Flex.Item>
+                  <Flex.Item>
+                    {this.state.valid && (
+                      <Button
+                        icon={IconEyeLine}
+                        margin="0 0 0 x-small"
+                        onClick={() => window.open(this.state.url)}
+                        data-testid="preview-button"
+                      >
+                        <ScreenReaderContent>{I18n.t('Preview website url')}</ScreenReaderContent>
+                      </Button>
+                    )}
+                  </Flex.Item>
+                </Flex>
+              </div>
+            </Flex.Item>
+            <Flex.Item margin="small 0" overflowY="visible">
+              <MoreOptions
+                assignmentID={this.props.assignment._id}
+                courseID={this.props.assignment.env.courseId}
+                userID={this.props.assignment.env.currentUser.id}
+              />
+            </Flex.Item>
+          </Flex>
+        )}
+      </StudentViewContext.Consumer>
     )
   }
 

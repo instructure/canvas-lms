@@ -29,6 +29,7 @@ import LoadingIndicator from '@canvas/loading-indicator'
 import React, {createRef} from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Submission} from '@canvas/assignments/graphql/student/Submission'
+import StudentViewContext from '../Context'
 import UploadMedia from '@instructure/canvas-media'
 import {
   UploadMediaStrings,
@@ -207,21 +208,26 @@ export default class MediaAttempt extends React.Component {
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         languages={languages}
       />
-      <Billboard
-        heading={I18n.t('Add Media')}
-        hero={<IconAttachMediaLine color="brand" />}
-        message={
-          <Button
-            size="small"
-            data-testid="media-modal-launch-button"
-            variant="primary"
-            onClick={() => this.setState({mediaModalOpen: true})}
-            ref={this._mediaUploadRef}
-          >
-            {I18n.t('Record/Upload')}
-          </Button>
-        }
-      />
+      <StudentViewContext.Consumer>
+        {context => (
+          <Billboard
+            heading={I18n.t('Add Media')}
+            hero={<IconAttachMediaLine color="brand" />}
+            message={
+              <Button
+                size="small"
+                data-testid="media-modal-launch-button"
+                variant="primary"
+                onClick={() => this.setState({mediaModalOpen: true})}
+                ref={this._mediaUploadRef}
+                interaction={!context.allowChangesToSubmission ? 'readonly' : 'enabled'}
+              >
+                {I18n.t('Record/Upload')}
+              </Button>
+            }
+          />
+        )}
+      </StudentViewContext.Consumer>
     </View>
   )
 
