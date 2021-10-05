@@ -82,14 +82,16 @@ export default function SpeedGraderStatusMenu(props) {
         </Flex.Item>
       </Flex>
       {props.selection === 'late' && (
-        <TimeLateInput
-          lateSubmissionInterval={props.lateSubmissionInterval}
-          locale={props.locale}
-          renderLabelBefore
-          secondsLate={props.secondsLate}
-          onSecondsLateUpdated={props.updateSubmission}
-          width="5rem"
-        />
+        <div style={{position: 'absolute', right: '24px'}}>
+          <TimeLateInput
+            lateSubmissionInterval={props.lateSubmissionInterval}
+            locale={props.locale}
+            renderLabelBefore
+            secondsLate={props.secondsLate}
+            onSecondsLateUpdated={props.updateSubmission}
+            width="5rem"
+          />
+        </div>
       )}
     </>
   )
