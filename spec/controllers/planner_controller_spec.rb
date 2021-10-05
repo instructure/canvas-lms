@@ -343,6 +343,23 @@ describe PlannerController do
           expect(response_json.length).to be 16
         end
 
+        it "returns data from contexted courses for observed user if specified" do
+          observer_in_course(course: @course1, associated_user_id: @student, active_all: true)
+          user_session(@observer)
+          get :index, params: { per_page: 50, observed_user_id: @student.to_param, context_codes: [@course1.asset_string] }
+          response_json = json_parse(response.body)
+          expect(response_json.length).to be 8
+          response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
+          expect(response_hash).to include(['assignment', @assignment1.id])
+          expect(response_hash).to include(['assignment', @group_assignment.id])
+          expect(response_hash).to include(['discussion_topic', @course_topic.id])
+          expect(response_hash).to include(['wiki_page', @course_page.id])
+          expect(response_hash).to include(['assignment', @assignment3.id])
+          expect(response_hash).to include(['quiz', @quiz.id])
+          expect(response_hash).to include(['planner_note', @course1_note.id])
+          expect(response_hash).to include(['calendar_event', @course1_event.id])
+        end
+
         it "does not restrict user if session has appropriate permissions for public_to_auth course" do
           @course.update_attribute(:is_public_to_auth_users, true)
           user_factory(active_all: true)
@@ -1190,6 +1207,52 @@ describe PlannerController do
           note = response_json.detect { |i| i["plannable_type"] == 'planner_note' }
           expect(note["plannable"]["title"]).to eq pn.title
         end
+      end
+    end
+  end
+
+  context 'as observer' do
+    before :once do
+      @original_enrollment = observer_in_course(active_all: true, associated_user_id: @student)
+    end
+
+    before :each do
+      user_session(@observer)
+    end
+
+    context 'GET #index' do
+      it "requires context_codes" do
+        get :index, params: { observed_user_id: @student.to_param }
+        assert_unauthorized
+      end
+
+      it 'requires the current user to be observing the observed user' do
+        user_session(@teacher)
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
+        assert_unauthorized
+      end
+
+      it 'requires the user to be observing observed_user_id in context_codes' do
+        other_course = course_model
+        other_course.enroll_student(@observer, enrollment_state: 'active')
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [other_course.asset_string] }
+        assert_unauthorized
+      end
+
+      it "allows an observer to query their observed user's planner items for valid context_codes" do
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
+        expect(response).to be_successful
+        response_json = json_parse(response.body)
+        expect(response_json.count).to eq 2
+        response_hash = response_json.map { |i| [i['plannable_type'], i['plannable_id']] }
+        expect(response_hash).to include(['assignment', @assignment.id])
+        expect(response_hash).to include(['assignment', @assignment2.id])
+      end
+
+      it 'requires that the enrollment be active' do
+        @original_enrollment.destroy
+        get :index, params: { observed_user_id: @student.to_param, context_codes: [@course.asset_string] }
+        assert_unauthorized
       end
     end
   end

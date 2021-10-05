@@ -97,6 +97,16 @@ require 'atom'
 #           "example": "Cooper, Sheldon",
 #           "type": "string"
 #         },
+#         "last_name": {
+#           "description": "The last name of the user.",
+#           "example": "Cooper",
+#           "type": "string"
+#         },
+#         "first_name": {
+#           "description": "The first name of the user.",
+#           "example": "Sheldon",
+#           "type": "string"
+#         },
 #         "short_name": {
 #           "description": "A short name the user has selected, for use in conversations or other less formal places through the site.",
 #           "example": "Shelly",

@@ -127,4 +127,30 @@ describe AssignmentConfigurationToolLookup do
       expect(AssignmentConfigurationToolLookup.by_tool_proxy(tool_proxy)).to match_array [assignment, second_assignment]
     end
   end
+
+  describe '#webhook_info' do
+    it 'shows the correct info' do
+      lookup = AssignmentConfigurationToolLookup.create!(
+        assignment: assignment,
+        tool_type: 'Lti::MessageHandler',
+        tool_product_code: product_family.product_code,
+        tool_vendor_code: product_family.vendor_code,
+        tool_resource_type_code: resource_handler.resource_type_code
+      )
+      expect(lookup.webhook_info).to match(
+        {
+          product_code: lookup.tool_product_code,
+          vendor_code: lookup.tool_vendor_code,
+          resource_type_code: lookup.tool_resource_type_code,
+          tool_proxy_id: tool_proxy.id,
+          tool_proxy_created_at: tool_proxy.created_at,
+          tool_proxy_updated_at: tool_proxy.updated_at,
+          tool_proxy_name: tool_proxy.name,
+          tool_proxy_context_type: tool_proxy.context_type,
+          tool_proxy_context_id: tool_proxy.context_id,
+          subscription_id: tool_proxy.subscription_id
+        }
+      )
+    end
+  end
 end

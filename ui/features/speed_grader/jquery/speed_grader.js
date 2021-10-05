@@ -185,6 +185,7 @@ let $comment_saved
 let $comment_saved_message
 let $reassignment_complete
 let $selectmenu
+let $word_count
 let browserableCssClasses
 let snapshotCache
 let sectionToShow
@@ -1663,9 +1664,8 @@ EG = {
         this.currentStudent.rubric_assessments = []
       }
 
-      this.currentStudent.rubric_assessments = this.currentStudent.rubric_assessments.concat(
-        provisionalAssessments
-      )
+      this.currentStudent.rubric_assessments =
+        this.currentStudent.rubric_assessments.concat(provisionalAssessments)
     }
 
     if (anonymousGraders) {
@@ -2242,6 +2242,17 @@ EG = {
     $submission_not_newest_notice.showIf(
       $submission_to_view.filter(':visible').find(':selected').nextAll().length
     )
+
+    if (ENV.FEATURES?.word_count_in_speed_grader) {
+      // xsslint safeString.method toLocaleString
+      // xsslint safeString.method t
+      const wordCountHTML = submission.word_count
+        ? `<label>${I18n.t('Word Count')}:</label> ${I18n.t('word', {
+            count: submission.word_count
+          })}`
+        : ''
+      $word_count.html($.raw(wordCountHTML))
+    }
 
     $submission_late_notice.showIf(submission.late)
     $full_width_container.removeClass('with_enrollment_notice')
@@ -2947,9 +2958,10 @@ EG = {
   },
 
   currentDisplayedSubmission() {
-    const displayedHistory = this.currentStudent.submission?.submission_history?.[
-      this.currentStudent.submission.currentSelectedIndex
-    ]
+    const displayedHistory =
+      this.currentStudent.submission?.submission_history?.[
+        this.currentStudent.submission.currentSelectedIndex
+      ]
     return displayedHistory?.submission || this.currentStudent.submission
   },
 
@@ -3320,7 +3332,7 @@ EG = {
     ) {
       $grade.val(submission.grade)
     } else {
-      grade = EG.getGradeToShow(submission, ENV.grading_role)
+      grade = EG.getGradeToShow(submission)
       $grade.val(grade.entered)
     }
 
@@ -3385,7 +3397,7 @@ EG = {
     return formattedGrade
   },
 
-  getGradeToShow(submission, grading_role) {
+  getGradeToShow(submission) {
     const grade = {entered: ''}
 
     if (submission) {
@@ -3396,23 +3408,12 @@ EG = {
           grade.pointsDeducted = I18n.n(-submission.points_deducted)
         }
 
-        let enteredScore = submission.entered_score
-        let enteredGrade = submission.entered_grade
-
-        if (submission.provisional_grade_id) {
-          enteredScore = submission.score
-          enteredGrade = submission.grade
-        }
-
-        if (enteredScore != null && ['moderator', 'provisional_grader'].includes(grading_role)) {
-          grade.entered = GradeFormatHelper.formatGrade(round(enteredScore, 2))
-          grade.adjusted = GradeFormatHelper.formatGrade(round(submission.score, 2))
-        } else if (submission.entered_grade != null) {
-          if (enteredGrade !== '' && !isNaN(enteredGrade)) {
-            grade.entered = GradeFormatHelper.formatGrade(round(enteredGrade, 2))
+        if (submission.entered_grade != null) {
+          if (submission.entered_grade !== '' && !isNaN(submission.entered_grade)) {
+            grade.entered = GradeFormatHelper.formatGrade(round(submission.entered_grade, 2))
             grade.adjusted = GradeFormatHelper.formatGrade(round(submission.grade, 2))
           } else {
-            grade.entered = GradeFormatHelper.formatGrade(enteredGrade)
+            grade.entered = GradeFormatHelper.formatGrade(submission.entered_grade)
             grade.adjusted = GradeFormatHelper.formatGrade(submission.grade)
           }
         }
@@ -3853,6 +3854,7 @@ function setupSelectors() {
   $width_resizer = $('#width_resizer')
   $window = $(window)
   $x_of_x_students = $('#x_of_x_students_frd')
+  $word_count = $('#submission_word_count')
   assignmentUrl = $('#assignment_url').attr('href')
   browserableCssClasses = /^(image|html|code)$/
   fileIndex = 1

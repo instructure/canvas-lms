@@ -289,11 +289,11 @@ export function CourseHeaderOptions({
   studentViewPath,
   canReadAsAdmin,
   courseContext,
-  parentSupportEnabled,
   observerList,
   currentUser,
   handleChangeObservedUser,
-  showingMobileNav
+  showingMobileNav,
+  showObserverOptions
 }) {
   const buttonProps = {
     id: 'manage-subject-btn',
@@ -302,8 +302,7 @@ export function CourseHeaderOptions({
     renderIcon: <IconEditSolid />
   }
   const altText = I18n.t('Manage Subject: %{courseContext}', {courseContext})
-  const showObserverOptions =
-    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
+
   const collapseManageButton = showingMobileNav && showObserverOptions
   const sideItemsWidth = '200px'
 
@@ -377,11 +376,11 @@ CourseHeaderOptions.propTypes = {
   studentViewPath: PropTypes.string.isRequired,
   canReadAsAdmin: PropTypes.bool.isRequired,
   courseContext: PropTypes.string.isRequired,
-  parentSupportEnabled: PropTypes.bool.isRequired,
   observerList: ObserverListShape.isRequired,
   handleChangeObservedUser: PropTypes.func.isRequired,
   currentUser: PropTypes.object.isRequired,
-  showingMobileNav: PropTypes.bool.isRequired
+  showingMobileNav: PropTypes.bool.isRequired,
+  showObserverOptions: PropTypes.bool.isRequired
 }
 
 export function K5Course({
@@ -442,6 +441,8 @@ export function K5Course({
   const [modulesExist, setModulesExist] = useState(true)
   const [windowSize, setWindowSize] = useState(() => getWindowSize())
   const [observedUserId, setObservedUserId] = useState(null)
+  const showObserverOptions =
+    parentSupportEnabled && shouldShowObserverOptions(observerList, currentUser)
   useEffect(() => {
     modulesRef.current = document.getElementById('k5-modules-container')
     contentRef.current.appendChild(modulesRef.current)
@@ -515,6 +516,7 @@ export function K5Course({
           currentUser={currentUser}
           handleChangeObservedUser={setObservedUserId}
           showingMobileNav={showingMobileNav}
+          showObserverOptions={showObserverOptions}
         />
         <CourseHeaderHero
           name={name}
@@ -600,6 +602,7 @@ export function K5Course({
             userIsCourseAdmin={canReadAsAdmin}
             showLearningMasteryGradebook={showLearningMasteryGradebook}
             outcomeProficiency={outcomeProficiency}
+            observedUserId={showObserverOptions ? observedUserId : null}
           />
         )}
         <ResourcesPage

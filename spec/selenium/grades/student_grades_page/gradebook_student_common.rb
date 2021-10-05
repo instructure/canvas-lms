@@ -34,7 +34,7 @@ shared_examples 'Arrange By dropdown' do |context|
   let(:assign_group_order) { [@assignment0.title, @discussion.title, @quiz.title, @assignment1.title] }
 
   it 'persists', test_id: pick_test_id(context, student: "591860", teacher: "592108", admin: "592119", ta: "592130"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    click_option('#assignment_sort_order_select_menu', 'Title')
+    click_option('#assignment_sort_order_select_menu', 'Name')
     expect_new_page_load { f('#apply_select_menus').click }
     get "/courses/#{@course.id}"
     get "/courses/#{@course.id}/grades/#{@student.id}"
@@ -75,8 +75,8 @@ shared_examples 'Arrange By dropdown' do |context|
     expect(option_values).to include 'assignment_group'
   end
 
-  it 'sorts by Title', test_id: pick_test_id(context, student: "591856", teacher: "592115", admin: "592126", ta: "592137"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    click_option('#assignment_sort_order_select_menu', 'Title')
+  it 'sorts by Name', test_id: pick_test_id(context, student: "591856", teacher: "592115", admin: "592126", ta: "592137"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
+    click_option('#assignment_sort_order_select_menu', 'Name')
     expect_new_page_load { f('#apply_select_menus').click }
 
     table_rows = ff('#grades_summary tr')

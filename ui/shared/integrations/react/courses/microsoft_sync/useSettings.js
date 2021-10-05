@@ -72,7 +72,13 @@ function useSettings(courseId) {
     try {
       await toggleGroup()
     } catch (e) {
-      setError(e.message)
+      let message
+      try {
+        message = e.response.data.message
+      } catch (e) {
+        message = null
+      }
+      setError(message ? {message} : e.message)
     }
     setLoading(false)
   }

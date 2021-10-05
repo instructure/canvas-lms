@@ -88,98 +88,46 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
     })
   })
   describe('"Display Options" field', () => {
-    describe('with rce_better_file_previewing off', () => {
-      const rce_better_file_previewing = window.ENV.FEATURES.rce_better_file_previewing
-      beforeAll(() => {
-        window.ENV.FEATURES.rce_better_file_previewing = false
-      })
-      afterAll(() => {
-        window.ENV.FEATURES.rce_better_file_previewing = rce_better_file_previewing
-      })
-
-      it('is hidden if the link is not previewable', () => {
-        props.content.isPreviewable = false
-        renderComponent()
-        expect(tray.$previewCheckbox).not.toBeInTheDocument()
-      })
-
-      it('is shown if the link is previewable', () => {
-        renderComponent()
-        expect(tray.$displayAsField).toBeInTheDocument()
-      })
-
-      it('checks auto-preview if displayAs is "embed"', () => {
-        props.content.displayAs = 'embed'
-        renderComponent()
-        expect(tray.autoPreview).toBeTruthy()
-      })
-
-      it('unchecks auto-preview if displayAs is "link"', () => {
-        props.content.displayAs = 'link'
-        renderComponent()
-        expect(tray.autoPreview).toBeFalsy()
-      })
-
-      it('can be reset to "Display Text Link"', () => {
-        props.content.displayAs = 'link'
-        renderComponent()
-        tray.setAutoPreview(true)
-        expect(tray.autoPreview).toBeTruthy()
-        tray.setAutoPreview(false)
-        expect(tray.autoPreview).toBeFalsy()
-      })
+    it('is hidden if the link is not previewable', () => {
+      props.content.isPreviewable = false
+      renderComponent()
+      expect(tray.$previewCheckbox).not.toBeInTheDocument()
     })
 
-    describe('with rce_better_file_previewing on', () => {
-      const rce_better_file_previewing = window.ENV.FEATURES.rce_better_file_previewing
-      beforeAll(() => {
-        window.ENV.FEATURES.rce_better_file_previewing = true
-      })
-      afterAll(() => {
-        window.ENV.FEATURES.rce_better_file_previewing = rce_better_file_previewing
-      })
+    it('is shown if the link is previewable', () => {
+      renderComponent()
+      expect(tray.$displayAsField).toBeInTheDocument()
+    })
 
-      it('is hidden if the link is not previewable', () => {
-        props.content.isPreviewable = false
-        renderComponent()
-        expect(tray.$previewCheckbox).not.toBeInTheDocument()
-      })
+    it('preview_option is "overlay" and auto-preview is hidden if displayAs is "embed-disabled"', () => {
+      props.content.displayAs = 'embed-disabled'
+      renderComponent()
+      expect(tray.$previewCheckbox).toBeNull()
+      expect(tray.previewOption).toBe('overlay')
+    })
 
-      it('is shown if the link is previewable', () => {
-        renderComponent()
-        expect(tray.$displayAsField).toBeInTheDocument()
-      })
+    it('preview_option is "inline" and auto-preview is shown if displayAs is "link"', () => {
+      props.content.displayAs = 'link'
+      renderComponent()
+      expect(tray.$previewCheckbox).toBeInTheDocument()
+      expect(tray.autoPreview).toBeFalsy()
+      expect(tray.previewOption).toBe('inline')
+    })
 
-      it('preview_option is "overlay" and auto-preview is hidden if displayAs is "embed-disabled"', () => {
-        props.content.displayAs = 'embed-disabled'
-        renderComponent()
-        expect(tray.$previewCheckbox).toBeNull()
-        expect(tray.previewOption).toBe('overlay')
-      })
+    it('preview_option is "inline" and auto-preview is checked if displayAs is "embed"', () => {
+      props.content.displayAs = 'embed'
+      renderComponent()
+      expect(tray.autoPreview).toBeTruthy()
+      expect(tray.previewOption).toBe('inline')
+    })
 
-      it('preview_option is "inline" and auto-preview is shown if displayAs is "link"', () => {
-        props.content.displayAs = 'link'
-        renderComponent()
-        expect(tray.$previewCheckbox).toBeInTheDocument()
-        expect(tray.autoPreview).toBeFalsy()
-        expect(tray.previewOption).toBe('inline')
-      })
-
-      it('preview_option is "inline" and auto-preview is checked if displayAs is "embed"', () => {
-        props.content.displayAs = 'embed'
-        renderComponent()
-        expect(tray.autoPreview).toBeTruthy()
-        expect(tray.previewOption).toBe('inline')
-      })
-
-      it('can be reset to "Display Text Link"', () => {
-        props.content.displayAs = 'link'
-        renderComponent()
-        tray.setAutoPreview(true)
-        expect(tray.autoPreview).toBeTruthy()
-        tray.setAutoPreview(false)
-        expect(tray.autoPreview).toBeFalsy()
-      })
+    it('can be reset to "Display Text Link"', () => {
+      props.content.displayAs = 'link'
+      renderComponent()
+      tray.setAutoPreview(true)
+      expect(tray.autoPreview).toBeTruthy()
+      tray.setAutoPreview(false)
+      expect(tray.autoPreview).toBeFalsy()
     })
   })
   describe('"Done" button', () => {
@@ -263,46 +211,15 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
       })
 
       describe('sets disablePreview', () => {
-        describe('with rce_better_file_previewing off', () => {
-          const rce_better_file_previewing = window.ENV.FEATURES.rce_better_file_previewing
-          beforeAll(() => {
-            window.ENV.FEATURES.rce_better_file_previewing = false
-          })
-          afterAll(() => {
-            window.ENV.FEATURES.rce_better_file_previewing = rce_better_file_previewing
-          })
-
-          it('if displayAs is "embed-disabled"', () => {
-            props.content.isPreviewable = true
-            renderComponent()
-            tray.setDisablePreview(true)
-            tray.$doneButton.click()
-            const [{embed}] = props.onSave.mock.calls[0]
-            expect(embed.type).toEqual('scribd')
-            expect(embed.autoOpenPreview).toBeFalsy()
-            expect(embed.disablePreview).toBeTruthy()
-          })
-        })
-
-        describe('with rce_better_file_previewing on', () => {
-          const rce_better_file_previewing = window.ENV.FEATURES.rce_better_file_previewing
-          beforeAll(() => {
-            window.ENV.FEATURES.rce_better_file_previewing = true
-          })
-          afterAll(() => {
-            window.ENV.FEATURES.rce_better_file_previewing = rce_better_file_previewing
-          })
-
-          it('if preview_option is "overlay"', () => {
-            props.content.isPreviewable = true
-            renderComponent()
-            tray.setPreviewOption('overlay')
-            tray.$doneButton.click()
-            const [{embed}] = props.onSave.mock.calls[0]
-            expect(embed.type).toEqual('scribd')
-            expect(embed.autoOpenPreview).toBeFalsy()
-            expect(embed.disablePreview).toBeTruthy()
-          })
+        it('if preview_option is "overlay"', () => {
+          props.content.isPreviewable = true
+          renderComponent()
+          tray.setPreviewOption('overlay')
+          tray.$doneButton.click()
+          const [{embed}] = props.onSave.mock.calls[0]
+          expect(embed.type).toEqual('scribd')
+          expect(embed.autoOpenPreview).toBeFalsy()
+          expect(embed.disablePreview).toBeTruthy()
         })
       })
     })
