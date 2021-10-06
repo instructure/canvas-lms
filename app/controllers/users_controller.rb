@@ -189,7 +189,7 @@ class UsersController < ApplicationController
                                          :user_dashboard, :toggle_hide_dashcard_color_overlays,
                                          :masquerade, :external_tool, :dashboard_sidebar, :settings, :activity_stream,
                                          :activity_stream_summary, :pandata_events_token, :dashboard_cards,
-                                         :user_graded_submissions]
+                                         :user_graded_submissions, :show]
   before_action :require_registered_user, :only => [:delete_user_service,
                                                     :create_user_service]
   before_action :reject_student_view_student, :only => [:delete_user_service,
@@ -1251,16 +1251,17 @@ class UsersController < ApplicationController
 
   def show
     GuardRail.activate(:secondary) do
-      get_context(include_deleted: true)
-      @context_account = @context.is_a?(Account) ? @context : @domain_root_account
-      @user = if @context.is_a?(User)
-                @context
-              else
-                api_find(@context.all_users, params[:id])
-              end
-      allowed = @user.grants_right?(@current_user, session, :read_full_profile)
+      # we _don't_ want to get context if the user is the context
+      # so that for missing user context we can 401, but for others we can 404
+      get_context(include_deleted: true) if params[:account_id] || params[:course_id] || params[:group_id]
 
-      raise ActiveRecord::RecordNotFound unless allowed
+      @context_account = @context.is_a?(Account) ? @context : @domain_root_account
+      @user = api_find_all(@context&.all_users || User, [params[:id]]).first
+      allowed = @user&.grants_right?(@current_user, session, :read_full_profile)
+
+      return render_unauthorized_action unless allowed
+
+      @context ||= @user
 
       add_crumb(t('crumbs.profile', "%{user}'s profile", :user => @user.short_name), @user == @current_user ? user_profile_path(@current_user) : user_path(@user))
 
