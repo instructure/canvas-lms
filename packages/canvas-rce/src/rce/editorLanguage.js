@@ -61,6 +61,7 @@ const mapping = {
   sv: 'sv_SE',
   tr: 'tr_TR',
   'uk-UA': 'uk_UA',
+  'uk': 'uk_UA',
   vi: 'vi_VN',
   zh: 'zh_CN',
   'zh-HK': 'zh_TW',
