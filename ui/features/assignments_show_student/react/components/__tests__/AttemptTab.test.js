@@ -31,7 +31,6 @@ jest.mock('@canvas/upload-file')
 
 describe('ContentTabs', () => {
   beforeAll(() => {
-    window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })

@@ -50,7 +50,6 @@ function renderInContext(overrides = {}, children) {
 
 describe('SubmissionManager', () => {
   beforeAll(() => {
-    window.ENV.use_rce_enhancements = true
     window.INST = window.INST || {}
     window.INST.editorButtons = []
   })

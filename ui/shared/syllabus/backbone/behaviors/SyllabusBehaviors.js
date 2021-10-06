@@ -19,7 +19,6 @@
 import $ from 'jquery'
 import {changeMonth} from '../../jquery/calendar_move' // calendarMonths
 import RichContentEditor from '@canvas/rce/RichContentEditor'
-import KeyboardShortcuts from '@canvas/tinymce-keyboard-shortcuts'
 import '@canvas/datetime' // dateString, datepicker
 import '@canvas/forms/jquery/jquery.instructure_forms' // formSubmit, formErrors
 import '@canvas/jquery/jquery.instructure_misc_plugins' // ifExists, showIf
@@ -46,10 +45,8 @@ function highlightDaysWithEvents() {
   wrapper.removeAttr('role')
   wrapper.removeAttr('tabindex')
 
-  $syllabus.find('tr.date:visible').each(function() {
-    const date = $(this)
-      .find('.day_date')
-      .attr('data-date')
+  $syllabus.find('tr.date:visible').each(function () {
+    const date = $(this).find('.day_date').attr('data-date')
     events = $mini_month.find(`#mini_day_${date}`)
     events.addClass('has_event')
     wrapper = events.find('.day_wrapper')
@@ -77,10 +74,7 @@ function highlightRelated(related_id, self) {
 
   $syllabus.find('tr.related_event').removeClass('related_event')
   if (related_id && $syllabus) {
-    $syllabus
-      .find(`tr.related-${related_id}`)
-      .not(self)
-      .addClass('related_event')
+    $syllabus.find(`tr.related-${related_id}`).not(self).addClass('related_event')
   }
 }
 
@@ -88,16 +82,13 @@ function highlightRelated(related_id, self) {
 //    Called to bind behaviors to #syllabus after it's rendered.
 function bindToSyllabus() {
   const $syllabus = $('#syllabus')
-  $syllabus.on('mouseenter mouseleave', 'tr.date', function(ev) {
+  $syllabus.on('mouseenter mouseleave', 'tr.date', function (ev) {
     let date
-    if (ev.type === 'mouseenter')
-      date = $(this)
-        .find('.day_date')
-        .attr('data-date')
+    if (ev.type === 'mouseenter') date = $(this).find('.day_date').attr('data-date')
     highlightDate(date)
   })
 
-  $syllabus.on('mouseenter mouseleave', 'tr.date.detail_list', function(ev) {
+  $syllabus.on('mouseenter mouseleave', 'tr.date.detail_list', function (ev) {
     let related_id = null
     if (ev.type === 'mouseenter') {
       const classNames = ($(this).attr('class') || '').split(/\s+/)
@@ -122,18 +113,13 @@ function selectRow($row) {
     $('tr.selected').removeClass('selected')
     $row.addClass('selected')
     $('html, body').scrollTo($row)
-    $row
-      .find('a')
-      .first()
-      .focus()
+    $row.find('a').first().focus()
   }
 }
 
 function selectDate(date) {
   $('.mini_month .day.selected').removeClass('selected')
-  $('.mini_month')
-    .find(`#mini_day_${date}`)
-    .addClass('selected')
+  $('.mini_month').find(`#mini_day_${date}`).addClass('selected')
 }
 
 // Binds to mini calendar dom events
@@ -141,17 +127,15 @@ function bindToMiniCalendar() {
   const $mini_month = $('.mini_month')
 
   const prev_next_links = $mini_month.find('.next_month_link, .prev_month_link')
-  prev_next_links.on('click', function(ev) {
+  prev_next_links.on('click', function (ev) {
     ev.preventDefault()
     changeMonth($mini_month, $(this).hasClass('next_month_link') ? 1 : -1)
     highlightDaysWithEvents()
   })
 
-  const miniCalendarDayClick = function(ev) {
+  const miniCalendarDayClick = function (ev) {
     ev.preventDefault()
-    const date = $(ev.target)
-      .closest('.mini_calendar_day')[0]
-      .id.slice(9)
+    const date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9)
     const [year, month, day] = Array.from(date.split('_'))
     changeMonth($mini_month, `${month}/${day}/${year}`)
     highlightDaysWithEvents()
@@ -168,9 +152,7 @@ function bindToMiniCalendar() {
   $mini_month.on('focus blur mouseover mouseout', '.day_wrapper', ev => {
     let date
     if (ev.type !== 'mouseout' && ev.type !== 'blur') {
-      date = $(ev.target)
-        .closest('.mini_calendar_day')[0]
-        .id.slice(9)
+      date = $(ev.target).closest('.mini_calendar_day')[0].id.slice(9)
     }
     highlightDate(date)
   })
@@ -179,10 +161,8 @@ function bindToMiniCalendar() {
     ev.preventDefault()
     const todayString = $.datepicker.formatDate('yy_mm_dd', new Date())
     let $lastBefore
-    $('tr.date').each(function() {
-      const dateString = $(this)
-        .find('.day_date')
-        .attr('data-date')
+    $('tr.date').each(function () {
+      const dateString = $(this).find('.day_date').attr('data-date')
 
       if (dateString) {
         if (dateString > todayString) return false
@@ -201,7 +181,7 @@ function bindToMiniCalendar() {
 }
 
 // Binds to edit syllabus dom events
-const bindToEditSyllabus = function(course_summary_enabled) {
+const bindToEditSyllabus = function (course_summary_enabled) {
   const $course_syllabus = $('#course_syllabus')
   $course_syllabus.data('syllabus_body', ENV.SYLLABUS_BODY)
   const $edit_syllabus_link = $('.edit_syllabus_link')
@@ -212,13 +192,6 @@ const bindToEditSyllabus = function(course_summary_enabled) {
   // syllabus_right_side view)
   if (!$edit_syllabus_link.length) return
 
-  // Add the backbone view for keyboardshortup help here
-  if (!ENV.use_rce_enhancements) {
-    $('.toggle_views_link')
-      .first()
-      .before(new KeyboardShortcuts().render().$el)
-  }
-
   function resetToggleLinks() {
     $('.toggle_html_editor_link').show()
     $('.toggle_rich_editor_link').hide()
@@ -227,15 +200,6 @@ const bindToEditSyllabus = function(course_summary_enabled) {
   const $edit_course_syllabus_form = $('#edit_course_syllabus_form')
   let $course_syllabus_body = $('#course_syllabus_body')
   const $course_syllabus_details = $('#course_syllabus_details')
-
-  RichContentEditor.initSidebar({
-    show() {
-      $('#sidebar_content, #course_show_secondary').hide()
-    },
-    hide() {
-      $('#sidebar_content, #course_show_secondary').show()
-    }
-  })
 
   $edit_course_syllabus_form.on('edit', () => {
     $edit_course_syllabus_form.show()
@@ -280,11 +244,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     RichContentEditor.callOnRCE($course_syllabus_body, 'toggle')
     // hide the clicked link, and show the other toggle link.
     // todo: replace .andSelf with .addBack when JQuery is upgraded.
-    $(ev.currentTarget)
-      .siblings('.toggle_views_link')
-      .andSelf()
-      .toggle()
-      .focus()
+    $(ev.currentTarget).siblings('.toggle_views_link').andSelf().toggle().focus()
   })
 
   $edit_course_syllabus_form.on('click', '.cancel_button', ev => {

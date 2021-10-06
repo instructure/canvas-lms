@@ -18,7 +18,6 @@
 
 import $ from 'jquery'
 import RCELoader from '@canvas/rce/serviceRCELoader'
-import * as jwt from '@canvas/rce/jwt'
 import editorUtils from 'helpers/editorUtils'
 import fakeENV from 'helpers/fakeENV'
 import fixtures from 'helpers/fixtures'
@@ -179,75 +178,4 @@ test('ensures yielded editor has call and focus methods', function (assert) {
     done()
   }
   RCELoader.loadOnTarget(this.$div, {}, cb)
-})
-
-QUnit.module('loadSidebarOnTarget', {
-  setup() {
-    fakeENV.setup()
-    ENV.RICH_CONTENT_APP_HOST = 'http://rce.host'
-    ENV.RICH_CONTENT_CAN_UPLOAD_FILES = true
-    ENV.context_asset_string = 'courses_1'
-    ENV.current_user_id = '17'
-    fixtures.setup()
-    this.$div = fixtures.create('<div />')
-    this.sidebar = {}
-    this.rce = {renderSidebarIntoDiv: sinon.stub().callsArgWith(2, this.sidebar)}
-    sinon.stub(RCELoader, 'loadRCE').callsArgWith(0, this.rce)
-    this.refreshToken = sinon.spy()
-    sandbox.stub(jwt, 'refreshFn').returns(this.refreshToken)
-  },
-  teardown() {
-    fakeENV.teardown()
-    fixtures.teardown()
-    RCELoader.loadRCE.restore()
-  }
-})
-
-test('passes host and context from ENV as props to sidebar', function () {
-  const cb = sinon.spy()
-  RCELoader.loadSidebarOnTarget(this.$div, cb)
-  ok(this.rce.renderSidebarIntoDiv.called)
-  const props = this.rce.renderSidebarIntoDiv.args[0][1]
-  equal(props.host, 'http://rce.host')
-  equal(props.contextType, 'courses')
-  equal(props.contextId, '1')
-})
-
-test('uses user context when in account context', function () {
-  ENV.context_asset_string = 'account_1'
-  const cb = sinon.spy()
-  RCELoader.loadSidebarOnTarget(this.$div, cb)
-  ok(this.rce.renderSidebarIntoDiv.called)
-  const props = this.rce.renderSidebarIntoDiv.args[0][1]
-  equal(props.contextType, 'user')
-  equal(props.contextId, '17')
-})
-
-test('yields sidebar to callback', function () {
-  const cb = sinon.spy()
-  RCELoader.loadSidebarOnTarget(this.$div, cb)
-  ok(cb.calledWith(this.sidebar))
-})
-
-test('ensures yielded sidebar has show and hide methods', function () {
-  const cb = () => {}
-  RCELoader.loadSidebarOnTarget(this.$div, cb)
-  equal(typeof this.sidebar.show, 'function')
-  equal(typeof this.sidebar.hide, 'function')
-})
-
-test('provides a callback for loading a new jwt', function () {
-  const cb = sinon.spy()
-  RCELoader.loadSidebarOnTarget(this.$div, cb)
-  ok(this.rce.renderSidebarIntoDiv.called)
-  const props = this.rce.renderSidebarIntoDiv.args[0][1]
-  ok(jwt.refreshFn.calledWith(props.jwt))
-  equal(props.refreshToken, this.refreshToken)
-})
-
-test('passes brand config json url', function () {
-  ENV.active_brand_config_json_url = {}
-  RCELoader.loadSidebarOnTarget(this.$div, () => {})
-  const props = this.rce.renderSidebarIntoDiv.args[0][1]
-  equal(props.themeUrl, ENV.active_brand_config_json_url)
 })

@@ -17,9 +17,7 @@
  */
 
 import I18n from 'i18n!ExternalToolsPlugin'
-import htmlEscape from 'html-escape'
-import './jquery/jquery.dropdownList'
-import '@canvas/jquery/jquery.instructure_misc_helpers'
+import $ from 'jquery'
 
 // setting ENV.MAX_MRU_LTI_TOOLS can make it easier to test
 const MAX_MRU_LTI_TOOLS = ENV.MAX_MRU_LTI_TOOLS || 5
@@ -53,96 +51,21 @@ export default {
    *   complete with title, cmd, image, and classes
    */
   buttonConfig(button, editor) {
-    const useRceEnhancements = ENV.use_rce_enhancements
-
     const config = {
       title: button.name,
       classes: 'widget btn instructure_external_tool_button'
     }
-    if (useRceEnhancements) {
-      config.id = button.id
-      config.onAction = () => {
-        editor.execCommand(`instructureExternalButton${button.id}`)
-        this.updateMRUList(button.id)
-        this.showHideButtons(editor)
-      }
-      config.description = button.description
-      config.favorite = button.favorite
-    } else {
-      config.cmd = `instructureExternalButton${button.id}`
+    config.id = button.id
+    config.onAction = () => {
+      editor.execCommand(`instructureExternalButton${button.id}`)
+      this.updateMRUList(button.id)
+      this.showHideButtons(editor)
     }
-
-    if (
-      !useRceEnhancements && // New RCE does not support custom icon classes
-      button.canvas_icon_class &&
-      typeof button.canvas_icon_class === 'string'
-    ) {
-      config.icon = `hack-to-avoid-mce-prefix ${button.canvas_icon_class}`
-    } else {
-      // default to image
-      config.image = button.icon_url
-    }
+    config.description = button.description
+    config.favorite = button.favorite
+    config.image = button.icon_url
 
     return config
-  },
-
-  /**
-   * convert the button clump configuration to
-   * an associative array where the key is an image tag
-   * with the name and the value is the thing to do
-   * when that button gets clicked.  This gives us
-   * a decent structure for mapping click events for
-   * each dynamically generated button in the button clump
-   * list.
-   *
-   * @param {Array<Hash (representing a button)>} clumpedButtons an array of
-   *   button configs, like the ones passed into "buttonConfig"
-   *   above as parameters
-   *
-   * @param {function(Hash), editor} onClickHandler the function that should get
-   *   called when this button gets clicked
-   *
-   * @returns {Hash<string,function(Hash)>} the hash we can use
-   *   for generating a dropdown list in jquery
-   */
-  clumpedButtonMapping(clumpedButtons, ed, onClickHandler) {
-    return clumpedButtons.reduce((items, button) => {
-      let key
-
-      // added  data-tool-id='"+ button.id +"' to make elements unique when the have the same name
-      if (button.canvas_icon_class) {
-        key = `<i class='${htmlEscape(button.canvas_icon_class)}' data-tool-id='${button.id}'></i>`
-      } else {
-        // icon_url is implied
-        key = `<img src='${htmlEscape(button.icon_url)}' data-tool-id='${button.id}'/>`
-      }
-      key += `&nbsp;${htmlEscape(button.name)}`
-      items[key] = function () {
-        onClickHandler(button, ed)
-      }
-      return items
-    }, {})
-  },
-
-  /**
-   * extend the dropdown menu for all the buttons
-   * clumped up into the "externalButtonClump", and attach
-   * an event to the editor so that whenever you click
-   * anywhere else on the editor the dropdown goes away.
-   *
-   * @param {jQuery Object} target the Dom element we're attaching
-   *   this dropdown list to
-   * @param {Hash<string,function(Hash)>} buttons the buttons to put
-   *   into the dropdown list, typically generated from 'clumpedButtonMapping'
-   * @param {tinymce.Editor} editor the relevant editor for this
-   *   dropdown list, to whom we will listen for any click events
-   *   outside the dropdown menu
-   */
-  attachClumpedDropdown(target, buttons, editor) {
-    target.dropdownList({options: buttons})
-    editor.on('click', () => {
-      target.dropdownList('hide')
-    })
   },
 
   showHideButtons(ed) {

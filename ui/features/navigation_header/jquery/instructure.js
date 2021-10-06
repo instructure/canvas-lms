@@ -692,14 +692,6 @@ $(function () {
       if (!$editor || $editor.length === 0) {
         return
       }
-      RichContentEditor.initSidebar({
-        show() {
-          $('#sidebar_content').hide()
-        },
-        hide() {
-          $('#sidebar_content').show()
-        }
-      })
       RichContentEditor.loadNewEditor($editor, {focus: true})
     })
     .bind('richTextEnd', (event, $editor) => {
