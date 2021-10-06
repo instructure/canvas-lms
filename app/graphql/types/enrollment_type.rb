@@ -48,7 +48,7 @@ module Types
     implements Interfaces::LegacyIDInterface
     implements Interfaces::AssetStringInterface
 
-    alias :enrollment :object
+    alias_method :enrollment, :object
 
     global_id_field :id
 

@@ -19,16 +19,28 @@
 import React from 'react'
 import {Provider} from 'react-redux'
 import I18n from 'i18n!gradebook_history'
+import GradebookMenu from '@canvas/gradebook-menu'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import SearchForm from './SearchForm'
 import SearchResults from './SearchResults'
 
 import GradebookHistoryStore from './store/GradebookHistoryStore'
+import {bool, string} from 'prop-types'
 
-const GradebookHistoryApp = () => (
+const GradebookHistoryApp = ({courseUrl, learningMasteryEnabled}) => (
   <Provider store={GradebookHistoryStore}>
     <div>
-      <h1>{I18n.t('Gradebook History')}</h1>
+      <h1 className="screenreader-only">{I18n.t('Gradebook History')}</h1>
+
+      {/* ugly negative left margin to cancel out unmodifiable InstUI button
+      padding and get the menu to line up with the search form */}
+      <div style={{margin: '0 0 1.5em -0.75rem'}}>
+        <GradebookMenu
+          courseUrl={courseUrl}
+          learningMasteryEnabled={learningMasteryEnabled}
+          variant="GradebookHistory"
+        />
+      </div>
       <SearchForm />
       <SearchResults
         caption={<ScreenReaderContent>{I18n.t('Grade Changes')}</ScreenReaderContent>}
@@ -36,5 +48,10 @@ const GradebookHistoryApp = () => (
     </div>
   </Provider>
 )
+
+GradebookHistoryApp.propTypes = {
+  courseUrl: string,
+  learningMasteryEnabled: bool
+}
 
 export default GradebookHistoryApp

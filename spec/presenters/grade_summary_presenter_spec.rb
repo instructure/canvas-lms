@@ -371,7 +371,7 @@ describe GradeSummaryPresenter do
     let(:module_option) { ["Module", "module"] }
 
     it "returns the default sort options" do
-      default_options = [["Due Date", "due_at"], ["Title", "title"]]
+      default_options = [["Due Date", "due_at"], ["Name", "title"]]
       expect(presenter.sort_options).to include(*default_options)
     end
 
@@ -410,7 +410,7 @@ describe GradeSummaryPresenter do
       @course.context_modules.create!(name: 'I <3 Modules')
 
       expect(I18n).to receive(:t).with('Due Date')
-      expect(I18n).to receive(:t).with('Title')
+      expect(I18n).to receive(:t).with('Name')
       expect(I18n).to receive(:t).with('Assignment Group')
       expect(I18n).to receive(:t).with('Module')
 
@@ -418,7 +418,7 @@ describe GradeSummaryPresenter do
     end
 
     it 'sorts menu items in a locale-aware way' do
-      expect(Canvas::ICU).to receive(:collate_by).with([['Due Date', 'due_at'], ['Title', 'title']], &:first)
+      expect(Canvas::ICU).to receive(:collate_by).with([['Due Date', 'due_at'], ['Name', 'title']], &:first)
       presenter.sort_options
     end
   end

@@ -161,7 +161,7 @@ module Lti
     ].freeze
 
     skip_before_action :load_user
-    before_action :activate_tool_shard!, only: :attachment
+    around_action :activate_tool_shard, only: :attachment
     before_action :authorized_lti2_tool
     before_action :authorized?
 
@@ -205,13 +205,13 @@ module Lti
 
     private
 
-    def activate_tool_shard!
+    def activate_tool_shard(&block)
       render_unauthorized and return unless access_token
 
       tool_shard = Shard.lookup(access_token.shard_id)
-      return if tool_shard == Shard.current
+      return yield if tool_shard == Shard.current
 
-      tool_shard.activate!
+      tool_shard.activate(&block)
     rescue Lti::Oauth2::InvalidTokenError
       render_unauthorized
     end

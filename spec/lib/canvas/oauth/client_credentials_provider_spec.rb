@@ -73,7 +73,7 @@ module Canvas::Oauth
     let(:aud) { Rails.application.routes.url_helpers.oauth2_token_url }
     let(:iat) { 1.minute.ago.to_i }
     let(:exp) { 10.minutes.from_now.to_i }
-    let(:rsa_key_pair) { Canvas::Security::RSAKeyPair.new }
+    let(:rsa_key_pair) { CanvasSecurity::RSAKeyPair.new }
     let(:signing_key) { JSON::JWK.new(rsa_key_pair.to_jwk) }
     let(:jwt) do
       {
@@ -219,7 +219,7 @@ module Canvas::Oauth
       end
 
       context 'with bad signing key' do
-        let(:signing_key) { JSON::JWK.new(Canvas::Security::RSAKeyPair.new.to_jwk) }
+        let(:signing_key) { JSON::JWK.new(CanvasSecurity::RSAKeyPair.new.to_jwk) }
 
         it { is_expected.not_to be_empty }
       end

@@ -3675,4 +3675,66 @@ describe User do
       expect(@teacher.comment_bank_items).to eq [@c1]
     end
   end
+
+  describe "create_courses_right" do
+    before :once do
+      @user = user_factory(active_all: true)
+      @account = Account.default
+    end
+
+    it "returns :admin for AccountUsers with :manage_courses" do
+      account_admin_user(user: @user)
+      expect(@user.create_courses_right(@account)).to be(:admin)
+    end
+
+    it "returns nil for AccountUsers without :manage_courses" do
+      account_admin_user_with_role_changes(user: @user, role_changes: { manage_courses: false })
+      expect(@user.create_courses_right(@account)).to be_nil
+    end
+
+    it "returns nil if fake student" do
+      fake_student = course_factory(active_all: true).student_view_student
+      expect(fake_student.create_courses_right(@account)).to be_nil
+    end
+
+    it "returns :teacher if user has teacher enrollments iff teachers_can_create_courses?" do
+      course_with_teacher(user: @user, active_all: true)
+      expect(@user.create_courses_right(@account)).to be_nil
+      @account.settings[:teachers_can_create_courses] = true
+      @account.save!
+      expect(@user.create_courses_right(@account)).to be(:teacher)
+    end
+
+    it "returns :student if user has student enrollments iff students_can_create_courses?" do
+      course_with_student(user: @user, active_all: true)
+      expect(@user.create_courses_right(@account)).to be_nil
+      @account.settings[:students_can_create_courses] = true
+      @account.save!
+      expect(@user.create_courses_right(@account)).to be(:student)
+    end
+
+    it "returns :no_enrollments if user has teacher enrollments iff no_enrollments_can_create_courses?" do
+      expect(@user.create_courses_right(@account)).to be_nil
+      @account.settings[:no_enrollments_can_create_courses] = true
+      @account.save!
+      expect(@user.create_courses_right(@account)).to be(:no_enrollments)
+    end
+
+    it "does not count deleted teacher enrollments" do
+      enrollment = course_with_teacher(user: @user)
+      enrollment.workflow_state = 'deleted'
+      enrollment.save!
+      @account.settings[:teachers_can_create_courses] = true
+      @account.save!
+      expect(@user.create_courses_right(@account)).to be_nil
+    end
+
+    it "returns :student if user has teacher and student enrollments but teachers_can_create_courses is false" do
+      course_with_teacher(user: @user, active_all: true)
+      course_with_student(user: @user, active_all: true)
+      @account.settings[:students_can_create_courses] = true
+      @account.save!
+      expect(@user.create_courses_right(@account)).to be(:student)
+    end
+  end
 end

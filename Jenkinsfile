@@ -173,6 +173,30 @@ def maybeSlackSendRetrigger() {
   }
 }
 
+def useRspecQ(percentage) {
+  if (configuration.isRspecqEnabled()) {
+    env.RSPECQ_ENABLED = '1'
+    return true
+  }
+
+  java.security.SecureRandom random = new java.security.SecureRandom()
+  if (!(env.RSPECQ_ENABLED == '1' && random.nextInt((100 / percentage).intValue()) == 0)) {
+    env.RSPECQ_ENABLED = '0'
+    return false
+  }
+
+  return true
+}
+
+def getRspecProcesses() {
+  // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
+  if (useRspecQ(50)) {
+    configuration.getInteger('rspecq-processes')
+  } else {
+    configuration.getInteger('rspec-processes')
+  }
+}
+
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
@@ -233,6 +257,7 @@ pipeline {
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
+    RSPEC_PROCESSES = getRspecProcesses()
 
     // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
@@ -273,11 +298,11 @@ pipeline {
     POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
 
-    CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
-    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
+    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
     KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     LINTERS_RUNNER_IMAGE = "$LINTERS_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
-    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-${env.RSPEC_PROCESSES ?: '4'}"
 
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
@@ -328,13 +353,6 @@ pipeline {
               postFn(stageConfig.status())
             }
           ]
-
-          // Determine if this build is using RSpecQ and set RSPEC_PROCESSES
-          if (rspecStage.useRspecQ(50)) {
-            env.RSPEC_PROCESSES = configuration.getInteger('rspecq-processes')
-          } else {
-            env.RSPEC_PROCESSES = configuration.getInteger('rspec-processes')
-          }
 
           extendedStage('Root').hooks(postBuildHandler).obeysAllowStages(false).timings(false).execute {
             def rootStages = [:]

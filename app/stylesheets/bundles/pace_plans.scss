@@ -25,6 +25,52 @@
 // This allows us to animate on height and width, which InstUI Transitions don't
 // handle very well.
 .pace-plans-collapse {
-  transition: max-height 500ms ease, max-width 500ms ease;
+  transition: height 500ms ease, width 500ms ease;
   white-space: nowrap;
+}
+
+.pace-plans-module-table {
+  // This prevents the focus outline on the ToggleDetails button from being
+  // overlapped by the modules Table underneath it
+  & button {
+    z-index: 1;
+  }
+
+  // This supports table-based transitions
+  & th, td, [role="cell"] {
+    overflow: hidden;
+    transition: height 500ms ease, width 500ms ease, opacity 500ms ease;
+    white-space: nowrap;
+
+    &:nth-child(3):not(:last-child) {
+      opacity: 0;
+    }
+  }
+
+  & [role="cell"] {
+    // This allows the auto-generated stacked labels to play nice with the
+    // assignment title cell, since that contains an icon + truncated text
+    display: flex;
+    align-items: center;
+
+    // This supports table-based transitions
+    transition: height 500ms ease, width 500ms ease, padding 500ms ease, opacity 500ms ease;
+    &:nth-child(3):not(:last-child) {
+      height: 0;
+      padding: 0 0.75rem;
+    }
+  }
+
+  // This supports table-based transitions
+  &.actually-expanded {
+    & th, td, [role="cell"] {
+      &:nth-child(3):not(:last-child) {
+        opacity: 1;
+      }
+    }
+    & [role="cell"]:nth-child(3):not(:last-child) {
+      height: 3.75rem;
+      padding: 0.5rem 0.75rem;
+    }
+  }
 }

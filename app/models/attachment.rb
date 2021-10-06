@@ -1378,7 +1378,7 @@ class Attachment < ActiveRecord::Base
   def currently_locked
     self.locked || (self.lock_at && Time.zone.now > self.lock_at) || (self.unlock_at && Time.zone.now < self.unlock_at) || self.file_state == 'hidden'
   end
-  alias currently_locked? currently_locked
+  alias_method :currently_locked?, :currently_locked
 
   def hidden
     hidden?
@@ -1471,7 +1471,7 @@ class Attachment < ActiveRecord::Base
     Attachment.skip_3rd_party_submits(false)
   end
 
-  alias destroy_permanently! destroy
+  alias_method :destroy_permanently!, :destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy

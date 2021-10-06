@@ -37,7 +37,7 @@ module Types
 
     implements Interfaces::AssetStringInterface
 
-    alias :course :object
+    alias_method :course, :object
 
     class CourseWorkflowState < BaseEnum
       graphql_name "CourseWorkflowState"

@@ -108,10 +108,8 @@ shared_examples_for 'k5 homeroom announcements' do
     end
   end
 
-  context 'announcement attachments with the better file downloading and previewing flags on' do
+  describe 'announcement attachments' do
     before :once do
-      Account.site_admin.enable_feature!(:rce_better_file_previewing)
-
       attachment_model(uploaded_data: fixture_file_upload("files/example.pdf", "application/pdf"))
       @homeroom_course.announcements.create!(title: "Welcome to class", message: "Hello!", attachment: @attachment)
     end

@@ -39,6 +39,15 @@ draft_discussions:
     in the discussions redesign
   applies_to: SiteAdmin
 
+discussions_reporting:
+  state: hidden
+  beta: false
+  display_name: Discussions Redesign - Reporting
+  description: |-
+    This feature flag enables Discussions Reporting inside the new
+    Discussions Redesign work.
+  applies_to: SiteAdmin
+
 isolated_view:
   state: hidden
   beta: true

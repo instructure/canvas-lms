@@ -22,7 +22,7 @@ module Types
   class CoursePermissionsType < ApplicationObjectType
     graphql_name "CoursePermissions"
 
-    alias perm_loader object
+    alias_method :perm_loader, :object
 
     field :manage_grades, Boolean, null: true
     def manage_grades

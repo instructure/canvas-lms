@@ -112,9 +112,19 @@ placements.forEach(placementName => {
   })
 })
 
-const couldBeEither = ['assignment_selection', 'link_selection']
+const couldBeEither = ['assignment_selection', 'link_selection', 'course_assignments_menu']
 
 couldBeEither.forEach(placementName => {
+  if (placementName === 'course_assignments_menu') {
+    beforeAll(() => {
+      global.ENV.FEATURES ||= {}
+      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = true
+    })
+
+    afterAll(() => {
+      global.ENV.FEATURES.lti_multiple_assignment_deep_linking = false
+    })
+  }
   it('displays alert when placement supports deep linking and resource link and deep linking chosen', () => {
     const wrapper = mount(
       <Placement {...props({placementName}, {message_type: 'LtiDeepLinkingRequest'})} />

@@ -97,7 +97,7 @@ still a correctly signed token that's been subsequently encrypted.
 You can verify the signature and decrypt upon receiving such a token:
 
 ```ruby
-decrypted = CanvasSecurity.decrypt_services_jwt(jwt, signing_secret, encryption_secret)
+decrypted = CanvasSecurity.decrypt_encrypted_jwt(jwt, signing_secret, encryption_secret)
 ```
 
 This will error unless your JWT has a valid signature and can be decrypted.

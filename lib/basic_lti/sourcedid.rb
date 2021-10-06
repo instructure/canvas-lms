@@ -96,7 +96,7 @@ module BasicLTI
     end
 
     def self.token_from_sourcedid!(sourcedid)
-      Canvas::Security.decrypt_services_jwt(
+      Canvas::Security.decrypt_encrypted_jwt(
         Canvas::Security.base64_decode(sourcedid),
         signing_secret,
         encryption_secret
