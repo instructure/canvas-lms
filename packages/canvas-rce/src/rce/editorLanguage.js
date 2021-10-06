@@ -54,7 +54,7 @@ const mapping = {
   pt: 'pt_PT',
   'pt-BR': 'pt_BR',
   ro: 'ro',
-  ru: 'ru_RU',
+  ru: 'ru',
   sq: undefined, // tiny doesn't have Albanian
   sr: 'sr',
   sl: 'sl',
