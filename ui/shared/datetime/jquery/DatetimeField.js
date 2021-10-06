@@ -245,7 +245,8 @@ export default class DatetimeField {
 
   parseValue() {
     if (this.$field.data('inputdate')) {
-      this.datetime = new Date(this.$field.data('inputdate'))
+      const inputdate = this.$field.data('inputdate')
+      this.datetime = inputdate instanceof Date ? inputdate : new Date(inputdate)
       this.blank = false
       this.invalid = this.datetime === null
       this.$field.data('inputdate', null)
