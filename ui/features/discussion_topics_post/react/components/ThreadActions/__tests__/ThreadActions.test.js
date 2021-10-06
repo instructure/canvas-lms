@@ -36,6 +36,7 @@ const createProps = overrides => {
     onOpenInSpeedGrader: jest.fn(),
     onMarkAllAsRead: jest.fn(),
     onMarkThreadAsRead: jest.fn(),
+    onReport: jest.fn(),
     ...overrides
   }
 }
@@ -55,12 +56,14 @@ describe('ThreadActions', () => {
     expect(getByTestId('edit')).toBeInTheDocument()
     expect(getByTestId('delete')).toBeInTheDocument()
     expect(getByTestId('inSpeedGrader')).toBeInTheDocument()
+    expect(getByTestId('report')).toBeInTheDocument()
 
     expect(queryByText('Mark All as Read')).toBeTruthy()
     expect(queryByText('Go To Topic')).toBeTruthy()
     expect(queryByText('Edit')).toBeTruthy()
     expect(queryByText('Delete')).toBeTruthy()
     expect(queryByText('Open in SpeedGrader')).toBeTruthy()
+    expect(queryByText('Report')).toBeTruthy()
   })
 
   it('does not display if callback is not provided', () => {
@@ -75,6 +78,7 @@ describe('ThreadActions', () => {
     expect(queryByText('Edit')).toBeFalsy()
     expect(queryByText('Delete')).toBeFalsy()
     expect(queryByText('Open in SpeedGrader')).toBeFalsy()
+    expect(queryByText('Report')).toBeFalsy()
   })
 
   it('should not render when is search', () => {
@@ -263,6 +267,36 @@ describe('ThreadActions', () => {
         fireEvent.click(getByText('Go To Parent'))
         expect(props.goToParent.mock.calls.length).toBe(1)
       })
+    })
+  })
+
+  describe('Report', () => {
+    it('calls provided callback when clicked', () => {
+      const props = createProps()
+      const {getByTestId, getByText} = render(<ThreadActions {...props} />)
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(props.onReport.mock.calls.length).toBe(0)
+      fireEvent.click(getByText('Report'))
+      expect(props.onReport.mock.calls.length).toBe(1)
+    })
+
+    it('shows Reported if isReported', () => {
+      const props = createProps()
+      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported />)
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(getByText('Reported')).toBeTruthy()
+    })
+
+    it('cannot click if isReported', () => {
+      const props = createProps()
+      const {getByTestId, getByText} = render(<ThreadActions {...props} isReported />)
+
+      fireEvent.click(getByTestId('thread-actions-menu'))
+      expect(props.onReport.mock.calls.length).toBe(0)
+      fireEvent.click(getByText('Reported'))
+      expect(props.onReport.mock.calls.length).toBe(0)
     })
   })
 })
