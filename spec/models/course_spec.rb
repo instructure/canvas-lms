@@ -5164,7 +5164,9 @@ describe Course, "#sync_homeroom_enrollments" do
     @homeroom_course.enroll_user(@student, "StudentEnrollment").accept
 
     @observer = User.create
-    @homeroom_course.enroll_user(@observer, "ObserverEnrollment").accept
+    observer_enrollment = @homeroom_course.enroll_user(@observer, "ObserverEnrollment")
+    observer_enrollment.accept
+    observer_enrollment.update(associated_user_id: @student.id)
 
     @course = course_factory(active_course: true, account: @homeroom_course.account)
     @course.sync_enrollments_from_homeroom = true
@@ -5182,6 +5184,7 @@ describe Course, "#sync_homeroom_enrollments" do
     expect(@course.user_is_instructor?(@ta)).to eq(true)
     expect(@course.user_is_student?(@student)).to eq(true)
     expect(@course.user_has_been_observer?(@observer)).to eq(true)
+    expect(@course.observer_enrollments.first.associated_user_id).to eq(@student.id)
   end
 
   it "readds enrollments deleted on subject courses" do

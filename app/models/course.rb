@@ -3461,6 +3461,7 @@ class Course < ActiveRecord::Base
         course_enrollment.start_at = enrollment.start_at
         course_enrollment.end_at = enrollment.end_at
         course_enrollment.completed_at = enrollment.completed_at
+        course_enrollment.associated_user_id = enrollment.associated_user_id
         course_enrollment.save!
         progress.increment_completion!(1) if progress&.total
       end

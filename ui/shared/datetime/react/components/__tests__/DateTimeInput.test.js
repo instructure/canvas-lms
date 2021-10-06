@@ -65,7 +65,7 @@ describe('DateTimeInput::', () => {
   })
 
   it('handles nullish value as current date and time', () => {
-    const now = changeTimezone(new Date(), timezone)
+    const now = changeTimezone(new Date(), {originTZ: timezone})
     const expDate = dateFormatter.format(now)
     const expTime = timeFormatter.format(now)
     const {getByDisplayValue} = renderInput({value: undefined})
