@@ -166,5 +166,17 @@ describe Lti::Messages::DeepLinkingRequest do
         let(:accept_multiple) { true }
       end
     end
+
+    context 'when resource type is "module_index_menu"' do
+      let(:opts) { { resource_type: 'module_index_menu' } }
+
+      it_behaves_like 'sets deep linking attributes' do
+        let(:accept_types) { %w[ltiResourceLink] }
+        let(:accept_presentation_document_targets) { %w[iframe window] }
+        let(:accept_media_types) { 'application/vnd.ims.lti.v1.ltilink' }
+        let(:auto_create) { true }
+        let(:accept_multiple) { true }
+      end
+    end
   end
 end

@@ -62,6 +62,7 @@ import '@canvas/rails-flash-notifications'
 import DirectShareCourseTray from '@canvas/direct-sharing/react/components/DirectShareCourseTray'
 import DirectShareUserModal from '@canvas/direct-sharing/react/components/DirectShareUserModal'
 import mathml from 'mathml'
+import {addDeepLinkingListener} from '../../deep-linking/DeepLinking'
 
 function scrollTo($thing, time = 500) {
   if (!$thing || $thing.length === 0) return
@@ -2733,6 +2734,10 @@ $(document).ready(function() {
 
   $('.menu_tray_tool_link').click(openExternalTool)
   monitorLtiMessages()
+  // listen for deep linking messages here, and probably just reload the page
+  addDeepLinkingListener(() => {
+    window.location.reload()
+  })
 
   function renderCopyToTray(open, contentSelection, returnFocusTo) {
     ReactDOM.render(
