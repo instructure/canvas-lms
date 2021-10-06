@@ -200,7 +200,16 @@ export const IsolatedViewContainer = props => {
         message,
         includeReplyPreview
       },
-      optimisticResponse: getOptimisticResponse(message, replyId, props.discussionEntryId)
+      optimisticResponse: getOptimisticResponse(
+        message,
+        replyId,
+        props.discussionEntryId,
+        null,
+        buildQuotedReply(
+          isolatedEntryOlderDirection.data?.legacyNode?.discussionSubentriesConnection.nodes,
+          props.replyFromId
+        )
+      )
     })
   }
 
