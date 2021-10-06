@@ -43,10 +43,18 @@ RSpec.shared_context "JWT setup" do
       "encryption-secret" => fake_encryption_secret
     }
   end
+  let(:fallback_proxy) do
+    DynamicSettings::FallbackProxy.new({
+                                         CanvasSecurity::KeyStorage::PAST => CanvasSecurity::KeyStorage.new_key,
+                                         CanvasSecurity::KeyStorage::PRESENT => CanvasSecurity::KeyStorage.new_key,
+                                         CanvasSecurity::KeyStorage::FUTURE => CanvasSecurity::KeyStorage.new_key
+                                       })
+  end
 
   before do
     allow(DynamicSettings).to receive(:find).with(any_args).and_call_original
     allow(DynamicSettings).to receive(:find).with("canvas").and_return(fake_secrets)
+    allow(DynamicSettings).to receive(:kv_proxy).and_return(fallback_proxy)
   end
 
   after do
