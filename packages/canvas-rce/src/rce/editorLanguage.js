@@ -35,6 +35,7 @@ const mapping = {
   es: 'es',
   fa: 'fa_IR',
   'fa-IR': 'fa_IR',
+  fi: 'fi',
   fr: 'fr_FR',
   'fr-CA': 'fr_FR',
   he: 'he_IL',

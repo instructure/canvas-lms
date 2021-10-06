@@ -63,6 +63,7 @@ const recognized = [
   'en-GB-x-ukhe',
   'es',
   'fa-IR',
+  'fi',
   'fr',
   'fr-CA',
   'he',
