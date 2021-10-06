@@ -21,7 +21,7 @@ module Types
   class AssignmentGroupRulesType < ApplicationObjectType
     graphql_name "AssignmentGroupRules"
 
-    alias_method :rules, :object
+    alias rules object
 
     field :drop_lowest, Integer,
           "The lowest N assignments are not included in grade calculations",

@@ -62,8 +62,9 @@ export const IsolatedViewContainer = props => {
       last: ISOLATED_VIEW_INITIAL_PAGE_SIZE,
       sort: 'asc',
       courseID: window.ENV?.course_id,
-      relativeEntryId: null,
-      includeRelativeEntry: false
+      relativeEntryId:
+        props.relativeEntryId === props.discussionEntryId ? null : props.relativeEntryId,
+      includeRelativeEntry: !!props?.relativeEntryId
     }
 
     updateDiscussionTopicEntryCounts(cache, props.discussionTopic.id, {repliesCountChange: 1})
@@ -78,10 +79,7 @@ export const IsolatedViewContainer = props => {
     onCompleted: data => {
       setOnSuccess(I18n.t('The discussion entry was successfully created.'))
       props.setHighlightEntryId(data.createDiscussionEntry.discussionEntry.id)
-      if (
-        props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.rootEntryId ||
-        props.relativeEntryId
-      ) {
+      if (props.discussionEntryId !== data.createDiscussionEntry.discussionEntry.rootEntryId) {
         props.onOpenIsolatedView(
           data.createDiscussionEntry.discussionEntry.rootEntryId,
           data.createDiscussionEntry.discussionEntry.rootEntryId,
@@ -245,7 +243,6 @@ export const IsolatedViewContainer = props => {
   })
 
   const isolatedEntryNewerDirection = useQuery(DISCUSSION_SUBENTRIES_QUERY, {
-    skip: !props.relativeEntryId,
     variables: {
       discussionEntryID: props.discussionEntryId,
       first: 0,

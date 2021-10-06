@@ -770,7 +770,6 @@ describe ExternalToolsController, type: :request do
       "vendor_help_link" => nil,
       "version" => "1.1",
       "resource_selection" => {
-        "enabled" => true,
         "text" => "",
         "url" => "http://www.example.com/ims/lti/resource",
         "selection_height" => 50,
@@ -779,7 +778,6 @@ describe ExternalToolsController, type: :request do
       },
       "privacy_level" => "public",
       "editor_button" => {
-        "enabled" => true,
         "icon_url" => "/images/delete.png",
         "text" => "editor button",
         "url" => "http://www.example.com/ims/lti/editor",
@@ -788,7 +786,6 @@ describe ExternalToolsController, type: :request do
         "label" => "editor button"
       },
       "homework_submission" => {
-        "enabled" => true,
         "text" => "homework submission",
         "url" => "http://www.example.com/ims/lti/editor",
         "selection_height" => 50,
@@ -798,7 +795,6 @@ describe ExternalToolsController, type: :request do
       "custom_fields" => { "key1" => "val1", "key2" => "val2" },
       "description" => "For testing stuff",
       "user_navigation" => {
-        "enabled" => true,
         "text" => "User nav",
         "url" => "http://www.example.com/ims/lti/user",
         "label" => "User nav",
@@ -806,7 +802,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800
       },
       "course_navigation" => {
-        "enabled" => true,
         "text" => "Course nav",
         "url" => "http://www.example.com/ims/lti/course",
         "visibility" => "admins",
@@ -816,7 +811,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800
       },
       "account_navigation" => {
-        "enabled" => true,
         "text" => "Account nav",
         "url" => "http://www.example.com/ims/lti/account",
         "custom_fields" => { "key" => "value" },
@@ -825,7 +819,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800
       },
       "migration_selection" => {
-        "enabled" => true,
         "text" => "migration selection",
         "label" => "migration selection",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -833,7 +826,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 42
       },
       "course_home_sub_navigation" => {
-        "enabled" => true,
         "text" => "course home sub navigation",
         "label" => "course home sub navigation",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -843,7 +835,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "course_settings_sub_navigation" => {
-        "enabled" => true,
         "text" => "course settings sub navigation",
         "label" => "course settings sub navigation",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -853,7 +844,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "global_navigation" => {
-        "enabled" => true,
         "text" => "global navigation",
         "label" => "global navigation",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -863,7 +853,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "assignment_menu" => {
-        "enabled" => true,
         "text" => "assignment menu",
         "label" => "assignment menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -873,7 +862,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "assignment_index_menu" => {
-        "enabled" => true,
         "text" => "assignment index menu",
         "label" => "assignment index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -883,7 +871,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "assignment_group_menu" => {
-        "enabled" => true,
         "text" => "assignment group menu",
         "label" => "assignment group menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -893,7 +880,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "discussion_topic_menu" => {
-        "enabled" => true,
         "text" => "discussion topic menu",
         "label" => "discussion topic menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -903,7 +889,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "discussion_topic_index_menu" => {
-        "enabled" => true,
         "text" => "discussion topic index menu",
         "label" => "discussion topic index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -913,7 +898,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "file_menu" => {
-        "enabled" => true,
         "text" => "file menu",
         "label" => "file menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -923,7 +907,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "file_index_menu" => {
-        "enabled" => true,
         "text" => "file index menu",
         "label" => "file index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -933,7 +916,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "module_menu" => {
-        "enabled" => true,
         "text" => "module menu",
         "label" => "module menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -943,7 +925,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "module_index_menu" => {
-        "enabled" => true,
         "text" => "modules index menu",
         "label" => "modules index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -953,7 +934,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "module_group_menu" => {
-        "enabled" => true,
         "text" => "modules group menu",
         "label" => "modules group menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -963,7 +943,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "quiz_menu" => {
-        "enabled" => true,
         "text" => "quiz menu",
         "label" => "quiz menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -973,7 +952,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "quiz_index_menu" => {
-        "enabled" => true,
         "text" => "quiz index menu",
         "label" => "quiz index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -983,7 +961,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "submission_type_selection" => {
-        "enabled" => true,
         "text" => "submission type selection",
         "label" => "submission type selection",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -993,7 +970,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "wiki_page_menu" => {
-        "enabled" => true,
         "text" => "wiki page menu",
         "label" => "wiki page menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -1003,7 +979,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "student_context_card" => {
-        "enabled" => true,
         "text" => "context card link",
         "label" => "context card link",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -1013,7 +988,6 @@ describe ExternalToolsController, type: :request do
         "selection_width" => 800,
       },
       "wiki_index_menu" => {
-        "enabled" => true,
         "text" => "wiki index menu",
         "label" => "wiki index menu",
         "url" => "http://www.example.com/ims/lti/resource",
@@ -1032,7 +1006,6 @@ describe ExternalToolsController, type: :request do
       # Add when conference_selection_lti_placement FF removed
       #  "conference_selection"=>
       #   {"icon_url"=>"/images/delete.png",
-      #     "enabled"=>true,
       #     "text"=>"conference selection",
       #     "url"=>"http://www.example.com/ims/lti/conference",
       #     "label"=>"conference selection",
@@ -1041,7 +1014,6 @@ describe ExternalToolsController, type: :request do
       "course_assignments_menu" => begin
         if et && et.course_assignments_menu
           {
-            "enabled" => true,
             "text" => "course assignments menu",
             "url" => "http://www.example.com/ims/lti/resource",
             "label" => "course assignments menu",

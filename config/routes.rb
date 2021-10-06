@@ -942,7 +942,6 @@ CanvasRails::Application.routes.draw do
 
   post 'object_snippet' => 'context#object_snippet'
   get 'saml2' => 'login/saml#metadata'
-  get 'internal/services/jwks' => 'security#jwks'
 
   # Routes for course exports
   get 'xsd/:version.xsd' => 'content_exports#xml_schema'
@@ -1197,10 +1196,6 @@ CanvasRails::Application.routes.draw do
         post "#{context.pluralize}/:#{context}_id/submissions/update_grades", action: :bulk_update
         put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_read, as: "#{context}_submission_mark_read"
         delete "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/read", action: :mark_submission_unread, as: "#{context}_submission_mark_unread"
-        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :document_annotations_read_state, as: "#{path_prefix}_submission_document_annotations_read_state"
-        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/document_annotations/read", action: :mark_document_annotations_read, as: "#{path_prefix}_submission_document_annotations_mark_read"
-        get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :rubric_comments_read_state, as: "#{path_prefix}_submission_rubric_comments_read_state"
-        put "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id/rubric_comments/read", action: :mark_rubric_comments_read, as: "#{path_prefix}_submission_rubric_comments_mark_read"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions", action: :index, as: "#{path_prefix}_assignment_submissions"
         get "#{context.pluralize}/:#{context}_id/students/submissions", controller: :submissions_api, action: :for_students, as: "#{path_prefix}_student_submissions"
         get "#{context.pluralize}/:#{context}_id/assignments/:assignment_id/submissions/:user_id", action: :show, as: "#{path_prefix}_assignment_submission"
@@ -1518,7 +1513,6 @@ CanvasRails::Application.routes.draw do
       get 'accounts/:account_id/courses/:id', controller: :courses, action: :show, as: 'account_course_show'
       get 'accounts/:account_id/permissions', action: :permissions
       get 'accounts/:account_id/settings', action: :show_settings
-      get 'manually_created_courses_account', action: :manually_created_courses_account
       delete 'accounts/:account_id/users/:user_id', action: :remove_user
       put 'accounts/:account_id/users/:user_id/restore', action: :restore_user
     end
@@ -2393,7 +2387,7 @@ CanvasRails::Application.routes.draw do
   post 'login/oauth2/accept' => 'oauth2_provider#accept', as: :oauth2_auth_accept
   get 'login/oauth2/deny' => 'oauth2_provider#deny', as: :oauth2_auth_deny
   delete 'login/oauth2/token' => 'oauth2_provider#destroy', as: :oauth2_logout
-  get 'login/oauth2/jwks' => 'security#jwks', as: :oauth2_jwks
+  get 'login/oauth2/jwks' => 'oauth2_provider#jwks', as: :oauth2_jwks
 
   ApiRouteSet.draw(self, "/api/lti/v1") do
     post "tools/:tool_id/grade_passback", controller: :lti_api, action: :grade_passback, as: "lti_grade_passback_api"
@@ -2543,7 +2537,7 @@ CanvasRails::Application.routes.draw do
     end
 
     # Security
-    scope(controller: 'security') do
+    scope(controller: 'lti/ims/security') do
       get "security/jwks", action: :jwks, as: :jwks_show
     end
 

@@ -20,15 +20,14 @@ import React from 'react'
 import I18n from 'i18n!pace_plans_show_projections_button'
 import {connect} from 'react-redux'
 
-import {Button, IconButton} from '@instructure/ui-buttons'
+import {Button} from '@instructure/ui-buttons'
 import {IconEyeLine, IconOffLine} from '@instructure/ui-icons'
 
-import {getResponsiveSize, getShowProjections} from '../../reducers/ui'
-import {ResponsiveSizes, StoreState} from '../../types'
+import {getShowProjections} from '../../reducers/ui'
+import {StoreState} from '../../types'
 import {actions as uiActions} from '../../actions/ui'
 
 interface StoreProps {
-  readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
 }
 
@@ -39,38 +38,21 @@ interface DispatchProps {
 type ComponentProps = StoreProps & DispatchProps
 
 export const ShowProjectionsButton: React.FC<ComponentProps> = ({
-  responsiveSize,
   showProjections,
   toggleShowProjections
 }) => {
-  const buttonText = showProjections ? I18n.t('Hide Projections') : I18n.t('Show Projections')
-  const Icon = showProjections ? IconOffLine : IconEyeLine
-
-  if (responsiveSize === 'small') {
-    return (
-      <IconButton
-        data-testid="projections-icon-button"
-        screenReaderLabel={buttonText}
-        onClick={toggleShowProjections}
-      >
-        <Icon />
-      </IconButton>
-    )
-  }
   return (
     <Button
-      data-test-id="projections-text-button"
-      renderIcon={Icon}
+      renderIcon={showProjections ? IconOffLine : IconEyeLine}
       onClick={toggleShowProjections}
     >
-      {buttonText}
+      {showProjections ? I18n.t('Hide Projections') : I18n.t('Show Projections')}
     </Button>
   )
 }
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    responsiveSize: getResponsiveSize(state),
     showProjections: getShowProjections(state)
   }
 }

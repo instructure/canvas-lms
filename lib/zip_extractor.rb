@@ -69,7 +69,7 @@ class ZipExtractor
     FileUtils.mkdir(@dirname)
     @dirname
   end
-  alias_method :dirname, :make_safe_haven
+  alias :dirname :make_safe_haven
 
   def safe_haven_name
     dirname = "/tmp/#{CanvasSlug.generate}"

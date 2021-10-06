@@ -315,7 +315,6 @@ describe('SubmissionManager', () => {
       expect(confirmationDialog).toHaveTextContent('You are submitting a Text submission')
       expect(within(confirmationDialog).getByRole('button', {name: /Cancel/})).toBeInTheDocument()
       expect(within(confirmationDialog).getByRole('button', {name: /Okay/})).toBeInTheDocument()
-      fireEvent.click(within(confirmationDialog).getByRole('button', {name: /Cancel/}))
     })
   })
 

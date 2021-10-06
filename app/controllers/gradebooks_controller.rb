@@ -624,9 +624,7 @@ class GradebooksController < ApplicationController
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
       js_env(
-        COURSE_URL: named_context_url(@context, :context_url),
         COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
-        OUTCOME_GRADEBOOK_ENABLED: outcome_gradebook_enabled?,
         OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?) &&
           Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
       )
@@ -768,9 +766,6 @@ class GradebooksController < ApplicationController
         include: { submission_history: { methods: %i[late missing], except: omitted_field } },
         except: [omitted_field, :submission_comments]
       }
-      if @domain_root_account.feature_enabled?(:word_count_in_speed_grader)
-        json_params[:include][:submission_history][:methods] << :word_count
-      end
       json = submission.as_json(Submission.json_serialization_full_parameters.merge(json_params))
 
       json[:submission].tap do |submission_json|
