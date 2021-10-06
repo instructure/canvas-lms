@@ -22,13 +22,15 @@ export const NOTIFICATION_PREFERENCES_CONTEXT_SELECT_QUERY = gql`
     legacyNode(_id: $userId, type: User) {
       ... on User {
         _id
-        enrollments {
+        enrollments(currentOnly: true, orderBy: ["courses.name", "courses.id"]) {
           course {
-            id
             _id
             name
+            term {
+              _id
+              name
+            }
           }
-          state
           type
         }
       }

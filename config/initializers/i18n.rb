@@ -282,7 +282,7 @@ I18n.send(:extend, Module.new {
       super(key, options.merge(locale: default_locale))
     end
   end
-  alias_method :t, :translate
+  alias :t :translate
 
   def bigeasy_locale
     backend.send(:lookup, locale.to_s, "bigeasy_locale") || locale.to_s.tr('-', '_')
@@ -379,7 +379,7 @@ ActionMailer::Base.class_eval do
     options[:i18nliner_scope] = i18nliner_scope
     I18n.translate(key, options)
   end
-  alias_method :t, :translate
+  alias :t :translate
 end
 
 require 'active_support/core_ext/array/conversions'

@@ -49,7 +49,6 @@ describe PseudonymsController, type: :request do
             'user_id' => p.user_id,
             'created_at' => p.created_at,
             'workflow_state' => 'active',
-            'declared_user_type' => nil
           }
         end)
       end
@@ -146,8 +145,7 @@ describe PseudonymsController, type: :request do
                           :login => {
                             :password => 'abcd1234',
                             :sis_user_id => '12345',
-                            :unique_id => 'test@example.com',
-                            :declared_user_type => 'teacher',
+                            :unique_id => 'test@example.com'
                           }
                         })
         expect(json).to eq({
@@ -160,7 +158,6 @@ describe PseudonymsController, type: :request do
                              'user_id' => @student.id,
                              'created_at' => json['created_at'],
                              'workflow_state' => 'active',
-                             'declared_user_type' => 'teacher'
                            })
       end
 
@@ -262,8 +259,7 @@ describe PseudonymsController, type: :request do
                           :login => {
                             :unique_id => 'student+new@example.com',
                             :password => 'password123',
-                            :sis_user_id => 'new-12345',
-                            :declared_user_type => 'teacher',
+                            :sis_user_id => 'new-12345'
                           }
                         })
         expect(json).to eq({
@@ -276,7 +272,6 @@ describe PseudonymsController, type: :request do
                              'user_id' => @student.id,
                              'created_at' => @student.pseudonym.created_at.iso8601,
                              'workflow_state' => 'active',
-                             'declared_user_type' => 'teacher'
                            })
         expect(@student.pseudonym.reload.valid_password?('password123')).to be_truthy
       end
@@ -294,11 +289,6 @@ describe PseudonymsController, type: :request do
 
       it 'ignores invalid workflow states' do
         raw_api_call(:put, @path, @path_options, { login: { workflow_state: 'bogus' } })
-        expect(response.code).to eql '400'
-      end
-
-      it 'ignores invalid declared_user_types' do
-        raw_api_call(:put, @path, @path_options, { login: { declared_user_type: 'ta' } })
         expect(response.code).to eql '400'
       end
 
@@ -449,7 +439,6 @@ describe PseudonymsController, type: :request do
                              'user_id' => @student.id,
                              'created_at' => pseudonym.created_at.iso8601,
                              'workflow_state' => 'deleted',
-                             'declared_user_type' => nil
                            })
       end
 

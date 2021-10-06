@@ -24,7 +24,7 @@ module Types
 
     description "A list of students that an `AssignmentOverride` applies to"
 
-    alias_method :override, :object
+    alias override object
 
     field :students, [UserType], null: true
 
@@ -69,7 +69,7 @@ module Types
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
 
-    alias_method :override, :object
+    alias :override :object
 
     field :assignment, AssignmentType, null: true
     def assignment

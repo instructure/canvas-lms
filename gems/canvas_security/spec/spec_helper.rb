@@ -21,7 +21,6 @@ require 'byebug'
 require 'canvas_security'
 require 'rails'
 Rails.env = 'test'
-Time.zone = 'UTC'
 
 # Right now Canvas injects the Setting class as the store.
 # It would be great to pull that one out to something we can
@@ -45,8 +44,6 @@ class MemorySettings
   end
 end
 CanvasSecurity.settings_store = MemorySettings.new
-
-require 'canvas_security/spec/jwt_env'
 
 RSpec.configure do |config|
   config.mock_with :rspec do |mocks|

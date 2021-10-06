@@ -36,7 +36,7 @@ describe MessageBus do
   end
 
   after(:each) do
-    MessageBus.process_all_and_reset!
+    MessageBus.reset!
   end
 
   describe ".reset!" do

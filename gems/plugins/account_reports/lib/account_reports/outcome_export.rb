@@ -113,11 +113,11 @@ module AccountReports
     end
 
     def outcome_scope
-      simple_outcome_scope.joins(<<~SQL)
+      simple_outcome_scope.joins(<<~SQL).
         JOIN #{LearningOutcomeGroup.quoted_table_name} learning_outcome_groups
         ON learning_outcome_groups.id = content_tags.associated_asset_id
       SQL
-                          .where("learning_outcomes.workflow_state <> 'deleted'")
+        where("learning_outcomes.workflow_state <> 'deleted'")
                           .order('learning_outcomes.id')
                           .group('learning_outcomes.id')
                           .group('content_tags.content_id')

@@ -37,6 +37,9 @@ module MicrosoftSync
     # GraphServiceHelpers::USERS_ULUVS_TO_AADS_BATCH_SIZE:
     ENROLLMENTS_ULUV_FETCHING_BATCH_SIZE = 750
 
+    MAX_ENROLLMENT_MEMBERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS
+    MAX_ENROLLMENT_OWNERS = MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS
+
     # Delays for intermittent errors and to allow Microsoft's
     # eventually-consistent API time to settle:
     STANDARD_RETRY_DELAY = [15, 60, 300].freeze
@@ -77,7 +80,7 @@ module MicrosoftSync
       end
 
       def public_interpolated_values
-        { max: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS }
+        { max: MAX_ENROLLMENT_MEMBERS }
       end
     end
 
@@ -87,7 +90,7 @@ module MicrosoftSync
       end
 
       def public_interpolated_values
-        { max: MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS }
+        { max: MAX_ENROLLMENT_OWNERS }
       end
     end
 
@@ -135,12 +138,8 @@ module MicrosoftSync
     # don't want to delete PartialSyncChanges corresponding to enrollments not
     # yet replicated.)
     def step_full_sync_prerequisites(_mem_data, _job_state_data)
-      if CanvasModelsHelpers.max_enrollment_members_reached?(course)
-        raise MaxMemberEnrollmentsReached
-      end
-      if CanvasModelsHelpers.max_enrollment_owners_reached?(course)
-        raise MaxOwnerEnrollmentsReached
-      end
+      raise MaxMemberEnrollmentsReached if max_enrollment_members_reached?
+      raise MaxOwnerEnrollmentsReached if max_enrollment_owners_reached?
 
       PartialSyncChange.delete_all_replicated_to_secondary_for_course(course.id)
 
@@ -425,6 +424,25 @@ module MicrosoftSync
 
     def graph_service
       @graph_service ||= graph_service_helpers.graph_service
+    end
+
+    def max_enrollment_members_reached?
+      course
+        .enrollments
+        .select(:user_id)
+        .limit(MAX_ENROLLMENT_MEMBERS + 1)
+        .distinct
+        .count > MAX_ENROLLMENT_MEMBERS
+    end
+
+    def max_enrollment_owners_reached?
+      course
+        .enrollments
+        .where(type: MicrosoftSync::MembershipDiff::OWNER_ENROLLMENT_TYPES)
+        .select(:user_id)
+        .limit(MAX_ENROLLMENT_OWNERS + 1)
+        .distinct
+        .count > MAX_ENROLLMENT_OWNERS
     end
   end
 end
