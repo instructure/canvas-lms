@@ -1219,7 +1219,7 @@ describe "security" do
         expect(response).to be_successful
 
         get "/users/#{@student.id}"
-        assert_status(404)
+        assert_status(401)
 
         admin = account_admin_user :account => Account.site_admin
         user_session(admin)

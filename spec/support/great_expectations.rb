@@ -88,7 +88,7 @@ module GreatExpectations
       GreatExpectations.expectation_checked(self, matcher)
       super
     end
-    alias to_not not_to
+    alias_method :to_not, :not_to
   end
 
   class << self

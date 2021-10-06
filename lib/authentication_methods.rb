@@ -67,7 +67,7 @@ module AuthenticationMethods
     return if load_pseudonym_from_inst_access_token(token_string)
 
     begin
-      services_jwt = Canvas::Security::ServicesJwt.new(token_string)
+      services_jwt = CanvasSecurity::ServicesJwt.new(token_string)
       @current_user = User.find(services_jwt.user_global_id)
       @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
       unless @current_user && @current_pseudonym

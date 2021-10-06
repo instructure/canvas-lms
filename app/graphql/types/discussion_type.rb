@@ -66,6 +66,11 @@ module Types
       object.message unless object.locked_for?(current_user, check_policies: true)
     end
 
+    field :locked_for_user, Boolean, null: false
+    def locked_for_user
+      object.locked_for?(current_user, check_policies: true)
+    end
+
     field :initial_post_required_for_current_user, Boolean, null: false
     def initial_post_required_for_current_user
       object.initial_post_required?(current_user, session)

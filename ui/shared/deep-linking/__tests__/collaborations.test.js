@@ -17,37 +17,7 @@
  */
 
 import $ from 'jquery'
-import {
-  addDeepLinkingListener,
-  handleDeepLinking,
-  collaborationUrl,
-  onExternalContentReady
-} from '../collaborations'
-
-describe('addDeepLinkingListener', () => {
-  let addEventListener
-  const subject = () => {
-    addDeepLinkingListener()
-  }
-
-  beforeAll(() => {
-    addEventListener = global.addEventListener
-    global.addEventListener = jest.fn()
-  })
-
-  afterAll(() => {
-    global.addEventListener = addEventListener
-  })
-
-  beforeEach(() => {
-    global.addEventListener.mockClear()
-  })
-
-  it('adds the message handler to the window', () => {
-    subject()
-    expect(global.addEventListener).toHaveBeenCalledWith('message', handleDeepLinking)
-  })
-})
+import {handleDeepLinking, collaborationUrl, onExternalContentReady} from '../collaborations'
 
 describe('handleDeepLinking', () => {
   const content_items = [
@@ -99,17 +69,6 @@ describe('handleDeepLinking', () => {
       expect.anything(),
       expect.anything()
     )
-  })
-
-  describe('when the event is invalid', () => {
-    const overrides = {
-      origin: 'http://bad.origin.com'
-    }
-
-    it('does not attempt to create a collaboration', async () => {
-      await handleDeepLinking(event(overrides))
-      expect($.ajaxJSON).not.toHaveBeenCalled()
-    })
   })
 
   describe('when there is a unhandled error parsing the content item', () => {

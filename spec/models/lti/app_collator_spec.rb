@@ -50,6 +50,22 @@ module Lti
     end
 
     describe "#app_definitions" do
+      def example_definition(tool, **overrides)
+        {
+          app_type: tool.class.name,
+          :context => tool.context_type,
+          :context_id => tool.context.id,
+          app_id: tool.id,
+          name: tool.name,
+          description: tool.description,
+          installed_locally: true,
+          has_update: nil,
+          enabled: true,
+          tool_configuration: nil,
+          reregistration_url: nil
+        }.merge(overrides)
+      end
+
       it 'returns tool_proxy app definitions' do
         tool_proxy = create_tool_proxy(context: account)
         tool_proxy.bindings.create(context: account)
@@ -57,20 +73,7 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
-                                   app_type: tool_proxy.class.name,
-                                   :context => tool_proxy.context_type,
-                                   :context_id => account.id,
-                                   app_id: tool_proxy.id,
-                                   name: tool_proxy.name,
-                                   description: tool_proxy.description,
-                                   installed_locally: true,
-                                   has_update: nil,
-                                   enabled: true,
-                                   tool_configuration: nil,
-                                   reregistration_url: nil,
-                                   lti_version: '2.0'
-                                 })
+        expect(definition).to eq(example_definition(tool_proxy, lti_version: '2.0'))
       end
 
       it 'returns an external tool app definition' do
@@ -80,22 +83,8 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
-                                   app_type: external_tool.class.name,
-                                   app_id: external_tool.id,
-                                   :context => external_tool.context_type,
-                                   :context_id => account.id,
-                                   name: external_tool.name,
-                                   description: external_tool.description,
-                                   installed_locally: true,
-                                   has_update: nil,
-                                   enabled: true,
-                                   tool_configuration: nil,
-                                   reregistration_url: nil,
-                                   lti_version: '1.1',
-                                   deployment_id: external_tool.deployment_id,
-                                   editor_button_settings: external_tool.settings[:editor_button]
-                                 })
+        expect(definition).to eq(example_definition(external_tool, lti_version: '1.1', deployment_id: external_tool.deployment_id,
+                                                                   editor_button_settings: external_tool.editor_button))
       end
 
       it 'returns an external tool app definition as 1.3 tool' do
@@ -107,22 +96,23 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
-                                   app_type: external_tool.class.name,
-                                   app_id: external_tool.id,
-                                   :context => external_tool.context_type,
-                                   :context_id => account.id,
-                                   name: external_tool.name,
-                                   description: external_tool.description,
-                                   installed_locally: true,
-                                   has_update: nil,
-                                   enabled: true,
-                                   tool_configuration: nil,
-                                   reregistration_url: nil,
-                                   lti_version: '1.3',
-                                   deployment_id: external_tool.deployment_id,
-                                   editor_button_settings: external_tool.settings[:editor_button]
-                                 })
+        expect(definition).to eq(example_definition(external_tool, lti_version: '1.3', deployment_id: external_tool.deployment_id,
+                                                                   editor_button_settings: external_tool.editor_button))
+      end
+
+      it 'returns definition with rce_favorite when editor_button placement is present' do
+        external_tool = new_valid_external_tool(account)
+        external_tool.editor_button = { icon_url: 'http://example.com/editor_button' }
+        external_tool.save!
+        tools_collection = subject.bookmarked_collection.paginate(per_page: 100).to_a
+
+        definitions = subject.app_definitions(tools_collection)
+        expect(definitions.count).to eq 1
+        definition = definitions.first
+        expect(definition).to eq(example_definition(external_tool, lti_version: '1.1',
+                                                                   deployment_id: external_tool.deployment_id,
+                                                                   editor_button_settings: external_tool.editor_button,
+                                                                   is_rce_favorite: false))
       end
 
       it 'returns an external tool and a tool proxy' do
@@ -179,20 +169,9 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
-                                   app_type: tool_proxy.class.name,
-                                   :context => tool_proxy.context_type,
-                                   :context_id => account.id,
-                                   app_id: tool_proxy.id,
-                                   name: tool_proxy.name,
-                                   description: tool_proxy.description,
-                                   installed_locally: true,
-                                   has_update: false,
-                                   enabled: true,
-                                   tool_configuration: nil,
-                                   reregistration_url: nil,
-                                   lti_version: '2.0'
-                                 })
+        expect(definition).to eq(example_definition(tool_proxy,
+                                                    has_update: false,
+                                                    lti_version: '2.0'))
       end
 
       it 'has_update set to true for tool proxies with an update_payload' do
@@ -207,20 +186,9 @@ module Lti
         definitions = subject.app_definitions(tools_collection)
         expect(definitions.count).to eq 1
         definition = definitions.first
-        expect(definition).to eq({
-                                   app_type: tool_proxy.class.name,
-                                   :context => tool_proxy.context_type,
-                                   :context_id => account.id,
-                                   app_id: tool_proxy.id,
-                                   name: tool_proxy.name,
-                                   description: tool_proxy.description,
-                                   installed_locally: true,
-                                   has_update: true,
-                                   enabled: true,
-                                   tool_configuration: nil,
-                                   reregistration_url: nil,
-                                   lti_version: '2.0'
-                                 })
+        expect(definition).to eq(example_definition(tool_proxy,
+                                                    has_update: true,
+                                                    lti_version: '2.0'))
       end
 
       it 'has reregistartion set to false for external_tools if the feature flag is enabled' do

@@ -20,14 +20,17 @@ import React from 'react'
 import {render, act, fireEvent} from '@testing-library/react'
 import getCookie from 'get-cookie'
 
-import ObserverOptions, {SELECTED_OBSERVED_USER_COOKIE} from '../ObserverOptions'
+import ObserverOptions, {OBSERVER_COOKIE_PREFIX} from '../ObserverOptions'
 import {MOCK_OBSERVER_LIST} from './fixtures'
+
+const userId = '13'
+const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${userId}`
 
 describe('ObserverOptions', () => {
   const getProps = (overrides = {}) => ({
     observerList: MOCK_OBSERVER_LIST,
     currentUser: {
-      id: '13',
+      id: userId,
       display_name: 'Zelda',
       avatar_image_url: 'http://avatar'
     },
@@ -37,7 +40,7 @@ describe('ObserverOptions', () => {
   })
 
   afterEach(() => {
-    document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=`
+    document.cookie = `${observedUserCookieName}=`
   })
 
   it('displays students in the select', () => {
@@ -68,7 +71,7 @@ describe('ObserverOptions', () => {
     act(() => select.click())
     act(() => getByText('Student 2').click())
     expect(handleChangeObservedUser).toHaveBeenCalledWith('2')
-    expect(getCookie(SELECTED_OBSERVED_USER_COOKIE)).toBe('2')
+    expect(getCookie(observedUserCookieName)).toBe('2')
   })
 
   it('renders a label if there is only one observed student', () => {
@@ -93,7 +96,7 @@ describe('ObserverOptions', () => {
   })
 
   it('automatically selects the user previously selected', () => {
-    document.cookie = `${SELECTED_OBSERVED_USER_COOKIE}=4;path=/`
+    document.cookie = `${observedUserCookieName}=4;path=/`
     const {getByRole} = render(<ObserverOptions {...getProps()} />)
     const select = getByRole('combobox', {name: 'Select a student to view'})
     expect(select.value).toBe('Student 4')

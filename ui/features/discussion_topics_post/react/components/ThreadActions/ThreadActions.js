@@ -29,7 +29,8 @@ import {
   IconTrashLine,
   IconSpeedGraderLine,
   IconMarkAsReadSolid,
-  IconMarkAsReadLine
+  IconMarkAsReadLine,
+  IconWarningBorderlessSolid
 } from '@instructure/ui-icons'
 
 import {IconButton} from '@instructure/ui-buttons'
@@ -50,7 +51,9 @@ export const ThreadActions = props => {
       onEdit: props.onEdit,
       onDelete: props.onDelete,
       onOpenInSpeedGrader: props.onOpenInSpeedGrader,
-      onMarkThreadAsRead: props.onMarkThreadAsRead
+      onMarkThreadAsRead: props.onMarkThreadAsRead,
+      onReport: props.onReport,
+      isReported: props.isReported
     }).map(config => renderMenuItem({...config}, props.id))
   }, [props])
 
@@ -173,25 +176,48 @@ const getMenuConfigs = props => {
       selectionCallback: props.onOpenInSpeedGrader
     })
   }
+  if (props.onReport) {
+    options.push({
+      separator: true
+    })
+    options.push({
+      key: 'report',
+      icon: <IconWarningBorderlessSolid />,
+      label: props.isReported ? I18n.t('Reported') : I18n.t('Report'),
+      selectionCallback: props.onReport,
+      disabled: props.isReported,
+      color: 'warning'
+    })
+  }
   return options
 }
 
-const renderMenuItem = ({selectionCallback, icon, label, key}, id) => (
-  <Menu.Item
-    key={`${key}-${id}`}
-    onSelect={() => {
-      selectionCallback(key)
-    }}
-    data-testid={key}
-  >
-    <Flex>
-      <Flex.Item>{icon}</Flex.Item>
-      <Flex.Item padding="0 0 0 xx-small">
-        <Text>{label}</Text>
-      </Flex.Item>
-    </Flex>
-  </Menu.Item>
-)
+const renderMenuItem = (
+  {selectionCallback, icon, label, key, separator = false, disabled = false, color = 'primary'},
+  id
+) => {
+  return separator ? (
+    <Menu.Separator />
+  ) : (
+    <Menu.Item
+      key={`${key}-${id}`}
+      onSelect={() => {
+        selectionCallback(key)
+      }}
+      data-testid={key}
+      disabled={disabled}
+    >
+      <Text color={color}>
+        <Flex>
+          <Flex.Item>{icon}</Flex.Item>
+          <Flex.Item padding="0 0 0 xx-small">
+            <Text>{label}</Text>
+          </Flex.Item>
+        </Flex>
+      </Text>
+    </Menu.Item>
+  )
+}
 
 ThreadActions.propTypes = {
   id: PropTypes.string.isRequired,
@@ -205,12 +231,15 @@ ThreadActions.propTypes = {
   onEdit: PropTypes.func,
   onDelete: PropTypes.func,
   onOpenInSpeedGrader: PropTypes.func,
+  onReport: PropTypes.func,
+  isReported: PropTypes.bool,
   isSearch: PropTypes.bool
 }
 
 ThreadActions.defaultProps = {
   isUnread: false,
-  isSearch: false
+  isSearch: false,
+  isReported: false
 }
 
 export default ThreadActions

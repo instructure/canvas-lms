@@ -22,7 +22,12 @@ require 'active_support/core_ext/module'
 require 'json/jwt'
 require 'dynamic_settings'
 require 'canvas_errors'
+require 'canvas_security/jwk_key_pair'
+require 'canvas_security/jwt_workflow'
+require 'canvas_security/key_storage'
 require 'canvas_security/page_view_jwt'
+require 'canvas_security/rsa_key_pair'
+require 'canvas_security/services_jwt'
 
 module CanvasSecurity
   class UnconfiguredError < StandardError; end
@@ -259,15 +264,7 @@ module CanvasSecurity
     raise CanvasSecurity::InvalidToken
   end
 
-  def self.decrypt_services_jwt(token, signing_secret = nil, encryption_secret = nil, ignore_expiration: false)
-    signing_secret ||= services_signing_secret
-    encryption_secret ||= services_encryption_secret
-
-    secrets_to_check = [signing_secret]
-    if signing_secret == services_signing_secret && services_previous_signing_secret
-      secrets_to_check << services_previous_signing_secret
-    end
-
+  def self.decrypt_encrypted_jwt(token, signing_secret, encryption_secret, ignore_expiration: false)
     begin
       signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
     rescue OpenSSL::Cipher::CipherError => e
@@ -276,6 +273,12 @@ module CanvasSecurity
       CanvasErrors.capture_exception(:security_auth, e, :warn)
       raise CanvasSecurity::InvalidToken
     end
+
+    secrets_to_check = if signing_secret.is_a?(Hash)
+                         Array.wrap(signing_secret[JSON::JWT.decode(signed_coded_jwt.plain_text, :skip_verification).header['alg']])
+                       else
+                         Array.wrap(signing_secret)
+                       end
 
     secrets_to_check.each do |cur_secret|
       begin

@@ -185,47 +185,47 @@ describe DiscussionTopic::MaterializedView do
 
     it "users global ids when accessed from a different shard" do
       @view.update_materialized_view(synchronous: true)
-      @shard1.activate!
-      structure, participant_ids, entry_ids = @topic.materialized_view
-      expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort
-      expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:global_id).sort
-      json = JSON.parse(structure)
-      simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
-      expect(simple_json).to eq [
-        {
-          'id' => @root1.global_id.to_s,
-          'user_id' => @student.global_id.to_s,
-          'replies' => [
-            {
-              'id' => @reply1.global_id.to_s,
-              'replies' => [{
-                'id' => @reply_reply2.global_id.to_s,
-                'user_id' => @student.global_id.to_s,
-                'replies' => []
-              }]
-            },
-            {
-              'id' => @reply2.global_id.to_s,
-              'user_id' => @teacher.global_id.to_s,
-              'replies' => [{
-                'id' => @reply_reply1.global_id.to_s,
-                'user_id' => @student.global_id.to_s,
-                'replies' => []
-              }]
-            },
-          ],
-        },
-        {
-          'id' => @root2.global_id.to_s,
-          'user_id' => @student.global_id.to_s,
-          'replies' => [{
-            'id' => @reply3.global_id.to_s,
+      @shard1.activate do
+        structure, participant_ids, entry_ids = @topic.materialized_view
+        expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort
+        expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:global_id).sort
+        json = JSON.parse(structure)
+        simple_json = recursively_slice_with_replies(json, ['id', 'user_id'])
+        expect(simple_json).to eq [
+          {
+            'id' => @root1.global_id.to_s,
             'user_id' => @student.global_id.to_s,
-            'replies' => []
-          }],
-        },
-      ]
-      Shard.default.activate!
+            'replies' => [
+              {
+                'id' => @reply1.global_id.to_s,
+                'replies' => [{
+                  'id' => @reply_reply2.global_id.to_s,
+                  'user_id' => @student.global_id.to_s,
+                  'replies' => []
+                }]
+              },
+              {
+                'id' => @reply2.global_id.to_s,
+                'user_id' => @teacher.global_id.to_s,
+                'replies' => [{
+                  'id' => @reply_reply1.global_id.to_s,
+                  'user_id' => @student.global_id.to_s,
+                  'replies' => []
+                }]
+              },
+            ],
+          },
+          {
+            'id' => @root2.global_id.to_s,
+            'user_id' => @student.global_id.to_s,
+            'replies' => [{
+              'id' => @reply3.global_id.to_s,
+              'user_id' => @student.global_id.to_s,
+              'replies' => []
+            }],
+          },
+        ]
+      end
     end
   end
 end

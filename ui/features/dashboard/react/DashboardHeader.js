@@ -270,18 +270,7 @@ function showTodoList() {
 
           const startButton = document.getElementById('start_new_course')
           const modalContainer = document.getElementById('create_course_modal_container')
-          let role
-          if (ENV.current_user_roles.includes('admin')) {
-            role = 'admin'
-          } else if (ENV.current_user_roles.includes('teacher')) {
-            role = 'teacher'
-          }
-          if (
-            startButton &&
-            modalContainer &&
-            role &&
-            ENV.FEATURES?.create_course_subaccount_picker
-          ) {
+          if (startButton && modalContainer && ENV.FEATURES?.create_course_subaccount_picker) {
             startButton.addEventListener('click', () => {
               ReactDOM.render(
                 <CreateCourseModal
@@ -289,7 +278,7 @@ function showTodoList() {
                   setModalOpen={isOpen => {
                     if (!isOpen) ReactDOM.unmountComponentAtNode(modalContainer)
                   }}
-                  permissions={role}
+                  permissions={ENV.CREATE_COURSES_PERMISSION}
                   isK5User={false} // can't be k5 user if classic dashboard is showing
                 />,
                 modalContainer

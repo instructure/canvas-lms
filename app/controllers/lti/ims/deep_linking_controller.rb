@@ -35,15 +35,15 @@ module Lti
       def deep_linking_response
         # content items not meant for creating module items should have resource links
         # associated with them here before passing them to the UI for further processing
-        create_lti_resource_links unless adding_module_item?
+        create_lti_resource_links unless adding_module_item? || create_new_module?
 
-        # multiple content items meant for creating module items should create the module
-        # items and associate resource links here before passing them to the UI and
-        # reloading the modules page
-        add_module_items if multiple_module_items?
+        # multiple content items meant for creating module items, or module items destined
+        # for a new module should create the module items and associate resource links here
+        # before passing them to the UI and reloading the modules page
+        add_module_items if should_add_module_items?
 
-        # one content item meant for creating a module item should be ignored, since the
-        # add module item modal in the UI will handle it
+        # one content item meant for creating a module item in an existing module
+        # should be ignored, since the add module item modal in the UI will handle it
 
         # Pass content items and messaging values in JS env. these will be sent via
         # window.postMessage to the main Canvas window, which can choose to do what

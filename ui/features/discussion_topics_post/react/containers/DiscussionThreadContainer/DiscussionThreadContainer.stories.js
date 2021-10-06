@@ -18,12 +18,42 @@
 
 import React from 'react'
 
-import {DiscussionThreadContainer, mockThreads} from './DiscussionThreadContainer'
+import {DiscussionThreadContainer} from './DiscussionThreadContainer'
 
 export default {
   title: 'Examples/Discussion Posts/Containers/Discussion Thread Container',
   component: DiscussionThreadContainer,
   argTypes: {}
+}
+
+const mockThreads = {
+  discussionEntry: {
+    id: '432',
+    author: {
+      displayName: 'Jeffrey Johnson',
+      avatarUrl: 'someURL'
+    },
+    createdAt: '2021-02-08T13:36:05-07:00',
+    message:
+      '<p>This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends. This is the post that never ends. It goes on and on my friends.</p>',
+    read: true,
+    lastReply: null,
+    rootEntryParticipantCounts: {
+      unreadCount: 0,
+      repliesCount: 0
+    },
+    subentriesCount: 0,
+    permissions: {
+      attach: true,
+      create: true,
+      delete: true,
+      rate: true,
+      read: true,
+      reply: true,
+      update: true,
+      viewRating: true
+    }
+  }
 }
 
 const Template = args => <DiscussionThreadContainer {...args} />

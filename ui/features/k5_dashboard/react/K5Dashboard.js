@@ -284,6 +284,7 @@ export const K5Dashboard = ({
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
+      observedUserId={observedUserId}
     />
   )
 
@@ -388,7 +389,7 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

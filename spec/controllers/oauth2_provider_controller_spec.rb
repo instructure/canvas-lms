@@ -838,25 +838,4 @@ describe Oauth2ProviderController do
       end
     end
   end
-
-  describe 'GET jwks' do
-    before :each do
-      allow(Canvas::Oauth::KeyStorage).to receive(:retrieve_keys).and_return({
-                                                                               Canvas::Security::KeyStorage::PAST => Canvas::Security::RSAKeyPair.new.to_jwk,
-                                                                               Canvas::Security::KeyStorage::PRESENT => Canvas::Security::RSAKeyPair.new.to_jwk,
-                                                                               Canvas::Security::KeyStorage::FUTURE => Canvas::Security::RSAKeyPair.new.to_jwk
-                                                                             })
-      get 'jwks'
-    end
-
-    it "provides the current jwk set" do
-      expect(response).to have_http_status :ok
-      json = JSON.parse(response.body)
-      expected_keys = %w(kid kty alg e n use)
-      expect(json['keys']).not_to be_empty
-      json['keys'].each do |key|
-        expect(key.keys - expected_keys).to be_empty
-      end
-    end
-  end
 end
