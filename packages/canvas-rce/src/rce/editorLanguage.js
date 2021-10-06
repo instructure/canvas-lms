@@ -56,6 +56,7 @@ const mapping = {
   ru: 'ru_RU',
   sq: undefined, // tiny doesn't have Albanian
   sr: 'sr',
+  sl: 'sl',
   sv: 'sv_SE',
   tr: 'tr_TR',
   'uk-UA': 'uk_UA',

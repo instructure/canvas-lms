@@ -85,6 +85,7 @@ const recognized = [
   'ru',
   'sq',
   'sr',
+  'sl',
   'sv',
   'sv-x-k12',
   'tr',
