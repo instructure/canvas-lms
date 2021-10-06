@@ -1582,9 +1582,22 @@ describe DiscussionTopic do
     end
 
     it 'uses fancy midnight' do
-      @topic.lock_at = Time.zone.parse('Sat, 31 Mar 2018')
-      @topic.save!
+      @topic.update!(lock_at: Time.zone.parse('Sat, 31 Mar 2018'))
       expect(@topic.lock_at.hour).to eq 23
+      expect(@topic.lock_at.min).to eq 59
+      expect(@topic.lock_at.sec).to eq 59
+    end
+
+    it 'uses fancy midnight relative to the context time_zone' do
+      zone = "America/New_York"
+      context = @topic.context
+      context.update(time_zone: zone)
+      @topic.update!(lock_at: Time.zone.parse('Sat, 31 Mar 2018'))
+      expect(@topic.lock_at.hour).to eq 0
+      expect(@topic.lock_at.min).to eq 0
+      expect(@topic.lock_at.sec).to eq 0
+      @topic.update!(lock_at: Time.zone.parse('Sat, 31 Mar 2018 4:00:00'))
+      expect(@topic.lock_at.hour).to eq 3
       expect(@topic.lock_at.min).to eq 59
       expect(@topic.lock_at.sec).to eq 59
     end
