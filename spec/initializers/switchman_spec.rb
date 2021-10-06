@@ -19,7 +19,7 @@
 require_relative "../spec_helper"
 
 describe Switchman::Shard do
-  describe "in_region" do
+  describe ".in_region" do
     it "does not include shards referencing non-extant database servers" do
       # this one isn't actually in the config
       allow(Shard).to receive(:non_existent_database_servers).and_return(["jobs4"])
@@ -39,6 +39,22 @@ describe Switchman::Shard do
       expect(Shard.in_region('us-east-1')).to eq([s1, s2])
       expect(Shard.in_region('eu-west-1')).to eq([s3])
     end
+  end
+
+  describe "#activate!" do
+    shared_examples_for "#activate!" do
+      it "disallows use" do
+        expect { Shard.default.activate! }.to raise_error(NotImplementedError)
+      end
+    end
+
+    context "with sharding" do
+      specs_require_sharding
+
+      include_examples "#activate!"
+    end
+
+    include_examples "#activate!"
   end
 
   describe "maintenance_windows" do
