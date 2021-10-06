@@ -58,7 +58,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update.'
+        'To edit lock settings on the Pages index page, Pages - update, Blueprint Courses - add / edit / associate / delete, and Courses - manage.'
       )
     },
     {

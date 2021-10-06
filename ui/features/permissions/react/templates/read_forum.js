@@ -39,13 +39,13 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit lock settings from the Discussions index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
       )
     },
     {
       title: I18n.t('Commons'),
       description: I18n.t(
-        'To share a discussion to Commons, Courses - manage / update must also be enabled.'
+        'To share a discussion to Commons, Courses - manage must also be enabled.'
       )
     },
     {

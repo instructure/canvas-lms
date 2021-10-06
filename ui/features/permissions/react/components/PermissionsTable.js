@@ -194,7 +194,7 @@ export default class PermissionsTable extends Component {
       return [
         <br key="group-description-br" />,
         <Text key="group-description-text" weight="light" size="small">
-          {description()}
+          {description(perm.contextType)}
         </Text>
       ]
     }

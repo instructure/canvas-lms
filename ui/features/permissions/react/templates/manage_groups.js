@@ -99,7 +99,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
       )
     },
     {
@@ -167,7 +167,7 @@ export const template = generateActionTemplates(
     },
     {
       description: I18n.t(
-        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage / update must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
+        'By default, students can always create groups in a course. To restrict students from creating groups, Courses - manage must be enabled, and the Let students organize their own groups checkbox in Course Settings must not be selected.'
       )
     },
     {

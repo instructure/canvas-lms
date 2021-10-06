@@ -30,7 +30,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Admin Tools (Undelete Courses)'),
       description: I18n.t(
-        'If Courses - manage / update and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
+        'If Courses - manage and Courses - undelete are also enabled, an account-level user will be able to restore deleted courses in Admin Tools.'
       )
     },
     {

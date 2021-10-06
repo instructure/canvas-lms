@@ -53,7 +53,7 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage / update must also be enabled.'
+        'To edit lock settings for course files, Course files - edit, Blueprint Courses - add / edit / associate / delete, and Courses - manage must also be enabled.'
       )
     }
   ],

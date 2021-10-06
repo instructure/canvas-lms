@@ -109,17 +109,17 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
       )
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
       )
     },
     {
@@ -254,17 +254,17 @@ export const template = generateActionTemplates(
     {
       title: I18n.t('Blueprint Courses'),
       description: I18n.t(
-        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit lock settings from the Assignments index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
       )
     },
     {
       description: I18n.t(
-        'If Blueprint Courses - add / edit / associate / delete and Courses - manage / update are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
+        'If Blueprint Courses - add / edit / associate / delete and Courses - manage are enabled, but Assignments and Quizzes - edit is not enabled, blueprint lock settings for an assignment can be managed from the assignment’s details page.'
       )
     },
     {
       description: I18n.t(
-        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage / update must also be enabled.'
+        'To edit lock settings on an individual quiz, or on the Quizzes index page, Blueprint Courses - add / edit / associate / delete and Courses - manage must also be enabled.'
       )
     },
     {
