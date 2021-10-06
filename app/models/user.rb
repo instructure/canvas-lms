@@ -3250,4 +3250,18 @@ class User < ActiveRecord::Base
   def pronouns=(pronouns)
     write_attribute(:pronouns, untranslate_pronouns(pronouns))
   end
+
+  def create_courses_right(account)
+    return :admin if account.cached_account_users_for(self).any? do |au|
+                       au.has_permission_to?(account, :manage_courses) || au.has_permission_to?(account, :manage_courses_add)
+                     end
+    return nil if fake_student? || account.root_account.site_admin?
+
+    scope = account.root_account.enrollments.active.where(user_id: self)
+    return :teacher if account.root_account.teachers_can_create_courses? && scope.exists?(type: %w[TeacherEnrollment DesignerEnrollment])
+    return :student if account.root_account.students_can_create_courses? && scope.exists?(type: %w[StudentEnrollment ObserverEnrollment])
+    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists?
+
+    nil
+  end
 end

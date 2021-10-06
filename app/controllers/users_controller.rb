@@ -513,7 +513,8 @@ class UsersController < ApplicationController
              STUDENT_PLANNER_ENABLED: planner_enabled?,
              STUDENT_PLANNER_COURSES: planner_enabled? && map_courses_for_menu(@current_user.courses_with_primary_enrollment),
              STUDENT_PLANNER_GROUPS: planner_enabled? && map_groups_for_planner(@current_user.current_groups),
-             CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user
+             CAN_ENABLE_K5_DASHBOARD: k5_disabled && k5_user,
+             CREATE_COURSES_PERMISSION: @current_user.create_courses_right(@domain_root_account)
            })
 
     if k5_user?
@@ -527,10 +528,6 @@ class UsersController < ApplicationController
                SELECTED_CONTEXT_CODES: @current_user.get_preference(:selected_calendar_contexts),
                SELECTED_CONTEXTS_LIMIT: @domain_root_account.settings[:calendar_contexts_limit] || 10,
                INITIAL_NUM_K5_CARDS: Rails.cache.read(['last_known_k5_cards_count', @current_user.global_id].cache_key) || 5,
-               PERMISSIONS: {
-                 create_courses_as_admin: @current_user.roles(@domain_root_account).include?('admin'),
-                 create_courses_as_teacher: @domain_root_account.grants_right?(@current_user, session, :create_courses)
-               },
                CAN_ADD_OBSERVEE: @current_user
                           .profile
                           .tabs_available(@current_user, :root_account => @domain_root_account)

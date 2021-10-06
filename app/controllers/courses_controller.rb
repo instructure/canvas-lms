@@ -498,6 +498,7 @@ class CoursesController < ApplicationController
         format.html {
           css_bundle :context_list, :course_list
           js_bundle :course_list
+          js_env({ CREATE_COURSES_PERMISSION: @current_user.create_courses_right(@domain_root_account) })
 
           set_k5_mode(require_k5_theme: true)
 
@@ -887,7 +888,7 @@ class CoursesController < ApplicationController
             Auditors::Course.record_published(@course, @current_user, source: :api)
           end
           # Sync homeroom enrollments and participation if enabled and the course isn't a SIS import
-          if @course.elementary_enabled? && params[:course][:sync_enrollments_from_homeroom] && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
+          if @course.elementary_enabled? && value_to_boolean(params[:course][:sync_enrollments_from_homeroom]) && params[:course][:homeroom_course_id] && @course.sis_batch_id.blank?
             progress = Progress.new(context: @course, tag: :sync_homeroom_enrollments)
             progress.user = @current_user
             progress.reset!

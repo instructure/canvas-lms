@@ -61,18 +61,13 @@ describe MessageBus::AsyncProducer do
 
   describe "push" do
     around(:each) do |example|
-      old_interval = MessageBus.worker_process_interval_lambda
-      old_queue_size = MessageBus.max_mem_queue_size_lambda
-      old_logger = MessageBus.logger
       # let's not waste time with queue throttling in tests
       MessageBus.worker_process_interval = -> { 0.01 }
       MessageBus.max_mem_queue_size = -> { 10 }
       MessageBus.logger = Rails.logger
       example.run
     ensure
-      MessageBus.worker_process_interval = old_interval unless old_interval.nil?
-      MessageBus.max_mem_queue_size_lambda = old_queue_size unless old_queue_size.nil?
-      MessageBus.logger = old_logger
+      Canvas::MessageBusConfig.apply # resets config changes made to interval and queue size
     end
 
     after(:each) do

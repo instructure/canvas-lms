@@ -2685,37 +2685,6 @@ describe UsersController do
           end
         end
 
-        context "ENV.PERMISSIONS" do
-          it "sets :create_courses_as_admin to true if user is admin" do
-            account_admin_user
-            user_session @user
-            get 'user_dashboard'
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_truthy
-          end
-
-          it "sets only :create_courses_as_teacher to true if user is a teacher and teachers can create courses" do
-            Account.default.settings[:teachers_can_create_courses] = true
-            course_with_teacher_logged_in
-            get 'user_dashboard'
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_truthy
-          end
-
-          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a teacher but teachers can't create courses" do
-            course_with_teacher_logged_in
-            get 'user_dashboard'
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
-          end
-
-          it "sets :create_courses_as_admin and :create_courses_as_teacher to false if user is a student" do
-            course_with_student_logged_in
-            get 'user_dashboard'
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_admin]).to be_falsey
-            expect(assigns[:js_env][:PERMISSIONS][:create_courses_as_teacher]).to be_falsey
-          end
-        end
-
         context "@cards_prefetch_observer_param" do
           before :once do
             Account.site_admin.enable_feature!(:k5_parent_support)
@@ -2742,6 +2711,15 @@ describe UsersController do
           end
         end
       end
+    end
+
+    it "sets ENV.CREATE_COURSES_PERMISSION to teacher if user is a teacher and can create courses" do
+      Account.default.settings[:teachers_can_create_courses] = true
+      Account.default.save!
+      course_with_teacher_logged_in(active_all: true)
+
+      get 'user_dashboard'
+      expect(assigns[:js_env][:CREATE_COURSES_PERMISSION]).to be(:teacher)
     end
   end
 

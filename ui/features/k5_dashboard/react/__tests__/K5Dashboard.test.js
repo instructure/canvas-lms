@@ -182,7 +182,7 @@ const defaultProps = {
   canDisableElementaryDashboard: false,
   currentUser,
   currentUserRoles: ['admin'],
-  createPermissions: 'none',
+  createPermissions: null,
   plannerEnabled: false,
   loadAllOpportunities: () => {},
   timeZone: defaultEnv.TIMEZONE,
