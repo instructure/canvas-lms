@@ -241,7 +241,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :responsive_awareness, :responsive_misc, :product_tours, :files_dnd, :usage_rights_discussion_topics,
     :inline_math_everywhere, :granular_permissions_manage_users, :rce_limit_init_render_on_page, :create_course_subaccount_picker,
-    :lti_deep_linking_module_index_menu
+    :lti_deep_linking_module_index_menu, :lti_multiple_assignment_deep_linking
   ].freeze
   JS_ENV_BRAND_ACCOUNT_FEATURES = [
     :embedded_release_notes

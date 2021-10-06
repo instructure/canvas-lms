@@ -25,6 +25,7 @@ import SpeedGrader from 'ui/features/speed_grader/jquery/speed_grader.js'
 import SpeedGraderAlerts from 'ui/features/speed_grader/react/SpeedGraderAlerts.js'
 import SpeedGraderHelpers from 'ui/features/speed_grader/jquery/speed_grader_helpers.js'
 import JQuerySelectorCache from 'ui/features/speed_grader/JQuerySelectorCache.js'
+import moxios from 'moxios'
 import fakeENV from 'helpers/fakeENV'
 import numberHelper from '@canvas/i18n/numberHelper'
 import userSettings from '@canvas/user-settings'
@@ -1380,6 +1381,21 @@ QUnit.module('SpeedGrader', rootHooks => {
       submissions = `/submissions/{{submissionId}}`
       params = `?download={{attachmentId}}`
       setupFixtures(`
+      <div id="combo_box_container"></div>
+      <ul
+        id="section-menu"
+        class="ui-selectmenu-menu ui-widget ui-widget-content ui-selectmenu-menu-dropdown ui-selectmenu-open"
+        style="display:none;" role="listbox" aria-activedescendant="section-menu-link"
+      >
+        <li role="presentation" class="ui-selectmenu-item">
+          <a href="#" tabindex="-1" role="option" aria-selected="true" id="section-menu-link">
+            <span>Showing: <span id="section_currently_showing">All Sections</span></span>
+          </a>
+          <ul>
+            <li><a class="selected" data-section-id="all" href="#">Show All Sections</a></li>
+          </ul>
+        </li>
+      </ul>
       <div id="iframe_holder"></div>
       <div id="react_pill_container"></div>
       <div id='grade_container'>
@@ -1398,6 +1414,7 @@ QUnit.module('SpeedGrader', rootHooks => {
       </div>
       <div id="submission_details">
         Submission Details
+        <div id="multiple_submissions"></div>
         <div id="speed_grader_edit_status_mount_point"></div>
         <div id="speed_grader_edit_status_secondary_mount_point"></div>
       </div>`)
@@ -1536,6 +1553,17 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.teardown()
       fakeENV.teardown()
     })
+
+    function selectStatusMenuOption(index) {
+      const button = document.querySelector(
+        '#speed_grader_edit_status_secondary_mount_point button'
+      )
+      button.click()
+
+      const $menuContent = document.querySelector(`[aria-labelledby="${button.id}"]`)
+      const menuOption = $menuContent.querySelectorAll('[role="none"]')[index]
+      menuOption.children[0].click()
+    }
 
     test('should use submission history lti launch url', () => {
       finishSetup()
@@ -1677,6 +1705,219 @@ QUnit.module('SpeedGrader', rootHooks => {
       SpeedGrader.EG.handleSubmissionSelectionChange()
       const mountPoint = document.getElementById('speed_grader_edit_status_mount_point')
       strictEqual(mountPoint.children.length, 1)
+    })
+
+    test('displays the late pill after the status has changed through the status menu', assert => {
+      const done = assert.async()
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission_state = 'not_submitted'
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{excused: false, late: false, missing: false}],
+        submission_type: 'online_text_entry',
+        user_id: '4',
+        assignment_id: '1'
+      }
+      window.jsonData.context.students[0] = SpeedGrader.EG.currentStudent
+      window.jsonData.studentMap[4] = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.showSubmissionDetails()
+
+      moxios.install()
+      const url = `/api/v1/courses/${ENV.course_id}/assignments/${SpeedGrader.EG.currentStudent.submission.assignment_id}/submissions/${SpeedGrader.EG.currentStudent.submission.user_id}`
+      moxios.stubRequest(url, {status: 200, response: {}})
+      moxios.wait(() => done())
+
+      const responseRefreshRequest = {
+        assignment_id: '1',
+        id: '1',
+        user_id: '4',
+        workflow_state: 'graded',
+        grade_matches_current_submission: true,
+        graded_at: '2021-09-23T14:41:15Z',
+        grader_id: '1',
+        excused: false,
+        points_deducted: 0.0,
+        late: true,
+        missing: false,
+        seconds_late: 0,
+        preview_url: '',
+        submission_history: [
+          {
+            id: '1',
+            assignment_id: '1',
+            user_id: '4',
+            workflow_state: 'graded',
+            grade_matches_current_submission: true,
+            graded_at: '2021-09-23T14:41:15Z',
+            grader_id: 1,
+            excused: false,
+            late: true,
+            missing: false,
+            seconds_late: 0,
+            preview_url: ''
+          }
+        ],
+        anonymous_id: 'yvqp3'
+      }
+
+      const optionsIndexes = {
+        Late: 1,
+        Missing: 2,
+        Excused: 3,
+        None: 4
+      }
+      selectStatusMenuOption(optionsIndexes.Late)
+
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+        successCallback(responseRefreshRequest)
+
+        moxios.uninstall()
+        getJsonStub.restore()
+        const pill = $('.submission-late-pill')
+        ok(pill.is(':visible'))
+      })
+    })
+
+    test('displays the missing pill after the status has changed through the status menu', assert => {
+      const done = assert.async()
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission_state = 'not_submitted'
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{excused: false, late: false, missing: false}],
+        submission_type: 'online_text_entry',
+        user_id: '4',
+        assignment_id: '1'
+      }
+      window.jsonData.context.students[0] = SpeedGrader.EG.currentStudent
+      window.jsonData.studentMap[4] = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.showSubmissionDetails()
+
+      moxios.install()
+      const url = `/api/v1/courses/${ENV.course_id}/assignments/${SpeedGrader.EG.currentStudent.submission.assignment_id}/submissions/${SpeedGrader.EG.currentStudent.submission.user_id}`
+      moxios.stubRequest(url, {status: 200, response: {}})
+      moxios.wait(() => done())
+
+      const responseRefreshRequest = {
+        assignment_id: '1',
+        id: '1',
+        user_id: '4',
+        workflow_state: 'graded',
+        grade_matches_current_submission: true,
+        graded_at: '2021-09-23T14:41:15Z',
+        grader_id: '1',
+        excused: false,
+        points_deducted: 0.0,
+        late: false,
+        missing: true,
+        seconds_late: 0,
+        preview_url: '',
+        submission_history: [
+          {
+            id: '1',
+            assignment_id: '1',
+            user_id: '4',
+            workflow_state: 'graded',
+            grade_matches_current_submission: true,
+            graded_at: '2021-09-23T14:41:15Z',
+            grader_id: 1,
+            excused: false,
+            late: false,
+            missing: true,
+            seconds_late: 0,
+            preview_url: ''
+          }
+        ],
+        anonymous_id: 'yvqp3'
+      }
+
+      const optionsIndexes = {
+        Late: 1,
+        Missing: 2,
+        Excused: 3,
+        None: 4
+      }
+      selectStatusMenuOption(optionsIndexes.Missing)
+
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+        successCallback(responseRefreshRequest)
+
+        moxios.uninstall()
+        getJsonStub.restore()
+        const pill = $('.submission-missing-pill')
+        ok(pill.is(':visible'))
+      })
+    })
+
+    test('displays the excused pill after the status has changed through the status menu', assert => {
+      const done = assert.async()
+      finishSetup()
+      SpeedGrader.EG.currentStudent.submission_state = 'not_submitted'
+      SpeedGrader.EG.currentStudent.submission = {
+        workflow_state: 'unsubmitted',
+        submission_history: [{excused: false, late: false, missing: false}],
+        submission_type: 'online_text_entry',
+        user_id: '4',
+        assignment_id: '1'
+      }
+      window.jsonData.context.students[0] = SpeedGrader.EG.currentStudent
+      window.jsonData.studentMap[4] = SpeedGrader.EG.currentStudent
+      SpeedGrader.EG.showSubmissionDetails()
+
+      moxios.install()
+      const url = `/api/v1/courses/${ENV.course_id}/assignments/${SpeedGrader.EG.currentStudent.submission.assignment_id}/submissions/${SpeedGrader.EG.currentStudent.submission.user_id}`
+      moxios.stubRequest(url, {status: 200, response: {}})
+      moxios.wait(() => done())
+
+      const responseRefreshRequest = {
+        assignment_id: '1',
+        id: '1',
+        user_id: '4',
+        workflow_state: 'graded',
+        grade_matches_current_submission: true,
+        graded_at: '2021-09-23T14:41:15Z',
+        grader_id: '1',
+        excused: true,
+        points_deducted: 0.0,
+        late: false,
+        missing: false,
+        seconds_late: 0,
+        preview_url: '',
+        submission_history: [
+          {
+            id: '1',
+            assignment_id: '1',
+            user_id: '4',
+            workflow_state: 'graded',
+            grade_matches_current_submission: true,
+            graded_at: '2021-09-23T14:41:15Z',
+            grader_id: 1,
+            excused: true,
+            late: false,
+            missing: false,
+            seconds_late: 0,
+            preview_url: ''
+          }
+        ],
+        anonymous_id: 'yvqp3'
+      }
+
+      const optionsIndexes = {
+        Late: 1,
+        Missing: 2,
+        Excused: 3,
+        None: 4
+      }
+      selectStatusMenuOption(optionsIndexes.Excused)
+
+      const getJsonStub = sinon.stub($, 'getJSON').callsFake((_url, successCallback) => {
+        successCallback(responseRefreshRequest)
+
+        moxios.uninstall()
+        getJsonStub.restore()
+        const pill = $('.submission-excused-pill')
+        ok(pill.is(':visible'))
+      })
     })
 
     test('includes last-viewed date for attachments if not anonymizing students', () => {
