@@ -595,7 +595,7 @@ describe "API Authentication", type: :request do
     end
 
     def wrapped_jwt_from_service(payload = { sub: @user.global_id })
-      services_jwt = Canvas::Security::ServicesJwt.generate(payload, false)
+      services_jwt = CanvasSecurity::ServicesJwt.generate(payload, false, symmetric: true)
       payload = {
         iss: "some other service",
         user_token: services_jwt

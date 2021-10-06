@@ -19,5 +19,5 @@
 #
 
 module Canvas::Oauth
-  KeyStorage = Canvas::Security::KeyStorage.new('oauth2-asymmetric')
+  KeyStorage = CanvasSecurity::KeyStorage.new('oauth2-asymmetric')
 end

@@ -147,7 +147,7 @@ class DeveloperKey < ActiveRecord::Base
   def generate_rsa_keypair!(overwrite: false)
     return if public_jwk.present? && !overwrite
 
-    key_pair = Canvas::Security::RSAKeyPair.new
+    key_pair = CanvasSecurity::RSAKeyPair.new
     @private_jwk = key_pair.to_jwk
     self.public_jwk = key_pair.public_jwk.to_h
   end

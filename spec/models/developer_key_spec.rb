@@ -65,7 +65,7 @@ describe DeveloperKey do
 
   describe 'default values for is_lti_key' do
     let(:public_jwk) do
-      key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
+      key_hash = CanvasSecurity::RSAKeyPair.new.public_jwk.to_h
       key_hash['kty'] = key_hash['kty'].to_s
       key_hash
     end
@@ -955,11 +955,11 @@ describe DeveloperKey do
       before { subject.generate_rsa_keypair! }
 
       it 'populates the "public_jwk" column with a public key' do
-        expect(subject.public_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY
+        expect(subject.public_jwk['kty']).to eq CanvasSecurity::RSAKeyPair::KTY
       end
 
       it 'populates the "private_jwk" attribute with a private key' do
-        expect(subject.private_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY.to_sym
+        expect(subject.private_jwk['kty']).to eq CanvasSecurity::RSAKeyPair::KTY.to_sym
       end
     end
   end
@@ -1081,7 +1081,7 @@ describe DeveloperKey do
   describe "issue_token" do
     subject { DeveloperKey.create! }
     let(:claims) { { "key" => "value" } }
-    let(:asymmetric_keypair) { Canvas::Security::RSAKeyPair.new.to_jwk }
+    let(:asymmetric_keypair) { CanvasSecurity::RSAKeyPair.new.to_jwk }
     let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
 
     before {

@@ -163,7 +163,7 @@ module Lti
         end
 
         context 'when a url is used to get public key' do
-          let(:rsa_key_pair) { Canvas::Security::RSAKeyPair.new }
+          let(:rsa_key_pair) { CanvasSecurity::RSAKeyPair.new }
           let(:url) { "https://get.public.jwk" }
           let(:public_jwk_url_response) do
             {
