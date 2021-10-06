@@ -3151,6 +3151,64 @@ describe AssignmentsApiController, type: :request do
       course_with_teacher(:active_all => true)
     end
 
+    context "when the current user can update assignments but cannot grade submissions" do
+      before(:once) do
+        course_with_student(active_all: true)
+        @course.account.role_overrides.create!(permission: "manage_grades", enabled: false, role: admin_role)
+        account_admin_user(active_all: true)
+        @assignment = @course.assignments.create!(
+          name: "some assignment",
+          grading_type: "points",
+          points_possible: 15
+        )
+        @assignment.grade_student(@student, grade: 15, grader: @teacher)
+      end
+
+      it "succeeds if points possible is provided but it matches current points possible" do
+        api_update_assignment_call(@course, @assignment, { points_possible: 15 })
+        expect(response).to be_successful
+      end
+
+      it "returns unauthorized if attempting to change points possible" do
+        api_update_assignment_call(@course, @assignment, { points_possible: 12 })
+        expect(response).to be_unauthorized
+      end
+
+      it "succeeds if grading_type is provided but it matches current grading_type" do
+        api_update_assignment_call(@course, @assignment, { grading_type: "points" })
+        expect(response).to be_successful
+      end
+
+      it "returns unauthorized if attempting to change grading_type" do
+        api_update_assignment_call(@course, @assignment, { grading_type: "percent" })
+        expect(response).to be_unauthorized
+      end
+
+      it "succeeds if grading_standard_id is provided but it matches current grading_standard_id" do
+        grading_standard = grading_standard_for(@course)
+        @assignment.update!(grading_standard: grading_standard)
+        api_update_assignment_call(@course, @assignment, { grading_standard_id: grading_standard.id })
+        expect(response).to be_successful
+      end
+
+      it "succeeds if grading_standard_id is empty string and assignment does not have a grading standard" do
+        api_update_assignment_call(@course, @assignment, { grading_standard_id: "" })
+        expect(response).to be_successful
+      end
+
+      it "returns unauthorized if attempting to change grading_standard_id" do
+        grading_standard = grading_standard_for(@course)
+        @assignment.update!(grading_standard: grading_standard)
+        api_update_assignment_call(@course, @assignment, { grading_standard_id: nil })
+        expect(response).to be_unauthorized
+      end
+
+      it "succeeds if not provided attributes that trigger a regrade" do
+        api_update_assignment_call(@course, @assignment, { title: "changed assignment name" })
+        expect(response).to be_successful
+      end
+    end
+
     it "returns unauthorized for users who do not have permission" do
       course_with_student(active_all: true)
       @assignment = @course.assignments.create!({
@@ -3207,22 +3265,6 @@ describe AssignmentsApiController, type: :request do
       api_update_assignment_call(@course, @assignment, { grading_type: 'percent' })
       expect(response).to be_successful
       expect(@assignment.grading_type).to eq 'percent'
-    end
-
-    it "returns unauthorized if user updates grading_type without grading rights when at least one submission has been graded" do
-      course_with_student(active_all: true)
-      @assignment = @course.assignments.create!(
-        name: "some assignment",
-        points_possible: 15,
-        grading_type: "points"
-      )
-      @assignment.grade_student(@student, grade: 15, grader: @teacher)
-
-      RoleOverride.create!(permission: 'manage_grades', enabled: false, context: @course.account, role: admin_role)
-      account_admin_user(active_all: true)
-
-      api_update_assignment_call(@course, @assignment, { grading_type: 'percent' })
-      expect(response.code).to eq "401"
     end
 
     it "updates published/unpublished" do
