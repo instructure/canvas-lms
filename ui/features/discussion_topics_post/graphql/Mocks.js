@@ -117,7 +117,8 @@ export const getDiscussionSubentriesQueryMock = ({
   last = null,
   relativeEntryId = null,
   rolePillTypes = ['TaEnrollment', 'TeacherEnrollment'],
-  sort = 'asc'
+  sort = 'asc',
+  shouldError = false
 } = {}) => [
   {
     request: {
@@ -131,7 +132,7 @@ export const getDiscussionSubentriesQueryMock = ({
         ...(first !== null && {first}),
         ...(includeRelativeEntry !== null && {includeRelativeEntry}),
         ...(last !== null && {last}),
-        relativeEntryId,
+        ...(relativeEntryId !== null && {relativeEntryId}),
         ...(rolePillTypes !== null && {rolePillTypes}),
         sort
       }
@@ -171,7 +172,8 @@ export const getDiscussionSubentriesQueryMock = ({
                   DiscussionEntry.mock({
                     _id: '104',
                     id: 'RGlzY3Vzc2lvbkVudHJ5LTEwNAo=',
-                    message: '<p>This is the child reply asc</p>'
+                    message: '<p>This is the child reply asc</p>',
+                    rootEntryId: discussionEntryID
                   })
                 ],
                 pageInfo: PageInfo.mock(),
@@ -196,7 +198,8 @@ export const getDiscussionSubentriesQueryMock = ({
           })
         })()
       }
-    }
+    },
+    ...(shouldError && {error: new Error('graphql error')})
   }
 ]
 
