@@ -21,6 +21,7 @@ import $ from 'jquery'
 import tz from '@canvas/timezone'
 import htmlEscape from 'html-escape'
 import * as dateFunctions from '../date-functions'
+import {changeTimezone} from '../changeTimezone'
 import DatetimeField from './InstrumentedDatetimeField'
 import renderDatepickerTime from '../react/components/render-datepicker-time'
 import '@canvas/keycodes'
@@ -102,6 +103,7 @@ $.fn.datepicker = function (options) {
       picker.selectedMonth,
       parseInt(picker.selectedDay, 10)
     )
+
     const hr = $div.find('.ui-datepicker-time-hour').val() || $(this).data('time-hour')
     const min = $div.find('.ui-datepicker-time-minute').val() || $(this).data('time-minute')
     const ampm = $div.find('.ui-datepicker-time-ampm').val() || $(this).data('time-ampm')
@@ -120,7 +122,9 @@ $.fn.datepicker = function (options) {
       inputdate.setHours(numericHr)
       inputdate.setMinutes(numericMin)
     }
-    picker.input.data('inputdate', inputdate)
+    // We have to be careful because Date objects are always in the browser's
+    // timezone, not necessarily what's reflected by ENV.TIMEZONE.
+    picker.input.data('inputdate', changeTimezone(inputdate, {desiredTZ: ENV.TIMEZONE}))
     picker.input.val(text).change()
   }
   if (!$.fn.datepicker.timepicker_initialized) {
