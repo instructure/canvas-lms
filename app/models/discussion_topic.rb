@@ -204,7 +204,7 @@ class DiscussionTopic < ActiveRecord::Base
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.zone.parse("Jan 1 2000")
     end
-    self.lock_at = CanvasTime.fancy_midnight(self.lock_at)
+    self.lock_at = CanvasTime.fancy_midnight(lock_at&.in_time_zone(context.time_zone))
 
     [
       :could_be_locked, :podcast_enabled, :podcast_has_student_posts,
