@@ -45,6 +45,9 @@ class JwtsController < ApplicationController
   # Generates a different JWT each time it's called, each one expires
   # after a short window (1 hour)
   #
+  # @argument workflows[] [String]
+  #   Adds additional data to the JWT to be used by the consuming service workflow
+  #
   # @example_request
   #   curl 'https://<canvas>/api/v1/jwts' \
   #         -X POST \
@@ -54,9 +57,7 @@ class JwtsController < ApplicationController
   # @returns JWT
   def create
     services_jwt = CanvasSecurity::ServicesJwt
-                   .for_user(request.host_with_port, @current_user, real_user: @real_current_user,
-                                                                    # TODO: remove this once we teach all consumers to consume the asymmetric ones
-                                                                    symmetric: true)
+                   .for_user(request.host_with_port, @current_user, real_user: @real_current_user, workflows: params[:workflows])
     render json: { token: services_jwt }
   end
 
