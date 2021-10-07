@@ -20,6 +20,7 @@
 
 require 'net-ldap'
 require 'net_ldap_extensions'
+NetLdapExtensions.apply
 
 class AuthenticationProvider < ActiveRecord::Base
   include Workflow
