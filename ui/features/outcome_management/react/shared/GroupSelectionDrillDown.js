@@ -33,6 +33,13 @@ const keyCodes = {
   ENTER: 13
 }
 
+const buildTreeBrowserParentGroup = id => ({
+  collections: [],
+  id,
+  isRootGroup: false,
+  name: null
+})
+
 const GroupSelectionDrillDown = ({
   collections,
   rootId,
@@ -42,15 +49,28 @@ const GroupSelectionDrillDown = ({
   movingGroupId
 }) => {
   const [highlighted, setHighlighted] = useState(SELECTED_GROUP_INDEX)
-  const [selected, setSelected] = useState(collections[selectedGroupId || rootId])
+  // the selectedGroupId can't be in the collections, this will happen when moving a deep
+  // outcome and hit BACK button. The parent group is loading
+  const selected =
+    collections[selectedGroupId || rootId] || buildTreeBrowserParentGroup(selectedGroupId)
+
   const isLoaded = loadedGroups.includes(selectedGroupId) || selectedGroupId === null
 
   useEffect(() => {
-    setSelected(collections[selectedGroupId || rootId])
     setHighlighted(SELECTED_GROUP_INDEX)
-  }, [collections, rootId, selectedGroupId])
+  }, [selectedGroupId])
 
   const options = selected.collections.filter(id => id !== movingGroupId).map(id => collections[id])
+
+  const handleBackAction = event => {
+    // handle move deep outcome clicking in back button,
+    // call handleClick with a mock of the parent group, since we dont have it in the
+    // collections
+    const group =
+      collections[selected.parentGroupId] || buildTreeBrowserParentGroup(selected.parentGroupId)
+
+    handleClick(event, group)
+  }
 
   const handleKeyDown = event => {
     let index = highlighted
@@ -65,9 +85,11 @@ const GroupSelectionDrillDown = ({
       index = highlighted - 1
     } else if (event.keyCode === keyCodes.ENTER && highlighted !== SELECTED_GROUP_INDEX) {
       // enter
-      const collection =
-        highlighted === BACK_INDEX ? collections[selected.parentGroupId] : options[index]
-      handleClick(event, collection)
+      if (highlighted === BACK_INDEX) {
+        handleBackAction(event)
+      } else {
+        handleClick(event, options[index])
+      }
     }
     setHighlighted(index)
   }
@@ -88,18 +110,18 @@ const GroupSelectionDrillDown = ({
             key="Back"
             variant={highlighted === BACK_INDEX ? 'highlighted' : 'default'}
             renderBeforeLabel={<IconArrowOpenStartSolid />}
-            onClick={event => handleClick(event, collections[selected.parentGroupId])}
+            onClick={handleBackAction}
           >
             {I18n.t('Back')}
           </Options.Item>
         )}
-        <Options.Item
-          key={collections[selected.id].name}
-          variant="selected"
-          renderBeforeLabel={<IconCheckSolid />}
-        >
-          {selected.name}
-        </Options.Item>
+
+        {/* selected.name as null will be when loading a parent group (move deep outcome) */}
+        {selected.name && (
+          <Options.Item variant="selected" renderBeforeLabel={<IconCheckSolid />}>
+            {selected.name}
+          </Options.Item>
+        )}
         {isLoaded &&
           options.map((option, index) => (
             <Options.Item
