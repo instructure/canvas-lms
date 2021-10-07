@@ -118,7 +118,7 @@ class Login::SamlController < ApplicationController
     if session[:parent_registration]
       expected_unique_id = session[:parent_registration][:observee][:unique_id]
       session[:parent_registration][:unique_id_match] = (expected_unique_id == unique_id)
-      saml = ExternalAuthObservation::Saml.new(@domain_root_account, request, response)
+      saml = ExternalAuthObservation::SAML.new(@domain_root_account, request, response)
       redirect_to saml.logout_url
       return
     end
