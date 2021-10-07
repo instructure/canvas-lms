@@ -140,14 +140,13 @@ describe PacePlansController, type: :controller do
                                                                                             }))
     end
 
-    it "creates a pace plan if no primary pace plans are available" do
+    it "does not create a pace plan if no primary pace plans are available" do
       @pace_plan.update(user_id: @student)
       expect(@course.pace_plans.count).to eq(1)
       expect(@course.pace_plans.primary).to be_empty
       get :index, params: { course_id: @course.id }
-      expect(@course.pace_plans.count).to eq(2)
-      expect(@course.pace_plans.primary.count).to eq(1)
-      expect(@course.pace_plans.primary.first.pace_plan_module_items.count).to eq(3)
+      expect(@course.pace_plans.count).to eq(1)
+      expect(@course.pace_plans.primary.count).to eq(0)
     end
 
     it "responds with not found if the pace_plans feature is disabled" do
