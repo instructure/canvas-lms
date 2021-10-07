@@ -89,6 +89,13 @@ module Lti::Messages
         document_targets: %w(iframe).freeze,
         media_types: %w(application/vnd.ims.imsccv1p1 application/vnd.ims.imsccv1p2 application/vnd.ims.imsccv1p3 application/zip application/xml).freeze
       }.freeze,
+      'module_index_menu' => {
+        accept_multiple: true,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: true,
+        document_targets: %w(iframe window).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze,
       'submission_type_selection' => {
         accept_multiple: false,
         accept_types: %w(ltiResourceLink).freeze,
@@ -99,6 +106,7 @@ module Lti::Messages
     }.freeze
 
     MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection course_assignments_menu).freeze
+    CREATE_MODULE_PLACEMENTS = %w(course_assignments_menu module_index_menu).freeze
 
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super
@@ -130,6 +138,7 @@ module Lti::Messages
         [@context, :deep_linking_response],
         {
           modal: MODAL_PLACEMENTS.include?(placement),
+          create_new_module: CREATE_MODULE_PLACEMENTS.include?(placement),
           context_module_id: @opts[:context_module_id]
         }.compact
       )

@@ -148,6 +148,34 @@ describe('TargetGroupSelector', () => {
     expect(getByText('Create New Group')).toBeInTheDocument()
   })
 
+  describe('passing starterGroupId', () => {
+    it('calls setTargetGroup with a mock group when back button is clicked', async () => {
+      const {getByText} = render(
+        <TargetGroupSelector {...defaultProps({starterGroupId: '123'})} />,
+        {
+          mocks: [
+            ...groupMocks({
+              groupId: '123',
+              parentOutcomeGroupId: '12',
+              parentOutcomeGroupTitle: 'Group 12'
+            }),
+            ...groupMocks({
+              groupId: '12'
+            })
+          ]
+        }
+      )
+      await act(async () => jest.runAllTimers())
+      // We're in group 123
+      fireEvent.click(getByText('Back'))
+      await act(async () => jest.runAllTimers())
+      // Now we're group 12 (parent group of 123)
+      expect(getByText('Group 12')).toBeInTheDocument()
+      // We should se a setTargetGroup with group 12 (parent of 123)
+      expect(setTargetGroupMock.mock.calls[1][0].targetGroup.id).toBe('12')
+    })
+  })
+
   describe('create new group button', () => {
     it('focuses on the link after the AddContentItem unexpands', async () => {
       const {getByText} = render(<TargetGroupSelector {...defaultProps()} />)

@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_start_date_selector'
 import moment from 'moment-timezone'
 
@@ -25,15 +26,14 @@ import {autoSavingActions as actions} from '../../../actions/pace_plans'
 import PacePlanDateInput from '../../../shared/components/pace_plan_date_input'
 import {StoreState, PacePlan} from '../../../types'
 import {BlackoutDate} from '../../../shared/types'
-import {getPacePlan, getDisabledDaysOfWeek, isPlanCompleted} from '../../../reducers/pace_plans'
+import {getPacePlan, getDisabledDaysOfWeek} from '../../../reducers/pace_plans'
 import {getBlackoutDates} from '../../../shared/reducers/blackout_dates'
 import * as DateHelpers from '../../../utils/date_stuff/date_helpers'
 
 interface StoreProps {
-  readonly pacePlan: PacePlan
-  readonly disabledDaysOfWeek: number[]
   readonly blackoutDates: BlackoutDate[]
-  readonly planCompleted: boolean
+  readonly disabledDaysOfWeek: number[]
+  readonly pacePlan: PacePlan
 }
 
 interface DispatchProps {
@@ -54,23 +54,20 @@ export class StartDateSelector extends React.Component<ComponentProps> {
     )
   }
 
-  disabled() {
-    return (
-      this.props.planCompleted ||
-      (this.props.pacePlan.context_type === 'Enrollment' && this.props.pacePlan.hard_end_dates)
-    )
-  }
-
   render() {
     return (
       <PacePlanDateInput
         id="start-date"
-        disabled={this.disabled()}
         dateValue={this.props.pacePlan.start_date}
-        onDateChange={this.onDateChange}
         disabledDaysOfWeek={this.props.disabledDaysOfWeek}
         disabledDays={this.isDayDisabled}
-        label={I18n.t('Projected Start Date')}
+        interaction={this.props.pacePlan.context_type === 'Enrollment' ? 'readonly' : 'enabled'}
+        label={
+          this.props.pacePlan.context_type === 'Enrollment'
+            ? I18n.t('Start Date')
+            : I18n.t('Projected Start Date')
+        }
+        onDateChange={this.onDateChange}
         width="14rem"
       />
     )
@@ -79,10 +76,9 @@ export class StartDateSelector extends React.Component<ComponentProps> {
 
 const mapStateToProps = (state: StoreState): StoreProps => {
   return {
-    pacePlan: getPacePlan(state),
-    disabledDaysOfWeek: getDisabledDaysOfWeek(state),
     blackoutDates: getBlackoutDates(state),
-    planCompleted: isPlanCompleted(state)
+    disabledDaysOfWeek: getDisabledDaysOfWeek(state),
+    pacePlan: getPacePlan(state)
   }
 }
 

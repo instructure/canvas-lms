@@ -84,7 +84,7 @@ class Lti::Result < ApplicationRecord
     # result_score to the result_maximum
     (raw_result_score * result_maximum) / assignment.points_possible.to_f
   end
-  alias result_score scaled_result_score
+  alias_method :result_score, :scaled_result_score
 
   # Updates score for submission safely (does not allow maximum score to be null, but
   # if it's not already set, it will set it to assignment's points_possible)

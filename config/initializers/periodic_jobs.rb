@@ -255,6 +255,10 @@ Rails.configuration.after_initialize do
     Canvas::Oauth::KeyStorage.rotate_keys
   end
 
+  Delayed::Periodic.cron 'CanvasSecurity::ServicesJwt::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    CanvasSecurity::KeyStorage.rotate_keys
+  end
+
   Delayed::Periodic.cron 'Purgatory.expire_old_purgatories', '0 0 * * *', priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Purgatory, :expire_old_purgatories, local_offset: true)
   end

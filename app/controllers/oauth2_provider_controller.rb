@@ -170,12 +170,6 @@ class Oauth2ProviderController < ApplicationController
     render json: response
   end
 
-  def jwks
-    keys = Canvas::Oauth::KeyStorage.public_keyset
-    response.set_header('Cache-Control', "max-age=#{Canvas::Oauth::KeyStorage.max_cache_age}")
-    render json: { keys: keys }
-  end
-
   private
 
   def oauth_error(exception)

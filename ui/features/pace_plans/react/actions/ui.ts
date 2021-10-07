@@ -23,7 +23,7 @@
 import {Action} from 'redux'
 import {ThunkAction} from 'redux-thunk'
 
-import {PlanContextTypes, StoreState, PacePlan} from '../types'
+import {PacePlan, PlanContextTypes, ResponsiveSizes, StoreState} from '../types'
 import {createAction, ActionsUnion} from '../shared/types'
 import {pacePlanActions} from './pace_plans'
 
@@ -36,6 +36,7 @@ export enum Constants {
   PUBLISH_PLAN_STARTED = 'UI/PUBLISH_PLAN_STARTED',
   PUBLISH_PLAN_FINISHED = 'UI/PUBLISH_PLAN_FINISHED',
   SET_SELECTED_PLAN_CONTEXT = 'UI/SET_SELECTED_PLAN_CONTEXT',
+  SET_RESPONSIVE_SIZE = 'UI/SET_RESPONSIVE_SIZE',
   SHOW_LOADING_OVERLAY = 'UI/SHOW_LOADING_OVERLAY',
   HIDE_LOADING_OVERLAY = 'UI/HIDE_LOADING_OVERLAY',
   SET_EDITING_BLACKOUT_DATES = 'UI/SET_EDITING_BLACKOUT_DATES',
@@ -61,6 +62,8 @@ export const regularActions = {
     contextId: string,
     newSelectedPlan: PacePlan
   ) => createAction(Constants.SET_SELECTED_PLAN_CONTEXT, {contextType, contextId, newSelectedPlan}),
+  setResponsiveSize: (responsiveSize: ResponsiveSizes) =>
+    createAction(Constants.SET_RESPONSIVE_SIZE, responsiveSize),
   setAdjustingHardEndDatesAfter: (position: number | undefined) =>
     createAction(Constants.SET_ADJUSTING_HARD_END_DATES_AFTER, position)
 }

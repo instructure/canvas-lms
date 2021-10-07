@@ -134,7 +134,7 @@ RSpec.shared_examples "DiscussionType" do
     expect(discussion_type.resolve("_id")).to eq discussion.id.to_s
   end
 
-  it "returns if the current user requires an inital post" do
+  it "returns if the current user requires an initial post" do
     discussion.update!(require_initial_post: true)
     student_in_course(active_all: true)
     discussion.discussion_entries.create!(message: 'other student entry', user: @student)
@@ -388,10 +388,12 @@ describe Types::DiscussionType do
         .with(@teacher, check_policies: true)
         .and_return(true)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to be_nil
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be true
       allow_any_instantiation_of(discussion).to receive(:locked_for?)
         .with(@teacher, check_policies: true)
         .and_return(false)
       expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("message")).to eq discussion.message
+      expect(GraphQLTypeTester.new(discussion, current_user: @teacher).resolve("lockedForUser")).to be false
     end
   end
 

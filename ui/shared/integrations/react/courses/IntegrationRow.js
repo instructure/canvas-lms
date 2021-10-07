@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState} from 'react'
+import React from 'react'
 import I18n from 'i18n!course_settings'
 
 import {Alert} from '@instructure/ui-alerts'
@@ -99,7 +99,7 @@ const IntegrationRow = ({
               </Text>
             </Alert>
           )}
-          {((!enabled && !loading) || info) && (
+          {((!enabled && !loading) || info) && (!error || enabled) && (
             <Alert variant={info?.variant || 'info'} margin="small">
               <Text>
                 {enabled

@@ -55,23 +55,17 @@ import * as DateHelpers from './date_helpers'
 
 export const getDueDates = (
   pacePlanItems: PacePlanItem[],
-  startDate: string | undefined,
   excludeWeekends: boolean,
-  blackoutDates: BlackoutDate[]
+  blackoutDates: BlackoutDate[],
+  startDate?: string
 ): PacePlanItemDueDates => {
   const dueDates = {}
-  // Subtract one day, because the starting date is not inclusive in DateHelpers.addDays
-  let currentStart = DateHelpers.formatDate(moment(startDate).subtract(1, 'day'))
+  if (!startDate) return dueDates
 
-  for (let i = 0, keys = Object.keys(pacePlanItems); i < keys.length; i++) {
-    const key = keys[i]
-    const item = pacePlanItems[key]
-
-    // We treat the first assignment as at least 1 day, even if it has a duration of 0
-    const duration = i === 0 && item.duration === 0 ? 1 : item.duration
-
-    currentStart = DateHelpers.addDays(currentStart, duration, excludeWeekends, blackoutDates)
-    dueDates[item.id] = currentStart
+  let currentStart = DateHelpers.formatDate(moment(startDate))
+  for (const item of pacePlanItems) {
+    currentStart = DateHelpers.addDays(currentStart, item.duration, excludeWeekends, blackoutDates)
+    dueDates[item.module_item_id] = currentStart
   }
 
   return dueDates

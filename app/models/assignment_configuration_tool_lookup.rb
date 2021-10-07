@@ -86,4 +86,31 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     end
     {}
   end
+
+  def associated_tool_proxy
+    Lti::ToolProxy.proxies_in_order_by_codes(
+      context: assignment.course,
+      vendor_code: tool_vendor_code,
+      product_code: tool_product_code,
+      resource_type_code: tool_resource_type_code
+    ).first
+  end
+
+  def webhook_info
+    tool_proxy = associated_tool_proxy
+    return unless tool_proxy
+
+    {
+      product_code: tool_product_code,
+      vendor_code: tool_vendor_code,
+      resource_type_code: tool_resource_type_code,
+      tool_proxy_id: tool_proxy.id,
+      tool_proxy_created_at: tool_proxy.created_at,
+      tool_proxy_updated_at: tool_proxy.updated_at,
+      tool_proxy_name: tool_proxy.name,
+      tool_proxy_context_type: tool_proxy.context_type,
+      tool_proxy_context_id: tool_proxy.context_id,
+      subscription_id: tool_proxy.subscription_id,
+    }
+  end
 end

@@ -88,7 +88,7 @@ export default function SpeedGraderStatusMenu(props) {
           renderLabelBefore
           secondsLate={props.secondsLate}
           onSecondsLateUpdated={props.updateSubmission}
-          width="3.3125rem"
+          width="5rem"
         />
       )}
     </>

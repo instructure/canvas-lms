@@ -31,26 +31,43 @@ if CANVAS_ZEITWERK
   # require 'canvas/plugins'
   # require 'canvas/plugins/validators'
 
-  # # TODO: Load things that are not being properly loaded by zeitwerk right now
-  # require 'canvas_connect'
-  # require 'canvas_connect/version'
+  # # TODO: Load things that are not being properly loaded by zeitwerk right now.
+  # These gems should have zeitwerk loaders created within their gem structure that
+  # follows the "for_gem" convention and inflects these properly.
+  require 'canvas_connect'
+  require 'canvas_connect/version'
   # # in the canvas_connect gem, the "to_prepare"
   # # block uses this.
   # require 'canvas/plugins/adobe_connect'
-  # require 'canvas_webex'
-  # require 'canvas_webex/version'
-  # byebug
+  require 'canvas_webex'
+  require 'canvas_webex/version'
 
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(
+      "api_array_serializer" => "APIArraySerializer",
+      "api_serialization" => "APISerialization",
+      "api_serializer" => "APISerializer",
+      "basic_lti" => "BasicLTI",
       "basic_lti_links" => "BasicLTILinks",
+      "brandable_css" => "BrandableCSS",
+      "cas" => "CAS",
       "cc" => "CC",
       "cc_helper" => "CCHelper",
       "cc_exporter" => "CCExporter",
       "cc_worker" => "CCWorker",
       "dynamo_db" => "DynamoDB",
+      "id_loader" => "IDLoader",
       "inst_fs" => "InstFS",
+      "ldap" => "LDAP",
+      "legacy_id_interface" => "LegacyIDInterface",
+      "open_id_connect" => "OpenIDConnect",
+      "saml" => "SAML",
+      "sis" => "SIS",
+      "sisid_loader" => "SISIDLoader",
+      "ssl_common" => "SSLCommon",
       "turnitin_id" => "TurnitinID",
+      "uk_federation" => "UKFederation",
+      "vericite" => "VeriCite",
       "xml_helper" => "XMLHelper",
     )
   end

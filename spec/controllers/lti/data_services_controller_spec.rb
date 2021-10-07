@@ -40,8 +40,8 @@ describe Lti::DataServicesController do
   end
 
   before do
-    allow(Canvas::Security::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
-    allow(Canvas::Security::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
+    allow(CanvasSecurity::ServicesJwt).to receive(:encryption_secret).and_return('setecastronomy92' * 2)
+    allow(CanvasSecurity::ServicesJwt).to receive(:signing_secret).and_return('donttell' * 10)
     allow(HTTParty).to receive(:send).and_return(double(body: subscription, code: 200))
 
     root_account.lti_context_id = SecureRandom.uuid

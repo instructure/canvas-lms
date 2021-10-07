@@ -148,9 +148,9 @@ export const DiscussionEntry = {
       pageInfo: PageInfo.mock(),
       __typename: 'DiscussionSubentriesConnection'
     },
-    rootEntryId = '77',
-    isolatedEntryId = '77',
-    parentId = '77',
+    rootEntryId = null,
+    isolatedEntryId = null,
+    parentId = null,
     quotedEntry = null
   } = {}) => ({
     id,

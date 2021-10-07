@@ -27,7 +27,7 @@ describe JwtsController do
     ->(resp) {
       utf8_token_string = json_parse(resp.body)['token']
       decoded_crypted_token = Canvas::Security.base64_decode(utf8_token_string)
-      return Canvas::Security.decrypt_services_jwt(decoded_crypted_token)
+      return CanvasSecurity::ServicesJwt.decrypt(decoded_crypted_token)
     }
   end
 
@@ -93,9 +93,9 @@ describe JwtsController do
         real_user = site_admin_user(active_user: true)
         user_with_pseudonym(:user => other_user, :username => "other@example.com")
         user_session(real_user)
-        services_jwt = class_double(Canvas::Security::ServicesJwt).as_stubbed_const
+        services_jwt = class_double(CanvasSecurity::ServicesJwt).as_stubbed_const
         expect(services_jwt).to receive(:refresh_for_user)
-          .with('testjwt', 'testhost', other_user, real_user: real_user)
+          .with('testjwt', 'testhost', other_user, real_user: real_user, symmetric: true)
           .and_return('refreshedjwt')
         post 'refresh', params: { jwt: 'testjwt', as_user_id: other_user.id }, format: 'json'
         token = JSON.parse(response.body)['token']
@@ -104,9 +104,10 @@ describe JwtsController do
 
       it "returns a different jwt when refresh is called" do
         course = course_factory
-        original_jwt = Canvas::Security::ServicesJwt.for_user(
+        original_jwt = CanvasSecurity::ServicesJwt.for_user(
           request.host_with_port,
-          token_user
+          token_user,
+          symmetric: true
         )
         post 'refresh', params: { jwt: original_jwt }
         refreshed_jwt = JSON.parse(response.body)['token']
@@ -114,10 +115,10 @@ describe JwtsController do
       end
 
       it "returns an error if jwt is invalid for refresh" do
-        services_jwt = class_double(Canvas::Security::ServicesJwt)
+        services_jwt = class_double(CanvasSecurity::ServicesJwt)
                        .as_stubbed_const(transfer_nested_constants: true)
         expect(services_jwt).to receive(:refresh_for_user)
-          .and_raise(Canvas::Security::ServicesJwt::InvalidRefresh)
+          .and_raise(CanvasSecurity::ServicesJwt::InvalidRefresh)
         post 'refresh', params: { jwt: 'testjwt' }, format: 'json'
         expect(response.status).to eq(400)
       end
