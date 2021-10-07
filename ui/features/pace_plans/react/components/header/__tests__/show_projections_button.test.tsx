@@ -24,6 +24,7 @@ import {ShowProjectionsButton} from '../show_projections_button'
 const toggleShowProjections = jest.fn()
 
 const defaultProps = {
+  pacePlanType: 'Course' as const,
   responsiveSize: 'large' as const,
   showProjections: false,
   toggleShowProjections
@@ -66,5 +67,12 @@ describe('ShowProjectionsButton', () => {
     expect(getByRole('button', {name: 'Hide Projections'})).toBeInTheDocument()
     expect(queryByTestId('projections-icon-button')).toBeInTheDocument()
     expect(queryByTestId('projections-text-button')).not.toBeInTheDocument()
+  })
+
+  it('does not render anything for student plans', () => {
+    const {queryByRole} = render(
+      <ShowProjectionsButton {...defaultProps} pacePlanType="Enrollment" />
+    )
+    expect(queryByRole('button')).not.toBeInTheDocument()
   })
 })

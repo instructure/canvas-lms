@@ -182,6 +182,16 @@ RSpec.describe SubmissionDraft do
         @submission_draft.body = 'some body'
         expect(@submission_draft.meets_assignment_criteria?).to eq(false)
       end
+
+      it "returns true if a valid lti_launch_url is present" do
+        @submission_draft.lti_launch_url = 'http://localhost/some-url'
+        expect(@submission_draft).to be_meets_assignment_criteria
+      end
+
+      it "returns false if there are no attachments and lti_launch_url is invalid" do
+        @submission_draft.lti_launch_url = 'oh no'
+        expect(@submission_draft).not_to be_meets_assignment_criteria
+      end
     end
 
     context 'the assignment is an online_url type' do

@@ -16,8 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {UIState, StoreState} from '../types'
+import {createSelector} from 'reselect'
+
+import {StoreState, UIState} from '../types'
 import {Constants as UIConstants, UIAction} from '../actions/ui'
+import {getPacePlanType} from './pace_plans'
 
 export const initialState: UIState = {
   autoSaving: false,
@@ -45,10 +48,15 @@ export const getSelectedContextId = (state: StoreState) => state.ui.selectedCont
 export const getLoadingMessage = (state: StoreState) => state.ui.loadingMessage
 export const getResponsiveSize = (state: StoreState) => state.ui.responsiveSize
 export const getShowLoadingOverlay = (state: StoreState) => state.ui.showLoadingOverlay
-export const getShowProjections = (state: StoreState) => state.ui.showProjections
 export const getEditingBlackoutDates = (state: StoreState) => state.ui.editingBlackoutDates
 export const getAdjustingHardEndDatesAfter = (state: StoreState) =>
   state.ui.adjustingHardEndDatesAfter
+
+export const getShowProjections = createSelector(
+  state => state.ui.showProjections,
+  getPacePlanType,
+  (showProjections, pacePlanType) => showProjections || pacePlanType === 'Enrollment'
+)
 
 /* Reducers */
 

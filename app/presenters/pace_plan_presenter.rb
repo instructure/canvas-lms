@@ -83,7 +83,7 @@ class PacePlanPresenter
 
   def context_type
     if pace_plan.user_id
-      'User'
+      'Enrollment'
     elsif pace_plan.course_section_id
       'Section'
     else

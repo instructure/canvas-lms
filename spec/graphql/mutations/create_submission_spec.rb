@@ -237,6 +237,13 @@ RSpec.describe Mutations::CreateSubmission do
     end
   end
 
+  context "when the submission_type is basic_lti_launch" do
+    it "returns an error" do
+      result = run_mutation(submission_type: "basic_lti_launch", url: "/some-url")
+      expect(result.dig(:errors, 0, :message)).to include("invalid value (basic_lti_launch)")
+    end
+  end
+
   it 'respects assignment overrides for the given user' do
     @assignment.update!(lock_at: 1.day.ago)
     create_adhoc_override_for_assignment(@assignment, @student, { lock_at: 1.day.from_now })

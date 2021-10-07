@@ -17,6 +17,7 @@
  */
 
 import React, {useEffect, useRef, useState} from 'react'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_module'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -82,10 +83,10 @@ export const Module: React.FC<PassedProps> = props => {
 
   const assignmentRows: JSX.Element[] = props.module.items.map(item => {
     // Scoping the key to the state of hard_end_dates and the pacePlan id ensures a full re-render of the row if either the hard_end_date
-    // status changes or the pace p     lan changes. This is necessary because the AssignmentRow maintains the duration in local state,
+    // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
     // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
     // get reverted as you type).
-    const key = `${item.id}|${props.pacePlan.id}|${props.pacePlan.hard_end_dates}`
+    const key = `${item.id}|${item.module_item_id}|${props.pacePlan.hard_end_dates}`
     return (
       <AssignmentRow
         key={key}
