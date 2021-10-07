@@ -190,7 +190,7 @@ export class PlannerItem extends Component {
   }
 
   renderDateField = () => {
-    if (this.props.date) {
+    if (this.props.date && this.props.date.isValid()) {
       if (this.props.allDay) {
         return formatMessage('All Day')
       }
