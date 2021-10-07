@@ -740,18 +740,20 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe "lti1p1 claims" do
+    let(:lti1p1_claim) { "https://purl.imsglobal.org/spec/lti/claim/lti1p1" }
+
     context "when user does not have lti_context_id" do
       before do
         allow(user).to receive(:lti_context_id).and_return(nil)
       end
 
       it "does not include the claim" do
-        expect(decoded_jwt).to_not include "https://purl.imsglobal.org/spec/lti/claim/lti1p1"
+        expect(decoded_jwt).to_not include lti1p1_claim
       end
     end
 
     context "when user has lti_context_id" do
-      let(:message_lti1p1) { decoded_jwt["https://purl.imsglobal.org/spec/lti/claim/lti1p1"] }
+      let(:message_lti1p1) { decoded_jwt[lti1p1_claim] }
 
       it "adds user_id" do
         expect(message_lti1p1["user_id"]).to eq user.lti_context_id
