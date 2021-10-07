@@ -203,7 +203,7 @@ module CanvasRails
 
             configure_connection
 
-            raise "Canvas requires PostgreSQL 9.5 or newer" unless postgresql_version >= 90500
+            raise "Canvas requires PostgreSQL 12 or newer" unless postgresql_version >= 12_00_00
 
             break
           rescue ::PG::Error => error
