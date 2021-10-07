@@ -44,13 +44,17 @@ if CANVAS_ZEITWERK
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(
       "basic_lti_links" => "BasicLTILinks",
+      "cas" => "CAS",
       "cc" => "CC",
       "cc_helper" => "CCHelper",
       "cc_exporter" => "CCExporter",
       "cc_worker" => "CCWorker",
       "dynamo_db" => "DynamoDB",
       "inst_fs" => "InstFS",
+      "open_id_connect" => "OpenIDConnect",
+      "saml" => "SAML",
       "turnitin_id" => "TurnitinID",
+      "uk_federation" => "UKFederation",
       "xml_helper" => "XMLHelper",
     )
   end
