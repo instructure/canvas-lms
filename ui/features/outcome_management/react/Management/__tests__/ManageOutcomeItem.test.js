@@ -72,15 +72,13 @@ describe('ManageOutcomeItem', () => {
 
   it('handles click on checkbox', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const checkbox = getByText('Select outcome')
-    fireEvent.click(checkbox)
+    fireEvent.click(getByText('Select outcome Outcome Title'))
     expect(onCheckboxHandlerMock).toHaveBeenCalledTimes(1)
   })
 
   it('passes selected outcome obj to checkbox onClick handler', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const checkbox = getByText('Select outcome')
-    fireEvent.click(checkbox)
+    fireEvent.click(getByText('Select outcome Outcome Title'))
     expect(onCheckboxHandlerMock).toHaveBeenCalledWith({linkId: '2'})
   })
 
@@ -91,23 +89,20 @@ describe('ManageOutcomeItem', () => {
 
   it('displays down pointing caret when description is expanded', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Expand outcome description'))
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('icon-arrow-down')).toBeInTheDocument()
   })
 
   it('expands description when user clicks on button with right pointing caret', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const caretBtn = getByText('Expand outcome description')
-    fireEvent.click(caretBtn)
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
     expect(queryByTestId('description-expanded')).toBeInTheDocument()
   })
 
   it('collapses description when user clicks on button with down pointing caret', () => {
     const {queryByTestId, getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    const caretBtn = getByText('Expand outcome description')
-    fireEvent.click(caretBtn)
-    const caretDownBtn = getByText('Collapse outcome description')
-    fireEvent.click(caretDownBtn)
+    fireEvent.click(getByText('Expand description for outcome Outcome Title'))
+    fireEvent.click(getByText('Collapse description for outcome Outcome Title'))
     expect(queryByTestId('description-truncated')).toBeInTheDocument()
   })
 
@@ -122,7 +117,7 @@ describe('ManageOutcomeItem', () => {
 
   it('handles click on individual outcome -> kebab menu -> remove option', () => {
     const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
-    fireEvent.click(getByText('Outcome Menu'))
+    fireEvent.click(getByText('Menu for outcome Outcome Title'))
     fireEvent.click(getByText('Remove'))
     expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
     expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
@@ -134,14 +129,14 @@ describe('ManageOutcomeItem', () => {
       const {queryByText} = render(
         <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
       )
-      expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
+      expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
     })
 
     it('hides checkboxes', () => {
       const {queryByText} = render(
         <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
       )
-      expect(queryByText('Select outcome')).not.toBeInTheDocument()
+      expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
     })
 
     describe('with manage_outcomes permission', () => {
@@ -154,7 +149,7 @@ describe('ManageOutcomeItem', () => {
             contextType: 'Course'
           }
         )
-        expect(getByText('Outcome Menu')).toBeInTheDocument()
+        expect(getByText('Menu for outcome Outcome Title')).toBeInTheDocument()
       })
 
       it('does not render the kebab menu if the user is not an admin', () => {
@@ -166,7 +161,7 @@ describe('ManageOutcomeItem', () => {
             contextType: 'Course'
           }
         )
-        expect(queryByText('Outcome Menu')).not.toBeInTheDocument()
+        expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
       })
     })
   })
