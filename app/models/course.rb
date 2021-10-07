@@ -1472,7 +1472,7 @@ class Course < ActiveRecord::Base
     super
   end
 
-  alias_method :destroy_permanently!, :destroy
+  alias destroy_permanently! destroy
   def destroy
     return false if template?
 
@@ -3242,10 +3242,8 @@ class Course < ActiveRecord::Base
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
         delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
 
-        if item_banks_tab &&
-           !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
-          tabs.reject! { |tab| tab[:id] == item_banks_tab[:id] }
-        end
+        tabs -= [item_banks_tab] if item_banks_tab && !check_for_permission.call(:manage_content, *RoleOverride::GRANULAR_MANAGE_ASSIGNMENT_PERMISSIONS)
+
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
         tabs.delete(outcome_tab) if outcome_tab && (!user || !check_for_permission.call(:manage_content, :participate_as_student, :read_as_admin))
@@ -3461,7 +3459,6 @@ class Course < ActiveRecord::Base
         course_enrollment.start_at = enrollment.start_at
         course_enrollment.end_at = enrollment.end_at
         course_enrollment.completed_at = enrollment.completed_at
-        course_enrollment.associated_user_id = enrollment.associated_user_id
         course_enrollment.save!
         progress.increment_completion!(1) if progress&.total
       end

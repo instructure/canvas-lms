@@ -147,7 +147,7 @@ class DeveloperKey < ActiveRecord::Base
   def generate_rsa_keypair!(overwrite: false)
     return if public_jwk.present? && !overwrite
 
-    key_pair = CanvasSecurity::RSAKeyPair.new
+    key_pair = Canvas::Security::RSAKeyPair.new
     @private_jwk = key_pair.to_jwk
     self.public_jwk = key_pair.public_jwk.to_h
   end
@@ -343,17 +343,6 @@ class DeveloperKey < ActiveRecord::Base
       # canvas
       Canvas::Security.create_jwt(claims).to_s
     end
-  end
-
-  def mobile_app?
-    false
-  end
-
-  def tokens_expire_in
-    return nil unless mobile_app?
-
-    sessions_settings = Canvas::Plugin.find('sessions').settings || {}
-    sessions_settings[:mobile_timeout]&.to_f&.minutes
   end
 
   private

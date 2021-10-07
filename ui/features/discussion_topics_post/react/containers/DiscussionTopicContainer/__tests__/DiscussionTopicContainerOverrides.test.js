@@ -16,11 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {Discussion} from '../../../../graphql/Discussion'
 import {DiscussionTopicContainer} from '../DiscussionTopicContainer'
 import {fireEvent, render} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
+import {ApolloProvider} from 'react-apollo'
 import React from 'react'
+import {mswClient} from '../../../../../../shared/msw/mswClient'
+import {Discussion} from '../../../../graphql/Discussion'
 
 jest.mock('../../../utils', () => ({
   ...jest.requireActual('../../../utils'),
@@ -40,11 +41,11 @@ beforeAll(() => {
 })
 
 describe('DiscussionTopicContainer', () => {
-  const setup = (props, mocks) => {
+  const setup = props => {
     return render(
-      <MockedProvider mocks={mocks}>
+      <ApolloProvider client={mswClient}>
         <DiscussionTopicContainer {...props} />
-      </MockedProvider>
+      </ApolloProvider>
     )
   }
 

@@ -73,11 +73,7 @@ const ManageOutcomeItem = ({
               {canManageOutcome && (
                 <Flex.Item>
                   <Checkbox
-                    label={
-                      <ScreenReaderContent>
-                        {I18n.t('Select outcome %{title}', {title})}
-                      </ScreenReaderContent>
-                    }
+                    label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
                     value="medium"
                     checked={isChecked}
                     onChange={onChangeHandler}
@@ -89,8 +85,8 @@ const ManageOutcomeItem = ({
                   size="small"
                   screenReaderLabel={
                     truncated
-                      ? I18n.t('Expand description for outcome %{title}', {title})
-                      : I18n.t('Collapse description for outcome %{title}', {title})
+                      ? I18n.t('Expand outcome description')
+                      : I18n.t('Collapse outcome description')
                   }
                   withBackground={false}
                   withBorder={false}
@@ -121,7 +117,7 @@ const ManageOutcomeItem = ({
             <OutcomeKebabMenu
               canDestroy={canUnlink}
               canEdit={canEdit}
-              menuTitle={I18n.t('Menu for outcome %{title}', {title})}
+              menuTitle={I18n.t('Outcome Menu')}
               onMenuHandler={onMenuHandlerWrapper}
             />
           </Flex.Item>

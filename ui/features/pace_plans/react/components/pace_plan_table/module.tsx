@@ -16,8 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-// @ts-ignore: TS doesn't understand i18n scoped imports
+import React from 'react'
 import I18n from 'i18n!pace_plans_module'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
@@ -25,148 +24,117 @@ import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {Heading} from '@instructure/ui-heading'
 import {IconMiniArrowDownLine, IconMiniArrowRightLine} from '@instructure/ui-icons'
-import {Table} from '@instructure/ui-table'
+import {Text} from '@instructure/ui-text'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
 import {View} from '@instructure/ui-view'
 
-import AssignmentRow from './assignment_row'
-import {Module as IModule, PacePlan, ResponsiveSizes} from '../../types'
-
-// Doing this to avoid TS2339 errors-- remove once we're on InstUI 8
-const {Body, ColHeader, Head, Row} = Table as any
+import AssignmentRow, {ColumnWrapper, COLUMN_WIDTHS} from './assignment_row'
+import {Module as IModule, PacePlan} from '../../types'
+import SlideTransition from '../../utils/slide_transition'
 
 interface PassedProps {
   readonly index: number
   readonly module: IModule
   readonly pacePlan: PacePlan
-  readonly responsiveSize: ResponsiveSizes
   readonly showProjections: boolean
 }
 
-export const Module: React.FC<PassedProps> = props => {
-  const [actuallyExpanded, setActuallyExpanded] = useState(props.showProjections)
-  const [datesVisible, setDatesVisible] = useState(props.showProjections)
-  const wasExpanded = useRef(props.showProjections)
+interface LocalState {
+  readonly visible: boolean
+}
 
-  useEffect(() => {
-    if (!wasExpanded.current && props.showProjections) {
-      setDatesVisible(true)
-      setActuallyExpanded(true)
-    }
-    if (wasExpanded.current && !props.showProjections) {
-      setActuallyExpanded(false)
-      setTimeout(() => setDatesVisible(false), 500)
-    }
-    wasExpanded.current = props.showProjections
-  }, [props.showProjections, setDatesVisible])
+export class Module extends React.Component<PassedProps, LocalState> {
+  state: LocalState = {visible: true}
 
-  const renderModuleHeader = () => {
+  renderArrow = () => {
+    return this.state.visible ? <IconMiniArrowDownLine /> : <IconMiniArrowRightLine />
+  }
+
+  renderDaysText = () => {
+    if (this.props.pacePlan.hard_end_dates && this.props.pacePlan.context_type === 'Enrollment') {
+      return null
+    } else {
+      return <Text weight="bold">{I18n.t('Days')}</Text>
+    }
+  }
+
+  renderModuleDetails = () => {
+    if (this.state.visible) {
+      return (
+        <Flex alignItems="end">
+          <ColumnWrapper width={COLUMN_WIDTHS.DURATION}>{this.renderDaysText()}</ColumnWrapper>
+          <SlideTransition
+            direction="horizontal"
+            expanded={this.props.showProjections}
+            size={COLUMN_WIDTHS.DATE}
+          >
+            <Text weight="bold">
+              <ColumnWrapper height="18px" width={COLUMN_WIDTHS.DATE}>
+                {I18n.t('Due Date')}
+              </ColumnWrapper>
+            </Text>
+          </SlideTransition>
+          <ColumnWrapper width={COLUMN_WIDTHS.STATUS}>
+            <Text weight="bold">{I18n.t('Status')}</Text>
+          </ColumnWrapper>
+        </Flex>
+      )
+    }
+  }
+
+  renderModuleHeader = () => {
     return (
       <Flex alignItems="center" justifyItems="space-between">
         <Heading level="h4" as="h2">
-          {`${props.index}. ${props.module.name}`}
+          {`${this.props.index}. ${this.props.module.name}`}
         </Heading>
+        {this.renderModuleDetails()}
       </Flex>
     )
   }
 
-  const renderDateColHeader = () => {
-    if (!props.showProjections && !actuallyExpanded && !datesVisible) return null
+  render() {
+    const assignmentRows: JSX.Element[] = this.props.module.items.map(item => {
+      // Scoping the key to the state of hard_end_dates and the pacePlan id ensures a full re-render of the row if either the hard_end_date
+      // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
+      // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
+      // get reverted as you type).
+      const key = `${item.id}|${this.props.pacePlan.id}|${this.props.pacePlan.hard_end_dates}`
+      return <AssignmentRow key={key} pacePlanItem={item} />
+    })
+
     return (
-      <ColHeader width={actuallyExpanded ? '6rem' : '0'} id={`module-${props.module.id}-duration`}>
-        <Flex as="div" alignItems="end" padding={headerPadding}>
-          {I18n.t('Due Date')}
-        </Flex>
-      </ColHeader>
-    )
-  }
-
-  const assignmentRows: JSX.Element[] = props.module.items.map(item => {
-    // Scoping the key to the state of hard_end_dates and the pacePlan id ensures a full re-render of the row if either the hard_end_date
-    // status changes or the pace plan changes. This is necessary because the AssignmentRow maintains the duration in local state,
-    // and applying updates with componentWillReceiveProps makes it buggy (because the Redux updates can be slow, causing changes to
-    // get reverted as you type).
-    const key = `${item.id}|${item.module_item_id}|${props.pacePlan.hard_end_dates}`
-    return (
-      <AssignmentRow
-        key={key}
-        actuallyExpanded={actuallyExpanded}
-        datesVisible={datesVisible}
-        pacePlanItem={item}
-      />
-    )
-  })
-
-  const headerPadding = `${props.responsiveSize === 'small' ? 'small' : 'medium'} small small`
-
-  return (
-    <View
-      as="div"
-      className={`pace-plans-module-table ${actuallyExpanded ? 'actually-expanded' : ''}`}
-      margin="0 0 medium"
-    >
-      <ApplyTheme
-        theme={{
-          [(Button as any).theme]: {
-            borderRadius: '0',
-            mediumPaddingTop: '1rem',
-            mediumPaddingBottom: '1rem'
-          },
-          [(ColHeader as any).theme]: {
-            padding: '0'
-          }
-        }}
-      >
-        <ToggleDetails
-          summary={renderModuleHeader()}
-          icon={() => <IconMiniArrowRightLine />}
-          iconExpanded={() => <IconMiniArrowDownLine />}
-          variant="filled"
-          defaultExpanded
-          size="large"
+      <View margin="0 0 medium">
+        <ApplyTheme
           theme={{
-            iconMargin: '0.5rem',
-            filledBorderRadius: '0',
-            filledPadding: '2rem',
-            togglePadding: '0'
+            [(Button as any).theme]: {
+              borderRadius: '0',
+              mediumPaddingTop: '1rem',
+              mediumPaddingBottom: '1rem'
+            }
           }}
         >
-          <View as="div" borderWidth="0 small">
-            <Table
-              caption={`${props.index}. ${props.module.name}`}
-              layout={props.responsiveSize === 'small' ? 'stacked' : 'fixed'}
-            >
-              <Head>
-                <Row>
-                  <ColHeader id={`module-${props.module.id}-assignments`}>
-                    <Flex as="div" alignItems="end" padding={headerPadding}>
-                      {I18n.t('Assignments')}
-                    </Flex>
-                  </ColHeader>
-                  <ColHeader id={`module-${props.module.id}-days`} width="8rem">
-                    <Flex as="div" alignItems="end" padding={headerPadding}>
-                      {I18n.t('Days')}
-                    </Flex>
-                  </ColHeader>
-                  {renderDateColHeader()}
-                  <ColHeader
-                    id={`module-${props.module.id}-status`}
-                    width="5rem"
-                    textAlign="center"
-                  >
-                    <Flex as="div" alignItems="end" justifyItems="center" padding={headerPadding}>
-                      {I18n.t('Status')}
-                    </Flex>
-                  </ColHeader>
-                </Row>
-              </Head>
-              <Body>{assignmentRows}</Body>
-            </Table>
-          </View>
-        </ToggleDetails>
-      </ApplyTheme>
-    </View>
-  )
+          <ToggleDetails
+            summary={this.renderModuleHeader()}
+            icon={() => <IconMiniArrowRightLine />}
+            iconExpanded={() => <IconMiniArrowDownLine />}
+            onToggle={(_, expanded) => this.setState({visible: expanded})}
+            variant="filled"
+            defaultExpanded
+            size="large"
+            theme={{
+              iconMargin: '0.5rem',
+              filledBorderRadius: '0',
+              filledPadding: '2rem',
+              togglePadding: '0'
+            }}
+          >
+            <View as="div">{assignmentRows}</View>
+          </ToggleDetails>
+        </ApplyTheme>
+      </View>
+    )
+  }
 }
 
 export default Module

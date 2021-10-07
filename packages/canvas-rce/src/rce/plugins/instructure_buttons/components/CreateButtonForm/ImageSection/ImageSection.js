@@ -19,10 +19,13 @@
 import React from 'react'
 
 import formatMessage from '../../../../../../format-message'
+import {MyImages} from './MyImages'
 import {Group} from '../Group'
 
 export const ImageSection = ({editor}) => (
   <Group as="section" defaultExpanded summary={formatMessage('Image')}>
-    <p>Image mode selection placeholder</p>
+    <Group as="div" padding="none" size="small" summary={formatMessage('My Images')}>
+      <MyImages editor={editor} />
+    </Group>
   </Group>
 )

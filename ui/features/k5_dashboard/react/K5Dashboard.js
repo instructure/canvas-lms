@@ -59,8 +59,10 @@ import usePlanner from '@canvas/k5/react/hooks/usePlanner'
 import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
-import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
-import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
+import ObserverOptions, {
+  ObserverListShape,
+  defaultSelectedObserverId
+} from '@canvas/k5/react/ObserverOptions'
 
 const DASHBOARD_TABS = [
   {
@@ -153,10 +155,7 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(() => {
-    const id = savedObservedId(currentUser.id)
-    return observerList.find(o => o.id === id) ? id : undefined
-  })
+  const [observedUserId, setObservedUserId] = useState(defaultSelectedObserverId)
   const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
@@ -285,7 +284,6 @@ export const K5Dashboard = ({
       handleClose={useImportantDatesTray ? () => setTrayOpen(false) : undefined}
       selectedContextCodes={selectedContextCodes}
       selectedContextsLimit={selectedContextsLimit}
-      observedUserId={observedUserId}
     />
   )
 
@@ -390,7 +388,7 @@ K5Dashboard.propTypes = {
   assignmentsDueToday: PropTypes.object.isRequired,
   assignmentsMissing: PropTypes.object.isRequired,
   assignmentsCompletedForToday: PropTypes.object.isRequired,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   currentUser: PropTypes.shape({
     id: PropTypes.string,
     display_name: PropTypes.string,

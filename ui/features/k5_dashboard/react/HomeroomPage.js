@@ -81,6 +81,8 @@ const HomeroomPage = ({
     </div>
   )
 
+  const canCreateCourses = createPermissions === 'admin' || createPermissions === 'teacher'
+
   return (
     <section
       id="dashboard_page_homeroom"
@@ -98,7 +100,7 @@ const HomeroomPage = ({
           <Flex.Item>
             <Heading level="h2">{I18n.t('My Subjects')}</Heading>
           </Flex.Item>
-          {createPermissions && (
+          {canCreateCourses && (
             <Flex.Item>
               <Tooltip renderTip={I18n.t('Start a new subject')}>
                 <IconButton
@@ -139,7 +141,7 @@ const HomeroomPage = ({
 
 HomeroomPage.propTypes = {
   cards: PropTypes.array,
-  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'student', 'no_enrollments']),
+  createPermissions: PropTypes.oneOf(['admin', 'teacher', 'none']).isRequired,
   homeroomAnnouncements: PropTypes.array.isRequired,
   loadingAnnouncements: PropTypes.bool.isRequired,
   visible: PropTypes.bool.isRequired,

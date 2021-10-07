@@ -61,12 +61,7 @@ const Integrations = () => {
             available={ENV.MSFT_SYNC_ENABLED}
             enabled={msEnabled}
             loading={msLoading}
-            onChange={() => {
-              if (!msEnabled) {
-                setMSExpanded(true)
-              }
-              msToggleEnabled()
-            }}
+            onChange={msToggleEnabled}
             error={msError}
             info={msInfo}
             expanded={msExpanded}
