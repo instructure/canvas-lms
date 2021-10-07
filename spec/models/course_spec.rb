@@ -521,6 +521,18 @@ describe Course do
     end
   end
 
+  describe 'allow_student_discussion_reporting' do
+    it 'defaults to true' do
+      expect(@course.allow_student_discussion_reporting).to eq true
+    end
+
+    it 'allows setting and getting' do
+      @course.allow_student_discussion_reporting = false
+      @course.save!
+      expect(@course.allow_student_discussion_reporting).to eq false
+    end
+  end
+
   describe "allow_student_discussion_topics" do
     it "defaults true" do
       expect(@course.allow_student_discussion_topics).to eq true

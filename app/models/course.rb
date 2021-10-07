@@ -2626,7 +2626,7 @@ class Course < ActiveRecord::Base
      :turnitin_comments, :self_enrollment, :license, :indexed, :locale,
      :hide_final_grade, :hide_distribution_graphs,
      :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
-     :organize_epub_by_content_type, :show_announcements_on_home_page,
+     :allow_student_discussion_reporting, :organize_epub_by_content_type, :show_announcements_on_home_page,
      :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
      :homeroom_course, :course_color, :alt_name]
@@ -3368,6 +3368,7 @@ class Course < ActiveRecord::Base
   add_setting :allow_student_discussion_topics, :boolean => true, :default => true
   add_setting :allow_student_discussion_editing, :boolean => true, :default => true
   add_setting :allow_student_forum_attachments, :boolean => true, :default => true
+  add_setting :allow_student_discussion_reporting, :boolean => true, :default => true
   add_setting :show_total_grade_as_points, :boolean => true, :default => false
   add_setting :filter_speed_grader_by_student_group, boolean: true, default: false
   add_setting :lock_all_announcements, :boolean => true, :default => false, :inherited => true

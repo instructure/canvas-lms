@@ -1578,6 +1578,9 @@ class CoursesController < ApplicationController
   # @argument allow_student_organized_groups [Boolean]
   #   Let students organize their own groups
   #
+  # @argument allow_student_discussion_reporting [Boolean]
+  #   Let students report offensive discussion content
+  #
   # @argument filter_speed_grader_by_student_group [Boolean]
   #   Filter SpeedGrader to only the selected student group
   #
@@ -1629,6 +1632,7 @@ class CoursesController < ApplicationController
       :allow_student_discussion_topics,
       :allow_student_forum_attachments,
       :allow_student_discussion_editing,
+      :allow_student_discussion_reporting,
       :filter_speed_grader_by_student_group,
       :show_total_grade_as_points,
       :allow_student_organized_groups,

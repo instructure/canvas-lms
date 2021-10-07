@@ -416,6 +416,7 @@ class DiscussionTopicsController < ApplicationController
             read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
+          student_reporting_enabled: Account.site_admin.feature_enabled?(:discussions_reporting),
           discussion_topic_index_menu_tools: (@domain_root_account&.feature_enabled?(:commons_favorites) ?
             external_tools_display_hashes(:discussion_topic_index_menu) : []),
         }
