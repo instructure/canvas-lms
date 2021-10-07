@@ -19,7 +19,7 @@
 import React, {useCallback, useEffect, useState} from 'react'
 import PropTypes from 'prop-types'
 import I18n from 'i18n!observer_options'
-import getCookie from 'get-cookie'
+import {selectedObservedCookieName, selectedObservedId} from '../ObserverGetObservee'
 
 import {View} from '@instructure/ui-view'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y-content'
@@ -31,8 +31,6 @@ import CanvasAsyncSelect from '@canvas/instui-bindings/react/AsyncSelect'
 import AddStudentModal from './AddStudentModal'
 import {showFlashAlert} from '@canvas/alerts/react/FlashAlert'
 import doFetchApi from '@canvas/do-fetch-api-effect'
-
-export const OBSERVER_COOKIE_PREFIX = 'k5_observed_user_for_'
 
 const ObserverOptions = ({
   observerList,
@@ -47,7 +45,7 @@ const ObserverOptions = ({
   const [selectedUser, setSelectedUser] = useState(null)
   const [newStudentModalOpen, setNewStudentModalOpen] = useState(false)
   const isOnlyObserver = currentUserRoles?.every(r => r === 'user' || r === 'observer')
-  const observedUserCookieName = `${OBSERVER_COOKIE_PREFIX}${currentUser.id}`
+  const observedUserCookieName = selectedObservedCookieName(currentUser.id)
 
   const handleUserSelected = useCallback(
     id => {
@@ -62,11 +60,11 @@ const ObserverOptions = ({
 
   useEffect(() => {
     if (observedUsers.length > 0) {
-      const storedObservedUserId = getCookie(observedUserCookieName)
+      const storedObservedUserId = selectedObservedId(currentUser.id)
       const validUser = !!observedUsers.find(u => u.id === storedObservedUserId)
       handleUserSelected(validUser ? storedObservedUserId : observedUsers[0].id)
     }
-  }, [observedUsers, handleUserSelected, observedUserCookieName])
+  }, [observedUsers, handleUserSelected, observedUserCookieName, currentUser.id])
 
   const selectAvatar =
     /* don't show the default Canvas avatar */
@@ -199,9 +197,6 @@ export const ObserverListShape = PropTypes.arrayOf(
 
 export const shouldShowObserverOptions = (observerList, currentUser) =>
   observerList.length > 1 || (observerList.length === 1 && observerList[0].id !== currentUser.id)
-
-export const defaultSelectedObserverId = currentUserId =>
-  getCookie(`${OBSERVER_COOKIE_PREFIX}${currentUserId}`)
 
 ObserverOptions.propTypes = {
   observerList: ObserverListShape.isRequired,

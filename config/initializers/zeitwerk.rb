@@ -44,7 +44,11 @@ if CANVAS_ZEITWERK
 
   Rails.autoloaders.each do |autoloader|
     autoloader.inflector.inflect(
+      "api_serialization" => "APISerialization",
+      "api_serializer" => "APISerializer",
+      "basic_lti" => "BasicLTI",
       "basic_lti_links" => "BasicLTILinks",
+      "brandable_css" => "BrandableCSS",
       "cas" => "CAS",
       "cc" => "CC",
       "cc_helper" => "CCHelper",
@@ -52,12 +56,15 @@ if CANVAS_ZEITWERK
       "cc_worker" => "CCWorker",
       "dynamo_db" => "DynamoDB",
       "inst_fs" => "InstFS",
+      "legacy_id_interface" => "LegacyIDInterface",
       "open_id_connect" => "OpenIDConnect",
       "saml" => "SAML",
+      "sis" => "SIS",
+      "ssl_common" => "SSLCommon",
       "turnitin_id" => "TurnitinID",
       "uk_federation" => "UKFederation",
+      "vericite" => "VeriCite",
       "xml_helper" => "XMLHelper",
-      "vericite" => "VeriCite"
     )
   end
 end

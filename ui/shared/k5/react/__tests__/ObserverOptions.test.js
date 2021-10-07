@@ -20,7 +20,8 @@ import React from 'react'
 import {render, act, fireEvent} from '@testing-library/react'
 import getCookie from 'get-cookie'
 
-import ObserverOptions, {OBSERVER_COOKIE_PREFIX} from '../ObserverOptions'
+import ObserverOptions from '../ObserverOptions'
+import {OBSERVER_COOKIE_PREFIX} from '../../ObserverGetObservee'
 import {MOCK_OBSERVER_LIST} from './fixtures'
 
 const userId = '13'

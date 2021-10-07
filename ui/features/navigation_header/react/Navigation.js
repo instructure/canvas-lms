@@ -28,6 +28,7 @@ import UnreadCounts from './UnreadCounts'
 import preventDefault from 'prevent-default'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
+import {selectedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
@@ -95,6 +96,7 @@ export default class Navigation extends React.Component {
     type: null,
     coursesLoading: false,
     coursesAreLoaded: false,
+    observedUserId: '',
     accountsLoading: false,
     accountsAreLoaded: false,
     groupsLoading: false,
@@ -173,9 +175,33 @@ export default class Navigation extends React.Component {
     this.loadResourcePage(url, type)
   }
 
+  _isLoadedOrLoading = type => this.state[`${type}AreLoaded`] || this.state[`${type}Loading`]
+
   ensureLoaded(type) {
-    if (TYPE_URL_MAP[type] && !this.state[`${type}AreLoaded`] && !this.state[`${type}Loading`]) {
-      this.getResource(TYPE_URL_MAP[type], type)
+    let url = TYPE_URL_MAP[type]
+    if (!url) return
+
+    // if going after courses and I'm an observer,
+    // only retrive the courses for my observee
+    if (type === 'courses' && ENV.current_user_roles.includes('observer')) {
+      let forceLoad = false
+      const k5_observed_user_id = selectedObservedId(ENV.current_user_id) // only returns a value if k5_parent_support is on
+      if (k5_observed_user_id) {
+        url = `${url}&observed_user=${k5_observed_user_id}`
+        if (k5_observed_user_id !== this.state.observedUserId) {
+          this.setState({
+            observedUserId: k5_observed_user_id,
+            [`${type}AreLoaded}`]: false,
+            [`${type}Loading`]: false
+          })
+          forceLoad = true
+        }
+      }
+      if (forceLoad || !this._isLoadedOrLoading(type)) {
+        this.getResource(url, type)
+      }
+    } else if (!this._isLoadedOrLoading(type)) {
+      this.getResource(url, type)
     }
   }
 

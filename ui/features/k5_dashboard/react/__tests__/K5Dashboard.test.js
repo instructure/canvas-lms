@@ -23,7 +23,7 @@ import {act, render, screen, waitFor} from '@testing-library/react'
 import {resetDashboardCards} from '@canvas/dashboard-card'
 import {resetPlanner} from '@instructure/canvas-planner'
 import fetchMock from 'fetch-mock'
-import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/react/ObserverOptions'
+import {OBSERVER_COOKIE_PREFIX} from '@canvas/k5/ObserverGetObservee'
 
 import {MOCK_TODOS} from './mocks'
 import {
