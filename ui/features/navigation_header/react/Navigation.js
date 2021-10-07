@@ -28,7 +28,7 @@ import UnreadCounts from './UnreadCounts'
 import preventDefault from 'prevent-default'
 import parseLinkHeader from 'link-header-parsing/parseLinkHeaderFromXHR'
 import tourPubSub from '@canvas/tour-pubsub'
-import {selectedObservedId} from '@canvas/k5/ObserverGetObservee'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
@@ -185,7 +185,7 @@ export default class Navigation extends React.Component {
     // only retrive the courses for my observee
     if (type === 'courses' && ENV.current_user_roles.includes('observer')) {
       let forceLoad = false
-      const k5_observed_user_id = selectedObservedId(ENV.current_user_id) // only returns a value if k5_parent_support is on
+      const k5_observed_user_id = savedObservedId(ENV.current_user_id) // only returns a value if k5_parent_support is on
       if (k5_observed_user_id) {
         url = `${url}&observed_user=${k5_observed_user_id}`
         if (k5_observed_user_id !== this.state.observedUserId) {

@@ -20,8 +20,17 @@ import getCookie from 'get-cookie'
 
 export const OBSERVER_COOKIE_PREFIX = 'k5_observed_user_for_'
 
-export const selectedObservedCookieName = currentUserId =>
-  `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
+export const savedObservedCookieName = currentUserId => `${OBSERVER_COOKIE_PREFIX}${currentUserId}`
 
-export const selectedObservedId = currentUserId =>
-  getCookie(selectedObservedCookieName(currentUserId))
+export const savedObservedId = currentUserId => getCookie(savedObservedCookieName(currentUserId))
+
+export const saveObservedId = (currentUserId, observeeId) => {
+  document.cookie = observedCookie(currentUserId, observeeId)
+}
+
+export const clearObservedId = currentUserId => {
+  document.cookie = `${observedCookie(currentUserId, '')};max-age=-1`
+}
+
+const observedCookie = (currentUserId, observeeId) =>
+  `${savedObservedCookieName(currentUserId)}=${observeeId};path=/`

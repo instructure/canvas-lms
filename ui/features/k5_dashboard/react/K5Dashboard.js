@@ -60,7 +60,7 @@ import useTabState from '@canvas/k5/react/hooks/useTabState'
 import {showFlashError} from '@canvas/alerts/react/FlashAlert'
 import ImportantDates from './ImportantDates'
 import ObserverOptions, {ObserverListShape} from '@canvas/k5/react/ObserverOptions'
-import {selectedObservedId} from '@canvas/k5/ObserverGetObservee'
+import {savedObservedId} from '@canvas/k5/ObserverGetObservee'
 
 const DASHBOARD_TABS = [
   {
@@ -153,7 +153,10 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(selectedObservedId(currentUser.id))
+  const [observedUserId, setObservedUserId] = useState(() => {
+    const id = savedObservedId(currentUser.id)
+    return observerList.find(o => o.id === id) ? id : undefined
+  })
   const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
