@@ -594,4 +594,53 @@ describe('api actions', () => {
       expect(mockDispatch).toHaveBeenCalledWith({type: 'CANCELED_EDITING_PLANNER_ITEM'})
     })
   })
+
+  describe('reloadWithObservee', () => {
+    it('dispatches actions to reload planner if observeeId/contextCodes are present and have changed', () => {
+      const mockDispatch = jest.fn()
+      const getState = () => ({
+        ...getBasicState(),
+        selectedObservee: {id: '5', contextCodes: undefined}
+      })
+      Actions.reloadWithObservee('5', ['course_1'])(mockDispatch, getState)
+      expect(mockDispatch).toHaveBeenCalledTimes(4)
+      expect(mockDispatch).toHaveBeenCalledWith({
+        payload: {id: '5', contextCodes: ['course_1']},
+        type: 'SELECTED_OBSERVEE'
+      })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'CLEAR_WEEKLY_ITEMS'
+      })
+    })
+
+    it('dispatches startLoadingItems if contextCodes are not present but observee id changed', () => {
+      const mockDispatch = jest.fn()
+      const getState = () => ({
+        ...getBasicState(),
+        selectedObservee: {id: '5', contextCodes: undefined}
+      })
+      Actions.reloadWithObservee('6', undefined)(mockDispatch, getState)
+      expect(mockDispatch).toHaveBeenCalledTimes(3)
+      expect(mockDispatch).toHaveBeenCalledWith({
+        payload: {id: '6', contextCodes: undefined},
+        type: 'SELECTED_OBSERVEE'
+      })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'CLEAR_WEEKLY_ITEMS'
+      })
+      expect(mockDispatch).toHaveBeenCalledWith({
+        type: 'START_LOADING_ITEMS'
+      })
+    })
+
+    it('does not dispatch anything if contextCodes and id have not changed', () => {
+      const mockDispatch = jest.fn()
+      const getState = () => ({
+        ...getBasicState(),
+        selectedObservee: {id: '5', contextCodes: ['course_5']}
+      })
+      Actions.reloadWithObservee('5', ['course_5'])(mockDispatch, getState)
+      expect(mockDispatch).toHaveBeenCalledTimes(0)
+    })
+  })
 })

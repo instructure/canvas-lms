@@ -18,7 +18,7 @@
 
 import moment from 'moment-timezone'
 import {combineReducers} from 'redux'
-import {handleAction} from 'redux-actions'
+import {handleAction, handleActions} from 'redux-actions'
 import days from './days-reducer'
 import loading from './loading-reducer'
 import courses from './courses-reducer'
@@ -87,6 +87,19 @@ const firstNewActivityDate = handleAction(
   null
 )
 
+const selectedObservee = handleActions(
+  {
+    SELECTED_OBSERVEE: (state, action) => ({
+      id: action.payload?.id,
+      contextCodes: action.payload?.contextCodes
+    }),
+    INITIAL_OPTIONS: (state, action) => ({
+      id: action.payload.observedUserId
+    })
+  },
+  null
+)
+
 const combinedReducers = combineReducers({
   courses,
   groups,
@@ -102,7 +115,8 @@ const combinedReducers = combineReducers({
   todo,
   ui,
   sidebar,
-  weeklyDashboard
+  weeklyDashboard,
+  selectedObservee
 })
 
 export default function finalReducer(state, action) {

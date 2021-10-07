@@ -774,57 +774,88 @@ describe ApplicationHelper do
       @domain_root_account = Account.default
     end
 
-    context "with student_planner feature flag enabled" do
-      it "returns false when a user has no student enrollments" do
-        course_with_teacher(:active_all => true)
-        @current_user = @user
-        expect(planner_enabled?).to be false
-      end
-
-      it "returns true when there is at least one student enrollment" do
-        course_with_student(:active_all => true)
-        @current_user = @user
-        expect(planner_enabled?).to be true
-      end
-
-      it "returns true for past student enrollments" do
-        enrollment = course_with_student
-        enrollment.workflow_state = 'completed'
-        enrollment.save!
-        @current_user = @user
-        expect(planner_enabled?).to be true
-      end
-
-      it "returns true for invited student enrollments" do
-        enrollment = course_with_student
-        enrollment.workflow_state = 'invited'
-        enrollment.save!
-        @current_user = @user
-        expect(planner_enabled?).to be true
-      end
-
-      it "returns true for future student enrollments" do
-        enrollment = course_with_student
-        enrollment.start_at = 2.months.from_now
-        enrollment.end_at = 3.months.from_now
-        enrollment.workflow_state = 'active'
-        enrollment.save!
-        @course.restrict_student_future_view = true
-        @course.restrict_enrollments_to_course_dates = true
-        @course.save!
-        @current_user = @user
-        expect(planner_enabled?).to be true
-      end
-
-      it "returns false with no user" do
-        expect(planner_enabled?).to be false
-      end
+    it "returns false when a user has no student enrollments" do
+      course_with_teacher(:active_all => true)
+      @current_user = @user
+      expect(planner_enabled?).to be false
     end
 
-    context "with student_planner feature flag disabled" do
-      it "returns false" do
-        @current_user = user_factory
-        expect(planner_enabled?).to be false
+    it "returns true when there is at least one student enrollment" do
+      course_with_student(:active_all => true)
+      @current_user = @user
+      expect(planner_enabled?).to be true
+    end
+
+    it "returns true for past student enrollments" do
+      enrollment = course_with_student
+      enrollment.workflow_state = 'completed'
+      enrollment.save!
+      @current_user = @user
+      expect(planner_enabled?).to be true
+    end
+
+    it "returns true for invited student enrollments" do
+      enrollment = course_with_student
+      enrollment.workflow_state = 'invited'
+      enrollment.save!
+      @current_user = @user
+      expect(planner_enabled?).to be true
+    end
+
+    it "returns true for future student enrollments" do
+      enrollment = course_with_student
+      enrollment.start_at = 2.months.from_now
+      enrollment.end_at = 3.months.from_now
+      enrollment.workflow_state = 'active'
+      enrollment.save!
+      @course.restrict_student_future_view = true
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      @current_user = @user
+      expect(planner_enabled?).to be true
+    end
+
+    it "returns false with no user" do
+      expect(planner_enabled?).to be false
+    end
+
+    context "for observers" do
+      before :once do
+        @course1 = course_factory(active_all: true)
+        @student1 = user_factory(active_all: true)
+        @observer = user_factory(active_all: true)
+        @course1.enroll_student(@student1)
+        @course1.enroll_user(@observer, "ObserverEnrollment", { associated_user_id: @student1.id })
+      end
+
+      context "with the k5_parent_support flag enabled" do
+        before :once do
+          Account.site_admin.enable_feature! :k5_parent_support
+        end
+
+        it "still returns true for the observed student" do
+          @current_user = @student1
+          expect(planner_enabled?).to be true
+        end
+
+        it "returns true for the observer" do
+          @current_user = @observer
+          expect(planner_enabled?).to be true
+        end
+
+        it "still returns false for a teacher" do
+          teacher = user_factory(active_all: true)
+          @course1.enroll_teacher(teacher)
+          @current_user = teacher
+          expect(planner_enabled?).to be false
+        end
+      end
+
+      context "with the k5_parent_support flag disabled" do
+        it "returns false as an observer with k5_parent_support enabled" do
+          @current_user = @observer
+          expect(planner_enabled?).to be false
+        end
       end
     end
   end

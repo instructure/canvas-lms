@@ -29,7 +29,8 @@ it('sets the default state for all properties empty initial state', () => {
     loading: {
       isLoading: false
     },
-    firstNewActivityDate: null
+    firstNewActivityDate: null,
+    selectedObservee: null
   })
 })
 

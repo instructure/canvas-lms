@@ -40,7 +40,8 @@ const PLANNER_CONFIG_KEYS = [
   'dateTimeFormatters',
   'externalFallbackFocusable',
   'env',
-  'singleCourse'
+  'singleCourse',
+  'observedUserId'
 ]
 
 const defaults = {plannerEnabled: true, isPlannerActive: () => {}}

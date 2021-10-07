@@ -17,6 +17,8 @@
  *
  */
 
+import moment from 'moment-timezone'
+
 export const GRADING_PERIODS = [
   {
     id: '1',
@@ -137,6 +139,23 @@ export const MOCK_CARDS = [
   }
 ]
 
+export const MOCK_CARDS_2 = [
+  {
+    id: '23',
+    assetString: 'course_23',
+    href: '/courses/23',
+    shortName: 'Economics 203',
+    originalName: 'UGLY-SIS-ECON-203',
+    color: 'yellow',
+    courseCode: 'ECON-203',
+    enrollmentState: 'active',
+    isHomeroom: false,
+    isK5Subject: true,
+    canManage: true,
+    published: true
+  }
+]
+
 export const MOCK_EVENTS = [
   {
     context_color: '#CCCCCC',
@@ -171,5 +190,37 @@ export const MOCK_OBSERVER_LIST = [
     id: '5',
     name: 'Student 5',
     avatar_url: 'http://canvas.instructure.com/images/messages/avatar-50.png'
+  }
+]
+
+export const MOCK_PLANNER_ITEM = [
+  {
+    context_name: 'Course2',
+    context_type: 'Course',
+    course_id: '1',
+    html_url: '/courses/2/assignments/15',
+    new_activity: false,
+    plannable: {
+      created_at: '2021-03-16T17:17:17Z',
+      due_at: moment().toISOString(),
+      id: '15',
+      points_possible: 10,
+      title: 'Assignment 15',
+      updated_at: '2021-03-16T17:31:52Z'
+    },
+    plannable_date: moment().toISOString(),
+    plannable_id: '15',
+    plannable_type: 'assignment',
+    planner_override: null,
+    submissions: {
+      excused: false,
+      graded: false,
+      has_feedback: false,
+      late: false,
+      missing: true,
+      needs_grading: false,
+      redo_request: false,
+      submitted: false
+    }
   }
 ]

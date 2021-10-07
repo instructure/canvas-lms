@@ -144,6 +144,10 @@ export const K5Dashboard = ({
   observerList,
   canAddObservee
 }) => {
+  const initialObservedId = observerList.find(o => o.id === savedObservedId(currentUser.id))
+    ? savedObservedId(currentUser.id)
+    : undefined
+
   const availableTabs = toRenderTabs(currentUserRoles, hideGradesTabForStudents)
   const {activeTab, currentTab, handleTabChange} = useTabState(defaultTab, availableTabs)
   const [cards, setCards] = useState(null)
@@ -153,16 +157,15 @@ export const K5Dashboard = ({
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true)
   const [tabsRef, setTabsRef] = useState(null)
   const [trayOpen, setTrayOpen] = useState(false)
-  const [observedUserId, setObservedUserId] = useState(() => {
-    const id = savedObservedId(currentUser.id)
-    return observerList.find(o => o.id === id) ? id : undefined
-  })
+  const [observedUserId, setObservedUserId] = useState(initialObservedId)
   const [observedUsersCards, setObservedUsersCards] = useState([])
   const plannerInitialized = usePlanner({
     plannerEnabled,
     isPlannerActive: () => activeTab.current === TAB_IDS.SCHEDULE,
     focusFallback: tabsRef,
-    callback: () => loadAllOpportunities()
+    callback: () => loadAllOpportunities(),
+    observedUserId: initialObservedId,
+    isObserver: currentUserRoles.includes('observer')
   })
   const canDisableElementaryDashboard = currentUserRoles.some(r => ['admin', 'teacher'].includes(r))
   const useImportantDatesTray = responsiveSize !== 'large'
@@ -342,6 +345,8 @@ export const K5Dashboard = ({
               userHasEnrollments={!!cards?.length}
               visible={currentTab === TAB_IDS.SCHEDULE}
               singleCourse={false}
+              observedUserId={observedUserId}
+              contextCodes={observedUsersCards[observedUserId]?.map(c => c.assetString)}
             />
             <GradesPage
               visible={currentTab === TAB_IDS.GRADES}
