@@ -53,7 +53,7 @@ export const DiscussionTopicRepliesContainer = props => {
   })
 
   useEffect(() => {
-    if (discussionEntriesToUpdate.size > 0 && filter !== 'drafts') {
+    if (discussionEntriesToUpdate.size > 0 && filter !== 'drafts' && !searchTerm) {
       const interval = setInterval(() => {
         let entryIds = Array.from(discussionEntriesToUpdate)
         const entries = props.discussionTopic.discussionEntriesConnection.nodes.filter(
@@ -82,7 +82,8 @@ export const DiscussionTopicRepliesContainer = props => {
     discussionEntriesToUpdate,
     props.discussionTopic.discussionEntriesConnection.nodes,
     updateDiscussionEntriesReadState,
-    filter
+    filter,
+    searchTerm
   ])
 
   const markAsRead = entryId => {
