@@ -25,10 +25,27 @@ import {MockedProvider} from '@apollo/react-testing'
 
 const render = (
   children,
-  {canManage = true, isAdmin = true, contextType = 'Account', renderer = rtlRender} = {}
+  {
+    canManage = true,
+    isAdmin = true,
+    contextId = '2',
+    contextType = 'Account',
+    friendlyDescriptionFF = true,
+    renderer = rtlRender
+  } = {}
 ) => {
   return renderer(
-    <OutcomesContext.Provider value={{env: {canManage, isAdmin, contextType}}}>
+    <OutcomesContext.Provider
+      value={{
+        env: {
+          canManage,
+          isAdmin,
+          contextId,
+          contextType,
+          friendlyDescriptionFF
+        }
+      }}
+    >
       <MockedProvider mocks={[]}>{children}</MockedProvider>
     </OutcomesContext.Provider>
   )
@@ -124,45 +141,57 @@ describe('ManageOutcomeItem', () => {
     expect(onMenuHandlerMock.mock.calls[0][1]).toBe('remove')
   })
 
-  describe('when canManageOutcome is false', () => {
-    it('hides the kebab menu', () => {
+  it('hides checkbox if canManageOutcome is false', () => {
+    const {queryByText} = render(<ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />)
+    expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
+  })
+
+  describe('Kebab menu -> edit option', () => {
+    it('enables option if Friendly Description FF is enabled', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+
+    it('enables option if user is admin within course context', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        contextType: 'Course',
+        friendlyDescriptionFF: false
+      })
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+
+    it('enables option if outcome is created within the same context', () => {
+      const {getByText} = render(<ManageOutcomeItem {...defaultProps()} />, {
+        contextId: '1',
+        friendlyDescriptionFF: false
+      })
+      fireEvent.click(getByText('Menu for outcome Outcome Title'))
+      fireEvent.click(getByText('Edit'))
+      expect(onMenuHandlerMock).toHaveBeenCalledTimes(1)
+      expect(onMenuHandlerMock.mock.calls[0][0]).toBe('2')
+      expect(onMenuHandlerMock.mock.calls[0][1]).toBe('edit')
+    })
+  })
+
+  describe('With manage_outcomes permisssion', () => {
+    it('displays kebab menu', () => {
+      const {queryByText} = render(<ManageOutcomeItem {...defaultProps()} />)
+      expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
+    })
+
+    it('displays kebab menu even if canManageOutcome is false', () => {
       const {queryByText} = render(
         <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
       )
-      expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
-    })
-
-    it('hides checkboxes', () => {
-      const {queryByText} = render(
-        <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />
-      )
-      expect(queryByText('Select outcome Outcome Title')).not.toBeInTheDocument()
-    })
-
-    describe('with manage_outcomes permission', () => {
-      it('renders the kebab menu if the user is an admin within the course context', () => {
-        const {getByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
-          {
-            isAdmin: true,
-            canManage: true,
-            contextType: 'Course'
-          }
-        )
-        expect(getByText('Menu for outcome Outcome Title')).toBeInTheDocument()
-      })
-
-      it('does not render the kebab menu if the user is not an admin', () => {
-        const {queryByText} = render(
-          <ManageOutcomeItem {...defaultProps({canManageOutcome: false})} />,
-          {
-            isAdmin: false,
-            canManage: true,
-            contextType: 'Course'
-          }
-        )
-        expect(queryByText('Menu for outcome Outcome Title')).not.toBeInTheDocument()
-      })
+      expect(queryByText('Menu for outcome Outcome Title')).toBeInTheDocument()
     })
   })
 })

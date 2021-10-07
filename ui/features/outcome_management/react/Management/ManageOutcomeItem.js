@@ -44,7 +44,8 @@ const ManageOutcomeItem = ({
   onCheckboxHandler,
   canUnlink
 }) => {
-  const {contextType, contextId, friendlyDescriptionFF} = useCanvasContext()
+  const {contextType, contextId, friendlyDescriptionFF, canManage, isAdmin, isCourse} =
+    useCanvasContext()
   const [truncated, setTruncated] = useState(true)
   const onClickHandler = () => setTruncated(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler({linkId})
@@ -52,10 +53,11 @@ const ManageOutcomeItem = ({
 
   // This allows account admins to edit global outcomes
   // within a course. See OUT-1415, OUT-1511
-  const {canManage, isAdmin, isCourse} = useCanvasContext()
   const allowAdminEdit = isCourse && canManage && isAdmin
   const canEdit =
-    friendlyDescriptionFF || (outcomeContextType === contextType && outcomeContextId === contextId)
+    friendlyDescriptionFF ||
+    (outcomeContextType === contextType && outcomeContextId === contextId) ||
+    allowAdminEdit
 
   if (!title) return null
 
@@ -116,7 +118,7 @@ const ManageOutcomeItem = ({
             </Heading>
           </div>
         </Flex.Item>
-        {(canManageOutcome || allowAdminEdit) && (
+        {canManage && (
           <Flex.Item>
             <OutcomeKebabMenu
               canDestroy={canUnlink}
