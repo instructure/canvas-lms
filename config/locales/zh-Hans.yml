@@ -6530,7 +6530,7 @@ zh-Hans:
       links: 
         access_report: "访问 %{user} 的报告"
         cant_delete: 无法删除
-        conclude_enrollment: 得出结论
+        conclude_enrollment: 结束
         delete_enrollment: 删除
         faculty_journal: "%{user} 的教师日志"
         link_enrollment: 链接此注册
@@ -6571,7 +6571,7 @@ zh-Hans:
     roster_user: 
       completed_enrollment: "完成于 *%{completed_at}*"
       confirm: 
-        conclude: 是否确定要完成此注册？
+        conclude: 是否确定要结束此注册？
         conclude_student: 是否确定要结束此学生的注册?
         delete_enrollment: 是否确定要删除此注册？
       enrolled_as: "已注册为 %{enrollment_type}"
