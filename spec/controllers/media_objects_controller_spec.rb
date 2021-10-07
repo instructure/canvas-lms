@@ -20,6 +20,11 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe MediaObjectsController do
+  before :once do
+    course_with_teacher(active_all: true)
+    student_in_course(active_all: true)
+  end
+
   describe "GET 'show'" do
     before do
       # We don't actually want to ping kaltura during these tests
@@ -666,6 +671,97 @@ describe MediaObjectsController do
       assert_status(200)
       json = JSON.parse(response.body)
       expect(json['title']).to eq('new title')
+    end
+  end
+
+  describe "GET '/media_objects/:id/thumbnail" do
+    it 'redirects to kaltura even if the MediaObject does not exist' do
+      allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+      expect_any_instance_of(CanvasKaltura::ClientV3).to receive(:thumbnail_url).and_return(
+        'http://test.host/thumbnail_redirect'
+      )
+      get :media_object_thumbnail, params: { id: '0_notexist', width: 100, height: 100 }
+
+      expect(response).to be_redirect
+      expect(response.location).to eq 'http://test.host/thumbnail_redirect'
+    end
+  end
+
+  describe "POST '/media_objects'" do
+    before :each do
+      user_session(@student)
+    end
+
+    it 'matches the create_media_object route' do
+      assert_recognizes(
+        { controller: 'media_objects', action: 'create_media_object' },
+        { path: 'media_objects', method: :post }
+      )
+    end
+
+    it 'updates the object if it already exists' do
+      @media_object = @user.media_objects.build(media_id: 'new_object')
+      @media_object.media_type = 'audio'
+      @media_object.title = 'original title'
+      @media_object.save
+
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}",
+             id: @media_object.media_id,
+             type: @media_object.media_type,
+             title: 'new title'
+           }
+
+      @media_object.reload
+      expect(@media_object.title).to eq 'new title'
+
+      @user.reload
+      expect(@user.media_objects.count).to eq @original_count
+    end
+
+    it "creates the object if it doesn't already exist" do
+      @original_count = @user.media_objects.count
+
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}", id: 'new_object', type: 'audio', title: 'title'
+           }
+
+      @user.reload
+      expect(@user.media_objects.count).to eq @original_count + 1
+      @media_object = @user.media_objects.last
+
+      expect(@media_object.media_id).to eq 'new_object'
+      expect(@media_object.media_type).to eq 'audio'
+      expect(@media_object.title).to eq 'title'
+    end
+
+    it 'truncates the title and user_entered_title' do
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}",
+             id: 'new_object',
+             type: 'audio',
+             title: 'x' * 300,
+             user_entered_title: 'y' * 300
+           }
+      @media_object = @user.reload.media_objects.last
+      expect(@media_object.title.size).to be <= 255
+      expect(@media_object.user_entered_title.size).to be <= 255
+    end
+
+    it 'returns the embedded_iframe_url' do
+      post :create_media_object,
+           params: {
+             context_code: "user_#{@user.id}", id: 'new_object', type: 'audio', title: 'title'
+           }
+      @media_object = @user.reload.media_objects.last
+      expect(JSON.parse(response.body)['embedded_iframe_url']).to eq media_object_iframe_url(
+        @media_object.media_id
+      )
     end
   end
 end

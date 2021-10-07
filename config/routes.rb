@@ -493,10 +493,10 @@ CanvasRails::Application.routes.draw do
   get 'quiz_statistics/:quiz_statistics_id/files/:file_id/download' => 'files#show', as: :quiz_statistics_download, download: '1'
 
   resources :page_views, only: :update
-  post 'media_objects' => 'context#create_media_object', as: :create_media_object
-  get 'media_objects/:id' => 'context#media_object_inline', as: :media_object
-  get 'media_objects/:id/redirect' => 'context#media_object_redirect', as: :media_object_redirect
-  get 'media_objects/:id/thumbnail' => 'context#media_object_thumbnail', as: :media_object_thumbnail
+  post 'media_objects' => 'media_objects#create_media_object', as: :create_media_object
+  get 'media_objects/:id' => 'media_objects#media_object_inline', as: :media_object
+  get 'media_objects/:id/redirect' => 'media_objects#media_object_redirect', as: :media_object_redirect
+  get 'media_objects/:id/thumbnail' => 'media_objects#media_object_thumbnail', as: :media_object_thumbnail
   get 'media_objects/:media_object_id/info' => 'media_objects#show', as: :media_object_info
   get 'media_objects_iframe/:media_object_id' => 'media_objects#iframe_media_player', as: :media_object_iframe
   get 'media_objects_iframe' => 'media_objects#iframe_media_player', as: :media_object_iframe_href
@@ -2325,7 +2325,7 @@ CanvasRails::Application.routes.draw do
       get "accounts/:account_id/csp_log", action: :csp_log
     end
 
-    scope(:controller => :context) do
+    scope(:controller => :media_objects) do
       post 'media_objects', action: 'create_media_object', as: :create_media_object
     end
 
