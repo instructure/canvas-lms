@@ -17,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module DataFixup::SetACTLContextTypeForCourseLevelToolProxies
+module DataFixup::SetActlContextTypeForCourseLevelToolProxies
   # The ACTL (AccountConfigurationToolLookup) context_type was added with a
   # default of "Account". This DataFixup finds ACTLs for courses that only have
   # a course-level tool installation -- they don't have an account-level tool
