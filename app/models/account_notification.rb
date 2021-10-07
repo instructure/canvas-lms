@@ -99,6 +99,9 @@ class AccountNotification < ActiveRecord::Base
       sub_account_ids_map = {}
 
       current.select! do |announcement|
+        # need to have these variables to be able to access them outside of the
+        # announcement.shard.activate block
+        enrollments, account_users = nil
         # use role.id instead of role_id to trigger Role#id magic for built in
         # roles. try(:id) because the AccountNotificationRole may have an
         # explicitly nil role_id to indicate the announcement's intended for
