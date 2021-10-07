@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,19 +16,9 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class CreateVersionPartitions < ActiveRecord::Migration[4.2]
-  tag :predeploy
-
-  def up
-    partman = CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
-    partman.create_initial_partitions(SimplyVersioned::Partitioner.precreate_tables)
-  end
-
-  def down
-    partman = CanvasPartman::PartitionManager.create(SimplyVersioned::Version)
-    partman.partition_tables.each do |partition|
-      drop_table partition
-    end
-  end
-end
+# this alias is just to make the "Version" constant
+# available in the global namespace so you can
+# do things like "Version.where(...)".
+Version = SimplyVersioned::Version
