@@ -105,7 +105,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   scope :active, -> { where("workflow_state <> 'deleted'") }
   belongs_to :account
-  include Canvas::RootAccountCacher
+  include ::Canvas::RootAccountCacher
   has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
