@@ -651,4 +651,49 @@ describe('FileUpload', () => {
       'Upload progress for file2.pdf 20 percent'
     )
   })
+
+  describe('webcam photo upload', () => {
+    it('is available when the assignment has no file extension restrictions', async () => {
+      const mocks = await createGraphqlMocks()
+      const props = await makeProps()
+
+      const {findByRole} = render(
+        <MockedProvider mocks={mocks}>
+          <FileUpload {...props} />
+        </MockedProvider>
+      )
+      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
+      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
+    })
+
+    it('is available when the assignment allows PNG files', async () => {
+      const mocks = await createGraphqlMocks()
+      const props = await makeProps({
+        Assignment: {allowedExtensions: ['jpg', 'png']}
+      })
+
+      const {findByRole} = render(
+        <MockedProvider mocks={mocks}>
+          <FileUpload {...props} />
+        </MockedProvider>
+      )
+      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
+      expect(await findByRole('button', {name: /Webcam/})).toBeInTheDocument()
+    })
+
+    it('is not available when the assignment does not allow PNG files', async () => {
+      const mocks = await createGraphqlMocks()
+      const props = await makeProps({
+        Assignment: {allowedExtensions: ['xls']}
+      })
+
+      const {findByRole, queryByRole} = render(
+        <MockedProvider mocks={mocks}>
+          <FileUpload {...props} />
+        </MockedProvider>
+      )
+      fireEvent.click(await findByRole('button', {name: /Canvas Files/}))
+      expect(queryByRole('button', {name: /Webcam/})).not.toBeInTheDocument()
+    })
+  })
 })
