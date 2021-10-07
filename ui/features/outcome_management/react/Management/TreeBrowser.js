@@ -76,6 +76,11 @@ const contentItem = ({
     focus()
   }
 
+  const themeOverrides = {
+    hoverBackgroundColor: 'white',
+    hoverTextColor: 'brand'
+  }
+
   return (
     <InstuiTreeBrowser.Node
       containerRef={el => onRefChange(el, id)}
@@ -89,6 +94,7 @@ const contentItem = ({
         )
       }
       variant="indent"
+      theme={expanded ? themeOverrides : null}
     >
       {expanded ? (
         <AddContentItem
