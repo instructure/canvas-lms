@@ -205,7 +205,7 @@ module Qti
           case @migration_type
           when 'True/False'
             @question[:question_type] = 'true_false_question'
-          when 'Short Response'
+          when 'Short Response', "Essay"
             @question[:question_type] = 'essay_question'
           when 'Fill in the Blank Plus'
             @question[:question_type] = 'fill_in_multiple_blanks_question'
@@ -219,8 +219,6 @@ module Qti
             end
           when 'Jumbled Sentence'
             @question[:question_type] = 'multiple_dropdowns_question'
-          when 'Essay'
-            @question[:question_type] = 'essay_question'
           end
         elsif (type = get_node_att(meta, 'instructureField[name=question_type]', 'value'))
           @migration_type = type
@@ -309,7 +307,6 @@ module Qti
 
     def self.create_instructure_question(opts)
       extend Canvas::Migration::XMLHelper
-      q = nil
       manifest_node = opts[:manifest_node]
 
       if manifest_node
@@ -322,14 +319,15 @@ module Qti
         if (type = get_node_att(manifest_node, 'instructureMetadata instructureField[name=question_type]', 'value'))
           type = type.downcase
           opts[:custom_type] ||= type
-          if type == 'matching_question'
+          case type
+          when 'matching_question'
             opts[:interaction_type] = 'choiceinteraction'
             opts[:custom_type] = 'canvas_matching'
-          elsif type == 'matching'
+          when 'matching'
             opts[:custom_type] = 'respondus_matching'
-          elsif type =~ /fillInMultiple|fill_in_multiple_blanks_question|fill in the blanks/i
+          when /fillInMultiple|fill_in_multiple_blanks_question|fill in the blanks/i
             opts[:interaction_type] = 'fill_in_multiple_blanks_question'
-          elsif type == 'multiple_dropdowns_question'
+          when 'multiple_dropdowns_question'
             opts[:interaction_type] = 'multiple_dropdowns_question'
           else
             opts[:custom_type] = type
@@ -342,39 +340,37 @@ module Qti
         opts[:interaction_type], opts[:custom_type] = guesser.educatedly_guess_type
       end
 
-      case opts[:interaction_type]
-      when /choiceinteraction|multiple_choice_question|multiple_answers_question|true_false_question|stupid_likert_scale_question/i
-        if opts[:custom_type] and opts[:custom_type] == "matching"
-          q = AssociateInteraction.new(opts)
-        elsif opts[:custom_type] && opts[:custom_type] =~ /respondus_matching|canvas_matching/
-          q = AssociateInteraction.new(opts)
-        else
-          q = ChoiceInteraction.new(opts)
-        end
-      when /associateinteraction|matching_question|matchinteraction/i
-        q = AssociateInteraction.new(opts)
-      when /extendedtextinteraction|extendedtextentryinteraction|textinteraction|essay_question|short_answer_question/i
-        if opts[:custom_type] and opts[:custom_type] =~ /calculated/i
-          q = CalculatedInteraction.new(opts)
-        elsif opts[:custom_type] and opts[:custom_type] =~ /numeric|numerical_question/
-          q = NumericInteraction.new(opts)
-        else
-          q = ExtendedTextInteraction.new(opts)
-        end
-      when /orderinteraction|ordering_question/i
-        q = OrderInteraction.new(opts)
-      when /fill_in_multiple_blanks_question|multiple_dropdowns_question/i
-        q = FillInTheBlank.new(opts)
-      when /textentryinteraction/i
-        q = FillInTheBlank.new(opts)
-      when nil
-        q = AssessmentItemConverter.new(opts)
-      else
-        Canvas::Migration::logger.warn "Unknown QTI question type: #{opts[:interaction_type]}"
-        q = AssessmentItemConverter.new(opts)
-      end
+      q = case opts[:interaction_type]
+          when /choiceinteraction|multiple_choice_question|multiple_answers_question|true_false_question|stupid_likert_scale_question/i
+            if opts[:custom_type] &&
+               (opts[:custom_type] == "matching" ||
+                opts[:custom_type] =~ /respondus_matching|canvas_matching/)
+              AssociateInteraction.new(opts)
+            else
+              ChoiceInteraction.new(opts)
+            end
+          when /associateinteraction|matching_question|matchinteraction/i
+            AssociateInteraction.new(opts)
+          when /extendedtextinteraction|extendedtextentryinteraction|textinteraction|essay_question|short_answer_question/i
+            if opts[:custom_type] && opts[:custom_type] =~ /calculated/i
+              CalculatedInteraction.new(opts)
+            elsif opts[:custom_type] && opts[:custom_type] =~ /numeric|numerical_question/
+              NumericInteraction.new(opts)
+            else
+              ExtendedTextInteraction.new(opts)
+            end
+          when /orderinteraction|ordering_question/i
+            OrderInteraction.new(opts)
+          when /fill_in_multiple_blanks_question|multiple_dropdowns_question|textentryinteraction/i
+            FillInTheBlank.new(opts)
+          when nil
+            AssessmentItemConverter.new(opts)
+          else
+            Canvas::Migration.logger.warn "Unknown QTI question type: #{opts[:interaction_type]}"
+            AssessmentItemConverter.new(opts)
+          end
 
-      q.create_instructure_question if q
+      q&.create_instructure_question
     end
 
     # Sets the actual feedback values and clears the feedback ids

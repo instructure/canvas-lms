@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../qti_helper')
 if Qti.migration_executable
   describe "Converting Blackboard Vista qti" do
-    KEYS_TO_IGNORE = ['is_quiz_question_bank', 'question_bank_migration_id']
+    let(:keys_to_ignore) { %w[is_quiz_question_bank question_bank_migration_id] }
 
     before(:once) do
       archive_file_path = File.join(BASE_FIXTURE_DIR, 'bb_vista', 'vista_archive.zip')
@@ -76,29 +76,29 @@ if Qti.migration_executable
 
     it "converts multiple choice" do
       hash = get_question("ID_4609865476341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MULTIPLE_CHOICE
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MULTIPLE_CHOICE
     end
 
     it "does not fail with missing response identifier" do
-      expect {
-        hash = get_question_hash(vista_question_dir, 'no_response_id', delete_answer_ids = true, opts = {})
-      }.not_to raise_error
+      expect do
+        get_question_hash(vista_question_dir, 'no_response_id')
+      end.not_to raise_error
     end
 
     it "converts images correctly" do
       manifest_node = get_manifest_node('true_false', :interaction_type => 'choiceInteraction')
       hash = Qti::ChoiceInteraction.create_instructure_question(:manifest_node => manifest_node, :base_dir => vista_question_dir).with_indifferent_access
       hash[:answers].each { |a| a.delete(:id) }
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::TRUE_FALSE2
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE2
     end
 
     it "converts image reference" do
-      hash = get_question_hash(vista_question_dir, 'mc', delete_answer_ids = true, opts = {})
+      hash = get_question_hash(vista_question_dir, 'mc')
       expect(hash[:question_text]).to match %r{\$CANVAS_OBJECT_REFERENCE\$/attachments/67320753001}
     end
 
     it "converts short answer questions with multiple required answers to fimb" do
-      hash = get_question_hash(vista_question_dir, 'short_to_fimb', delete_answer_ids = true, opts = {})
+      hash = get_question_hash(vista_question_dir, 'short_to_fimb')
       expect(hash[:question_type]).to eq "fill_in_multiple_blanks_question"
       expect(hash[:question_text]).to include("[SA01]")
       expect(hash[:question_text]).to include("[SA02]")
@@ -106,22 +106,22 @@ if Qti.migration_executable
 
     it "converts true/false questions" do
       hash = get_question("ID_4609865577341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::TRUE_FALSE
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::TRUE_FALSE
     end
 
     it "converts multiple choice questions with multiple correct answers (multiple answer)" do
       hash = get_question("ID_4609865392341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MULTIPLE_ANSWER
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MULTIPLE_ANSWER
     end
 
     it "converts essay questions" do
       hash = get_question("ID_4609842537341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::ESSAY
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::ESSAY
     end
 
     it "converts short answer questions" do
       hash = get_question("ID_4609865550341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::SHORT_ANSWER
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::SHORT_ANSWER
     end
 
     it "converts matching questions" do
@@ -136,7 +136,7 @@ if Qti.migration_executable
       # compare everything else without the ids
       hash[:answers].each { |a| a.delete(:id); a.delete(:match_id) }
       hash[:matches].each { |m| m.delete(:match_id) }
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::MATCHING
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::MATCHING
     end
 
     it "converts the assessments into quizzes" do
@@ -145,27 +145,27 @@ if Qti.migration_executable
 
     it "converts simple calculated questions" do
       hash = get_question("ID_4609842344341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::CALCULATED_SIMPLE
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::CALCULATED_SIMPLE
     end
 
     it "converts complex calculated questions" do
       hash = get_question("ID_4609823478341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::CALCULATED_COMPLEX
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::CALCULATED_COMPLEX
     end
 
     it "converts combination to multiple choice" do
       hash = get_question("ID_4609885376341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::COMBINATION
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::COMBINATION
     end
 
     it "converts fill in multiple blanks questions" do
       hash = get_question("ID_4609842630341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::FILL_IN_MULTIPLE_BLANKS
     end
 
     it "marks jumbled sentence as not supported" do
       hash = get_question("ID_4609842882341")
-      expect(hash.reject { |k, v| KEYS_TO_IGNORE.include?(k.to_s) }).to eq VistaExpected::JUMBLED_SENTENCE
+      expect(hash.except(*keys_to_ignore)).to eq VistaExpected::JUMBLED_SENTENCE
     end
 
     it "references associated files correctly" do

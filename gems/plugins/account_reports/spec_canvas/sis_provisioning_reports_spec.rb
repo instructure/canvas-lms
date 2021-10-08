@@ -1534,7 +1534,7 @@ describe "Default Account Reports" do
 
       users_report = parsed["users.csv"][1..-1].sort_by { |r| r[0] }
       expect(users_report.length).to eq 4
-      expect(users_report).to eq [@user1, @user2, @user3, @user4].map { |u| expected_user(u) }
+      expect(users_report).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
     end
 
     it "runs the SIS Export reports with no data" do
