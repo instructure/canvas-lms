@@ -790,7 +790,7 @@
       "render_path": null,
       "location": {
         "type": "method",
-        "class": "Lti::Ims::Providers::MembershipsProvider",
+        "class": "Lti::IMS::Providers::MembershipsProvider",
         "method": "correlated_assignment_submissions"
       },
       "user_input": "outer_user_id_column",

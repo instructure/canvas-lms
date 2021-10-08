@@ -24,7 +24,7 @@ require File.expand_path(File.dirname(__FILE__) + '/concerns/lti_services_shared
 require_dependency "lti/ims/line_items_controller"
 
 module Lti
-  module Ims
+  module IMS
     RSpec.describe LineItemsController do
       include_context 'advantage services context'
 

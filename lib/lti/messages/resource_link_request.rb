@@ -87,7 +87,7 @@ module Lti::Messages
       return if @assignment.nil?
 
       unless defined?(@assignment_resource_link)
-        launch_error = Lti::Ims::AdvantageErrors::InvalidLaunchError
+        launch_error = Lti::IMS::AdvantageErrors::InvalidLaunchError
         unless @assignment.external_tool?
           raise launch_error.new(nil, api_message: 'Assignment not configured for external tool launches')
         end

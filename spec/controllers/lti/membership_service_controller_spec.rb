@@ -166,8 +166,8 @@ module Lti
 
             expect(membership.size).to eq 4
             expect(membership.fetch(:@id)).to be_nil
-            expect(membership.fetch(:status)).to eq IMS::LIS::Statuses::SimpleNames::Active
-            expect(membership.fetch(:role)).to match_array([IMS::LIS::Roles::Context::URNs::Instructor])
+            expect(membership.fetch(:status)).to eq ::IMS::LIS::Statuses::SimpleNames::Active
+            expect(membership.fetch(:role)).to match_array([::IMS::LIS::Roles::Context::URNs::Instructor])
 
             member = membership.fetch(:member)
             expect(member.fetch(:@id)).to be_nil
@@ -188,7 +188,7 @@ module Lti
             end
 
             it 'outputs the expected data in the expected format at the membership level' do
-              get 'course_index', params: { course_id: @course.id, role: IMS::LIS::ContextType::URNs::Group }
+              get 'course_index', params: { course_id: @course.id, role: ::IMS::LIS::ContextType::URNs::Group }
               hash = json_parse.with_indifferent_access
               @group.reload
               memberships = hash[:pageOf][:membershipSubject][:membership]
@@ -199,8 +199,8 @@ module Lti
 
               expect(membership.size).to eq 4
               expect(membership.fetch(:@id)).to be_nil
-              expect(membership.fetch(:status)).to eq IMS::LIS::Statuses::SimpleNames::Active
-              expect(membership.fetch(:role)).to match_array([IMS::LIS::ContextType::URNs::Group])
+              expect(membership.fetch(:status)).to eq ::IMS::LIS::Statuses::SimpleNames::Active
+              expect(membership.fetch(:role)).to match_array([::IMS::LIS::ContextType::URNs::Group])
 
               member = membership.fetch(:member)
               expect(member.fetch(:@id)).to be_nil
@@ -384,8 +384,8 @@ module Lti
 
             expect(membership.size).to eq 4
             expect(membership.fetch(:@id)).to be_nil
-            expect(membership.fetch(:status)).to eq IMS::LIS::Statuses::SimpleNames::Active
-            expect(membership.fetch(:role)).to match_array([IMS::LIS::Roles::Context::URNs::Member])
+            expect(membership.fetch(:status)).to eq ::IMS::LIS::Statuses::SimpleNames::Active
+            expect(membership.fetch(:role)).to match_array([::IMS::LIS::Roles::Context::URNs::Member])
 
             member = membership.fetch(:member)
             expect(member.fetch(:@id)).to be_nil

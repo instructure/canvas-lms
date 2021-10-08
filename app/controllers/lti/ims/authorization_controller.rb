@@ -20,7 +20,7 @@
 require 'json/jwt'
 
 module Lti
-  module Ims
+  module IMS
     # @API LTI 2 Authorization
     # @internal
     # The LTI 2 authorization server is used to retrieve an access token that can be used to access

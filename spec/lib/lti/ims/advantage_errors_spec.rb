@@ -78,70 +78,70 @@ describe 'LTI Advantage Errors' do
     end
   end
 
-  describe Lti::Ims::AdvantageErrors::AdvantageServiceError do
+  describe Lti::IMS::AdvantageErrors::AdvantageServiceError do
     let(:default_api_message) { 'Failed LTI Advantage service invocation' }
     let(:default_status_code) { :internal_server_error }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::AdvantageClientError do
+  describe Lti::IMS::AdvantageErrors::AdvantageClientError do
     let(:default_api_message) { 'Invalid LTI Advantage service invocation' }
     let(:default_status_code) { :bad_request }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidLaunchError do
+  describe Lti::IMS::AdvantageErrors::InvalidLaunchError do
     let(:default_api_message) { 'Invalid LTI launch attempt' }
     let(:default_status_code) { :bad_request }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::AdvantageSecurityError do
+  describe Lti::IMS::AdvantageErrors::AdvantageSecurityError do
     let(:default_api_message) { 'Service invocation refused' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidAccessToken do
+  describe Lti::IMS::AdvantageErrors::InvalidAccessToken do
     let(:default_api_message) { 'Invalid access token' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidAccessTokenSignature do
+  describe Lti::IMS::AdvantageErrors::InvalidAccessTokenSignature do
     let(:default_api_message) { 'Invalid access token signature' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidAccessTokenSignatureType do
+  describe Lti::IMS::AdvantageErrors::InvalidAccessTokenSignatureType do
     let(:default_api_message) { 'Access token signature algorithm not allowed' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::MalformedAccessToken do
+  describe Lti::IMS::AdvantageErrors::MalformedAccessToken do
     let(:default_api_message) { 'Invalid access token format' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims do
+  describe Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims do
     let(:default_api_message) { 'Access token contains invalid claims' }
     let(:default_status_code) { :unauthorized }
 
     it_behaves_like 'error check'
   end
 
-  describe Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter do
+  describe Lti::IMS::AdvantageErrors::InvalidResourceLinkIdFilter do
     let(:default_api_message) { 'Invalid \'rlid\' parameter' }
     let(:default_status_code) { :bad_request }
 
@@ -155,8 +155,8 @@ describe 'LTI Advantage Errors' do
       # of that tree and see if we can rescue it specifying a type at the top of that tree. (This is basically what
       # LTI Advantage controllers are expected to do.)
       begin
-        raise Lti::Ims::AdvantageErrors::InvalidAccessTokenClaims, 'message override'
-      rescue Lti::Ims::AdvantageErrors::AdvantageServiceError => error
+        raise Lti::IMS::AdvantageErrors::InvalidAccessTokenClaims, 'message override'
+      rescue Lti::IMS::AdvantageErrors::AdvantageServiceError => error
         expect(error.message).to eq('message override :: Access token contains invalid claims')
         expect(error.api_message).to eq('Access token contains invalid claims')
         expect(error.status_code).to eq(:unauthorized)

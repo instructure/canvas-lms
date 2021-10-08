@@ -1906,7 +1906,7 @@ class ApplicationController < ActionController::Base
           @prepend_template = 'assignments/lti_header' if render_external_tool_prepend_template?
           begin
             @lti_launch.params = lti_launch_params(adapter)
-          rescue Lti::Ims::AdvantageErrors::InvalidLaunchError
+          rescue Lti::IMS::AdvantageErrors::InvalidLaunchError
             return render_error_with_details(
               title: t('LTI Launch Error'),
               summary: t('There was an error launching to the configured tool.'),

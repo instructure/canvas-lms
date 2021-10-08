@@ -37,7 +37,7 @@ module Lti
 
     def process_tool_proxy_json(json:, context:, guid:, tool_proxy_to_update: nil, tc_half_shared_secret: nil, developer_key: nil, registration_url: nil)
       @tc_half_secret = tc_half_shared_secret
-      tp = IMS::LTI::Models::ToolProxy.new.from_json(json)
+      tp = ::IMS::LTI::Models::ToolProxy.new.from_json(json)
       tp.tool_proxy_guid = guid
       tcp_uuid = tp.tool_consumer_profile&.match(/tool_consumer_profile\/([a-fA-f0-9\-]+)/)&.captures&.first
       tcp_uuid ||= developer_key&.tool_consumer_profile&.uuid
@@ -170,7 +170,7 @@ module Lti
       resource_handlers = tp.tool_profile.resource_handlers
       if tp.tool_profile.messages.present?
         product_name = tp.tool_profile.product_instance.product_info.product_name
-        r = IMS::LTI::Models::ResourceHandler.new.from_json(
+        r = ::IMS::LTI::Models::ResourceHandler.new.from_json(
           {
             resource_type: { code: 'instructure.com:default' },
             resource_name: product_name

@@ -20,7 +20,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../../lti_1_3_spec_helper')
 
-describe Lti::Ims::AuthenticationController do
+describe Lti::IMS::AuthenticationController do
   include Lti::RedisMessageClient
 
   let(:developer_key) {

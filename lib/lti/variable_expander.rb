@@ -366,7 +366,7 @@ module Lti
     #   "iframe"
     #   ```
     register_expansion 'Message.documentTarget', [],
-                       -> { IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME },
+                       -> { ::IMS::LTI::Models::Messages::Message::LAUNCH_TARGET_IFRAME },
                        default_name: 'launch_presentation_document_target'
 
     # returns the current locale

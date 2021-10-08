@@ -21,7 +21,7 @@ require 'spec_helper'
 require_relative './concerns/deep_linking_spec_helper'
 
 module Lti
-  module Ims
+  module IMS
     RSpec.describe DeepLinkingController do
       include_context 'deep_linking_spec_helper'
 

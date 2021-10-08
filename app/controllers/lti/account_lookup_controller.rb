@@ -64,7 +64,7 @@ module Lti
   #     }
   #
   class AccountLookupController < ApplicationController
-    include Ims::Concerns::AdvantageServices
+    include ::Lti::IMS::Concerns::AdvantageServices
     include Api::V1::Account
 
     MIME_TYPE = 'application/vnd.canvas.accountlookup+json'.freeze

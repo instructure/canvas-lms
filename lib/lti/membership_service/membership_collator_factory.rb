@@ -23,7 +23,7 @@ module Lti
       class << self
         def collator_instance(context, user, opts)
           if context.is_a?(Course)
-            if opts[:role].present? && opts[:role].include?(IMS::LIS::ContextType::URNs::Group)
+            if opts[:role].present? && opts[:role].include?(::IMS::LIS::ContextType::URNs::Group)
               Lti::MembershipService::CourseGroupCollator.new(context, opts)
             else
               Lti::MembershipService::CourseLisPersonCollator.new(context, user, opts)

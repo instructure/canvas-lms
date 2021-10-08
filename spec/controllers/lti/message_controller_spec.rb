@@ -52,7 +52,7 @@ module Lti
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
           expect(launch_params['lti_message_type'])
-            .to eq IMS::LTI::Models::Messages::RegistrationRequest::MESSAGE_TYPE
+            .to eq ::IMS::LTI::Models::Messages::RegistrationRequest::MESSAGE_TYPE
           expect(launch_params['lti_version']).to eq 'LTI-2p0'
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
@@ -99,7 +99,7 @@ module Lti
           expect(lti_launch.resource_url).to eq 'http://tool.consumer.url'
           launch_params = lti_launch.params
           expect(launch_params['lti_message_type'])
-            .to eq IMS::LTI::Models::Messages::RegistrationRequest::MESSAGE_TYPE
+            .to eq ::IMS::LTI::Models::Messages::RegistrationRequest::MESSAGE_TYPE
           expect(launch_params['lti_version']).to eq 'LTI-2p0'
           expect(launch_params['launch_presentation_document_target']).to eq 'iframe'
           expect(launch_params['reg_key']).not_to be_empty
@@ -127,7 +127,7 @@ module Lti
     describe "GET #reregistration" do
       before(:each) do
         MessageHandler.create!(
-          message_type: IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE,
+          message_type: ::IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE,
           launch_path: 'https://samplelaunch/rereg',
           resource_handler: default_resource_handler
         )
@@ -141,7 +141,7 @@ module Lti
           lti_launch = assigns[:lti_launch]
           launch_params = lti_launch.params
           expect(launch_params[:lti_message_type])
-            .to eq IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
+            .to eq ::IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE
         end
 
         it 'sends the correct version' do
@@ -383,7 +383,7 @@ module Lti
                                                     params: { tool_launch_context: 'my_custom_context' } }
           params = assigns[:lti_launch].params
           launch_url = assigns[:lti_launch].resource_url
-          authenticator = IMS::LTI::Services::MessageAuthenticator.new(launch_url, params, tool_proxy.shared_secret)
+          authenticator = ::IMS::LTI::Services::MessageAuthenticator.new(launch_url, params, tool_proxy.shared_secret)
           expect(authenticator.valid_signature?).to eq true
         end
 
@@ -394,7 +394,7 @@ module Lti
                                                     message_handler_id: message_handler.id,
                                                     params: { tool_launch_context: 'my_custom_context' } }
           params = assigns[:lti_launch].params.stringify_keys!
-          message = IMS::LTI::Models::Messages::Message.generate(params)
+          message = ::IMS::LTI::Models::Messages::Message.generate(params)
           expect(message.post_params["roles"]).to eq ["http://purl.imsglobal.org/vocab/lis/v2/system/person#User"]
         end
 
@@ -498,7 +498,7 @@ module Lti
 
         it 'does custom variable expansion for tool settings' do
           parameters = %w(LtiLink.custom.url ToolProxyBinding.custom.url ToolProxy.custom.url).map do |key|
-            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
+            ::IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
@@ -532,7 +532,7 @@ module Lti
 
         it 'adds module item substitutions' do
           parameters = %w(Canvas.module.id Canvas.moduleItem.id).map do |key|
-            IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
+            ::IMS::LTI::Models::Parameter.new(name: key.underscore, variable: key)
           end
           message_handler.parameters = parameters.as_json
           message_handler.save
@@ -606,7 +606,7 @@ module Lti
         end
 
         it 'does only adds non-required params if they are present in enabled_capability' do
-          allow_any_instance_of(IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) { {} }
+          allow_any_instance_of(::IMS::LTI::Models::ToolProxy).to receive(:enabled_capability) { {} }
 
           get 'basic_lti_launch_request', params: { account_id: account.id, message_handler_id: message_handler.id,
                                                     params: { tool_launch_context: 'my_custom_context' } }

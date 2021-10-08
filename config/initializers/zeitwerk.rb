@@ -65,6 +65,7 @@ if CANVAS_ZEITWERK
       "dynamo_db" => "DynamoDB",
       "icu" => "ICU",
       "id_loader" => "IDLoader",
+      "ims" => "IMS",
       "inst_fs" => "InstFS",
       "ldap" => "LDAP",
       "legacy_id_interface" => "LegacyIDInterface",

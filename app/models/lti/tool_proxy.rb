@@ -115,7 +115,7 @@ module Lti
 
       if default_resource_handler
         @reregistration_message_handler ||= default_resource_handler.message_handlers
-                                                                    .by_message_types(IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE).first
+                                                                    .by_message_types(::IMS::LTI::Models::Messages::ToolProxyUpdateRequest::MESSAGE_TYPE).first
       end
       @reregistration_message_handler
     end
@@ -129,7 +129,7 @@ module Lti
     end
 
     def ims_tool_proxy
-      @_ims_tool_proxy ||= IMS::LTI::Models::ToolProxy.from_json(raw_data)
+      @_ims_tool_proxy ||= ::IMS::LTI::Models::ToolProxy.from_json(raw_data)
     end
 
     def security_profiles
