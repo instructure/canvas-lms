@@ -17,7 +17,8 @@
  */
 
 import React from 'react'
-import {waitFor} from '@testing-library/react'
+import {act, waitFor} from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 
 import {BLACKOUT_DATES, PRIMARY_PLAN} from '../../../__tests__/fixtures'
 import {renderConnected} from '../../../__tests__/utils'
@@ -33,6 +34,7 @@ const defaultProps = {
   excludeWeekends: false,
   pacePlanItem: PRIMARY_PLAN.modules[0].items[0],
   pacePlanItemPosition: 0,
+  planPublishing: false,
   blackoutDates: BLACKOUT_DATES,
   autosaving: false,
   enrollmentHardEndDatePlan: false,
@@ -47,6 +49,26 @@ const defaultProps = {
 }
 
 describe('AssignmentRow', () => {
+  it('renders the assignment title and icon of the module item', () => {
+    const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
+    expect(getByText('Basic encryption/decryption')).toBeInTheDocument()
+  })
+
+  it('renders an input that updates the duration for that module item', () => {
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} />)
+    const daysInput = getByRole('textbox', {
+      name: 'Duration for module Basic encryption/decryption'
+    }) as HTMLInputElement
+    expect(daysInput).toBeInTheDocument()
+    expect(daysInput.value).toBe('2')
+
+    userEvent.type(daysInput, '{selectall}{backspace}4')
+    act(() => daysInput.blur())
+
+    expect(setPlanItemDuration).toHaveBeenCalled()
+    expect(setPlanItemDuration).toHaveBeenCalledWith('60', 4)
+  })
+
   it('renders the projected due date if projections are being shown', () => {
     const {getByText} = renderConnected(<AssignmentRow {...defaultProps} />)
     expect(getByText('1/1/2020')).toBeInTheDocument()
@@ -57,5 +79,29 @@ describe('AssignmentRow', () => {
       <AssignmentRow {...defaultProps} datesVisible={false} showProjections={false} />
     )
     await waitFor(() => expect(queryByText('1/1/2020')).not.toBeInTheDocument())
+  })
+
+  it('renders an icon showing whether or not the module item is published', () => {
+    const publishedIcon = renderConnected(<AssignmentRow {...defaultProps} />).getByText(
+      'Published'
+    )
+    expect(publishedIcon).toBeInTheDocument()
+
+    const unpublishedProps = {
+      ...defaultProps,
+      pacePlanItem: {...defaultProps.pacePlanItem, published: false}
+    }
+    const unpublishedIcon = renderConnected(<AssignmentRow {...unpublishedProps} />).getByText(
+      'Unpublished'
+    )
+    expect(unpublishedIcon).toBeInTheDocument()
+  })
+
+  it('disables duration inputs while publishing', () => {
+    const {getByRole} = renderConnected(<AssignmentRow {...defaultProps} planPublishing />)
+    const daysInput = getByRole('textbox', {
+      name: 'Duration for module Basic encryption/decryption'
+    })
+    expect(daysInput).toHaveAttribute('disabled')
   })
 })

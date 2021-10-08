@@ -27,8 +27,9 @@ import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
 
 import {actions} from './actions/ui'
-import Header from './components/header/header'
 import Body from './components/body'
+import Footer from './components/footer'
+import Header from './components/header/header'
 import {ResponsiveSizes, StoreState} from './types'
 import {getErrorMessage, getLoadingMessage, getShowLoadingOverlay} from './reducers/ui'
 import UnpublishedChangesTrayContents from './components/unpublished_changes_tray_contents'
@@ -92,6 +93,7 @@ export const App: React.FC<ResponsiveComponentProps> = ({
           <Header handleDrawerToggle={() => setTrayOpen(!trayOpen)} />
         </View>
         <Body />
+        <Footer />
         <Tray
           label={I18n.t('Unpublished Changes tray')}
           open={trayOpen}

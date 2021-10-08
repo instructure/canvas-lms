@@ -20,12 +20,19 @@ import {CondensedButton} from '@instructure/ui-buttons'
 // @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!unpublished_changes_button_props'
 import React from 'react'
-import {getUnpublishedChangeCount} from '../reducers/pace_plans'
+import {getPacePlan, getUnpublishedChangeCount} from '../reducers/pace_plans'
 import {StoreState} from '../types'
 import {connect} from 'react-redux'
+import {getPlanPublishing} from '../reducers/ui'
+import {Spinner} from '@instructure/ui-spinner'
+import {PresentationContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 type StateProps = {
   changeCount: number
+  planPublishing: boolean
+  newPlan: boolean
 }
 
 export type UnpublishedChangesIndicatorProps = StateProps & {
@@ -48,19 +55,35 @@ const text = (changeCount: number) => {
 
 export const UnpublishedChangesIndicator = ({
   changeCount,
+  margin,
   onClick,
-  margin
-}: UnpublishedChangesIndicatorProps) =>
-  changeCount ? (
+  planPublishing,
+  newPlan
+}: UnpublishedChangesIndicatorProps) => {
+  if (newPlan) return null
+  if (planPublishing) {
+    return (
+      <View>
+        <Spinner size="x-small" margin="0 x-small 0" renderTitle={I18n.t('Publishing plan...')} />
+        <PresentationContent>
+          <Text>{I18n.t('Publishing plan...')}</Text>
+        </PresentationContent>
+      </View>
+    )
+  }
+  return changeCount ? (
     <CondensedButton onClick={onClick} margin={margin}>
       {text(changeCount)}
     </CondensedButton>
   ) : (
     <span>{text(changeCount)}</span>
   )
+}
 
 const mapStateToProps = (state: StoreState) => ({
-  changeCount: getUnpublishedChangeCount(state)
+  changeCount: getUnpublishedChangeCount(state),
+  planPublishing: getPlanPublishing(state),
+  newPlan: !getPacePlan(state)?.id
 })
 
 export default connect(mapStateToProps)(UnpublishedChangesIndicator)
