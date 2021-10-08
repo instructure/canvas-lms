@@ -110,7 +110,7 @@ describe('Assignment Details', () => {
     )
     expect(getByText('8/2/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('7/28/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available from
-    expect(getByText('8/4/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available to
+    expect(getByText('to 8/4/2019', everyoneElseOverrideSummary)).toBeInTheDocument() // Available to
 
     // Section A
     const sectionAOverrideSummary = getByText('Section A').closest(
@@ -118,7 +118,7 @@ describe('Assignment Details', () => {
     )
     expect(getByText('9/2/2019', sectionAOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('8/28/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available from
-    expect(getByText('9/4/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available to
+    expect(getByText('to 9/4/2019', sectionAOverrideSummary)).toBeInTheDocument() // Available to
 
     // Section B
     const sectionBOverrideSummary = getByText('Section B').closest(
@@ -126,7 +126,7 @@ describe('Assignment Details', () => {
     )
     expect(getByText('10/2/2019', sectionBOverrideSummary)).toBeInTheDocument() // Due Date
     expect(getByText('9/28/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available from
-    expect(getByText('10/4/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available to
+    expect(getByText('to 10/4/2019', sectionBOverrideSummary)).toBeInTheDocument() // Available to
   })
 
   /*
