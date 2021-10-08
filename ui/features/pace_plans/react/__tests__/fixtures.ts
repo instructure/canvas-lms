@@ -142,8 +142,7 @@ export const PRIMARY_PLAN: PacePlan = {
   workflow_state: 'active',
   exclude_weekends: true,
   hard_end_dates: true,
-  modules: [PLAN_MODULE_1, PLAN_MODULE_2],
-  linked_to_parent: false
+  modules: [PLAN_MODULE_1, PLAN_MODULE_2]
 }
 
 export const SECTION_PLAN: PacePlan = {
@@ -158,8 +157,7 @@ export const SECTION_PLAN: PacePlan = {
   workflow_state: 'active',
   exclude_weekends: false,
   hard_end_dates: true,
-  modules: [PLAN_MODULE_1, PLAN_MODULE_2],
-  linked_to_parent: false
+  modules: [PLAN_MODULE_1, PLAN_MODULE_2]
 }
 
 export const STUDENT_PLAN: PacePlan = {
@@ -174,8 +172,7 @@ export const STUDENT_PLAN: PacePlan = {
   workflow_state: 'active',
   exclude_weekends: true,
   hard_end_dates: true,
-  modules: [PLAN_MODULE_1, PLAN_MODULE_2],
-  linked_to_parent: false
+  modules: [PLAN_MODULE_1, PLAN_MODULE_2]
 }
 
 export interface DefaultStoreState {

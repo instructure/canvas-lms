@@ -34,6 +34,7 @@ const defaultProps = {
   courseId: COURSE.id,
   excludeWeekends: PRIMARY_PLAN.exclude_weekends,
   pacePlan: PRIMARY_PLAN,
+  planPublishing: false,
   loadLatestPlanByContext,
   setEditingBlackoutDates,
   showLoadingOverlay,
@@ -78,6 +79,15 @@ describe('Settings', () => {
     // expect(hardEndDatesToggle).not.toHaveAttribute('disabled')
     // act(() => hardEndDatesToggle.click())
     // expect(toggleHardEndDates).toHaveBeenCalled()
+  })
+
+  it('disables all settings while publishing', () => {
+    const {getByRole} = render(<Settings {...defaultProps} planPublishing />)
+    const settingsButton = getByRole('button', {name: 'Modify Settings'})
+    act(() => settingsButton.click())
+
+    const skipWeekendsToggle = screen.getByRole('checkbox', {name: 'Skip Weekends'})
+    expect(skipWeekendsToggle).toHaveAttribute('disabled')
   })
 
   // Skipped since we're not implementing this feature yet

@@ -21,16 +21,26 @@ import {UnpublishedChangesIndicator} from '../unpublished_changes_indicator'
 import React from 'react'
 import userEvent from '@testing-library/user-event'
 
+const defaultProps = {
+  changeCount: 2,
+  planPublishing: false,
+  newPlan: false
+}
+
 describe('UnpublishedChangesIndicator', () => {
   it('pluralizes and formats correctly', () => {
     expect(
-      render(<UnpublishedChangesIndicator changeCount={0} />).getByText('All changes published')
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={0} />).getByText(
+        'All changes published'
+      )
     ).toBeInTheDocument()
     expect(
-      render(<UnpublishedChangesIndicator changeCount={1} />).getByText('1 unpublished change')
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={1} />).getByText(
+        '1 unpublished change'
+      )
     ).toBeInTheDocument()
     expect(
-      render(<UnpublishedChangesIndicator changeCount={2500} />).getByText(
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={2500} />).getByText(
         '2,500 unpublished changes'
       )
     ).toBeInTheDocument()
@@ -41,14 +51,18 @@ describe('UnpublishedChangesIndicator', () => {
     beforeEach(() => (onClick = jest.fn()))
 
     it('is called when clicked if there are pending changes', () => {
-      const {getByRole} = render(<UnpublishedChangesIndicator changeCount={3} onClick={onClick} />)
+      const {getByRole} = render(
+        <UnpublishedChangesIndicator {...defaultProps} changeCount={3} onClick={onClick} />
+      )
 
       userEvent.click(getByRole('button', {name: '3 unpublished changes'}))
       expect(onClick).toHaveBeenCalled()
     })
 
     it('is not called when clicked if there are no pending changes', () => {
-      const {getByText} = render(<UnpublishedChangesIndicator changeCount={0} onClick={onClick} />)
+      const {getByText} = render(
+        <UnpublishedChangesIndicator {...defaultProps} changeCount={0} onClick={onClick} />
+      )
 
       userEvent.click(getByText('All changes published'))
       expect(onClick).not.toHaveBeenCalled()
@@ -56,6 +70,18 @@ describe('UnpublishedChangesIndicator', () => {
   })
 
   it('throws when a negative changeCount is specified', () => {
-    expect(() => render(<UnpublishedChangesIndicator changeCount={-1} />)).toThrow()
+    expect(() =>
+      render(<UnpublishedChangesIndicator {...defaultProps} changeCount={-1} />)
+    ).toThrow()
+  })
+
+  it('displays a spinner indicating ongoing publishing when planPublishing is true', () => {
+    const {getAllByText} = render(<UnpublishedChangesIndicator {...defaultProps} planPublishing />)
+    expect(getAllByText('Publishing plan...')[0]).toBeInTheDocument()
+  })
+
+  it('renders nothing if the plan has not yet been published', () => {
+    const {queryByText} = render(<UnpublishedChangesIndicator {...defaultProps} newPlan />)
+    expect(queryByText('All changes published')).not.toBeInTheDocument()
   })
 })

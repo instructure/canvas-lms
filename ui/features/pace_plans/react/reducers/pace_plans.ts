@@ -17,7 +17,7 @@
  */
 
 import {createSelector, createSelectorCreator, defaultMemoize} from 'reselect'
-import equal from 'fast-deep-equal'
+import {deepEqual} from '@instructure/ui-utils'
 
 import {Constants as PacePlanConstants, PacePlanAction} from '../actions/pace_plans'
 import pacePlanItemsReducer from './pace_plan_items'
@@ -61,7 +61,7 @@ const getModuleItems = (modules: Module[]) =>
 // The memoization equality check is potentially slower, but if the selector itself is computing
 // some complex data, it will ultimately be better to use this, otherwise you'll get unnecessary
 // calculations.
-const createDeepEqualSelector = createSelectorCreator(defaultMemoize, equal)
+const createDeepEqualSelector = createSelectorCreator(defaultMemoize, deepEqual)
 
 export const getExcludeWeekends = (state: StoreState): boolean => state.pacePlan.exclude_weekends
 export const getOriginalPlan = (state: StoreState) => state.pacePlan.originalPlan
@@ -254,8 +254,6 @@ export default (
       return {...state, start_date: DateHelpers.formatDate(action.payload)}
     case PacePlanConstants.SET_END_DATE:
       return {...state, end_date: DateHelpers.formatDate(action.payload)}
-    case PacePlanConstants.SET_UNPUBLISHED_CHANGES:
-      return {...state, unpublished_changes: action.payload}
     case PacePlanConstants.PLAN_CREATED:
       // Could use a *REFACTOR* to better handle new plans and updating the ui properly
       return {
@@ -274,8 +272,8 @@ export default (
       }
     case PacePlanConstants.TOGGLE_HARD_END_DATES:
       return {...state, hard_end_dates: !state.hard_end_dates}
-    case PacePlanConstants.SET_LINKED_TO_PARENT:
-      return {...state, linked_to_parent: action.payload}
+    case PacePlanConstants.RESET_PLAN:
+      return {...state.originalPlan, originalPlan: state.originalPlan}
     default:
       return {...state, modules: pacePlanItemsReducer(state.modules, action)}
   }
