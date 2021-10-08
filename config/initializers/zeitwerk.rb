@@ -30,14 +30,6 @@ if CANVAS_ZEITWERK
   # require 'canvas'
   # require 'canvas/plugins'
   # require 'canvas/plugins/validators'
-
-  # # TODO: Load things that are not being properly loaded by zeitwerk right now.
-  # These gems should have zeitwerk loaders created within their gem structure that
-  # follows the "for_gem" convention and inflects these properly.
-  require 'canvas_connect'
-  require 'canvas_connect/version'
-  # # in the canvas_connect gem, the "to_prepare"
-  # # block uses this.
   # require 'canvas/plugins/adobe_connect'
   require 'canvas_webex'
   require 'canvas_webex/version'
@@ -45,7 +37,8 @@ if CANVAS_ZEITWERK
   # we don't want zeitwerk to try to eager_load some
   # "Version" constant from any plugins
   Rails.autoloaders.main.ignore(
-    "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb"
+    "#{__dir__}/../../gems/plugins/simply_versioned/lib/simply_versioned/gem_version.rb",
+    "#{__dir__}/../../lib/cdc_migration_testing" # these aren't really modules we use in canvas runtime
   )
 
   Rails.autoloaders.each do |autoloader|
@@ -73,6 +66,7 @@ if CANVAS_ZEITWERK
       "saml" => "SAML",
       "sis" => "SIS",
       "sisid_loader" => "SISIDLoader",
+      "sms_presenter" => "SMSPresenter",
       "ssl_common" => "SSLCommon",
       "turnitin_id" => "TurnitinID",
       "uk_federation" => "UKFederation",
