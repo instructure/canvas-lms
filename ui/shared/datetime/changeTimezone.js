@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+const MINS = 60 * 1000
+
 function formatObject(tz) {
   return {
     year: 'numeric',
@@ -28,21 +30,32 @@ function formatObject(tz) {
   }
 }
 
-// Takes a Date object and a timezone name, and returns a new Date object
-// shifted from the browser's timezone to the specified one
-
-function changeTimezone(hereDate, desiredTZ) {
-  const thereDate = new Date(hereDate.toLocaleString('en-US', formatObject(desiredTZ)))
-  const diff = hereDate.getTime() - thereDate.getTime()
-
-  return new Date(hereDate.getTime() - diff) // needs to subtract
+//
+// Takes a Date object and an object with two optional properties,
+//    originTZ:  an origin timezone
+//    desiredTZ:  a timezone we are shiftint to
+// and returns a new Date object representing the given date in
+// the origin timezone shifted to the desired timezone
+//
+// If either timezone is unspecified or null, the browser's local
+// timezone is used
+//
+function changeTimezone(date, {originTZ = null, desiredTZ = null}) {
+  const originOffset = utcTimeOffset(date, originTZ)
+  const desiredOffset = utcTimeOffset(date, desiredTZ)
+  return new Date(date.getTime() + originOffset - desiredOffset)
 }
 
 //
 // Takes a Date object and a timezone, and returns the offset from UTC
-// for that timezone on that date.
+// for that timezone on that date. If no timezone is specified, the browser's
+// timezone is used
 //
-function utcTimeOffset(date, hereTZ) {
+function utcTimeOffset(date, hereTZ = null) {
+  if (hereTZ === null) {
+    // getTimezoneOffset returns minutes and has the "wrong" sign, sigh
+    return -date.getTimezoneOffset() * MINS
+  }
   const jsDate = date instanceof Date ? date : new Date(date)
   const hereDate = new Date(jsDate.toLocaleString('en-US', formatObject(hereTZ)))
   const utcDate = new Date(jsDate.toLocaleString('en-US', formatObject('Etc/UTC')))

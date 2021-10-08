@@ -52,6 +52,19 @@ describe('useDateTimeFormat', () => {
     expect(fmt(d)).toBe('Mon, Aug 3, 2015, 4:22:23 PM CDT')
   })
 
+  it('returns the empty string if given a null date', () => {
+    const {result} = renderHook(() => useDateTimeFormat('date.formats.medium_with_weekday'))
+    const fmt = result.current
+    expect(fmt(null)).toBe('')
+  })
+
+  it('returns the empty string if given an invalid date', () => {
+    const {result} = renderHook(() => useDateTimeFormat('nonsense'))
+    const fmt = result.current
+    const d = 'nonsense'
+    expect(fmt(d)).toBe('')
+  })
+
   it('honors the locale in ENV', () => {
     ENV.LOCALE = 'fr'
     const {result} = renderHook(() => useDateTimeFormat('date.formats.medium_with_weekday'))

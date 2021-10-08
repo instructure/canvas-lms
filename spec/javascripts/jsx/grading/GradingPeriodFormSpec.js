@@ -19,7 +19,7 @@
 import React from 'react'
 import $ from 'jquery'
 import {mount} from 'enzyme'
-import GradingPeriodForm from 'ui/features/account_grading_standards/react/GradingPeriodForm.js'
+import GradingPeriodForm from 'ui/features/account_grading_standards/react/GradingPeriodForm'
 import chicago from 'timezone/America/Chicago'
 import tz from '@canvas/timezone'
 import tzInTest from '@canvas/timezone/specHelpers'
@@ -33,7 +33,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   let wrapper
 
   suiteHooks.beforeEach(() => {
-    fakeENV.setup({CONTEXT_TIMEZONE: 'Etc/GMT+0', TIMEZONE: 'Etc/GMT+0'})
+    fakeENV.setup({CONTEXT_TIMEZONE: 'Etc/UTC', TIMEZONE: 'Etc/UTC'})
 
     gradingPeriod = {
       closeDate: new Date('2016-01-07T12:00:00Z'),
@@ -75,10 +75,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       .filterWhere(label => label.text() === inputLabel)
       .at(0)
       .instance()
-    return wrapper
-      .find(`input[aria-labelledby="${$label.id}"]`)
-      .at(0)
-      .instance()
+    return wrapper.find(`input[aria-labelledby="${$label.id}"]`).at(0).instance()
   }
 
   function getDateTimeSuggestions(inputLabel) {
@@ -91,10 +88,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   }
 
   function getInput(id) {
-    return wrapper
-      .find(`input#${id}`)
-      .at(0)
-      .instance()
+    return wrapper.find(`input#${id}`).at(0).instance()
   }
 
   function setDateInputValue(label, value) {
@@ -120,7 +114,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   QUnit.module('"Start Date" input', () => {
     test('value is set to the grading period start date', () => {
       mountComponent()
-      equal(getDateInput('Start Date').value, 'Nov 1, 2015 12pm')
+      equal(getDateInput('Start Date').value, 'Nov 1, 2015, 12:00 PM')
     })
 
     QUnit.module('when local and server time are different', hooks => {
@@ -131,7 +125,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tzData: {
             'America/Chicago': chicago
           },
-          formats: getI18nFormats(),
+          formats: getI18nFormats()
         })
         mountComponent()
       })
@@ -145,19 +139,14 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       test('formats the start date for the local timezone', () => {
         const $suggestions = getDateTimeSuggestions('Start Date')
         // Local is GMT
-        strictEqual($suggestions[0].textContent, 'Local: Sun Nov 1, 2015 12:00pm')
+        strictEqual($suggestions[0].textContent, 'Local: Sun, Nov 1, 2015, 12:00 PM')
       })
 
       test('formats the start date for the context timezone', () => {
         const $suggestions = getDateTimeSuggestions('Start Date')
         // Course is in Chicago
-        strictEqual($suggestions[1].textContent, 'Account: Sun Nov 1, 2015 6:00am')
+        strictEqual($suggestions[1].textContent, 'Account: Sun, Nov 1, 2015, 6:00 AM')
       })
-    })
-
-    test('does not show local and server time for start date when they are the same', () => {
-      mountComponent()
-      strictEqual(getDateTimeSuggestions('Start Date').length, 0)
     })
 
     test('does not alter the seconds value when emitting the new date', () => {
@@ -172,7 +161,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   QUnit.module('"End Date" input', () => {
     test('value is set to the grading period end date', () => {
       mountComponent()
-      equal(getDateInput('End Date').value, 'Dec 31, 2015 12pm')
+      equal(getDateInput('End Date').value, 'Dec 31, 2015, 12:00 PM')
     })
 
     /* eslint-disable-next-line qunit/no-identical-names */
@@ -184,7 +173,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tzData: {
             'America/Chicago': chicago
           },
-          formats: getI18nFormats(),
+          formats: getI18nFormats()
         })
         mountComponent()
       })
@@ -198,24 +187,19 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       test('formats the end date for the local timezone', () => {
         const $suggestions = getDateTimeSuggestions('End Date')
         // Local is GMT
-        strictEqual($suggestions[0].textContent, 'Local: Thu Dec 31, 2015 12:00pm')
+        strictEqual($suggestions[0].textContent, 'Local: Thu, Dec 31, 2015, 12:00 PM')
       })
 
       test('formats the end date for the context timezone', () => {
         const $suggestions = getDateTimeSuggestions('End Date')
         // Course is in Chicago
-        strictEqual($suggestions[1].textContent, 'Account: Thu Dec 31, 2015 6:00am')
+        strictEqual($suggestions[1].textContent, 'Account: Thu, Dec 31, 2015, 6:00 AM')
       })
-    })
-
-    test('does not show local and server time for end date when they are the same', () => {
-      mountComponent()
-      strictEqual(getDateTimeSuggestions('End Date').length, 0)
     })
 
     test('sets the seconds value to 59 when emitting the updated date', () => {
       mountComponent()
-      setDateInputValue('End Date', 'Dec 31, 2015 11pm')
+      setDateInputValue('End Date', 'Dec 31, 2015, 11:00 PM')
 
       const endDate = tz.parse(wrapper.state().period.endDate)
       strictEqual(tz.format(endDate, '%S'), '59')
@@ -225,7 +209,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
   QUnit.module('"Close Date" input', () => {
     test('value is set to the grading period close date for an existing grading period', () => {
       mountComponent()
-      equal(getDateInput('Close Date').value, 'Jan 7, 2016 12pm')
+      equal(getDateInput('Close Date').value, 'Jan 7, 2016, 12:00 PM')
     })
 
     /* eslint-disable-next-line qunit/no-identical-names */
@@ -237,7 +221,7 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
           tzData: {
             'America/Chicago': chicago
           },
-          formats: getI18nFormats(),
+          formats: getI18nFormats()
         })
         mountComponent()
       })
@@ -251,13 +235,13 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       test('formats the close date for the local timezone', () => {
         const $suggestions = getDateTimeSuggestions('Close Date')
         // Local is GMT
-        strictEqual($suggestions[0].textContent, 'Local: Thu Jan 7, 2016 12:00pm')
+        strictEqual($suggestions[0].textContent, 'Local: Thu, Jan 7, 2016, 12:00 PM')
       })
 
       test('formats the close date for the context timezone', () => {
         const $suggestions = getDateTimeSuggestions('Close Date')
         // Course is in Chicago
-        strictEqual($suggestions[1].textContent, 'Account: Thu Jan 7, 2016 6:00am')
+        strictEqual($suggestions[1].textContent, 'Account: Thu, Jan 7, 2016, 6:00 AM')
       })
     })
 
@@ -265,34 +249,36 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       props.period = null
       mountComponent()
       setDateInputValue('End Date', 'Dec 31, 2015 12pm')
-      equal(getDateInput('Close Date').value, 'Dec 31, 2015 12pm')
+      equal(getDateInput('Close Date').value, 'Dec 31, 2015, 12:00 PM')
     })
 
     test('updates to match "End Date" when currently matching "End Date" and "End Date" changes', () => {
       props.period.closeDate = props.period.endDate
       mountComponent()
       setDateInputValue('End Date', 'Dec 31, 2015 12pm')
-      equal(getDateInput('Close Date').value, 'Dec 31, 2015 12pm')
+      equal(getDateInput('Close Date').value, 'Dec 31, 2015, 12:00 PM')
     })
 
     test('does not update when not set equal to "End Date" and "End Date" changes', () => {
       mountComponent()
       setDateInputValue('End Date', 'Dec 31, 2015 12pm')
-      equal(getDateInput('Close Date').value, 'Jan 7, 2016 12pm')
+      equal(getDateInput('Close Date').value, 'Jan 7, 2016, 12:00 PM')
     })
 
-    test('does not update when "End Date" changes to match and changes again', () => {
+    test('does not update when "End Date" changes to match and changes again', async () => {
       mountComponent()
       setDateInputValue('End Date', 'Jan 7, 2016 12pm')
       setDateInputValue('End Date', 'Dec 31, 2015 12pm')
-      equal(getDateInput('Close Date').value, 'Jan 7, 2016 12pm')
+      await new Promise(resolve => setTimeout(resolve, 0))
+      equal(getDateInput('Close Date').value, 'Jan 7, 2016, 12:00 PM')
     })
 
-    test('updates to match "End Date" after being cleared and "End Date" changes', () => {
+    test('updates to match "End Date" after being cleared and "End Date" changes', async () => {
       mountComponent()
       setDateInputValue('Close Date', '')
-      setDateInputValue('End Date', 'Dec 31, 2015 12pm')
-      equal(getDateInput('Close Date').value, 'Dec 31, 2015 12pm')
+      setDateInputValue('End Date', 'Dec 31, 2015 12:34')
+      await new Promise(resolve => setTimeout(resolve, 0))
+      equal(getDateInput('Close Date').value, 'Dec 31, 2015, 12:34 PM')
     })
 
     test('sets the seconds value to 59 when emitting the updated date', () => {
@@ -300,7 +286,8 @@ QUnit.module('GradingPeriodForm', suiteHooks => {
       setDateInputValue('Close Date', 'Dec 31, 2015 11pm')
 
       const closeDate = tz.parse(wrapper.state().period.closeDate)
-      strictEqual(tz.format(closeDate, '%S'), '59')
+      const fmtr = new Intl.DateTimeFormat('en', {second: 'numeric'})
+      strictEqual(fmtr.format(closeDate), '59')
     })
   })
 

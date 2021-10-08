@@ -159,15 +159,15 @@ describe "admin_tools" do
           expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from the beginning to now.")
           # Search with begin date and end date - should show time actually being used
           perform_user_search("#commMessagesSearchForm", @student.id)
-          set_value f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001'
-          set_value f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001'
+          replace_and_proceed(f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001')
+          replace_and_proceed(f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001')
           f('.userDateRangeSearchModal .userDateRangeSearchBtn').click
           wait_for_ajaximations
           expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 12am to Mar 9, 2001 at 12am.")
           # Search with begin date/time and end date/time - should use and show given time
           perform_user_search("#commMessagesSearchForm", @student.id)
-          set_value f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001 1:05p'
-          set_value f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001 3p'
+          replace_and_proceed(f('.userDateRangeSearchModal .dateStartSearchField'), 'Mar 3, 2001 1:05p')
+          replace_and_proceed(f('.userDateRangeSearchModal .dateEndSearchField'), 'Mar 9, 2001 3p')
           f('.userDateRangeSearchBtn').click
           wait_for_ajaximations
           expect(f('#commMessagesSearchOverview').text).to include("Notifications sent to #{@student.name} from Mar 3, 2001 at 1:05pm to Mar 9, 2001 at 3pm.")

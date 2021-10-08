@@ -14,6 +14,9 @@ import $ from 'jquery'
 import './core'
 import './widget'
 
+// This code is so old it basically fails all our linter rules so why bother
+/* eslint-disable */
+
 $.extend($.ui, { datepicker: { version: "@VERSION" } });
 
 var PROP_NAME = 'datepicker';
@@ -1294,16 +1297,22 @@ $.extend(Datepicker.prototype, {
 		if (inst.input.val() == inst.lastVal) {
 			return;
 		}
+		const iso = inst.input.data('iso8601');
 		var dateFormat = this._get(inst, 'dateFormat');
 		var dates = inst.lastVal = inst.input ? inst.input.val() : null;
 		var date, defaultDate;
 		date = defaultDate = this._getDefaultDate(inst);
 		var settings = this._getFormatConfig(inst);
-		try {
-			date = this.parseDate(dateFormat, dates, settings) || defaultDate;
-		} catch (event) {
-			this.log(event);
-			dates = (noDefault ? '' : dates);
+		if (iso) {
+			date = new Date(iso);
+		} else {
+			console.warn('WARNING datepicker is probably going to parse wrong (no ISO string available)!')
+			try {
+				date = this.parseDate(dateFormat, dates, settings) || defaultDate;
+			} catch (event) {
+				this.log(event);
+				dates = (noDefault ? '' : dates);
+			}
 		}
 		inst.selectedDay = date.getDate();
 		inst.drawMonth = inst.selectedMonth = date.getMonth();
@@ -1847,4 +1856,4 @@ $.datepicker.version = "@VERSION";
 // Add another global to avoid noConflict issues with inline event handlers
 window['DP_jQuery_' + dpuuid] = $;
 
-
+/* eslint-enable */

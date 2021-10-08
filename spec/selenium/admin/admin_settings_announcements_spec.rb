@@ -124,8 +124,8 @@ describe "settings tabs" do
 
         f("#account_notification_subject").send_keys("some name")
         type_in_tiny "textarea", "this is a message"
-        f("#account_notification_start_at").send_keys(2.days.from_now.to_date.to_s)
-        f("#account_notification_end_at").send_keys(3.days.from_now.to_date.to_s)
+        replace_and_proceed(f("#account_notification_start_at"), 2.days.from_now.to_date.to_s)
+        replace_and_proceed(f("#account_notification_end_at"), 3.days.from_now.to_date.to_s)
 
         f("label[for=account_notification_send_message]").click
         submit_form("#add_notification_form")

@@ -23,7 +23,7 @@ const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
 const glob = require('glob')
-const { promisify } = require('util')
+const {promisify} = require('util')
 const testWebpackConfig = require('./frontend_build/baseWebpackConfig')
 
 const CONTEXT_COFFEESCRIPT_SPEC = 'spec/coffeescripts'
@@ -50,19 +50,21 @@ testWebpackConfig.plugins.push(
     RESOURCE_COFFEESCRIPT_SPEC,
     RESOURCE_EMBER_GRADEBOOK_SPEC,
     RESOURCE_JSX_SPEC,
-    WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS),
+    WEBPACK_PLUGIN_SPECS: JSON.stringify(WEBPACK_PLUGIN_SPECS)
   })
 )
 
-testWebpackConfig.plugins.push(new webpack.EnvironmentPlugin({
-  JSPEC_PATH: null,
-  JSPEC_GROUP: null,
-  JSPEC_RECURSE: '1',
-  JSPEC_VERBOSE: '0',
-  A11Y_REPORT: false,
-  SENTRY_DSN: null,
-  GIT_COMMIT: null
-}))
+testWebpackConfig.plugins.push(
+  new webpack.EnvironmentPlugin({
+    JSPEC_PATH: null,
+    JSPEC_GROUP: null,
+    JSPEC_RECURSE: '1',
+    JSPEC_VERBOSE: '0',
+    A11Y_REPORT: false,
+    SENTRY_DSN: null,
+    GIT_COMMIT: null
+  })
+)
 
 const getAllFiles = (dirPath, arrayOfFiles, callback) => {
   const files = fs.readdirSync(dirPath)
@@ -116,13 +118,17 @@ if (process.env.JSPEC_GROUP) {
       const allFiles = []
 
       getAllFiles(CONTEXT_COFFEESCRIPT_SPEC, allFiles, filePath => {
-        const relativePath = filePath.replace(CONTEXT_COFFEESCRIPT_SPEC, '.').replace(/\.(coffee|js)$/, '')
+        const relativePath = filePath
+          .replace(CONTEXT_COFFEESCRIPT_SPEC, '.')
+          .replace(/\.(coffee|js)$/, '')
 
         return RESOURCE_COFFEESCRIPT_SPEC.test(relativePath) ? relativePath : null
       })
 
       getAllFiles(CONTEXT_EMBER_GRADEBOOK_SPEC, allFiles, filePath => {
-        const relativePath = filePath.replace(CONTEXT_EMBER_GRADEBOOK_SPEC, '.').replace(/\.(coffee|js)$/, '')
+        const relativePath = filePath
+          .replace(CONTEXT_EMBER_GRADEBOOK_SPEC, '.')
+          .replace(/\.(coffee|js)$/, '')
 
         return RESOURCE_EMBER_GRADEBOOK_SPEC.test(relativePath) ? relativePath : null
       })
@@ -133,20 +139,16 @@ if (process.env.JSPEC_GROUP) {
     ignoreResource = (resource, context) => {
       return (
         (context.endsWith(CONTEXT_JSX_SPEC) && RESOURCE_JSX_SPEC.test(resource)) ||
-        (
-          partitions &&
-            context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) &&
-            RESOURCE_COFFEESCRIPT_SPEC.test(resource) &&
-            !isPartitionMatch(resource, partitions, nodeIndex)
-        ) ||
-        (
-          partitions &&
-            context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) &&
-            // FIXME: Unlike the other specs, webpack is including the suffix
-            (resource = resource.replace(/\.(coffee|js)$/, '')) &&
-            RESOURCE_EMBER_GRADEBOOK_SPEC.test(resource) &&
-            !isPartitionMatch(resource, partitions, nodeIndex)
-        )
+        (partitions &&
+          context.endsWith(CONTEXT_COFFEESCRIPT_SPEC) &&
+          RESOURCE_COFFEESCRIPT_SPEC.test(resource) &&
+          !isPartitionMatch(resource, partitions, nodeIndex)) ||
+        (partitions &&
+          context.endsWith(CONTEXT_EMBER_GRADEBOOK_SPEC) &&
+          // FIXME: Unlike the other specs, webpack is including the suffix
+          (resource = resource.replace(/\.(coffee|js)$/, '')) &&
+          RESOURCE_EMBER_GRADEBOOK_SPEC.test(resource) &&
+          !isPartitionMatch(resource, partitions, nodeIndex))
       )
     }
   } else if (process.env.JSPEC_GROUP === 'jsa') {
@@ -206,55 +208,62 @@ if (process.env.JSPEC_GROUP) {
 }
 
 if (process.env.SENTRY_DSN) {
-  const SentryCliPlugin = require('@sentry/webpack-plugin');
-  testWebpackConfig.plugins.push(new SentryCliPlugin({
-    release: process.env.GIT_COMMIT,
-    include: [
-      path.resolve(__dirname, 'ui'),
-      path.resolve(__dirname, 'spec/javascripts/jsx'),
-      path.resolve(__dirname, 'spec/coffeescripts')
-    ],
-    ignore: [
-      path.resolve(__dirname, 'public/javascripts/translations'),
-      /bower\//
-    ]
-  }));
+  const SentryCliPlugin = require('@sentry/webpack-plugin')
+  testWebpackConfig.plugins.push(
+    new SentryCliPlugin({
+      release: process.env.GIT_COMMIT,
+      include: [
+        path.resolve(__dirname, 'ui'),
+        path.resolve(__dirname, 'spec/javascripts/jsx'),
+        path.resolve(__dirname, 'spec/coffeescripts')
+      ],
+      ignore: [path.resolve(__dirname, 'public/javascripts/translations'), /bower\//]
+    })
+  )
 }
 
 class PluginSpecsRunner {
-  constructor({ pattern, outfile }) {
+  constructor({pattern, outfile}) {
     this.pattern = pattern
     this.outfile = outfile
   }
 
   apply(compiler) {
     compiler.hooks.beforeCompile.tapAsync('PluginSpecsRunner', (_, callback) => {
-      glob(this.pattern, { absolute: true }, (e, files) => {
-        if (e) { return callback(e) }
+      glob(this.pattern, {absolute: true}, (e, files) => {
+        if (e) {
+          return callback(e)
+        }
 
-        fs.writeFile(
-          this.outfile,
-          files.map(x => `require("${x}")`).join('\n'),
-          'utf8',
-          callback
-        )
+        fs.writeFile(this.outfile, files.map(x => `require("${x}")`).join('\n'), 'utf8', callback)
       })
     })
   }
 }
 
-testWebpackConfig.plugins.push(new PluginSpecsRunner({
-  pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
-  outfile: WEBPACK_PLUGIN_SPECS
-}))
+testWebpackConfig.plugins.push(
+  new PluginSpecsRunner({
+    pattern: 'gems/plugins/*/spec_canvas/coffeescripts/**/*Spec.js',
+    outfile: WEBPACK_PLUGIN_SPECS
+  })
+)
 
-testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(__dirname, CONTEXT_EMBER_GRADEBOOK_SPEC)
-testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(__dirname, CONTEXT_COFFEESCRIPT_SPEC)
+testWebpackConfig.resolve.alias[CONTEXT_EMBER_GRADEBOOK_SPEC] = path.resolve(
+  __dirname,
+  CONTEXT_EMBER_GRADEBOOK_SPEC
+)
+testWebpackConfig.resolve.alias[CONTEXT_COFFEESCRIPT_SPEC] = path.resolve(
+  __dirname,
+  CONTEXT_COFFEESCRIPT_SPEC
+)
 testWebpackConfig.resolve.alias[CONTEXT_JSX_SPEC] = path.resolve(__dirname, CONTEXT_JSX_SPEC)
 testWebpackConfig.resolve.alias['spec/jsx'] = path.resolve(__dirname, 'spec/javascripts/jsx')
 testWebpackConfig.resolve.alias['ui/features'] = path.resolve(__dirname, 'ui/features')
 testWebpackConfig.resolve.alias['ui/ext'] = path.resolve(__dirname, 'ui/ext')
-testWebpackConfig.resolve.alias['ui/boot/initializers'] = path.resolve(__dirname, 'ui/boot/initializers')
+testWebpackConfig.resolve.alias['ui/boot/initializers'] = path.resolve(
+  __dirname,
+  'ui/boot/initializers'
+)
 testWebpackConfig.resolve.extensions.push('.coffee')
 testWebpackConfig.resolve.modules.push(path.resolve(__dirname, 'spec/coffeescripts'))
 testWebpackConfig.mode = 'development'
@@ -271,9 +280,7 @@ testWebpackConfig.module.rules.unshift({
   // These imports loaders make it so they are avalable as local variables
   // inside of a closure, without truly making them globals.
   // We should get rid of this and just change our actual source to s/test/qunit.test/ and s/module/qunit.module/
-  loaders: [
-    'imports-loader?test=>QUnit.test',
-  ]
+  loaders: ['imports-loader?test=>QUnit.test']
 })
 
 module.exports = testWebpackConfig
