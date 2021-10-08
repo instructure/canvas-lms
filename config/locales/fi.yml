@@ -6976,7 +6976,7 @@ fi:
       yesterday: Eilen
     dow_offset: 1
     formats: 
-      date_at_time: "%b %-d kohteessa %l:%M%P"
+      date_at_time: "%b %-d, %Y klo %l:%M%P"
       default: "%Y-%m-%d"
       full: "%b %-d, %Y %-l:%M%P"
       full_with_weekday: "%a %b %-d, %Y %-l:%M%P"
