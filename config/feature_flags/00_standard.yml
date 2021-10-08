@@ -15,8 +15,12 @@ analytics_2:
   state: hidden
   applies_to: Course
   display_name: New Course and User Analytics
-  description: Show new analytics for course and user data. Data may take 24 hours
-    to appear in New Analytics after setting this feature flag to ON.
+  description:
+    wrapper: <a href="https://community.canvaslms.com/t5/New-Analytics-Users/gh-p/analytics">\1</a>
+    new_analytics_description: Show new analytics for course and user data. Data
+      may take 24 hours to appear in New Analytics after setting this feature flag
+      to ON. For full details, please see the *New Analytics user group* in the Canvas
+      Community.
   after_state_change_proc: analytics_2_after_state_change_hook
 anonymous_instructor_annotations:
   type: setting
