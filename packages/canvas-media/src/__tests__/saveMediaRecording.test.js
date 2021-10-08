@@ -232,6 +232,27 @@ describe('saveClosedCaptions', () => {
     return expect(successPromise).rejects.toMatchObject({response: {status: 500}})
   })
 
+  describe('when the CC file size is too large', () => {
+    let mediaId, fileAndLanguage
+
+    const subject = () => saveClosedCaptions(mediaId, [fileAndLanguage], rcsConfig, 1)
+
+    beforeEach(() => {
+      mediaId = '4'
+      fileAndLanguage = {
+        language: {selectedOptionId: 'en'},
+        file: new Blob(['file contents'], {type: 'text/plain'}),
+        isNew: true
+      }
+    })
+
+    it('rejects with a "file size" error', () => {
+      subject()
+        .then(() => {})
+        .catch(e => expect(e.name).toEqual('FileSizeError'))
+    })
+  })
+
   it('calls canvas api if rcsConfig.origin is not provided', () => {
     delete rcsConfig.origin
     delete rcsConfig.headers

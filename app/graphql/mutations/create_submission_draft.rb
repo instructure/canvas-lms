@@ -33,8 +33,11 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
   argument :active_submission_type, Types::DraftableSubmissionType, required: true
   argument :attempt, Integer, required: false
   argument :body, String, required: false
+  argument :external_tool_id, ID, required: false
   argument :file_ids, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('Attachment')
+  argument :lti_launch_url, String, required: false
   argument :media_id, ID, required: false
+  argument :resource_link_lookup_uuid, String, required: false
   argument :submission_id, ID, required: true, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Submission')
   argument :url, String, required: false
 
@@ -60,6 +63,19 @@ class Mutations::CreateSubmissionDraft < Mutations::BaseMutation
     #       the active submission.
     submission_draft.active_submission_type = input[:active_submission_type]
     case input[:active_submission_type]
+    when 'basic_lti_launch'
+      raise SubmissionError if input[:lti_launch_url].blank? || input[:external_tool_id].blank?
+
+      external_tool = ContextExternalTool.find_external_tool(
+        input[:lti_launch_url],
+        submission.course,
+        input[:external_tool_id]
+      )
+      raise SubmissionError, I18n.t("no matching external tool found") if external_tool.blank?
+
+      submission_draft.context_external_tool_id = external_tool.id
+      submission_draft.lti_launch_url = input[:lti_launch_url]
+      submission_draft.resource_link_lookup_uuid = input[:resource_link_lookup_uuid]
     when 'media_recording'
       submission_draft.media_object_id = input[:media_id]
     when 'online_text_entry'

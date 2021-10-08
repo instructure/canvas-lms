@@ -22,8 +22,7 @@ import {mount, shallow} from 'enzyme'
 import SectionTooltip from '../index'
 
 const defaultProps = () => ({
-  sections: [{id: 2, name: 'sections name', user_count: 4}],
-  totalUserCount: 5
+  sections: [{id: 2, name: 'sections name', user_count: 4}]
 })
 
 test('renders the SectionTooltip component', () => {
@@ -33,8 +32,8 @@ test('renders the SectionTooltip component', () => {
 
 test('renders the correct section text', () => {
   const tree = mount(<SectionTooltip {...defaultProps()} />)
-  const node = tree.find('Button Text')
-  expect(node.text()).toBe('1 Sectionsections name')
+  const node = tree.find('Text')
+  expect(node.first().text()).toBe('1 Sectionsections name')
   const screenReaderNode = tree.find('ScreenReaderContent')
   expect(screenReaderNode.text()).toBe('sections name')
 })
@@ -43,7 +42,7 @@ test('renders all sections if no sections are given', () => {
   const props = defaultProps()
   props.sections = null
   const tree = mount(<SectionTooltip {...props} />)
-  const node = tree.find('Button Text')
+  const node = tree.find('Text')
   expect(node.text()).toBe('All Sections')
 })
 
@@ -70,14 +69,10 @@ test('renders multiple sections into tooltip', () => {
   ).toBe('section other name (8 Users)')
 })
 
-test('renders tooltip text correcly without', () => {
+test('does not renders tooltip text when All Sections', () => {
   const props = defaultProps()
   props.sections = null
   const tree = shallow(<SectionTooltip {...props} />)
   const node = tree.find('Tooltip')
-  expect(
-    mount(node.prop('tip'))
-      .find('View Text')
-      .text()
-  ).toBe('(5 Users)')
+  expect(node).toEqual({})
 })

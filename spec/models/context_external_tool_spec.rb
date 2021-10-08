@@ -1564,6 +1564,30 @@ describe ContextExternalTool do
       expect(tool.editor_button).not_to eq nil
     end
 
+    context 'placement enabled setting' do
+      context 'when placement has enabled defined' do
+        before do
+          tool.course_navigation = { enabled: false }
+          tool.save
+        end
+
+        it 'includes enabled from placement' do
+          expect(tool.course_navigation[:enabled]).to be false
+        end
+      end
+
+      context 'when placement does not have enabled defined' do
+        before do
+          tool.course_navigation = { text: 'hello world' }
+        end
+
+        it "includes enabled: true" do
+          expect(tool.course_navigation[:enabled]).to be true
+        end
+      end
+    end
+
+
     describe "display_type" do
       it "is 'in_context' by default" do
         expect(tool.display_type(:course_navigation)).to eq 'in_context'
@@ -1619,6 +1643,68 @@ describe ContextExternalTool do
           set_visibility('members')
           set_visibility(nil)
           expect(tool.file_menu.key?(:visibility)).to be false
+        end
+      end
+    end
+  end
+
+  describe '#setting_with_default_enabled' do
+    let(:tool) do
+      t = external_tool_model(context: @root_account)
+      t.settings = settings
+      t.save
+      t
+    end
+
+    subject do
+      tool.setting_with_default_enabled(type)
+    end
+
+    context 'when settings does not contain type' do
+      let(:settings) { { oauth_compliant: true } }
+      let(:type) { :course_navigation }
+
+      it 'returns nil' do
+        expect(subject).to be_nil
+      end
+    end
+
+    context 'when settings contains type' do
+      context 'when type is not a placement' do
+        let(:settings) { { oauth_compliant: true } }
+        let(:type) { :oauth_compliant }
+
+        it 'returns settings[type]' do
+          expect(subject).to eq settings[type]
+        end
+      end
+
+      context 'when type is a placement' do
+        let(:type) { :course_navigation }
+
+        context 'when type configuration defines `enabled`' do
+          let(:settings) do
+            {
+              course_navigation: { enabled: false, text: 'hello world' }
+            }
+          end
+
+          it 'returns settings[type]' do
+            expect(subject).to eq settings[type].with_indifferent_access
+          end
+        end
+
+        context 'when type configuration does not define `enabled`' do
+          let(:settings) do
+            {
+              course_navigation: { text: 'hello world' }
+            }
+          end
+
+          it 'returns settings[type] with enabled: true' do
+            expect(subject[:enabled]).to be true
+            expect(subject.except(:enabled)).to eq settings[type].with_indifferent_access
+          end
         end
       end
     end

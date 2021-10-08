@@ -753,57 +753,97 @@ QUnit.module('Gradebook#makeColumnSortFn', {
   }
 })
 
-QUnit.module('Gradebook#rowFilter', {
-  setup() {
-    this.gradebook = createGradebook()
-    this.student = {
+QUnit.module('Gradebook#rowFilter', contextHooks => {
+  let gradebook
+  let student
+
+  contextHooks.beforeEach(() => {
+    student = {
+      id: '1',
       login_id: 'charlie.xi@example.com',
       name: 'Charlie Xi',
       short_name: 'Chuck Xi',
       sortable_name: 'Xi, Charlie',
       sis_user_id: '123456789'
     }
-  }
-})
+  })
 
-test('returns true when search term matches the student name', function () {
-  this.gradebook.userFilterTerm = 'charlie Xi'
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+  QUnit.module('when gradebook_assignment_search_and_redesign is enabled', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook({gradebook_assignment_search_and_redesign: true})
+    })
 
-test('returns true when search term matches the student login id', function () {
-  this.gradebook.userFilterTerm = 'example.com'
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+    test('ignores the userFilterTerm', () => {
+      gradebook.userFilterTerm = 'charlie Xi'
+      gradebook.filteredStudentIds = ['2']
+      strictEqual(gradebook.rowFilter(student), false)
+    })
 
-test('returns true when search term matches the student short name', function () {
-  this.gradebook.userFilterTerm = 'chuck'
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+    test('returns true when filtered students include the student', () => {
+      gradebook.filteredStudentIds = ['1']
+      strictEqual(gradebook.rowFilter(student), true)
+    })
 
-test('returns true when search term matches the student sortable name', function () {
-  this.gradebook.userFilterTerm = 'Xi, Charlie'
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+    test('returns false when filtered students do not include the student', () => {
+      gradebook.filteredStudentIds = ['2']
+      strictEqual(gradebook.rowFilter(student), false)
+    })
 
-test('returns true when search term matches the student sis id', function () {
-  this.gradebook.userFilterTerm = '123456789'
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+    test('returns true when not filtering students (never filtered)', () => {
+      strictEqual(gradebook.rowFilter(student), true)
+    })
 
-test('returns false when search term does not match', function () {
-  this.gradebook.userFilterTerm = 'Betty'
-  strictEqual(this.gradebook.rowFilter(this.student), false)
-})
+    test('returns true when not filtering students (originally filtered and then cleared filters)', () => {
+      gradebook.filteredStudentIds = []
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+  })
 
-test('returns true when not filtering by a search term', function () {
-  this.gradebook.userFilterTerm = ''
-  strictEqual(this.gradebook.rowFilter(this.student), true)
-})
+  QUnit.module('when gradebook_assignment_search_and_redesign is disabled', hooks => {
+    hooks.beforeEach(() => {
+      gradebook = createGradebook()
+    })
 
-test('returns true when search term is not defined', function () {
-  this.gradebook.userFilterTerm = null
-  strictEqual(this.gradebook.rowFilter(this.student), true)
+    test('returns true when search term matches the student name', () => {
+      gradebook.userFilterTerm = 'charlie Xi'
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns true when search term matches the student login id', () => {
+      gradebook.userFilterTerm = 'example.com'
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns true when search term matches the student short name', () => {
+      gradebook.userFilterTerm = 'chuck'
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns true when search term matches the student sortable name', () => {
+      gradebook.userFilterTerm = 'Xi, Charlie'
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns true when search term matches the student sis id', () => {
+      gradebook.userFilterTerm = '123456789'
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns false when search term does not match', () => {
+      gradebook.userFilterTerm = 'Betty'
+      strictEqual(gradebook.rowFilter(student), false)
+    })
+
+    test('returns true when not filtering by a search term', () => {
+      gradebook.userFilterTerm = ''
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+
+    test('returns true when search term is not defined', () => {
+      gradebook.userFilterTerm = null
+      strictEqual(gradebook.rowFilter(student), true)
+    })
+  })
 })
 
 QUnit.module('Gradebook#compareAssignmentNames', {
@@ -1456,6 +1496,7 @@ QUnit.module(
 )
 
 test('does not render old set up/search field', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
   this.gradebook.renderStudentSearchFilter([])
   const input = document.querySelector('#search-filter-container input')
   strictEqual(input.disabled, false, 'input is not disabled')
@@ -1463,9 +1504,42 @@ test('does not render old set up/search field', function () {
 })
 
 test('renders Student Names label', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
   this.gradebook.renderStudentSearchFilter([])
   const studentSearch = document.querySelector('#gradebook-student-search')
   ok(studentSearch.textContent.includes('Student Names'))
+})
+
+test('enables the input if there is at least one student to filter by', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  const studentSearchInput = document.getElementById('student-names-filter')
+  notOk(studentSearchInput.disabled)
+})
+
+test('disables the input if the grid has not yet rendered', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('pending')
+  this.gradebook.renderStudentSearchFilter([{id: '1', name: 'Joe Dirt'}])
+  const studentSearchInput = document.getElementById('student-names-filter')
+  ok(studentSearchInput.disabled)
+})
+
+test('disables the input if there are no students to filter by', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  this.gradebook.renderStudentSearchFilter([])
+  const studentSearchInput = document.getElementById('student-names-filter')
+  ok(studentSearchInput.disabled)
+})
+
+test('displays a select menu option for each student', function () {
+  sinon.stub(this.gradebook.gridReady, 'state').returns('resolved')
+  const student = {id: '1', name: 'Joe Dirt', loaded: true, isPlaceholder: false}
+  this.gradebook.renderStudentSearchFilter([student])
+  const studentSearchInput = document.getElementById('student-names-filter')
+  studentSearchInput.click()
+  const options = [...document.querySelectorAll('ul[role="listbox"] li span[role="option"]')]
+  ok(options.some(option => option.textContent === student.name))
+  studentSearchInput.click() // close the menu to avoid DOM test pollution
 })
 
 QUnit.module(

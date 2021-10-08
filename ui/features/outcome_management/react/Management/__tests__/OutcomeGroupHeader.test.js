@@ -27,8 +27,8 @@ describe('OutcomeGroupHeader', () => {
   const defaultProps = (props = {}) =>
     merge(
       {
-        title: 'Group 3',
-        description: 'Description',
+        title: 'Group Title',
+        description: 'Group Description',
         onMenuHandler: onMenuHandlerMock,
         canManage: true,
         hideOutcomesView: hideOutcomesViewMock
@@ -53,7 +53,7 @@ describe('OutcomeGroupHeader', () => {
 
   it('renders Outcome Group custom title when title prop provided', () => {
     const {getByText} = render(<OutcomeGroupHeader {...defaultProps()} />)
-    expect(getByText('Group 3 Outcomes')).toBeInTheDocument()
+    expect(getByText('Group Title Outcomes')).toBeInTheDocument()
   })
 
   it('renders Outcome Group default title when title prop not provided', () => {
@@ -66,7 +66,7 @@ describe('OutcomeGroupHeader', () => {
       const {getByText} = render(<OutcomeGroupHeader {...defaultProps({})} />)
       const actions = ['Edit', 'Remove', 'Move']
       actions.forEach(action => {
-        fireEvent.click(getByText('Outcome Group Menu'))
+        fireEvent.click(getByText('Menu for group Group Title'))
         fireEvent.click(getByText(action))
       })
       expect(onMenuHandlerMock).toHaveBeenCalledTimes(3)
@@ -74,7 +74,7 @@ describe('OutcomeGroupHeader', () => {
 
     it('does not render OutcomeKebabMenu when canManage is false', () => {
       const {queryByText} = render(<OutcomeGroupHeader {...defaultProps({canManage: false})} />)
-      expect(queryByText('Outcome Group Menu')).not.toBeInTheDocument()
+      expect(queryByText('Menu for group Group Title')).not.toBeInTheDocument()
     })
   })
 
@@ -85,7 +85,7 @@ describe('OutcomeGroupHeader', () => {
 
     it('renders the group title', () => {
       const {getByText} = renderWithContext(<OutcomeGroupHeader {...defaultProps()} />)
-      expect(getByText('Group 3')).toBeInTheDocument()
+      expect(getByText('Group Title')).toBeInTheDocument()
     })
 
     it('renders a caret', () => {

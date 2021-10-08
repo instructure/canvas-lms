@@ -242,30 +242,12 @@ export function enhanceUserContent() {
       )
 
       if ($link.hasClass('instructure_scribd_file')) {
-        if (ENV.FEATURES?.rce_better_file_previewing) {
-          if ($link.hasClass('inline_disabled')) {
-            // link opens in overlay
-            $link.addClass('preview_in_overlay')
-          } else {
-            // link opens inline preview
-            $link.addClass('file_preview_link')
-          }
-        } else if (!$link.hasClass('inline_disabled')) {
-          $preview_link = $(`
-          <a
-          class='file_preview_link'
-          aria-hidden='true'
-          href='${htmlEscape($link.attr('href'))}'
-          title='${htmlEscape(I18n.t('titles.preview_document', 'Preview the document'))}'
-          style='margin-inline-start: 5px;'>
-            <img
-            src='/images/preview.png'
-            alt='${htmlEscape(I18n.t('titles.preview_document', 'Preview the document'))}' />
-            <span class="screenreader-only">
-                ${htmlEscape(I18n.t('Preview %{filename}', {filename}))}
-              </span>
-          </a>
-          `)
+        if ($link.hasClass('inline_disabled')) {
+          // link opens in overlay
+          $link.addClass('preview_in_overlay')
+        } else {
+          // link opens inline preview
+          $link.addClass('file_preview_link')
         }
       }
       $link.removeClass('instructure_file_link')
@@ -555,11 +537,7 @@ $(function () {
       return
     }
     $link.loadingImage({image_size: 'small', horizontal: 'right!'})
-    if (ENV.FEATURES?.rce_better_file_previewing) {
-      $link.attr('aria-expanded', 'true')
-    } else {
-      $link.hide()
-    }
+    $link.attr('aria-expanded', 'true')
     $.ajaxJSON(
       $link
         .attr('href')
@@ -575,9 +553,7 @@ $(function () {
           attachment &&
           ($.isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
         ) {
-          const $div = window.ENV?.FEATURES.rce_better_file_previewing
-            ? $(`[id="${$link.attr('aria-controls')}"]`)
-            : $link.parent().find('[role="region"][id^="preview_"]')
+          const $div = $(`[id="${$link.attr('aria-controls')}"]`)
           $div.css('display', 'block').loadDocPreview({
             canvadoc_session_url: attachment.canvadoc_session_url,
             mimeType: attachment.content_type,
@@ -612,34 +588,32 @@ $(function () {
       }
     )
   })
-  if (ENV.FEATURES?.rce_better_file_previewing) {
-    $('a.preview_in_overlay').live('click', event => {
-      let target = null
-      if (event.target.href) {
-        target = event.target
-      } else if (event.currentTarget?.href) {
-        target = event.currentTarget
+  $('a.preview_in_overlay').live('click', event => {
+    let target = null
+    if (event.target.href) {
+      target = event.target
+    } else if (event.currentTarget?.href) {
+      target = event.currentTarget
+    }
+    const matches = target?.href.match(/\/files\/(\d+)/)
+    if (matches) {
+      if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+        // if any modifier keys are pressed, do the browser default thing
+        return
       }
-      const matches = target?.href.match(/\/files\/(\d+)/)
-      if (matches) {
-        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
-          // if any modifier keys are pressed, do the browser default thing
-          return
-        }
-        event.preventDefault()
-        const url = new URL(target.href)
-        const verifier = url?.searchParams.get('verifier')
-        const file_id = matches[1]
-        import('../react/showFilePreview')
-          .then(module => {
-            module.showFilePreview(file_id, verifier)
-          })
-          .catch(_err => {
-            $.flashError(I18n.t('Something went wrong loading the file previewer.'))
-          })
-      }
-    })
-  }
+      event.preventDefault()
+      const url = new URL(target.href)
+      const verifier = url?.searchParams.get('verifier')
+      const file_id = matches[1]
+      import('../react/showFilePreview')
+        .then(module => {
+          module.showFilePreview(file_id, verifier)
+        })
+        .catch(_err => {
+          $.flashError(I18n.t('Something went wrong loading the file previewer.'))
+        })
+    }
+  })
   // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
   let enhanceUserContentTimeout
   $.subscribe('userContent/change', () => {

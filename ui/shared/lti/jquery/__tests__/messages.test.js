@@ -16,53 +16,85 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {ltiMessageHandler} from '../messages'
-import $ from 'jquery'
+import {ltiMessageHandler, ltiState} from '../messages'
+import $ from '@canvas/rails-flash-notifications'
+
+const requestFullWindowLaunchMessage = {
+  subject: 'requestFullWindowLaunch',
+  data: 'http://localhost/test'
+}
+
+const reactDevToolsBridge = {
+  data: 'http://localhost/test',
+  source: 'react-devtools-bridge'
+}
+
+function postMessageEvent(data, origin, source) {
+  return {
+    data,
+    origin,
+    source: source || {postMessage: jest.fn()}
+  }
+}
 
 describe('ltiMessageHander', () => {
-  /* eslint-disable no-console */
-  const oldLog = console.log
-  const oldError = console.error
-
-  const logMock = jest.fn()
-  const errorMock = jest.fn()
-
-  beforeEach(() => {
-    console.log = logMock
-    console.error = errorMock
+  it('does not handle unparseable messages from window.postMessage', async () => {
+    const wasCalled = await ltiMessageHandler(postMessageEvent('abcdef'))
+    expect(wasCalled).toBeFalsy()
   })
 
-  afterEach(() => {
-    console.log = oldLog
-    console.error = oldError
-    jest.restoreAllMocks()
-  })
-  /* eslint-enable no-console */
-
-  it('does not log unparseable messages from window.postMessage', () => {
-    ltiMessageHandler({data: 'abcdef'})
-    expect(logMock).not.toHaveBeenCalled()
-    expect(errorMock).not.toHaveBeenCalled()
-  })
-
-  it('does not log ignored messages from window.postMessage', () => {
-    ltiMessageHandler({data: JSON.stringify({a: 'b', c: 'd'})})
-    ltiMessageHandler({data: {abc: 'def'}})
-    expect(logMock).not.toHaveBeenCalled()
-    expect(errorMock).not.toHaveBeenCalled()
-  })
-
-  it('handles parseable messages from window.postMessage', () => {
+  it('handles parseable messages from window.postMessage', async () => {
     const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler({data: JSON.stringify({subject: 'lti.screenReaderAlert', body: 'Hi'})})
+    await ltiMessageHandler(postMessageEvent({subject: 'lti.screenReaderAlert', body: 'Hi'}))
     expect(flashMessage).toHaveBeenCalledWith('Hi')
   })
 
-  it('prevents html from being passed to screenReaderFlashMessageExclusive', () => {
-    const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
-    ltiMessageHandler({
-      data: JSON.stringify({subject: 'lti.screenReaderAlert', body: {html: 'abc'}})
+  describe('when a whitelisted event is processed', () => {
+    let oldLocation
+
+    beforeEach(() => {
+      oldLocation = window.location
+      delete window.location
+      window.location = {assign: jest.fn()}
     })
-    expect(flashMessage).toHaveBeenCalledWith('{"html":"abc"}')
+
+    afterEach(() => {
+      window.location = oldLocation
+    })
+
+    it('attempts to call the message handler', async () => {
+      ENV.context_asset_string = 'account_1'
+      const wasCalled = await ltiMessageHandler(postMessageEvent(requestFullWindowLaunchMessage))
+      expect(wasCalled).toBeTruthy()
+    })
+  })
+
+  describe('when a non-whitelisted event is processed', () => {
+    it('does not error nor attempt to call the message handler', async () => {
+      const wasCalled = await ltiMessageHandler(postMessageEvent({subject: 'notSupported'}))
+      expect(wasCalled).toBeFalsy()
+    })
+  })
+
+  describe('when an ignored event is processed', () => {
+    it('does not attempt to call the message handler', async () => {
+      const wasCalled = await ltiMessageHandler(
+        postMessageEvent({subject: 'LtiDeepLinkingResponse'})
+      )
+      expect(wasCalled).toBeFalsy()
+    })
+  })
+
+  describe('when source is react-dev-tools', () => {
+    it('does not attempt to call the message handler', async () => {
+      const wasCalled = await ltiMessageHandler(postMessageEvent(reactDevToolsBridge))
+      expect(wasCalled).toBeFalsy()
+    })
+  })
+})
+
+describe('ltiState', () => {
+  it('is empty initially', () => {
+    expect(ltiState).toEqual({})
   })
 })

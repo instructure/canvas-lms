@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {connect} from 'react-redux'
+// @ts-ignore: TS doesn't understand i18n scoped imports
 import I18n from 'i18n!pace_plans_projected_dates'
 
 import {Flex} from '@instructure/ui-flex'
@@ -50,7 +51,7 @@ export const ProjectedDates: React.FC<ComponentProps> = ({
       <View as="div">
         <Flex as="section" alignItems="start" margin="0 0 small">
           <StartDateSelector />
-          <View margin="0 0 0 small">
+          <View margin="0 0 0 medium">
             <EndDateSelector />
           </View>
         </Flex>

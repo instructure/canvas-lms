@@ -215,7 +215,7 @@ module CanvasCassandra
     def keyspace
       db.keyspace.to_s.dup.force_encoding('UTF-8')
     end
-    alias :name :keyspace
+    alias_method :name, :keyspace
 
     protected
 

@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import clickCallback from '../clickCallback'
+import clickCallback, {handleUpload} from '../clickCallback'
 import {getAllByLabelText} from '@testing-library/react'
+import FileSizeError from '@instructure/canvas-media/src/shared/FileSizeError'
 
 const fauxEditor = {
   settings: {
@@ -27,6 +28,31 @@ const fauxEditor = {
     }
   }
 }
+
+describe('handleUpload()', () => {
+  let error, uploadData, onUploadComplete, uploadBookmark
+
+  const subject = () => handleUpload(error, uploadData, onUploadComplete, uploadBookmark)
+
+  beforeEach(() => {
+    onUploadComplete = jest.fn()
+  })
+
+  describe('with a file size error', () => {
+    beforeEach(() => {
+      error = new FileSizeError({maxBytes: 1, actualBytes: 2})
+    })
+
+    it('calls onUploadComplete with the file size error', () => {
+      subject()
+      expect(onUploadComplete).toHaveBeenCalledWith(
+        'Size of caption file is greater than the maximum 0.001 kb allowed file size.',
+        uploadData
+      )
+    })
+  })
+})
+
 describe('Instructure Media Plugin: clickCallback', () => {
   let trayProps
   beforeEach(() => {

@@ -86,5 +86,55 @@ describe PacePlanPresenter do
       expect(second_module_item[:module_item_type]).to eq('Assignment')
       expect(second_module_item[:published]).to eq(true)
     end
+
+    it 'returns necessary data if the pace plan is only instantiated' do
+      pace_plan = @course.pace_plans.new
+      @course.context_module_tags.each do |module_item|
+        pace_plan.pace_plan_module_items.new module_item: module_item, duration: 0
+      end
+      formatted_plan = PacePlanPresenter.new(pace_plan).as_json
+
+      expect(formatted_plan[:id]).to eq(pace_plan.id)
+      expect(formatted_plan[:context_id]).to eq(pace_plan.course_id)
+      expect(formatted_plan[:context_type]).to eq('Course')
+      expect(formatted_plan[:course_id]).to eq(pace_plan.course_id)
+      expect(formatted_plan[:course_section_id]).to eq(pace_plan.course_section_id)
+      expect(formatted_plan[:user_id]).to eq(pace_plan.user_id)
+      expect(formatted_plan[:workflow_state]).to eq(pace_plan.workflow_state)
+      expect(formatted_plan[:start_date]).to eq(pace_plan.start_date)
+      expect(formatted_plan[:end_date]).to eq(pace_plan.end_date)
+      expect(formatted_plan[:exclude_weekends]).to eq(pace_plan.exclude_weekends)
+      expect(formatted_plan[:hard_end_dates]).to eq(pace_plan.hard_end_dates)
+      expect(formatted_plan[:created_at]).to eq(pace_plan.created_at)
+      expect(formatted_plan[:updated_at]).to eq(pace_plan.updated_at)
+      expect(formatted_plan[:published_at]).to eq(pace_plan.published_at)
+      expect(formatted_plan[:root_account_id]).to eq(pace_plan.root_account_id)
+      expect(formatted_plan[:modules].size).to eq(2)
+
+      first_module = formatted_plan[:modules].first
+      expect(first_module[:name]).to eq(@mod1.name)
+      expect(first_module[:position]).to eq(1)
+      expect(first_module[:items].size).to eq(1)
+      first_module_item = first_module[:items].first
+      expect(first_module_item[:assignment_title]).to eq(@a1.name)
+      expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:published]).to eq(true)
+
+      second_module = formatted_plan[:modules].second
+      expect(second_module[:name]).to eq(@mod2.name)
+      expect(second_module[:position]).to eq(2)
+      expect(second_module[:items].size).to eq(2)
+      first_module_item = second_module[:items].first
+      expect(first_module_item[:assignment_title]).to eq(@a2.name)
+      expect(first_module_item[:position]).to eq(1)
+      expect(first_module_item[:module_item_type]).to eq('Assignment')
+      expect(first_module_item[:published]).to eq(false)
+      second_module_item = second_module[:items].second
+      expect(second_module_item[:assignment_title]).to eq(@a3.name)
+      expect(second_module_item[:position]).to eq(2)
+      expect(second_module_item[:module_item_type]).to eq('Assignment')
+      expect(second_module_item[:published]).to eq(true)
+    end
   end
 end

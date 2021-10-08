@@ -87,8 +87,8 @@ describe('HomeroomPage', () => {
   })
 
   describe('start a new subject button', () => {
-    it('is not present if createPermissions is set to none', () => {
-      const {queryByText} = render(<HomeroomPage {...getProps({createPermissions: 'none'})} />)
+    it('is not present if createPermissions is set to null', () => {
+      const {queryByText} = render(<HomeroomPage {...getProps({createPermissions: null})} />)
       expect(queryByText('Open new subject modal')).not.toBeInTheDocument()
     })
 

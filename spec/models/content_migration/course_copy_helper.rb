@@ -65,7 +65,7 @@ shared_examples_for "course copy" do
   def run_import(export_attachment_id)
     @cm.set_default_settings
     @cm.migration_type = 'canvas_cartridge_importer'
-    worker = Canvas::Migration::Worker::CCWorker.new
+    worker = CC::Importer::CCWorker.new
     @cm.attachment_id = export_attachment_id
     @cm.skip_job_progress = true
     worker.perform(@cm)

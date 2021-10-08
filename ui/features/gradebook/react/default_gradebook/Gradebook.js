@@ -82,6 +82,7 @@ import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import * as FlashAlert from '@canvas/alerts/react/FlashAlert'
 import {deferPromise} from 'defer-promise'
+import MultiSelectSearchInput from './components/MultiSelectSearchInput'
 import TextSearchInput from './components/TextSearchInput'
 import '@canvas/jquery/jquery.ajaxJSON'
 import '@canvas/datetime'
@@ -256,6 +257,7 @@ class Gradebook extends React.Component {
     this.switchTotalDisplay = this.switchTotalDisplay.bind(this)
     this.togglePointsOrPercentTotals = this.togglePointsOrPercentTotals.bind(this)
     this.onUserFilterInputStudents = this.onUserFilterInputStudents.bind(this)
+    this.onFilterToStudents = this.onFilterToStudents.bind(this)
     this.onUserFilterInputAssignments = this.onUserFilterInputAssignments.bind(this)
     this.renderStudentSearchFilter = this.renderStudentSearchFilter.bind(this)
     this.renderAssignmentSearchFilter = this.renderAssignmentSearchFilter.bind(this)
@@ -643,7 +645,10 @@ class Gradebook extends React.Component {
       // Preload the Grade Detail Tray
       AsyncComponents.loadGradeDetailTray()
       this.renderViewOptionsMenu()
-      return this.renderGradebookSettingsModal()
+      this.renderGradebookSettingsModal()
+      this.renderStudentSearchFilter(
+        this.courseContent.students.listStudents({includePlaceholders: false})
+      )
     })
   }
 
@@ -867,9 +872,16 @@ class Gradebook extends React.Component {
     if (this.isFilteringRowsBySearchTerm()) {
       // When filtering, students cannot be matched until loaded. The grid must
       // be re-rendered more aggressively to ensure new rows are inserted.
-      return this.buildRows()
+      this.buildRows()
     } else {
-      return this.gradebookGrid.render()
+      this.gradebookGrid.render()
+    }
+
+    const searchFilterStudents = this.courseContent.students.listStudents({
+      includePlaceholders: false
+    })
+    if (this._gridHasRendered() && searchFilterStudents.length > 0) {
+      this.renderStudentSearchFilter(searchFilterStudents)
     }
   }
 
@@ -1156,6 +1168,11 @@ class Gradebook extends React.Component {
     if (!this.isFilteringRowsBySearchTerm()) {
       return true
     }
+
+    if (this.options.gradebook_assignment_search_and_redesign) {
+      return this.filteredStudentIds.includes(student.id)
+    }
+
     const propertiesToMatch = ['name', 'login_id', 'short_name', 'sortable_name', 'sis_user_id']
     const pattern = new RegExp(this.userFilterTerm, 'i')
     return _.some(propertiesToMatch, function (prop) {
@@ -2010,7 +2027,9 @@ class Gradebook extends React.Component {
     if (this.contentLoadStates.contextModulesLoaded) {
       this.updateModulesFilterVisibility()
     }
-    this.renderStudentSearchFilter(this.courseContent.students.listStudents())
+    this.renderStudentSearchFilter(
+      this.courseContent.students.listStudents({includePlaceholders: false})
+    )
     this.renderAssignmentSearchFilter(this.assignments)
   }
 
@@ -2142,16 +2161,24 @@ class Gradebook extends React.Component {
     return this.buildRows()
   }
 
+  onFilterToStudents(studentIds) {
+    this.filteredStudentIds = studentIds
+    this.buildRows()
+  }
+
   renderStudentSearchFilter(students) {
     if (this.options.gradebook_assignment_search_and_redesign) {
-      const mountPoint = document.getElementById('gradebook-student-search')
       const props = {
+        id: 'student-names-filter',
+        disabled: students.length === 0 || !this._gridHasRendered(),
         label: I18n.t('Student Names'),
-        readonly: students.length === 0,
-        onChange: this.onUserFilterInputStudents,
+        onChange: this.onFilterToStudents,
+        options: students.map(student => ({id: student.id, text: student.name})),
         placeholder: I18n.t('Search Students')
       }
-      renderComponent(TextSearchInput, mountPoint, props)
+
+      const mountPoint = document.getElementById('gradebook-student-search')
+      renderComponent(MultiSelectSearchInput, mountPoint, props)
     } else {
       if (!this.userFilter) {
         const opts = {el: '#search-filter-container input'}
@@ -2162,6 +2189,7 @@ class Gradebook extends React.Component {
         this.userFilter = new InputFilterView(opts)
         this.userFilter.on('input', this.onUserFilterInputStudents)
       }
+
       const disabled =
         !this.contentLoadStates.studentsLoaded || !this.contentLoadStates.submissionsLoaded
       this.userFilter.el.disabled = disabled
@@ -3627,6 +3655,10 @@ class Gradebook extends React.Component {
   }
 
   isFilteringRowsBySearchTerm() {
+    if (this.options.gradebook_assignment_search_and_redesign) {
+      return this.filteredStudentIds != null && this.filteredStudentIds.length > 0
+    }
+
     return this.userFilterTerm != null && this.userFilterTerm !== ''
   }
 

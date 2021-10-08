@@ -1683,6 +1683,32 @@ class User < ActiveRecord::Base
     set_preference(:closed_notifications, closed.uniq)
   end
 
+  def unread_submission_annotations?(submission)
+    !!get_preference(:unread_submission_annotations, submission.global_id)
+  end
+
+  def mark_submission_annotations_unread!(submission)
+    set_preference(:unread_submission_annotations, submission.global_id, true)
+  end
+
+  def mark_submission_annotations_read!(submission)
+    # this will delete the user_preference_value
+    set_preference(:unread_submission_annotations, submission.global_id, nil)
+  end
+
+  def unread_rubric_comments?(submission)
+    !!get_preference(:unread_rubric_comments, submission.global_id)
+  end
+
+  def mark_rubric_comments_unread!(submission)
+    set_preference(:unread_rubric_comments, submission.global_id, true)
+  end
+
+  def mark_rubric_comments_read!(submission)
+    # this will delete the user_preference_value
+    set_preference(:unread_rubric_comments, submission.global_id, nil)
+  end
+
   def prefers_high_contrast?
     !!feature_enabled?(:high_contrast)
   end
@@ -3223,5 +3249,19 @@ class User < ActiveRecord::Base
 
   def pronouns=(pronouns)
     write_attribute(:pronouns, untranslate_pronouns(pronouns))
+  end
+
+  def create_courses_right(account)
+    return :admin if account.cached_account_users_for(self).any? do |au|
+                       au.has_permission_to?(account, :manage_courses) || au.has_permission_to?(account, :manage_courses_add)
+                     end
+    return nil if fake_student? || account.root_account.site_admin?
+
+    scope = account.root_account.enrollments.active.where(user_id: self)
+    return :teacher if account.root_account.teachers_can_create_courses? && scope.exists?(type: %w[TeacherEnrollment DesignerEnrollment])
+    return :student if account.root_account.students_can_create_courses? && scope.exists?(type: %w[StudentEnrollment ObserverEnrollment])
+    return :no_enrollments if account.root_account.no_enrollments_can_create_courses? && !scope.exists?
+
+    nil
   end
 end

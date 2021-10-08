@@ -20,13 +20,13 @@
 
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
 
-describe Canvas::Migration::Worker::CCWorker do
+describe CC::Importer::CCWorker do
   it "sets the worker_class on the migration" do
     cm = ContentMigration.create!(:migration_settings => { :converter_class => CC::Importer::Canvas::Converter,
                                                            :no_archive_file => true }, :context => course_factory)
     cm.reset_job_progress
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
-    worker = Canvas::Migration::Worker::CCWorker.new(cm.id)
+    worker = CC::Importer::CCWorker.new(cm.id)
     expect(worker.perform()).to eq true
     expect(cm.reload.migration_settings[:worker_class]).to eq 'CC::Importer::Canvas::Converter'
   end
@@ -35,7 +35,7 @@ describe Canvas::Migration::Worker::CCWorker do
     cm = ContentMigration.create!(:migration_settings => { :converter_class => CC::Importer::Canvas::Converter,
                                                            :no_archive_file => true, :skip_job_progress => true }, :context => course_factory)
     expect_any_instance_of(CC::Importer::Canvas::Converter).to receive(:export).and_return({})
-    worker = Canvas::Migration::Worker::CCWorker.new(cm.id)
+    worker = CC::Importer::CCWorker.new(cm.id)
     expect(worker.perform()).to eq true
     expect(cm.skip_job_progress).to be_truthy
   end

@@ -222,7 +222,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when max members enrollments was reached in a course' do
       before do
-        stub_const('MicrosoftSync::SyncerSteps::MAX_ENROLLMENT_MEMBERS', 3)
+        stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_MEMBERS', 3)
       end
 
       it_should_behave_like 'max of members enrollment reached', 3
@@ -230,7 +230,7 @@ describe MicrosoftSync::SyncerSteps do
 
     context 'when max owners enrollments was reached in a course' do
       before do
-        stub_const('MicrosoftSync::SyncerSteps::MAX_ENROLLMENT_OWNERS', 1)
+        stub_const('MicrosoftSync::MembershipDiff::MAX_ENROLLMENT_OWNERS', 1)
       end
 
       it_behaves_like 'max of owners enrollment reached', 1

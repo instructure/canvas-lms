@@ -83,7 +83,6 @@ export function PostMessage({...props}) {
                 style={{
                   fontSize: theme.variables.typography[responsiveProps.messageTextSize]
                 }}
-                className="no-margin"
               >
                 <SearchSpan
                   isIsolatedView={props.isIsolatedView}

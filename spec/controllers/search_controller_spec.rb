@@ -205,6 +205,9 @@ describe SearchController do
       @c1 = course_factory(course_name: 'foo', active_course: true)
       @c2 = course_factory(course_name: 'bar', active_course: true)
       @c2.update_attribute(:indexed, true)
+      ra = @c1.root_account
+      ra.settings[:enable_course_catalog] = true
+      ra.save!
     end
 
     it "returns indexed courses" do
@@ -226,6 +229,14 @@ describe SearchController do
     it "does not cache XHR requests" do
       get 'all_courses', xhr: true
       expect(response.headers["Pragma"]).to eq "no-cache"
+    end
+
+    it "401s if the course catalog is disabled" do
+      ra = @c1.root_account
+      ra.settings[:enable_course_catalog] = false
+      ra.save!
+      get 'all_courses', format: :json
+      expect(response.status).to eq 401
     end
   end
 end

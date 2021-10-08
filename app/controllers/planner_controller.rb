@@ -57,6 +57,11 @@ class PlannerController < ApplicationController
   #   parameter. The format of this field is the context type, followed by an underscore,
   #   followed by the context id. For example: course_42, group_123
   #
+  # @argument observed_user_id [String]
+  #   Return planner items for the given observed user. Must be accompanied by context_codes[].
+  #   The user making the request must be observing the observed user in all the courses specified by
+  #   context_codes[].
+  #
   # @argument filter [String, "new_activity"]
   #   Only return items that have new or unread activity
   #
@@ -152,6 +157,14 @@ class PlannerController < ApplicationController
     if params.key?(:user_id)
       @user = api_find(User, params[:user_id])
       return render_unauthorized_action unless @user == @current_user || @user.grants_right?(@current_user, session, :read_as_parent)
+    elsif params.key?(:observed_user_id)
+      return render_unauthorized_action if !params.key?(:context_codes) || params[:context_codes].empty?
+
+      @user = api_find(User, params[:observed_user_id])
+      # observers can only specify course context_codes
+      course_ids = Course.find_all_by_asset_string(params[:context_codes]).pluck(:id)
+      valid_course_ids = @current_user.observer_enrollments.active.where(associated_user_id: params[:observed_user_id]).shard(@current_user).pluck(:course_id)
+      return render_unauthorized_action unless (course_ids - valid_course_ids).empty?
     else
       @user = @current_user
     end

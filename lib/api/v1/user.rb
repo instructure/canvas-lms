@@ -89,6 +89,10 @@ module Api::V1::User
       if includes.include?('avatar_url') && user.account.service_enabled?(:avatars)
         json[:avatar_url] = avatar_url_for_user(user)
       end
+
+      json[:last_name] = user.last_name if includes.include?('last_name')
+      json[:first_name] = user.first_name if includes.include?('first_name')
+
       if enrollments
         json[:enrollments] = enrollments.map do |e|
           enrollment_json(e, current_user, session, includes: includes, excludes: excludes, opts: enrollment_json_opts)

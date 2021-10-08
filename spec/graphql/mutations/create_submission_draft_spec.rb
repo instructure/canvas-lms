@@ -36,8 +36,11 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     active_submission_type: nil,
     attempt: nil,
     body: nil,
+    external_tool_id: nil,
     file_ids: [],
+    lti_launch_url: nil,
     media_id: nil,
+    resource_link_lookup_uuid: nil,
     url: nil
   )
     <<~GQL
@@ -47,8 +50,11 @@ RSpec.describe Mutations::CreateSubmissionDraft do
           #{"activeSubmissionType: #{active_submission_type}" if active_submission_type}
           #{"attempt: #{attempt}" if attempt}
           #{"body: \"#{body}\"" if body}
+          #{"externalToolId: \"#{external_tool_id}\"" if external_tool_id}
           fileIds: #{file_ids}
+          #{"ltiLaunchUrl: \"#{lti_launch_url}\"" if lti_launch_url}
           #{"mediaId: \"#{media_id}\"" if media_id}
+          #{"resourceLinkLookupUuid: \"#{resource_link_lookup_uuid}\"" if resource_link_lookup_uuid}
           #{"url: \"#{url}\"" if url}
         }) {
           submissionDraft {
@@ -60,9 +66,14 @@ RSpec.describe Mutations::CreateSubmissionDraft do
               displayName
             }
             body
+            externalTool {
+              _id
+            }
+            ltiLaunchUrl
             mediaObject {
               _id
             }
+            resourceLinkLookupUuid
             url
           }
           errors {
@@ -331,6 +342,75 @@ RSpec.describe Mutations::CreateSubmissionDraft do
     expect(
       result.dig(:data, :createSubmissionDraft, :submissionDraft, :submissionAttempt)
     ).to eq 1
+  end
+
+  context "when saving a basic_lti_launch draft" do
+    let(:external_tool) do
+      @submission.course.context_external_tools.create!(
+        consumer_key: "aaaa",
+        domain: "somewhere",
+        name: "some tool",
+        shared_secret: "zzzz"
+      )
+    end
+
+    it "throws an error if an lti_launch_url is not included" do
+      result = run_mutation(submission_id: @submission.id, active_submission_type: "basic_lti_launch", attempt: 1)
+      expect(result.dig(:data, :createSubmissionDraft, :errors, 0, :message)).to eq "SubmissionError"
+    end
+
+    it "throws an error if external_tool_id is not included" do
+      result = run_mutation(
+        active_submission_type: "basic_lti_launch",
+        attempt: 1,
+        lti_launch_url: "http://localhost/some-url",
+        submission_id: @submission.id
+      )
+      expect(result.dig(:data, :createSubmissionDraft, :errors, 0, :message)).to eq "SubmissionError"
+    end
+
+    it "throws an error if a matching external tool cannot be found" do
+      allow(ContextExternalTool).to receive(:find_external_tool).and_return(nil)
+      result = run_mutation(
+        active_submission_type: "basic_lti_launch",
+        attempt: 1,
+        external_tool_id: external_tool.id + 1,
+        lti_launch_url: "http://localhost/some-url",
+        submission_id: @submission.id
+      )
+      expect(result.dig(:data, :createSubmissionDraft, :errors, 0, :message)).to eq "no matching external tool found"
+    end
+
+    it "saves the draft if lti_launch_url is present and external_tool_id points to a valid tool" do
+      allow(ContextExternalTool).to receive(:find_external_tool).and_return(external_tool)
+      result = run_mutation(
+        active_submission_type: "basic_lti_launch",
+        attempt: 1,
+        external_tool_id: external_tool.id,
+        lti_launch_url: "http://localhost/some-url",
+        submission_id: @submission.id
+      )
+
+      aggregate_failures do
+        expect(result.dig(:data, :createSubmissionDraft, :submissionDraft, :activeSubmissionType)).to eq "basic_lti_launch"
+        expect(result.dig(:data, :createSubmissionDraft, :submissionDraft, :ltiLaunchUrl)).to eq "http://localhost/some-url"
+        expect(result.dig(:data, :createSubmissionDraft, :submissionDraft, :externalTool, :_id)).to eq external_tool.id.to_s
+      end
+    end
+
+    it "optionally saves a resource_link_lookup_uuid" do
+      allow(ContextExternalTool).to receive(:find_external_tool).and_return(external_tool)
+      uuid = SecureRandom.uuid
+      result = run_mutation(
+        active_submission_type: "basic_lti_launch",
+        attempt: 1,
+        external_tool_id: external_tool.id,
+        lti_launch_url: "http://localhost/some-url",
+        resource_link_lookup_uuid: uuid,
+        submission_id: @submission.id
+      )
+      expect(result.dig(:data, :createSubmissionDraft, :submissionDraft, :resourceLinkLookupUuid)).to eq uuid
+    end
   end
 
   context 'when dup records exist' do

@@ -20,7 +20,7 @@
 
 module Types
   class AuditLogsType < ApplicationObjectType
-    alias dynamo object
+    alias_method :dynamo, :object
 
     field :mutation_logs, MutationLogType.connection_type, null: true do
       description "A list of all recent graphql mutations run on the specified object"
